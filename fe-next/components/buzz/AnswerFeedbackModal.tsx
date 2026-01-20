@@ -4,11 +4,13 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { formatValidAnswers } from '@/utils/buzz/answerValidation';
 
 interface AnswerFeedbackModalProps {
   isOpen: boolean;
   isCorrect: boolean;
   correctAnswer: string;
+  alternatives?: string[];
   userAnswer: string;
   points: number;
   trendingContext?: string;
@@ -27,6 +29,7 @@ export default function AnswerFeedbackModal({
   isOpen,
   isCorrect,
   correctAnswer,
+  alternatives,
   userAnswer,
   points,
   trendingContext,
@@ -124,7 +127,7 @@ export default function AnswerFeedbackModal({
                     {t('buzz.feedback.answerWas')}
                   </div>
                   <div className="text-2xl font-black text-white uppercase">
-                    {correctAnswer}
+                    {formatValidAnswers(correctAnswer, alternatives)}
                   </div>
                 </div>
               )}

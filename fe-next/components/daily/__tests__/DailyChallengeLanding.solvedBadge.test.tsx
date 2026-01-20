@@ -15,6 +15,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 // Mock the hooks and utilities
 jest.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: jest.fn(() => false),
+  getWordHuntStatusToday: jest.fn(() => null), // null = not played yet
 }));
 
 jest.mock('@/utils/guestManager', () => ({
@@ -112,9 +113,9 @@ describe('DailyChallengeLanding Solved Badge', () => {
     });
   });
 
-  test('solved badge should have data-testid for easy selection', async () => {
+  test('won badge should have data-testid for easy selection', async () => {
     const storage = require('@/utils/dailyChallenge/storage');
-    storage.hasPlayedToday.mockReturnValue(true);
+    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
@@ -126,16 +127,16 @@ describe('DailyChallengeLanding Solved Badge', () => {
 
     // Wait for component to update status
     await waitFor(() => {
-      const solvedBadge = screen.getByTestId('solved-badge');
-      expect(solvedBadge).toBeInTheDocument();
+      const wonBadge = screen.getByTestId('won-badge');
+      expect(wonBadge).toBeInTheDocument();
     }, { timeout: 2000 });
 
-    storage.hasPlayedToday.mockReturnValue(false);
+    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
-  test('solved badge should contain Check icon', async () => {
+  test('won badge should contain Check icon', async () => {
     const storage = require('@/utils/dailyChallenge/storage');
-    storage.hasPlayedToday.mockReturnValue(true);
+    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
@@ -143,21 +144,21 @@ describe('DailyChallengeLanding Solved Badge', () => {
       currentLanguage: 'en' as const,
     };
 
-    const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
+    renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     await waitFor(() => {
-      const solvedBadge = screen.getByTestId('solved-badge');
+      const wonBadge = screen.getByTestId('won-badge');
       // Check icon is an SVG element inside the badge
-      const svgIcon = solvedBadge.querySelector('svg');
+      const svgIcon = wonBadge.querySelector('svg');
       expect(svgIcon).toBeInTheDocument();
     }, { timeout: 2000 });
 
-    storage.hasPlayedToday.mockReturnValue(false);
+    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
-  test('solved badge should have neo-brutalist styling (solid background, border)', async () => {
+  test('won badge should have neo-brutalist styling (solid background, border)', async () => {
     const storage = require('@/utils/dailyChallenge/storage');
-    storage.hasPlayedToday.mockReturnValue(true);
+    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
@@ -168,21 +169,21 @@ describe('DailyChallengeLanding Solved Badge', () => {
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     await waitFor(() => {
-      const solvedBadge = screen.getByTestId('solved-badge');
+      const wonBadge = screen.getByTestId('won-badge');
       // Should have solid background (bg-neo-lime), not transparent
-      expect(solvedBadge).toHaveClass('bg-neo-lime');
+      expect(wonBadge).toHaveClass('bg-neo-lime');
       // Should have border (border-2)
-      expect(solvedBadge).toHaveClass('border-2');
+      expect(wonBadge).toHaveClass('border-2');
       // Should have hard shadow
-      expect(solvedBadge).toHaveClass('shadow-hard-sm');
+      expect(wonBadge).toHaveClass('shadow-hard-sm');
     }, { timeout: 2000 });
 
-    storage.hasPlayedToday.mockReturnValue(false);
+    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
-  test('solved badge should show translated text on larger screens', async () => {
+  test('won badge should show translated text on larger screens', async () => {
     const storage = require('@/utils/dailyChallenge/storage');
-    storage.hasPlayedToday.mockReturnValue(true);
+    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
@@ -193,12 +194,37 @@ describe('DailyChallengeLanding Solved Badge', () => {
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     await waitFor(() => {
-      const solvedBadge = screen.getByTestId('solved-badge');
+      const wonBadge = screen.getByTestId('won-badge');
       // Should contain "Solved" text (hidden on mobile via hidden xs:inline)
-      expect(solvedBadge).toHaveTextContent('Solved');
+      expect(wonBadge).toHaveTextContent('Solved');
     }, { timeout: 2000 });
 
-    storage.hasPlayedToday.mockReturnValue(false);
+    storage.getWordHuntStatusToday.mockReturnValue(null);
+  });
+
+  test('lost badge should show X icon and pink background', async () => {
+    const storage = require('@/utils/dailyChallenge/storage');
+    storage.getWordHuntStatusToday.mockReturnValue({ solved: false }); // Lost state
+
+    const mockProps = {
+      onSelectWordHunt: jest.fn(),
+      onSelectBuzz: jest.fn(),
+      currentLanguage: 'en' as const,
+    };
+
+    renderWithProviders(<DailyChallengeLanding {...mockProps} />);
+
+    await waitFor(() => {
+      const lostBadge = screen.getByTestId('lost-badge');
+      expect(lostBadge).toBeInTheDocument();
+      // Should have pink background for loss
+      expect(lostBadge).toHaveClass('bg-neo-pink');
+      // Should have X icon
+      const svgIcon = lostBadge.querySelector('svg');
+      expect(svgIcon).toBeInTheDocument();
+    }, { timeout: 2000 });
+
+    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 });
 

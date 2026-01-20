@@ -2562,6 +2562,7 @@ const he = {
     "play": "שחקו עכשיו",
     "viewResults": "צפו בתוצאות",
     "solved": "פתור",
+    "failed": "נכשל",
 "wordHunt": {
       "title": "ציד מילים",
       "subtitle": "מצב הישרדות",
@@ -2645,6 +2646,11 @@ const he = {
       "correct": "נכון!",
       "incorrect": "לא נכון",
       "answerWas": "התשובה הייתה:"
+    },
+    "fillBlank": {
+      "firstLetterHint": "האות הראשונה נחשפת כרמז",
+      "hintLetter": "רמז",
+      "validAlternatives": "מספר תשובות נכונות מתקבלות"
     },
     "share": {
       "text": "באזז יומי: {topic} | {score}/100 | תנסה לנצח 🔥"
@@ -3445,6 +3451,13 @@ const he = {
       "showing": "מציג",
       "of": "מתוך",
       "lastUpdated": "עודכן לאחרונה"
+    },
+    "templateEditor": {
+      "previewTitle": "תצוגה מקדימה עם נתונים לדוגמה",
+      "validationTitle": "אימות תבנית",
+      "missingPlaceholders": "חסרים משתנים נדרשים",
+      "unusedPlaceholders": "זוהו משתנים שאינם בשימוש",
+      "validTemplate": "התבנית תקינה"
     }
   },
   "tvTutorial": {

@@ -840,7 +840,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
     }
 
     // Fetch leaderboard from the Word Hunt leaderboard view
-    // Filter: only show solved attempts from authenticated users (guests shown in stats only)
+    // Filter: only show solved attempts from authenticated users (guests shown in stats badge)
     const { data, error } = await supabase
       .from('daily_word_hunt_leaderboard')
       .select('*')

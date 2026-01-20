@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -444,7 +445,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
           onClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
-          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] py-2"
+          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] py-2 relative"
         >
           <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
@@ -455,6 +456,18 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <div className="text-slate-400 text-sm font-medium">
             {t('common.points')}
           </div>
+
+          {/* Trophy mascot for top 3 finishers */}
+          {currentUserRank !== null && currentUserRank <= 3 && isNewCompletion && (
+            <div className="absolute -right-2 sm:right-0 top-1/2 -translate-y-1/2 pointer-events-none">
+              <CelebrationMascotWithEntrance
+                variant="trophy"
+                size="sm"
+                delay={0.5}
+                className="drop-shadow-lg"
+              />
+            </div>
+          )}
         </motion.div>
 
         {/* Streak milestone - Simplified */}

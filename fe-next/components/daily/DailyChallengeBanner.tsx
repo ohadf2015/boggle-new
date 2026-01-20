@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Target, Flame, Check, Clock, Sparkles } from 'lucide-react';
+import { Target, Flame, Check, Clock, Sparkles, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
@@ -13,7 +13,7 @@ import {
   getPuzzleNumber,
   getSecondsUntilNextDaily,
   formatCountdown,
-  hasPlayedWordHuntToday,
+  getWordHuntStatusToday,
   getDailyStreak,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
@@ -38,6 +38,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const { t, language, dir } = useLanguage();
   const [countdown, setCountdown] = useState<string>('');
   const [hasPlayed, setHasPlayed] = useState<boolean>(false);
+  const [hasSolved, setHasSolved] = useState<boolean>(false);
   const [streak, setStreak] = useState<number>(0);
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [isClient, setIsClient] = useState(false);
@@ -69,7 +70,12 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     setIsClient(true);
     const date = getDailyChallengeDate();
     setPuzzleNumber(getPuzzleNumber(date));
-    setHasPlayed(hasPlayedWordHuntToday(language as Language));
+
+    // Get full status including win/loss
+    const status = getWordHuntStatusToday(language as Language);
+    setHasPlayed(!!status);
+    setHasSolved(status?.solved ?? false);
+
     setStreak(getDailyStreak().currentStreak);
   }, [language]);
 
@@ -88,19 +94,23 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     return () => clearInterval(interval);
   }, [isClient]);
 
-  // Refresh has played status when language changes
+  // Refresh status when language changes
   useEffect(() => {
     if (!isClient) return;
-    setHasPlayed(hasPlayedWordHuntToday(language as Language));
+    const status = getWordHuntStatusToday(language as Language);
+    setHasPlayed(!!status);
+    setHasSolved(status?.solved ?? false);
     setStreak(getDailyStreak().currentStreak);
   }, [language, isClient]);
 
-  // Refresh has played status when page becomes visible (handles navigation back)
+  // Refresh status when page becomes visible (handles navigation back)
   useEffect(() => {
     if (!isClient) return;
 
     const refreshStatus = () => {
-      setHasPlayed(hasPlayedWordHuntToday(language as Language));
+      const status = getWordHuntStatusToday(language as Language);
+      setHasPlayed(!!status);
+      setHasSolved(status?.solved ?? false);
       setStreak(getDailyStreak().currentStreak);
     };
 
@@ -252,15 +262,25 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
             </div>
           </div>
 
-          {/* Completion indicator */}
+          {/* Win/Loss/Play indicator */}
           {hasPlayed ? (
             <motion.div
-              className="flex items-center justify-center w-8 h-8 bg-neo-lime-light rounded-full border-2 border-neo-black text-neo-black"
+              className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-full border-2 border-neo-black",
+                hasSolved
+                  ? "bg-neo-lime-light text-neo-black"  // Green for win
+                  : "bg-neo-pink text-neo-black"         // Pink for loss
+              )}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 20 }}
+              data-testid={hasSolved ? "won-badge" : "lost-badge"}
             >
-              <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
+              {hasSolved ? (
+                <Check className="w-4 h-4" strokeWidth={3} />
+              ) : (
+                <X className="w-4 h-4" strokeWidth={3} />
+              )}
             </motion.div>
           ) : (
             <motion.div

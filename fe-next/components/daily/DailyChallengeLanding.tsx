@@ -3,10 +3,10 @@
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock } from 'lucide-react';
+import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
+import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { getSecondsUntilNextDaily, formatCountdown } from '@/utils/dailyChallenge';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
@@ -22,8 +22,8 @@ interface DailyChallengeLandingProps {
 }
 
 interface ChallengeStatus {
-  wordHunt: 'new' | 'done';
-  buzz: 'new' | 'done' | 'unavailable';
+  wordHunt: 'new' | 'won' | 'lost';
+  buzz: 'new' | 'won' | 'lost' | 'unavailable';
 }
 
 // Separate loading states for status checks (shouldn't block card rendering)
@@ -82,10 +82,17 @@ export function DailyChallengeLanding({
     // Reset loading states when language changes
     setLoadingStatus({ wordHunt: true, buzz: true });
 
-    // Word Hunt status check - synchronous local storage check
+    // Word Hunt status check - synchronous local storage check with win/loss
     const checkWordHunt = () => {
-      const wordHuntPlayed = hasPlayedToday(currentLanguage);
-      setStatus(prev => ({ ...prev, wordHunt: wordHuntPlayed ? 'done' : 'new' }));
+      const wordHuntStatus = getWordHuntStatusToday(currentLanguage);
+      if (!wordHuntStatus) {
+        setStatus(prev => ({ ...prev, wordHunt: 'new' }));
+      } else {
+        setStatus(prev => ({
+          ...prev,
+          wordHunt: wordHuntStatus.solved ? 'won' : 'lost'
+        }));
+      }
       setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
     };
 
@@ -116,6 +123,7 @@ export function DailyChallengeLanding({
       }
 
       let buzzPlayed = false;
+      let buzzCompleted = false;
       try {
         // Build query params for user identification
         const checkParams = new URLSearchParams();
@@ -135,6 +143,7 @@ export function DailyChallengeLanding({
           if (response.ok) {
             const data = await response.json();
             buzzPlayed = data.data?.played || false;
+            buzzCompleted = data.data?.completed || false;
           }
         }
       } catch (err) {
@@ -158,7 +167,15 @@ export function DailyChallengeLanding({
         console.error('Failed to fetch buzz preview:', err);
       }
 
-      setStatus(prev => ({ ...prev, buzz: buzzPlayed ? 'done' : 'new' }));
+      // Set buzz status based on played and completed flags
+      if (!buzzPlayed) {
+        setStatus(prev => ({ ...prev, buzz: 'new' }));
+      } else {
+        setStatus(prev => ({
+          ...prev,
+          buzz: buzzCompleted ? 'won' : 'lost'
+        }));
+      }
       setLoadingStatus(prev => ({ ...prev, buzz: false }));
     };
 
@@ -198,7 +215,8 @@ export function DailyChallengeLanding({
     }
   };
 
-  const bothCompleted = status.wordHunt === 'done' && status.buzz === 'done';
+  // "Daily Double" badge only shows if BOTH challenges were won
+  const bothWon = status.wordHunt === 'won' && status.buzz === 'won';
 
   return (
     <motion.div
@@ -276,7 +294,7 @@ export function DailyChallengeLanding({
           customPreview="word-hunt-grid"
           currentLanguage={currentLanguage}
           buttonText={
-            status.wordHunt === 'done'
+            (status.wordHunt === 'won' || status.wordHunt === 'lost')
               ? t('daily.viewResults')
               : t('daily.play')
           }
@@ -299,7 +317,7 @@ export function DailyChallengeLanding({
           timeModeLabel={t('daily.takeYourTime')}
           badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
           buttonText={
-            status.buzz === 'done'
+            (status.buzz === 'won' || status.buzz === 'lost')
               ? t('daily.viewResults')
               : status.buzz === 'unavailable'
                 ? t('buzz.requestChallenge')
@@ -328,7 +346,7 @@ export function DailyChallengeLanding({
       )}
 
       {/* Daily Double Achievement - Premium Badge */}
-      {bothCompleted && (
+      {bothWon && (
         <motion.div
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -449,7 +467,7 @@ interface CompactChallengeCardProps {
   title: string;
   tagline: string;
   color: 'orange' | 'yellow';
-  status: 'new' | 'done' | 'unavailable';
+  status: 'new' | 'won' | 'lost' | 'unavailable';
   /** Whether status is still being determined (only affects status badge) */
   isLoadingStatus?: boolean;
   onPlay: () => void;
@@ -617,7 +635,7 @@ function CompactChallengeCard({
           'flex flex-col items-center text-center cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
-          status === 'done' && 'opacity-85',
+          (status === 'won' || status === 'lost') && 'opacity-85',
           isUnavailable && 'opacity-60'
         )}
         style={{
@@ -654,14 +672,14 @@ function CompactChallengeCard({
             <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
               <Loader2 className="w-3 h-3 animate-spin inline" />
             </span>
-          ) : status === 'done' ? (
+          ) : (status === 'won' || status === 'lost') ? (
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               className="relative"
             >
-              {/* Glow effect behind badge */}
+              {/* Glow effect behind badge - green for won, pink for lost */}
               <motion.div
                 className="absolute -inset-1 rounded-full blur-sm -z-10"
                 animate={{
@@ -669,14 +687,29 @@ function CompactChallengeCard({
                   scale: [1, 1.1, 1],
                 }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ background: 'rgba(191, 255, 0, 0.5)' }}
+                style={{
+                  background: status === 'won'
+                    ? 'rgba(191, 255, 0, 0.5)'  // Green glow for win
+                    : 'rgba(255, 20, 147, 0.5)' // Pink glow for loss
+                }}
               />
               <span
-                className="flex items-center gap-1 text-xs sm:text-sm font-bold bg-neo-lime text-neo-black px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border-2 border-neo-black shadow-hard-sm"
-                data-testid="solved-badge"
+                className={cn(
+                  "flex items-center gap-1 text-xs sm:text-sm font-bold px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border-2 border-neo-black shadow-hard-sm",
+                  status === 'won'
+                    ? "bg-neo-lime text-neo-black"  // Green for win
+                    : "bg-neo-pink text-neo-black"   // Pink for loss
+                )}
+                data-testid={status === 'won' ? "won-badge" : "lost-badge"}
               >
-                <Check className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={3} />
-                <span className="hidden xs:inline">{t('daily.solved')}</span>
+                {status === 'won' ? (
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={3} />
+                ) : (
+                  <X className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={3} />
+                )}
+                <span className="hidden xs:inline">
+                  {status === 'won' ? t('daily.solved') : t('daily.failed')}
+                </span>
               </span>
             </motion.div>
           ) : isUnavailable ? (

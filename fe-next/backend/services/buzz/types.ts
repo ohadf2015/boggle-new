@@ -33,6 +33,7 @@ export interface BuzzChallenge {
   trend_topic: string;
   prompt: string;
   answer: string;
+  alternatives?: string[]; // Alternative valid answers (1-2 max) for fill_blank challenges
   hint?: string;
   difficulty: DifficultyLevel;
   trending_context: string;

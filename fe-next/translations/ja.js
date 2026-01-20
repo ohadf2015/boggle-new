@@ -2412,6 +2412,7 @@ const ja = {
     "play": "プレイ",
     "viewResults": "結果を見る",
     "solved": "クリア",
+    "failed": "失敗",
 "wordHunt": {
       "title": "ワードハント",
       "subtitle": "サバイバルモード",
@@ -2665,6 +2666,11 @@ const ja = {
       "correct": "正解！",
       "incorrect": "不正解",
       "answerWas": "正解は:"
+    },
+    "fillBlank": {
+      "firstLetterHint": "最初の文字がヒントとして表示されます",
+      "hintLetter": "ヒント",
+      "validAlternatives": "複数の正解が受け入れられます"
     },
     "share": {
       "text": "デイリーバズ: {topic} | {score}/100 | 挑戦する？🔥"
@@ -3511,6 +3517,13 @@ const ja = {
       "showing": "表示中",
       "of": "/",
       "lastUpdated": "最終更新"
+    },
+    "templateEditor": {
+      "previewTitle": "サンプルデータでプレビュー",
+      "validationTitle": "テンプレート検証",
+      "missingPlaceholders": "必須プレースホルダーが不足しています",
+      "unusedPlaceholders": "未使用のプレースホルダーが検出されました",
+      "validTemplate": "テンプレートは有効です"
     }
   },
   "gift": {

@@ -103,6 +103,17 @@ export function hasPlayedWordHuntToday(language: Language): boolean {
 }
 
 /**
+ * Get Word Hunt win/loss status for today
+ * Returns null if not played, otherwise { solved: boolean }
+ * Used by cards/banners to show distinct win vs loss indicators
+ */
+export function getWordHuntStatusToday(language: Language): { solved: boolean } | null {
+  const result = getTodaysWordHuntResult(language);
+  if (!result) return null;
+  return { solved: result.result.solved };
+}
+
+/**
  * Get the stored Word Hunt result for today (if exists)
  * Returns null if the stored result has invalid data (e.g., attemptsUsed outside 1-10)
  */

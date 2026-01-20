@@ -12,6 +12,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 // Mock the hooks and utilities
 jest.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: jest.fn(() => false),
+  getWordHuntStatusToday: jest.fn(() => null), // null = not played yet
 }));
 
 jest.mock('@/utils/guestManager', () => ({
@@ -150,9 +151,9 @@ describe('DailyChallengeLanding Loading State', () => {
   });
 
   test('status badge should update to checkmark after API confirms completion', async () => {
-    // Mock hasPlayedToday to return true for this test
+    // Mock getWordHuntStatusToday to return won state for this test
     const storage = require('@/utils/dailyChallenge/storage');
-    storage.hasPlayedToday.mockReturnValue(true);
+    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
       onSelectWordHunt: jest.fn(),
@@ -169,7 +170,7 @@ describe('DailyChallengeLanding Loading State', () => {
     }, { timeout: 2000 });
 
     // Reset mock
-    storage.hasPlayedToday.mockReturnValue(false);
+    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
   test('card title and tagline should be visible immediately', () => {

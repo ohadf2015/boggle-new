@@ -30,6 +30,7 @@ interface BuzzGameScreenProps {
       trendTopic: string;
       prompt: string;
       answer: string;
+      alternatives?: string[];
       hint?: string;
       difficulty: 'easy' | 'medium' | 'hard';
       trendingContext?: string;
@@ -87,6 +88,7 @@ export default function BuzzGameScreen({
   const [feedbackData, setFeedbackData] = useState<{
     isCorrect: boolean;
     correctAnswer: string;
+    alternatives?: string[];
     userAnswer: string;
     points: number;
     trendingContext?: string;
@@ -130,7 +132,14 @@ export default function BuzzGameScreen({
       // Normalize answers for language-specific comparison (e.g., Hebrew final letters)
       const normalizedUserAnswer = normalizeWord(userAnswer.trim(), challengeData.language as Language);
       const normalizedCorrectAnswer = normalizeWord(currentChallenge.answer.trim(), challengeData.language as Language);
-      const correct = normalizedUserAnswer === normalizedCorrectAnswer;
+
+      // Check against alternatives if provided (for fill_blank challenges)
+      const normalizedAlternatives = currentChallenge.alternatives?.map(alt =>
+        normalizeWord(alt.trim(), challengeData.language as Language)
+      );
+
+      const correct = normalizedUserAnswer === normalizedCorrectAnswer ||
+        (normalizedAlternatives?.some(alt => normalizedUserAnswer === alt) ?? false);
       const timeTaken = Math.floor((Date.now() - challengeStartTime) / 1000);
 
       // Play sound
@@ -167,6 +176,7 @@ export default function BuzzGameScreen({
       setFeedbackData({
         isCorrect: correct,
         correctAnswer: currentChallenge.answer,
+        alternatives: currentChallenge.alternatives,
         userAnswer: userAnswer,
         points: points,
         trendingContext: currentChallenge.trendingContext,
@@ -606,6 +616,7 @@ export default function BuzzGameScreen({
           isOpen={showFeedback}
           isCorrect={feedbackData.isCorrect}
           correctAnswer={feedbackData.correctAnswer}
+          alternatives={feedbackData.alternatives}
           userAnswer={feedbackData.userAnswer}
           points={feedbackData.points}
           trendingContext={feedbackData.trendingContext}

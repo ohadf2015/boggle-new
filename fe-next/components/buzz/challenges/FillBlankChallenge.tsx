@@ -38,7 +38,11 @@ export default function FillBlankChallenge({
 }: FillBlankChallengeProps) {
   const { t, language } = useLanguage();
   const answerLength = challenge.answer.length;
-  const [letters, setLetters] = useState<string[]>(Array(answerLength).fill(''));
+  // Reveal first letter as a hint (not included in user input)
+  const firstLetter = challenge.answer[0].toUpperCase();
+  // Remaining letters for user to fill (answer length minus first letter)
+  const remainingLength = answerLength - 1;
+  const [letters, setLetters] = useState<string[]>(Array(remainingLength).fill(''));
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,12 +73,12 @@ export default function FillBlankChallenge({
     });
 
     // Auto-advance to next empty box
-    if (index < answerLength - 1) {
+    if (index < remainingLength - 1) {
       const nextIndex = index + 1;
       setActiveIndex(nextIndex);
       inputRefs.current[nextIndex]?.focus();
     }
-  }, [answerLength]);
+  }, [remainingLength]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((index: number, e: React.KeyboardEvent) => {
@@ -102,16 +106,18 @@ export default function FillBlankChallenge({
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
       const direction = e.key === 'ArrowLeft' ? (isRTL ? 1 : -1) : (isRTL ? -1 : 1);
-      const newIndex = Math.max(0, Math.min(answerLength - 1, index + direction));
+      const newIndex = Math.max(0, Math.min(remainingLength - 1, index + direction));
       setActiveIndex(newIndex);
       inputRefs.current[newIndex]?.focus();
     } else if (e.key === 'Enter') {
-      const answer = letters.join('');
-      if (answer.length === answerLength && letters.every(l => l)) {
-        onAnswer(answer);
+      // Prepend first letter to user's input for full answer
+      const userInput = letters.join('');
+      if (userInput.length === remainingLength && letters.every(l => l)) {
+        const fullAnswer = firstLetter + userInput;
+        onAnswer(fullAnswer);
       }
     }
-  }, [letters, answerLength, isRTL, onAnswer]);
+  }, [letters, remainingLength, firstLetter, isRTL, onAnswer]);
 
   // Handle box click
   const handleBoxClick = useCallback((index: number) => {
@@ -121,18 +127,20 @@ export default function FillBlankChallenge({
 
   // Handle submit
   const handleSubmit = useCallback(() => {
-    const answer = letters.join('');
-    if (answer.length === answerLength && letters.every(l => l)) {
-      onAnswer(answer);
+    // Prepend first letter to user's input for full answer
+    const userInput = letters.join('');
+    if (userInput.length === remainingLength && letters.every(l => l)) {
+      const fullAnswer = firstLetter + userInput;
+      onAnswer(fullAnswer);
     }
-  }, [letters, answerLength, onAnswer]);
+  }, [letters, remainingLength, firstLetter, onAnswer]);
 
   // Clear all letters
   const handleClear = useCallback(() => {
-    setLetters(Array(answerLength).fill(''));
+    setLetters(Array(remainingLength).fill(''));
     setActiveIndex(0);
     inputRefs.current[0]?.focus();
-  }, [answerLength]);
+  }, [remainingLength]);
 
   const isComplete = letters.every(l => l);
   const filledCount = letters.filter(l => l).length;
@@ -158,9 +166,11 @@ export default function FillBlankChallenge({
           transition={{ delay: 0.15 }}
           className="text-sm text-slate-400"
         >
+          <span className="font-bold text-neo-cyan">{firstLetter}</span>
+          <span className="text-slate-500"> + </span>
           <span className="font-bold text-neo-yellow">{filledCount}</span>
           <span className="text-slate-500"> / </span>
-          <span className="font-bold text-neo-yellow">{answerLength}</span>
+          <span className="font-bold text-neo-yellow">{remainingLength}</span>
           {' '}{t('buzz.letters')}
         </motion.div>
       </div>
@@ -179,16 +189,60 @@ export default function FillBlankChallenge({
         </motion.div>
       )}
 
+      {/* First Letter Hint Label */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-center text-xs text-neo-cyan font-bold uppercase"
+      >
+        {t('buzz.fillBlank.firstLetterHint')}
+      </motion.div>
+
       {/* Letter Boxes Grid */}
       <motion.div
         ref={containerRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.25 }}
         className="flex flex-wrap justify-center gap-2 sm:gap-3 py-4"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        {Array.from({ length: answerLength }).map((_, index) => {
+        {/* First Letter (revealed as hint) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 25 }}
+          className="relative"
+        >
+          <motion.div
+            className="
+              relative w-12 h-14 sm:w-14 sm:h-16
+              flex items-center justify-center
+              text-2xl sm:text-3xl font-black
+              border-3 rounded-lg
+              border-neo-cyan bg-neo-cyan/20 shadow-hard-lg text-neo-cyan
+            "
+          >
+            <motion.span
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.35, type: 'spring', stiffness: 500, damping: 25 }}
+            >
+              {firstLetter}
+            </motion.span>
+            {/* Hint badge */}
+            <div className="absolute -top-2 -right-2 bg-neo-cyan text-neo-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-neo-black">
+              {t('buzz.fillBlank.hintLetter')}
+            </div>
+          </motion.div>
+          <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 font-mono">
+            1
+          </div>
+        </motion.div>
+
+        {/* Remaining Letter Boxes (user input) */}
+        {Array.from({ length: remainingLength }).map((_, index) => {
           const letter = letters[index];
           const isActive = activeIndex === index;
           const isFilled = !!letter;
@@ -274,9 +328,9 @@ export default function FillBlankChallenge({
                 )}
               </motion.div>
 
-              {/* Box number indicator */}
+              {/* Box number indicator (offset by 1 since first letter is shown) */}
               <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 font-mono">
-                {index + 1}
+                {index + 2}
               </div>
             </motion.div>
           );

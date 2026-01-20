@@ -67,6 +67,7 @@ jest.mock('@/utils/dailyChallenge', () => ({
 // Mock storage
 jest.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: jest.fn().mockReturnValue(false),
+  getWordHuntStatusToday: jest.fn().mockReturnValue(null), // null = not played yet
 }));
 
 // Mock NextStepPrompt

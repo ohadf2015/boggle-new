@@ -6,7 +6,7 @@
  */
 
 import type { Language } from '@/types';
-import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+import { normalizeHebrewLetter, sanitizeWord } from '@/shared/utils/wordNormalization';
 import { findWordPath } from '@/utils/wordPathFinder';
 
 export type FeedbackType = 'green' | 'yellow' | 'gray';
@@ -49,8 +49,13 @@ export function getLetterFeedback(
   targetWord: string,
   language?: Language
 ): LetterFeedback[] {
-  const submitted = submittedWord.toUpperCase();
-  const target = targetWord.toUpperCase();
+  // Sanitize words to remove invisible Unicode characters (RTL marks, niqqud, etc.)
+  // This fixes length mismatches that cause "?" padding in feedback tiles
+  const sanitizedSubmitted = sanitizeWord(submittedWord, language);
+  const sanitizedTarget = sanitizeWord(targetWord, language);
+
+  const submitted = sanitizedSubmitted.toUpperCase();
+  const target = sanitizedTarget.toUpperCase();
 
   const feedback: LetterFeedback[] = [];
 

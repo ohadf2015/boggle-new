@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Sparkles, TrendingUp, Star, X } from 'lucide-react';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -331,6 +332,16 @@ export default function TierUpCelebration({
             >
               {t('brain.tierUp.continue')}
             </motion.button>
+          </div>
+
+          {/* Celebration Mascot - positioned at corner */}
+          <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 pointer-events-none z-10">
+            <CelebrationMascotWithEntrance
+              variant="celebration"
+              size="sm"
+              delay={0.9}
+              className="drop-shadow-lg"
+            />
           </div>
         </motion.div>
       </motion.div>

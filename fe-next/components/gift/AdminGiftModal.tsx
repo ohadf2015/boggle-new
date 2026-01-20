@@ -464,7 +464,7 @@ export function AdminGiftModal({
                           'text-xs uppercase tracking-wide font-semibold',
                           rarityColors[gift.badge.rarity]?.text || 'text-gray-300'
                         )}>
-                          {t(`rarity.${gift.badge.rarity}`) || gift.badge.rarity} {t('gift.badge') || 'Badge'}
+                          {t(`collectibles.rarity.${gift.badge.rarity}`) || gift.badge.rarity} {t('gift.badge') || 'Badge'}
                         </span>
                       </div>
                       <p className="text-white font-bold text-lg">

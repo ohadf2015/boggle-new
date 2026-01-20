@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Sparkles, X } from 'lucide-react';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -284,6 +285,16 @@ export default function FirstGameCelebration({
               {t('brain.playAgain')}
             </button>
           </motion.div>
+
+          {/* Celebration Mascot - positioned at corner */}
+          <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 pointer-events-none z-10">
+            <CelebrationMascotWithEntrance
+              variant="celebration"
+              size="sm"
+              delay={1.0}
+              className="drop-shadow-lg"
+            />
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>

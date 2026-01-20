@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Star, Trophy, Crown, Sparkles } from 'lucide-react';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 
 interface LevelUpCelebrationProps {
   /** New level reached */
@@ -376,6 +377,18 @@ export function LevelUpCelebration({
             >
               {t('common.tapToContinue') || 'Tap to continue'}
             </motion.p>
+
+            {/* Celebration Mascot - appears after reveal */}
+            {phase !== 'flash' && phase !== 'badge' && (
+              <div className="absolute bottom-8 right-8 sm:bottom-12 sm:right-12 pointer-events-none">
+                <CelebrationMascotWithEntrance
+                  variant="celebration"
+                  size="md"
+                  delay={0.8}
+                  className="drop-shadow-lg"
+                />
+              </div>
+            )}
           </div>
         </motion.div>
       )}

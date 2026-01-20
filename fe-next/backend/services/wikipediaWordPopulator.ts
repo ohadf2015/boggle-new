@@ -1,10 +1,12 @@
 /**
  * Wikipedia Word Populator
  * Orchestrates fetching, validating, and storing Wikipedia-sourced words
- * Includes fallback to static word lists when Wikipedia is unavailable
+ * Includes fallback to local JSON files and static word lists when Wikipedia is unavailable
  */
 
 import type { Language } from '@/shared/types/game';
+import path from 'path';
+import fs from 'fs';
 import {
   fetchFeaturedContent,
   fetchRandomArticles,
@@ -67,18 +69,68 @@ const FALLBACK_WORD_LISTS: Record<Language, string[]> = {
 };
 
 /**
+ * Wikipedia word data structure from JSON files
+ */
+interface WikipediaWordData {
+  word: string;
+  source: string;
+  url?: string;
+  score: number;
+}
+
+/**
  * Result of word population
  */
 export interface PopulationResult {
   wordsFound: number;
-  source: 'wikipedia' | 'fallback';
+  source: 'wikipedia' | 'local_json' | 'fallback';
   selectedWord?: string;
-  candidates: Array<{ word: string; score: number; source: string }>;
+  candidates: Array<{ word: string; score: number; source: string; url?: string }>;
+}
+
+/**
+ * Load Wikipedia words from local JSON file
+ * These files contain pre-validated words from Wikipedia for reliable fallback
+ *
+ * @param language - Language code
+ * @returns Array of word candidates with metadata, or null if file not found
+ */
+async function loadWordsFromJSON(
+  language: Language
+): Promise<Array<WikipediaWordData> | null> {
+  try {
+    // Path to JSON file in data/wikipedia-words/
+    const jsonPath = path.join(process.cwd(), 'data', 'wikipedia-words', `${language}.json`);
+
+    // Check if file exists
+    if (!fs.existsSync(jsonPath)) {
+      console.log(`[WikiPopulator] No local JSON file found for ${language} at ${jsonPath}`);
+      return null;
+    }
+
+    // Read and parse JSON file
+    const fileContent = fs.readFileSync(jsonPath, 'utf-8');
+    const data = JSON.parse(fileContent) as {
+      language: string;
+      lastUpdated: string;
+      words: WikipediaWordData[];
+    };
+
+    console.log(`[WikiPopulator] Loaded ${data.words.length} words from local JSON for ${language} (updated: ${data.lastUpdated})`);
+
+    return data.words;
+
+  } catch (error) {
+    console.error(`[WikiPopulator] Error loading JSON file for ${language}:`, error);
+    return null;
+  }
 }
 
 /**
  * Populate Wikipedia words for a specific language and date
- * Falls back to static lists if Wikipedia is unavailable
+ * Strategy:
+ * - Production: Local JSON → Wikipedia API → Fallback lists
+ * - Development: Wikipedia API → Local JSON → Fallback lists
  *
  * @param date - Date to populate words for
  * @param language - Language code
@@ -95,7 +147,21 @@ export async function populateWikipediaWords(
   const recentlyUsed = await getRecentlyUsedWords(language, 30);
   console.log(`[WikiPopulator] Found ${recentlyUsed.size} recently used words to avoid`);
 
-  // Try Wikipedia first
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // Production: Try local JSON first (reliable, fast)
+  if (isProduction) {
+    console.log(`[WikiPopulator] Production mode: trying local JSON first`);
+    const jsonResult = await tryLocalJSONSource(language, recentlyUsed, dateStr);
+
+    if (jsonResult && jsonResult.candidates.length > 0) {
+      return jsonResult;
+    }
+
+    console.log(`[WikiPopulator] Local JSON unavailable, trying Wikipedia API`);
+  }
+
+  // Try Wikipedia API (both dev and production)
   const wikipediaResult = await tryWikipediaSource(date, language, recentlyUsed);
 
   if (wikipediaResult && wikipediaResult.candidates.length > 0) {
@@ -133,9 +199,91 @@ export async function populateWikipediaWords(
     }
   }
 
-  // Fallback to static word lists
-  console.log(`[WikiPopulator] Wikipedia unavailable, using fallback for ${language}`);
+  // Development: Try local JSON as fallback before static lists
+  if (!isProduction) {
+    console.log(`[WikiPopulator] Development mode: Wikipedia failed, trying local JSON`);
+    const jsonResult = await tryLocalJSONSource(language, recentlyUsed, dateStr);
+
+    if (jsonResult && jsonResult.candidates.length > 0) {
+      return jsonResult;
+    }
+  }
+
+  // Final fallback to static word lists
+  console.log(`[WikiPopulator] All sources failed, using static fallback for ${language}`);
   return getFallbackWords(language, recentlyUsed);
+}
+
+/**
+ * Try to load words from local JSON file
+ */
+async function tryLocalJSONSource(
+  language: Language,
+  recentlyUsed: Set<string>,
+  dateStr: string
+): Promise<PopulationResult | null> {
+  try {
+    const jsonWords = await loadWordsFromJSON(language);
+
+    if (!jsonWords || jsonWords.length === 0) {
+      return null;
+    }
+
+    console.log(`[WikiPopulator] Processing ${jsonWords.length} words from local JSON`);
+
+    // Convert JSON words to candidate format
+    const candidates = jsonWords
+      .filter(w => !recentlyUsed.has(w.word))
+      .map(w => ({
+        word: w.word,
+        score: w.score,
+        source: `${w.source}_json`,
+        url: w.url
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 50); // Top 50 candidates
+
+    if (candidates.length === 0) {
+      console.log(`[WikiPopulator] All JSON words were recently used`);
+      return null;
+    }
+
+    // Store in database for tracking
+    await storeWikipediaWordCandidates(
+      language,
+      new Date(dateStr),
+      candidates.map(c => ({
+        word: c.word,
+        source: c.source,
+        url: c.url,
+        score: c.score
+      }))
+    );
+
+    // Validate top candidates (limit to avoid excessive AI calls)
+    const validatedCandidates = await validateTopCandidates(
+      candidates.slice(0, 10),
+      language,
+      dateStr
+    );
+
+    if (validatedCandidates.length > 0) {
+      const bestWord = selectBestWord(validatedCandidates, recentlyUsed);
+
+      return {
+        wordsFound: validatedCandidates.length,
+        source: 'local_json',
+        selectedWord: bestWord?.word,
+        candidates: validatedCandidates
+      };
+    }
+
+    return null;
+
+  } catch (error) {
+    console.error(`[WikiPopulator] Error processing local JSON for ${language}:`, error);
+    return null;
+  }
 }
 
 /**

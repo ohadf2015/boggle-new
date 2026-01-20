@@ -16,6 +16,7 @@ import LandscapeIndicator from '@/components/LandscapeIndicator';
 import HowToPlay from '@/components/HowToPlay';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import QuickPlayButton from './QuickPlayButton';
+import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
 import { hasPlayedAnyGame } from '@/utils/playerProgressStorage';
 
 interface RoomListViewProps {
@@ -110,13 +111,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
         {/* Main Content - no scroll on this container */}
         <div className="flex-1 flex flex-col px-3 lg:px-4 py-3 min-h-0 gap-3">
-          {/* Hero: Quick Play Button - fixed size */}
+          {/* Hero: Quick Play Button with DJ Mascot */}
           {onQuickPlay && (
             <motion.div
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="flex-shrink-0"
+              className="flex-shrink-0 relative"
             >
               <QuickPlayButton
                 onQuickPlay={onQuickPlay}
@@ -124,6 +125,14 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 t={t}
                 variant="hero"
               />
+              {/* DJ Mascot - decorative party vibe */}
+              <div className="absolute -top-6 -right-2 sm:-right-4 pointer-events-none z-10 hidden sm:block">
+                <DJMascotWithEntrance
+                  size="sm"
+                  delay={0.3}
+                  className="drop-shadow-lg"
+                />
+              </div>
             </motion.div>
           )}
 

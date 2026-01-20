@@ -2546,6 +2546,7 @@ const es = {
     "play": "JUGAR AHORA",
     "viewResults": "VER RESULTADOS",
     "solved": "Resuelto",
+    "failed": "Fallido",
 "wordHunt": {
       "title": "Caza Palabras",
       "subtitle": "Modo Supervivencia",
@@ -2615,6 +2616,11 @@ const es = {
       "correct": "¡CORRECTO!",
       "incorrect": "INCORRECTO",
       "answerWas": "La respuesta era:"
+    },
+    "fillBlank": {
+      "firstLetterHint": "Primera letra revelada como pista",
+      "hintLetter": "Pista",
+      "validAlternatives": "Se aceptan múltiples respuestas válidas"
     },
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | ¿Le entras? 🔥"
@@ -3441,6 +3447,13 @@ const es = {
       "showing": "Mostrando",
       "of": "de",
       "lastUpdated": "Última actualización"
+    },
+    "templateEditor": {
+      "previewTitle": "Vista previa con datos de muestra",
+      "validationTitle": "Validación de plantilla",
+      "missingPlaceholders": "Faltan marcadores de posición requeridos",
+      "unusedPlaceholders": "Se detectaron marcadores de posición no utilizados",
+      "validTemplate": "La plantilla es válida"
     }
   },
   "tvTutorial": {

@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-01-20T12:21:51.716Z",
+  "totalWords": 9876,
+  "totalIssues": 0,
+  "totalWarnings": 648,
+  "avgQuality": 95.7,
+  "languages": [
+    {
+      "language": "en",
+      "totalWords": 2687,
+      "wordsWithIssues": 0,
+      "wordsWithWarnings": 7,
+      "avgDiversity": 0.8939116026015913,
+      "avgLength": 5.972459992556755,
+      "qualityScore": "99.9"
+    },
+    {
+      "language": "he",
+      "totalWords": 1494,
+      "wordsWithIssues": 0,
+      "wordsWithWarnings": 638,
+      "avgDiversity": 0.9356146809460038,
+      "avgLength": 4.756358768406961,
+      "qualityScore": "78.6"
+    },
+    {
+      "language": "sv",
+      "totalWords": 1834,
+      "wordsWithIssues": 0,
+      "wordsWithWarnings": 3,
+      "avgDiversity": 0.8929207560886929,
+      "avgLength": 6.01690294438386,
+      "qualityScore": "99.9"
+    },
+    {
+      "language": "ja",
+      "totalWords": 2376,
+      "wordsWithIssues": 0,
+      "wordsWithWarnings": 0,
+      "avgDiversity": 0.9964576318742986,
+      "avgLength": 3.3792087542087543,
+      "qualityScore": "100.0"
+    },
+    {
+      "language": "es",
+      "totalWords": 1485,
+      "wordsWithIssues": 0,
+      "wordsWithWarnings": 0,
+      "avgDiversity": 0.8926198492865138,
+      "avgLength": 6.016161616161616,
+      "qualityScore": "100.0"
+    }
+  ]
+}

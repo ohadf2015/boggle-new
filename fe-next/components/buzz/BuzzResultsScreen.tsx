@@ -19,6 +19,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { formatValidAnswers } from '@/utils/buzz/answerValidation';
 
 interface BuzzResultsScreenProps {
   challengeData: {
@@ -30,6 +31,7 @@ interface BuzzResultsScreenProps {
       type: string;
       prompt: string;
       answer: string;
+      alternatives?: string[];
       trendingContext?: string;
     }>;
   };
@@ -238,7 +240,7 @@ export default function BuzzResultsScreen({
               })
             }
           >
-            <div className="text-xs text-slate-500 uppercase font-black tracking-widest mb-2">
+            <div className="text-xs text-slate-400 uppercase font-black tracking-widest mb-2">
               {t('buzz.yourScore')}
             </div>
 
@@ -255,11 +257,11 @@ export default function BuzzResultsScreen({
               >
                 {displayedScore}
               </motion.div>
-              <div className="text-slate-400 text-lg font-bold mt-1">/100</div>
+              <div className="text-slate-300 text-lg font-bold mt-1">/100</div>
             </div>
 
             {/* Tap to celebrate hint */}
-            <p className="text-xs text-slate-600 mt-2">
+            <p className="text-xs text-slate-500 mt-2">
               {t('buzz.tapToCelebrate')}
             </p>
           </motion.div>
@@ -296,7 +298,7 @@ export default function BuzzResultsScreen({
               <Target className="w-4 h-4 text-neo-lime" />
             </div>
             <div className="text-2xl sm:text-3xl font-black text-white">{correctCount}</div>
-            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
+            <div className="text-[10px] sm:text-xs text-slate-300 font-bold uppercase">
               {t('buzz.correct')}
             </div>
           </div>
@@ -307,7 +309,7 @@ export default function BuzzResultsScreen({
               <Sparkles className="w-4 h-4 text-neo-cyan" />
             </div>
             <div className="text-2xl sm:text-3xl font-black text-white">{totalChallenges}</div>
-            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
+            <div className="text-[10px] sm:text-xs text-slate-300 font-bold uppercase">
               {t('buzz.total')}
             </div>
           </div>
@@ -321,7 +323,7 @@ export default function BuzzResultsScreen({
               {Math.floor(resultData.completionTimeSeconds / 60)}:
               {(resultData.completionTimeSeconds % 60).toString().padStart(2, '0')}
             </div>
-            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
+            <div className="text-[10px] sm:text-xs text-slate-300 font-bold uppercase">
               {t('results.time')}
             </div>
           </div>
@@ -339,14 +341,14 @@ export default function BuzzResultsScreen({
             onClick={() => setIsReviewExpanded(!isReviewExpanded)}
             className="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors text-left"
           >
-            <span className="text-xs text-slate-400 uppercase font-black tracking-wider">
+            <span className="text-xs text-slate-300 uppercase font-black tracking-wider">
               {t('buzz.results.reviewTitle')}
             </span>
             <motion.div
               animate={{ rotate: isReviewExpanded ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronDown className="w-5 h-5 text-slate-400" />
+              <ChevronDown className="w-5 h-5 text-slate-300" />
             </motion.div>
           </button>
 
@@ -384,15 +386,15 @@ export default function BuzzResultsScreen({
                   >
                     {/* Challenge number and status */}
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-slate-500 font-bold">#{index + 1}</span>
+                      <span className="text-xs text-slate-300 font-bold">#{index + 1}</span>
                       <div className="flex items-center gap-1.5">
                         {solved.correct ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          <CheckCircle2 className="w-4 h-4 text-emerald-300" />
                         ) : (
-                          <XCircle className="w-4 h-4 text-red-400" />
+                          <XCircle className="w-4 h-4 text-red-300" />
                         )}
                         <span
-                          className={`text-xs font-black ${solved.correct ? 'text-emerald-400' : 'text-red-400'}`}
+                          className={`text-xs font-black ${solved.correct ? 'text-emerald-300' : 'text-red-300'}`}
                         >
                           {solved.correct
                             ? t('buzz.feedback.correct')
@@ -411,20 +413,20 @@ export default function BuzzResultsScreen({
                     {/* Answer comparison */}
                     <div className="space-y-1 text-left">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500 min-w-[70px]">
+                        <span className="text-xs text-slate-300 min-w-[70px]">
                           {t('buzz.results.correctAnswer')}
                         </span>
-                        <span className="text-sm font-black text-emerald-300 uppercase">
-                          {challenge.answer}
+                        <span className="text-sm font-black text-emerald-200 uppercase">
+                          {formatValidAnswers(challenge.answer, challenge.alternatives)}
                         </span>
                       </div>
 
                       {!solved.correct && !isSkipped && (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500 min-w-[70px]">
+                          <span className="text-xs text-slate-300 min-w-[70px]">
                             {t('buzz.results.yourAnswer')}
                           </span>
-                          <span className="text-sm text-red-300/80 line-through uppercase">
+                          <span className="text-sm text-red-200 line-through uppercase">
                             {solved.userAnswer}
                           </span>
                         </div>
@@ -434,7 +436,7 @@ export default function BuzzResultsScreen({
                     {/* Trending context */}
                     {challenge.trendingContext && (
                       <div className="mt-2 pt-2 border-t border-slate-700/40">
-                        <p className="text-xs text-slate-400 leading-relaxed text-left">
+                        <p className="text-xs text-slate-300 leading-relaxed text-left">
                           {challenge.trendingContext}
                         </p>
                       </div>
@@ -455,7 +457,7 @@ export default function BuzzResultsScreen({
         >
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-neo-cyan" />
-            <span className="text-xs text-slate-500 uppercase font-black tracking-wider">
+            <span className="text-xs text-slate-300 uppercase font-black tracking-wider">
               {t('buzz.results.trending')}
             </span>
           </div>

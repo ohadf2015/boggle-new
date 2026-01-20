@@ -196,6 +196,11 @@ ${langExamples}
 2. **fill_blank**: Phrase with unexpected angle on trend
    - Format: "Phrase with _ _ _ _ _ (N letters)" - USE SPACED UNDERSCORES matching exact word length!
    - CRITICAL: Count of underscores MUST EQUAL the answer length. Each underscore = one letter.
+   - **ALTERNATIVES** (NEW): If the blank could have 1-2 other equally valid words of the SAME LENGTH, include them in "alternatives" array
+   - Example: "You need to _ _ _ _ _ a tent (5 letters)" → answer: "PITCH", alternatives: ["RAISE", "ERECT"]
+   - Example: "Where to _ _ _ _ your car (4 letters)" → answer: "PARK", alternatives: ["STOP"]
+   - Only include alternatives if they are EQUALLY common and valid. Don't force it.
+   - If no valid alternatives exist (most cases), omit the "alternatives" field entirely.
    - Trend "Election" → "Voters stood in _ _ _ _ for hours (4 letters)" → LINE (4 letters = 4 underscores)
    - Trend "Heat Wave" → "People escaped to the _ _ _ _ _ (5 letters)" → SHADE (5 letters = 5 underscores)
 

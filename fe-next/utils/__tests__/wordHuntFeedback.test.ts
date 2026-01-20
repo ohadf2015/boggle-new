@@ -116,6 +116,55 @@ describe('getLetterKnowledge', () => {
   });
 });
 
+describe('invisible Unicode character handling', () => {
+  it('handles target word with RTL mark', () => {
+    // שמים with RTL mark (U+200F) - the bug that was reported
+    const targetWithRtl = 'שמים\u200F';
+    const feedback = getLetterFeedback('שמים', targetWithRtl, 'he');
+
+    // Should return 4 feedback items, not 5
+    expect(feedback.length).toBe(4);
+    expect(feedback.every(f => f.feedback === 'green')).toBe(true);
+    // No "?" padding should occur
+    expect(feedback.every(f => f.letter !== '?')).toBe(true);
+  });
+
+  it('handles target word with zero-width space', () => {
+    const targetWithZws = 'HELLO\u200B'; // Zero-width space at end
+    const feedback = getLetterFeedback('HELLO', targetWithZws);
+
+    expect(feedback.length).toBe(5);
+    expect(feedback.every(f => f.feedback === 'green')).toBe(true);
+  });
+
+  it('handles submitted word with invisible characters', () => {
+    const submittedWithMarks = '\u200Fשמים\u200F'; // RTL marks at both ends
+    const feedback = getLetterFeedback(submittedWithMarks, 'שמים', 'he');
+
+    expect(feedback.length).toBe(4);
+    expect(feedback.every(f => f.feedback === 'green')).toBe(true);
+  });
+
+  it('handles Hebrew word with niqqud (vowel points)', () => {
+    // שָׁמַיִם with niqqud
+    const targetWithNiqqud = 'שָׁמַיִם';
+    const feedback = getLetterFeedback('שמים', targetWithNiqqud, 'he');
+
+    // Niqqud should be stripped, leaving just the 4 consonants
+    expect(feedback.length).toBe(4);
+    expect(feedback.every(f => f.feedback === 'green')).toBe(true);
+  });
+
+  it('handles both words having invisible characters', () => {
+    const target = 'HELLO\u200B\u200F'; // ZWS + RTL mark
+    const submitted = '\uFEFFHELLO\u00AD'; // BOM + soft hyphen
+    const feedback = getLetterFeedback(submitted, target);
+
+    expect(feedback.length).toBe(5);
+    expect(feedback.every(f => f.feedback === 'green')).toBe(true);
+  });
+});
+
 describe('canFormWordOnBoard', () => {
   describe('valid words', () => {
     it('returns true for word that can be traced horizontally', () => {

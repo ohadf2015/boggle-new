@@ -74,6 +74,7 @@ export {
   saveDailyResult,
   getAllDailyResults,
   hasPlayedWordHuntToday,
+  getWordHuntStatusToday,
   getTodaysWordHuntResult,
   saveWordHuntResult,
   clearWordHuntResultForRetry,

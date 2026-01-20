@@ -2416,6 +2416,7 @@ const en = {
     "play": "PLAY",
     "viewResults": "VIEW RESULTS",
     "solved": "Solved",
+    "failed": "Failed",
     "puzzleNumber": "Daily #{number}",
     "playButton": "Play",
     "nextPuzzleIn": "Next in",
@@ -2632,6 +2633,11 @@ const en = {
       "compoundHint": "Forms a compound word with BOTH neighbors",
       "exampleHint": "Example: SUN→FLOWER→POT (sunflower + flowerpot)",
       "thinkCompound": "Think compound words!"
+    },
+    "fillBlank": {
+      "firstLetterHint": "First letter revealed as a hint",
+      "hintLetter": "Hint",
+      "validAlternatives": "Multiple valid answers accepted"
     },
     "preview": {
       "title": "Today's Topics",
@@ -3447,6 +3453,13 @@ const en = {
       "showing": "Showing",
       "of": "of",
       "lastUpdated": "Last updated"
+    },
+    "templateEditor": {
+      "previewTitle": "Preview with Sample Data",
+      "validationTitle": "Template Validation",
+      "missingPlaceholders": "Missing required placeholders",
+      "unusedPlaceholders": "Unused placeholders detected",
+      "validTemplate": "Template is valid"
     }
   },
   "tvTutorial": {

@@ -2413,6 +2413,7 @@ const sv = {
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
     "solved": "Löst",
+    "failed": "Misslyckades",
 "wordHunt": {
       "title": "Ordjakt",
       "subtitle": "Överlevnadsläge",
@@ -2659,6 +2660,11 @@ const sv = {
       "correct": "RÄTT!",
       "incorrect": "FEL",
       "answerWas": "Svaret var:"
+    },
+    "fillBlank": {
+      "firstLetterHint": "Första bokstaven visas som ledtråd",
+      "hintLetter": "Ledtråd",
+      "validAlternatives": "Flera giltiga svar accepteras"
     },
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥"
@@ -3438,6 +3444,13 @@ const sv = {
       "showing": "Visar",
       "of": "av",
       "lastUpdated": "Senast uppdaterad"
+    },
+    "templateEditor": {
+      "previewTitle": "Förhandsgranska med exempeldata",
+      "validationTitle": "Mallvalidering",
+      "missingPlaceholders": "Saknade obligatoriska platshållare",
+      "unusedPlaceholders": "Oanvända platshållare upptäckta",
+      "validTemplate": "Mallen är giltig"
     }
   },
   "tvTutorial": {

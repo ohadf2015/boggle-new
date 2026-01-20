@@ -155,6 +155,57 @@ export function normalizeWord(word: string, language: Language): string {
 }
 
 // ============================================================
+// WORD SANITIZATION (Removes invisible Unicode characters)
+// ============================================================
+
+/**
+ * Regex pattern for invisible Unicode characters that should be removed
+ * Includes:
+ * - Zero-width characters (ZWSP, ZWNJ, ZWJ, WJ)
+ * - Directional formatting marks (LRM, RLM, LRE, RLE, PDF, etc.)
+ * - Soft hyphen
+ * - Non-breaking spaces (converted to regular spaces then trimmed)
+ * - Hebrew vowel points (niqqud) and cantillation marks
+ */
+const INVISIBLE_UNICODE_PATTERN = /[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u00AD\u00A0\u0591-\u05C7]/g;
+
+/**
+ * Sanitize a word by removing invisible Unicode characters
+ * This fixes issues where words from database or user input contain hidden characters
+ * that cause length mismatches in feedback generation
+ *
+ * @param word - The word to sanitize
+ * @param language - Optional language for additional filtering
+ * @returns Sanitized word with only visible characters
+ *
+ * @example
+ * // Remove RTL mark from Hebrew word
+ * sanitizeWord('שמים\u200F') // Returns: 'שמים'
+ *
+ * // Remove niqqud (vowel points) from Hebrew
+ * sanitizeWord('שָׁמַיִם') // Returns: 'שמים'
+ *
+ * // Trim whitespace
+ * sanitizeWord('  hello  ') // Returns: 'hello'
+ */
+export function sanitizeWord(word: string, language?: Language): string {
+  if (typeof word !== 'string') return '';
+
+  // Step 1: Remove invisible Unicode characters
+  let sanitized = word.replace(INVISIBLE_UNICODE_PATTERN, '');
+
+  // Step 2: Trim whitespace
+  sanitized = sanitized.trim();
+
+  // Step 3: If language specified, filter to valid characters only
+  if (language === 'he') {
+    sanitized = filterHebrewWord(sanitized);
+  }
+
+  return sanitized;
+}
+
+// ============================================================
 // VALIDATION PATTERNS
 // ============================================================
 

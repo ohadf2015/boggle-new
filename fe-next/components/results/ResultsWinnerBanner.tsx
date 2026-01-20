@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { fireRankConfetti } from '@/utils/confettiUtils';
 import Avatar from '../Avatar';
 import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import type { PlayerResult } from '@/types/components';
 
 // Winner data - includes username, score, and optional avatar
@@ -339,14 +340,23 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
           </div>
         </div>
 
-        {/* Mascot - Positioned at corner with animation */}
+        {/* Mascot - Trophy for winners, regular mascot for others */}
         <div className="absolute -bottom-2 -right-2 sm:bottom-0 sm:right-0 z-20 pointer-events-none">
-          <MascotWithEntrance
-            variant={mascotVariant}
-            size="sm"
-            delay={0.6}
-            className="drop-shadow-lg"
-          />
+          {(rank <= 3 || variant === 'highScore' || variant === 'newRecord') && winner?.score !== 0 ? (
+            <CelebrationMascotWithEntrance
+              variant="trophy"
+              size="sm"
+              delay={0.6}
+              className="drop-shadow-lg"
+            />
+          ) : (
+            <MascotWithEntrance
+              variant={mascotVariant}
+              size="sm"
+              delay={0.6}
+              className="drop-shadow-lg"
+            />
+          )}
         </div>
       </div>
     </motion.div>
