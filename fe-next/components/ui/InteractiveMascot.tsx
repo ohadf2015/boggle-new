@@ -7,121 +7,108 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { MASCOT_IMAGES, MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
 
 /**
- * Mood-based variants (emotional states) - these use fallback images
+ * Extended variants for semantic meaning - ALL map to 4 GIF variants
+ * These provide better semantic names for different contexts
  */
-export type MoodVariant = 'confused' | 'proud' | 'nervous' | 'sad' | 'winking';
+export type MoodVariant =
+  | 'confused'      // → thinking
+  | 'proud'         // → happy
+  | 'nervous'       // → oops
+  | 'sad'           // → thinking
+  | 'winking'       // → happy
+  | 'celebrating'   // → happy
+  | 'victory'       // → happy
+  | 'excited'       // → happy
+  | 'encouraging'   // → happy
+  | 'pointing'      // → happy
+  | 'surprised'     // → oops
+  | 'sleepy'        // → thinking
+  | 'focused';      // → thinking
 
 /**
- * Activity-based variants (mascot doing things)
- * These now have their own dedicated images
+ * Activity-based variants - ALL map to 4 GIF variants
  */
 export type ActivityVariant =
-  | 'eating_pizza'
-  | 'drinking_coffee'
-  | 'gaming'
-  | 'dancing'
-  | 'waving'
-  | 'holding_trophy'
-  | 'holding_sign'
-  | 'cheering'
-  | 'skateboarding';
+  | 'eating_pizza'     // → happy
+  | 'drinking_coffee'  // → thinking
+  | 'dancing'          // → happy
+  | 'waving'           // → happy
+  | 'holding_trophy'   // → happy
+  | 'holding_sign'     // → happy
+  | 'cheering'         // → happy
+  | 'skateboarding';   // → gaming
 
 /**
- * Extended mascot variants including interaction states and activities
+ * Extended mascot variants including semantic aliases
  */
 export type ExtendedMascotVariant = MascotVariant | MoodVariant | ActivityVariant;
 
 /**
- * Fallback mapping for mood variants that don't have dedicated images
+ * Mapping table: ALL extended variants → 4 GIF variants
  */
-const MOOD_FALLBACKS: Record<MoodVariant, MascotVariant> = {
+const VARIANT_MAP: Record<string, MascotVariant> = {
+  // Mood variants
   confused: 'thinking',
-  proud: 'victory',
+  proud: 'happy',
   nervous: 'oops',
-  sad: 'sleepy',
+  sad: 'thinking',
   winking: 'happy',
+  celebrating: 'happy',
+  victory: 'happy',
+  excited: 'happy',
+  encouraging: 'happy',
+  pointing: 'happy',
+  surprised: 'oops',
+  sleepy: 'thinking',
+  focused: 'thinking',
+  // Activity variants
+  eating_pizza: 'happy',
+  drinking_coffee: 'thinking',
+  dancing: 'happy',
+  waving: 'happy',
+  holding_trophy: 'happy',
+  holding_sign: 'happy',
+  cheering: 'happy',
+  skateboarding: 'gaming',
 };
 
 /**
- * Get the base MascotVariant for any ExtendedMascotVariant
- * Most activity variants now have direct images
+ * Get the base GIF variant for any ExtendedMascotVariant
+ * ALL extended variants map to one of 4 GIF variants: happy, gaming, thinking, oops
  */
 function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
-  // If it's a mood variant, use fallback
-  if (variant in MOOD_FALLBACKS) {
-    return MOOD_FALLBACKS[variant as MoodVariant];
+  // If it's already a base variant, return as-is
+  if (variant === 'happy' || variant === 'gaming' || variant === 'thinking' || variant === 'oops') {
+    return variant;
   }
-  // For holding_sign (no image yet), fallback to pointing
-  if (variant === 'holding_sign') {
-    return 'pointing';
-  }
-  // All other variants have direct images
-  return variant as MascotVariant;
+  // Map extended variant to base GIF variant
+  return VARIANT_MAP[variant] || 'happy';
 }
 
 /**
- * Default state transitions for interactions
+ * Default state transitions for interactions (simplified to 4 GIF variants)
+ * All interactions transition between: happy, gaming, thinking, oops
  */
-const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
-  // Base emotions
-  happy: 'excited',
-  sleepy: 'surprised',
-  thinking: 'happy',
-  focused: 'excited',
-  encouraging: 'celebrating',
-  oops: 'nervous',
-  celebrating: 'victory',
-  victory: 'celebrating',
-  surprised: 'excited',
-  excited: 'celebrating',
-  pointing: 'happy',
-  // Mood variants
-  confused: 'thinking',
-  proud: 'celebrating',
-  nervous: 'oops',
-  sad: 'encouraging',
-  winking: 'excited',
-  // Activity variants - hover shows more energetic version
-  eating_pizza: 'excited',
-  drinking_coffee: 'happy',
-  gaming: 'celebrating',
-  dancing: 'cheering',
-  waving: 'excited',
-  holding_trophy: 'celebrating',
-  holding_sign: 'excited',
-  cheering: 'victory',
-  skateboarding: 'excited',
+const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
+  // Base GIF variants
+  happy: 'gaming',      // Happy → Gaming (more energetic)
+  gaming: 'happy',      // Gaming → Happy (celebration)
+  thinking: 'happy',    // Thinking → Happy (done thinking)
+  oops: 'thinking',     // Oops → Thinking (figuring it out)
+
+  // All extended variants transition to more energetic state
+  // Most default to gaming (energetic) or happy (celebratory)
 };
 
-const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
-  // Base emotions
-  happy: 'celebrating',
-  sleepy: 'excited',
-  thinking: 'surprised',
-  focused: 'victory',
-  encouraging: 'excited',
-  oops: 'surprised',
-  celebrating: 'victory',
-  victory: 'excited',
-  surprised: 'happy',
-  excited: 'victory',
-  pointing: 'celebrating',
-  // Mood variants
-  confused: 'surprised',
-  proud: 'victory',
-  nervous: 'surprised',
-  sad: 'happy',
-  winking: 'celebrating',
-  // Activity variants - click shows celebratory reaction
-  eating_pizza: 'celebrating',
-  drinking_coffee: 'excited',
-  gaming: 'victory',
-  dancing: 'victory',
-  waving: 'celebrating',
-  holding_trophy: 'victory',
-  holding_sign: 'celebrating',
-  cheering: 'victory',
-  skateboarding: 'victory',
+const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
+  // Base GIF variants
+  happy: 'gaming',      // Happy → Gaming (let's play!)
+  gaming: 'happy',      // Gaming → Happy (victory!)
+  thinking: 'oops',     // Thinking → Oops (oh!)
+  oops: 'happy',        // Oops → Happy (recovered!)
+
+  // All extended variants get celebratory reaction on click
+  // Most default to happy (celebration) or gaming (excitement)
 };
 
 /**
@@ -222,125 +209,34 @@ function getImageSource(variant: ExtendedMascotVariant): string {
 }
 
 /**
- * Get idle animation based on variant
- * Activity variants have their own unique animations
+ * Get idle animation based on variant (simplified to 4 GIF variants)
+ * CSS animations that complement the GIF animation
  */
 function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
   const animations: Record<MascotVariant, TargetAndTransition> = {
-    // Base emotional variants
+    // Happy: Gentle floating bob (complements main-nobg.gif)
     happy: {
       y: [0, -6, 0],
       rotate: [0, -2, 2, 0],
       transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
     },
-    celebrating: {
-      y: [0, -12, 0, -6, 0],
-      scale: [1, 1.05, 1],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    thinking: {
-      y: [0, -3, 0],
-      rotate: [0, 2, 0, -2, 0],
-      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-    },
-    encouraging: {
-      y: [0, -5, 0],
-      x: [0, 2, -2, 0],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    oops: {
-      x: [0, -2, 2, -1, 1, 0],
-      transition: { duration: 0.5, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' },
-    },
-    victory: {
-      y: [0, -10, 0, -5, 0],
-      scale: [1, 1.05, 1],
-      transition: { duration: 1.8, repeat: Infinity, ease: 'easeOut' },
-    },
-    focused: {
-      scale: [1, 1.02, 1],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    surprised: {
-      y: [0, -8, 0],
-      scale: [1, 1.1, 1],
-      transition: { duration: 0.6, repeat: Infinity, repeatDelay: 2, ease: 'easeOut' },
-    },
-    sleepy: {
-      y: [0, 2, 0],
-      rotate: [0, 1, 0, -1, 0],
-      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-    },
-    excited: {
-      y: [0, -15, 0, -8, 0],
-      scale: [1, 1.08, 1],
-      rotate: [0, -5, 5, 0],
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeOut' },
-    },
-    pointing: {
-      x: [0, 4, 0],
-      rotate: [0, 2, 0],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    // Activity variants - expressive animations matching each mood
-    eating_pizza: {
-      // Munching motion - happy satisfied eating
-      y: [0, -4, 0, -2, 0],
-      rotate: [0, -3, 3, -2, 2, 0],
-      scale: [1, 1.05, 0.98, 1.03, 1],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    drinking_coffee: {
-      // Cozy sipping - slow, relaxed, content
-      y: [0, -2, 0, -1, 0],
-      rotate: [0, 2, 0, -1, 0],
-      scale: [1, 1.02, 0.99, 1.01, 1],
-      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-    },
+    // Gaming: Intense reactive motion (complements play-nobg.gif)
     gaming: {
-      // Intense gaming - quick reactive movements
       x: [0, -3, 3, -2, 2, -1, 1, 0],
       y: [0, -5, -2, -4, 0],
       rotate: [0, -3, 3, -2, 0],
       transition: { duration: 0.6, repeat: Infinity, ease: 'easeOut' },
     },
-    dancing: {
-      // Groovy dance - rhythmic bouncy movement
-      y: [0, -12, 0, -8, 0, -10, 0],
-      rotate: [0, -10, 10, -8, 8, -5, 0],
-      scale: [1, 1.08, 0.95, 1.06, 0.97, 1.04, 1],
-      x: [0, 3, -3, 2, -2, 0],
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
+    // Thinking: Slow thoughtful bob with head tilt (complements study-nobg.gif)
+    thinking: {
+      y: [0, -3, 0],
+      rotate: [0, 2, 0, -2, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
     },
-    waving: {
-      // Friendly wave - energetic greeting
-      rotate: [0, -8, 8, -6, 6, -4, 4, 0],
-      y: [0, -5, -3, -5, -2, -4, 0],
-      scale: [1, 1.05, 1.02, 1.04, 1],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    holding_trophy: {
-      // Victorious celebration - proud sway with trophy
-      y: [0, -10, 0, -6, 0],
-      rotate: [0, -4, 4, -2, 0],
-      scale: [1, 1.1, 1, 1.05, 1],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeOut' },
-    },
-    cheering: {
-      // Enthusiastic cheer - high energy bouncing
-      y: [0, -18, 0, -12, 0, -8, 0],
-      rotate: [0, -8, 8, -6, 6, -3, 0],
-      scale: [1, 1.15, 1, 1.1, 1, 1.05, 1],
+    // Oops: Nervous shake/wiggle (complements oops-nobg.gif)
+    oops: {
       x: [0, -2, 2, -1, 1, 0],
-      transition: { duration: 1.4, repeat: Infinity, ease: 'easeOut' },
-    },
-    skateboarding: {
-      // Dynamic rolling motion - cool skateboarding vibes
-      x: [0, 3, -3, 2, -2, 0],
-      y: [0, -6, -2, -5, -1, -3, 0],
-      rotate: [0, -6, 6, -4, 4, -2, 0],
-      scale: [1, 1.06, 1.02, 1.04, 1],
-      transition: { duration: 1.6, repeat: Infinity, ease: 'easeOut' },
+      transition: { duration: 0.5, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' },
     },
   };
 
@@ -350,23 +246,28 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
 
 /**
  * Interactive Mascot component with hover and click state changes
+ * GIF-ONLY: All variants use animated GIFs, extended variants map to 4 base GIFs
  *
  * @example
- * // Basic interactive mascot
+ * // Basic interactive mascot with base GIF variant
  * <InteractiveMascot variant="happy" enableHover enableClick />
  *
- * // Custom interactions
+ * // Using extended semantic variant (maps to base GIF)
+ * <InteractiveMascot variant="celebrating" enableHover enableClick />
+ * // 'celebrating' → 'happy' GIF
+ *
+ * // Custom interactions with base GIF variants
  * <InteractiveMascot
  *   variant="thinking"
- *   hoverVariant="excited"
- *   clickVariant="celebrating"
+ *   hoverVariant="happy"
+ *   clickVariant="gaming"
  *   clickAnimation="bounce"
  *   onClick={() => console.log('Mascot clicked!')}
  * />
  *
- * // With tooltip
+ * // With tooltip and activity variant
  * <InteractiveMascot
- *   variant="encouraging"
+ *   variant="skateboarding"  // → gaming GIF
  *   enableHover
  *   enableClick
  *   tooltip="Click me!"

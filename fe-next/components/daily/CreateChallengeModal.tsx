@@ -455,7 +455,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       className="relative z-10"
                     >
                       <Mascot
-                        variant="holding_trophy"
+                        variant="happy"
                         size="2xl"
                         animated={true}
                         className="drop-shadow-2xl"

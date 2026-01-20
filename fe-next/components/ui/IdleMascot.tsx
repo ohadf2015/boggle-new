@@ -12,10 +12,10 @@ import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES, DEFAULT_BASE_VARIANTS
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /**
- * NOTE: IdleMascot automatically uses GIF variants when available
- * The getMascotImagePath() helper in Mascot.tsx determines whether
- * to use GIF or PNG based on the variant. GIF variants (happy, gaming,
- * thinking, oops) will automatically display animated GIFs.
+ * NOTE: IdleMascot uses GIF-ONLY architecture
+ * ALL mascot variants are now animated GIFs (main-nobg.gif, play-nobg.gif, study-nobg.gif, oops-nobg.gif)
+ * Extended variants (activities, moods) automatically map to one of the 4 base GIF variants
+ * via getBaseVariant() in InteractiveMascot.tsx
  */
 
 interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {

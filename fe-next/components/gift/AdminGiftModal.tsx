@@ -99,7 +99,13 @@ export function AdminGiftModal({
 
   // GSAP Timeline Animation
   useEffect(() => {
-    if (!show || !containerRef.current || prefersReducedMotion || !gift) return;
+    if (!show || !gift) return;
+
+    // Skip animation for reduced motion - go directly to ready state
+    if (prefersReducedMotion || !containerRef.current) {
+      setPhase('ready');
+      return;
+    }
 
     const container = containerRef.current;
     const ctx = gsap.context(() => {
@@ -300,6 +306,7 @@ export function AdminGiftModal({
               <button
                 onClick={onDismiss}
                 className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                aria-label={t('common.close') || 'Close'}
               >
                 <X className="w-4 h-4 text-white/70" />
               </button>

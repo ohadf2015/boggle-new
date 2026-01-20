@@ -223,9 +223,10 @@ export function useWikipediaCandidates({
   );
 
   const triggerPopulation = useCallback(async (): Promise<boolean> => {
-    // Client-side timeout (55s) - slightly less than server's maxDuration (60s)
-    // This ensures we get a proper error message instead of browser hanging
-    const CLIENT_TIMEOUT_MS = 55000;
+    // Client-side timeout (90s) - gives server enough time for Wikipedia API retries
+    // Server maxDuration is 60s, but we allow extra buffer for processing
+    // Wikipedia API can be slow (30s timeout + retries per language)
+    const CLIENT_TIMEOUT_MS = 90000;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();

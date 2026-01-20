@@ -86,6 +86,7 @@ const mockT = (key: string) => {
     'gift.feedbackLine': 'Your voice matters to us!',
     'gift.thankYouLine': 'A special thank you from us!',
     'gift.customLine': 'A message just for you!',
+    'common.close': 'Close',
   };
   return translations[key] || key;
 };
@@ -411,6 +412,71 @@ describe('AdminGiftModal', () => {
         />
       );
       expect(screen.getByText(/admin_user/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Close Button Accessibility', () => {
+    it('shows close button immediately when prefersReducedMotion is true', () => {
+      // GIVEN: User has reduced motion preference (mocked in setup)
+      // WHEN: Modal is shown
+      render(
+        <AdminGiftModal
+          gift={mockGift}
+          show={true}
+          onClaim={mockOnClaim}
+          onDismiss={mockOnDismiss}
+        />
+      );
+
+      // THEN: Close button should be immediately visible without waiting for GSAP animation
+      // Bug: Close button only shows when phase === 'ready', but GSAP animation doesn't run
+      // when prefersReducedMotion is true, leaving phase stuck at 'entrance'
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      expect(closeButton).toBeInTheDocument();
+    });
+
+    it('calls onDismiss when close button is clicked', async () => {
+      // GIVEN: Modal is open
+      render(
+        <AdminGiftModal
+          gift={mockGift}
+          show={true}
+          onClaim={mockOnClaim}
+          onDismiss={mockOnDismiss}
+        />
+      );
+
+      // WHEN: Close button is clicked
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      fireEvent.click(closeButton);
+
+      // THEN: onDismiss should be called
+      await waitFor(() => {
+        expect(mockOnDismiss).toHaveBeenCalled();
+      });
+    });
+
+    it('allows backdrop click to dismiss modal when ready', () => {
+      // GIVEN: Modal is open and in ready state
+      render(
+        <AdminGiftModal
+          gift={mockGift}
+          show={true}
+          onClaim={mockOnClaim}
+          onDismiss={mockOnDismiss}
+        />
+      );
+
+      // WHEN: Backdrop is clicked
+      // Find backdrop by its class - the element with bg-black/70
+      const backdrop = document.querySelector('.bg-black\\/70');
+      expect(backdrop).toBeInTheDocument();
+      if (backdrop) {
+        fireEvent.click(backdrop);
+      }
+
+      // THEN: onDismiss should be called
+      expect(mockOnDismiss).toHaveBeenCalled();
     });
   });
 });

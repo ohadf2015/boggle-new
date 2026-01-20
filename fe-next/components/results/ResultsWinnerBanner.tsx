@@ -201,15 +201,15 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     // Zero score - oops face
     if (winner && winner.score === 0) return 'oops';
 
-    // Single player variants
-    if (variant === 'highScore' || variant === 'newRecord') return 'victory';
+    // Single player variants (GIF-ONLY: victory → happy)
+    if (variant === 'highScore' || variant === 'newRecord') return 'happy';
     if (variant === 'completion') return 'happy';
 
-    // Multiplayer ranking
-    if (rank === 1) return 'victory'; // Crown celebration
-    if (rank === 2) return 'celebrating'; // Silver happiness
-    if (rank === 3) return 'excited'; // Bronze excitement
-    return 'encouraging'; // Non-podium encouragement
+    // Multiplayer ranking (GIF-ONLY: all celebration variants → happy)
+    if (rank === 1) return 'happy'; // Crown celebration
+    if (rank === 2) return 'happy'; // Silver happiness
+    if (rank === 3) return 'happy'; // Bronze excitement
+    return 'happy'; // Non-podium encouragement
   };
 
   const mascotVariant = getMascotVariant();

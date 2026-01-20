@@ -146,7 +146,7 @@ export function PageStateHandler({
         type="no-results"
         title={emptyText || t('common.noData') || 'No data available'}
         showMascot
-        mascotVariant="encouraging"
+        mascotVariant="happy"
       />
     );
   }

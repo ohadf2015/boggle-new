@@ -41,6 +41,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const [selectedGift, setSelectedGift] = useState<typeof gifts[0] | null>(null);
     // Track which gift IDs have been auto-shown this session to prevent re-showing
     const autoShownGiftIdsRef = useRef<Set<string>>(new Set());
+    // Track which gift IDs have been dismissed this session (user clicked X without claiming)
+    // This prevents the gift from re-appearing after 3 second auto-show timer
+    const dismissedGiftIdsRef = useRef<Set<string>>(new Set());
 
     // Handle opening gift modal with oldest unclaimed gift
     const handleOpenGiftModal = useCallback(() => {
@@ -64,8 +67,17 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     // Handle dismissing gift modal - show next unclaimed gift if available
     // Also persist dismissal to database to prevent auto-showing in future sessions
     const handleDismissGiftModal = useCallback(async () => {
-        // Find the next unclaimed gift (excluding the currently selected one)
-        const nextUnclaimedGift = gifts.find(g => !g.claimed && g.id !== selectedGift?.id);
+        // Mark current gift as dismissed to prevent re-showing this session
+        if (selectedGift?.id) {
+            dismissedGiftIdsRef.current.add(selectedGift.id);
+        }
+
+        // Find the next unclaimed gift (excluding the currently selected one and dismissed ones)
+        const nextUnclaimedGift = gifts.find(g =>
+            !g.claimed &&
+            g.id !== selectedGift?.id &&
+            !dismissedGiftIdsRef.current.has(g.id)
+        );
 
         if (nextUnclaimedGift) {
             // Show the next unclaimed gift
@@ -89,7 +101,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 // Non-critical error - don't block user experience
             }
         }
-    }, [gifts, selectedGift?.id, refreshProfile]);
+    }, [gifts, selectedGift, refreshProfile]);
 
     // Auto-show gift modal after 3 seconds when user has unclaimed gifts
     // - Tracks which gifts have been auto-shown this session to prevent re-showing
@@ -116,6 +128,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             if (g.claimed) return false;
             // Skip if already auto-shown this session
             if (autoShownGiftIdsRef.current.has(g.id)) return false;
+            // Skip if already dismissed this session (user clicked X)
+            if (dismissedGiftIdsRef.current.has(g.id)) return false;
             // If dismissal timestamp exists, only show gifts created AFTER dismissal
             if (dismissedAt > 0) {
                 const giftCreatedAt = new Date(g.created_at).getTime();
@@ -374,10 +388,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             className={cn(
                                 "relative flex items-center justify-center",
                                 "w-10 h-10",
-                                "bg-gradient-to-br from-amber-400 to-amber-500 text-neo-black",
+                                "bg-amber-400 text-neo-black",
                                 "border-3 border-neo-black",
                                 "rounded-neo shadow-hard-sm",
-                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:from-amber-500 hover:to-amber-600",
+                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-amber-500",
                                 "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                                 "transition-all duration-100"
                             )}
@@ -394,10 +408,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         className={cn(
                             "flex items-center justify-center",
                             "w-10 h-10",
-                            "bg-neo-purple/20 text-neo-purple dark:text-neo-purple-light",
+                            "bg-neo-cream text-neo-black",
                             "border-3 border-neo-black",
                             "rounded-neo shadow-hard-sm",
-                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-purple/40",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                             "transition-all duration-100"
                         )}
@@ -563,7 +577,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     }}
                                                     className={cn(
                                                         "relative flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                        "bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-neo-black",
+                                                        "bg-amber-400 hover:bg-amber-500 text-neo-black",
                                                         "shadow-hard-sm hover:shadow-hard"
                                                     )}
                                                 >
@@ -618,11 +632,11 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             onClick={() => setShowMobileMenu(false)}
                                             className={cn(
                                                 "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                "bg-neo-purple/20 dark:bg-neo-purple/30 hover:bg-neo-purple/40 dark:hover:bg-neo-purple/50 text-neo-black dark:text-white",
+                                                "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                 "shadow-hard-sm hover:shadow-hard"
                                             )}
                                         >
-                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple/30 border-3 border-neo-black text-neo-purple dark:text-neo-purple-light">
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-3 border-neo-black text-neo-black dark:text-white">
                                                 <Accessibility className="w-4 h-4" aria-hidden="true" />
                                             </span>
                                             <span>{t('settings.accessibility') || 'Accessibility'}</span>

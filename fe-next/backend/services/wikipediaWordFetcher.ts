@@ -220,7 +220,9 @@ export async function fetchFeaturedContent(
     const [year, month, day] = dateStr.split('-');
     const url = `https://api.wikimedia.org/feed/v1/wikipedia/${language}/featured/${year}/${month}/${day}`;
 
-    const data = await fetchWithRetry<WikipediaFeaturedContent>(url, 10000);
+    // Increased timeout to 30s to reduce retry overhead (Wikipedia API can be slow)
+    // With 2 retries: worst case = 30s + 500ms + 30s + 1000ms = ~62s total
+    const data = await fetchWithRetry<WikipediaFeaturedContent>(url, 30000);
 
     const apiResponseTime = Date.now() - startTime;
     console.log(`[Wikipedia] Fetched featured content for ${language} in ${apiResponseTime}ms`);

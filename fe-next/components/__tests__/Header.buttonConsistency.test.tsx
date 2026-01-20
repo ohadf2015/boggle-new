@@ -170,26 +170,25 @@ describe('Header Button Consistency', () => {
         expect(profileButton).toHaveClass('border-3');
     });
 
-    it('should render gift button with distinctive amber gradient', () => {
+    it('should render gift button with distinctive amber background', () => {
         const { container } = render(<Header />);
 
         // Get desktop controls section
         const desktopControls = container.querySelector('.hidden.sm\\:flex');
         const giftButton = desktopControls?.querySelector('button[aria-label*="gift"]');
 
-        expect(giftButton).toHaveClass('bg-gradient-to-br');
-        expect(giftButton).toHaveClass('from-amber-400');
+        expect(giftButton).toHaveClass('bg-amber-400');
         expect(giftButton).toHaveClass('border-3');
     });
 
-    it('should render accessibility button with purple accent', () => {
+    it('should render accessibility button with neutral background', () => {
         const { container } = render(<Header />);
 
         // Get desktop controls section
         const desktopControls = container.querySelector('.hidden.sm\\:flex');
         const a11yButton = desktopControls?.querySelector('a[href*="accessibility"]');
 
-        expect(a11yButton).toHaveClass('bg-neo-purple/20');
+        expect(a11yButton).toHaveClass('bg-neo-cream');
         expect(a11yButton).toHaveClass('border-3');
     });
 

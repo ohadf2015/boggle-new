@@ -5,11 +5,11 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /**
  * Default fun activities that can be randomly displayed
+ * NOTE: 'gaming' is now a base variant, not an activity variant
  */
 export const DEFAULT_IDLE_ACTIVITIES: ActivityVariant[] = [
   'eating_pizza',
   'drinking_coffee',
-  'gaming',
   'dancing',
   'skateboarding',
   'waving',
@@ -19,14 +19,13 @@ export const DEFAULT_IDLE_ACTIVITIES: ActivityVariant[] = [
 
 /**
  * Default emotional base variants to cycle through for variety
+ * GIF-ONLY: Only the 4 base GIF variants (happy, gaming, thinking, oops)
  */
 export const DEFAULT_BASE_VARIANTS: MascotVariant[] = [
   'happy',
-  'encouraging',
-  'excited',
+  'gaming',
   'thinking',
-  'focused',
-  'pointing',
+  'oops',
 ];
 
 interface UseRandomMascotActivityOptions {

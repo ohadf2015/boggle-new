@@ -15,8 +15,10 @@ import {
 import { triggerWikipediaWordPopulation } from '@/backend/services/cronScheduler';
 import type { Language } from '@/shared/types/game';
 
-// Allow 60 seconds for Wikipedia API calls + AI scoring
-export const maxDuration = 60;
+// Allow 90 seconds for Wikipedia API calls + AI scoring
+// Wikipedia API can be slow (30s timeout per request + retries)
+// With 7 languages in parallel, some may timeout and retry
+export const maxDuration = 90;
 
 const SUPPORTED_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'];
 
