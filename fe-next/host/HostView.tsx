@@ -351,7 +351,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   }, [runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
 
   return (
-    <div className="h-full overflow-hidden bg-neo-navy">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
       {/* GO Animation */}
       {runtime.showStartAnimation && (
         <GoRipplesAnimation onComplete={() => state.setShowStartAnimation(false)} />

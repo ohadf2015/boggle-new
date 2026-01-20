@@ -689,6 +689,7 @@ const he = {
     "live": "שידור חי",
     "waitingForGame": "ממתין למשחק...",
     "noPlayersYet": "אין שחקנים עדיין",
+    "waitingForPlayers": "מחכים לשחקנים שיצטרפו...",
     "earthquake": "רעידת אדמה!",
     "fireRound": "סיבוב אש",
     "twoXPoints": "נקודות X2",

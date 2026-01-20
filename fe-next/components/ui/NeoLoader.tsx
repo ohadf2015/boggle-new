@@ -27,7 +27,7 @@ interface NeoLoaderProps {
   size?: 'sm' | 'md' | 'lg';
   /** Loading animation variant */
   variant?: 'letters' | 'mascot' | 'dots' | 'mascot-letters';
-  /** Mascot variant for mascot mode (default: 'thinking') */
+  /** Mascot variant for mascot mode (default: 'happy') */
   mascotVariant?: MascotVariant;
   /** Optional className for the wrapper element */
   className?: string;
@@ -41,7 +41,7 @@ export const NeoLoader = memo(function NeoLoader({
   text,
   size = 'md',
   variant = 'letters',
-  mascotVariant = 'thinking',
+  mascotVariant = 'happy',
   className,
 }: NeoLoaderProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();

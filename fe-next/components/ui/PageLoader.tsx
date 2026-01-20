@@ -39,7 +39,7 @@ export const PageLoader = memo(function PageLoader({
   variant = 'mascot-letters',
   size = 'lg',
   text,
-  mascotVariant = 'thinking',
+  mascotVariant = 'happy',
   nested = false,
 }: PageLoaderProps) {
   // Use flex-1 for nested Suspense fallbacks, screen-fit for full-page loading.tsx

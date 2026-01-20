@@ -23,16 +23,12 @@ describe('SettingsPanel', () => {
   const mockT = (key: string) => key;
   const mockOnPresetClick = jest.fn();
   const mockOnTvModeToggle = jest.fn();
-  const mockOnCopyCode = jest.fn();
 
   const defaultProps = {
     selectedPreset: 'party' as const,
     onPresetClick: mockOnPresetClick,
     tvMode: false,
     onTvModeToggle: mockOnTvModeToggle,
-    timerValue: 2,
-    gameCode: 'ABC123',
-    onCopyCode: mockOnCopyCode,
     t: mockT,
   };
 
@@ -67,27 +63,6 @@ describe('SettingsPanel', () => {
 
     fireEvent.click(screen.getByTestId('preset-fast'));
     expect(mockOnPresetClick).toHaveBeenCalledWith('fast');
-  });
-
-  it('should display the room code', () => {
-    render(<SettingsPanel {...defaultProps} />);
-
-    expect(screen.getByText('ABC123')).toBeInTheDocument();
-  });
-
-  it('should call onCopyCode when copy button is clicked', () => {
-    render(<SettingsPanel {...defaultProps} />);
-
-    const copyButton = screen.getByTestId('copy-code-button');
-    fireEvent.click(copyButton);
-    expect(mockOnCopyCode).toHaveBeenCalled();
-  });
-
-  it('should display the timer value', () => {
-    render(<SettingsPanel {...defaultProps} timerValue={3} />);
-
-    // The timer value should be displayed - t() returns key, so look for "3 common.minutes"
-    expect(screen.getByText(/3 common\.minutes/)).toBeInTheDocument();
   });
 
   it('should render TV mode toggle', () => {

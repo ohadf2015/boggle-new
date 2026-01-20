@@ -230,8 +230,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 </div>
               )}
 
-              {/* Stats row - Timer + Score (mobile) or Timer only (desktop) */}
-              <div className="flex w-full items-center justify-between relative">
+              {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
+              <div
+                className="flex w-full items-center justify-center lg:justify-between relative min-h-[80px] md:min-h-[100px] lg:min-h-[120px]"
+                data-testid="stats-row"
+              >
                 {/* Desktop header */}
                 <GameHeader
                   onExitRoom={onExitRoom}
@@ -245,6 +248,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 {/* Timer (center) */}
                 <motion.div
                   data-tutorial="timer"
+                  data-testid="timer-container"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="relative z-20 shrink-0"
@@ -260,19 +264,20 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   </div>
                 </motion.div>
 
-                {/* Right Side: Score (mobile) */}
+                {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (
-                  <div className="flex-1 flex justify-start pl-1 md:pl-3 pointer-events-none lg:hidden">
-                    <div className="pointer-events-auto">
-                      <ScoreDisplay
-                        score={playerScore}
-                        rank={playerRank}
-                        leaderboardSize={leaderboard.length}
-                        minWordLength={minWordLength}
-                        t={t}
-                        variant="mobile"
-                      />
-                    </div>
+                  <div
+                    className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 lg:hidden"
+                    data-testid="score-mobile"
+                  >
+                    <ScoreDisplay
+                      score={playerScore}
+                      rank={playerRank}
+                      leaderboardSize={leaderboard.length}
+                      minWordLength={minWordLength}
+                      t={t}
+                      variant="mobile"
+                    />
                   </div>
                 )}
 

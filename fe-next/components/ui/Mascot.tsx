@@ -31,7 +31,7 @@ export type MascotVariant =
   | 'skateboarding';
 
 /**
- * Mascot image paths mapping
+ * Mascot image paths mapping (PNG fallbacks)
  */
 export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   // Base emotional variants
@@ -56,6 +56,50 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   cheering: '/mascot/lexi-cheering.png',
   skateboarding: '/mascot/lexi-skateboarding.png',
 };
+
+/**
+ * Variants that use animated GIF files instead of static PNGs
+ * These have background-removed GIF versions for enhanced animation
+ */
+export const GIF_VARIANTS = new Set<MascotVariant>([
+  'happy',    // main.gif - Happy/idle state
+  'gaming',   // play.gif - Gaming/excited gameplay
+  'thinking', // study.gif - Thinking/focused states
+  'oops',     // oops.gif - Errors/mistakes
+]);
+
+/**
+ * Get the appropriate image path for a mascot variant.
+ * Returns GIF path for GIF variants, PNG path for others.
+ *
+ * @param variant - The mascot variant
+ * @returns Image path (either .gif or .png)
+ */
+export function getMascotImagePath(variant: MascotVariant): string {
+  // Check if this variant has a GIF version
+  if (GIF_VARIANTS.has(variant)) {
+    const gifMap: Record<string, string> = {
+      'happy': '/mascot/main-nobg.gif',
+      'gaming': '/mascot/play-nobg.gif',
+      'thinking': '/mascot/study-nobg.gif',
+      'oops': '/mascot/oops-nobg.gif',
+    };
+    return gifMap[variant] || MASCOT_IMAGES[variant];
+  }
+
+  // Use PNG for all other variants
+  return MASCOT_IMAGES[variant];
+}
+
+/**
+ * Check if a variant uses an animated GIF
+ *
+ * @param variant - The mascot variant
+ * @returns True if variant uses GIF, false if PNG
+ */
+export function isGifVariant(variant: MascotVariant): boolean {
+  return GIF_VARIANTS.has(variant);
+}
 
 /**
  * Size presets for the mascot
@@ -379,7 +423,8 @@ export const Mascot = memo(function Mascot({
   const shouldAnimate = animated && !prefersReducedMotion && enableComplexAnimations;
   const animationVariants = useMemo(() => getAnimationVariants(variant), [variant]);
 
-  const imageSrc = MASCOT_IMAGES[variant];
+  const imageSrc = getMascotImagePath(variant);
+  const isGif = isGifVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
   return (
@@ -395,6 +440,7 @@ export const Mascot = memo(function Mascot({
         height={SIZE_PIXELS[size]}
         className="object-contain drop-shadow-lg"
         priority={priority}
+        unoptimized={isGif}
       />
     </motion.div>
   );
@@ -417,7 +463,8 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const shouldAnimate = animated && !prefersReducedMotion && enableComplexAnimations;
   const loopVariants = useMemo(() => getAnimationVariants(variant), [variant]);
 
-  const imageSrc = MASCOT_IMAGES[variant];
+  const imageSrc = getMascotImagePath(variant);
+  const isGif = isGifVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
   return (
@@ -444,6 +491,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
           height={SIZE_PIXELS[size]}
           className="object-contain drop-shadow-lg"
           priority={priority}
+          unoptimized={isGif}
         />
       </motion.div>
     </motion.div>

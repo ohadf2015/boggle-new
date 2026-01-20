@@ -168,7 +168,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const isEarthquakeShaking = earthquakeState === 'shaking';
 
   return (
-    <div className="h-full bg-neo-navy flex flex-col overflow-hidden relative">
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative">
       {/* Top Right Controls: Help + Fullscreen */}
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
         {/* Tutorial Help Button */}
@@ -195,24 +195,19 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         )}
       </div>
 
-      {/* Join Bar (Kahoot-style) - Hidden in fullscreen */}
-      <AnimatePresence>
-        {!isFullscreen && (
-          <motion.div
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <TvJoinBar
-              gameCode={gameCode}
-              roomName={roomName}
-              playerCount={playersReady.length}
-              t={t}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Join Bar (Kahoot-style) - Always visible, even in fullscreen */}
+      <motion.div
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      >
+        <TvJoinBar
+          gameCode={gameCode}
+          roomName={roomName}
+          playerCount={playersReady.length}
+          t={t}
+        />
+      </motion.div>
 
       {/* Game Header with Timer - Always visible */}
       <TvGameHeader
@@ -224,10 +219,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         t={t}
       />
 
-      {/* Main Content: Grid + Leaderboard (50/50) */}
-      <div className={`flex-1 min-h-0 flex flex-col md:flex-row gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
-        {/* Left: Grid - aspect-square ensures square cells */}
-        <div className="flex-1 min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+      {/* Main Content: Grid + Leaderboard (50/50) - Using CSS Grid for reliable height distribution */}
+      <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
+        {/* Left: Grid - fills grid cell and centers the square grid inside */}
+        <div className="min-h-[200px] md:min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           {tableData && Array.isArray(tableData) && tableData.length > 0 && tableData[0] && tableData[0].length > 0 ? (
             <TvGrid
               grid={tableData}
@@ -235,14 +230,14 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
               earthquakeShaking={isEarthquakeShaking}
             />
           ) : (
-            <div className="h-full flex items-center justify-center">
-              <p className="text-neo-black/50 font-bold text-xl">{t('tvBroadcast.waitingForGame')}</p>
+            <div className="w-full h-full flex items-center justify-center p-4">
+              <p className="text-neo-black/50 font-bold text-xl text-center">{t('tvBroadcast.waitingForGame')}</p>
             </div>
           )}
         </div>
 
-        {/* Right: Leaderboard */}
-        <div className="flex-1 min-h-0 bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+        {/* Right: Leaderboard - fills grid cell */}
+        <div className="min-h-[150px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           <TvLeaderboard
             players={leaderboardData}
             playerCombos={playerCombos}

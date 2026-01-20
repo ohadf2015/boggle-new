@@ -79,6 +79,7 @@ import CircularTimer from '../../CircularTimer';
  *   - ComboDisplay returns null internally for level 0
  * - Desktop: Combo absolutely positioned on right (hidden lg:flex, z-30)
  * - Timer centered in stats row with z-20
+ * - Mobile score is absolutely positioned to not affect timer centering
  */
 const FixedStatsRowTestComponent = ({
   comboLevel,
@@ -90,10 +91,7 @@ const FixedStatsRowTestComponent = ({
   score?: number;
 }) => {
   return (
-    <div
-      data-testid="stats-section"
-      className="flex flex-col gap-1"
-    >
+    <div data-testid="stats-section" className="flex flex-col gap-1">
       {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
       {showCombo && (
         <div
@@ -104,25 +102,23 @@ const FixedStatsRowTestComponent = ({
         </div>
       )}
 
-      {/* Stats row - Timer + Score */}
+      {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
       <div
         data-testid="stats-row"
-        className="flex w-full items-center justify-between relative"
+        className="flex w-full items-center justify-center lg:justify-between relative min-h-[80px]"
       >
         {/* Timer (center) */}
         <div data-testid="timer-wrapper" className="relative z-20 shrink-0">
           <CircularTimer remainingTime={60} totalTime={180} size="xs" />
         </div>
 
-        {/* Score (right side on mobile) */}
-        <div className="flex-1 flex justify-start pl-2 lg:hidden">
-          <div
-            data-testid="score-display-mobile"
-            className="px-1.5 py-0.5 min-w-[50px]"
-          >
-            <div className="text-lg font-black">{score}</div>
-            <div className="text-xs font-bold uppercase">Score</div>
-          </div>
+        {/* Score (mobile) - absolutely positioned to not affect timer centering */}
+        <div
+          data-testid="score-display-mobile"
+          className="absolute right-1 top-1/2 -translate-y-1/2 lg:hidden px-1.5 py-0.5 min-w-[50px]"
+        >
+          <div className="text-lg font-black">{score}</div>
+          <div className="text-xs font-bold uppercase">Score</div>
         </div>
 
         {/* Desktop: Combo + Score - absolutely positioned on right */}
@@ -134,10 +130,7 @@ const FixedStatsRowTestComponent = ({
             <div className="h-[32px] flex items-center justify-end">
               {comboLevel > 0 && <ComboDisplay comboLevel={comboLevel} compact />}
             </div>
-            <div
-              data-testid="score-display-desktop"
-              className="px-4 py-1.5 min-w-[90px]"
-            >
+            <div data-testid="score-display-desktop" className="px-4 py-1.5 min-w-[90px]">
               <div className="text-2xl font-black">{score}</div>
               <div className="text-xs font-bold uppercase">Score</div>
             </div>
@@ -267,6 +260,39 @@ describe('InGameScreen Combo Layout', () => {
 
       const timerWrapper = screen.getByTestId('timer-wrapper');
       expect(timerWrapper).toHaveClass('z-20');
+    });
+  });
+
+  describe('mobile timer centering', () => {
+    it('stats row uses justify-center on mobile for timer centering', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const statsRow = screen.getByTestId('stats-row');
+      expect(statsRow).toHaveClass('justify-center');
+    });
+
+    it('stats row uses justify-between on desktop (lg breakpoint)', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const statsRow = screen.getByTestId('stats-row');
+      expect(statsRow).toHaveClass('lg:justify-between');
+    });
+
+    it('mobile score is absolutely positioned to not affect timer centering', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const scoreMobile = screen.getByTestId('score-display-mobile');
+      expect(scoreMobile).toHaveClass('absolute');
+      expect(scoreMobile).toHaveClass('right-1');
+      expect(scoreMobile).toHaveClass('top-1/2');
+      expect(scoreMobile).toHaveClass('-translate-y-1/2');
+    });
+
+    it('stats row has minimum height for consistent spacing', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const statsRow = screen.getByTestId('stats-row');
+      expect(statsRow).toHaveClass('min-h-[80px]');
     });
   });
 

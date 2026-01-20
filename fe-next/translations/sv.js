@@ -679,6 +679,7 @@ const sv = {
     "live": "LIVE",
     "waitingForGame": "Väntar på spel...",
     "noPlayersYet": "Inga spelare ännu",
+    "waitingForPlayers": "Väntar på spelare att ansluta...",
     "earthquake": "JORDBÄVNING!",
     "fireRound": "ELDRUNDA",
     "twoXPoints": "2X POÄNG",

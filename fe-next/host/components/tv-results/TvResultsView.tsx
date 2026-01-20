@@ -183,7 +183,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   const showTournamentStandings = currentPhase === 'tournament-standings';
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-[60] overflow-hidden">
       {/* Fullscreen Toggle Button */}
       {isFullscreenSupported && (
         <motion.button
@@ -192,7 +192,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={toggleFullscreen}
-          className="absolute top-4 right-4 z-[60] bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+          className="absolute top-4 right-4 z-[70] bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
           title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
           aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
         >

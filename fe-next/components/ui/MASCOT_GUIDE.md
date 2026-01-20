@@ -56,10 +56,10 @@ import IdleMascot from '@/components/ui/IdleMascot';
 ## Available Variants
 
 ### Base Emotional Variants
-- `happy` - Default cheerful state
+- `happy` - Default cheerful state ✨ **Animated GIF**
 - `encouraging` - Motivating, pointing gesture
-- `thinking` - Contemplative, head tilted
-- `oops` - Nervous, mistakes happened
+- `thinking` - Contemplative, head tilted ✨ **Animated GIF**
+- `oops` - Nervous, mistakes happened ✨ **Animated GIF**
 - `celebrating` - Party mode!
 - `victory` - Triumphant with crown
 - `focused` - Concentrated, determined
@@ -72,7 +72,7 @@ import IdleMascot from '@/components/ui/IdleMascot';
 - `eating_pizza` 🍕 - Munching on a slice
 - `drinking_coffee` ☕ - Enjoying a cozy drink
 - `reading` 📚 - Absorbed in a book
-- `gaming` 🎮 - Intense gameplay
+- `gaming` 🎮 - Intense gameplay ✨ **Animated GIF**
 - `dancing` 💃 - Groovy dance moves
 - `sleeping` 😴 - Peaceful slumber
 - `waving` 👋 - Friendly greeting
@@ -84,6 +84,53 @@ import IdleMascot from '@/components/ui/IdleMascot';
 - **`playing_ball` ⚽ - Bouncing a ball (NEW!)**
 - **`skateboarding` 🛹 - Riding a skateboard (NEW!)**
 - **`juggling` 🤹 - Juggling colorful balls (NEW!)**
+
+## Animated GIF Variants
+
+Some mascot variants use **animated GIF files** for enhanced visual appeal, while others use static PNG images with CSS animations. The system automatically selects the correct format.
+
+### GIF-Enabled Variants
+The following variants use real animated GIF files (background-removed, optimized):
+
+- **`happy`** ✨ - Happy/idle state (main.gif)
+  - Default cheerful mascot animation
+  - Best for: landing pages, waiting states, general usage
+
+- **`gaming`** ✨ - Gaming/excited gameplay (play.gif)
+  - Intense gameplay animation
+  - Best for: game screens, competitive modes, achievement celebrations
+
+- **`thinking`** ✨ - Thinking/focused states (study.gif)
+  - Contemplative animation with head movement
+  - Best for: loading screens, processing states, brain training modes
+
+- **`oops`** ✨ - Errors/mistakes (oops.gif)
+  - Nervous/apologetic animation
+  - Best for: error pages, validation failures, "try again" states
+
+### How It Works
+
+The mascot system automatically detects GIF variants and handles them correctly:
+
+```tsx
+// You use the same API - the system handles GIF vs PNG automatically
+<Mascot variant="happy" />  // Renders main-nobg.gif
+<Mascot variant="celebrating" />  // Renders lexi-celebrating.png
+```
+
+**Technical Details:**
+- `getMascotImagePath(variant)` - Returns correct path (GIF or PNG)
+- `isGifVariant(variant)` - Returns true for GIF variants
+- `GIF_VARIANTS` - Set containing: `'happy'`, `'gaming'`, `'thinking'`, `'oops'`
+- Next.js Image component automatically uses `unoptimized={true}` for GIFs
+
+### GIF Optimization
+
+All GIF mascots are:
+- **Background-removed** - Transparent backgrounds for Neo-Brutalist dark theme
+- **Optimized** - Target file size < 500KB for fast loading
+- **Frame-preserved** - Original animation timing and smoothness maintained
+- **High-quality** - Lossy compression (80%) balances size and quality
 
 ## Usage Examples
 
@@ -168,6 +215,8 @@ If you don't specify activities, `IdleMascot` uses these by default:
 
 ## Generating New Mascot Images
 
+### For PNG Mascots (Static with CSS Animations)
+
 If you need to create new activity variants:
 
 1. **Generate the image** using the image generation tool
@@ -186,6 +235,63 @@ If you need to create new activity variants:
    your_new_variant: '/mascot/lexi-your-new-variant.png',
    ```
 5. **Add animation** in both Mascot.tsx and InteractiveMascot.tsx
+
+### For GIF Mascots (Animated GIF Files)
+
+If you need to process new animated GIF mascots:
+
+1. **Place GIF file** in `public/mascot/` directory (e.g., `new-animation.gif`)
+2. **Remove background** using the GIF processing script:
+   ```bash
+   # Process single GIF
+   python3 scripts/remove_gif_background.py public/mascot/new-animation.gif
+
+   # Or batch process all GIFs in directory
+   python3 scripts/remove_gif_background.py --batch public/mascot/
+   ```
+3. **Optimize the processed GIF**:
+   ```bash
+   # Single file
+   python3 scripts/optimize_processed_gifs.py public/mascot/new-animation-nobg.gif
+
+   # Or batch optimize
+   python3 scripts/optimize_processed_gifs.py --batch public/mascot/
+   ```
+4. **Add to GIF_VARIANTS Set** in `components/ui/Mascot.tsx`:
+   ```ts
+   export const GIF_VARIANTS = new Set<MascotVariant>([
+     'happy',
+     'gaming',
+     'thinking',
+     'oops',
+     'your_new_variant',  // Add here
+   ]);
+   ```
+5. **Add GIF mapping** in `getMascotImagePath()`:
+   ```ts
+   if (GIF_VARIANTS.has(variant)) {
+     const gifMap: Record<string, string> = {
+       'happy': '/mascot/main-nobg.gif',
+       'gaming': '/mascot/play-nobg.gif',
+       'thinking': '/mascot/study-nobg.gif',
+       'oops': '/mascot/oops-nobg.gif',
+       'your_new_variant': '/mascot/new-animation-nobg.gif',  // Add here
+     };
+     return gifMap[variant] || MASCOT_IMAGES[variant];
+   }
+   ```
+6. **Test the GIF**:
+   ```tsx
+   <Mascot variant="your_new_variant" size="lg" />
+   ```
+
+**Note:** GIF processing is computationally intensive (5-10 minutes per file). The script:
+- Extracts all frames from the GIF
+- Removes background from each frame individually using AI (rembg)
+- Reconstructs the GIF with preserved timing and metadata
+- Creates automatic backups (`.gif.backup`)
+
+For more details, see the `/remove-bg-gif` skill or `.claude/skills/remove-bg-gif/SKILL.md`.
 
 ## Best Practices
 

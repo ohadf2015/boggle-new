@@ -18,7 +18,6 @@ import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
-import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -147,11 +146,11 @@ const LandingView: React.FC = () => {
     threshold: 60,
   });
 
-  // Tutorial prompt state (non-intrusive banner for first-time visitors)
-  const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
-
-  // Onboarding modal state (opened when user clicks to start tutorial)
+  // Onboarding modal state (opened when user clicks tutorial button)
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Track if user is first-time visitor for enhanced tutorial button animation
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
 
   // Auth modal state (opened when user clicks locked feature)
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -170,41 +169,23 @@ const LandingView: React.FC = () => {
     }
   }, [language, router]);
 
-  // Show tutorial prompt for first-time visitors (non-intrusive approach)
+  // Check if user is first-time visitor for enhanced tutorial button animation
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Only show if not completed and no room redirect in progress
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasRoom = urlParams.get('room');
-
-    // Skip tutorial prompt if user is authenticated or already completed onboarding
-    if (hasRoom || isAuthenticated || hasCompletedOnboarding()) {
-      return;
-    }
-
-    // Show prompt after a brief delay (lets the page settle)
-    const timer = setTimeout(() => {
-      setShowTutorialPrompt(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    // Only consider first-time if not authenticated and hasn't completed onboarding
+    const isFirstTime = !isAuthenticated && !hasCompletedOnboarding();
+    setIsFirstTimeUser(isFirstTime);
   }, [isAuthenticated]);
 
-  // Handle tutorial prompt actions
-  const handleStartTutorial = () => {
-    setShowTutorialPrompt(false);
-    setShowOnboarding(true);
-  };
-
-  const handleDismissTutorialPrompt = () => {
-    setShowTutorialPrompt(false);
-    markOnboardingSkipped(); // Mark as skipped so prompt won't show again
-  };
-
-  // Re-open tutorial (for the "Tutorial" button)
+  // Open tutorial modal
   const handleOpenTutorial = () => {
     setShowOnboarding(true);
+    // Mark onboarding as started when user clicks tutorial button
+    if (isFirstTimeUser) {
+      markOnboardingSkipped();
+      setIsFirstTimeUser(false);
+    }
   };
 
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
@@ -304,14 +285,6 @@ const LandingView: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Tutorial Prompt - Non-intrusive banner for first-time visitors (hidden in landscape and mobile portrait) */}
-        {!isLandscape && !isMobilePortrait && (
-          <TutorialPrompt
-            isVisible={showTutorialPrompt}
-            onStartTutorial={handleStartTutorial}
-            onDismiss={handleDismissTutorialPrompt}
-          />
-        )}
 
         {/* Daily Challenge Banner for mobile/landscape - Lazy loaded with skeleton fallback */}
         {/* On desktop, the banner is inside the cards container for tighter spacing */}
@@ -569,7 +542,7 @@ const LandingView: React.FC = () => {
         </>
       </main>
 
-      {/* Tutorial FAB - Fixed bottom corner button */}
+      {/* Tutorial FAB - Fixed bottom corner button with enhanced animation for first-time users */}
       {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
       {/* sm:bottom-24 clears the footer (visible at sm:) which is ~72px tall */}
       <motion.button
@@ -589,20 +562,46 @@ const LandingView: React.FC = () => {
           rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8
         "
         initial={{ opacity: 0, y: 20 }}
-        animate={{
-          opacity: 1,
-          y: 0,
-          boxShadow: [
-            '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
-            '4px 4px 0px black, 0 0 20px rgba(139, 92, 246, 0.6)',
-            '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
-          ]
-        }}
-        transition={{
-          opacity: { duration: 0.3 },
-          y: { duration: 0.3 },
-          boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' }
-        }}
+        animate={
+          isFirstTimeUser
+            ? {
+                // Enhanced animation for first-time users
+                opacity: 1,
+                y: 0,
+                scale: [1, 1.08, 1, 1.05, 1],
+                boxShadow: [
+                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
+                  '6px 6px 0px black, 0 0 30px rgba(139, 92, 246, 0.8), 0 0 50px rgba(139, 92, 246, 0.4)',
+                  '4px 4px 0px black, 0 0 20px rgba(139, 92, 246, 0.6)',
+                  '6px 6px 0px black, 0 0 30px rgba(139, 92, 246, 0.8), 0 0 50px rgba(139, 92, 246, 0.4)',
+                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
+                ],
+              }
+            : {
+                // Subtle animation for returning users
+                opacity: 1,
+                y: 0,
+                boxShadow: [
+                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
+                  '4px 4px 0px black, 0 0 20px rgba(139, 92, 246, 0.6)',
+                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
+                ],
+              }
+        }
+        transition={
+          isFirstTimeUser
+            ? {
+                opacity: { duration: 0.3 },
+                y: { duration: 0.3 },
+                scale: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+                boxShadow: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+              }
+            : {
+                opacity: { duration: 0.3 },
+                y: { duration: 0.3 },
+                boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+              }
+        }
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label={t('landing.tutorial') || 'Tutorial'}

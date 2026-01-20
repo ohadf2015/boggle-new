@@ -114,6 +114,13 @@ export function useSurvivalClues({
   /**
    * Update clues from word discovery (3+ letter words can reveal positional clues)
    * Returns the number of clues revealed
+   *
+   * This function handles:
+   * 1. Adding green clues for position matches
+   * 2. Adding known letters (yellow-equivalent) for letters that exist in target but wrong position
+   * 3. Cleaning up knownLetters when all occurrences of a letter are found as green
+   *
+   * All logic is combined here to use fresh data and avoid stale closure issues.
    */
   const updateCluesFromDiscovery = useCallback((word: string): number => {
     const normalizedWord = word.toUpperCase();
@@ -124,52 +131,56 @@ export function useSurvivalClues({
     const checkLength = Math.min(normalizedWord.length, targetLength);
     let cluesRevealed = 0;
 
+    // Compute new greens for this word (position matches)
+    const newGreensFromWord = new Map<number, string>();
+    for (let pos = 0; pos < checkLength; pos++) {
+      const wordLetter = normalizedWord[pos];
+      const targetLetter = normalizedTarget[pos];
+      if (wordLetter === targetLetter) {
+        newGreensFromWord.set(pos, wordLetter);
+      }
+    }
+
     setAccumulatedClues(prev => {
       const updated = new Map(prev);
       let newGreens = 0;
 
       // Only add GREEN clues - exact position matches between discovered word and target
-      // Yellow letters (exist but wrong position) go to knownLetters, not accumulatedClues
-      for (let pos = 0; pos < checkLength; pos++) {
-        const wordLetter = normalizedWord[pos];
-        const targetLetter = normalizedTarget[pos];
-
-        if (wordLetter === targetLetter) {
-          const existing = updated.get(pos);
-          if (!existing || existing.type !== 'green') {
-            updated.set(pos, { letter: wordLetter, type: 'green' });
-            newGreens++;
-          }
+      newGreensFromWord.forEach((letter, pos) => {
+        const existing = updated.get(pos);
+        if (!existing || existing.type !== 'green') {
+          updated.set(pos, { letter, type: 'green' });
+          newGreens++;
         }
-      }
+      });
 
       cluesRevealed = newGreens;
       return updated;
     });
 
-    return cluesRevealed;
-  }, [normalizedTarget]);
-
-  /**
-   * Update known letters from word discovery
-   */
-  const updateKnownLettersFromDiscovery = useCallback((word: string) => {
-    const normalizedWord = word.toUpperCase();
-
-    if (normalizedWord.length < 3) return;
-
+    // Update knownLetters with fresh green data
+    // This handles both adding new known letters AND cleanup
     setKnownLetters(prev => {
       const updated = new Set(prev);
-      const usedCounts = new Map<string, number>();
 
-      // Count existing GREEN letters
+      // Count ALL greens including what we just added
+      // Combine current accumulatedClues + newGreensFromWord for fresh count
       const greenLetterCounts = new Map<string, number>();
+
+      // Add greens from current accumulated clues (before this update)
       accumulatedClues.forEach((clue) => {
         if (clue.type === 'green') {
           greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
         }
       });
 
+      // Add the NEW greens we're adding in this call
+      newGreensFromWord.forEach((letter) => {
+        greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
+      });
+
+      // Add known letters for letters in discovered word that exist in target but not fully green
+      const usedCounts = new Map<string, number>();
       for (const letter of normalizedWord) {
         const targetCount = targetLetterCounts.get(letter) || 0;
         const greenCount = greenLetterCounts.get(letter) || 0;
@@ -183,12 +194,67 @@ export function useSurvivalClues({
         }
       }
 
+      // Remove letters from knownLetters where all occurrences are now green
       greenLetterCounts.forEach((greenCount, letter) => {
         const targetCount = targetLetterCounts.get(letter) || 0;
         if (greenCount >= targetCount) {
           updated.delete(letter);
         }
       });
+
+      return updated;
+    });
+
+    return cluesRevealed;
+  }, [normalizedTarget, targetLetterCounts, accumulatedClues]);
+
+  /**
+   * Update known letters from word discovery
+   *
+   * This function ONLY adds letters to knownLetters for letters that exist in the
+   * target but are not yet found as green. It does NOT handle cleanup (removal) -
+   * that's handled by updateCluesFromDiscovery which has access to fresh green data.
+   *
+   * Note: This function reads accumulatedClues from state, which may be stale when
+   * called immediately after updateCluesFromDiscovery. However, since cleanup is
+   * handled by updateCluesFromDiscovery, and we use React's functional setState
+   * (which batches correctly), any letters incorrectly added here will be properly
+   * removed by the knownLetters cleanup in updateCluesFromDiscovery.
+   */
+  const updateKnownLettersFromDiscovery = useCallback((word: string) => {
+    const normalizedWord = word.toUpperCase();
+
+    if (normalizedWord.length < 3) return;
+
+    setKnownLetters(prev => {
+      const updated = new Set(prev);
+      const usedCounts = new Map<string, number>();
+
+      // Count existing GREEN letters from accumulatedClues
+      // Note: This may be stale, but updateCluesFromDiscovery handles the cleanup
+      const greenLetterCounts = new Map<string, number>();
+      accumulatedClues.forEach((clue) => {
+        if (clue.type === 'green') {
+          greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
+        }
+      });
+
+      // Add letters that exist in target but not all found as green yet
+      for (const letter of normalizedWord) {
+        const targetCount = targetLetterCounts.get(letter) || 0;
+        const greenCount = greenLetterCounts.get(letter) || 0;
+
+        if (targetCount > 0 && targetCount > greenCount) {
+          const used = usedCounts.get(letter) || 0;
+          if (used < targetCount - greenCount) {
+            usedCounts.set(letter, used + 1);
+            updated.add(letter);
+          }
+        }
+      }
+
+      // NOTE: No cleanup here! Cleanup is handled by updateCluesFromDiscovery
+      // which has access to fresh accumulated clues data.
 
       return updated;
     });

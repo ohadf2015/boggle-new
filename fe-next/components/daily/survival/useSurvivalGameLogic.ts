@@ -479,9 +479,8 @@ export function useSurvivalGameLogic({
     dispatch({ type: 'DISCOVER_WORD', payload: { discovery, newLife } });
     playWordAcceptedSound?.();
 
-    // Update clues from discovery
+    // Update clues from discovery (handles greens, known letters, and cleanup)
     const cluesRevealed = clueActions.updateCluesFromDiscovery(word);
-    clueActions.updateKnownLettersFromDiscovery(word);
 
     // Life gain animation
     dispatch({ type: 'SET_LIFE_GAIN_ANIMATION', payload: { amount: lifeGained, isGaining: true } });

@@ -133,12 +133,6 @@ jest.mock('../ModeCard', () => {
   };
 });
 
-jest.mock('../TutorialPrompt', () => {
-  return function MockTutorialPrompt() {
-    return <div data-testid="tutorial-prompt">Tutorial Prompt</div>;
-  };
-});
-
 jest.mock('@/components/auth/AuthModal', () => {
   return function MockAuthModal() {
     return <div data-testid="auth-modal">Auth Modal</div>;

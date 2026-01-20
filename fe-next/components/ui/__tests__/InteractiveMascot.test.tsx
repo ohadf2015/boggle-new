@@ -57,7 +57,7 @@ describe('InteractiveMascot', () => {
     it('renders the correct image source for variant', () => {
       render(<InteractiveMascot variant="thinking" />);
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/lexi-thinking.png');
+      expect(img).toHaveAttribute('src', '/mascot/study-nobg.gif');
     });
   });
 
@@ -85,8 +85,8 @@ describe('InteractiveMascot', () => {
     it('renders mood variant with fallback image', () => {
       render(<InteractiveMascot variant="confused" />);
       const img = screen.getByRole('img');
-      // 'confused' falls back to 'thinking' (mood variants still use fallbacks)
-      expect(img).toHaveAttribute('src', '/mascot/lexi-thinking.png');
+      // 'confused' falls back to 'thinking' (which is now a GIF variant)
+      expect(img).toHaveAttribute('src', '/mascot/study-nobg.gif');
     });
 
     it('renders activity variant with dedicated image', () => {
@@ -99,8 +99,8 @@ describe('InteractiveMascot', () => {
     it('renders gaming variant with dedicated image', () => {
       render(<InteractiveMascot variant="gaming" />);
       const img = screen.getByRole('img');
-      // Activity variants now have their own dedicated images
-      expect(img).toHaveAttribute('src', '/mascot/lexi-gaming.png');
+      // Gaming is now a GIF variant
+      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
     });
 
     it('renders skateboarding variant with dedicated image', () => {
@@ -148,7 +148,7 @@ describe('InteractiveMascot', () => {
       fireEvent.mouseLeave(button);
 
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/lexi-happy.png');
+      expect(img).toHaveAttribute('src', '/mascot/main-nobg.gif');
     });
 
     it('calls onHover callback', () => {
@@ -227,7 +227,7 @@ describe('InteractiveMascot', () => {
         jest.advanceTimersByTime(500);
       });
 
-      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/lexi-happy.png');
+      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/main-nobg.gif');
 
       jest.useRealTimers();
     });
@@ -370,7 +370,7 @@ describe('InteractiveMascotWithEntrance', () => {
       />
     );
     const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src', '/mascot/lexi-thinking.png');
+    expect(img).toHaveAttribute('src', '/mascot/study-nobg.gif');
   });
 
   it('accepts delay prop', () => {

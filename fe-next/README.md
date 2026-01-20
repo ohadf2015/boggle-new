@@ -20,6 +20,32 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Admin Dashboard Setup
+
+To access the admin dashboard in development:
+
+### Step 1: Configure Supabase Service Key
+
+```bash
+npm run setup:supabase
+```
+
+Paste your service role key when prompted (get it from [Supabase Dashboard > API Settings](https://supabase.com/dashboard/project/hdtmpkicuxvtmvrmtybx/settings/api)).
+
+### Step 2: Grant Admin Access
+
+```bash
+npm run grant-dev-admin
+```
+
+Follow the interactive prompts to grant admin access to your user account.
+
+### Step 3: Access Dashboard
+
+**📍 http://localhost:3001/en/admin**
+
+For detailed setup instructions, troubleshooting, and security information, see **[ADMIN_SETUP.md](./ADMIN_SETUP.md)**.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

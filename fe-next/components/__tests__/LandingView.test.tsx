@@ -68,12 +68,6 @@ jest.mock('@/components/ProfileCustomizationModal', () => ({
   default: () => null,
 }));
 
-// Mock TutorialPrompt
-jest.mock('../landing/TutorialPrompt', () => ({
-  __esModule: true,
-  default: () => <div data-testid="tutorial-prompt">Tutorial Prompt</div>,
-}));
-
 // Mock DailyChallengeBanner
 jest.mock('@/components/daily/DailyChallengeBanner', () => ({
   __esModule: true,
