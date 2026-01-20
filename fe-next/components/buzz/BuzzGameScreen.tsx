@@ -224,25 +224,25 @@ export default function BuzzGameScreen({
       setPendingCompletionData(null);
     } else {
       // Auto-advance to next challenge if not the last one
-      if (currentIndex < challengeData.challenges.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
-      }
+      // Use setState callback to avoid stale closure over currentIndex
+      setCurrentIndex((prevIndex) => {
+        if (prevIndex < challengeData.challenges.length - 1) {
+          return prevIndex + 1;
+        }
+        return prevIndex;
+      });
     }
-  }, [pendingCompletionData, startTime, challengeData.id, challengeData.challenges.length, onComplete, currentIndex]);
+  }, [pendingCompletionData, startTime, challengeData.id, challengeData.challenges.length, onComplete]);
 
   // Handle navigation to previous challenge
   const handlePrevChallenge = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-    }
-  }, [currentIndex]);
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
+  }, []);
 
   // Handle navigation to next challenge
   const handleNextChallenge = useCallback(() => {
-    if (currentIndex < challengeData.challenges.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    }
-  }, [currentIndex, challengeData.challenges.length]);
+    setCurrentIndex((prev) => (prev < challengeData.challenges.length - 1 ? prev + 1 : prev));
+  }, [challengeData.challenges.length]);
 
   // Bidirectional swipe gesture for mobile navigation
   // NOTE: useSwipeGesture already handles RTL reversal internally when isRtl=true,
