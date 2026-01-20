@@ -64,7 +64,7 @@ describe('IdleMascot', () => {
   });
 
   it('should pass props to useRandomMascotActivity hook', () => {
-    const activities: ActivityVariant[] = ['eating_pizza', 'gaming'];
+    const activities: ActivityVariant[] = ['eating_pizza', 'skateboarding'];
     const initialDelayMin = 1000;
     const initialDelayMax = 3000;
     const minInterval = 15000;

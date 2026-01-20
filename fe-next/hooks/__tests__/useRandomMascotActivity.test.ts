@@ -134,7 +134,7 @@ describe('useRandomMascotActivity', () => {
     const { result } = renderHook(() =>
       useRandomMascotActivity({
         baseVariant: 'thinking',
-        activities: ['eating_pizza', 'gaming'],
+        activities: ['eating_pizza', 'skateboarding'],
         activityDuration: 3000,
       })
     );
@@ -145,7 +145,7 @@ describe('useRandomMascotActivity', () => {
     });
 
     expect(result.current.isDoingActivity).toBe(true);
-    expect(['eating_pizza', 'gaming']).toContain(result.current.currentVariant);
+    expect(['eating_pizza', 'skateboarding']).toContain(result.current.currentVariant);
 
     // Reset after duration
     act(() => {
@@ -296,7 +296,7 @@ describe('useRandomMascotActivity', () => {
       const { result } = renderHook(() =>
         useRandomMascotActivity({
           baseVariant: 'happy',
-          baseVariants: ['excited', 'thinking', 'focused'],
+          baseVariants: ['gaming', 'thinking', 'oops'],
           cycleBaseVariants: true,
           activityDuration: 1000,
         })
@@ -321,7 +321,7 @@ describe('useRandomMascotActivity', () => {
 
       expect(result.current.isDoingActivity).toBe(false);
       // New base should be from the combined list (original + baseVariants)
-      const allVariants = ['happy', 'excited', 'thinking', 'focused'];
+      const allVariants = ['happy', 'gaming', 'thinking', 'oops'];
       expect(allVariants).toContain(result.current.currentBaseVariant);
       expect(result.current.currentVariant).toBe(result.current.currentBaseVariant);
     });
@@ -330,7 +330,7 @@ describe('useRandomMascotActivity', () => {
       const { result } = renderHook(() =>
         useRandomMascotActivity({
           baseVariant: 'happy',
-          baseVariants: ['excited', 'thinking'],
+          baseVariants: ['gaming', 'thinking'],
           cycleBaseVariants: false,
           activityDuration: 1000,
         })
@@ -364,7 +364,7 @@ describe('useRandomMascotActivity', () => {
       const { result } = renderHook(() =>
         useRandomMascotActivity({
           baseVariant: 'happy',
-          baseVariants: ['excited'],
+          baseVariants: ['gaming'],
           cycleBaseVariants: true,
           activityDuration: 1000,
         })

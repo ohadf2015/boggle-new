@@ -54,10 +54,10 @@ describe('PageLoader', () => {
   });
 
   it('should pass mascotVariant prop to NeoLoader', () => {
-    render(<PageLoader variant="mascot" mascotVariant="encouraging" />);
+    render(<PageLoader variant="mascot" mascotVariant="happy" />);
 
     const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-mascot-variant', 'encouraging');
+    expect(loader).toHaveAttribute('data-mascot-variant', 'happy');
   });
 
   it('should render full-page container with correct classes', () => {
