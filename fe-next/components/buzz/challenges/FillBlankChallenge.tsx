@@ -10,6 +10,7 @@ interface FillBlankChallengeProps {
   challenge: {
     prompt: string;
     answer: string;
+    alternatives?: string[];
     hint?: string;
     trendingContext?: string;
   };
@@ -38,10 +39,13 @@ export default function FillBlankChallenge({
 }: FillBlankChallengeProps) {
   const { t, language } = useLanguage();
   const answerLength = challenge.answer.length;
-  // Reveal first letter as a hint (not included in user input)
-  const firstLetter = challenge.answer[0].toUpperCase();
-  // Remaining letters for user to fill (answer length minus first letter)
-  const remainingLength = answerLength - 1;
+  // Only reveal first letter as a hint when there are NO alternatives
+  // (alternatives may start with different letters, making the hint misleading)
+  const hasAlternatives = challenge.alternatives && challenge.alternatives.length > 0;
+  const showFirstLetterHint = !hasAlternatives;
+  const firstLetter = showFirstLetterHint ? challenge.answer[0].toUpperCase() : '';
+  // Remaining letters for user to fill
+  const remainingLength = showFirstLetterHint ? answerLength - 1 : answerLength;
   const [letters, setLetters] = useState<string[]>(Array(remainingLength).fill(''));
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -110,14 +114,14 @@ export default function FillBlankChallenge({
       setActiveIndex(newIndex);
       inputRefs.current[newIndex]?.focus();
     } else if (e.key === 'Enter') {
-      // Prepend first letter to user's input for full answer
+      // Construct full answer (prepend first letter only if hint is shown)
       const userInput = letters.join('');
       if (userInput.length === remainingLength && letters.every(l => l)) {
-        const fullAnswer = firstLetter + userInput;
+        const fullAnswer = showFirstLetterHint ? firstLetter + userInput : userInput;
         onAnswer(fullAnswer);
       }
     }
-  }, [letters, remainingLength, firstLetter, isRTL, onAnswer]);
+  }, [letters, remainingLength, firstLetter, showFirstLetterHint, isRTL, onAnswer]);
 
   // Handle box click
   const handleBoxClick = useCallback((index: number) => {
@@ -127,13 +131,13 @@ export default function FillBlankChallenge({
 
   // Handle submit
   const handleSubmit = useCallback(() => {
-    // Prepend first letter to user's input for full answer
+    // Construct full answer (prepend first letter only if hint is shown)
     const userInput = letters.join('');
     if (userInput.length === remainingLength && letters.every(l => l)) {
-      const fullAnswer = firstLetter + userInput;
+      const fullAnswer = showFirstLetterHint ? firstLetter + userInput : userInput;
       onAnswer(fullAnswer);
     }
-  }, [letters, remainingLength, firstLetter, onAnswer]);
+  }, [letters, remainingLength, firstLetter, showFirstLetterHint, onAnswer]);
 
   // Clear all letters
   const handleClear = useCallback(() => {
@@ -166,8 +170,12 @@ export default function FillBlankChallenge({
           transition={{ delay: 0.15 }}
           className="text-sm text-slate-400"
         >
-          <span className="font-bold text-neo-cyan">{firstLetter}</span>
-          <span className="text-slate-500"> + </span>
+          {showFirstLetterHint && (
+            <>
+              <span className="font-bold text-neo-cyan">{firstLetter}</span>
+              <span className="text-slate-500"> + </span>
+            </>
+          )}
           <span className="font-bold text-neo-yellow">{filledCount}</span>
           <span className="text-slate-500"> / </span>
           <span className="font-bold text-neo-yellow">{remainingLength}</span>
@@ -189,15 +197,17 @@ export default function FillBlankChallenge({
         </motion.div>
       )}
 
-      {/* First Letter Hint Label */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2 }}
-        className="text-center text-xs text-neo-cyan font-bold uppercase"
-      >
-        {t('buzz.fillBlank.firstLetterHint')}
-      </motion.div>
+      {/* First Letter Hint Label - only show when first letter hint is enabled */}
+      {showFirstLetterHint && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-center text-xs text-neo-cyan font-bold uppercase"
+        >
+          {t('buzz.fillBlank.firstLetterHint')}
+        </motion.div>
+      )}
 
       {/* Letter Boxes Grid */}
       <motion.div
@@ -208,38 +218,40 @@ export default function FillBlankChallenge({
         className="flex flex-wrap justify-center gap-2 sm:gap-3 py-4"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        {/* First Letter (revealed as hint) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 25 }}
-          className="relative"
-        >
+        {/* First Letter (revealed as hint) - only show when first letter hint is enabled */}
+        {showFirstLetterHint && (
           <motion.div
-            className="
-              relative w-12 h-14 sm:w-14 sm:h-16
-              flex items-center justify-center
-              text-2xl sm:text-3xl font-black
-              border-3 rounded-lg
-              border-neo-cyan bg-neo-cyan/20 shadow-hard-lg text-neo-cyan
-            "
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 25 }}
+            className="relative"
           >
-            <motion.span
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.35, type: 'spring', stiffness: 500, damping: 25 }}
+            <motion.div
+              className="
+                relative w-12 h-14 sm:w-14 sm:h-16
+                flex items-center justify-center
+                text-2xl sm:text-3xl font-black
+                border-3 rounded-lg
+                border-neo-cyan bg-neo-cyan/20 shadow-hard-lg text-neo-cyan
+              "
             >
-              {firstLetter}
-            </motion.span>
-            {/* Hint badge */}
-            <div className="absolute -top-2 -right-2 bg-neo-cyan text-neo-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-neo-black">
-              {t('buzz.fillBlank.hintLetter')}
+              <motion.span
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 500, damping: 25 }}
+              >
+                {firstLetter}
+              </motion.span>
+              {/* Hint badge */}
+              <div className="absolute -top-2 -right-2 bg-neo-cyan text-neo-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-neo-black">
+                {t('buzz.fillBlank.hintLetter')}
+              </div>
+            </motion.div>
+            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 font-mono">
+              1
             </div>
           </motion.div>
-          <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 font-mono">
-            1
-          </div>
-        </motion.div>
+        )}
 
         {/* Remaining Letter Boxes (user input) */}
         {Array.from({ length: remainingLength }).map((_, index) => {
@@ -328,9 +340,9 @@ export default function FillBlankChallenge({
                 )}
               </motion.div>
 
-              {/* Box number indicator (offset by 1 since first letter is shown) */}
+              {/* Box number indicator (offset by 1 if first letter is shown, otherwise start at 1) */}
               <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 font-mono">
-                {index + 2}
+                {showFirstLetterHint ? index + 2 : index + 1}
               </div>
             </motion.div>
           );
