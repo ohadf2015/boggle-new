@@ -97,6 +97,7 @@ jest.mock('../AnswerFeedbackModal', () => {
         // Reset when modal closes
         calledRef.current = false;
       }
+      return undefined;
     }, [isOpen]); // Only depend on isOpen, not onClose
 
     if (!isOpen) return null;

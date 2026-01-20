@@ -259,6 +259,12 @@ describe('FillBlankChallenge', () => {
         await user.type(inputs[2], 'L');
         await user.type(inputs[3], 'E');
 
+        // Wait for state to update after typing
+        const submitButton = screen.getByRole('button', { name: /submit/i });
+        await waitFor(() => {
+          expect(submitButton).not.toBeDisabled();
+        }, { timeout: 3000 });
+
         // Press Enter in any input box
         fireEvent.keyDown(inputs[3], { key: 'Enter', code: 'Enter' });
 
