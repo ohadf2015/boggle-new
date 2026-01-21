@@ -217,11 +217,10 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type remaining letters: "PPLE"
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
-        await user.type(inputs[2], 'L');
-        await user.type(inputs[3], 'E');
+        // Focus first input and type all letters - auto-advance handles focus
+        // Using keyboard() types into currently focused element, allowing auto-advance to work
+        await user.click(inputs[0]);
+        await user.keyboard('PPLE');
 
         // Submit button should be enabled
         const submitButton = screen.getByRole('button', { name: /submit/i });
@@ -253,11 +252,9 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type remaining letters: "PPLE"
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
-        await user.type(inputs[2], 'L');
-        await user.type(inputs[3], 'E');
+        // Focus first input and type all letters - auto-advance handles focus
+        await user.click(inputs[0]);
+        await user.keyboard('PPLE');
 
         // Wait for state to update after typing
         const submitButton = screen.getByRole('button', { name: /submit/i });
@@ -265,8 +262,8 @@ describe('FillBlankChallenge', () => {
           expect(submitButton).not.toBeDisabled();
         }, { timeout: 3000 });
 
-        // Press Enter in any input box
-        fireEvent.keyDown(inputs[3], { key: 'Enter', code: 'Enter' });
+        // Press Enter in the last input (which is now focused after auto-advance)
+        await user.keyboard('{Enter}');
 
         // onAnswer should be called with first letter prepended: "APPLE"
         await waitFor(() => {
@@ -321,18 +318,17 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type partial answer
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
+        // Focus first input and type partial answer
+        await user.click(inputs[0]);
+        await user.keyboard('PP');
 
-        // Still disabled (incomplete)
+        // Still disabled (incomplete - only 2 of 4 letters filled)
         expect(submitButton).toBeDisabled();
 
-        // Complete the answer
-        await user.type(inputs[2], 'L');
-        await user.type(inputs[3], 'E');
+        // Complete the answer by typing remaining letters
+        await user.keyboard('LE');
 
-        // Now enabled
+        // Now enabled (all 4 letters filled)
         await waitFor(() => {
           expect(submitButton).not.toBeDisabled();
         }, { timeout: 3000 });
