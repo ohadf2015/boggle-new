@@ -520,6 +520,55 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
 }
 
 /**
+ * Sync all local JSON words to database for admin panel visibility
+ * This is useful when JSON files have been updated and need to be visible in admin
+ */
+export async function syncLocalJSONToDatabase(
+  language?: Language
+): Promise<{ success: boolean; results: Record<string, { synced: number; error?: string }> }> {
+  const targetLanguages = language ? [language] : (['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as Language[]);
+  const results: Record<string, { synced: number; error?: string }> = {};
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0];
+
+  console.log(`[WikiPopulator] Starting local JSON sync for: ${targetLanguages.join(', ')}`);
+
+  for (const lang of targetLanguages) {
+    try {
+      const jsonWords = await loadWordsFromJSON(lang);
+
+      if (!jsonWords || jsonWords.length === 0) {
+        results[lang] = { synced: 0, error: 'No JSON file found or empty' };
+        continue;
+      }
+
+      // Store all words with today's date
+      await storeWikipediaWordCandidates(
+        lang,
+        today,
+        jsonWords.map(w => ({
+          word: w.word,
+          source: `${w.source}_json_sync`,
+          url: w.url,
+          score: w.score
+        }))
+      );
+
+      console.log(`[WikiPopulator] Synced ${jsonWords.length} words from JSON for ${lang}`);
+      results[lang] = { synced: jsonWords.length };
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`[WikiPopulator] Error syncing JSON for ${lang}:`, errorMsg);
+      results[lang] = { synced: 0, error: errorMsg };
+    }
+  }
+
+  const allSuccess = Object.values(results).every(r => !r.error || r.synced > 0);
+  return { success: allSuccess, results };
+}
+
+/**
  * Admin: Add custom word candidate
  */
 export async function adminAddWordCandidate(

@@ -28,6 +28,7 @@ interface UseWikipediaCandidatesResult {
   bulkUpdateStatus: (ids: string[], status: ValidationStatus) => Promise<boolean>;
   bulkDelete: (ids: string[]) => Promise<boolean>;
   triggerPopulation: () => Promise<boolean>;
+  syncFromJSON: () => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -281,6 +282,60 @@ export function useWikipediaCandidates({
     }
   }, [supabase, language, fetchCandidates]);
 
+  const syncFromJSON = useCallback(async (): Promise<boolean> => {
+    const CLIENT_TIMEOUT_MS = 60000; // 60 seconds should be enough for JSON sync
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, CLIENT_TIMEOUT_MS);
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        setError('Not authenticated');
+        return false;
+      }
+
+      console.log('[Wikipedia] Syncing from JSON for', language);
+
+      const response = await fetch('/api/admin/wikipedia-words', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          action: 'sync-json',
+          language,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to sync from JSON');
+      }
+
+      console.log('[Wikipedia] JSON sync completed successfully');
+
+      // Refresh after sync
+      await fetchCandidates();
+      return true;
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Request timed out while syncing from JSON files.');
+        return false;
+      }
+      setError(err instanceof Error ? err.message : 'Failed to sync from JSON');
+      return false;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }, [supabase, language, fetchCandidates]);
+
   const clearError = useCallback((): void => {
     setError(null);
   }, []);
@@ -296,6 +351,7 @@ export function useWikipediaCandidates({
     bulkUpdateStatus,
     bulkDelete,
     triggerPopulation,
+    syncFromJSON,
     clearError,
   };
 }

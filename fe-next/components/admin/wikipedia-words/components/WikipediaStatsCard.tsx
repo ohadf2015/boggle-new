@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { RefreshCw, Globe, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { RefreshCw, Globe, Clock, CheckCircle, XCircle, Loader2, FileJson } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WikipediaWordsStats } from '../types';
 
@@ -10,6 +10,7 @@ interface WikipediaStatsCardProps {
   loading: boolean;
   onRefresh: () => Promise<void>;
   onTriggerPopulation: () => Promise<boolean>;
+  onSyncFromJSON?: () => Promise<boolean>;
 }
 
 interface StatItemProps {
@@ -42,9 +43,11 @@ export function WikipediaStatsCard({
   loading,
   onRefresh,
   onTriggerPopulation,
+  onSyncFromJSON,
 }: WikipediaStatsCardProps): React.ReactElement {
   const [isPopulating, setIsPopulating] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const handleRefresh = async (): Promise<void> => {
     setIsRefreshing(true);
@@ -58,6 +61,13 @@ export function WikipediaStatsCard({
     setIsPopulating(false);
   };
 
+  const handleSyncFromJSON = async (): Promise<void> => {
+    if (!onSyncFromJSON) return;
+    setIsSyncing(true);
+    await onSyncFromJSON();
+    setIsSyncing(false);
+  };
+
   return (
     <div className="space-y-4">
       {/* Header with Actions */}
@@ -66,7 +76,7 @@ export function WikipediaStatsCard({
           <Globe className="w-5 h-5 text-neo-cyan" />
           Wikipedia Candidates
         </h3>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={handleRefresh}
             disabled={loading || isRefreshing}
@@ -75,6 +85,21 @@ export function WikipediaStatsCard({
             <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
             Refresh
           </button>
+          {onSyncFromJSON && (
+            <button
+              onClick={handleSyncFromJSON}
+              disabled={loading || isSyncing}
+              className="px-3 py-2 bg-neo-cyan text-neo-black rounded-lg text-sm font-bold hover:bg-neo-cyan/90 disabled:opacity-50 transition-colors flex items-center gap-2 shadow-hard-sm"
+              title="Sync pre-validated words from local JSON files to database"
+            >
+              {isSyncing ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <FileJson className="w-4 h-4" />
+              )}
+              Sync from JSON
+            </button>
+          )}
           <button
             onClick={handlePopulate}
             disabled={loading || isPopulating}

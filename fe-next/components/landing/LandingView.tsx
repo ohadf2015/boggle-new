@@ -210,7 +210,7 @@ const LandingView: React.FC = () => {
   return (
     <div
       className={cn(
-        'flex flex-col bg-gray-100 dark:bg-neo-navy relative overflow-hidden page-content-safe',
+        'flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe min-h-screen',
         isLandscape && 'landscape-full-height',
         !isLandscape && !isMobilePortrait && 'h-full'
       )}

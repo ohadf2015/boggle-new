@@ -10,7 +10,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import {
   getWordCandidatesForAdmin,
-  adminAddWordCandidate
+  adminAddWordCandidate,
+  syncLocalJSONToDatabase
 } from '@/backend/services/wikipediaWordPopulator';
 import { triggerWikipediaWordPopulation } from '@/backend/services/cronScheduler';
 import type { Language } from '@/shared/types/game';
@@ -148,9 +149,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         });
       }
 
+      case 'sync-json': {
+        // Sync local JSON files to database
+        console.log('[Admin Wikipedia] Starting JSON sync...');
+        const targetLanguage = language as Language | undefined;
+
+        const result = await syncLocalJSONToDatabase(targetLanguage);
+
+        const duration = Date.now() - startTime;
+        console.log(`[Admin Wikipedia] JSON sync completed in ${duration}ms, success:`, result.success);
+
+        return NextResponse.json({
+          success: result.success,
+          results: result.results
+        });
+      }
+
       default:
         return NextResponse.json(
-          { error: `Unknown action: ${action}. Use: add, populate` },
+          { error: `Unknown action: ${action}. Use: add, populate, sync-json` },
           { status: 400 }
         );
     }

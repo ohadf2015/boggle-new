@@ -28,6 +28,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
     bulkUpdateStatus,
     bulkDelete,
     triggerPopulation,
+    syncFromJSON,
     clearError,
   } = useWikipediaCandidates({
     language: selectedLanguage,
@@ -79,6 +80,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
         loading={loading}
         onRefresh={refresh}
         onTriggerPopulation={triggerPopulation}
+        onSyncFromJSON={syncFromJSON}
       />
 
       {/* Filters */}
