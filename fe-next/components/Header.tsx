@@ -40,9 +40,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const [showGiftModal, setShowGiftModal] = useState(false);
     const [selectedGift, setSelectedGift] = useState<typeof gifts[0] | null>(null);
     // Track which gift IDs have been auto-shown this session to prevent re-showing
+    // Note: Cross-session persistence is handled by profile.gift_modal_dismissed_at in DB
     const autoShownGiftIdsRef = useRef<Set<string>>(new Set());
     // Track which gift IDs have been dismissed this session (user clicked X without claiming)
-    // This prevents the gift from re-appearing after 3 second auto-show timer
+    // Note: Dismissal is immediately persisted to DB via /api/player/gifts/dismiss-modal
     const dismissedGiftIdsRef = useRef<Set<string>>(new Set());
 
     // Handle opening gift modal with oldest unclaimed gift
@@ -65,12 +66,25 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, [claimGift, refreshGifts, refreshProfile]);
 
     // Handle dismissing gift modal - show next unclaimed gift if available
-    // Also persist dismissal to database to prevent auto-showing in future sessions
+    // Persist dismissal to database IMMEDIATELY to prevent auto-showing in future sessions/pages
     const handleDismissGiftModal = useCallback(async () => {
-        // Mark current gift as dismissed to prevent re-showing this session
+        // Mark current gift as dismissed in ref for immediate effect within this session
         if (selectedGift?.id) {
             dismissedGiftIdsRef.current.add(selectedGift.id);
         }
+
+        // Persist dismissal to database IMMEDIATELY (fire-and-forget)
+        // This updates gift_modal_dismissed_at so gifts created before this timestamp
+        // won't auto-show again in future sessions or after navigation
+        fetch('/api/player/gifts/dismiss-modal', {
+            method: 'POST',
+        }).then(() => {
+            // Refresh profile to get updated gift_modal_dismissed_at
+            refreshProfile();
+        }).catch(error => {
+            console.error('Failed to persist gift modal dismissal:', error);
+            // Non-critical error - don't block user experience
+        });
 
         // Find the next unclaimed gift (excluding the currently selected one and dismissed ones)
         const nextUnclaimedGift = gifts.find(g =>
@@ -87,19 +101,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             // No more unclaimed gifts, close the modal
             setShowGiftModal(false);
             setSelectedGift(null);
-
-            // Persist dismissal to database (fire-and-forget)
-            // This prevents auto-showing the modal in future sessions
-            try {
-                await fetch('/api/player/gifts/dismiss-modal', {
-                    method: 'POST',
-                });
-                // Refresh profile to get updated gift_modal_dismissed_at
-                await refreshProfile();
-            } catch (error) {
-                console.error('Failed to persist gift modal dismissal:', error);
-                // Non-critical error - don't block user experience
-            }
         }
     }, [gifts, selectedGift, refreshProfile]);
 
@@ -145,7 +146,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
         // Auto-show after 3 seconds
         const timer = setTimeout(() => {
-            // Mark this gift as auto-shown this session
+            // Mark this gift as auto-shown this session (ref only - DB handles cross-session)
             autoShownGiftIdsRef.current.add(eligibleGift.id);
             setSelectedGift(eligibleGift);
             setShowGiftModal(true);

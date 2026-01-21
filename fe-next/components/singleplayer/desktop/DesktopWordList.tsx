@@ -81,7 +81,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-1 bg-neo-cyan/20 px-2 py-0.5 rounded-neo">
-          <span className="font-black text-neo-cyan text-lg">{displayWords.length}</span>
+          <span className="font-black text-neo-cyan text-lg tabular-nums tracking-normal">{displayWords.length}</span>
         </div>
       </div>
 
@@ -228,12 +228,12 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
       </div>
 
       {/* Score */}
-      <div className="flex items-center gap-1 flex-shrink-0">
-        <span className="font-black text-neo-cream">
+      <div className="flex items-center gap-1 flex-shrink-0 tabular-nums">
+        <span className="font-black text-neo-cream tracking-normal">
           {totalScore}
         </span>
         {(hasComboBonus || hasFireBonus) && (
-          <span className="text-xs text-neo-lime">
+          <span className="text-xs text-neo-lime tracking-normal">
             (+{(word.comboBonus || 0) + (word.fireRoundBonus || 0)})
           </span>
         )}

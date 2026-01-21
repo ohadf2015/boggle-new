@@ -32,8 +32,8 @@ describe('GIF Mascot Integration', () => {
       expect(path).toBe('/mascot/oops-nobg.gif');
     });
 
-    it('should return GIF paths for all 4 base variants', () => {
-      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops'];
+    it('should return GIF paths for all 7 base variants', () => {
+      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
 
       allVariants.forEach((variant) => {
         const path = getMascotImagePath(variant);
@@ -46,7 +46,7 @@ describe('GIF Mascot Integration', () => {
 
   describe('isGifVariant', () => {
     it('should return true for ALL variants (GIF-ONLY system)', () => {
-      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops'];
+      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
 
       allVariants.forEach((variant) => {
         expect(isGifVariant(variant)).toBe(true);
@@ -158,8 +158,8 @@ describe('GIF Mascot Integration', () => {
   });
 
   describe('GIF-Only System', () => {
-    it('should handle all 4 GIF variants without errors', () => {
-      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops'];
+    it('should handle all 7 GIF variants without errors', () => {
+      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
 
       allVariants.forEach((variant) => {
         expect(() => getMascotImagePath(variant)).not.toThrow();

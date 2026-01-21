@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Sparkles, TrendingUp, Star, X } from 'lucide-react';
+import { Crown, Sparkles, TrendingUp, Star, X, type LucideIcon } from 'lucide-react';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -21,7 +21,7 @@ const TIER_CONFIG: Record<BrainTier, {
   color: string;
   bgGradient: string;
   emoji: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
 }> = {
   novice: { color: 'text-slate-400', bgGradient: 'from-slate-500 to-slate-600', emoji: '🌱', icon: Star },
   apprentice: { color: 'text-neo-green', bgGradient: 'from-green-500 to-green-600', emoji: '📚', icon: Star },

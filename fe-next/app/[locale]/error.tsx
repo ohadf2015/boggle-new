@@ -9,15 +9,26 @@ import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || '';
   const name = error.name?.toLowerCase() || '';
+
+  // Check for explicit chunk load error name
+  if (name === 'chunkloaderror') return true;
+
+  // Check for specific chunk-related error messages
+  // Note: 'failed to fetch' alone is too broad - only match if it's clearly a chunk/module error
   return (
-    name === 'chunkloaderror' ||
     message.includes('loading chunk') ||
     message.includes('failed to load chunk') ||
     message.includes('loading css chunk') ||
     message.includes('dynamically imported module') ||
     message.includes('_next/static/chunks') ||
     message.includes('module 964893') || // Specific error from report
-    message.includes('failed to fetch')
+    // Only match 'failed to fetch' if it's in context of module/chunk loading
+    (message.includes('failed to fetch') && (
+      message.includes('module') ||
+      message.includes('chunk') ||
+      message.includes('_next/') ||
+      message.includes('dynamically imported')
+    ))
   );
 }
 

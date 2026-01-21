@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -14,7 +14,7 @@ import type { DrillProgress, DrillType } from '@/shared/types/cognitive';
 
 interface Drill {
   id: DrillType;
-  icon: React.ElementType;
+  icon: LucideIcon;
   domain: string;
   color: string;
   bgColor: string;

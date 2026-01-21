@@ -1,0 +1,1 @@
+export { useCommunityWords } from './useCommunityWords';

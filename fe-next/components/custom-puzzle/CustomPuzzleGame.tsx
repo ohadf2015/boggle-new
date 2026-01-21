@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
@@ -11,44 +11,60 @@ import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import Link from 'next/link';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
-import type { LetterGrid, Language } from '@/types';
 import { buildPuzzleShareUrl, type LeaderboardEntry } from '@/utils/customPuzzle';
 import { NeoLoader } from '@/components/ui/NeoLoader';
-
-interface CustomPuzzleData {
-  id: string;
-  puzzleCode: string;
-  creatorDisplayName: string;
-  language: Language;
-  targetWord: string;
-  grid: LetterGrid;
-  creatorSolved: boolean;
-  creatorAttemptsUsed: number;
-  creatorEfficiencyScore: number;
-  totalPlays: number;
-}
+import {
+  useCustomPuzzlePhase,
+  useCustomPuzzlePuzzle,
+  useCustomPuzzleError,
+  useCustomPuzzleGameResult,
+  useCustomPuzzleLeaderboard,
+  useCustomPuzzlePlayerRank,
+  useCustomPuzzleBeatCreator,
+  useCustomPuzzleActions,
+} from '@/hooks/customPuzzleState';
 
 interface CustomPuzzleGameProps {
   puzzleCode: string;
 }
 
-type Phase = 'loading' | 'intro' | 'playing' | 'results';
-
 const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
-  const [fingerprint, setFingerprint] = useState<string | null>(null);
 
-  const [phase, setPhase] = useState<Phase>('loading');
-  const [puzzle, setPuzzle] = useState<CustomPuzzleData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [gameResult, setGameResult] = useState<SurvivalGameResult | null>(null);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [playerRank, setPlayerRank] = useState<number | null>(null);
-  const [beatCreator, setBeatCreator] = useState(false);
+  // Zustand store selectors - components only re-render when subscribed state changes
+  const phase = useCustomPuzzlePhase();
+  const puzzle = useCustomPuzzlePuzzle();
+  const error = useCustomPuzzleError();
+  const gameResult = useCustomPuzzleGameResult();
+  const leaderboard = useCustomPuzzleLeaderboard();
+  const playerRank = useCustomPuzzlePlayerRank();
+  const beatCreator = useCustomPuzzleBeatCreator();
+  const {
+    setPhase,
+    setPuzzle,
+    setError,
+    setGameResult,
+    setLeaderboard,
+    setPlayerRank,
+    setBeatCreator,
+    resetAll,
+  } = useCustomPuzzleActions();
+
+  // Local state for fingerprint (not game state)
+  const [fingerprint, setFingerprint] = React.useState<string | null>(null);
 
   // Get display name
   const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Player';
+
+  // Reset store when puzzle code changes or on mount
+  useEffect(() => {
+    resetAll();
+    return () => {
+      // Cleanup on unmount
+      resetAll();
+    };
+  }, [puzzleCode, resetAll]);
 
   // Get fingerprint for guest users
   useEffect(() => {
@@ -79,7 +95,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     }
 
     fetchPuzzle();
-  }, [puzzleCode]);
+  }, [puzzleCode, setError, setPhase, setPuzzle]);
 
   // Handle game completion
   const handleGameComplete = useCallback(async (result: SurvivalGameResult) => {
@@ -141,7 +157,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
     }
-  }, [puzzle, puzzleCode, displayName, user, fingerprint]);
+  }, [puzzle, puzzleCode, displayName, user, fingerprint, setGameResult, setPhase, setBeatCreator, setLeaderboard, setPlayerRank]);
 
   // Handle quit
   const handleQuit = useCallback(() => {

@@ -2425,6 +2425,7 @@ const es = {
     "dayStreak": "días de racha",
     "daysStreak": "días de racha",
     "playNow": "JUGAR AHORA",
+    "today": "HOY",
     "loading": "Cargando Desafío Diario...",
     "todaysPlayers": "Jugadores de hoy",
     "beFirstToPlay": "¡Sé el primero en jugar el desafío de hoy!",

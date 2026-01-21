@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Target, BookOpen, Crown, Star, Dumbbell } from 'lucide-react';
+import { Zap, Target, BookOpen, Crown, Star, Dumbbell, type LucideIcon } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { cn } from '../../../lib/utils';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -30,7 +30,7 @@ interface PlayerData {
 
 interface Award {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   description: string;
   recipient: {

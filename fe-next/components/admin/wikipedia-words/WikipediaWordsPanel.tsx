@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { AlertCircle, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, X } from 'lucide-react';
 import type { Language } from '@/types';
 import { getDefaultDateRange, type ValidationStatus } from './types';
-import { useWikipediaCandidates } from './hooks';
+import { useWikipediaCandidates, type SyncResult } from './hooks';
 import {
   WikipediaFilters,
   WikipediaCandidatesList,
@@ -16,6 +16,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
   const [selectedStatus, setSelectedStatus] = useState<'all' | ValidationStatus>('all');
   const [dateRange, setDateRange] = useState(getDefaultDateRange);
   const [searchQuery, setSearchQuery] = useState('');
+  const [syncSuccess, setSyncSuccess] = useState<SyncResult | null>(null);
 
   const {
     candidates,
@@ -56,8 +57,60 @@ export function WikipediaWordsPanel(): React.ReactElement {
     setSearchQuery(query);
   }, []);
 
+  const handleSyncFromJSON = useCallback(async (): Promise<SyncResult> => {
+    setSyncSuccess(null);
+    const result = await syncFromJSON();
+
+    if (result.success && result.syncDate) {
+      // Update date range to include today so synced words are visible
+      const today = result.syncDate;
+      setDateRange(prev => {
+        if (prev.end < today) {
+          return { ...prev, end: today };
+        }
+        return prev;
+      });
+
+      setSyncSuccess(result);
+
+      // Auto-clear success message after 5 seconds
+      setTimeout(() => setSyncSuccess(null), 5000);
+    }
+
+    return result;
+  }, [syncFromJSON]);
+
+  const clearSyncSuccess = useCallback((): void => {
+    setSyncSuccess(null);
+  }, []);
+
   return (
     <div className="space-y-6">
+      {/* Success Banner */}
+      {syncSuccess && (
+        <div className="flex items-center justify-between p-4 bg-green-500/10 border-2 border-green-500 rounded-lg">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-500" />
+            <span className="text-green-500 font-medium">
+              Sync completed: {syncSuccess.wordCount ?? 0} words synced
+              {syncSuccess.languageBreakdown && Object.keys(syncSuccess.languageBreakdown).length > 1 && (
+                <span className="text-green-400 text-sm ml-2">
+                  ({Object.entries(syncSuccess.languageBreakdown)
+                    .map(([lang, count]) => `${lang}: ${count}`)
+                    .join(', ')})
+                </span>
+              )}
+            </span>
+          </div>
+          <button
+            onClick={clearSyncSuccess}
+            className="p-1 hover:bg-green-500/20 rounded transition-colors"
+          >
+            <X className="w-5 h-5 text-green-500" />
+          </button>
+        </div>
+      )}
+
       {/* Error Banner */}
       {error && (
         <div className="flex items-center justify-between p-4 bg-red-500/10 border-2 border-red-500 rounded-lg">
@@ -80,7 +133,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
         loading={loading}
         onRefresh={refresh}
         onTriggerPopulation={triggerPopulation}
-        onSyncFromJSON={syncFromJSON}
+        onSyncFromJSON={handleSyncFromJSON}
       />
 
       {/* Filters */}

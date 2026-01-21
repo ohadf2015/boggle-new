@@ -17,6 +17,13 @@ interface UseWikipediaCandidatesOptions {
   searchQuery: string;
 }
 
+export interface SyncResult {
+  success: boolean;
+  wordCount?: number;
+  languageBreakdown?: Record<string, number>;
+  syncDate?: string;
+}
+
 interface UseWikipediaCandidatesResult {
   candidates: WikipediaWordCandidate[];
   stats: WikipediaWordsStats;
@@ -28,7 +35,7 @@ interface UseWikipediaCandidatesResult {
   bulkUpdateStatus: (ids: string[], status: ValidationStatus) => Promise<boolean>;
   bulkDelete: (ids: string[]) => Promise<boolean>;
   triggerPopulation: () => Promise<boolean>;
-  syncFromJSON: () => Promise<boolean>;
+  syncFromJSON: () => Promise<SyncResult>;
   clearError: () => void;
 }
 
@@ -282,7 +289,7 @@ export function useWikipediaCandidates({
     }
   }, [supabase, language, fetchCandidates]);
 
-  const syncFromJSON = useCallback(async (): Promise<boolean> => {
+  const syncFromJSON = useCallback(async (): Promise<SyncResult> => {
     // Match server maxDuration of 90s - large JSON files (2687 words for en.json)
     // are now processed in batches, but still need adequate time
     const CLIENT_TIMEOUT_MS = 95000; // 95 seconds (slightly more than server's 90s maxDuration)
@@ -298,7 +305,7 @@ export function useWikipediaCandidates({
 
       if (!session?.access_token) {
         setError('Not authenticated');
-        return false;
+        return { success: false };
       }
 
       console.log('[Wikipedia] Syncing from JSON for', language);
@@ -321,18 +328,42 @@ export function useWikipediaCandidates({
         throw new Error(data.error || 'Failed to sync from JSON');
       }
 
-      console.log('[Wikipedia] JSON sync completed successfully');
+      const responseData = await response.json();
+      const today = new Date().toISOString().split('T')[0];
+
+      // Calculate total word count from results
+      // API returns: { success: boolean, results: Record<string, { synced: number, error?: string }> }
+      let totalWordCount = 0;
+      const languageBreakdown: Record<string, number> = {};
+
+      if (responseData.results && typeof responseData.results === 'object') {
+        for (const [lang, result] of Object.entries(responseData.results)) {
+          const syncResult = result as { synced: number; error?: string };
+          if (typeof syncResult.synced === 'number' && syncResult.synced > 0) {
+            totalWordCount += syncResult.synced;
+            languageBreakdown[lang] = syncResult.synced;
+          }
+        }
+      }
+
+      console.log(`[Wikipedia] JSON sync completed successfully - ${totalWordCount} words synced`);
 
       // Refresh after sync
       await fetchCandidates();
-      return true;
+
+      return {
+        success: true,
+        wordCount: totalWordCount,
+        languageBreakdown,
+        syncDate: today
+      };
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         setError('Request timed out while syncing from JSON files.');
-        return false;
+        return { success: false };
       }
       setError(err instanceof Error ? err.message : 'Failed to sync from JSON');
-      return false;
+      return { success: false };
     } finally {
       clearTimeout(timeoutId);
     }

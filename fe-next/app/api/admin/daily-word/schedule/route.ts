@@ -1,25 +1,19 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import type { Language } from '@/types';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check admin access
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -40,14 +34,14 @@ export async function GET(request: Request) {
     if (startDate) {
       query = query.gte('puzzle_date', startDate);
     }
-    
+
     if (endDate) {
       query = query.lte('puzzle_date', endDate);
     } else {
       // Default to showing future words if no range specified
-      // But maybe we want to see history too? 
+      // But maybe we want to see history too?
       // If no end date, maybe limit to 100?
-      query = query.limit(100); 
+      query = query.limit(100);
     }
 
     const { data, error } = await query;

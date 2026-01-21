@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Target, Flame, Check, Clock, Sparkles, X } from 'lucide-react';
+import { Target, Flame, Check, Clock, Sparkles, X, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
@@ -142,23 +142,30 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     // Uses exact same structure as rendered content with fixed dimensions
     return (
       <div className={cn(
-        "w-full rounded-neo border-3 border-neo-black shadow-hard bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300",
-        compact ? "p-2" : "p-2 sm:p-3",
+        "w-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500",
+        compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
         className
       )}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className={cn(
-            "rounded-neo border-2 border-neo-black bg-neo-black/20 shrink-0",
-            compact ? "w-8 h-8" : "w-10 h-10 sm:w-12 sm:h-12"
+            "rounded-neo border-2 border-neo-black bg-neo-navy shrink-0",
+            compact ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
           )} />
           <div className="flex-1 min-w-0 space-y-2">
-            <div className="h-5 w-32 bg-neo-black/10 rounded" />
-            <div className="h-3 w-20 bg-neo-black/10 rounded" />
+            <div className="h-6 w-40 bg-neo-black/15 rounded" />
+            <div className="h-4 w-24 bg-neo-black/10 rounded" />
           </div>
         </div>
       </div>
     );
   }
+
+  // Premium gold gradient for "daily treasure" feel
+  const gradientClass = hasPlayed
+    ? "bg-gradient-to-br from-amber-400 via-orange-400 to-amber-500"
+    : "bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500";
+
+  const glowColor = 'rgba(255, 165, 0, 0.5)';
 
   return (
     <Link href={`/${language}/daily`} className="block w-full group">
@@ -172,123 +179,178 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'
             : 'active:translate-x-[1px] active:translate-y-[1px]',
           'active:shadow-hard-pressed',
-          // Vibrant gradient for premium daily challenge look
-          hasPlayed
-            ? "bg-gradient-to-r from-neo-lime via-lime-400 to-neo-lime"
-            : "bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300",
-          compact ? "p-2" : "p-2 sm:p-3",
+          // Premium gold gradient
+          gradientClass,
+          compact ? "p-2 sm:p-3" : "p-3 sm:p-4",
           className
         )}
         style={{
-          // Hover glow effect - lime color to match gradient
+          // Hover glow effect - gold/orange color for premium feel
           boxShadow: isHovered
-            ? `0 0 25px rgba(191, 255, 0, 0.5), 0 0 50px rgba(191, 255, 0, 0.3), 6px 6px 0px rgb(var(--neo-black))`
+            ? `0 0 30px ${glowColor}, 0 0 60px ${glowColor}, 6px 6px 0px rgb(var(--neo-black))`
             : undefined,
           ...tiltStyle,
         }}
         {...combinedHandlers}
       >
-        {/* Animated sparkles for unplayed state */}
-        {!hasPlayed && (
-          <motion.div
-            className="absolute top-1 right-12"
-            animate={{
-              rotate: [0, 15, -15, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <Sparkles className="w-4 h-4 text-yellow-600/70" />
-          </motion.div>
+        {/* Animated sparkles for unplayed state - multiple sparkles */}
+        {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
+          <>
+            <motion.div
+              className="absolute top-2 right-16"
+              animate={{
+                rotate: [0, 15, -15, 0],
+                scale: [1, 1.3, 1],
+                opacity: [0.6, 1, 0.6],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <Sparkles className="w-4 h-4 text-yellow-100" />
+            </motion.div>
+            <motion.div
+              className="absolute top-1 right-8"
+              animate={{
+                rotate: [0, -10, 10, 0],
+                scale: [1, 1.2, 1],
+                opacity: [0.5, 0.9, 0.5],
+              }}
+              transition={{
+                duration: 1.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5
+              }}
+            >
+              <Star className="w-3 h-3 text-yellow-100 fill-yellow-100" />
+            </motion.div>
+            <motion.div
+              className="absolute bottom-2 right-4"
+              animate={{
+                rotate: [0, 20, -20, 0],
+                scale: [0.8, 1.1, 0.8],
+                opacity: [0.4, 0.8, 0.4],
+              }}
+              transition={{
+                duration: 2.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+            >
+              <Zap className="w-3 h-3 text-yellow-100 fill-yellow-100" />
+            </motion.div>
+          </>
         )}
 
-        <div className="flex items-center gap-3 relative z-10">
-          {/* Icon or Mascot */}
+        <div className="flex items-center gap-3 sm:gap-4 relative z-10">
+          {/* Icon or Mascot - Enhanced with animated ring */}
           {mascot ? (
             <div className="flex-shrink-0">{mascot}</div>
           ) : (
-            <motion.div
-              className={cn(
-                "flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-black",
-                compact ? "w-8 h-8" : "w-10 h-10 sm:w-12 sm:h-12"
+            <div className="relative">
+              {/* Animated glow ring for unplayed state */}
+              {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
+                <motion.div
+                  className={cn(
+                    "absolute inset-0 rounded-neo",
+                    compact ? "-inset-1" : "-inset-1.5"
+                  )}
+                  animate={{
+                    boxShadow: [
+                      '0 0 0px rgba(255, 165, 0, 0)',
+                      '0 0 20px rgba(255, 165, 0, 0.8)',
+                      '0 0 0px rgba(255, 165, 0, 0)'
+                    ],
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
               )}
-              animate={!hasPlayed ? {
-                boxShadow: ['0 0 0px rgba(191, 255, 0, 0)', '0 0 15px rgba(191, 255, 0, 0.5)', '0 0 0px rgba(191, 255, 0, 0)']
-              } : undefined}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Target className={cn(
-                "text-neo-lime",
-                compact ? "w-4 h-4" : "w-5 h-5 sm:w-6 sm:h-6"
-              )} />
-            </motion.div>
+              <motion.div
+                className={cn(
+                  "flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy relative",
+                  compact ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
+                )}
+                animate={!hasPlayed ? {
+                  scale: [1, 1.05, 1],
+                } : undefined}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Target className={cn(
+                  "text-amber-400",
+                  compact ? "w-5 h-5" : "w-6 h-6 sm:w-7 sm:h-7"
+                )} />
+              </motion.div>
+            </div>
           )}
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className={cn(
-                "font-black uppercase text-neo-black leading-tight",
-                compact ? "text-sm" : "text-base sm:text-lg"
+                "font-black uppercase text-neo-black leading-tight drop-shadow-sm",
+                compact ? "text-base" : "text-lg sm:text-xl"
               )}>
                 {t('daily.badge') || 'Daily Challenge'}
               </h3>
-              <span className="font-bold text-neo-black/70 text-sm">
+              <span className={cn(
+                "font-black text-neo-white bg-neo-navy/90 px-2 py-0.5 rounded-neo border-2 border-neo-black shadow-hard-xs",
+                compact ? "text-xs" : "text-sm"
+              )}>
                 #{puzzleNumber}
               </span>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              {/* Streak badge - more prominent */}
               {streak > 0 && (
                 <motion.span
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neo-black/15 text-neo-black"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-neo bg-neo-navy text-neo-orange border border-neo-black"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
                 >
-                  <Flame className="w-3 h-3 text-orange-600" />
-                  <span className="text-xs font-bold">{streak}</span>
+                  <Flame className="w-3.5 h-3.5" />
+                  <span className="text-xs font-black">{streak} {t('daily.dayStreak') || 'day streak'}</span>
                 </motion.span>
               )}
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-neo-black/70 font-medium mt-0.5">
-              <Clock className="w-3 h-3" />
-              <span className="tabular-nums min-w-[5ch]">
-                {hasPlayed
-                  ? <><span>{t('daily.nextPuzzleIn') || 'Next'}: </span><span className="inline-block min-w-[4.5em]">{countdown}</span></>
-                  : <span className="inline-block min-w-[4.5em]">{countdown}</span>
-                }
-              </span>
+              {/* Countdown */}
+              <div className={cn(
+                "flex items-center gap-1.5 text-neo-black/70 font-semibold",
+                compact ? "text-xs" : "text-xs sm:text-sm"
+              )}>
+                <Clock className="w-3.5 h-3.5" />
+                <span className="tabular-nums">
+                  {hasPlayed
+                    ? <><span>{t('daily.nextPuzzleIn') || 'Next'}: </span><span className="font-bold">{countdown}</span></>
+                    : <span className="font-bold">{countdown}</span>
+                  }
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Win/Loss/Play indicator */}
-          {hasPlayed ? (
+          {/* Win/Loss indicator - only show when played */}
+          {hasPlayed && (
             <motion.div
               className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full border-2 border-neo-black",
+                "flex items-center justify-center rounded-full border-2 border-neo-black",
+                compact ? "w-10 h-10" : "w-12 h-12",
                 hasSolved
-                  ? "bg-neo-lime-light text-neo-black"  // Green for win
-                  : "bg-neo-pink text-neo-black"         // Pink for loss
+                  ? "bg-neo-lime text-neo-black"  // Green for win
+                  : "bg-neo-pink text-neo-black"   // Pink for loss
               )}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 500, damping: 20 }}
               data-testid={hasSolved ? "won-badge" : "lost-badge"}
             >
               {hasSolved ? (
-                <Check className="w-4 h-4" strokeWidth={3} />
+                <Check className={cn(compact ? "w-5 h-5" : "w-6 h-6")} strokeWidth={3} />
               ) : (
-                <X className="w-4 h-4" strokeWidth={3} />
+                <X className={cn(compact ? "w-5 h-5" : "w-6 h-6")} strokeWidth={3} />
               )}
-            </motion.div>
-          ) : (
-            <motion.div
-              className="text-neo-black font-bold text-xs uppercase px-2 py-1 bg-neo-black/10 rounded-neo"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              {t('daily.playNow') || 'Play!'}
             </motion.div>
           )}
         </div>
@@ -304,21 +366,21 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
                 initial={{ x: '-100%' }}
                 animate={isHovered ? { x: '200%' } : { x: '-100%' }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
               />
             </motion.div>
 
             {/* Decorative corner accent */}
             <motion.div
-              className="absolute top-0 right-0 w-12 h-12 pointer-events-none overflow-hidden rounded-neo"
+              className="absolute top-0 left-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo"
               initial={false}
             >
               <motion.div
-                className="absolute -top-6 -right-6 w-12 h-12 bg-white/10 rotate-45"
-                animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
+                className="absolute -top-8 -left-8 w-16 h-16 bg-white/15 rotate-45"
+                animate={isHovered ? { scale: 1.3, opacity: 0.25 } : { scale: 1, opacity: 0.1 }}
                 transition={{ duration: 0.3 }}
               />
             </motion.div>

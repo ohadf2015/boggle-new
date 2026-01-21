@@ -19,13 +19,16 @@ export const DEFAULT_IDLE_ACTIVITIES: ActivityVariant[] = [
 
 /**
  * Default emotional base variants to cycle through for variety
- * GIF-ONLY: Only the 4 base GIF variants (happy, gaming, thinking, oops)
+ * GIF-ONLY: All 7 base GIF variants
  */
 export const DEFAULT_BASE_VARIANTS: MascotVariant[] = [
   'happy',
   'gaming',
   'thinking',
   'oops',
+  'celebration',
+  'dj',
+  'trophy',
 ];
 
 interface UseRandomMascotActivityOptions {

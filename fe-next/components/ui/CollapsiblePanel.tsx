@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface CollapsiblePanelProps {
@@ -11,7 +11,7 @@ export interface CollapsiblePanelProps {
   /** Optional short label for mobile (shown instead of label on small screens) */
   mobileLabel?: string;
   /** Icon component to show before the label */
-  icon?: React.ElementType;
+  icon?: LucideIcon;
   /** Whether the panel is currently expanded */
   isOpen: boolean;
   /** Callback when the header is clicked */

@@ -2438,6 +2438,7 @@ const sv = {
     "dayStreak": "dagars streak",
     "daysStreak": "dagars streak",
     "playNow": "SPELA NU",
+    "today": "IDAG",
     "loading": "Laddar daglig utmaning...",
     "todaysPlayers": "Dagens spelare",
     "beFirstToPlay": "Bli först att spela dagens utmaning!",

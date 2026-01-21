@@ -2438,6 +2438,7 @@ const he = {
     "dayStreak": "ימים ברצף",
     "daysStreak": "ימים ברצף",
     "playNow": "שחקו עכשיו",
+    "today": "היום",
     "loading": "טוען אתגר יומי...",
     "todaysPlayers": "השחקנים של היום",
     "beFirstToPlay": "היו הראשונים לשחק באתגר של היום!",

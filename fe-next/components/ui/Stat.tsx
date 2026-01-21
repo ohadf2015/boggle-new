@@ -231,8 +231,6 @@ export function Stat({
     const isIconComponent = typeof icon === 'function' ||
       (typeof icon === 'object' && icon !== null && '$$typeof' in icon);
 
-    const IconComponent = isIconComponent && !isReactElement ? icon as React.ElementType : null;
-
     if (iconStyle === 'box') {
       // Icon in colored container (StatBadge style)
       return (
@@ -244,8 +242,11 @@ export function Stat({
               sizeConfig.iconContainer
             )}
           >
-            {IconComponent ? (
-              <IconComponent className={cn(iconColor, sizeConfig.iconSize)} />
+            {isIconComponent && !isReactElement ? (
+              (() => {
+                const IconComponent = icon as React.ComponentType<{ className?: string }>;
+                return <IconComponent className={cn(iconColor, sizeConfig.iconSize)} />;
+              })()
             ) : isReactElement ? (
               icon
             ) : (
@@ -259,8 +260,11 @@ export function Stat({
     // Icon above value (StatDisplay/StatCard style)
     return (
       <div className="text-slate-400 dark:text-slate-500 mb-1" aria-hidden="true">
-        {IconComponent ? (
-          <IconComponent className={sizeConfig.iconSize} />
+        {isIconComponent && !isReactElement ? (
+          (() => {
+            const IconComponent = icon as React.ComponentType<{ className?: string }>;
+            return <IconComponent className={sizeConfig.iconSize} />;
+          })()
         ) : (
           icon as React.ReactNode
         )}

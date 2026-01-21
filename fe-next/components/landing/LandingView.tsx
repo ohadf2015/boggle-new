@@ -31,16 +31,16 @@ interface HeroMascotProps {
 /**
  * Interactive Mascot component for the hero section
  * Responds to hover and click with mood changes
- * Uses responsive sizing - xs on mobile portrait, sm/md/lg on other viewports
+ * Uses responsive sizing - md on mobile, lg on tablet, xl on desktop
  */
 const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMascotProps) {
-  // Mobile portrait: use sm size (64px) with tap interaction
+  // Mobile portrait: use md size (96px) with tap interaction
   if (isMobilePortrait) {
     return (
       <div className="relative mx-auto mb-0">
         <IdleMascotWithEntrance
           baseVariant="happy"
-          size="sm"
+          size="md"
           enableHover={false}
           enableClick
           clickVariant="celebrating"
@@ -55,22 +55,8 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
   // Desktop/tablet: responsive sizes with hover+click
   return (
     <div className="relative mx-auto mb-1">
-      {/* sm (64px) on small screens */}
+      {/* md (96px) on small screens */}
       <div className="block sm:hidden">
-        <IdleMascotWithEntrance
-          baseVariant="happy"
-          size="sm"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          delay={0.1}
-        />
-      </div>
-      {/* md (96px) on tablet */}
-      <div className="hidden sm:block lg:hidden">
         <IdleMascotWithEntrance
           baseVariant="happy"
           size="md"
@@ -83,11 +69,25 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
           delay={0.1}
         />
       </div>
-      {/* lg (128px) on desktop */}
-      <div className="hidden lg:block">
+      {/* lg (128px) on tablet */}
+      <div className="hidden sm:block lg:hidden">
         <IdleMascotWithEntrance
           baseVariant="happy"
           size="lg"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+      {/* xl (160px) on desktop */}
+      <div className="hidden lg:block">
+        <IdleMascotWithEntrance
+          baseVariant="happy"
+          size="xl"
           enableHover
           enableClick
           hoverVariant="excited"
@@ -311,14 +311,14 @@ const LandingView: React.FC = () => {
             <div className="w-full mb-4">
             <Suspense fallback={
               <div
-                className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300"
-                style={{ minHeight: '52px' }}
+                className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
+                style={{ minHeight: '60px' }}
               >
-                <div className="flex items-center gap-3 animate-pulse">
-                  <div className="w-8 h-8 rounded-neo bg-neo-black/20 shrink-0" />
+                <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
+                  <div className="w-10 h-10 rounded-neo bg-neo-navy shrink-0" />
                   <div className="flex-1 min-w-0 space-y-2">
-                    <div className="h-5 w-32 bg-neo-black/20 rounded" />
-                    <div className="h-3 w-20 bg-neo-black/10 rounded" />
+                    <div className="h-5 w-36 bg-neo-black/15 rounded" />
+                    <div className="h-3 w-24 bg-neo-black/10 rounded" />
                   </div>
                 </div>
               </div>
@@ -478,14 +478,14 @@ const LandingView: React.FC = () => {
               <div className="col-span-1 sm:col-span-2 w-full">
                 <Suspense fallback={
                   <div
-                    className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300"
-                    style={{ minHeight: '62px' }}
+                    className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
+                    style={{ minHeight: '72px' }}
                   >
-                    <div className="flex items-center gap-3 animate-pulse">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20 shrink-0" />
+                    <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-neo bg-neo-navy shrink-0" />
                       <div className="flex-1 min-w-0 space-y-2">
-                        <div className="h-5 w-32 bg-neo-black/20 rounded" />
-                        <div className="h-3 w-20 bg-neo-black/10 rounded" />
+                        <div className="h-6 w-40 bg-neo-black/15 rounded" />
+                        <div className="h-4 w-28 bg-neo-black/10 rounded" />
                       </div>
                     </div>
                   </div>

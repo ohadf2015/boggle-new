@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -9,26 +10,17 @@ import type { Language } from '@/types';
  * When the word is replaced, the stored grid is cleared and regenerated
  * Only accessible to admin users
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated and is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     // Parse request body
@@ -77,7 +69,7 @@ export async function POST(request: Request) {
         .from('daily_target_words')
         .update({
           override_word: formattedWord,
-          override_by: user.id,
+          override_by: authResult.user!.id,
           override_at: new Date().toISOString(),
           grid: null, // Clear stored grid - will be regenerated on next request
           grid_generated_at: null,
@@ -111,7 +103,7 @@ export async function POST(request: Request) {
           ai_selected: false,
           ai_reason: 'Admin manual selection',
           override_word: formattedWord,
-          override_by: user.id,
+          override_by: authResult.user!.id,
           override_at: new Date().toISOString(),
           // grid will be generated on first player request
         });

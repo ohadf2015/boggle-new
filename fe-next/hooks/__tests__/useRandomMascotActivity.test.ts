@@ -353,11 +353,14 @@ describe('useRandomMascotActivity', () => {
     it('should export DEFAULT_BASE_VARIANTS array', () => {
       expect(DEFAULT_BASE_VARIANTS).toBeDefined();
       expect(Array.isArray(DEFAULT_BASE_VARIANTS)).toBe(true);
-      expect(DEFAULT_BASE_VARIANTS.length).toBe(4); // GIF-only: 4 variants
+      expect(DEFAULT_BASE_VARIANTS.length).toBe(7); // GIF-only: 7 variants
       expect(DEFAULT_BASE_VARIANTS).toContain('happy');
       expect(DEFAULT_BASE_VARIANTS).toContain('gaming');
       expect(DEFAULT_BASE_VARIANTS).toContain('thinking');
       expect(DEFAULT_BASE_VARIANTS).toContain('oops');
+      expect(DEFAULT_BASE_VARIANTS).toContain('celebration');
+      expect(DEFAULT_BASE_VARIANTS).toContain('dj');
+      expect(DEFAULT_BASE_VARIANTS).toContain('trophy');
     });
 
     it('should use currentBaseVariant when resetting', () => {

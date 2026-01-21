@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useState } from 'react';
+import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Zap, TrendingUp, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -31,6 +31,9 @@ interface ScoreChange {
   delta: number;
   timestamp: number;
 }
+
+// Debounce interval for visual updates (ms) - prevents state cascade
+const VISUAL_UPDATE_DEBOUNCE = 100;
 
 /**
  * CompactLeaderboard - Race Track Style competitive leaderboard
@@ -82,47 +85,71 @@ export function CompactLeaderboard({
     };
   }, [players, currentUsername]);
 
-  // Detect score and rank changes for animations
+  // Refs to track pending updates and avoid state cascade
+  const pendingUpdateRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scoreCleanupRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rankCleanupRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Detect score and rank changes for animations (debounced to prevent cascade)
   useEffect(() => {
-    const newScoreChanges: ScoreChange[] = [];
-    const newRankChanges = new Map<string, 'up' | 'down'>();
-
-    sortedPlayers.forEach(player => {
-      const prevScore = prevScoresRef.current.get(player.username);
-      const prevRank = prevRanksRef.current.get(player.username);
-
-      // Detect score change
-      if (prevScore !== undefined && player.score > prevScore) {
-        newScoreChanges.push({
-          username: player.username,
-          delta: player.score - prevScore,
-          timestamp: Date.now(),
-        });
-      }
-
-      // Detect rank change
-      if (prevRank !== undefined && player.rank !== prevRank) {
-        newRankChanges.set(player.username, player.rank < prevRank ? 'up' : 'down');
-      }
-
-      // Update refs
-      prevScoresRef.current.set(player.username, player.score);
-      prevRanksRef.current.set(player.username, player.rank);
-    });
-
-    if (newScoreChanges.length > 0) {
-      setScoreChanges(prev => [...prev, ...newScoreChanges]);
-      // Clear old score changes after animation
-      setTimeout(() => {
-        setScoreChanges(prev => prev.filter(c => Date.now() - c.timestamp < 1500));
-      }, 1500);
+    // Cancel any pending update to debounce rapid changes
+    if (pendingUpdateRef.current) {
+      clearTimeout(pendingUpdateRef.current);
     }
 
-    if (newRankChanges.size > 0) {
-      setRankChanges(newRankChanges);
-      // Clear rank changes after animation
-      setTimeout(() => setRankChanges(new Map()), 2000);
-    }
+    pendingUpdateRef.current = setTimeout(() => {
+      const newScoreChanges: ScoreChange[] = [];
+      const newRankChanges = new Map<string, 'up' | 'down'>();
+
+      sortedPlayers.forEach(player => {
+        const prevScore = prevScoresRef.current.get(player.username);
+        const prevRank = prevRanksRef.current.get(player.username);
+
+        // Detect score change
+        if (prevScore !== undefined && player.score > prevScore) {
+          newScoreChanges.push({
+            username: player.username,
+            delta: player.score - prevScore,
+            timestamp: Date.now(),
+          });
+        }
+
+        // Detect rank change
+        if (prevRank !== undefined && player.rank !== prevRank) {
+          newRankChanges.set(player.username, player.rank < prevRank ? 'up' : 'down');
+        }
+
+        // Update refs
+        prevScoresRef.current.set(player.username, player.score);
+        prevRanksRef.current.set(player.username, player.rank);
+      });
+
+      // Batch state updates together
+      if (newScoreChanges.length > 0 || newRankChanges.size > 0) {
+        if (newScoreChanges.length > 0) {
+          setScoreChanges(prev => [...prev, ...newScoreChanges]);
+          // Clear previous cleanup timeout
+          if (scoreCleanupRef.current) clearTimeout(scoreCleanupRef.current);
+          scoreCleanupRef.current = setTimeout(() => {
+            setScoreChanges(prev => prev.filter(c => Date.now() - c.timestamp < 1500));
+          }, 1500);
+        }
+
+        if (newRankChanges.size > 0) {
+          setRankChanges(newRankChanges);
+          // Clear previous cleanup timeout
+          if (rankCleanupRef.current) clearTimeout(rankCleanupRef.current);
+          rankCleanupRef.current = setTimeout(() => setRankChanges(new Map()), 2000);
+        }
+      }
+    }, VISUAL_UPDATE_DEBOUNCE);
+
+    // Cleanup on unmount
+    return () => {
+      if (pendingUpdateRef.current) clearTimeout(pendingUpdateRef.current);
+      if (scoreCleanupRef.current) clearTimeout(scoreCleanupRef.current);
+      if (rankCleanupRef.current) clearTimeout(rankCleanupRef.current);
+    };
   }, [sortedPlayers]);
 
   // Calculate points needed to catch next target
@@ -207,17 +234,10 @@ export function CompactLeaderboard({
             const rankChange = rankChanges.get(player.username);
 
             return (
-              <motion.div
+              <div
                 key={player.username}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  layout: { type: 'spring', stiffness: 300, damping: 30 },
-                  delay: index * 0.05
-                }}
                 className={cn(
-                  'relative flex items-center gap-1.5 h-8 rounded-neo overflow-hidden',
+                  'relative flex items-center gap-1.5 h-8 rounded-neo overflow-hidden transition-all duration-200',
                   isMe
                     ? 'bg-neo-cyan/30 border-2 border-neo-cyan'
                     : 'bg-neo-black/5 border border-neo-black/20'
@@ -313,7 +333,7 @@ export function CompactLeaderboard({
                     {isMe ? (t('leaderboard.you') || 'YOU') : player.username}
                   </span>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

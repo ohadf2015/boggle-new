@@ -5,69 +5,18 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-/**
- * Get Supabase admin client
- */
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
-
-/**
- * Check if request has valid admin authorization
- */
-async function isAdminRequest(request: NextRequest): Promise<{ isAdmin: boolean; userId?: string }> {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    return { isAdmin: false };
-  }
-
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { isAdmin: false };
-  }
-
-  const token = authHeader.substring(7);
-
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-  if (error || !user) {
-    return { isAdmin: false };
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError || !profile?.is_admin) {
-    return { isAdmin: false };
-  }
-
-  return { isAdmin: true, userId: user.id };
-}
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 /**
  * POST - Disapprove/reject a community word
  */
 export async function POST(request: NextRequest) {
   try {
-    const { isAdmin } = await isAdminRequest(request);
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     const supabase = getSupabaseAdmin();

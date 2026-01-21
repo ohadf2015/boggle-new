@@ -62,7 +62,7 @@ export const NeoLoader = memo(function NeoLoader({
           <div className="w-3 h-3 bg-neo-pink rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
         </div>
         {text && (
-          <p className="text-neo-white/70 text-sm mt-3 font-neo-body">{text}</p>
+          <p className="text-sm mt-3 font-neo-body opacity-70">{text}</p>
         )}
       </div>
     );
@@ -87,7 +87,7 @@ export const NeoLoader = memo(function NeoLoader({
           ))}
         </div>
         {text && (
-          <p className="text-neo-white/70 text-sm mt-3 font-neo-body">{text}</p>
+          <p className="text-sm mt-3 font-neo-body opacity-70">{text}</p>
         )}
       </div>
     );
@@ -105,7 +105,7 @@ export const NeoLoader = memo(function NeoLoader({
         />
         {text && (
           <motion.p
-            className="text-neo-white/70 text-sm mt-3 font-neo-body"
+            className="text-sm mt-3 font-neo-body"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -154,7 +154,7 @@ export const NeoLoader = memo(function NeoLoader({
         </div>
         {text && (
           <motion.p
-            className="text-neo-white/70 text-sm font-neo-body"
+            className="text-sm font-neo-body"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -197,7 +197,7 @@ export const NeoLoader = memo(function NeoLoader({
       </div>
       {text && (
         <motion.p
-          className="text-neo-white/70 text-sm mt-4 font-neo-body"
+          className="text-sm mt-4 font-neo-body opacity-70"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}

@@ -2456,6 +2456,7 @@ const ja = {
     "dayStreak": "日連続",
     "daysStreak": "日連続",
     "playNow": "今すぐプレイ",
+    "today": "TODAY",
     "loading": "デイリーチャレンジを読み込み中...",
     "todaysPlayers": "今日のプレイヤー",
     "beFirstToPlay": "今日のチャレンジに最初に挑戦しよう！",

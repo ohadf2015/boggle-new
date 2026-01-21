@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, Lightbulb, ArrowRight, TrendingDown } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, Lightbulb, ArrowRight, TrendingDown, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -34,7 +34,7 @@ const DOMAIN_TO_DRILL: Record<CognitiveDomain, DrillType> = {
 };
 
 const DRILL_CONFIG: Record<DrillType, {
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   bgColor: string;
   unlockRequirement: number;

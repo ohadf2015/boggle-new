@@ -50,6 +50,21 @@ export type {
   GridPosition,
 } from './components';
 
+// Adventure mode types
+export type {
+  TileType,
+  TileState,
+  SpecialTile,
+  ObjectiveType,
+  LevelObjective,
+  LevelConfig,
+  LevelCompletion,
+  PlayerProgression,
+  AdventureGameState,
+  WorldName,
+} from './adventure';
+export { WORLD_NAMES } from './adventure';
+
 // ==================== Re-exports for backwards compatibility ====================
 // These aliases ensure existing imports continue to work
 

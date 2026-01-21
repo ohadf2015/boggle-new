@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import type { LucideIcon } from 'lucide-react';
 
 export interface StatBadgeProps {
   /** Icon component to display */
-  icon: React.ElementType;
+  icon: LucideIcon;
   /** The main value to display (number or string) */
   value: string | number;
   /** Label text below the value */

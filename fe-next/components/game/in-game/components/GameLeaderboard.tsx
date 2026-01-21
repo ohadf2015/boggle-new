@@ -23,6 +23,92 @@ interface MemoizedLeaderboardPlayer extends LeaderboardPlayer {
   rankDisplay: string;
 }
 
+interface LeaderboardRowProps {
+  player: MemoizedLeaderboardPlayer;
+  isHost: boolean;
+  dir: 'rtl' | 'ltr';
+  t: TranslationFn;
+}
+
+/**
+ * LeaderboardRow - Memoized individual row for performance
+ *
+ * PERFORMANCE: Removed `layout` prop and staggered delays that caused
+ * expensive DOM measurements on every leaderboard update. Uses CSS
+ * transitions instead of Framer Motion layout animations.
+ */
+const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
+  player,
+  isHost,
+  dir,
+  t,
+}) {
+  return (
+    <div
+      className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all duration-200
+        hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+        ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+    >
+      {/* Rank badge */}
+      <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
+        {player.rankDisplay}
+      </div>
+
+      {/* Avatar */}
+      <Avatar
+        profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+        avatarImage={player.avatar?.avatarImage}
+        size="xl"
+      />
+
+      {/* Player info */}
+      <div className="flex-1 min-w-0">
+        <div
+          className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+        >
+          {player.isHost && (
+            <Crown
+              className="w-4 h-4 text-neo-lime flex-shrink-0"
+              style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }}
+            />
+          )}
+          <span className="truncate" title={player.username}>
+            {player.username}
+          </span>
+          {player.isMe && (
+            <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
+              {t('playerView.me') || 'YOU'}
+            </span>
+          )}
+        </div>
+        <div className="text-xs font-bold text-neo-black/70 flex items-center gap-1">
+          <Type className="w-3 h-3 text-neo-cyan" />
+          <span className="tabular-nums">{player.wordCount || 0}</span>
+          <span>{t('hostView.words') || 'words'}</span>
+        </div>
+      </div>
+
+      {/* Presence and Score */}
+      <div className="flex items-center gap-2">
+        {/* Presence indicator (only show for others when host) */}
+        {isHost && !player.isMe && player.presenceStatus && (
+          <PresenceIndicator
+            status={player.presenceStatus}
+            isWindowFocused={player.isWindowFocused}
+            size="lg"
+          />
+        )}
+        <div className="text-right bg-neo-black/5 rounded-neo px-2 py-1 min-w-[50px]">
+          <div className="text-[10px] font-bold text-neo-black/60 uppercase tracking-wide">
+            {t('common.score') || 'Score'}
+          </div>
+          <div className="text-lg font-black text-neo-black leading-none tabular-nums">{player.score}</div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 /**
  * GameLeaderboard - Desktop leaderboard sidebar
  */
@@ -64,74 +150,14 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
       {/* Content */}
       <div className="overflow-y-auto flex-1 p-3 custom-scrollbar">
         <div className="space-y-2">
-          {memoizedLeaderboard.map((player, index) => (
-            <motion.div
+          {memoizedLeaderboard.map((player) => (
+            <LeaderboardRow
               key={player.username}
-              initial={{ x: 50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.05 }}
-              layout
-              className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
-                hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-                ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-            >
-              {/* Rank badge */}
-              <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
-                {player.rankDisplay}
-              </div>
-
-              {/* Avatar */}
-              <Avatar
-                profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-                avatarImage={player.avatar?.avatarImage}
-                size="xl"
-              />
-
-              {/* Player info */}
-              <div className="flex-1 min-w-0">
-                <div
-                  className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-                >
-                  {player.isHost && (
-                    <Crown
-                      className="w-4 h-4 text-neo-lime flex-shrink-0"
-                      style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }}
-                    />
-                  )}
-                  <span className="truncate" title={player.username}>
-                    {player.username}
-                  </span>
-                  {player.isMe && (
-                    <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
-                      {t('playerView.me') || 'YOU'}
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs font-bold text-neo-black/70 flex items-center gap-1">
-                  <Type className="w-3 h-3 text-neo-cyan" />
-                  <span className="tabular-nums">{player.wordCount || 0}</span>
-                  <span>{t('hostView.words') || 'words'}</span>
-                </div>
-              </div>
-
-              {/* Presence and Score */}
-              <div className="flex items-center gap-2">
-                {/* Presence indicator (only show for others when host) */}
-                {isHost && !player.isMe && player.presenceStatus && (
-                  <PresenceIndicator
-                    status={player.presenceStatus}
-                    isWindowFocused={player.isWindowFocused}
-                    size="lg"
-                  />
-                )}
-                <div className="text-right bg-neo-black/5 rounded-neo px-2 py-1 min-w-[50px]">
-                  <div className="text-[10px] font-bold text-neo-black/60 uppercase tracking-wide">
-                    {t('common.score') || 'Score'}
-                  </div>
-                  <div className="text-lg font-black text-neo-black leading-none tabular-nums">{player.score}</div>
-                </div>
-              </div>
-            </motion.div>
+              player={player}
+              isHost={isHost}
+              dir={dir}
+              t={t}
+            />
           ))}
 
           {leaderboard.length === 0 && (

@@ -15,20 +15,34 @@ const CHUNK_ERROR_REFRESH_TIMEOUT_MS = 10000; // 10 seconds to prevent loops
 
 /**
  * Detects if an error is a chunk loading failure (stale deployment)
+ * IMPORTANT: Be very specific to avoid false positives that cause refresh loops
  */
 function isChunkLoadError(error: Error | null): boolean {
   if (!error) return false;
   const message = error.message?.toLowerCase() || '';
   const name = error.name?.toLowerCase() || '';
 
-  return (
-    name === 'chunkloaderror' ||
+  // Check for explicit chunk load error name
+  if (name === 'chunkloaderror') return true;
+
+  // Check for specific Next.js chunk loading patterns
+  // Must include '_next/' path to ensure it's actually a chunk error
+  const hasNextPath = message.includes('_next/');
+  const isChunkError = (
     message.includes('loading chunk') ||
     message.includes('loading css chunk') ||
-    message.includes('failed to load chunk') ||
-    message.includes('failed to fetch dynamically imported module') ||
-    message.includes('dynamically imported module')
+    message.includes('failed to load chunk')
   );
+
+  if (isChunkError) return true;
+
+  // For "dynamically imported module" errors, require explicit fetch failure + next path
+  // This prevents false positives from other module/resource loading failures
+  if (message.includes('failed to fetch dynamically imported module') && hasNextPath) {
+    return true;
+  }
+
+  return false;
 }
 
 /**

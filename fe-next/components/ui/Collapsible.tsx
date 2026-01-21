@@ -226,9 +226,8 @@ export function Collapsible({
     const isIconComponent = typeof icon === 'function' ||
       (typeof icon === 'object' && icon !== null && '$$typeof' in icon);
 
-    const IconComponent = isIconComponent && !isReactElement ? icon as React.ElementType : null;
-
-    if (IconComponent) {
+    if (isIconComponent && !isReactElement) {
+      const IconComponent = icon as React.ComponentType<{ className?: string }>;
       return <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />;
     }
 

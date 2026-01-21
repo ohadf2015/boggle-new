@@ -2439,6 +2439,7 @@ const en = {
     "dayStreak": "day streak",
     "daysStreak": "days",
     "playNow": "PLAY",
+    "today": "TODAY",
     "loading": "Getting puzzle ready...",
     "todaysPlayers": "Today's Players",
     "beFirstToPlay": "Be the first today!",
@@ -3594,6 +3595,66 @@ const en = {
     "sendError": "Failed to send gift. Please try again.",
     "step": "Step",
     "of": "of"
+  },
+  "adventure": {
+    "title": "Adventure Mode",
+    "subtitle": "Journey through 10 themed worlds, conquer 100 levels, and become the ultimate word master!",
+    "progress": "Progress",
+    "levels": "levels",
+    "backToMap": "Back to World Map",
+    "worldLabel": "World",
+    "hiddenWord": "Hidden Word",
+    "devPreview": "Development Preview",
+    "devPreviewDesc": "Adventure Mode is under development. This preview shows the world map and level configuration.",
+    "worlds": {
+      "alphabetMeadows": "Alphabet Meadows",
+      "synonymSprings": "Synonym Springs",
+      "rootCaverns": "Root Caverns",
+      "idiomArchipelago": "Idiom Archipelago",
+      "compoundCanyon": "Compound Canyon",
+      "anagramLabyrinth": "Anagram Labyrinth",
+      "mirrorPalace": "Mirror Palace",
+      "neologismNebula": "Neologism Nebula",
+      "polyglotPeaks": "Polyglot Peaks",
+      "lexiconThrone": "Lexicon Throne"
+    },
+    "themes": {
+      "sunny-pastoral": "Sunny Pastoral",
+      "waterfalls": "Waterfalls",
+      "crystal-caves": "Crystal Caves",
+      "tropical-islands": "Tropical Islands",
+      "desert-cliffs": "Desert Cliffs",
+      "escher-maze": "Escher Maze",
+      "reflective-glass": "Reflective Glass",
+      "space-stars": "Space Stars",
+      "mountain-aurora": "Mountain Aurora",
+      "golden-library": "Golden Library"
+    },
+    "mechanics": {
+      "synonymPairs": "+25% for synonym pairs",
+      "etymologyRoots": "Bonus for Latin/Greek roots",
+      "idioms": "Hidden idiom challenges",
+      "compounds": "+30% for compound words",
+      "anagrams": "Solve anagrams for bonuses",
+      "palindromes": "+50% for palindromes",
+      "rareWords": "+40% for rare/new words",
+      "multilingual": "Multi-language word bonuses",
+      "allMechanics": "All mechanics combined"
+    },
+    "objectives": {
+      "wordCount": "Find words",
+      "scoreTarget": "Reach score",
+      "clearIce": "Clear ice",
+      "longWords": "Long words (5+)",
+      "timeBonus": "Time remaining",
+      "collectGems": "Collect gems"
+    },
+    "tiles": {
+      "gold": "Gold (3x points)",
+      "ice": "Ice (obstacle)",
+      "bomb": "Bomb (clears row)",
+      "rainbow": "Rainbow (wildcard)"
+    }
   }
 };
 

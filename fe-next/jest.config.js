@@ -32,6 +32,8 @@ const customJestConfig = {
     '<rootDir>/app/**/*.test.{ts,tsx}',
     '<rootDir>/host/**/*.test.{ts,tsx}',
     '<rootDir>/player/**/*.test.{ts,tsx}',
+    '<rootDir>/types/**/*.test.{ts,tsx}',
+    '<rootDir>/lib/**/*.test.{ts,tsx}',
     '<rootDir>/__tests__/**/*.test.{ts,tsx}',
   ],
 
@@ -73,6 +75,7 @@ const customJestConfig = {
     'hooks/**/*.{ts,tsx}',
     'contexts/**/*.{ts,tsx}',
     'utils/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/*.test.{ts,tsx}',

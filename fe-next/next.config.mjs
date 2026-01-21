@@ -26,6 +26,14 @@ const nextConfig = {
     turbopackUseSystemTlsCerts: true,
   },
 
+  // Transpile Three.js packages to fix HMR issues with Turbopack
+  transpilePackages: [
+    'three',
+    '@react-three/fiber',
+    '@react-three/drei',
+    '@react-three/postprocessing',
+  ],
+
   // Compiler optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
