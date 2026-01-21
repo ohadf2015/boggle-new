@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Unlock, Shuffle, BookOpen, Sparkles } from 'lucide-react';
+import { Lock, Unlock, Shuffle, BookOpen, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,7 +11,7 @@ import type { DrillType } from '@/shared/types/cognitive';
 interface LockedDrill {
   drillType: DrillType;
   gamesRequired: number;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
 }
 

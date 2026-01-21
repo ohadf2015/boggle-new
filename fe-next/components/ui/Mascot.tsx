@@ -10,10 +10,13 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
  * All mascot images are animated GIFs with backgrounds removed
  */
 export type MascotVariant =
-  | 'happy'    // main-nobg.gif - Happy/idle/celebration states
-  | 'gaming'   // play-nobg.gif - Gaming/active/energetic states
-  | 'thinking' // study-nobg.gif - Thinking/focused/waiting states
-  | 'oops';    // oops-nobg.gif - Error/mistake/surprised states
+  | 'happy'       // main-nobg.gif - Happy/idle states
+  | 'gaming'      // play-nobg.gif - Gaming/active/energetic states
+  | 'thinking'    // study-nobg.gif - Thinking/focused/waiting states
+  | 'oops'        // oops-nobg.gif - Error/mistake/surprised states
+  | 'celebration' // celebration-nobg.gif - Victory/cheering states
+  | 'dj'          // dj-nobg.gif - Party/music/dancing states
+  | 'trophy';     // trophy-nobg.gif - Winner/achievement states
 
 /**
  * Mascot GIF paths (ALL mascots use animated GIFs)
@@ -23,6 +26,9 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   gaming: '/mascot/play-nobg.gif',
   thinking: '/mascot/study-nobg.gif',
   oops: '/mascot/oops-nobg.gif',
+  celebration: '/mascot/celebration-nobg.gif',
+  dj: '/mascot/dj-nobg.gif',
+  trophy: '/mascot/trophy-nobg.gif',
 };
 
 /**
@@ -138,6 +144,45 @@ function getAnimationVariants(variant: MascotVariant): Variants {
           duration: 0.5,
           repeat: Infinity,
           repeatDelay: 2,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Celebration: Bouncy victory dance (complements celebration-nobg.gif)
+    celebration: {
+      animate: {
+        y: [0, -12, 0, -8, 0],
+        scale: [1, 1.05, 1, 1.03, 1],
+        rotate: [0, -5, 5, -3, 3, 0],
+        transition: {
+          duration: 0.8,
+          repeat: Infinity,
+          ease: 'easeOut',
+        },
+      },
+    },
+    // DJ: Rhythmic bounce (complements dj-nobg.gif)
+    dj: {
+      animate: {
+        y: [0, -6, 0],
+        rotate: [0, -3, 3, 0],
+        scale: [1, 1.02, 1],
+        transition: {
+          duration: 0.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Trophy: Proud pose with subtle sway (complements trophy-nobg.gif)
+    trophy: {
+      animate: {
+        y: [0, -4, 0],
+        rotate: [0, 2, -2, 0],
+        scale: [1, 1.03, 1],
+        transition: {
+          duration: 2,
+          repeat: Infinity,
           ease: 'easeInOut',
         },
       },

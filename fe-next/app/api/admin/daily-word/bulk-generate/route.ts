@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import type { Language } from '@/types';
 import { gameAIService } from '@/lib/ai-service';
 
@@ -26,25 +27,17 @@ const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
  * Generate unique words for a date range using AI
  * Returns suggested words for admin approval before saving
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated and is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     const body = await request.json();
@@ -113,7 +106,7 @@ export async function POST(request: Request) {
     // Check if Vertex AI is configured
     try {
       aiConfigured = await gameAIService.isConfigured();
-      
+
       if (aiConfigured) {
         generatedWords = await generateWordsWithAI(
           language as Language,
@@ -168,24 +161,17 @@ export async function POST(request: Request) {
  * PUT /api/admin/daily-word/bulk-generate
  * Save the approved bulk words to the database
  */
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     const body = await request.json();
@@ -223,7 +209,7 @@ export async function PUT(request: Request) {
           .from('daily_target_words')
           .update({
             override_word: formattedWord,
-            override_by: user.id,
+            override_by: authResult.user!.id,
             override_at: new Date().toISOString(),
             grid: null,
             grid_generated_at: null,
@@ -276,7 +262,7 @@ export async function PUT(request: Request) {
 }
 
 async function getRecentlyUsedWords(
-  supabase: ReturnType<typeof createClient> extends Promise<infer T> ? T : never,
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
   language: string,
   targetDate: string
 ): Promise<Set<string>> {

@@ -632,11 +632,13 @@ export async function storeWikipediaWordCandidates(
       const batch = insertData.slice(i, i + BATCH_SIZE);
       const batchNum = Math.floor(i / BATCH_SIZE) + 1;
 
+      // Note: ignoreDuplicates: false allows updates to existing records
+      // This ensures re-syncing will update interestingness_score and other fields
       const { error } = await supabase
         .from('wikipedia_word_candidates')
         .upsert(batch, {
           onConflict: 'language,word,fetch_date',
-          ignoreDuplicates: true
+          ignoreDuplicates: false
         });
 
       if (error) {

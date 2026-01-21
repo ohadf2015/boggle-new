@@ -44,18 +44,19 @@ export type ActivityVariant =
 export type ExtendedMascotVariant = MascotVariant | MoodVariant | ActivityVariant;
 
 /**
- * Mapping table: ALL extended variants → 4 GIF variants
+ * Mapping table: ALL extended variants → 7 GIF variants
+ * Now includes: happy, gaming, thinking, oops, celebration, dj, trophy
  */
 const VARIANT_MAP: Record<string, MascotVariant> = {
   // Mood variants
   confused: 'thinking',
-  proud: 'happy',
+  proud: 'trophy',
   nervous: 'oops',
   sad: 'thinking',
   winking: 'happy',
-  celebrating: 'happy',
-  victory: 'happy',
-  excited: 'happy',
+  celebrating: 'celebration',
+  victory: 'celebration',
+  excited: 'celebration',
   encouraging: 'happy',
   pointing: 'happy',
   surprised: 'oops',
@@ -64,51 +65,56 @@ const VARIANT_MAP: Record<string, MascotVariant> = {
   // Activity variants
   eating_pizza: 'happy',
   drinking_coffee: 'thinking',
-  dancing: 'happy',
+  dancing: 'dj',
   waving: 'happy',
-  holding_trophy: 'happy',
+  holding_trophy: 'trophy',
   holding_sign: 'happy',
-  cheering: 'happy',
+  cheering: 'celebration',
   skateboarding: 'gaming',
 };
 
 /**
+ * All base GIF variants
+ */
+const BASE_VARIANTS: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
+
+/**
  * Get the base GIF variant for any ExtendedMascotVariant
- * ALL extended variants map to one of 4 GIF variants: happy, gaming, thinking, oops
+ * ALL extended variants map to one of 7 GIF variants: happy, gaming, thinking, oops, celebration, dj, trophy
  */
 function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
   // If it's already a base variant, return as-is
-  if (variant === 'happy' || variant === 'gaming' || variant === 'thinking' || variant === 'oops') {
-    return variant;
+  if (BASE_VARIANTS.includes(variant as MascotVariant)) {
+    return variant as MascotVariant;
   }
   // Map extended variant to base GIF variant
   return VARIANT_MAP[variant] || 'happy';
 }
 
 /**
- * Default state transitions for interactions (simplified to 4 GIF variants)
- * All interactions transition between: happy, gaming, thinking, oops
+ * Default state transitions for interactions
+ * All interactions transition between the 7 GIF variants
  */
 const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
   // Base GIF variants
-  happy: 'gaming',      // Happy → Gaming (more energetic)
-  gaming: 'happy',      // Gaming → Happy (celebration)
-  thinking: 'happy',    // Thinking → Happy (done thinking)
-  oops: 'thinking',     // Oops → Thinking (figuring it out)
-
-  // All extended variants transition to more energetic state
-  // Most default to gaming (energetic) or happy (celebratory)
+  happy: 'gaming',        // Happy → Gaming (more energetic)
+  gaming: 'happy',        // Gaming → Happy (nice!)
+  thinking: 'happy',      // Thinking → Happy (done thinking)
+  oops: 'thinking',       // Oops → Thinking (figuring it out)
+  celebration: 'trophy',  // Celebration → Trophy (show off!)
+  dj: 'celebration',      // DJ → Celebration (party time!)
+  trophy: 'celebration',  // Trophy → Celebration (victory dance!)
 };
 
 const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
   // Base GIF variants
-  happy: 'gaming',      // Happy → Gaming (let's play!)
-  gaming: 'happy',      // Gaming → Happy (victory!)
-  thinking: 'oops',     // Thinking → Oops (oh!)
-  oops: 'happy',        // Oops → Happy (recovered!)
-
-  // All extended variants get celebratory reaction on click
-  // Most default to happy (celebration) or gaming (excitement)
+  happy: 'celebration',   // Happy → Celebration (let's celebrate!)
+  gaming: 'trophy',       // Gaming → Trophy (victory!)
+  thinking: 'oops',       // Thinking → Oops (oh!)
+  oops: 'happy',          // Oops → Happy (recovered!)
+  celebration: 'dj',      // Celebration → DJ (party mode!)
+  dj: 'trophy',           // DJ → Trophy (winner!)
+  trophy: 'celebration',  // Trophy → Celebration (celebrate win!)
 };
 
 /**
@@ -209,7 +215,7 @@ function getImageSource(variant: ExtendedMascotVariant): string {
 }
 
 /**
- * Get idle animation based on variant (simplified to 4 GIF variants)
+ * Get idle animation based on variant
  * CSS animations that complement the GIF animation
  */
 function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
@@ -237,6 +243,27 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
     oops: {
       x: [0, -2, 2, -1, 1, 0],
       transition: { duration: 0.5, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' },
+    },
+    // Celebration: Bouncy victory dance (complements celebration-nobg.gif)
+    celebration: {
+      y: [0, -10, 0, -6, 0],
+      scale: [1, 1.05, 1, 1.03, 1],
+      rotate: [0, -4, 4, -2, 2, 0],
+      transition: { duration: 0.8, repeat: Infinity, ease: 'easeOut' },
+    },
+    // DJ: Rhythmic bounce (complements dj-nobg.gif)
+    dj: {
+      y: [0, -5, 0],
+      rotate: [0, -3, 3, 0],
+      scale: [1, 1.02, 1],
+      transition: { duration: 0.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Trophy: Proud pose with subtle sway (complements trophy-nobg.gif)
+    trophy: {
+      y: [0, -4, 0],
+      rotate: [0, 2, -2, 0],
+      scale: [1, 1.03, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
     },
   };
 

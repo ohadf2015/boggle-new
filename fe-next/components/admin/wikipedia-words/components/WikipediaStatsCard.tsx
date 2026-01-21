@@ -10,7 +10,7 @@ interface WikipediaStatsCardProps {
   loading: boolean;
   onRefresh: () => Promise<void>;
   onTriggerPopulation: () => Promise<boolean>;
-  onSyncFromJSON?: () => Promise<boolean>;
+  onSyncFromJSON?: () => Promise<unknown>;
 }
 
 interface StatItemProps {

@@ -15,6 +15,7 @@ import {
   Sword,
   Crown,
   AlertTriangle,
+  type LucideIcon,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
@@ -59,7 +60,7 @@ interface TvNotificationProps {
 
 // Notification type configurations
 const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
-  icon: React.ElementType;
+  icon: LucideIcon;
   bgGradient: string;
   textColor: string;
   borderColor: string;

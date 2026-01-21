@@ -218,7 +218,7 @@ export const GameBadge = React.memo<GameBadgeProps>(({
     }
 
     // Otherwise render as React component (Lucide icon)
-    const IconComponent = Icon;
+    const IconComponent = Icon as React.ComponentType<{ className?: string }>;
     return <IconComponent className={ICON_SIZES[size]} />;
   };
 

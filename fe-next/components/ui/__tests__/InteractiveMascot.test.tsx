@@ -110,11 +110,11 @@ describe('InteractiveMascot', () => {
       expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
     });
 
-    it('renders activity variant mapped to GIF (dancing → happy)', () => {
+    it('renders activity variant mapped to GIF (dancing → dj)', () => {
       render(<InteractiveMascot variant="dancing" />);
       const img = screen.getByRole('img');
-      // dancing maps to happy GIF
-      expect(img).toHaveAttribute('src', '/mascot/main-nobg.gif');
+      // dancing maps to dj GIF
+      expect(img).toHaveAttribute('src', '/mascot/dj-nobg.gif');
     });
   });
 
@@ -349,9 +349,9 @@ describe('InteractiveMascot', () => {
       const button = screen.getByRole('button');
       fireEvent.click(button);
 
-      // 'happy' defaults to 'gaming' on click (updated for GIF variants)
+      // 'happy' defaults to 'celebration' on click
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/celebration-nobg.gif');
     });
   });
 });

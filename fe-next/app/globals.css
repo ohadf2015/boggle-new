@@ -746,9 +746,12 @@ body {
     padding: 12px;
     /* Simplified sizing using vmin to prevent layout shift on orientation change */
     /* Max height leaves room for timer, stats, and word forming area above grid */
-    width: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
-    height: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
-    max-height: calc(100dvh - 220px);
+    /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */
+    /* This ensures cells maintain 1:1 aspect ratio regardless of flex container constraints */
+    --board-size: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
+    width: var(--board-size);
+    height: var(--board-size);
+    max-height: var(--board-size);
     aspect-ratio: 1 / 1;
     /* Center within parent */
     margin: 0 auto;
@@ -761,9 +764,12 @@ body {
     .game-board-frame {
       /* Desktop: larger grid that fills available space between sidebars */
       /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
-      width: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
-      height: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
-      max-height: calc(100dvh - 260px);
+      /* FIX: Use CSS variable to GUARANTEE width === height for perfectly square grid */
+      /* This prevents cells from being stretched when flex containers affect dimensions */
+      --board-size: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      width: var(--board-size);
+      height: var(--board-size);
+      max-height: var(--board-size);
       padding: 14px;
     }
   }
@@ -772,9 +778,11 @@ body {
   @media (min-width: 1280px) {
     .game-board-frame {
       /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
-      width: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
-      height: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
-      max-height: calc(100dvh - 250px);
+      /* FIX: Single variable ensures square container */
+      --board-size: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      width: var(--board-size);
+      height: var(--board-size);
+      max-height: var(--board-size);
     }
   }
 
@@ -782,9 +790,11 @@ body {
   @media (min-width: 1536px) {
     .game-board-frame {
       /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
-      width: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
-      height: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
-      max-height: calc(100dvh - 240px);
+      /* FIX: Single variable ensures square container */
+      --board-size: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      width: var(--board-size);
+      height: var(--board-size);
+      max-height: var(--board-size);
     }
   }
 
@@ -3169,10 +3179,12 @@ body.crazygames-embed {
 @media (orientation: landscape) and (min-height: 601px) and (max-height: 900px) and (max-width: 1199px) {
   .game-board-frame {
     /* Larger grid for better playability on tablets in landscape */
-    width: min(80vh, calc(100vw - 300px));
-    max-width: min(80vh, calc(100vw - 300px));
-    height: min(85vh, calc(100vw - 360px));
-    max-height: min(85vh, calc(100vw - 360px));
+    /* FIX: Use single variable to ensure square grid (was using different values for width/height!) */
+    --board-size: min(80vh, calc(100vw - 300px));
+    width: var(--board-size);
+    max-width: var(--board-size);
+    height: var(--board-size);
+    max-height: var(--board-size);
   }
 }
 

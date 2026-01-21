@@ -31,7 +31,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
           <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
             {t('hostView.words') || 'Your Words'}
           </span>
-          <span className="text-xs font-bold text-neo-black/90">{foundWords.length}</span>
+          <span className="text-xs font-bold text-neo-black/90 tabular-nums">{foundWords.length}</span>
         </div>
         <div className="max-h-[50px] overflow-hidden">
           {foundWords.length === 0 ? (

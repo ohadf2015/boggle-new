@@ -199,10 +199,13 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const comboShieldsUsedRef = useRef<number>(0);
 
   // Combo timer tracking for visual feedback
+  // PERFORMANCE: Uses RAF instead of setInterval to reduce state updates
   const [comboTimeRemaining, setComboTimeRemaining] = useState<number | null>(null);
   const [comboDanger, setComboDanger] = useState(false);
-  const comboTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const comboTimerRafRef = useRef<number | null>(null);
+  const lastDisplayedComboTimeRef = useRef<number>(100);
   const DANGER_THRESHOLD = 30; // 30% remaining = danger
+  const COMBO_UPDATE_THRESHOLD = 2; // Only update when change is >2% (reduces state updates)
 
   // Tournament state
   const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
@@ -336,40 +339,54 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   }, [lastWordTime]);
 
   // Combo timer visual feedback - tracks time remaining for combo window
+  // PERFORMANCE: Uses RAF instead of 50ms setInterval to reduce state updates from 20/sec to ~10/sec
   useEffect(() => {
-    // Clear any existing interval
-    if (comboTimerIntervalRef.current) {
-      clearInterval(comboTimerIntervalRef.current);
-      comboTimerIntervalRef.current = null;
+    // Clear any existing RAF
+    if (comboTimerRafRef.current) {
+      cancelAnimationFrame(comboTimerRafRef.current);
+      comboTimerRafRef.current = null;
     }
 
     // Only track time if we have an active combo
     if (comboLevel > 0 && lastWordTime !== null) {
       const comboWindow = calculateComboChainWindow(comboLevel);
+      lastDisplayedComboTimeRef.current = 100; // Reset for new combo
 
       const updateTimeRemaining = () => {
         const now = Date.now();
         const elapsed = now - (lastWordTimeRef.current ?? now);
         const remaining = Math.max(0, 100 - (elapsed / comboWindow) * 100);
 
-        setComboTimeRemaining(remaining);
+        // Only trigger state update if change is visually significant (>2%)
+        // This reduces state updates from ~20/sec to ~10/sec while keeping smooth visuals
+        const shouldUpdate = Math.abs(remaining - lastDisplayedComboTimeRef.current) > COMBO_UPDATE_THRESHOLD;
 
-        // Check danger state
-        const isNowDanger = remaining <= DANGER_THRESHOLD && remaining > 0;
-        setComboDanger(isNowDanger);
+        if (shouldUpdate || remaining === 0) {
+          lastDisplayedComboTimeRef.current = remaining;
+          setComboTimeRemaining(remaining);
+
+          // Check danger state
+          const isNowDanger = remaining <= DANGER_THRESHOLD && remaining > 0;
+          setComboDanger(isNowDanger);
+        }
+
+        // Continue RAF loop while combo is active
+        if (remaining > 0) {
+          comboTimerRafRef.current = requestAnimationFrame(updateTimeRemaining);
+        }
       };
 
-      // Update immediately and then at 50ms intervals for smooth progress
-      updateTimeRemaining();
-      comboTimerIntervalRef.current = setInterval(updateTimeRemaining, 50);
+      // Start RAF loop
+      comboTimerRafRef.current = requestAnimationFrame(updateTimeRemaining);
     } else {
       setComboTimeRemaining(null);
       setComboDanger(false);
+      lastDisplayedComboTimeRef.current = 100;
     }
 
     return () => {
-      if (comboTimerIntervalRef.current) {
-        clearInterval(comboTimerIntervalRef.current);
+      if (comboTimerRafRef.current) {
+        cancelAnimationFrame(comboTimerRafRef.current);
       }
     };
   }, [comboLevel, lastWordTime]);

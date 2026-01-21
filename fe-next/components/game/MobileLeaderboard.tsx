@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Trophy, Crown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getRankIconString, getRankStyle } from '@/utils/rankingStyles';
@@ -25,6 +25,78 @@ interface MobileLeaderboardProps {
   t: (path: string, params?: Record<string, string | number>) => string;
   dir?: 'rtl' | 'ltr';
 }
+
+interface MemoizedPlayer extends LeaderboardPlayer {
+  rankStyle: string;
+  rankDisplay: string;
+  isMe: boolean;
+}
+
+interface LeaderboardRowProps {
+  player: MemoizedPlayer;
+  t: (path: string, params?: Record<string, string | number>) => string;
+  dir: 'rtl' | 'ltr';
+}
+
+/**
+ * LeaderboardRow - Memoized individual row for performance
+ *
+ * PERFORMANCE: Uses CSS transitions instead of Framer Motion layout animations
+ * to avoid expensive DOM measurements on every leaderboard update.
+ */
+const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
+  player,
+  t,
+  dir,
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-3 p-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
+        'transition-all duration-200',
+        player.isMe && 'ring-2 ring-neo-cyan ring-offset-1',
+        player.rankStyle,
+        dir === 'rtl' && 'flex-row-reverse'
+      )}
+    >
+      {/* Rank badge */}
+      <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-cream border-2 border-neo-black">
+        {player.rankDisplay}
+      </div>
+
+      {/* Avatar */}
+      <Avatar
+        profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+        avatarImage={player.avatar?.avatarImage}
+        size="2xl"
+      />
+
+      {/* Player info */}
+      <div className="flex-1 min-w-0">
+        <div className={cn('font-black truncate text-sm flex items-center gap-1', dir === 'rtl' && 'flex-row-reverse')}>
+          {player.isHost && <Crown className="w-4 h-4 text-neo-lime flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
+          <span className="truncate">{player.username}</span>
+          {player.isMe && (
+            <span className="text-[10px] bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
+              {t('playerView.me') || 'YOU'}
+            </span>
+          )}
+        </div>
+        <div className="text-xs font-bold text-neo-black/90">
+          <span className="tabular-nums">{player.wordCount || 0}</span> {t('hostView.words') || 'words'}
+        </div>
+      </div>
+
+      {/* Score */}
+      <div className="text-right">
+        <div className="text-lg font-black text-neo-black leading-none tabular-nums tracking-normal">
+          {player.score}
+        </div>
+        <div className="text-[9px] font-bold text-neo-black uppercase">pts</div>
+      </div>
+    </div>
+  );
+});
 
 /**
  * Mobile-friendly floating leaderboard for during gameplay
@@ -52,7 +124,17 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
   // Get top 3 players for mini-view
   const top3 = useMemo(() => leaderboard.slice(0, 3), [leaderboard]);
 
-  // Ranking utilities imported from @/utils/rankingStyles
+  // Memoize leaderboard items with centralized ranking utilities
+  const memoizedLeaderboard: MemoizedPlayer[] = useMemo(
+    () =>
+      leaderboard.map((player, index) => ({
+        ...player,
+        rankStyle: getRankStyle(index),
+        rankDisplay: getRankIconString(index),
+        isMe: player.username === currentUsername,
+      })),
+    [leaderboard, currentUsername]
+  );
 
   if (leaderboard.length === 0) return null;
 
@@ -106,7 +188,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
                 <span className="flex-1 font-bold truncate max-w-[80px] text-[11px]">
                   {player.username === currentUsername ? (t('playerView.me') || 'You') : player.username}
                 </span>
-                <span className="font-black text-[11px]">{player.score}</span>
+                <span className="font-black text-[11px] tabular-nums">{player.score}</span>
               </div>
             ))}
           </div>
@@ -116,13 +198,13 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
             <>
               <div className="text-center text-neo-black/90 text-[10px]">⋯</div>
               <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-neo text-xs bg-neo-cyan ring-2 ring-neo-black">
-                <span className="font-black w-5 text-center text-[10px]">
+                <span className="font-black w-5 text-center text-[10px] tabular-nums">
                   #{playerData.rank}
                 </span>
                 <span className="flex-1 font-bold truncate max-w-[80px] text-[11px] text-neo-black">
                   {t('playerView.me') || 'You'}
                 </span>
-                <span className="font-black text-[11px] text-neo-black">{playerData.score}</span>
+                <span className="font-black text-[11px] text-neo-black tabular-nums">{playerData.score}</span>
               </div>
             </>
           )}
@@ -137,64 +219,18 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
         height="half"
       >
         {/* Helpful tip for new players */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xs text-neo-black/60 text-center mb-3 px-2"
-        >
+        <p className="text-xs text-neo-black/60 text-center mb-3 px-2">
           {t('leaderboard.multiplayerTip') || 'Find unique words to score! Words others find count as 0.'}
-        </motion.p>
+        </p>
 
         <div className="space-y-2">
-          {leaderboard.map((player, index) => (
-            <motion.div
+          {memoizedLeaderboard.map((player) => (
+            <LeaderboardRow
               key={player.username}
-              initial={{ x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.03 }}
-              className={cn(
-                'flex items-center gap-3 p-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-                player.username === currentUsername && 'ring-2 ring-neo-cyan ring-offset-1',
-                getRankStyle(index),
-                dir === 'rtl' && 'flex-row-reverse'
-              )}
-            >
-              {/* Rank badge */}
-              <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-cream border-2 border-neo-black">
-                {getRankIconString(index)}
-              </div>
-
-              {/* Avatar */}
-              <Avatar
-                profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-                avatarImage={player.avatar?.avatarImage}
-                size="2xl"
-              />
-
-              {/* Player info */}
-              <div className="flex-1 min-w-0">
-                <div className={cn('font-black truncate text-sm flex items-center gap-1', dir === 'rtl' && 'flex-row-reverse')}>
-                  {player.isHost && <Crown className="w-4 h-4 text-neo-lime flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
-                  <span className="truncate">{player.username}</span>
-                  {player.username === currentUsername && (
-                    <span className="text-[10px] bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
-                      {t('playerView.me') || 'YOU'}
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs font-bold text-neo-black/90">
-                  {player.wordCount || 0} {t('hostView.words') || 'words'}
-                </div>
-              </div>
-
-              {/* Score */}
-              <div className="text-right">
-                <div className="text-lg font-black text-neo-black leading-none">
-                  {player.score}
-                </div>
-                <div className="text-[9px] font-bold text-neo-black uppercase">pts</div>
-              </div>
-            </motion.div>
+              player={player}
+              t={t}
+              dir={dir}
+            />
           ))}
         </div>
       </MobileDrawer>

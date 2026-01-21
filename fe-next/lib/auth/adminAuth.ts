@@ -1,6 +1,7 @@
 /**
  * Admin Authentication Utilities for Next.js API Routes
  * Validates JWT tokens and verifies admin status via Supabase
+ * Supports both Bearer token and cookie-based session authentication
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -20,31 +21,56 @@ export interface AdminAuthResult {
 
 /**
  * Verify admin authentication from Next.js API route request
- * Checks JWT token and admin status in Supabase
+ * Supports two authentication methods:
+ * 1. Bearer token in Authorization header (for API calls)
+ * 2. Cookie-based session (for dashboard/browser requests)
  *
  * @param request - Next.js API request
  * @returns Admin auth result with user or error response
  */
 export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthResult> {
-  const authHeader = request.headers.get('authorization');
   const startTime = Date.now();
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('[AdminAuth] Missing or invalid authorization header');
-    return {
-      success: false,
-      error: 'Missing authorization header',
-      response: NextResponse.json(
-        { error: 'Missing authorization header' },
-        { status: 401 }
-      ),
-    };
+  // First try Bearer token authentication
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const result = await verifyBearerToken(authHeader.substring(7));
+    if (result.success) {
+      const authDuration = Date.now() - startTime;
+      console.log(`[AdminAuth] Bearer auth successful for ${result.user?.email} in ${authDuration}ms`);
+      return result;
+    }
+    // If Bearer token provided but invalid, don't fall back to cookie auth
+    console.log('[AdminAuth] Bearer token provided but invalid');
+    return result;
   }
 
-  const token = authHeader.substring(7); // Remove 'Bearer '
+  // Fall back to cookie-based session auth
+  const cookieResult = await verifyCookieSession();
+  if (cookieResult.success) {
+    const authDuration = Date.now() - startTime;
+    console.log(`[AdminAuth] Cookie auth successful for ${cookieResult.user?.email} in ${authDuration}ms`);
+    return cookieResult;
+  }
 
+  // Neither auth method succeeded
+  console.log('[AdminAuth] No valid authentication found');
+  return {
+    success: false,
+    error: 'Missing authorization header',
+    response: NextResponse.json(
+      { error: 'Missing authorization header' },
+      { status: 401 }
+    ),
+  };
+}
+
+/**
+ * Verify Bearer token authentication
+ */
+async function verifyBearerToken(token: string): Promise<AdminAuthResult> {
   try {
-    // Create Supabase client (dynamic import for server-side)
+    // Create Supabase client with service role key for token verification
     const supabaseLib = await import('@supabase/supabase-js');
     const supabase = supabaseLib.createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -55,7 +81,6 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      console.log('[AdminAuth] Invalid token or auth error:', authError?.message || 'No user');
       return {
         success: false,
         error: 'Invalid token',
@@ -71,7 +96,6 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
       .single();
 
     if (profileError || !profile?.is_admin) {
-      console.log('[AdminAuth] User not admin:', user.email, 'profileError:', profileError?.message);
       return {
         success: false,
         error: 'Admin access required',
@@ -81,9 +105,6 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
         ),
       };
     }
-
-    const authDuration = Date.now() - startTime;
-    console.log(`[AdminAuth] Auth successful for ${user.email} in ${authDuration}ms`);
 
     return {
       success: true,
@@ -95,7 +116,67 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[AdminAuth] Exception during auth:', errorMessage);
+    console.error('[AdminAuth] Bearer token verification error:', errorMessage);
+    return {
+      success: false,
+      error: errorMessage,
+      response: NextResponse.json(
+        { error: 'Authentication failed' },
+        { status: 500 }
+      ),
+    };
+  }
+}
+
+/**
+ * Verify cookie-based session authentication
+ */
+async function verifyCookieSession(): Promise<AdminAuthResult> {
+  try {
+    // Dynamic import to avoid issues in edge runtime
+    const { createClient } = await import('@/utils/supabase/server');
+    const supabase = await createClient();
+
+    // Get user from cookie session
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        error: 'Unauthorized',
+        response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+      };
+    }
+
+    // Check admin status in profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin, username')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile?.is_admin) {
+      return {
+        success: false,
+        error: 'Admin access required',
+        response: NextResponse.json(
+          { error: 'Admin access required' },
+          { status: 403 }
+        ),
+      };
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email!,
+        username: profile.username,
+      },
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[AdminAuth] Cookie session verification error:', errorMessage);
     return {
       success: false,
       error: errorMessage,

@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hash, Ruler, Zap, Flame, Target, Trophy } from 'lucide-react';
+import { Hash, Ruler, Zap, Flame, Target, Trophy, type LucideIcon } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { cn } from '../../../lib/utils';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -30,7 +30,7 @@ interface PlayerData {
 
 interface GameStat {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   value: string | number;
   subValue?: string;

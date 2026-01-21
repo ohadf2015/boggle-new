@@ -235,8 +235,11 @@ export function DesktopGameLayout({
           </div>
 
           {/* Game Grid - centered with aspect ratio maintained */}
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full">
-            <div className="desktop-grid-container aspect-square h-full max-w-full">
+          {/* Parent container uses container-type: size for responsive grid sizing */}
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full" style={{ containerType: 'size' }}>
+            {/* FIX: Use min(100cqw, 100cqh) for both dimensions to GUARANTEE square container */}
+            {/* Previous h-full + aspect-square + max-w-full failed when parent was taller than wide */}
+            <div className="desktop-grid-container" style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}>
               <GridComponent
                 grid={grid}
                 interactive={!isPaused}
