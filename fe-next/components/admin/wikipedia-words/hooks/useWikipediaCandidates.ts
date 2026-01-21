@@ -283,7 +283,9 @@ export function useWikipediaCandidates({
   }, [supabase, language, fetchCandidates]);
 
   const syncFromJSON = useCallback(async (): Promise<boolean> => {
-    const CLIENT_TIMEOUT_MS = 60000; // 60 seconds should be enough for JSON sync
+    // Match server maxDuration of 90s - large JSON files (2687 words for en.json)
+    // are now processed in batches, but still need adequate time
+    const CLIENT_TIMEOUT_MS = 95000; // 95 seconds (slightly more than server's 90s maxDuration)
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();

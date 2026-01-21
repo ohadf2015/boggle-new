@@ -583,14 +583,24 @@ function formatDateForApi(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
+// Batch size for database operations to prevent timeout
+// Supabase performs well with batches of 500 or fewer records
+const BATCH_SIZE = 500;
+
 /**
  * Store fetched Wikipedia words in database for later use
+ * Uses batching to prevent timeout on large datasets (e.g., 2687 words in en.json)
  */
 export async function storeWikipediaWordCandidates(
   language: Language,
   date: Date,
   candidates: Array<{ word: string; source: string; url?: string; score?: number }>
 ): Promise<void> {
+  if (candidates.length === 0) {
+    console.log(`[Wikipedia] No candidates to store for ${language}`);
+    return;
+  }
+
   try {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(
@@ -600,7 +610,7 @@ export async function storeWikipediaWordCandidates(
 
     const dateStr = date.toISOString().split('T')[0];
 
-    // Insert candidates (ignore duplicates)
+    // Prepare all insert data
     const insertData = candidates.map(c => ({
       language,
       fetch_date: dateStr,
@@ -611,15 +621,34 @@ export async function storeWikipediaWordCandidates(
       validation_status: 'pending'
     }));
 
-    const { error } = await supabase
-      .from('wikipedia_word_candidates')
-      .upsert(insertData, {
-        onConflict: 'language,word,fetch_date',
-        ignoreDuplicates: true
-      });
+    // Process in batches to prevent timeout on large datasets
+    const totalBatches = Math.ceil(insertData.length / BATCH_SIZE);
+    let successCount = 0;
+    let errorCount = 0;
 
-    if (error) {
-      console.error('[Wikipedia] Error storing candidates:', error.message);
+    console.log(`[Wikipedia] Storing ${candidates.length} candidates for ${language} in ${totalBatches} batch(es)`);
+
+    for (let i = 0; i < insertData.length; i += BATCH_SIZE) {
+      const batch = insertData.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+
+      const { error } = await supabase
+        .from('wikipedia_word_candidates')
+        .upsert(batch, {
+          onConflict: 'language,word,fetch_date',
+          ignoreDuplicates: true
+        });
+
+      if (error) {
+        console.error(`[Wikipedia] Error storing batch ${batchNum}/${totalBatches} for ${language}:`, error.message);
+        errorCount += batch.length;
+      } else {
+        successCount += batch.length;
+      }
+    }
+
+    if (errorCount > 0) {
+      console.warn(`[Wikipedia] Stored ${successCount}/${candidates.length} candidates for ${language} (${errorCount} failed)`);
     } else {
       console.log(`[Wikipedia] Stored ${candidates.length} word candidates for ${language}`);
     }
