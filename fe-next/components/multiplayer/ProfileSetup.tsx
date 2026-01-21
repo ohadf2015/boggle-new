@@ -182,7 +182,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col page-content-safe">
+      <div dir={dir} className="min-h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col page-content-safe">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

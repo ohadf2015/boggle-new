@@ -78,12 +78,12 @@ const DesktopMainContainerTestComponent = () => {
   return (
     <div
       data-testid="main-container"
-      className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full"
+      className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out"
     >
       <div data-testid="left-sidebar" className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 min-h-0 flex-shrink-0">
         Left Sidebar
       </div>
-      <div data-testid="center-column" className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
+      <div data-testid="center-column" className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         Center Content
       </div>
       <div data-testid="right-sidebar" className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 flex-shrink-0">
