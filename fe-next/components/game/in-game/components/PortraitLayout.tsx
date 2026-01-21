@@ -187,7 +187,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         gameLanguage={gameLanguage}
       />
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
