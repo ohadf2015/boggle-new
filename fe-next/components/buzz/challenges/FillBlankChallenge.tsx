@@ -81,10 +81,14 @@ export default function FillBlankChallenge({
     });
 
     // Auto-advance to next empty box
+    // Use setTimeout(0) to delay focus until after React re-renders
+    // This prevents race conditions when typing rapidly
     if (index < remainingLength - 1) {
       const nextIndex = index + 1;
       setActiveIndex(nextIndex);
-      inputRefs.current[nextIndex]?.focus();
+      setTimeout(() => {
+        inputRefs.current[nextIndex]?.focus();
+      }, 0);
     }
   }, [remainingLength]);
 
