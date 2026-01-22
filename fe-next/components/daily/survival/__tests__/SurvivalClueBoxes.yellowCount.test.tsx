@@ -15,7 +15,7 @@ import type { AccumulatedClue } from '../types';
 
 describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
   const defaultProps = {
-    currentHint: { level: 0, hint: '_ _ _', revealed: 0, unlockCost: 0 },
+    currentHint: { level: 0, hint: '_ _ _', unlockCost: 0 },
     targetWord: 'CAT',
     attempts: [],
     accumulatedClues: new Map<number, AccumulatedClue>(),
@@ -88,7 +88,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
       <SurvivalClueBoxes
         {...defaultProps}
         targetWord="APPLE"
-        currentHint={{ level: 0, hint: '_ _ _ _ _', revealed: 0, unlockCost: 0 }}
+        currentHint={{ level: 0, hint: '_ _ _ _ _', unlockCost: 0 }}
         attempts={attempts}
         showFeedbackOverlay={false}
       />
@@ -128,7 +128,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
       <SurvivalClueBoxes
         {...defaultProps}
         targetWord="APPLE"
-        currentHint={{ level: 0, hint: '_ _ _ _ _', revealed: 0, unlockCost: 0 }}
+        currentHint={{ level: 0, hint: '_ _ _ _ _', unlockCost: 0 }}
         attempts={attempts}
         accumulatedClues={accumulatedClues}
         showFeedbackOverlay={false}
@@ -173,7 +173,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
       <SurvivalClueBoxes
         {...defaultProps}
         targetWord="APPLE"
-        currentHint={{ level: 0, hint: '_ _ _ _ _', revealed: 0, unlockCost: 0 }}
+        currentHint={{ level: 0, hint: '_ _ _ _ _', unlockCost: 0 }}
         attempts={attempts}
         accumulatedClues={accumulatedClues}
         showFeedbackOverlay={false}
@@ -215,7 +215,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
       <SurvivalClueBoxes
         {...defaultProps}
         targetWord="BANANA"
-        currentHint={{ level: 0, hint: '_ _ _ _ _ _', revealed: 0, unlockCost: 0 }}
+        currentHint={{ level: 0, hint: '_ _ _ _ _ _', unlockCost: 0 }}
         attempts={attempts}
         showFeedbackOverlay={false}
       />
@@ -266,7 +266,7 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
       <SurvivalClueBoxes
         {...defaultProps}
         targetWord="APPLE"
-        currentHint={{ level: 0, hint: '_ _ _ _ _', revealed: 0, unlockCost: 0 }}
+        currentHint={{ level: 0, hint: '_ _ _ _ _', unlockCost: 0 }}
         attempts={attempts}
         showFeedbackOverlay={false}
       />
