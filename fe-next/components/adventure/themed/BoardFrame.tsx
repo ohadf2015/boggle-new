@@ -129,7 +129,8 @@ CornerDecor.displayName = 'CornerDecor';
 
 const BoardFrame = memo<BoardFrameProps>(({ children, className }) => {
   // Use context directly to allow usage both inside and outside AdventureThemeProvider
-  const adventureTheme = AdventureThemeContext ? React.useContext(AdventureThemeContext) : null;
+  // Always call useContext unconditionally (Rules of Hooks), then check if value is null
+  const adventureTheme = React.useContext(AdventureThemeContext);
   const worldId = adventureTheme?.worldId || 1;
 
   const frameClass = WORLD_FRAME_CLASSES[worldId] || WORLD_FRAME_CLASSES[1];

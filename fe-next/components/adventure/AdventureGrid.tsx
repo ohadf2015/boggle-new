@@ -156,7 +156,8 @@ const AdventureGrid = memo(
 
       // World theming - default to world 1 if theme context is not available
       // This allows AdventureGrid to work both inside and outside AdventureThemeProvider
-      const adventureTheme = AdventureThemeContext ? React.useContext(AdventureThemeContext) : null;
+      // Always call useContext unconditionally (Rules of Hooks), then check if value is null
+      const adventureTheme = React.useContext(AdventureThemeContext);
       const worldId = adventureTheme?.worldId || 1;
 
       // Merge refs (internal and forwarded)
