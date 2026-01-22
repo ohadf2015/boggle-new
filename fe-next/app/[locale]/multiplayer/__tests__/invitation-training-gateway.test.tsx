@@ -90,8 +90,10 @@ jest.mock('@/contexts/MusicContext', () => ({
 
 // Mock trainingProgressStorage
 const mockShouldShowTrainingGateway = jest.fn();
+const mockMarkGatewaySeen = jest.fn();
 jest.mock('@/utils/trainingProgressStorage', () => ({
   shouldShowTrainingGateway: () => mockShouldShowTrainingGateway(),
+  markGatewaySeen: () => mockMarkGatewaySeen(),
 }));
 
 // Mock TrainingGatewayModal

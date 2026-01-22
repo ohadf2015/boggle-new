@@ -336,4 +336,89 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
       );
     });
   });
+
+  describe('Cleanup Behavior', () => {
+    let mockHistoryBack: jest.SpyInstance;
+
+    beforeEach(() => {
+      // Mock history.back to track if it gets called
+      mockHistoryBack = jest.spyOn(window.history, 'back').mockImplementation();
+    });
+
+    afterEach(() => {
+      mockHistoryBack.mockRestore();
+    });
+
+    it('should NOT call history.back() during cleanup - prevents unwanted navigation', () => {
+      // BUG: The cleanup function was calling history.back() which triggers navigation
+      // without showing the confirmation dialog. This test ensures cleanup doesn't
+      // cause unwanted navigation.
+
+      // Mock history.state to simulate having our guard state
+      const originalState = window.history.state;
+      Object.defineProperty(window.history, 'state', {
+        value: { gameGuard: true },
+        writable: true,
+        configurable: true,
+      });
+
+      const { unmount } = renderHook(() =>
+        useNavigationGuard({
+          enabled: true,
+          onNavigationAttempt: () => false,
+        })
+      );
+
+      // Clear any previous calls
+      mockHistoryBack.mockClear();
+
+      // Unmount should cleanup WITHOUT navigating away
+      unmount();
+
+      // Should NOT call history.back() - this was the bug!
+      // Calling history.back() causes navigation without confirmation dialog
+      expect(mockHistoryBack).not.toHaveBeenCalled();
+
+      // Restore original state
+      Object.defineProperty(window.history, 'state', {
+        value: originalState,
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    it('should NOT call history.back() when enabled changes from true to false', () => {
+      // Same bug scenario: when game becomes inactive, cleanup shouldn't navigate
+
+      const originalState = window.history.state;
+      Object.defineProperty(window.history, 'state', {
+        value: { gameGuard: true },
+        writable: true,
+        configurable: true,
+      });
+
+      const { rerender } = renderHook(
+        ({ enabled }) =>
+          useNavigationGuard({
+            enabled,
+            onNavigationAttempt: () => false,
+          }),
+        { initialProps: { enabled: true } }
+      );
+
+      mockHistoryBack.mockClear();
+
+      // Disable the guard (simulates game ending or user confirming exit)
+      rerender({ enabled: false });
+
+      // Should NOT navigate away
+      expect(mockHistoryBack).not.toHaveBeenCalled();
+
+      Object.defineProperty(window.history, 'state', {
+        value: originalState,
+        writable: true,
+        configurable: true,
+      });
+    });
+  });
 });

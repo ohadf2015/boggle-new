@@ -13,7 +13,7 @@ import { SocketContext, getSharedSocket, releaseSharedSocket, getSharedSocketIfE
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TrainingGatewayModal } from '@/components/training';
-import { shouldShowTrainingGateway } from '@/utils/trainingProgressStorage';
+import { shouldShowTrainingGateway, markGatewaySeen } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
@@ -226,6 +226,13 @@ export default function MultiplayerPage(): React.JSX.Element {
     // Check if player should see training gateway
     const shouldShow = shouldShowTrainingGateway();
     if (shouldShow) {
+      // CRITICAL FIX: Mark as seen IMMEDIATELY before setting up the timer
+      // This prevents the race condition where the effect re-runs before the
+      // modal's useEffect has a chance to call markGatewaySeen()
+      // The modal's useEffect will also call this (idempotent), but calling it
+      // here ensures the flag is set even if the effect re-runs during the 500ms delay
+      markGatewaySeen();
+
       // Small delay to let the page render first
       const timer = setTimeout(() => {
         setShowTrainingGateway(true);

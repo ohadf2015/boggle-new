@@ -9,29 +9,31 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 1 of 10 (Infrastructure Foundation) ✓ COMPLETE
-Next: Phase 2 (Core Game Juice)
-Status: Ready for Phase 2
-Last activity: 2026-01-22 - Completed Phase 1
+Phase: 2 of 10 (Core Game Juice) IN PROGRESS
+Plan: 2 of 3 in phase ✓ COMPLETE
+Status: Phase 2 in progress
+Last activity: 2026-01-22 - Completed 02-02-PLAN.md
 
-Progress: [██████████] 100% (Phase 1)
+Progress: [██░░░░░░░░] 13% (1/10 phases complete, 8/~30 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 10 min
-- Total execution time: ~1 hour
+- Total plans completed: 8
+- Average duration: 11 min
+- Total execution time: ~84 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 Infrastructure Foundation | 6 | ~60min | 10min |
+| 02 Core Game Juice | 2 | ~24min | 12min |
 
 **Recent Trend:**
-- Phase 1 completed efficiently
-- 01-06 deferred to Phase 7 (video delivery belongs with video cutscenes)
+- Phase 1 completed efficiently (10min avg)
+- Phase 2 momentum: 02-01 (18min), 02-02 (6min)
+- Animation patterns accelerating execution speed
 
 *Updated after each plan completion*
 
@@ -55,6 +57,12 @@ Recent decisions affecting current work:
 - **01-05:** Lighthouse CI 90+ thresholds as errors (enforces performance budget)
 - **01-05:** BundleWatch limits 250KB JS / 50KB CSS (gzip, matches CDN)
 - **01-06:** Video delivery deferred to Phase 7 (Remotion infra validated, content in Phase 7)
+- **02-01:** forwardRef pattern for grid container ref passing (enables coordinate calculation)
+- **02-01:** Index-based stable timestamps for trail animation (prevents re-renders)
+- **02-01:** DOM coordinate calculation with mathematical fallback (testing support)
+- **02-02:** Spring physics constants (stiffness 300, damping 20, mass 0.5) for tile bounce
+- **02-02:** Viewport coordinates for sparkle positioning (SelectionSparkle uses fixed positioning)
+- **02-02:** Framer Motion over CSS transitions for spring physics control
 
 ### Pending Todos
 
@@ -72,9 +80,17 @@ None.
 - AI prompt consistency across 4 worlds needs experimentation
 - Current performance scores unknown - first CI run will establish baseline
 
+**Phase 2 Core Game Juice:** IN PROGRESS
+- ✅ Word selection trail animation complete (02-01)
+- ✅ Letter tile pop animation complete (02-02)
+- Next: Word flash animation (02-03)
+
 **Phase 7 Video Cutscenes:**
 - RTL video production workflow undefined for 4-language variants
 - Video delivery strategy (Lambda vs bundled) to be decided in Phase 7
+
+**General:**
+- Friends page build error pre-exists (unrelated to Phase 2 work)
 
 ## Phase 1 Deliverables
 
@@ -87,12 +103,21 @@ None.
 | 01-05 | Performance CI (Lighthouse, BundleWatch) | ✓ |
 | 01-06 | Video delivery | ⏸️ Deferred to Phase 7 |
 
+## Phase 2 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 02-01 | Word selection trail animation | ✓ |
+| 02-02 | Letter tile pop animation | ✓ |
+| 02-03 | Word flash animation | 🔲 |
+
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Phase 1 complete
+Stopped at: Completed 02-02-PLAN.md (Letter Tile Pop Animation)
 Resume file: None
+Next: 02-03-PLAN.md (Word Flash Animation)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-22*
+*Last updated: 2026-01-22 17:35 UTC*

@@ -586,13 +586,16 @@ export function useGridInteraction({
 
       // Only determine gesture type after exceeding deadzone threshold
       if (totalMovement >= getDeadzoneThreshold()) {
-        // If movement is primarily vertical (more than 1.5x), treat as scroll
-        // This allows users to scroll the page even when starting on the grid
-        if (deltaY > deltaX * 1.5) {
+        // If movement is primarily vertical (more than 1.5x) AND user hasn't
+        // started selecting yet, treat as scroll. This allows users to scroll
+        // the page even when starting on the grid.
+        // IMPORTANT: Once user has selected cells (started a word), we must
+        // NOT treat vertical movement as scroll - they're selecting letters!
+        if (deltaY > deltaX * 1.5 && selectedCells.length === 0) {
           isScrollGestureRef.current = true;
           return; // Let browser handle scroll
         }
-        // Horizontal/diagonal movement = selection intent, prevent scroll
+        // Horizontal/diagonal movement OR already selecting = selection intent, prevent scroll
         if ('cancelable' in e && e.cancelable) e.preventDefault();
       }
       // Before reaching deadzone, don't prevent default yet
@@ -622,7 +625,7 @@ export function useGridInteraction({
       // Capable devices: process immediately for best responsiveness
       processTouchMove(touchX, touchY);
     }
-  }, [interactive, performanceConfig.isLowEnd, processTouchMove]);
+  }, [interactive, performanceConfig.isLowEnd, processTouchMove, selectedCells.length]);
 
   const handleTouchEnd = useCallback(() => {
     if (!interactive || !isTouchingRef.current) return;

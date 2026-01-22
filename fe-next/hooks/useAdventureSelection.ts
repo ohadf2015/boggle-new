@@ -12,6 +12,12 @@ import type { GridTileState } from '@/types/adventure';
 // TYPES
 // ==============================================
 
+export interface PathPoint {
+  x: number;
+  y: number;
+  timestamp: number;
+}
+
 export interface UseAdventureSelectionProps {
   /** Flat array of grid tiles */
   tiles: GridTileState[];
@@ -19,6 +25,8 @@ export interface UseAdventureSelectionProps {
   gridSize: number;
   /** Whether selection is disabled */
   disabled?: boolean;
+  /** Grid container ref for coordinate calculation */
+  gridRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export interface UseAdventureSelectionReturn {
@@ -34,6 +42,8 @@ export interface UseAdventureSelectionReturn {
   clearSelection: () => void;
   /** Get path as row/col coordinates */
   getPath: () => Array<{ row: number; col: number }>;
+  /** Path points for trail animation */
+  pathPoints: PathPoint[];
 }
 
 // ==============================================
@@ -68,6 +78,7 @@ export function useAdventureSelection({
   tiles,
   gridSize,
   disabled = false,
+  gridRef,
 }: UseAdventureSelectionProps): UseAdventureSelectionReturn {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
@@ -78,6 +89,54 @@ export function useAdventureSelection({
 
   // Whether user is actively selecting
   const isSelecting = selectedIndices.length > 0;
+
+  // Calculate path points for trail animation
+  const pathPoints = useMemo<PathPoint[]>(() => {
+    if (selectedIndices.length === 0 || !gridRef?.current) return [];
+
+    const gridContainer = gridRef.current;
+    if (!gridContainer) return [];
+
+    // Use a stable base timestamp derived from the selection count
+    const baseTimestamp = selectedIndices.length * 1000;
+
+    return selectedIndices
+      .map((idx, index) => {
+        const tile = tiles[idx];
+        if (!tile) return null;
+
+        // Try to find the cell element
+        const cellElement = gridContainer.querySelector(
+          `[data-row="${tile.row}"][data-col="${tile.col}"]`
+        );
+
+        if (!cellElement) {
+          // Mathematical fallback if element not found
+          // This approximation works for uniform grids
+          const gridRect = gridContainer.getBoundingClientRect();
+
+          // Estimate cell size based on grid size
+          const cellSize = gridRect.width / gridSize;
+          const gap = 4; // Default gap in pixels (matches Tailwind gap-1)
+
+          return {
+            x: tile.col * (cellSize + gap) + cellSize / 2,
+            y: tile.row * (cellSize + gap) + cellSize / 2,
+            timestamp: baseTimestamp + index * 100,
+          };
+        }
+
+        const rect = cellElement.getBoundingClientRect();
+        const gridRect = gridContainer.getBoundingClientRect();
+
+        return {
+          x: rect.left + rect.width / 2 - gridRect.left,
+          y: rect.top + rect.height / 2 - gridRect.top,
+          timestamp: baseTimestamp + index * 100,
+        };
+      })
+      .filter((p): p is PathPoint => p !== null);
+  }, [selectedIndices, tiles, gridRef, gridSize]);
 
   // Select a tile by index
   const selectTile = useCallback(
@@ -136,5 +195,6 @@ export function useAdventureSelection({
     selectTile,
     clearSelection,
     getPath,
+    pathPoints,
   };
 }

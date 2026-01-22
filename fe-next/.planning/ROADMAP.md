@@ -55,10 +55,12 @@ Plans:
   3. Score appears as floating animation showing points earned with combo multipliers
   4. All animations respect reduced-motion preference and work in Hebrew RTL mode
   5. Performance budget maintained (no FPS drops on low-end devices)
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Integrate WordPathTrail into adventure grid for selection trail
+- [ ] 02-02-PLAN.md — Enhance letter tile animations with spring physics and sparkle
+- [ ] 02-03-PLAN.md — Add ScorePopupFly animation on valid word submission
 
 ### Phase 3: Level Entry Experience
 **Goal**: Create dramatic level start that builds anticipation before gameplay begins
@@ -187,8 +189,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure Foundation | 6/6 | ✓ Complete | 2026-01-22 |
-| 2. Core Game Juice | 0/TBD | Not started | - |
+| 1. Infrastructure Foundation | 6/6 | Complete | 2026-01-22 |
+| 2. Core Game Juice | 0/3 | Ready | - |
 | 3. Level Entry Experience | 0/TBD | Not started | - |
 | 4. World Theming | 0/TBD | Not started | - |
 | 5. Lexi Personality | 0/TBD | Not started | - |

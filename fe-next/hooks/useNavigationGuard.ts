@@ -97,14 +97,12 @@ export function useNavigationGuard({
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      // Clean up the dummy history state when disabled
-      if (historyPushedRef.current) {
-        // Only go back if we still have our guard state
-        if (window.history.state?.gameGuard) {
-          window.history.back();
-        }
-        historyPushedRef.current = false;
-      }
+      // Reset the tracking ref - we don't call history.back() because:
+      // 1. If user confirmed exit, they want to navigate away - let browser handle it
+      // 2. If component unmounts during game, we shouldn't force navigation
+      // 3. Calling history.back() causes navigation WITHOUT showing confirmation dialog
+      //    because the popstate listener was already removed above
+      historyPushedRef.current = false;
     };
   }, [enabled]); // Only re-run when enabled changes, not when callback changes
 }

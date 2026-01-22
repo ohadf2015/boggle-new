@@ -7,9 +7,12 @@
 
 'use client';
 
-import React, { memo, useCallback, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
+import { WordPathTrail, SelectionSparkle } from '@/components/animations';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // ==============================================
 // TYPES
@@ -40,6 +43,12 @@ interface AdventureGridProps {
   onDragEnd?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /** Path points for trail animation */
+  pathPoints?: Array<{ x: number; y: number; timestamp: number }>;
+  /** Whether current word is valid */
+  isWordValid?: boolean;
+  /** Whether word was just submitted */
+  wasWordSubmitted?: boolean;
 }
 
 // ==============================================
@@ -76,27 +85,49 @@ const GRID_COLS_CLASSES: Record<number, string> = {
 // COMPONENT
 // ==============================================
 
-const AdventureGrid = memo<AdventureGridProps>(
-  ({
-    tiles,
-    gridSize,
-    selectedIndices = [],
-    interactive = false,
-    disabled = false,
-    showWordPreview = false,
-    onTileSelect,
-    onWordSubmit,
-    onDragStart,
-    onDragEnter,
-    onDragEnd,
-    className,
-  }) => {
-    // Track whether we're currently dragging
-    const isDraggingRef = useRef(false);
-    // Track last tile index for touch move to prevent duplicate calls
-    const lastTouchTileIndexRef = useRef<number | null>(null);
-    // Ref to grid container for touch event handling
-    const gridRef = useRef<HTMLDivElement>(null);
+const AdventureGrid = memo(
+  React.forwardRef<HTMLDivElement, AdventureGridProps>(
+    (
+      {
+        tiles,
+        gridSize,
+        selectedIndices = [],
+        interactive = false,
+        disabled = false,
+        showWordPreview = false,
+        onTileSelect,
+        onWordSubmit,
+        onDragStart,
+        onDragEnter,
+        onDragEnd,
+        className,
+        pathPoints,
+        isWordValid = false,
+        wasWordSubmitted = false,
+      },
+      ref
+    ) => {
+      // Track whether we're currently dragging
+      const isDraggingRef = useRef(false);
+      // Track last tile index for touch move to prevent duplicate calls
+      const lastTouchTileIndexRef = useRef<number | null>(null);
+      // Ref to grid container for touch event handling
+      const gridRef = useRef<HTMLDivElement>(null);
+
+      // Merge refs (internal and forwarded)
+      React.useImperativeHandle(ref, () => gridRef.current!);
+
+      // Use gridRef consistently
+      const containerRef = gridRef;
+
+      // Device performance detection for adaptive animations
+      const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
+
+      // Sparkle state for selection feedback
+      const [sparkleState, setSparkleState] = useState<{
+        position: { x: number; y: number } | null;
+        key: number;
+      }>({ position: null, key: 0 });
 
     // Build selected set for quick lookup
     const selectedSet = useMemo(
@@ -122,15 +153,26 @@ const AdventureGrid = memo<AdventureGridProps>(
 
     // Handle drag start (mouse down / touch start on tile)
     const handleDragStart = useCallback(
-      (index: number, tile: GridTileState) => {
+      (e: React.MouseEvent | React.TouchEvent, index: number, tile: GridTileState) => {
         if (disabled || tile.isCleared || !interactive) return;
         isDraggingRef.current = true;
         lastTouchTileIndexRef.current = index;
+
+        // Trigger sparkle at click/touch position
+        if (enableComplexAnimations) {
+          const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+          const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+          setSparkleState({
+            position: { x: clientX, y: clientY },
+            key: Date.now(),
+          });
+        }
+
         if (onDragStart) {
           onDragStart(index, tile);
         }
       },
-      [disabled, interactive, onDragStart]
+      [disabled, interactive, onDragStart, enableComplexAnimations]
     );
 
     // Handle drag enter (mouse enters tile during drag)
@@ -176,7 +218,7 @@ const AdventureGrid = memo<AdventureGridProps>(
         if (!tileElement) return;
 
         // Get the tile index from data attribute or find it in the grid
-        const allTiles = gridRef.current?.querySelectorAll('[role="gridcell"]');
+        const allTiles = containerRef.current?.querySelectorAll('[role="gridcell"]');
         if (!allTiles) return;
 
         const tileIndex = Array.from(allTiles).indexOf(tileElement);
@@ -231,7 +273,7 @@ const AdventureGrid = memo<AdventureGridProps>(
 
         {/* Grid */}
         <div
-          ref={gridRef}
+          ref={containerRef}
           role="grid"
           aria-label="Adventure game board"
           onMouseUp={interactive ? handleMouseUp : undefined}
@@ -239,7 +281,7 @@ const AdventureGrid = memo<AdventureGridProps>(
           onTouchEnd={interactive ? handleMouseUp : undefined}
           className={cn(
             'adventure-grid',
-            'grid gap-1 p-2',
+            'relative grid gap-1 p-2',
             'bg-neo-navy/40 rounded-neo',
             'select-none touch-none',
             GRID_COLS_CLASSES[gridSize] || 'grid-cols-4',
@@ -251,15 +293,38 @@ const AdventureGrid = memo<AdventureGridProps>(
             const canInteract = interactive && !disabled && !tile.isCleared;
 
             return (
-              <div
+              <motion.div
                 key={tile.id}
+                data-row={tile.row}
+                data-col={tile.col}
                 role="gridcell"
                 aria-label={getTileAriaLabel(tile)}
                 aria-selected={isSelected}
                 onClick={() => handleTileClick(index, tile)}
-                onMouseDown={() => handleDragStart(index, tile)}
+                onMouseDown={(e) => handleDragStart(e, index, tile)}
                 onMouseEnter={() => handleDragEnter(index, tile)}
-                onTouchStart={() => handleDragStart(index, tile)}
+                onTouchStart={(e) => handleDragStart(e, index, tile)}
+                animate={
+                  prefersReducedMotion
+                    ? { scale: isSelected ? 1.1 : 1, y: 0, rotate: 0 }
+                    : {
+                        scale: isSelected ? 1.1 : 1,
+                        y: isSelected ? -2 : 0,
+                        rotate: isSelected ? [0, -2, 2, 0] : 0,
+                      }
+                }
+                transition={
+                  prefersReducedMotion
+                    ? { duration: 0 }
+                    : {
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 20,
+                        mass: 0.5,
+                        rotate: { duration: 0.3 },
+                      }
+                }
+                whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
                 style={{
                   animationDelay: tile.cascadeDelay
                     ? `${tile.cascadeDelay}ms`
@@ -270,15 +335,13 @@ const AdventureGrid = memo<AdventureGridProps>(
                   'relative aspect-square flex items-center justify-center',
                   'font-black text-xl cursor-pointer overflow-hidden',
                   'border-2 border-neo-black/30 rounded-neo',
-                  'transition-all duration-200',
 
                   // Type-specific classes
                   TILE_TYPE_CLASSES[tile.type],
 
                   // State classes
                   tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
-                  isSelected &&
-                    'tile-selected ring-2 ring-neo-cyan z-10 scale-105',
+                  isSelected && 'tile-selected ring-2 ring-neo-cyan z-10',
                   tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
 
                   // Standard tile background
@@ -325,10 +388,7 @@ const AdventureGrid = memo<AdventureGridProps>(
                     'bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600',
                     'text-neo-white shadow-[0_0_10px_rgba(16,185,129,0.5)]',
                     'border-emerald-600/60',
-                  ],
-
-                  // Interactive state
-                  canInteract && 'hover:scale-105 active:scale-95'
+                  ]
                 )}
               >
                 {/* Letter */}
@@ -409,13 +469,37 @@ const AdventureGrid = memo<AdventureGridProps>(
                     )}
                   />
                 )}
-              </div>
+              </motion.div>
             );
           })}
+
+          {/* Word Path Trail */}
+          {pathPoints && pathPoints.length >= 2 && (
+            <div className="absolute inset-0 pointer-events-none" data-testid="word-path-trail">
+              <WordPathTrail
+                points={pathPoints}
+                isValid={isWordValid}
+                wasSubmitted={wasWordSubmitted}
+                showParticles
+                showGlow
+              />
+            </div>
+          )}
+
+          {/* Selection Sparkle Effect */}
+          <SelectionSparkle
+            position={sparkleState.position}
+            triggerKey={sparkleState.key}
+            colorScheme="valid"
+            particleCount={6}
+            spreadRadius={30}
+            useSquareParticles
+          />
         </div>
       </div>
     );
-  }
+    }
+  )
 );
 
 AdventureGrid.displayName = 'AdventureGrid';

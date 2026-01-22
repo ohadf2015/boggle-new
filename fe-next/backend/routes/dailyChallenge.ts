@@ -12,7 +12,20 @@ import logger from '../utils/logger';
 import { generateDailyPuzzle, generateDailyPuzzleAsync, getPuzzleNumber } from '../../utils/dailyChallenge';
 import { isDictionaryWord } from '../dictionary';
 import { isWordCommunityValid } from '../modules/communityWordManager';
+import { normalizeHebrewWord } from '../../shared/utils/wordNormalization';
 import type { Language } from '../../types';
+
+/**
+ * Normalize a word for comparison based on language.
+ * For Hebrew: converts final letters (ם,ך,ן,ף,ץ) to regular forms (מ,כ,נ,פ,צ)
+ * For other languages: uses toUpperCase()
+ */
+function normalizeWordForComparison(word: string, language: Language): string {
+  if (language === 'he') {
+    return normalizeHebrewWord(word);
+  }
+  return word.toUpperCase();
+}
 
 /**
  * Check if a word is valid for daily challenge submission.
@@ -637,8 +650,9 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
         // Fallback to async generation if cache miss (rare - only if Redis is down or cache expired)
         expectedPuzzle = await generateDailyPuzzleAsync(puzzleDate, language as Language) as CachedPuzzle;
       }
-      const expectedTargetWord = expectedPuzzle.targetWord.toUpperCase();
-      const submittedTargetWord = targetWord.toUpperCase();
+      // Normalize words for comparison - handles Hebrew final letters (ם vs מ, etc.)
+      const expectedTargetWord = normalizeWordForComparison(expectedPuzzle.targetWord, language as Language);
+      const submittedTargetWord = normalizeWordForComparison(targetWord, language as Language);
 
       if (expectedTargetWord !== submittedTargetWord) {
         logger.warn('API', `Word Hunt validation failed: expected ${expectedTargetWord}, got ${submittedTargetWord} for ${puzzleDate}/${language}`);
@@ -657,7 +671,8 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       // If solved, verify the last attempt matches the target word
       if (solved && attemptWords && attemptWords.length > 0) {
         const lastAttempt = attemptWords[attemptWords.length - 1];
-        if (lastAttempt.word.toUpperCase() !== expectedTargetWord) {
+        const normalizedLastAttempt = normalizeWordForComparison(lastAttempt.word, language as Language);
+        if (normalizedLastAttempt !== expectedTargetWord) {
           logger.warn('API', `Word Hunt validation failed: solved=true but last attempt "${lastAttempt.word}" doesn't match target "${expectedTargetWord}"`);
           res.status(400).json({ error: 'Invalid solve claim' });
           return;
@@ -676,9 +691,10 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       if (attemptWords && attemptWords.length > 0) {
         const invalidWords: string[] = [];
         for (const attempt of attemptWords) {
-          const wordUpper = attempt.word.toUpperCase();
-          if (!isWordValidForDailyChallenge(wordUpper, language as Language)) {
-            invalidWords.push(wordUpper);
+          // Normalize word for comparison (handles Hebrew final letters)
+          const normalizedWord = normalizeWordForComparison(attempt.word, language as Language);
+          if (!isWordValidForDailyChallenge(normalizedWord, language as Language)) {
+            invalidWords.push(normalizedWord);
           }
         }
         if (invalidWords.length > 0) {

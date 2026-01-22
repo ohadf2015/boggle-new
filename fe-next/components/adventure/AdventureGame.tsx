@@ -7,13 +7,14 @@
 
 'use client';
 
-import React, { memo, useCallback, useState, useEffect, useMemo } from 'react';
+import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import { Pause, Play, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
+import { ScorePopupFly } from '@/components/animations';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -34,6 +35,15 @@ interface AdventureGameProps {
   onLevelComplete: (stars: number, score: number) => void;
   /** Callback to exit the game */
   onExit: () => void;
+}
+
+interface ScorePopup {
+  id: number;
+  value: number;
+  x: number;
+  y: number;
+  word?: string;
+  bonus?: string;
 }
 
 // ==============================================
@@ -92,6 +102,15 @@ const AdventureGame = memo<AdventureGameProps>(
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
     const [validationError, setValidationError] = useState<string | null>(null);
+    const [wasWordSubmitted, setWasWordSubmitted] = useState(false);
+    const [isWordValid, setIsWordValid] = useState(false);
+    const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
+
+    // Ref for score display target (for ScorePopupFly animation)
+    const scoreDisplayRef = useRef<HTMLDivElement>(null);
+
+    // Current popup from queue
+    const currentPopup = popupQueue[0] ?? null;
 
     // Word validation hook (must come before selection hook which depends on isValidating)
     const { validateWord, isValidating } = useAdventureWordValidation({
@@ -101,6 +120,9 @@ const AdventureGame = memo<AdventureGameProps>(
       foundWords: gameState.wordsFound,
     });
 
+    // Ref to grid for coordinate calculation
+    const gridRef = React.useRef<HTMLDivElement | null>(null);
+
     // Selection hook with adjacency validation
     const {
       selectedIndices,
@@ -108,10 +130,12 @@ const AdventureGame = memo<AdventureGameProps>(
       selectTile,
       clearSelection,
       getPath,
+      pathPoints,
     } = useAdventureSelection({
       tiles,
       gridSize: levelConfig.gridSize,
       disabled: !isPlaying || isPaused || isValidating,
+      gridRef,
     });
 
     // Start game on mount
@@ -128,6 +152,28 @@ const AdventureGame = memo<AdventureGameProps>(
         pauseGame();
       }
     }, [gameState.isComplete, timeRemaining, pauseGame]);
+
+    // Helper to calculate popup start position from last selected tile
+    const getPopupStartPosition = useCallback(() => {
+      // Get position of last selected tile (center of word)
+      if (selectedIndices.length === 0) {
+        return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      }
+
+      const lastIndex = selectedIndices[selectedIndices.length - 1];
+      const gridElement = gridRef.current;
+      const tileElement = gridElement?.querySelectorAll('[role="gridcell"]')[lastIndex];
+
+      if (tileElement) {
+        const rect = tileElement.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+      }
+
+      return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    }, [selectedIndices]);
 
     // Handle pause toggle
     const handlePauseToggle = useCallback(() => {
@@ -185,11 +231,38 @@ const AdventureGame = memo<AdventureGameProps>(
         const result = await validateWord(currentWord, path);
 
         if (result.isValid && result.score) {
+          // Get position BEFORE clearing selection
+          const startPos = getPopupStartPosition();
+
+          // Store score value for TypeScript
+          const scoreValue = result.score;
+
+          // Calculate bonus string from combo
+          const comboBonus = gameState.comboCount > 1 ? `${gameState.comboCount}x` : undefined;
+
+          // Add score popup to queue
+          setPopupQueue(prev => [...prev, {
+            id: Date.now(),
+            value: scoreValue,
+            x: startPos.x,
+            y: startPos.y,
+            word: currentWord,
+            bonus: comboBonus,
+          }]);
+
           // Valid word - submit with calculated score
-          submitWord(currentWord, result.score);
+          setIsWordValid(true);
+          setWasWordSubmitted(true);
+          submitWord(currentWord, scoreValue);
           clearSelection();
+          // Reset after animation duration
+          setTimeout(() => {
+            setWasWordSubmitted(false);
+            setIsWordValid(false);
+          }, 400);
         } else if (result.errorKey) {
           // Invalid word - show error
+          setIsWordValid(false);
           setValidationError(t(result.errorKey) || result.errorKey);
           clearSelection();
 
@@ -197,7 +270,7 @@ const AdventureGame = memo<AdventureGameProps>(
           setTimeout(() => setValidationError(null), 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWord, clearSelection, t]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWord, clearSelection, t, getPopupStartPosition, gameState.comboCount]
     );
 
     // Handle level complete continue
@@ -218,6 +291,11 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleExit = useCallback(() => {
       onExit();
     }, [onExit]);
+
+    // Handle score popup completion
+    const handlePopupComplete = useCallback(() => {
+      setPopupQueue(prev => prev.slice(1));
+    }, []);
 
     // Calculate star count for display
     const starsEarned = gameState.stars;
@@ -259,7 +337,11 @@ const AdventureGame = memo<AdventureGameProps>(
           {/* Level Info */}
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-black">Level {levelConfig.level}</h1>
-            <div data-testid="score-display" className="font-mono font-bold">
+            <div
+              ref={scoreDisplayRef}
+              data-testid="score-display"
+              className="font-mono font-bold"
+            >
               {gameState.score}
             </div>
           </div>
@@ -315,6 +397,7 @@ const AdventureGame = memo<AdventureGameProps>(
             )}
 
             <AdventureGrid
+              ref={gridRef}
               tiles={tiles}
               gridSize={levelConfig.gridSize}
               selectedIndices={selectedIndices}
@@ -326,6 +409,9 @@ const AdventureGame = memo<AdventureGameProps>(
               disabled={!isPlaying || isPaused || isValidating}
               showWordPreview
               className="max-w-md w-full"
+              pathPoints={pathPoints}
+              isWordValid={isWordValid}
+              wasWordSubmitted={wasWordSubmitted}
             />
           </div>
 
@@ -419,6 +505,16 @@ const AdventureGame = memo<AdventureGameProps>(
           onContinue={handleContinue}
           onRetry={handleRetry}
           onExit={handleExit}
+        />
+
+        {/* Score Popup Animation */}
+        <ScorePopupFly
+          popup={currentPopup}
+          targetRef={scoreDisplayRef}
+          flyToTarget
+          showWord
+          size="md"
+          onComplete={handlePopupComplete}
         />
       </div>
     );
