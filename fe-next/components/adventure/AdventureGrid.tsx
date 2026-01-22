@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import BoardFrame from '@/components/adventure/themed/BoardFrame';
+import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
 
 // ==============================================
 // TYPES
@@ -85,6 +87,35 @@ const GRID_COLS_CLASSES: Record<number, string> = {
   6: 'grid-cols-6',
 };
 
+// World-specific theming classes
+const TEXTURE_CLASSES: Record<number, string> = {
+  1: 'tile-texture-meadows',
+  2: 'tile-texture-springs',
+  3: 'tile-texture-caverns',
+};
+
+const BORDER_CLASSES: Record<number, string> = {
+  1: 'tile-border-meadows',
+  2: 'tile-border-springs',
+  3: 'tile-border-caverns',
+};
+
+const LETTER_GLOW_CLASSES: Record<number, string> = {
+  1: 'letter-glow-meadows',
+  2: 'letter-glow-springs',
+  3: 'letter-glow-caverns',
+};
+
+// Tile types that should NOT receive texture/border theming
+const SPECIAL_TILE_TYPES: Set<TileType> = new Set([
+  'gold',
+  'ice',
+  'bomb',
+  'rainbow',
+  'chain',
+  'time',
+]);
+
 // ==============================================
 // COMPONENT
 // ==============================================
@@ -122,6 +153,11 @@ const AdventureGrid = memo(
 
       // Cascade animation state
       const [cascadeComplete, setCascadeComplete] = useState(!showCascade);
+
+      // World theming - default to world 1 if theme context is not available
+      // This allows AdventureGrid to work both inside and outside AdventureThemeProvider
+      const adventureTheme = AdventureThemeContext ? React.useContext(AdventureThemeContext) : null;
+      const worldId = adventureTheme?.worldId || 1;
 
       // Merge refs (internal and forwarded)
       React.useImperativeHandle(ref, () => gridRef.current!);
@@ -312,8 +348,9 @@ const AdventureGrid = memo(
           </div>
         )}
 
-        {/* Grid */}
-        <div
+        {/* Grid with world-themed board frame */}
+        <BoardFrame>
+          <div
           ref={containerRef}
           role="grid"
           aria-label="Adventure game board"
@@ -332,6 +369,12 @@ const AdventureGrid = memo(
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
             const canInteract = interactive && !disabled && !tile.isCleared;
+
+            // World-specific theming
+            const isStandardTile = !SPECIAL_TILE_TYPES.has(tile.type);
+            const textureClass = isStandardTile ? TEXTURE_CLASSES[worldId] : '';
+            const borderClass = isStandardTile ? BORDER_CLASSES[worldId] : '';
+            const letterGlowClass = LETTER_GLOW_CLASSES[worldId] || LETTER_GLOW_CLASSES[1];
 
             return (
               <motion.div
@@ -385,6 +428,10 @@ const AdventureGrid = memo(
                   'relative aspect-square flex items-center justify-center',
                   'font-black text-xl cursor-pointer overflow-hidden',
                   'border-2 border-neo-black/30 rounded-neo',
+
+                  // World-specific theming (NEW)
+                  textureClass,
+                  borderClass,
 
                   // Type-specific classes
                   TILE_TYPE_CLASSES[tile.type],
@@ -442,7 +489,9 @@ const AdventureGrid = memo(
                 )}
               >
                 {/* Letter */}
-                <span className="relative z-10 select-none">{tile.letter}</span>
+                <span className={cn('relative z-10 select-none', letterGlowClass)}>
+                  {tile.letter}
+                </span>
 
                 {/* Gold badge */}
                 {tile.type === 'gold' && (
@@ -545,7 +594,8 @@ const AdventureGrid = memo(
             spreadRadius={30}
             useSquareParticles
           />
-        </div>
+          </div>
+        </BoardFrame>
       </div>
     );
     }

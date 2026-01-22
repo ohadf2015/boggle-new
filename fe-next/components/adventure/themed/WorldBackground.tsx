@@ -11,6 +11,8 @@ import React, { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
+import { useParallax } from '@/hooks/useParallax';
+import WorldParticles from './WorldParticles';
 import type { ParallaxLayer, TextureConfig, ParticleConfig } from '@/lib/adventure/themes/types';
 
 // ==============================================
@@ -31,10 +33,16 @@ interface WorldBackgroundProps {
 interface ParallaxLayerComponentProps {
   layer: ParallaxLayer;
   index: number;
+  parallaxX: number;
+  parallaxY: number;
 }
 
-const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index }) => {
+const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index, parallaxX, parallaxY }) => {
   const isGradient = layer.source.startsWith('bg-');
+
+  // Calculate transform based on layer depth and parallax offset
+  const transformX = parallaxX * layer.depth;
+  const transformY = parallaxY * layer.depth;
 
   return (
     <motion.div
@@ -46,6 +54,8 @@ const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index
       style={{
         opacity: layer.opacity,
         zIndex: index,
+        transform: `translate(${transformX}px, ${transformY}px)`,
+        transition: 'transform 0.3s ease-out',
         ...(isGradient ? {} : {
           backgroundImage: `url(${layer.source})`,
           backgroundSize: 'cover',
@@ -97,105 +107,6 @@ const TextureOverlay = memo<TextureOverlayProps>(({ texture }) => {
 
 TextureOverlay.displayName = 'TextureOverlay';
 
-interface ParticleSystemProps {
-  particles: ParticleConfig;
-}
-
-/**
- * Simple seeded PRNG for deterministic "random" values
- * Uses mulberry32 algorithm for fast, predictable results
- */
-function seededRandom(seed: number): () => number {
-  let t = seed + 0x6D2B79F5;
-  return () => {
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-const ParticleSystem = memo<ParticleSystemProps>(({ particles }) => {
-  // Generate particles with deterministic positions using seeded random
-  const particleElements = useMemo(() => {
-    return Array.from({ length: particles.count }, (_, i) => {
-      // Create seeded random for each particle based on index
-      const random = seededRandom(i * 12345 + 67890);
-
-      const size = particles.sizeRange[0] +
-        random() * (particles.sizeRange[1] - particles.sizeRange[0]);
-      const colorIndex = Math.floor(random() * particles.colors.length);
-      const startX = random() * 100;
-      const startY = random() * 100;
-      const duration = (3 + random() * 4) / particles.speed;
-
-      return {
-        id: i,
-        size,
-        color: particles.colors[colorIndex],
-        startX,
-        startY,
-        duration,
-        delay: random() * duration,
-      };
-    });
-  }, [particles.count, particles.colors, particles.sizeRange, particles.speed]);
-
-  const getAnimationClass = (type: ParticleConfig['type']) => {
-    switch (type) {
-      case 'leaves':
-        return 'animate-particle-fall';
-      case 'bubbles':
-        return 'animate-particle-rise';
-      case 'sparkles':
-        return 'animate-particle-sparkle';
-      default:
-        return '';
-    }
-  };
-
-  const getParticleShape = (type: ParticleConfig['type']) => {
-    switch (type) {
-      case 'leaves':
-        return 'rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%]'; // Leaf shape
-      case 'bubbles':
-        return 'rounded-full';
-      case 'sparkles':
-        return 'rotate-45';
-      default:
-        return 'rounded-full';
-    }
-  };
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particleElements.map((particle) => (
-        <motion.div
-          key={particle.id}
-          className={cn(
-            'absolute',
-            getParticleShape(particles.type),
-            getAnimationClass(particles.type)
-          )}
-          style={{
-            width: particle.size,
-            height: particle.size,
-            backgroundColor: particle.color,
-            left: `${particle.startX}%`,
-            top: `${particle.startY}%`,
-            animationDuration: `${particle.duration}s`,
-            animationDelay: `${particle.delay}s`,
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: particle.delay }}
-        />
-      ))}
-    </div>
-  );
-});
-
-ParticleSystem.displayName = 'ParticleSystem';
-
 // ==============================================
 // MAIN COMPONENT
 // ==============================================
@@ -203,6 +114,15 @@ ParticleSystem.displayName = 'ParticleSystem';
 const WorldBackground = memo<WorldBackgroundProps>(({ className, children }) => {
   const { theme, isTransitioning } = useAdventureTheme();
   const { background, containerClass } = theme;
+
+  // Use parallax hook for interactive motion
+  const { x: parallaxX, y: parallaxY } = useParallax({
+    intensity: 0.8,
+    enableGyroscope: true,
+    enableGesture: true,
+    enableAmbient: true,
+    ambientSpeed: 0.5,
+  });
 
   return (
     <div
@@ -227,14 +147,16 @@ const WorldBackground = memo<WorldBackgroundProps>(({ className, children }) => 
           key={layer.id}
           layer={layer}
           index={index + 1}
+          parallaxX={parallaxX}
+          parallaxY={parallaxY}
         />
       ))}
 
       {/* Texture overlay */}
       <TextureOverlay texture={background.texture} />
 
-      {/* Particle system */}
-      <ParticleSystem particles={background.particles} />
+      {/* World-specific particles */}
+      <WorldParticles particles={background.particles} />
 
       {/* Content layer */}
       <div className="relative z-50">

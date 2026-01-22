@@ -47,7 +47,7 @@ export interface TextureConfig {
  */
 export interface ParticleConfig {
   /** Particle type identifier */
-  type: 'leaves' | 'snowflakes' | 'embers' | 'bubbles' | 'dust' | 'sparkles' | 'none';
+  type: 'leaves' | 'snowflakes' | 'embers' | 'bubbles' | 'dust' | 'sparkles' | 'butterflies' | 'droplets' | 'crystals' | 'none';
   /** Number of particles (max 50 for performance) */
   count: number;
   /** Particle colors */
@@ -56,6 +56,10 @@ export interface ParticleConfig {
   speed: number;
   /** Particle size range [min, max] in pixels */
   sizeRange: [number, number];
+  /** Particle variant (for type-specific variations) */
+  variant?: string;
+  /** Enable foreground particles (render above content) */
+  enableForeground?: boolean;
 }
 
 /**

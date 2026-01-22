@@ -1,8 +1,11 @@
 /**
  * ThemedTile Component
  *
- * Renders adventure mode tiles with visual styles based on the current world theme.
- * Uses the theme context to apply world-specific colors, textures, and effects.
+ * Wraps tile content with world-specific styling (texture, border, letter glow).
+ * Only applies theming to standard tiles - special tiles maintain their distinct appearance.
+ *
+ * Note: This is a lightweight wrapper component that adds world theming to existing tiles.
+ * For full tile rendering with animations, see AdventureGrid which wraps content with this component.
  */
 
 'use client';
@@ -14,6 +17,38 @@ import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
 import type { TileState, TileType } from '@/types/adventure';
 import type { TileVisualConfig } from '@/lib/adventure/themes/types';
+
+// ==============================================
+// THEMING CONSTANTS (NEW - for texture/border overlay)
+// ==============================================
+
+const TEXTURE_CLASSES: Record<number, string> = {
+  1: 'tile-texture-meadows',
+  2: 'tile-texture-springs',
+  3: 'tile-texture-caverns',
+};
+
+const BORDER_CLASSES: Record<number, string> = {
+  1: 'tile-border-meadows',
+  2: 'tile-border-springs',
+  3: 'tile-border-caverns',
+};
+
+const LETTER_GLOW_CLASSES: Record<number, string> = {
+  1: 'letter-glow-meadows',
+  2: 'letter-glow-springs',
+  3: 'letter-glow-caverns',
+};
+
+// Tile types that should NOT receive texture/border theming
+const SPECIAL_TILE_TYPES: Set<TileType> = new Set([
+  'gold',
+  'ice',
+  'bomb',
+  'rainbow',
+  'chain',
+  'time',
+]);
 
 // ==============================================
 // TYPES
@@ -188,7 +223,7 @@ TileBadge.displayName = 'TileBadge';
 
 const ThemedTile = memo<ThemedTileProps>(
   ({ tile, isSelected = false, className, onClick }) => {
-    const { getTileConfig, theme } = useAdventureTheme();
+    const { getTileConfig, theme, worldId } = useAdventureTheme();
     const { letter, type, isCleared, isFrozen, cascadeDelay } = tile;
 
     // Get theme-based visual config for this tile type
@@ -199,6 +234,12 @@ const ThemedTile = memo<ThemedTileProps>(
       () => buildTileClasses(config, isSelected, isCleared || false, isFrozen || false),
       [config, isSelected, isCleared, isFrozen]
     );
+
+    // World-specific theming (NEW)
+    const isStandardTile = !SPECIAL_TILE_TYPES.has(type);
+    const textureClass = isStandardTile ? TEXTURE_CLASSES[worldId] : '';
+    const borderClass = isStandardTile ? BORDER_CLASSES[worldId] : '';
+    const letterGlowClass = LETTER_GLOW_CLASSES[worldId] || LETTER_GLOW_CLASSES[1];
 
     // Get the icon for special tiles
     const icon = getTileIcon(type);
@@ -241,12 +282,18 @@ const ThemedTile = memo<ThemedTileProps>(
           // Theme-based classes
           tileClasses,
 
+          // World-specific theming (NEW)
+          textureClass,
+          borderClass,
+
           // Selection ring uses theme primary color
           isSelected && `ring-${theme.colors.primary}`,
 
           // Custom className
           className
         )}
+        data-world={worldId}
+        data-tile-type={type}
         style={{
           animationDelay: cascadeDelay ? `${cascadeDelay}ms` : undefined,
         }}
@@ -277,7 +324,8 @@ const ThemedTile = memo<ThemedTileProps>(
           className={cn(
             'relative z-10 select-none',
             'text-[clamp(1rem,4cqw,2rem)]',
-            type === 'standard' ? 'text-neo-black' : 'text-inherit'
+            type === 'standard' ? 'text-neo-black' : 'text-inherit',
+            letterGlowClass  // World-specific letter glow (NEW)
           )}
         >
           {letter}

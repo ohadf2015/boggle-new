@@ -75,11 +75,11 @@ const background: WorldBackground = {
     blendMode: 'soft-light',
   },
   particles: {
-    type: 'sparkles',
-    count: 40,
-    colors: ['rgba(200,150,255,0.7)', 'rgba(255,100,200,0.5)', 'rgba(150,200,255,0.6)'],
+    type: 'crystals',
+    count: 8,
+    colors: ['rgba(200,150,255,0.8)', 'rgba(255,100,200,0.7)', 'rgba(220,180,255,0.75)'],
     speed: 0.6,
-    sizeRange: [2, 6],
+    sizeRange: [14, 24],
   },
 };
 

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 2 - Core Game Juice (ready to start)
+**Current focus:** Phase 5 - Lexi Personality (ready to plan)
 
 ## Current Position
 
-Phase: 4 of 10 (World Theming)
+Phase: 5 of 10 (Lexi Personality)
 Plan: 0 of TBD in phase
-Status: Phase 4 ready - awaiting planning
-Last activity: 2026-01-22 - Completed Phase 3 (level entry experience)
+Status: Phase 5 ready - awaiting planning
+Last activity: 2026-01-22 - Completed Phase 4 (world theming)
 
-Progress: [███░░░░░░░] 30% (3 phases complete, 16/~30 plans)
+Progress: [████░░░░░░] 40% (4 phases complete, 19/~30 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 8 min
-- Total execution time: ~110 min
+- Total plans completed: 16
+- Average duration: 10 min
+- Total execution time: ~160 min
 
 **By Phase:**
 
@@ -30,11 +30,13 @@ Progress: [███░░░░░░░] 30% (3 phases complete, 16/~30 plans)
 | 01 Infrastructure Foundation | 6 | ~60min | 10min |
 | 02 Core Game Juice | 3 | ~32min | 11min |
 | 03 Level Entry Experience | 3 | ~19min | 6min |
+| 04 World Theming | 3 | ~50min | 17min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
 - Phase 2 complete: 02-01 (18min), 02-02 (6min), 02-03 (8min)
 - Phase 3 complete: 03-01 (8min), 03-02 (7min), 03-03 (4min)
+- Phase 4 in progress: 04-01 (14min), 04-02 (25min), 04-03 (11min) - world theming UI
 - Animation patterns significantly accelerating execution (6min avg in Phase 3)
 
 *Updated after each plan completion*
@@ -81,6 +83,20 @@ Recent decisions affecting current work:
 - **03-03:** Scale burst animation (0 → 1.5 → 1.1) creates dramatic impact
 - **03-03:** Three-phase timing: 400ms burst + 600ms hold + 300ms fade = 1.3s total
 - **03-03:** World themes: World 1 (lime), World 2 (cyan), World 3 (orange)
+- **04-01:** Combine three input sources (gyro, gesture, ambient) for "always alive" parallax
+- **04-01:** iOS permission request on first touch interaction (graceful fallback)
+- **04-01:** Ambient drift uses sine/cosine oscillation at 0.0003/0.0002 speed
+- **04-01:** All parallax event listeners use passive: true for scroll performance
+- **04-02:** SVG-based particle shapes over CSS shapes for rich visual quality
+- **04-02:** Hard cap at 10 visible particles max (sparse, non-distracting)
+- **04-02:** Adaptive particle rendering based on device capability (4/8/20 → capped at 10)
+- **04-02:** Parallax depth transform: `translate(x * depth, y * depth)` for natural depth perception
+- **04-02:** Seeded random (mulberry32) for deterministic particle placement
+- **04-03:** Texture opacity < 0.1 for letter readability while providing world distinction
+- **04-03:** Special tiles (gold, ice, bomb, rainbow) maintain distinct appearance without world theming
+- **04-03:** Letter glow applies to all tiles, texture/border only to standard tiles
+- **04-03:** Optional context usage (AdventureThemeContext with fallback) allows grid in/out of provider
+- **04-03:** SVG decorations for corner elements (vines, water splashes, crystal clusters)
 
 ### Pending Todos
 
@@ -117,6 +133,15 @@ None.
   - Objectives slide in (RTL-aware, ~500ms)
   - Level title bursts (scale + glow, ~1.3s)
   - Total entry time: ~2.4s (slight timing gap noted in verification)
+
+**Phase 4 World Theming:** ✓ COMPLETE (infrastructure ready, assets pending Phase 6)
+- ✅ useParallax hook: Combined gyro/gesture/ambient inputs (04-01)
+- ✅ WorldParticles: Butterflies, droplets, crystals with SVG shapes (04-02)
+- ✅ WorldBackground: Parallax motion + particles integration (04-02)
+- ✅ BoardFrame: Corner decorations (vines, splashes, crystals) (04-03)
+- ✅ ThemedTile: Texture overlays, borders, letter glow (04-03)
+- ⏸️ Parallax images → Phase 6 (AI Asset Generation)
+- ⏸️ Background images → Phase 6 (AI Asset Generation)
 
 **Phase 7 Video Cutscenes:**
 - RTL video production workflow undefined for 4-language variants
@@ -162,15 +187,17 @@ None.
 
 | Plan | Description | Status |
 |------|-------------|--------|
-| 04-01 | TBD - Adventure Level Content | ⏳ Next |
+| 04-01 | Parallax input system (gyro + gesture + ambient) | ✓ |
+| 04-02 | World particles & parallax backgrounds | ✓ |
+| 04-03 | Board frame decorations & tile theming | ✓ |
 
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Completed Phase 3 - Level Entry Experience with bug fix
+Stopped at: Completed Phase 4 - World Theming
 Resume file: None
-Next: Phase 4 - World Theming (parallax backgrounds, particles, dynamic boards)
+Next: Phase 5 - Lexi Personality (mascot reactions and contextual feedback)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-22 19:14 UTC*
+*Last updated: 2026-01-22 23:25 UTC*

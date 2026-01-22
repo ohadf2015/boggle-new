@@ -68,11 +68,11 @@ const background: WorldBackground = {
     blendMode: 'overlay',
   },
   particles: {
-    type: 'leaves',
-    count: 25,
-    colors: ['#90EE90', '#98FB98', '#228B22'],
+    type: 'butterflies',
+    count: 8,
+    colors: ['#90EE90', '#FFD700', '#98FB98'],
     speed: 0.8,
-    sizeRange: [8, 16],
+    sizeRange: [12, 20],
   },
 };
 

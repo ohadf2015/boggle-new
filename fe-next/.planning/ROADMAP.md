@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Infrastructure Foundation** - Asset pipeline, Remotion setup, optimization
 - [x] **Phase 2: Core Game Juice** - Word trails, letter pops, score animations
 - [x] **Phase 3: Level Entry Experience** - Tile cascade, objective reveal, title burst
-- [ ] **Phase 4: World Theming** - Parallax backgrounds, particles, dynamic boards
+- [x] **Phase 4: World Theming** - Parallax backgrounds, particles, dynamic boards
 - [ ] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
 - [ ] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
 - [ ] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
@@ -89,10 +89,12 @@ Plans:
   3. Root Caverns has cave-specific atmosphere with crystal particle effects
   4. Game board tiles have subtle world-specific decorations without obscuring letters
   5. All themes maintain 90+ Lighthouse score and work in reduced-motion mode
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 04-01: TBD
+- [x] 04-01-PLAN.md — Create useParallax hook with combined gyro/gesture/ambient parallax
+- [x] 04-02-PLAN.md — Enhance WorldBackground with parallax motion and world-specific particles
+- [x] 04-03-PLAN.md — Add board frame decorations and tile theming
 
 ### Phase 5: Lexi Personality
 **Goal**: Lexi mascot provides emotional connection through contextual reactions and encouragement
@@ -194,7 +196,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Infrastructure Foundation | 6/6 | Complete | 2026-01-22 |
 | 2. Core Game Juice | 3/3 | Complete | 2026-01-22 |
 | 3. Level Entry Experience | 3/3 | Complete | 2026-01-22 |
-| 4. World Theming | 0/TBD | Ready | - |
+| 4. World Theming | 3/3 | Complete | 2026-01-22 |
 | 5. Lexi Personality | 0/TBD | Not started | - |
 | 6. AI Asset Generation | 0/TBD | Not started | - |
 | 7. Video Cutscenes | 0/TBD | Not started | - |
@@ -204,4 +206,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-22*
+*Last updated: 2026-01-22 (Phase 4 complete)*

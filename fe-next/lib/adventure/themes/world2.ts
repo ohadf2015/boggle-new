@@ -75,11 +75,11 @@ const background: WorldBackground = {
     blendMode: 'normal',
   },
   particles: {
-    type: 'bubbles',
-    count: 35,
-    colors: ['rgba(255,255,255,0.6)', 'rgba(200,255,255,0.4)', 'rgba(150,220,255,0.5)'],
+    type: 'droplets',
+    count: 10,
+    colors: ['rgba(100,200,255,0.7)', 'rgba(150,220,255,0.6)', 'rgba(200,240,255,0.5)'],
     speed: 1.2,
-    sizeRange: [4, 12],
+    sizeRange: [10, 18],
   },
 };
 

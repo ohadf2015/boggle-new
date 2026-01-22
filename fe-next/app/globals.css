@@ -3844,3 +3844,159 @@ html.reduce-motion *::after {
 .low-end-device .animate-sparkle-right {
   animation: none;
 }
+
+/* ====================================
+   ADVENTURE MODE - WORLD THEMING
+   Board frames & tile styling for Worlds 1-3
+   ==================================== */
+
+/* ==================== TILE TEXTURES ==================== */
+/* Very subtle textures (opacity < 0.1) to preserve letter readability */
+
+.tile-texture-meadows {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(139, 69, 19, 0.06) 0px,
+    transparent 1px,
+    transparent 2px,
+    rgba(139, 69, 19, 0.06) 3px
+  );
+}
+
+.tile-texture-springs {
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.08) 0%,
+    transparent 2px,
+    transparent 4px,
+    rgba(0, 255, 255, 0.08) 6px
+  );
+  background-size: 12px 12px;
+}
+
+.tile-texture-caverns {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(139, 92, 246, 0.07) 0px,
+    transparent 2px,
+    transparent 4px,
+    rgba(139, 92, 246, 0.07) 6px
+  );
+}
+
+/* ==================== TILE BORDERS ==================== */
+
+.tile-border-meadows {
+  border: 2px solid rgba(190, 255, 0, 0.5);
+  box-shadow: inset 0 0 8px rgba(190, 255, 0, 0.1);
+}
+
+.tile-border-springs {
+  border: 2px solid rgba(0, 255, 255, 0.5);
+  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.1);
+}
+
+.tile-border-caverns {
+  border: 2px solid rgba(139, 92, 246, 0.5);
+  box-shadow: inset 0 0 8px rgba(139, 92, 246, 0.15);
+}
+
+/* ==================== LETTER GLOW EFFECTS ==================== */
+
+.letter-glow-meadows {
+  text-shadow: 0 0 4px rgba(190, 255, 0, 0.3);
+}
+
+.letter-glow-springs {
+  text-shadow: 0 0 4px rgba(0, 255, 255, 0.3);
+}
+
+.letter-glow-caverns {
+  text-shadow: 0 0 4px rgba(139, 92, 246, 0.3);
+}
+
+/* ==================== BOARD FRAME DECORATIONS ==================== */
+
+/* Base frame styling */
+.board-frame {
+  position: relative;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+/* World 1: Meadows - Vine corners */
+.board-frame-meadows {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 139, 34, 0.1) 0%,
+    transparent 15%,
+    transparent 85%,
+    rgba(34, 139, 34, 0.1) 100%
+  );
+}
+
+/* World 2: Springs - Water splash effects */
+.board-frame-springs {
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(0, 255, 255, 0.08) 0%,
+    transparent 25%
+  ),
+  radial-gradient(
+    ellipse at bottom right,
+    rgba(0, 255, 255, 0.08) 0%,
+    transparent 25%
+  );
+}
+
+/* World 3: Caverns - Crystal clusters */
+.board-frame-caverns {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.12) 0%,
+    transparent 15%,
+    transparent 85%,
+    rgba(139, 92, 246, 0.12) 100%
+  );
+}
+
+/* ==================== RTL SUPPORT ==================== */
+
+/* Mirror decorations for Hebrew */
+[dir="rtl"] .board-frame-meadows,
+[dir="rtl"] .board-frame-springs,
+[dir="rtl"] .board-frame-caverns {
+  transform: scaleX(-1);
+}
+
+/* Keep tile content upright in RTL */
+[dir="rtl"] .board-frame [role="gridcell"] {
+  transform: scaleX(-1);
+}
+
+/* ==================== REDUCED MOTION ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-texture-meadows,
+  .tile-texture-springs,
+  .tile-texture-caverns,
+  .letter-glow-meadows,
+  .letter-glow-springs,
+  .letter-glow-caverns {
+    animation: none !important;
+  }
+}
+
+/* ==================== LOW-END DEVICE OPTIMIZATION ==================== */
+
+.low-end-device .tile-texture-meadows,
+.low-end-device .tile-texture-springs,
+.low-end-device .tile-texture-caverns {
+  background-image: none !important;
+}
+
+.low-end-device .letter-glow-meadows,
+.low-end-device .letter-glow-springs,
+.low-end-device .letter-glow-caverns {
+  text-shadow: none !important;
+}
