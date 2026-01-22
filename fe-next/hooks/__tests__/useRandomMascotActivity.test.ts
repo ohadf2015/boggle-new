@@ -6,7 +6,7 @@ import {
 } from '../useRandomMascotActivity';
 
 // Use global mock from jest.setup.js
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const mockUseDevicePerformance = (global as any).mockUseDevicePerformance;
 
 describe('useRandomMascotActivity', () => {

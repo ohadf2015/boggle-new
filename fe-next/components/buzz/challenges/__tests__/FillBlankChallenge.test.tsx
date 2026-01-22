@@ -163,7 +163,6 @@ describe('FillBlankChallenge', () => {
       });
 
       it('should update letter count as user fills boxes', async () => {
-        const user = userEvent.setup();
         render(
           <LanguageProvider>
             <FillBlankChallenge
@@ -179,8 +178,8 @@ describe('FillBlankChallenge', () => {
         // Initially should show: A + 0 / 4
         expect(screen.getByText('0')).toBeInTheDocument();
 
-        // Type "P" in first input box
-        await user.type(inputs[0], 'P');
+        // Type "P" in first input box (use fireEvent for deterministic behavior)
+        fireEvent.change(inputs[0], { target: { value: 'P' } });
 
         // Should now show: A + 1 / 4
         // Note: "1" appears multiple times (filled count + box number indicator)
@@ -190,7 +189,7 @@ describe('FillBlankChallenge', () => {
         });
 
         // Type "P" in second input box
-        await user.type(inputs[1], 'P');
+        fireEvent.change(inputs[1], { target: { value: 'P' } });
 
         // Should now show: A + 2 / 4
         // Note: "2" appears multiple times (filled count + box number indicator)
@@ -217,11 +216,12 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type each letter into specific inputs (user.type targets the element, ignoring focus)
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
-        await user.type(inputs[2], 'L');
-        await user.type(inputs[3], 'E');
+        // Use fireEvent.change for deterministic state updates
+        // (avoids race conditions with auto-focus and userEvent.type)
+        fireEvent.change(inputs[0], { target: { value: 'P' } });
+        fireEvent.change(inputs[1], { target: { value: 'P' } });
+        fireEvent.change(inputs[2], { target: { value: 'L' } });
+        fireEvent.change(inputs[3], { target: { value: 'E' } });
 
         // Submit button should be enabled
         const submitButton = screen.getByRole('button', { name: /submit/i });
@@ -239,7 +239,6 @@ describe('FillBlankChallenge', () => {
       });
 
       it('should prepend first letter when submitting via Enter key', async () => {
-        const user = userEvent.setup();
         const onAnswer = jest.fn();
         render(
           <LanguageProvider>
@@ -253,11 +252,12 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type each letter into specific inputs
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
-        await user.type(inputs[2], 'L');
-        await user.type(inputs[3], 'E');
+        // Use fireEvent.change for deterministic state updates
+        // (avoids race conditions with auto-focus and userEvent.type)
+        fireEvent.change(inputs[0], { target: { value: 'P' } });
+        fireEvent.change(inputs[1], { target: { value: 'P' } });
+        fireEvent.change(inputs[2], { target: { value: 'L' } });
+        fireEvent.change(inputs[3], { target: { value: 'E' } });
 
         // Wait for state to update after typing
         const submitButton = screen.getByRole('button', { name: /submit/i });
@@ -275,7 +275,6 @@ describe('FillBlankChallenge', () => {
       });
 
       it('should NOT submit if incomplete when Enter pressed', async () => {
-        const user = userEvent.setup();
         const onAnswer = jest.fn();
         render(
           <LanguageProvider>
@@ -289,9 +288,9 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type only partial answer: "PP"
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
+        // Type only partial answer: "PP" using fireEvent for deterministic behavior
+        fireEvent.change(inputs[0], { target: { value: 'P' } });
+        fireEvent.change(inputs[1], { target: { value: 'P' } });
 
         // Press Enter in second input box
         fireEvent.keyDown(inputs[1], { key: 'Enter', code: 'Enter' });
@@ -303,7 +302,6 @@ describe('FillBlankChallenge', () => {
       });
 
       it('should disable submit button when incomplete', async () => {
-        const user = userEvent.setup();
         render(
           <LanguageProvider>
             <FillBlankChallenge
@@ -321,16 +319,16 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type partial answer into specific inputs
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
+        // Type partial answer into specific inputs using fireEvent
+        fireEvent.change(inputs[0], { target: { value: 'P' } });
+        fireEvent.change(inputs[1], { target: { value: 'P' } });
 
         // Still disabled (incomplete - only 2 of 4 letters filled)
         expect(submitButton).toBeDisabled();
 
         // Complete the answer by typing remaining letters
-        await user.type(inputs[2], 'L');
-        await user.type(inputs[3], 'E');
+        fireEvent.change(inputs[2], { target: { value: 'L' } });
+        fireEvent.change(inputs[3], { target: { value: 'E' } });
 
         // Now enabled (all 4 letters filled)
         await waitFor(() => {
@@ -354,10 +352,10 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Type some letters
-        await user.type(inputs[0], 'P');
-        await user.type(inputs[1], 'P');
-        await user.type(inputs[2], 'L');
+        // Type some letters using fireEvent for deterministic behavior
+        fireEvent.change(inputs[0], { target: { value: 'P' } });
+        fireEvent.change(inputs[1], { target: { value: 'P' } });
+        fireEvent.change(inputs[2], { target: { value: 'L' } });
 
         // Click clear button (has Delete icon)
         const buttons = screen.getAllByRole('button');
