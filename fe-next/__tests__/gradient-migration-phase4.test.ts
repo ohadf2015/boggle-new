@@ -156,13 +156,14 @@ describe('Phase 4: Gradient Standardization', () => {
         }
       }
 
-      // Should have < 320 total gradients remaining (down from 350+ before migration)
-      // Higher than initially expected because many remaining gradients are:
+      // Should have < 330 total gradients remaining (down from 350+ before migration)
+      // Threshold increased from 320 due to legitimate additions from new features:
       // 1. Semantic/functional (progress bars, rank badges, tier indicators)
       // 2. Neo-Brutalist brand gradients (neo-pink to neo-cyan, etc.)
       // 3. Status-based (score ranges, performance levels)
+      // 4. Adventure mode world themes and mechanics (worlds 1-3)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThan(320);
+      expect(totalGradients).toBeLessThan(330);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients
