@@ -8,7 +8,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AdventureView from '../AdventureView';
-import type { ProgressionState } from '@/contexts/ProgressionContext';
+import type { PlayerProgression } from '@/types/adventure';
 
 // ==============================================
 // MOCKS
@@ -90,7 +90,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 // Mock ProgressionContext with controllable state
 let mockProgressionState: {
-  progression: ProgressionState | null;
+  progression: PlayerProgression | null;
   isLoading: boolean;
   error: string | null;
   completeLevel: jest.Mock;
@@ -110,15 +110,21 @@ jest.mock('@/contexts/ProgressionContext', () => ({
 // TEST FIXTURES
 // ==============================================
 
-const createMockProgression = (overrides = {}): ProgressionState => ({
+const createMockProgression = (overrides = {}): PlayerProgression => ({
+  userId: 'test-user-123',
+  xp: 1500,
+  currentWorld: 1,
+  currentLevel: 6,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
   totalStars: 15,
   playerLevel: 3,
   completions: [
-    { world: 1, level: 1, stars: 3 },
-    { world: 1, level: 2, stars: 2 },
-    { world: 1, level: 3, stars: 3 },
-    { world: 1, level: 4, stars: 2 },
-    { world: 1, level: 5, stars: 2 },
+    { world: 1, level: 1, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+    { world: 1, level: 2, stars: 2, bestScore: 1200, bestWords: 12, completedAt: new Date().toISOString() },
+    { world: 1, level: 3, stars: 3, bestScore: 1800, bestWords: 18, completedAt: new Date().toISOString() },
+    { world: 1, level: 4, stars: 2, bestScore: 1100, bestWords: 11, completedAt: new Date().toISOString() },
+    { world: 1, level: 5, stars: 2, bestScore: 1300, bestWords: 13, completedAt: new Date().toISOString() },
   ],
   ...overrides,
 });

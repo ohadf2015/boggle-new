@@ -330,8 +330,9 @@ describe('AdventureGame', () => {
 
   describe('Error Handling', () => {
     it('should handle invalid level config gracefully', () => {
-      // GIVEN
-      const invalidConfig = { ...mockLevelConfig, gridSize: 0 };
+      // GIVEN - intentionally create invalid config to test error handling
+      // Cast through unknown to bypass TypeScript's literal type checking
+      const invalidConfig = { ...mockLevelConfig, gridSize: 0 } as unknown as LevelConfig;
 
       // WHEN / THEN - should not crash
       expect(() => {
