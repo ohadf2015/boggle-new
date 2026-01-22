@@ -236,7 +236,7 @@ const AdventureGrid = memo(
           onDragEnter(tileIndex, tile);
         }
       },
-      [disabled, interactive, tiles, onDragEnter]
+      [disabled, interactive, tiles, onDragEnter, containerRef]
     );
 
     // Handle word submission (on mouse/touch up)

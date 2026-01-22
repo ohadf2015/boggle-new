@@ -72,10 +72,12 @@ Plans:
   3. Level title bursts onto screen with prominent animation
   4. Full entry sequence completes in <2 seconds (respects player time)
   5. Animations work correctly in all 4 languages including Hebrew RTL
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Tile cascade animation with diagonal wave pattern
+- [ ] 03-02-PLAN.md — Objective cards slide-in with RTL support
+- [ ] 03-03-PLAN.md — Level title burst animation with world theming
 
 ### Phase 4: World Theming
 **Goal**: Each world has distinct visual identity through parallax backgrounds, particles, and board styling
@@ -185,13 +187,13 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 6/6 | Complete | 2026-01-22 |
-| 2. Core Game Juice | 0/3 | Ready | - |
-| 3. Level Entry Experience | 0/TBD | Not started | - |
+| 2. Core Game Juice | 3/3 | Complete | 2026-01-22 |
+| 3. Level Entry Experience | 0/3 | Ready | - |
 | 4. World Theming | 0/TBD | Not started | - |
 | 5. Lexi Personality | 0/TBD | Not started | - |
 | 6. AI Asset Generation | 0/TBD | Not started | - |
