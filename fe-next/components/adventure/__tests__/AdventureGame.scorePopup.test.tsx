@@ -20,10 +20,20 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// Define the expected props type for ScorePopupFly
+interface ScorePopupFlyProps {
+  popup: unknown;
+  targetRef: React.RefObject<HTMLElement> | null;
+  flyToTarget: boolean;
+  showWord: boolean;
+  size: string;
+  onComplete: () => void;
+}
+
 // Mock ScorePopupFly to capture props
-const mockScorePopupFly = jest.fn(() => null);
+const mockScorePopupFly = jest.fn<null, [ScorePopupFlyProps]>();
 jest.mock('@/components/animations', () => ({
-  ScorePopupFly: (props: any) => {
+  ScorePopupFly: (props: ScorePopupFlyProps) => {
     mockScorePopupFly(props);
     return <div data-testid="score-popup-fly">ScorePopup</div>;
   },
@@ -76,6 +86,8 @@ const mockLevelConfig = {
   specialTiles: [],
   difficulty: 'MEDIUM' as const,
   chapterNumber: 1 as const,
+  levelInChapter: 1 as const,
+  isBossLevel: false,
 };
 
 const mockInitialGrid = [
@@ -154,7 +166,10 @@ describe('AdventureGame - Score Popup Animation', () => {
     // Verify ScorePopupFly is called
     expect(mockScorePopupFly).toHaveBeenCalled();
 
-    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    const calls = mockScorePopupFly.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    const lastCall = calls[calls.length - 1];
+    expect(lastCall).toBeDefined();
     const props = lastCall[0];
 
     // Verify essential props
@@ -189,7 +204,9 @@ describe('AdventureGame - Score Popup Animation', () => {
       />
     );
 
-    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    const calls = mockScorePopupFly.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    const lastCall = calls[calls.length - 1];
     expect(lastCall[0].popup).toBeNull();
   });
 
@@ -204,7 +221,9 @@ describe('AdventureGame - Score Popup Animation', () => {
     );
 
     // Get the onComplete callback
-    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    const calls = mockScorePopupFly.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    const lastCall = calls[calls.length - 1];
     const { onComplete } = lastCall[0];
 
     // Verify onComplete is a function
@@ -224,7 +243,9 @@ describe('AdventureGame - Score Popup Animation', () => {
     );
 
     // After completion, popup should still be null (queue is empty)
-    const newCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    const newCalls = mockScorePopupFly.mock.calls;
+    expect(newCalls.length).toBeGreaterThan(0);
+    const newCall = newCalls[newCalls.length - 1];
     expect(newCall[0].popup).toBeNull();
   });
 

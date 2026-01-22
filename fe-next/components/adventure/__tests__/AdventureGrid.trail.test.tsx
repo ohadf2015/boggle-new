@@ -38,15 +38,15 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 describe('AdventureGrid - WordPathTrail Integration', () => {
   // Test tile data
   const mockTiles: GridTileState[] = [
-    { id: 'tile-0-0', letter: 'A', row: 0, col: 0, type: 'standard' },
-    { id: 'tile-0-1', letter: 'B', row: 0, col: 1, type: 'standard' },
-    { id: 'tile-0-2', letter: 'C', row: 0, col: 2, type: 'standard' },
-    { id: 'tile-1-0', letter: 'D', row: 1, col: 0, type: 'standard' },
-    { id: 'tile-1-1', letter: 'E', row: 1, col: 1, type: 'standard' },
-    { id: 'tile-1-2', letter: 'F', row: 1, col: 2, type: 'standard' },
-    { id: 'tile-2-0', letter: 'G', row: 2, col: 0, type: 'standard' },
-    { id: 'tile-2-1', letter: 'H', row: 2, col: 1, type: 'standard' },
-    { id: 'tile-2-2', letter: 'I', row: 2, col: 2, type: 'standard' },
+    { id: 'tile-0-0', letter: 'A', row: 0, col: 0, type: 'standard', isCleared: false },
+    { id: 'tile-0-1', letter: 'B', row: 0, col: 1, type: 'standard', isCleared: false },
+    { id: 'tile-0-2', letter: 'C', row: 0, col: 2, type: 'standard', isCleared: false },
+    { id: 'tile-1-0', letter: 'D', row: 1, col: 0, type: 'standard', isCleared: false },
+    { id: 'tile-1-1', letter: 'E', row: 1, col: 1, type: 'standard', isCleared: false },
+    { id: 'tile-1-2', letter: 'F', row: 1, col: 2, type: 'standard', isCleared: false },
+    { id: 'tile-2-0', letter: 'G', row: 2, col: 0, type: 'standard', isCleared: false },
+    { id: 'tile-2-1', letter: 'H', row: 2, col: 1, type: 'standard', isCleared: false },
+    { id: 'tile-2-2', letter: 'I', row: 2, col: 2, type: 'standard', isCleared: false },
   ];
 
   const mockPathPoints = [
