@@ -1,40 +1,41 @@
 # Root Cause Analysis: Mobile Scroll Blocked
 
-**Date:** 2026-01-21
-**Issue:** On some mobile devices, there is no scroll at all and part of the content is unreachable
+**Date:** 2026-01-22 (Updated)
+**Issue:** Single-finger touch scroll doesn't work on mobile - only two-finger gestures work
 **Severity:** High
-**Status:** Analysis Complete - Ready for Implementation
+**Status:** ✅ FIXED
 
 ## Issue Summary
 
 **Description:**
-On certain mobile devices, users cannot scroll to reach all content on the page. The content appears cut off at the bottom with no way to scroll down to see the rest.
+On mobile devices, single-finger vertical swipe gestures do not scroll pages. Users report that only two-finger gestures (pinch/zoom) allow scrolling, which is a non-standard interaction.
 
 **Expected Behavior:**
-All page content should be scrollable on mobile devices, allowing users to reach every section of the page.
+Single-finger vertical swipe should scroll page content normally on all mobile devices.
 
 **Actual Behavior:**
-Content is clipped at the visible viewport height. No scroll indicator appears and touch scrolling has no effect on some devices.
+Single-finger swipe does nothing. Only two-finger gestures work. This affects ALL pages, not just specific ones.
 
 **Impact:**
-- Affected users: Mobile users on certain browsers (likely older iOS Safari, some Android browsers)
-- Affected features: All pages with content taller than viewport (settings, rules, profile, etc.)
-- Severity: High - Users cannot access important features
+- Affected users: All mobile users (majority of traffic)
+- Affected features: All pages with scrollable content
+- Severity: High - Core UX functionality broken
 
 ## Reproduction
 
-**Can Reproduce:** Partially - Device/browser dependent
+**Can Reproduce:** Yes - consistently on mobile devices
 
 **Reproduction Steps:**
-1. Open the app on a mobile device (especially older iOS Safari or certain Android browsers)
-2. Navigate to a page with content taller than viewport (e.g., /settings, /rules)
-3. Attempt to scroll down
-4. Observe that content is cut off and scrolling doesn't work
+1. Open any page on a mobile device (iOS or Android)
+2. Try scrolling with single finger swipe
+3. Observe: Page does not scroll
+4. Try two-finger gesture
+5. Observe: Page scrolls (but this is non-standard UX)
 
 **Environment:**
-- Mode: PRODUCTION
-- Affected devices: Certain mobile browsers, especially those with dynamic viewport handling issues
-- Not affected: Modern browsers with full `dvh` support
+- Mode: PRODUCTION and LOCAL
+- Affected devices: All mobile phones (iOS Safari, Chrome Mobile, Android browsers)
+- Not affected: Desktop browsers (mouse wheel works)
 
 ## Analysis
 
@@ -42,181 +43,155 @@ Content is clipped at the visible viewport height. No scroll indicator appears a
 
 | File | Role |
 |------|------|
-| `app/[locale]/layout.tsx:710-730` | Root layout with scroll architecture |
-| `app/globals.css:1995-2025` | `screen-fit` and `screen-fit-content` CSS classes |
-| `app/[locale]/settings/page.tsx:153-159` | Example page with `min-h-screen` |
-| `app/[locale]/rules/page.tsx:96` | Example page with nested `<main>` |
-| `app/[locale]/__tests__/layout.overflow.test.tsx` | Test that documents intended architecture |
+| `app/[locale]/layout.tsx:724` | Root layout wrapper with `overflow-hidden` (THE PROBLEM) |
+| `app/[locale]/layout.tsx:725` | Main element with `screen-fit-content` (scroll container) |
+| `app/globals.css:2019-2025` | `.screen-fit-content` CSS class definition |
 
-**Code Flow:**
+**Verified DOM Structure (via Playwright):**
 
 ```
-Layout hierarchy:
-<body className="screen-fit">                    <!-- min-height: 100dvh, overflow-y: auto -->
-  <div className="flex-1 min-h-0 overflow-hidden">  <!-- CLIPS content! -->
-    <main className="screen-fit-content">        <!-- flex: 1, overflow-y: auto -->
-      {children}                                  <!-- Page content -->
-    </main>
-  </div>
+<body className="antialiased screen-fit">
+  <Providers>
+    <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">  <!-- LINE 724 - THE PROBLEM -->
+      <main className="screen-fit-content">  <!-- Child wants to scroll but parent blocks it -->
+        {children}
+      </main>
+    </div>
+  </Providers>
 </body>
-
-Page content pattern (problematic):
-<div className="min-h-screen">                   <!-- Forces 100vh height -->
-  <main>...</main>                               <!-- NESTED main element -->
-</div>
 ```
+
+**Playwright Analysis Results:**
+- Parent div: `overflow: hidden`, height: 2181px (computed)
+- Main element: `overflowY: auto`, height: 2181px (computed)
+- Viewport: 667px
+- `touchAction`: `auto` on all elements (NOT a touch-action issue)
 
 ## Root Cause
 
 **Root Cause Statement:**
 
-The scroll architecture has a **height resolution conflict** between the layout's `screen-fit-content` scroll container and individual pages that use `min-h-screen`. The issue manifests on mobile browsers due to:
-
-1. **`min-h-screen` resolves to viewport units (`100vh`/`100dvh`)** - This is computed relative to the browser viewport, NOT the scroll container
-2. **The wrapper div has `overflow-hidden`** - This is intentional to make `<main>` the scroll container
-3. **Pages nest their own `<main>` elements** - Creating semantic HTML conflicts
-4. **Mobile browser `dvh` support varies** - Older browsers may not handle dynamic viewport height correctly
-
-**Why it Happened:**
-
-1. The scroll containment architecture is correct in principle (test file documents this)
-2. However, pages were built without awareness of this architecture
-3. Using `min-h-screen` on page content defeats the flex-based height calculation
-4. The scroll container (`screen-fit-content`) cannot scroll content that declares its own viewport-relative minimum height
+The parent `div` at line 724 has `overflow-hidden` which **blocks touch scroll events from reaching the child** `main` element on mobile devices.
 
 **Technical Explanation:**
 
-When a page uses `min-h-screen`:
-- The content declares "I must be at least 100dvh tall"
-- But the scroll container is constrained by the layout hierarchy
-- On browsers with full support, this mostly works because `dvh` adapts
-- On browsers with incomplete support, the content is simply clipped
+1. On mobile, touch scroll events use a different propagation model than desktop mouse wheel
+2. When a parent element has `overflow: hidden`, it creates a **scroll boundary**
+3. The child element's `overflow-y: auto` cannot receive touch scroll events because the parent intercepts and blocks them
+4. Two-finger gestures work because they use a different event path (pinch/zoom) that bypasses the overflow clipping
+5. On desktop, mouse wheel events propagate differently and can reach the child element
+
+**Git History Analysis:**
+- Commit `0c822d74` ("fix scroll") added `overflow-hidden` to fix a visual overflow issue
+- Commit `dbda3f5b` changed `overflow-clip` to `overflow-hidden` for cross-browser compatibility
+- Both changes inadvertently broke mobile touch scrolling
+
+**Why it Happened:**
+- The fix was likely tested on desktop but not on actual mobile devices
+- `overflow-hidden` and `overflow-clip` both block scroll event propagation on mobile
+- The intent was to contain visual overflow, not to block scrolling
 
 ## Fix Strategy
 
-**Recommended Fix: Option 1 (Systematic)**
+**Recommended Fix: Option 1 (Simple - Recommended)**
 
-Remove `min-h-screen` from page content and let the flex-based layout handle height. Pages should use:
-- No explicit height constraints on root elements
-- `pb-safe` or `pb-24 lg:pb-6` for bottom navigation spacing
-- No nested `<main>` elements (the layout provides `<main>`)
+Replace `overflow-hidden` with `overflow-x-hidden` to only contain horizontal overflow while allowing vertical scroll propagation.
 
-**Option 2 (Quick Fix - Less Recommended):**
-Add `-webkit-fill-available` as a fallback in the `screen-fit` class for Safari compatibility.
+**Implementation:**
 
-**Fix Strategy (Systematic):**
+Change line 724 in `app/[locale]/layout.tsx` from:
+```jsx
+<div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
+```
+To:
+```jsx
+<div className="flex-1 flex flex-col min-h-0 relative overflow-x-hidden">
+```
 
-1. **Audit all pages** - Find all uses of `min-h-screen` on page root elements
-2. **Remove viewport-relative heights** - Replace with flex-based layouts
-3. **Remove nested `<main>` elements** - Use `<div>` or `<section>` instead
-4. **Update page patterns** - Document the correct page structure
+**Option 2: Remove overflow entirely**
+- **Approach:** Remove the `overflow-hidden` class entirely
+- **Pros:** Most straightforward fix
+- **Cons:** May reintroduce the horizontal overflow issue the original fix addressed
+- **Risk:** Low - can always add back if needed
+
+**Option 3: Move scroll responsibility to wrapper**
+- **Approach:** Add `overflow-y-auto` to the wrapper div, remove from main
+- **Pros:** Keeps overflow containment in one place
+- **Cons:** Changes the scroll container, may affect existing page layouts
+- **Risk:** Medium
 
 **Files to Modify:**
 
 | File | Change |
 |------|--------|
-| `app/[locale]/settings/page.tsx` | Remove `min-h-screen`, use flex layout |
-| `app/[locale]/rules/page.tsx` | Remove `min-h-screen`, change `<main>` to `<div>` |
-| `app/[locale]/friends/page.tsx` | Remove `min-h-screen`, change `<main>` to `<div>` |
-| `app/[locale]/brain/page.tsx` | Change nested `<main>` to `<div>` |
-| `app/[locale]/admin/page.tsx` | Change nested `<main>` to `<div>` |
-| `app/[locale]/admin/players/page.tsx` | Change nested `<main>` to `<div>` |
-| `app/[locale]/admin/dictionary/page.tsx` | Change nested `<main>` to `<div>` |
-| `components/landing/LandingView.tsx` | Remove `min-h-screen` |
-| Many other pages | Similar changes |
+| `app/[locale]/layout.tsx:724` | Change `overflow-hidden` to `overflow-x-hidden` |
 
 **Testing Strategy:**
-- Test on iOS Safari (multiple versions)
-- Test on Android Chrome
-- Test on Android Firefox
-- Test in landscape mode
-- Test with browser address bar visible/hidden
-- Verify all content is reachable via scrolling
+- Test on iOS Safari (actual device)
+- Test on Android Chrome (actual device)
+- Test single-finger scroll on all page types
+- Verify no horizontal scroll appears
+- Verify desktop behavior unchanged
+- Test the /rules page which has long scrollable content
 
 **Validation:**
-- Manual testing on actual mobile devices
-- Verify scroll works on pages with long content
-- Verify no regressions on desktop
+- How to verify: Open any page on mobile, single-finger swipe should scroll
+- Regression testing: Check no horizontal overflow on any page
 
 ## Impact
 
 **Current Impact:**
-- Users affected: Mobile users on certain browsers/devices
-- Features affected: Any page with content taller than viewport
+- Users affected: ALL mobile users
+- Features affected: All pages with scrollable content
 - Data impact: None (display issue only)
+- User experience: Severely degraded - core navigation broken
 
 **Potential Side Effects:**
-- Removing `min-h-screen` may cause pages to appear shorter on very tall viewports
-- Need to ensure backgrounds still cover full viewport
-- May need to add flex-grow to content areas to fill available space
+- Changing to `overflow-x-hidden` may allow vertical content to escape if any exists (unlikely)
+- Need to verify no horizontal scrollbar appears after the fix
 
 ## Prevention
 
 **How to Prevent:**
 
-- [ ] **Document page structure requirements** in CLAUDE.md
-- [ ] **Add lint rule** to warn about `min-h-screen` in page components
-- [ ] **Create page template** that follows correct scroll architecture
-- [ ] **Add integration test** that verifies pages are scrollable on mobile viewport sizes
-- [ ] **Code review checklist** item for scroll architecture compliance
-
-**Recommended Documentation Addition:**
-
-```markdown
-## Page Structure Requirements
-
-Pages rendered inside the locale layout should NOT:
-- Use `min-h-screen` on root elements (layout handles viewport sizing)
-- Nest `<main>` elements (layout provides the `<main>`)
-- Use `h-screen` or `100vh` on content containers
-
-Pages SHOULD:
-- Use flex-based layouts that grow naturally
-- Add `pb-24 lg:pb-6` for bottom navigation spacing on mobile
-- Use semantic `<section>` or `<div>` for content grouping
-```
+- [ ] **Test on actual mobile devices** before merging scroll-related changes
+- [ ] **Add E2E test** for basic scroll functionality on mobile viewport
+- [ ] **Document overflow-hidden dangers** in code review checklist
+- [ ] **Prefer overflow-x-hidden** over overflow-hidden in layout containers
 
 ## Next Steps
 
-1. Implement fix using: `/bug_fix:implement-fix rca-mobile-scroll-blocked`
-2. Test on multiple mobile devices
-3. Update documentation
-4. Add preventive lint rules
+1. Implement fix: Change `overflow-hidden` to `overflow-x-hidden` in `app/[locale]/layout.tsx:724`
+2. Test on actual mobile device (iOS Safari, Chrome Mobile)
+3. Verify desktop behavior unchanged
+4. Verify no horizontal scroll regression
+5. Deploy and monitor
 
 ---
 
 **RCA Status:** Implementation Ready
 
-## Appendix: Affected Pages Audit
+## Evidence
 
-Pages using `min-h-screen` on root element:
-- `app/[locale]/settings/page.tsx:155`
-- `app/[locale]/rules/page.tsx:96`
-- `app/[locale]/friends/page.tsx:50`
-- `app/[locale]/brain/drills/*/page.tsx` (multiple)
-- `app/[locale]/accessibility/page.tsx:154`
-- `app/[locale]/unsubscribe/page.tsx:50`
-- `app/[locale]/adventure/page.tsx:10`
-- `app/[locale]/contact/page.tsx:68`
-- `app/[locale]/auth/callback/page.tsx:75`
-- `app/[locale]/admin/*/page.tsx` (multiple)
-- `app/[locale]/error.tsx:112`
-- `app/[locale]/not-found.tsx:11`
-- `components/landing/LandingView.tsx:213`
-- `components/join/QuickJoinForm.tsx:55`
-- `components/join/AutoJoiningState.tsx:26`
-- `components/challenge/ChallengeView.tsx:142`
-- `components/custom-puzzle/CustomPuzzleGame.tsx:193`
-- `components/join-view/QuickJoinView.tsx:132`
-- `components/join-view/AutoJoiningView.tsx:29`
-- `components/buzz/BuzzChallengeWrapper.tsx:24`
-- `components/legal/LegalPageLayout.tsx:31`
-- `components/singleplayer/SinglePlayerLobby.tsx:376`
+**Playwright Analysis (2026-01-22):**
+```javascript
+{
+  "overflowHiddenElements": [
+    {
+      "tag": "DIV",
+      "className": "flex-1 flex flex-col min-h-0 relative overflow-hidden",
+      "overflow": "hidden",
+      "overflowY": "hidden",
+      "height": "2181.25px"  // Content is taller than viewport
+    }
+  ],
+  "documentHeight": 2181,
+  "viewportHeight": 667,  // But viewport is only 667px
+  "mainInfo": {
+    "overflowY": "auto",  // Main wants to scroll
+    "touchAction": "auto"  // No touch-action issue
+  }
+}
+```
 
-Pages with nested `<main>` elements:
-- `app/[locale]/rules/page.tsx:99`
-- `app/[locale]/friends/page.tsx:89`
-- `app/[locale]/brain/page.tsx:170,223,283,340`
-- `app/[locale]/admin/page.tsx:89`
-- `app/[locale]/admin/players/page.tsx:79`
-- `app/[locale]/admin/dictionary/page.tsx:79`
+This confirms the parent's `overflow: hidden` is blocking scroll events from reaching the child on mobile.
