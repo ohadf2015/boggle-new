@@ -238,9 +238,9 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
         </div>
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid */}
-        <div ref={containerRef} className="w-full h-48 min-h-[12rem] min-w-[100px]">
-          {isReady && dimensions ? (
-          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
+        <div ref={containerRef} className="w-full h-48 min-h-[12rem] min-w-[100px]" style={{ minHeight: '12rem', minWidth: 100 }}>
+          {isReady && dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
+          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100} debounce={50}>
             <AreaChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 5 }}

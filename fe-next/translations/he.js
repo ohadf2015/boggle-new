@@ -3131,7 +3131,9 @@ const he = {
     "points": "נקודות קוגניטיביות",
     "loading": "טוען אימון קוגניטיבי...",
     "nav": {
-      "profile": "פרופיל"
+      "profile": "פרופיל",
+      "home": "בית",
+      "brain": "אימון קוגניטיבי"
     },
     "domains": {
       "processingSpeed": "מהירות עיבוד",

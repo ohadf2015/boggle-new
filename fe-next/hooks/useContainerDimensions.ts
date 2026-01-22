@@ -36,11 +36,12 @@ export function useContainerDimensions(minDimension: number = 100) {
         const width = Math.floor(rect.width);
         const height = Math.floor(rect.height);
         // Only mark as ready if dimensions are valid (>= minDimension)
-        // Also check for positive values to prevent -1 errors
-        if (width >= minDimension && height >= minDimension) {
+        // Also check for positive values to prevent -1 errors from Recharts
+        // Mobile browsers can report -1 or 0 during layout transitions
+        if (width > 0 && height > 0 && width >= minDimension && height >= minDimension) {
           setDimensions({ width, height });
         } else {
-          // Reset if dimensions become too small or invalid
+          // Reset if dimensions become invalid (including -1 from mobile browsers)
           setDimensions(null);
         }
       }

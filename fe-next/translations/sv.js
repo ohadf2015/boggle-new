@@ -3124,7 +3124,9 @@ const sv = {
     "points": "Hjärnpoäng",
     "loading": "Laddar hjärnträning...",
     "nav": {
-      "profile": "Profil"
+      "profile": "Profil",
+      "home": "Hem",
+      "brain": "Hjärnträning"
     },
     "domains": {
       "processingSpeed": "Bearbetningshastighet",

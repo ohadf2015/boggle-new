@@ -3130,7 +3130,9 @@ const ja = {
     "points": "ブレインポイント",
     "loading": "脳トレを読み込み中...",
     "nav": {
-      "profile": "プロフィール"
+      "profile": "プロフィール",
+      "home": "ホーム",
+      "brain": "脳トレ"
     },
     "domains": {
       "processingSpeed": "処理速度",

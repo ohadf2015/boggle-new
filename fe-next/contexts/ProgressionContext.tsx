@@ -91,6 +91,14 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         credentials: 'include',
       });
 
+      // Handle auth failures silently - user's session may have expired
+      // This is an expected state, not an error that should be logged
+      if (response.status === 401) {
+        setProgression(null);
+        setIsLoading(false);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`Failed to fetch progression: ${response.status}`);
       }
@@ -98,7 +106,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       const data = await response.json();
       setProgression(data);
     } catch (err) {
-      console.error('[ProgressionContext] Fetch error:', err);
+      // Only log non-network errors to avoid Sentry noise
+      // Network errors during navigation are expected on mobile
+      const isNetworkError = err instanceof TypeError && err.message === 'Failed to fetch';
+      if (!isNetworkError) {
+        console.error('[ProgressionContext] Fetch error:', err);
+      }
       setError(err instanceof Error ? err : new Error('Failed to fetch progression'));
     } finally {
       setIsLoading(false);

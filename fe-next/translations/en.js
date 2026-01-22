@@ -3133,7 +3133,9 @@ const en = {
     "points": "Brain Points",
     "loading": "Loading Brain Training...",
     "nav": {
-      "profile": "Profile"
+      "profile": "Profile",
+      "home": "Home",
+      "brain": "Brain Training"
     },
     "domains": {
       "processingSpeed": "Processing Speed",

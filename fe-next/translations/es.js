@@ -3127,7 +3127,9 @@ const es = {
     "points": "Puntos Cerebrales",
     "loading": "Cargando entrenamiento mental...",
     "nav": {
-      "profile": "Perfil"
+      "profile": "Perfil",
+      "home": "Inicio",
+      "brain": "Entrenamiento Mental"
     },
     "domains": {
       "processingSpeed": "Velocidad de Procesamiento",
