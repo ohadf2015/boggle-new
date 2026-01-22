@@ -31,6 +31,8 @@ export interface DesktopGameLayoutProps {
   targetHighScore: number | null;
   // Combo
   comboLevel: number;
+  comboTimeRemaining: number | null;
+  comboDanger: boolean;
   maxCombo: number;
   comboCoinReward: number | null;
   onCoinAnimationComplete: () => void;
@@ -95,6 +97,8 @@ export function DesktopGameLayout({
   mode,
   targetHighScore,
   comboLevel,
+  comboTimeRemaining,
+  comboDanger,
   maxCombo,
   comboCoinReward,
   onCoinAnimationComplete,
@@ -180,6 +184,8 @@ export function DesktopGameLayout({
             remainingTime={remainingTime}
             totalTime={totalTime}
             comboLevel={comboLevel}
+            comboTimeRemaining={comboTimeRemaining}
+            comboDanger={comboDanger}
             maxCombo={maxCombo}
             wordsFound={validWordCount}
             totalBoardWords={totalBoardWords}

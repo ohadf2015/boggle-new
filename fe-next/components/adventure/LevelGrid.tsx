@@ -20,6 +20,7 @@ interface LevelGridProps {
   world: WorldConfig;
   completions: Array<{ world: number; level: number; stars: number }>;
   totalStars: number;
+  onLevelSelect: (worldId: number, levelId: number) => void;
 }
 
 // Icon map for special tile types
@@ -39,6 +40,7 @@ export default function LevelGrid({
   world,
   completions,
   totalStars,
+  onLevelSelect,
 }: LevelGridProps): React.JSX.Element {
   const { t } = useLanguage();
 
@@ -72,7 +74,7 @@ export default function LevelGrid({
   const worldColors = getWorldColors(world.colorPrimary);
 
   return (
-    <div className="space-y-6">
+    <div data-testid="level-grid" className="space-y-6">
       {/* World Header with themed accent */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -135,6 +137,8 @@ export default function LevelGrid({
           <motion.button
             key={levelNum}
             disabled={!isUnlocked}
+            onClick={() => isUnlocked && onLevelSelect(world.id, levelNum)}
+            data-testid={`level-button-${levelNum}`}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: levelNum * 0.03 }}

@@ -3592,6 +3592,61 @@ const ja = {
     "sendError": "ギフトの送信に失敗しました。もう一度お試しください。",
     "step": "ステップ",
     "of": "/"
+  },
+  "adventure": {
+    "title": "アドベンチャーモード",
+    "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
+    "progress": "進捗",
+    "levels": "レベル",
+    "backToMap": "ワールドマップに戻る",
+    "worldLabel": "ワールド",
+    "hiddenWord": "隠しワード",
+    "devPreview": "開発プレビュー",
+    "devPreviewDesc": "アドベンチャーモードは開発中です。このプレビューではワールドマップとレベル設定を表示しています。",
+    "exitToMap": "マップに戻る",
+    "startLevel": "レベル開始",
+    "levelComplete": "レベルクリア！",
+    "starsEarned": "獲得した星",
+    "continueToNext": "続ける",
+    "retryLevel": "リトライ",
+    "loadError": "進捗の読み込みに失敗しました",
+    "worlds": {
+      "alphabetMeadows": "アルファベットの草原",
+      "synonymSprings": "同義語の泉",
+      "rootCaverns": "語源の洞窟",
+      "idiomArchipelago": "慣用句の群島",
+      "compoundCanyon": "複合語の峡谷",
+      "anagramLabyrinth": "アナグラムの迷宮",
+      "mirrorPalace": "鏡の宮殿",
+      "neologismNebula": "新語の星雲",
+      "polyglotPeaks": "多言語の峰",
+      "lexiconThrone": "辞書の玉座"
+    },
+    "mechanics": {
+      "synonymPairs": "同義語ペアで+25%",
+      "etymologyRoots": "ラテン語/ギリシャ語の語源でボーナス",
+      "idioms": "隠し慣用句チャレンジ",
+      "compounds": "複合語で+30%",
+      "anagrams": "アナグラムを解いてボーナス",
+      "palindromes": "回文で+50%",
+      "rareWords": "珍しい/新しい単語で+40%",
+      "multilingual": "多言語ワードボーナス",
+      "allMechanics": "すべてのメカニクスを組み合わせ"
+    },
+    "objectives": {
+      "wordCount": "単語を見つける",
+      "scoreTarget": "スコア目標",
+      "clearIce": "氷をクリア",
+      "longWords": "長い単語（5文字以上）",
+      "timeBonus": "残り時間",
+      "collectGems": "宝石を集める"
+    },
+    "tiles": {
+      "gold": "ゴールド（3倍ポイント）",
+      "ice": "氷（障害物）",
+      "bomb": "爆弾（行をクリア）",
+      "rainbow": "レインボー（ワイルドカード）"
+    }
   }
 };
 

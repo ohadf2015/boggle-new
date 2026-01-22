@@ -689,7 +689,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Waiting for results - show simple view with validation modal overlay
   if (waitingForResults) {
     return (
-      <div className="min-h-screen w-full bg-neo-cream text-neo-black dark:bg-slate-900 dark:text-white flex items-center justify-center transition-colors duration-300">
+      <div className="flex-1 w-full bg-neo-cream text-neo-black dark:bg-slate-900 dark:text-white flex items-center justify-center transition-colors duration-300">
         <ValidationModal
           isOpen={true}
           t={t}

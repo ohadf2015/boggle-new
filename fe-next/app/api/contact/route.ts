@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
+import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
 
 /**
  * Contact Form API Endpoint
  *
  * Handles contact form submissions:
- * 1. Validates input
- * 2. Stores message in Supabase
- * 3. Optionally sends email notification via SendGrid
+ * 1. Rate limits requests (5 per hour per IP to prevent spam)
+ * 2. Validates input
+ * 3. Stores message in Supabase
+ * 4. Optionally sends email notification via SendGrid
  */
 
 const CONTACT_EMAIL = 'lexiclash.game@gmail.com';
+
+// Rate limit config: 5 requests per hour per IP (strict for contact form)
+const CONTACT_RATE_LIMIT = {
+  maxRequests: 5,
+  windowMs: 60 * 60 * 1000, // 1 hour
+  blockDurationMs: 24 * 60 * 60 * 1000, // 24 hour block for abuse
+};
 
 /**
  * Get Supabase admin client for database operations
@@ -114,6 +123,13 @@ async function sendEmailNotification(name: string, email: string, message: strin
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit check - prevent spam and abuse
+  const rateLimitResult = checkApiRateLimit(request, 'contact', CONTACT_RATE_LIMIT);
+  if (!rateLimitResult.success) {
+    console.warn('[Contact Form] Rate limit exceeded for IP');
+    return rateLimitResponse(rateLimitResult);
+  }
+
   try {
     const body = await request.json();
     const { name, email, message } = body;
@@ -179,10 +195,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Message sent successfully',
     });
+    return addRateLimitHeaders(response, rateLimitResult, CONTACT_RATE_LIMIT.maxRequests);
   } catch (error) {
     console.error('[Contact Form] Unexpected error:', error);
     captureApiError(

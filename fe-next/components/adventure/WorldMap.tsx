@@ -273,6 +273,7 @@ const WorldNode = ({
           <motion.button
             onClick={onClick}
             disabled={!isUnlocked}
+            data-testid={`world-${world.id}`}
             whileHover={isUnlocked ? { scale: 1.08, y: -4 } : undefined}
             whileTap={isUnlocked ? { scale: 0.95 } : undefined}
             className={cn(
@@ -517,6 +518,7 @@ export default function WorldMap({
   return (
     <div
       ref={containerRef}
+      data-testid="world-map"
       className="relative h-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent"
     >
       {/* Deep space background gradient */}

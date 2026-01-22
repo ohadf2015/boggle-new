@@ -13,12 +13,14 @@ import {
   getShareBrandColorVar,
   getAvatarColor,
   getAvatarColorVar,
+  getAvatarColorHex,
   getRankGradient,
   getStatGradient,
   getButtonTokenClass,
   getBadgeTokenClass,
   isHardcodedColor,
   suggestDesignToken,
+  type AvatarCharacter,
 } from '@/lib/designSystem';
 
 describe('OAuth Brand Colors', () => {
@@ -122,6 +124,36 @@ describe('Avatar Colors', () => {
     test('should return CSS variable format for all avatars', () => {
       const result = getAvatarColorVar('pizza-pete');
       expect(result).toMatch(/^var\(--avatar-\d+\)$/);
+    });
+  });
+
+  describe('getAvatarColorHex', () => {
+    test('should return hex color for avatar characters', () => {
+      expect(getAvatarColorHex('broccoli-bob')).toBe('#52B788');
+      expect(getAvatarColorHex('drippy-drop')).toBe('#4ECDC4');
+      expect(getAvatarColorHex('sunny-steve')).toBe('#F8B739');
+      expect(getAvatarColorHex('pizza-pete')).toBe('#FF6B6B');
+    });
+
+    test('should return hex color format for all avatars', () => {
+      const avatars: AvatarCharacter[] = [
+        'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
+        'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
+        'avo-alex', 'frosty-frank', 'flaky-fred', 'eggy-ed',
+        'slimy-sam', 'starry-stella', 'shroom-shelly', 'donut-danny',
+        'jelly-jen',
+      ];
+
+      avatars.forEach(avatar => {
+        const result = getAvatarColorHex(avatar);
+        // Should be a valid hex color matching socket schema: /^#[0-9A-Fa-f]{6}$/
+        expect(result).toMatch(/^#[0-9A-Fa-f]{6}$/);
+      });
+    });
+
+    test('should return default hex fallback for unknown avatar', () => {
+      // @ts-expect-error Testing invalid input
+      expect(getAvatarColorHex('unknown-avatar')).toBe('#FF6B6B');
     });
   });
 });

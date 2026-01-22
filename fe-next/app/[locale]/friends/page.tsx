@@ -47,7 +47,7 @@ export default function FriendsPage(): React.JSX.Element {
   return (
     <div
       className={cn(
-        'min-h-screen relative',
+        'flex-1 flex flex-col relative',
         isDark
           ? 'bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy'
           : 'bg-neo-navy'
@@ -86,7 +86,7 @@ export default function FriendsPage(): React.JSX.Element {
       </header>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto p-4 pb-24 lg:pb-4">
+      <div className="max-w-2xl mx-auto p-4 page-content-safe flex-1">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -116,7 +116,7 @@ export default function FriendsPage(): React.JSX.Element {
             <FriendsList onChallengeClick={handleChallengeClick} />
           )}
         </motion.div>
-      </main>
+      </div>
     </div>
   );
 }

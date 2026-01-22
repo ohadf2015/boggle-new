@@ -412,6 +412,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           <ComboDisplay
             comboLevel={combo.comboLevel}
             compact
+            timeRemaining={combo.comboTimeRemaining}
+            isDanger={combo.isDangerState}
             coinReward={comboCoinReward}
             onCoinAnimationComplete={() => setComboCoinReward(null)}
           />

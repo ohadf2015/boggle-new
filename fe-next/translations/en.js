@@ -3654,7 +3654,14 @@ const en = {
       "ice": "Ice (obstacle)",
       "bomb": "Bomb (clears row)",
       "rainbow": "Rainbow (wildcard)"
-    }
+    },
+    "exitToMap": "Exit to Map",
+    "startLevel": "Start Level",
+    "levelComplete": "Level Complete!",
+    "starsEarned": "Stars Earned",
+    "continueToNext": "Continue",
+    "retryLevel": "Retry",
+    "loadError": "Failed to load progress"
   }
 };
 

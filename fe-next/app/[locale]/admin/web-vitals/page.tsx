@@ -236,14 +236,14 @@ export default function WebVitalsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+      <div className="flex-1 flex items-center justify-center bg-neo-navy">
         <NeoLoader variant="mascot-letters" size="lg" text="Loading Web Vitals..." />
       </div>
     );
   }
 
   return (
-    <div className={cn("min-h-screen", isDark ? "bg-gray-900" : "bg-gray-50")}>
+    <div className={cn("flex-1 flex flex-col", isDark ? "bg-gray-900" : "bg-gray-50")}>
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8">

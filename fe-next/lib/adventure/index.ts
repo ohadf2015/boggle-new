@@ -67,3 +67,12 @@ export {
   WORLD_COLOR_KEYS,
   type WorldColorPalette,
 } from './colors';
+
+// Grid generation for adventure levels
+export {
+  generateAdventureGrid,
+  getLevelSeed,
+  VOWELS,
+  COMMON_CONSONANTS,
+  RARE_CONSONANTS,
+} from './gridGenerator';

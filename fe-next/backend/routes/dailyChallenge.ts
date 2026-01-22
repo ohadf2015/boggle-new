@@ -140,6 +140,14 @@ interface AttemptInsertData {
   guest_fingerprint?: string;
 }
 
+interface CachedPuzzle {
+  grid: string[][];
+  targetWord: string;
+  puzzleDate: string;
+  puzzleNumber: number;
+  language: string;
+}
+
 interface PuzzleStats {
   total_attempts: number;
   total_completions: number;
@@ -622,8 +630,13 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
 
     // Server-side validation: Verify target word matches expected puzzle
     try {
-      // Use async version to check database for AI-selected word first
-      const expectedPuzzle = await generateDailyPuzzleAsync(puzzleDate, language as Language);
+      // Use cached puzzle first to ensure we validate against the same puzzle the client received
+      // This prevents race conditions where the database word changes after the client started playing
+      let expectedPuzzle: CachedPuzzle | null = await getCachedDailyPuzzle(puzzleDate, language) as CachedPuzzle | null;
+      if (!expectedPuzzle || !expectedPuzzle.targetWord) {
+        // Fallback to async generation if cache miss (rare - only if Redis is down or cache expired)
+        expectedPuzzle = await generateDailyPuzzleAsync(puzzleDate, language as Language) as CachedPuzzle;
+      }
       const expectedTargetWord = expectedPuzzle.targetWord.toUpperCase();
       const submittedTargetWord = targetWord.toUpperCase();
 

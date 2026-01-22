@@ -1,19 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, Sparkles, Trophy, Map, Zap } from 'lucide-react';
+import { ArrowLeft, Star, Sparkles, Trophy, Map, Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useProgression } from '@/contexts/ProgressionContext';
 import {
-  WORLDS_COUNT,
-  LEVELS_PER_WORLD,
-  MAX_STARS_PER_LEVEL,
   getWorldConfig,
+  getLevelConfig,
+  generateAdventureGrid,
+  getLevelSeed,
 } from '@/lib/adventure';
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
+import AdventureGame from './AdventureGame';
+
+// View state type for navigation
+type ViewState = 'worldMap' | 'levelGrid' | 'playing';
 
 /**
  * AdventureView - Main Adventure Mode with interactive floating islands world map
@@ -23,37 +28,128 @@ export default function AdventureView(): React.JSX.Element {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
 
-  // Mock player progress - in real implementation, this would come from user context/API
-  const [playerProgress] = useState({
-    totalStars: 25, // Example: player has 25 stars
-    completions: [
-      { world: 1, level: 1, stars: 3 },
-      { world: 1, level: 2, stars: 2 },
-      { world: 1, level: 3, stars: 3 },
-      { world: 1, level: 4, stars: 2 },
-      { world: 1, level: 5, stars: 3 },
-      { world: 1, level: 6, stars: 2 },
-      { world: 1, level: 7, stars: 2 },
-      { world: 1, level: 8, stars: 3 },
-      { world: 1, level: 9, stars: 2 },
-      { world: 1, level: 10, stars: 3 },
-      { world: 2, level: 1, stars: 2 },
-      { world: 2, level: 2, stars: 2 },
-    ],
-    totalXp: 1250,
-    playerLevel: 5,
-  });
+  // Get progression data from context
+  const { progression, isLoading, error, completeLevel } = useProgression();
 
-  // State for selected world (to show level grid)
+  // View navigation state
+  const [viewState, setViewState] = useState<ViewState>('worldMap');
   const [selectedWorld, setSelectedWorld] = useState<number | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
 
-  // Calculate progress stats
-  const maxPossibleStars = WORLDS_COUNT * LEVELS_PER_WORLD * MAX_STARS_PER_LEVEL;
-  const completedLevels = playerProgress.completions.length;
-  const totalLevels = WORLDS_COUNT * LEVELS_PER_WORLD;
+  // Derive player stats from progression
+  const totalStars = progression?.totalStars ?? 0;
+  const playerLevel = progression?.playerLevel ?? 1;
+  const completions = progression?.completions ?? [];
 
   // Get selected world config
   const selectedWorldConfig = selectedWorld ? getWorldConfig(selectedWorld) : null;
+
+  // Get level config and grid for gameplay
+  const levelConfig =
+    selectedWorld && selectedLevel
+      ? getLevelConfig(selectedWorld, selectedLevel)
+      : null;
+
+  const gameGrid =
+    selectedWorld && selectedLevel && levelConfig
+      ? generateAdventureGrid(
+          levelConfig.gridSize as 4 | 5 | 6 | 7,
+          getLevelSeed(selectedWorld, selectedLevel)
+        )
+      : null;
+
+  // Handle world selection from WorldMap
+  const handleWorldSelect = useCallback((worldId: number) => {
+    setSelectedWorld(worldId);
+    setViewState('levelGrid');
+  }, []);
+
+  // Handle level selection from LevelGrid
+  const handleLevelSelect = useCallback((worldId: number, levelId: number) => {
+    setSelectedWorld(worldId);
+    setSelectedLevel(levelId);
+    setViewState('playing');
+  }, []);
+
+  // Handle game completion
+  const handleLevelComplete = useCallback(
+    async (stars: number, score: number) => {
+      if (selectedWorld && selectedLevel) {
+        try {
+          await completeLevel(
+            selectedWorld,
+            selectedLevel,
+            stars as 0 | 1 | 2 | 3,
+            score,
+            0 // words count - can be expanded later
+          );
+        } catch (err) {
+          console.error('Failed to save progress:', err);
+        }
+        // Navigate back to level grid regardless of save success
+        setViewState('levelGrid');
+        setSelectedLevel(null);
+      }
+    },
+    [selectedWorld, selectedLevel, completeLevel]
+  );
+
+  // Handle exit from game
+  const handleGameExit = useCallback(() => {
+    setViewState('levelGrid');
+    setSelectedLevel(null);
+  }, []);
+
+  // Handle back navigation based on current view
+  const handleBack = useCallback(() => {
+    if (viewState === 'playing') {
+      setViewState('levelGrid');
+      setSelectedLevel(null);
+    } else if (viewState === 'levelGrid') {
+      setViewState('worldMap');
+      setSelectedWorld(null);
+    }
+  }, [viewState]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="h-screen bg-neo-navy flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 text-neo-yellow animate-spin" />
+          <p className="text-neo-white font-bold">
+            {t('common.loading') || 'Loading...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="h-screen bg-neo-navy flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center px-4">
+          <div className="w-16 h-16 bg-neo-red/20 rounded-full flex items-center justify-center">
+            <span className="text-3xl">!</span>
+          </div>
+          <p className="text-neo-white font-bold">
+            {t('adventure.loadError') || 'Failed to load progress'}
+          </p>
+          <Link
+            href="/"
+            className={cn(
+              'px-4 py-2 bg-neo-purple text-neo-white font-bold',
+              'border-3 border-neo-black rounded-neo shadow-hard',
+              'hover:bg-neo-purple-light transition-colors'
+            )}
+          >
+            {t('common.back') || 'Back'}
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-neo-navy relative flex flex-col overflow-hidden">
@@ -61,9 +157,9 @@ export default function AdventureView(): React.JSX.Element {
       <header className="relative z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Back / World Map button */}
-          {selectedWorld ? (
+          {viewState !== 'worldMap' ? (
             <button
-              onClick={() => setSelectedWorld(null)}
+              onClick={handleBack}
               className={cn(
                 'flex items-center gap-2 px-4 py-2',
                 'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
@@ -72,7 +168,11 @@ export default function AdventureView(): React.JSX.Element {
               )}
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
-              <span>{t('adventure.backToMap') || 'World Map'}</span>
+              <span>
+                {viewState === 'playing'
+                  ? t('adventure.exitToMap') || 'Exit to Map'
+                  : t('adventure.backToMap') || 'World Map'}
+              </span>
             </button>
           ) : (
             <Link
@@ -104,7 +204,7 @@ export default function AdventureView(): React.JSX.Element {
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo">
               <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
               <span className="font-bold text-neo-yellow text-sm">
-                {playerProgress.totalStars}
+                {totalStars}
               </span>
             </div>
 
@@ -112,7 +212,7 @@ export default function AdventureView(): React.JSX.Element {
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-purple/20 border-2 border-neo-purple rounded-neo">
               <Zap className="w-4 h-4 text-neo-purple" />
               <span className="font-bold text-neo-purple text-sm">
-                Lv.{playerProgress.playerLevel}
+                Lv.{playerLevel}
               </span>
             </div>
           </div>
@@ -122,7 +222,7 @@ export default function AdventureView(): React.JSX.Element {
       {/* Main Content - Takes remaining height */}
       <main className="relative z-10 flex-1 overflow-hidden">
         <AnimatePresence mode="wait">
-          {selectedWorld === null ? (
+          {viewState === 'worldMap' && (
             // World Map View
             <motion.div
               key="world-map"
@@ -133,12 +233,14 @@ export default function AdventureView(): React.JSX.Element {
               className="h-full"
             >
               <WorldMap
-                totalStars={playerProgress.totalStars}
-                completions={playerProgress.completions}
-                onWorldSelect={setSelectedWorld}
+                totalStars={totalStars}
+                completions={completions}
+                onWorldSelect={handleWorldSelect}
               />
             </motion.div>
-          ) : (
+          )}
+
+          {viewState === 'levelGrid' && selectedWorldConfig && (
             // Level Grid View
             <motion.div
               key="level-grid"
@@ -149,20 +251,38 @@ export default function AdventureView(): React.JSX.Element {
               className="px-4 py-6 sm:px-6 lg:px-8 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent"
             >
               <div className="max-w-7xl mx-auto">
-                {selectedWorldConfig && (
-                  <LevelGrid
-                    world={selectedWorldConfig}
-                    completions={playerProgress.completions}
-                    totalStars={playerProgress.totalStars}
-                  />
-                )}
+                <LevelGrid
+                  world={selectedWorldConfig}
+                  completions={completions}
+                  totalStars={totalStars}
+                  onLevelSelect={handleLevelSelect}
+                />
               </div>
+            </motion.div>
+          )}
+
+          {viewState === 'playing' && levelConfig && gameGrid && (
+            // Game View
+            <motion.div
+              key="playing"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
+            >
+              <AdventureGame
+                levelConfig={levelConfig}
+                initialGrid={gameGrid}
+                onLevelComplete={handleLevelComplete}
+                onExit={handleGameExit}
+              />
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Development Notice - Only show on world map */}
-        {selectedWorld === null && (
+        {viewState === 'worldMap' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

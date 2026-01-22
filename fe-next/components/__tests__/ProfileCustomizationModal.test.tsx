@@ -10,33 +10,33 @@ import { getAvatarEmojiAndColor, AVATARS } from '@/utils/avatarConfig';
 describe('Profile Customization Avatar Config', () => {
   describe('getAvatarEmojiAndColor', () => {
     it('returns correct values for known avatars', () => {
-      // Test a few known avatar IDs - now using CSS variables from design system
+      // Test a few known avatar IDs - now using hex colors for socket/database compatibility
       const broccoliResult = getAvatarEmojiAndColor('broccoli-bob');
-      expect(broccoliResult).toEqual({ emoji: '🥦', color: 'var(--avatar-10)' });
+      expect(broccoliResult).toEqual({ emoji: '🥦', color: '#52B788' });
 
       const sunnyResult = getAvatarEmojiAndColor('sunny-steve');
-      expect(sunnyResult).toEqual({ emoji: '☀️', color: 'var(--avatar-9)' });
+      expect(sunnyResult).toEqual({ emoji: '☀️', color: '#F8B739' });
 
       const octoResult = getAvatarEmojiAndColor('octo-otto');
-      expect(octoResult).toEqual({ emoji: '🐙', color: 'var(--avatar-7)' });
+      expect(octoResult).toEqual({ emoji: '🐙', color: '#BB8FCE' });
     });
 
     it('returns default for unknown avatars', () => {
       const unknownResult = getAvatarEmojiAndColor('unknown-avatar');
-      expect(unknownResult).toEqual({ emoji: '🎯', color: 'var(--avatar-1)' });
+      expect(unknownResult).toEqual({ emoji: '🎯', color: '#FF6B6B' });
     });
 
     it('returns default for profile picture avatar ID', () => {
       const profileResult = getAvatarEmojiAndColor('__profile_avatar__');
-      expect(profileResult).toEqual({ emoji: '🎯', color: 'var(--avatar-1)' });
+      expect(profileResult).toEqual({ emoji: '🎯', color: '#FF6B6B' });
     });
 
-    it('all AVATARS have valid emoji and color mappings', () => {
+    it('all AVATARS have valid emoji and hex color mappings', () => {
       AVATARS.forEach(avatar => {
         const { emoji, color } = getAvatarEmojiAndColor(avatar.id);
         expect(emoji).toBeTruthy();
-        // Colors now use CSS variables instead of hex codes
-        expect(color).toMatch(/^var\(--avatar-\d+\)$/);
+        // Colors are hex for socket schema validation
+        expect(color).toMatch(/^#[0-9A-Fa-f]{6}$/);
       });
     });
   });
@@ -75,7 +75,7 @@ describe('Profile Customization Save Handler Integration', () => {
       username: 'TestPlayer',
       avatar_image: 'broccoli-bob',
       avatar_emoji: '🥦',
-      avatar_color: 'var(--avatar-10)', // Using CSS variable from design system
+      avatar_color: '#52B788', // Using hex color for socket/database compatibility
       has_customized_profile: true,
     });
   });
@@ -106,7 +106,7 @@ describe('Profile Customization Save Handler Integration', () => {
         display_name: 'TestPlayer',
         avatar_image: PROFILE_AVATAR_ID,
         avatar_emoji: '🎯',  // default emoji for profile avatar
-        avatar_color: 'var(--avatar-1)',  // default color using CSS variable
+        avatar_color: '#FF6B6B',  // default hex color for socket/database compatibility
         has_customized_profile: true,
       })
     );

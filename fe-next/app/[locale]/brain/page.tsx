@@ -167,7 +167,7 @@ export default function BrainTrainingPage() {
           title={t('brain.title')}
           backText={t('common.back')}
         />
-        <main className="px-4 py-6 max-w-4xl mx-auto">
+        <div className="px-4 py-6 max-w-4xl mx-auto flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -201,7 +201,7 @@ export default function BrainTrainingPage() {
               {t('brain.errors.retry') || 'Retry'}
             </button>
           </motion.div>
-        </main>
+        </div>
       </div>
     );
   }
@@ -220,7 +220,7 @@ export default function BrainTrainingPage() {
           title={t('brain.title')}
           backText={t('common.back')}
         />
-        <main className="px-4 py-6 max-w-4xl mx-auto">
+        <div className="px-4 py-6 max-w-4xl mx-auto flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -261,7 +261,7 @@ export default function BrainTrainingPage() {
             onClose={() => setShowAuthModal(false)}
             showGuestStats={true}
           />
-        </main>
+        </div>
       </div>
     );
   }
@@ -280,7 +280,7 @@ export default function BrainTrainingPage() {
           title={t('brain.title')}
           backText={t('common.back')}
         />
-        <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
+        <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -317,7 +317,7 @@ export default function BrainTrainingPage() {
 
           {/* Show Quick Drills section even for new users */}
           <QuickDrillsSection drillProgress={drillProgress} />
-        </main>
+        </div>
       </div>
     );
   }
@@ -337,7 +337,7 @@ export default function BrainTrainingPage() {
       />
 
       {/* Main Content */}
-      <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
+      <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto flex-1">
         {/* Brain Score Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -462,7 +462,7 @@ export default function BrainTrainingPage() {
             </p>
           </motion.div>
         )}
-      </main>
+      </div>
 
       {/* First Game Celebration Modal */}
       {brainScore && (

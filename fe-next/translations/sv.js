@@ -3586,6 +3586,61 @@ const sv = {
     "sendError": "Kunde inte skicka gåvan. Försök igen.",
     "step": "Steg",
     "of": "av"
+  },
+  "adventure": {
+    "title": "Äventyrsläge",
+    "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
+    "progress": "Framsteg",
+    "levels": "nivåer",
+    "backToMap": "Tillbaka till världskartan",
+    "worldLabel": "Värld",
+    "hiddenWord": "Dolt ord",
+    "devPreview": "Utvecklingsförhandsgranskning",
+    "devPreviewDesc": "Äventyrsläge är under utveckling. Denna förhandsgranskning visar världskartan och nivåkonfiguration.",
+    "exitToMap": "Avsluta till karta",
+    "startLevel": "Starta nivå",
+    "levelComplete": "Nivå klar!",
+    "starsEarned": "Stjärnor intjänade",
+    "continueToNext": "Fortsätt",
+    "retryLevel": "Försök igen",
+    "loadError": "Kunde inte ladda framsteg",
+    "worlds": {
+      "alphabetMeadows": "Alfabetsängarna",
+      "synonymSprings": "Synonymkällorna",
+      "rootCaverns": "Rotgrottorna",
+      "idiomArchipelago": "Idiomskärgården",
+      "compoundCanyon": "Sammansättningskanjonen",
+      "anagramLabyrinth": "Anagramlabyrinten",
+      "mirrorPalace": "Spegelpalatset",
+      "neologismNebula": "Neologismnebulosan",
+      "polyglotPeaks": "Polyglottopparna",
+      "lexiconThrone": "Lexikontronen"
+    },
+    "mechanics": {
+      "synonymPairs": "+25% för synonympar",
+      "etymologyRoots": "Bonus för latinska/grekiska rötter",
+      "idioms": "Dolda idiomutmaningar",
+      "compounds": "+30% för sammansatta ord",
+      "anagrams": "Lös anagram för bonusar",
+      "palindromes": "+50% för palindromer",
+      "rareWords": "+40% för sällsynta/nya ord",
+      "multilingual": "Flerspråkiga ordbonusar",
+      "allMechanics": "Alla mekaniker kombinerade"
+    },
+    "objectives": {
+      "wordCount": "Hitta ord",
+      "scoreTarget": "Nå poäng",
+      "clearIce": "Rensa is",
+      "longWords": "Långa ord (5+)",
+      "timeBonus": "Tid kvar",
+      "collectGems": "Samla juveler"
+    },
+    "tiles": {
+      "gold": "Guld (3x poäng)",
+      "ice": "Is (hinder)",
+      "bomb": "Bomb (rensar rad)",
+      "rainbow": "Regnbåge (joker)"
+    }
   }
 };
 

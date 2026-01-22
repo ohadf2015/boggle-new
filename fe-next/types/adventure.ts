@@ -36,6 +36,19 @@ export interface TileState {
 }
 
 /**
+ * TileState with position information for flat grid representation
+ * Used by AdventureGrid component for rendering tiles with unique keys
+ */
+export interface GridTileState extends TileState {
+  /** Unique identifier for the tile */
+  id: string;
+  /** Row position (0-indexed) */
+  row: number;
+  /** Column position (0-indexed) */
+  col: number;
+}
+
+/**
  * Configuration for a special tile placed on the grid
  */
 export interface SpecialTile {

@@ -93,10 +93,10 @@ export default function RulesPage(): React.JSX.Element {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(howToPlaySchema) }}
             />
-            <div dir={dir} className="min-h-screen bg-neo-navy">
+            <div dir={dir} className="flex-1 flex flex-col bg-neo-navy">
                 <Header />
 
-            <main className="max-w-4xl mx-auto px-2 sm:px-6 py-3 sm:py-10 pb-24 lg:pb-10">
+            <div className="max-w-4xl mx-auto px-2 sm:px-6 py-3 sm:py-10 page-content-safe flex-1">
                 {/* Page Header - Compact */}
                 <motion.div
                     className="text-center mb-3 sm:mb-6"
@@ -372,7 +372,7 @@ export default function RulesPage(): React.JSX.Element {
                         </Link>
                     </motion.div>
                 </div>
-            </main>
+            </div>
             </div>
         </>
     );

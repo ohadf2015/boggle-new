@@ -131,7 +131,7 @@ describe('ProfileCustomizationWrapper', () => {
         username: 'NewPlayer',
         avatar_image: 'broccoli-bob',
         avatar_emoji: '🥦',
-        avatar_color: 'var(--avatar-10)', // Using CSS variable from design system
+        avatar_color: '#52B788', // Using hex color for socket/database compatibility
         has_customized_profile: true,
       });
     });
@@ -144,7 +144,7 @@ describe('ProfileCustomizationWrapper', () => {
         const { emoji, color } = getAvatarEmojiAndColor(avatar.id);
 
         expect(emoji).toBeTruthy();
-        expect(color).toMatch(/^var\(--avatar-\d+\)$/); // CSS variable format
+        expect(color).toMatch(/^#[0-9A-Fa-f]{6}$/); // Hex color format for socket/database
 
         // Simulate save for each avatar
         mockUpdateProfile.mockClear();
@@ -191,7 +191,7 @@ describe('ProfileCustomizationWrapper', () => {
         expect.objectContaining({
           avatar_image: PROFILE_AVATAR_ID,
           avatar_emoji: '🎯', // default
-          avatar_color: 'var(--avatar-1)', // default CSS variable
+          avatar_color: '#FF6B6B', // default hex color for socket/database
           has_customized_profile: true,
         })
       );
@@ -240,7 +240,7 @@ describe('Integration: Profile Customization Flow', () => {
       username: 'SunnyPlayer',
       avatar_image: 'sunny-steve',
       avatar_emoji: '☀️',
-      avatar_color: 'var(--avatar-9)', // Using CSS variable from design system
+      avatar_color: '#F8B739', // Using hex color for socket/database compatibility
       has_customized_profile: true,
     });
   });
@@ -266,7 +266,7 @@ describe('Integration: Profile Customization Flow', () => {
       username: 'Johnny',
       avatar_image: '__profile_avatar__',
       avatar_emoji: '🎯',
-      avatar_color: 'var(--avatar-1)', // Using CSS variable from design system
+      avatar_color: '#FF6B6B', // Using hex color for socket/database compatibility
       has_customized_profile: true,
     });
   });

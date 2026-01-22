@@ -199,6 +199,44 @@ export function getAvatarColorVar(character: AvatarCharacter): string {
   return characterMap[character] || 'var(--avatar-1)'; // Default fallback
 }
 
+/**
+ * Get hex color value for avatar character
+ *
+ * Use this for contexts requiring hex colors (socket communication, database storage)
+ * where CSS variables cannot be resolved.
+ *
+ * @param character - Avatar character name
+ * @returns Hex color string (e.g., '#52B788')
+ *
+ * @example
+ * ```typescript
+ * getAvatarColorHex('broccoli-bob') // '#52B788'
+ * ```
+ */
+export function getAvatarColorHex(character: AvatarCharacter): string {
+  const characterMap: Record<AvatarCharacter, string> = {
+    'broccoli-bob': '#52B788',
+    'drippy-drop': '#4ECDC4',
+    'sunny-steve': '#F8B739',
+    'cloudy-carl': '#85C1E2',
+    'octo-otto': '#BB8FCE',
+    'pizza-pete': '#FF6B6B',
+    'prickly-pat': '#6BCF7F',
+    'melon-molly': '#FF8FAB',
+    'avo-alex': '#98D8C8',
+    'frosty-frank': '#45B7D1',
+    'flaky-fred': '#98D8C8',
+    'eggy-ed': '#F7DC6F',
+    'slimy-sam': '#6BCF7F',
+    'starry-stella': '#FFB347',
+    'shroom-shelly': '#FF6F61',
+    'donut-danny': '#FFB347',
+    'jelly-jen': '#BB8FCE',
+  };
+
+  return characterMap[character] || '#FF6B6B'; // Default fallback
+}
+
 // ============================================================================
 // Rank Gradients
 // ============================================================================
@@ -430,6 +468,7 @@ export const designSystem = {
   // Avatars
   getAvatarColor,
   getAvatarColorVar,
+  getAvatarColorHex,
 
   // Gradients
   getRankGradient,

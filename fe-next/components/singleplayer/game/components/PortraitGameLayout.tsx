@@ -36,6 +36,8 @@ export interface PortraitGameLayoutProps {
   targetHighScore: number | null;
   // Combo
   comboLevel: number;
+  comboTimeRemaining: number | null;
+  comboDanger: boolean;
   maxCombo: number;
   comboCoinReward: number | null;
   onCoinAnimationComplete: () => void;
@@ -103,6 +105,8 @@ export function PortraitGameLayout({
   mode,
   targetHighScore,
   comboLevel,
+  comboTimeRemaining,
+  comboDanger,
   maxCombo,
   comboCoinReward,
   onCoinAnimationComplete,
@@ -225,15 +229,17 @@ export function PortraitGameLayout({
 
       {/* Stats section with vertical stacking on mobile */}
       <div ref={gameStatsRef} className="flex flex-col gap-1 w-full px-1 md:px-2" role="status" aria-label="Game status">
-        {/* Combo row - mobile only, centered (normal mode only) */}
-        {!isPracticeMode && comboLevel > 0 && (
+        {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
+        {!isPracticeMode && (
           <div
-            className="flex lg:hidden justify-center items-center min-h-[40px]"
+            className="flex lg:hidden justify-center items-center h-[40px]"
             data-testid="combo-row-mobile"
           >
             <ComboDisplay
               comboLevel={comboLevel}
               compact
+              timeRemaining={comboTimeRemaining}
+              isDanger={comboDanger}
               coinReward={comboCoinReward}
               onCoinAnimationComplete={onCoinAnimationComplete}
             />
@@ -338,6 +344,8 @@ export function PortraitGameLayout({
                   <ComboDisplay
                     comboLevel={comboLevel}
                     compact
+                    timeRemaining={comboTimeRemaining}
+                    isDanger={comboDanger}
                     coinReward={comboCoinReward}
                     onCoinAnimationComplete={onCoinAnimationComplete}
                   />

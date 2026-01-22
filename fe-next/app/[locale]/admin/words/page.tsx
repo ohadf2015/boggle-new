@@ -17,7 +17,7 @@ export default function AdminWordsPage() {
 
   return (
     <div className={cn(
-      'min-h-screen',
+      'flex-1 flex flex-col',
       isDarkMode
         ? 'bg-neo-navy'
         : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'

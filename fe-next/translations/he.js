@@ -3593,6 +3593,61 @@ const he = {
     "sendError": "שליחת המתנה נכשלה. נסה שוב.",
     "step": "שלב",
     "of": "מתוך"
+  },
+  "adventure": {
+    "title": "מצב הרפתקה",
+    "subtitle": "מסע דרך 10 עולמות, כבשו 100 שלבים, והפכו לאדון המילים האולטימטיבי!",
+    "progress": "התקדמות",
+    "levels": "שלבים",
+    "backToMap": "חזרה למפת העולם",
+    "worldLabel": "עולם",
+    "hiddenWord": "מילה נסתרת",
+    "devPreview": "תצוגה מקדימה",
+    "devPreviewDesc": "מצב הרפתקה בפיתוח. תצוגה מקדימה זו מציגה את מפת העולם ותצורת השלבים.",
+    "exitToMap": "יציאה למפה",
+    "startLevel": "התחל שלב",
+    "levelComplete": "השלב הושלם!",
+    "starsEarned": "כוכבים שנצברו",
+    "continueToNext": "המשך",
+    "retryLevel": "נסה שוב",
+    "loadError": "נכשל לטעון התקדמות",
+    "worlds": {
+      "alphabetMeadows": "אחו האותיות",
+      "synonymSprings": "מעיינות המילים הנרדפות",
+      "rootCaverns": "מערות השורשים",
+      "idiomArchipelago": "ארכיפלג הביטויים",
+      "compoundCanyon": "קניון המילים המורכבות",
+      "anagramLabyrinth": "מבוך האנגרמות",
+      "mirrorPalace": "ארמון המראות",
+      "neologismNebula": "ערפילית המילים החדשות",
+      "polyglotPeaks": "פסגות הרב-לשוניות",
+      "lexiconThrone": "כס המילון"
+    },
+    "mechanics": {
+      "synonymPairs": "+25% לזוגות נרדפים",
+      "etymologyRoots": "בונוס לשורשים לטיניים/יווניים",
+      "idioms": "אתגרי ביטויים נסתרים",
+      "compounds": "+30% למילים מורכבות",
+      "anagrams": "פתרו אנגרמות לבונוסים",
+      "palindromes": "+50% לפלינדרומים",
+      "rareWords": "+40% למילים נדירות/חדשות",
+      "multilingual": "בונוסים למילים רב-לשוניות",
+      "allMechanics": "כל המכניקות משולבות"
+    },
+    "objectives": {
+      "wordCount": "מצאו מילים",
+      "scoreTarget": "הגיעו לניקוד",
+      "clearIce": "הפשירו קרח",
+      "longWords": "מילים ארוכות (5+)",
+      "timeBonus": "זמן שנותר",
+      "collectGems": "אספו אבני חן"
+    },
+    "tiles": {
+      "gold": "זהב (x3 נקודות)",
+      "ice": "קרח (מכשול)",
+      "bomb": "פצצה (מנקה שורה)",
+      "rainbow": "קשת (ג'וקר)"
+    }
   }
 };
 

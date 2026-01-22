@@ -76,7 +76,7 @@ export default function PatternSwitcherPage() {
   if (isLoading || grid.length === 0) {
     return (
       <div className={cn(
-        'min-h-screen flex items-center justify-center',
+        'flex-1 flex items-center justify-center',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <motion.div
@@ -93,7 +93,7 @@ export default function PatternSwitcherPage() {
 
   return (
     <div className={cn(
-      'min-h-screen flex flex-col',
+      'flex-1 flex flex-col',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
       {/* Header */}

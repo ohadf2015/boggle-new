@@ -14,7 +14,7 @@ export default function LeaderboardError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-neo-navy">
+    <div className="flex-1 bg-neo-navy">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center py-12">
           <div className="mx-auto text-6xl text-gray-600 mb-4">🏆</div>

@@ -122,10 +122,10 @@ describe('Avatar Configuration', () => {
       expect(result).toHaveProperty('emoji');
       expect(result).toHaveProperty('color');
       expect(result.emoji).toBe('🥦');
-      expect(result.color).toBe('var(--avatar-10)');
+      expect(result.color).toBe('#52B788');
     });
 
-    test('should use CSS variables instead of hardcoded colors', () => {
+    test('should return hex colors for socket/database compatibility', () => {
       const avatarIds = [
         'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
         'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
@@ -136,12 +136,12 @@ describe('Avatar Configuration', () => {
 
       avatarIds.forEach(id => {
         const result = getAvatarEmojiAndColor(id);
-        // Color should be a CSS variable, not a hex code
-        expect(result.color).toMatch(/^var\(--avatar-\d+\)$/);
+        // Color should be a hex code for socket schema validation
+        expect(result.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
       });
     });
 
-    test('should NOT contain hardcoded hex colors', () => {
+    test('should return valid hex colors that pass socket validation', () => {
       const avatarIds = [
         'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
         'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
@@ -150,19 +150,19 @@ describe('Avatar Configuration', () => {
         'jelly-jen',
       ];
 
+      // Socket schema pattern: /^#[0-9A-Fa-f]{6}$/
+      const socketColorPattern = /^#[0-9A-Fa-f]{6}$/;
+
       avatarIds.forEach(id => {
         const result = getAvatarEmojiAndColor(id);
-        // Should NOT be hex color
-        expect(result.color).not.toMatch(/^#[0-9A-Fa-f]{6}$/);
-        // Should NOT be RGB
-        expect(result.color).not.toMatch(/^rgba?\(/);
+        expect(result.color).toMatch(socketColorPattern);
       });
     });
 
     test('should return default emoji and color for unknown ID', () => {
       const result = getAvatarEmojiAndColor('unknown-avatar');
       expect(result.emoji).toBe('🎯');
-      expect(result.color).toBe('var(--avatar-1)');
+      expect(result.color).toBe('#FF6B6B');
     });
 
     test('all avatars should have emojis', () => {
@@ -197,13 +197,13 @@ describe('Avatar Configuration', () => {
   });
 
   describe('Avatar Color Integration', () => {
-    test('avatar colors should be consistent with design system', () => {
-      // Test that avatar colors map to the numeric avatar slots correctly
+    test('avatar colors should be consistent with design system hex values', () => {
+      // Test that avatar colors map to the correct hex values
       const colorMappings = {
-        'broccoli-bob': 'var(--avatar-10)',
-        'drippy-drop': 'var(--avatar-2)',
-        'sunny-steve': 'var(--avatar-9)',
-        'pizza-pete': 'var(--avatar-1)',
+        'broccoli-bob': '#52B788',  // --avatar-10
+        'drippy-drop': '#4ECDC4',   // --avatar-2
+        'sunny-steve': '#F8B739',   // --avatar-9
+        'pizza-pete': '#FF6B6B',    // --avatar-1
       };
 
       Object.entries(colorMappings).forEach(([avatarId, expectedColor]) => {

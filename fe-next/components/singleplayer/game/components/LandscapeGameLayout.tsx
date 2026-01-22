@@ -35,6 +35,8 @@ export interface LandscapeGameLayoutProps {
   mode: string;
   // Combo
   comboLevel: number;
+  comboTimeRemaining: number | null;
+  comboDanger: boolean;
   maxCombo: number;
   comboCoinReward: number | null;
   onCoinAnimationComplete: () => void;
@@ -99,6 +101,8 @@ export function LandscapeGameLayout({
   totalTime,
   mode,
   comboLevel,
+  comboTimeRemaining,
+  comboDanger,
   maxCombo,
   comboCoinReward,
   onCoinAnimationComplete,
@@ -145,7 +149,7 @@ export function LandscapeGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900 text-white">
+    <div className="relative flex items-center justify-center w-full h-full flex-1 overflow-hidden bg-slate-900 text-white">
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
@@ -273,6 +277,8 @@ export function LandscapeGameLayout({
 
             <ComboDisplay
               comboLevel={comboLevel}
+              timeRemaining={comboTimeRemaining}
+              isDanger={comboDanger}
               coinReward={comboCoinReward}
               onCoinAnimationComplete={onCoinAnimationComplete}
               highContrast

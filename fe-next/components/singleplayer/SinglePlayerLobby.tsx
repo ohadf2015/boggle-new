@@ -373,7 +373,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="min-h-screen flex flex-col justify-start max-w-xl mx-auto space-y-3 sm:space-y-4 px-2 xs:px-4 py-4"
+        className="flex-1 flex flex-col justify-start max-w-xl mx-auto space-y-3 sm:space-y-4 px-2 xs:px-4 py-4"
       >
       {/* Title with back button */}
       <div className="relative flex items-center justify-center mb-1 px-16 overflow-visible">

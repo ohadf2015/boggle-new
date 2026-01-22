@@ -8,7 +8,7 @@ export default function NotFound() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">
+    <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">
       {/* Animated background decoration - floating letters */}
       <div className="absolute inset-0 pointer-events-none opacity-10">
         <div className="absolute top-[10%] left-[10%] text-6xl font-black text-neo-lime animate-float font-neo-display">?</div>

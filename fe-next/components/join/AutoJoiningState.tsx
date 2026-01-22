@@ -23,7 +23,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+    <div className="flex-1 bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
       <motion.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}

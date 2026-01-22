@@ -234,7 +234,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
+    <div className="flex-1 bg-neo-navy flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
 
       {/* Top Bar with Exit Button */}
       <div className="w-full max-w-6xl flex justify-end mb-4">

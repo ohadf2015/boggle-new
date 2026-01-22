@@ -36,7 +36,7 @@ export default function DailyChallengeRouter() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-neo-navy">
+    <div className="flex-1 flex flex-col bg-neo-navy">
       <Header />
 
       <DailyChallengeLanding

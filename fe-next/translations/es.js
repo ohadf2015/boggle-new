@@ -3589,6 +3589,61 @@ const es = {
     "sendError": "No se pudo enviar el regalo. Inténtalo de nuevo.",
     "step": "Paso",
     "of": "de"
+  },
+  "adventure": {
+    "title": "Modo Aventura",
+    "subtitle": "¡Viaja por 10 mundos temáticos, conquista 100 niveles y conviértete en el maestro de palabras definitivo!",
+    "progress": "Progreso",
+    "levels": "niveles",
+    "backToMap": "Volver al mapa del mundo",
+    "worldLabel": "Mundo",
+    "hiddenWord": "Palabra oculta",
+    "devPreview": "Vista previa de desarrollo",
+    "devPreviewDesc": "El Modo Aventura está en desarrollo. Esta vista previa muestra el mapa del mundo y la configuración de niveles.",
+    "exitToMap": "Salir al mapa",
+    "startLevel": "Iniciar nivel",
+    "levelComplete": "¡Nivel completado!",
+    "starsEarned": "Estrellas ganadas",
+    "continueToNext": "Continuar",
+    "retryLevel": "Reintentar",
+    "loadError": "Error al cargar el progreso",
+    "worlds": {
+      "alphabetMeadows": "Praderas del Alfabeto",
+      "synonymSprings": "Manantiales de Sinónimos",
+      "rootCaverns": "Cavernas de Raíces",
+      "idiomArchipelago": "Archipiélago de Modismos",
+      "compoundCanyon": "Cañón de Compuestos",
+      "anagramLabyrinth": "Laberinto de Anagramas",
+      "mirrorPalace": "Palacio de Espejos",
+      "neologismNebula": "Nebulosa de Neologismos",
+      "polyglotPeaks": "Cumbres Políglotas",
+      "lexiconThrone": "Trono del Léxico"
+    },
+    "mechanics": {
+      "synonymPairs": "+25% por pares de sinónimos",
+      "etymologyRoots": "Bonificación por raíces latinas/griegas",
+      "idioms": "Desafíos de modismos ocultos",
+      "compounds": "+30% por palabras compuestas",
+      "anagrams": "Resuelve anagramas para bonificaciones",
+      "palindromes": "+50% por palíndromos",
+      "rareWords": "+40% por palabras raras/nuevas",
+      "multilingual": "Bonificaciones de palabras multilingües",
+      "allMechanics": "Todas las mecánicas combinadas"
+    },
+    "objectives": {
+      "wordCount": "Encuentra palabras",
+      "scoreTarget": "Alcanza puntuación",
+      "clearIce": "Despeja hielo",
+      "longWords": "Palabras largas (5+)",
+      "timeBonus": "Tiempo restante",
+      "collectGems": "Colecciona gemas"
+    },
+    "tiles": {
+      "gold": "Oro (3x puntos)",
+      "ice": "Hielo (obstáculo)",
+      "bomb": "Bomba (despeja fila)",
+      "rainbow": "Arcoíris (comodín)"
+    }
   }
 };
 

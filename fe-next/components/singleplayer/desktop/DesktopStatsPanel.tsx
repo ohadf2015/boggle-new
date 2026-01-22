@@ -16,6 +16,10 @@ interface DesktopStatsPanelProps {
   totalTime: number;
   /** Current combo level */
   comboLevel: number;
+  /** Combo time remaining as percentage (0-100) */
+  comboTimeRemaining?: number | null;
+  /** Whether combo timer is in danger zone */
+  comboDanger?: boolean;
   /** Maximum combo achieved */
   maxCombo: number;
   /** Number of valid words found */
@@ -43,6 +47,8 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
   remainingTime,
   totalTime,
   comboLevel,
+  comboTimeRemaining,
+  comboDanger,
   maxCombo,
   wordsFound,
   totalBoardWords,
@@ -135,6 +141,8 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
         <ComboDisplay
           comboLevel={comboLevel}
           compact={false}
+          timeRemaining={comboTimeRemaining}
+          isDanger={comboDanger}
           coinReward={comboCoinReward}
           onCoinAnimationComplete={onCoinAnimationComplete}
         />

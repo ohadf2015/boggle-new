@@ -10,7 +10,7 @@ const DailyBuzzAdminPanel = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center min-h-screen bg-neo-navy">
+      <div className="flex-1 flex items-center justify-center bg-neo-navy">
         <NeoLoader variant="mascot-letters" size="lg" text="Loading admin panel..." />
       </div>
     ),
@@ -29,10 +29,10 @@ const DailyBuzzAdminPanel = dynamic(
  */
 export default function DailyBuzzAdminPage() {
   return (
-    <div className="min-h-screen bg-neo-navy py-12 px-4">
+    <div className="flex-1 flex flex-col bg-neo-navy py-12 px-4">
       <Suspense
         fallback={
-          <div className="flex items-center justify-center min-h-screen bg-neo-navy">
+          <div className="flex-1 flex items-center justify-center bg-neo-navy">
             <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
           </div>
         }

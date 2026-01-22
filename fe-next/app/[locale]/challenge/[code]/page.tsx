@@ -8,7 +8,7 @@ import { NeoLoader } from '@/components/ui/NeoLoader';
 // Dynamic import for code splitting
 const ChallengeView = nextDynamic(() => import('@/components/challenge/ChallengeView'), {
   loading: () => (
-    <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+    <div className="flex-1 flex items-center justify-center bg-neo-navy">
       <NeoLoader variant="mascot-letters" size="lg" text="Loading challenge..." />
     </div>
   ),

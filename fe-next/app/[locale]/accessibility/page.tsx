@@ -151,9 +151,9 @@ export default function AccessibilitySettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-neo-navy">
+    <div className="flex-1 flex flex-col bg-neo-navy">
       <Header />
-      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 pb-24 lg:pb-12">
+      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 page-content-safe">
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

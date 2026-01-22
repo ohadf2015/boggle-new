@@ -3,7 +3,7 @@
  * Defines all available character avatar images
  */
 
-import { getAvatarColorVar } from '@/lib/designSystem';
+import { getAvatarColorHex } from '@/lib/designSystem';
 
 export interface AvatarConfig {
   id: string;
@@ -126,28 +126,29 @@ export function mapEmojiToAvatar(emoji: string): AvatarConfig {
 
 /**
  * Avatar emoji and color mappings for leaderboard display
+ * Uses hex colors for socket/database compatibility
  */
 const AVATAR_EMOJI_COLOR_MAP: Record<string, { emoji: string; color: string }> = {
-  'broccoli-bob': { emoji: '🥦', color: getAvatarColorVar('broccoli-bob') },
-  'drippy-drop': { emoji: '💧', color: getAvatarColorVar('drippy-drop') },
-  'sunny-steve': { emoji: '☀️', color: getAvatarColorVar('sunny-steve') },
-  'cloudy-carl': { emoji: '☁️', color: getAvatarColorVar('cloudy-carl') },
-  'octo-otto': { emoji: '🐙', color: getAvatarColorVar('octo-otto') },
-  'pizza-pete': { emoji: '🍕', color: getAvatarColorVar('pizza-pete') },
-  'prickly-pat': { emoji: '🌵', color: getAvatarColorVar('prickly-pat') },
-  'melon-molly': { emoji: '🍉', color: getAvatarColorVar('melon-molly') },
-  'avo-alex': { emoji: '🥑', color: getAvatarColorVar('avo-alex') },
-  'frosty-frank': { emoji: '🧊', color: getAvatarColorVar('frosty-frank') },
-  'flaky-fred': { emoji: '🥐', color: getAvatarColorVar('flaky-fred') },
-  'eggy-ed': { emoji: '🥚', color: getAvatarColorVar('eggy-ed') },
-  'slimy-sam': { emoji: '🦠', color: getAvatarColorVar('slimy-sam') },
-  'starry-stella': { emoji: '⭐', color: getAvatarColorVar('starry-stella') },
-  'shroom-shelly': { emoji: '🍄', color: getAvatarColorVar('shroom-shelly') },
-  'donut-danny': { emoji: '🍩', color: getAvatarColorVar('donut-danny') },
-  'jelly-jen': { emoji: '🪼', color: getAvatarColorVar('jelly-jen') },
+  'broccoli-bob': { emoji: '🥦', color: getAvatarColorHex('broccoli-bob') },
+  'drippy-drop': { emoji: '💧', color: getAvatarColorHex('drippy-drop') },
+  'sunny-steve': { emoji: '☀️', color: getAvatarColorHex('sunny-steve') },
+  'cloudy-carl': { emoji: '☁️', color: getAvatarColorHex('cloudy-carl') },
+  'octo-otto': { emoji: '🐙', color: getAvatarColorHex('octo-otto') },
+  'pizza-pete': { emoji: '🍕', color: getAvatarColorHex('pizza-pete') },
+  'prickly-pat': { emoji: '🌵', color: getAvatarColorHex('prickly-pat') },
+  'melon-molly': { emoji: '🍉', color: getAvatarColorHex('melon-molly') },
+  'avo-alex': { emoji: '🥑', color: getAvatarColorHex('avo-alex') },
+  'frosty-frank': { emoji: '🧊', color: getAvatarColorHex('frosty-frank') },
+  'flaky-fred': { emoji: '🥐', color: getAvatarColorHex('flaky-fred') },
+  'eggy-ed': { emoji: '🥚', color: getAvatarColorHex('eggy-ed') },
+  'slimy-sam': { emoji: '🦠', color: getAvatarColorHex('slimy-sam') },
+  'starry-stella': { emoji: '⭐', color: getAvatarColorHex('starry-stella') },
+  'shroom-shelly': { emoji: '🍄', color: getAvatarColorHex('shroom-shelly') },
+  'donut-danny': { emoji: '🍩', color: getAvatarColorHex('donut-danny') },
+  'jelly-jen': { emoji: '🪼', color: getAvatarColorHex('jelly-jen') },
 };
 
-const DEFAULT_EMOJI_COLOR = { emoji: '🎯', color: 'var(--avatar-1)' };
+const DEFAULT_EMOJI_COLOR = { emoji: '🎯', color: '#FF6B6B' };
 
 /**
  * Get emoji and color for an avatar ID

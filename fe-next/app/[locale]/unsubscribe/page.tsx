@@ -47,7 +47,7 @@ export default function UnsubscribePage() {
   };
 
   return (
-    <div className="min-h-screen bg-neo-navy text-neo-cream flex items-center justify-center p-4">
+    <div className="flex-1 flex flex-col bg-neo-navy text-neo-cream items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

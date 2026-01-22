@@ -135,7 +135,7 @@ export const PROFILE_SELECTS = {
   // Auth and settings fields
   settings: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, profile_picture_provider, has_customized_profile, is_admin, country_code, daily_email_subscribed, timezone',
   // Full profile (use sparingly - only when all fields needed)
-  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, profile_picture_provider, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone'
+  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, profile_picture_provider, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone, gift_modal_dismissed_at'
 } as const;
 
 export type ProfileSelectType = keyof typeof PROFILE_SELECTS;

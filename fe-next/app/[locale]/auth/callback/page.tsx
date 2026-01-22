@@ -72,7 +72,7 @@ function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIPr
   const isRtl = locale === 'he';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neo-navy" dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className="flex-1 flex items-center justify-center bg-neo-navy" dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="flex flex-col items-center gap-6">
         <NeoLoader variant="mascot-letters" size="lg" text={t('auth.callback.completingSignIn')} />
 
@@ -481,7 +481,7 @@ function AuthCallbackContent(): React.ReactNode {
 // Simple fallback for Suspense - no retry logic needed during initial load
 function SuspenseFallback(): React.ReactNode {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+    <div className="flex-1 flex items-center justify-center bg-neo-navy">
       <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
     </div>
   );

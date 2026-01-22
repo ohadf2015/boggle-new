@@ -55,7 +55,7 @@ export default function AdminPage() {
   // Not authenticated or not admin (but only check after profile has loaded)
   if (!authLoading && !isProfileLoading && (!user || !isAdmin)) {
     return (
-      <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
+      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-neo-lime mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
@@ -76,17 +76,17 @@ export default function AdminPage() {
   // Loading state
   if (authLoading || isProfileLoading || !authToken) {
     return (
-      <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
+      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
       </div>
     );
   }
 
   const content = (
-    <div className={cn('min-h-screen bg-neo-navy', isRTL && 'rtl')}>
+    <div className={cn('flex-1 flex flex-col bg-neo-navy', isRTL && 'rtl')}>
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -212,7 +212,7 @@ export default function AdminPage() {
             userName={profile?.display_name || profile?.username}
           />
         </div>
-      </main>
+      </div>
     </div>
   );
 

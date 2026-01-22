@@ -119,7 +119,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-4 pb-24 min-h-0 overflow-y-auto">
+        <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-4 min-h-0 overflow-y-auto">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

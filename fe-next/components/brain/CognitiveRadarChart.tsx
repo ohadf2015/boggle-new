@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   RadarChart,
@@ -15,72 +15,7 @@ import { Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-/**
- * Hook to track container dimensions and only render when valid
- * Prevents Recharts "width(-1) and height(-1)" warning
- *
- * Enhanced with:
- * - Client-side hydration check to avoid SSR/hydration dimension mismatches
- * - Delayed initial measurement to allow layout to stabilize
- * - Multiple measurement attempts for mobile browsers with slow layout
- */
-function useContainerDimensions() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  // Hydration safety: only run dimension checks on client
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    // Skip dimension checks during SSR/hydration
-    if (!isClient) return;
-
-    const checkDimensions = () => {
-      if (containerRef.current) {
-        const { clientWidth, clientHeight } = containerRef.current;
-        // Only mark as ready if dimensions are valid (>= 100 for minimum usable chart)
-        if (clientWidth >= 100 && clientHeight >= 100) {
-          setDimensions({ width: clientWidth, height: clientHeight });
-        } else {
-          // Reset if dimensions become too small
-          setDimensions(null);
-        }
-      }
-    };
-
-    // Delay initial check to allow layout to settle after animations
-    // This is especially important for mobile Chrome where layout can be slow
-    const initialDelay = setTimeout(checkDimensions, 50);
-
-    // Also check on next frame in case of layout shift
-    const frameId = requestAnimationFrame(() => {
-      // Additional frame delay for animation completion
-      requestAnimationFrame(checkDimensions);
-    });
-
-    // Set up resize observer for dynamic changes
-    const observer = new ResizeObserver(checkDimensions);
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    // Add polling as fallback for edge cases (reduced frequency)
-    const pollInterval = setInterval(checkDimensions, 250);
-
-    return () => {
-      clearTimeout(initialDelay);
-      cancelAnimationFrame(frameId);
-      observer.disconnect();
-      clearInterval(pollInterval);
-    };
-  }, [isClient]);
-
-  return { containerRef, dimensions, isReady: isClient && dimensions !== null };
-}
+import { useContainerDimensions } from '@/hooks/useContainerDimensions';
 
 interface CognitiveRadarChartProps {
   domains: {
