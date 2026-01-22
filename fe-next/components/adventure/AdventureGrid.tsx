@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
 
@@ -32,6 +32,12 @@ interface AdventureGridProps {
   onTileSelect?: (index: number, tile: GridTileState) => void;
   /** Callback when word is submitted */
   onWordSubmit?: (word: string, indices: number[]) => void;
+  /** Callback when drag selection starts */
+  onDragStart?: (index: number, tile: GridTileState) => void;
+  /** Callback when drag enters a new tile */
+  onDragEnter?: (index: number, tile: GridTileState) => void;
+  /** Callback when drag selection ends */
+  onDragEnd?: () => void;
   /** Additional CSS classes */
   className?: string;
 }
@@ -76,8 +82,18 @@ const AdventureGrid = memo<AdventureGridProps>(
     showWordPreview = false,
     onTileSelect,
     onWordSubmit,
+    onDragStart,
+    onDragEnter,
+    onDragEnd,
     className,
   }) => {
+    // Track whether we're currently dragging
+    const isDraggingRef = useRef(false);
+    // Track last tile index for touch move to prevent duplicate calls
+    const lastTouchTileIndexRef = useRef<number | null>(null);
+    // Ref to grid container for touch event handling
+    const gridRef = useRef<HTMLDivElement>(null);
+
     // Build selected set for quick lookup
     const selectedSet = useMemo(
       () => new Set(selectedIndices),
@@ -100,13 +116,93 @@ const AdventureGrid = memo<AdventureGridProps>(
       [disabled, interactive, onTileSelect]
     );
 
+    // Handle drag start (mouse down / touch start on tile)
+    const handleDragStart = useCallback(
+      (index: number, tile: GridTileState) => {
+        if (disabled || tile.isCleared || !interactive) return;
+        isDraggingRef.current = true;
+        lastTouchTileIndexRef.current = index;
+        if (onDragStart) {
+          onDragStart(index, tile);
+        }
+      },
+      [disabled, interactive, onDragStart]
+    );
+
+    // Handle drag enter (mouse enters tile during drag)
+    const handleDragEnter = useCallback(
+      (index: number, tile: GridTileState) => {
+        if (disabled || tile.isCleared || !interactive) return;
+        if (isDraggingRef.current && onDragEnter) {
+          onDragEnter(index, tile);
+        }
+      },
+      [disabled, interactive, onDragEnter]
+    );
+
+    // Handle drag end (mouse up)
+    const handleDragEnd = useCallback(() => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        lastTouchTileIndexRef.current = null;
+        if (onDragEnd) {
+          onDragEnd();
+        }
+      }
+    }, [onDragEnd]);
+
+    // Handle touch move - find element under touch and trigger drag enter
+    const handleTouchMove = useCallback(
+      (e: React.TouchEvent) => {
+        if (!isDraggingRef.current || disabled || !interactive) return;
+
+        const touch = e.touches[0];
+        if (!touch) return;
+
+        // Find element under touch point
+        const elementUnderTouch = document.elementFromPoint(
+          touch.clientX,
+          touch.clientY
+        );
+
+        if (!elementUnderTouch) return;
+
+        // Find the gridcell parent (tile element)
+        const tileElement = elementUnderTouch.closest('[role="gridcell"]');
+        if (!tileElement) return;
+
+        // Get the tile index from data attribute or find it in the grid
+        const allTiles = gridRef.current?.querySelectorAll('[role="gridcell"]');
+        if (!allTiles) return;
+
+        const tileIndex = Array.from(allTiles).indexOf(tileElement);
+        if (tileIndex === -1) return;
+
+        // Skip if same tile as last touch
+        if (tileIndex === lastTouchTileIndexRef.current) return;
+        lastTouchTileIndexRef.current = tileIndex;
+
+        const tile = tiles[tileIndex];
+        if (!tile || tile.isCleared) return;
+
+        // Trigger drag enter
+        if (onDragEnter) {
+          onDragEnter(tileIndex, tile);
+        }
+      },
+      [disabled, interactive, tiles, onDragEnter]
+    );
+
     // Handle word submission (on mouse/touch up)
     const handleMouseUp = useCallback(() => {
+      // Call drag end first
+      handleDragEnd();
+
       if (disabled || selectedIndices.length === 0) return;
       if (onWordSubmit) {
         onWordSubmit(formedWord, selectedIndices);
       }
-    }, [disabled, selectedIndices, formedWord, onWordSubmit]);
+    }, [disabled, selectedIndices, formedWord, onWordSubmit, handleDragEnd]);
 
     // Get aria-label for tile
     const getTileAriaLabel = useCallback((tile: GridTileState): string => {
@@ -131,9 +227,11 @@ const AdventureGrid = memo<AdventureGridProps>(
 
         {/* Grid */}
         <div
+          ref={gridRef}
           role="grid"
           aria-label="Adventure game board"
           onMouseUp={interactive ? handleMouseUp : undefined}
+          onTouchMove={interactive ? handleTouchMove : undefined}
           onTouchEnd={interactive ? handleMouseUp : undefined}
           className={cn(
             'adventure-grid',
@@ -155,6 +253,9 @@ const AdventureGrid = memo<AdventureGridProps>(
                 aria-label={getTileAriaLabel(tile)}
                 aria-selected={isSelected}
                 onClick={() => handleTileClick(index, tile)}
+                onMouseDown={() => handleDragStart(index, tile)}
+                onMouseEnter={() => handleDragEnter(index, tile)}
+                onTouchStart={() => handleDragStart(index, tile)}
                 style={{
                   animationDelay: tile.cascadeDelay
                     ? `${tile.cascadeDelay}ms`

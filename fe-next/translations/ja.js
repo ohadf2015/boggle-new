@@ -2222,6 +2222,8 @@ const ja = {
     "multiplayerDesc": "リアルタイムで友達と対戦！",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
+    "adventureMode": "アドベンチャー",
+    "adventureModeDesc": "10の世界で100レベル",
     "signInToUnlock": "ログインして解除",
     "openRooms": "部屋が開放中",
     "playersLive": "プレイ中",
@@ -3443,11 +3445,33 @@ const ja = {
     "nav": {
       "players": "プレイヤー",
       "dictionary": "辞書",
+      "invalidWords": "無効な単語",
       "dailyChallenge": "デイリーチャレンジ",
       "wikipediaWords": "Wikipedia単語",
       "dailyBuzz": "デイリーバズ",
       "webVitals": "Webパフォーマンス",
       "email": "メール"
+    },
+    "invalidWords": {
+      "title": "無効な単語の確認",
+      "subtitle": "3回以上送信されたが検証されていない単語",
+      "word": "単語",
+      "language": "言語",
+      "count": "送信回数",
+      "reason": "理由",
+      "firstSubmitted": "初回送信",
+      "lastSubmitted": "最終送信",
+      "approve": "承認",
+      "approved": "承認済み",
+      "dismiss": "却下",
+      "addToDictionary": "辞書に追加",
+      "noResults": "しきい値を満たす無効な単語がありません",
+      "pendingReview": "確認待ち",
+      "reasons": {
+        "not_on_board": "ボード上にない",
+        "not_in_dictionary": "辞書にない",
+        "peer_rejected": "プレイヤーに拒否された"
+      }
     },
     "live": {
       "subtitle": "リアルタイムゲーム監視",
@@ -3646,6 +3670,14 @@ const ja = {
       "ice": "氷（障害物）",
       "bomb": "爆弾（行をクリア）",
       "rainbow": "レインボー（ワイルドカード）"
+    },
+    "errors": {
+      "tooShort": "単語が短すぎます",
+      "invalidPath": "無効なパス - タイルは隣接している必要があります",
+      "wordMismatch": "単語が選択したタイルと一致しません",
+      "alreadyFound": "この単語は既に見つかっています",
+      "notInDictionary": "辞書にない単語です",
+      "validationFailed": "単語を検証できませんでした"
     }
   }
 };

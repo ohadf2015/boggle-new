@@ -2216,6 +2216,8 @@ const sv = {
     "multiplayerDesc": "Tävla med vänner i realtid!",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
+    "adventureMode": "Äventyr",
+    "adventureModeDesc": "100 nivåer i 10 världar",
     "signInToUnlock": "Logga in för att låsa upp",
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
@@ -3370,11 +3372,33 @@ const sv = {
     "nav": {
       "players": "Spelare",
       "dictionary": "Ordbok",
+      "invalidWords": "Ogiltiga Ord",
       "dailyChallenge": "Daglig Utmaning",
       "wikipediaWords": "Wikipedia-ord",
       "dailyBuzz": "Dagligt Buzz",
       "webVitals": "Webbprestanda",
       "email": "E-post"
+    },
+    "invalidWords": {
+      "title": "Granskning av Ogiltiga Ord",
+      "subtitle": "Ord inskickade 3+ gånger men ej validerade",
+      "word": "Ord",
+      "language": "Språk",
+      "count": "Antal Inskickningar",
+      "reason": "Orsak",
+      "firstSubmitted": "Först Inskickad",
+      "lastSubmitted": "Senast Inskickad",
+      "approve": "Godkänn",
+      "approved": "Godkänd",
+      "dismiss": "Avvisa",
+      "addToDictionary": "Lägg till i ordbok",
+      "noResults": "Inga ogiltiga ord som når tröskeln",
+      "pendingReview": "Väntar på Granskning",
+      "reasons": {
+        "not_on_board": "Inte på brädet",
+        "not_in_dictionary": "Inte i ordboken",
+        "peer_rejected": "Avvisad av spelare"
+      }
     },
     "live": {
       "subtitle": "Spelövervakning i realtid",
@@ -3640,6 +3664,14 @@ const sv = {
       "ice": "Is (hinder)",
       "bomb": "Bomb (rensar rad)",
       "rainbow": "Regnbåge (joker)"
+    },
+    "errors": {
+      "tooShort": "Ordet är för kort",
+      "invalidPath": "Ogiltig väg - rutorna måste vara intill varandra",
+      "wordMismatch": "Ordet matchar inte valda rutor",
+      "alreadyFound": "Ordet har redan hittats",
+      "notInDictionary": "Ordet finns inte i ordboken",
+      "validationFailed": "Kunde inte validera ordet"
     }
   }
 };

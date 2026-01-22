@@ -2225,6 +2225,8 @@ const en = {
     "multiplayerDesc": "Live word battles!",
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "Track cognitive growth",
+    "adventureMode": "Adventure",
+    "adventureModeDesc": "100 levels across 10 worlds",
     "signInToUnlock": "Sign in to unlock",
     "openRooms": "rooms",
     "playersLive": "live",
@@ -3379,11 +3381,33 @@ const en = {
     "nav": {
       "players": "Players",
       "dictionary": "Dictionary",
+      "invalidWords": "Invalid Words",
       "dailyChallenge": "Daily Challenge",
       "wikipediaWords": "Wikipedia Words",
       "dailyBuzz": "Daily Buzz",
       "webVitals": "Web Vitals",
       "email": "Email"
+    },
+    "invalidWords": {
+      "title": "Invalid Words Review",
+      "subtitle": "Words submitted 3+ times but not validated",
+      "word": "Word",
+      "language": "Language",
+      "count": "Times Submitted",
+      "reason": "Reason",
+      "firstSubmitted": "First Submitted",
+      "lastSubmitted": "Last Submitted",
+      "approve": "Approve",
+      "approved": "Approved",
+      "dismiss": "Dismiss",
+      "addToDictionary": "Add to dictionary",
+      "noResults": "No invalid words meeting threshold",
+      "pendingReview": "Pending Review",
+      "reasons": {
+        "not_on_board": "Not on board",
+        "not_in_dictionary": "Not in dictionary",
+        "peer_rejected": "Peer rejected"
+      }
     },
     "live": {
       "subtitle": "Real-time game monitoring",
@@ -3661,7 +3685,15 @@ const en = {
     "starsEarned": "Stars Earned",
     "continueToNext": "Continue",
     "retryLevel": "Retry",
-    "loadError": "Failed to load progress"
+    "loadError": "Failed to load progress",
+    "errors": {
+      "tooShort": "Word is too short",
+      "invalidPath": "Invalid path - tiles must be adjacent",
+      "wordMismatch": "Word doesn't match selected tiles",
+      "alreadyFound": "Word already found",
+      "notInDictionary": "Word not in dictionary",
+      "validationFailed": "Could not validate word"
+    }
   }
 };
 

@@ -197,7 +197,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
           <>
             <motion.div
-              className="absolute top-2 right-16"
+              className="absolute top-2 right-16 rtl:right-auto rtl:left-16"
               animate={{
                 rotate: [0, 15, -15, 0],
                 scale: [1, 1.3, 1],
@@ -212,7 +212,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               <Sparkles className="w-4 h-4 text-yellow-100" />
             </motion.div>
             <motion.div
-              className="absolute top-1 right-8"
+              className="absolute top-1 right-8 rtl:right-auto rtl:left-8"
               animate={{
                 rotate: [0, -10, 10, 0],
                 scale: [1, 1.2, 1],
@@ -228,7 +228,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               <Star className="w-3 h-3 text-yellow-100 fill-yellow-100" />
             </motion.div>
             <motion.div
-              className="absolute bottom-2 right-4"
+              className="absolute bottom-2 right-4 rtl:right-auto rtl:left-4"
               animate={{
                 rotate: [0, 20, -20, 0],
                 scale: [0.8, 1.1, 0.8],

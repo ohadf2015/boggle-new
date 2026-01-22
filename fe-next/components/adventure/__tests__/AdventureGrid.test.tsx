@@ -420,4 +420,229 @@ describe('AdventureGrid', () => {
       expect(grid).toHaveClass('adventure-grid-disabled');
     });
   });
+
+  describe('Drag Selection', () => {
+    it('should call onDragStart when mouse is pressed on tile', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragStart = jest.fn();
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragStart={onDragStart}
+          interactive
+        />
+      );
+
+      const cells = screen.getAllByRole('gridcell');
+      fireEvent.mouseDown(cells[0]);
+
+      // THEN
+      expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
+    });
+
+    it('should call onDragEnter when mouse enters tile during drag', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragEnter = jest.fn();
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragEnter={onDragEnter}
+          interactive
+        />
+      );
+
+      const cells = screen.getAllByRole('gridcell');
+      // Simulate drag: mouseDown on cell 0, then mouseEnter on cell 1
+      fireEvent.mouseDown(cells[0]);
+      fireEvent.mouseEnter(cells[1]);
+
+      // THEN
+      expect(onDragEnter).toHaveBeenCalledWith(1, tiles[1]);
+    });
+
+    it('should not call onDragEnter when not dragging', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragEnter = jest.fn();
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragEnter={onDragEnter}
+          interactive
+        />
+      );
+
+      const cells = screen.getAllByRole('gridcell');
+      // Just mouseEnter without mouseDown
+      fireEvent.mouseEnter(cells[1]);
+
+      // THEN
+      expect(onDragEnter).not.toHaveBeenCalled();
+    });
+
+    it('should call onDragEnd when mouse is released', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragEnd = jest.fn();
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragEnd={onDragEnd}
+          interactive
+        />
+      );
+
+      const cells = screen.getAllByRole('gridcell');
+      fireEvent.mouseDown(cells[0]);
+      fireEvent.mouseUp(cells[0]);
+
+      // THEN
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+
+    it('should not call drag handlers when disabled', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragStart = jest.fn();
+      const onDragEnter = jest.fn();
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragStart={onDragStart}
+          onDragEnter={onDragEnter}
+          interactive
+          disabled
+        />
+      );
+
+      const cells = screen.getAllByRole('gridcell');
+      fireEvent.mouseDown(cells[0]);
+      fireEvent.mouseEnter(cells[1]);
+
+      // THEN
+      expect(onDragStart).not.toHaveBeenCalled();
+      expect(onDragEnter).not.toHaveBeenCalled();
+    });
+
+    it('should handle touch events for drag selection', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragStart = jest.fn();
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragStart={onDragStart}
+          interactive
+        />
+      );
+
+      const cells = screen.getAllByRole('gridcell');
+      fireEvent.touchStart(cells[0]);
+
+      // THEN
+      expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
+    });
+
+    it('should handle touch move to select tiles during drag', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragStart = jest.fn();
+      const onDragEnter = jest.fn();
+
+      // Mock document.elementFromPoint to return grid cells
+      const originalElementFromPoint = document.elementFromPoint;
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragStart={onDragStart}
+          onDragEnter={onDragEnter}
+          interactive
+        />
+      );
+
+      const grid = screen.getByRole('grid');
+      const cells = screen.getAllByRole('gridcell');
+
+      // Start drag on first cell
+      fireEvent.touchStart(cells[0]);
+      expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
+
+      // Mock elementFromPoint to return second cell
+      document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
+
+      // Simulate touch move
+      fireEvent.touchMove(grid, {
+        touches: [{ clientX: 100, clientY: 100 }],
+      });
+
+      // THEN
+      expect(onDragEnter).toHaveBeenCalledWith(1, tiles[1]);
+
+      // Restore original
+      document.elementFromPoint = originalElementFromPoint;
+    });
+
+    it('should not call onDragEnter twice for same tile during touch move', () => {
+      // GIVEN
+      const tiles = createMockTiles(4);
+      const onDragStart = jest.fn();
+      const onDragEnter = jest.fn();
+
+      const originalElementFromPoint = document.elementFromPoint;
+
+      // WHEN
+      render(
+        <AdventureGrid
+          tiles={tiles}
+          gridSize={4}
+          onDragStart={onDragStart}
+          onDragEnter={onDragEnter}
+          interactive
+        />
+      );
+
+      const grid = screen.getByRole('grid');
+      const cells = screen.getAllByRole('gridcell');
+
+      // Start drag
+      fireEvent.touchStart(cells[0]);
+
+      // Mock elementFromPoint to return second cell
+      document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
+
+      // Simulate multiple touch moves on same cell
+      fireEvent.touchMove(grid, { touches: [{ clientX: 100, clientY: 100 }] });
+      fireEvent.touchMove(grid, { touches: [{ clientX: 101, clientY: 101 }] });
+      fireEvent.touchMove(grid, { touches: [{ clientX: 102, clientY: 102 }] });
+
+      // THEN - should only be called once despite multiple touch moves
+      expect(onDragEnter).toHaveBeenCalledTimes(1);
+
+      // Restore original
+      document.elementFromPoint = originalElementFromPoint;
+    });
+  });
 });

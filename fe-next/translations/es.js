@@ -2219,6 +2219,8 @@ const es = {
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
+    "adventureMode": "Aventura",
+    "adventureModeDesc": "100 niveles en 10 mundos",
     "signInToUnlock": "Inicia sesión para desbloquear",
     "openRooms": "salas abiertas",
     "playersLive": "jugando ahora",
@@ -3373,11 +3375,33 @@ const es = {
     "nav": {
       "players": "Jugadores",
       "dictionary": "Diccionario",
+      "invalidWords": "Palabras Inválidas",
       "dailyChallenge": "Desafío Diario",
       "wikipediaWords": "Palabras Wikipedia",
       "dailyBuzz": "Buzz Diario",
       "webVitals": "Rendimiento Web",
       "email": "Correo"
+    },
+    "invalidWords": {
+      "title": "Revisión de Palabras Inválidas",
+      "subtitle": "Palabras enviadas 3+ veces pero no validadas",
+      "word": "Palabra",
+      "language": "Idioma",
+      "count": "Veces Enviada",
+      "reason": "Razón",
+      "firstSubmitted": "Primera Vez",
+      "lastSubmitted": "Última Vez",
+      "approve": "Aprobar",
+      "approved": "Aprobada",
+      "dismiss": "Descartar",
+      "addToDictionary": "Agregar al diccionario",
+      "noResults": "No hay palabras inválidas que cumplan el umbral",
+      "pendingReview": "Pendiente de Revisión",
+      "reasons": {
+        "not_on_board": "No está en el tablero",
+        "not_in_dictionary": "No está en el diccionario",
+        "peer_rejected": "Rechazada por jugadores"
+      }
     },
     "live": {
       "subtitle": "Monitoreo de juegos en tiempo real",
@@ -3643,6 +3667,14 @@ const es = {
       "ice": "Hielo (obstáculo)",
       "bomb": "Bomba (despeja fila)",
       "rainbow": "Arcoíris (comodín)"
+    },
+    "errors": {
+      "tooShort": "La palabra es muy corta",
+      "invalidPath": "Ruta inválida - las fichas deben ser adyacentes",
+      "wordMismatch": "La palabra no coincide con las fichas seleccionadas",
+      "alreadyFound": "Esta palabra ya fue encontrada",
+      "notInDictionary": "La palabra no está en el diccionario",
+      "validationFailed": "No se pudo validar la palabra"
     }
   }
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -136,6 +136,16 @@ export default function AdminPage() {
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
               <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dictionary')}</span>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/invalid-words`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.invalidWords') || 'Invalid Words'}</span>
             </CardContent>
           </Card>
 

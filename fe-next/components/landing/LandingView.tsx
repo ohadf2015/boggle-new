@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Lock } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Lock, Map } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -400,15 +400,40 @@ const LandingView: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Brain Training Card - Compact, spans both columns */}
+            {/* Adventure Mode Card - Compact */}
+            <motion.div
+              whileHover={{
+                scale: 1.03,
+                boxShadow: '0 0 25px rgba(255, 107, 53, 0.5), 0 0 50px rgba(255, 107, 53, 0.3), 6px 6px 0px black'
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Link
+                href={`/${language}/adventure`}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'bg-gradient-to-br from-neo-orange to-amber-500',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                )}
+                aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
+              >
+                <Map className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.adventureMode') || 'Adventure'}</span>
+              </Link>
+            </motion.div>
+
+            {/* Brain Training Card - Compact */}
             {/* Show loading state during auth check to prevent UI flicker */}
             {authLoading ? (
               <div
                 className={cn(
-                  'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-purple to-purple-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[80px] sm:min-h-[100px]',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
                   'cursor-wait'
                 )}
                 aria-label={`${t('landing.brainTraining') || 'Brain Training'} - Loading`}
@@ -419,9 +444,8 @@ const LandingView: React.FC = () => {
               </div>
             ) : isAuthenticated ? (
               <motion.div
-                className="col-span-2"
                 whileHover={{
-                  scale: 1.02,
+                  scale: 1.03,
                   boxShadow: '0 0 25px rgba(139, 92, 246, 0.5), 0 0 50px rgba(139, 92, 246, 0.3), 6px 6px 0px black'
                 }}
                 whileTap={{ scale: 0.98 }}
@@ -433,7 +457,7 @@ const LandingView: React.FC = () => {
                     'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                     'bg-gradient-to-br from-neo-purple to-purple-400',
                     'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                    'transition-all min-h-[80px] sm:min-h-[100px]',
+                    'transition-all min-h-[100px] sm:min-h-[120px]',
                     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                   )}
                   aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
@@ -446,10 +470,10 @@ const LandingView: React.FC = () => {
               <motion.button
                 onClick={() => setShowAuthModal(true)}
                 className={cn(
-                  'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
+                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
                   'bg-gradient-to-br from-neo-purple to-purple-400 grayscale',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[80px] sm:min-h-[100px]',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 whileHover={{ scale: 1.02 }}
@@ -520,21 +544,27 @@ const LandingView: React.FC = () => {
                 variant="cyan"
               />
 
-              {/* Brain Training card - centered below primary cards */}
-              <div className="col-span-1 sm:col-span-2 flex justify-center w-full">
-                <ModeCard
-                  title={t('landing.brainTraining') || 'Brain Training'}
-                  description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
-                  href={`/${language}/brain`}
-                  icon={<Brain className="w-6 h-6" />}
-                  variant="purple"
-                  secondary
-                  loading={authLoading}
-                  locked={!isAuthenticated}
-                  lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
-                  onLockedClick={() => setShowAuthModal(true)}
-                />
-              </div>
+              {/* Secondary cards - Adventure Mode and Brain Training */}
+              <ModeCard
+                title={t('landing.adventureMode') || 'Adventure'}
+                description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
+                href={`/${language}/adventure`}
+                icon={<Map className="w-6 h-6" />}
+                variant="orange"
+                secondary
+              />
+              <ModeCard
+                title={t('landing.brainTraining') || 'Brain Training'}
+                description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
+                href={`/${language}/brain`}
+                icon={<Brain className="w-6 h-6" />}
+                variant="purple"
+                secondary
+                loading={authLoading}
+                locked={!isAuthenticated}
+                lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
+                onLockedClick={() => setShowAuthModal(true)}
+              />
             </div>
           </div>
         )}

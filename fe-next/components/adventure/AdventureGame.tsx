@@ -10,7 +10,10 @@
 import React, { memo, useCallback, useState, useEffect, useMemo } from 'react';
 import { Pause, Play, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
+import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
+import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -81,10 +84,34 @@ const AdventureGame = memo<AdventureGameProps>(
     // Flatten tiles for AdventureGrid component
     const tiles = useMemo(() => flattenTiles(tiles2D), [tiles2D]);
 
+    // Language context for translations
+    const { t, language } = useLanguage();
+
     // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
-    const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+    const [validationError, setValidationError] = useState<string | null>(null);
+
+    // Word validation hook (must come before selection hook which depends on isValidating)
+    const { validateWord, isValidating } = useAdventureWordValidation({
+      grid: initialGrid,
+      language: language || 'en',
+      minWordLength: 3,
+      foundWords: gameState.wordsFound,
+    });
+
+    // Selection hook with adjacency validation
+    const {
+      selectedIndices,
+      currentWord,
+      selectTile,
+      clearSelection,
+      getPath,
+    } = useAdventureSelection({
+      tiles,
+      gridSize: levelConfig.gridSize,
+      disabled: !isPlaying || isPaused || isValidating,
+    });
 
     // Start game on mount
     useEffect(() => {
@@ -112,34 +139,64 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [isPaused, startGame, pauseGame]);
 
-    // Handle tile selection
+    // Handle tile selection (for click)
     const handleTileSelect = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused) return;
-
-        setSelectedIndices((prev) => {
-          // If tile already selected, deselect
-          if (prev.includes(index)) {
-            return prev.filter((i) => i !== index);
-          }
-          // Add to selection
-          return [...prev, index];
-        });
+        if (!isPlaying || isPaused || isValidating) return;
+        selectTile(index);
       },
-      [isPlaying, isPaused]
+      [isPlaying, isPaused, isValidating, selectTile]
     );
 
-    // Handle word submission
-    const handleWordSubmit = useCallback(
-      (word: string, indices: number[]) => {
-        if (!isPlaying || isPaused || word.length < 3) return;
-
-        // Calculate base score (simple implementation)
-        const baseScore = word.length * 10;
-        submitWord(word, baseScore);
-        setSelectedIndices([]);
+    // Handle drag start
+    const handleDragStart = useCallback(
+      (index: number, _tile: GridTileState) => {
+        if (!isPlaying || isPaused || isValidating) return;
+        // Clear previous selection and start new one
+        clearSelection();
+        selectTile(index);
       },
-      [isPlaying, isPaused, submitWord]
+      [isPlaying, isPaused, isValidating, clearSelection, selectTile]
+    );
+
+    // Handle drag enter (when dragging over tiles)
+    const handleDragEnter = useCallback(
+      (index: number, _tile: GridTileState) => {
+        if (!isPlaying || isPaused || isValidating) return;
+        selectTile(index);
+      },
+      [isPlaying, isPaused, isValidating, selectTile]
+    );
+
+    // Handle word submission with validation
+    const handleWordSubmit = useCallback(
+      async (_word: string, _indices: number[]) => {
+        // Use currentWord and getPath() from selection hook for validated path
+        if (!isPlaying || isPaused || currentWord.length < 3 || isValidating) return;
+
+        // Clear any previous error
+        setValidationError(null);
+
+        // Get validated path from selection hook
+        const path = getPath();
+
+        // Validate word
+        const result = await validateWord(currentWord, path);
+
+        if (result.isValid && result.score) {
+          // Valid word - submit with calculated score
+          submitWord(currentWord, result.score);
+          clearSelection();
+        } else if (result.errorKey) {
+          // Invalid word - show error
+          setValidationError(t(result.errorKey) || result.errorKey);
+          clearSelection();
+
+          // Clear error after 2 seconds
+          setTimeout(() => setValidationError(null), 2000);
+        }
+      },
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWord, clearSelection, t]
     );
 
     // Handle level complete continue
@@ -151,10 +208,10 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle retry
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
-      setSelectedIndices([]);
+      clearSelection();
       resetGame();
       startGame();
-    }, [resetGame, startGame]);
+    }, [resetGame, startGame, clearSelection]);
 
     // Handle exit from pause menu
     const handleExit = useCallback(() => {
@@ -227,15 +284,42 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Main Game Area */}
         <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-hidden">
           {/* Grid Section */}
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center gap-3">
+            {/* Validation Feedback */}
+            {validationError && (
+              <div
+                data-testid="validation-error"
+                className={cn(
+                  'px-4 py-2 rounded-neo',
+                  'bg-neo-red/20 border-2 border-neo-red',
+                  'text-neo-red font-bold text-sm',
+                  'animate-neo-shake'
+                )}
+              >
+                {validationError}
+              </div>
+            )}
+
+            {/* Loading Indicator */}
+            {isValidating && (
+              <div
+                data-testid="validation-loading"
+                className="text-neo-cyan font-bold text-sm animate-pulse"
+              >
+                {t('common.validating') || 'Validating...'}
+              </div>
+            )}
+
             <AdventureGrid
               tiles={tiles}
               gridSize={levelConfig.gridSize}
               selectedIndices={selectedIndices}
               onTileSelect={handleTileSelect}
               onWordSubmit={handleWordSubmit}
-              interactive={isPlaying && !isPaused}
-              disabled={!isPlaying || isPaused}
+              onDragStart={handleDragStart}
+              onDragEnter={handleDragEnter}
+              interactive={isPlaying && !isPaused && !isValidating}
+              disabled={!isPlaying || isPaused || isValidating}
               showWordPreview
               className="max-w-md w-full"
             />

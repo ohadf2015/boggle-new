@@ -1145,13 +1145,22 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
   }
 }
 
+/** Valid reasons for invalid word submissions */
+export type InvalidWordReason = 'not_on_board' | 'not_in_dictionary' | 'peer_rejected';
+
 /**
- * Record a wrong word submission from a player
- * These are used to make bots more human-like by using real player mistakes
- * @param word - The wrong word submitted
+ * Record an invalid word submission from a player
+ * Tracks words that fail validation with submission counters.
+ * Admins can review words submitted 3+ times and approve them.
+ * @param word - The invalid word submitted
  * @param language - Game language
+ * @param reason - Why the word was invalid (default: 'not_in_dictionary')
  */
-export async function recordPlayerWrongWord(word: string, language: string): Promise<void> {
+export async function recordPlayerWrongWord(
+  word: string,
+  language: string,
+  reason: InvalidWordReason = 'not_in_dictionary'
+): Promise<void> {
   const client = getSupabase();
   if (!client) return;
 
@@ -1161,21 +1170,22 @@ export async function recordPlayerWrongWord(word: string, language: string): Pro
   if (normalizedWord.length < 3) return;
 
   try {
-    // Use the RPC function we created in the migration
-    const { error } = await client.rpc('record_player_wrong_word', {
+    // Use the RPC function to upsert/increment submission count
+    const { error } = await client.rpc('record_invalid_word_submission', {
       p_word: normalizedWord,
-      p_language: language
+      p_language: language,
+      p_reason: reason
     });
 
     if (error) {
       // Ignore errors - this is non-critical functionality
-      logger.debug('SUPABASE', `Failed to record wrong word "${normalizedWord}": ${error.message}`);
+      logger.debug('SUPABASE', `Failed to record invalid word "${normalizedWord}": ${error.message}`);
     } else {
-      logger.debug('SUPABASE', `Recorded wrong word "${normalizedWord}" for ${language}`);
+      logger.debug('SUPABASE', `Recorded invalid word "${normalizedWord}" (${reason}) for ${language}`);
     }
   } catch (err) {
     // Ignore errors - this is non-critical functionality
-    logger.debug('SUPABASE', `Error recording wrong word: ${err}`);
+    logger.debug('SUPABASE', `Error recording invalid word: ${err}`);
   }
 }
 

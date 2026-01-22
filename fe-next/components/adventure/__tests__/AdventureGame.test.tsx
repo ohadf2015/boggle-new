@@ -48,6 +48,46 @@ const defaultProps = {
 // MOCKS
 // ==============================================
 
+// Mock useLanguage context
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+    setLanguage: jest.fn(),
+  }),
+}));
+
+// Mock useAdventureWordValidation hook
+const mockValidateWord = jest.fn().mockResolvedValue({
+  isValid: true,
+  score: 30,
+});
+
+jest.mock('@/hooks/useAdventureWordValidation', () => ({
+  useAdventureWordValidation: () => ({
+    validateWord: mockValidateWord,
+    isValidating: false,
+    lastValidationResult: null,
+  }),
+}));
+
+// Mock useAdventureSelection hook
+const mockSelectTile = jest.fn();
+const mockClearSelection = jest.fn();
+const mockGetPath = jest.fn().mockReturnValue([]);
+
+jest.mock('@/hooks/useAdventureSelection', () => ({
+  useAdventureSelection: () => ({
+    selectedIndices: [],
+    currentWord: '',
+    isSelecting: false,
+    selectTile: mockSelectTile,
+    clearSelection: mockClearSelection,
+    getPath: mockGetPath,
+  }),
+}));
+
 // Mock framer-motion to avoid animation timing issues in tests
 jest.mock('framer-motion', () => {
   const React = require('react');

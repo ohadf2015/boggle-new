@@ -2027,4 +2027,230 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
   }
 });
 
+// ==========================================
+// INVALID WORD SUBMISSIONS ROUTES
+// ==========================================
+
+/**
+ * GET /api/admin/invalid-words
+ * Get invalid word submissions for admin review
+ *
+ * Query params:
+ * - language: Filter by language (en, he, sv, ja, es)
+ * - minCount: Minimum submission count (default 3)
+ * - search: Search for specific word
+ * - limit: Number of results (max 500)
+ * - offset: Pagination offset
+ */
+router.get('/invalid-words', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const supabase = getSupabase();
+    const language = (req.query.language as string) || null;
+    const minCount = parseInt(req.query.minCount as string) || 3;
+    const search = (req.query.search as string) || null;
+    const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    // Build query for pending (unapproved) invalid words
+    let query = supabase
+      .from('invalid_word_submissions')
+      .select('id, word, language, submission_count, reason, first_submitted_at, last_submitted_at, approved_at, approved_by', { count: 'exact' })
+      .is('approved_at', null) // Only pending (unapproved) words
+      .gte('submission_count', minCount)
+      .order('submission_count', { ascending: false });
+
+    // Apply filters
+    if (language) {
+      query = query.eq('language', language);
+    }
+
+    if (search) {
+      query = query.ilike('word', `%${search}%`);
+    }
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    // Get summary stats
+    const { data: statsData } = await supabase
+      .from('invalid_word_submissions')
+      .select('submission_count, approved_at')
+      .gte('submission_count', minCount)
+      .throwOnError();
+
+    interface InvalidWordStatsRow {
+      submission_count: number;
+      approved_at: string | null;
+    }
+
+    const typedStatsData = statsData as InvalidWordStatsRow[] | null;
+    const stats = {
+      total: typedStatsData?.length || 0,
+      pending: typedStatsData?.filter((w: InvalidWordStatsRow) => !w.approved_at).length || 0,
+      approved: typedStatsData?.filter((w: InvalidWordStatsRow) => w.approved_at).length || 0,
+    };
+
+    res.json({
+      words: data || [],
+      total: count || 0,
+      stats,
+      pagination: {
+        limit,
+        offset,
+        hasMore: (count || 0) > offset + limit,
+      },
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Invalid words error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch invalid words' });
+  }
+});
+
+/**
+ * POST /api/admin/invalid-words/approve
+ * Approve an invalid word - adds to word_scores with positive votes
+ * and marks it as approved in invalid_word_submissions
+ */
+router.post('/invalid-words/approve', async (req: AdminRequest, res: Response): Promise<void> => {
+  const supabase = getSupabase();
+  const { word, language, addToDictionary } = req.body;
+
+  if (!word || !language) {
+    res.status(400).json({ error: 'Missing word or language' });
+    return;
+  }
+
+  const normalizedWord = (word as string).toLowerCase().trim();
+
+  try {
+    // First verify the word exists in invalid_word_submissions
+    const { data: invalidWord, error: lookupError } = await supabase
+      .from('invalid_word_submissions')
+      .select('id, submission_count')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    if (lookupError || !invalidWord) {
+      res.status(404).json({ error: 'Word not found in invalid submissions' });
+      return;
+    }
+
+    // Calculate votes to add based on submission count (more submissions = more votes)
+    const votesNeeded = Math.max(10, Math.min(invalidWord.submission_count * 2, 20));
+
+    // Add to word_scores to make it community-validated
+    const { error: scoreError } = await supabase
+      .from('word_scores')
+      .upsert({
+        word: normalizedWord,
+        language,
+        likes_count: votesNeeded,
+        dislikes_count: 0,
+        first_submitter: 'admin_approved',
+        last_voted_at: new Date().toISOString(),
+      }, { onConflict: 'word,language' });
+
+    if (scoreError) {
+      logger.error('ADMIN_API', `Word score update failed: ${scoreError.message}`);
+      res.status(500).json({ error: 'Failed to update word score' });
+      return;
+    }
+
+    // Mark as approved in invalid_word_submissions
+    const { error: approveError } = await supabase
+      .from('invalid_word_submissions')
+      .update({
+        approved_at: new Date().toISOString(),
+        approved_by: req.adminUser!.id,
+      })
+      .eq('id', invalidWord.id);
+
+    if (approveError) {
+      logger.error('ADMIN_API', `Invalid word approval update failed: ${approveError.message}`);
+      // Continue anyway - word is already in word_scores
+    }
+
+    // Remove from bot blacklist if present
+    await supabase
+      .from('bot_word_blacklist')
+      .delete()
+      .eq('word', normalizedWord)
+      .eq('language', language);
+
+    // Optionally add to permanent dictionary file
+    if (addToDictionary) {
+      try {
+        const dictionary = require('../../backend/dictionary');
+        await dictionary.addApprovedWord(normalizedWord, language);
+        auditLog(req.adminUser, 'INVALID_WORD_ADD_TO_DICTIONARY', { word: normalizedWord, language });
+      } catch (dictError) {
+        logger.warn('ADMIN_API', `Dictionary add failed: ${(dictError as Error).message}`);
+      }
+    }
+
+    auditLog(req.adminUser, 'INVALID_WORD_APPROVE', {
+      word: normalizedWord,
+      language,
+      votesAdded: votesNeeded,
+      addToDictionary,
+      submissionCount: invalidWord.submission_count,
+    });
+
+    res.json({ success: true, votesAdded: votesNeeded });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Invalid word approve error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to approve word' });
+  }
+});
+
+/**
+ * POST /api/admin/invalid-words/dismiss
+ * Dismiss an invalid word - marks it as reviewed without approving
+ */
+router.post('/invalid-words/dismiss', async (req: AdminRequest, res: Response): Promise<void> => {
+  const supabase = getSupabase();
+  const { word, language, reason } = req.body;
+
+  if (!word || !language) {
+    res.status(400).json({ error: 'Missing word or language' });
+    return;
+  }
+
+  const normalizedWord = (word as string).toLowerCase().trim();
+
+  try {
+    // Mark as dismissed by setting approved_at with a special marker
+    const { error } = await supabase
+      .from('invalid_word_submissions')
+      .update({
+        approved_at: new Date().toISOString(),
+        approved_by: req.adminUser!.id,
+        // We'll use the reason field to track this is a dismissal
+        reason: `dismissed:${reason || 'admin_review'}`,
+      })
+      .eq('word', normalizedWord)
+      .eq('language', language);
+
+    if (error) {
+      throw error;
+    }
+
+    auditLog(req.adminUser, 'INVALID_WORD_DISMISS', { word: normalizedWord, language, reason });
+    res.json({ success: true });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Invalid word dismiss error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to dismiss word' });
+  }
+});
+
 export default router;

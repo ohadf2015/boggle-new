@@ -292,9 +292,9 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         incPerGame(gameCode, 'wordNotOnBoard');
         socket.emit('wordNotOnBoard', { word: normalizedWord });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.NOT_ON_BOARD, game);
-        // Record wrong word for bot learning (non-blocking)
+        // Record invalid word submission for admin review (non-blocking)
         if (isSupabaseConfigured()) {
-          recordPlayerWrongWord(normalizedWord, game.language || 'en').catch(() => {});
+          recordPlayerWrongWord(normalizedWord, game.language || 'en', 'not_on_board').catch(() => {});
         }
         return;
       }
@@ -624,9 +624,9 @@ function handlePeerRejection(io: Server, gameCode: string, game: Game, result: P
 
   logger.info('PEER_VALIDATION', `Word "${result.word}" rejected. Removed ${scoreRemoved} from ${result.submitter}`);
 
-  // Record rejected word for bot learning (if not a bot word)
+  // Record rejected word for admin review (if not a bot word)
   if (!result.isBot && result.word && isSupabaseConfigured()) {
-    recordPlayerWrongWord(result.word, game.language || 'en').catch(() => {});
+    recordPlayerWrongWord(result.word, game.language || 'en', 'peer_rejected').catch(() => {});
   }
 
   // Blacklist bot words

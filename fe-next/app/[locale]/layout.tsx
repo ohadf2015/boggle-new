@@ -4,7 +4,6 @@ import nextDynamic from 'next/dynamic';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
-import { GlobalBottomNav } from '@/components/layout/GlobalBottomNav';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
@@ -722,13 +721,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
-                    <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
+                    <div className="flex-1 flex flex-col min-h-0 relative overflow-clip">
                         <main id="main-content" className="screen-fit-content relative z-10" tabIndex={-1}>
                             {children}
                         </main>
                         <AutoHideFooter className="hidden sm:block relative z-10 flex-shrink-0" />
                     </div>
-                    <GlobalBottomNav />
                     <PWAInstallPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />

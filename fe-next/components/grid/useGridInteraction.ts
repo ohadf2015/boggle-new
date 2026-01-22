@@ -109,6 +109,9 @@ export function useGridInteraction({
   const isTouchingRef = useRef<boolean>(false);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hasMovedRef = useRef<boolean>(false);
+  // Track if current gesture is determined to be a scroll (vertical movement)
+  // This prevents blocking scroll when user is trying to scroll the page
+  const isScrollGestureRef = useRef<boolean>(false);
   const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startCellRef = useRef<SelectedCell | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -451,6 +454,7 @@ export function useGridInteraction({
     if (!interactive) return;
     isTouchingRef.current = true;
     hasMovedRef.current = false;
+    isScrollGestureRef.current = false; // Reset scroll detection for new gesture
 
     // Cancel any pending fade timeout
     if (fadeTimeoutRef.current) {
@@ -564,12 +568,38 @@ export function useGridInteraction({
   // Main touch move handler with RAF throttling for low-end devices
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;
-    if ('cancelable' in e && e.cancelable) e.preventDefault();
+
+    // If this gesture was already determined to be a scroll, let the browser handle it
+    if (isScrollGestureRef.current) return;
 
     const touch = 'touches' in e ? e.touches[0] : e;
     if (!touch) return;
     const touchX = touch.clientX;
     const touchY = touch.clientY;
+
+    // Detect scroll vs selection intent based on movement direction
+    // Only prevent default (block scroll) if movement indicates selection intent
+    if (!hasMovedRef.current) {
+      const deltaX = Math.abs(touchX - startPosRef.current.x);
+      const deltaY = Math.abs(touchY - startPosRef.current.y);
+      const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      // Only determine gesture type after exceeding deadzone threshold
+      if (totalMovement >= getDeadzoneThreshold()) {
+        // If movement is primarily vertical (more than 1.5x), treat as scroll
+        // This allows users to scroll the page even when starting on the grid
+        if (deltaY > deltaX * 1.5) {
+          isScrollGestureRef.current = true;
+          return; // Let browser handle scroll
+        }
+        // Horizontal/diagonal movement = selection intent, prevent scroll
+        if ('cancelable' in e && e.cancelable) e.preventDefault();
+      }
+      // Before reaching deadzone, don't prevent default yet
+    } else {
+      // Already in selection mode, always prevent scroll
+      if ('cancelable' in e && e.cancelable) e.preventDefault();
+    }
 
     // On low-end devices, use RAF throttling to limit processing to ~30fps
     // This prevents layout thrashing and keeps the UI responsive

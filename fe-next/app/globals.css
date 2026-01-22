@@ -2145,10 +2145,10 @@ body.crazygames-embed .game-view-container,
    RESPONSIVE FLEX LAYOUTS - No Scroll Pattern
    ============================================ */
 
-/* Bottom nav spacing variable */
+/* Bottom safe area spacing variable (device safe area only, no bottom nav) */
 :root {
-  --bottom-nav-height: 64px;
-  --bottom-safe-padding: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
+  --bottom-nav-height: 0px;
+  --bottom-safe-padding: calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
 
 @media (min-width: 1024px) {

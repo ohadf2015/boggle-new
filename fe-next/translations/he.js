@@ -2232,6 +2232,8 @@ const he = {
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
     "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
+    "adventureMode": "הרפתקה",
+    "adventureModeDesc": "100 שלבים ב-10 עולמות",
     "signInToUnlock": "התחבר כדי לפתוח",
     "openRooms": "חדרים פתוחים",
     "playersLive": "משחקים עכשיו",
@@ -3377,11 +3379,33 @@ const he = {
     "nav": {
       "players": "שחקנים",
       "dictionary": "מילון",
+      "invalidWords": "מילים לא תקינות",
       "dailyChallenge": "אתגר יומי",
       "wikipediaWords": "מילות ויקיפדיה",
       "dailyBuzz": "באזז יומי",
       "webVitals": "ביצועי אתר",
       "email": "אימייל"
+    },
+    "invalidWords": {
+      "title": "בדיקת מילים לא תקינות",
+      "subtitle": "מילים שהוגשו 3+ פעמים אך לא אומתו",
+      "word": "מילה",
+      "language": "שפה",
+      "count": "מספר הגשות",
+      "reason": "סיבה",
+      "firstSubmitted": "הגשה ראשונה",
+      "lastSubmitted": "הגשה אחרונה",
+      "approve": "אשר",
+      "approved": "אושר",
+      "dismiss": "דחה",
+      "addToDictionary": "הוסף למילון",
+      "noResults": "אין מילים לא תקינות העומדות בסף",
+      "pendingReview": "ממתין לבדיקה",
+      "reasons": {
+        "not_on_board": "לא על הלוח",
+        "not_in_dictionary": "לא במילון",
+        "peer_rejected": "נדחה על ידי שחקנים"
+      }
     },
     "live": {
       "subtitle": "מעקב משחקים בזמן אמת",
@@ -3647,6 +3671,14 @@ const he = {
       "ice": "קרח (מכשול)",
       "bomb": "פצצה (מנקה שורה)",
       "rainbow": "קשת (ג'וקר)"
+    },
+    "errors": {
+      "tooShort": "המילה קצרה מדי",
+      "invalidPath": "נתיב לא תקין - האריחים חייבים להיות צמודים",
+      "wordMismatch": "המילה לא תואמת לאריחים שנבחרו",
+      "alreadyFound": "המילה כבר נמצאה",
+      "notInDictionary": "המילה לא במילון",
+      "validationFailed": "לא ניתן לאמת את המילה"
     }
   }
 };

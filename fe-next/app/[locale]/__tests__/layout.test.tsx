@@ -59,11 +59,6 @@ jest.mock('@/components/celebration/NewYearCountdown', () => ({
     default: () => null,
 }));
 
-jest.mock('@/components/layout/GlobalBottomNav', () => ({
-    __esModule: true,
-    GlobalBottomNav: () => null,
-}));
-
 jest.mock('../../providers', () => ({
     Providers: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
