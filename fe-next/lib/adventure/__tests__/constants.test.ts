@@ -39,12 +39,12 @@ describe('Adventure Constants', () => {
       expect(WORLDS_COUNT).toBe(10);
     });
 
-    it('should have 10 levels per world', () => {
-      expect(LEVELS_PER_WORLD).toBe(10);
+    it('should have 7 levels per world (2-2-3 chapter structure)', () => {
+      expect(LEVELS_PER_WORLD).toBe(7);
     });
 
-    it('should have 100 total levels', () => {
-      expect(TOTAL_LEVELS).toBe(100);
+    it('should have 70 total levels', () => {
+      expect(TOTAL_LEVELS).toBe(70);
     });
 
     it('should have max player level of 50', () => {
@@ -63,12 +63,14 @@ describe('Adventure Constants', () => {
   });
 
   describe('Tile Types', () => {
-    it('should have all 5 tile types', () => {
+    it('should have all 7 tile types', () => {
       expect(TILE_TYPES.STANDARD).toBe('standard');
       expect(TILE_TYPES.GOLD).toBe('gold');
       expect(TILE_TYPES.ICE).toBe('ice');
       expect(TILE_TYPES.BOMB).toBe('bomb');
       expect(TILE_TYPES.RAINBOW).toBe('rainbow');
+      expect(TILE_TYPES.CHAIN).toBe('chain');
+      expect(TILE_TYPES.TIME).toBe('time');
     });
   });
 
@@ -229,24 +231,24 @@ describe('World Unlock Functions', () => {
       expect(getWorldUnlockRequirement(1)).toBe(0);
     });
 
-    it('should require 15 stars per world', () => {
-      // World 2 requires 15 stars
-      expect(getWorldUnlockRequirement(2)).toBe(15);
-      // World 3 requires 30 stars
-      expect(getWorldUnlockRequirement(3)).toBe(30);
-      // World 4 requires 45 stars
-      expect(getWorldUnlockRequirement(4)).toBe(45);
+    it('should require 11 stars per world (with 7 levels = 21 max stars)', () => {
+      // World 2 requires 11 stars (~52% of world 1 max)
+      expect(getWorldUnlockRequirement(2)).toBe(11);
+      // World 3 requires 22 stars
+      expect(getWorldUnlockRequirement(3)).toBe(22);
+      // World 4 requires 33 stars
+      expect(getWorldUnlockRequirement(4)).toBe(33);
     });
 
-    it('should require 80 stars for world 10', () => {
-      // Final world has special requirement
-      expect(getWorldUnlockRequirement(10)).toBe(80);
+    it('should require 60 stars for world 10', () => {
+      // Final world has special requirement (encourages replaying)
+      expect(getWorldUnlockRequirement(10)).toBe(60);
     });
 
     it('should handle invalid world numbers', () => {
       expect(getWorldUnlockRequirement(0)).toBe(0);
       expect(getWorldUnlockRequirement(-1)).toBe(0);
-      expect(getWorldUnlockRequirement(11)).toBe(80);
+      expect(getWorldUnlockRequirement(11)).toBe(60);
     });
   });
 
@@ -255,15 +257,15 @@ describe('World Unlock Functions', () => {
       expect(isWorldUnlocked(1, 0)).toBe(true);
     });
 
-    it('should unlock world 2 with 15+ stars', () => {
-      expect(isWorldUnlocked(2, 14)).toBe(false);
-      expect(isWorldUnlocked(2, 15)).toBe(true);
-      expect(isWorldUnlocked(2, 30)).toBe(true);
+    it('should unlock world 2 with 11+ stars', () => {
+      expect(isWorldUnlocked(2, 10)).toBe(false);
+      expect(isWorldUnlocked(2, 11)).toBe(true);
+      expect(isWorldUnlocked(2, 21)).toBe(true);
     });
 
-    it('should unlock world 10 with 80+ stars', () => {
-      expect(isWorldUnlocked(10, 79)).toBe(false);
-      expect(isWorldUnlocked(10, 80)).toBe(true);
+    it('should unlock world 10 with 60+ stars', () => {
+      expect(isWorldUnlocked(10, 59)).toBe(false);
+      expect(isWorldUnlocked(10, 60)).toBe(true);
     });
   });
 

@@ -52,6 +52,8 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   ice: 'tile-ice',
   bomb: 'tile-bomb',
   rainbow: 'tile-rainbow',
+  chain: 'tile-chain',
+  time: 'tile-time',
 };
 
 const TILE_TYPE_LABELS: Record<TileType, string> = {
@@ -60,6 +62,8 @@ const TILE_TYPE_LABELS: Record<TileType, string> = {
   ice: 'ice tile (obstacle)',
   bomb: 'bomb tile (clears row)',
   rainbow: 'rainbow tile (wildcard)',
+  chain: 'chain tile (link bonus)',
+  time: 'time tile (+5 seconds)',
 };
 
 const GRID_COLS_CLASSES: Record<number, string> = {
@@ -309,6 +313,20 @@ const AdventureGrid = memo<AdventureGridProps>(
                     'border-purple-500/60',
                   ],
 
+                  // Chain tile - purple link
+                  tile.type === 'chain' && [
+                    'bg-gradient-to-br from-purple-400 via-violet-500 to-violet-600',
+                    'text-neo-white shadow-[0_0_10px_rgba(138,43,226,0.5)]',
+                    'border-purple-700/60',
+                  ],
+
+                  // Time tile - emerald clock
+                  tile.type === 'time' && [
+                    'bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600',
+                    'text-neo-white shadow-[0_0_10px_rgba(16,185,129,0.5)]',
+                    'border-emerald-600/60',
+                  ],
+
                   // Interactive state
                   canInteract && 'hover:scale-105 active:scale-95'
                 )}
@@ -345,6 +363,38 @@ const AdventureGrid = memo<AdventureGridProps>(
                     )}
                   >
                     *
+                  </span>
+                )}
+
+                {/* Chain link badge */}
+                {tile.type === 'chain' && (
+                  <span
+                    className={cn(
+                      'absolute -top-1 -right-1 z-20',
+                      'min-w-[18px] h-[18px]',
+                      'flex items-center justify-center',
+                      'bg-neo-black text-purple-400',
+                      'text-[10px] font-black',
+                      'rounded-full border-2 border-purple-500'
+                    )}
+                  >
+                    🔗
+                  </span>
+                )}
+
+                {/* Time bonus badge */}
+                {tile.type === 'time' && (
+                  <span
+                    className={cn(
+                      'absolute -top-1 -right-1 z-20',
+                      'min-w-[18px] h-[18px]',
+                      'flex items-center justify-center',
+                      'bg-neo-black text-emerald-400',
+                      'text-[9px] font-black',
+                      'rounded-full border-2 border-emerald-500'
+                    )}
+                  >
+                    +5s
                   </span>
                 )}
 

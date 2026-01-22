@@ -16,6 +16,7 @@ import {
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
 import AdventureGame from './AdventureGame';
+import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 
 // View state type for navigation
 type ViewState = 'worldMap' | 'levelGrid' | 'playing';
@@ -25,7 +26,7 @@ type ViewState = 'worldMap' | 'levelGrid' | 'playing';
  * Shows all 10 worlds with visual progression and level selection
  */
 export default function AdventureView(): React.JSX.Element {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const isRTL = dir === 'rtl';
 
   // Get progression data from context
@@ -54,7 +55,8 @@ export default function AdventureView(): React.JSX.Element {
     selectedWorld && selectedLevel && levelConfig
       ? generateAdventureGrid(
           levelConfig.gridSize as 4 | 5 | 6 | 7,
-          getLevelSeed(selectedWorld, selectedLevel)
+          getLevelSeed(selectedWorld, selectedLevel),
+          language
         )
       : null;
 
@@ -152,6 +154,10 @@ export default function AdventureView(): React.JSX.Element {
   }
 
   return (
+    <AdventureThemeProvider
+      initialWorldId={selectedWorld || 1}
+      initialLevel={selectedLevel || 1}
+    >
     <div className="h-screen bg-neo-navy relative flex flex-col overflow-hidden">
       {/* Header - Fixed at top */}
       <header className="relative z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm border-b border-neo-white/10 flex-shrink-0">
@@ -281,15 +287,15 @@ export default function AdventureView(): React.JSX.Element {
           )}
         </AnimatePresence>
 
-        {/* Development Notice - Only show on world map */}
+        {/* Development Notice - Only show on world map, positioned within content flow */}
         {viewState === 'worldMap' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1 }}
-            className="fixed bottom-4 left-4 right-4 z-20"
+            className="absolute bottom-4 left-4 right-4 pointer-events-none"
           >
-            <div className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto pointer-events-auto">
               <div
                 className={cn(
                   'flex items-center gap-3 px-4 py-3',
@@ -313,5 +319,6 @@ export default function AdventureView(): React.JSX.Element {
         )}
       </main>
     </div>
+    </AdventureThemeProvider>
   );
 }

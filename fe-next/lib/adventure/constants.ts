@@ -15,14 +15,29 @@
 export const WORLDS_COUNT = 10;
 
 /**
- * Number of levels per world
+ * Number of levels per world (7 levels in 2-2-3 chapter structure)
  */
-export const LEVELS_PER_WORLD = 10;
+export const LEVELS_PER_WORLD = 7;
 
 /**
  * Total number of levels (WORLDS_COUNT * LEVELS_PER_WORLD)
  */
 export const TOTAL_LEVELS = WORLDS_COUNT * LEVELS_PER_WORLD;
+
+// ==============================================
+// CHAPTER STRUCTURE CONSTANTS
+// ==============================================
+
+/**
+ * Number of chapters per world (Zone 1, Zone 2, Boss Zone)
+ */
+export const CHAPTERS_PER_WORLD = 3;
+
+/**
+ * Chapter structure: levels per chapter
+ * Chapter 1: 2 levels, Chapter 2: 2 levels, Chapter 3: 3 levels (boss)
+ */
+export const CHAPTER_STRUCTURE: [number, number, number] = [2, 2, 3];
 
 /**
  * Maximum player level achievable
@@ -60,15 +75,16 @@ export const STARS_TO_UNLOCK_NEXT_LEVEL = 1;
 
 /**
  * Stars needed from previous world to unlock next world
- * (15 stars = 50% of world's 30 possible stars)
+ * (11 stars = ~52% of world's 21 possible stars)
  */
-export const STARS_TO_UNLOCK_NEXT_WORLD = 15;
+export const STARS_TO_UNLOCK_NEXT_WORLD = 11;
 
 /**
  * Total stars required to unlock the final world (World 10)
- * Special requirement: needs 80 total stars regardless of distribution
+ * Special requirement: needs 60 total stars regardless of distribution
+ * (60 = ~32% of total 189 possible stars, encourages replaying)
  */
-export const TOTAL_STARS_FOR_FINAL_WORLD = 80;
+export const TOTAL_STARS_FOR_FINAL_WORLD = 60;
 
 /**
  * Maximum stars per level
@@ -98,6 +114,10 @@ export const TILE_TYPES = {
   BOMB: 'bomb',
   /** Wildcard - matches any letter */
   RAINBOW: 'rainbow',
+  /** Links adjacent tiles for combo bonuses */
+  CHAIN: 'chain',
+  /** Adds bonus time when used in a word */
+  TIME: 'time',
 } as const;
 
 // ==============================================

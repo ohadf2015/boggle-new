@@ -3637,6 +3637,7 @@ const he = {
     "continueToNext": "המשך",
     "retryLevel": "נסה שוב",
     "loadError": "נכשל לטעון התקדמות",
+    "boss": "בוס",
     "worlds": {
       "alphabetMeadows": "אחו האותיות",
       "synonymSprings": "מעיינות המילים הנרדפות",
@@ -3648,6 +3649,35 @@ const he = {
       "neologismNebula": "ערפילית המילים החדשות",
       "polyglotPeaks": "פסגות הרב-לשוניות",
       "lexiconThrone": "כס המילון"
+    },
+    "chapters": {
+      "meadows": {
+        "zone1": "שדות עשב",
+        "zone2": "גני פרחים",
+        "bossZone": "האלון העתיק"
+      },
+      "springs": {
+        "zone1": "נחל הבדולח",
+        "zone2": "מפלי המים",
+        "bossZone": "הבריכה העמוקה"
+      },
+      "caverns": {
+        "zone1": "מנהרות השורשים",
+        "zone2": "אולמות הגבישים",
+        "bossZone": "חדר האטימולוגיה"
+      }
+    },
+    "themes": {
+      "sunny-pastoral": "נוף כפרי שמשי",
+      "waterfalls": "מפלים",
+      "crystal-caves": "מערות בדולח",
+      "tropical-islands": "איים טרופיים",
+      "desert-cliffs": "צוקי מדבר",
+      "escher-maze": "מבוך אשר",
+      "reflective-glass": "זכוכית מחזירה",
+      "space-stars": "כוכבים בחלל",
+      "mountain-aurora": "זוהר הרים",
+      "golden-library": "ספרייה מוזהבת"
     },
     "mechanics": {
       "synonymPairs": "+25% לזוגות נרדפים",

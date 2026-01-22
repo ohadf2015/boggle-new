@@ -383,8 +383,8 @@ describe('AdventureView Integration', () => {
       renderAdventureView();
       fireEvent.click(screen.getByTestId('world-1'));
 
-      // WHEN - try to click level 10 (should be locked)
-      const levelButton = screen.getByTestId('level-button-10');
+      // WHEN - try to click level 7 (should be locked - only level 1 completed)
+      const levelButton = screen.getByTestId('level-button-7');
       fireEvent.click(levelButton);
 
       // THEN - should still be on level grid, not playing

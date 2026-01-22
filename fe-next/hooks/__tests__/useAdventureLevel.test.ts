@@ -66,19 +66,19 @@ describe('useAdventureLevel', () => {
       expect(resultWorld11.current.levelConfig).toBeNull();
       expect(resultWorld11.current.error).toBeTruthy();
 
-      // GIVEN - Level 0 is invalid (must be 1-10)
+      // GIVEN - Level 0 is invalid (must be 1-7)
       const { result: resultLevel0 } = renderHook(() => useAdventureLevel(1, 0));
 
       // THEN
       expect(resultLevel0.current.levelConfig).toBeNull();
       expect(resultLevel0.current.error).toBeTruthy();
 
-      // GIVEN - Level 11 is invalid (must be 1-10)
-      const { result: resultLevel11 } = renderHook(() => useAdventureLevel(1, 11));
+      // GIVEN - Level 8 is invalid (must be 1-7)
+      const { result: resultLevel8 } = renderHook(() => useAdventureLevel(1, 8));
 
       // THEN
-      expect(resultLevel11.current.levelConfig).toBeNull();
-      expect(resultLevel11.current.error).toBeTruthy();
+      expect(resultLevel8.current.levelConfig).toBeNull();
+      expect(resultLevel8.current.error).toBeTruthy();
     });
   });
 
@@ -114,10 +114,10 @@ describe('useAdventureLevel', () => {
   });
 
   describe('Level Metadata', () => {
-    it('should provide isBossLevel for level 10', () => {
-      // GIVEN
-      const { result: boss } = renderHook(() => useAdventureLevel(1, 10));
-      const { result: normal } = renderHook(() => useAdventureLevel(1, 5));
+    it('should provide isBossLevel for level 7 (boss level in 2-2-3 structure)', () => {
+      // GIVEN - level 7 is boss level (final level of boss chapter)
+      const { result: boss } = renderHook(() => useAdventureLevel(1, 7));
+      const { result: normal } = renderHook(() => useAdventureLevel(1, 3));
 
       // THEN
       expect(boss.current.isBossLevel).toBe(true);
@@ -137,15 +137,15 @@ describe('useAdventureLevel', () => {
     });
 
     it('should provide globalLevelNumber', () => {
-      // GIVEN
+      // GIVEN - 7 levels per world
       const { result: w1l1 } = renderHook(() => useAdventureLevel(1, 1));
       const { result: w2l5 } = renderHook(() => useAdventureLevel(2, 5));
-      const { result: w10l10 } = renderHook(() => useAdventureLevel(10, 10));
+      const { result: w10l7 } = renderHook(() => useAdventureLevel(10, 7));
 
       // THEN
       expect(w1l1.current.globalLevelNumber).toBe(1);
-      expect(w2l5.current.globalLevelNumber).toBe(15); // (2-1)*10 + 5
-      expect(w10l10.current.globalLevelNumber).toBe(100);
+      expect(w2l5.current.globalLevelNumber).toBe(12); // (2-1)*7 + 5
+      expect(w10l7.current.globalLevelNumber).toBe(70); // (10-1)*7 + 7
     });
   });
 

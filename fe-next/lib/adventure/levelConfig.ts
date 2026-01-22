@@ -185,35 +185,36 @@ export function getAllWorldConfigs(): WorldConfig[] {
 
 /**
  * Hidden words for bonus stars on milestone levels
+ * Level 4 = mid-boss chapter, Level 7 = final boss level
  */
 const HIDDEN_WORDS: Record<string, string> = {
-  '1-5': 'MAGIC',
-  '1-10': 'ADVENTURE',
-  '2-5': 'CRYSTAL',
-  '2-10': 'LANGUAGE',
-  '3-5': 'ANCIENT',
-  '3-10': 'KNOWLEDGE',
-  '4-5': 'ISLAND',
-  '4-10': 'TREASURE',
-  '5-5': 'COMPOUND',
-  '5-10': 'BUILDER',
-  '6-5': 'PUZZLE',
-  '6-10': 'TWISTED',
-  '7-5': 'MIRROR',
-  '7-10': 'REFLECT',
-  '8-5': 'COSMOS',
-  '8-10': 'STELLAR',
-  '9-5': 'GLOBAL',
-  '9-10': 'WISDOM',
-  '10-5': 'THRONE',
-  '10-10': 'LEXICON',
+  '1-4': 'MAGIC',
+  '1-7': 'ADVENTURE',
+  '2-4': 'CRYSTAL',
+  '2-7': 'LANGUAGE',
+  '3-4': 'ANCIENT',
+  '3-7': 'KNOWLEDGE',
+  '4-4': 'ISLAND',
+  '4-7': 'TREASURE',
+  '5-4': 'COMPOUND',
+  '5-7': 'BUILDER',
+  '6-4': 'PUZZLE',
+  '6-7': 'TWISTED',
+  '7-4': 'MIRROR',
+  '7-7': 'REFLECT',
+  '8-4': 'COSMOS',
+  '8-7': 'STELLAR',
+  '9-4': 'GLOBAL',
+  '9-7': 'WISDOM',
+  '10-4': 'THRONE',
+  '10-7': 'LEXICON',
 };
 
 /**
  * Get level configuration for a specific world and level
  *
  * @param world - World number (1-10)
- * @param level - Level within world (1-10)
+ * @param level - Level within world (1-7)
  * @returns Complete level configuration
  * @throws Error if world or level is invalid
  */
@@ -239,6 +240,17 @@ export function getLevelConfig(world: number, level: number): LevelConfig {
   const objectives = generateObjectives(world, level);
   const specialTiles = generateSpecialTiles(world, level, gridSize);
 
+  // Calculate chapter structure (2-2-3 pattern)
+  // Chapter 1: levels 1-2, Chapter 2: levels 3-4, Chapter 3 (Boss): levels 5-7
+  const chapterNumber: 1 | 2 | 3 = level <= 2 ? 1 : level <= 4 ? 2 : 3;
+  const levelInChapter: 1 | 2 | 3 =
+    level <= 2
+      ? (level as 1 | 2 | 3)
+      : level <= 4
+        ? ((level - 2) as 1 | 2 | 3)
+        : ((level - 4) as 1 | 2 | 3);
+  const isBossLevel = level === LEVELS_PER_WORLD; // Level 7
+
   // Build config
   const config: LevelConfig = {
     world,
@@ -248,6 +260,9 @@ export function getLevelConfig(world: number, level: number): LevelConfig {
     objectives,
     specialTiles,
     difficulty,
+    chapterNumber,
+    levelInChapter,
+    isBossLevel,
   };
 
   // Add world mechanic for non-tutorial worlds
@@ -268,7 +283,7 @@ export function getLevelConfig(world: number, level: number): LevelConfig {
  * Get all level configs for a specific world
  *
  * @param world - World number (1-10)
- * @returns Array of 10 level configurations
+ * @returns Array of 7 level configurations
  */
 export function getWorldLevels(world: number): LevelConfig[] {
   return Array.from({ length: LEVELS_PER_WORLD }, (_, i) =>
@@ -279,7 +294,7 @@ export function getWorldLevels(world: number): LevelConfig[] {
 /**
  * Get all level configs for all worlds
  *
- * @returns Array of 100 level configurations (ordered by world, then level)
+ * @returns Array of 70 level configurations (ordered by world, then level)
  */
 export function getAllLevelConfigs(): LevelConfig[] {
   const configs: LevelConfig[] = [];
@@ -411,13 +426,14 @@ export function generateSpecialTiles(
     }
   };
 
-  // World 1: No special tiles for levels 1-7 (tutorial)
-  if (world === 1 && level < 8) {
+  // World 1: No special tiles for levels 1-4 (tutorial chapters 1-2)
+  // Introduce gold tiles in boss chapter (levels 5-7)
+  if (world === 1 && level < 5) {
     return tiles;
   }
 
-  // Gold tiles: World 1 level 8+, increasing count
-  if ((world >= 1 && level >= 8) || world >= 2) {
+  // Gold tiles: World 1 level 5+ (boss chapter), World 2+ all levels
+  if ((world === 1 && level >= 5) || world >= 2) {
     const goldCount = Math.min(
       1 + Math.floor((world - 1) / 2) + Math.floor(level / 5),
       4
@@ -482,7 +498,7 @@ export function validateLevelConfig(config: LevelConfig): ValidationResult {
 
   // Validate level
   if (config.level < 1 || config.level > LEVELS_PER_WORLD) {
-    errors.push('Invalid level: must be 1-10');
+    errors.push('Invalid level: must be 1-7');
   }
 
   // Validate grid size

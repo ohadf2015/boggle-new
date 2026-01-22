@@ -119,10 +119,10 @@ describe('Level Configuration', () => {
       // Test a sampling of levels across worlds
       const testCases = [
         { world: 1, level: 1 },
-        { world: 1, level: 10 },
+        { world: 1, level: 7 },
         { world: 5, level: 5 },
         { world: 10, level: 1 },
-        { world: 10, level: 10 },
+        { world: 10, level: 7 },
       ];
 
       for (const { world, level } of testCases) {
@@ -165,14 +165,14 @@ describe('Level Configuration', () => {
       expect(() => getLevelConfig(0, 1)).toThrow();
       expect(() => getLevelConfig(1, 0)).toThrow();
       expect(() => getLevelConfig(11, 1)).toThrow();
-      expect(() => getLevelConfig(1, 11)).toThrow();
+      expect(() => getLevelConfig(1, 8)).toThrow(); // Max level is 7
     });
   });
 
   describe('getWorldLevels', () => {
-    it('should return 10 levels for a world', () => {
+    it('should return 7 levels for a world', () => {
       const levels = getWorldLevels(1);
-      expect(levels).toHaveLength(10);
+      expect(levels).toHaveLength(7);
     });
 
     it('should return levels in order', () => {
@@ -186,9 +186,9 @@ describe('Level Configuration', () => {
   });
 
   describe('getAllLevelConfigs', () => {
-    it('should return all 100 level configs', () => {
+    it('should return all 70 level configs', () => {
       const allConfigs = getAllLevelConfigs();
-      expect(allConfigs).toHaveLength(100);
+      expect(allConfigs).toHaveLength(70);
     });
 
     it('should be ordered by world then level', () => {
@@ -198,14 +198,14 @@ describe('Level Configuration', () => {
       expect(allConfigs[0].world).toBe(1);
       expect(allConfigs[0].level).toBe(1);
 
-      // Check last level
-      expect(allConfigs[99].world).toBe(10);
-      expect(allConfigs[99].level).toBe(10);
+      // Check last level (10 worlds * 7 levels = 70 total, index 69)
+      expect(allConfigs[69].world).toBe(10);
+      expect(allConfigs[69].level).toBe(7);
 
       // Check order throughout
-      for (let i = 0; i < 100; i++) {
-        const expectedWorld = Math.floor(i / 10) + 1;
-        const expectedLevel = (i % 10) + 1;
+      for (let i = 0; i < 70; i++) {
+        const expectedWorld = Math.floor(i / 7) + 1;
+        const expectedLevel = (i % 7) + 1;
         expect(allConfigs[i].world).toBe(expectedWorld);
         expect(allConfigs[i].level).toBe(expectedLevel);
       }
@@ -227,7 +227,7 @@ describe('Objective Generation', () => {
       let hasWordCount = false;
       let hasScoreTarget = false;
 
-      for (let level = 1; level <= 10; level++) {
+      for (let level = 1; level <= 7; level++) {
         const objectives = generateObjectives(1, level);
         const primary = objectives.find((o) => o.isPrimary);
 
@@ -235,13 +235,13 @@ describe('Objective Generation', () => {
         if (primary?.type === 'scoreTarget') hasScoreTarget = true;
       }
 
-      // Should have both types across 10 levels
+      // Should have both types across 7 levels
       expect(hasWordCount || hasScoreTarget).toBe(true);
     });
 
     it('should increase objective targets for higher levels', () => {
       const early = generateObjectives(1, 1);
-      const late = generateObjectives(3, 10);
+      const late = generateObjectives(3, 7);
 
       const earlyPrimary = early.find((o) => o.isPrimary);
       const latePrimary = late.find((o) => o.isPrimary);
@@ -264,7 +264,7 @@ describe('Objective Generation', () => {
       // Should sometimes have clearIce objectives
       // (not always, so we check multiple levels)
       let foundClearIce = false;
-      for (let level = 1; level <= 10; level++) {
+      for (let level = 1; level <= 7; level++) {
         const objs = generateObjectives(2, level);
         if (objs.some((o) => o.type === 'clearIce')) {
           foundClearIce = true;
@@ -279,13 +279,13 @@ describe('Objective Generation', () => {
 describe('Special Tile Generation', () => {
   describe('generateSpecialTiles', () => {
     it('should return empty array for world 1 early levels', () => {
-      // Tutorial levels have no special tiles
+      // Tutorial levels 1-4 (chapters 1-2) have no special tiles
       const tiles = generateSpecialTiles(1, 1, 4);
       expect(tiles).toHaveLength(0);
     });
 
-    it('should add gold tiles from world 1 level 8+', () => {
-      const tiles = generateSpecialTiles(1, 8, 4);
+    it('should add gold tiles from world 1 level 5+ (boss chapter)', () => {
+      const tiles = generateSpecialTiles(1, 5, 4);
       const goldTiles = tiles.filter((t) => t.type === 'gold');
 
       expect(goldTiles.length).toBeGreaterThan(0);
@@ -318,7 +318,7 @@ describe('Special Tile Generation', () => {
     });
 
     it('should not have duplicate positions', () => {
-      const tiles = generateSpecialTiles(5, 10, 6);
+      const tiles = generateSpecialTiles(5, 7, 6);
       const positions = new Set(tiles.map((t) => `${t.row},${t.col}`));
 
       expect(positions.size).toBe(tiles.length);

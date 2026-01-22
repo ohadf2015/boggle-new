@@ -3632,6 +3632,7 @@ const en = {
     "hiddenWord": "Hidden Word",
     "devPreview": "Development Preview",
     "devPreviewDesc": "Adventure Mode is under development. This preview shows the world map and level configuration.",
+    "boss": "Boss",
     "worlds": {
       "alphabetMeadows": "Alphabet Meadows",
       "synonymSprings": "Synonym Springs",
@@ -3643,6 +3644,23 @@ const en = {
       "neologismNebula": "Neologism Nebula",
       "polyglotPeaks": "Polyglot Peaks",
       "lexiconThrone": "Lexicon Throne"
+    },
+    "chapters": {
+      "meadows": {
+        "zone1": "Grassy Fields",
+        "zone2": "Flower Gardens",
+        "bossZone": "Ancient Oak"
+      },
+      "springs": {
+        "zone1": "Crystal Stream",
+        "zone2": "Cascade Falls",
+        "bossZone": "Deep Pool"
+      },
+      "caverns": {
+        "zone1": "Root Tunnels",
+        "zone2": "Crystal Halls",
+        "bossZone": "Etymology Chamber"
+      }
     },
     "themes": {
       "sunny-pastoral": "Sunny Pastoral",

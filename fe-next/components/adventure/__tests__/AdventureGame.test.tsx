@@ -112,6 +112,32 @@ jest.mock('framer-motion', () => {
   };
 });
 
+// Mock AdventureThemeContext to avoid theme provider requirement
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useAdventureTheme: () => ({
+    theme: {
+      worldId: 1,
+      background: {
+        baseColor: 'bg-neo-navy',
+        layers: [],
+        texture: { type: 'none', opacity: 0, blendMode: 'normal' },
+        particles: { type: 'leaves', count: 0, colors: [], sizeRange: [2, 4], speed: 1 },
+      },
+      tiles: {},
+      ui: { accentColor: 'neo-lime', textColor: 'neo-white', headerBg: 'bg-neo-navy/80' },
+      chapters: [],
+      containerClass: 'adventure-world-1',
+    },
+    worldId: 1,
+    level: 1,
+    setWorld: jest.fn(),
+    setLevel: jest.fn(),
+    isTransitioning: false,
+    chapter: { id: 1, name: 'Tutorial', levels: [1, 2], starThreshold: 0, accentColor: 'neo-lime' },
+  }),
+  AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // ==============================================
 // TESTS
 // ==============================================

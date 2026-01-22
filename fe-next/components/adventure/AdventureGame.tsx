@@ -18,6 +18,7 @@ import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
 import LevelCompleteModal from './LevelCompleteModal';
+import WorldBackground from './themed/WorldBackground';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -241,9 +242,12 @@ const AdventureGame = memo<AdventureGameProps>(
         aria-label="Adventure Mode Game"
         className={cn(
           'relative flex flex-col h-full',
-          'bg-neo-navy text-neo-white'
+          'text-neo-white'
         )}
       >
+        {/* Themed World Background */}
+        <WorldBackground className="absolute inset-0 -z-10" />
+
         {/* Header */}
         <header
           className={cn(

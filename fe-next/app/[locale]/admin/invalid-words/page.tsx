@@ -69,14 +69,14 @@ export default function InvalidWordsPage() {
 
   return (
     <div className={cn(
-      'flex-1 flex flex-col',
+      'flex-1 flex flex-col w-full overflow-x-hidden',
       isDarkMode
         ? 'bg-neo-navy'
         : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
+      <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         <div className="flex items-center gap-4 mb-6">
           <Button
             onClick={() => router.push(`/${language}/admin`)}

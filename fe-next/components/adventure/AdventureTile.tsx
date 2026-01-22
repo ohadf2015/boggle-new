@@ -36,6 +36,8 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   ice: 'tile-ice',
   bomb: 'tile-bomb',
   rainbow: 'tile-rainbow',
+  chain: 'tile-chain',
+  time: 'tile-time',
 };
 
 const TILE_TYPE_LABELS: Record<TileType, string> = {
@@ -44,6 +46,8 @@ const TILE_TYPE_LABELS: Record<TileType, string> = {
   ice: 'ice tile (obstacle)',
   bomb: 'bomb tile (clears row)',
   rainbow: 'rainbow tile (wildcard)',
+  chain: 'chain tile (link bonus)',
+  time: 'time tile (+5 seconds)',
 };
 
 // ==============================================

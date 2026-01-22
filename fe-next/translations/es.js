@@ -3633,6 +3633,7 @@ const es = {
     "continueToNext": "Continuar",
     "retryLevel": "Reintentar",
     "loadError": "Error al cargar el progreso",
+    "boss": "Jefe",
     "worlds": {
       "alphabetMeadows": "Praderas del Alfabeto",
       "synonymSprings": "Manantiales de Sinónimos",
@@ -3644,6 +3645,35 @@ const es = {
       "neologismNebula": "Nebulosa de Neologismos",
       "polyglotPeaks": "Cumbres Políglotas",
       "lexiconThrone": "Trono del Léxico"
+    },
+    "chapters": {
+      "meadows": {
+        "zone1": "Campos de Hierba",
+        "zone2": "Jardines de Flores",
+        "bossZone": "El Roble Antiguo"
+      },
+      "springs": {
+        "zone1": "Arroyo Cristalino",
+        "zone2": "Cascadas",
+        "bossZone": "Estanque Profundo"
+      },
+      "caverns": {
+        "zone1": "Túneles de Raíces",
+        "zone2": "Salones de Cristal",
+        "bossZone": "Cámara de Etimología"
+      }
+    },
+    "themes": {
+      "sunny-pastoral": "Pastoral Soleado",
+      "waterfalls": "Cascadas",
+      "crystal-caves": "Cuevas de Cristal",
+      "tropical-islands": "Islas Tropicales",
+      "desert-cliffs": "Acantilados del Desierto",
+      "escher-maze": "Laberinto de Escher",
+      "reflective-glass": "Vidrio Reflejante",
+      "space-stars": "Estrellas del Espacio",
+      "mountain-aurora": "Aurora de Montaña",
+      "golden-library": "Biblioteca Dorada"
     },
     "mechanics": {
       "synonymPairs": "+25% por pares de sinónimos",

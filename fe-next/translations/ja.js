@@ -3636,6 +3636,7 @@ const ja = {
     "continueToNext": "続ける",
     "retryLevel": "リトライ",
     "loadError": "進捗の読み込みに失敗しました",
+    "boss": "ボス",
     "worlds": {
       "alphabetMeadows": "アルファベットの草原",
       "synonymSprings": "同義語の泉",
@@ -3647,6 +3648,35 @@ const ja = {
       "neologismNebula": "新語の星雲",
       "polyglotPeaks": "多言語の峰",
       "lexiconThrone": "辞書の玉座"
+    },
+    "chapters": {
+      "meadows": {
+        "zone1": "草原の野原",
+        "zone2": "花の庭園",
+        "bossZone": "古代の樫の木"
+      },
+      "springs": {
+        "zone1": "水晶の小川",
+        "zone2": "滝の流れ",
+        "bossZone": "深い泉"
+      },
+      "caverns": {
+        "zone1": "根のトンネル",
+        "zone2": "水晶の広間",
+        "bossZone": "語源の間"
+      }
+    },
+    "themes": {
+      "sunny-pastoral": "晴れた牧歌的風景",
+      "waterfalls": "滝",
+      "crystal-caves": "水晶洞窟",
+      "tropical-islands": "熱帯の島々",
+      "desert-cliffs": "砂漠の崖",
+      "escher-maze": "エッシャー迷路",
+      "reflective-glass": "反射ガラス",
+      "space-stars": "宇宙の星々",
+      "mountain-aurora": "山岳オーロラ",
+      "golden-library": "黄金の図書館"
     },
     "mechanics": {
       "synonymPairs": "同義語ペアで+25%",

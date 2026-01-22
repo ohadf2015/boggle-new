@@ -1,0 +1,311 @@
+/**
+ * ThemedTile Component
+ *
+ * Renders adventure mode tiles with visual styles based on the current world theme.
+ * Uses the theme context to apply world-specific colors, textures, and effects.
+ */
+
+'use client';
+
+import React, { memo, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { Bomb, Link2, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
+import type { TileState, TileType } from '@/types/adventure';
+import type { TileVisualConfig } from '@/lib/adventure/themes/types';
+
+// ==============================================
+// TYPES
+// ==============================================
+
+interface ThemedTileProps {
+  /** Tile state including letter, type, and status */
+  tile: TileState;
+  /** Whether this tile is currently selected */
+  isSelected?: boolean;
+  /** Additional CSS classes */
+  className?: string;
+  /** Click handler */
+  onClick?: () => void;
+}
+
+// ==============================================
+// HELPER FUNCTIONS
+// ==============================================
+
+function buildTileClasses(
+  config: TileVisualConfig,
+  isSelected: boolean,
+  isCleared: boolean,
+  isFrozen: boolean
+): string {
+  const classes: string[] = [
+    // Base from config
+    config.baseClasses,
+    config.borderColor,
+
+    // Gradient background
+    `bg-gradient-to-br from-${config.gradientFrom} to-${config.gradientTo}`,
+
+    // Shadow style
+    config.shadowStyle === 'hard' && 'shadow-hard-sm',
+    config.shadowStyle === 'glow' && config.shadowColor && `shadow-[0_0_12px_${config.shadowColor}]`,
+
+    // State classes
+    isCleared && 'opacity-40 pointer-events-none',
+    isSelected && 'ring-2 z-10 scale-105',
+    isFrozen && 'ring-2 ring-cyan-400',
+  ].filter(Boolean) as string[];
+
+  return cn(classes);
+}
+
+function getTileIcon(type: TileType): React.ReactNode {
+  switch (type) {
+    case 'bomb':
+      return <Bomb className="w-4 h-4 text-neo-yellow drop-shadow-lg" />;
+    case 'chain':
+      return <Link2 className="w-4 h-4 text-purple-200 drop-shadow-lg" />;
+    case 'time':
+      return <Clock className="w-4 h-4 text-emerald-200 drop-shadow-lg" />;
+    default:
+      return null;
+  }
+}
+
+// ==============================================
+// SUB-COMPONENTS
+// ==============================================
+
+interface TileOverlayProps {
+  type: TileVisualConfig['overlayType'];
+  config: TileVisualConfig;
+}
+
+const TileOverlay = memo<TileOverlayProps>(({ type, config }) => {
+  switch (type) {
+    case 'sparkle':
+      return (
+        <motion.div
+          className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo"
+          animate={{
+            background: [
+              'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%)',
+              'radial-gradient(circle at 70% 70%, rgba(255,255,255,0.3) 0%, transparent 50%)',
+              'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%)',
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      );
+
+    case 'frost':
+      return (
+        <div className={cn(
+          'absolute inset-0 rounded-neo pointer-events-none',
+          'bg-gradient-to-br from-white/40 via-cyan-100/30 to-blue-200/40',
+          'backdrop-blur-[1px]'
+        )} />
+      );
+
+    case 'flames':
+      return (
+        <motion.div
+          className="absolute inset-0 pointer-events-none rounded-neo"
+          animate={{
+            boxShadow: [
+              '0 0 5px rgba(255, 100, 50, 0.4)',
+              '0 0 15px rgba(255, 100, 50, 0.7)',
+              '0 0 5px rgba(255, 100, 50, 0.4)',
+            ],
+          }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      );
+
+    case 'chain-link':
+      return (
+        <div className={cn(
+          'absolute inset-0 rounded-neo pointer-events-none',
+          'border-2 border-dashed border-purple-400/50'
+        )} />
+      );
+
+    case 'clock':
+      return (
+        <motion.div
+          className="absolute inset-0 pointer-events-none rounded-neo"
+          animate={{
+            boxShadow: [
+              '0 0 5px rgba(50, 200, 150, 0.3)',
+              '0 0 12px rgba(50, 200, 150, 0.6)',
+              '0 0 5px rgba(50, 200, 150, 0.3)',
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      );
+
+    case 'none':
+    default:
+      return null;
+  }
+});
+
+TileOverlay.displayName = 'TileOverlay';
+
+interface TileBadgeProps {
+  text?: string;
+  background?: string;
+  config: TileVisualConfig;
+}
+
+const TileBadge = memo<TileBadgeProps>(({ text, background, config }) => {
+  if (!text) return null;
+
+  return (
+    <span
+      className={cn(
+        'absolute -top-1 -right-1 z-20',
+        'min-w-[20px] h-[20px]',
+        'flex items-center justify-center',
+        'text-[10px] font-black text-neo-white',
+        'rounded-full border-2 border-neo-black/50',
+        background || config.badgeBackground
+      )}
+    >
+      {text}
+    </span>
+  );
+});
+
+TileBadge.displayName = 'TileBadge';
+
+// ==============================================
+// MAIN COMPONENT
+// ==============================================
+
+const ThemedTile = memo<ThemedTileProps>(
+  ({ tile, isSelected = false, className, onClick }) => {
+    const { getTileConfig, theme } = useAdventureTheme();
+    const { letter, type, isCleared, isFrozen, cascadeDelay } = tile;
+
+    // Get theme-based visual config for this tile type
+    const config = useMemo(() => getTileConfig(type), [getTileConfig, type]);
+
+    // Build dynamic classes based on config
+    const tileClasses = useMemo(
+      () => buildTileClasses(config, isSelected, isCleared || false, isFrozen || false),
+      [config, isSelected, isCleared, isFrozen]
+    );
+
+    // Get the icon for special tiles
+    const icon = getTileIcon(type);
+
+    // Accessibility label
+    const ariaLabel = type === 'standard'
+      ? `Letter ${letter}`
+      : `Letter ${letter}, ${type} tile`;
+
+    // Animation variants based on theme
+    const entryAnimation = theme.animations.tileEntry;
+    const getEntryVariants = () => {
+      switch (entryAnimation) {
+        case 'cascade':
+          return { initial: { y: -20, opacity: 0 }, animate: { y: 0, opacity: 1 } };
+        case 'wave':
+          return { initial: { x: -20, opacity: 0 }, animate: { x: 0, opacity: 1 } };
+        case 'spiral':
+          return { initial: { scale: 0, rotate: -180 }, animate: { scale: 1, rotate: 0 } };
+        case 'fade':
+        default:
+          return { initial: { opacity: 0 }, animate: { opacity: 1 } };
+      }
+    };
+
+    const entryVariants = getEntryVariants();
+
+    return (
+      <motion.div
+        role="gridcell"
+        aria-label={ariaLabel}
+        aria-selected={isSelected}
+        onClick={onClick}
+        className={cn(
+          // Base styles
+          'relative aspect-square flex items-center justify-center',
+          'font-black cursor-pointer overflow-hidden',
+          'transition-all duration-200',
+
+          // Theme-based classes
+          tileClasses,
+
+          // Selection ring uses theme primary color
+          isSelected && `ring-${theme.colors.primary}`,
+
+          // Custom className
+          className
+        )}
+        style={{
+          animationDelay: cascadeDelay ? `${cascadeDelay}ms` : undefined,
+        }}
+        initial={entryVariants.initial}
+        animate={{
+          ...entryVariants.animate,
+          scale: isSelected ? 1.05 : 1,
+          y: isSelected ? -2 : 0,
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cascadeDelay ? cascadeDelay / 1000 : 0,
+        }}
+        whileHover={!isCleared ? { scale: 1.02 } : undefined}
+      >
+        {/* Theme-specific overlay effects */}
+        <TileOverlay type={config.overlayType} config={config} />
+
+        {/* Show texture on standard tiles */}
+        {config.showTexture && (
+          <div className="absolute inset-0 opacity-10 bg-[url('/images/textures/grain.png')] rounded-neo" />
+        )}
+
+        {/* Letter text */}
+        <span
+          className={cn(
+            'relative z-10 select-none',
+            'text-[clamp(1rem,4cqw,2rem)]',
+            type === 'standard' ? 'text-neo-black' : 'text-inherit'
+          )}
+        >
+          {letter}
+        </span>
+
+        {/* Badge (for gold, rainbow, time tiles) */}
+        <TileBadge
+          text={config.badgeText}
+          background={config.badgeBackground}
+          config={config}
+        />
+
+        {/* Icon for bomb, chain, time tiles */}
+        {icon && (
+          <span className="absolute top-0.5 right-0.5 z-20">
+            {icon}
+          </span>
+        )}
+
+        {/* Chain indicator for chained tiles */}
+        {tile.isChained && tile.chainedWith && tile.chainedWith.length > 0 && (
+          <div className="absolute inset-0 border-2 border-purple-400 rounded-neo animate-pulse" />
+        )}
+      </motion.div>
+    );
+  }
+);
+
+ThemedTile.displayName = 'ThemedTile';
+
+export default ThemedTile;

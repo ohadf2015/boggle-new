@@ -243,10 +243,10 @@ export default function WebVitalsPage() {
   }
 
   return (
-    <div className={cn("flex-1 flex flex-col", isDark ? "bg-gray-900" : "bg-gray-50")}>
+    <div className={cn("flex-1 flex flex-col w-full overflow-x-hidden", isDark ? "bg-gray-900" : "bg-gray-50")}>
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

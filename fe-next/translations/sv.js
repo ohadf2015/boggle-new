@@ -3630,6 +3630,7 @@ const sv = {
     "continueToNext": "Fortsätt",
     "retryLevel": "Försök igen",
     "loadError": "Kunde inte ladda framsteg",
+    "boss": "Boss",
     "worlds": {
       "alphabetMeadows": "Alfabetsängarna",
       "synonymSprings": "Synonymkällorna",
@@ -3641,6 +3642,35 @@ const sv = {
       "neologismNebula": "Neologismnebulosan",
       "polyglotPeaks": "Polyglottopparna",
       "lexiconThrone": "Lexikontronen"
+    },
+    "chapters": {
+      "meadows": {
+        "zone1": "Gräsmarkerna",
+        "zone2": "Blomträdgårdarna",
+        "bossZone": "Uråldriga Eken"
+      },
+      "springs": {
+        "zone1": "Kristallbäcken",
+        "zone2": "Kaskadfallen",
+        "bossZone": "Djupa Dammen"
+      },
+      "caverns": {
+        "zone1": "Rottunnlarna",
+        "zone2": "Kristallhallarna",
+        "bossZone": "Etymologikammaren"
+      }
+    },
+    "themes": {
+      "sunny-pastoral": "Solig Pastoral",
+      "waterfalls": "Vattenfall",
+      "crystal-caves": "Kristallgrottor",
+      "tropical-islands": "Tropiska Öar",
+      "desert-cliffs": "Ökenklippor",
+      "escher-maze": "Escherlabyrint",
+      "reflective-glass": "Reflekterande Glas",
+      "space-stars": "Rymdstjärnor",
+      "mountain-aurora": "Bergsaurora",
+      "golden-library": "Gyllene Bibliotek"
     },
     "mechanics": {
       "synonymPairs": "+25% för synonympar",

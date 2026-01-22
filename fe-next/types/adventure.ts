@@ -16,8 +16,10 @@
  * - ice: Obstacle that must be cleared
  * - bomb: Clears entire row when used
  * - rainbow: Wildcard that matches any letter
+ * - chain: Links adjacent tiles together for combo bonuses
+ * - time: Adds bonus time when used in a word
  */
-export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow';
+export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time';
 
 /**
  * State of an individual tile in the game grid
@@ -25,7 +27,7 @@ export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow';
 export interface TileState {
   /** The letter displayed on this tile */
   letter: string;
-  /** The type of tile (standard, gold, ice, bomb, rainbow) */
+  /** The type of tile (standard, gold, ice, bomb, rainbow, chain, time) */
   type: TileType;
   /** Whether the tile has been cleared/used */
   isCleared: boolean;
@@ -33,6 +35,12 @@ export interface TileState {
   cascadeDelay?: number;
   /** Whether the tile is frozen (for ice tiles) */
   isFrozen?: boolean;
+  /** Whether the tile is part of a chain (for chain tiles) */
+  isChained?: boolean;
+  /** Indices of tiles chained to this one (for chain tiles) */
+  chainedWith?: number[];
+  /** Bonus time value in seconds (for time tiles) */
+  bonusTime?: number;
 }
 
 /**
@@ -107,7 +115,7 @@ export interface LevelObjective {
 export interface LevelConfig {
   /** World number (1-10) */
   world: number;
-  /** Level number within the world (1-10) */
+  /** Level number within the world (1-7) */
   level: number;
   /** Grid size (4x4, 5x5, 6x6, or 7x7) */
   gridSize: 4 | 5 | 6 | 7;
@@ -123,6 +131,12 @@ export interface LevelConfig {
   hiddenWord?: string;
   /** Optional world mechanic identifier */
   worldMechanic?: string;
+  /** Chapter number within the world (1-3) */
+  chapterNumber: 1 | 2 | 3;
+  /** Level position within the chapter (1-3) */
+  levelInChapter: 1 | 2 | 3;
+  /** Whether this is a boss level (last level of world) */
+  isBossLevel: boolean;
 }
 
 // ==============================================

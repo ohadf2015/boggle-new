@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 2289,
+    "totalKeysInCode": 2302,
     "keyCountByLanguage": {
-      "en": 2911,
-      "he": 2901,
-      "sv": 2895,
-      "ja": 2901,
-      "es": 2901
+      "en": 2923,
+      "he": 2923,
+      "sv": 2917,
+      "ja": 2923,
+      "es": 2923
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
       "fallbackUsages": 0,
-      "variableKeys": 3
+      "variableKeys": 6
     }
   },
   "runtimeRisks": {
@@ -50,6 +50,30 @@
     "fallbackUsages": [],
     "variableKeys": [
       {
+        "pattern": "t(mechanicNameKey)",
+        "variable": "mechanicNameKey",
+        "file": "components/adventure/themed/ModifierBadge.tsx",
+        "line": 80,
+        "context": "{t(mechanicNameKey)}",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(mechanicDescKey)",
+        "variable": "mechanicDescKey",
+        "file": "components/adventure/themed/ModifierBadge.tsx",
+        "line": 86,
+        "context": "{t(mechanicDescKey)}",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(mechanicNameKey)",
+        "variable": "mechanicNameKey",
+        "file": "components/adventure/themed/ModifierBadge.tsx",
+        "line": 97,
+        "context": "{t(mechanicNameKey)}",
+        "type": "variable_key"
+      },
+      {
         "pattern": "t(titleKey)",
         "variable": "titleKey",
         "file": "components/auth/shared/BenefitsList.tsx",
@@ -84,18 +108,7 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "adventure.themes.sunny-pastoral",
-      "adventure.themes.waterfalls",
-      "adventure.themes.crystal-caves",
-      "adventure.themes.tropical-islands",
-      "adventure.themes.desert-cliffs",
-      "adventure.themes.escher-maze",
-      "adventure.themes.reflective-glass",
-      "adventure.themes.space-stars",
-      "adventure.themes.mountain-aurora",
-      "adventure.themes.golden-library"
-    ],
+    "he": [],
     "sv": [
       "nextStep.tryDailyChallenge",
       "nextStep.tryDailyChallengeDesc",
@@ -111,17 +124,7 @@
       "daily.nextChallenge.buzzCTA",
       "daily.nextChallenge.multiplayerTitle",
       "daily.nextChallenge.multiplayerDesc",
-      "daily.nextChallenge.multiplayerCTA",
-      "adventure.themes.sunny-pastoral",
-      "adventure.themes.waterfalls",
-      "adventure.themes.crystal-caves",
-      "adventure.themes.tropical-islands",
-      "adventure.themes.desert-cliffs",
-      "adventure.themes.escher-maze",
-      "adventure.themes.reflective-glass",
-      "adventure.themes.space-stars",
-      "adventure.themes.mountain-aurora",
-      "adventure.themes.golden-library"
+      "daily.nextChallenge.multiplayerCTA"
     ],
     "ja": [
       "daily.nextChallenge.wordHuntTitle",
@@ -132,30 +135,9 @@
       "daily.nextChallenge.buzzCTA",
       "daily.nextChallenge.multiplayerTitle",
       "daily.nextChallenge.multiplayerDesc",
-      "daily.nextChallenge.multiplayerCTA",
-      "adventure.themes.sunny-pastoral",
-      "adventure.themes.waterfalls",
-      "adventure.themes.crystal-caves",
-      "adventure.themes.tropical-islands",
-      "adventure.themes.desert-cliffs",
-      "adventure.themes.escher-maze",
-      "adventure.themes.reflective-glass",
-      "adventure.themes.space-stars",
-      "adventure.themes.mountain-aurora",
-      "adventure.themes.golden-library"
+      "daily.nextChallenge.multiplayerCTA"
     ],
-    "es": [
-      "adventure.themes.sunny-pastoral",
-      "adventure.themes.waterfalls",
-      "adventure.themes.crystal-caves",
-      "adventure.themes.tropical-islands",
-      "adventure.themes.desert-cliffs",
-      "adventure.themes.escher-maze",
-      "adventure.themes.reflective-glass",
-      "adventure.themes.space-stars",
-      "adventure.themes.mountain-aurora",
-      "adventure.themes.golden-library"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

@@ -24,9 +24,9 @@ interface UseAdventureLevelReturn {
   levelConfig: LevelConfig | null;
   /** World configuration */
   worldConfig: WorldConfig | null;
-  /** Whether this is a boss level (level 10) */
+  /** Whether this is a boss level (final level of the world) */
   isBossLevel: boolean;
-  /** Global level number (1-100) */
+  /** Global level number (1-70) */
   globalLevelNumber: number;
   /** Error if invalid world/level */
   error: Error | null;
@@ -40,7 +40,7 @@ interface UseAdventureLevelReturn {
  * Hook to get adventure level configuration
  *
  * @param world - World number (1-10)
- * @param level - Level number within world (1-10)
+ * @param level - Level number within world (1-7)
  * @returns Level config, world config, and metadata
  */
 export function useAdventureLevel(
@@ -86,7 +86,7 @@ export function useAdventureLevel(
 
   // Compute derived values
   const isBossLevel = useMemo(() => {
-    return level === LEVELS_PER_WORLD; // Level 10 is boss level
+    return level === LEVELS_PER_WORLD; // Level 7 is boss level (final level of world)
   }, [level]);
 
   const globalLevelNumber = useMemo(() => {
