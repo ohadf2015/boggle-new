@@ -3627,6 +3627,7 @@ const en = {
     "subtitle": "Journey through 10 themed worlds, conquer 100 levels, and become the ultimate word master!",
     "progress": "Progress",
     "levels": "levels",
+    "level": "Level",
     "backToMap": "Back to World Map",
     "worldLabel": "World",
     "hiddenWord": "Hidden Word",

@@ -25,15 +25,7 @@ jest.mock('@/components/animations/WordPathTrail', () => {
   return { WordPathTrail };
 });
 
-// Mock device performance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
-  useDevicePerformance: jest.fn(() => ({
-    isLowEnd: false,
-    prefersReducedMotion: false,
-    enableGlowEffects: true,
-    enableComplexAnimations: true,
-  })),
-}));
+// Note: useDevicePerformance is mocked globally in jest.setup.js
 
 describe('AdventureGrid - WordPathTrail Integration', () => {
   // Test tile data

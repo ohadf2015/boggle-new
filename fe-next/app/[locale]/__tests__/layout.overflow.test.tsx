@@ -46,9 +46,13 @@ describe('Layout Mobile Scroll Architecture', () => {
       // Should have min-h-0 to allow shrinking in flex context
       expect(wrapperClasses).toContain('min-h-0');
 
-      // CRITICAL: Should have overflow-x-hidden (NOT overflow-hidden)
-      // overflow-hidden blocks touch scroll on mobile; overflow-x-hidden allows it
-      expect(wrapperClasses).toContain('overflow-x-hidden');
+      // CRITICAL: Should have overflow-x constraint (NOT overflow-hidden)
+      // overflow-hidden blocks touch scroll on mobile; overflow-x containment allows it
+      // Can use either overflow-x-hidden or [overflow-x:clip] (clip is actually better)
+      const hasOverflowXConstraint =
+        wrapperClasses.includes('overflow-x-hidden') ||
+        wrapperClasses.includes('[overflow-x:clip]');
+      expect(hasOverflowXConstraint).toBe(true);
 
       // Should NOT have overflow-hidden - this blocks mobile touch scroll
       expect(wrapperClasses).not.toContain('overflow-hidden ');

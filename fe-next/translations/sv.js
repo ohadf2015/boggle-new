@@ -3632,6 +3632,7 @@ const sv = {
     "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
     "progress": "Framsteg",
     "levels": "nivåer",
+    "level": "Nivå",
     "backToMap": "Tillbaka till världskartan",
     "worldLabel": "Värld",
     "hiddenWord": "Dolt ord",

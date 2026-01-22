@@ -39,6 +39,8 @@ interface UseAdventureGameReturn {
   canComplete: boolean;
   /** Whether the game is currently running */
   isPlaying: boolean;
+  /** Whether cascade animation has completed */
+  cascadeComplete: boolean;
   /** Submit a word and score */
   submitWord: (word: string, score: number) => void;
   /** Submit a word with path for special tile effects */
@@ -57,6 +59,8 @@ interface UseAdventureGameReturn {
   resetGame: () => void;
   /** Check if a tile is a wildcard (rainbow) */
   isWildcard: (row: number, col: number) => boolean;
+  /** Mark cascade animation as complete */
+  markCascadeComplete: () => void;
 }
 
 // ==============================================
@@ -77,7 +81,8 @@ type GameAction =
     }
   | { type: 'COMPLETE_LEVEL' }
   | { type: 'RESET_GAME'; payload: { initialState: GameState } }
-  | { type: 'COMBO_TIMEOUT' };
+  | { type: 'COMBO_TIMEOUT' }
+  | { type: 'CASCADE_COMPLETE' };
 
 interface GameState {
   gameState: AdventureGameState;
@@ -86,6 +91,7 @@ interface GameState {
   timeRemaining: number;
   isPlaying: boolean;
   levelConfig: LevelConfig;
+  cascadeComplete: boolean;
 }
 
 // ==============================================
@@ -170,6 +176,7 @@ function createInitialState(
     timeRemaining: levelConfig.timerSeconds,
     isPlaying: false,
     levelConfig,
+    cascadeComplete: false,
   };
 }
 
@@ -362,6 +369,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         },
       };
 
+    case 'CASCADE_COMPLETE':
+      return {
+        ...state,
+        cascadeComplete: true,
+      };
+
     case 'COMPLETE_LEVEL': {
       // Update time bonus objective if applicable
       const updatedObjectives = state.objectives.map((obj) => {
@@ -524,6 +537,10 @@ export function useAdventureGame({
     [state.tiles]
   );
 
+  const markCascadeComplete = useCallback(() => {
+    dispatch({ type: 'CASCADE_COMPLETE' });
+  }, []);
+
   return {
     gameState: state.gameState,
     tiles: state.tiles,
@@ -531,6 +548,7 @@ export function useAdventureGame({
     timeRemaining: state.timeRemaining,
     canComplete,
     isPlaying: state.isPlaying,
+    cascadeComplete: state.cascadeComplete,
     submitWord,
     submitWordWithPath,
     startGame,
@@ -538,5 +556,6 @@ export function useAdventureGame({
     completeLevel,
     resetGame,
     isWildcard,
+    markCascadeComplete,
   };
 }

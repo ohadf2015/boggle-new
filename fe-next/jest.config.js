@@ -96,8 +96,10 @@ const customJestConfig = {
   testTimeout: 10000,
 
   // Clear mocks between tests
+  // clearMocks: true clears mock call history but preserves implementations
+  // resetMocks: false prevents mock implementations from being reset to undefined
   clearMocks: true,
-  resetMocks: true,
+  resetMocks: false,
 
   // Verbose output
   verbose: true,

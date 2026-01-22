@@ -4,13 +4,10 @@ import {
   DEFAULT_IDLE_ACTIVITIES,
   DEFAULT_BASE_VARIANTS,
 } from '../useRandomMascotActivity';
-import { useDevicePerformance } from '../useDevicePerformance';
 
-// Mock device performance hook
-jest.mock('../useDevicePerformance');
-const mockUseDevicePerformance = useDevicePerformance as jest.MockedFunction<
-  typeof useDevicePerformance
->;
+// Use global mock from jest.setup.js
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockUseDevicePerformance = (global as any).mockUseDevicePerformance;
 
 describe('useRandomMascotActivity', () => {
   beforeEach(() => {

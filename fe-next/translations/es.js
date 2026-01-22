@@ -3621,6 +3621,7 @@ const es = {
     "subtitle": "¡Viaja por 10 mundos temáticos, conquista 100 niveles y conviértete en el maestro de palabras definitivo!",
     "progress": "Progreso",
     "levels": "niveles",
+    "level": "Nivel",
     "backToMap": "Volver al mapa del mundo",
     "worldLabel": "Mundo",
     "hiddenWord": "Palabra oculta",

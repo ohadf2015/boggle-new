@@ -12,7 +12,7 @@ import AdventureGame from '../AdventureGame';
 jest.mock('@/hooks/useAdventureGame');
 jest.mock('@/hooks/useAdventureWordValidation');
 jest.mock('@/hooks/useAdventureSelection');
-jest.mock('@/hooks/useDevicePerformance');
+// Note: useDevicePerformance is mocked globally in jest.setup.js
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
@@ -97,6 +97,10 @@ const mockInitialGrid = [
   ['S', 'T', 'A', 'R'],
 ];
 
+// Use global mock from jest.setup.js
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockUseDevicePerformance = (global as any).mockUseDevicePerformance;
+
 describe('AdventureGame - Score Popup Animation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -105,12 +109,18 @@ describe('AdventureGame - Score Popup Animation', () => {
     const { useAdventureGame } = require('@/hooks/useAdventureGame');
     const { useAdventureWordValidation } = require('@/hooks/useAdventureWordValidation');
     const { useAdventureSelection } = require('@/hooks/useAdventureSelection');
-    const { useDevicePerformance } = require('@/hooks/useDevicePerformance');
 
-    useDevicePerformance.mockReturnValue({
+    mockUseDevicePerformance.mockReturnValue({
       isLowEnd: false,
       prefersReducedMotion: false,
       enableGlowEffects: true,
+      enableComplexAnimations: true,
+      targetFPS: 60,
+      throttleMs: 16,
+      reduceParticles: false,
+      maxParticles: 20,
+      isSlowConnection: false,
+      isMobile: false,
     });
 
     useAdventureGame.mockReturnValue({

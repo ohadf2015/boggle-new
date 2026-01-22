@@ -10,6 +10,15 @@ import { render, screen } from '@testing-library/react';
 import AdventureObjectives from '../AdventureObjectives';
 import type { LevelObjective } from '@/types/adventure';
 
+// Mock LanguageContext
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================

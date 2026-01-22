@@ -557,7 +557,10 @@ describe('AdventureGrid', () => {
       );
 
       const cells = screen.getAllByRole('gridcell');
-      fireEvent.touchStart(cells[0]);
+      // Touch events must include touches array with coordinates
+      fireEvent.touchStart(cells[0], {
+        touches: [{ clientX: 50, clientY: 50 }],
+      });
 
       // THEN
       expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
@@ -586,8 +589,10 @@ describe('AdventureGrid', () => {
       const grid = screen.getByRole('grid');
       const cells = screen.getAllByRole('gridcell');
 
-      // Start drag on first cell
-      fireEvent.touchStart(cells[0]);
+      // Start drag on first cell with proper touch coordinates
+      fireEvent.touchStart(cells[0], {
+        touches: [{ clientX: 50, clientY: 50 }],
+      });
       expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
 
       // Mock elementFromPoint to return second cell
@@ -627,8 +632,10 @@ describe('AdventureGrid', () => {
       const grid = screen.getByRole('grid');
       const cells = screen.getAllByRole('gridcell');
 
-      // Start drag
-      fireEvent.touchStart(cells[0]);
+      // Start drag with proper touch coordinates
+      fireEvent.touchStart(cells[0], {
+        touches: [{ clientX: 50, clientY: 50 }],
+      });
 
       // Mock elementFromPoint to return second cell
       document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);

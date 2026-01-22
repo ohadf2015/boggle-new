@@ -6,7 +6,7 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import {
   Check,
   Target,
@@ -16,7 +16,10 @@ import {
   Gem,
   FileText,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
@@ -28,6 +31,10 @@ interface AdventureObjectivesProps {
   objectives: LevelObjective[];
   /** Additional CSS classes */
   className?: string;
+  /** Whether to show slide-in animation */
+  showSlideIn?: boolean;
+  /** Callback when slide-in animation completes */
+  onSlideInComplete?: () => void;
 }
 
 // ==============================================
@@ -57,23 +64,95 @@ const OBJECTIVE_LABELS: Record<ObjectiveType, string> = {
 // ==============================================
 
 const AdventureObjectives = memo<AdventureObjectivesProps>(
-  ({ objectives, className }) => {
+  ({ objectives, className, showSlideIn = false, onSlideInComplete }) => {
+    const { language } = useLanguage();
+    const { prefersReducedMotion } = useDevicePerformance();
+    const isRTL = language === 'he';
+
+    // Track animation completion
+    const [animationComplete, setAnimationComplete] = useState(!showSlideIn);
+
+    // Reset animation state when showSlideIn transitions to true
+    // This handles the case where component renders first with showSlideIn=false
+    // (during cascade phase), then showSlideIn becomes true (objectives phase)
+    useEffect(() => {
+      if (showSlideIn && animationComplete) {
+        setAnimationComplete(false);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally omit animationComplete to avoid infinite loop
+    }, [showSlideIn]);
+
+    // Calculate total animation time and call completion callback
+    useEffect(() => {
+      if (!showSlideIn || animationComplete) return;
+
+      // Calculate total animation time: each objective staggers 100ms + 300ms duration
+      const totalTime = objectives.length * 100 + 300;
+
+      const timer = setTimeout(() => {
+        setAnimationComplete(true);
+        onSlideInComplete?.();
+      }, totalTime);
+
+      return () => clearTimeout(timer);
+    }, [showSlideIn, animationComplete, objectives.length, onSlideInComplete]);
+
+    // Handle reduced motion - complete immediately
+    useEffect(() => {
+      if (showSlideIn && prefersReducedMotion && !animationComplete) {
+        setAnimationComplete(true);
+        onSlideInComplete?.();
+      }
+    }, [showSlideIn, prefersReducedMotion, animationComplete, onSlideInComplete]);
+
+    // Define animation variants for slide-in
+    const slideVariants = {
+      hidden: (isRTL: boolean) => ({
+        x: isRTL ? -50 : 50,
+        opacity: 0,
+      }),
+      visible: {
+        x: 0,
+        opacity: 1,
+      },
+    };
+
     return (
-      <ul
+      <motion.ul
         role="list"
         className={cn('flex flex-col gap-2', className)}
         aria-label="Level objectives"
+        initial={false}
+        data-testid="objectives-list"
+        data-animation-complete={animationComplete}
       >
-        {objectives.map((objective) => {
+        {objectives.map((objective, index) => {
           const Icon = OBJECTIVE_ICONS[objective.type];
           const label = OBJECTIVE_LABELS[objective.type];
           const current = objective.current ?? 0;
           const progress = Math.min((current / objective.target) * 100, 100);
 
+          // Skip animation if not showing or reduced motion
+          const shouldAnimate = showSlideIn && !prefersReducedMotion && !animationComplete;
+
           return (
-            <li
+            <motion.li
               key={objective.type}
               data-testid={`objective-${objective.type}`}
+              custom={isRTL}
+              initial={shouldAnimate ? 'hidden' : 'visible'}
+              animate="visible"
+              variants={slideVariants}
+              transition={
+                shouldAnimate
+                  ? {
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 30,
+                      delay: index * 0.1, // 100ms stagger between objectives
+                    }
+                  : { duration: 0 }
+              }
               className={cn(
                 'flex items-center gap-2 p-2 rounded-neo',
                 'border-2 border-neo-black/20',
@@ -170,10 +249,10 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                   <Check className="w-4 h-4" strokeWidth={3} />
                 </div>
               )}
-            </li>
+            </motion.li>
           );
         })}
-      </ul>
+      </motion.ul>
     );
   }
 );

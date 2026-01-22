@@ -17,17 +17,16 @@ import type { PlayerProgression } from '@/types/adventure';
 // Mock framer-motion with all hooks used by components
 jest.mock('framer-motion', () => {
   const React = require('react');
-  const MockMotionDiv = React.forwardRef(
-    ({ children, ...props }: any, ref: any) =>
-      React.createElement('div', { ...props, ref }, children)
-  );
-  MockMotionDiv.displayName = 'MockMotionDiv';
 
-  const MockMotionButton = React.forwardRef(
-    ({ children, ...props }: any, ref: any) =>
-      React.createElement('button', { ...props, ref }, children)
-  );
-  MockMotionButton.displayName = 'MockMotionButton';
+  // Create mock motion component factory
+  const createMockMotion = (element: string) => {
+    const MockComponent = React.forwardRef(
+      ({ children, ...props }: any, ref: any) =>
+        React.createElement(element, { ...props, ref }, children)
+    );
+    MockComponent.displayName = `MockMotion${element.charAt(0).toUpperCase() + element.slice(1)}`;
+    return MockComponent;
+  };
 
   // Mock useMotionValue with get/set methods
   const useMotionValue = (initial: any) => ({
@@ -47,8 +46,11 @@ jest.mock('framer-motion', () => {
 
   return {
     motion: {
-      div: MockMotionDiv,
-      button: MockMotionButton,
+      div: createMockMotion('div'),
+      button: createMockMotion('button'),
+      ul: createMockMotion('ul'),
+      li: createMockMotion('li'),
+      span: createMockMotion('span'),
     },
     AnimatePresence: ({ children }: any) => children,
     useMotionValue,

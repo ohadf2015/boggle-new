@@ -61,7 +61,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('@/utils/profileStorage', () => ({
-  getStoredUsername: jest.fn().mockReturnValue('TestPlayer'),
+  getStoredUsername: jest.fn().mockReturnValue('Test Avatar'),
   getStoredAvatarId: jest.fn().mockReturnValue('avatar-1'),
   setStoredUsername: jest.fn(),
   setStoredAvatarId: jest.fn(),

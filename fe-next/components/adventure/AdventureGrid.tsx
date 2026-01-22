@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
@@ -49,6 +49,10 @@ interface AdventureGridProps {
   isWordValid?: boolean;
   /** Whether word was just submitted */
   wasWordSubmitted?: boolean;
+  /** Whether cascade animation should play on mount */
+  showCascade?: boolean;
+  /** Callback when cascade animation completes */
+  onCascadeComplete?: () => void;
 }
 
 // ==============================================
@@ -104,6 +108,8 @@ const AdventureGrid = memo(
         pathPoints,
         isWordValid = false,
         wasWordSubmitted = false,
+        showCascade = false,
+        onCascadeComplete,
       },
       ref
     ) => {
@@ -113,6 +119,9 @@ const AdventureGrid = memo(
       const lastTouchTileIndexRef = useRef<number | null>(null);
       // Ref to grid container for touch event handling
       const gridRef = useRef<HTMLDivElement>(null);
+
+      // Cascade animation state
+      const [cascadeComplete, setCascadeComplete] = useState(!showCascade);
 
       // Merge refs (internal and forwarded)
       React.useImperativeHandle(ref, () => gridRef.current!);
@@ -128,6 +137,38 @@ const AdventureGrid = memo(
         position: { x: number; y: number } | null;
         key: number;
       }>({ position: null, key: 0 });
+
+    // Calculate cascade delay per tile (diagonal wave pattern)
+    const getCascadeDelay = useCallback((row: number, col: number): number => {
+      // Diagonal wave: tiles closer to top-left appear first
+      const diagonalIndex = row + col;
+      const baseDelay = 30; // ms between each diagonal
+      return diagonalIndex * baseDelay;
+    }, []);
+
+    // Cascade completion effect
+    useEffect(() => {
+      if (!showCascade || cascadeComplete) return;
+
+      // Calculate total cascade duration
+      const maxDiagonal = (gridSize - 1) * 2;
+      const totalDuration = maxDiagonal * 30 + 400; // stagger + spring settle time
+
+      const timer = setTimeout(() => {
+        setCascadeComplete(true);
+        onCascadeComplete?.();
+      }, totalDuration);
+
+      return () => clearTimeout(timer);
+    }, [showCascade, cascadeComplete, gridSize, onCascadeComplete]);
+
+    // Instant completion for reduced motion
+    useEffect(() => {
+      if (showCascade && prefersReducedMotion && !cascadeComplete) {
+        setCascadeComplete(true);
+        onCascadeComplete?.();
+      }
+    }, [showCascade, prefersReducedMotion, cascadeComplete, onCascadeComplete]);
 
     // Build selected set for quick lookup
     const selectedSet = useMemo(
@@ -304,25 +345,34 @@ const AdventureGrid = memo(
                 onMouseDown={(e) => handleDragStart(e, index, tile)}
                 onMouseEnter={() => handleDragEnter(index, tile)}
                 onTouchStart={(e) => handleDragStart(e, index, tile)}
-                animate={
-                  prefersReducedMotion
-                    ? { scale: isSelected ? 1.1 : 1, y: 0, rotate: 0 }
-                    : {
-                        scale: isSelected ? 1.1 : 1,
-                        y: isSelected ? -2 : 0,
-                        rotate: isSelected ? [0, -2, 2, 0] : 0,
-                      }
-                }
+                initial={showCascade && !cascadeComplete ? {
+                  y: -100,
+                  opacity: 0,
+                  scale: 0.8,
+                } : undefined}
+                animate={{
+                  y: isSelected ? -2 : 0,
+                  opacity: 1,
+                  scale: isSelected ? 1.1 : 1,
+                  rotate: isSelected && !prefersReducedMotion ? [0, -2, 2, 0] : 0,
+                }}
                 transition={
                   prefersReducedMotion
                     ? { duration: 0 }
-                    : {
-                        type: 'spring',
-                        stiffness: 300,
-                        damping: 20,
-                        mass: 0.5,
-                        rotate: { duration: 0.3 },
-                      }
+                    : showCascade && !cascadeComplete
+                      ? {
+                          type: 'spring',
+                          stiffness: 400,
+                          damping: 25,
+                          mass: 0.8,
+                          delay: getCascadeDelay(tile.row, tile.col) / 1000,
+                        }
+                      : {
+                          type: 'spring',
+                          stiffness: 300,
+                          damping: 20,
+                          mass: 0.5,
+                        }
                 }
                 whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
                 style={{

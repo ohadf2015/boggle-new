@@ -19,6 +19,7 @@ import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
 import LevelCompleteModal from './LevelCompleteModal';
+import LevelEntryOverlay from './LevelEntryOverlay';
 import WorldBackground from './themed/WorldBackground';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
@@ -82,11 +83,13 @@ const AdventureGame = memo<AdventureGameProps>(
       timeRemaining,
       canComplete,
       isPlaying,
+      cascadeComplete,
       submitWord,
       startGame,
       pauseGame,
       completeLevel,
       resetGame,
+      markCascadeComplete,
     } = useAdventureGame({
       levelConfig,
       initialGrid,
@@ -105,6 +108,9 @@ const AdventureGame = memo<AdventureGameProps>(
     const [wasWordSubmitted, setWasWordSubmitted] = useState(false);
     const [isWordValid, setIsWordValid] = useState(false);
     const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
+
+    // Track entry sequence phases
+    const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
 
     // Ref for score display target (for ScorePopupFly animation)
     const scoreDisplayRef = useRef<HTMLDivElement>(null);
@@ -138,12 +144,24 @@ const AdventureGame = memo<AdventureGameProps>(
       gridRef,
     });
 
-    // Start game on mount
-    useEffect(() => {
-      if (isValidConfig) {
+    // Handle cascade completion to advance to objectives phase
+    const handleCascadeComplete = useCallback(() => {
+      markCascadeComplete();
+      setEntryPhase('objectives');
+    }, [markCascadeComplete]);
+
+    // Handle objectives slide-in completion to advance to title phase
+    const handleObjectivesComplete = useCallback(() => {
+      setEntryPhase('title');
+    }, []);
+
+    // Handle title animation completion to start gameplay
+    const handleTitleComplete = useCallback(() => {
+      setEntryPhase('playing');
+      if (!isPlaying) {
         startGame();
       }
-    }, [isValidConfig, startGame]);
+    }, [isPlaying, startGame]);
 
     // Check for level completion
     useEffect(() => {
@@ -405,13 +423,15 @@ const AdventureGame = memo<AdventureGameProps>(
               onWordSubmit={handleWordSubmit}
               onDragStart={handleDragStart}
               onDragEnter={handleDragEnter}
-              interactive={isPlaying && !isPaused && !isValidating}
-              disabled={!isPlaying || isPaused || isValidating}
+              interactive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating}
+              disabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
               showWordPreview
               className="max-w-md w-full"
               pathPoints={pathPoints}
               isWordValid={isWordValid}
               wasWordSubmitted={wasWordSubmitted}
+              showCascade={entryPhase === 'cascade'}
+              onCascadeComplete={handleCascadeComplete}
             />
           </div>
 
@@ -427,7 +447,11 @@ const AdventureGame = memo<AdventureGameProps>(
               <h2 className="text-sm font-bold text-neo-white/60 uppercase tracking-wide mb-2">
                 Objectives
               </h2>
-              <AdventureObjectives objectives={objectives} />
+              <AdventureObjectives
+                objectives={objectives}
+                showSlideIn={entryPhase === 'objectives'}
+                onSlideInComplete={handleObjectivesComplete}
+              />
             </div>
 
             {/* Combo Display */}
@@ -493,6 +517,14 @@ const AdventureGame = memo<AdventureGameProps>(
             </div>
           </div>
         )}
+
+        {/* Level Entry Overlay - shows during title phase */}
+        <LevelEntryOverlay
+          levelNumber={levelConfig.level}
+          worldNumber={levelConfig.world}
+          isVisible={entryPhase === 'title'}
+          onComplete={handleTitleComplete}
+        />
 
         {/* Level Complete Modal */}
         <LevelCompleteModal

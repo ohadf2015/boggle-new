@@ -1,0 +1,61 @@
+/**
+ * Admin API Routes - Main Router
+ * Combines all admin sub-routers with authentication and rate limiting.
+ *
+ * Security features:
+ * - JWT authentication via Supabase
+ * - Admin role verification
+ * - Rate limiting per IP
+ * - Audit logging for sensitive operations
+ *
+ * Route structure:
+ * - /api/admin/stats - Dashboard statistics
+ * - /api/admin/players/* - Player management
+ * - /api/admin/games/* - Game history
+ * - /api/admin/activity/* - Activity tracking
+ * - /api/admin/realtime - Live stats
+ * - /api/admin/live-games - Live game monitoring
+ * - /api/admin/analytics/* - Guest analytics
+ * - /api/admin/bot-words - Bot word management
+ * - /api/admin/bot-blacklist - Blacklist management
+ * - /api/admin/community-words - Community word moderation
+ * - /api/admin/invalid-words - Invalid word submissions
+ * - /api/admin/daily-word/* - Daily challenge management
+ * - /api/admin/send-test-email - Email testing
+ */
+
+import express, { Router } from 'express';
+import { adminRateLimit, adminAuth } from './middleware';
+import statsRoutes from './statsRoutes';
+import playerRoutes from './playerRoutes';
+import gameRoutes from './gameRoutes';
+import wordModerationRoutes from './wordModerationRoutes';
+import utilityRoutes from './utilityRoutes';
+
+const router: Router = express.Router();
+
+// Apply rate limiting first, then auth to all admin routes
+router.use(adminRateLimit);
+router.use(adminAuth);
+
+// Mount sub-routers
+// Stats routes (/api/admin/stats)
+router.use('/', statsRoutes);
+
+// Player routes (/api/admin/players/*)
+router.use('/', playerRoutes);
+
+// Game routes (/api/admin/games/*, /api/admin/activity/*, /api/admin/realtime, etc.)
+router.use('/', gameRoutes);
+
+// Word moderation routes (/api/admin/bot-words, /api/admin/community-words, /api/admin/invalid-words)
+router.use('/', wordModerationRoutes);
+
+// Utility routes (/api/admin/daily-word/*, /api/admin/send-test-email)
+router.use('/', utilityRoutes);
+
+export default router;
+
+// Re-export types and middleware for external use
+export * from './types';
+export { auditLog, adminRateLimit, adminAuth, adminRateLimiter } from './middleware';

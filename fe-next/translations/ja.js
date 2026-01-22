@@ -3632,6 +3632,7 @@ const ja = {
     "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
     "progress": "進捗",
     "levels": "レベル",
+    "level": "レベル",
     "backToMap": "ワールドマップに戻る",
     "worldLabel": "ワールド",
     "hiddenWord": "隠しワード",

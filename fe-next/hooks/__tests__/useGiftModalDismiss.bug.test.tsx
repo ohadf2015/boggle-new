@@ -8,12 +8,7 @@
  * Expected: Once dismissed, the modal should NOT auto-show in future sessions.
  */
 
-import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Mock fetch for API calls
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
 
 // Mock AuthContext
 jest.mock('@/contexts/AuthContext', () => ({
@@ -30,8 +25,9 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockFetch.mockClear();
+    // Don't call jest.clearAllMocks() - it clears mock implementations too
+    // Just clear the specific mocks we need
+    (global.fetch as jest.Mock).mockReset();
     localStorage.clear();
     sessionStorage.clear();
 
@@ -56,7 +52,7 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
     });
 
     // Mock API response with unclaimed gifts
-    mockFetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         gifts: [
@@ -85,13 +81,17 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
 
   it('should persist dismissal to database when user closes modal', async () => {
     // Mock API endpoint to mark modal as dismissed
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        success: true,
-        dismissedAt: '2026-01-19T12:30:00Z',
-      }),
-    });
+    // Use mockImplementationOnce instead of mockResolvedValueOnce for more reliable behavior
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            dismissedAt: '2026-01-19T12:30:00Z',
+          }),
+      })
+    );
 
     // Simulate API call when user dismisses modal
     const response = await fetch('/api/player/gifts/dismiss-modal', {
@@ -100,7 +100,7 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
 
     const data = await response.json();
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/player/gifts/dismiss-modal', {
+    expect(global.fetch).toHaveBeenCalledWith('/api/player/gifts/dismiss-modal', {
       method: 'POST',
     });
     expect(data.success).toBe(true);

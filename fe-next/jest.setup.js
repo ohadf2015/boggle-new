@@ -235,6 +235,37 @@ global.Audio = jest.fn().mockImplementation(() => ({
 }));
 
 // ==========================================
+// Mock useDevicePerformance Hook
+// ==========================================
+
+// Default values for useDevicePerformance mock
+const defaultDevicePerformanceValue = {
+  isLowEnd: false,
+  prefersReducedMotion: false,
+  enableGlowEffects: true,
+  enableComplexAnimations: true,
+  targetFPS: 60,
+  throttleMs: 16,
+  reduceParticles: false,
+  maxParticles: 20,
+  isSlowConnection: false,
+  isMobile: false,
+};
+
+// Create a mock function with a stable default implementation
+// Tests can override this using mockReturnValue
+const mockUseDevicePerformance = jest.fn(() => defaultDevicePerformanceValue);
+
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: mockUseDevicePerformance,
+  createAdaptiveThrottle: () => (fn) => fn,
+}));
+
+// Export for tests that need to customize the mock
+global.mockUseDevicePerformance = mockUseDevicePerformance;
+global.defaultDevicePerformanceValue = defaultDevicePerformanceValue;
+
+// ==========================================
 // Mock Console for Clean Output
 // ==========================================
 
