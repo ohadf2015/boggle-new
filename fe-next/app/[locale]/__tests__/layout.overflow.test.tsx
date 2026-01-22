@@ -9,12 +9,13 @@ import { resolve } from 'path';
  *
  * The correct scroll containment pattern requires:
  * 1. Body with screen-fit (provides min-height: 100dvh, overflow-y: auto)
- * 2. Wrapper div with overflow-clip (prevents growing beyond body, allows touch scroll)
+ * 2. Wrapper div with overflow-hidden (prevents growing beyond body, creates BFC)
  * 3. Main with screen-fit-content (the actual scroll container with touch scrolling)
  *
- * Using overflow-clip instead of overflow-hidden is critical for mobile touch scrolling.
- * overflow-hidden creates a scroll context that can trap touch events, requiring 2-finger
- * scroll on some devices. overflow-clip clips visually without this side effect.
+ * Using overflow-hidden (not overflow-clip) is important for cross-browser compatibility.
+ * overflow-hidden creates a Block Formatting Context (BFC) that Android browsers handle
+ * correctly. overflow-clip doesn't create a BFC and can cause scroll issues on Android 10+.
+ * The -webkit-overflow-scrolling: touch in screen-fit-content ensures smooth scrolling.
  */
 describe('Layout Mobile Scroll Architecture', () => {
   let layoutSource: string;
@@ -25,10 +26,10 @@ describe('Layout Mobile Scroll Architecture', () => {
     layoutSource = readFileSync(layoutPath, 'utf-8');
   });
 
-  it('wrapper div should have overflow-clip to prevent growing beyond body', () => {
-    // The wrapper div must have overflow-clip to constrain content visually
-    // overflow-clip is used instead of overflow-hidden to avoid touch scroll issues
-    // Pattern: <div className="flex-1 flex flex-col min-h-0 relative overflow-clip">
+  it('wrapper div should have overflow-hidden to prevent growing beyond body', () => {
+    // The wrapper div must have overflow-hidden to constrain content and create BFC
+    // overflow-hidden creates a Block Formatting Context that Android browsers handle correctly
+    // Pattern: <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
     const wrapperClassMatch = layoutSource.match(/<div\s+className="([^"]*flex-1[^"]*min-h-0[^"]*relative[^"]*)"/);
 
     expect(wrapperClassMatch).toBeTruthy();
@@ -42,10 +43,10 @@ describe('Layout Mobile Scroll Architecture', () => {
       // Should have min-h-0 to allow shrinking in flex context
       expect(wrapperClasses).toContain('min-h-0');
 
-      // CRITICAL: Should have overflow-clip to prevent wrapper from growing beyond viewport
-      // Using overflow-clip instead of overflow-hidden to avoid touch scroll issues
-      // overflow-clip clips content visually but doesn't create a scroll context that traps touch events
-      expect(wrapperClasses).toContain('overflow-clip');
+      // CRITICAL: Should have overflow-hidden to prevent wrapper from growing beyond viewport
+      // overflow-hidden creates a BFC that ensures proper scroll behavior on Android
+      // The -webkit-overflow-scrolling: touch in screen-fit-content handles smooth touch scrolling
+      expect(wrapperClasses).toContain('overflow-hidden');
 
       // Should NOT have h-full - this causes height conflicts
       expect(wrapperClasses).not.toContain('h-full');
