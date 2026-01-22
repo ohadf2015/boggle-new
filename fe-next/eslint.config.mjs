@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Python virtual environment (contains third-party JS from packages like gradio)
+    ".venv/**",
   ]),
   {
     rules: {

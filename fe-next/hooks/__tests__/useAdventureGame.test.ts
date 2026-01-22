@@ -28,6 +28,9 @@ function createMockLevelConfig(overrides?: Partial<LevelConfig>): LevelConfig {
     ],
     specialTiles: [],
     difficulty: 'EASY',
+    chapterNumber: 1,
+    levelInChapter: 1,
+    isBossLevel: false,
     ...overrides,
   };
 }
@@ -734,6 +737,9 @@ describe('useAdventureGame', () => {
         objectives: [],
         specialTiles: [],
         difficulty: 'EASY',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
       } as LevelConfig;
       const grid = createMockGrid();
 

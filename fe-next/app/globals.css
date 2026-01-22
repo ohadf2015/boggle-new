@@ -2015,13 +2015,12 @@ body {
   overflow: hidden;
 }
 
-/* Scrollable content area - fills remaining space, scrolls on overflow */
+/* Scrollable content area - fills remaining space */
+/* NOTE: Scroll is handled by parent .screen-fit body to avoid iOS scroll trap */
+/* Do NOT add overflow-y: auto here - it creates nested scrolling issues on mobile */
 .screen-fit-content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Screen-fit with header offset (when header takes fixed space) */

@@ -234,57 +234,106 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
 
   // Compute persisted letters from attempts (most recent yellow/green at each position)
   // Priority: green > yellow (from most recent to oldest attempt)
-  // IMPORTANT: Yellow letters are REMOVED when all occurrences of that letter are found as green
+  // IMPORTANT: Yellow letters are capped by how many times they appear in the target word
+  // and are REMOVED when all occurrences of that letter are found as green
   const persistedLetters = React.useMemo(() => {
     const result = new Map<number, { letter: string; type: 'green' | 'yellow' }>();
 
-    // First pass: collect all green and yellow letters
+    // First pass: collect all green letters from attempts (these always win)
     for (const attempt of attempts) {
       for (const fb of attempt.feedback) {
         if (fb.feedback === 'green') {
-          // Green always wins at this position
           result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
-        } else if (fb.feedback === 'yellow') {
-          // Yellow only sets if no green exists at this position yet
-          const existing = result.get(fb.position);
-          if (!existing || existing.type !== 'green') {
-            result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'yellow' });
-          }
         }
-        // Gray letters don't persist
       }
     }
 
-    // Second pass: count green occurrences of each letter
+    // Count green occurrences from BOTH attempts AND accumulatedClues
+    // accumulatedClues can contain greens from word discovery, shop reveals, etc.
+    // Use a Set to track which positions we've counted to avoid double-counting
     const greenLetterCounts = new Map<string, number>();
-    result.forEach((entry) => {
+    const countedPositions = new Set<number>();
+
+    // Count greens from persisted attempts first
+    result.forEach((entry, position) => {
       if (entry.type === 'green') {
         const letter = entry.letter;
         greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
+        countedPositions.add(position);
       }
     });
 
+    // Also count greens from accumulatedClues, but skip positions we already counted
+    accumulatedClues.forEach((clue, position) => {
+      if (clue.type === 'green' && !countedPositions.has(position)) {
+        const letter = clue.letter.toUpperCase();
+        greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
+        countedPositions.add(position);
+      }
+    });
+
+    // Second pass: collect yellow letters, but LIMIT by target word frequency
+    // Process attempts in order so most recent yellows win at each position
+    // We need to recalculate yellow counts after each update to handle replacements
+    for (const attempt of attempts) {
+      for (const fb of attempt.feedback) {
+        if (fb.feedback === 'yellow') {
+          const letter = fb.letter.toUpperCase();
+          const existing = result.get(fb.position);
+
+          // Skip if position already has a green (from attempts)
+          if (existing?.type === 'green') {
+            continue;
+          }
+
+          // Skip if position has a green in accumulatedClues
+          const accumulatedClue = accumulatedClues.get(fb.position);
+          if (accumulatedClue?.type === 'green') {
+            continue;
+          }
+
+          // Calculate current yellow counts EXCLUDING the position we might update
+          const currentYellowCounts = new Map<string, number>();
+          result.forEach((entry, pos) => {
+            if (entry.type === 'yellow' && pos !== fb.position) {
+              currentYellowCounts.set(entry.letter, (currentYellowCounts.get(entry.letter) || 0) + 1);
+            }
+          });
+
+          // Check if we can set this yellow
+          const targetCount = targetLetterCounts.get(letter) || 0;
+          const greenCount = greenLetterCounts.get(letter) || 0;
+          const currentYellowCount = currentYellowCounts.get(letter) || 0;
+
+          // Maximum yellows allowed = target occurrences - green occurrences
+          const maxYellows = Math.max(0, targetCount - greenCount);
+
+          if (currentYellowCount < maxYellows) {
+            // Allow setting/replacing yellow at this position
+            result.set(fb.position, { letter, type: 'yellow' });
+          }
+        }
+      }
+    }
+
     // Third pass: remove yellow letters where all occurrences are now found as green
-    // A yellow letter at position X means "this letter exists but not at position X"
-    // If we've found ALL occurrences of that letter as green elsewhere, the yellow is obsolete
+    // (This handles edge cases where greens were found after yellows were added)
     const positionsToRemove: number[] = [];
     result.forEach((entry, position) => {
       if (entry.type === 'yellow') {
         const letter = entry.letter;
         const targetCount = targetLetterCounts.get(letter) || 0;
         const greenCount = greenLetterCounts.get(letter) || 0;
-        // If all occurrences of this letter are accounted for by green clues, remove yellow
         if (greenCount >= targetCount) {
           positionsToRemove.push(position);
         }
       }
     });
 
-    // Remove the obsolete yellow entries
     positionsToRemove.forEach(pos => result.delete(pos));
 
     return result;
-  }, [attempts, targetLetterCounts]);
+  }, [attempts, targetLetterCounts, accumulatedClues]);
   const sizeClass = wordLength <= 4
     ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
     : wordLength <= 6

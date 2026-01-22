@@ -1037,7 +1037,13 @@ const sv = {
     "challengeBots": "Utmana Bottar",
     "challengeBotsDesc": "Testa dina färdigheter mot AI-motståndare",
     "challengeBotsAgain": "Spela igen!",
-    "challengeBotsAgainDesc": "Starta en ny match med bottar"
+    "challengeBotsAgainDesc": "Starta en ny match med bottar",
+    "tryDailyChallenge": "Testa Daglig Utmaning",
+    "tryDailyChallengeDesc": "Samma pussel för alla i världen - tävla globalt!",
+    "goMultiplayer": "Gå Multiplayer",
+    "goMultiplayerDesc": "Utmana riktiga spelare i livekamper med ord",
+    "brainTraining": "Hjärnträning",
+    "brainTrainingDesc": "Förbättra dina kognitiva förmågor med fokuserade övningar"
   },
   "player": {
     "new": "NY"
@@ -2556,7 +2562,16 @@ const sv = {
       "returnNote": "Efter träningen kommer du automatiskt tillbaka till daglig utmaning!",
       "startTraining": "Starta träning",
       "skipToDaily": "Hoppa över, jag klarar mig",
-      "redirecting": "På väg till daglig utmaning...",
+      "redirecting": "På väg till daglig utmaning..."
+    },
+    "wordHunt": {
+      "title": "Word Hunt",
+      "subtitle": "Överlevnadsläge",
+      "desc": "Hitta ord. Överlev.",
+      "feature1": "90 sekunder",
+      "feature2": "Kombosystem",
+      "feature3": "Global topplista"
+    },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
       "wordHuntDesc": "Testa din hastighet! Hitta målord så snabbt du kan.",
@@ -2567,7 +2582,6 @@ const sv = {
       "multiplayerTitle": "🎮 Redo för Mer?",
       "multiplayerDesc": "Utmana vänner eller slåss mot bottar i realtid!",
       "multiplayerCTA": "Spela Multiplayer"
-    }
     }
   },
   "buzz": {

@@ -4,7 +4,7 @@
     "keyCountByLanguage": {
       "en": 2923,
       "he": 2923,
-      "sv": 2917,
+      "sv": 2923,
       "ja": 2923,
       "es": 2923
     },
@@ -109,60 +109,14 @@
   "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
-    "sv": [
-      "nextStep.tryDailyChallenge",
-      "nextStep.tryDailyChallengeDesc",
-      "nextStep.goMultiplayer",
-      "nextStep.goMultiplayerDesc",
-      "nextStep.brainTraining",
-      "nextStep.brainTrainingDesc",
-      "daily.nextChallenge.wordHuntTitle",
-      "daily.nextChallenge.wordHuntDesc",
-      "daily.nextChallenge.wordHuntCTA",
-      "daily.nextChallenge.buzzTitle",
-      "daily.nextChallenge.buzzDesc",
-      "daily.nextChallenge.buzzCTA",
-      "daily.nextChallenge.multiplayerTitle",
-      "daily.nextChallenge.multiplayerDesc",
-      "daily.nextChallenge.multiplayerCTA"
-    ],
-    "ja": [
-      "daily.nextChallenge.wordHuntTitle",
-      "daily.nextChallenge.wordHuntDesc",
-      "daily.nextChallenge.wordHuntCTA",
-      "daily.nextChallenge.buzzTitle",
-      "daily.nextChallenge.buzzDesc",
-      "daily.nextChallenge.buzzCTA",
-      "daily.nextChallenge.multiplayerTitle",
-      "daily.nextChallenge.multiplayerDesc",
-      "daily.nextChallenge.multiplayerCTA"
-    ],
+    "sv": [],
+    "ja": [],
     "es": []
   },
   "keysNotInEnglish": {
     "he": [],
-    "sv": [
-      "daily.trainingSuggestion.nextChallenge.wordHuntTitle",
-      "daily.trainingSuggestion.nextChallenge.wordHuntDesc",
-      "daily.trainingSuggestion.nextChallenge.wordHuntCTA",
-      "daily.trainingSuggestion.nextChallenge.buzzTitle",
-      "daily.trainingSuggestion.nextChallenge.buzzDesc",
-      "daily.trainingSuggestion.nextChallenge.buzzCTA",
-      "daily.trainingSuggestion.nextChallenge.multiplayerTitle",
-      "daily.trainingSuggestion.nextChallenge.multiplayerDesc",
-      "daily.trainingSuggestion.nextChallenge.multiplayerCTA"
-    ],
-    "ja": [
-      "daily.trainingSuggestion.nextChallenge.wordHuntTitle",
-      "daily.trainingSuggestion.nextChallenge.wordHuntDesc",
-      "daily.trainingSuggestion.nextChallenge.wordHuntCTA",
-      "daily.trainingSuggestion.nextChallenge.buzzTitle",
-      "daily.trainingSuggestion.nextChallenge.buzzDesc",
-      "daily.trainingSuggestion.nextChallenge.buzzCTA",
-      "daily.trainingSuggestion.nextChallenge.multiplayerTitle",
-      "daily.trainingSuggestion.nextChallenge.multiplayerDesc",
-      "daily.trainingSuggestion.nextChallenge.multiplayerCTA"
-    ],
+    "sv": [],
+    "ja": [],
     "es": []
   }
 }

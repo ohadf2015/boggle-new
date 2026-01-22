@@ -2562,7 +2562,16 @@ const ja = {
       "returnNote": "練習後、自動的にデイリーチャレンジに戻ります！",
       "startTraining": "練習を始める",
       "skipToDaily": "スキップして始める",
-      "redirecting": "デイリーチャレンジに移動中...",
+      "redirecting": "デイリーチャレンジに移動中..."
+    },
+    "wordHunt": {
+      "title": "ワードハント",
+      "subtitle": "サバイバルモード",
+      "desc": "単語を見つけて生き残れ。",
+      "feature1": "90秒",
+      "feature2": "コンボシステム",
+      "feature3": "グローバルランキング"
+    },
     "nextChallenge": {
       "wordHuntTitle": "⚡ デイリーワードハントが待っています！",
       "wordHuntDesc": "スピードをテスト！できるだけ早く目標の単語を見つけよう。",
@@ -2573,7 +2582,6 @@ const ja = {
       "multiplayerTitle": "🎮 もっとプレイ？",
       "multiplayerDesc": "友達に挑戦するか、リアルタイムでボットと戦おう！",
       "multiplayerCTA": "マルチプレイヤーをプレイ"
-    }
     }
   },
   "buzz": {

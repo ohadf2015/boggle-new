@@ -53,7 +53,7 @@ Create a comprehensive state management layer:
 
 - `fe-next/CLAUDE.md` - Project coding standards and design system
 - `.claude/rules/22-tdd-strict.md` - TDD requirements (RED-GREEN-REFACTOR)
-- `.claude/rules/21-testing.md` - Given-When-Then test patterns
+- `.claude/rules/20-testing.md` - Given-When-Then test patterns
 
 ### Relevant Codebase Files (MUST READ BEFORE IMPLEMENTING!)
 
@@ -214,7 +214,7 @@ Connect existing components to real data.
 ### Task 1: CREATE contexts/__tests__/ProgressionContext.test.tsx
 
 - **IMPLEMENT:** Test suite for ProgressionContext
-- **PATTERN:** Given-When-Then structure from `.claude/rules/21-testing.md`
+- **PATTERN:** Given-When-Then structure from `.claude/rules/20-testing.md`
 - **TDD:** RED phase - tests MUST fail before implementation
 
 ```typescript

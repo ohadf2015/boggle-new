@@ -28,6 +28,9 @@ const mockLevelConfig: LevelConfig = {
     { row: 2, col: 2, type: 'gold' },
   ],
   difficulty: 'EASY',
+  chapterNumber: 1,
+  levelInChapter: 1,
+  isBossLevel: false,
 };
 
 const mockGrid = [

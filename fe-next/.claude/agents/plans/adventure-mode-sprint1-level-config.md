@@ -41,7 +41,7 @@ Create two core library files:
 
 - `fe-next/CLAUDE.md` - Project coding standards and design system
 - `.claude/rules/22-tdd-strict.md` - TDD requirements (RED-GREEN-REFACTOR)
-- `.claude/rules/21-testing.md` - Given-When-Then test patterns
+- `.claude/rules/20-testing.md` - Given-When-Then test patterns
 
 ### Relevant Codebase Files (MUST READ BEFORE IMPLEMENTING!)
 
@@ -201,7 +201,7 @@ Create `lib/adventure/levelConfig.ts` with world definitions and level generator
 ### Task 1: CREATE lib/adventure/__tests__/constants.test.ts
 
 - **IMPLEMENT:** Test suite for all constants and utility functions
-- **PATTERN:** Given-When-Then structure from `.claude/rules/21-testing.md`
+- **PATTERN:** Given-When-Then structure from `.claude/rules/20-testing.md`
 - **TDD:** RED phase - tests MUST fail before implementation
 
 ```typescript

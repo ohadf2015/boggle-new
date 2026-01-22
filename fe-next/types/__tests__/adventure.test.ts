@@ -131,6 +131,9 @@ describe('Adventure Types', () => {
         objectives: [{ type: 'wordCount', target: 10 }],
         specialTiles: [],
         difficulty: 'MEDIUM',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
       };
       expect(config.world).toBe(1);
       expect(config.level).toBe(1);
@@ -151,6 +154,9 @@ describe('Adventure Types', () => {
         specialTiles: [{ row: 0, col: 0, type: 'gold' }],
         difficulty: 'HARD',
         hiddenWord: 'LEXICON',
+        chapterNumber: 2,
+        levelInChapter: 2,
+        isBossLevel: false,
       };
       expect(config.hiddenWord).toBe('LEXICON');
     });
@@ -165,6 +171,9 @@ describe('Adventure Types', () => {
         specialTiles: [],
         difficulty: 'EASY',
         worldMechanic: 'rootCaverns',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
       };
       expect(config.worldMechanic).toBe('rootCaverns');
     });
@@ -180,6 +189,9 @@ describe('Adventure Types', () => {
           objectives: [],
           specialTiles: [],
           difficulty: 'MEDIUM',
+          chapterNumber: 1,
+          levelInChapter: 1,
+          isBossLevel: false,
         };
         expect(config.gridSize).toBe(size);
       });
@@ -196,6 +208,9 @@ describe('Adventure Types', () => {
           objectives: [],
           specialTiles: [],
           difficulty,
+          chapterNumber: 1,
+          levelInChapter: 1,
+          isBossLevel: false,
         };
         expect(config.difficulty).toBe(difficulty);
       });
@@ -280,6 +295,9 @@ describe('Adventure Types', () => {
           objectives: [{ type: 'wordCount', target: 10, current: 3, isComplete: false }],
           specialTiles: [],
           difficulty: 'MEDIUM',
+          chapterNumber: 1,
+          levelInChapter: 1,
+          isBossLevel: false,
         },
         tiles: [
           [

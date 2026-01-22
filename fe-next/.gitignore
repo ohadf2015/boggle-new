@@ -42,3 +42,12 @@ next-env.d.ts
 
 # backend compiled schemas
 /backend/dist
+
+# Python virtual environment
+.venv/
+
+# Temporary image processing files
+*.png.tmp
+
+# Asset pipeline temp files
+.asset-temp/

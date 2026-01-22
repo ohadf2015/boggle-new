@@ -60,7 +60,7 @@ Create a complete navigation flow:
 
 - `fe-next/CLAUDE.md` - Project coding standards and design system
 - `.claude/rules/22-tdd-strict.md` - TDD requirements (RED-GREEN-REFACTOR)
-- `.claude/rules/21-testing.md` - Given-When-Then test patterns
+- `.claude/rules/20-testing.md` - Given-When-Then test patterns
 
 ### Relevant Codebase Files (MUST READ BEFORE IMPLEMENTING!)
 

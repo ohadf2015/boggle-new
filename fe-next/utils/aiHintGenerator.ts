@@ -403,28 +403,32 @@ function generateBlanksDisplay(word: string, revealPositions: number[]): string 
  * Calculate optimal letter reveal order for hints
  *
  * Strategy:
- * 1. Reveal vowels first (from end of word to start)
- * 2. Then reveal consonants (from end to start)
+ * 1. Reveal vowels first (from second-to-last position backward)
+ * 2. Then reveal consonants (from second-to-last position backward)
+ * 3. NEVER include the last position - always keep at least one letter hidden
  *
- * Revealing from the end helps players who may have guessed the start
- * but are unsure about the ending.
+ * Revealing from near the end helps players who may have guessed the start
+ * but are unsure about the ending, while still maintaining mystery.
  *
  * @param word - The target word
  * @param language - Language for vowel detection
- * @returns Array of positions in reveal order
+ * @returns Array of positions in reveal order (excludes last position)
  */
 function calculateRevealOrder(word: string, language: Language): number[] {
+  const lastPosition = word.length - 1;
   const vowelPositions = findVowelPositions(word, language);
 
-  // Sort vowel positions from end to start (reverse order)
-  const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
-
-  // Get consonant positions from end to start
-  const consonantPositions = [...Array(word.length).keys()]
-    .filter(i => !vowelPositions.includes(i))
+  // Sort vowel positions from end to start, EXCLUDING the last position
+  const vowelsFromEnd = [...vowelPositions]
+    .filter(i => i !== lastPosition)
     .sort((a, b) => b - a);
 
-  // Vowels first, then consonants
+  // Get consonant positions from end to start, EXCLUDING the last position
+  const consonantPositions = [...Array(word.length).keys()]
+    .filter(i => !vowelPositions.includes(i) && i !== lastPosition)
+    .sort((a, b) => b - a);
+
+  // Vowels first, then consonants (last position is never included)
   return [...vowelsFromEnd, ...consonantPositions];
 }
 
@@ -448,10 +452,15 @@ export function generateFallbackHints(
   // Maximum letters we can ever reveal is 50% of the word (rounded down)
   const maxReveal = Math.floor(wordLength / 2);
 
-  // Calculate optimal reveal order
+  // Calculate optimal reveal order (excludes last position)
   const revealOrder = calculateRevealOrder(word, language);
+  const lastPosition = wordLength - 1;
+
+  // Find vowels excluding the last position
   const vowelPositions = findVowelPositions(word, language);
-  const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
+  const vowelsFromEndExcludingLast = [...vowelPositions]
+    .filter(i => i !== lastPosition)
+    .sort((a, b) => b - a);
 
   const hints: HintLevel[] = [];
 
@@ -462,10 +471,12 @@ export function generateFallbackHints(
     unlockCost: HINT_UNLOCK_COSTS.LEVEL_1,
   });
 
-  // Level 2: Reveal last vowel (or last letter if no vowels)
-  const level2Positions = vowelsFromEnd.length > 0
-    ? [vowelsFromEnd[0]]
-    : [wordLength - 1];
+  // Level 2: Reveal last vowel (excluding final position) or first letter if no vowels
+  // IMPORTANT: Never reveal the last letter - always keep at least one letter hidden
+  // to prevent visual confusion where all boxes appear green but game continues
+  const level2Positions = vowelsFromEndExcludingLast.length > 0
+    ? [vowelsFromEndExcludingLast[0]]
+    : wordLength > 1 ? [0] : [];
   hints.push({
     level: 2,
     hint: generateBlanksDisplay(word, level2Positions),

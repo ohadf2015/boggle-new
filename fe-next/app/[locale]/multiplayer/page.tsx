@@ -20,6 +20,7 @@ import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
+import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import { sanitizeRoomName } from '@/utils/consts';
@@ -45,6 +46,33 @@ interface GameStartData {
   letterGrid: string[][];
   timerSeconds: number;
   language: Language;
+}
+
+// Hex color validation pattern (must match backend schema)
+const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
+const DEFAULT_AVATAR_COLOR = '#FF6B6B';
+
+/**
+ * Sanitizes avatar color to ensure it matches the required hex format.
+ * Backend validation requires: /^#[0-9A-Fa-f]{6}$/
+ * @param color - The color to validate (may be invalid, undefined, or CSS variable)
+ * @param avatarImage - Optional avatar image ID to derive color from
+ * @returns A valid hex color string
+ */
+function sanitizeAvatarColor(color: string | undefined | null, avatarImage?: string | null): string {
+  // If color is valid hex format, return it
+  if (color && HEX_COLOR_PATTERN.test(color)) {
+    return color;
+  }
+
+  // Try to derive color from avatar image
+  if (avatarImage) {
+    const avatarData = getAvatarEmojiAndColor(avatarImage);
+    return avatarData.color;
+  }
+
+  // Fall back to default color
+  return DEFAULT_AVATAR_COLOR;
 }
 
 // Dynamic imports for code splitting - only load when needed
@@ -1114,8 +1142,10 @@ export default function MultiplayerPage(): React.JSX.Element {
     const avatarImageId = getStoredAvatarId();
 
     // Determine avatar to use: prioritize modal selection > profile > guest state > just-generated > derive from name
+    // Sanitize profile color to ensure it matches backend validation pattern
+    const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
     const effectiveAvatar = profile
-      ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: avatarImageId || profile.avatar_image }
+      ? { emoji: profile.avatar_emoji, color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage), avatarImage: effectiveAvatarImage }
       : {
         ...(generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername)),
         avatarImage: avatarImageId || undefined
@@ -1177,8 +1207,10 @@ export default function MultiplayerPage(): React.JSX.Element {
       const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
 
       // For hosts: prioritize modal selection, then profile, then generated/guest avatar
+      // Sanitize profile color to ensure it matches backend validation pattern
+      const hostAvatarImage = avatarImageId || profile?.avatar_image;
       const hostAvatar = profile
-        ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: avatarImageId || profile.avatar_image }
+        ? { emoji: profile.avatar_emoji, color: sanitizeAvatarColor(profile.avatar_color, hostAvatarImage), avatarImage: hostAvatarImage }
         : {
           ...(generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername)),
           avatarImage: avatarImageId || undefined

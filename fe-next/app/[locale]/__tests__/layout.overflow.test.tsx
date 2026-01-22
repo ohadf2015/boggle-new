@@ -8,14 +8,16 @@ import { resolve } from 'path';
  * Test for mobile scroll architecture
  *
  * The correct scroll containment pattern requires:
- * 1. Body with screen-fit (provides min-height: 100dvh, overflow-y: auto)
- * 2. Wrapper div with overflow-x-hidden (contains horizontal overflow, allows vertical scroll)
- * 3. Main with screen-fit-content (the actual scroll container with touch scrolling)
+ * 1. Body with screen-fit (provides min-height: 100dvh, overflow-y: auto, -webkit-overflow-scrolling: touch)
+ * 2. Wrapper div with overflow-x-hidden (contains horizontal overflow only)
+ * 3. Main with screen-fit-content (provides flex: 1, min-height: 0 for flex sizing)
  *
- * IMPORTANT: Using overflow-x-hidden (NOT overflow-hidden) is critical for mobile touch scroll.
- * overflow-hidden blocks touch scroll events from propagating to child elements on mobile devices.
- * overflow-x-hidden only contains horizontal overflow while allowing vertical touch scroll to work.
- * The -webkit-overflow-scrolling: touch in screen-fit-content ensures smooth scrolling.
+ * IMPORTANT: Scroll is handled at the BODY level (screen-fit), NOT at the main level.
+ * Having overflow-y: auto on BOTH body AND main creates a "scroll trap" on iOS where
+ * overscroll-behavior-y: contain blocks momentum scrolling.
+ *
+ * The fix: screen-fit-content no longer has overflow-y: auto or overscroll-behavior.
+ * This creates a single scroll point at the body, which iOS can reliably track.
  */
 describe('Layout Mobile Scroll Architecture', () => {
   let layoutSource: string;
@@ -64,17 +66,17 @@ describe('Layout Mobile Scroll Architecture', () => {
     expect(layoutSource).toContain('body className="antialiased screen-fit"');
   });
 
-  it('main should use screen-fit-content for mobile scroll support', () => {
+  it('main should use screen-fit-content for flex sizing', () => {
     // Main content should use screen-fit-content class which provides:
-    // flex: 1, min-height: 0, overflow-y: auto, -webkit-overflow-scrolling: touch
-    // This makes main the actual scroll container for mobile devices
+    // flex: 1, min-height: 0 (for proper flex sizing)
+    // NOTE: Scroll is handled at body level, NOT at main level
     const mainMatch = layoutSource.match(/<main[^>]*className="([^"]*)"/);
 
     expect(mainMatch).toBeTruthy();
 
     if (mainMatch) {
       const mainClasses = mainMatch[1];
-      // CRITICAL: Main must have screen-fit-content for mobile scrolling
+      // Main uses screen-fit-content for flex sizing (not for scrolling)
       expect(mainClasses).toContain('screen-fit-content');
     }
   });

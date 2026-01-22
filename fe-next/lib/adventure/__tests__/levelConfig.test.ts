@@ -345,6 +345,9 @@ describe('Level Config Validation', () => {
         objectives: [],
         specialTiles: [],
         difficulty: 'EASY',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
       };
 
       const result = validateLevelConfig(config);
@@ -361,6 +364,9 @@ describe('Level Config Validation', () => {
         objectives: [], // Empty!
         specialTiles: [],
         difficulty: 'EASY',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
       };
 
       const result = validateLevelConfig(config);
@@ -377,6 +383,9 @@ describe('Level Config Validation', () => {
         objectives: [{ type: 'wordCount', target: 10, isPrimary: true }],
         specialTiles: [{ row: 5, col: 0, type: 'gold' }], // Row 5 invalid for 4x4
         difficulty: 'EASY',
+        chapterNumber: 1,
+        levelInChapter: 1,
+        isBossLevel: false,
       };
 
       const result = validateLevelConfig(config);
