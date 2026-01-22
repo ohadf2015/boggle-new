@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, memo } from 'react';
+import React, { useEffect, useState, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
@@ -68,13 +68,16 @@ const COLOR_SCHEMES = {
  * />
  * ```
  */
+// Default size range - defined outside component to prevent reference changes
+const DEFAULT_SIZE_RANGE: [number, number] = [3, 6];
+
 export const SelectionSparkle = memo(function SelectionSparkle({
   position,
   triggerKey,
   colorScheme = 'default',
   particleCount = 8,
   spreadRadius = 40,
-  sizeRange = [3, 6],
+  sizeRange = DEFAULT_SIZE_RANGE,
   duration = 400,
   useSquareParticles = true,
   className,
@@ -84,9 +87,14 @@ export const SelectionSparkle = memo(function SelectionSparkle({
   const [particles, setParticles] = useState<SparkleParticle[]>([]);
   const [isActive, setIsActive] = useState(false);
 
+  // Use ref for position to avoid dependency array issues
+  // Position changes should NOT trigger the effect - only triggerKey should
+  const positionRef = useRef(position);
+  positionRef.current = position;
+
   const colors = COLOR_SCHEMES[colorScheme];
 
-  // Generate particles
+  // Generate particles - use stable reference by reading from ref
   const generateParticles = useCallback(
     (pos: { x: number; y: number }): SparkleParticle[] => {
       const count = Math.min(particleCount, isLowEnd ? 4 : maxParticles);
@@ -104,10 +112,12 @@ export const SelectionSparkle = memo(function SelectionSparkle({
     [particleCount, isLowEnd, maxParticles, sizeRange, spreadRadius, colors]
   );
 
-  // Trigger effect when key changes
+  // Trigger effect ONLY when triggerKey changes
+  // Position is read from ref to avoid stale closure while keeping effect stable
   useEffect(() => {
-    if (position && enableComplexAnimations) {
-      setParticles(generateParticles(position));
+    const currentPosition = positionRef.current;
+    if (currentPosition && enableComplexAnimations) {
+      setParticles(generateParticles(currentPosition));
       setIsActive(true);
 
       const timer = setTimeout(() => {
@@ -118,7 +128,8 @@ export const SelectionSparkle = memo(function SelectionSparkle({
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [triggerKey, position, generateParticles, duration, enableComplexAnimations]);
+    // NOTE: position is intentionally excluded - triggerKey is the trigger mechanism
+  }, [triggerKey, generateParticles, duration, enableComplexAnimations]);
 
   // Skip for reduced motion or disabled animations
   if (prefersReducedMotion || !enableComplexAnimations || !isActive) {

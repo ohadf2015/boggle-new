@@ -65,7 +65,7 @@ export function WordPathTrail({
   isValid = false,
   wasSubmitted = false,
   color,
-  thickness = 4,
+  thickness = 6,
   showParticles = true,
   showGlow = true,
   fadeDuration = 300,
@@ -163,8 +163,8 @@ export function WordPathTrail({
         {shouldShowGlow && (
           <defs>
             <filter id="trail-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feFlood floodColor={trailColor} floodOpacity="0.6" />
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feFlood floodColor={trailColor} floodOpacity="0.7" />
               <feComposite in2="blur" operator="in" />
               <feMerge>
                 <feMergeNode />

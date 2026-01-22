@@ -186,14 +186,17 @@ export default function ProfilePage(): React.ReactNode {
   return (
     <>
       {/* ===== MOBILE VIEW ===== */}
+      {/* NOTE: Do NOT use h-full here - it creates nested scroll containers with body's screen-fit */}
+      {/* Scroll is handled at body level via screen-fit class. This container just provides flex layout. */}
       <div className={cn(
-        'md:hidden h-full flex flex-col relative',
+        'md:hidden flex-1 flex flex-col min-h-0 relative',
         isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
 
+        {/* NOTE: Do NOT use overflow-y-auto here - scroll propagates to body's screen-fit */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pt-2 page-content-safe relative"
+          className="flex-1 min-h-0 px-3 pt-2 page-content-safe relative"
           {...pullToRefreshHandlers}
         >
           <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />

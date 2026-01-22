@@ -301,7 +301,7 @@ html.light body {
 }
 
 html {
-  overflow-x: hidden;
+  overflow: visible !important; /* Prevent html from becoming a scroll container */
 }
 
 body {
@@ -309,7 +309,7 @@ body {
   font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  /* Note: overflow-x handled by .screen-fit class */
   /* Neo-brutalist background with halftone dots and retro grid - consistent across entire app */
   background-color: var(--neo-navy);
   background-image:
@@ -1999,9 +1999,9 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior-y: contain;
+  overflow-x: clip; /* Use clip to prevent auto overflow-y on html */
   -webkit-overflow-scrolling: touch;
+  /* Note: Removed overscroll-behavior-y: contain to prevent iOS scroll trapping */
 }
 
 /* Full-screen flex container - LOCKED (no scroll) */
@@ -2021,6 +2021,7 @@ body {
 .screen-fit-content {
   flex: 1;
   min-height: 0;
+  overflow: visible !important; /* Explicitly prevent becoming a scroll container */
 }
 
 /* Screen-fit with header offset (when header takes fixed space) */

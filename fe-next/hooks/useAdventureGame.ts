@@ -426,11 +426,14 @@ export function useAdventureGame({
   // Combo timeout ref
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Timer effect
+  // Timer effect - only depends on isPlaying
+  // NOTE: timeRemaining is intentionally excluded from dependencies
+  // The TICK action in the reducer handles stopping when time reaches 0
+  // Including timeRemaining would cause effect to re-run every second, recreating the interval
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    if (state.isPlaying && state.timeRemaining > 0) {
+    if (state.isPlaying) {
       intervalId = setInterval(() => {
         dispatch({ type: 'TICK' });
       }, 1000);
@@ -441,7 +444,7 @@ export function useAdventureGame({
         clearInterval(intervalId);
       }
     };
-  }, [state.isPlaying, state.timeRemaining]);
+  }, [state.isPlaying]);
 
   // Cleanup combo timeout on unmount
   useEffect(() => {

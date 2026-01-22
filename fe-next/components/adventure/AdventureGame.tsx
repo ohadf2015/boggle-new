@@ -514,6 +514,7 @@ const AdventureGame = memo<AdventureGameProps>(
           flyToTarget
           showWord
           size="md"
+          duration={1800}
           onComplete={handlePopupComplete}
         />
       </div>

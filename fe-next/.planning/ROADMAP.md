@@ -13,7 +13,7 @@ This milestone brings adventure mode from functional to immersive through a foun
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Infrastructure Foundation** - Asset pipeline, Remotion setup, optimization
-- [ ] **Phase 2: Core Game Juice** - Word trails, letter pops, score animations
+- [x] **Phase 2: Core Game Juice** - Word trails, letter pops, score animations
 - [ ] **Phase 3: Level Entry Experience** - Tile cascade, objective reveal, title burst
 - [ ] **Phase 4: World Theming** - Parallax backgrounds, particles, dynamic boards
 - [ ] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
@@ -58,9 +58,9 @@ Plans:
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Integrate WordPathTrail into adventure grid for selection trail
-- [ ] 02-02-PLAN.md — Enhance letter tile animations with spring physics and sparkle
-- [ ] 02-03-PLAN.md — Add ScorePopupFly animation on valid word submission
+- [x] 02-01-PLAN.md — Integrate WordPathTrail into adventure grid for selection trail
+- [x] 02-02-PLAN.md — Enhance letter tile animations with spring physics and sparkle
+- [x] 02-03-PLAN.md — Add ScorePopupFly animation on valid word submission
 
 ### Phase 3: Level Entry Experience
 **Goal**: Create dramatic level start that builds anticipation before gameplay begins

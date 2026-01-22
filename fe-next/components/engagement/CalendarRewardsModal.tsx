@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 
@@ -40,12 +41,17 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchCalendarStatus = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id || !supabase) return;
 
     try {
       setIsLoading(true);
       setFetchError(null);
-      const response = await fetch('/api/engagement/calendar');
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch('/api/engagement/calendar', {
+        headers: {
+          'Authorization': `Bearer ${session?.access_token || ''}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setCalendarStatus(data);
@@ -74,12 +80,16 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   }, [isOpen, user?.id, fetchCalendarStatus]);
 
   const handleClaimReward = async () => {
-    if (!calendarStatus?.canClaimToday || isClaiming) return;
+    if (!calendarStatus?.canClaimToday || isClaiming || !supabase) return;
 
     try {
       setIsClaiming(true);
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch('/api/engagement/calendar', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token || ''}`
+        }
       });
 
       if (response.ok) {

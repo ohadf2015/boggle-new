@@ -5,15 +5,10 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
-import { useAdventureGame } from '@/hooks/useAdventureGame';
-import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
-import { useAdventureSelection } from '@/hooks/useAdventureSelection';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
-// Mock hooks
+// Mock all dependencies
 jest.mock('@/hooks/useAdventureGame');
 jest.mock('@/hooks/useAdventureWordValidation');
 jest.mock('@/hooks/useAdventureSelection');
@@ -30,19 +25,19 @@ const mockScorePopupFly = jest.fn(() => null);
 jest.mock('@/components/animations', () => ({
   ScorePopupFly: (props: any) => {
     mockScorePopupFly(props);
-    return null;
+    return <div data-testid="score-popup-fly">ScorePopup</div>;
   },
 }));
 
-// Mock other components
-jest.mock('../AdventureGrid', () => ({
-  __esModule: true,
-  default: React.forwardRef((props: any, ref: any) => (
-    <div ref={ref} role="grid" data-testid="adventure-grid">
-      Grid
-    </div>
-  )),
-}));
+// Mock child components
+jest.mock('../AdventureGrid', () => {
+  const React = require('react');
+  const MockGrid = React.forwardRef(function AdventureGrid() {
+    return React.createElement('div', { 'data-testid': 'adventure-grid' }, 'Grid');
+  });
+  MockGrid.displayName = 'AdventureGrid';
+  return { __esModule: true, default: MockGrid };
+});
 
 jest.mock('../AdventureObjectives', () => ({
   __esModule: true,
@@ -64,13 +59,23 @@ jest.mock('../themed/WorldBackground', () => ({
   default: () => <div data-testid="world-background">Background</div>,
 }));
 
-// Minimal level config for testing
+// Minimal level config
 const mockLevelConfig = {
   level: 1,
   world: 1,
-  gridSize: 4,
-  objectives: [{ type: 'score' as const, target: 100, current: 0 }],
-  timeLimit: 120,
+  gridSize: 4 as const,
+  timerSeconds: 120,
+  objectives: [
+    {
+      type: 'scoreTarget' as const,
+      target: 100,
+      current: 0,
+      isComplete: false,
+    },
+  ],
+  specialTiles: [],
+  difficulty: 'MEDIUM' as const,
+  chapterNumber: 1 as const,
 };
 
 const mockInitialGrid = [
@@ -81,48 +86,35 @@ const mockInitialGrid = [
 ];
 
 describe('AdventureGame - Score Popup Animation', () => {
-  const mockUseAdventureGame = useAdventureGame as jest.MockedFunction<typeof useAdventureGame>;
-  const mockUseAdventureWordValidation = useAdventureWordValidation as jest.MockedFunction<
-    typeof useAdventureWordValidation
-  >;
-  const mockUseAdventureSelection = useAdventureSelection as jest.MockedFunction<
-    typeof useAdventureSelection
-  >;
-  const mockUseDevicePerformance = useDevicePerformance as jest.MockedFunction<
-    typeof useDevicePerformance
-  >;
-
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Mock device performance
-    mockUseDevicePerformance.mockReturnValue({
+    // Setup mock hooks with proper types
+    const { useAdventureGame } = require('@/hooks/useAdventureGame');
+    const { useAdventureWordValidation } = require('@/hooks/useAdventureWordValidation');
+    const { useAdventureSelection } = require('@/hooks/useAdventureSelection');
+    const { useDevicePerformance } = require('@/hooks/useDevicePerformance');
+
+    useDevicePerformance.mockReturnValue({
       isLowEnd: false,
       prefersReducedMotion: false,
       enableGlowEffects: true,
-      performanceTier: 'high',
     });
 
-    // Mock game state
-    mockUseAdventureGame.mockReturnValue({
+    useAdventureGame.mockReturnValue({
       gameState: {
         score: 0,
         wordsFound: [],
         comboCount: 1,
         stars: 0,
         isComplete: false,
+        levelConfig: mockLevelConfig,
+        tiles: [],
+        objectives: mockLevelConfig.objectives,
+        cascadeActive: false,
       },
-      tiles: [
-        [
-          { letter: 'H', type: 'standard' },
-          { letter: 'E', type: 'standard' },
-        ],
-        [
-          { letter: 'L', type: 'standard' },
-          { letter: 'L', type: 'standard' },
-        ],
-      ],
-      objectives: [{ type: 'score' as const, target: 100, current: 0, isComplete: false }],
+      tiles: [],
+      objectives: mockLevelConfig.objectives,
       timeRemaining: 120,
       canComplete: false,
       isPlaying: true,
@@ -133,10 +125,15 @@ describe('AdventureGame - Score Popup Animation', () => {
       resetGame: jest.fn(),
     });
 
-    // Mock selection
-    mockUseAdventureSelection.mockReturnValue({
+    useAdventureWordValidation.mockReturnValue({
+      validateWord: jest.fn(),
+      isValidating: false,
+    });
+
+    useAdventureSelection.mockReturnValue({
       selectedIndices: [],
       currentWord: '',
+      isSelecting: false,
       selectTile: jest.fn(),
       clearSelection: jest.fn(),
       getPath: jest.fn(() => []),
@@ -144,83 +141,111 @@ describe('AdventureGame - Score Popup Animation', () => {
     });
   });
 
-  test('score popup appears on valid word submission', async () => {
-    const user = userEvent.setup();
-    const mockValidateWord = jest.fn().mockResolvedValue({
-      isValid: true,
-      score: 15,
-    });
-
-    mockUseAdventureWordValidation.mockReturnValue({
-      validateWord: mockValidateWord,
-      isValidating: false,
-    });
-
-    // Update selection to simulate word selection
-    mockUseAdventureSelection.mockReturnValue({
-      selectedIndices: [0, 1, 2],
-      currentWord: 'HEL',
-      selectTile: jest.fn(),
-      clearSelection: jest.fn(),
-      getPath: jest.fn(() => [
-        { row: 0, col: 0 },
-        { row: 0, col: 1 },
-        { row: 1, col: 0 },
-      ]),
-      pathPoints: [],
-    });
-
-    const onLevelComplete = jest.fn();
-    const onExit = jest.fn();
-
+  test('ScorePopupFly is rendered with correct props', () => {
     render(
       <AdventureGame
         levelConfig={mockLevelConfig}
         initialGrid={mockInitialGrid}
-        onLevelComplete={onLevelComplete}
-        onExit={onExit}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
       />
     );
 
-    // Simulate word submission by triggering the grid's onWordSubmit
-    const grid = screen.getByTestId('adventure-grid');
-    const onWordSubmit = grid.parentElement?.querySelector('[data-testid="adventure-grid"]')
-      ? mockUseAdventureSelection().getPath
-      : null;
+    // Verify ScorePopupFly is called
+    expect(mockScorePopupFly).toHaveBeenCalled();
 
-    // We need to trigger handleWordSubmit directly
-    // Since the grid is mocked, we'll wait for the component to mount and check the popup
-    await waitFor(() => {
-      const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
-      if (lastCall) {
-        const props = lastCall[0];
-        // Initially no popup
-        expect(props.popup).toBeNull();
-      }
-    });
+    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    const props = lastCall[0];
+
+    // Verify essential props
+    expect(props.targetRef).toBeDefined();
+    expect(props.flyToTarget).toBe(true);
+    expect(props.showWord).toBe(true);
+    expect(props.size).toBe('md');
+    expect(props.onComplete).toBeDefined();
   });
 
-  test('score popup shows combo multiplier when combo active', () => {
-    // Update game state with combo
-    mockUseAdventureGame.mockReturnValue({
+  test('score display has ref attached', () => {
+    render(
+      <AdventureGame
+        levelConfig={mockLevelConfig}
+        initialGrid={mockInitialGrid}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
+      />
+    );
+
+    const scoreDisplay = screen.getByTestId('score-display');
+    expect(scoreDisplay).toBeInTheDocument();
+  });
+
+  test('popup state initially null', () => {
+    render(
+      <AdventureGame
+        levelConfig={mockLevelConfig}
+        initialGrid={mockInitialGrid}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
+      />
+    );
+
+    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    expect(lastCall[0].popup).toBeNull();
+  });
+
+  test('onComplete callback clears popup from queue', () => {
+    const { rerender } = render(
+      <AdventureGame
+        levelConfig={mockLevelConfig}
+        initialGrid={mockInitialGrid}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
+      />
+    );
+
+    // Get the onComplete callback
+    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    const { onComplete } = lastCall[0];
+
+    // Verify onComplete is a function
+    expect(typeof onComplete).toBe('function');
+
+    // Call onComplete
+    onComplete();
+
+    // Re-render to verify state update
+    rerender(
+      <AdventureGame
+        levelConfig={mockLevelConfig}
+        initialGrid={mockInitialGrid}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
+      />
+    );
+
+    // After completion, popup should still be null (queue is empty)
+    const newCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
+    expect(newCall[0].popup).toBeNull();
+  });
+
+  test('component renders with combo display', () => {
+    const { useAdventureGame } = require('@/hooks/useAdventureGame');
+
+    // Mock with combo count
+    useAdventureGame.mockReturnValue({
       gameState: {
         score: 30,
-        wordsFound: ['WORD1', 'WORD2'],
+        wordsFound: ['WORD'],
         comboCount: 3,
         stars: 1,
         isComplete: false,
+        levelConfig: mockLevelConfig,
+        tiles: [],
+        objectives: mockLevelConfig.objectives,
+        cascadeActive: false,
       },
-      tiles: [
-        [
-          { letter: 'H', type: 'standard' },
-          { letter: 'E', type: 'standard' },
-        ],
-        [
-          { letter: 'L', type: 'standard' },
-          { letter: 'L', type: 'standard' },
-        ],
-      ],
-      objectives: [{ type: 'score' as const, target: 100, current: 30, isComplete: false }],
+      tiles: [],
+      objectives: mockLevelConfig.objectives,
       timeRemaining: 120,
       canComplete: false,
       isPlaying: true,
@@ -231,122 +256,17 @@ describe('AdventureGame - Score Popup Animation', () => {
       resetGame: jest.fn(),
     });
 
-    const mockValidateWord = jest.fn();
-    mockUseAdventureWordValidation.mockReturnValue({
-      validateWord: mockValidateWord,
-      isValidating: false,
-    });
-
-    const onLevelComplete = jest.fn();
-    const onExit = jest.fn();
-
     render(
       <AdventureGame
         levelConfig={mockLevelConfig}
         initialGrid={mockInitialGrid}
-        onLevelComplete={onLevelComplete}
-        onExit={onExit}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
       />
     );
 
-    // Verify ScorePopupFly is rendered
-    expect(mockScorePopupFly).toHaveBeenCalled();
-  });
-
-  test('score popup flies to target via targetRef', () => {
-    const mockValidateWord = jest.fn();
-    mockUseAdventureWordValidation.mockReturnValue({
-      validateWord: mockValidateWord,
-      isValidating: false,
-    });
-
-    const onLevelComplete = jest.fn();
-    const onExit = jest.fn();
-
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={onLevelComplete}
-        onExit={onExit}
-      />
-    );
-
-    // Check that ScorePopupFly receives targetRef
-    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
-    expect(lastCall).toBeDefined();
-
-    const props = lastCall[0];
-    expect(props.targetRef).toBeDefined();
-    expect(props.flyToTarget).toBe(true);
-  });
-
-  test('popup cleared on completion callback', () => {
-    const mockValidateWord = jest.fn();
-    mockUseAdventureWordValidation.mockReturnValue({
-      validateWord: mockValidateWord,
-      isValidating: false,
-    });
-
-    const onLevelComplete = jest.fn();
-    const onExit = jest.fn();
-
-    const { rerender } = render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={onLevelComplete}
-        onExit={onExit}
-      />
-    );
-
-    // Get the onComplete callback
-    const lastCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
-    const { onComplete } = lastCall[0];
-
-    // Call onComplete
-    onComplete?.();
-
-    // Re-render to verify popup is cleared
-    rerender(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={onLevelComplete}
-        onExit={onExit}
-      />
-    );
-
-    // After completion, popup should be null
-    const newCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
-    expect(newCall[0].popup).toBeNull();
-  });
-
-  test('queue handles rapid submissions', () => {
-    const mockValidateWord = jest.fn();
-    mockUseAdventureWordValidation.mockReturnValue({
-      validateWord: mockValidateWord,
-      isValidating: false,
-    });
-
-    const onLevelComplete = jest.fn();
-    const onExit = jest.fn();
-
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={onLevelComplete}
-        onExit={onExit}
-      />
-    );
-
-    // Initially no popup
-    const initialCall = mockScorePopupFly.mock.calls[mockScorePopupFly.mock.calls.length - 1];
-    expect(initialCall[0].popup).toBeNull();
-
-    // This test verifies the queue mechanism exists
-    // Full integration testing would require triggering actual word submissions
-    // which is better done in E2E tests
+    const comboDisplay = screen.getByTestId('combo-display');
+    expect(comboDisplay).toBeInTheDocument();
+    expect(comboDisplay).toHaveTextContent('x3');
   });
 });

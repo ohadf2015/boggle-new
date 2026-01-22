@@ -37,12 +37,12 @@ const colors: WorldColorPalette = {
 // ==============================================
 
 const background: WorldBackground = {
-  baseColor: 'bg-gradient-to-b from-cyan-600 via-blue-500 to-cyan-400',
+  baseColor: 'bg-gradient-to-b from-neo-navy via-slate-900 to-cyan-950',
   illustrationPath: '/images/adventure/backgrounds/springs.webp',
   layers: [
     {
       id: 'springs-sky',
-      source: 'bg-gradient-to-b from-cyan-700 to-blue-500',
+      source: 'bg-gradient-to-b from-neo-navy via-slate-900 to-cyan-950',
       depth: 0.1,
       opacity: 1,
       className: 'absolute inset-0',

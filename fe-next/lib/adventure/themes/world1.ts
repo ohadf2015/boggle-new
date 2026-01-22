@@ -37,12 +37,12 @@ const colors: WorldColorPalette = {
 // ==============================================
 
 const background: WorldBackground = {
-  baseColor: 'bg-gradient-to-b from-sky-400 via-sky-300 to-lime-200',
+  baseColor: 'bg-gradient-to-b from-neo-navy via-slate-900 to-emerald-950',
   illustrationPath: '/images/adventure/backgrounds/meadows.webp',
   layers: [
     {
       id: 'meadows-sky',
-      source: 'bg-gradient-to-b from-sky-400 to-sky-300',
+      source: 'bg-gradient-to-b from-neo-navy via-slate-900 to-emerald-950',
       depth: 0.1,
       opacity: 1,
       className: 'absolute inset-0',
