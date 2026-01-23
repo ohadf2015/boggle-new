@@ -511,4 +511,98 @@ describe('useAdventureSelection', () => {
       expect(result.current.selectedIndices).toEqual([]);
     });
   });
+
+  describe('Frozen Tile Selection', () => {
+    const createGridWithFrozenTile = (): GridTileState[] => {
+      const tiles = createTestGrid();
+      // Make tile at index 1 (position 0,1) frozen
+      tiles[1] = {
+        ...tiles[1],
+        type: 'ice',
+        isFrozen: true,
+      };
+      return tiles;
+    };
+
+    it('should NOT allow selecting a frozen tile as first tile', () => {
+      // GIVEN - Grid with frozen tile at index 1
+      const frozenTiles = createGridWithFrozenTile();
+      const { result } = renderHook(() =>
+        useAdventureSelection({ tiles: frozenTiles, gridSize: 4 })
+      );
+
+      // WHEN - Try to select frozen tile
+      act(() => {
+        result.current.selectTile(1); // Frozen ice tile
+      });
+
+      // THEN - Selection should be rejected
+      expect(result.current.selectedIndices).toEqual([]);
+      expect(result.current.currentWord).toBe('');
+    });
+
+    it('should NOT allow selecting a frozen tile as part of a path', () => {
+      // GIVEN - Grid with frozen tile at index 1, select tile 0 first
+      const frozenTiles = createGridWithFrozenTile();
+      const { result } = renderHook(() =>
+        useAdventureSelection({ tiles: frozenTiles, gridSize: 4 })
+      );
+
+      act(() => {
+        result.current.selectTile(0); // Select C at (0,0)
+      });
+      expect(result.current.selectedIndices).toEqual([0]);
+
+      // WHEN - Try to select adjacent frozen tile
+      act(() => {
+        result.current.selectTile(1); // Frozen A at (0,1)
+      });
+
+      // THEN - Frozen tile should NOT be added to selection
+      expect(result.current.selectedIndices).toEqual([0]);
+      expect(result.current.currentWord).toBe('C');
+    });
+
+    it('should allow selecting an unfrozen ice tile', () => {
+      // GIVEN - Grid with unfrozen ice tile at index 1
+      const tiles = createTestGrid();
+      tiles[1] = {
+        ...tiles[1],
+        type: 'ice',
+        isFrozen: false, // Unfrozen
+      };
+
+      const { result } = renderHook(() =>
+        useAdventureSelection({ tiles, gridSize: 4 })
+      );
+
+      // WHEN - Select the unfrozen ice tile
+      act(() => {
+        result.current.selectTile(1);
+      });
+
+      // THEN - Should be allowed
+      expect(result.current.selectedIndices).toEqual([1]);
+      expect(result.current.currentWord).toBe('A');
+    });
+
+    it('should allow selecting standard tiles adjacent to frozen tiles', () => {
+      // GIVEN - Grid with frozen tile at index 1
+      const frozenTiles = createGridWithFrozenTile();
+      const { result } = renderHook(() =>
+        useAdventureSelection({ tiles: frozenTiles, gridSize: 4 })
+      );
+
+      // WHEN - Select tiles around the frozen tile (0 -> 4 -> 5)
+      act(() => {
+        result.current.selectTile(0); // C at (0,0)
+        result.current.selectTile(4); // D at (1,0) - diagonal from frozen
+        result.current.selectTile(5); // O at (1,1) - adjacent to frozen
+      });
+
+      // THEN - Standard tiles should be selected
+      expect(result.current.selectedIndices).toEqual([0, 4, 5]);
+      expect(result.current.currentWord).toBe('CDO');
+    });
+  });
 });

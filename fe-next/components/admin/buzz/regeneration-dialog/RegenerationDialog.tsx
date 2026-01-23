@@ -16,7 +16,7 @@ import {
 import type { RegenerationDialogProps } from '../types';
 
 // Hooks
-import { usePromptPreview, useRegenerationWizard } from './hooks';
+import { useRegenerationWizard } from './hooks';
 
 // Components
 import {
@@ -32,48 +32,24 @@ export default function RegenerationDialog({
   challengeIndex,
   challengeData,
   onRegenerateSuccess,
-}: RegenerationDialogProps) {
+}: RegenerationDialogProps): React.ReactElement {
   // Get current challenge
   const currentChallenge =
     challengeIndex !== null && challengeData
       ? challengeData.challenges[challengeIndex]
       : null;
 
-  // Prompt preview hook (needs to be called first for useRegenerationWizard)
-  const promptPreviewHook = usePromptPreview({
-    date: challengeData?.puzzle_date || '',
-    language: challengeData?.language || '',
-    challengeIndex: challengeIndex ?? 0,
-    selectedFields: ['all'], // Will be updated by wizard
-    feedback: '', // Will be updated by wizard
-  });
-
-  // Main wizard hook
+  // Single consolidated wizard hook (no more double hook call)
   const wizard = useRegenerationWizard({
     open,
     challengeIndex,
     challengeData,
     onOpenChange,
     onRegenerateSuccess,
-    promptPreview: promptPreviewHook.promptPreview,
-    customPrompt: promptPreviewHook.customPrompt,
-    isEditingPrompt: promptPreviewHook.isEditingPrompt,
-    loadPromptPreview: promptPreviewHook.loadPromptPreview,
-    resetPreview: promptPreviewHook.resetPreview,
-  });
-
-  // Re-initialize prompt preview hook with actual values from wizard
-  // Note: This is a workaround for the hook dependency issue
-  const actualPromptPreview = usePromptPreview({
-    date: challengeData?.puzzle_date || '',
-    language: challengeData?.language || '',
-    challengeIndex: challengeIndex ?? 0,
-    selectedFields: wizard.selectedFields,
-    feedback: wizard.feedback,
   });
 
   // Render step content
-  const renderStepContent = () => {
+  function renderStepContent(): React.ReactElement {
     switch (wizard.currentStep) {
       case 'fields':
         return (
@@ -97,20 +73,31 @@ export default function RegenerationDialog({
       case 'preview':
         return (
           <PreviewStep
-            promptPreview={actualPromptPreview.promptPreview}
-            customPrompt={actualPromptPreview.customPrompt}
-            onCustomPromptChange={actualPromptPreview.setCustomPrompt}
-            isEditingPrompt={actualPromptPreview.isEditingPrompt}
-            onToggleEdit={() =>
-              actualPromptPreview.setIsEditingPrompt(!actualPromptPreview.isEditingPrompt)
-            }
-            doNotDoExamples={actualPromptPreview.doNotDoExamples}
-            loadingPreview={actualPromptPreview.loadingPreview}
-            error={wizard.regenerateError || actualPromptPreview.error}
+            promptPreview={wizard.promptPreview}
+            customPrompt={wizard.customPrompt}
+            onCustomPromptChange={wizard.setCustomPrompt}
+            isEditingPrompt={wizard.isEditingPrompt}
+            onToggleEdit={() => wizard.setIsEditingPrompt(!wizard.isEditingPrompt)}
+            doNotDoExamples={wizard.doNotDoExamples}
+            loadingPreview={wizard.loadingPreview}
+            error={wizard.regenerateError || wizard.previewError}
           />
         );
     }
-  };
+  }
+
+  function handleBack(): void {
+    if (wizard.currentStep === 'fields') {
+      onOpenChange(false);
+    } else {
+      const prevStep = wizard.currentStep === 'preview' ? 'feedback' : 'fields';
+      wizard.setCurrentStep(prevStep);
+    }
+  }
+
+  function handleNext(): void {
+    wizard.goToStep(wizard.currentStep === 'fields' ? 'feedback' : 'preview');
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -133,14 +120,7 @@ export default function RegenerationDialog({
         <DialogFooter>
           {/* Back/Cancel button */}
           <button
-            onClick={() => {
-              if (wizard.currentStep === 'fields') {
-                onOpenChange(false);
-              } else {
-                const prevStep = wizard.currentStep === 'preview' ? 'feedback' : 'fields';
-                wizard.setCurrentStep(prevStep);
-              }
-            }}
+            onClick={handleBack}
             disabled={wizard.isRegenerating}
             className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-slate-400 disabled:opacity-50"
           >
@@ -150,9 +130,7 @@ export default function RegenerationDialog({
           {/* Next/Regenerate button */}
           {wizard.currentStep !== 'preview' ? (
             <button
-              onClick={() =>
-                wizard.goToStep(wizard.currentStep === 'fields' ? 'feedback' : 'preview')
-              }
+              onClick={handleNext}
               disabled={!wizard.canGoNext()}
               className="px-4 py-2 rounded-lg bg-neo-cyan text-neo-black font-bold border-2 border-neo-black shadow-hard-sm hover:shadow-hard disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
@@ -162,7 +140,7 @@ export default function RegenerationDialog({
           ) : (
             <button
               onClick={wizard.handleRegenerate}
-              disabled={wizard.isRegenerating || actualPromptPreview.loadingPreview}
+              disabled={wizard.isRegenerating || wizard.loadingPreview}
               className="px-4 py-2 rounded-lg bg-neo-cyan text-neo-black font-bold border-2 border-neo-black shadow-hard-sm hover:shadow-hard disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {wizard.isRegenerating ? (

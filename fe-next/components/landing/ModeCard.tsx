@@ -27,7 +27,7 @@ interface ModeCardProps {
   description: string;
   href: string;
   icon: React.ReactNode;
-  variant: 'cyan' | 'pink' | 'purple' | 'orange';
+  variant: 'cyan' | 'pink' | 'purple' | 'orange' | 'lime';
   className?: string;
   liveBadge?: LiveBadgeProps;
   /** Simple player count indicator - shows "X playing now" style badge */
@@ -42,6 +42,8 @@ interface ModeCardProps {
   lockedMessage?: string;
   /** Callback when locked card is clicked */
   onLockedClick?: () => void;
+  /** Optional badge to display (e.g., "BETA", "NEW") */
+  badge?: string;
 }
 
 /**
@@ -62,6 +64,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   loading = false,
   lockedMessage,
   onLockedClick,
+  badge,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -122,6 +125,14 @@ const ModeCard: React.FC<ModeCardProps> = ({
       arrow: 'bg-neo-navy text-neo-orange',
       glowColor: 'rgba(255, 107, 53, 0.4)',
     },
+    lime: {
+      bg: 'bg-gradient-to-br from-neo-lime via-lime-400 to-neo-lime-dark',
+      hoverBg: 'hover:from-neo-lime-light hover:via-neo-lime hover:to-neo-lime-dark',
+      iconBg: 'bg-neo-navy',
+      iconText: 'text-neo-lime-light',
+      arrow: 'bg-neo-navy text-neo-lime',
+      glowColor: 'rgba(163, 230, 53, 0.4)',
+    },
   };
 
   const styles = variantStyles[variant];
@@ -164,6 +175,24 @@ const ModeCard: React.FC<ModeCardProps> = ({
       }}
       {...handlers}
     >
+      {/* Badge (e.g., BETA, NEW) - positioned in top-right corner */}
+      {badge && !locked && (
+        <div
+          className={cn(
+            'absolute top-2 right-2 z-10',
+            'px-2 py-0.5 sm:px-2.5 sm:py-1',
+            'bg-neo-navy text-neo-white',
+            'font-black uppercase tracking-wider',
+            'text-[10px] sm:text-xs',
+            'border-2 border-neo-black rounded-neo shadow-hard-sm',
+            'transform rotate-3',
+            isRTL && 'right-auto left-2 -rotate-3'
+          )}
+        >
+          {badge}
+        </div>
+      )}
+
       {/* Header with icon, title, and arrow in one row */}
       <div className={cn('flex items-center', secondary ? 'gap-2' : 'gap-2 sm:gap-3 lg:gap-4')} style={{ marginBottom: secondary ? 'clamp(0.125rem, 1cqw, 0.5rem)' : 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}>
         {/* Icon - container-relative sizing */}

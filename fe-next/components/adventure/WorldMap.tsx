@@ -167,9 +167,9 @@ const TrailPath = ({
   isUnlocked: boolean;
   fromLeft: boolean; // true = connecting FROM left world TO right world
 }) => {
-  // World positions: left at ~22%, right at ~78%
-  const leftX = 22;
-  const rightX = 78;
+  // World positions: more centered for desktop (30% and 70%)
+  const leftX = 30;
+  const rightX = 70;
 
   // S-curve that extends slightly beyond viewport to hide endpoints
   // Endpoints at y=-5 and y=65 (outside viewBox 0-60) so they connect cleanly under worlds
@@ -178,7 +178,7 @@ const TrailPath = ({
     : `M ${rightX} -5 C ${rightX} 25, ${leftX} 35, ${leftX} 65`;
 
   return (
-    <div className="relative h-20 sm:h-24 w-full -my-2">
+    <div className="relative h-20 sm:h-24 w-full -my-2 lg:max-w-4xl lg:mx-auto">
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 100 60"
@@ -250,18 +250,19 @@ const WorldNode = ({
 
   return (
     <motion.div
-      className="relative w-full px-4"
+      className={cn(
+        'relative w-full px-4 sm:px-8 lg:px-12',
+        // Flex layout with justify for proper centering on desktop
+        'flex items-center gap-4 sm:gap-6 lg:gap-8',
+        isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
+        isLeft ? 'flex-row' : 'flex-row-reverse'
+      )}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, type: 'spring', stiffness: 100, damping: 15 }}
     >
-      {/* World positioned at fixed percentage from edge */}
-      <div
-        className={cn(
-          'absolute top-1/2 -translate-y-1/2',
-          isLeft ? 'left-[22%] -translate-x-1/2' : 'right-[22%] translate-x-1/2'
-        )}
-      >
+      {/* World node container */}
+      <div className="flex-shrink-0">
         {/* Container for world + orbiting letters */}
         <div className="relative">
           {/* Orbiting letters around unlocked worlds */}
@@ -344,16 +345,14 @@ const WorldNode = ({
         </div>
       </div>
 
-      {/* World Info Card - positioned on the opposite side, more prominent */}
+      {/* World Info Card - in flex flow next to world */}
       <motion.div
         className={cn(
-          'absolute top-1/2 -translate-y-1/2',
-          'max-w-[170px] sm:max-w-[200px]',
+          'flex-shrink-0',
+          'w-[170px] sm:w-[200px] lg:w-[220px]',
           'bg-neo-navy-light border-4 border-neo-black rounded-neo',
           'p-3 sm:p-4 shadow-hard',
-          !isUnlocked && 'opacity-60',
-          // Position card on opposite side of world
-          isLeft ? 'left-[44%]' : 'right-[44%]'
+          !isUnlocked && 'opacity-60'
         )}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -396,9 +395,6 @@ const WorldNode = ({
           </div>
         )}
       </motion.div>
-
-      {/* Spacer for layout height - increased for larger nodes */}
-      <div className="h-28 sm:h-32 md:h-36 lg:h-40" />
     </motion.div>
   );
 };
@@ -661,8 +657,8 @@ export default function WorldMap({
         <Cloud className="top-[80%] left-[8%]" size="sm" speed={0.6} />
       </motion.div>
 
-      {/* World trail */}
-      <div className="relative z-10 py-8 sm:py-12">
+      {/* World trail - centered on desktop with max width */}
+      <div className="relative z-10 py-8 sm:py-12 lg:max-w-4xl lg:mx-auto">
         {worldsData.map((data, index) => {
           const isLeft = index % 2 === 0;
 

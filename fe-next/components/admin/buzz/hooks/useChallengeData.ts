@@ -7,6 +7,17 @@ import type { DailyBuzzDataAdmin } from '../types';
 // Regeneration timeout (70s API maxDuration + buffer)
 const REGENERATE_TIMEOUT_MS = 80_000;
 
+// Consolidated operation state type
+interface OperationState {
+  loading: boolean;
+  error: string | null;
+}
+
+const initialOperationState: OperationState = {
+  loading: false,
+  error: null,
+};
+
 export interface UseChallengeDataReturn {
   challengeData: DailyBuzzDataAdmin | null;
   loadingChallenges: boolean;
@@ -29,22 +40,16 @@ export interface UseChallengeDataReturn {
 
 /**
  * Hook for managing challenge data fetching, updates, and image operations.
+ * Uses consolidated operation state to reduce state explosion.
  */
 export function useChallengeData(): UseChallengeDataReturn {
   const [challengeData, setChallengeData] = useState<DailyBuzzDataAdmin | null>(null);
   const [loadingChallenges, setLoadingChallenges] = useState(false);
 
-  // Image regeneration state
-  const [isRegeneratingImage, setIsRegeneratingImage] = useState(false);
-  const [regenerateImageError, setRegenerateImageError] = useState<string | null>(null);
-
-  // Image removal state
-  const [isRemovingImage, setIsRemovingImage] = useState(false);
-  const [removeImageError, setRemoveImageError] = useState<string | null>(null);
-
-  // Type regeneration state
-  const [isRegeneratingType, setIsRegeneratingType] = useState(false);
-  const [typeRegenerateError, setTypeRegenerateError] = useState<string | null>(null);
+  // Consolidated operation states
+  const [imageRegenState, setImageRegenState] = useState<OperationState>(initialOperationState);
+  const [imageRemoveState, setImageRemoveState] = useState<OperationState>(initialOperationState);
+  const [typeRegenState, setTypeRegenState] = useState<OperationState>(initialOperationState);
 
   const fetchChallenges = useCallback(async (date: string, language: string) => {
     setLoadingChallenges(true);
@@ -85,8 +90,7 @@ export function useChallengeData(): UseChallengeDataReturn {
   const handleRegenerateImage = useCallback(async () => {
     if (!challengeData) return;
 
-    setIsRegeneratingImage(true);
-    setRegenerateImageError(null);
+    setImageRegenState({ loading: true, error: null });
 
     try {
       const { data: { session } } = await getSession();
@@ -127,25 +131,18 @@ export function useChallengeData(): UseChallengeDataReturn {
         image_category: data.data.image_category,
         image_alt_text: data.data.image_alt_text,
       });
+
+      setImageRegenState({ loading: false, error: null });
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        setRegenerateImageError(
-          'Request timed out after 80 seconds. The AI model may be overloaded. Please try again in a few minutes.'
-        );
-      } else {
-        const errorMsg = error instanceof Error ? error.message : 'Failed to regenerate image';
-        setRegenerateImageError(errorMsg);
-      }
-    } finally {
-      setIsRegeneratingImage(false);
+      const errorMsg = getTimeoutOrError(error, 'Failed to regenerate image');
+      setImageRegenState({ loading: false, error: errorMsg });
     }
   }, [challengeData]);
 
   const handleRemoveImage = useCallback(async () => {
     if (!challengeData) return;
 
-    setIsRemovingImage(true);
-    setRemoveImageError(null);
+    setImageRemoveState({ loading: true, error: null });
 
     try {
       const { data: { session } } = await getSession();
@@ -177,19 +174,18 @@ export function useChallengeData(): UseChallengeDataReturn {
         image_prompt: null,
         image_category: null,
       });
+
+      setImageRemoveState({ loading: false, error: null });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Failed to remove image';
-      setRemoveImageError(errorMsg);
-    } finally {
-      setIsRemovingImage(false);
+      setImageRemoveState({ loading: false, error: errorMsg });
     }
   }, [challengeData]);
 
   const handleRegenerateByType = useCallback(async (type: string, feedback: string) => {
     if (!type || !challengeData || !feedback.trim()) return;
 
-    setIsRegeneratingType(true);
-    setTypeRegenerateError(null);
+    setTypeRegenState({ loading: true, error: null });
 
     try {
       const { data: { session } } = await getSession();
@@ -225,29 +221,21 @@ export function useChallengeData(): UseChallengeDataReturn {
 
       const data = await response.json();
       setChallengeData(data.data);
+      setTypeRegenState({ loading: false, error: null });
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        setTypeRegenerateError(
-          'Request timed out after 80 seconds. The AI model may be overloaded. ' +
-          'Please try again in a few minutes.'
-        );
-      } else {
-        const errorMsg = error instanceof Error ? error.message : 'Failed to regenerate';
-        setTypeRegenerateError(errorMsg);
-      }
+      const errorMsg = getTimeoutOrError(error, 'Failed to regenerate');
+      setTypeRegenState({ loading: false, error: errorMsg });
       throw error; // Re-throw to let caller handle
-    } finally {
-      setIsRegeneratingType(false);
     }
   }, [challengeData]);
 
   const clearImageErrors = useCallback(() => {
-    setRegenerateImageError(null);
-    setRemoveImageError(null);
+    setImageRegenState((prev) => ({ ...prev, error: null }));
+    setImageRemoveState((prev) => ({ ...prev, error: null }));
   }, []);
 
   const clearTypeError = useCallback(() => {
-    setTypeRegenerateError(null);
+    setTypeRegenState((prev) => ({ ...prev, error: null }));
   }, []);
 
   return {
@@ -255,16 +243,29 @@ export function useChallengeData(): UseChallengeDataReturn {
     loadingChallenges,
     fetchChallenges,
     setChallengeData,
-    isRegeneratingImage,
-    regenerateImageError,
+    // Image regeneration (destructured from consolidated state)
+    isRegeneratingImage: imageRegenState.loading,
+    regenerateImageError: imageRegenState.error,
     handleRegenerateImage,
-    isRemovingImage,
-    removeImageError,
+    // Image removal (destructured from consolidated state)
+    isRemovingImage: imageRemoveState.loading,
+    removeImageError: imageRemoveState.error,
     handleRemoveImage,
     clearImageErrors,
-    isRegeneratingType,
-    typeRegenerateError,
+    // Type regeneration (destructured from consolidated state)
+    isRegeneratingType: typeRegenState.loading,
+    typeRegenerateError: typeRegenState.error,
     handleRegenerateByType,
     clearTypeError,
   };
+}
+
+/**
+ * Helper to get appropriate error message for timeout or generic errors.
+ */
+function getTimeoutOrError(error: unknown, defaultMsg: string): string {
+  if (error instanceof Error && error.name === 'AbortError') {
+    return 'Request timed out after 80 seconds. The AI model may be overloaded. Please try again in a few minutes.';
+  }
+  return error instanceof Error ? error.message : defaultMsg;
 }

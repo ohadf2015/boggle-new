@@ -10,7 +10,7 @@ export { STEP_LABELS, DIALOG_STEPS } from './types';
 export { REGENERATE_TIMEOUT_MS, MIN_FEEDBACK_LENGTH } from './constants';
 
 // Hooks
-export { usePromptPreview, useRegenerationWizard } from './hooks';
+export { useRegenerationWizard } from './hooks';
 
 // Sub-components
 export {

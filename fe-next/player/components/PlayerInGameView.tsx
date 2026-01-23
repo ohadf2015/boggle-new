@@ -97,7 +97,6 @@ interface PlayerInGameViewProps {
   onExitRoom: () => void;
   onConfirmExit: () => void;
   onWordSubmit: (word: string) => void;
-  setWord: (word: string) => void;
   onResetCombo?: () => void;
 
   // Hints (single-player mode)

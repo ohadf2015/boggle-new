@@ -101,6 +101,10 @@ interface GameState {
 const COMBO_TIMEOUT_MS = 3000; // 3 seconds
 const GOLD_MULTIPLIER = 3;
 const LONG_WORD_LENGTH = 5;
+const TIME_TILE_BONUS_SECONDS = 5;
+const RAINBOW_SCORE_MULTIPLIER = 1.25; // 25% bonus
+const CHAIN_COMBO_MULTIPLIER = 1.5; // 50% extra combo bonus
+const MAX_TIMER_SECONDS = 180; // Maximum timer cap
 
 // ==============================================
 // HELPER FUNCTIONS
@@ -133,6 +137,10 @@ function initializeTiles(
         type: tileType,
         isCleared: false,
         isFrozen: tileType === 'ice',
+        // Initialize time tile bonus property
+        ...(tileType === 'time' ? { bonusTime: TIME_TILE_BONUS_SECONDS } : {}),
+        // Initialize chain tile property
+        ...(tileType === 'chain' ? { isChained: false } : {}),
       });
     }
     tiles.push(rowTiles);
@@ -268,9 +276,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       let finalScore = score;
       let newTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })));
       let iceClearedCount = 0;
+      let timeBonusSeconds = 0;
 
       if (path && path.length > 0) {
-        // Check for gold tile multiplier
+        // Check for gold tile multiplier (3x)
         const hasGold = path.some(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'gold'
         );
@@ -278,17 +287,49 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           finalScore *= GOLD_MULTIPLIER;
         }
 
-        // Handle bomb tile - clear entire row
+        // Check for rainbow/wildcard tile bonus (+25%)
+        const hasRainbow = path.some(
+          (pos) => newTiles[pos.row]?.[pos.col]?.type === 'rainbow'
+        );
+        if (hasRainbow) {
+          finalScore = Math.floor(finalScore * RAINBOW_SCORE_MULTIPLIER);
+        }
+
+        // Check for chain tile combo bonus
+        const hasChain = path.some(
+          (pos) => newTiles[pos.row]?.[pos.col]?.type === 'chain'
+        );
+        if (hasChain && state.gameState.comboCount > 0) {
+          // Apply enhanced combo bonus for chain tiles
+          const comboBonus = state.gameState.comboCount * 0.1 * CHAIN_COMBO_MULTIPLIER;
+          finalScore = Math.floor(finalScore * (1 + comboBonus));
+        }
+
+        // Calculate time bonus from time tiles
+        for (const pos of path) {
+          const tile = newTiles[pos.row]?.[pos.col];
+          if (tile?.type === 'time') {
+            timeBonusSeconds += tile.bonusTime ?? TIME_TILE_BONUS_SECONDS;
+          }
+        }
+
+        // Handle bomb tile - clear entire row (including ice tiles)
         const bombPos = path.find(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'bomb'
         );
         if (bombPos) {
           for (let col = 0; col < newTiles[bombPos.row].length; col++) {
-            newTiles[bombPos.row][col].isCleared = true;
+            const tile = newTiles[bombPos.row][col];
+            // Count ice tiles in the row before clearing
+            if (tile.type === 'ice' && !tile.isCleared) {
+              iceClearedCount++;
+              tile.isFrozen = false; // Unfreeze ice tiles
+            }
+            tile.isCleared = true;
           }
         }
 
-        // Clear ice tiles adjacent to used tiles
+        // Clear and unfreeze ice tiles adjacent to used tiles
         const gridSize = state.levelConfig.gridSize;
         for (const pos of path) {
           // Check all 8 neighbors
@@ -301,7 +342,27 @@ function gameReducer(state: GameState, action: GameAction): GameState {
                 const neighborTile = newTiles[nr][nc];
                 if (neighborTile.type === 'ice' && !neighborTile.isCleared) {
                   neighborTile.isCleared = true;
+                  neighborTile.isFrozen = false; // Unfreeze ice tiles
                   iceClearedCount++;
+                }
+              }
+            }
+          }
+        }
+
+        // Mark adjacent tiles as chained when chain tile is used
+        if (hasChain) {
+          for (const pos of path) {
+            if (newTiles[pos.row]?.[pos.col]?.type === 'chain') {
+              // Mark all 8 neighbors as chained
+              for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                  if (dr === 0 && dc === 0) continue;
+                  const nr = pos.row + dr;
+                  const nc = pos.col + dc;
+                  if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
+                    newTiles[nr][nc].isChained = true;
+                  }
                 }
               }
             }
@@ -313,6 +374,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           newTiles[pos.row][pos.col].isCleared = true;
         }
       }
+
+      // Apply time bonus (capped at level's original timer duration)
+      const newTimeRemaining = Math.min(
+        state.timeRemaining + timeBonusSeconds,
+        state.levelConfig.timerSeconds
+      );
 
       // Update objectives
       const newObjectives = state.objectives.map((obj) => {
@@ -358,10 +425,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         // Update time bonus objective with current time remaining
         const finalObjectives = newObjectives.map((obj) => {
           if (obj.type === 'timeBonus') {
-            const isComplete = state.timeRemaining >= obj.target;
+            const isComplete = newTimeRemaining >= obj.target;
             return {
               ...obj,
-              current: state.timeRemaining,
+              current: newTimeRemaining,
               isComplete,
             };
           }
@@ -375,6 +442,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           tiles: newTiles,
           objectives: finalObjectives,
           isPlaying: false,
+          timeRemaining: newTimeRemaining,
           gameState: {
             ...state.gameState,
             score: state.gameState.score + finalScore,
@@ -391,6 +459,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         tiles: newTiles,
         objectives: newObjectives,
+        timeRemaining: newTimeRemaining,
         gameState: {
           ...state.gameState,
           score: state.gameState.score + finalScore,

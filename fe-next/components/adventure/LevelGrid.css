@@ -6,33 +6,36 @@
  * performance on the compositor thread.
  */
 
-/* Floating particle animation - gentle drift and fade */
+/* Floating particle animation - gentle drift and fade
+ * Uses --parallax-x/--parallax-y from :root (set by useParallax hook)
+ * Scales by 0.3 to match original container transform behavior
+ */
 @keyframes particle-float {
   0%, 100% {
     transform: translate(
-      calc(var(--parallax-x, 0px)),
-      calc(var(--parallax-y, 0px))
+      calc(var(--parallax-x, 0px) * 0.3),
+      calc(var(--parallax-y, 0px) * 0.3)
     );
     opacity: 0.4;
   }
   25% {
     transform: translate(
-      calc(var(--parallax-x, 0px) + 15px),
-      calc(var(--parallax-y, 0px) - 20px)
+      calc(var(--parallax-x, 0px) * 0.3 + 15px),
+      calc(var(--parallax-y, 0px) * 0.3 - 20px)
     );
     opacity: 0.7;
   }
   50% {
     transform: translate(
-      calc(var(--parallax-x, 0px) + 5px),
-      calc(var(--parallax-y, 0px) - 30px)
+      calc(var(--parallax-x, 0px) * 0.3 + 5px),
+      calc(var(--parallax-y, 0px) * 0.3 - 30px)
     );
     opacity: 0.5;
   }
   75% {
     transform: translate(
-      calc(var(--parallax-x, 0px) - 10px),
-      calc(var(--parallax-y, 0px) - 15px)
+      calc(var(--parallax-x, 0px) * 0.3 - 10px),
+      calc(var(--parallax-y, 0px) * 0.3 - 15px)
     );
     opacity: 0.6;
   }

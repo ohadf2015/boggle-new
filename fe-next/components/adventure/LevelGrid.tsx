@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import {
@@ -169,15 +169,15 @@ const cardVariants = {
 };
 
 // Floating particle component with CSS animations
-const FloatingParticle = ({
+// Performance: Uses CSS custom properties from :root (set by useParallax)
+// instead of receiving parallax values as props, avoiding re-renders
+const FloatingParticle = memo(({
   emoji,
   left,
   top,
   size,
   duration,
   delay,
-  parallaxX,
-  parallaxY,
 }: {
   emoji: string;
   left: number;
@@ -185,8 +185,6 @@ const FloatingParticle = ({
   size: number;
   duration: number;
   delay: number;
-  parallaxX: number;
-  parallaxY: number;
 }) => (
   <div
     className="level-grid-particle"
@@ -196,13 +194,15 @@ const FloatingParticle = ({
       fontSize: `${size}px`,
       '--particle-duration': `${duration}s`,
       '--particle-delay': `${delay}s`,
-      '--parallax-x': `${parallaxX * 0.5}px`,
-      '--parallax-y': `${parallaxY * 0.5}px`,
+      // --parallax-x and --parallax-y are set on :root by useParallax
+      // CSS animation uses calc() with these values
     } as React.CSSProperties}
   >
     {emoji}
   </div>
-);
+));
+
+FloatingParticle.displayName = 'FloatingParticle';
 
 /**
  * LevelGrid - Displays all levels for a selected world
@@ -278,74 +278,71 @@ export default function LevelGrid({
   }, [particleConfig]);
 
   return (
-    <div data-testid="level-grid" className="relative min-h-full overflow-hidden">
-      {/* Parallax World Background - Deep layer (0.1x movement) */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
-        }}
-      >
-        {/* World image as blurred background */}
-        <div className="absolute inset-0 scale-150 opacity-30">
-          <Image
-            src={worldImage}
-            alt=""
-            fill
-            className="object-cover blur-xl"
-            priority
-          />
-        </div>
-        {/* World-colored gradient overlay */}
+    <div data-testid="level-grid" className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent">
+      {/* Parallax container - stays fixed while content scrolls */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Parallax World Background - Deep layer (0.1x movement) */}
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(180deg, transparent 0%, ${glowColor}20 50%, ${glowColor}40 100%)`,
+            transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
           }}
-        />
-      </div>
-
-      {/* Atmospheric glow - Mid layer (0.2x movement) */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
-        }}
-      >
-        {/* Radial glow from world color */}
-        <div
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-30"
-          style={{
-            background: `radial-gradient(circle, ${glowColor}60 0%, transparent 70%)`,
-            filter: 'blur(60px)',
-          }}
-        />
-      </div>
-
-      {/* Floating particles layer (0.5x movement) */}
-      <div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{
-          transform: `translate(${parallaxX * 0.3}px, ${parallaxY * 0.3}px)`,
-        }}
-      >
-        {particles.map((particle) => (
-          <FloatingParticle
-            key={particle.id}
-            emoji={particle.emoji}
-            left={particle.left}
-            top={particle.top}
-            size={particle.size}
-            duration={particle.duration}
-            delay={particle.delay}
-            parallaxX={parallaxX}
-            parallaxY={parallaxY}
+        >
+          {/* World image as blurred background */}
+          <div className="absolute inset-0 scale-150 opacity-30">
+            <Image
+              src={worldImage}
+              alt=""
+              fill
+              className="object-cover blur-xl"
+              priority
+            />
+          </div>
+          {/* World-colored gradient overlay */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, transparent 0%, ${glowColor}20 50%, ${glowColor}40 100%)`,
+            }}
           />
-        ))}
+        </div>
+
+        {/* Atmospheric glow - Mid layer (0.2x movement) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
+          }}
+        >
+          {/* Radial glow from world color */}
+          <div
+            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-30"
+            style={{
+              background: `radial-gradient(circle, ${glowColor}60 0%, transparent 70%)`,
+              filter: 'blur(60px)',
+            }}
+          />
+        </div>
+
+        {/* Floating particles layer (0.3x movement via CSS custom properties) */}
+        {/* Particles use --parallax-x/--parallax-y from :root set by useParallax */}
+        <div className="absolute inset-0">
+          {particles.map((particle) => (
+            <FloatingParticle
+              key={particle.id}
+              emoji={particle.emoji}
+              left={particle.left}
+              top={particle.top}
+              size={particle.size}
+              duration={particle.duration}
+              delay={particle.delay}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Main content layer */}
-      <div className="relative z-10 space-y-6 sm:space-y-8 pb-8 px-4 sm:px-6">
+      {/* Main content layer - scrolls independently */}
+      <div className="relative z-10 space-y-6 sm:space-y-8 pt-6 sm:pt-8 pb-8 px-4 sm:px-6 max-w-7xl mx-auto">
         {/* World Header - Glass-morphism with world accent */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -460,11 +457,12 @@ export default function LevelGrid({
         </motion.div>
 
         {/* Level Grid - Staggered glass cards */}
+        {/* Desktop: max 5 columns for better card sizing, centered with auto margins */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4 sm:gap-5"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 lg:max-w-5xl lg:mx-auto"
         >
           {levels.map(({ levelNum, config, isUnlocked, stars, isPerfect }) => (
             <motion.button

@@ -176,119 +176,99 @@ export function useCommunityWords({
     [authToken, stats, fetchWords]
   );
 
+  // Shared bulk operation logic
+  const executeBulkOperation = useCallback(
+    async (
+      endpoint: string,
+      getBody: (word: CommunityWord) => Record<string, unknown>,
+      updateStats: (stats: CommunityStats, count: number) => CommunityStats,
+      actionName: string
+    ) => {
+      if (selectedWords.size === 0) {
+        toast.error('No words selected');
+        return;
+      }
+
+      try {
+        setBulkProcessing(true);
+        const wordsToProcess = words.filter((w) =>
+          selectedWords.has(createWordKey(w.word, w.language))
+        );
+
+        const results = await Promise.allSettled(
+          wordsToProcess.map((w) =>
+            fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: JSON.stringify(getBody(w)),
+            })
+          )
+        );
+
+        const succeeded = results.filter((r) => r.status === 'fulfilled').length;
+        const failed = results.filter((r) => r.status === 'rejected').length;
+
+        // Remove processed words from list
+        setWords((prev) =>
+          prev.filter((w) => !selectedWords.has(createWordKey(w.word, w.language)))
+        );
+        setSelectedWords(new Set());
+
+        // Show result toast
+        if (failed === 0) {
+          toast.success(`${actionName} ${succeeded} word${succeeded !== 1 ? 's' : ''}`);
+        } else {
+          toast.error(`${actionName} ${succeeded}, failed ${failed}`);
+        }
+
+        // Update stats
+        if (stats) {
+          setStats(updateStats(stats, succeeded));
+        }
+      } catch {
+        toast.error(`Failed to bulk ${actionName.toLowerCase()}`);
+        fetchWords();
+      } finally {
+        setBulkProcessing(false);
+      }
+    },
+    [authToken, words, selectedWords, stats, fetchWords]
+  );
+
   // Bulk approve selected words
-  const handleBulkApprove = useCallback(async () => {
-    if (selectedWords.size === 0) {
-      toast.error('No words selected');
-      return;
-    }
-
-    try {
-      setBulkProcessing(true);
-      const wordsToApprove = words.filter((w) =>
-        selectedWords.has(createWordKey(w.word, w.language))
-      );
-
-      const results = await Promise.allSettled(
-        wordsToApprove.map((w) =>
-          fetch('/api/admin/community-words/approve', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ word: w.word, language: w.language, addToDictionary: true }),
-          })
-        )
-      );
-
-      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
-      const failed = results.filter((r) => r.status === 'rejected').length;
-
-      // Remove approved words from list
-      setWords((prev) =>
-        prev.filter((w) => !selectedWords.has(createWordKey(w.word, w.language)))
-      );
-      setSelectedWords(new Set());
-
-      if (failed === 0) {
-        toast.success(`Approved ${succeeded} word${succeeded !== 1 ? 's' : ''}`);
-      } else {
-        toast.error(`Approved ${succeeded}, failed ${failed}`);
-      }
-
-      // Update stats
-      if (stats) {
-        setStats({
-          ...stats,
-          validated: stats.validated + succeeded,
-          pendingReview: Math.max(0, stats.pendingReview - succeeded),
-        });
-      }
-    } catch (error) {
-      toast.error('Failed to bulk approve');
-      fetchWords();
-    } finally {
-      setBulkProcessing(false);
-    }
-  }, [authToken, words, selectedWords, stats, fetchWords]);
+  const handleBulkApprove = useCallback(
+    () =>
+      executeBulkOperation(
+        '/api/admin/community-words/approve',
+        (w) => ({ word: w.word, language: w.language, addToDictionary: true }),
+        (s, count) => ({
+          ...s,
+          validated: s.validated + count,
+          pendingReview: Math.max(0, s.pendingReview - count),
+        }),
+        'Approved'
+      ),
+    [executeBulkOperation]
+  );
 
   // Bulk reject selected words
-  const handleBulkReject = useCallback(async () => {
-    if (selectedWords.size === 0) {
-      toast.error('No words selected');
-      return;
-    }
-
-    try {
-      setBulkProcessing(true);
-      const wordsToReject = words.filter((w) =>
-        selectedWords.has(createWordKey(w.word, w.language))
-      );
-
-      const results = await Promise.allSettled(
-        wordsToReject.map((w) =>
-          fetch('/api/admin/community-words/disapprove', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ word: w.word, language: w.language, blacklist: true }),
-          })
-        )
-      );
-
-      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
-      const failed = results.filter((r) => r.status === 'rejected').length;
-
-      // Remove rejected words from list
-      setWords((prev) =>
-        prev.filter((w) => !selectedWords.has(createWordKey(w.word, w.language)))
-      );
-      setSelectedWords(new Set());
-
-      if (failed === 0) {
-        toast.success(`Rejected ${succeeded} word${succeeded !== 1 ? 's' : ''}`);
-      } else {
-        toast.error(`Rejected ${succeeded}, failed ${failed}`);
-      }
-
-      // Update stats
-      if (stats) {
-        setStats({
-          ...stats,
-          rejected: stats.rejected + succeeded,
-          pendingReview: Math.max(0, stats.pendingReview - succeeded),
-        });
-      }
-    } catch (error) {
-      toast.error('Failed to bulk reject');
-      fetchWords();
-    } finally {
-      setBulkProcessing(false);
-    }
-  }, [authToken, words, selectedWords, stats, fetchWords]);
+  const handleBulkReject = useCallback(
+    () =>
+      executeBulkOperation(
+        '/api/admin/community-words/disapprove',
+        (w) => ({ word: w.word, language: w.language, blacklist: true }),
+        (s, count) => ({
+          ...s,
+          rejected: s.rejected + count,
+          pendingReview: Math.max(0, s.pendingReview - count),
+        }),
+        'Rejected'
+      ),
+    [executeBulkOperation]
+  );
 
   // Toggle selection for a single word
   const toggleWordSelection = useCallback((word: string, language: string) => {

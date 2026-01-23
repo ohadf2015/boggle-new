@@ -146,6 +146,10 @@ export function useAdventureSelection({
       // Validate index
       if (index < 0 || index >= tiles.length || !tiles[index]) return;
 
+      // Block selection of frozen tiles
+      const targetTile = tiles[index];
+      if (targetTile.isFrozen) return;
+
       setSelectedIndices((prev) => {
         // If this is the first tile, select it
         if (prev.length === 0) {

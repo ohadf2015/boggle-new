@@ -7,11 +7,16 @@
  * - Ambient drift: Subtle sine/cosine oscillation that's always active
  *
  * Respects prefers-reduced-motion and device capabilities.
+ *
+ * Performance optimizations:
+ * - Uses refs + CSS custom properties to avoid React re-renders
+ * - Pauses RAF loop when tab is hidden (Page Visibility API)
+ * - Returns stable reference to prevent consumer re-renders
  */
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useDevicePerformance } from './useDevicePerformance';
 
 export interface ParallaxOptions {
@@ -25,6 +30,8 @@ export interface ParallaxOptions {
   enableAmbient?: boolean;
   /** Ambient drift speed multiplier (default: 1) */
   ambientSpeed?: number;
+  /** CSS selector for element to set custom properties on (default: ':root') */
+  cssTarget?: string;
 }
 
 export interface ParallaxOutput {
@@ -42,6 +49,7 @@ const DEFAULT_OPTIONS: Required<ParallaxOptions> = {
   enableGesture: true,
   enableAmbient: true,
   ambientSpeed: 1,
+  cssTarget: ':root',
 };
 
 /**
@@ -51,17 +59,63 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+/**
+ * Update CSS custom properties on target element
+ * This moves animation to compositor thread, avoiding React re-renders
+ */
+function updateCSSProperties(x: number, y: number, target: string): void {
+  const element = target === ':root' ? document.documentElement : document.querySelector(target);
+  if (element instanceof HTMLElement) {
+    element.style.setProperty('--parallax-x', `${x}px`);
+    element.style.setProperty('--parallax-y', `${y}px`);
+  }
+}
+
 export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const { prefersReducedMotion, isMobile, enableComplexAnimations } = useDevicePerformance();
 
-  const [gyro, setGyro] = useState({ x: 0, y: 0 });
-  const [gesture, setGesture] = useState({ x: 0, y: 0 });
-  const [ambient, setAmbient] = useState({ x: 0, y: 0 });
+  // Use refs for values that update frequently to avoid re-renders
+  const gyroRef = useRef({ x: 0, y: 0 });
+  const gestureRef = useRef({ x: 0, y: 0 });
+  const ambientRef = useRef({ x: 0, y: 0 });
+
+  // State only for values that consumers need to react to
   const [isGyroActive, setIsGyroActive] = useState(false);
 
+  // Track visibility for pausing RAF
+  const isVisibleRef = useRef(true);
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+
+  // Stable output ref to avoid consumer re-renders
+  const outputRef = useRef<ParallaxOutput>({ x: 0, y: 0, isGyroActive: false });
+
+  // Force update trigger for when consumers need the latest values
+  const [, forceUpdate] = useState(0);
+
+  // Update combined output and CSS properties
+  const updateOutput = useCallback(() => {
+    const x = gyroRef.current.x + gestureRef.current.x + ambientRef.current.x;
+    const y = gyroRef.current.y + gestureRef.current.y + ambientRef.current.y;
+
+    outputRef.current.x = x;
+    outputRef.current.y = y;
+    outputRef.current.isGyroActive = isGyroActive;
+
+    // Update CSS custom properties (moves animation to compositor thread)
+    updateCSSProperties(x, y, opts.cssTarget);
+  }, [isGyroActive, opts.cssTarget]);
+
+  // Visibility API - pause RAF when tab is hidden
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = document.visibilityState === 'visible';
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Gyroscope input (mobile only)
   useEffect(() => {
@@ -80,11 +134,12 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       // beta: front-back tilt (-180 to 180)
       const x = ((e.gamma || 0) / 45) * 15 * opts.intensity;
       const y = ((e.beta || 0) / 45) * 15 * opts.intensity;
-      setGyro({
+      gyroRef.current = {
         x: clamp(x, -20, 20),
         y: clamp(y, -20, 20),
-      });
+      };
       setIsGyroActive(true);
+      updateOutput();
     };
 
     // Request permission on iOS 13+
@@ -122,7 +177,7 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       window.removeEventListener('deviceorientation', handleOrientation);
       window.removeEventListener('touchstart', handleFirstInteraction);
     };
-  }, [opts.enableGyroscope, opts.intensity, isMobile, prefersReducedMotion, enableComplexAnimations]);
+  }, [opts.enableGyroscope, opts.intensity, isMobile, prefersReducedMotion, enableComplexAnimations, updateOutput]);
 
   // Gesture input (mouse on desktop, touch on mobile)
   useEffect(() => {
@@ -133,7 +188,8 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 30 * opts.intensity;
       const y = (e.clientY / window.innerHeight - 0.5) * 30 * opts.intensity;
-      setGesture({ x, y });
+      gestureRef.current = { x, y };
+      updateOutput();
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -141,7 +197,8 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       const touch = e.touches[0];
       const x = (touch.clientX / window.innerWidth - 0.5) * 20 * opts.intensity;
       const y = (touch.clientY / window.innerHeight - 0.5) * 20 * opts.intensity;
-      setGesture({ x, y });
+      gestureRef.current = { x, y };
+      updateOutput();
     };
 
     if (isMobile) {
@@ -151,9 +208,12 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       window.addEventListener('mousemove', handleMouseMove, { passive: true });
       return () => window.removeEventListener('mousemove', handleMouseMove);
     }
-  }, [opts.enableGesture, opts.intensity, isMobile, prefersReducedMotion, enableComplexAnimations]);
+  }, [opts.enableGesture, opts.intensity, isMobile, prefersReducedMotion, enableComplexAnimations, updateOutput]);
 
-  // Ambient drift (always-on subtle oscillation)
+  // Ambient drift (always-on oscillation for 3D effect)
+  // Uses Lissajous-like curves (overlapping sine waves) for organic, non-repeating motion
+  // Performance: Uses refs and CSS custom properties to avoid React re-renders
+  // Also pauses when tab is hidden to save CPU
   useEffect(() => {
     if (!opts.enableAmbient || prefersReducedMotion) {
       return;
@@ -162,11 +222,38 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     startTimeRef.current = performance.now();
 
     const animate = (time: number) => {
+      // Skip animation when tab is hidden (save CPU)
+      if (!isVisibleRef.current) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       const elapsed = time - startTimeRef.current;
-      // Slow sine/cosine oscillation
-      const x = Math.sin(elapsed * 0.0003 * opts.ambientSpeed) * 3;
-      const y = Math.cos(elapsed * 0.0002 * opts.ambientSpeed) * 2;
-      setAmbient({ x, y });
+      const speed = opts.ambientSpeed;
+      const intensity = opts.intensity;
+
+      // Primary slow oscillation (main drift)
+      const primaryX = Math.sin(elapsed * 0.0002 * speed) * 12;
+      const primaryY = Math.cos(elapsed * 0.00015 * speed) * 10;
+
+      // Secondary faster oscillation (adds organic feel)
+      const secondaryX = Math.sin(elapsed * 0.0005 * speed + 0.5) * 5;
+      const secondaryY = Math.cos(elapsed * 0.00045 * speed + 0.3) * 4;
+
+      // Tertiary subtle tremor (micro-movement for "alive" feel)
+      const tertiaryX = Math.sin(elapsed * 0.001 * speed) * 2;
+      const tertiaryY = Math.cos(elapsed * 0.0012 * speed) * 1.5;
+
+      // Combine all waves with intensity multiplier
+      const x = (primaryX + secondaryX + tertiaryX) * intensity;
+      const y = (primaryY + secondaryY + tertiaryY) * intensity;
+
+      // Update ref (no re-render)
+      ambientRef.current = { x, y };
+
+      // Update combined output and CSS properties
+      updateOutput();
+
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
@@ -177,19 +264,27 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [opts.enableAmbient, opts.ambientSpeed, prefersReducedMotion]);
+  }, [opts.enableAmbient, opts.ambientSpeed, opts.intensity, prefersReducedMotion, updateOutput]);
+
+  // Trigger initial render and periodic sync for consumers that need values
+  // This is a low-frequency update (not 60fps) just to sync React state with refs
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    const syncInterval = setInterval(() => {
+      forceUpdate((n) => n + 1);
+    }, 100); // 10fps sync is enough for consumers
+
+    return () => clearInterval(syncInterval);
+  }, [prefersReducedMotion]);
 
   // Return static values for reduced motion
   if (prefersReducedMotion) {
     return { x: 0, y: 0, isGyroActive: false };
   }
 
-  // Combine all inputs
-  return {
-    x: gyro.x + gesture.x + ambient.x,
-    y: gyro.y + gesture.y + ambient.y,
-    isGyroActive,
-  };
+  // Return current output (stable reference pattern)
+  return outputRef.current;
 }
 
 export default useParallax;

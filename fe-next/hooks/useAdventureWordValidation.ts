@@ -9,7 +9,7 @@
  * 5. Exists in dictionary (via API)
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 
 // ==============================================
 // TYPES
@@ -137,6 +137,10 @@ export function useAdventureWordValidation({
   const [lastValidationResult, setLastValidationResult] =
     useState<WordValidationResult | null>(null);
 
+  // Abort controller for request deduplication
+  // Cancels previous in-flight request when new validation starts
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // Normalize found words for comparison
   const normalizedFoundWords = useMemo(
     () => new Set(foundWords.map((w) => w.toLowerCase())),
@@ -190,6 +194,12 @@ export function useAdventureWordValidation({
       }
 
       // 5. Validate against dictionary (API call)
+      // Cancel any previous in-flight request (request deduplication)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
       setIsValidating(true);
 
       try {
@@ -197,6 +207,7 @@ export function useAdventureWordValidation({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ word, language }),
+          signal: abortControllerRef.current.signal,
         });
 
         const data = await response.json();
@@ -219,6 +230,14 @@ export function useAdventureWordValidation({
           return result;
         }
       } catch (error) {
+        // Ignore aborted requests (user started new validation)
+        if (error instanceof Error && error.name === 'AbortError') {
+          return {
+            isValid: false,
+            errorKey: 'adventure.errors.validationCancelled',
+          };
+        }
+
         const result: WordValidationResult = {
           isValid: false,
           errorKey: 'adventure.errors.validationFailed',

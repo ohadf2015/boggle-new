@@ -61,6 +61,19 @@ interface ScorePopup {
   bonus?: string;
 }
 
+interface LastReportedTimerState {
+  isPlaying: boolean;
+  isPaused: boolean;
+  phase: string;
+  timeRemaining: number;
+}
+
+interface ValidationFeedback {
+  error: string | null;
+  wasSubmitted: boolean;
+  isValid: boolean;
+}
+
 // ==============================================
 // HELPER FUNCTIONS
 // ==============================================
@@ -81,6 +94,49 @@ function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
     }
   }
   return flat;
+}
+
+/**
+ * Compare 2D tile arrays for equality (avoiding new references)
+ * Returns true if tiles are structurally identical
+ */
+function tilesEqual(a: TileState[][], b: TileState[][]): boolean {
+  if (a.length !== b.length) return false;
+  for (let row = 0; row < a.length; row++) {
+    if (a[row].length !== b[row].length) return false;
+    for (let col = 0; col < a[row].length; col++) {
+      const tileA = a[row][col];
+      const tileB = b[row][col];
+      // Compare relevant tile properties from TileState interface
+      if (
+        tileA.letter !== tileB.letter ||
+        tileA.type !== tileB.type ||
+        tileA.isCleared !== tileB.isCleared ||
+        tileA.isFrozen !== tileB.isFrozen ||
+        tileA.isChained !== tileB.isChained
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Hook to memoize flattened tiles with structural equality check
+ * Prevents unnecessary re-renders when tiles2D reference changes but content is same
+ */
+function useMemoizedFlatTiles(tiles2D: TileState[][]): GridTileState[] {
+  const prevTilesRef = useRef<TileState[][] | null>(null);
+  const flatTilesRef = useRef<GridTileState[]>([]);
+
+  // Only recompute if tiles actually changed
+  if (!prevTilesRef.current || !tilesEqual(prevTilesRef.current, tiles2D)) {
+    prevTilesRef.current = tiles2D;
+    flatTilesRef.current = flattenTiles(tiles2D);
+  }
+
+  return flatTilesRef.current;
 }
 
 // ==============================================
@@ -112,8 +168,8 @@ const AdventureGame = memo<AdventureGameProps>(
       initialGrid,
     });
 
-    // Flatten tiles for AdventureGrid component
-    const tiles = useMemo(() => flattenTiles(tiles2D), [tiles2D]);
+    // Flatten tiles for AdventureGrid component (uses structural equality)
+    const tiles = useMemoizedFlatTiles(tiles2D);
 
     // Language context for translations
     const { t, language } = useLanguage();
@@ -121,16 +177,40 @@ const AdventureGame = memo<AdventureGameProps>(
     // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
-    const [validationError, setValidationError] = useState<string | null>(null);
-    const [wasWordSubmitted, setWasWordSubmitted] = useState(false);
-    const [isWordValid, setIsWordValid] = useState(false);
     const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
+
+    // Consolidated validation feedback state
+    const [validationFeedback, setValidationFeedback] = useState<ValidationFeedback>({
+      error: null,
+      wasSubmitted: false,
+      isValid: false,
+    });
+
+    // Refs for timeout cleanup
+    const validationErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Track entry sequence phases
     const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
 
     // Ref for score display target (for ScorePopupFly animation)
     const scoreDisplayRef = useRef<HTMLDivElement>(null);
+
+    // Cleanup all timeouts on unmount
+    useEffect(() => {
+      return () => {
+        if (validationErrorTimeoutRef.current) {
+          clearTimeout(validationErrorTimeoutRef.current);
+        }
+        if (wordSubmittedTimeoutRef.current) {
+          clearTimeout(wordSubmittedTimeoutRef.current);
+        }
+        if (popupQueueTimeoutRef.current) {
+          clearTimeout(popupQueueTimeoutRef.current);
+        }
+      };
+    }, []);
 
     // Current popup from queue
     const currentPopup = popupQueue[0] ?? null;
@@ -144,7 +224,7 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     // Ref to grid for coordinate calculation
-    const gridRef = React.useRef<HTMLDivElement | null>(null);
+    const gridRef = useRef<HTMLDivElement>(null);
 
     // Selection hook with adjacency validation
     const {
@@ -162,14 +242,42 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     // Lexi reaction state - transform game state to reaction format
-    const lexiGameState: GameStateForReactions = useMemo(() => ({
-      wordsFound: gameState.wordsFound,
-      comboCount: gameState.comboCount,
-      timeRemaining,
-      isComplete: gameState.isComplete,
-      stars: gameState.stars,
-      worldId: levelConfig.world,
-    }), [gameState.wordsFound, gameState.comboCount, timeRemaining, gameState.isComplete, gameState.stars, levelConfig.world]);
+    // Using ref + selective update to avoid recreating object on every timer tick
+    const lexiGameStateRef = useRef<GameStateForReactions>({
+      wordsFound: [],
+      comboCount: 0,
+      timeRemaining: 0,
+      isComplete: false,
+      stars: 0,
+      worldId: 1,
+    });
+
+    // Only update ref when non-timer values change (timer ticks shouldn't trigger reactions)
+    const lexiGameState = useMemo(() => {
+      const ref = lexiGameStateRef.current;
+      // Check if significant values changed (not just timeRemaining)
+      const significantChange =
+        ref.wordsFound !== gameState.wordsFound ||
+        ref.comboCount !== gameState.comboCount ||
+        ref.isComplete !== gameState.isComplete ||
+        ref.stars !== gameState.stars ||
+        ref.worldId !== levelConfig.world;
+
+      if (significantChange) {
+        lexiGameStateRef.current = {
+          wordsFound: gameState.wordsFound,
+          comboCount: gameState.comboCount,
+          timeRemaining,
+          isComplete: gameState.isComplete,
+          stars: gameState.stars,
+          worldId: levelConfig.world,
+        };
+      } else {
+        // Update timeRemaining without creating new object
+        ref.timeRemaining = timeRemaining;
+      }
+      return lexiGameStateRef.current;
+    }, [gameState.wordsFound, gameState.comboCount, timeRemaining, gameState.isComplete, gameState.stars, levelConfig.world]);
 
     // Lexi reactions hook
     const { reaction, dismissReaction } = useLexiReactions({
@@ -179,13 +287,37 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Report timer state to parent for music coordination
     // Parent (AdventureView) owns the useAdventureMusic hook to play music on all screens
+    // Performance: Only report on significant changes (not every second tick)
+    const lastReportedStateRef = useRef<LastReportedTimerState | null>(null);
+
     useEffect(() => {
-      onTimerStateChange?.({
-        timeRemaining,
-        totalTime: levelConfig.timerSeconds,
-        isPlaying: isPlaying && entryPhase === 'playing',
-        isPaused,
-      });
+      const actuallyPlaying = isPlaying && entryPhase === 'playing';
+      const lastState = lastReportedStateRef.current;
+
+      // Determine if this is a significant change worth reporting
+      const isSignificantChange =
+        !lastState ||
+        lastState.isPlaying !== actuallyPlaying ||
+        lastState.isPaused !== isPaused ||
+        lastState.phase !== entryPhase ||
+        // Report every 5 seconds during gameplay, or when time is critical (<10s)
+        Math.floor(lastState.timeRemaining / 5) !== Math.floor(timeRemaining / 5) ||
+        timeRemaining <= 10;
+
+      if (isSignificantChange && onTimerStateChange) {
+        lastReportedStateRef.current = {
+          isPlaying: actuallyPlaying,
+          isPaused,
+          phase: entryPhase,
+          timeRemaining,
+        };
+        onTimerStateChange({
+          timeRemaining,
+          totalTime: levelConfig.timerSeconds,
+          isPlaying: actuallyPlaying,
+          isPaused,
+        });
+      }
     }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, levelConfig.timerSeconds]);
 
     // Handle cascade completion to advance to objectives phase
@@ -283,8 +415,18 @@ const AdventureGame = memo<AdventureGameProps>(
         // Use currentWord and getPath() from selection hook for validated path
         if (!isPlaying || isPaused || currentWord.length < 3 || isValidating) return;
 
+        // Clear previous timeouts to prevent stale state updates
+        if (validationErrorTimeoutRef.current) {
+          clearTimeout(validationErrorTimeoutRef.current);
+          validationErrorTimeoutRef.current = null;
+        }
+        if (wordSubmittedTimeoutRef.current) {
+          clearTimeout(wordSubmittedTimeoutRef.current);
+          wordSubmittedTimeoutRef.current = null;
+        }
+
         // Clear any previous error
-        setValidationError(null);
+        setValidationFeedback(prev => ({ ...prev, error: null }));
 
         // Get validated path from selection hook
         const path = getPath();
@@ -295,11 +437,7 @@ const AdventureGame = memo<AdventureGameProps>(
         if (result.isValid && result.score) {
           // Get position BEFORE clearing selection
           const startPos = getPopupStartPosition();
-
-          // Store score value for TypeScript
           const scoreValue = result.score;
-
-          // Calculate bonus string from combo
           const comboBonus = gameState.comboCount > 1 ? `${gameState.comboCount}x` : undefined;
 
           // Add score popup to queue
@@ -313,23 +451,24 @@ const AdventureGame = memo<AdventureGameProps>(
           }]);
 
           // Valid word - submit with calculated score and path for special tile effects
-          setIsWordValid(true);
-          setWasWordSubmitted(true);
+          setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
           submitWordWithPath(currentWord, scoreValue, path);
           clearSelection();
-          // Reset after animation duration
-          setTimeout(() => {
-            setWasWordSubmitted(false);
-            setIsWordValid(false);
+
+          // Reset after animation duration with proper cleanup
+          wordSubmittedTimeoutRef.current = setTimeout(() => {
+            setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
           }, 400);
         } else if (result.errorKey) {
           // Invalid word - show error
-          setIsWordValid(false);
-          setValidationError(t(result.errorKey) || result.errorKey);
+          const errorMessage = t(result.errorKey) || result.errorKey;
+          setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
           clearSelection();
 
-          // Clear error after 2 seconds
-          setTimeout(() => setValidationError(null), 2000);
+          // Clear error after 2 seconds with proper cleanup
+          validationErrorTimeoutRef.current = setTimeout(() => {
+            setValidationFeedback(prev => ({ ...prev, error: null }));
+          }, 2000);
         }
       },
       [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount]
@@ -349,15 +488,29 @@ const AdventureGame = memo<AdventureGameProps>(
       startGame();
     }, [resetGame, startGame, clearSelection]);
 
-    // Handle exit from pause menu
-    const handleExit = useCallback(() => {
-      onExit();
-    }, [onExit]);
+    // Handle exit - directly use onExit since no additional logic needed
+    const handleExit = onExit;
 
-    // Handle score popup completion
+    // Handle score popup completion with safety timeout fallback
     const handlePopupComplete = useCallback(() => {
+      // Clear safety timeout when popup completes normally
+      if (popupQueueTimeoutRef.current) {
+        clearTimeout(popupQueueTimeoutRef.current);
+        popupQueueTimeoutRef.current = null;
+      }
       setPopupQueue(prev => prev.slice(1));
     }, []);
+
+    // Safety mechanism: clear stuck popups after max duration
+    useEffect(() => {
+      if (currentPopup && !popupQueueTimeoutRef.current) {
+        const POPUP_MAX_DURATION_MS = 3000; // Max 3 seconds per popup
+        popupQueueTimeoutRef.current = setTimeout(() => {
+          setPopupQueue(prev => prev.slice(1));
+          popupQueueTimeoutRef.current = null;
+        }, POPUP_MAX_DURATION_MS);
+      }
+    }, [currentPopup]);
 
     // Calculate star count for display
     const starsEarned = gameState.stars;
@@ -430,16 +583,16 @@ const AdventureGame = memo<AdventureGameProps>(
         </header>
 
         {/* Main Game Area */}
-        <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-hidden">
+        <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-y-auto min-h-0">
           {/* Grid Section */}
-          <div className="flex-1 flex flex-col items-center justify-center gap-3">
+          <div className="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center gap-3 min-h-0">
             {/* Feedback Container - Always reserve space to prevent layout shift */}
             <div
               data-testid="feedback-container"
               className="min-h-[40px] flex items-center justify-center"
             >
               {/* Validation Feedback */}
-              {validationError && (
+              {validationFeedback.error && (
                 <div
                   data-testid="validation-error"
                   className={cn(
@@ -449,7 +602,7 @@ const AdventureGame = memo<AdventureGameProps>(
                     'animate-neo-shake'
                   )}
                 >
-                  {validationError}
+                  {validationFeedback.error}
                 </div>
               )}
 
@@ -478,8 +631,8 @@ const AdventureGame = memo<AdventureGameProps>(
               showWordPreview
               className="max-w-md w-full"
               pathPoints={pathPoints}
-              isWordValid={isWordValid}
-              wasWordSubmitted={wasWordSubmitted}
+              isWordValid={validationFeedback.isValid}
+              wasWordSubmitted={validationFeedback.wasSubmitted}
               showCascade={entryPhase === 'cascade'}
               onCascadeComplete={handleCascadeComplete}
             />
@@ -488,7 +641,7 @@ const AdventureGame = memo<AdventureGameProps>(
           {/* Sidebar - Objectives & Combo */}
           <aside
             className={cn(
-              'lg:w-64 flex flex-col gap-4',
+              'flex-shrink-0 lg:w-64 flex flex-col gap-4',
               'lg:border-l-2 lg:border-neo-black/20 lg:pl-4',
               // Glass effect for better visibility over world backgrounds
               'p-4 rounded-neo',

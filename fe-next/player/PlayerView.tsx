@@ -128,11 +128,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   } = useGameStateContext();
 
   // Game state
-  const [word, setWord] = useState<string>('');
   const [gameActive, setGameActive] = useState<boolean>(false);
   const [achievements, setAchievements] = useState<string[]>([]);
-  // letterGrid now comes from GameStateContext (see above)
-  // waitingForResults is now from context (see useGameStateContext above)
   const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
   const [minWordLength, setMinWordLength] = useState<number>(2);
 
@@ -165,7 +162,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     playerCount: humanPlayerCount,
     gameActive,
   });
-  // shufflingGrid now comes from GameStateContext (see above)
   const [highlightedCells, setHighlightedCells] = useState<GridPosition[]>([]);
   const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
 
@@ -326,10 +322,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [waitingForResults, fadeToTrack, TRACKS]);
 
-  // Timer is now managed by useGameTimer hook (lines 136-147)
-  // Server time updates will sync via gameTimer.setTime() in socket events
-
-  // Keep refs in sync
+  // Keep refs in sync with state for use in callbacks
   useEffect(() => {
     comboLevelRef.current = comboLevel;
   }, [comboLevel]);
@@ -748,7 +741,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         onExitRoom={handleExitRoom}
         onConfirmExit={confirmExitRoom}
         onWordSubmit={handleWordSubmit}
-        setWord={setWord}
         onResetCombo={handleResetCombo}
         hints={hints}
         earthquakeState={earthquakeState}

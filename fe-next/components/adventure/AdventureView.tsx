@@ -18,7 +18,7 @@ import {
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
 import AdventureGame from './AdventureGame';
-import WorldBackground from './themed/WorldBackground';
+// WorldBackground is handled internally by LevelGrid for proper parallax layering
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import MusicControls from '@/components/MusicControls';
 
@@ -298,7 +298,7 @@ export default function AdventureView(): React.JSX.Element {
           )}
 
           {viewState === 'levelGrid' && selectedWorldConfig && (
-            // Level Grid View - with world-themed parallax background
+            // Level Grid View - LevelGrid handles its own scrolling and parallax
             <motion.div
               key="level-grid"
               initial={{ opacity: 0, x: isRTL ? -100 : 100 }}
@@ -307,18 +307,12 @@ export default function AdventureView(): React.JSX.Element {
               transition={{ duration: 0.3 }}
               className="h-full"
             >
-              <WorldBackground className="h-full">
-                <div className="h-full overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent">
-                  <div className="max-w-7xl mx-auto">
-                    <LevelGrid
-                      world={selectedWorldConfig}
-                      completions={completions}
-                      totalStars={totalStars}
-                      onLevelSelect={handleLevelSelect}
-                    />
-                  </div>
-                </div>
-              </WorldBackground>
+              <LevelGrid
+                world={selectedWorldConfig}
+                completions={completions}
+                totalStars={totalStars}
+                onLevelSelect={handleLevelSelect}
+              />
             </motion.div>
           )}
 

@@ -6,6 +6,8 @@ import type {
   RegenerableField,
   DailyBuzzDataAdmin,
   RegenerationDialogProps,
+  PromptExample,
+  PromptPreviewResponse,
 } from '../../types';
 import type { DialogStep } from '../types';
 import { REGENERATE_TIMEOUT_MS, MIN_FEEDBACK_LENGTH } from '../constants';
@@ -16,11 +18,6 @@ interface UseRegenerationWizardOptions {
   challengeData: DailyBuzzDataAdmin | null;
   onOpenChange: (open: boolean) => void;
   onRegenerateSuccess: RegenerationDialogProps['onRegenerateSuccess'];
-  promptPreview: string;
-  customPrompt: string;
-  isEditingPrompt: boolean;
-  loadPromptPreview: () => Promise<void>;
-  resetPreview: () => void;
 }
 
 interface UseRegenerationWizardReturn {
@@ -38,6 +35,16 @@ interface UseRegenerationWizardReturn {
   feedback: string;
   setFeedback: (value: string) => void;
 
+  // Prompt preview (consolidated from usePromptPreview)
+  promptPreview: string;
+  customPrompt: string;
+  setCustomPrompt: (value: string) => void;
+  isEditingPrompt: boolean;
+  setIsEditingPrompt: (value: boolean) => void;
+  doNotDoExamples: PromptExample[];
+  loadingPreview: boolean;
+  previewError: string | null;
+
   // Regeneration
   isRegenerating: boolean;
   regenerateError: string | null;
@@ -50,11 +57,6 @@ export function useRegenerationWizard({
   challengeData,
   onOpenChange,
   onRegenerateSuccess,
-  promptPreview,
-  customPrompt,
-  isEditingPrompt,
-  loadPromptPreview,
-  resetPreview,
 }: UseRegenerationWizardOptions): UseRegenerationWizardReturn {
   // Step management
   const [currentStep, setCurrentStep] = useState<DialogStep>('fields');
@@ -65,20 +67,36 @@ export function useRegenerationWizard({
   // Feedback
   const [feedback, setFeedback] = useState('');
 
+  // Prompt preview state (consolidated from usePromptPreview)
+  const [promptPreview, setPromptPreview] = useState('');
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [isEditingPrompt, setIsEditingPrompt] = useState(false);
+  const [doNotDoExamples, setDoNotDoExamples] = useState<PromptExample[]>([]);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
   // Regeneration state
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [regenerateError, setRegenerateError] = useState<string | null>(null);
 
-  // Reset state when dialog opens/closes
+  // Reset all state when dialog opens/closes
+  const resetState = useCallback(() => {
+    setCurrentStep('fields');
+    setSelectedFields(['all']);
+    setFeedback('');
+    setRegenerateError(null);
+    setPromptPreview('');
+    setCustomPrompt('');
+    setIsEditingPrompt(false);
+    setDoNotDoExamples([]);
+    setPreviewError(null);
+  }, []);
+
   useEffect(() => {
     if (open) {
-      setCurrentStep('fields');
-      setSelectedFields(['all']);
-      setFeedback('');
-      setRegenerateError(null);
-      resetPreview();
+      resetState();
     }
-  }, [open, resetPreview]);
+  }, [open, resetState]);
 
   // Field toggle handler
   const handleFieldToggle = useCallback((field: RegenerableField) => {
@@ -96,6 +114,51 @@ export function useRegenerationWizard({
       });
     }
   }, []);
+
+  // Load prompt preview (consolidated from usePromptPreview)
+  const loadPromptPreview = useCallback(async () => {
+    if (!challengeData) return;
+
+    setLoadingPreview(true);
+    setPreviewError(null);
+
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
+      const fieldsParam = selectedFields.join(',');
+      const params = new URLSearchParams({
+        date: challengeData.puzzle_date,
+        language: challengeData.language,
+        challengeIndex: (challengeIndex ?? 0).toString(),
+        feedback: feedback || 'Needs improvement',
+        fields: fieldsParam,
+      });
+
+      const response = await fetch(`/api/admin/buzz/prompt-preview?${params}`, {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to load prompt preview');
+      }
+
+      const data: PromptPreviewResponse = await response.json();
+      setPromptPreview(data.data.aiPrompt);
+      setCustomPrompt(data.data.aiPrompt);
+      setDoNotDoExamples(data.data.availableExamples);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load preview';
+      setPreviewError(errorMsg);
+    } finally {
+      setLoadingPreview(false);
+    }
+  }, [challengeData, challengeIndex, selectedFields, feedback]);
 
   // Step navigation
   const goToStep = useCallback(
@@ -227,6 +290,16 @@ export function useRegenerationWizard({
     // Feedback
     feedback,
     setFeedback,
+
+    // Prompt preview
+    promptPreview,
+    customPrompt,
+    setCustomPrompt,
+    isEditingPrompt,
+    setIsEditingPrompt,
+    doNotDoExamples,
+    loadingPreview,
+    previewError,
 
     // Regeneration
     isRegenerating,

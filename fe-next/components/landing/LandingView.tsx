@@ -404,7 +404,7 @@ const LandingView: React.FC = () => {
             <motion.div
               whileHover={{
                 scale: 1.03,
-                boxShadow: '0 0 25px rgba(255, 107, 53, 0.5), 0 0 50px rgba(255, 107, 53, 0.3), 6px 6px 0px black'
+                boxShadow: '0 0 25px rgba(163, 230, 53, 0.5), 0 0 50px rgba(163, 230, 53, 0.3), 6px 6px 0px black'
               }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
@@ -412,14 +412,18 @@ const LandingView: React.FC = () => {
               <Link
                 href={`/${language}/adventure`}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                  'bg-gradient-to-br from-neo-orange to-amber-500',
+                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
+                  'bg-gradient-to-br from-neo-lime to-lime-500',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'transition-all min-h-[100px] sm:min-h-[120px]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
               >
+                {/* Beta badge */}
+                <span className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3">
+                  BETA
+                </span>
                 <Map className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
                 <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.adventureMode') || 'Adventure'}</span>
               </Link>
@@ -550,8 +554,9 @@ const LandingView: React.FC = () => {
                 description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
                 href={`/${language}/adventure`}
                 icon={<Map className="w-6 h-6" />}
-                variant="orange"
+                variant="lime"
                 secondary
+                badge="BETA"
               />
               <ModeCard
                 title={t('landing.brainTraining') || 'Brain Training'}

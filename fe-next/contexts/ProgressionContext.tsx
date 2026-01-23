@@ -248,15 +248,23 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [progression]
   );
 
-  // Helper: Get total stars for a world
+  // Pre-compute world stars map for O(1) lookups instead of O(n) filter/reduce
+  const worldStarsMap = useMemo(() => {
+    if (!progression) return new Map<number, number>();
+    const map = new Map<number, number>();
+    for (const completion of progression.completions) {
+      const current = map.get(completion.world) || 0;
+      map.set(completion.world, current + completion.stars);
+    }
+    return map;
+  }, [progression]);
+
+  // Helper: Get total stars for a world (O(1) lookup from pre-computed map)
   const getWorldStars = useCallback(
     (worldId: number): number => {
-      if (!progression) return 0;
-      return progression.completions
-        .filter((c) => c.world === worldId)
-        .reduce((sum, c) => sum + c.stars, 0);
+      return worldStarsMap.get(worldId) || 0;
     },
-    [progression]
+    [worldStarsMap]
   );
 
   // Helper: Get completion for a specific level
