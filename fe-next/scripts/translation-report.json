@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 2314,
+    "totalKeysInCode": 2312,
     "keyCountByLanguage": {
       "en": 2946,
       "he": 2946,
@@ -42,7 +42,7 @@
       {
         "pattern": "adventure.worlds.${world.name}",
         "file": "components/adventure/WorldMap.tsx",
-        "line": 248,
+        "line": 245,
         "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;",
         "type": "template_literal"
       }
