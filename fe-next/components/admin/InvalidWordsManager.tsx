@@ -153,6 +153,15 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       if (!response.ok) throw new Error('Failed to approve word');
 
       toast.success(`Approved "${word}"`);
+      // Find the word's id to remove from selection
+      const wordToRemove = words.find(w => w.word === word && w.language === language);
+      if (wordToRemove) {
+        setSelectedIds(prev => {
+          const next = new Set(prev);
+          next.delete(wordToRemove.id);
+          return next;
+        });
+      }
       // Remove from list
       setWords(prev => prev.filter(w => !(w.word === word && w.language === language)));
       setTotal(prev => prev - 1);
@@ -187,6 +196,15 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       if (!response.ok) throw new Error('Failed to dismiss word');
 
       toast.success(`Dismissed "${word}"`);
+      // Find the word's id to remove from selection
+      const wordToRemove = words.find(w => w.word === word && w.language === language);
+      if (wordToRemove) {
+        setSelectedIds(prev => {
+          const next = new Set(prev);
+          next.delete(wordToRemove.id);
+          return next;
+        });
+      }
       // Remove from list
       setWords(prev => prev.filter(w => !(w.word === word && w.language === language)));
       setTotal(prev => prev - 1);

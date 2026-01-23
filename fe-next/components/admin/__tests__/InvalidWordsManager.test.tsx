@@ -369,4 +369,122 @@ describe('InvalidWordsManager', () => {
     // The other word should still be there
     expect(screen.getByText('anotherword')).toBeInTheDocument();
   });
+
+  // Selection functionality tests
+  describe('Selection functionality', () => {
+    it('renders checkbox for each word', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes.length).toBe(2); // One for each word
+    });
+
+    it('toggles selection when checkbox is clicked', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      fireEvent.click(checkboxes[0]);
+
+      expect(checkboxes[0]).toBeChecked();
+      expect(screen.getByText('1 selected')).toBeInTheDocument();
+    });
+
+    it('selects all words when Select All is clicked', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: /select all/i }));
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes[0]).toBeChecked();
+      expect(checkboxes[1]).toBeChecked();
+      expect(screen.getByText('2 selected')).toBeInTheDocument();
+    });
+
+    it('clears all selections when Clear Selection is clicked', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      // Select all first
+      fireEvent.click(screen.getByRole('button', { name: /select all/i }));
+      expect(screen.getByText('2 selected')).toBeInTheDocument();
+
+      // Clear selection
+      fireEvent.click(screen.getByRole('button', { name: /clear selection/i }));
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes[0]).not.toBeChecked();
+      expect(checkboxes[1]).not.toBeChecked();
+      expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
+    });
+
+    it('removes word from selection after approval', async () => {
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockInvalidWordsResponse),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ success: true, votesAdded: 10 }),
+        });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      // Select the word
+      const checkboxes = screen.getAllByRole('checkbox');
+      fireEvent.click(checkboxes[0]);
+      expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+      // Approve the word
+      const approveButtons = screen.getAllByRole('button', { name: /approve/i });
+      fireEvent.click(approveButtons[0]);
+
+      // Wait for word to be removed
+      await waitFor(() => {
+        expect(screen.queryByText('testword')).not.toBeInTheDocument();
+      });
+
+      // Selection count should update (word removed from list and selection)
+      expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+    });
+  });
 });
