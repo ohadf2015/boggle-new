@@ -15,9 +15,7 @@ import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
-import { useWorldIntroState } from '@/hooks/useTutorialState';
 import { ScorePopupFly } from '@/components/animations';
-import { CutscenePlayer, type WorldId } from '@/components/video/CutscenePlayer';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -50,9 +48,7 @@ interface AdventureGameProps {
   onExit: () => void;
   /** Callback to report timer state to parent (for music coordination) */
   onTimerStateChange?: (timerState: GameTimerState) => void;
-  /** Callback when completing a level unlocks a new world */
-  onWorldUnlock?: (fromWorldId: string, toWorldId: string) => void;
-  /** Total stars accumulated across all levels (for world unlock detection) */
+  /** Total stars accumulated across all levels */
   totalStars?: number;
 }
 
@@ -68,24 +64,6 @@ interface ScorePopup {
 // ==============================================
 // HELPER FUNCTIONS
 // ==============================================
-
-/**
- * Get world ID string from level number
- * Maps level numbers to world identifiers for cutscene videos
- */
-function getWorldIdFromLevel(level: number): WorldId {
-  // 7 levels per world (2-2-3 chapter structure)
-  const worldNumber = Math.ceil(level / 7);
-
-  // Map world number to world ID string
-  const worldIdMap: Record<number, WorldId> = {
-    1: 'meadows',      // Alphabet Meadows (levels 1-7)
-    2: 'springs',      // Synonym Springs (levels 8-14)
-    3: 'caverns',      // Root Caverns (levels 15-21)
-  };
-
-  return worldIdMap[worldNumber] || 'meadows'; // Fallback to meadows
-}
 
 /**
  * Flatten 2D TileState array and add id/row/col
@@ -110,7 +88,7 @@ function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
 // ==============================================
 
 const AdventureGame = memo<AdventureGameProps>(
-  ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, onWorldUnlock, totalStars }) => {
+  ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars }) => {
     // Validate config
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
 
@@ -123,7 +101,7 @@ const AdventureGame = memo<AdventureGameProps>(
       canComplete,
       isPlaying,
       cascadeComplete,
-      submitWord,
+      submitWordWithPath,
       startGame,
       pauseGame,
       completeLevel,
@@ -150,11 +128,6 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Track entry sequence phases
     const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
-
-    // Level intro cutscene state
-    const worldId = useMemo(() => getWorldIdFromLevel(levelConfig.level), [levelConfig.level]);
-    const { hasViewedIntro, markIntroViewed } = useWorldIntroState(worldId);
-    const [showLevelIntro, setShowLevelIntro] = useState(!hasViewedIntro);
 
     // Ref for score display target (for ScorePopupFly animation)
     const scoreDisplayRef = useRef<HTMLDivElement>(null);
@@ -214,13 +187,6 @@ const AdventureGame = memo<AdventureGameProps>(
         isPaused,
       });
     }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, levelConfig.timerSeconds]);
-
-    // Handle level intro cutscene completion/skip
-    const handleLevelIntroComplete = useCallback(() => {
-      markIntroViewed();
-      setShowLevelIntro(false);
-      // Entry animation (cascade) begins after cutscene
-    }, [markIntroViewed]);
 
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
@@ -346,10 +312,10 @@ const AdventureGame = memo<AdventureGameProps>(
             bonus: comboBonus,
           }]);
 
-          // Valid word - submit with calculated score
+          // Valid word - submit with calculated score and path for special tile effects
           setIsWordValid(true);
           setWasWordSubmitted(true);
-          submitWord(currentWord, scoreValue);
+          submitWordWithPath(currentWord, scoreValue, path);
           clearSelection();
           // Reset after animation duration
           setTimeout(() => {
@@ -366,7 +332,7 @@ const AdventureGame = memo<AdventureGameProps>(
           setTimeout(() => setValidationError(null), 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWord, clearSelection, t, getPopupStartPosition, gameState.comboCount]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount]
     );
 
     // Handle level complete continue
@@ -524,14 +490,16 @@ const AdventureGame = memo<AdventureGameProps>(
             className={cn(
               'lg:w-64 flex flex-col gap-4',
               'lg:border-l-2 lg:border-neo-black/20 lg:pl-4',
-              // Dark background for better visibility
-              'p-3 rounded-neo',
-              'bg-neo-navy/90 border-2 border-neo-black/30'
+              // Glass effect for better visibility over world backgrounds
+              'p-4 rounded-neo',
+              'bg-neo-navy/85 backdrop-blur-md',
+              'border-2 border-neo-white/15',
+              'shadow-hard'
             )}
           >
             {/* Objectives */}
             <div>
-              <h2 className="text-sm font-bold text-neo-white/60 uppercase tracking-wide mb-2">
+              <h2 className="text-sm font-bold text-neo-white/80 uppercase tracking-wide mb-2">
                 {t('adventure.game.objectives')}
               </h2>
               <AdventureObjectives
@@ -546,13 +514,13 @@ const AdventureGame = memo<AdventureGameProps>(
               data-testid="combo-display"
               className={cn(
                 'p-3 rounded-neo',
-                'bg-neo-white/5 border-2 border-neo-white/10'
+                'bg-neo-black/30 border-2 border-neo-cyan/30'
               )}
             >
-              <p className="text-sm font-bold text-neo-white/60 uppercase tracking-wide mb-1">
+              <p className="text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-1">
                 {t('adventure.game.combo')}
               </p>
-              <p className="text-2xl font-black text-neo-cyan">
+              <p className="text-2xl font-black text-neo-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]">
                 x{gameState.comboCount}
               </p>
             </div>
@@ -624,7 +592,6 @@ const AdventureGame = memo<AdventureGameProps>(
           onContinue={handleContinue}
           onRetry={handleRetry}
           onExit={handleExit}
-          onWorldUnlock={onWorldUnlock}
           totalStars={totalStars}
         />
 
@@ -644,17 +611,6 @@ const AdventureGame = memo<AdventureGameProps>(
           reaction={reaction}
           onDismiss={dismissReaction}
         />
-
-        {/* Level Intro Cutscene - plays before entry animation */}
-        {showLevelIntro && (
-          <CutscenePlayer
-            type="level-intro"
-            worldId={worldId}
-            onComplete={handleLevelIntroComplete}
-            onSkip={handleLevelIntroComplete}
-            allowSkipAfterMs={2000}
-          />
-        )}
       </div>
     );
   }

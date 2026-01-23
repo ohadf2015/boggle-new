@@ -51,6 +51,8 @@ jest.mock('framer-motion', () => {
       ul: createMockMotion('ul'),
       li: createMockMotion('li'),
       span: createMockMotion('span'),
+      h2: createMockMotion('h2'),
+      p: createMockMotion('p'),
     },
     AnimatePresence: ({ children }: any) => children,
     useMotionValue,
@@ -66,6 +68,25 @@ jest.mock('next/link', () => {
   MockLink.displayName = 'MockLink';
   return MockLink;
 });
+
+// Mock Next.js Image
+jest.mock('next/image', () => {
+  const MockImage = ({ src, alt, ...props }: any) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return React.createElement('img', { src, alt, ...props });
+  };
+  MockImage.displayName = 'MockImage';
+  return { __esModule: true, default: MockImage };
+});
+
+// Mock useParallax hook
+jest.mock('@/hooks/useParallax', () => ({
+  useParallax: () => ({
+    x: 0,
+    y: 0,
+    isGyroActive: false,
+  }),
+}));
 
 // Mock LanguageContext
 const mockT = (key: string) => {
@@ -97,9 +118,26 @@ jest.mock('@/contexts/MusicContext', () => ({
     playTrack: jest.fn(),
     fadeToTrack: jest.fn(),
     setVolume: jest.fn(),
+    toggleMute: jest.fn(),
+    unlockAudio: jest.fn(),
     isPlaying: false,
+    isMuted: false,
+    audioUnlocked: true,
     currentTrack: null,
     volume: 0.5,
+  }),
+}));
+
+// Mock SoundEffectsContext - required by MusicControls component
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    sfxVolume: 0.5,
+    setSfxVolume: jest.fn(),
+    sfxMuted: false,
+    toggleSfxMute: jest.fn(),
+    playWordAcceptedSound: jest.fn(),
+    playErrorSound: jest.fn(),
+    playBonusSound: jest.fn(),
   }),
 }));
 

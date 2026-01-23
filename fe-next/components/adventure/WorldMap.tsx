@@ -8,8 +8,6 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParallax } from '@/hooks/useParallax';
-import { useTutorialState, useWorldTransitionState } from '@/hooks/useTutorialState';
-import { CutscenePlayer } from '@/components/video/CutscenePlayer';
 import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
@@ -24,7 +22,6 @@ interface WorldMapProps {
   totalStars: number;
   completions: Array<{ world: number; level: number; stars: number }>;
   onWorldSelect: (worldId: number) => void;
-  onWorldUnlock?: (fromWorldId: string, toWorldId: string) => void;
 }
 
 // World images mapping
@@ -408,71 +405,16 @@ const WorldNode = ({
 
 /**
  * WorldMap - Trail-based adventure map with word game elements
- * Features: dynamic SVG trails, floating clouds & letters, mascot GIFs
+ * Features: dynamic SVG trails, floating clouds & letters, scrollable world navigation
  */
 export default function WorldMap({
   totalStars,
   completions,
   onWorldSelect,
-  onWorldUnlock,
 }: WorldMapProps): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
-
-  // Tutorial state
-  const { hasViewedTutorial, markTutorialViewed } = useTutorialState();
-  const [showTutorial, setShowTutorial] = React.useState(!hasViewedTutorial);
-
-  // World transition state
-  const [pendingTransition, setPendingTransition] = React.useState<{
-    from: string;
-    to: string;
-  } | null>(null);
-
-  // Get transition state hooks (only when we have a pending transition)
-  const transitionFromId = pendingTransition?.from || '';
-  const transitionToId = pendingTransition?.to || '';
-  const { hasViewedTransition, markTransitionViewed } = useWorldTransitionState(
-    transitionFromId,
-    transitionToId
-  );
-
-  // Tutorial completion handler
-  const handleTutorialComplete = useCallback(() => {
-    markTutorialViewed();
-    setShowTutorial(false);
-  }, [markTutorialViewed]);
-
-  // Handle world unlock from child components
-  const handleWorldUnlock = useCallback((fromWorldId: string, toWorldId: string) => {
-    // Check if this transition has been viewed before
-    const transitionKey = `${fromWorldId}->${toWorldId}`;
-    const viewedJson = typeof window !== 'undefined' ? localStorage.getItem('lexiclash:world-transition:viewed') : null;
-    let hasViewed = false;
-
-    if (viewedJson) {
-      try {
-        const viewedTransitions: string[] = JSON.parse(viewedJson);
-        hasViewed = Array.isArray(viewedTransitions) && viewedTransitions.includes(transitionKey);
-      } catch {
-        hasViewed = false;
-      }
-    }
-
-    if (!hasViewed) {
-      // Show transition cutscene
-      setPendingTransition({ from: fromWorldId, to: toWorldId });
-    }
-    // If already viewed, skip directly to new world (no action needed, navigation handled by parent)
-  }, []);
-
-  // World transition completion handler
-  const handleTransitionComplete = useCallback(() => {
-    markTransitionViewed();
-    setPendingTransition(null);
-    // Navigation to new world happens after cutscene
-  }, [markTransitionViewed]);
 
   // RAF-throttled scroll handler for parallax effect
   // Performance: Throttles from 60-120 calls/sec to max 60 calls/sec (RAF rate)
@@ -569,19 +511,19 @@ export default function WorldMap({
   // Prepare worlds data (World 10 at top, World 1 at bottom)
   const worldsData = useMemo(() => {
     return [...WORLD_CONFIGS].reverse().map((world) => {
-      const isUnlocked = isWorldUnlocked(world.id, totalStars);
+      const unlocked = isWorldUnlocked(world.id, totalStars);
       const unlockRequirement = getWorldUnlockRequirement(world.id);
       const worldCompletions = completions.filter((c) => c.world === world.id);
       const worldStars = worldCompletions.reduce((sum, c) => sum + c.stars, 0);
-      const totalWorldStars = LEVELS_PER_WORLD * MAX_STARS_PER_LEVEL;
+      const worldTotalStars = LEVELS_PER_WORLD * MAX_STARS_PER_LEVEL;
 
       return {
         world,
-        isUnlocked,
+        isUnlocked: unlocked,
         unlockRequirement,
         currentStars: worldStars,
         completedLevels: worldCompletions.length,
-        totalWorldStars,
+        totalWorldStars: worldTotalStars,
       };
     });
   }, [totalStars, completions]);
@@ -749,7 +691,7 @@ export default function WorldMap({
           );
         })}
 
-        {/* Journey Start section with mascot - at the END of the trail (bottom) */}
+        {/* Journey Start section - at the END of the trail (bottom) */}
         <motion.div
           className="relative mt-10 flex flex-col items-center"
           initial={{ opacity: 0, y: 20 }}
@@ -761,21 +703,6 @@ export default function WorldMap({
             <div className="absolute inset-0 w-2 bg-neo-yellow/40 blur-sm" />
             <div className="w-2 h-10 bg-neo-yellow mb-3" />
           </div>
-
-          {/* Mascot GIF - slightly larger */}
-          <motion.div
-            className="relative w-28 h-28 sm:w-36 sm:h-36 mb-4"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Image
-              src="/mascot/play-nobg.gif"
-              alt="Mascot ready to play"
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </motion.div>
 
           {/* Start banner - larger and more prominent */}
           <motion.div
@@ -793,48 +720,6 @@ export default function WorldMap({
         <div ref={bottomRef} className="h-8" />
       </div>
 
-      {/* Scroll hint at top with mascot - more prominent */}
-      <motion.div
-        className="fixed top-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, y: [0, -4, 0] }}
-        transition={{ delay: 2, duration: 1.5, repeat: Infinity }}
-      >
-        <div className="w-10 h-10 relative">
-          <Image
-            src="/mascot/study-nobg.gif"
-            alt=""
-            fill
-            className="object-contain"
-            unoptimized
-          />
-        </div>
-        <div className="px-4 py-2 bg-neo-black/80 border-2 border-neo-white/20 rounded-full text-neo-white/80 text-sm font-bold backdrop-blur-sm shadow-hard-sm">
-          ↑ Scroll up for more worlds
-        </div>
-      </motion.div>
-
-      {/* Tutorial Cutscene - full-screen overlay for new players */}
-      {showTutorial && (
-        <CutscenePlayer
-          type="tutorial"
-          onComplete={handleTutorialComplete}
-          onSkip={handleTutorialComplete}
-          allowSkipAfterMs={0}
-        />
-      )}
-
-      {/* World Transition Cutscene - plays when unlocking new world */}
-      {pendingTransition && (
-        <CutscenePlayer
-          type="transition"
-          fromWorldId={pendingTransition.from as any}
-          toWorldId={pendingTransition.to as any}
-          onComplete={handleTransitionComplete}
-          onSkip={handleTransitionComplete}
-          allowSkipAfterMs={2000}
-        />
-      )}
     </div>
   );
 }

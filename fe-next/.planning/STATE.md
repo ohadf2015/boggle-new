@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 7 - Video Cutscenes (in progress)
+**Current focus:** Phase 8 - Wikipedia Integration
 
 ## Current Position
 
-Phase: 7 of 10 (Video Cutscenes)
-Plan: 6 of 6 in phase
-Status: Phase Complete
-Last activity: 2026-01-23 - Completed 07-06 (Cutscene Integration)
+Phase: 8 of 10 (Wikipedia Integration)
+Plan: 0 of TBD in phase
+Status: Ready to plan
+Last activity: 2026-01-23 - Completed Phase 7 (Video Cutscenes)
 
 Progress: [███████░░░] 70% (7 phases complete, 29/~35 plans)
 
@@ -196,7 +196,7 @@ None.
 - ✅ Video render pipeline with H.264 codec (07-04)
 - ✅ CutscenePlayer component with iOS Safari support (07-05)
 - ✅ Cutscene integration (tutorial, level intro, world transition) (07-06)
-- ⏸️ Manual verification pending (human checkpoint)
+- ⏸️ Video files not yet rendered (run `./scripts/render-cutscenes.sh` when ready)
 
 **General:**
 - Friends page build error pre-exists (unrelated to Phase 2 work)
@@ -268,14 +268,14 @@ None.
 | 07-03 | Tutorial composition | ✓ |
 | 07-04 | Video render pipeline | ✓ |
 | 07-05 | CutscenePlayer component | ✓ |
-| 07-06 | Cutscene integration | ✓ (pending verification) |
+| 07-06 | Cutscene integration | ✓ |
 
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 07-06 - Cutscene Integration (Phase 7 complete, awaiting human verification)
+Stopped at: Completed Phase 7 - Video Cutscenes (videos deferred to on-demand rendering)
 Resume file: None
-Next: Phase 8 - Sound Design (after 07-06 verification)
+Next: Phase 8 - Wikipedia Integration
 
 ---
 *State initialized: 2026-01-22*

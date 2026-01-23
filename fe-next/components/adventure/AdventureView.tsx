@@ -9,8 +9,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
-import { useWorldTransitionState } from '@/hooks/useTutorialState';
-import { CutscenePlayer } from '@/components/video/CutscenePlayer';
 import {
   getWorldConfig,
   getLevelConfig,
@@ -20,7 +18,9 @@ import {
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
 import AdventureGame from './AdventureGame';
+import WorldBackground from './themed/WorldBackground';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
+import MusicControls from '@/components/MusicControls';
 
 // View state type for navigation
 type ViewState = 'worldMap' | 'levelGrid' | 'playing';
@@ -60,16 +60,6 @@ export default function AdventureView(): React.JSX.Element {
     isPaused: false,
   });
 
-  // World transition state
-  const [pendingTransition, setPendingTransition] = useState<{
-    from: string;
-    to: string;
-  } | null>(null);
-
-  const transitionFromId = pendingTransition?.from || '';
-  const transitionToId = pendingTransition?.to || '';
-  const { markTransitionViewed } = useWorldTransitionState(transitionFromId, transitionToId);
-
   // Stop global music when adventure mode starts
   useEffect(() => {
     stopGlobalMusic(500); // Quick fade out
@@ -94,19 +84,6 @@ export default function AdventureView(): React.JSX.Element {
   const handleTimerStateChange = useCallback((timerState: GameTimerState) => {
     setGameTimerState(timerState);
   }, []);
-
-  // Handle world unlock - show transition cutscene
-  const handleWorldUnlock = useCallback((fromWorldId: string, toWorldId: string) => {
-    setPendingTransition({ from: fromWorldId, to: toWorldId });
-  }, []);
-
-  // Handle transition cutscene completion
-  const handleTransitionComplete = useCallback(() => {
-    markTransitionViewed();
-    setPendingTransition(null);
-    // After transition, return to world map to show unlocked world
-    setViewState('worldMap');
-  }, [markTransitionViewed]);
 
   // Derive player stats from progression
   const totalStars = progression?.totalStars ?? 0;
@@ -230,8 +207,8 @@ export default function AdventureView(): React.JSX.Element {
       initialLevel={selectedLevel || 1}
     >
     <div className="h-screen bg-neo-navy relative flex flex-col overflow-hidden">
-      {/* Header - Fixed at top */}
-      <header className="relative z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm border-b border-neo-white/10 flex-shrink-0">
+      {/* Header - Sticky at top */}
+      <header className="sticky top-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Back / World Map button */}
           {viewState !== 'worldMap' ? (
@@ -275,7 +252,7 @@ export default function AdventureView(): React.JSX.Element {
             <Sparkles className="w-6 h-6 text-neo-yellow" />
           </div>
 
-          {/* Player Stats */}
+          {/* Player Stats and Controls */}
           <div className="flex items-center gap-3">
             {/* Total Stars */}
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo">
@@ -292,6 +269,9 @@ export default function AdventureView(): React.JSX.Element {
                 Lv.{playerLevel}
               </span>
             </div>
+
+            {/* Sound Controller */}
+            <MusicControls />
           </div>
         </div>
       </header>
@@ -318,23 +298,27 @@ export default function AdventureView(): React.JSX.Element {
           )}
 
           {viewState === 'levelGrid' && selectedWorldConfig && (
-            // Level Grid View
+            // Level Grid View - with world-themed parallax background
             <motion.div
               key="level-grid"
               initial={{ opacity: 0, x: isRTL ? -100 : 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="px-4 py-6 sm:px-6 lg:px-8 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent"
+              className="h-full"
             >
-              <div className="max-w-7xl mx-auto">
-                <LevelGrid
-                  world={selectedWorldConfig}
-                  completions={completions}
-                  totalStars={totalStars}
-                  onLevelSelect={handleLevelSelect}
-                />
-              </div>
+              <WorldBackground className="h-full">
+                <div className="h-full overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent">
+                  <div className="max-w-7xl mx-auto">
+                    <LevelGrid
+                      world={selectedWorldConfig}
+                      completions={completions}
+                      totalStars={totalStars}
+                      onLevelSelect={handleLevelSelect}
+                    />
+                  </div>
+                </div>
+              </WorldBackground>
             </motion.div>
           )}
 
@@ -354,7 +338,6 @@ export default function AdventureView(): React.JSX.Element {
                 onLevelComplete={handleLevelComplete}
                 onExit={handleGameExit}
                 onTimerStateChange={handleTimerStateChange}
-                onWorldUnlock={handleWorldUnlock}
                 totalStars={totalStars}
               />
             </motion.div>
@@ -392,18 +375,6 @@ export default function AdventureView(): React.JSX.Element {
           </motion.div>
         )}
       </main>
-
-      {/* World Transition Cutscene - shows when unlocking new world */}
-      {pendingTransition && (
-        <CutscenePlayer
-          type="transition"
-          fromWorldId={pendingTransition.from as any}
-          toWorldId={pendingTransition.to as any}
-          onComplete={handleTransitionComplete}
-          onSkip={handleTransitionComplete}
-          allowSkipAfterMs={2000}
-        />
-      )}
     </div>
     </AdventureThemeProvider>
   );

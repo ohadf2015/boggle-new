@@ -13,12 +13,6 @@ import { Star, Check, X, Trophy, RotateCcw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
-import {
-  LEVELS_PER_WORLD,
-  getWorldUnlockRequirement,
-  isWorldUnlocked,
-  WORLD_CONFIGS,
-} from '@/lib/adventure';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
@@ -46,8 +40,6 @@ interface LevelCompleteModalProps {
   onRetry: () => void;
   /** Exit to menu callback */
   onExit: () => void;
-  /** Callback when completing a level unlocks a new world */
-  onWorldUnlock?: (fromWorldId: string, toWorldId: string) => void;
   /** Total stars accumulated across all levels */
   totalStars?: number;
 }
@@ -89,52 +81,6 @@ function getMascotVariantForStars(stars: number): ExtendedMascotVariant {
 function seededRandom(seed: number): number {
   const x = Math.sin(seed * 9999) * 10000;
   return x - Math.floor(x);
-}
-
-/**
- * Detect if completing this level unlocks a new world
- *
- * @param levelNumber - Current level number (1-70)
- * @param worldNumber - Current world number (1-10)
- * @param totalStars - Total stars accumulated across all levels
- * @returns { fromWorldId, toWorldId } if world unlocked, null otherwise
- */
-function detectWorldUnlock(
-  levelNumber: number,
-  worldNumber: number,
-  totalStars: number
-): { fromWorldId: string; toWorldId: string } | null {
-  // Check if this is the last level of a world
-  const isLastLevelOfWorld = (levelNumber % LEVELS_PER_WORLD) === 0;
-
-  if (!isLastLevelOfWorld) return null;
-
-  // Calculate next world number
-  const nextWorldNumber = worldNumber + 1;
-
-  // Check if next world exists
-  const nextWorld = WORLD_CONFIGS.find(w => w.id === nextWorldNumber);
-  if (!nextWorld) return null;
-
-  // Check if next world was just unlocked (not already unlocked before this level)
-  const isNextWorldUnlocked = isWorldUnlocked(nextWorldNumber, totalStars);
-  if (!isNextWorldUnlocked) return null;
-
-  // Get world IDs for cutscene
-  const currentWorld = WORLD_CONFIGS.find(w => w.id === worldNumber);
-  if (!currentWorld) return null;
-
-  // Map world names to cutscene IDs
-  const worldIdMap: Record<string, string> = {
-    'alphabetMeadows': 'meadows',
-    'synonymSprings': 'springs',
-    'rootCaverns': 'caverns',
-  };
-
-  const fromWorldId = worldIdMap[currentWorld.name] || 'meadows';
-  const toWorldId = worldIdMap[nextWorld.name] || 'springs';
-
-  return { fromWorldId, toWorldId };
 }
 
 // ==============================================
@@ -188,7 +134,6 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     onContinue,
     onRetry,
     onExit,
-    onWorldUnlock,
     totalStars = 0,
   }) => {
     const { t } = useLanguage();
@@ -216,15 +161,6 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
         repeatDelay: seededRandom(i * 3 + 4) * 2,
       }));
     }, []);
-
-    // Handle Continue button - detect world unlock before continuing
-    const handleContinue = () => {
-      const worldUnlock = detectWorldUnlock(levelNumber, worldNumber, totalStars);
-      if (worldUnlock && onWorldUnlock) {
-        onWorldUnlock(worldUnlock.fromWorldId, worldUnlock.toWorldId);
-      }
-      onContinue();
-    };
 
     if (!isOpen) return null;
 
@@ -402,7 +338,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               {/* Continue Button (hidden when failed) */}
               {!isFailed && (
                 <button
-                  onClick={handleContinue}
+                  onClick={onContinue}
                   className={cn(
                     'btn-primary',
                     'w-full py-3 px-4',

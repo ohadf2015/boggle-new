@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: World Theming** - Parallax backgrounds, particles, dynamic boards
 - [x] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
 - [x] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
-- [ ] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
+- [x] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
 - [ ] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
 - [ ] **Phase 9: Invalid Word System** - Admin queue and approval workflow
 - [ ] **Phase 10: Bug Fixes & Stabilization** - Daily challenge fixes and loose ends
@@ -144,12 +144,12 @@ Plans:
 **Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 07-01-PLAN.md — Create LevelIntro composition with Ken Burns zoom effect
-- [ ] 07-02-PLAN.md — Create WorldTransition composition with portal animation
-- [ ] 07-03-PLAN.md — Create Tutorial composition with UI highlights
-- [ ] 07-04-PLAN.md — Create batch rendering script for all video variants
-- [ ] 07-05-PLAN.md — Create CutscenePlayer React component
-- [ ] 07-06-PLAN.md — Integrate cutscenes into adventure mode flow
+- [x] 07-01-PLAN.md — Create LevelIntro composition with Ken Burns zoom effect
+- [x] 07-02-PLAN.md — Create WorldTransition composition with portal animation
+- [x] 07-03-PLAN.md — Create Tutorial composition with UI highlights
+- [x] 07-04-PLAN.md — Create batch rendering script for all video variants
+- [x] 07-05-PLAN.md — Create CutscenePlayer React component
+- [x] 07-06-PLAN.md — Integrate cutscenes into adventure mode flow
 
 ### Phase 8: Wikipedia Integration
 **Goal**: Wikipedia word extraction pipeline reliably syncs curated words to game dictionary
@@ -209,7 +209,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. World Theming | 3/3 | Complete | 2026-01-22 |
 | 5. Lexi Personality | 3/3 | Complete | 2026-01-22 |
 | 6. AI Asset Generation | 4/4 | Complete | 2026-01-23 |
-| 7. Video Cutscenes | 0/6 | Planned | - |
+| 7. Video Cutscenes | 6/6 | Complete | 2026-01-23 |
 | 8. Wikipedia Integration | 0/TBD | Not started | - |
 | 9. Invalid Word System | 0/TBD | Not started | - |
 | 10. Bug Fixes & Stabilization | 0/TBD | Not started | - |

@@ -46,6 +46,8 @@ jest.mock('framer-motion', () => {
       ul: createMockMotion('ul'),
       li: createMockMotion('li'),
       span: createMockMotion('span'),
+      h2: createMockMotion('h2'),
+      p: createMockMotion('p'),
     },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
     useMotionValue: (initial: number) => ({
@@ -79,6 +81,25 @@ jest.mock('next/link', () => {
   return MockLink;
 });
 
+// Mock Next.js Image
+jest.mock('next/image', () => {
+  const MockImage = ({ src, alt, ...props }: { src: string; alt: string }) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return React.createElement('img', { src, alt, ...props });
+  };
+  MockImage.displayName = 'MockImage';
+  return { __esModule: true, default: MockImage };
+});
+
+// Mock useParallax hook
+jest.mock('@/hooks/useParallax', () => ({
+  useParallax: () => ({
+    x: 0,
+    y: 0,
+    isGyroActive: false,
+  }),
+}));
+
 // Mock LanguageContext
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -96,9 +117,26 @@ jest.mock('@/contexts/MusicContext', () => ({
     playTrack: jest.fn(),
     fadeToTrack: jest.fn(),
     setVolume: jest.fn(),
+    toggleMute: jest.fn(),
+    unlockAudio: jest.fn(),
     isPlaying: false,
+    isMuted: false,
+    audioUnlocked: true,
     currentTrack: null,
     volume: 0.5,
+  }),
+}));
+
+// Mock SoundEffectsContext - required by MusicControls component
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    sfxVolume: 0.5,
+    setSfxVolume: jest.fn(),
+    sfxMuted: false,
+    toggleSfxMute: jest.fn(),
+    playWordAcceptedSound: jest.fn(),
+    playErrorSound: jest.fn(),
+    playBonusSound: jest.fn(),
   }),
 }));
 
@@ -146,9 +184,27 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
   AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
   useAdventureTheme: () => ({
     worldId: 1,
-    level: 1,
-    colors: { primary: '#000', secondary: '#fff', accent: '#f00' },
-    updateLevel: jest.fn(),
+    currentLevel: 1,
+    theme: {
+      background: {
+        baseColor: '#000',
+        gradient: 'linear-gradient(180deg, #000 0%, #111 100%)',
+        layers: [],
+        texture: { type: 'none', opacity: 0, blendMode: 'normal' },
+        particles: { type: 'none', count: 0, colors: [], speed: 1, sizeRange: [1, 2] },
+        ambientColor: '#000',
+        ambientIntensity: 0,
+      },
+      containerClass: '',
+      colors: { primary: '#000', secondary: '#fff', accent: '#f00' },
+    },
+    isTransitioning: false,
+    setWorld: jest.fn(),
+    setLevel: jest.fn(),
+    getTileConfig: jest.fn(),
+    getChapter: jest.fn(),
+    isBoss: jest.fn(() => false),
+    getLevelPosition: jest.fn(() => 1),
   }),
 }));
 

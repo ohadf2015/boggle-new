@@ -122,8 +122,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONT-10 | Phase 7 | Pending |
 | CONT-11 | Phase 7 | Pending |
 | CONT-12 | Phase 7 | Pending |
-| FIX-01 | Phase 8 | Pending |
-| FIX-02 | Phase 8 | Pending |
+| FIX-01 | Phase 8 (Plans 08-01, 08-03, 08-04) | Pending |
+| FIX-02 | Phase 8 (Plans 08-02, 08-04) | Pending |
 | FIX-03 | Phase 9 | Pending |
 | FIX-04 | Phase 9 | Pending |
 | FIX-05 | Phase 9 | Pending |
@@ -137,4 +137,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-23 (Phase 5 complete)*
+*Last updated: 2026-01-23 (Phase 8 planned: 4 plans created)*

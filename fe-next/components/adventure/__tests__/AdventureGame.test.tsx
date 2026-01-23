@@ -495,4 +495,5 @@ describe('AdventureGame', () => {
       }).not.toThrow();
     });
   });
+
 });
