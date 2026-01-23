@@ -377,6 +377,25 @@ async function validateTopCandidates(
       if (result.valid) {
         validated.push(candidate);
         await updateWordValidationStatus(language, candidate.word, dateStr, 'valid', candidate.score);
+
+        // AUTO-PROMOTION: High-scoring validated words go directly to dictionary
+        if (candidate.score >= AUTO_PROMOTION_SCORE_THRESHOLD) {
+          // Check if word already exists to avoid duplicate errors
+          const alreadyInDict = await isWordInDictionary(candidate.word, language);
+
+          if (!alreadyInDict) {
+            try {
+              const { gameAIService } = await import('@/lib/ai-service');
+              await gameAIService.validateAndSaveWord(candidate.word, language);
+              console.log(`[WikiPopulator] Auto-promoted ${candidate.word} (score: ${candidate.score}) to dictionary`);
+            } catch (promoError) {
+              // Log but don't fail - word is still validated
+              console.warn(`[WikiPopulator] Auto-promotion failed for ${candidate.word}:`, promoError);
+            }
+          } else {
+            console.log(`[WikiPopulator] Word ${candidate.word} already in dictionary, skipping promotion`);
+          }
+        }
       } else {
         await updateWordValidationStatus(language, candidate.word, dateStr, 'invalid');
       }
