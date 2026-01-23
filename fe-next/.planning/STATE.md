@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8 of 10 (Wikipedia Integration)
-Plan: 3 of 4 in phase
+Plan: 3 of 4 complete
 Status: In progress
 Last activity: 2026-01-23 - Completed 08-03-PLAN.md (Edge Case Hardening)
 
-Progress: [████████░░] 77% (7 phases complete, 32/~35 plans)
+Progress: [████████░░] 80% (7 phases complete, 33/~35 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
-- Average duration: 11 min
-- Total execution time: ~238 min
+- Total plans completed: 33
+- Average duration: 12 min
+- Total execution time: ~278 min
 
 **By Phase:**
 
@@ -34,7 +34,7 @@ Progress: [████████░░] 77% (7 phases complete, 32/~35 plans)
 | 05 Lexi Personality | 3 | ~23min | 8min |
 | 06 AI Asset Generation | 4/4 | ~85min | 21min |
 | 07 Video Cutscenes | 6/6 | ~59min | 10min |
-| 08 Wikipedia Integration | 3/4 | ~43min | 14min |
+| 08 Wikipedia Integration | 3/4 | ~52min | 17min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -147,6 +147,10 @@ Recent decisions affecting current work:
 - **08-01:** Dictionary check before promotion prevents duplicate insertion errors
 - **08-01:** Fire-and-forget error handling for auto-promotion (non-blocking)
 - **08-01:** Export threshold constant for admin dashboard transparency
+- **08-02:** Maximum 100 candidates per batch (prevents API timeout with 90s limit)
+- **08-02:** Check checkDatabaseOnly before promoting (skip duplicates gracefully)
+- **08-02:** Mark valid separate from promote (clearer UX distinction)
+- **08-02:** Neo-brutalist shadow-hard styling for BulkApproveButton
 - **08-03:** Format-only fallback threshold 85 for AI unavailability scenarios
 - **08-03:** logPipelineError helper provides structured error context (operation, word, language, score)
 - **08-03:** Per-candidate try-catch in validateTopCandidates ensures pipeline continues after individual failures
