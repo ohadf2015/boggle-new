@@ -135,7 +135,7 @@ describe('Bulk Approve Business Logic', () => {
     it('should require candidateIds array', () => {
       // GIVEN: Input validation rules
       const validInput = { candidateIds: ['uuid-1'], language: 'en' };
-      const invalidInput1 = { language: 'en' };
+      const invalidInput1: Record<string, unknown> = { language: 'en' };
       const invalidInput2 = { candidateIds: null, language: 'en' };
       const invalidInput3 = { candidateIds: [], language: 'en' };
 
@@ -151,7 +151,7 @@ describe('Bulk Approve Business Logic', () => {
     it('should require language parameter', () => {
       // GIVEN: Input validation rules
       const validInput = { candidateIds: ['uuid-1'], language: 'en' };
-      const invalidInput = { candidateIds: ['uuid-1'] };
+      const invalidInput: Record<string, unknown> = { candidateIds: ['uuid-1'] };
 
       // THEN: Validate inputs
       expect(validInput.language).toBeDefined();
@@ -194,7 +194,13 @@ describe('Bulk Approve Business Logic', () => {
   describe('Result tracking', () => {
     it('should track approved, skipped, and failed counts', () => {
       // GIVEN: Result structure
-      const result = {
+      const result: {
+        success: boolean;
+        approved: number;
+        skipped: number;
+        failed: number;
+        errors: Array<{ word: string; error: string }>;
+      } = {
         success: true,
         approved: 0,
         skipped: 0,

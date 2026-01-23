@@ -69,10 +69,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 const mockWorld: WorldConfig = {
   id: 1,
   name: 'alphabetMeadows',
+  theme: 'sunny-pastoral',
+  mechanic: null,
+  bossName: 'msGrammar',
   colorPrimary: 'neo-lime',
-  colorSecondary: 'neo-emerald',
-  mechanic: 'basic',
-  unlockStars: 0,
+  colorSecondary: 'neo-lime-light',
+  description: 'worldDescAlphabetMeadows',
 };
 
 const mockCompletions = [
