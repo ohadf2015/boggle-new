@@ -653,9 +653,9 @@ const AdventureGrid = memo(
             );
           })}
 
-          {/* Word Path Trail */}
+          {/* Word Path Trail - z-20 to render above tiles (which have z-10 when selected) */}
           {pathPoints && pathPoints.length >= 2 && (
-            <div className="absolute inset-0 pointer-events-none" data-testid="word-path-trail">
+            <div className="absolute inset-0 pointer-events-none z-20" data-testid="word-path-trail">
               <WordPathTrail
                 points={pathPoints}
                 isValid={isWordValid}

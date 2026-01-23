@@ -1016,7 +1016,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
 
           {/* Player Cards - scrollable */}
-          <div className="space-y-2 flex-1 overflow-y-auto min-h-0 pr-1">
+          <div className="space-y-2 flex-1 overflow-y-auto scrollable-area min-h-0 pr-1">
             {sortedScores.map((player, index) => (
               <ResultsPlayerCard
                 key={player.username}
@@ -1348,7 +1348,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
 
         {/* Tab Content - Scrollable area */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-20">
+        <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area px-2 pb-20">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div

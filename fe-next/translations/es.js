@@ -3708,6 +3708,40 @@ const es = {
       "alreadyFound": "Esta palabra ya fue encontrada",
       "notInDictionary": "La palabra no está en el diccionario",
       "validationFailed": "No se pudo validar la palabra"
+    },
+    "lexi": {
+      "longWord": {
+        "default": "¡Vaya! ¡Esa es muy larga!",
+        "world1": "¡Palabra brillantemente florida!",
+        "world2": "¡Descubrimiento refrescante!",
+        "world3": "¡Genialidad cristalina!"
+      },
+      "combo3x": {
+        "default": "¡Estás en racha!"
+      },
+      "combo5x": {
+        "default": "¡Imparable!"
+      },
+      "combo10x": {
+        "default": "¡COMBO LEGENDARIO!"
+      },
+      "firstWord": {
+        "default": "¡Buen comienzo! ¡Sigue así!"
+      },
+      "timeBonus": {
+        "default": "¡Victoria crucial!"
+      },
+      "stuck": {
+        "default": "¡Intenta buscar palabras más largas!"
+      },
+      "encourage": {
+        "default": "¡No te rindas! ¡Tú puedes!"
+      },
+      "levelComplete": {
+        "star1": "¡Nivel completado!",
+        "star2": "¡Excelente trabajo!",
+        "star3": "¡Puntuación perfecta!"
+      }
     }
   }
 };

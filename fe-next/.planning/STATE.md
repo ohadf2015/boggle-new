@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 5 - Lexi Personality (COMPLETE)
+**Current focus:** Phase 6 - AI Asset Generation (in progress)
 
 ## Current Position
 
-Phase: 5 of 10 (Lexi Personality)
-Plan: 3 of 3 in phase
-Status: Phase complete
-Last activity: 2026-01-22 - Completed 05-03 (Adventure integration)
+Phase: 6 of 10 (AI Asset Generation)
+Plan: 4 of 4 in phase
+Status: Complete
+Last activity: 2026-01-23 - Completed 06-04 (Asset pipeline processing)
 
-Progress: [█████░░░░░] 50% (5 phases complete, 18/~30 plans)
+Progress: [██████░░░░] 60% (6 phases complete, 23/~34 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 10 min
-- Total execution time: ~174 min
+- Total execution time: ~184 min
 
 **By Phase:**
 
@@ -32,6 +32,7 @@ Progress: [█████░░░░░] 50% (5 phases complete, 18/~30 plans)
 | 03 Level Entry Experience | 3 | ~19min | 6min |
 | 04 World Theming | 3 | ~50min | 17min |
 | 05 Lexi Personality | 3 | ~23min | 8min |
+| 06 AI Asset Generation | 4/4 | ~85min | 21min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -112,6 +113,14 @@ Recent decisions affecting current work:
 - **05-03:** Star-based mascot variant: 3=victory, 2=celebrating, 1=happy, 0=thinking
 - **05-03:** Game state adapter pattern for hook integration
 - **05-03:** Lexi celebrates alongside (not replaces) existing star animation
+- **06-01:** No tile graphics needed - ThemedTile uses CSS overlays (sparkle, frost, flames)
+- **06-01:** Different size targets per asset type: 200KB backgrounds, 150KB parallax, 100KB sprites
+- **06-01:** Natural language prompts (no hex codes) to prevent Midjourney artifacts
+- **06-01:** Midjourney --cref flag for Lexi character consistency across poses
+- **06-01:** 2 frames per sprite animation (balance smooth motion with file count)
+- **06-04:** PIL-based white bg removal over rembg (simpler, fewer dependencies)
+- **06-04:** Depth blur on parallax: far 4-5px, mid 2-3px, near 1px
+- **06-04:** Lexi sprites deferred to future iteration (user decision for first stage)
 
 ### Pending Todos
 
@@ -125,9 +134,10 @@ None.
 - ✅ Performance budget enforced via CI
 - ⏸️ iOS Safari video autoplay → deferred to Phase 7
 
-**Phase 6 Asset Generation:**
-- AI prompt consistency across 4 worlds needs experimentation
-- Current performance scores unknown - first CI run will establish baseline
+**Phase 6 Asset Generation:** ✓ COMPLETE
+- ✅ 11 assets generated and processed (3 backgrounds + 8 parallax)
+- ✅ All assets under size budget (backgrounds <200KB, parallax <150KB)
+- ⏸️ Lexi sprites → deferred per user decision (existing mascot used)
 
 **Phase 2 Core Game Juice:** ✓ COMPLETE
 - ✅ Word selection trail animation complete (02-01)
@@ -214,13 +224,22 @@ None.
 | 05-02 | LexiReaction component (visual feedback display) | ✓ |
 | 05-03 | Adventure integration (hook + component) | ✓ |
 
+## Phase 6 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 06-01 | Asset infrastructure (directories + manifest + prompts) | ✓ |
+| 06-02 | AI image generation (MCP image generation) | ✓ |
+| 06-03 | Background integration (parallax layers) | ✓ |
+| 06-04 | Asset pipeline processing (WebP optimization) | ✓ (11/19 assets - Lexi sprites deferred) |
+
 ## Session Continuity
 
-Last session: 2026-01-22
-Stopped at: Completed 05-03 - Adventure integration (Phase 5 complete)
+Last session: 2026-01-23
+Stopped at: Completed 06-04 - Asset pipeline processing (Phase 6 complete)
 Resume file: None
-Next: Phase 6 - AI Asset Generation
+Next: Phase 7 - Video Cutscenes
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-22 22:07 UTC*
+*Last updated: 2026-01-23 08:13 UTC*

@@ -233,7 +233,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     return (
       <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
-        <div className="w-1/2 flex flex-col items-center gap-2 overflow-y-auto">
+        <div className="w-1/2 flex flex-col items-center gap-2 overflow-y-auto scrollable-area">
           <LandscapeBanner
             playerScore={results.playerScore}
             validWordCount={validWordCount}
@@ -261,7 +261,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <CoinRewardDisplay reward={coinReward} variant="inline" mode={isAuthenticated ? 'earned' : 'teasing'} />
           <BrainPointsDisplay reward={brainPointsReward} variant="inline" />
         </div>
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto scrollable-area">
           <LandscapeWordsSection
             wordsByPoints={wordsByPoints}
             sortedPointGroups={sortedPointGroups}
@@ -286,7 +286,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="relative">
       {/* MOBILE VIEW */}
       <div className="md:hidden flex flex-col min-h-full">
-        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-28">
+        <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area px-2 pb-28">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div

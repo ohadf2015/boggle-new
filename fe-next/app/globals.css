@@ -3980,17 +3980,21 @@ html.reduce-motion *::after {
 
 /* ==================== RTL SUPPORT ==================== */
 
-/* Mirror decorations for Hebrew */
-[dir="rtl"] .board-frame-meadows,
-[dir="rtl"] .board-frame-springs,
-[dir="rtl"] .board-frame-caverns {
-  transform: scaleX(-1);
-}
-
-/* Keep tile content upright in RTL */
-[dir="rtl"] .board-frame [role="gridcell"] {
-  transform: scaleX(-1);
-}
+/*
+ * NOTE: Board frame and grid content should NOT be mirrored for RTL.
+ *
+ * The corner decorations in BoardFrame.tsx are already symmetric (they use
+ * rotation transforms for each corner position), so no RTL flipping is needed.
+ *
+ * Previously, the board-frame was flipped with scaleX(-1) and grid cells were
+ * counter-flipped to "fix" the content. This caused:
+ * 1. Hebrew letters to appear mirrored (scaleX on gridcell affects text)
+ * 2. Trail SVG coordinates to be mirrored (wrong visual position)
+ * 3. Particle effects to render incorrectly (transformed coordinate space)
+ *
+ * The grid uses CSS Grid which naturally handles RTL via the document direction.
+ * Hard shadows for RTL are handled separately in the shadow-hard-* classes.
+ */
 
 /* ==================== REDUCED MOTION ==================== */
 

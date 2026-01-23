@@ -123,10 +123,13 @@ Plans:
   3. All 4 special tile types have themed graphics (gold sparkle, ice frozen, bomb pulse, rainbow)
   4. Background removal pipeline produces clean-edged PNGs ready for game integration
   5. All assets optimized to WebP <200KB and stored with version control
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md — Set up asset infrastructure, directories, manifest, and prompt templates
+- [ ] 06-02-PLAN.md — Generate world backgrounds for Meadows, Springs, and Caverns
+- [ ] 06-03-PLAN.md — Generate Lexi mascot sprites (idle, celebrate, sad, hint states)
+- [ ] 06-04-PLAN.md — Process assets through pipeline (background removal + WebP optimization)
 
 ### Phase 7: Video Cutscenes
 **Goal**: Remotion-powered video cutscenes add narrative polish at key moments (optional enhancement)
@@ -200,7 +203,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Level Entry Experience | 3/3 | Complete | 2026-01-22 |
 | 4. World Theming | 3/3 | Complete | 2026-01-22 |
 | 5. Lexi Personality | 3/3 | Complete | 2026-01-22 |
-| 6. AI Asset Generation | 0/TBD | Not started | - |
+| 6. AI Asset Generation | 0/4 | Planned | - |
 | 7. Video Cutscenes | 0/TBD | Not started | - |
 | 8. Wikipedia Integration | 0/TBD | Not started | - |
 | 9. Invalid Word System | 0/TBD | Not started | - |
@@ -208,4 +211,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-22 (Phase 5 complete)*
+*Last updated: 2026-01-23 (Phase 6 planned)*

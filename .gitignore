@@ -16,6 +16,7 @@ playwright-report/
 coverage/
 .nyc_output/
 *.lcov
+**/*.venv-rembg
 
 # Test media (screenshots, videos, traces)
 **/*-test-results/

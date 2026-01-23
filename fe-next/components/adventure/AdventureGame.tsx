@@ -15,6 +15,7 @@ import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
+import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import { ScorePopupFly } from '@/components/animations';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
@@ -160,6 +161,16 @@ const AdventureGame = memo<AdventureGameProps>(
     const { reaction, dismissReaction } = useLexiReactions({
       gameState: lexiGameState,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+    });
+
+    // Adventure music hook - world-specific tracks with dynamic switching
+    useAdventureMusic({
+      worldNumber: levelConfig.world,
+      isPlaying: isPlaying && entryPhase === 'playing',
+      isPaused,
+      timeRemaining,
+      totalTime: levelConfig.timerSeconds,
+      enabled: true,
     });
 
     // Handle cascade completion to advance to objectives phase

@@ -6,7 +6,7 @@
       "he": 2938,
       "sv": 2938,
       "ja": 2938,
-      "es": 2924
+      "es": 2938
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -127,22 +127,7 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "adventure.lexi.longWord.default",
-      "adventure.lexi.longWord.world1",
-      "adventure.lexi.longWord.world2",
-      "adventure.lexi.longWord.world3",
-      "adventure.lexi.combo3x.default",
-      "adventure.lexi.combo5x.default",
-      "adventure.lexi.combo10x.default",
-      "adventure.lexi.firstWord.default",
-      "adventure.lexi.timeBonus.default",
-      "adventure.lexi.stuck.default",
-      "adventure.lexi.encourage.default",
-      "adventure.lexi.levelComplete.star1",
-      "adventure.lexi.levelComplete.star2",
-      "adventure.lexi.levelComplete.star3"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

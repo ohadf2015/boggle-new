@@ -29,6 +29,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
+        'nextStep.challengeBots': 'Challenge the Bots!',
+        'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
         'nextStep.tryDailyChallenge': 'Try Daily Challenge',
         'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.backToLobby': 'Back to Lobby',
@@ -276,6 +278,29 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
     // After code simplification, SinglePlayerResults no longer uses onPlayAgain or onQuickRematch
     // Navigation is handled by NextStepPrompt component using router.push
     expect(mockOnPlayAgain).not.toHaveBeenCalled();
+    expect(mockOnQuickRematch).not.toHaveBeenCalled();
+  });
+
+  it('should navigate to /singleplayer?preset=bots when clicking next step in PRACTICE mode results', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <SinglePlayerResults
+        results={{ ...baseResults, botScores: [] }} // Practice mode has no bots
+        mode="practice"
+        onPlayAgain={mockOnPlayAgain}
+        onQuickRematch={mockOnQuickRematch}
+        onBackToLobby={mockOnBackToLobby}
+      />
+    );
+
+    // In practice mode, the next step is "Challenge the Bots!"
+    // The clickable element is the "Let's Go!" button
+    const letsGoButtons = screen.getAllByText("Let's Go!");
+    await user.click(letsGoButtons[0]);
+
+    // Should navigate to singleplayer with bots preset
+    expect(mockRouterPush).toHaveBeenCalledWith('/en/singleplayer?preset=bots');
     expect(mockOnQuickRematch).not.toHaveBeenCalled();
   });
 });

@@ -233,8 +233,10 @@ const SinglePlayerView: React.FC = () => {
   useEffect(() => {
     // Don't run if autoStart is handling the start
     if (autoStart) return;
-    // Only run once and only from preset-selection phase
-    if (!presetParam || phase !== 'preset-selection' || hasAutoStartedRef.current) return;
+    // Don't run if no preset param or already started
+    if (!presetParam || hasAutoStartedRef.current) return;
+    // Don't interrupt an ongoing game
+    if (phase === 'playing') return;
 
     hasAutoStartedRef.current = true;
 

@@ -180,11 +180,30 @@ describe('ProgressionContext', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      // GIVEN - Completion response
-      const updatedProgression = createMockProgression({ totalStars: 8 });
+      // GIVEN - Completion response (matching actual API response format)
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, progression: updatedProgression }),
+        json: async () => ({
+          success: true,
+          progression: {
+            playerLevel: 5,
+            xp: 2600,
+            totalStars: 8,
+            currentWorld: 2,
+            currentLevel: 3,
+          },
+          completion: {
+            world: 1,
+            level: 3,
+            stars: 3,
+            bestScore: 500,
+            bestWords: 20,
+            completedAt: new Date().toISOString(),
+          },
+          xpEarned: 100,
+          starsGained: 3,
+          leveledUp: false,
+        }),
       });
 
       // WHEN
@@ -210,9 +229,30 @@ describe('ProgressionContext', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      // Mock completion response (matching actual API response format)
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, progression: mockProgression }),
+        json: async () => ({
+          success: true,
+          progression: {
+            playerLevel: mockProgression.playerLevel,
+            xp: mockProgression.xp,
+            totalStars: mockProgression.totalStars,
+            currentWorld: mockProgression.currentWorld,
+            currentLevel: mockProgression.currentLevel,
+          },
+          completion: {
+            world: 2,
+            level: 5,
+            stars: 2,
+            bestScore: 350,
+            bestWords: 12,
+            completedAt: new Date().toISOString(),
+          },
+          xpEarned: 100,
+          starsGained: 2,
+          leveledUp: false,
+        }),
       });
 
       // WHEN

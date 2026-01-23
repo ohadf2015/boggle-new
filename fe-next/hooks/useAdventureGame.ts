@@ -347,6 +347,46 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       // Increment combo
       const newComboCount = state.gameState.comboCount + 1;
 
+      // Check if all primary objectives are now met (auto-complete)
+      const primaryObjectives = newObjectives.filter((o) => o.isPrimary);
+      const allPrimaryMet = primaryObjectives.every(
+        (o) => (o.current ?? 0) >= o.target
+      );
+
+      // If all primary objectives are met, auto-complete the level
+      if (allPrimaryMet) {
+        // Update time bonus objective with current time remaining
+        const finalObjectives = newObjectives.map((obj) => {
+          if (obj.type === 'timeBonus') {
+            const isComplete = state.timeRemaining >= obj.target;
+            return {
+              ...obj,
+              current: state.timeRemaining,
+              isComplete,
+            };
+          }
+          return obj;
+        });
+
+        const stars = calculateStars(finalObjectives);
+
+        return {
+          ...state,
+          tiles: newTiles,
+          objectives: finalObjectives,
+          isPlaying: false,
+          gameState: {
+            ...state.gameState,
+            score: state.gameState.score + finalScore,
+            wordsFound: [...state.gameState.wordsFound, word],
+            comboCount: newComboCount,
+            isComplete: true,
+            stars,
+          },
+        };
+      }
+
+      // Primary objectives not yet met - continue playing
       return {
         ...state,
         tiles: newTiles,

@@ -159,8 +159,68 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
         const data = await response.json();
 
-        if (data.success && data.progression) {
-          setProgression(data.progression);
+        if (data.success && data.progression && data.completion) {
+          // Merge progression data with existing completions
+          setProgression((prev) => {
+            if (!prev) {
+              // No previous progression - create new one with the completion
+              return {
+                userId: user.id,
+                playerLevel: data.progression.playerLevel,
+                xp: data.progression.xp,
+                currentWorld: data.progression.currentWorld,
+                currentLevel: data.progression.currentLevel,
+                totalStars: data.progression.totalStars,
+                completions: [
+                  {
+                    world: data.completion.world,
+                    level: data.completion.level,
+                    stars: data.completion.stars,
+                    bestScore: data.completion.bestScore,
+                    bestWords: data.completion.bestWords,
+                    completedAt: data.completion.completedAt,
+                  },
+                ],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+            }
+
+            // Update existing completion or add new one
+            const existingCompletionIndex = prev.completions.findIndex(
+              (c) => c.world === world && c.level === level
+            );
+
+            const updatedCompletion = {
+              world: data.completion.world,
+              level: data.completion.level,
+              stars: data.completion.stars,
+              bestScore: data.completion.bestScore,
+              bestWords: data.completion.bestWords,
+              completedAt: data.completion.completedAt,
+            };
+
+            let updatedCompletions: typeof prev.completions;
+            if (existingCompletionIndex >= 0) {
+              // Update existing completion
+              updatedCompletions = [...prev.completions];
+              updatedCompletions[existingCompletionIndex] = updatedCompletion;
+            } else {
+              // Add new completion
+              updatedCompletions = [...prev.completions, updatedCompletion];
+            }
+
+            return {
+              ...prev,
+              playerLevel: data.progression.playerLevel,
+              xp: data.progression.xp,
+              currentWorld: data.progression.currentWorld,
+              currentLevel: data.progression.currentLevel,
+              totalStars: data.progression.totalStars,
+              completions: updatedCompletions,
+              updatedAt: new Date().toISOString(),
+            };
+          });
         }
       } catch (err) {
         console.error('[ProgressionContext] Complete level error:', err);
