@@ -28,6 +28,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
     deleteCandidate,
     bulkUpdateStatus,
     bulkDelete,
+    bulkApproveToDict,
     triggerPopulation,
     syncFromJSON,
     clearError,
@@ -156,6 +157,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
         onDelete={deleteCandidate}
         onBulkUpdateStatus={bulkUpdateStatus}
         onBulkDelete={bulkDelete}
+        onBulkApproveToDict={bulkApproveToDict}
       />
     </div>
   );
