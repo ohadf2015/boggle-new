@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BulkApproveButton } from './invalid-words';
 
 interface InvalidWord {
   id: string;
@@ -373,7 +374,13 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                 {selectedIds.size} selected
               </span>
             )}
-            {/* BulkApproveButton will be added here in Plan 03 */}
+            <BulkApproveButton
+              selectedCount={selectedIds.size}
+              selectedIds={Array.from(selectedIds)}
+              authToken={authToken}
+              onComplete={() => { clearSelection(); fetchWords(); }}
+              disabled={selectedIds.size === 0}
+            />
           </div>
         </div>
       )}
