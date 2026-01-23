@@ -43,7 +43,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
         <Users className="text-neo-pink/80" />
         {t('hostView.playersJoined')} ({players.length})
       </h3>
-      <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto">
+      <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto overscroll-contain scrollable-area">
         <AnimatePresence>
           {players.map((player, index) => {
             const playerUsername = typeof player === 'string' ? player : player.username;

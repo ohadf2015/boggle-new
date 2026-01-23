@@ -91,6 +91,18 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
   }),
 }));
 
+// Mock MusicContext - useMusic is called in AdventureGame to stop global music
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    stopMusic: jest.fn(),
+    playMusic: jest.fn(),
+    pauseMusic: jest.fn(),
+    resumeMusic: jest.fn(),
+    isPlaying: false,
+    currentTrack: null,
+  }),
+}));
+
 // Mock framer-motion to avoid animation timing issues in tests
 jest.mock('framer-motion', () => {
   const React = require('react');

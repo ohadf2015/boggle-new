@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Level Entry Experience** - Tile cascade, objective reveal, title burst
 - [x] **Phase 4: World Theming** - Parallax backgrounds, particles, dynamic boards
 - [x] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
-- [ ] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
+- [x] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
 - [ ] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
 - [ ] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
 - [ ] **Phase 9: Invalid Word System** - Admin queue and approval workflow
@@ -126,25 +126,30 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 06-01-PLAN.md — Set up asset infrastructure, directories, manifest, and prompt templates
-- [ ] 06-02-PLAN.md — Generate world backgrounds for Meadows, Springs, and Caverns
-- [ ] 06-03-PLAN.md — Generate Lexi mascot sprites (idle, celebrate, sad, hint states)
-- [ ] 06-04-PLAN.md — Process assets through pipeline (background removal + WebP optimization)
+- [x] 06-01-PLAN.md — Set up asset infrastructure, directories, manifest, and prompt templates
+- [x] 06-02-PLAN.md — Generate world backgrounds for Meadows, Springs, and Caverns
+- [x] 06-03-PLAN.md — Generate Lexi mascot sprites (idle, celebrate, sad, hint states)
+- [x] 06-04-PLAN.md — Process assets through pipeline (background removal + WebP optimization)
 
 ### Phase 7: Video Cutscenes
-**Goal**: Remotion-powered video cutscenes add narrative polish at key moments (optional enhancement)
+**Goal**: Remotion-powered video cutscenes add narrative polish at key moments
 **Depends on**: Phase 6 (assets generated for video content)
 **Requirements**: CONT-10, CONT-11, CONT-12
 **Success Criteria** (what must be TRUE):
-  1. Level intro cutscene plays on first level entry (15-30s, skippable after 2s)
+  1. Level intro cutscene plays on first level entry (5-10s, skippable after 2s)
   2. World transition video plays when unlocking new world (skippable)
   3. Tutorial/onboarding video available for new players (fully skippable)
   4. All videos work on iOS Safari with muted autoplay and playsinline attributes
-  5. Videos rendered in all 4 languages with Hebrew RTL subtitle support
-**Plans**: TBD
+  5. Videos rendered in all 4 languages with Hebrew RTL text support
+**Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md — Create LevelIntro composition with Ken Burns zoom effect
+- [ ] 07-02-PLAN.md — Create WorldTransition composition with portal animation
+- [ ] 07-03-PLAN.md — Create Tutorial composition with UI highlights
+- [ ] 07-04-PLAN.md — Create batch rendering script for all video variants
+- [ ] 07-05-PLAN.md — Create CutscenePlayer React component
+- [ ] 07-06-PLAN.md — Integrate cutscenes into adventure mode flow
 
 ### Phase 8: Wikipedia Integration
 **Goal**: Wikipedia word extraction pipeline reliably syncs curated words to game dictionary
@@ -203,12 +208,12 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Level Entry Experience | 3/3 | Complete | 2026-01-22 |
 | 4. World Theming | 3/3 | Complete | 2026-01-22 |
 | 5. Lexi Personality | 3/3 | Complete | 2026-01-22 |
-| 6. AI Asset Generation | 0/4 | Planned | - |
-| 7. Video Cutscenes | 0/TBD | Not started | - |
+| 6. AI Asset Generation | 4/4 | Complete | 2026-01-23 |
+| 7. Video Cutscenes | 0/6 | Planned | - |
 | 8. Wikipedia Integration | 0/TBD | Not started | - |
 | 9. Invalid Word System | 0/TBD | Not started | - |
 | 10. Bug Fixes & Stabilization | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-23 (Phase 6 planned)*
+*Last updated: 2026-01-23 (Phase 7 planned)*

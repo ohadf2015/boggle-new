@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import { motion, useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css'; // CSS keyframe animations for performance
-import { Star, Lock, Crown, Sparkles } from 'lucide-react';
+import { Star, Lock, Crown } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useParallax } from '@/hooks/useParallax';
 import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
@@ -147,7 +148,7 @@ const WorldOrbitingLetters = ({
         <OrbitingLetter
           key={`${worldId}-${letter}-${i}`}
           letter={letter}
-          radius={55 + i * 12}
+          radius={65 + i * 14} // Larger radius to match bigger world nodes
           duration={6 + i * 2}
           delay={i * 1.5}
           clockwise={i % 2 === 0}
@@ -177,37 +178,37 @@ const TrailPath = ({
     : `M ${rightX} -5 C ${rightX} 25, ${leftX} 35, ${leftX} 65`;
 
   return (
-    <div className="relative h-16 sm:h-20 w-full -my-2">
+    <div className="relative h-20 sm:h-24 w-full -my-2">
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 100 60"
         preserveAspectRatio="none"
         style={{ overflow: 'visible' }}
       >
-        {/* Subtle center glow only - no endpoint glow */}
+        {/* Stronger glow for unlocked paths */}
         {isUnlocked && (
           <path
             d={path}
             fill="none"
             stroke="#FFE135"
-            strokeWidth="8"
+            strokeWidth="12"
             strokeLinecap="butt"
-            opacity={0.2}
-            style={{ filter: 'blur(6px)' }}
+            opacity={0.35}
+            style={{ filter: 'blur(8px)' }}
           />
         )}
-        {/* Main trail path - flat ends that go under world circles */}
+        {/* Main trail path - thicker and bolder */}
         <path
           d={path}
           fill="none"
-          stroke={isUnlocked ? '#FFE135' : 'rgba(255,255,255,0.08)'}
-          strokeWidth="4"
+          stroke={isUnlocked ? '#FFE135' : 'rgba(255,255,255,0.12)'}
+          strokeWidth="6"
           strokeLinecap="butt"
-          strokeDasharray={isUnlocked ? '0' : '8 6'}
+          strokeDasharray={isUnlocked ? '0' : '10 8'}
         />
-        {/* Animated particle on unlocked path */}
+        {/* Animated particle on unlocked path - larger */}
         {isUnlocked && (
-          <circle r="3" fill="#FFFFFF" opacity={0.8}>
+          <circle r="5" fill="#FFFFFF" opacity={0.9}>
             <animateMotion dur="2.5s" repeatCount="indefinite" path={path} />
           </circle>
         )}
@@ -282,56 +283,60 @@ const WorldNode = ({
               isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'
             )}
             style={{
-              filter: isUnlocked ? `drop-shadow(0 0 16px ${glowColor})` : 'grayscale(1) brightness(0.5)',
+              // Enhanced glow for unlocked worlds - larger radius and stronger
+              filter: isUnlocked
+                ? `drop-shadow(0 0 20px ${glowColor}) drop-shadow(0 0 40px ${glowColor})`
+                : 'grayscale(1) brightness(0.5)',
             }}
           >
-            {/* Circular World Image */}
+            {/* Circular World Image - larger and more prominent (96-144px range) */}
             <div className={cn(
-              'relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28',
+              'relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36',
               'rounded-full overflow-hidden',
-              'border-4 border-neo-black',
-              isUnlocked && 'ring-2 ring-neo-yellow/50'
+              'border-[5px] border-neo-black',
+              // Stronger ring for unlocked worlds
+              isUnlocked && 'ring-[3px] ring-neo-yellow/60'
             )}>
             <Image
               src={worldImage}
               alt={worldName}
               fill
               className={cn(
-                'object-cover',
+                'object-cover scale-110', // Slight zoom to show more of the world
                 !isUnlocked && 'opacity-40'
               )}
             />
             {/* Lock overlay for locked worlds */}
             {!isUnlocked && (
               <div className="absolute inset-0 flex items-center justify-center bg-neo-black/50">
-                <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white/70" />
+                <Lock className="w-10 h-10 sm:w-12 sm:h-12 text-neo-white/70" />
               </div>
             )}
           </div>
 
-          {/* Crown for final world */}
+          {/* Crown for final world - larger and more prominent */}
           {isFinalWorld && isUnlocked && (
             <motion.div
-              className="absolute -top-4 left-1/2 -translate-x-1/2"
-              animate={{ y: [0, -3, 0] }}
+              className="absolute -top-5 left-1/2 -translate-x-1/2"
+              animate={{ y: [0, -4, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <Crown className="w-7 h-7 text-neo-yellow fill-neo-yellow drop-shadow-lg" />
+              <Crown className="w-9 h-9 sm:w-10 sm:h-10 text-neo-yellow fill-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.8)]" />
             </motion.div>
           )}
 
-          {/* Completion badge */}
+          {/* Completion badge - larger with stronger shadow */}
           {isComplete && (
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 bg-neo-lime rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm z-10">
-              <span className="text-neo-black font-black text-sm">✓</span>
+            <div className="absolute -bottom-1 -right-1 w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-10">
+              <span className="text-neo-black font-black text-base sm:text-lg">✓</span>
             </div>
           )}
 
-          {/* Animated pulse ring for unlocked */}
+          {/* Animated pulse ring for unlocked - thicker border */}
           {isUnlocked && !isComplete && (
             <motion.div
-              className="absolute -inset-1 rounded-full border-2 border-neo-yellow"
-              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
+              className="absolute -inset-1 rounded-full border-[3px] border-neo-yellow"
+              animate={{ scale: [1, 1.18, 1], opacity: [0.7, 0, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
           )}
@@ -339,62 +344,61 @@ const WorldNode = ({
         </div>
       </div>
 
-      {/* World Info Card - positioned on the opposite side */}
+      {/* World Info Card - positioned on the opposite side, more prominent */}
       <motion.div
         className={cn(
           'absolute top-1/2 -translate-y-1/2',
-          'max-w-[150px] sm:max-w-[180px]',
-          'bg-neo-navy-light/95 backdrop-blur-sm',
-          'border-3 border-neo-black rounded-neo',
-          'p-2.5 sm:p-3 shadow-hard-sm',
+          'max-w-[170px] sm:max-w-[200px]',
+          'bg-neo-navy-light border-4 border-neo-black rounded-neo',
+          'p-3 sm:p-4 shadow-hard',
           !isUnlocked && 'opacity-60',
           // Position card on opposite side of world
-          isLeft ? 'left-[42%]' : 'right-[42%]'
+          isLeft ? 'left-[44%]' : 'right-[44%]'
         )}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: index * 0.08 + 0.1 }}
       >
-        {/* World name */}
+        {/* World name - bolder */}
         <h3 className={cn(
-          'font-black text-xs sm:text-sm uppercase tracking-tight leading-tight',
+          'font-black text-sm sm:text-base uppercase tracking-tight leading-tight',
           isUnlocked ? 'text-neo-white' : 'text-neo-white/50'
         )}>
           {worldName}
         </h3>
 
-        {/* Stars progress */}
-        <div className="flex items-center gap-1.5 mt-1.5">
+        {/* Stars progress - larger icons and text */}
+        <div className="flex items-center gap-2 mt-2">
           <Star className={cn(
-            'w-3.5 h-3.5',
+            'w-4 h-4 sm:w-5 sm:h-5',
             currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/30'
           )} />
           <span className={cn(
-            'text-xs font-bold',
+            'text-sm font-bold',
             isUnlocked ? 'text-neo-yellow' : 'text-neo-white/40'
           )}>
             {currentStars}/{totalWorldStars}
           </span>
           <span className={cn(
-            'text-xs',
+            'text-sm',
             isUnlocked ? 'text-neo-white/60' : 'text-neo-white/30'
           )}>
             · {completedLevels}/{LEVELS_PER_WORLD}
           </span>
         </div>
 
-        {/* Unlock requirement */}
+        {/* Unlock requirement - slightly larger */}
         {!isUnlocked && (
-          <div className="flex items-center gap-1 mt-2 text-[11px] text-neo-white/50">
-            <Lock className="w-3 h-3" />
+          <div className="flex items-center gap-1.5 mt-2.5 text-xs text-neo-white/50">
+            <Lock className="w-3.5 h-3.5" />
             <span>{unlockRequirement}</span>
-            <Star className="w-3 h-3 text-neo-yellow/50" />
+            <Star className="w-3.5 h-3.5 text-neo-yellow/50" />
           </div>
         )}
       </motion.div>
 
-      {/* Spacer for layout height */}
-      <div className="h-24 sm:h-28 md:h-32" />
+      {/* Spacer for layout height - increased for larger nodes */}
+      <div className="h-28 sm:h-32 md:h-36 lg:h-40" />
     </motion.div>
   );
 };
@@ -455,9 +459,18 @@ export default function WorldMap({
     };
   }, [handleScroll]);
 
-  // Parallax transforms for different layers
+  // Scroll-based parallax transforms for different layers
   const starsY = useTransform(scrollProgress, [0, 1], [0, -100]);
   const cloudsY = useTransform(scrollProgress, [0, 1], [0, -150]);
+
+  // Interactive parallax from gyroscope/mouse/touch - match game view intensity
+  const { x: parallaxX, y: parallaxY } = useParallax({
+    intensity: 0.8,
+    enableGyroscope: true,
+    enableGesture: true,
+    enableAmbient: true,
+    ambientSpeed: 0.5,
+  });
 
   // Pre-generate star positions for galaxy background
   const stars = useMemo(() => {
@@ -521,18 +534,24 @@ export default function WorldMap({
       data-testid="world-map"
       className="relative h-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent"
     >
-      {/* Deep space background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-b from-[#050510] via-[#0a0a2a] to-[#0d1033] pointer-events-none" />
+      {/* Deep space background gradient - very subtle parallax (depth: 0.05) */}
+      <div
+        className="fixed inset-0 bg-gradient-to-b from-[#050510] via-[#0a0a2a] to-[#0d1033] pointer-events-none"
+        style={{
+          transform: `translate(${parallaxX * 0.05}px, ${parallaxY * 0.05}px)`,
+        }}
+      />
 
-      {/* Milky Way band - diagonal gradient across screen */}
+      {/* Milky Way band - diagonal gradient across screen (depth: 0.1) */}
       <div
         className="fixed inset-0 pointer-events-none opacity-30"
         style={{
           background: 'linear-gradient(135deg, transparent 20%, rgba(139,92,246,0.1) 35%, rgba(236,72,153,0.08) 50%, rgba(34,211,238,0.1) 65%, transparent 80%)',
+          transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
         }}
       />
 
-      {/* Cosmic dust particles */}
+      {/* Cosmic dust particles (depth: 0.15) */}
       <div
         className="fixed inset-0 pointer-events-none opacity-40"
         style={{
@@ -543,11 +562,17 @@ export default function WorldMap({
                            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent),
                            radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.15), transparent)`,
           backgroundSize: '200px 200px',
+          transform: `translate(${parallaxX * 0.15}px, ${parallaxY * 0.15}px)`,
         }}
       />
 
-      {/* Nebula clouds for cosmic atmosphere - CSS animations for performance */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* Nebula clouds for cosmic atmosphere - CSS animations for performance (depth: 0.25) */}
+      <div
+        className="fixed inset-0 pointer-events-none overflow-hidden"
+        style={{
+          transform: `translate(${parallaxX * 0.25}px, ${parallaxY * 0.25}px)`,
+        }}
+      >
         {nebulaClouds.map((nebula, i) => (
           <div
             key={i}
@@ -565,8 +590,13 @@ export default function WorldMap({
         ))}
       </div>
 
-      {/* Shooting stars - CSS animations for performance */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* Shooting stars - CSS animations for performance (depth: 0.2) */}
+      <div
+        className="fixed inset-0 pointer-events-none overflow-hidden"
+        style={{
+          transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
+        }}
+      >
         {shootingStars.map((star, i) => (
           <div
             key={i}
@@ -581,10 +611,14 @@ export default function WorldMap({
         ))}
       </div>
 
-      {/* Starfield background with parallax - CSS animations for performance */}
+      {/* Starfield background with parallax - scroll + interactive (depth: 0.4) */}
       <motion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ y: starsY }}
+        style={{
+          y: starsY,
+          x: parallaxX * 0.4,
+          translateY: parallaxY * 0.4,
+        }}
       >
         {stars.map((star) => (
           <div
@@ -613,8 +647,15 @@ export default function WorldMap({
         ))}
       </motion.div>
 
-      {/* Floating clouds with parallax - fewer clouds for cleaner look */}
-      <motion.div className="fixed inset-0 pointer-events-none" style={{ y: cloudsY }}>
+      {/* Floating clouds with parallax - scroll + interactive (depth: 0.6) */}
+      <motion.div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          y: cloudsY,
+          x: parallaxX * 0.6,
+          translateY: parallaxY * 0.6,
+        }}
+      >
         <Cloud className="top-[15%] left-[5%]" size="md" speed={0.5} />
         <Cloud className="top-[50%] right-[6%]" size="lg" speed={0.4} />
         <Cloud className="top-[80%] left-[8%]" size="sm" speed={0.6} />
@@ -652,18 +693,21 @@ export default function WorldMap({
 
         {/* Journey Start section with mascot - at the END of the trail (bottom) */}
         <motion.div
-          className="relative mt-8 flex flex-col items-center"
+          className="relative mt-10 flex flex-col items-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          {/* Connection to last world */}
-          <div className="w-1.5 h-8 bg-neo-yellow mb-2" />
+          {/* Connection to last world - thicker and with glow */}
+          <div className="relative">
+            <div className="absolute inset-0 w-2 bg-neo-yellow/40 blur-sm" />
+            <div className="w-2 h-10 bg-neo-yellow mb-3" />
+          </div>
 
-          {/* Mascot GIF */}
+          {/* Mascot GIF - slightly larger */}
           <motion.div
-            className="relative w-24 h-24 sm:w-32 sm:h-32 mb-3"
-            animate={{ y: [0, -5, 0] }}
+            className="relative w-28 h-28 sm:w-36 sm:h-36 mb-4"
+            animate={{ y: [0, -6, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Image
@@ -675,12 +719,13 @@ export default function WorldMap({
             />
           </motion.div>
 
-          {/* Start banner */}
+          {/* Start banner - larger and more prominent */}
           <motion.div
-            className="px-5 py-2.5 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard"
-            whileHover={{ scale: 1.05 }}
+            className="px-8 py-4 bg-neo-lime border-4 border-neo-black rounded-neo shadow-hard-lg"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98, y: 0 }}
           >
-            <span className="text-neo-black font-black text-sm sm:text-base">
+            <span className="text-neo-black font-black text-lg sm:text-xl tracking-tight">
               Start Your Journey!
             </span>
           </motion.div>
@@ -690,14 +735,14 @@ export default function WorldMap({
         <div ref={bottomRef} className="h-8" />
       </div>
 
-      {/* Scroll hint at top with mascot */}
+      {/* Scroll hint at top with mascot - more prominent */}
       <motion.div
         className="fixed top-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1, y: [0, -3, 0] }}
+        animate={{ opacity: 1, y: [0, -4, 0] }}
         transition={{ delay: 2, duration: 1.5, repeat: Infinity }}
       >
-        <div className="w-8 h-8 relative">
+        <div className="w-10 h-10 relative">
           <Image
             src="/mascot/study-nobg.gif"
             alt=""
@@ -706,7 +751,7 @@ export default function WorldMap({
             unoptimized
           />
         </div>
-        <div className="px-3 py-1.5 bg-neo-black/70 rounded-full text-neo-white/70 text-xs font-medium backdrop-blur-sm">
+        <div className="px-4 py-2 bg-neo-black/80 border-2 border-neo-white/20 rounded-full text-neo-white/80 text-sm font-bold backdrop-blur-sm shadow-hard-sm">
           ↑ Scroll up for more worlds
         </div>
       </motion.div>

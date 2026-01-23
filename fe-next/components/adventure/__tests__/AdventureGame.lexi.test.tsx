@@ -64,6 +64,18 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
   }),
 }));
 
+// Mock MusicContext - adventure mode stops global music when it starts
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    stopMusic: jest.fn(),
+    playMusic: jest.fn(),
+    pauseMusic: jest.fn(),
+    resumeMusic: jest.fn(),
+    isPlaying: false,
+    currentTrack: null,
+  }),
+}));
+
 // Mock components that aren't relevant to Lexi tests
 jest.mock('../themed/WorldBackground', () => ({
   __esModule: true,

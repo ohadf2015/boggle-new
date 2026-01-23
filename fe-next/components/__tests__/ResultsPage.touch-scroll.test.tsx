@@ -123,6 +123,152 @@ describe('Result Pages Touch Scroll Compliance', () => {
     });
   });
 
+  describe('DailyWordHuntResults.tsx', () => {
+    const sourcePath = resolve(process.cwd(), 'components/daily/DailyWordHuntResults.tsx');
+    const source = readFileSync(sourcePath, 'utf-8');
+
+    it('should have touch scrolling support on main content area', () => {
+      // Find the main scrollable content area:
+      // <div className="flex-1 overflow-y-auto px-3 pb-20 md:pb-6 relative">
+      const overflowPatterns = source.match(
+        /className="[^"]*overflow-y-auto[^"]*"/g
+      ) || [];
+
+      expect(overflowPatterns.length).toBeGreaterThan(0);
+
+      overflowPatterns.forEach((match) => {
+        const hasTouchSupport = hasProperTouchScrolling(match);
+        expect(hasTouchSupport).toBe(true);
+      });
+    });
+  });
+
+  describe('DailyChallengeResults.tsx', () => {
+    const sourcePath = resolve(process.cwd(), 'components/daily/DailyChallengeResults.tsx');
+    const source = readFileSync(sourcePath, 'utf-8');
+
+    it('should have touch scrolling support on main content area', () => {
+      // Find scrollable content areas with overflow-y-auto
+      const overflowPatterns = source.match(
+        /className="[^"]*overflow-y-auto[^"]*"/g
+      ) || [];
+
+      expect(overflowPatterns.length).toBeGreaterThan(0);
+
+      overflowPatterns.forEach((match) => {
+        const hasTouchSupport = hasProperTouchScrolling(match);
+        expect(hasTouchSupport).toBe(true);
+      });
+    });
+  });
+
+  describe('BuzzResultsScreen.tsx', () => {
+    const sourcePath = resolve(process.cwd(), 'components/buzz/BuzzResultsScreen.tsx');
+    const source = readFileSync(sourcePath, 'utf-8');
+
+    it('should have touch scrolling support on main content area', () => {
+      // Find scrollable content areas with overflow-y-auto
+      const overflowPatterns = source.match(
+        /className="[^"]*overflow-y-auto[^"]*"/g
+      ) || [];
+
+      expect(overflowPatterns.length).toBeGreaterThan(0);
+
+      overflowPatterns.forEach((match) => {
+        const hasTouchSupport = hasProperTouchScrolling(match);
+        expect(hasTouchSupport).toBe(true);
+      });
+    });
+  });
+
+  describe('SharePanel.tsx', () => {
+    const sourcePath = resolve(process.cwd(), 'components/daily/results/SharePanel.tsx');
+    const source = readFileSync(sourcePath, 'utf-8');
+
+    it('should have touch scrolling support on modal overlay', () => {
+      // Find the modal overlay with overflow-y-auto:
+      // className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      const overflowPatterns = source.match(
+        /className="[^"]*overflow-y-auto[^"]*"/g
+      ) || [];
+
+      expect(overflowPatterns.length).toBeGreaterThan(0);
+
+      overflowPatterns.forEach((match) => {
+        const hasTouchSupport = hasProperTouchScrolling(match);
+        expect(hasTouchSupport).toBe(true);
+      });
+    });
+  });
+
+  describe('SinglePlayerLobby.tsx', () => {
+    const sourcePath = resolve(process.cwd(), 'components/singleplayer/SinglePlayerLobby.tsx');
+    const source = readFileSync(sourcePath, 'utf-8');
+
+    it('should have touch scrolling support on all scrollable areas', () => {
+      const overflowPatterns = source.match(
+        /className="[^"]*overflow-y-auto[^"]*"/g
+      ) || [];
+
+      expect(overflowPatterns.length).toBeGreaterThan(0);
+
+      overflowPatterns.forEach((match) => {
+        const hasTouchSupport = hasProperTouchScrolling(match);
+        expect(hasTouchSupport).toBe(true);
+      });
+    });
+  });
+
+  describe('JoinView.tsx', () => {
+    const sourcePath = resolve(process.cwd(), 'components/views/JoinView.tsx');
+    const source = readFileSync(sourcePath, 'utf-8');
+
+    it('should have touch scrolling support on all scrollable areas', () => {
+      const overflowPatterns = source.match(
+        /className="[^"]*overflow-y-auto[^"]*"/g
+      ) || [];
+
+      expect(overflowPatterns.length).toBeGreaterThan(0);
+
+      overflowPatterns.forEach((match) => {
+        const hasTouchSupport = hasProperTouchScrolling(match);
+        expect(hasTouchSupport).toBe(true);
+      });
+    });
+  });
+
+  describe('Host and Player Components', () => {
+    const components = [
+      { name: 'TvLeaderboard', path: 'host/components/tv-broadcast/TvLeaderboard.tsx' },
+      { name: 'HostPreGameView', path: 'host/components/HostPreGameView.tsx' },
+      { name: 'EnhancedPlayerList', path: 'host/components/pre-game/desktop/EnhancedPlayerList.tsx' },
+      { name: 'DesktopLobbyLayout', path: 'host/components/pre-game/desktop/DesktopLobbyLayout.tsx' },
+      { name: 'PlayersListPanel', path: 'host/components/pre-game/PlayersListPanel.tsx' },
+      { name: 'TvResultsLeaderboard', path: 'host/components/tv-results/TvResultsLeaderboard.tsx' },
+      { name: 'PlayerWaitingView', path: 'player/components/PlayerWaitingView.tsx' },
+      { name: 'FoundWordsList', path: 'player/components/in-game/FoundWordsList.tsx' },
+      { name: 'LiveLeaderboard', path: 'player/components/in-game/LiveLeaderboard.tsx' },
+    ];
+
+    components.forEach(({ name, path }) => {
+      it(`${name} should have touch scrolling support`, () => {
+        const sourcePath = resolve(process.cwd(), path);
+        const source = readFileSync(sourcePath, 'utf-8');
+
+        const overflowPatterns = source.match(
+          /className="[^"]*overflow-y-auto[^"]*"/g
+        ) || [];
+
+        expect(overflowPatterns.length).toBeGreaterThan(0);
+
+        overflowPatterns.forEach((match) => {
+          const hasTouchSupport = hasProperTouchScrolling(match);
+          expect(hasTouchSupport).toBe(true);
+        });
+      });
+    });
+  });
+
   describe('CSS utility class validation', () => {
     const cssPath = resolve(process.cwd(), 'app/globals.css');
     const cssSource = readFileSync(cssPath, 'utf-8');

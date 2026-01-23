@@ -83,7 +83,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="h-full overflow-y-auto p-4 space-y-2"
+        className="h-full overflow-y-auto overscroll-contain scrollable-area p-4 space-y-2"
       >
         <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2">
           {t('tvBroadcast.leaderboard')}
@@ -117,7 +117,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
       </h3>
       <div
         ref={parentRef}
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto overscroll-contain scrollable-area"
         style={{ contain: 'strict' }}
       >
         <div

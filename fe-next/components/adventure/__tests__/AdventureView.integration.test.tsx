@@ -90,6 +90,19 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// Mock MusicContext - adventure mode stops global music when it starts
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    stopMusic: jest.fn(),
+    playTrack: jest.fn(),
+    fadeToTrack: jest.fn(),
+    setVolume: jest.fn(),
+    isPlaying: false,
+    currentTrack: null,
+    volume: 0.5,
+  }),
+}));
+
 // Mock ProgressionContext with controllable state
 let mockProgressionState: {
   progression: PlayerProgression | null;

@@ -45,7 +45,7 @@ export const FoundWordsList = memo<FoundWordsListProps>(({
           {t('playerView.wordsFound')}
         </h3>
       </div>
-      <div className="flex-1 overflow-y-auto p-3 min-h-0">
+      <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area p-3 min-h-0">
         <div className="space-y-2" ref={wordListRef}>
           <AnimatePresence>
             {foundWords.map((foundWordObj, index) => {

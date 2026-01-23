@@ -86,7 +86,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           {t('hostView.playersJoined')} ({playersReady.length})
         </span>
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-2 space-y-1">
         <AnimatePresence>
           {playersReady.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;

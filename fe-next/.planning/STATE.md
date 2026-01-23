@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 6 - AI Asset Generation (in progress)
+**Current focus:** Phase 7 - Video Cutscenes (in progress)
 
 ## Current Position
 
-Phase: 6 of 10 (AI Asset Generation)
-Plan: 4 of 4 in phase
-Status: Complete
-Last activity: 2026-01-23 - Completed 06-04 (Asset pipeline processing)
+Phase: 7 of 10 (Video Cutscenes)
+Plan: 3 of 5 in phase
+Status: In Progress
+Last activity: 2026-01-23 - Completed 07-03 (Tutorial composition)
 
-Progress: [██████░░░░] 60% (6 phases complete, 23/~34 plans)
+Progress: [██████░░░░] 63% (6 phases complete + 07-01,02,03, 26/~34 plans)
 
 ## Performance Metrics
 
@@ -121,6 +121,15 @@ Recent decisions affecting current work:
 - **06-04:** PIL-based white bg removal over rembg (simpler, fewer dependencies)
 - **06-04:** Depth blur on parallax: far 4-5px, mid 2-3px, near 1px
 - **06-04:** Lexi sprites deferred to future iteration (user decision for first stage)
+- **07-02:** Portal uses neo-brutalist colors (cyan #00FFFF to pink #FF1493 gradient)
+- **07-02:** Three overlapping phases for smooth world transitions (old fade + portal + new fade)
+- **07-02:** Portal animation has three visual layers (outer glow, main portal, inner swirl)
+- **07-01:** Ken Burns zoom 1.15x -> 1.0x for subtle camera movement in world flyby
+- **07-01:** Text overlay appears at frame 150 (last 3 seconds) for world name reveal
+- **07-01:** Rubik font for Hebrew, Fredoka for others (per design system)
+- **07-03:** Embedded translations for Remotion (cannot use React context in video compositions)
+- **07-03:** 5% sine wave pulse animation for tutorial highlight boxes
+- **07-03:** Simple SVG icons (swipe arrow, checkmark, plus) for clean UI focus
 
 ### Pending Todos
 
@@ -233,13 +242,23 @@ None.
 | 06-03 | Background integration (parallax layers) | ✓ |
 | 06-04 | Asset pipeline processing (WebP optimization) | ✓ (11/19 assets - Lexi sprites deferred) |
 
+## Phase 7 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 07-01 | LevelIntro composition | ✓ |
+| 07-02 | WorldTransition composition | ✓ |
+| 07-03 | Tutorial composition | ✓ |
+| 07-04 | CutscenePlayer component | Pending |
+| 07-05 | Adventure integration | Pending |
+
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 06-04 - Asset pipeline processing (Phase 6 complete)
+Stopped at: Completed 07-01 - LevelIntro composition
 Resume file: None
-Next: Phase 7 - Video Cutscenes
+Next: 07-04 - CutscenePlayer component
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-23 08:13 UTC*
+*Last updated: 2026-01-23 11:57 UTC*

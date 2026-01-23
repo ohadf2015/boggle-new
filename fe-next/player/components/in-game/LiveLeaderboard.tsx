@@ -109,7 +109,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
           {t('playerView.leaderboard')}
         </h3>
       </div>
-      <div ref={parentRef} className="overflow-y-auto flex-1 p-3" style={{ maxHeight: compact ? '300px' : '400px' }}>
+      <div ref={parentRef} className="overflow-y-auto overscroll-contain scrollable-area flex-1 p-3" style={{ maxHeight: compact ? '300px' : '400px' }}>
         {useVirtual ? (
           // Virtual scrolling for large lists
           <div

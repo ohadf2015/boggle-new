@@ -166,7 +166,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
         <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-3 gap-4 landscape-full-height">
         {/* Left column: Mode Selection */}
-        <div className="w-[40%] flex flex-col gap-3 overflow-y-auto">
+        <div className="w-[40%] flex flex-col gap-3 overflow-y-auto overscroll-contain scrollable-area">
           {/* Header with back */}
           <div className="flex items-center gap-3">
             {onBack ? (
@@ -228,7 +228,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
         {/* Right column: Settings + Start */}
         <div className="w-[60%] flex flex-col gap-3 overflow-hidden min-h-0">
-          <div className="flex-1 overflow-y-auto space-y-3">
+          <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area space-y-3">
             {/* Difficulty - Icon-based compact selector */}
             <div>
               <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>

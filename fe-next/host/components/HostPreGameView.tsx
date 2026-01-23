@@ -166,7 +166,7 @@ function HostPreGameView({
 
   // Render Lobby Tab Content
   const renderLobbyContent = (): React.ReactElement => (
-    <div className="flex flex-col h-full p-3 gap-3 overflow-y-auto min-h-0">
+    <div className="flex flex-col h-full p-3 gap-3 overflow-y-auto overscroll-contain scrollable-area min-h-0">
       <PresetSelector
         selectedPreset={selectedPreset}
         onPresetClick={setPresetInfoOpen}
@@ -197,7 +197,7 @@ function HostPreGameView({
             {t('hostView.playersJoined')} ({playersReady.length})
           </span>
         </div>
-        <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-2 space-y-1">
           <AnimatePresence>
             {playersReady.map((player, index) => {
               const name = typeof player === 'string' ? player : player.username;

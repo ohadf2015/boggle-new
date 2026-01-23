@@ -50,7 +50,7 @@ export function DesktopLobbyLayout({
       {/* Left Column - Settings & Controls */}
       <aside
         data-testid="desktop-left-column"
-        className="flex flex-col gap-4 overflow-y-auto min-h-0"
+        className="flex flex-col gap-4 overflow-y-auto overscroll-contain scrollable-area min-h-0"
       >
         {leftContent}
       </aside>
@@ -58,7 +58,7 @@ export function DesktopLobbyLayout({
       {/* Center Column - Hero/Preview Area */}
       <main
         data-testid="desktop-center-column"
-        className="flex flex-col items-center justify-start gap-6 overflow-y-auto min-h-0"
+        className="flex flex-col items-center justify-start gap-6 overflow-y-auto overscroll-contain scrollable-area min-h-0"
       >
         {centerContent}
       </main>

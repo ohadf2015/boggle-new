@@ -202,14 +202,18 @@ export function useAdventureMusic({
 
   /**
    * Create a looping Howl instance with crossfade
+   * Note: preload is true by default - tracks load immediately when created
    */
   const createHowl = useCallback((src: string, trackName: string): Howl => {
     const howl = new Howl({
       src: [src],
       loop: false, // Manual looping for crossfade
       volume: 0,
-      preload: false,
+      preload: true, // Preload immediately so tracks are ready when needed
       html5: false,
+      onload: () => {
+        logger.log(`[AdventureMusic] ${trackName} loaded successfully`);
+      },
       onloaderror: (id, err) => {
         logger.error(`[AdventureMusic] Failed to load ${trackName}:`, err);
       },

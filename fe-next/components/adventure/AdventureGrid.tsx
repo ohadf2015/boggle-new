@@ -416,15 +416,31 @@ const AdventureGrid = memo(
 
     return (
       <div className={cn('flex flex-col gap-2', className)}>
-        {/* Word Preview */}
-        {showWordPreview && formedWord.length > 0 && (
+        {/* Word Preview - Always reserve space to prevent layout shift */}
+        {showWordPreview && (
           <div
-            className={cn(
-              'text-center text-2xl font-black text-neo-white',
-              'bg-neo-navy/60 rounded-neo px-4 py-2'
-            )}
+            data-testid="word-preview-container"
+            className="min-h-[44px] flex items-center justify-center"
           >
-            {formedWord}
+            {formedWord.length > 0 ? (
+              <div
+                className={cn(
+                  'text-center text-2xl font-black text-neo-white',
+                  'bg-neo-navy/60 rounded-neo px-4 py-2'
+                )}
+              >
+                {formedWord}
+              </div>
+            ) : (
+              /* Invisible placeholder to reserve space */
+              <div
+                data-testid="word-preview-placeholder"
+                className="invisible text-2xl font-black px-4 py-2"
+                aria-hidden="true"
+              >
+                &nbsp;
+              </div>
+            )}
           </div>
         )}
 
@@ -432,6 +448,7 @@ const AdventureGrid = memo(
         <BoardFrame>
           <div
           ref={containerRef}
+          dir="ltr"
           role="grid"
           aria-label="Adventure game board"
           onMouseUp={interactive ? handleMouseUp : undefined}

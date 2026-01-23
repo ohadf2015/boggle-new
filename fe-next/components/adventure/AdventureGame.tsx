@@ -11,6 +11,7 @@ import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from '
 import { Pause, Play, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
@@ -104,6 +105,9 @@ const AdventureGame = memo<AdventureGameProps>(
     // Language context for translations
     const { t, language } = useLanguage();
 
+    // Global music context - stop main game music when adventure starts
+    const { stopMusic: stopGlobalMusic } = useMusic();
+
     // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
@@ -162,6 +166,12 @@ const AdventureGame = memo<AdventureGameProps>(
       gameState: lexiGameState,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
     });
+
+    // Stop global music when adventure mode starts to avoid conflict
+    // Adventure mode has its own world-specific music system
+    useEffect(() => {
+      stopGlobalMusic(500); // Quick fade out
+    }, [stopGlobalMusic]);
 
     // Adventure music hook - world-specific tracks with dynamic switching
     useAdventureMusic({
@@ -418,30 +428,36 @@ const AdventureGame = memo<AdventureGameProps>(
         <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-hidden">
           {/* Grid Section */}
           <div className="flex-1 flex flex-col items-center justify-center gap-3">
-            {/* Validation Feedback */}
-            {validationError && (
-              <div
-                data-testid="validation-error"
-                className={cn(
-                  'px-4 py-2 rounded-neo',
-                  'bg-neo-red/20 border-2 border-neo-red',
-                  'text-neo-red font-bold text-sm',
-                  'animate-neo-shake'
-                )}
-              >
-                {validationError}
-              </div>
-            )}
+            {/* Feedback Container - Always reserve space to prevent layout shift */}
+            <div
+              data-testid="feedback-container"
+              className="min-h-[40px] flex items-center justify-center"
+            >
+              {/* Validation Feedback */}
+              {validationError && (
+                <div
+                  data-testid="validation-error"
+                  className={cn(
+                    'px-4 py-2 rounded-neo',
+                    'bg-neo-red/20 border-2 border-neo-red',
+                    'text-neo-red font-bold text-sm',
+                    'animate-neo-shake'
+                  )}
+                >
+                  {validationError}
+                </div>
+              )}
 
-            {/* Loading Indicator */}
-            {isValidating && (
-              <div
-                data-testid="validation-loading"
-                className="text-neo-cyan font-bold text-sm animate-pulse"
-              >
-                {t('common.validating') || 'Validating...'}
-              </div>
-            )}
+              {/* Loading Indicator */}
+              {isValidating && (
+                <div
+                  data-testid="validation-loading"
+                  className="text-neo-cyan font-bold text-sm animate-pulse"
+                >
+                  {t('common.validating') || 'Validating...'}
+                </div>
+              )}
+            </div>
 
             <AdventureGrid
               ref={gridRef}

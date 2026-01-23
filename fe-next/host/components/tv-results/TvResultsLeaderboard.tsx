@@ -64,7 +64,7 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
             {t('tvResults.fullRankings')}
           </motion.h3>
 
-          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-neo-cream/30 scrollbar-track-transparent">
+          <div className="space-y-2 max-h-[400px] overflow-y-auto overscroll-contain scrollable-area pr-2 scrollbar-thin scrollbar-thumb-neo-cream/30 scrollbar-track-transparent">
             {displayPlayers.map((player, index) => (
               <motion.div
                 key={player.username}

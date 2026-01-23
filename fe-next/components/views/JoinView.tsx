@@ -302,7 +302,7 @@ const JoinView: React.FC<JoinViewProps> = ({
     return (
       <div dir={dir} className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
         {/* Left column: Form */}
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
+        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto overscroll-contain scrollable-area">
           {/* Mode Selector */}
           <ModeSelector mode={mode} onModeChange={handleModeChange} />
 
@@ -314,7 +314,7 @@ const JoinView: React.FC<JoinViewProps> = ({
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-2 flex-1 overflow-y-auto">
+          <form onSubmit={handleSubmit} className="space-y-2 flex-1 overflow-y-auto overscroll-contain scrollable-area">
             <div className="space-y-2">
               {mode === 'host' ? (
                 <div className="space-y-2 text-sm">
@@ -376,7 +376,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         {/* Right column: Room List */}
         <div className="w-1/2 flex flex-col gap-2 overflow-hidden">
           <h2 className="text-xs font-black uppercase text-neo-white text-center">{t('joinView.activeRooms') || 'Active Rooms'}</h2>
-          <div className="flex-1 overflow-y-auto bg-slate-800 text-white rounded-neo border-2 border-neo-black p-2">
+          <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area bg-slate-800 text-white rounded-neo border-2 border-neo-black p-2">
             <RoomList
               activeRooms={activeRooms}
               onRoomSelect={handleRoomSelect}

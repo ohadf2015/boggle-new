@@ -20,6 +20,18 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// Mock MusicContext - adventure mode stops global music when it starts
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    stopMusic: jest.fn(),
+    playMusic: jest.fn(),
+    pauseMusic: jest.fn(),
+    resumeMusic: jest.fn(),
+    isPlaying: false,
+    currentTrack: null,
+  }),
+}));
+
 // Define the expected props type for ScorePopupFly
 interface ScorePopupFlyProps {
   popup: unknown;
