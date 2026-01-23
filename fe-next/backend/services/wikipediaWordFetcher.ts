@@ -632,20 +632,29 @@ export async function storeWikipediaWordCandidates(
       const batch = insertData.slice(i, i + BATCH_SIZE);
       const batchNum = Math.floor(i / BATCH_SIZE) + 1;
 
-      // Note: ignoreDuplicates: false allows updates to existing records
-      // This ensures re-syncing will update interestingness_score and other fields
-      const { error } = await supabase
-        .from('wikipedia_word_candidates')
-        .upsert(batch, {
-          onConflict: 'language,word,fetch_date',
-          ignoreDuplicates: false
-        });
+      try {
+        // Note: ignoreDuplicates: false allows updates to existing records
+        // This ensures re-syncing will update interestingness_score and other fields
+        const { error } = await supabase
+          .from('wikipedia_word_candidates')
+          .upsert(batch, {
+            onConflict: 'language,word,fetch_date',
+            ignoreDuplicates: false
+          });
 
-      if (error) {
-        console.error(`[Wikipedia] Error storing batch ${batchNum}/${totalBatches} for ${language}:`, error.message);
+        if (error) {
+          // Log but don't throw - continue with other batches
+          console.error(`[Wikipedia] Batch ${batchNum}/${totalBatches} upsert error for ${language}:`, error.message);
+          errorCount += batch.length;
+        } else {
+          successCount += batch.length;
+        }
+      } catch (batchError) {
+        // Catch any unexpected errors and continue processing
+        const errorMsg = batchError instanceof Error ? batchError.message : 'Unknown error';
+        console.error(`[Wikipedia] Batch ${batchNum}/${totalBatches} processing error for ${language}:`, errorMsg);
         errorCount += batch.length;
-      } else {
-        successCount += batch.length;
+        // Continue with next batch
       }
     }
 

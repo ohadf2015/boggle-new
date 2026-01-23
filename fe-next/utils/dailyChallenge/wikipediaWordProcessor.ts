@@ -351,18 +351,24 @@ export async function getRecentlyUsedWords(
   }
 }
 
+// Minimum score for format-only fallback validation
+// Words with this score or higher can be approved without AI when AI is unavailable
+export const FORMAT_ONLY_FALLBACK_THRESHOLD = 85;
+
 /**
- * Validate a word using AI service (for words not in dictionary)
- * This is an async check that calls the AI validation service
+ * Validate a word using AI service with fallback to format validation
+ * When AI is unavailable, high-scoring words that pass format validation are approved
  *
  * @param word - Word to validate
  * @param language - Language code
- * @returns Whether the word is valid
+ * @param score - Interestingness score (used for fallback decision)
+ * @returns Whether the word is valid, reason, and validation source
  */
 export async function validateWordWithAI(
   word: string,
-  language: Language
-): Promise<{ valid: boolean; reason: string }> {
+  language: Language,
+  score?: number
+): Promise<{ valid: boolean; reason: string; source: 'ai' | 'format' }> {
   try {
     // Dynamic import to avoid circular dependencies
     const { gameAIService } = await import('@/lib/ai-service');
@@ -372,7 +378,8 @@ export async function validateWordWithAI(
     if (dbResult.source === 'database' && dbResult.isValid) {
       return {
         valid: true,
-        reason: 'Dictionary validated'
+        reason: 'Dictionary validated',
+        source: 'ai'  // Actually database, but same pipeline
       };
     }
 
@@ -381,15 +388,33 @@ export async function validateWordWithAI(
 
     return {
       valid: result.isValid,
-      reason: result.reason || (result.isValid ? 'AI validated' : 'AI rejected')
+      reason: result.reason || (result.isValid ? 'AI validated' : 'AI rejected'),
+      source: 'ai'
     };
 
   } catch (error) {
-    console.error('[WordProcessor] AI validation error:', error);
-    // Default to invalid on error to be safe
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.warn(`[WordProcessor] AI validation error for ${word}:`, errorMessage);
+
+    // FALLBACK: For high-scoring words, use format validation
+    if (score !== undefined && score >= FORMAT_ONLY_FALLBACK_THRESHOLD) {
+      const formatResult = validateGameWord(word, language);
+
+      if (formatResult.valid) {
+        console.log(`[WordProcessor] Using format-only fallback for ${word} (score: ${score})`);
+        return {
+          valid: true,
+          reason: 'Format validated (AI unavailable)',
+          source: 'format'
+        };
+      }
+    }
+
+    // Default to invalid on error for lower-scoring words
     return {
       valid: false,
-      reason: 'AI validation unavailable'
+      reason: 'AI validation unavailable',
+      source: 'ai'
     };
   }
 }

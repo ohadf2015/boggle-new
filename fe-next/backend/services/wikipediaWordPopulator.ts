@@ -18,12 +18,39 @@ import {
   getRecentlyUsedWords,
   selectBestWord,
   validateWordWithAI,
-  updateWordValidationStatus
+  updateWordValidationStatus,
+  validateGameWord,
+  FORMAT_ONLY_FALLBACK_THRESHOLD
 } from '@/utils/dailyChallenge/wikipediaWordProcessor';
 
 // Minimum score threshold for auto-promotion to dictionary
 // Words >= this score that pass AI validation are automatically added to community_words
 const AUTO_PROMOTION_SCORE_THRESHOLD = 80;
+
+/**
+ * Log Wikipedia pipeline error with structured context
+ * Provides consistent error logging throughout the pipeline
+ */
+function logPipelineError(
+  operation: string,
+  error: unknown,
+  context: {
+    word?: string;
+    language?: Language;
+    score?: number;
+    candidateId?: string;
+  }
+): void {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const contextStr = JSON.stringify(context);
+
+  console.error(`[WikiPopulator] ${operation} failed: ${errorMessage}`, {
+    operation,
+    error: errorMessage,
+    ...context,
+    timestamp: new Date().toISOString()
+  });
+}
 
 // Fallback static word lists - curated interesting words (4+ letters)
 const FALLBACK_WORD_LISTS: Record<Language, string[]> = {
@@ -361,6 +388,7 @@ async function isWordInDictionary(
 
 /**
  * Validate top candidates with AI service
+ * Uses per-candidate error handling to ensure pipeline continues after individual failures
  */
 async function validateTopCandidates(
   candidates: Array<{ word: string; score: number; source: string; url?: string }>,
@@ -368,15 +396,19 @@ async function validateTopCandidates(
   dateStr: string
 ): Promise<Array<{ word: string; score: number; source: string; url?: string }>> {
   const validated: Array<{ word: string; score: number; source: string; url?: string }> = [];
+  const errors: Array<{ word: string; error: string }> = [];
 
   // Validate top 10 candidates
   for (const candidate of candidates.slice(0, 10)) {
     try {
-      const result = await validateWordWithAI(candidate.word, language);
+      const result = await validateWordWithAI(candidate.word, language, candidate.score);
 
       if (result.valid) {
         validated.push(candidate);
-        await updateWordValidationStatus(language, candidate.word, dateStr, 'valid', candidate.score);
+
+        // Update status in staging table
+        await updateWordValidationStatus(language, candidate.word, dateStr, 'valid', candidate.score)
+          .catch(err => logPipelineError('status-update', err, { word: candidate.word, language }));
 
         // AUTO-PROMOTION: High-scoring validated words go directly to dictionary
         if (candidate.score >= AUTO_PROMOTION_SCORE_THRESHOLD) {
@@ -390,21 +422,49 @@ async function validateTopCandidates(
               console.log(`[WikiPopulator] Auto-promoted ${candidate.word} (score: ${candidate.score}) to dictionary`);
             } catch (promoError) {
               // Log but don't fail - word is still validated
-              console.warn(`[WikiPopulator] Auto-promotion failed for ${candidate.word}:`, promoError);
+              logPipelineError('auto-promotion', promoError, {
+                word: candidate.word,
+                language,
+                score: candidate.score
+              });
             }
           } else {
             console.log(`[WikiPopulator] Word ${candidate.word} already in dictionary, skipping promotion`);
           }
         }
       } else {
-        await updateWordValidationStatus(language, candidate.word, dateStr, 'invalid');
+        await updateWordValidationStatus(language, candidate.word, dateStr, 'invalid')
+          .catch(err => logPipelineError('status-update', err, { word: candidate.word, language }));
       }
 
     } catch (error) {
-      // On AI validation error, assume valid if it passed basic validation
-      console.warn(`[WikiPopulator] AI validation failed for ${candidate.word}, assuming valid`);
-      validated.push(candidate);
+      // Individual candidate failure - log and continue
+      errors.push({
+        word: candidate.word,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      logPipelineError('validation', error, {
+        word: candidate.word,
+        language,
+        score: candidate.score
+      });
+
+      // For format-valid high-scoring words, still consider them validated
+      // This handles the case where AI fails but format validation passes
+      if (candidate.score >= FORMAT_ONLY_FALLBACK_THRESHOLD) {
+        const formatResult = validateGameWord(candidate.word, language);
+        if (formatResult.valid) {
+          validated.push(candidate);
+          console.log(`[WikiPopulator] Added ${candidate.word} despite error (format valid, high score)`);
+        }
+      }
     }
+  }
+
+  if (errors.length > 0) {
+    console.warn(`[WikiPopulator] ${errors.length} candidates had errors:`,
+      errors.map(e => `${e.word}: ${e.error}`).join(', ')
+    );
   }
 
   return validated;
