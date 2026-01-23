@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8 of 10 (Wikipedia Integration)
-Plan: 1 of 4 in phase
+Plan: 3 of 4 in phase
 Status: In progress
-Last activity: 2026-01-23 - Completed 08-01-PLAN.md (Auto-Promote High-Scoring Candidates)
+Last activity: 2026-01-23 - Completed 08-03-PLAN.md (Edge Case Hardening)
 
-Progress: [███████░░░] 73% (7 phases complete, 30/~35 plans)
+Progress: [████████░░] 77% (7 phases complete, 32/~35 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
-- Average duration: 10 min
-- Total execution time: ~207 min
+- Total plans completed: 32
+- Average duration: 11 min
+- Total execution time: ~238 min
 
 **By Phase:**
 
@@ -34,7 +34,7 @@ Progress: [███████░░░] 73% (7 phases complete, 30/~35 plans)
 | 05 Lexi Personality | 3 | ~23min | 8min |
 | 06 AI Asset Generation | 4/4 | ~85min | 21min |
 | 07 Video Cutscenes | 6/6 | ~59min | 10min |
-| 08 Wikipedia Integration | 1/4 | ~12min | 12min |
+| 08 Wikipedia Integration | 3/4 | ~43min | 14min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -147,6 +147,10 @@ Recent decisions affecting current work:
 - **08-01:** Dictionary check before promotion prevents duplicate insertion errors
 - **08-01:** Fire-and-forget error handling for auto-promotion (non-blocking)
 - **08-01:** Export threshold constant for admin dashboard transparency
+- **08-03:** Format-only fallback threshold 85 for AI unavailability scenarios
+- **08-03:** logPipelineError helper provides structured error context (operation, word, language, score)
+- **08-03:** Per-candidate try-catch in validateTopCandidates ensures pipeline continues after individual failures
+- **08-03:** Defensive batch processing with try-catch per batch prevents data loss on database errors
 
 ### Pending Todos
 
@@ -280,17 +284,17 @@ None.
 | Plan | Description | Status |
 |------|-------------|--------|
 | 08-01 | Auto-promote high-scoring candidates | ✓ |
-| 08-02 | Admin word queue interface | ⏸️ |
-| 08-03 | Validation pipeline improvements | ⏸️ |
+| 08-02 | Admin word queue interface | ✓ |
+| 08-03 | Edge case hardening | ✓ |
 | 08-04 | Daily challenge integration | ⏸️ |
 
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 08-01-PLAN.md (Auto-Promote High-Scoring Candidates)
+Stopped at: Completed 08-03-PLAN.md (Edge Case Hardening)
 Resume file: None
-Next: 08-02-PLAN.md (Admin Word Queue Interface)
+Next: 08-04-PLAN.md (Daily Challenge Integration)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-23 14:48 UTC*
+*Last updated: 2026-01-23 15:17 UTC*
