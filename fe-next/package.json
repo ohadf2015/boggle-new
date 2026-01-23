@@ -36,6 +36,7 @@
     "check:translations": "node scripts/find-missing-translations.js",
     "test:wikipedia": "tsx scripts/test-wikipedia-flow.ts",
     "test:wikipedia:production": "tsx scripts/verify-production-wikipedia.ts",
+    "verify:wikipedia": "tsx scripts/verify-wikipedia-e2e.ts",
     "optimize:image": "tsx scripts/optimize-image.ts",
     "optimize:batch": "tsx scripts/optimize-image.ts --batch",
     "asset:generate": "tsx scripts/generate-asset.ts",
