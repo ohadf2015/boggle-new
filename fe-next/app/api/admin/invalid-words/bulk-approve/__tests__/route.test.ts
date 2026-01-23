@@ -4,22 +4,30 @@
  * Tests for POST /api/admin/invalid-words/bulk-approve
  */
 
-import { handleBulkApprove, type BulkApproveResult } from '../route';
+// Mock Next.js server runtime BEFORE any imports
+jest.mock('next/server', () => ({
+  NextRequest: jest.fn(),
+  NextResponse: {
+    json: jest.fn((data, init) => ({ data, status: init?.status || 200 })),
+  },
+}));
 
-// Mock Supabase
+// Mock Supabase - use functions that can be overridden per-test
 const mockSupabaseFrom = jest.fn();
 const mockSupabaseSelect = jest.fn();
 const mockSupabaseIn = jest.fn();
 const mockSupabaseUpsert = jest.fn();
 const mockSupabaseUpdate = jest.fn();
-const mockSupabaseDelete = jest.fn();
 const mockSupabaseEq = jest.fn();
 
 // Test data
 let mockSelectData: unknown[] = [];
+// Control upsert error responses per call
+let mockUpsertResults: Array<{ error: { message: string } | null }> = [];
+let upsertCallIndex = 0;
 
-jest.mock('@/backend/modules/supabaseServer', () => ({
-  getSupabase: () => ({
+jest.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({
     from: (table: string) => {
       mockSupabaseFrom(table);
       return {
@@ -34,6 +42,12 @@ jest.mock('@/backend/modules/supabaseServer', () => ({
         },
         upsert: (data: unknown, options?: unknown) => {
           mockSupabaseUpsert(data, options);
+          // Use controlled results if provided, else default success
+          if (mockUpsertResults.length > 0) {
+            const result = mockUpsertResults[upsertCallIndex] || { error: null };
+            upsertCallIndex++;
+            return Promise.resolve(result);
+          }
           return Promise.resolve({ error: null });
         },
         update: (data: unknown) => {
@@ -55,6 +69,14 @@ jest.mock('@/backend/modules/supabaseServer', () => ({
   }),
 }));
 
+// Mock admin auth
+jest.mock('@/lib/auth/adminAuth', () => ({
+  verifyAdminAuth: jest.fn(),
+  AdminUser: {},
+}));
+
+import { handleBulkApprove, type BulkApproveResult } from '../route';
+
 const mockAdminUser = {
   id: 'admin-uuid',
   email: 'admin@test.com',
@@ -64,6 +86,8 @@ describe('Bulk Approve Invalid Words API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSelectData = [];
+    mockUpsertResults = [];
+    upsertCallIndex = 0;
   });
 
   describe('Input validation', () => {
@@ -212,15 +236,11 @@ describe('Bulk Approve Invalid Words API', () => {
         { id: 'word-2', word: 'another', language: 'en', submission_count: 3, approved_at: null },
       ];
 
-      // Make first upsert fail
-      let callCount = 0;
-      mockSupabaseUpsert.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) {
-          return Promise.resolve({ error: { message: 'Database error' } });
-        }
-        return Promise.resolve({ error: null });
-      });
+      // Make first upsert fail, second succeed
+      mockUpsertResults = [
+        { error: { message: 'Database error' } },
+        { error: null },
+      ];
 
       const result = await handleBulkApprove(
         { wordIds: ['word-1', 'word-2'] },
