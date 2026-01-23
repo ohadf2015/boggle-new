@@ -41,9 +41,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [x] **FIX-01**: Wikipedia word extraction pipeline working
 - [x] **FIX-02**: Words sync from admin dashboard to game dictionary
-- [ ] **FIX-03**: Track frequently rejected invalid words
-- [ ] **FIX-04**: Admin review queue for popular invalid submissions
-- [ ] **FIX-05**: Approve words from admin queue to dictionary
+- [x] **FIX-03**: Track frequently rejected invalid words
+- [x] **FIX-04**: Admin review queue for popular invalid submissions
+- [x] **FIX-05**: Approve words from admin queue to dictionary
 - [ ] **FIX-06**: Daily challenge word hunt bugs (discover and fix)
 - [ ] **FIX-07**: General loose ends and bug fixes throughout
 
@@ -124,9 +124,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONT-12 | Phase 7 | Pending |
 | FIX-01 | Phase 8 (Plans 08-01, 08-03, 08-04) | Complete |
 | FIX-02 | Phase 8 (Plans 08-02, 08-04) | Complete |
-| FIX-03 | Phase 9 | Pending |
-| FIX-04 | Phase 9 | Pending |
-| FIX-05 | Phase 9 | Pending |
+| FIX-03 | Phase 9 | Complete |
+| FIX-04 | Phase 9 | Complete |
+| FIX-05 | Phase 9 | Complete |
 | FIX-06 | Phase 10 | Pending |
 | FIX-07 | Phase 10 | Pending |
 
@@ -137,4 +137,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-23 (Phase 8 planned: 4 plans created)*
+*Last updated: 2026-01-23 (Phase 9 complete)*
