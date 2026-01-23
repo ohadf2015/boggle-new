@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
 - [x] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
 - [x] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
-- [ ] **Phase 9: Invalid Word System** - Admin queue and approval workflow
+- [x] **Phase 9: Invalid Word System** - Admin queue and approval workflow
 - [ ] **Phase 10: Bug Fixes & Stabilization** - Daily challenge fixes and loose ends
 
 ## Phase Details
@@ -182,10 +182,10 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 09-01-PLAN.md — Add checkbox selection UI to InvalidWordsManager
-- [ ] 09-02-PLAN.md — Create bulk approve API endpoint (TDD)
-- [ ] 09-03-PLAN.md — Create BulkApproveButton component and integration
-- [ ] 09-04-PLAN.md — Verification and phase completion
+- [x] 09-01-PLAN.md — Add checkbox selection UI to InvalidWordsManager
+- [x] 09-02-PLAN.md — Create bulk approve API endpoint (TDD)
+- [x] 09-03-PLAN.md — Create BulkApproveButton component and integration
+- [x] 09-04-PLAN.md — Verification and phase completion
 
 ### Phase 10: Bug Fixes & Stabilization
 **Goal**: Daily challenge works reliably and loose ends are resolved for production readiness
@@ -217,9 +217,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 6. AI Asset Generation | 4/4 | Complete | 2026-01-23 |
 | 7. Video Cutscenes | 6/6 | Complete | 2026-01-23 |
 | 8. Wikipedia Integration | 4/4 | Complete | 2026-01-23 |
-| 9. Invalid Word System | 0/4 | Not started | - |
+| 9. Invalid Word System | 4/4 | Complete | 2026-01-23 |
 | 10. Bug Fixes & Stabilization | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-23 (Phase 7 planned)*
+*Last updated: 2026-01-23 (Phase 9 complete)*
