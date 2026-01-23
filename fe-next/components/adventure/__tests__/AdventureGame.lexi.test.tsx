@@ -180,7 +180,10 @@ describe('AdventureGame Lexi Integration', () => {
       { type: 'wordCount', target: 5, isPrimary: true },
     ],
     specialTiles: [],
-    hiddenWords: [],
+    difficulty: 'EASY',
+    chapterNumber: 1,
+    levelInChapter: 1,
+    isBossLevel: false,
   });
 
   const createGrid = (): string[][] => [

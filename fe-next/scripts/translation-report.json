@@ -2,10 +2,10 @@
   "summary": {
     "totalKeysInCode": 2303,
     "keyCountByLanguage": {
-      "en": 2924,
-      "he": 2924,
-      "sv": 2924,
-      "ja": 2924,
+      "en": 2938,
+      "he": 2938,
+      "sv": 2938,
+      "ja": 2938,
       "es": 2924
     },
     "missingFromEnglish": 0,
@@ -13,7 +13,7 @@
     "runtimeRisks": {
       "templateLiterals": 4,
       "fallbackUsages": 0,
-      "variableKeys": 6
+      "variableKeys": 8
     }
   },
   "runtimeRisks": {
@@ -49,6 +49,22 @@
     ],
     "fallbackUsages": [],
     "variableKeys": [
+      {
+        "pattern": "t(messageKey)",
+        "variable": "messageKey",
+        "file": "components/adventure/LexiReaction.tsx",
+        "line": 152,
+        "context": "const message = t(messageKey);",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(defaultKey)",
+        "variable": "defaultKey",
+        "file": "components/adventure/LexiReaction.tsx",
+        "line": 159,
+        "context": "const defaultMessage = t(defaultKey);",
+        "type": "variable_key"
+      },
       {
         "pattern": "t(mechanicNameKey)",
         "variable": "mechanicNameKey",
@@ -111,7 +127,22 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "adventure.lexi.longWord.default",
+      "adventure.lexi.longWord.world1",
+      "adventure.lexi.longWord.world2",
+      "adventure.lexi.longWord.world3",
+      "adventure.lexi.combo3x.default",
+      "adventure.lexi.combo5x.default",
+      "adventure.lexi.combo10x.default",
+      "adventure.lexi.firstWord.default",
+      "adventure.lexi.timeBonus.default",
+      "adventure.lexi.stuck.default",
+      "adventure.lexi.encourage.default",
+      "adventure.lexi.levelComplete.star1",
+      "adventure.lexi.levelComplete.star2",
+      "adventure.lexi.levelComplete.star3"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],
