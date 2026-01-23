@@ -4,6 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { Check, X, Trash2, ExternalLink, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDateShort, type WikipediaWordCandidate, type ValidationStatus } from '../types';
+import { BulkApproveButton } from './BulkApproveButton';
+import type { BulkApproveResult } from '../hooks/useWikipediaCandidates';
 
 interface WikipediaCandidatesListProps {
   candidates: WikipediaWordCandidate[];
@@ -12,6 +14,7 @@ interface WikipediaCandidatesListProps {
   onDelete: (id: string) => Promise<boolean>;
   onBulkUpdateStatus: (ids: string[], status: ValidationStatus) => Promise<boolean>;
   onBulkDelete: (ids: string[]) => Promise<boolean>;
+  onBulkApproveToDict: (ids: string[]) => Promise<BulkApproveResult>;
 }
 
 const STATUS_BADGES: Record<ValidationStatus, { label: string; className: string }> = {
@@ -27,6 +30,7 @@ export function WikipediaCandidatesList({
   onDelete,
   onBulkUpdateStatus,
   onBulkDelete,
+  onBulkApproveToDict,
 }: WikipediaCandidatesListProps): React.ReactElement {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
@@ -105,6 +109,25 @@ export function WikipediaCandidatesList({
     setBulkProcessing(false);
   };
 
+  const handleBulkApprove = async (): Promise<{
+    approved: number;
+    skipped: number;
+    failed: number;
+  }> => {
+    const ids = Array.from(selectedIds);
+    const result = await onBulkApproveToDict(ids);
+
+    if (result.success || result.approved > 0) {
+      setSelectedIds(new Set());
+    }
+
+    return {
+      approved: result.approved,
+      skipped: result.skipped,
+      failed: result.failed,
+    };
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -126,18 +149,23 @@ export function WikipediaCandidatesList({
     <div className="space-y-4">
       {/* Bulk Actions Toolbar */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 p-3 bg-neo-navy/50 rounded-lg border-2 border-neo-pink">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-3 p-3 bg-neo-navy/50 rounded-lg border-2 border-neo-pink">
           <span className="text-sm font-bold text-white">
             {selectedIds.size} selected
           </span>
-          <div className="flex gap-2 ml-auto">
+          <div className="flex flex-wrap gap-2 md:ml-auto">
+            <BulkApproveButton
+              selectedCount={selectedIds.size}
+              onApprove={handleBulkApprove}
+              disabled={bulkProcessing}
+            />
             <button
               onClick={() => handleBulkAction('approve')}
               disabled={bulkProcessing}
               className="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600 disabled:opacity-50 transition-colors flex items-center gap-1"
             >
               <Check className="w-4 h-4" />
-              Approve
+              Mark Valid
             </button>
             <button
               onClick={() => handleBulkAction('reject')}
