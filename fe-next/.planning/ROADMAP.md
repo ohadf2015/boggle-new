@@ -179,10 +179,13 @@ Plans:
   3. Admin can approve words from queue with one click, adding to valid dictionary
   4. Approved words immediately validate correctly in new games
   5. Queue shows context (example sentences, rejection reasons) to aid review decisions
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — Add checkbox selection UI to InvalidWordsManager
+- [ ] 09-02-PLAN.md — Create bulk approve API endpoint (TDD)
+- [ ] 09-03-PLAN.md — Create BulkApproveButton component and integration
+- [ ] 09-04-PLAN.md — Verification and phase completion
 
 ### Phase 10: Bug Fixes & Stabilization
 **Goal**: Daily challenge works reliably and loose ends are resolved for production readiness
@@ -213,8 +216,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Lexi Personality | 3/3 | Complete | 2026-01-22 |
 | 6. AI Asset Generation | 4/4 | Complete | 2026-01-23 |
 | 7. Video Cutscenes | 6/6 | Complete | 2026-01-23 |
-| 8. Wikipedia Integration | 0/TBD | Not started | - |
-| 9. Invalid Word System | 0/TBD | Not started | - |
+| 8. Wikipedia Integration | 4/4 | Complete | 2026-01-23 |
+| 9. Invalid Word System | 0/4 | Not started | - |
 | 10. Bug Fixes & Stabilization | 0/TBD | Not started | - |
 
 ---
