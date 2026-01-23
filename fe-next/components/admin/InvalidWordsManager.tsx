@@ -71,6 +71,32 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
   const [limit] = useState(50);
   const [offset, setOffset] = useState(0);
 
+  // Selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Selection helper functions
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    setSelectedIds(new Set(words.map(w => w.id)));
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const isSelected = (id: string) => selectedIds.has(id);
+
   const fetchWords = useCallback(async () => {
     try {
       setLoading(true);
@@ -105,6 +131,11 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
     }, 300);
     return () => clearTimeout(timer);
   }, [fetchWords]);
+
+  // Clear selection when filters or pagination change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [searchQuery, langFilter, minCount, offset]);
 
   const handleApprove = async (word: string, language: string, addToDictionary: boolean = false) => {
     const key = `${word}-${language}`;
@@ -294,6 +325,41 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
         </div>
       </div>
 
+      {/* Bulk Selection Toolbar */}
+      {words.length > 0 && (
+        <div className="flex items-center justify-between bg-slate-800 p-3 rounded-lg border border-slate-700">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={selectAll}
+              className="border-slate-600 hover:bg-slate-700"
+              disabled={selectedIds.size === words.length}
+            >
+              Select All ({words.length})
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearSelection}
+              className="text-slate-400 hover:text-white"
+              disabled={selectedIds.size === 0}
+            >
+              Clear Selection
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <span className="text-sm text-neo-yellow font-medium">
+                {selectedIds.size} selected
+              </span>
+            )}
+            {/* BulkApproveButton will be added here in Plan 03 */}
+          </div>
+        </div>
+      )}
+
       {/* Words List */}
       {loading && words.length === 0 ? (
         <div className="flex justify-center py-12">
@@ -321,12 +387,23 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                   exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 >
                   <Card className={cn(
-                    "bg-slate-800 border-slate-700 transition-all",
+                    "bg-slate-800 border-slate-700 transition-all relative",
+                    isSelected(word.id) && "ring-2 ring-neo-yellow",
                     isProcessing && "opacity-50 pointer-events-none"
                   )}>
                     <CardContent className="p-4 space-y-3">
+                      {/* Selection Checkbox */}
+                      <div className="absolute top-2 left-2">
+                        <input
+                          type="checkbox"
+                          checked={isSelected(word.id)}
+                          onChange={() => toggleSelection(word.id)}
+                          className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-neo-yellow focus:ring-neo-yellow cursor-pointer"
+                          aria-label={`Select ${word.word}`}
+                        />
+                      </div>
                       {/* Word Header */}
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between pl-6">
                         <div>
                           <h3 className="text-lg font-bold text-white">{word.word}</h3>
                           <div className="flex items-center gap-2 mt-1">
