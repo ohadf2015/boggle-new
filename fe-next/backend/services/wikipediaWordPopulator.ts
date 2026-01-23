@@ -675,3 +675,9 @@ export async function adminAddWordCandidate(
     return { success: false };
   }
 }
+
+/**
+ * Export auto-promotion threshold for admin dashboard visibility
+ * Allows admin UI to display the threshold value to users
+ */
+export const AUTO_PROMOTION_THRESHOLD = AUTO_PROMOTION_SCORE_THRESHOLD;
