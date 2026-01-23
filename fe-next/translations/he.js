@@ -3712,6 +3712,40 @@ const he = {
       "alreadyFound": "המילה כבר נמצאה",
       "notInDictionary": "המילה לא במילון",
       "validationFailed": "לא ניתן לאמת את המילה"
+    },
+    "lexi": {
+      "longWord": {
+        "default": "וואו! מילה ארוכה!",
+        "world1": "מילה פורחת!",
+        "world2": "מציאה מעולה!",
+        "world3": "גאונות קריסטלית!"
+      },
+      "combo3x": {
+        "default": "את/ה על גלגל!"
+      },
+      "combo5x": {
+        "default": "בלתי ניתן לעצירה!"
+      },
+      "combo10x": {
+        "default": "קומבו אגדי!"
+      },
+      "firstWord": {
+        "default": "התחלה מעולה! המשיכו!"
+      },
+      "timeBonus": {
+        "default": "ניצחון ברגע האחרון!"
+      },
+      "stuck": {
+        "default": "נסו לחפש מילים ארוכות יותר!"
+      },
+      "encourage": {
+        "default": "אל תוותרו! אתם יכולים!"
+      },
+      "levelComplete": {
+        "star1": "השלב הושלם!",
+        "star2": "עבודה מצוינת!",
+        "star3": "ניקוד מושלם!"
+      }
     }
   }
 };

@@ -14,12 +14,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
+import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
 import { ScorePopupFly } from '@/components/animations';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
+import LexiReaction from './LexiReaction';
 import WorldBackground from './themed/WorldBackground';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
@@ -142,6 +144,22 @@ const AdventureGame = memo<AdventureGameProps>(
       gridSize: levelConfig.gridSize,
       disabled: !isPlaying || isPaused || isValidating,
       gridRef,
+    });
+
+    // Lexi reaction state - transform game state to reaction format
+    const lexiGameState: GameStateForReactions = useMemo(() => ({
+      wordsFound: gameState.wordsFound,
+      comboCount: gameState.comboCount,
+      timeRemaining,
+      isComplete: gameState.isComplete,
+      stars: gameState.stars,
+      worldId: levelConfig.world,
+    }), [gameState.wordsFound, gameState.comboCount, timeRemaining, gameState.isComplete, gameState.stars, levelConfig.world]);
+
+    // Lexi reactions hook
+    const { reaction, dismissReaction } = useLexiReactions({
+      gameState: lexiGameState,
+      isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
     });
 
     // Handle cascade completion to advance to objectives phase
@@ -548,6 +566,12 @@ const AdventureGame = memo<AdventureGameProps>(
           size="md"
           duration={1800}
           onComplete={handlePopupComplete}
+        />
+
+        {/* Lexi Mascot Reactions */}
+        <LexiReaction
+          reaction={reaction}
+          onDismiss={dismissReaction}
         />
       </div>
     );

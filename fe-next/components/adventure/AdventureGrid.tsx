@@ -15,6 +15,15 @@ import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
+import {
+  type GridMeasurements,
+  measureAdventureGrid,
+  getCellAtPosition,
+  getTileIndex,
+  isWithinSelectionThreshold,
+  isDiagonalMove,
+  hasExceededDeadzone,
+} from './adventureGridGeometry';
 
 // ==============================================
 // TYPES
@@ -150,6 +159,12 @@ const AdventureGrid = memo(
       const lastTouchTileIndexRef = useRef<number | null>(null);
       // Ref to grid container for touch event handling
       const gridRef = useRef<HTMLDivElement>(null);
+      // Track whether deadzone has been exceeded
+      const hasExceededDeadzoneRef = useRef(false);
+      // Track start position for deadzone calculation
+      const startPosRef = useRef<{ x: number; y: number } | null>(null);
+      // Cache grid measurements to avoid layout thrashing
+      const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
 
       // Cascade animation state
       const [cascadeComplete, setCascadeComplete] = useState(!showCascade);
@@ -229,17 +244,41 @@ const AdventureGrid = memo(
       [disabled, interactive, onTileSelect]
     );
 
+    // Get cached or fresh grid measurements
+    const getGridMeasurements = useCallback((): GridMeasurements | null => {
+      if (!containerRef.current) return null;
+
+      const now = performance.now();
+      // Cache measurements for 100ms to avoid layout thrashing
+      if (gridMeasurementsRef.current && now - gridMeasurementsRef.current.timestamp < 100) {
+        return gridMeasurementsRef.current;
+      }
+
+      const measurements = measureAdventureGrid(containerRef.current, gridSize);
+      if (measurements) {
+        gridMeasurementsRef.current = measurements;
+      }
+      return measurements;
+    }, [gridSize, containerRef]);
+
     // Handle drag start (mouse down / touch start on tile)
     const handleDragStart = useCallback(
       (e: React.MouseEvent | React.TouchEvent, index: number, tile: GridTileState) => {
         if (disabled || tile.isCleared || !interactive) return;
         isDraggingRef.current = true;
         lastTouchTileIndexRef.current = index;
+        hasExceededDeadzoneRef.current = false;
+
+        // Store start position for deadzone calculation
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        startPosRef.current = { x: clientX, y: clientY };
+
+        // Cache grid measurements at start of drag
+        getGridMeasurements();
 
         // Trigger sparkle at click/touch position
         if (enableComplexAnimations) {
-          const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-          const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
           setSparkleState({
             position: { x: clientX, y: clientY },
             key: Date.now(),
@@ -250,7 +289,7 @@ const AdventureGrid = memo(
           onDragStart(index, tile);
         }
       },
-      [disabled, interactive, onDragStart, enableComplexAnimations]
+      [disabled, interactive, onDragStart, enableComplexAnimations, getGridMeasurements]
     );
 
     // Handle drag enter (mouse enters tile during drag)
@@ -269,6 +308,8 @@ const AdventureGrid = memo(
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         lastTouchTileIndexRef.current = null;
+        hasExceededDeadzoneRef.current = false;
+        startPosRef.current = null;
         if (onDragEnd) {
           onDragEnd();
         }
@@ -276,6 +317,7 @@ const AdventureGrid = memo(
     }, [onDragEnd]);
 
     // Handle touch move - find element under touch and trigger drag enter
+    // Uses selection threshold to prevent accidental over-selection
     const handleTouchMove = useCallback(
       (e: React.TouchEvent) => {
         if (!isDraggingRef.current || disabled || !interactive) return;
@@ -283,38 +325,75 @@ const AdventureGrid = memo(
         const touch = e.touches[0];
         if (!touch) return;
 
-        // Find element under touch point
-        const elementUnderTouch = document.elementFromPoint(
-          touch.clientX,
-          touch.clientY
-        );
+        const touchX = touch.clientX;
+        const touchY = touch.clientY;
 
-        if (!elementUnderTouch) return;
+        // Check deadzone - must exceed threshold before selecting new cells
+        if (!hasExceededDeadzoneRef.current && startPosRef.current) {
+          if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
+            return; // Still within deadzone, don't select
+          }
+          hasExceededDeadzoneRef.current = true;
+        }
 
-        // Find the gridcell parent (tile element)
-        const tileElement = elementUnderTouch.closest('[role="gridcell"]');
-        if (!tileElement) return;
+        // Get grid measurements for precise cell detection
+        const measurements = getGridMeasurements();
+        if (!measurements) {
+          // Fallback to element-based detection if measurements unavailable
+          const elementUnderTouch = document.elementFromPoint(touchX, touchY);
+          if (!elementUnderTouch) return;
 
-        // Get the tile index from data attribute or find it in the grid
-        const allTiles = containerRef.current?.querySelectorAll('[role="gridcell"]');
-        if (!allTiles) return;
+          const tileElement = elementUnderTouch.closest('[role="gridcell"]');
+          if (!tileElement) return;
 
-        const tileIndex = Array.from(allTiles).indexOf(tileElement);
-        if (tileIndex === -1) return;
+          const allTiles = containerRef.current?.querySelectorAll('[role="gridcell"]');
+          if (!allTiles) return;
+
+          const tileIndex = Array.from(allTiles).indexOf(tileElement);
+          if (tileIndex === -1 || tileIndex === lastTouchTileIndexRef.current) return;
+
+          const tile = tiles[tileIndex];
+          if (!tile || tile.isCleared) return;
+
+          lastTouchTileIndexRef.current = tileIndex;
+          if (onDragEnter) onDragEnter(tileIndex, tile);
+          return;
+        }
+
+        // Use precise cell detection with selection threshold
+        const cellPosition = getCellAtPosition(touchX, touchY, tiles, gridSize, measurements);
+        if (!cellPosition) return;
+
+        const newTileIndex = getTileIndex(cellPosition.row, cellPosition.col, gridSize);
 
         // Skip if same tile as last touch
-        if (tileIndex === lastTouchTileIndexRef.current) return;
-        lastTouchTileIndexRef.current = tileIndex;
+        if (newTileIndex === lastTouchTileIndexRef.current) return;
 
-        const tile = tiles[tileIndex];
+        // Get last selected tile for diagonal detection
+        const lastIndex = lastTouchTileIndexRef.current;
+        const lastTile = lastIndex !== null ? tiles[lastIndex] : null;
+
+        // Check if movement is diagonal (more lenient threshold)
+        const isDiagonal = lastTile
+          ? isDiagonalMove(lastTile, { row: cellPosition.row, col: cellPosition.col })
+          : false;
+
+        // Apply selection threshold - must be close to cell center
+        if (!isWithinSelectionThreshold(cellPosition, isDiagonal)) {
+          return; // Touch too far from cell center, don't select
+        }
+
+        lastTouchTileIndexRef.current = newTileIndex;
+
+        const tile = tiles[newTileIndex];
         if (!tile || tile.isCleared) return;
 
         // Trigger drag enter
         if (onDragEnter) {
-          onDragEnter(tileIndex, tile);
+          onDragEnter(newTileIndex, tile);
         }
       },
-      [disabled, interactive, tiles, onDragEnter, containerRef]
+      [disabled, interactive, tiles, gridSize, onDragEnter, containerRef, getGridMeasurements]
     );
 
     // Handle word submission (on mouse/touch up)
@@ -427,10 +506,10 @@ const AdventureGrid = memo(
                 className={cn(
                   // Base tile styles
                   'relative aspect-square flex items-center justify-center',
-                  'font-black text-xl cursor-pointer overflow-hidden',
+                  'font-black text-xl cursor-pointer',
                   'border-2 border-neo-black/30 rounded-neo',
 
-                  // World-specific theming (NEW)
+                  // World-specific theming
                   textureClass,
                   borderClass,
 
@@ -439,7 +518,8 @@ const AdventureGrid = memo(
 
                   // State classes
                   tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
-                  isSelected && 'tile-selected ring-2 ring-neo-cyan z-10',
+                  // Enhanced selection: bright ring + glow shadow for visibility
+                  isSelected && 'tile-selected ring-2 ring-neo-lime z-10 shadow-[0_0_12px_rgba(191,255,0,0.6)]',
                   tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
 
                   // Standard tile background

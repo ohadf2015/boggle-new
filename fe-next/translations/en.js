@@ -3714,6 +3714,40 @@ const en = {
       "alreadyFound": "Word already found",
       "notInDictionary": "Word not in dictionary",
       "validationFailed": "Could not validate word"
+    },
+    "lexi": {
+      "longWord": {
+        "default": "Wow! That's a long one!",
+        "world1": "Blooming brilliant word!",
+        "world2": "Splashing good find!",
+        "world3": "Crystal clear genius!"
+      },
+      "combo3x": {
+        "default": "You're on a roll!"
+      },
+      "combo5x": {
+        "default": "Unstoppable!"
+      },
+      "combo10x": {
+        "default": "LEGENDARY COMBO!"
+      },
+      "firstWord": {
+        "default": "Great start! Keep going!"
+      },
+      "timeBonus": {
+        "default": "Clutch victory!"
+      },
+      "stuck": {
+        "default": "Try looking for longer words!"
+      },
+      "encourage": {
+        "default": "Don't give up! You've got this!"
+      },
+      "levelComplete": {
+        "star1": "Level cleared!",
+        "star2": "Excellent work!",
+        "star3": "Perfect score!"
+      }
     }
   }
 };

@@ -9,18 +9,18 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Adventure Polish
 
-- [ ] **ADV-01**: World-specific parallax backgrounds for Worlds 1-3
-- [ ] **ADV-02**: World-specific floating particles (meadow butterflies, spring droplets, cave crystals)
-- [ ] **ADV-03**: Dynamic board theming that matches current world
-- [ ] **ADV-04**: Word selection trail animation (connecting line between tiles)
-- [ ] **ADV-05**: Letter pop animation on valid word
-- [ ] **ADV-06**: Score pop-up animation with combo multipliers
-- [ ] **ADV-07**: Level entry tile cascade animation
-- [ ] **ADV-08**: Objective cards slide-in reveal
-- [ ] **ADV-09**: "Level X" title burst animation
-- [ ] **ADV-10**: Lexi mascot celebration reactions on achievements
-- [ ] **ADV-11**: Lexi contextual feedback (encouragement, hints)
-- [ ] **ADV-12**: Level complete star burst animation
+- [x] **ADV-01**: World-specific parallax backgrounds for Worlds 1-3
+- [x] **ADV-02**: World-specific floating particles (meadow butterflies, spring droplets, cave crystals)
+- [x] **ADV-03**: Dynamic board theming that matches current world
+- [x] **ADV-04**: Word selection trail animation (connecting line between tiles)
+- [x] **ADV-05**: Letter pop animation on valid word
+- [x] **ADV-06**: Score pop-up animation with combo multipliers
+- [x] **ADV-07**: Level entry tile cascade animation
+- [x] **ADV-08**: Objective cards slide-in reveal
+- [x] **ADV-09**: "Level X" title burst animation
+- [x] **ADV-10**: Lexi mascot celebration reactions on achievements
+- [x] **ADV-11**: Lexi contextual feedback (encouragement, hints)
+- [x] **ADV-12**: Level complete star burst animation
 
 ### Content Creation
 
@@ -49,12 +49,12 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INF-01**: Remotion workspace setup alongside Next.js
-- [ ] **INF-02**: React 18 isolation for Remotion (React 19 incompatible)
-- [ ] **INF-03**: AI image generation API integration (Image MCP or Flux 2)
-- [ ] **INF-04**: Python microservice for background removal (rembg)
-- [ ] **INF-05**: Asset optimization pipeline (WebP, <200KB)
-- [ ] **INF-06**: Video delivery strategy (CDN vs bundled)
+- [x] **INF-01**: Remotion workspace setup alongside Next.js
+- [x] **INF-02**: React 18 isolation for Remotion (React 19 incompatible)
+- [x] **INF-03**: AI image generation API integration (Image MCP or Flux 2)
+- [x] **INF-04**: Python microservice for background removal (rembg)
+- [x] **INF-05**: Asset optimization pipeline (WebP, <200KB)
+- [x] **INF-06**: Video delivery strategy (CDN vs bundled)
 
 ## v2 Requirements
 
@@ -92,24 +92,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INF-01 | Phase 1 | Pending |
-| INF-02 | Phase 1 | Pending |
-| INF-03 | Phase 1 | Pending |
-| INF-04 | Phase 1 | Pending |
-| INF-05 | Phase 1 | Pending |
-| INF-06 | Phase 1 | Pending |
-| ADV-04 | Phase 2 | Pending |
-| ADV-05 | Phase 2 | Pending |
-| ADV-06 | Phase 2 | Pending |
-| ADV-07 | Phase 3 | Pending |
-| ADV-08 | Phase 3 | Pending |
-| ADV-09 | Phase 3 | Pending |
-| ADV-01 | Phase 4 | Pending |
-| ADV-02 | Phase 4 | Pending |
-| ADV-03 | Phase 4 | Pending |
-| ADV-10 | Phase 5 | Pending |
-| ADV-11 | Phase 5 | Pending |
-| ADV-12 | Phase 5 | Pending |
+| INF-01 | Phase 1 | Complete |
+| INF-02 | Phase 1 | Complete |
+| INF-03 | Phase 1 | Complete |
+| INF-04 | Phase 1 | Complete |
+| INF-05 | Phase 1 | Complete |
+| INF-06 | Phase 1 | Complete |
+| ADV-04 | Phase 2 | Complete |
+| ADV-05 | Phase 2 | Complete |
+| ADV-06 | Phase 2 | Complete |
+| ADV-07 | Phase 3 | Complete |
+| ADV-08 | Phase 3 | Complete |
+| ADV-09 | Phase 3 | Complete |
+| ADV-01 | Phase 4 | Complete |
+| ADV-02 | Phase 4 | Complete |
+| ADV-03 | Phase 4 | Complete |
+| ADV-10 | Phase 5 | Complete |
+| ADV-11 | Phase 5 | Complete |
+| ADV-12 | Phase 5 | Complete |
 | CONT-01 | Phase 6 | Pending |
 | CONT-02 | Phase 6 | Pending |
 | CONT-03 | Phase 6 | Pending |
@@ -137,4 +137,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-22*
-*Last updated: 2026-01-22 after initial definition*
+*Last updated: 2026-01-23 (Phase 5 complete)*

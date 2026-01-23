@@ -11,6 +11,7 @@ import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
@@ -54,6 +55,20 @@ const OBJECTIVE_LABELS: Record<ObjectiveType, string> = {
 };
 
 const PARTICLE_COUNT = 20;
+
+/**
+ * Get mascot variant based on star count
+ * 3 stars = victory (trophy pose)
+ * 2 stars = celebrating (celebration dance)
+ * 1 star = happy (happy face)
+ * 0 stars = thinking (thoughtful)
+ */
+function getMascotVariantForStars(stars: number): ExtendedMascotVariant {
+  if (stars >= 3) return 'victory';      // Perfect! Trophy pose
+  if (stars >= 2) return 'celebrating';  // Great! Celebration dance
+  if (stars >= 1) return 'happy';        // Nice! Happy face
+  return 'thinking';                      // No stars? Thoughtful
+}
 
 // Simple seeded pseudo-random number generator for deterministic particles
 function seededRandom(seed: number): number {
@@ -209,6 +224,27 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             <p className="text-center text-neo-white/70 font-bold mb-4">
               Level {levelNumber}
             </p>
+
+            {/* Lexi Celebration - celebrates alongside existing star animation */}
+            <motion.div
+              className="flex justify-center mb-4"
+              initial={{ scale: 0, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{
+                delay: 0.2,
+                type: 'spring',
+                stiffness: 200,
+                damping: 20,
+              }}
+            >
+              <InteractiveMascot
+                variant={getMascotVariantForStars(stars)}
+                size="lg"
+                animated
+                enableHover={false}
+                enableClick={false}
+              />
+            </motion.div>
 
             {/* Perfect Badge */}
             {isPerfect && (

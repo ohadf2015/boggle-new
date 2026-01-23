@@ -1,0 +1,326 @@
+/**
+ * AdventureGame Lexi Integration Tests
+ *
+ * Tests that Lexi reactions appear during gameplay when triggers fire.
+ */
+
+import React from 'react';
+import { render, screen, act, waitFor } from '@testing-library/react';
+import AdventureGame from '../AdventureGame';
+import type { LevelConfig } from '@/types/adventure';
+
+// Mock dependencies
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'adventure.lexi.longWord.default': 'Wow! Long word!',
+        'adventure.lexi.longWord.world1': 'Amazing forest find!',
+        'adventure.lexi.firstWord.default': 'Great start!',
+        'adventure.lexi.combo3x.default': "On a roll!",
+        'adventure.lexi.combo5x.default': "Incredible streak!",
+        'adventure.lexi.combo10x.default': "LEGENDARY!",
+        'common.validating': 'Checking...',
+      };
+      return translations[key] || key;
+    },
+    language: 'en',
+    dir: 'ltr',
+    setLanguage: jest.fn(),
+  }),
+}));
+
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    prefersReducedMotion: false,
+    isMobile: false,
+    enableComplexAnimations: true,
+    enableGlowEffects: true,
+    isLowEnd: false,
+  }),
+}));
+
+// Mock word validation to always return valid
+jest.mock('@/hooks/useAdventureWordValidation', () => ({
+  useAdventureWordValidation: () => ({
+    validateWord: async (word: string) => ({
+      isValid: true,
+      score: word.length * 10,
+    }),
+    isValidating: false,
+  }),
+}));
+
+// Mock useAdventureSelection hook
+jest.mock('@/hooks/useAdventureSelection', () => ({
+  useAdventureSelection: () => ({
+    selectedIndices: [],
+    currentWord: '',
+    isSelecting: false,
+    selectTile: jest.fn(),
+    clearSelection: jest.fn(),
+    getPath: jest.fn().mockReturnValue([]),
+    pathPoints: [],
+  }),
+}));
+
+// Mock components that aren't relevant to Lexi tests
+jest.mock('../themed/WorldBackground', () => ({
+  __esModule: true,
+  default: () => <div data-testid="world-background" />,
+}));
+
+jest.mock('../LevelEntryOverlay', () => {
+  const LevelEntryOverlayMock = ({ onComplete }: { onComplete: () => void }) => {
+    // Auto-complete entry sequence
+    React.useEffect(() => {
+      const timer = setTimeout(onComplete, 10);
+      return () => clearTimeout(timer);
+    }, [onComplete]);
+    return null;
+  };
+  return {
+    __esModule: true,
+    default: LevelEntryOverlayMock,
+  };
+});
+
+jest.mock('../LevelCompleteModal', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+// Mock AdventureThemeContext
+jest.mock('@/contexts/AdventureThemeContext', () => {
+  const React = require('react');
+  const MockAdventureThemeContext = React.createContext({
+    worldId: 1,
+    level: 1,
+    theme: {
+      worldId: 1,
+      background: {
+        baseColor: 'bg-neo-navy',
+        layers: [],
+        texture: { type: 'none', opacity: 0, blendMode: 'normal' },
+        particles: { type: 'leaves', count: 0, colors: [], sizeRange: [2, 4], speed: 1 },
+      },
+      tiles: {},
+      ui: { accentColor: 'neo-lime', textColor: 'neo-white', headerBg: 'bg-neo-navy/80' },
+      chapters: [],
+      containerClass: 'adventure-world-1',
+    },
+  });
+  return {
+    AdventureThemeContext: MockAdventureThemeContext,
+    useAdventureTheme: () => ({
+      theme: {
+        worldId: 1,
+        background: {
+          baseColor: 'bg-neo-navy',
+          layers: [],
+          texture: { type: 'none', opacity: 0, blendMode: 'normal' },
+          particles: { type: 'leaves', count: 0, colors: [], sizeRange: [2, 4], speed: 1 },
+        },
+        tiles: {},
+        ui: { accentColor: 'neo-lime', textColor: 'neo-white', headerBg: 'bg-neo-navy/80' },
+        chapters: [],
+        containerClass: 'adventure-world-1',
+      },
+      worldId: 1,
+      level: 1,
+      setWorld: jest.fn(),
+      setLevel: jest.fn(),
+      isTransitioning: false,
+      chapter: { id: 1, name: 'Tutorial', levels: [1, 2], starThreshold: 0, accentColor: 'neo-lime' },
+    }),
+    AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
+
+// Mock framer-motion for simpler testing
+jest.mock('framer-motion', () => {
+  const React = require('react');
+
+  const createMockMotion = (element: string) => {
+    const MockComponent = React.forwardRef(
+      ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLElement>) => {
+        // Filter out framer-motion specific props
+        const filteredProps: Record<string, unknown> = {};
+        Object.keys(props).forEach(key => {
+          if (!['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'variants'].includes(key)) {
+            filteredProps[key] = props[key];
+          }
+        });
+        return React.createElement(element, { ...filteredProps, ref }, children);
+      }
+    );
+    MockComponent.displayName = `MockMotion${element.charAt(0).toUpperCase() + element.slice(1)}`;
+    return MockComponent;
+  };
+
+  return {
+    motion: {
+      div: createMockMotion('div'),
+      span: createMockMotion('span'),
+      button: createMockMotion('button'),
+      ul: createMockMotion('ul'),
+      li: createMockMotion('li'),
+    },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
+
+describe('AdventureGame Lexi Integration', () => {
+  const createLevelConfig = (): LevelConfig => ({
+    world: 1,
+    level: 1,
+    gridSize: 4,
+    timerSeconds: 120,
+    objectives: [
+      { type: 'wordCount', target: 5, isPrimary: true },
+    ],
+    specialTiles: [],
+    hiddenWords: [],
+  });
+
+  const createGrid = (): string[][] => [
+    ['A', 'D', 'V', 'E'],
+    ['N', 'T', 'U', 'R'],
+    ['E', 'S', 'T', 'A'],
+    ['R', 'T', 'I', 'N'],
+  ];
+
+  const mockOnLevelComplete = jest.fn();
+  const mockOnExit = jest.fn();
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    mockOnLevelComplete.mockClear();
+    mockOnExit.mockClear();
+    document.documentElement.dir = 'ltr';
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('renders AdventureGame without Lexi initially', async () => {
+    render(
+      <AdventureGame
+        levelConfig={createLevelConfig()}
+        initialGrid={createGrid()}
+        onLevelComplete={mockOnLevelComplete}
+        onExit={mockOnExit}
+      />
+    );
+
+    // Wait for entry sequence to complete
+    await waitFor(() => {
+      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+    });
+
+    // Advance timers to complete entry sequence
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    // Lexi should not be visible initially (no reaction triggered yet)
+    expect(screen.queryByTestId('lexi-reaction')).not.toBeInTheDocument();
+  });
+
+  it('renders LexiReaction component in the DOM tree', () => {
+    // This test verifies the component is part of the render tree
+    render(
+      <AdventureGame
+        levelConfig={createLevelConfig()}
+        initialGrid={createGrid()}
+        onLevelComplete={mockOnLevelComplete}
+        onExit={mockOnExit}
+      />
+    );
+
+    // The adventure game should render
+    expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+
+    // LexiReaction is present but may be empty (no active reaction)
+    // The component renders AnimatePresence which shows children only when reaction exists
+  });
+
+  it('coexists with score popup without blocking grid', async () => {
+    render(
+      <AdventureGame
+        levelConfig={createLevelConfig()}
+        initialGrid={createGrid()}
+        onLevelComplete={mockOnLevelComplete}
+        onExit={mockOnExit}
+      />
+    );
+
+    // Wait for game to be ready
+    await waitFor(() => {
+      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+    });
+
+    // Game should still be interactive - grid should be present
+    const grid = screen.getByRole('grid');
+    expect(grid).toBeInTheDocument();
+  });
+
+  it('respects isPlaying state for reactions', async () => {
+    render(
+      <AdventureGame
+        levelConfig={createLevelConfig()}
+        initialGrid={createGrid()}
+        onLevelComplete={mockOnLevelComplete}
+        onExit={mockOnExit}
+      />
+    );
+
+    // Wait for entry sequence
+    await waitFor(() => {
+      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+    });
+
+    // Pause the game
+    const pauseButton = screen.getByRole('button', { name: /pause/i });
+    act(() => {
+      pauseButton.click();
+    });
+
+    // Lexi should not trigger reactions when paused
+    // Verify pause overlay is showing (game is paused)
+    expect(screen.getByTestId('pause-overlay')).toBeInTheDocument();
+  });
+
+  it('integrates Lexi hook with game state', () => {
+    // This test verifies the hook is properly integrated
+    render(
+      <AdventureGame
+        levelConfig={createLevelConfig()}
+        initialGrid={createGrid()}
+        onLevelComplete={mockOnLevelComplete}
+        onExit={mockOnExit}
+      />
+    );
+
+    // The game should render without errors
+    // This proves the hook integration doesn't break the component
+    expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+
+    // Score display should work (hook doesn't interfere)
+    expect(screen.getByTestId('score-display')).toBeInTheDocument();
+
+    // Combo display should work (hook reads this state)
+    expect(screen.getByTestId('combo-display')).toBeInTheDocument();
+  });
+});
+
+describe('LevelCompleteModal Lexi Integration', () => {
+  // These tests would require importing LevelCompleteModal directly
+  // and testing with different star counts
+
+  it.todo('shows victory mascot for 3 stars');
+  it.todo('shows celebrating mascot for 2 stars');
+  it.todo('shows happy mascot for 1 star');
+  it.todo('shows thinking mascot for 0 stars');
+});

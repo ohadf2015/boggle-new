@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Core Game Juice** - Word trails, letter pops, score animations
 - [x] **Phase 3: Level Entry Experience** - Tile cascade, objective reveal, title burst
 - [x] **Phase 4: World Theming** - Parallax backgrounds, particles, dynamic boards
-- [ ] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
+- [x] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
 - [ ] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
 - [ ] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
 - [ ] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
@@ -106,10 +106,12 @@ Plans:
   3. Level completion shows star burst animation with Lexi celebration
   4. All Lexi animations can be tapped to speed up 2x (respect player time)
   5. Lexi sprite consistency maintained across all animations (Leonardo AI character reference)
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 05-01: TBD
+- [x] 05-01-PLAN.md — Create useLexiReactions hook and translation keys
+- [x] 05-02-PLAN.md — Create LexiReaction display component with tap-to-speed
+- [x] 05-03-PLAN.md — Integrate Lexi into AdventureGame and LevelCompleteModal
 
 ### Phase 6: AI Asset Generation
 **Goal**: Production-ready pipeline generates all visual assets for Worlds 1-3 with consistent style
@@ -197,7 +199,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. Core Game Juice | 3/3 | Complete | 2026-01-22 |
 | 3. Level Entry Experience | 3/3 | Complete | 2026-01-22 |
 | 4. World Theming | 3/3 | Complete | 2026-01-22 |
-| 5. Lexi Personality | 0/TBD | Not started | - |
+| 5. Lexi Personality | 3/3 | Complete | 2026-01-22 |
 | 6. AI Asset Generation | 0/TBD | Not started | - |
 | 7. Video Cutscenes | 0/TBD | Not started | - |
 | 8. Wikipedia Integration | 0/TBD | Not started | - |
@@ -206,4 +208,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-22 (Phase 4 complete)*
+*Last updated: 2026-01-22 (Phase 5 complete)*

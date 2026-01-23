@@ -10,6 +10,45 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AdventureGrid from '../AdventureGrid';
 import type { GridTileState, TileType } from '@/types/adventure';
 
+// Mock geometry module - default behavior allows all selections
+jest.mock('../adventureGridGeometry', () => ({
+  measureAdventureGrid: jest.fn().mockReturnValue({
+    gridRect: { left: 0, top: 0, width: 256, height: 256, right: 256, bottom: 256, x: 0, y: 0, toJSON: () => ({}) },
+    cellWidth: 60,
+    cellHeight: 60,
+    gridPaddingLeft: 0,
+    gridPaddingTop: 0,
+    gapX: 4,
+    gapY: 4,
+    cellWithGapWidth: 64,
+    cellWithGapHeight: 64,
+    timestamp: Date.now(),
+  }),
+  getCellAtPosition: jest.fn().mockImplementation((touchX: number, touchY: number, tiles: GridTileState[], gridSize: number) => {
+    // Simple mock: calculate cell based on position
+    const col = Math.floor(touchX / 64);
+    const row = Math.floor(touchY / 64);
+    if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) return null;
+    const index = row * gridSize + col;
+    const tile = tiles[index];
+    if (!tile) return null;
+    return {
+      row,
+      col,
+      letter: tile.letter,
+      distanceFromCenter: 5, // Always close to center (allows selection)
+      cellRadius: 30,
+    };
+  }),
+  getTileIndex: (row: number, col: number, gridSize: number) => row * gridSize + col,
+  isWithinSelectionThreshold: jest.fn().mockReturnValue(true), // Allow all selections by default
+  isDiagonalMove: jest.fn().mockReturnValue(false),
+  hasExceededDeadzone: jest.fn().mockReturnValue(true), // Always exceed deadzone by default
+  DEADZONE_THRESHOLD: 8,
+  CELL_SELECTION_THRESHOLD: 0.85,
+  DIAGONAL_SELECTION_THRESHOLD: 0.95,
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================
@@ -595,12 +634,13 @@ describe('AdventureGrid', () => {
       });
       expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
 
-      // Mock elementFromPoint to return second cell
+      // Mock elementFromPoint to return second cell (fallback only)
       document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
 
-      // Simulate touch move
+      // Simulate touch move to cell 1 (row 0, col 1)
+      // With 64px cell size: col 1 center = 64 + 30 = 94, row 0 center = 30
       fireEvent.touchMove(grid, {
-        touches: [{ clientX: 100, clientY: 100 }],
+        touches: [{ clientX: 94, clientY: 30 }],
       });
 
       // THEN
@@ -637,13 +677,14 @@ describe('AdventureGrid', () => {
         touches: [{ clientX: 50, clientY: 50 }],
       });
 
-      // Mock elementFromPoint to return second cell
+      // Mock elementFromPoint to return second cell (fallback only)
       document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
 
-      // Simulate multiple touch moves on same cell
-      fireEvent.touchMove(grid, { touches: [{ clientX: 100, clientY: 100 }] });
-      fireEvent.touchMove(grid, { touches: [{ clientX: 101, clientY: 101 }] });
-      fireEvent.touchMove(grid, { touches: [{ clientX: 102, clientY: 102 }] });
+      // Simulate multiple touch moves on same cell (cell 1 = row 0, col 1)
+      // All coordinates within cell 1: x in [64, 127], y in [0, 63]
+      fireEvent.touchMove(grid, { touches: [{ clientX: 94, clientY: 30 }] });
+      fireEvent.touchMove(grid, { touches: [{ clientX: 95, clientY: 31 }] });
+      fireEvent.touchMove(grid, { touches: [{ clientX: 96, clientY: 32 }] });
 
       // THEN - should only be called once despite multiple touch moves
       expect(onDragEnter).toHaveBeenCalledTimes(1);

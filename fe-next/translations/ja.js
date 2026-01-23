@@ -3719,6 +3719,40 @@ const ja = {
       "alreadyFound": "この単語は既に見つかっています",
       "notInDictionary": "辞書にない単語です",
       "validationFailed": "単語を検証できませんでした"
+    },
+    "lexi": {
+      "longWord": {
+        "default": "すごい!長い言葉!",
+        "world1": "素晴らしい言葉!",
+        "world2": "素敵な発見!",
+        "world3": "天才的!"
+      },
+      "combo3x": {
+        "default": "調子いいね!"
+      },
+      "combo5x": {
+        "default": "止まらない!"
+      },
+      "combo10x": {
+        "default": "伝説のコンボ!"
+      },
+      "firstWord": {
+        "default": "いいスタート!続けて!"
+      },
+      "timeBonus": {
+        "default": "ギリギリの勝利!"
+      },
+      "stuck": {
+        "default": "長い言葉を探してみて!"
+      },
+      "encourage": {
+        "default": "諦めないで!できるよ!"
+      },
+      "levelComplete": {
+        "star1": "レベルクリア!",
+        "star2": "素晴らしい!",
+        "star3": "完璧!"
+      }
     }
   }
 };

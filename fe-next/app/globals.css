@@ -3851,9 +3851,27 @@ html.reduce-motion *::after {
    ==================================== */
 
 /* ==================== TILE TEXTURES ==================== */
-/* Very subtle textures (opacity < 0.1) to preserve letter readability */
+/* Use ::after pseudo-element for textures to avoid overriding Tailwind gradient backgrounds */
+/* The texture layers ON TOP of the background, preserving contrast */
 
-.tile-texture-meadows {
+.tile-texture-meadows,
+.tile-texture-springs,
+.tile-texture-caverns {
+  position: relative;
+}
+
+.tile-texture-meadows::after,
+.tile-texture-springs::after,
+.tile-texture-caverns::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.tile-texture-meadows::after {
   background-image: repeating-linear-gradient(
     90deg,
     rgba(139, 69, 19, 0.06) 0px,
@@ -3863,7 +3881,7 @@ html.reduce-motion *::after {
   );
 }
 
-.tile-texture-springs {
+.tile-texture-springs::after {
   background-image: radial-gradient(
     circle,
     rgba(0, 255, 255, 0.08) 0%,
@@ -3874,7 +3892,7 @@ html.reduce-motion *::after {
   background-size: 12px 12px;
 }
 
-.tile-texture-caverns {
+.tile-texture-caverns::after {
   background-image: repeating-linear-gradient(
     45deg,
     rgba(139, 92, 246, 0.07) 0px,
@@ -3989,10 +4007,10 @@ html.reduce-motion *::after {
 
 /* ==================== LOW-END DEVICE OPTIMIZATION ==================== */
 
-.low-end-device .tile-texture-meadows,
-.low-end-device .tile-texture-springs,
-.low-end-device .tile-texture-caverns {
-  background-image: none !important;
+.low-end-device .tile-texture-meadows::after,
+.low-end-device .tile-texture-springs::after,
+.low-end-device .tile-texture-caverns::after {
+  display: none !important;
 }
 
 .low-end-device .letter-glow-meadows,

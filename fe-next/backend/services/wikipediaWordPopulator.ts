@@ -522,24 +522,28 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
 /**
  * Sync all local JSON words to database for admin panel visibility
  * This is useful when JSON files have been updated and need to be visible in admin
+ *
+ * IMPORTANT: Languages are processed in parallel to avoid timeout
+ * With 7 languages each having 2000+ words, sequential processing would
+ * exceed the 90-second server timeout. Parallel processing completes in ~15-30s.
  */
 export async function syncLocalJSONToDatabase(
   language?: Language
 ): Promise<{ success: boolean; results: Record<string, { synced: number; error?: string }> }> {
   const targetLanguages = language ? [language] : (['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as Language[]);
-  const results: Record<string, { synced: number; error?: string }> = {};
   const today = new Date();
-  const dateStr = today.toISOString().split('T')[0];
 
-  console.log(`[WikiPopulator] Starting local JSON sync for: ${targetLanguages.join(', ')}`);
+  console.log(`[WikiPopulator] Starting local JSON sync for: ${targetLanguages.join(', ')} (parallel processing)`);
+  const startTime = Date.now();
 
-  for (const lang of targetLanguages) {
+  // Process all languages in parallel to avoid timeout
+  // Sequential processing of 7 languages with 2000+ words each would exceed 90s timeout
+  const syncPromises = targetLanguages.map(async (lang) => {
     try {
       const jsonWords = await loadWordsFromJSON(lang);
 
       if (!jsonWords || jsonWords.length === 0) {
-        results[lang] = { synced: 0, error: 'No JSON file found or empty' };
-        continue;
+        return { lang, synced: 0, error: 'No JSON file found or empty' };
       }
 
       // Store all words with today's date
@@ -555,16 +559,35 @@ export async function syncLocalJSONToDatabase(
       );
 
       console.log(`[WikiPopulator] Synced ${jsonWords.length} words from JSON for ${lang}`);
-      results[lang] = { synced: jsonWords.length };
+      return { lang, synced: jsonWords.length };
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error(`[WikiPopulator] Error syncing JSON for ${lang}:`, errorMsg);
-      results[lang] = { synced: 0, error: errorMsg };
+      return { lang, synced: 0, error: errorMsg };
+    }
+  });
+
+  // Wait for all languages to complete
+  const settledResults = await Promise.allSettled(syncPromises);
+
+  // Collect results from all promises
+  const results: Record<string, { synced: number; error?: string }> = {};
+  for (const result of settledResults) {
+    if (result.status === 'fulfilled') {
+      const { lang, synced, error } = result.value;
+      results[lang] = { synced, error };
+    } else {
+      // Promise rejected (shouldn't happen with our try-catch, but handle defensively)
+      console.error('[WikiPopulator] Unexpected promise rejection:', result.reason);
     }
   }
 
+  const duration = Date.now() - startTime;
   const allSuccess = Object.values(results).every(r => !r.error || r.synced > 0);
+
+  console.log(`[WikiPopulator] JSON sync completed in ${duration}ms (success: ${allSuccess})`);
+
   return { success: allSuccess, results };
 }
 

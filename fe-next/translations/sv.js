@@ -3719,6 +3719,40 @@ const sv = {
       "alreadyFound": "Ordet har redan hittats",
       "notInDictionary": "Ordet finns inte i ordboken",
       "validationFailed": "Kunde inte validera ordet"
+    },
+    "lexi": {
+      "longWord": {
+        "default": "Wow! Det var ett langt ord!",
+        "world1": "Blomstrande bra ord!",
+        "world2": "Fantastiskt fynd!",
+        "world3": "Kristallklar genialitet!"
+      },
+      "combo3x": {
+        "default": "Du ar pa gang!"
+      },
+      "combo5x": {
+        "default": "Ostoppbar!"
+      },
+      "combo10x": {
+        "default": "LEGENDARISK KOMBO!"
+      },
+      "firstWord": {
+        "default": "Bra start! Fortsatt sa!"
+      },
+      "timeBonus": {
+        "default": "Segervinst i sista sekunden!"
+      },
+      "stuck": {
+        "default": "Prova att hitta langre ord!"
+      },
+      "encourage": {
+        "default": "Ge inte upp! Du klarar det!"
+      },
+      "levelComplete": {
+        "star1": "Nivan avklarad!",
+        "star2": "Utmarkt arbete!",
+        "star3": "Perfekt poang!"
+      }
     }
   }
 };

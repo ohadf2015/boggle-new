@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 5 - Lexi Personality (ready to plan)
+**Current focus:** Phase 5 - Lexi Personality (COMPLETE)
 
 ## Current Position
 
 Phase: 5 of 10 (Lexi Personality)
-Plan: 0 of TBD in phase
-Status: Phase 5 ready - awaiting planning
-Last activity: 2026-01-22 - Completed Phase 4 (world theming)
+Plan: 3 of 3 in phase
+Status: Phase complete
+Last activity: 2026-01-22 - Completed 05-03 (Adventure integration)
 
-Progress: [████░░░░░░] 40% (4 phases complete, 19/~30 plans)
+Progress: [█████░░░░░] 50% (5 phases complete, 18/~30 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 18
 - Average duration: 10 min
-- Total execution time: ~160 min
+- Total execution time: ~174 min
 
 **By Phase:**
 
@@ -31,13 +31,14 @@ Progress: [████░░░░░░] 40% (4 phases complete, 19/~30 plans)
 | 02 Core Game Juice | 3 | ~32min | 11min |
 | 03 Level Entry Experience | 3 | ~19min | 6min |
 | 04 World Theming | 3 | ~50min | 17min |
+| 05 Lexi Personality | 3 | ~23min | 8min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
 - Phase 2 complete: 02-01 (18min), 02-02 (6min), 02-03 (8min)
 - Phase 3 complete: 03-01 (8min), 03-02 (7min), 03-03 (4min)
-- Phase 4 in progress: 04-01 (14min), 04-02 (25min), 04-03 (11min) - world theming UI
-- Animation patterns significantly accelerating execution (6min avg in Phase 3)
+- Phase 4 complete: 04-01 (14min), 04-02 (25min), 04-03 (11min) - world theming UI
+- Phase 5 complete: 05-01 (6min), 05-02 (9min), 05-03 (8min) - Lexi personality system
 
 *Updated after each plan completion*
 
@@ -97,6 +98,20 @@ Recent decisions affecting current work:
 - **04-03:** Letter glow applies to all tiles, texture/border only to standard tiles
 - **04-03:** Optional context usage (AdventureThemeContext with fallback) allows grid in/out of provider
 - **04-03:** SVG decorations for corner elements (vines, water splashes, crystal clusters)
+- **05-01:** 3s cooldown between reactions (configurable via cooldownMs)
+- **05-01:** Priority system: high > normal > low for reaction override
+- **05-01:** Long word threshold: 6+ letters (matches score bonus)
+- **05-01:** Combo milestones: 3x, 5x, 10x with progressive excitement
+- **05-01:** World-specific translation keys: adventure.lexi.{type}.world{N}
+- **05-02:** Spring physics (stiffness 300, damping 20) for entrance animation
+- **05-02:** Position: bottom-20 (above game controls), z-40 (above game, below modals)
+- **05-02:** Tap-to-speed pattern: single tap = 2x, double tap = dismiss
+- **05-02:** MutationObserver for RTL detection (handles language switching)
+- **05-02:** Reduced motion fallback: static mascot + text bubble
+- **05-03:** Lexi reactions only fire when isPlaying && entryPhase === 'playing' && !isPaused
+- **05-03:** Star-based mascot variant: 3=victory, 2=celebrating, 1=happy, 0=thinking
+- **05-03:** Game state adapter pattern for hook integration
+- **05-03:** Lexi celebrates alongside (not replaces) existing star animation
 
 ### Pending Todos
 
@@ -191,13 +206,21 @@ None.
 | 04-02 | World particles & parallax backgrounds | ✓ |
 | 04-03 | Board frame decorations & tile theming | ✓ |
 
+## Phase 5 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 05-01 | Lexi reactions hook (trigger detection + cooldown) | ✓ |
+| 05-02 | LexiReaction component (visual feedback display) | ✓ |
+| 05-03 | Adventure integration (hook + component) | ✓ |
+
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Completed Phase 4 - World Theming
+Stopped at: Completed 05-03 - Adventure integration (Phase 5 complete)
 Resume file: None
-Next: Phase 5 - Lexi Personality (mascot reactions and contextual feedback)
+Next: Phase 6 - AI Asset Generation
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-22 23:25 UTC*
+*Last updated: 2026-01-22 22:07 UTC*

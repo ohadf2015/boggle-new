@@ -159,9 +159,9 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
             }}
             transition={{
               scale: {
-                type: 'spring',
-                stiffness: 300,
-                damping: 15,
+                // Using keyframes transition for 3-value animation (spring only supports 2 keyframes)
+                type: 'keyframes',
+                ease: [0.22, 1, 0.36, 1], // Custom easing for bounce-like feel
                 duration: BURST_DURATION / 1000,
               },
               opacity: { duration: FADE_DURATION / 1000 },
