@@ -24,6 +24,14 @@ export interface SyncResult {
   syncDate?: string;
 }
 
+export interface BulkApproveResult {
+  success: boolean;
+  approved: number;
+  skipped: number;
+  failed: number;
+  errors: Array<{ word: string; error: string }>;
+}
+
 interface UseWikipediaCandidatesResult {
   candidates: WikipediaWordCandidate[];
   stats: WikipediaWordsStats;
@@ -34,6 +42,7 @@ interface UseWikipediaCandidatesResult {
   deleteCandidate: (id: string) => Promise<boolean>;
   bulkUpdateStatus: (ids: string[], status: ValidationStatus) => Promise<boolean>;
   bulkDelete: (ids: string[]) => Promise<boolean>;
+  bulkApproveToDict: (ids: string[]) => Promise<BulkApproveResult>;
   triggerPopulation: () => Promise<boolean>;
   syncFromJSON: () => Promise<SyncResult>;
   clearError: () => void;
@@ -369,6 +378,53 @@ export function useWikipediaCandidates({
     }
   }, [supabase, language, fetchCandidates]);
 
+  const bulkApproveToDict = useCallback(
+    async (ids: string[]): Promise<BulkApproveResult> => {
+      if (ids.length === 0) {
+        return { success: true, approved: 0, skipped: 0, failed: 0, errors: [] };
+      }
+
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.access_token) {
+          setError('Not authenticated');
+          return { success: false, approved: 0, skipped: 0, failed: 0, errors: [] };
+        }
+
+        const response = await fetch('/api/admin/wikipedia-words/bulk-approve', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            candidateIds: ids,
+            language,
+          }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Bulk approval failed');
+        }
+
+        const result = await response.json();
+
+        // Refresh candidates list
+        await fetchCandidates();
+
+        return result;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Bulk approval failed');
+        return { success: false, approved: 0, skipped: 0, failed: 0, errors: [] };
+      }
+    },
+    [supabase, language, fetchCandidates]
+  );
+
   const clearError = useCallback((): void => {
     setError(null);
   }, []);
@@ -383,6 +439,7 @@ export function useWikipediaCandidates({
     deleteCandidate,
     bulkUpdateStatus,
     bulkDelete,
+    bulkApproveToDict,
     triggerPopulation,
     syncFromJSON,
     clearError,
