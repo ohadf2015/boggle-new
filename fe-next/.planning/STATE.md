@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 8 of 10 (Wikipedia Integration)
-Plan: 0 of TBD in phase
-Status: Ready to plan
-Last activity: 2026-01-23 - Completed Phase 7 (Video Cutscenes)
+Plan: 1 of 4 in phase
+Status: In progress
+Last activity: 2026-01-23 - Completed 08-01-PLAN.md (Auto-Promote High-Scoring Candidates)
 
-Progress: [███████░░░] 70% (7 phases complete, 29/~35 plans)
+Progress: [███████░░░] 73% (7 phases complete, 30/~35 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 30
 - Average duration: 10 min
-- Total execution time: ~195 min
+- Total execution time: ~207 min
 
 **By Phase:**
 
@@ -34,6 +34,7 @@ Progress: [███████░░░] 70% (7 phases complete, 29/~35 plans)
 | 05 Lexi Personality | 3 | ~23min | 8min |
 | 06 AI Asset Generation | 4/4 | ~85min | 21min |
 | 07 Video Cutscenes | 6/6 | ~59min | 10min |
+| 08 Wikipedia Integration | 1/4 | ~12min | 12min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -142,6 +143,10 @@ Recent decisions affecting current work:
 - **07-06:** AdventureView orchestrates transitions (manages full-screen cutscene overlay)
 - **07-06:** Callback composition for world unlock: Modal → Game → View → CutscenePlayer
 - **07-06:** Tutorial renders before map content, level intro before tile cascade
+- **08-01:** Score threshold 80 for Wikipedia word auto-promotion (high-confidence words)
+- **08-01:** Dictionary check before promotion prevents duplicate insertion errors
+- **08-01:** Fire-and-forget error handling for auto-promotion (non-blocking)
+- **08-01:** Export threshold constant for admin dashboard transparency
 
 ### Pending Todos
 
@@ -270,13 +275,22 @@ None.
 | 07-05 | CutscenePlayer component | ✓ |
 | 07-06 | Cutscene integration | ✓ |
 
+## Phase 8 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 08-01 | Auto-promote high-scoring candidates | ✓ |
+| 08-02 | Admin word queue interface | ⏸️ |
+| 08-03 | Validation pipeline improvements | ⏸️ |
+| 08-04 | Daily challenge integration | ⏸️ |
+
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed Phase 7 - Video Cutscenes (videos deferred to on-demand rendering)
+Stopped at: Completed 08-01-PLAN.md (Auto-Promote High-Scoring Candidates)
 Resume file: None
-Next: Phase 8 - Wikipedia Integration
+Next: 08-02-PLAN.md (Admin Word Queue Interface)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-23 12:39 UTC*
+*Last updated: 2026-01-23 14:48 UTC*
