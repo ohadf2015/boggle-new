@@ -140,10 +140,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     console.log(`[BulkApprove] Complete: ${result.approved} approved, ${result.skipped} skipped, ${result.failed} failed`);
 
-    return NextResponse.json({
-      success: result.failed === 0,
-      ...result,
-    });
+    // Update success field based on failures
+    result.success = result.failed === 0;
+
+    return NextResponse.json(result);
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
