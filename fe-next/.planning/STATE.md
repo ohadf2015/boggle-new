@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 8 of 10 (Wikipedia Integration)
-Plan: 4 of 4 complete
-Status: Phase complete
-Last activity: 2026-01-23 - Completed 08-04-PLAN.md (End-to-End Integration Test)
+Phase: 9 of 10 (Invalid Word System)
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-01-23 - Completed 09-01-PLAN.md (Checkbox Selection UI)
 
-Progress: [████████░░] 82% (8 phases complete, 34/~35 plans)
+Progress: [████████░░] 85% (8 phases complete + 09-01, 35/~38 plans)
 
 ## Performance Metrics
 
@@ -155,6 +155,9 @@ Recent decisions affecting current work:
 - **08-03:** logPipelineError helper provides structured error context (operation, word, language, score)
 - **08-03:** Per-candidate try-catch in validateTopCandidates ensures pipeline continues after individual failures
 - **08-03:** Defensive batch processing with try-catch per batch prevents data loss on database errors
+- **09-01:** Use word.id for selection tracking (not word+language)
+- **09-01:** Clear selection when filters or pagination change
+- **09-01:** Remove item from selection on approve/dismiss
 
 ### Pending Todos
 
@@ -299,13 +302,21 @@ None.
 | 08-03 | Edge case hardening | ✓ |
 | 08-04 | End-to-End Integration Test | ✓ |
 
+## Phase 9 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 09-01 | Checkbox Selection UI | ✓ |
+| 09-02 | Bulk approve API endpoint | |
+| 09-03 | BulkApproveButton integration | |
+
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 08-04-PLAN.md (End-to-End Integration Test)
+Stopped at: Completed 09-01-PLAN.md (Checkbox Selection UI)
 Resume file: None
-Next: Phase 9 (TBD)
+Next: 09-02-PLAN.md (Bulk approve API endpoint)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-23 15:20 UTC*
+*Last updated: 2026-01-23 19:25 UTC*
