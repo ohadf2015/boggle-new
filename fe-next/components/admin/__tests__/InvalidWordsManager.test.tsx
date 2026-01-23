@@ -27,6 +27,69 @@ jest.mock('framer-motion', () => {
   };
 });
 
+// Mock AlertDialog component for BulkApproveButton
+// This mock simulates Radix AlertDialog behavior: always render trigger, conditionally render content
+jest.mock('@/components/ui/alert-dialog', () => ({
+  AlertDialog: ({ children, open }: React.PropsWithChildren<{ open?: boolean; onOpenChange?: (open: boolean) => void }>) => {
+    // Filter children to find trigger and content
+    const childArray = React.Children.toArray(children);
+    // Find trigger and content components
+    const trigger = childArray.find((child: React.ReactNode) => {
+      if (React.isValidElement(child)) {
+        // Check for our mocked components by displayName or type
+        const c = child as React.ReactElement<{ 'data-testid'?: string }>;
+        return c.props['data-testid'] === 'alert-dialog-trigger' || (child.type as { displayName?: string })?.displayName === 'AlertDialogTrigger';
+      }
+      return false;
+    });
+    const content = childArray.find((child: React.ReactNode) => {
+      if (React.isValidElement(child)) {
+        const c = child as React.ReactElement<{ 'data-testid'?: string }>;
+        return c.props['data-testid'] === 'alert-dialog-content' || (child.type as { displayName?: string })?.displayName === 'AlertDialogContent';
+      }
+      return false;
+    });
+
+    // Always render trigger, only render content when open
+    return (
+      <>
+        {trigger}
+        {open && content}
+      </>
+    );
+  },
+  AlertDialogTrigger: Object.assign(
+    ({ children, asChild }: React.PropsWithChildren<{ asChild?: boolean }>) => (
+      <span data-testid="alert-dialog-trigger">{asChild ? children : <button>{children}</button>}</span>
+    ),
+    { displayName: 'AlertDialogTrigger' }
+  ),
+  AlertDialogContent: Object.assign(
+    ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+      <div role="alertdialog" data-testid="alert-dialog-content" className={className}>{children}</div>
+    ),
+    { displayName: 'AlertDialogContent' }
+  ),
+  AlertDialogHeader: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+    <div className={className}>{children}</div>
+  ),
+  AlertDialogFooter: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+    <div className={className}>{children}</div>
+  ),
+  AlertDialogTitle: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+    <h2 className={className}>{children}</h2>
+  ),
+  AlertDialogDescription: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+    <p className={className}>{children}</p>
+  ),
+  AlertDialogAction: ({ children, onClick, className }: React.PropsWithChildren<{ onClick?: () => void; className?: string }>) => (
+    <button onClick={onClick} className={className}>{children}</button>
+  ),
+  AlertDialogCancel: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+    <button className={className}>{children}</button>
+  ),
+}));
+
 // Mock useDevicePerformance hook
 jest.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
@@ -83,6 +146,13 @@ describe('InvalidWordsManager', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset fetch mock before each test
+    mockFetch.mockReset();
+  });
+
+  afterEach(() => {
+    // Clean up any pending promises and timers
+    jest.clearAllTimers();
   });
 
   const mockInvalidWordsResponse = {
@@ -214,8 +284,9 @@ describe('InvalidWordsManager', () => {
       expect(screen.getByText('testword')).toBeInTheDocument();
     });
 
-    // Find and click the first Approve button
-    const approveButtons = screen.getAllByRole('button', { name: /approve/i });
+    // Find the Approve button in the card (exact text "Approve", not "Bulk Approve")
+    // The card approve buttons have exact text "Approve" while bulk has "Bulk Approve (X)"
+    const approveButtons = screen.getAllByRole('button', { name: /^approve$/i });
     fireEvent.click(approveButtons[0]);
 
     await waitFor(() => {
@@ -357,8 +428,8 @@ describe('InvalidWordsManager', () => {
       expect(screen.getByText('testword')).toBeInTheDocument();
     });
 
-    // Click approve on first word
-    const approveButtons = screen.getAllByRole('button', { name: /approve/i });
+    // Click approve on first word (exact match to avoid matching Bulk Approve)
+    const approveButtons = screen.getAllByRole('button', { name: /^approve$/i });
     fireEvent.click(approveButtons[0]);
 
     // Wait for the word to be removed from the list
@@ -474,8 +545,8 @@ describe('InvalidWordsManager', () => {
       fireEvent.click(checkboxes[0]);
       expect(screen.getByText('1 selected')).toBeInTheDocument();
 
-      // Approve the word
-      const approveButtons = screen.getAllByRole('button', { name: /approve/i });
+      // Approve the word (exact match to avoid matching Bulk Approve)
+      const approveButtons = screen.getAllByRole('button', { name: /^approve$/i });
       fireEvent.click(approveButtons[0]);
 
       // Wait for word to be removed
@@ -485,6 +556,82 @@ describe('InvalidWordsManager', () => {
 
       // Selection count should update (word removed from list and selection)
       expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+    });
+  });
+
+  // BulkApproveButton integration tests
+  describe('BulkApproveButton integration', () => {
+    it('renders BulkApproveButton in toolbar when words are loaded', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      // BulkApproveButton should be rendered with initial count of 0
+      expect(screen.getByRole('button', { name: /bulk approve/i })).toBeInTheDocument();
+    });
+
+    it('BulkApproveButton shows selected count in label', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      // Select both words
+      fireEvent.click(screen.getByRole('button', { name: /select all/i }));
+
+      // BulkApproveButton should show count of 2
+      expect(screen.getByRole('button', { name: /bulk approve \(2\)/i })).toBeInTheDocument();
+    });
+
+    it('BulkApproveButton is disabled when no words are selected', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      // BulkApproveButton should be disabled
+      const bulkApproveButton = screen.getByRole('button', { name: /bulk approve/i });
+      expect(bulkApproveButton).toBeDisabled();
+    });
+
+    it('BulkApproveButton is enabled when words are selected', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockInvalidWordsResponse),
+      });
+
+      render(<InvalidWordsManager authToken={mockAuthToken} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('testword')).toBeInTheDocument();
+      });
+
+      // Select a word
+      const checkboxes = screen.getAllByRole('checkbox');
+      fireEvent.click(checkboxes[0]);
+
+      // BulkApproveButton should be enabled
+      const bulkApproveButton = screen.getByRole('button', { name: /bulk approve \(1\)/i });
+      expect(bulkApproveButton).not.toBeDisabled();
     });
   });
 });
