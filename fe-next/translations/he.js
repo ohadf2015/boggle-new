@@ -3713,6 +3713,18 @@ const he = {
       "notInDictionary": "המילה לא במילון",
       "validationFailed": "לא ניתן לאמת את המילה"
     },
+"game": {
+      "objectives": "מטרות",
+      "combo": "קומבו",
+      "wordsFound": "מילים שנמצאו",
+      "paused": "מושהה",
+      "tryAgain": "נסו שוב!",
+      "perfect": "מושלם!",
+      "newHighScore": "שיא חדש!"
+    },
+    "cutscene": {
+      "skip": "דלג"
+    },
     "lexi": {
       "longWord": {
         "default": "וואו! מילה ארוכה!",

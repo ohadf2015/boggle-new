@@ -3715,6 +3715,18 @@ const en = {
       "notInDictionary": "Word not in dictionary",
       "validationFailed": "Could not validate word"
     },
+"game": {
+      "objectives": "Objectives",
+      "combo": "Combo",
+      "wordsFound": "Words Found",
+      "paused": "Paused",
+      "tryAgain": "Try Again!",
+      "perfect": "Perfect!",
+      "newHighScore": "New High Score!"
+    },
+    "cutscene": {
+      "skip": "Skip"
+    },
     "lexi": {
       "longWord": {
         "default": "Wow! That's a long one!",

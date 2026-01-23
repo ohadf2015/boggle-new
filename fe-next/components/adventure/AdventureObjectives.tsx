@@ -50,13 +50,17 @@ const OBJECTIVE_ICONS: Record<ObjectiveType, React.ComponentType<{ className?: s
   collectGems: Gem,
 };
 
-const OBJECTIVE_LABELS: Record<ObjectiveType, string> = {
-  wordCount: 'Find Words',
-  scoreTarget: 'Score Points',
-  longWords: 'Long Words',
-  clearIce: 'Clear Ice',
-  timeBonus: 'Time Bonus',
-  collectGems: 'Collect Gems',
+/**
+ * Maps ObjectiveType to translation keys.
+ * Actual translation is done via t() in component render.
+ */
+const OBJECTIVE_TRANSLATION_KEYS: Record<ObjectiveType, string> = {
+  wordCount: 'adventure.objectives.wordCount',
+  scoreTarget: 'adventure.objectives.scoreTarget',
+  longWords: 'adventure.objectives.longWords',
+  clearIce: 'adventure.objectives.clearIce',
+  timeBonus: 'adventure.objectives.timeBonus',
+  collectGems: 'adventure.objectives.collectGems',
 };
 
 // ==============================================
@@ -65,7 +69,7 @@ const OBJECTIVE_LABELS: Record<ObjectiveType, string> = {
 
 const AdventureObjectives = memo<AdventureObjectivesProps>(
   ({ objectives, className, showSlideIn = false, onSlideInComplete }) => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const { prefersReducedMotion } = useDevicePerformance();
     const isRTL = language === 'he';
 
@@ -128,7 +132,8 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
       >
         {objectives.map((objective, index) => {
           const Icon = OBJECTIVE_ICONS[objective.type];
-          const label = OBJECTIVE_LABELS[objective.type];
+          const translationKey = OBJECTIVE_TRANSLATION_KEYS[objective.type];
+          const label = t(translationKey);
           const current = objective.current ?? 0;
           const progress = Math.min((current / objective.target) * 100, 100);
 

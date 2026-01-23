@@ -3720,6 +3720,18 @@ const sv = {
       "notInDictionary": "Ordet finns inte i ordboken",
       "validationFailed": "Kunde inte validera ordet"
     },
+"game": {
+      "objectives": "Mål",
+      "combo": "Kombo",
+      "wordsFound": "Hittade ord",
+      "paused": "Pausad",
+      "tryAgain": "Försök igen!",
+      "perfect": "Perfekt!",
+      "newHighScore": "Nytt rekord!"
+    },
+    "cutscene": {
+      "skip": "Hoppa över"
+    },
     "lexi": {
       "longWord": {
         "default": "Wow! Det var ett langt ord!",

@@ -4,8 +4,9 @@
  * POST - Complete a level and update progression
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { createClient as createServiceClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -19,22 +20,6 @@ const XP_PER_STAR = 25;
  * Base XP for completing a level
  */
 const BASE_COMPLETION_XP = 50;
-
-/**
- * Extract user ID from request authentication
- */
-async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '') || request.cookies.get('sb-access-token')?.value;
-
-  if (!token) return null;
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-
-  if (error || !user) return null;
-  return user.id;
-}
 
 /**
  * Validate completion request body
@@ -114,12 +99,17 @@ function calculatePlayerLevel(totalXp: number): number {
  * POST /api/adventure/complete
  * Complete a level and update progression
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    // Get authenticated user using proper Supabase SSR auth
+    const authSupabase = await createClient();
+    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const userId = user.id;
 
     // Parse and validate request body
     let body: Record<string, unknown>;
@@ -136,7 +126,8 @@ export async function POST(request: NextRequest) {
 
     const { world, level, stars, score, words } = validation.data;
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Use service role client for database operations (bypasses RLS)
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Ensure progression exists
     const { data: existingProgression, error: progressionError } = await supabase

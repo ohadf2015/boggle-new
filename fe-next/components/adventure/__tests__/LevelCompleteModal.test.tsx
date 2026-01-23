@@ -10,6 +10,34 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import LevelCompleteModal from '../LevelCompleteModal';
 import type { LevelObjective } from '@/types/adventure';
 
+// Mock translation function that returns English text for test assertions
+const mockTranslations: Record<string, string> = {
+  'adventure.levelComplete': 'Level Complete!',
+  'adventure.game.tryAgain': 'Try Again!',
+  'adventure.level': 'Level',
+  'adventure.game.perfect': 'Perfect!',
+  'adventure.game.objectives': 'Objectives',
+  'adventure.game.newHighScore': 'New High Score!',
+  'adventure.continueToNext': 'Continue',
+  'adventure.retryLevel': 'Retry',
+  'adventure.objectives.wordCount': 'Find Words',
+  'adventure.objectives.scoreTarget': 'Score Points',
+  'adventure.objectives.longWords': 'Long Words',
+  'adventure.objectives.clearIce': 'Clear Ice',
+  'adventure.objectives.timeBonus': 'Time Bonus',
+  'adventure.objectives.collectGems': 'Collect Gems',
+  'common.score': 'Score',
+  'common.exit': 'Exit',
+};
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => mockTranslations[key] || key,
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================

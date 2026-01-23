@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Asset pipeline temp files
 .asset-temp/
+
+# Rendered video cutscenes (generated on demand)
+public/videos/cutscenes/*.mp4

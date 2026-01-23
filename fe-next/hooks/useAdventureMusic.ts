@@ -101,6 +101,7 @@ export function useAdventureMusic({
   const isPlayingRef = useRef(isPlaying);
   const isPausedRef = useRef(isPaused);
   const enabledRef = useRef(enabled);
+  const prevTotalTimeRef = useRef(totalTime);
 
   // Window focus tracking
   const windowFocusedRef = useRef(typeof document !== 'undefined' ? document.hasFocus() : true);
@@ -416,6 +417,29 @@ export function useAdventureMusic({
       switchToTrack2();
     }
   }, [timeRemaining, totalTime, isPlaying, isPaused, enabled, switchToTrack2]);
+
+  // Handle returning to ambient mode (totalTime becomes 0)
+  // When exiting gameplay and returning to WorldMap/LevelGrid, reset to track 1
+  useEffect(() => {
+    const wasInGameplay = prevTotalTimeRef.current > 0;
+    const isNowAmbient = totalTime === 0;
+
+    // Update ref for next comparison
+    prevTotalTimeRef.current = totalTime;
+
+    // Detect transition from gameplay to ambient
+    if (wasInGameplay && isNowAmbient && enabled && isPlaying && !isPaused) {
+      logger.log(`[AdventureMusic] Returning to ambient mode - resetting to track 1`);
+
+      // Reset track switch flag so track 2 can be triggered again in next gameplay
+      hasSwitchedToTrack2Ref.current = false;
+
+      // If on track 2, switch back to track 1 for ambient looping
+      if (currentTrackRef.current === 2) {
+        startTrack1();
+      }
+    }
+  }, [totalTime, enabled, isPlaying, isPaused, startTrack1]);
 
   // ==============================================
   // RETURN

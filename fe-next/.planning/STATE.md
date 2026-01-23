@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 7 of 10 (Video Cutscenes)
-Plan: 3 of 5 in phase
-Status: In Progress
-Last activity: 2026-01-23 - Completed 07-03 (Tutorial composition)
+Plan: 6 of 6 in phase
+Status: Phase Complete
+Last activity: 2026-01-23 - Completed 07-06 (Cutscene Integration)
 
-Progress: [██████░░░░] 63% (6 phases complete + 07-01,02,03, 26/~34 plans)
+Progress: [███████░░░] 70% (7 phases complete, 29/~35 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 10 min
-- Total execution time: ~184 min
+- Total execution time: ~195 min
 
 **By Phase:**
 
@@ -33,6 +33,7 @@ Progress: [██████░░░░] 63% (6 phases complete + 07-01,02,03,
 | 04 World Theming | 3 | ~50min | 17min |
 | 05 Lexi Personality | 3 | ~23min | 8min |
 | 06 AI Asset Generation | 4/4 | ~85min | 21min |
+| 07 Video Cutscenes | 6/6 | ~59min | 10min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -130,6 +131,17 @@ Recent decisions affecting current work:
 - **07-03:** Embedded translations for Remotion (cannot use React context in video compositions)
 - **07-03:** 5% sine wave pulse animation for tutorial highlight boxes
 - **07-03:** Simple SVG icons (swipe arrow, checkmark, plus) for clean UI focus
+- **07-04:** H.264 codec with CRF 23 for iOS Safari compatibility
+- **07-04:** Videos excluded from git (generated on demand via npm script)
+- **07-04:** Single npm command `video:render` generates all 24 video variants
+- **07-05:** iOS autoplay requires muted + playsInline + autoPlay attributes
+- **07-05:** Tutorial videos immediately skippable (0ms delay), others 2000ms default
+- **07-05:** Reduced motion preference auto-completes video (accessibility)
+- **07-06:** localStorage for cutscene viewed state (client preference, no server sync)
+- **07-06:** World ID mapping: levels 1-7 = meadows, 8-14 = springs, 15-21 = caverns
+- **07-06:** AdventureView orchestrates transitions (manages full-screen cutscene overlay)
+- **07-06:** Callback composition for world unlock: Modal → Game → View → CutscenePlayer
+- **07-06:** Tutorial renders before map content, level intro before tile cascade
 
 ### Pending Todos
 
@@ -177,9 +189,14 @@ None.
 - ⏸️ Parallax images → Phase 6 (AI Asset Generation)
 - ⏸️ Background images → Phase 6 (AI Asset Generation)
 
-**Phase 7 Video Cutscenes:**
-- RTL video production workflow undefined for 4-language variants
-- Video delivery strategy (Lambda vs bundled) to be decided in Phase 7
+**Phase 7 Video Cutscenes:** ✓ COMPLETE
+- ✅ LevelIntro composition with Ken Burns zoom (07-01)
+- ✅ WorldTransition composition with portal animation (07-02)
+- ✅ Tutorial composition with embedded translations (07-03)
+- ✅ Video render pipeline with H.264 codec (07-04)
+- ✅ CutscenePlayer component with iOS Safari support (07-05)
+- ✅ Cutscene integration (tutorial, level intro, world transition) (07-06)
+- ⏸️ Manual verification pending (human checkpoint)
 
 **General:**
 - Friends page build error pre-exists (unrelated to Phase 2 work)
@@ -249,16 +266,17 @@ None.
 | 07-01 | LevelIntro composition | ✓ |
 | 07-02 | WorldTransition composition | ✓ |
 | 07-03 | Tutorial composition | ✓ |
-| 07-04 | CutscenePlayer component | Pending |
-| 07-05 | Adventure integration | Pending |
+| 07-04 | Video render pipeline | ✓ |
+| 07-05 | CutscenePlayer component | ✓ |
+| 07-06 | Cutscene integration | ✓ (pending verification) |
 
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 07-01 - LevelIntro composition
+Stopped at: Completed 07-06 - Cutscene Integration (Phase 7 complete, awaiting human verification)
 Resume file: None
-Next: 07-04 - CutscenePlayer component
+Next: Phase 8 - Sound Design (after 07-06 verification)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-23 11:57 UTC*
+*Last updated: 2026-01-23 12:39 UTC*

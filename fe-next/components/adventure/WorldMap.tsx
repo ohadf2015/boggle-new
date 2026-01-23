@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParallax } from '@/hooks/useParallax';
+import { useTutorialState, useWorldTransitionState } from '@/hooks/useTutorialState';
+import { CutscenePlayer } from '@/components/video/CutscenePlayer';
 import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
@@ -22,6 +24,7 @@ interface WorldMapProps {
   totalStars: number;
   completions: Array<{ world: number; level: number; stars: number }>;
   onWorldSelect: (worldId: number) => void;
+  onWorldUnlock?: (fromWorldId: string, toWorldId: string) => void;
 }
 
 // World images mapping
@@ -411,10 +414,65 @@ export default function WorldMap({
   totalStars,
   completions,
   onWorldSelect,
+  onWorldUnlock,
 }: WorldMapProps): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
+
+  // Tutorial state
+  const { hasViewedTutorial, markTutorialViewed } = useTutorialState();
+  const [showTutorial, setShowTutorial] = React.useState(!hasViewedTutorial);
+
+  // World transition state
+  const [pendingTransition, setPendingTransition] = React.useState<{
+    from: string;
+    to: string;
+  } | null>(null);
+
+  // Get transition state hooks (only when we have a pending transition)
+  const transitionFromId = pendingTransition?.from || '';
+  const transitionToId = pendingTransition?.to || '';
+  const { hasViewedTransition, markTransitionViewed } = useWorldTransitionState(
+    transitionFromId,
+    transitionToId
+  );
+
+  // Tutorial completion handler
+  const handleTutorialComplete = useCallback(() => {
+    markTutorialViewed();
+    setShowTutorial(false);
+  }, [markTutorialViewed]);
+
+  // Handle world unlock from child components
+  const handleWorldUnlock = useCallback((fromWorldId: string, toWorldId: string) => {
+    // Check if this transition has been viewed before
+    const transitionKey = `${fromWorldId}->${toWorldId}`;
+    const viewedJson = typeof window !== 'undefined' ? localStorage.getItem('lexiclash:world-transition:viewed') : null;
+    let hasViewed = false;
+
+    if (viewedJson) {
+      try {
+        const viewedTransitions: string[] = JSON.parse(viewedJson);
+        hasViewed = Array.isArray(viewedTransitions) && viewedTransitions.includes(transitionKey);
+      } catch {
+        hasViewed = false;
+      }
+    }
+
+    if (!hasViewed) {
+      // Show transition cutscene
+      setPendingTransition({ from: fromWorldId, to: toWorldId });
+    }
+    // If already viewed, skip directly to new world (no action needed, navigation handled by parent)
+  }, []);
+
+  // World transition completion handler
+  const handleTransitionComplete = useCallback(() => {
+    markTransitionViewed();
+    setPendingTransition(null);
+    // Navigation to new world happens after cutscene
+  }, [markTransitionViewed]);
 
   // RAF-throttled scroll handler for parallax effect
   // Performance: Throttles from 60-120 calls/sec to max 60 calls/sec (RAF rate)
@@ -755,6 +813,28 @@ export default function WorldMap({
           ↑ Scroll up for more worlds
         </div>
       </motion.div>
+
+      {/* Tutorial Cutscene - full-screen overlay for new players */}
+      {showTutorial && (
+        <CutscenePlayer
+          type="tutorial"
+          onComplete={handleTutorialComplete}
+          onSkip={handleTutorialComplete}
+          allowSkipAfterMs={0}
+        />
+      )}
+
+      {/* World Transition Cutscene - plays when unlocking new world */}
+      {pendingTransition && (
+        <CutscenePlayer
+          type="transition"
+          fromWorldId={pendingTransition.from as any}
+          toWorldId={pendingTransition.to as any}
+          onComplete={handleTransitionComplete}
+          onSkip={handleTransitionComplete}
+          allowSkipAfterMs={2000}
+        />
+      )}
     </div>
   );
 }

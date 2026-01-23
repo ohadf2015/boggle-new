@@ -44,6 +44,8 @@
     "assets:check:verbose": "tsx scripts/check-asset-sizes.ts --verbose",
     "remotion:preview": "remotion preview remotion/index.ts",
     "remotion:render": "remotion render remotion/index.ts TestComposition --output=out/test.mp4",
+    "video:render": "bash scripts/render-cutscenes.sh",
+    "video:render:test": "npx remotion render remotion/index.ts LevelIntro public/videos/cutscenes/test-verify.mp4 --props='{\"worldId\":\"meadows\",\"locale\":\"en\"}' --codec=h264 --log=error",
     "bundle:check": "bundlewatch",
     "prepare": "husky"
   },

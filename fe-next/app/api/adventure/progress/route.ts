@@ -5,28 +5,13 @@
  * POST - Create initial progression for new user
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { createClient as createServiceClient } from '@supabase/supabase-js';
 import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-/**
- * Extract user ID from request authentication
- */
-async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '') || request.cookies.get('sb-access-token')?.value;
-
-  if (!token) return null;
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-
-  if (error || !user) return null;
-  return user.id;
-}
 
 /**
  * Transform database row to PlayerProgression type
@@ -80,14 +65,20 @@ function transformCompletion(dbRow: Record<string, unknown>): LevelCompletion {
  * GET /api/adventure/progress
  * Retrieve user's adventure progression
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    // Get authenticated user using proper Supabase SSR auth
+    const authSupabase = await createClient();
+    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
+
+    // Use service role client for database operations (bypasses RLS)
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch progression
     const { data: progressionRow, error: progressionError } = await supabase
@@ -135,14 +126,20 @@ export async function GET(request: NextRequest) {
  * POST /api/adventure/progress
  * Create initial progression for new user
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    // Get authenticated user using proper Supabase SSR auth
+    const authSupabase = await createClient();
+    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
+
+    // Use service role client for database operations (bypasses RLS)
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Check if progression already exists
     const { data: existing } = await supabase

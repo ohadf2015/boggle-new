@@ -10,10 +10,20 @@ import { render, screen } from '@testing-library/react';
 import AdventureObjectives from '../AdventureObjectives';
 import type { LevelObjective } from '@/types/adventure';
 
+// Mock translation function that returns English text for test assertions
+const mockTranslations: Record<string, string> = {
+  'adventure.objectives.wordCount': 'Find words',
+  'adventure.objectives.scoreTarget': 'Reach score',
+  'adventure.objectives.longWords': 'Long words (5+)',
+  'adventure.objectives.clearIce': 'Clear ice',
+  'adventure.objectives.timeBonus': 'Time remaining',
+  'adventure.objectives.collectGems': 'Collect gems',
+};
+
 // Mock LanguageContext
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => key,
+    t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
   }),

@@ -52,9 +52,25 @@ const defaultProps = {
 // ==============================================
 
 // Mock useLanguage context
+// Mock translation function that returns English text for test assertions
+const mockTranslations: Record<string, string> = {
+  'adventure.game.objectives': 'Objectives',
+  'adventure.game.combo': 'Combo',
+  'adventure.game.paused': 'Paused',
+  'adventure.objectives.wordCount': 'Find words',
+  'adventure.objectives.scoreTarget': 'Reach score',
+  'adventure.objectives.longWords': 'Long words (5+)',
+  'adventure.objectives.clearIce': 'Clear ice',
+  'adventure.objectives.timeBonus': 'Time remaining',
+  'adventure.objectives.collectGems': 'Collect gems',
+  'common.resume': 'Resume',
+  'common.exit': 'Exit',
+  'common.validating': 'Checking...',
+};
+
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => key,
+    t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),

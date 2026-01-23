@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 2303,
+    "totalKeysInCode": 2314,
     "keyCountByLanguage": {
-      "en": 2938,
-      "he": 2938,
-      "sv": 2938,
-      "ja": 2938,
-      "es": 2938
+      "en": 2946,
+      "he": 2946,
+      "sv": 2946,
+      "ja": 2946,
+      "es": 2946
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -42,7 +42,7 @@
       {
         "pattern": "adventure.worlds.${world.name}",
         "file": "components/adventure/WorldMap.tsx",
-        "line": 244,
+        "line": 248,
         "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;",
         "type": "template_literal"
       }

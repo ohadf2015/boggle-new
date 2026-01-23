@@ -1,12 +1,16 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star, Sparkles, Trophy, Map, Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
+import { useMusic } from '@/contexts/MusicContext';
+import { useAdventureMusic } from '@/hooks/useAdventureMusic';
+import { useWorldTransitionState } from '@/hooks/useTutorialState';
+import { CutscenePlayer } from '@/components/video/CutscenePlayer';
 import {
   getWorldConfig,
   getLevelConfig,
@@ -21,6 +25,14 @@ import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 // View state type for navigation
 type ViewState = 'worldMap' | 'levelGrid' | 'playing';
 
+// Timer state for music hook coordination
+interface GameTimerState {
+  timeRemaining: number;
+  totalTime: number;
+  isPlaying: boolean;
+  isPaused: boolean;
+}
+
 /**
  * AdventureView - Main Adventure Mode with interactive floating islands world map
  * Shows all 10 worlds with visual progression and level selection
@@ -32,10 +44,69 @@ export default function AdventureView(): React.JSX.Element {
   // Get progression data from context
   const { progression, isLoading, error, completeLevel } = useProgression();
 
+  // Global music context - stop main game music when adventure starts
+  const { stopMusic: stopGlobalMusic } = useMusic();
+
   // View navigation state
   const [viewState, setViewState] = useState<ViewState>('worldMap');
   const [selectedWorld, setSelectedWorld] = useState<number | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+
+  // Game timer state for music coordination (reported by AdventureGame)
+  const [gameTimerState, setGameTimerState] = useState<GameTimerState>({
+    timeRemaining: 0,
+    totalTime: 0,
+    isPlaying: false,
+    isPaused: false,
+  });
+
+  // World transition state
+  const [pendingTransition, setPendingTransition] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
+
+  const transitionFromId = pendingTransition?.from || '';
+  const transitionToId = pendingTransition?.to || '';
+  const { markTransitionViewed } = useWorldTransitionState(transitionFromId, transitionToId);
+
+  // Stop global music when adventure mode starts
+  useEffect(() => {
+    stopGlobalMusic(500); // Quick fade out
+  }, [stopGlobalMusic]);
+
+  // Current world for music (selected world or default to 1)
+  const currentMusicWorld = selectedWorld || 1;
+
+  // Adventure music hook - plays on ALL adventure screens
+  // - WorldMap/LevelGrid: ambient mode (track 1 loops, no timer tracking)
+  // - AdventureGame: dynamic mode (track switching based on time)
+  useAdventureMusic({
+    worldNumber: currentMusicWorld,
+    isPlaying: viewState === 'playing' ? gameTimerState.isPlaying : true,
+    isPaused: viewState === 'playing' ? gameTimerState.isPaused : false,
+    timeRemaining: viewState === 'playing' ? gameTimerState.timeRemaining : 0,
+    totalTime: viewState === 'playing' ? gameTimerState.totalTime : 0,
+    enabled: true,
+  });
+
+  // Callback for AdventureGame to report timer state
+  const handleTimerStateChange = useCallback((timerState: GameTimerState) => {
+    setGameTimerState(timerState);
+  }, []);
+
+  // Handle world unlock - show transition cutscene
+  const handleWorldUnlock = useCallback((fromWorldId: string, toWorldId: string) => {
+    setPendingTransition({ from: fromWorldId, to: toWorldId });
+  }, []);
+
+  // Handle transition cutscene completion
+  const handleTransitionComplete = useCallback(() => {
+    markTransitionViewed();
+    setPendingTransition(null);
+    // After transition, return to world map to show unlocked world
+    setViewState('worldMap');
+  }, [markTransitionViewed]);
 
   // Derive player stats from progression
   const totalStars = progression?.totalStars ?? 0;
@@ -282,6 +353,9 @@ export default function AdventureView(): React.JSX.Element {
                 initialGrid={gameGrid}
                 onLevelComplete={handleLevelComplete}
                 onExit={handleGameExit}
+                onTimerStateChange={handleTimerStateChange}
+                onWorldUnlock={handleWorldUnlock}
+                totalStars={totalStars}
               />
             </motion.div>
           )}
@@ -318,6 +392,18 @@ export default function AdventureView(): React.JSX.Element {
           </motion.div>
         )}
       </main>
+
+      {/* World Transition Cutscene - shows when unlocking new world */}
+      {pendingTransition && (
+        <CutscenePlayer
+          type="transition"
+          fromWorldId={pendingTransition.from as any}
+          toWorldId={pendingTransition.to as any}
+          onComplete={handleTransitionComplete}
+          onSkip={handleTransitionComplete}
+          allowSkipAfterMs={2000}
+        />
+      )}
     </div>
     </AdventureThemeProvider>
   );

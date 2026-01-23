@@ -3720,6 +3720,18 @@ const ja = {
       "notInDictionary": "辞書にない単語です",
       "validationFailed": "単語を検証できませんでした"
     },
+"game": {
+      "objectives": "目標",
+      "combo": "コンボ",
+      "wordsFound": "見つけた単語",
+      "paused": "一時停止",
+      "tryAgain": "もう一度!",
+      "perfect": "パーフェクト!",
+      "newHighScore": "新記録!"
+    },
+    "cutscene": {
+      "skip": "スキップ"
+    },
     "lexi": {
       "longWord": {
         "default": "すごい!長い言葉!",

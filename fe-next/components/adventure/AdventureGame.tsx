@@ -11,13 +11,13 @@ import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from '
 import { Pause, Play, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMusic } from '@/contexts/MusicContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
-import { useAdventureMusic } from '@/hooks/useAdventureMusic';
+import { useWorldIntroState } from '@/hooks/useTutorialState';
 import { ScorePopupFly } from '@/components/animations';
+import { CutscenePlayer, type WorldId } from '@/components/video/CutscenePlayer';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -31,6 +31,14 @@ import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 // TYPES
 // ==============================================
 
+/** Timer state for parent coordination with music hook */
+export interface GameTimerState {
+  timeRemaining: number;
+  totalTime: number;
+  isPlaying: boolean;
+  isPaused: boolean;
+}
+
 interface AdventureGameProps {
   /** Level configuration */
   levelConfig: LevelConfig;
@@ -40,6 +48,12 @@ interface AdventureGameProps {
   onLevelComplete: (stars: number, score: number) => void;
   /** Callback to exit the game */
   onExit: () => void;
+  /** Callback to report timer state to parent (for music coordination) */
+  onTimerStateChange?: (timerState: GameTimerState) => void;
+  /** Callback when completing a level unlocks a new world */
+  onWorldUnlock?: (fromWorldId: string, toWorldId: string) => void;
+  /** Total stars accumulated across all levels (for world unlock detection) */
+  totalStars?: number;
 }
 
 interface ScorePopup {
@@ -52,9 +66,30 @@ interface ScorePopup {
 }
 
 // ==============================================
-// HELPER: Flatten 2D TileState array and add id/row/col
+// HELPER FUNCTIONS
 // ==============================================
 
+/**
+ * Get world ID string from level number
+ * Maps level numbers to world identifiers for cutscene videos
+ */
+function getWorldIdFromLevel(level: number): WorldId {
+  // 7 levels per world (2-2-3 chapter structure)
+  const worldNumber = Math.ceil(level / 7);
+
+  // Map world number to world ID string
+  const worldIdMap: Record<number, WorldId> = {
+    1: 'meadows',      // Alphabet Meadows (levels 1-7)
+    2: 'springs',      // Synonym Springs (levels 8-14)
+    3: 'caverns',      // Root Caverns (levels 15-21)
+  };
+
+  return worldIdMap[worldNumber] || 'meadows'; // Fallback to meadows
+}
+
+/**
+ * Flatten 2D TileState array and add id/row/col
+ */
 function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
   const flat: GridTileState[] = [];
   for (let row = 0; row < tiles2D.length; row++) {
@@ -75,7 +110,7 @@ function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
 // ==============================================
 
 const AdventureGame = memo<AdventureGameProps>(
-  ({ levelConfig, initialGrid, onLevelComplete, onExit }) => {
+  ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, onWorldUnlock, totalStars }) => {
     // Validate config
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
 
@@ -105,9 +140,6 @@ const AdventureGame = memo<AdventureGameProps>(
     // Language context for translations
     const { t, language } = useLanguage();
 
-    // Global music context - stop main game music when adventure starts
-    const { stopMusic: stopGlobalMusic } = useMusic();
-
     // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
@@ -118,6 +150,11 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Track entry sequence phases
     const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
+
+    // Level intro cutscene state
+    const worldId = useMemo(() => getWorldIdFromLevel(levelConfig.level), [levelConfig.level]);
+    const { hasViewedIntro, markIntroViewed } = useWorldIntroState(worldId);
+    const [showLevelIntro, setShowLevelIntro] = useState(!hasViewedIntro);
 
     // Ref for score display target (for ScorePopupFly animation)
     const scoreDisplayRef = useRef<HTMLDivElement>(null);
@@ -167,21 +204,23 @@ const AdventureGame = memo<AdventureGameProps>(
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
     });
 
-    // Stop global music when adventure mode starts to avoid conflict
-    // Adventure mode has its own world-specific music system
+    // Report timer state to parent for music coordination
+    // Parent (AdventureView) owns the useAdventureMusic hook to play music on all screens
     useEffect(() => {
-      stopGlobalMusic(500); // Quick fade out
-    }, [stopGlobalMusic]);
+      onTimerStateChange?.({
+        timeRemaining,
+        totalTime: levelConfig.timerSeconds,
+        isPlaying: isPlaying && entryPhase === 'playing',
+        isPaused,
+      });
+    }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, levelConfig.timerSeconds]);
 
-    // Adventure music hook - world-specific tracks with dynamic switching
-    useAdventureMusic({
-      worldNumber: levelConfig.world,
-      isPlaying: isPlaying && entryPhase === 'playing',
-      isPaused,
-      timeRemaining,
-      totalTime: levelConfig.timerSeconds,
-      enabled: true,
-    });
+    // Handle level intro cutscene completion/skip
+    const handleLevelIntroComplete = useCallback(() => {
+      markIntroViewed();
+      setShowLevelIntro(false);
+      // Entry animation (cascade) begins after cutscene
+    }, [markIntroViewed]);
 
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
@@ -484,13 +523,16 @@ const AdventureGame = memo<AdventureGameProps>(
           <aside
             className={cn(
               'lg:w-64 flex flex-col gap-4',
-              'lg:border-l-2 lg:border-neo-black/20 lg:pl-4'
+              'lg:border-l-2 lg:border-neo-black/20 lg:pl-4',
+              // Dark background for better visibility
+              'p-3 rounded-neo',
+              'bg-neo-navy/90 border-2 border-neo-black/30'
             )}
           >
             {/* Objectives */}
             <div>
               <h2 className="text-sm font-bold text-neo-white/60 uppercase tracking-wide mb-2">
-                Objectives
+                {t('adventure.game.objectives')}
               </h2>
               <AdventureObjectives
                 objectives={objectives}
@@ -508,7 +550,7 @@ const AdventureGame = memo<AdventureGameProps>(
               )}
             >
               <p className="text-sm font-bold text-neo-white/60 uppercase tracking-wide mb-1">
-                Combo
+                {t('adventure.game.combo')}
               </p>
               <p className="text-2xl font-black text-neo-cyan">
                 x{gameState.comboCount}
@@ -527,11 +569,11 @@ const AdventureGame = memo<AdventureGameProps>(
               'bg-neo-black/80 backdrop-blur-sm'
             )}
           >
-            <h2 className="text-3xl font-black mb-8">Paused</h2>
+            <h2 className="text-3xl font-black mb-8">{t('adventure.game.paused')}</h2>
             <div className="flex flex-col gap-4 w-48">
               <button
                 onClick={handlePauseToggle}
-                aria-label="Resume"
+                aria-label={t('common.resume')}
                 className={cn(
                   'py-3 px-6',
                   'bg-neo-lime text-neo-black',
@@ -541,11 +583,11 @@ const AdventureGame = memo<AdventureGameProps>(
                   'transition-all duration-200'
                 )}
               >
-                Resume
+                {t('common.resume')}
               </button>
               <button
                 onClick={handleExit}
-                aria-label="Exit"
+                aria-label={t('common.exit')}
                 className={cn(
                   'py-3 px-6',
                   'flex items-center justify-center gap-2',
@@ -557,7 +599,7 @@ const AdventureGame = memo<AdventureGameProps>(
                 )}
               >
                 <LogOut className="w-5 h-5" />
-                Exit
+                {t('common.exit')}
               </button>
             </div>
           </div>
@@ -582,6 +624,8 @@ const AdventureGame = memo<AdventureGameProps>(
           onContinue={handleContinue}
           onRetry={handleRetry}
           onExit={handleExit}
+          onWorldUnlock={onWorldUnlock}
+          totalStars={totalStars}
         />
 
         {/* Score Popup Animation */}
@@ -600,6 +644,17 @@ const AdventureGame = memo<AdventureGameProps>(
           reaction={reaction}
           onDismiss={dismissReaction}
         />
+
+        {/* Level Intro Cutscene - plays before entry animation */}
+        {showLevelIntro && (
+          <CutscenePlayer
+            type="level-intro"
+            worldId={worldId}
+            onComplete={handleLevelIntroComplete}
+            onSkip={handleLevelIntroComplete}
+            allowSkipAfterMs={2000}
+          />
+        )}
       </div>
     );
   }

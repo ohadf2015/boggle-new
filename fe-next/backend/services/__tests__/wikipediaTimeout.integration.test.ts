@@ -23,8 +23,8 @@ describe('Wikipedia API Timeout Reproduction', () => {
     const duration = Date.now() - startTime;
     console.log(`[TEST] Fetch completed in ${duration}ms`);
 
-    // THEN: Should complete within 30 seconds (new axios timeout)
-    expect(duration).toBeLessThan(30000);
+    // THEN: Should complete within 35 seconds (axios timeout is 30s + network variability buffer)
+    expect(duration).toBeLessThan(35000);
 
     // THEN: Should return featured content or null (404 is ok)
     expect(result).toBeDefined();
@@ -43,8 +43,8 @@ describe('Wikipedia API Timeout Reproduction', () => {
     const duration = Date.now() - startTime;
     console.log(`[TEST] Fetch completed in ${duration}ms`);
 
-    // THEN: Should complete within 30 seconds (new axios timeout)
-    expect(duration).toBeLessThan(30000);
+    // THEN: Should complete within 35 seconds (axios timeout is 30s + network variability buffer)
+    expect(duration).toBeLessThan(35000);
 
     // THEN: Should return result or null
     expect(result).toBeDefined();

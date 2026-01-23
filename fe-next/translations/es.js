@@ -3709,6 +3709,18 @@ const es = {
       "notInDictionary": "La palabra no está en el diccionario",
       "validationFailed": "No se pudo validar la palabra"
     },
+"game": {
+      "objectives": "Objetivos",
+      "combo": "Combo",
+      "wordsFound": "Palabras encontradas",
+      "paused": "Pausado",
+      "tryAgain": "¡Inténtalo de nuevo!",
+      "perfect": "¡Perfecto!",
+      "newHighScore": "¡Nuevo récord!"
+    },
+    "cutscene": {
+      "skip": "Omitir"
+    },
     "lexi": {
       "longWord": {
         "default": "¡Vaya! ¡Esa es muy larga!",
