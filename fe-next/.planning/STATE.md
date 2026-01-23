@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 9 of 10 (Invalid Word System)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-23 - Completed 09-01-PLAN.md (Checkbox Selection UI)
+Last activity: 2026-01-23 - Completed 09-02-PLAN.md (Bulk Approve API Endpoint)
 
-Progress: [████████░░] 85% (8 phases complete + 09-01, 35/~38 plans)
+Progress: [████████░░] 87% (8 phases complete + 09-01/02, 36/~38 plans)
 
 ## Performance Metrics
 
@@ -158,6 +158,10 @@ Recent decisions affecting current work:
 - **09-01:** Use word.id for selection tracking (not word+language)
 - **09-01:** Clear selection when filters or pagination change
 - **09-01:** Remove item from selection on approve/dismiss
+- **09-02:** Sequential word processing (not parallel) to avoid race conditions
+- **09-02:** Vote calculation: max(10, min(submission_count * 2, 20))
+- **09-02:** Use verifyAdminAuth + console.log for App Router compatibility
+- **09-02:** Business logic extracted to handleBulkApprove for direct testing
 
 ### Pending Todos
 
@@ -307,16 +311,16 @@ None.
 | Plan | Description | Status |
 |------|-------------|--------|
 | 09-01 | Checkbox Selection UI | ✓ |
-| 09-02 | Bulk approve API endpoint | |
+| 09-02 | Bulk approve API endpoint | ✓ |
 | 09-03 | BulkApproveButton integration | |
 
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 09-01-PLAN.md (Checkbox Selection UI)
+Stopped at: Completed 09-02-PLAN.md (Bulk Approve API Endpoint)
 Resume file: None
-Next: 09-02-PLAN.md (Bulk approve API endpoint)
+Next: 09-03-PLAN.md (BulkApproveButton integration)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-23 19:25 UTC*
+*Last updated: 2026-01-23 19:30 UTC*
