@@ -21,6 +21,10 @@ import {
   updateWordValidationStatus
 } from '@/utils/dailyChallenge/wikipediaWordProcessor';
 
+// Minimum score threshold for auto-promotion to dictionary
+// Words >= this score that pass AI validation are automatically added to community_words
+const AUTO_PROMOTION_SCORE_THRESHOLD = 80;
+
 // Fallback static word lists - curated interesting words (4+ letters)
 const FALLBACK_WORD_LISTS: Record<Language, string[]> = {
   en: [
@@ -334,6 +338,24 @@ async function tryWikipediaSource(
   } catch (error) {
     console.error(`[WikiPopulator] Wikipedia fetch error for ${language}:`, error);
     return null;
+  }
+}
+
+/**
+ * Check if a word already exists in the game dictionary (community_words)
+ * to avoid duplicate insertion errors
+ */
+async function isWordInDictionary(
+  word: string,
+  language: Language
+): Promise<boolean> {
+  try {
+    const { gameAIService } = await import('@/lib/ai-service');
+    const result = await gameAIService.checkDatabaseOnly(word, language);
+    return result.source === 'database' && result.isValid;
+  } catch (error) {
+    console.warn(`[WikiPopulator] Dictionary check failed for ${word}:`, error);
+    return false;
   }
 }
 
