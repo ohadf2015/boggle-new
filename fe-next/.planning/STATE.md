@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 8 - Wikipedia Integration
+**Current focus:** Phase 9 - Invalid Word System
 
 ## Current Position
 
@@ -210,6 +210,13 @@ None.
 - ✅ CutscenePlayer component with iOS Safari support (07-05)
 - ✅ Cutscene integration (tutorial, level intro, world transition) (07-06)
 - ⏸️ Video files not yet rendered (run `./scripts/render-cutscenes.sh` when ready)
+
+**Phase 8 Wikipedia Integration:** ✓ COMPLETE
+- ✅ Auto-promotion for high-scoring words (≥80) (08-01)
+- ✅ Bulk approve UI with BulkApproveButton (08-02)
+- ✅ Edge case hardening with AI fallback (08-03)
+- ✅ E2E integration tests (13 tests) + verification script (08-04)
+- ✅ Phase verified: 5/5 success criteria met
 
 **General:**
 - Friends page build error pre-exists (unrelated to Phase 2 work)

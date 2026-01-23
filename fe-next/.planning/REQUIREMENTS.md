@@ -39,8 +39,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Bug Fixes
 
-- [ ] **FIX-01**: Wikipedia word extraction pipeline working
-- [ ] **FIX-02**: Words sync from admin dashboard to game dictionary
+- [x] **FIX-01**: Wikipedia word extraction pipeline working
+- [x] **FIX-02**: Words sync from admin dashboard to game dictionary
 - [ ] **FIX-03**: Track frequently rejected invalid words
 - [ ] **FIX-04**: Admin review queue for popular invalid submissions
 - [ ] **FIX-05**: Approve words from admin queue to dictionary
@@ -122,8 +122,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONT-10 | Phase 7 | Pending |
 | CONT-11 | Phase 7 | Pending |
 | CONT-12 | Phase 7 | Pending |
-| FIX-01 | Phase 8 (Plans 08-01, 08-03, 08-04) | Pending |
-| FIX-02 | Phase 8 (Plans 08-02, 08-04) | Pending |
+| FIX-01 | Phase 8 (Plans 08-01, 08-03, 08-04) | Complete |
+| FIX-02 | Phase 8 (Plans 08-02, 08-04) | Complete |
 | FIX-03 | Phase 9 | Pending |
 | FIX-04 | Phase 9 | Pending |
 | FIX-05 | Phase 9 | Pending |

@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Lexi Personality** - Mascot reactions and contextual feedback
 - [x] **Phase 6: AI Asset Generation** - Backgrounds, tiles, characters, removal pipeline
 - [x] **Phase 7: Video Cutscenes** - Remotion compositions and delivery
-- [ ] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
+- [x] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
 - [ ] **Phase 9: Invalid Word System** - Admin queue and approval workflow
 - [ ] **Phase 10: Bug Fixes & Stabilization** - Daily challenge fixes and loose ends
 
@@ -161,10 +161,13 @@ Plans:
   3. Word sync happens reliably without manual intervention
   4. Admin sees confirmation when words successfully added to dictionary
   5. System handles edge cases (duplicate words, invalid formats, non-English pages)
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 08-01: TBD
+- [x] 08-01-PLAN.md — Auto-promote high-scoring candidates (score ≥80)
+- [x] 08-02-PLAN.md — Admin bulk approve UI with BulkApproveButton
+- [x] 08-03-PLAN.md — Edge case hardening (AI fallback, error isolation)
+- [x] 08-04-PLAN.md — E2E integration tests and verification script
 
 ### Phase 9: Invalid Word System
 **Goal**: Admin can review and approve frequently submitted invalid words to improve dictionary
