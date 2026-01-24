@@ -1,6 +1,34 @@
 import { checkWordIntegration } from '../useWordIntegration';
 
+// Mock the dictionary module
+jest.mock('@/backend/dictionary', () => ({
+  isDictionaryWord: jest.fn(),
+}));
+
+import { isDictionaryWord } from '@/backend/dictionary';
+
+const mockIsDictionaryWord = isDictionaryWord as jest.MockedFunction<typeof isDictionaryWord>;
+
 describe('checkWordIntegration', () => {
+  beforeEach(() => {
+    // Reset mocks before each test
+    jest.clearAllMocks();
+
+    // Default: simulate dictionary loaded, word validation based on common words
+    mockIsDictionaryWord.mockImplementation((word: string, language: string) => {
+      // Simulate common English words
+      const commonWords = ['cat', 'dog', 'hello', 'appreciation', 'world'];
+      // Simulate common words in other languages (basic check)
+      const hebrewWords = ['שלום'];
+      const swedishWords = ['hej'];
+      const japaneseWords = ['日本'];
+      const spanishWords = ['hola'];
+
+      const allWords = [...commonWords, ...hebrewWords, ...swedishWords, ...japaneseWords, ...spanishWords];
+
+      return allWords.includes(word.toLowerCase());
+    });
+  });
   // Valid dictionary words
   describe('Valid dictionary words', () => {
     it('should return canIntegrate=true for valid English dictionary word', () => {
@@ -269,6 +297,45 @@ describe('checkWordIntegration', () => {
       // THEN: Should not be in dictionary
       expect(result.canIntegrate).toBe(false);
       expect(result.reason).toBe('word_not_in_dictionary');
+    });
+  });
+
+  // React hook batch checking
+  describe('useWordIntegration hook', () => {
+    it('should provide batch checking functionality', () => {
+      // GIVEN: Multiple words to check
+      const words = ['cat', 'dog', 'xyzabc', 'supercalifragilistic', 'ab'];
+      const language = 'en' as const;
+
+      // Import the hook
+      const { useWordIntegration } = require('../useWordIntegration');
+      const { checkWords } = useWordIntegration();
+
+      // WHEN: Checking words in batch
+      const results = checkWords(words, language);
+
+      // THEN: Should return array of results
+      expect(results).toHaveLength(5);
+      expect(results[0].canIntegrate).toBe(true); // cat
+      expect(results[1].canIntegrate).toBe(true); // dog
+      expect(results[2].canIntegrate).toBe(false); // xyzabc - not in dict
+      expect(results[3].canIntegrate).toBe(false); // too long
+      expect(results[4].canIntegrate).toBe(false); // too short
+    });
+
+    it('should handle empty word array', () => {
+      // GIVEN: Empty array
+      const words: string[] = [];
+      const language = 'en' as const;
+
+      const { useWordIntegration } = require('../useWordIntegration');
+      const { checkWords } = useWordIntegration();
+
+      // WHEN: Checking empty array
+      const results = checkWords(words, language);
+
+      // THEN: Should return empty array
+      expect(results).toEqual([]);
     });
   });
 
