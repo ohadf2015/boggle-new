@@ -54,6 +54,7 @@ This registry documents all bugs discovered during systematic bug discovery sess
 **Severity:** High
 **Component:** components/daily/results/useResultSubmission.ts
 **Language:** All
+**Status:** ✅ FIXED (Plan 10-03)
 **Steps to Reproduce:**
 1. Complete Word Hunt game
 2. If attemptsUsed < 1 or > 10 (data corruption scenario)
@@ -72,7 +73,13 @@ if (result.attemptsUsed < 1 || result.attemptsUsed > 10) {
 ```
 
 **Root Cause:** Data validation happens AFTER submission flag is set, causing permanent data loss
-**Fix Plan:** 10-03 (result submission fixes)
+
+**Fix Applied:**
+- Removed `hasSubmittedRef.current = true` and `markWordHuntResultSubmitted(language)` calls
+- Changed to console.error for better visibility
+- Return early without marking as submitted
+- Test coverage: 4 tests in bug-fixes.test.tsx (RED-GREEN cycle verified)
+- Commit: 99f53d9b (test), [next] (fix)
 
 #### BUG-003: Known Letters Not Cleaned Up When All Occurrences Become Green
 **Severity:** High (affects clue accuracy)
@@ -279,7 +286,7 @@ VARIABLE KEYS (8 found):
 ### BUG-009: Next.js 16 Turbopack Production Build Failure
 
 **Severity:** Critical
-**Status:** OPEN
+**Status:** RESOLVED (transient issue - build now passes)
 **Discovered:** 2026-01-24 (Plan 10-02)
 **Component:** Build System / Next.js 16
 **Language:** All

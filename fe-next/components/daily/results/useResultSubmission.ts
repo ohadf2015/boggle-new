@@ -89,11 +89,16 @@ export function useResultSubmission({
           // Validate attemptsUsed BEFORE marking as submitted
           // Zero attempts means the result was created but never actually attempted
           // which indicates stale/invalid data that should not be submitted
+          // BUG FIX (BUG-002): Do NOT mark as submitted when data is invalid
+          // This allows user to correct the issue or retry with valid data
           if (result.attemptsUsed < 1 || result.attemptsUsed > 10) {
-            console.warn('[WordHunt Submit] Invalid attempts count:', result.attemptsUsed, '- must be between 1 and 10. Marking as submitted to prevent retries.');
-            // Mark as submitted even though invalid to prevent infinite retry loops
-            hasSubmittedRef.current = true;
-            markWordHuntResultSubmitted(language);
+            console.error(
+              '[WordHunt Submit] Invalid attempts count:',
+              result.attemptsUsed,
+              '- must be between 1 and 10. Cannot submit invalid data.'
+            );
+            // DO NOT mark as submitted - invalid data should not be persisted
+            // DO NOT retry - just exit silently to prevent infinite loops
             return;
           }
 
