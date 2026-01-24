@@ -3761,6 +3761,80 @@ const en = {
         "star3": "Perfect score!"
       }
     }
+  },
+  "teacher": {
+    "accessRequired": "Teacher Access Required",
+    "accessDenied": "You need teacher privileges to access this page.",
+    "dashboard": {
+      "title": "Teacher Dashboard",
+      "classrooms": "Classrooms",
+      "lessons": "Vocabulary Lessons",
+      "students": "Students",
+      "progress": "Progress"
+    },
+    "classroom": {
+      "create": "Create Classroom",
+      "edit": "Edit Classroom",
+      "delete": "Delete Classroom",
+      "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
+      "name": "Classroom Name",
+      "joinCode": "Join Code",
+      "copyCode": "Copy Code",
+      "codeCopied": "Join code copied!",
+      "members": "{{count}} students",
+      "member": "1 student",
+      "noMembers": "No students yet",
+      "language": "Language",
+      "created": "Created {{date}}",
+      "noClassrooms": "No classrooms yet",
+      "createFirst": "Create your first classroom to get started"
+    },
+    "lesson": {
+      "create": "Create Lesson",
+      "edit": "Edit Lesson",
+      "delete": "Delete Lesson",
+      "confirmDelete": "Delete this lesson? Student progress will be lost.",
+      "name": "Lesson Name",
+      "description": "Description (optional)",
+      "words": "{{count}} words",
+      "word": "1 word",
+      "noWords": "No words yet",
+      "addWord": "Add Word",
+      "removeWord": "Remove",
+      "wordPlaceholder": "Enter a word...",
+      "canIntegrate": "Can embed in games",
+      "cannotIntegrate": "Track only",
+      "assignToClassroom": "Assign to Classroom",
+      "noClassroomSelected": "No classroom (personal lesson)",
+      "isPublic": "Make public",
+      "publicDescription": "Other teachers can discover and use this lesson",
+      "save": "Save Lesson",
+      "saving": "Saving...",
+      "saved": "Lesson saved!",
+      "noLessons": "No lessons yet",
+      "createFirst": "Create your first vocabulary lesson"
+    },
+    "progress": {
+      "title": "Student Progress",
+      "student": "Student",
+      "wordsAttempted": "Attempted",
+      "wordsMastered": "Mastered",
+      "accuracy": "Accuracy",
+      "lastActive": "Last Active",
+      "noData": "No progress data yet",
+      "assignLessons": "Assign lessons to start tracking student progress",
+      "chartTitle": "Class Progress Over Time",
+      "wordsLearned": "Words Learned",
+      "accuracy": "Accuracy %",
+      "expandDetails": "View word breakdown"
+    },
+    "stats": {
+      "totalStudents": "Total Students",
+      "completionRate": "Completion Rate",
+      "averageAccuracy": "Average Accuracy",
+      "wordsAttempted": "Words Attempted",
+      "wordsMastered": "Words Mastered"
+    }
   }
 };
 
