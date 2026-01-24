@@ -38,18 +38,18 @@ interface LevelGridProps {
   onLevelSelect: (worldId: number, levelId: number) => void;
 }
 
-// World images mapping
+// World images mapping (WebP for smaller file sizes)
 const WORLD_IMAGES: Record<number, string> = {
-  1: '/images/adventure/world-meadows-3d.png',
-  2: '/images/adventure/world-springs-3d.png',
-  3: '/images/adventure/world-caverns-3d.png',
-  4: '/images/adventure/world-archipelago-3d.png',
-  5: '/images/adventure/world-canyon-3d.png',
-  6: '/images/adventure/world-labyrinth-3d.png',
-  7: '/images/adventure/world-palace-3d.png',
-  8: '/images/adventure/world-nebula-3d.png',
-  9: '/images/adventure/world-peaks-3d.png',
-  10: '/images/adventure/world-throne-3d.png',
+  1: '/images/adventure/world-meadows-3d.webp',
+  2: '/images/adventure/world-springs-3d.webp',
+  3: '/images/adventure/world-caverns-3d.webp',
+  4: '/images/adventure/world-archipelago-3d.webp',
+  5: '/images/adventure/world-canyon-3d.webp',
+  6: '/images/adventure/world-labyrinth-3d.webp',
+  7: '/images/adventure/world-palace-3d.webp',
+  8: '/images/adventure/world-nebula-3d.webp',
+  9: '/images/adventure/world-peaks-3d.webp',
+  10: '/images/adventure/world-throne-3d.webp',
 };
 
 // World-specific floating particle configurations

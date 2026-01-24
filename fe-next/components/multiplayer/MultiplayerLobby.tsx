@@ -222,7 +222,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
         <div dir={dir} className="flex h-dvh w-full overflow-hidden bg-neo-navy text-white p-3 gap-4 landscape-full-height">
         {/* Left column: Form */}
-        <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
+        <div className="w-[45%] flex flex-col gap-3 overflow-y-auto overscroll-contain scrollable-area">
           {/* Header with back + title */}
           <div className="flex items-center gap-3">
             <Link
@@ -319,7 +319,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <h2 className="text-base font-black uppercase text-neo-white text-center">
             {t('joinView.activeRooms') || 'Active Rooms'}
           </h2>
-          <div className="flex-1 overflow-y-auto bg-neo-navy text-white rounded-neo border-3 border-neo-black p-3 shadow-hard">
+          <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area bg-neo-navy text-white rounded-neo border-3 border-neo-black p-3 shadow-hard">
             <RoomList
               activeRooms={activeRooms}
               onRoomSelect={handleRoomSelect}
@@ -343,8 +343,8 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       {/* Landscape mode suggestion banner */}
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col">
-      <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0">
+      <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col overflow-y-auto scrollable-area">
+      <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0 pb-[--mobile-bottom-safe]">
         {/* Compact Header: back button + title inline with premium gradient accent */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

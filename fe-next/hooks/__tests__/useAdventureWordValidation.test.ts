@@ -362,6 +362,119 @@ describe('useAdventureWordValidation', () => {
       expect(validationResult!.score).toBeGreaterThan(0);
     });
 
+    it('should return 3x score when word path contains gold tile', async () => {
+      // GIVEN - Grid with tiles and gold tile info passed
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ isValid: true, source: 'dictionary' }),
+      });
+
+      // Mock tiles with gold tile at position (0,0)
+      const mockTiles = [
+        [
+          { letter: 'C', type: 'gold' as const, isCleared: false },
+          { letter: 'A', type: 'standard' as const, isCleared: false },
+          { letter: 'T', type: 'standard' as const, isCleared: false },
+          { letter: 'S', type: 'standard' as const, isCleared: false },
+        ],
+        [
+          { letter: 'D', type: 'standard' as const, isCleared: false },
+          { letter: 'O', type: 'standard' as const, isCleared: false },
+          { letter: 'G', type: 'standard' as const, isCleared: false },
+          { letter: 'E', type: 'standard' as const, isCleared: false },
+        ],
+        [
+          { letter: 'B', type: 'standard' as const, isCleared: false },
+          { letter: 'I', type: 'standard' as const, isCleared: false },
+          { letter: 'R', type: 'standard' as const, isCleared: false },
+          { letter: 'D', type: 'standard' as const, isCleared: false },
+        ],
+        [
+          { letter: 'F', type: 'standard' as const, isCleared: false },
+          { letter: 'I', type: 'standard' as const, isCleared: false },
+          { letter: 'S', type: 'standard' as const, isCleared: false },
+          { letter: 'H', type: 'standard' as const, isCleared: false },
+        ],
+      ];
+
+      const { result } = renderHook(() =>
+        useAdventureWordValidation({
+          grid: mockGrid,
+          language: 'en',
+          minWordLength: 3,
+          foundWords: [],
+          tiles: mockTiles,
+        })
+      );
+
+      // WHEN - Validate CAT starting with gold tile
+      let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
+      await act(async () => {
+        validationResult = await result.current.validateWord('CAT', validCatPath);
+      });
+
+      // THEN - Score should be 3x the base score (30 * 3 = 90 for 3-letter word)
+      // Base score = 3 letters * 10 points = 30
+      // With gold multiplier = 30 * 3 = 90
+      expect(validationResult!.isValid).toBe(true);
+      expect(validationResult!.score).toBe(90); // 3x multiplier applied
+    });
+
+    it('should return 1.25x score when word path contains rainbow tile', async () => {
+      // GIVEN - Grid with rainbow tile
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ isValid: true, source: 'dictionary' }),
+      });
+
+      const mockTiles = [
+        [
+          { letter: 'C', type: 'rainbow' as const, isCleared: false },
+          { letter: 'A', type: 'standard' as const, isCleared: false },
+          { letter: 'T', type: 'standard' as const, isCleared: false },
+          { letter: 'S', type: 'standard' as const, isCleared: false },
+        ],
+        [
+          { letter: 'D', type: 'standard' as const, isCleared: false },
+          { letter: 'O', type: 'standard' as const, isCleared: false },
+          { letter: 'G', type: 'standard' as const, isCleared: false },
+          { letter: 'E', type: 'standard' as const, isCleared: false },
+        ],
+        [
+          { letter: 'B', type: 'standard' as const, isCleared: false },
+          { letter: 'I', type: 'standard' as const, isCleared: false },
+          { letter: 'R', type: 'standard' as const, isCleared: false },
+          { letter: 'D', type: 'standard' as const, isCleared: false },
+        ],
+        [
+          { letter: 'F', type: 'standard' as const, isCleared: false },
+          { letter: 'I', type: 'standard' as const, isCleared: false },
+          { letter: 'S', type: 'standard' as const, isCleared: false },
+          { letter: 'H', type: 'standard' as const, isCleared: false },
+        ],
+      ];
+
+      const { result } = renderHook(() =>
+        useAdventureWordValidation({
+          grid: mockGrid,
+          language: 'en',
+          minWordLength: 3,
+          foundWords: [],
+          tiles: mockTiles,
+        })
+      );
+
+      // WHEN - Validate CAT starting with rainbow tile
+      let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
+      await act(async () => {
+        validationResult = await result.current.validateWord('CAT', validCatPath);
+      });
+
+      // THEN - Score should be 1.25x the base score (30 * 1.25 = 37.5 -> 37)
+      expect(validationResult!.isValid).toBe(true);
+      expect(validationResult!.score).toBe(37); // 1.25x multiplier applied and floored
+    });
+
     it('should return higher score for longer words', async () => {
       // GIVEN
       mockFetch

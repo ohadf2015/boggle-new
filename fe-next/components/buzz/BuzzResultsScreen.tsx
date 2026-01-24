@@ -143,6 +143,10 @@ export default function BuzzResultsScreen({
           text: shareText,
         });
       } catch (err) {
+        // AbortError means user cancelled the share dialog - this is normal behavior
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
         console.error('Share failed:', err);
       }
     } else {

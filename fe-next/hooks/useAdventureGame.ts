@@ -329,7 +329,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           }
         }
 
-        // Clear and unfreeze ice tiles adjacent to used tiles
+        // Melt ice tiles adjacent to used tiles - convert to standard usable tiles
         const gridSize = state.levelConfig.gridSize;
         for (const pos of path) {
           // Check all 8 neighbors
@@ -340,9 +340,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
               const nc = pos.col + dc;
               if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
                 const neighborTile = newTiles[nr][nc];
-                if (neighborTile.type === 'ice' && !neighborTile.isCleared) {
-                  neighborTile.isCleared = true;
-                  neighborTile.isFrozen = false; // Unfreeze ice tiles
+                if (neighborTile.type === 'ice' && neighborTile.isFrozen) {
+                  // Convert ice to standard tile (melted ice becomes usable)
+                  neighborTile.type = 'standard';
+                  neighborTile.isFrozen = false;
+                  // Note: isCleared stays false so tile can be selected
                   iceClearedCount++;
                 }
               }

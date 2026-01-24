@@ -537,7 +537,7 @@ const AdventureGrid = memo(
 
                   // Enhanced effect classes for special tiles
                   enableComplexAnimations && tile.type === 'gold' && 'tile-gold-enhanced',
-                  enableComplexAnimations && tile.type === 'ice' && 'tile-ice-enhanced',
+                  enableComplexAnimations && tile.type === 'ice' && !tile.isCleared && 'tile-ice-enhanced',
                   enableComplexAnimations && tile.type === 'bomb' && 'tile-bomb-enhanced',
                   enableComplexAnimations && tile.type === 'rainbow' && 'tile-rainbow-enhanced',
                   enableComplexAnimations && tile.type === 'chain' && 'tile-chain-enhanced',
@@ -605,7 +605,8 @@ const AdventureGrid = memo(
                 )}
 
                 {/* ========== ICE TILE EFFECTS ========== */}
-                {tile.type === 'ice' && enableComplexAnimations && (
+                {/* Only show ice effects when tile is NOT cleared (melted) */}
+                {tile.type === 'ice' && !tile.isCleared && enableComplexAnimations && (
                   <>
                     <span className="tile-ice-snowflake tile-ice-snowflake--1">❄</span>
                     <span className="tile-ice-snowflake tile-ice-snowflake--2">❄</span>

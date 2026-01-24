@@ -191,6 +191,7 @@ export default function LessonBuilder() {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
           <Dialog.Content
+            aria-describedby={undefined}
             className={cn(
               'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
               'w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6',

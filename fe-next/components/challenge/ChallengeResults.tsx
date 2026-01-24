@@ -103,7 +103,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
   }, [challenge, language, handleCopyLink]);
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+    <div className="flex-1 min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4 overflow-y-auto scrollable-area">
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}

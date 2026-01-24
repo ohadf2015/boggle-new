@@ -140,9 +140,10 @@ const AdventureTile = memo<AdventureTileProps>(
       : `Letter ${letter}, ${tileTypeLabel}`;
 
     // Enhanced class for special tiles with effects
+    // Don't apply ice-enhanced class to cleared ice tiles (they've "melted")
     const enhancedClass = enableEffects ? {
       gold: 'tile-gold-enhanced',
-      ice: 'tile-ice-enhanced',
+      ice: isCleared ? '' : 'tile-ice-enhanced',
       bomb: 'tile-bomb-enhanced',
       rainbow: 'tile-rainbow-enhanced',
       chain: 'tile-chain-enhanced',
@@ -237,7 +238,8 @@ const AdventureTile = memo<AdventureTileProps>(
         {type === 'gold' && enableEffects && <GoldEffects />}
 
         {/* ========== ICE TILE EFFECTS ========== */}
-        {type === 'ice' && enableEffects && <IceEffects />}
+        {/* Only show ice effects when tile is NOT cleared (melted) */}
+        {type === 'ice' && !isCleared && enableEffects && <IceEffects />}
 
         {/* Frost overlay for frozen ice tiles */}
         {type === 'ice' && isFrozen && (

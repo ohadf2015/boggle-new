@@ -1466,7 +1466,7 @@ export default function MultiplayerPage(): React.JSX.Element {
 
       <AutoHideHeader />
       <ErrorBoundary>
-        <div tabIndex={-1} className='flex-1 flex flex-col min-h-0 w-full'>
+        <div tabIndex={-1} className='h-dvh flex flex-col min-h-0 w-full overflow-hidden'>
           {renderView()}
         </div>
       </ErrorBoundary>

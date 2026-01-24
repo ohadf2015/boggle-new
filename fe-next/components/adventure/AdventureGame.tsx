@@ -216,11 +216,13 @@ const AdventureGame = memo<AdventureGameProps>(
     const currentPopup = popupQueue[0] ?? null;
 
     // Word validation hook (must come before selection hook which depends on isValidating)
+    // Pass tiles for score calculation with special tile multipliers (gold 3x, rainbow 1.25x)
     const { validateWord, isValidating } = useAdventureWordValidation({
       grid: initialGrid,
       language: language || 'en',
       minWordLength: 3,
       foundWords: gameState.wordsFound,
+      tiles: tiles2D,
     });
 
     // Ref to grid for coordinate calculation

@@ -206,7 +206,7 @@ export default function AdventureView(): React.JSX.Element {
       initialWorldId={selectedWorld || 1}
       initialLevel={selectedLevel || 1}
     >
-    <div className="h-screen bg-neo-navy relative flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
       {/* Header - Sticky at top */}
       <header className="sticky top-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -276,8 +276,8 @@ export default function AdventureView(): React.JSX.Element {
         </div>
       </header>
 
-      {/* Main Content - Takes remaining height */}
-      <main className="relative z-10 flex-1 overflow-hidden">
+      {/* Main Content - Takes remaining height, children handle their own scroll */}
+      <main className="relative z-10 flex-1 min-h-0">
         <AnimatePresence mode="wait">
           {viewState === 'worldMap' && (
             // World Map View

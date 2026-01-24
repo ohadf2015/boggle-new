@@ -152,8 +152,7 @@ export default function SettingsPage(): React.ReactNode {
 
   return (
     <div className={cn(
-      'flex-1 flex flex-col',
-      isLandscape && 'h-screen overflow-y-auto',
+      'flex-1 flex flex-col min-h-screen',
       isDarkMode
         ? 'bg-neo-navy'
         : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'

@@ -21,6 +21,13 @@ export interface WordValidationResult {
   score?: number;
 }
 
+/** Tile state for score calculation with special tile multipliers */
+export interface TileStateForValidation {
+  letter: string;
+  type: 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time';
+  isCleared: boolean;
+}
+
 export interface UseAdventureWordValidationProps {
   /** The letter grid (2D array) */
   grid: string[][];
@@ -30,6 +37,8 @@ export interface UseAdventureWordValidationProps {
   minWordLength: number;
   /** Already found words */
   foundWords: string[];
+  /** Optional tile states for special tile multiplier calculation */
+  tiles?: TileStateForValidation[][];
 }
 
 export interface UseAdventureWordValidationReturn {
@@ -60,6 +69,12 @@ const LENGTH_BONUS_MULTIPLIER: Record<number, number> = {
   7: 3,
   8: 4,
 };
+
+/** Gold tile score multiplier */
+const GOLD_MULTIPLIER = 3;
+
+/** Rainbow tile score multiplier */
+const RAINBOW_MULTIPLIER = 1.25;
 
 // ==============================================
 // HELPER FUNCTIONS
@@ -115,12 +130,40 @@ function getWordFromPath(
 }
 
 /**
- * Calculate score for a valid word
+ * Calculate score for a valid word including special tile multipliers
+ * @param wordLength - Length of the word
+ * @param tiles - Optional 2D array of tile states
+ * @param path - Optional path of positions to check for special tiles
  */
-function calculateScore(wordLength: number): number {
+function calculateScore(
+  wordLength: number,
+  tiles?: TileStateForValidation[][],
+  path?: Array<{ row: number; col: number }>
+): number {
   const baseScore = wordLength * BASE_SCORE_PER_LETTER;
-  const multiplier = LENGTH_BONUS_MULTIPLIER[wordLength] || (wordLength >= 8 ? 4 : 1);
-  return Math.round(baseScore * multiplier);
+  const lengthMultiplier = LENGTH_BONUS_MULTIPLIER[wordLength] || (wordLength >= 8 ? 4 : 1);
+  let score = Math.round(baseScore * lengthMultiplier);
+
+  // Apply special tile multipliers if tiles and path are provided
+  if (tiles && path && path.length > 0) {
+    // Check for gold tile in path (3x multiplier)
+    const hasGold = path.some(
+      (pos) => tiles[pos.row]?.[pos.col]?.type === 'gold'
+    );
+    if (hasGold) {
+      score = Math.round(score * GOLD_MULTIPLIER);
+    }
+
+    // Check for rainbow tile in path (1.25x multiplier)
+    const hasRainbow = path.some(
+      (pos) => tiles[pos.row]?.[pos.col]?.type === 'rainbow'
+    );
+    if (hasRainbow) {
+      score = Math.floor(score * RAINBOW_MULTIPLIER);
+    }
+  }
+
+  return score;
 }
 
 // ==============================================
@@ -132,6 +175,7 @@ export function useAdventureWordValidation({
   language,
   minWordLength,
   foundWords,
+  tiles,
 }: UseAdventureWordValidationProps): UseAdventureWordValidationReturn {
   const [isValidating, setIsValidating] = useState(false);
   const [lastValidationResult, setLastValidationResult] =
@@ -215,7 +259,7 @@ export function useAdventureWordValidation({
         if (data.isValid) {
           const result: WordValidationResult = {
             isValid: true,
-            score: calculateScore(word.length),
+            score: calculateScore(word.length, tiles, path),
           };
           setLastValidationResult(result);
           setIsValidating(false);
@@ -247,7 +291,7 @@ export function useAdventureWordValidation({
         return result;
       }
     },
-    [grid, language, minWordLength, normalizedFoundWords]
+    [grid, language, minWordLength, normalizedFoundWords, tiles]
   );
 
   return {

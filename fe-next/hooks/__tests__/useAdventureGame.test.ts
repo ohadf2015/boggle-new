@@ -426,8 +426,9 @@ describe('useAdventureGame', () => {
         ]);
       });
 
-      // THEN - Ice should be cleared
-      expect(result.current.tiles[0][1].isCleared).toBe(true);
+      // THEN - Ice should become standard (melted and selectable)
+      expect(result.current.tiles[0][1].type).toBe('standard');
+      expect(result.current.tiles[0][1].isCleared).toBe(false); // NOT cleared - selectable
       const clearIceObjective = result.current.objectives.find(
         (o) => o.type === 'clearIce'
       );

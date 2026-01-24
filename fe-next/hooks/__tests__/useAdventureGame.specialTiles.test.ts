@@ -440,8 +440,9 @@ describe('Ice Tile - Clearing Mechanics', () => {
       ]);
     });
 
-    // THEN - Ice tile should be cleared
-    expect(result.current.tiles[0][1].isCleared).toBe(true);
+    // THEN - Ice tile should become standard (melted and selectable)
+    expect(result.current.tiles[0][1].type).toBe('standard');
+    expect(result.current.tiles[0][1].isCleared).toBe(false); // NOT cleared - so it's selectable
   });
 
   it('should unfreeze ice tile when cleared by adjacent tile', () => {
@@ -471,9 +472,10 @@ describe('Ice Tile - Clearing Mechanics', () => {
       ]);
     });
 
-    // THEN - Ice tile should be unfrozen AND cleared
+    // THEN - Ice tile should be unfrozen AND become standard (melted)
     expect(result.current.tiles[0][1].isFrozen).toBe(false);
-    expect(result.current.tiles[0][1].isCleared).toBe(true);
+    expect(result.current.tiles[0][1].type).toBe('standard');
+    expect(result.current.tiles[0][1].isCleared).toBe(false); // NOT cleared - selectable!
   });
 
   it('should increment clearIce objective when ice is cleared', () => {

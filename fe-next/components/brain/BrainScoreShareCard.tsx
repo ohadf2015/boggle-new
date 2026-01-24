@@ -131,7 +131,10 @@ lexiclash.com`;
         url: 'https://lexiclash.com',
       });
     } catch (err) {
-      // User cancelled or error
+      // AbortError means user cancelled the share dialog - this is normal behavior
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
       console.error('Share failed:', err);
     } finally {
       setIsSharing(false);

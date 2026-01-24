@@ -216,7 +216,9 @@ export function useAdventureMusic({
         logger.log(`[AdventureMusic] ${trackName} loaded successfully`);
       },
       onloaderror: (id, err) => {
-        logger.error(`[AdventureMusic] Failed to load ${trackName}:`, err);
+        // Log at info level - audio decoding can fail on some mobile devices due to codec/memory issues
+        // This is a non-critical feature, game works fine without music
+        logger.log(`[AdventureMusic] Failed to load ${trackName}:`, err);
       },
       onplayerror: (id, err) => {
         logger.error(`[AdventureMusic] Failed to play ${trackName}:`, err);
