@@ -52,6 +52,100 @@ const WORLD_IMAGES: Record<number, string> = {
   10: '/images/adventure/world-throne-3d.webp',
 };
 
+/**
+ * World-specific parallax layer configuration
+ * Each world can have up to 3 parallax layers (far, mid, near) using dedicated assets
+ * Depth values: lower = slower movement (farther), higher = faster movement (closer)
+ */
+interface ParallaxLayerConfig {
+  src: string;
+  depth: number;
+  opacity: number;
+  scale?: number;
+  position?: 'top' | 'bottom' | 'center';
+  blur?: number;
+}
+
+interface WorldParallaxConfig {
+  far?: ParallaxLayerConfig;
+  mid?: ParallaxLayerConfig;
+  near?: ParallaxLayerConfig;
+}
+
+const WORLD_PARALLAX_LAYERS: Record<number, WorldParallaxConfig> = {
+  1: { // Meadows - rolling hills and grass
+    far: {
+      src: '/images/adventure/parallax/meadows-hills.webp',
+      depth: 0.15,
+      opacity: 0.5,
+      scale: 1.3,
+      position: 'bottom',
+    },
+    near: {
+      src: '/images/adventure/parallax/meadows-grass.webp',
+      depth: 0.5,
+      opacity: 0.7,
+      scale: 1.2,
+      position: 'bottom',
+    },
+  },
+  2: { // Springs - waterfalls and mist
+    far: {
+      src: '/images/adventure/parallax/springs-rocks.webp',
+      depth: 0.15,
+      opacity: 0.4,
+      scale: 1.3,
+      position: 'center',
+    },
+    mid: {
+      src: '/images/adventure/parallax/springs-waterfall.webp',
+      depth: 0.3,
+      opacity: 0.6,
+      scale: 1.2,
+      position: 'center',
+    },
+    near: {
+      src: '/images/adventure/parallax/springs-mist.webp',
+      depth: 0.55,
+      opacity: 0.5,
+      scale: 1.4,
+      position: 'bottom',
+      blur: 2,
+    },
+  },
+  3: { // Caverns - crystals and stalactites
+    far: {
+      src: '/images/adventure/parallax/caverns-crystals-far.webp',
+      depth: 0.12,
+      opacity: 0.5,
+      scale: 1.3,
+      position: 'center',
+    },
+    mid: {
+      src: '/images/adventure/parallax/caverns-stalactites.webp',
+      depth: 0.25,
+      opacity: 0.6,
+      scale: 1.2,
+      position: 'top',
+    },
+    near: {
+      src: '/images/adventure/parallax/caverns-crystals-near.webp',
+      depth: 0.5,
+      opacity: 0.7,
+      scale: 1.3,
+      position: 'bottom',
+    },
+  },
+  // Worlds 4-10 use gradient-based parallax layers (no dedicated images yet)
+  4: {}, // Archipelago
+  5: {}, // Canyon
+  6: {}, // Labyrinth
+  7: {}, // Palace
+  8: {}, // Nebula
+  9: {}, // Peaks
+  10: {}, // Throne
+};
+
 // World-specific floating particle configurations
 interface ParticleConfig {
   count: number;
@@ -205,6 +299,92 @@ const FloatingParticle = memo(({
 FloatingParticle.displayName = 'FloatingParticle';
 
 /**
+ * ParallaxImageLayer - Renders a single parallax background layer
+ * Uses CSS transforms for GPU-accelerated movement
+ */
+const ParallaxImageLayer = memo(({
+  src,
+  depth,
+  opacity,
+  scale = 1.2,
+  position = 'center',
+  blur = 0,
+  parallaxX,
+  parallaxY,
+}: ParallaxLayerConfig & {
+  parallaxX: number;
+  parallaxY: number;
+}) => {
+  const positionClass = position === 'top'
+    ? 'object-top'
+    : position === 'bottom'
+      ? 'object-bottom'
+      : 'object-center';
+
+  return (
+    <div
+      className="absolute inset-0 level-grid-parallax-layer"
+      style={{
+        transform: `translate(${parallaxX * depth}px, ${parallaxY * depth}px) scale(${scale})`,
+        opacity,
+      }}
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        className={cn('object-cover', positionClass)}
+        style={blur > 0 ? { filter: `blur(${blur}px)` } : undefined}
+      />
+    </div>
+  );
+});
+
+ParallaxImageLayer.displayName = 'ParallaxImageLayer';
+
+/**
+ * ForegroundFrame - Creates depth framing effect around viewport edges
+ * Adds subtle vignette and edge blur for "looking through a window" effect
+ */
+const ForegroundFrame = memo(({
+  glowColor,
+  parallaxX,
+  parallaxY,
+}: {
+  glowColor: string;
+  parallaxX: number;
+  parallaxY: number;
+}) => (
+  <>
+    {/* Top edge shadow - moves slightly with parallax */}
+    <div
+      className="level-grid-foreground-edge level-grid-foreground-edge--top"
+      style={{
+        transform: `translateY(${parallaxY * 0.6}px)`,
+        background: `linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)`,
+      }}
+    />
+    {/* Bottom edge with world color glow */}
+    <div
+      className="level-grid-foreground-edge level-grid-foreground-edge--bottom"
+      style={{
+        transform: `translateY(${-parallaxY * 0.6}px)`,
+        background: `linear-gradient(0deg, ${glowColor}30 0%, transparent 100%)`,
+      }}
+    />
+    {/* Side vignettes */}
+    <div
+      className="level-grid-foreground-vignette"
+      style={{
+        transform: `translate(${parallaxX * 0.4}px, ${parallaxY * 0.4}px)`,
+      }}
+    />
+  </>
+));
+
+ForegroundFrame.displayName = 'ForegroundFrame';
+
+/**
  * DifficultyIndicator - Visual difficulty indicator using bars
  * Shows 1 bar for EASY, 2 for MEDIUM, 3 for HARD
  * More intuitive than cryptic single letters (E, M, H)
@@ -313,6 +493,7 @@ export default function LevelGrid({
   const glowColor = getWorldGlow(world.colorPrimary);
   const worldImage = WORLD_IMAGES[world.id];
   const particleConfig = WORLD_PARTICLES[world.id];
+  const parallaxLayers = WORLD_PARALLAX_LAYERS[world.id] || {};
 
   // Generate floating particles with stable positions
   const particles = useMemo(() => {
@@ -334,53 +515,88 @@ export default function LevelGrid({
 
   return (
     <div data-testid="level-grid" className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent">
-      {/* Parallax container - stays fixed while content scrolls */}
+      {/* Multi-layer parallax container - stays fixed while content scrolls */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Parallax World Background - Deep layer (0.1x movement) */}
+        {/* Layer 1: Deep space/base gradient (depth: 0.05) */}
         <div
           className="absolute inset-0"
           style={{
-            transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
+            transform: `translate(${parallaxX * 0.05}px, ${parallaxY * 0.05}px)`,
+            background: `radial-gradient(ellipse at 50% 30%, ${glowColor}15 0%, transparent 60%),
+                         linear-gradient(180deg, rgba(10,10,30,0.9) 0%, rgba(15,15,40,0.95) 100%)`,
+          }}
+        />
+
+        {/* Layer 2: World image as blurred background (depth: 0.1) */}
+        <div
+          className="absolute inset-0 level-grid-parallax-layer"
+          style={{
+            transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px) scale(1.4)`,
           }}
         >
-          {/* World image as blurred background */}
-          <div className="absolute inset-0 scale-150 opacity-30">
-            <Image
-              src={worldImage}
-              alt=""
-              fill
-              className="object-cover blur-xl"
-              priority
-            />
-          </div>
-          {/* World-colored gradient overlay */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, transparent 0%, ${glowColor}20 50%, ${glowColor}40 100%)`,
-            }}
+          <Image
+            src={worldImage}
+            alt=""
+            fill
+            className="object-cover blur-xl opacity-35"
+            priority
           />
         </div>
 
-        {/* Atmospheric glow - Mid layer (0.2x movement) */}
+        {/* Layer 3: Far parallax image layer (depth: 0.12-0.15) */}
+        {parallaxLayers.far && (
+          <ParallaxImageLayer
+            {...parallaxLayers.far}
+            parallaxX={parallaxX}
+            parallaxY={parallaxY}
+          />
+        )}
+
+        {/* Layer 4: World-colored gradient overlay (depth: 0.18) */}
         <div
           className="absolute inset-0"
           style={{
-            transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
+            transform: `translate(${parallaxX * 0.18}px, ${parallaxY * 0.18}px)`,
+            background: `linear-gradient(180deg, transparent 0%, ${glowColor}15 40%, ${glowColor}35 100%)`,
+          }}
+        />
+
+        {/* Layer 5: Mid parallax image layer (depth: 0.25-0.3) */}
+        {parallaxLayers.mid && (
+          <ParallaxImageLayer
+            {...parallaxLayers.mid}
+            parallaxX={parallaxX}
+            parallaxY={parallaxY}
+          />
+        )}
+
+        {/* Layer 6: Atmospheric glow orbs (depth: 0.25) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translate(${parallaxX * 0.25}px, ${parallaxY * 0.25}px)`,
           }}
         >
-          {/* Radial glow from world color - smaller for less visual clutter */}
+          {/* Primary glow - top center */}
           <div
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full opacity-25"
+            className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] rounded-full level-grid-glow-orb"
             style={{
-              background: `radial-gradient(circle, ${glowColor}50 0%, transparent 70%)`,
-              filter: 'blur(50px)',
-            }}
+              background: `radial-gradient(ellipse, ${glowColor}40 0%, transparent 65%)`,
+              '--glow-color': glowColor,
+            } as React.CSSProperties}
+          />
+          {/* Secondary glow - bottom offset */}
+          <div
+            className="absolute bottom-[20%] left-[30%] w-[300px] h-[300px] rounded-full level-grid-glow-orb"
+            style={{
+              background: `radial-gradient(circle, ${glowColor}25 0%, transparent 70%)`,
+              '--glow-color': glowColor,
+              animationDelay: '2s',
+            } as React.CSSProperties}
           />
         </div>
 
-        {/* Floating particles layer (0.3x movement via CSS custom properties) */}
-        {/* Particles use --parallax-x/--parallax-y from :root set by useParallax */}
+        {/* Layer 7: Floating particles (depth: 0.35 via CSS) */}
         <div className="absolute inset-0">
           {particles.map((particle) => (
             <FloatingParticle
@@ -394,6 +610,22 @@ export default function LevelGrid({
             />
           ))}
         </div>
+
+        {/* Layer 8: Near parallax image layer (depth: 0.5-0.55) */}
+        {parallaxLayers.near && (
+          <ParallaxImageLayer
+            {...parallaxLayers.near}
+            parallaxX={parallaxX}
+            parallaxY={parallaxY}
+          />
+        )}
+
+        {/* Layer 9: Foreground depth frame (depth: 0.6) */}
+        <ForegroundFrame
+          glowColor={glowColor}
+          parallaxX={parallaxX}
+          parallaxY={parallaxY}
+        />
       </div>
 
       {/* Main content layer - scrolls independently */}

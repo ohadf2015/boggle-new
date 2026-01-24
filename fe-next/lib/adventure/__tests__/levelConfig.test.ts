@@ -323,6 +323,48 @@ describe('Special Tile Generation', () => {
 
       expect(positions.size).toBe(tiles.length);
     });
+
+    it('should not place ice tiles on vowels when grid is provided', () => {
+      // Create a grid with known vowel positions
+      const gridSize = 5;
+      const grid: string[][] = [];
+      const vowels = new Set(['A', 'E', 'I', 'O', 'U']);
+
+      // Fill grid with vowels at specific positions for testing
+      for (let row = 0; row < gridSize; row++) {
+        const rowLetters: string[] = [];
+        for (let col = 0; col < gridSize; col++) {
+          // Make positions (0,0), (1,1), (2,2), (3,3), (4,4) vowels
+          if (row === col) {
+            rowLetters.push(['A', 'E', 'I', 'O', 'U'][row % 5]);
+          } else {
+            rowLetters.push('B'); // Consonant
+          }
+        }
+        grid.push(rowLetters);
+      }
+
+      // Run multiple times to account for randomness
+      for (let i = 0; i < 50; i++) {
+        const tiles = generateSpecialTiles(3, 5, gridSize, grid);
+        const iceTiles = tiles.filter((t) => t.type === 'ice');
+
+        // Verify no ice tile is placed on a vowel
+        for (const ice of iceTiles) {
+          const letter = grid[ice.row][ice.col];
+          expect(vowels.has(letter.toUpperCase())).toBe(false);
+        }
+      }
+    });
+
+    it('should still work without grid (backward compatibility)', () => {
+      // Without grid, ice tiles can be placed anywhere
+      const tiles = generateSpecialTiles(3, 5, 5);
+      const iceTiles = tiles.filter((t) => t.type === 'ice');
+
+      // Ice tiles should still be generated
+      expect(iceTiles.length).toBeGreaterThan(0);
+    });
   });
 });
 

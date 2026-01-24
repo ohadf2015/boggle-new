@@ -18,7 +18,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
+import type { PlayerProgression, LevelCompletion, LevelAttempt } from '@/types/adventure';
 import {
   isWorldUnlocked as checkWorldUnlocked,
   isLevelUnlocked as checkLevelUnlocked,
@@ -31,6 +31,8 @@ import {
 interface ProgressionContextType {
   /** Current player progression data */
   progression: PlayerProgression | null;
+  /** Level attempts (including failed attempts) */
+  attempts: LevelAttempt[];
   /** Loading state for initial fetch */
   isLoading: boolean;
   /** Error from fetch or update operations */
@@ -45,6 +47,16 @@ interface ProgressionContextType {
     score: number,
     words: number
   ) => Promise<void>;
+  /** Record a level attempt (including failures) */
+  recordAttempt: (
+    world: number,
+    level: number,
+    words: number,
+    score: number,
+    timeRemaining: number,
+    objectiveProgress: Record<string, number>,
+    isCompletion: boolean
+  ) => Promise<LevelAttempt | null>;
   /** Check if a world is unlocked */
   isWorldUnlocked: (worldId: number) => boolean;
   /** Check if a level is unlocked */
@@ -53,6 +65,8 @@ interface ProgressionContextType {
   getWorldStars: (worldId: number) => number;
   /** Get completion data for a specific level */
   getLevelCompletion: (worldId: number, levelId: number) => LevelCompletion | undefined;
+  /** Get attempt data for a specific level (includes failed attempts) */
+  getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
 }
 
 // ==============================================
@@ -72,10 +86,11 @@ interface ProgressionProviderProps {
 export function ProgressionProvider({ children }: ProgressionProviderProps) {
   const { user, loading: authLoading } = useAuth();
   const [progression, setProgression] = useState<PlayerProgression | null>(null);
+  const [attempts, setAttempts] = useState<LevelAttempt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Fetch progression from API
+  // Fetch progression and attempts from API
   const fetchProgression = useCallback(async () => {
     if (!user?.id) {
       setIsLoading(false);
@@ -84,27 +99,41 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
     try {
       setError(null);
-      const response = await fetch('/api/adventure/progress', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+
+      // Fetch both progression and attempts in parallel
+      const [progressResponse, attemptsResponse] = await Promise.all([
+        fetch('/api/adventure/progress', {
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        }),
+        fetch('/api/adventure/attempt', {
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        }),
+      ]);
 
       // Handle auth failures silently - user's session may have expired
-      // This is an expected state, not an error that should be logged
-      if (response.status === 401) {
+      if (progressResponse.status === 401) {
         setProgression(null);
+        setAttempts([]);
         setIsLoading(false);
         return;
       }
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch progression: ${response.status}`);
+      if (!progressResponse.ok) {
+        throw new Error(`Failed to fetch progression: ${progressResponse.status}`);
       }
 
-      const data = await response.json();
-      setProgression(data);
+      const progressData = await progressResponse.json();
+      setProgression(progressData);
+
+      // Attempts are optional - don't fail if unavailable
+      if (attemptsResponse.ok) {
+        const attemptsData = await attemptsResponse.json();
+        if (attemptsData.success && attemptsData.attempts) {
+          setAttempts(attemptsData.attempts);
+        }
+      }
     } catch (err) {
       // Only log non-network errors to avoid Sentry noise
       // Network errors during navigation are expected on mobile
@@ -230,6 +259,78 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [user?.id]
   );
 
+  // Record a level attempt (including failed attempts)
+  const recordAttempt = useCallback(
+    async (
+      world: number,
+      level: number,
+      words: number,
+      score: number,
+      timeRemaining: number,
+      objectiveProgress: Record<string, number>,
+      isCompletion: boolean
+    ): Promise<LevelAttempt | null> => {
+      if (!user?.id) {
+        return null;
+      }
+
+      try {
+        const response = await fetch('/api/adventure/attempt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            world,
+            level,
+            words,
+            score,
+            timeRemaining,
+            objectiveProgress,
+            isCompletion,
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('[ProgressionContext] Record attempt failed:', response.status);
+          return null;
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.attempt) {
+          const newAttempt: LevelAttempt = data.attempt;
+
+          // Update local attempts state
+          setAttempts((prev) => {
+            const existingIndex = prev.findIndex(
+              (a) => a.world === world && a.level === level
+            );
+
+            if (existingIndex >= 0) {
+              // Update existing attempt
+              const updated = [...prev];
+              updated[existingIndex] = newAttempt;
+              return updated;
+            } else {
+              // Add new attempt
+              return [...prev, newAttempt];
+            }
+          });
+
+          return newAttempt;
+        }
+
+        return null;
+      } catch (err) {
+        console.error('[ProgressionContext] Record attempt error:', err);
+        return null;
+      }
+    },
+    [user?.id]
+  );
+
   // Helper: Check if world is unlocked
   const isWorldUnlocked = useCallback(
     (worldId: number): boolean => {
@@ -278,6 +379,16 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [progression]
   );
 
+  // Helper: Get attempt for a specific level (includes failed attempts)
+  const getLevelAttempt = useCallback(
+    (worldId: number, levelId: number): LevelAttempt | undefined => {
+      return attempts.find(
+        (a) => a.world === worldId && a.level === levelId
+      );
+    },
+    [attempts]
+  );
+
   // Initial fetch on mount (when auth is ready)
   useEffect(() => {
     if (!authLoading) {
@@ -289,25 +400,31 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
   const contextValue = useMemo<ProgressionContextType>(
     () => ({
       progression,
+      attempts,
       isLoading,
       error,
       refreshProgression,
       completeLevel,
+      recordAttempt,
       isWorldUnlocked,
       isLevelUnlocked,
       getWorldStars,
       getLevelCompletion,
+      getLevelAttempt,
     }),
     [
       progression,
+      attempts,
       isLoading,
       error,
       refreshProgression,
       completeLevel,
+      recordAttempt,
       isWorldUnlocked,
       isLevelUnlocked,
       getWorldStars,
       getLevelCompletion,
+      getLevelAttempt,
     ]
   );
 

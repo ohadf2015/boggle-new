@@ -107,6 +107,39 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
   }),
 }));
 
+// Mock ProgressionContext - tracks player progress
+jest.mock('@/contexts/ProgressionContext', () => ({
+  useProgression: () => ({
+    recordAttempt: jest.fn(),
+    getLevelAttempt: jest.fn(() => null),
+    progression: null,
+    isLoading: false,
+    error: null,
+    refreshProgression: jest.fn(),
+    completeLevel: jest.fn(),
+    isWorldUnlocked: jest.fn(() => true),
+    isLevelUnlocked: jest.fn(() => true),
+    getWorldStars: jest.fn(() => 0),
+  }),
+}));
+
+// Mock useAdventureHints hook
+jest.mock('@/hooks/useAdventureHints', () => ({
+  useAdventureHints: () => ({
+    hasHintsAvailable: true,
+    getHint: jest.fn(() => ({ word: 'TEST', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })),
+    currentHint: null,
+    clearCurrentHint: jest.fn(),
+    recordActivity: jest.fn(),
+    showAutoHint: false,
+    dismissAutoHint: jest.fn(),
+    isLoading: false,
+    error: null,
+    remainingHintWords: ['TEST', 'WORD'],
+    findPathForWord: jest.fn(() => null),
+  }),
+}));
+
 // Mock MusicContext - useMusic is called in AdventureGame to stop global music
 jest.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({

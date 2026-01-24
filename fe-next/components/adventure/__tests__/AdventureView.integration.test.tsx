@@ -147,16 +147,35 @@ let mockProgressionState: {
   isLoading: boolean;
   error: string | null;
   completeLevel: jest.Mock;
+  getLevelAttempt: jest.Mock;
 } = {
   progression: null,
   isLoading: false,
   error: null,
   completeLevel: jest.fn(),
+  getLevelAttempt: jest.fn().mockReturnValue(null),
 };
 
 jest.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => mockProgressionState,
   ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock useAdventureHints hook - required by AdventureGame
+jest.mock('@/hooks/useAdventureHints', () => ({
+  useAdventureHints: () => ({
+    hasHintsAvailable: true,
+    getHint: jest.fn(() => ({ word: 'TEST', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })),
+    currentHint: null,
+    clearCurrentHint: jest.fn(),
+    recordActivity: jest.fn(),
+    showAutoHint: false,
+    dismissAutoHint: jest.fn(),
+    isLoading: false,
+    error: null,
+    remainingHintWords: ['TEST', 'WORD'],
+    findPathForWord: jest.fn(() => null),
+  }),
 }));
 
 // ==============================================
@@ -203,6 +222,7 @@ describe('AdventureView Integration', () => {
       isLoading: false,
       error: null,
       completeLevel: jest.fn().mockResolvedValue(undefined),
+      getLevelAttempt: jest.fn().mockReturnValue(null),
     };
   });
 

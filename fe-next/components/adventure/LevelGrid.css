@@ -1,43 +1,132 @@
 /**
  * LevelGrid CSS Animations
  *
- * Performance-optimized CSS keyframe animations for floating particles
- * and gradient effects. Using CSS animations instead of JS for better
- * performance on the compositor thread.
+ * Performance-optimized CSS keyframe animations for multi-layer parallax,
+ * floating particles, and depth effects. Uses GPU-accelerated transforms
+ * and CSS custom properties for smooth 60fps animations.
  */
 
-/* Floating particle animation - gentle drift and fade
+/* =============================================================================
+ * PARALLAX LAYER ANIMATIONS
+ * ============================================================================= */
+
+/* Base parallax layer - GPU-accelerated with smooth transitions */
+.level-grid-parallax-layer {
+  will-change: transform;
+  transition: transform 0.15s ease-out;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Glow orb breathing animation - subtle pulsing for atmosphere */
+@keyframes glow-orb-breathe {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+    filter: blur(60px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: blur(70px);
+  }
+}
+
+.level-grid-glow-orb {
+  pointer-events: none;
+  will-change: opacity, transform, filter;
+  animation: glow-orb-breathe 8s ease-in-out infinite;
+}
+
+/* =============================================================================
+ * FOREGROUND DEPTH FRAME
+ * ============================================================================= */
+
+/* Edge shadows for depth framing */
+.level-grid-foreground-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.2s ease-out;
+}
+
+.level-grid-foreground-edge--top {
+  top: 0;
+  height: 120px;
+}
+
+.level-grid-foreground-edge--bottom {
+  bottom: 0;
+  height: 150px;
+}
+
+/* Vignette overlay for "looking through window" effect */
+.level-grid-foreground-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.2s ease-out;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 50%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.15) 80%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+/* =============================================================================
+ * FLOATING PARTICLES
+ * ============================================================================= */
+
+/* Enhanced particle animation with Lissajous-curve motion
  * Uses --parallax-x/--parallax-y from :root (set by useParallax hook)
- * Scales by 0.3 to match original container transform behavior
+ * Creates organic, non-repeating movement paths
  */
 @keyframes particle-float {
-  0%, 100% {
+  0% {
     transform: translate(
-      calc(var(--parallax-x, 0px) * 0.5),
-      calc(var(--parallax-y, 0px) * 0.5)
+      calc(var(--parallax-x, 0px) * 0.35),
+      calc(var(--parallax-y, 0px) * 0.35)
     );
     opacity: 0.4;
   }
-  25% {
+  20% {
     transform: translate(
-      calc(var(--parallax-x, 0px) * 0.3 + 15px),
-      calc(var(--parallax-y, 0px) * 0.3 - 20px)
+      calc(var(--parallax-x, 0px) * 0.35 + 12px),
+      calc(var(--parallax-y, 0px) * 0.35 - 18px)
     );
-    opacity: 0.7;
+    opacity: 0.65;
   }
-  50% {
+  40% {
     transform: translate(
-      calc(var(--parallax-x, 0px) * 0.3 + 5px),
-      calc(var(--parallax-y, 0px) * 0.3 - 30px)
+      calc(var(--parallax-x, 0px) * 0.35 + 8px),
+      calc(var(--parallax-y, 0px) * 0.35 - 35px)
     );
     opacity: 0.5;
   }
-  75% {
+  60% {
     transform: translate(
-      calc(var(--parallax-x, 0px) * 0.3 - 10px),
-      calc(var(--parallax-y, 0px) * 0.3 - 15px)
+      calc(var(--parallax-x, 0px) * 0.35 - 6px),
+      calc(var(--parallax-y, 0px) * 0.35 - 28px)
     );
-    opacity: 0.6;
+    opacity: 0.7;
+  }
+  80% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35 - 10px),
+      calc(var(--parallax-y, 0px) * 0.35 - 12px)
+    );
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35),
+      calc(var(--parallax-y, 0px) * 0.35)
+    );
+    opacity: 0.4;
   }
 }
 
@@ -47,7 +136,8 @@
   will-change: transform, opacity;
   animation: particle-float var(--particle-duration, 20s) ease-in-out infinite;
   animation-delay: var(--particle-delay, 0s);
-  filter: drop-shadow(0 0 4px currentColor);
+  filter: drop-shadow(0 0 6px currentColor);
+  text-shadow: 0 0 8px currentColor;
 }
 
 /* Gradient sweep animation for header */
@@ -112,13 +202,25 @@
   animation: star-sparkle 1.5s ease-in-out infinite;
 }
 
-/* Reduce motion for accessibility */
+/* =============================================================================
+ * ACCESSIBILITY - REDUCED MOTION
+ * ============================================================================= */
+
+/* Disable all animations for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .level-grid-particle,
   .level-grid-gradient-sweep,
   .level-grid-card-shimmer,
   .level-grid-glow-pulse,
-  .level-grid-star-sparkle {
+  .level-grid-star-sparkle,
+  .level-grid-glow-orb {
     animation: none;
+  }
+
+  .level-grid-parallax-layer,
+  .level-grid-foreground-edge,
+  .level-grid-foreground-vignette {
+    transition: none;
+    transform: none !important;
   }
 }

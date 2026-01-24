@@ -3743,7 +3743,55 @@ const sv = {
       "paused": "Pausad",
       "tryAgain": "Försök igen!",
       "perfect": "Perfekt!",
-      "newHighScore": "Nytt rekord!"
+      "newHighScore": "Nytt rekord!",
+      "yourBest": "Ditt bästa",
+      "words": "Ord",
+      "keepTrying": "Fortsätt försöka! Du blir bättre!",
+      "hint": "Tips",
+      "hintAvailable": "Behöver du ett tips?",
+      "hintUsed": "Prova det här ordet!",
+      "noHints": "Inga fler tips tillgängliga"
+    },
+    "retry": {
+      "title": "Nästan där!",
+      "subtitle": "Ge inte upp - du kommer närmare!",
+      "tryAgain": "Försök igen",
+      "bonusTime": "Försök med bonustid",
+      "bonusTimeDesc": "+30 sekunder att hitta ord",
+      "startWithHint": "Börja med ett tips",
+      "startWithHintDesc": "Visar ett ord för att komma igång",
+      "yourProgress": "Din framsteg",
+      "bestWords": "Bästa ord",
+      "bestScore": "Bästa poäng",
+      "attempts": "Försök"
+    },
+    "preview": {
+      "title": "Förhandsvisning",
+      "objectives": "Mål",
+      "timer": "Tidsgräns",
+      "seconds": "sekunder",
+      "specialTiles": "Specialbrickor",
+      "noSpecialTiles": "Endast standardbrickor",
+      "start": "Starta nivå",
+      "back": "Tillbaka",
+      "bestAttempt": "Ditt bästa",
+      "notAttempted": "Ej försökt ännu"
+    },
+    "tiles": {
+      "gold": "Guld (3x poäng)",
+      "ice": "Is (hinder)",
+      "bomb": "Bomb (rensar rad)",
+      "rainbow": "Regnbåge (joker)",
+      "chain": "Kedja (kombo)",
+      "time": "Tid (+5 sek)"
+    },
+    "objectives": {
+      "wordCount": "Hitta ord",
+      "scoreTarget": "Nå poäng",
+      "longWords": "Långa ord (5+)",
+      "clearIce": "Rensa isbrickor",
+      "timeBonus": "Tidsbonus",
+      "collectGems": "Samla juveler"
     },
     "cutscene": {
       "skip": "Hoppa över"

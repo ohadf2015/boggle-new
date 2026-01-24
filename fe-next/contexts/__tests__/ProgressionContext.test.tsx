@@ -17,6 +17,12 @@ import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
+// Mock attempts response
+const mockAttemptsResponse = {
+  ok: true,
+  json: async () => ({ success: true, attempts: [] }),
+};
+
 // Mock AuthContext
 jest.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -49,6 +55,22 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ProgressionProvider>{children}</ProgressionProvider>
 );
 
+// Helper to create a mock that handles both progression and attempts endpoints
+function createFetchMock(progressionResponse: object | null, attemptsResponse = mockAttemptsResponse) {
+  return jest.fn((url: string) => {
+    if (url.includes('/api/adventure/attempt')) {
+      return Promise.resolve(attemptsResponse);
+    }
+    if (url.includes('/api/adventure/progress')) {
+      if (progressionResponse === null) {
+        return new Promise(() => {}); // Never resolves
+      }
+      return Promise.resolve(progressionResponse);
+    }
+    return Promise.resolve({ ok: true, json: async () => ({}) });
+  });
+}
+
 describe('ProgressionContext', () => {
   beforeEach(() => {
     mockFetch.mockClear();
@@ -56,8 +78,8 @@ describe('ProgressionContext', () => {
 
   describe('Initial Loading', () => {
     it('should show loading state initially', async () => {
-      // GIVEN
-      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+      // GIVEN - Use createFetchMock with null to simulate never-resolving progression
+      mockFetch.mockImplementation(createFetchMock(null));
 
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -70,10 +92,10 @@ describe('ProgressionContext', () => {
     it('should load progression on mount', async () => {
       // GIVEN
       const mockProgression = createMockProgression();
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -88,11 +110,11 @@ describe('ProgressionContext', () => {
 
     it('should set error on fetch failure', async () => {
       // GIVEN
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: false,
         status: 500,
         json: async () => ({ error: 'Server error' }),
-      });
+      }));
 
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -110,10 +132,10 @@ describe('ProgressionContext', () => {
     it('should provide total stars', async () => {
       // GIVEN
       const mockProgression = createMockProgression({ totalStars: 42 });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -132,10 +154,10 @@ describe('ProgressionContext', () => {
         { world: 1, level: 3, stars: 1, bestScore: 300, bestWords: 10, completedAt: '2025-01-20T13:00:00Z' },
       ];
       const mockProgression = createMockProgression({ completions });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -149,10 +171,10 @@ describe('ProgressionContext', () => {
     it('should provide player level and XP', async () => {
       // GIVEN
       const mockProgression = createMockProgression({ playerLevel: 10, xp: 5000 });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -169,10 +191,10 @@ describe('ProgressionContext', () => {
     it('should update progression after completing level', async () => {
       // GIVEN - Initial load
       const initialProgression = createMockProgression({ totalStars: 5 });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => initialProgression,
-      });
+      }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
 
@@ -181,29 +203,34 @@ describe('ProgressionContext', () => {
       });
 
       // GIVEN - Completion response (matching actual API response format)
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          progression: {
-            playerLevel: 5,
-            xp: 2600,
-            totalStars: 8,
-            currentWorld: 2,
-            currentLevel: 3,
-          },
-          completion: {
-            world: 1,
-            level: 3,
-            stars: 3,
-            bestScore: 500,
-            bestWords: 20,
-            completedAt: new Date().toISOString(),
-          },
-          xpEarned: 100,
-          starsGained: 3,
-          leveledUp: false,
-        }),
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/complete')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              success: true,
+              progression: {
+                playerLevel: 5,
+                xp: 2600,
+                totalStars: 8,
+                currentWorld: 2,
+                currentLevel: 3,
+              },
+              completion: {
+                world: 1,
+                level: 3,
+                stars: 3,
+                bestScore: 500,
+                bestWords: 20,
+                completedAt: new Date().toISOString(),
+              },
+              xpEarned: 100,
+              starsGained: 3,
+              leveledUp: false,
+            }),
+          });
+        }
+        return Promise.resolve(mockAttemptsResponse);
       });
 
       // WHEN
@@ -218,10 +245,10 @@ describe('ProgressionContext', () => {
     it('should call API with correct parameters', async () => {
       // GIVEN
       const mockProgression = createMockProgression();
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
 
@@ -230,29 +257,34 @@ describe('ProgressionContext', () => {
       });
 
       // Mock completion response (matching actual API response format)
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          progression: {
-            playerLevel: mockProgression.playerLevel,
-            xp: mockProgression.xp,
-            totalStars: mockProgression.totalStars,
-            currentWorld: mockProgression.currentWorld,
-            currentLevel: mockProgression.currentLevel,
-          },
-          completion: {
-            world: 2,
-            level: 5,
-            stars: 2,
-            bestScore: 350,
-            bestWords: 12,
-            completedAt: new Date().toISOString(),
-          },
-          xpEarned: 100,
-          starsGained: 2,
-          leveledUp: false,
-        }),
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/complete')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              success: true,
+              progression: {
+                playerLevel: mockProgression.playerLevel,
+                xp: mockProgression.xp,
+                totalStars: mockProgression.totalStars,
+                currentWorld: mockProgression.currentWorld,
+                currentLevel: mockProgression.currentLevel,
+              },
+              completion: {
+                world: 2,
+                level: 5,
+                stars: 2,
+                bestScore: 350,
+                bestWords: 12,
+                completedAt: new Date().toISOString(),
+              },
+              xpEarned: 100,
+              starsGained: 2,
+              leveledUp: false,
+            }),
+          });
+        }
+        return Promise.resolve(mockAttemptsResponse);
       });
 
       // WHEN
@@ -281,10 +313,10 @@ describe('ProgressionContext', () => {
     it('should refresh progression data', async () => {
       // GIVEN - Initial load
       const initialProgression = createMockProgression({ xp: 1000 });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => initialProgression,
-      });
+      }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
 
@@ -294,10 +326,10 @@ describe('ProgressionContext', () => {
 
       // GIVEN - Refresh response with updated data
       const refreshedProgression = createMockProgression({ xp: 1500 });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => refreshedProgression,
-      });
+      }));
 
       // WHEN
       await act(async () => {
@@ -313,10 +345,10 @@ describe('ProgressionContext', () => {
     it('should provide isWorldUnlocked helper', async () => {
       // GIVEN
       const mockProgression = createMockProgression({ totalStars: 20 });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
 
@@ -340,10 +372,10 @@ describe('ProgressionContext', () => {
         { world: 1, level: 2, stars: 1, bestScore: 200, bestWords: 8, completedAt: '2025-01-20T12:30:00Z' },
       ];
       const mockProgression = createMockProgression({ completions });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
 
@@ -370,10 +402,10 @@ describe('ProgressionContext', () => {
         { world: 2, level: 1, stars: 1, bestScore: 300, bestWords: 10, completedAt: '2025-01-20T13:00:00Z' },
       ];
       const mockProgression = createMockProgression({ completions });
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockImplementation(createFetchMock({
         ok: true,
         json: async () => mockProgression,
-      });
+      }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
 

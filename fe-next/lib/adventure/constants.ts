@@ -178,19 +178,24 @@ export function getGridSize(world: number): 4 | 5 | 6 | 7 {
 
 /**
  * Timer durations per world (in seconds)
- * Shorter timers for higher worlds
+ *
+ * Uses a gentler linear curve (-5 seconds per world) to prevent
+ * frustration-based abandonment in later worlds. Previous aggressive
+ * curve (120s → 45s) caused significant player drop-off at World 5+.
+ *
+ * New curve: 120s → 75s (37.5% reduction vs previous 62.5% reduction)
  */
 export const TIMER_DURATIONS: Record<number, number> = {
   1: 120, // 2 minutes - generous for tutorial
-  2: 110,
-  3: 100,
-  4: 90,
-  5: 80,
-  6: 70,
-  7: 60,
-  8: 55,
-  9: 50,
-  10: 45, // 45 seconds - challenging finale
+  2: 115, // Gentle introduction to time pressure
+  3: 110, // 5x5 grid introduction
+  4: 105,
+  5: 100, // Mid-game milestone
+  6: 95,
+  7: 90,  // 6x6 grid starts - still comfortable
+  8: 85,
+  9: 80,  // 7x7 grid - challenging but fair
+  10: 75, // Final world - 75s gives time to strategize
 };
 
 /**

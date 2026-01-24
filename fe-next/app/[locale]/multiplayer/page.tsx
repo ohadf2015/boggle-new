@@ -491,7 +491,7 @@ export default function MultiplayerPage(): React.JSX.Element {
                 ...authContext,
                 avatar: profile ? {
                   emoji: profile.avatar_emoji,
-                  color: profile.avatar_color,
+                  color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
                 } : getAvatarForName(savedSession.hostUsername || savedSession.username || ''),
               });
             } else {
@@ -501,7 +501,7 @@ export default function MultiplayerPage(): React.JSX.Element {
                 ...authContext,
                 avatar: profile ? {
                   emoji: profile.avatar_emoji,
-                  color: profile.avatar_color,
+                  color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
                 } : getAvatarForName(savedSession.username || ''),
               });
             }
@@ -1055,7 +1055,7 @@ export default function MultiplayerPage(): React.JSX.Element {
           ...authContext,
           avatar: profile ? {
             emoji: profile.avatar_emoji,
-            color: profile.avatar_color,
+            color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
           } : getAvatarForName(savedSession.hostUsername),
           profilePictureUrl: profile?.profile_picture_url,
         });
@@ -1071,7 +1071,7 @@ export default function MultiplayerPage(): React.JSX.Element {
           ...authContext,
           avatar: profile ? {
             emoji: profile.avatar_emoji,
-            color: profile.avatar_color,
+            color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
           } : getAvatarForName(savedSession.username),
           profilePictureUrl: profile?.profile_picture_url,
         });

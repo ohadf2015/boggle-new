@@ -8,13 +8,15 @@
 'use client';
 
 import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
-import { Pause, Play, LogOut } from 'lucide-react';
+import { Pause, Play, LogOut, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
+import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { ScorePopupFly } from '@/components/animations';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
@@ -174,6 +176,15 @@ const AdventureGame = memo<AdventureGameProps>(
     // Language context for translations
     const { t, language } = useLanguage();
 
+    // Progression context for recording attempts
+    const { recordAttempt, getLevelAttempt } = useProgression();
+
+    // Get best attempt for this level (for partial progress display)
+    const bestAttempt = useMemo(
+      () => getLevelAttempt(levelConfig.world, levelConfig.level),
+      [getLevelAttempt, levelConfig.world, levelConfig.level]
+    );
+
     // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
@@ -241,6 +252,23 @@ const AdventureGame = memo<AdventureGameProps>(
       gridSize: levelConfig.gridSize,
       disabled: !isPlaying || isPaused || isValidating,
       gridRef,
+    });
+
+    // Hint system hook
+    const {
+      hasHintsAvailable,
+      getHint,
+      currentHint,
+      clearCurrentHint,
+      recordActivity,
+      showAutoHint,
+      dismissAutoHint,
+    } = useAdventureHints({
+      grid: initialGrid,
+      language: language || 'en',
+      foundWords: gameState.wordsFound,
+      isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+      inactivityThresholdMs: 15000, // 15 seconds
     });
 
     // Lexi reaction state - transform game state to reaction format
@@ -341,13 +369,42 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [isPlaying, startGame]);
 
-    // Check for level completion
+    // Check for level completion and record attempt
     useEffect(() => {
       if (gameState.isComplete || timeRemaining === 0) {
         setShowLevelComplete(true);
         pauseGame();
+
+        // Record attempt (including failures) for partial progress tracking
+        // Build objective progress map from current objectives
+        const objectiveProgress: Record<string, number> = {};
+        for (const obj of objectives) {
+          objectiveProgress[obj.type] = obj.current ?? 0;
+        }
+
+        // Record the attempt (stars > 0 means completion)
+        recordAttempt(
+          levelConfig.world,
+          levelConfig.level,
+          gameState.wordsFound.length,
+          gameState.score,
+          timeRemaining,
+          objectiveProgress,
+          gameState.stars > 0
+        );
       }
-    }, [gameState.isComplete, timeRemaining, pauseGame]);
+    }, [
+      gameState.isComplete,
+      timeRemaining,
+      pauseGame,
+      recordAttempt,
+      levelConfig.world,
+      levelConfig.level,
+      gameState.wordsFound.length,
+      gameState.score,
+      gameState.stars,
+      objectives,
+    ]);
 
     // Helper to calculate popup start position from last selected tile
     const getPopupStartPosition = useCallback(() => {
@@ -456,6 +513,9 @@ const AdventureGame = memo<AdventureGameProps>(
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
           submitWordWithPath(currentWord, scoreValue, path);
           clearSelection();
+          // Clear any hint and reset inactivity timer
+          clearCurrentHint();
+          recordActivity();
 
           // Reset after animation duration with proper cleanup
           wordSubmittedTimeoutRef.current = setTimeout(() => {
@@ -473,7 +533,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity]
     );
 
     // Handle level complete continue
@@ -492,6 +552,20 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Handle exit - directly use onExit since no additional logic needed
     const handleExit = onExit;
+
+    // Handle hint button click
+    const handleHintClick = useCallback(() => {
+      if (hasHintsAvailable) {
+        getHint();
+        dismissAutoHint();
+      }
+    }, [hasHintsAvailable, getHint, dismissAutoHint]);
+
+    // Convert hint path to indices for grid highlighting
+    const hintHighlightIndices = useMemo(() => {
+      if (!currentHint?.path) return [];
+      return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
+    }, [currentHint, levelConfig.gridSize]);
 
     // Handle score popup completion with safety timeout fallback
     const handlePopupComplete = useCallback(() => {
@@ -540,8 +614,12 @@ const AdventureGame = memo<AdventureGameProps>(
           'text-neo-white'
         )}
       >
-        {/* Themed World Background */}
-        <WorldBackground className="absolute inset-0 -z-10" />
+        {/* Themed World Background - reduced parallax for gameplay focus */}
+        <WorldBackground
+          className="absolute inset-0 -z-10"
+          parallaxIntensity={0.2}
+          enableAmbient={false}
+        />
 
         {/* Header */}
         <header
@@ -637,6 +715,7 @@ const AdventureGame = memo<AdventureGameProps>(
               wasWordSubmitted={validationFeedback.wasSubmitted}
               showCascade={entryPhase === 'cascade'}
               onCascadeComplete={handleCascadeComplete}
+              hintHighlightIndices={hintHighlightIndices}
             />
           </div>
 
@@ -679,6 +758,59 @@ const AdventureGame = memo<AdventureGameProps>(
                 x{gameState.comboCount}
               </p>
             </div>
+
+            {/* Hint Button */}
+            <button
+              onClick={handleHintClick}
+              disabled={!hasHintsAvailable}
+              data-testid="hint-button"
+              aria-label={t('adventure.game.hint')}
+              className={cn(
+                'flex items-center justify-center gap-2',
+                'p-3 rounded-neo',
+                'font-bold transition-all duration-200',
+                hasHintsAvailable
+                  ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
+                  : 'bg-neo-black/30 text-neo-white/40 border-2 border-neo-white/10 cursor-not-allowed'
+              )}
+            >
+              <Lightbulb className="w-5 h-5" />
+              {t('adventure.game.hint')}
+            </button>
+
+            {/* Auto-Hint Prompt */}
+            {showAutoHint && (
+              <div
+                data-testid="auto-hint-prompt"
+                className={cn(
+                  'p-3 rounded-neo',
+                  'bg-neo-yellow/20 border-2 border-neo-yellow/50',
+                  'animate-neo-pop'
+                )}
+              >
+                <p className="text-sm font-bold text-neo-yellow text-center">
+                  {t('adventure.game.hintAvailable')}
+                </p>
+              </div>
+            )}
+
+            {/* Current Hint Display */}
+            {currentHint && (
+              <div
+                data-testid="current-hint-display"
+                className={cn(
+                  'p-3 rounded-neo',
+                  'bg-neo-lime/20 border-2 border-neo-lime/50'
+                )}
+              >
+                <p className="text-sm font-bold text-neo-lime text-center">
+                  {t('adventure.game.hintUsed')}
+                </p>
+                <p className="text-lg font-black text-neo-white text-center mt-1">
+                  {currentHint.word}
+                </p>
+              </div>
+            )}
           </aside>
         </main>
 
@@ -751,6 +883,7 @@ const AdventureGame = memo<AdventureGameProps>(
           onRetry={handleRetry}
           onExit={handleExit}
           totalStars={totalStars}
+          bestAttempt={bestAttempt}
         />
 
         {/* Score Popup Animation */}

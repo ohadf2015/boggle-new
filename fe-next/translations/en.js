@@ -3738,7 +3738,47 @@ const en = {
       "paused": "Paused",
       "tryAgain": "Try Again!",
       "perfect": "Perfect!",
-      "newHighScore": "New High Score!"
+      "newHighScore": "New High Score!",
+      "yourBest": "Your Best",
+      "words": "Words",
+      "keepTrying": "Keep trying! You're getting better!",
+      "hint": "Hint",
+      "hintAvailable": "Need a hint?",
+      "hintUsed": "Try this word!",
+      "noHints": "No more hints available"
+    },
+    "retry": {
+      "title": "Almost There!",
+      "subtitle": "Don't give up - you're getting closer!",
+      "tryAgain": "Try Again",
+      "bonusTime": "Try with Bonus Time",
+      "bonusTimeDesc": "+30 seconds to find words",
+      "startWithHint": "Start with a Hint",
+      "startWithHintDesc": "Shows one word to get started",
+      "yourProgress": "Your Progress",
+      "bestWords": "Best Words",
+      "bestScore": "Best Score",
+      "attempts": "Attempts"
+    },
+    "preview": {
+      "title": "Level Preview",
+      "objectives": "Objectives",
+      "timer": "Time Limit",
+      "seconds": "seconds",
+      "specialTiles": "Special Tiles",
+      "noSpecialTiles": "Standard tiles only",
+      "start": "Start Level",
+      "back": "Back",
+      "bestAttempt": "Your Best",
+      "notAttempted": "Not attempted yet"
+    },
+    "tiles": {
+      "gold": "Gold (3x points)",
+      "ice": "Ice (obstacle)",
+      "bomb": "Bomb (clears row)",
+      "rainbow": "Rainbow (wild)",
+      "chain": "Chain (combo)",
+      "time": "Time (+5 sec)"
     },
     "cutscene": {
       "skip": "Skip"

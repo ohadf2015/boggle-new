@@ -3743,7 +3743,55 @@ const ja = {
       "paused": "一時停止",
       "tryAgain": "もう一度!",
       "perfect": "パーフェクト!",
-      "newHighScore": "新記録!"
+      "newHighScore": "新記録!",
+      "yourBest": "ベスト記録",
+      "words": "単語",
+      "keepTrying": "頑張って！上達してるよ！",
+      "hint": "ヒント",
+      "hintAvailable": "ヒントが必要？",
+      "hintUsed": "この言葉を試してみて！",
+      "noHints": "ヒントはもうありません"
+    },
+    "retry": {
+      "title": "もう少し！",
+      "subtitle": "あきらめないで - 近づいてるよ！",
+      "tryAgain": "もう一度",
+      "bonusTime": "ボーナスタイム付きで挑戦",
+      "bonusTimeDesc": "+30秒で言葉を探す",
+      "startWithHint": "ヒント付きでスタート",
+      "startWithHintDesc": "最初の言葉を表示",
+      "yourProgress": "あなたの進捗",
+      "bestWords": "最高の単語数",
+      "bestScore": "最高スコア",
+      "attempts": "挑戦回数"
+    },
+    "preview": {
+      "title": "レベル プレビュー",
+      "objectives": "目標",
+      "timer": "制限時間",
+      "seconds": "秒",
+      "specialTiles": "特殊タイル",
+      "noSpecialTiles": "通常タイルのみ",
+      "start": "スタート",
+      "back": "戻る",
+      "bestAttempt": "あなたのベスト",
+      "notAttempted": "まだ挑戦していません"
+    },
+    "tiles": {
+      "gold": "ゴールド (3倍ポイント)",
+      "ice": "アイス (障害物)",
+      "bomb": "ボム (行をクリア)",
+      "rainbow": "レインボー (ワイルド)",
+      "chain": "チェーン (コンボ)",
+      "time": "タイム (+5秒)"
+    },
+    "objectives": {
+      "wordCount": "単語を見つける",
+      "scoreTarget": "スコア達成",
+      "longWords": "長い単語 (5+)",
+      "clearIce": "アイスタイルをクリア",
+      "timeBonus": "タイムボーナス",
+      "collectGems": "ジェムを集める"
     },
     "cutscene": {
       "skip": "スキップ"

@@ -12,8 +12,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useParallax } from '@/hooks/useParallax';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
-import type { LevelObjective, ObjectiveType } from '@/types/adventure';
+import type { LevelObjective, ObjectiveType, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
 // TYPES
@@ -42,6 +43,8 @@ interface LevelCompleteModalProps {
   onExit: () => void;
   /** Total stars accumulated across all levels */
   totalStars?: number;
+  /** Best attempt data for this level (shows partial progress on failure) */
+  bestAttempt?: LevelAttempt | null;
 }
 
 // ==============================================
@@ -142,10 +145,21 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     onRetry,
     onExit,
     totalStars = 0,
+    bestAttempt,
   }) => {
     const { t } = useLanguage();
     const isPerfect = stars === 3;
     const isFailed = stars === 0;
+
+    // Enhanced parallax for celebration - dramatic intensity scales with stars
+    const parallaxIntensity = stars === 3 ? 1.5 : stars === 2 ? 1.0 : stars === 1 ? 0.6 : 0.3;
+    const { x: parallaxX, y: parallaxY } = useParallax({
+      intensity: parallaxIntensity,
+      enableGyroscope: true,
+      enableGesture: true,
+      enableAmbient: true,
+      ambientSpeed: isPerfect ? 1.0 : 0.5, // Faster ambient for perfect scores
+    });
 
     // Count completed objectives
     const completedCount = useMemo(
@@ -183,6 +197,95 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             'bg-neo-black/80 backdrop-blur-sm'
           )}
         >
+          {/* Parallax celebration background - responds to device movement */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {/* Deep glow layer - slowest movement */}
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
+                background: isPerfect
+                  ? 'radial-gradient(ellipse at 50% 30%, rgba(255,225,53,0.2) 0%, transparent 60%)'
+                  : stars >= 2
+                    ? 'radial-gradient(ellipse at 50% 30%, rgba(163,230,53,0.15) 0%, transparent 60%)'
+                    : stars >= 1
+                      ? 'radial-gradient(ellipse at 50% 30%, rgba(34,211,238,0.12) 0%, transparent 60%)'
+                      : 'radial-gradient(ellipse at 50% 30%, rgba(239,68,68,0.1) 0%, transparent 60%)',
+              }}
+              animate={isPerfect ? {
+                scale: [1, 1.1, 1],
+                opacity: [0.8, 1, 0.8],
+              } : undefined}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+
+            {/* Mid layer - star burst rays */}
+            {stars > 0 && (
+              <motion.div
+                className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]"
+                style={{
+                  transform: `translate(calc(-50% + ${parallaxX * 0.25}px), calc(-50% + ${parallaxY * 0.25}px))`,
+                  background: isPerfect
+                    ? 'conic-gradient(from 0deg, transparent, rgba(255,225,53,0.08) 10%, transparent 20%)'
+                    : 'conic-gradient(from 0deg, transparent, rgba(163,230,53,0.05) 10%, transparent 20%)',
+                }}
+                animate={{
+                  rotate: [0, 360],
+                }}
+                transition={{
+                  duration: isPerfect ? 20 : 40,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+              />
+            )}
+
+            {/* Near layer - floating orbs */}
+            {isPerfect && (
+              <>
+                <motion.div
+                  className="absolute top-[20%] left-[15%] w-24 h-24 rounded-full"
+                  style={{
+                    transform: `translate(${parallaxX * 0.5}px, ${parallaxY * 0.5}px)`,
+                    background: 'radial-gradient(circle, rgba(255,225,53,0.3) 0%, transparent 70%)',
+                    filter: 'blur(20px)',
+                  }}
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.5, 0.8, 0.5],
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                />
+                <motion.div
+                  className="absolute bottom-[25%] right-[10%] w-32 h-32 rounded-full"
+                  style={{
+                    transform: `translate(${parallaxX * 0.6}px, ${parallaxY * 0.6}px)`,
+                    background: 'radial-gradient(circle, rgba(255,225,53,0.25) 0%, transparent 70%)',
+                    filter: 'blur(25px)',
+                  }}
+                  animate={{
+                    scale: [1.2, 1, 1.2],
+                    opacity: [0.6, 0.4, 0.6],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 0.5,
+                  }}
+                />
+              </>
+            )}
+          </div>
+
           {/* Celebration particles for any star completion (scaled by star count) */}
           {stars > 0 && (
             <div className="celebration-effect absolute inset-0 pointer-events-none overflow-hidden">
@@ -343,6 +446,38 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 ))}
               </ul>
             </div>
+
+            {/* Partial Progress Display (for failed attempts) */}
+            {isFailed && bestAttempt && bestAttempt.attemptCount > 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className={cn(
+                  'mb-6 p-4 rounded-neo',
+                  'bg-neo-cyan/10 border-2 border-neo-cyan/30'
+                )}
+              >
+                <p className="text-neo-cyan font-bold text-sm uppercase tracking-wide mb-2">
+                  {t('adventure.game.yourBest')}
+                </p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-neo-white/60">{t('adventure.game.words')}: </span>
+                    <span className="font-bold text-neo-white">{bestAttempt.bestWords}</span>
+                  </div>
+                  <div>
+                    <span className="text-neo-white/60">{t('common.score')}: </span>
+                    <span className="font-bold text-neo-white">{bestAttempt.bestScore.toLocaleString()}</span>
+                  </div>
+                </div>
+                {bestAttempt.attemptCount >= 3 && (
+                  <p className="text-neo-lime text-sm font-bold mt-2">
+                    {t('adventure.game.keepTrying')}
+                  </p>
+                )}
+              </motion.div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">

@@ -108,16 +108,22 @@ describe('Adventure Constants', () => {
   });
 
   describe('Timer Durations', () => {
-    it('should decrease timer with higher worlds', () => {
-      // World 1 has longest timer
-      expect(TIMER_DURATIONS[1]).toBeGreaterThanOrEqual(90);
+    it('should decrease timer with higher worlds using gentle curve', () => {
+      // World 1 has longest timer (tutorial)
+      expect(TIMER_DURATIONS[1]).toBe(120);
 
-      // World 10 has shortest timer
-      expect(TIMER_DURATIONS[10]).toBeLessThanOrEqual(45);
+      // World 10 has shortest timer (but still playable at 75s)
+      // Uses gentle linear curve (-5s per world) to prevent abandonment
+      expect(TIMER_DURATIONS[10]).toBe(75);
 
-      // Timer decreases as worlds increase
+      // Timer decreases progressively (5s per world)
       expect(TIMER_DURATIONS[5]).toBeLessThan(TIMER_DURATIONS[1]);
       expect(TIMER_DURATIONS[10]).toBeLessThan(TIMER_DURATIONS[5]);
+
+      // Verify linear progression
+      for (let world = 2; world <= 10; world++) {
+        expect(TIMER_DURATIONS[world]).toBe(TIMER_DURATIONS[world - 1] - 5);
+      }
     });
   });
 });

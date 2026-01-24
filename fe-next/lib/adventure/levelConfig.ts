@@ -21,6 +21,7 @@ import {
   getTimerDuration,
   getDifficultyForWorld,
 } from './constants';
+import { VOWELS } from './gridGenerator';
 
 // ==============================================
 // WORLD CONFIGURATION
@@ -215,10 +216,15 @@ const HIDDEN_WORDS: Record<string, string> = {
  *
  * @param world - World number (1-10)
  * @param level - Level within world (1-7)
+ * @param grid - Optional letter grid for vowel protection (prevents ice on vowels)
  * @returns Complete level configuration
  * @throws Error if world or level is invalid
  */
-export function getLevelConfig(world: number, level: number): LevelConfig {
+export function getLevelConfig(
+  world: number,
+  level: number,
+  grid?: string[][]
+): LevelConfig {
   // Validate inputs
   if (world < 1 || world > WORLDS_COUNT) {
     throw new Error(
@@ -237,8 +243,9 @@ export function getLevelConfig(world: number, level: number): LevelConfig {
   const difficulty = getDifficultyForWorld(world);
 
   // Generate level-specific content
+  // Pass grid for vowel protection on ice tiles (prevents unfair levels)
   const objectives = generateObjectives(world, level);
-  const specialTiles = generateSpecialTiles(world, level, gridSize);
+  const specialTiles = generateSpecialTiles(world, level, gridSize, grid);
 
   // Calculate chapter structure (2-2-3 pattern)
   // Chapter 1: levels 1-2, Chapter 2: levels 3-4, Chapter 3 (Boss): levels 5-7
@@ -389,24 +396,38 @@ export function generateObjectives(
 // SPECIAL TILE GENERATION
 // ==============================================
 
+/** Set of vowels for ice tile protection (case-insensitive check) */
+const VOWEL_SET = new Set(VOWELS.map((v) => v.toUpperCase()));
+
+/**
+ * Check if a letter is a vowel (supports multiple languages)
+ * Ice tiles should not be placed on vowels to ensure levels are completable.
+ */
+function isVowel(letter: string): boolean {
+  return VOWEL_SET.has(letter.toUpperCase());
+}
+
 /**
  * Generate special tiles for a level
  *
  * @param world - World number
  * @param level - Level within world
  * @param gridSize - Size of the grid (4-7)
+ * @param grid - Optional letter grid for vowel protection (ice tiles won't be placed on vowels)
  * @returns Array of special tile positions
  */
 export function generateSpecialTiles(
   world: number,
   level: number,
-  gridSize: number
+  gridSize: number,
+  grid?: string[][]
 ): SpecialTile[] {
   const tiles: SpecialTile[] = [];
   const usedPositions = new Set<string>();
 
   /**
    * Add a tile at a random unique position
+   * For ice tiles, avoids placing on vowels when grid is provided
    */
   const addTile = (type: TileType): void => {
     let attempts = 0;
@@ -417,12 +438,25 @@ export function generateSpecialTiles(
       const col = Math.floor(Math.random() * gridSize);
       const posKey = `${row},${col}`;
 
-      if (!usedPositions.has(posKey)) {
-        usedPositions.add(posKey);
-        tiles.push({ row, col, type });
-        return;
+      // Skip if position already used
+      if (usedPositions.has(posKey)) {
+        attempts++;
+        continue;
       }
-      attempts++;
+
+      // Vowel protection: Ice tiles should not be placed on vowels
+      // This prevents RNG-based unfair levels where critical vowels are frozen
+      if (type === 'ice' && grid) {
+        const letter = grid[row]?.[col];
+        if (letter && isVowel(letter)) {
+          attempts++;
+          continue; // Skip vowel positions for ice tiles
+        }
+      }
+
+      usedPositions.add(posKey);
+      tiles.push({ row, col, type });
+      return;
     }
   };
 

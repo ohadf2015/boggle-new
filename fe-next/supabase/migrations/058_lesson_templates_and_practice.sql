@@ -135,10 +135,9 @@ CREATE POLICY "Students view assigned lesson templates" ON lesson_templates
     USING (
         EXISTS (
             SELECT 1 FROM lesson_assignments la
-            JOIN classroom_students cs ON la.classroom_id = cs.classroom_id
+            JOIN classroom_memberships cm ON la.classroom_id = cm.classroom_id
             WHERE la.lesson_id = lesson_templates.lesson_id
-            AND cs.student_id = auth.uid()
-            AND cs.status = 'active'
+            AND cm.student_id = auth.uid()
         )
     );
 

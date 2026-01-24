@@ -66,6 +66,8 @@ interface AdventureGridProps {
   showCascade?: boolean;
   /** Callback when cascade animation completes */
   onCascadeComplete?: () => void;
+  /** Indices of tiles to highlight as hint */
+  hintHighlightIndices?: number[];
 }
 
 // ==============================================
@@ -152,6 +154,7 @@ const AdventureGrid = memo(
         wasWordSubmitted = false,
         showCascade = false,
         onCascadeComplete,
+        hintHighlightIndices = [],
       },
       ref
     ) => {
@@ -228,6 +231,12 @@ const AdventureGrid = memo(
     const selectedSet = useMemo(
       () => new Set(selectedIndices),
       [selectedIndices]
+    );
+
+    // Build hint highlight set for quick lookup
+    const hintSet = useMemo(
+      () => new Set(hintHighlightIndices),
+      [hintHighlightIndices]
     );
 
     // Detect if a bomb tile is selected and get its row for preview highlighting
@@ -478,6 +487,7 @@ const AdventureGrid = memo(
         >
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
+            const isHintHighlighted = hintSet.has(index);
             const canInteract = interactive && !disabled && !tile.isCleared;
 
             // World-specific theming
@@ -571,6 +581,13 @@ const AdventureGrid = memo(
 
                   // Bomb row preview: highlight tiles in bomb's row when bomb is selected
                   bombRowPreview !== null && tile.row === bombRowPreview && 'bomb-row-preview',
+
+                  // Hint highlight: show which tiles form the hinted word
+                  isHintHighlighted && !isSelected && [
+                    'ring-2 ring-neo-yellow',
+                    'shadow-[0_0_16px_rgba(255,225,53,0.7),0_0_32px_rgba(255,225,53,0.3)]',
+                    'animate-pulse',
+                  ],
 
                   // Standard tile background
                   tile.type === 'standard' &&

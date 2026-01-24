@@ -3725,7 +3725,55 @@ const es = {
       "paused": "Pausado",
       "tryAgain": "¡Inténtalo de nuevo!",
       "perfect": "¡Perfecto!",
-      "newHighScore": "¡Nuevo récord!"
+      "newHighScore": "¡Nuevo récord!",
+      "yourBest": "Tu mejor intento",
+      "words": "Palabras",
+      "keepTrying": "¡Sigue intentando! ¡Estás mejorando!",
+      "hint": "Pista",
+      "hintAvailable": "¿Necesitas una pista?",
+      "hintUsed": "¡Prueba esta palabra!",
+      "noHints": "No hay más pistas disponibles"
+    },
+    "retry": {
+      "title": "¡Casi lo tienes!",
+      "subtitle": "¡No te rindas - estás cada vez más cerca!",
+      "tryAgain": "Intentar de nuevo",
+      "bonusTime": "Intentar con tiempo extra",
+      "bonusTimeDesc": "+30 segundos para encontrar palabras",
+      "startWithHint": "Empezar con una pista",
+      "startWithHintDesc": "Muestra una palabra para empezar",
+      "yourProgress": "Tu progreso",
+      "bestWords": "Mejores palabras",
+      "bestScore": "Mejor puntuación",
+      "attempts": "Intentos"
+    },
+    "preview": {
+      "title": "Vista previa del nivel",
+      "objectives": "Objetivos",
+      "timer": "Límite de tiempo",
+      "seconds": "segundos",
+      "specialTiles": "Fichas especiales",
+      "noSpecialTiles": "Solo fichas estándar",
+      "start": "Comenzar nivel",
+      "back": "Volver",
+      "bestAttempt": "Tu mejor intento",
+      "notAttempted": "No intentado aún"
+    },
+    "tiles": {
+      "gold": "Oro (3x puntos)",
+      "ice": "Hielo (obstáculo)",
+      "bomb": "Bomba (limpia fila)",
+      "rainbow": "Arcoíris (comodín)",
+      "chain": "Cadena (combo)",
+      "time": "Tiempo (+5 seg)"
+    },
+    "objectives": {
+      "wordCount": "Encontrar palabras",
+      "scoreTarget": "Alcanzar puntuación",
+      "longWords": "Palabras largas (5+)",
+      "clearIce": "Limpiar fichas de hielo",
+      "timeBonus": "Bonificación de tiempo",
+      "collectGems": "Recolectar gemas"
     },
     "cutscene": {
       "skip": "Omitir"

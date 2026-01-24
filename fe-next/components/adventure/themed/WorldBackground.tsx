@@ -24,6 +24,10 @@ interface WorldBackgroundProps {
   className?: string;
   /** Children to render on top of background */
   children?: React.ReactNode;
+  /** Parallax intensity multiplier (0 = disabled, 1 = normal, default: 0.8) */
+  parallaxIntensity?: number;
+  /** Enable ambient drift animation (default: true) */
+  enableAmbient?: boolean;
 }
 
 // ==============================================
@@ -111,16 +115,22 @@ TextureOverlay.displayName = 'TextureOverlay';
 // MAIN COMPONENT
 // ==============================================
 
-const WorldBackground = memo<WorldBackgroundProps>(({ className, children }) => {
+const WorldBackground = memo<WorldBackgroundProps>(({
+  className,
+  children,
+  parallaxIntensity = 0.8,
+  enableAmbient = true,
+}) => {
   const { theme, isTransitioning } = useAdventureTheme();
   const { background, containerClass } = theme;
 
   // Use parallax hook for interactive motion
+  // Intensity can be reduced/disabled for gameplay focus
   const { x: parallaxX, y: parallaxY } = useParallax({
-    intensity: 0.8,
-    enableGyroscope: true,
-    enableGesture: true,
-    enableAmbient: true,
+    intensity: parallaxIntensity,
+    enableGyroscope: parallaxIntensity > 0,
+    enableGesture: parallaxIntensity > 0,
+    enableAmbient: enableAmbient && parallaxIntensity > 0,
     ambientSpeed: 0.5,
   });
 

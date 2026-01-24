@@ -178,6 +178,33 @@ export interface LevelCompletion {
 }
 
 /**
+ * A player's attempt on a level (including failed attempts)
+ * Used for "Partial Progress" UX showing encouragement on failures
+ */
+export interface LevelAttempt {
+  /** World number (1-10) */
+  world: number;
+  /** Level within world (1-7) */
+  level: number;
+  /** Best word count across all attempts */
+  bestWords: number;
+  /** Best score across all attempts */
+  bestScore: number;
+  /** Best time remaining across all attempts */
+  bestTimeRemaining: number;
+  /** Best progress for each objective type */
+  objectiveProgress: Record<string, number>;
+  /** Total number of attempts on this level */
+  attemptCount: number;
+  /** Consecutive failures (resets on completion) - used for Retry Assist */
+  consecutiveFailures: number;
+  /** ISO timestamp of first attempt */
+  firstAttemptAt: string;
+  /** ISO timestamp of last attempt */
+  lastAttemptAt: string;
+}
+
+/**
  * Player's overall progression in adventure mode
  */
 export interface PlayerProgression {

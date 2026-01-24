@@ -14,6 +14,7 @@ import {
   getLevelConfig,
   generateAdventureGrid,
   getLevelSeed,
+  getGridSize,
 } from '@/lib/adventure';
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
@@ -100,19 +101,21 @@ export default function AdventureView(): React.JSX.Element {
   // Get selected world config
   const selectedWorldConfig = selectedWorld ? getWorldConfig(selectedWorld) : null;
 
-  // Get level config and grid for gameplay
-  const levelConfig =
-    selectedWorld && selectedLevel
-      ? getLevelConfig(selectedWorld, selectedLevel)
-      : null;
-
+  // Generate grid FIRST, then pass to level config for vowel protection
+  // This prevents ice tiles from being placed on vowels, ensuring fair levels
   const gameGrid =
-    selectedWorld && selectedLevel && levelConfig
+    selectedWorld && selectedLevel
       ? generateAdventureGrid(
-          levelConfig.gridSize as 4 | 5 | 6 | 7,
+          getGridSize(selectedWorld) as 4 | 5 | 6 | 7,
           getLevelSeed(selectedWorld, selectedLevel),
           language
         )
+      : null;
+
+  // Get level config with grid for vowel-protected special tiles
+  const levelConfig =
+    selectedWorld && selectedLevel
+      ? getLevelConfig(selectedWorld, selectedLevel, gameGrid ?? undefined)
       : null;
 
   // Track if we're handling a popstate event to avoid pushing state during back nav

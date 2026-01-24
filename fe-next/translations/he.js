@@ -3736,7 +3736,55 @@ const he = {
       "paused": "מושהה",
       "tryAgain": "נסו שוב!",
       "perfect": "מושלם!",
-      "newHighScore": "שיא חדש!"
+      "newHighScore": "שיא חדש!",
+      "yourBest": "השיא שלך",
+      "words": "מילים",
+      "keepTrying": "המשיכו לנסות! אתם משתפרים!",
+      "hint": "רמז",
+      "hintAvailable": "צריכים רמז?",
+      "hintUsed": "נסו את המילה הזו!",
+      "noHints": "אין עוד רמזים זמינים"
+    },
+    "retry": {
+      "title": "כמעט שם!",
+      "subtitle": "אל תוותרו - אתם מתקרבים!",
+      "tryAgain": "נסו שוב",
+      "bonusTime": "נסו עם זמן בונוס",
+      "bonusTimeDesc": "+30 שניות למצוא מילים",
+      "startWithHint": "התחילו עם רמז",
+      "startWithHintDesc": "מציג מילה אחת להתחלה",
+      "yourProgress": "ההתקדמות שלכם",
+      "bestWords": "מילים הכי טובות",
+      "bestScore": "ניקוד הכי טוב",
+      "attempts": "ניסיונות"
+    },
+    "preview": {
+      "title": "תצוגה מקדימה של שלב",
+      "objectives": "מטרות",
+      "timer": "מגבלת זמן",
+      "seconds": "שניות",
+      "specialTiles": "אריחים מיוחדים",
+      "noSpecialTiles": "אריחים רגילים בלבד",
+      "start": "התחל שלב",
+      "back": "חזור",
+      "bestAttempt": "השיא שלכם",
+      "notAttempted": "עדיין לא ניסיתם"
+    },
+    "tiles": {
+      "gold": "זהב (×3 נקודות)",
+      "ice": "קרח (מכשול)",
+      "bomb": "פצצה (מנקה שורה)",
+      "rainbow": "קשת (ג'וקר)",
+      "chain": "שרשרת (קומבו)",
+      "time": "זמן (+5 שניות)"
+    },
+    "objectives": {
+      "wordCount": "מצאו מילים",
+      "scoreTarget": "הגיעו לניקוד",
+      "longWords": "מילים ארוכות (5+)",
+      "clearIce": "נקו אריחי קרח",
+      "timeBonus": "בונוס זמן",
+      "collectGems": "אספו יהלומים"
     },
     "cutscene": {
       "skip": "דלג"
