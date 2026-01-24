@@ -3834,6 +3834,14 @@ const en = {
       "averageAccuracy": "Average Accuracy",
       "wordsAttempted": "Words Attempted",
       "wordsMastered": "Words Mastered"
+    },
+    "wordSelector": {
+      "title": "Select Vocabulary Words",
+      "saveAsLesson": "Save as Lesson",
+      "saveLessonTitle": "Save Vocabulary Lesson",
+      "lessonNamePlaceholder": "Enter lesson name...",
+      "noClassroom": "No classroom (personal lesson)",
+      "selectWords": "Select words to create a vocabulary lesson"
     }
   }
 };
