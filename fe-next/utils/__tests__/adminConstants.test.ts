@@ -109,6 +109,17 @@ describe('Admin Constants', () => {
 });
 
 describe('Date Utility Functions', () => {
+  /**
+   * Helper to get local date string in YYYY-MM-DD format.
+   * Avoids timezone issues from toISOString() which returns UTC.
+   */
+  function getLocalDateString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   describe('getTodayDateString', () => {
     test('should return date in YYYY-MM-DD format', () => {
       // WHEN: Getting today's date string
@@ -119,14 +130,14 @@ describe('Date Utility Functions', () => {
     });
 
     test('should return today\'s date', () => {
-      // GIVEN: Today's date
+      // GIVEN: Today's date in UTC (toISOString returns UTC)
       const today = new Date();
       const expected = today.toISOString().split('T')[0];
 
       // WHEN: Getting today's date string
       const result = getTodayDateString();
 
-      // THEN: Should match today's date
+      // THEN: Should match today's UTC date
       expect(result).toBe(expected);
     });
   });
@@ -140,7 +151,7 @@ describe('Date Utility Functions', () => {
       expect(result).toHaveProperty('start');
       expect(result).toHaveProperty('end');
 
-      // AND: End date should be today
+      // AND: End date should be today (using UTC like the function)
       const today = new Date().toISOString().split('T')[0];
       expect(result.end).toBe(today);
 
@@ -175,8 +186,8 @@ describe('Date Utility Functions', () => {
 
   describe('formatDateWithLabel', () => {
     test('should return "Today" for today\'s date', () => {
-      // GIVEN: Today's date string
-      const today = new Date().toISOString().split('T')[0];
+      // GIVEN: Today's date string (using local timezone)
+      const today = getLocalDateString(new Date());
 
       // WHEN: Formatting today's date
       const result = formatDateWithLabel(today);
@@ -186,10 +197,10 @@ describe('Date Utility Functions', () => {
     });
 
     test('should return "Tomorrow" for tomorrow\'s date', () => {
-      // GIVEN: Tomorrow's date string
+      // GIVEN: Tomorrow's date string (using local timezone)
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const tomorrowStr = getLocalDateString(tomorrow);
 
       // WHEN: Formatting tomorrow's date
       const result = formatDateWithLabel(tomorrowStr);
@@ -199,10 +210,10 @@ describe('Date Utility Functions', () => {
     });
 
     test('should return formatted date for other dates', () => {
-      // GIVEN: A date far in the future
+      // GIVEN: A date far in the future (using local timezone)
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 7);
-      const futureDateStr = futureDate.toISOString().split('T')[0];
+      const futureDateStr = getLocalDateString(futureDate);
 
       // WHEN: Formatting the date
       const result = formatDateWithLabel(futureDateStr);
@@ -215,8 +226,8 @@ describe('Date Utility Functions', () => {
 
   describe('isToday', () => {
     test('should return true for today\'s date', () => {
-      // GIVEN: Today's date string
-      const today = new Date().toISOString().split('T')[0];
+      // GIVEN: Today's date string (using local timezone)
+      const today = getLocalDateString(new Date());
 
       // WHEN: Checking if it's today
       const result = isToday(today);
@@ -226,10 +237,10 @@ describe('Date Utility Functions', () => {
     });
 
     test('should return false for yesterday', () => {
-      // GIVEN: Yesterday's date string
+      // GIVEN: Yesterday's date string (using local timezone)
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const yesterdayStr = getLocalDateString(yesterday);
 
       // WHEN: Checking if it's today
       const result = isToday(yesterdayStr);
@@ -241,10 +252,10 @@ describe('Date Utility Functions', () => {
 
   describe('isPastDate', () => {
     test('should return true for yesterday', () => {
-      // GIVEN: Yesterday's date string
+      // GIVEN: Yesterday's date string (using local timezone)
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const yesterdayStr = getLocalDateString(yesterday);
 
       // WHEN: Checking if it's past
       const result = isPastDate(yesterdayStr);
@@ -254,8 +265,8 @@ describe('Date Utility Functions', () => {
     });
 
     test('should return false for today', () => {
-      // GIVEN: Today's date string
-      const today = new Date().toISOString().split('T')[0];
+      // GIVEN: Today's date string (using local timezone)
+      const today = getLocalDateString(new Date());
 
       // WHEN: Checking if it's past
       const result = isPastDate(today);
@@ -265,10 +276,10 @@ describe('Date Utility Functions', () => {
     });
 
     test('should return false for tomorrow', () => {
-      // GIVEN: Tomorrow's date string
+      // GIVEN: Tomorrow's date string (using local timezone)
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const tomorrowStr = getLocalDateString(tomorrow);
 
       // WHEN: Checking if it's past
       const result = isPastDate(tomorrowStr);

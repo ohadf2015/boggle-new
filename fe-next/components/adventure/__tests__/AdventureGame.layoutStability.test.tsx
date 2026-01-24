@@ -85,6 +85,35 @@ jest.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
+// Mock ProgressionContext - required by AdventureGame
+jest.mock('@/contexts/ProgressionContext', () => ({
+  useProgression: () => ({
+    progression: {
+      userId: 'test-user',
+      xp: 0,
+      currentWorld: 1,
+      currentLevel: 1,
+      totalStars: 0,
+      playerLevel: 1,
+      completions: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    isLoading: false,
+    error: null,
+    completeLevel: jest.fn(),
+    recordAttempt: jest.fn(),
+    isWorldUnlocked: jest.fn(() => true),
+    isLevelUnlocked: jest.fn(() => true),
+    getWorldStars: jest.fn(() => 0),
+    getLevelCompletion: jest.fn(() => undefined),
+    getLevelAttempt: jest.fn(() => undefined),
+    refreshProgression: jest.fn(),
+    attempts: [],
+  }),
+  ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 jest.mock('../AdventureGrid', () => {
   return function MockAdventureGrid() {
     return <div data-testid="adventure-grid">Grid</div>;

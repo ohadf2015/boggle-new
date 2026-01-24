@@ -108,18 +108,30 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
 }));
 
 // Mock ProgressionContext - tracks player progress
+// Define stable mock functions OUTSIDE the factory to prevent infinite re-renders
+const mockRecordAttempt = jest.fn();
+const mockGetLevelAttempt = jest.fn(() => null);
+const mockRefreshProgression = jest.fn();
+const mockCompleteLevel = jest.fn();
+const mockIsWorldUnlocked = jest.fn(() => true);
+const mockIsLevelUnlocked = jest.fn(() => true);
+const mockGetWorldStars = jest.fn(() => 0);
+const mockGetLevelCompletion = jest.fn(() => undefined);
+
 jest.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
-    recordAttempt: jest.fn(),
-    getLevelAttempt: jest.fn(() => null),
+    recordAttempt: mockRecordAttempt,
+    getLevelAttempt: mockGetLevelAttempt,
+    getLevelCompletion: mockGetLevelCompletion,
     progression: null,
     isLoading: false,
     error: null,
-    refreshProgression: jest.fn(),
-    completeLevel: jest.fn(),
-    isWorldUnlocked: jest.fn(() => true),
-    isLevelUnlocked: jest.fn(() => true),
-    getWorldStars: jest.fn(() => 0),
+    refreshProgression: mockRefreshProgression,
+    completeLevel: mockCompleteLevel,
+    isWorldUnlocked: mockIsWorldUnlocked,
+    isLevelUnlocked: mockIsLevelUnlocked,
+    getWorldStars: mockGetWorldStars,
+    attempts: [],
   }),
 }));
 
