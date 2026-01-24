@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 9: Invalid Word System** - Admin queue and approval workflow
 - [x] **Phase 10: Bug Fixes & Stabilization** - Daily challenge fixes and loose ends
 - [x] **Phase 11: Teacher Vocabulary Builder** - Multiplayer word selection, grid integration preview, teacher lessons & student tracking
-- [ ] **Phase 12: Asset WebP Migration Completion** - Restore parallax/background directories, stage new WebP files, verify integration
+- [x] **Phase 12: Asset WebP Migration Completion** - Restore parallax/background directories, stage new WebP files, verify integration
 - [ ] **Phase 13: Translation Completion** - Add missing Phase 11 translation keys (372 keys across 4 languages)
 
 ## Phase Details
@@ -245,9 +245,9 @@ Plans:
 **Plans**: 3 plans in 1 wave
 
 Plans:
-- [ ] 12-01-PLAN.md — Restore backgrounds and parallax directories from backup
-- [ ] 12-02-PLAN.md — Stage WebP files and update any hardcoded .png references
-- [ ] 12-03-PLAN.md — Verification and cleanup (remove backups, test integration)
+- [x] 12-01-PLAN.md — Restore backgrounds and parallax directories from backup
+- [x] 12-02-PLAN.md — Stage WebP files and update any hardcoded .png references
+- [x] 12-03-PLAN.md — Verification and cleanup (remove backups, test integration)
 
 ### Phase 13: Translation Completion
 **Goal**: Add all missing translation keys for Phase 11 Teacher Vocabulary Builder feature
@@ -284,9 +284,9 @@ Phases execute in numeric order: 1 -> 2 -> ... -> 11 -> 12 -> 13
 | 9. Invalid Word System | 4/4 | Complete | 2026-01-23 |
 | 10. Bug Fixes & Stabilization | 5/5 | Complete | 2026-01-24 |
 | 11. Teacher Vocabulary Builder | 8/8 | Complete | 2026-01-24 |
-| 12. Asset WebP Migration | 0/3 | Pending | - |
+| 12. Asset WebP Migration | 3/3 | Complete | 2026-01-24 |
 | 13. Translation Completion | 0/2 | Pending | - |
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-24 (Gap closure phases 12-13 added from audit)*
+*Last updated: 2026-01-24 (Phase 12 complete)*

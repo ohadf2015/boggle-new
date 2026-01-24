@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 11 complete - All milestone phases complete
+**Current focus:** Phase 12 complete - Asset WebP migration finished
 
 ## Current Position
 
-Phase: 11 of 11 (Teacher Vocabulary Builder) - COMPLETE
-Plan: 8 of 8 complete
-Status: All phases complete (verified)
-Last activity: 2026-01-24 - Completed Phase 11 verification
+Phase: 12 of 13 (Asset WebP Migration Completion) - COMPLETE
+Plan: 3 of 3 complete
+Status: Verified (5/5 must-haves)
+Last activity: 2026-01-24 - Completed Phase 12 verification
 
-Progress: [██████████] 100% (11 phases complete, 51/51 total plans)
+Progress: [████████░░] 92% (12 phases complete, 54/56 total plans)
 
 ## Performance Metrics
 
@@ -38,6 +38,7 @@ Progress: [██████████] 100% (11 phases complete, 51/51 total
 | 09 Invalid Word System | 4/4 | ~48min | 12min |
 | 10 Bug Fixes & Stabilization | 5/5 | ~60min | 12min |
 | 11 Teacher Vocabulary Builder | 8/8 | ~95min | 12min |
+| 12 Asset WebP Migration | 3/3 | ~12min | 4min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -395,13 +396,30 @@ None.
 
 **Phase 11 Complete:** ✓ Teacher Vocabulary Builder fully functional (verified 2026-01-24)
 
+## Phase 12 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 12-01 | Restore backgrounds and parallax directories from backup | ✓ |
+| 12-02 | Stage WebP files and update .gitignore | ✓ |
+| 12-03 | Verification and cleanup (human-verified) | ✓ |
+
+**Phase 12 Complete:** ✓ Asset WebP Migration fully functional (verified 2026-01-24)
+
+### Phase 12 Key Outcomes
+- 11 WebP files restored (3 backgrounds + 8 parallax layers)
+- Zero 404 errors in WorldBackground component
+- All files valid WebP format (1024x1024 backgrounds, varied parallax)
+- Backup folders gitignored for safety (can delete after 30-60 days)
+- Total WebP migration: 61 production files with ~40-60% size reduction
+
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed Phase 11 (Teacher Vocabulary Builder) - All milestone phases complete
+Stopped at: Completed Phase 12 (Asset WebP Migration Completion)
 Resume file: None
-Next: Milestone complete - ready for production deployment
+Next: Phase 13 (Translation Completion)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-24 (Phase 11 complete - all 8 plans verified)*
+*Last updated: 2026-01-24 (Phase 12 complete - all 3 plans verified)*
