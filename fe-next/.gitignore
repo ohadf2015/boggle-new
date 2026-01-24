@@ -52,3 +52,8 @@ next-env.d.ts
 # Asset pipeline temp files
 .asset-temp/
 
+# Asset backup folders (keep locally, don't commit)
+public/images/adventure-png-backup/
+public/collectibles/*-png-backup/
+public/logos-png-backup/
+
