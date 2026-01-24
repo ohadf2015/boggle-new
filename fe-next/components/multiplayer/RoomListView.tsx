@@ -102,7 +102,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           <button
             onClick={() => setShowHowToPlay(true)}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black/50 bg-neo-navy/50 hover:bg-neo-purple/30 transition-all"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black/50 bg-neo-navy/50 shadow-hard-sm hover:bg-neo-purple/30 hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
             aria-label={t('landing.tutorial')}
           >
             <HelpCircle className="w-5 h-5 text-neo-cream" />
@@ -125,12 +125,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 t={t}
                 variant="hero"
               />
-              {/* DJ Mascot - decorative party vibe */}
-              <div className="absolute -top-6 -right-2 sm:-right-4 pointer-events-none z-10 hidden sm:block">
+              {/* DJ Mascot - decorative party vibe, visible on all screens */}
+              <div className="absolute -top-4 sm:-top-6 -right-1 sm:-right-4 pointer-events-none z-10">
                 <DJMascotWithEntrance
-                  size="sm"
+                  size="xs"
                   delay={0.3}
-                  className="drop-shadow-lg"
+                  className="drop-shadow-lg scale-75 sm:scale-100"
                 />
               </div>
             </motion.div>
@@ -224,22 +224,32 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   ))}
                 </motion.div>
               ) : (
-                /* Empty State - Enhanced Neo-Brutalist */
+                /* Empty State - Enhanced Neo-Brutalist with integrated CTA */
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.25 }}
-                  className="flex flex-col items-center justify-center text-center py-6"
+                  className="flex flex-col items-center justify-center text-center py-8"
                 >
-                  <div className="w-14 h-14 rounded-neo bg-neo-navy/70 border-2 border-neo-black shadow-hard flex items-center justify-center mb-3">
-                    <Users className="w-7 h-7 text-neo-cyan" />
+                  <div className="w-16 h-16 rounded-neo bg-neo-navy/70 border-3 border-neo-black shadow-hard flex items-center justify-center mb-4">
+                    <Users className="w-8 h-8 text-neo-cyan" />
                   </div>
-                  <p className="text-sm font-bold text-neo-cream/80 mb-1">
+                  <p className="text-base font-bold text-neo-cream mb-1">
                     {t('multiplayerFlow.roomList.noRooms')}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-sm text-slate-400 mb-5">
                     {t('multiplayerFlow.roomList.beFirst')}
                   </p>
+                  {/* Integrated Create Button - pulsing to draw attention */}
+                  <motion.button
+                    onClick={onCreateRoom}
+                    className="flex items-center gap-2 px-6 py-3 text-sm font-bold uppercase border-3 border-neo-black bg-neo-lime text-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                    animate={{ scale: [1, 1.02, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <Plus className="w-5 h-5" />
+                    {t('multiplayerFlow.roomList.createButton')}
+                  </motion.button>
                 </motion.div>
               )}
             </div>

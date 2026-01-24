@@ -476,10 +476,14 @@ export default function LevelGrid({
               className={cn(
                 'relative p-4 sm:p-5 rounded-neo-lg transition-all duration-200',
                 'border-4 border-neo-black',
+                // Focus states for accessibility (keyboard navigation)
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isUnlocked
                   ? cn(
                       'bg-neo-black/50 backdrop-blur-md',
                       'shadow-hard hover:shadow-hard-lg cursor-pointer',
+                      // Active/pressed state for better feedback
+                      'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
                       stars > 0 && 'ring-2 ring-inset',
                       isPerfect && 'ring-neo-yellow'
                     )
@@ -589,13 +593,14 @@ export default function LevelGrid({
                 </div>
               )}
 
-              {/* Difficulty Badge - More subtle */}
+              {/* Difficulty Badge - Enhanced visibility */}
               <div
                 className={cn(
-                  'absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded-sm uppercase tracking-wider',
-                  config.difficulty === 'EASY' && 'bg-neo-lime/30 text-neo-lime',
-                  config.difficulty === 'MEDIUM' && 'bg-neo-orange/30 text-neo-orange',
-                  config.difficulty === 'HARD' && 'bg-neo-red/30 text-neo-red'
+                  'absolute top-2 right-2 rtl:right-auto rtl:left-2 text-[10px] sm:text-xs font-black px-2 py-1 rounded-sm uppercase tracking-wider',
+                  'border border-neo-black/30',
+                  config.difficulty === 'EASY' && 'bg-neo-lime/40 text-neo-lime',
+                  config.difficulty === 'MEDIUM' && 'bg-neo-orange/40 text-neo-orange',
+                  config.difficulty === 'HARD' && 'bg-neo-red/40 text-neo-red'
                 )}
               >
                 {config.difficulty[0]}

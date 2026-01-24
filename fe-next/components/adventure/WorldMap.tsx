@@ -358,9 +358,9 @@ const WorldNode = ({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: index * 0.08 + 0.1 }}
       >
-        {/* World name - bolder */}
+        {/* World name - bolder with truncation for overflow */}
         <h3 className={cn(
-          'font-black text-sm sm:text-base uppercase tracking-tight leading-tight',
+          'font-black text-xs sm:text-sm md:text-base uppercase tracking-tight leading-tight truncate',
           isUnlocked ? 'text-neo-white' : 'text-neo-white/50'
         )}>
           {worldName}
