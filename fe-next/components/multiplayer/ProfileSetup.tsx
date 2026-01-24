@@ -191,7 +191,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
         >
           <button
             onClick={onBack}
-            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-neo-black/50 bg-neo-cream dark:bg-neo-navy shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
+            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-neo-black/50 bg-neo-cream dark:bg-neo-navy shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black dark:text-neo-white text-sm font-bold"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
@@ -239,7 +239,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                     <button
                       type="button"
                       onClick={() => setIsAvatarPickerOpen(true)}
-                      className="w-full p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 flex items-center gap-3 transition-colors group"
+                      className="w-full p-3 rounded-neo bg-purple-50 dark:bg-purple-900/30 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-100 dark:hover:bg-purple-900/50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:border-neo-lime active:scale-[0.98] flex items-center gap-3 transition-all group"
                     >
                       <div className="relative flex-shrink-0">
                         <div className="w-14 h-14 rounded-full border-3 border-neo-cyan shadow-hard overflow-hidden group-hover:border-purple-400 transition-colors">

@@ -55,8 +55,12 @@ const QuickPlayButton: React.FC<QuickPlayButtonProps> = ({
         'rounded-neo-lg border-4 border-neo-black',
         'font-black uppercase tracking-wide',
         'transition-all duration-200',
+        // Focus state for accessibility (keyboard navigation)
+        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         // Pressed state shadow
         isPressed ? 'shadow-hard-pressed translate-x-[2px] translate-y-[2px]' : 'shadow-hard-lg',
+        // Hover state (only when not pressed)
+        !isPressed && !disabled && !isLoading && 'hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-hard-xl',
         // Disabled state
         (disabled || isLoading) && 'opacity-70 cursor-not-allowed',
         // Hero variant styles

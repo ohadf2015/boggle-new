@@ -126,7 +126,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
           <button
             onClick={onBack}
             disabled={isSubmitting}
-            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-neo-black/50 bg-neo-cream dark:bg-neo-navy shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
+            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-neo-black/50 bg-neo-cream dark:bg-neo-navy shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
@@ -242,7 +242,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                         type="button"
                         onClick={onRefreshRooms}
                         disabled={roomsLoading}
-                        className="p-1.5 rounded-full hover:bg-neo-cyan/20 transition-colors"
+                        className="p-1.5 rounded-full hover:bg-neo-cyan/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:bg-neo-cyan/30 transition-colors disabled:opacity-50"
                         aria-label={t('multiplayerFlow.joinForm.refreshButton') || 'Refresh'}
                       >
                         {roomsLoading ? <NeoLoader variant="dots" size="sm" /> : <RefreshCw className="w-3 h-3 text-neo-cyan" />}
@@ -262,7 +262,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                               type="button"
                               onClick={() => handleQuickJoin(room.gameCode)}
                               disabled={isSubmitting}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-neo-cyan/10 transition-colors text-left group"
+                              className="w-full flex items-center gap-3 p-3 hover:bg-neo-cyan/10 focus-visible:bg-neo-cyan/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neo-cyan active:bg-neo-cyan/20 transition-all text-left group"
                             >
                               <span className="text-lg">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
                               <div className="flex-1 min-w-0">

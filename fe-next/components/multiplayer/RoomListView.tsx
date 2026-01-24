@@ -90,7 +90,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         >
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-2 border-neo-black/50 bg-neo-navy/50 shadow-hard-sm hover:bg-neo-black/30/50 transition-all text-neo-cream text-sm font-bold"
+            className="flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-2 border-neo-black/50 bg-neo-navy/50 shadow-hard-sm hover:bg-neo-black/30 hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-cream text-sm font-bold"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back')}</span>
@@ -171,7 +171,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <button
                 onClick={onRefreshRooms}
                 disabled={roomsLoading}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy/50 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/20 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-50"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy/50 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/20 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all disabled:opacity-50"
                 aria-label={t('common.refresh')}
               >
                 {roomsLoading ? (
@@ -204,7 +204,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                       onClick={() => onRoomClick(room)}
                       whileHover={{ scale: 1.02, x: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan transition-all text-left group"
+                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:border-neo-lime transition-all text-left group"
                     >
                       <span className="text-xl">
                         {LANGUAGE_FLAGS[room.language] || '🎮'}

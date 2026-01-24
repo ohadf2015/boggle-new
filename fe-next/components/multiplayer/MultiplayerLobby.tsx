@@ -227,7 +227,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all"
               aria-label={t('common.back') || 'Back'}
             >
               <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
@@ -353,7 +353,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         >
           <Link
             href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all text-neo-black"
+            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all text-neo-black"
             aria-label={t('common.back') || 'Back'}
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
