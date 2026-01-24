@@ -22,6 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Wikipedia Integration** - Word extraction and sync pipeline
 - [x] **Phase 9: Invalid Word System** - Admin queue and approval workflow
 - [ ] **Phase 10: Bug Fixes & Stabilization** - Daily challenge fixes and loose ends
+- [ ] **Phase 11: Teacher Vocabulary Builder** - Multiplayer word selection, grid integration preview, teacher lessons & student tracking
 
 ## Phase Details
 
@@ -206,10 +207,32 @@ Plans:
 - [ ] 10-04-PLAN.md — Multi-language edge case verification and fixes
 - [ ] 10-05-PLAN.md — Final validation and phase verification
 
+### Phase 11: Teacher Vocabulary Builder
+**Goal**: Enable teachers to create custom vocabulary lessons from multiplayer word selection with student performance tracking
+**Depends on**: Phase 10 (stabilization complete)
+**Requirements**: EDU-01, EDU-02, EDU-03, EDU-04
+**Success Criteria** (what must be TRUE):
+  1. Multiplayer host can select specific words from the game grid to include in a vocabulary list
+  2. System shows visual indicator whether selected word can be integrated into future grids
+  3. Teachers can save word selections as reusable "vocabulary lessons"
+  4. Teacher dashboard shows student performance metrics (words learned, accuracy, progress over time)
+  5. Students can be assigned specific vocabulary lessons by their teacher
+**Plans**: 8 plans in 6 waves
+
+Plans:
+- [ ] 11-01-PLAN.md — Database schema (classrooms, lessons, progress) with RLS
+- [ ] 11-02-PLAN.md — Word integration check hook (TDD)
+- [ ] 11-03-PLAN.md — Teacher dashboard data hooks (useClassroom, useLessons, useProgress)
+- [ ] 11-04-PLAN.md — Vocabulary selection socket events (TDD)
+- [ ] 11-05-PLAN.md — Teacher dashboard UI (classrooms, lessons, charts)
+- [ ] 11-06-PLAN.md — Host word selector UI in multiplayer results
+- [ ] 11-07-PLAN.md — Student lesson view and practice mode
+- [ ] 11-08-PLAN.md — Verification and phase completion
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -223,7 +246,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. Wikipedia Integration | 4/4 | Complete | 2026-01-23 |
 | 9. Invalid Word System | 4/4 | Complete | 2026-01-23 |
 | 10. Bug Fixes & Stabilization | 0/5 | Not started | - |
+| 11. Teacher Vocabulary Builder | 0/8 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-23 (Phase 9 complete)*
+*Last updated: 2026-01-24 (Phase 11 planned - 8 plans in 6 waves)*
