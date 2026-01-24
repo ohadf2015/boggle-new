@@ -48,6 +48,13 @@ const invalidPath = [
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
+// Mock invalidWordTracker to prevent actual API calls
+jest.mock('@/utils/invalidWordTracker', () => ({
+  recordNotOnBoard: jest.fn(),
+  recordNotInDictionary: jest.fn(),
+  recordInvalidWord: jest.fn(),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================
@@ -56,6 +63,11 @@ describe('useAdventureWordValidation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockFetch.mockReset();
+    // Default implementation for any unexpected fetch calls (e.g., from invalidWordTracker)
+    // This prevents "Cannot read properties of undefined (reading 'catch')" errors
+    mockFetch.mockImplementation(() =>
+      Promise.resolve({ ok: true, json: async () => ({}) })
+    );
   });
 
   describe('Initialization', () => {

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, Sparkles, Trophy, Map, Zap, Loader2 } from 'lucide-react';
+import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -337,37 +337,6 @@ export default function AdventureView(): React.JSX.Element {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Development Notice - Only show on world map, positioned within content flow */}
-        {viewState === 'worldMap' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="absolute bottom-4 left-4 right-4 pointer-events-none"
-          >
-            <div className="max-w-md mx-auto pointer-events-auto">
-              <div
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3',
-                  'bg-neo-purple/90 border-3 border-neo-black rounded-neo-lg',
-                  'shadow-hard backdrop-blur-sm'
-                )}
-              >
-                <Trophy className="w-6 h-6 text-neo-yellow flex-shrink-0" />
-                <div>
-                  <p className="text-neo-white font-bold text-sm">
-                    {t('adventure.devPreview') || 'Development Preview'}
-                  </p>
-                  <p className="text-neo-white/70 text-xs">
-                    {t('adventure.devPreviewDesc') ||
-                      'Adventure Mode is under development.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </main>
     </div>
     </AdventureThemeProvider>

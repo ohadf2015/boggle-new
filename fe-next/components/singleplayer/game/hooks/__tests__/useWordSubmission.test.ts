@@ -15,6 +15,13 @@ jest.mock('@/utils/haptics', () => ({
   hapticError: jest.fn(),
 }));
 
+// Mock invalidWordTracker to prevent fetch calls during tests
+jest.mock('@/utils/invalidWordTracker', () => ({
+  recordNotOnBoard: jest.fn(),
+  recordNotInDictionary: jest.fn(),
+  recordInvalidWord: jest.fn(),
+}));
+
 // Import mocked modules
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 
@@ -75,8 +82,12 @@ describe('useWordSubmission', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset fetch mock
-    global.fetch = jest.fn();
+    // Reset fetch mock with default implementation
+    // This prevents "Cannot read properties of undefined (reading 'catch')" errors
+    // when invalidWordTracker calls fetch() for tracking purposes
+    global.fetch = jest.fn().mockImplementation(() =>
+      Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
+    );
   });
 
   describe('initial state', () => {

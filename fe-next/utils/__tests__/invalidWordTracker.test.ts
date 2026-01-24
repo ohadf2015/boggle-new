@@ -4,36 +4,39 @@
  * Tests for the client-side invalid word tracking utility.
  */
 
-// Mock fetch globally
-const mockFetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve({ success: true }),
-  })
-);
-
-global.fetch = mockFetch as unknown as typeof fetch;
-
-// Import after mocking
-import {
-  recordInvalidWord,
-  recordNotOnBoard,
-  recordNotInDictionary,
-  type InvalidWordReason,
-  type GameMode,
-} from '../invalidWordTracker';
-
+// Use jest.isolateModules to ensure fresh module state for each test
 describe('invalidWordTracker', () => {
+  let mockFetch: jest.Mock;
+  let recordInvalidWord: typeof import('../invalidWordTracker').recordInvalidWord;
+  let recordNotOnBoard: typeof import('../invalidWordTracker').recordNotOnBoard;
+  let recordNotInDictionary: typeof import('../invalidWordTracker').recordNotInDictionary;
+
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset the module state between tests to clear deduplication cache
+    // Create fresh mock for each test
+    mockFetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ success: true }),
+      })
+    );
+    global.fetch = mockFetch as unknown as typeof fetch;
+
+    // Re-import module to get fresh state (clear deduplication cache)
     jest.resetModules();
+    const tracker = require('../invalidWordTracker');
+    recordInvalidWord = tracker.recordInvalidWord;
+    recordNotOnBoard = tracker.recordNotOnBoard;
+    recordNotInDictionary = tracker.recordNotInDictionary;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('recordInvalidWord', () => {
     it('sends POST request to API with correct payload', () => {
       recordInvalidWord({
-        word: 'testword',
+        word: 'uniqueword1',
         language: 'en',
         reason: 'not_in_dictionary',
         gameMode: 'daily_word_hunt',
@@ -43,7 +46,7 @@ describe('invalidWordTracker', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'testword',
+          word: 'uniqueword1',
           language: 'en',
           reason: 'not_in_dictionary',
           gameMode: 'daily_word_hunt',
@@ -73,7 +76,7 @@ describe('invalidWordTracker', () => {
 
     it('skips too_short reason', () => {
       recordInvalidWord({
-        word: 'testword',
+        word: 'uniqueword2',
         language: 'en',
         reason: 'too_short',
       });
@@ -81,13 +84,13 @@ describe('invalidWordTracker', () => {
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('handles API errors silently', async () => {
+    it('handles API errors silently', () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       // Should not throw
       expect(() => {
         recordInvalidWord({
-          word: 'testword',
+          word: 'uniqueword3',
           language: 'en',
           reason: 'not_in_dictionary',
         });
@@ -96,7 +99,7 @@ describe('invalidWordTracker', () => {
 
     it('works without gameMode', () => {
       recordInvalidWord({
-        word: 'testword',
+        word: 'uniqueword4',
         language: 'en',
         reason: 'not_on_board',
       });
@@ -105,7 +108,7 @@ describe('invalidWordTracker', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'testword',
+          word: 'uniqueword4',
           language: 'en',
           reason: 'not_on_board',
           gameMode: undefined,
@@ -114,11 +117,11 @@ describe('invalidWordTracker', () => {
     });
 
     it('supports all valid reasons', () => {
-      const reasons: InvalidWordReason[] = ['not_on_board', 'not_in_dictionary', 'peer_rejected'];
+      const reasons = ['not_on_board', 'not_in_dictionary', 'peer_rejected'] as const;
 
       reasons.forEach((reason, index) => {
         recordInvalidWord({
-          word: `word${index}unique`,
+          word: `reasonword${index}`,
           language: 'en',
           reason,
         });
@@ -128,18 +131,18 @@ describe('invalidWordTracker', () => {
     });
 
     it('supports all valid game modes', () => {
-      const gameModes: GameMode[] = [
+      const gameModes = [
         'multiplayer',
         'adventure',
         'daily_word_hunt',
         'daily_buzz',
         'single_player',
         'drill',
-      ];
+      ] as const;
 
       gameModes.forEach((gameMode, index) => {
         recordInvalidWord({
-          word: `mode${index}word`,
+          word: `gamemodeword${index}`,
           language: 'en',
           reason: 'not_in_dictionary',
           gameMode,
@@ -151,7 +154,7 @@ describe('invalidWordTracker', () => {
 
     it('supports Hebrew language', () => {
       recordInvalidWord({
-        word: 'מילה',
+        word: 'מילהארוכה',
         language: 'he',
         reason: 'not_in_dictionary',
         gameMode: 'adventure',
@@ -161,24 +164,41 @@ describe('invalidWordTracker', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'מילה',
+          word: 'מילהארוכה',
           language: 'he',
           reason: 'not_in_dictionary',
           gameMode: 'adventure',
         }),
       });
     });
+
+    it('deduplicates repeated submissions of same word', () => {
+      recordInvalidWord({
+        word: 'duplicateword',
+        language: 'en',
+        reason: 'not_in_dictionary',
+      });
+
+      recordInvalidWord({
+        word: 'duplicateword',
+        language: 'en',
+        reason: 'not_in_dictionary',
+      });
+
+      // Should only call once due to deduplication
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('recordNotOnBoard', () => {
     it('calls recordInvalidWord with not_on_board reason', () => {
-      recordNotOnBoard('testword', 'en', 'adventure');
+      recordNotOnBoard('notonboardword', 'en', 'adventure');
 
       expect(mockFetch).toHaveBeenCalledWith('/api/invalid-word/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'testword',
+          word: 'notonboardword',
           language: 'en',
           reason: 'not_on_board',
           gameMode: 'adventure',
@@ -187,13 +207,13 @@ describe('invalidWordTracker', () => {
     });
 
     it('works without gameMode', () => {
-      recordNotOnBoard('newword', 'sv');
+      recordNotOnBoard('newwordboard', 'sv');
 
       expect(mockFetch).toHaveBeenCalledWith('/api/invalid-word/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'newword',
+          word: 'newwordboard',
           language: 'sv',
           reason: 'not_on_board',
           gameMode: undefined,
@@ -204,13 +224,13 @@ describe('invalidWordTracker', () => {
 
   describe('recordNotInDictionary', () => {
     it('calls recordInvalidWord with not_in_dictionary reason', () => {
-      recordNotInDictionary('unknownword', 'ja', 'daily_buzz');
+      recordNotInDictionary('notindictword', 'ja', 'daily_buzz');
 
       expect(mockFetch).toHaveBeenCalledWith('/api/invalid-word/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'unknownword',
+          word: 'notindictword',
           language: 'ja',
           reason: 'not_in_dictionary',
           gameMode: 'daily_buzz',
@@ -219,13 +239,13 @@ describe('invalidWordTracker', () => {
     });
 
     it('works without gameMode', () => {
-      recordNotInDictionary('anotherword', 'es');
+      recordNotInDictionary('anothernotdict', 'es');
 
       expect(mockFetch).toHaveBeenCalledWith('/api/invalid-word/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: 'anotherword',
+          word: 'anothernotdict',
           language: 'es',
           reason: 'not_in_dictionary',
           gameMode: undefined,
