@@ -66,6 +66,10 @@
   --border-neo: 3px;
   --border-neo-thick: 4px;
 
+  /* Mobile Layout Variables */
+  --mobile-tab-bar-height: 4rem; /* 64px base height for bottom tab bars */
+  --mobile-bottom-safe: calc(var(--mobile-tab-bar-height) + env(safe-area-inset-bottom, 0px));
+
   /* Snappy Timing Functions */
   --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Brain, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -11,9 +12,29 @@ import { useBrainScore } from '@/hooks/useBrainScore';
 import { cn } from '@/lib/utils';
 import BrainScoreHero from '@/components/brain/BrainScoreHero';
 import CognitiveDomainGrid from '@/components/brain/CognitiveDomainGrid';
-import CognitiveRadarChart from '@/components/brain/CognitiveRadarChart';
-import BrainScoreHistoryChart from '@/components/brain/BrainScoreHistoryChart';
 import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
+
+// Dynamic imports for chart components (Recharts is ~120KB gzipped)
+// This reduces initial page load for low-end devices
+const CognitiveRadarChart = dynamic(
+  () => import('@/components/brain/CognitiveRadarChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 bg-slate-800/50 rounded-neo border-3 border-neo-black animate-pulse" />
+    )
+  }
+);
+
+const BrainScoreHistoryChart = dynamic(
+  () => import('@/components/brain/BrainScoreHistoryChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-48 bg-slate-800/50 rounded-neo border-3 border-neo-black animate-pulse" />
+    )
+  }
+);
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
 import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
 import PersonalizedDrillRecommendation from '@/components/brain/PersonalizedDrillRecommendation';

@@ -498,71 +498,71 @@ const sv = {
   },
   "multiplayerFlow": {
     "roomList": {
-      "activeRooms": "Aktiva rum",
-      "online": "online",
-      "noRooms": "Inga aktiva rum",
-      "beFirst": "Var först med att skapa ett!",
-      "createButton": "Skapa rum",
-      "refreshed": "Rum uppdaterade",
-      "quickPlay": "Snabbspel",
-      "orJoinRoom": "eller gå med i ett rum"
+      "activeRooms": "Hoppa in!",
+      "online": "i strid",
+      "noRooms": "Inga strider pågår",
+      "beFirst": "Starta festen!",
+      "createButton": "Starta en strid",
+      "refreshed": "Uppdaterat!",
+      "quickPlay": "Snabbmatch",
+      "orJoinRoom": "eller hoppa in"
     },
     "joinModal": {
-      "title": "Gå med i rum",
-      "yourName": "Ditt namn",
-      "namePlaceholder": "Ditt namn",
-      "joinButton": "Gå med",
-      "joining": "Går med..."
+      "title": "Gå med i striden",
+      "yourName": "Kalla mig...",
+      "namePlaceholder": "Ditt stridsnamn",
+      "joinButton": "Kör!",
+      "joining": "Hoppar in..."
     },
     "createModal": {
-      "title": "Skapa rum",
-      "yourName": "Ditt namn",
-      "namePlaceholder": "Ditt namn",
+      "title": "Starta en strid",
+      "yourName": "Kalla mig...",
+      "namePlaceholder": "Ditt stridsnamn",
       "roomNameLabel": "Rumsnamn",
       "optional": "valfritt",
-      "createButton": "Skapa rum",
-      "creating": "Skapar..."
+      "createButton": "Starta striden!",
+      "creating": "Förbereder arenan..."
     },
     "profileSetup": {
-      "title": "Inställning",
+      "title": "Redo?",
       "progress": "1 av 2",
-      "forCreate": "Ställ in för att skapa rum",
-      "forJoin": "Ställ in för att gå med",
+      "forCreate": "Vem är värd?",
+      "forJoin": "Vem hoppar in?",
       "usernameLabel": "Namn",
-      "usernamePlaceholder": "Namn",
+      "usernamePlaceholder": "Stridsnamn",
       "usernameHint": "2-20 tecken",
-      "avatarLabel": "Avatar",
-      "avatarHint": "Välj en avatar som representerar dig",
-      "avatarRequired": "Välj en avatar för att gå med i striden!",
+      "avatarLabel": "Look",
+      "avatarHint": "Välj ditt stridsansikte",
+      "avatarRequired": "Välj din look först!",
       "usingProfileAvatar": "Profilavatar",
       "usingGameAvatar": "Spelavatar",
-      "tapToChange": "Tryck för att ändra",
-      "continueButton": "Fortsätt",
+      "tapToChange": "Tryck för att byta",
+      "continueButton": "Nästa",
       "selectAvatar": "Välj Avatar"
     },
     "createForm": {
-      "title": "Skapa",
+      "title": "Nästan där!",
       "progress": "2 av 2",
-      "profileLabel": "Profil",
+      "profileLabel": "Du",
       "roomNameLabel": "Rum",
-      "roomNamePlaceholder": "Rumsnamn (valfritt)",
+      "roomNamePlaceholder": "Namnge din arena",
       "roomNameHint": "Visas i lobbyn",
       "languageHint": "Ordspråk",
-      "createButton": "Skapa",
-      "creating": "Skapar..."
+      "createButton": "Kör igång!",
+      "creating": "Skapar arena..."
     },
     "joinForm": {
-      "title": "Gå med",
+      "title": "Hoppa in i action",
       "progress": "2 av 2",
-      "profileLabel": "Profil",
-      "codeLabel": "Kod",
+      "profileLabel": "Du",
+      "codeLabel": "Har du kod?",
       "codePlaceholder": "ABC123",
-      "codeHint": "Be vän om kod",
-      "roomsLabel": "Eller välj rum",
+      "codeHint": "Fråga din kompis!",
+      "roomsLabel": "Eller hoppa in i",
       "refreshButton": "Uppdatera",
-      "noRooms": "Inga rum. Få en kod!",
-      "joinButton": "Gå med",
-      "joining": "Går med..."
+      "noRooms": "Inga öppna rum. Har du kod?",
+      "joinButton": "Hoppa in!",
+      "joining": "Hoppar in..."
     }
   },
   "hostView": {
@@ -3710,7 +3710,9 @@ const sv = {
       "gold": "Guld (3x poäng)",
       "ice": "Is (hinder)",
       "bomb": "Bomb (rensar rad)",
-      "rainbow": "Regnbåge (joker)"
+      "rainbow": "Regnbåge (joker)",
+      "chain": "Kedja (länkbonus)",
+      "time": "Tid (+5 sekunder)"
     },
     "errors": {
       "tooShort": "Ordet är för kort",
@@ -3765,6 +3767,129 @@ const sv = {
         "star2": "Utmarkt arbete!",
         "star3": "Perfekt poang!"
       }
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "Mina lektioner",
+      "subtitle": "Öva glosor och följ dina framsteg"
+    },
+    "lessons": {
+      "lesson": "Lektion",
+      "words": "Ord",
+      "mastered": "Bemästrad",
+      "practice": "Öva",
+      "review": "Repetera",
+      "empty": {
+        "title": "Inga lektioner än",
+        "subtitle": "Gå med i ett klassrum för att börja öva"
+      },
+      "sort": {
+        "recent": "Senaste",
+        "progress": "Framsteg"
+      }
+    },
+    "practice": {
+      "title": "Övningsläge",
+      "definition": "Definition",
+      "yourAnswer": "Ditt svar",
+      "submit": "Skicka",
+      "next": "Nästa ord",
+      "correct": "Rätt!",
+      "incorrect": "Försök igen",
+      "hint": "Ledtråd",
+      "skip": "Hoppa över",
+      "complete": {
+        "title": "Lektion klar!",
+        "subtitle": "Du har bemästrat alla ord",
+        "backToLessons": "Tillbaka till lektioner"
+      },
+      "progress": {
+        "wordsLeft": "{{count}} ord kvar",
+        "streak": "{{count}} i rad",
+        "mastered": "Bemästrad!"
+      }
+    }
+  },
+  "teacher": {
+    "accessRequired": "Lärarbehörighet krävs",
+    "accessDenied": "Du behöver lärarbehörighet för denna sida.",
+    "dashboard": {
+      "title": "Lärarpanel",
+      "classrooms": "Klassrum",
+      "lessons": "Glosor",
+      "students": "Elever",
+      "progress": "Framsteg"
+    },
+    "classroom": {
+      "create": "Skapa klassrum",
+      "edit": "Redigera klassrum",
+      "delete": "Ta bort klassrum",
+      "confirmDelete": "Ta bort klassrummet? Elever förlorar tillgång.",
+      "name": "Klassrumsnamn",
+      "joinCode": "Gå med-kod",
+      "copyCode": "Kopiera kod",
+      "codeCopied": "Koden kopierad!",
+      "members": "{{count}} elever",
+      "member": "1 elev",
+      "noMembers": "Inga elever än",
+      "language": "Språk",
+      "created": "Skapad {{date}}",
+      "noClassrooms": "Inga klassrum än",
+      "createFirst": "Skapa ditt första klassrum för att börja"
+    },
+    "lesson": {
+      "create": "Skapa lektion",
+      "edit": "Redigera lektion",
+      "delete": "Ta bort lektion",
+      "confirmDelete": "Ta bort lektionen? Elevframsteg försvinner.",
+      "name": "Lektionsnamn",
+      "description": "Beskrivning (valfritt)",
+      "words": "{{count}} ord",
+      "word": "1 ord",
+      "noWords": "Inga ord än",
+      "addWord": "Lägg till ord",
+      "removeWord": "Ta bort",
+      "wordPlaceholder": "Skriv ett ord...",
+      "canIntegrate": "Kan användas i spel",
+      "cannotIntegrate": "Endast spårning",
+      "assignToClassroom": "Tilldela klassrum",
+      "noClassroomSelected": "Inget klassrum (privat lektion)",
+      "isPublic": "Gör offentlig",
+      "publicDescription": "Andra lärare kan hitta och använda lektionen",
+      "save": "Spara lektion",
+      "saving": "Sparar...",
+      "saved": "Lektion sparad!",
+      "noLessons": "Inga lektioner än",
+      "createFirst": "Skapa din första gloslektion"
+    },
+    "progress": {
+      "title": "Elevframsteg",
+      "student": "Elev",
+      "wordsAttempted": "Försökt",
+      "wordsMastered": "Bemästrad",
+      "accuracy": "Träffsäkerhet",
+      "lastActive": "Senast aktiv",
+      "noData": "Inga framsteg än",
+      "assignLessons": "Tilldela lektioner för att börja följa framsteg",
+      "chartTitle": "Klassframsteg över tid",
+      "wordsLearned": "Inlärda ord",
+      "expandDetails": "Visa orddetaljer"
+    },
+    "stats": {
+      "totalStudents": "Totalt elever",
+      "completionRate": "Genomförandegrad",
+      "averageAccuracy": "Genomsnittlig träffsäkerhet",
+      "wordsAttempted": "Försökta ord",
+      "wordsMastered": "Bemästrade ord"
+    },
+    "wordSelector": {
+      "title": "Välj glosor",
+      "saveAsLesson": "Spara som lektion",
+      "saveLessonTitle": "Spara gloslektion",
+      "lessonNamePlaceholder": "Ange lektionsnamn...",
+      "noClassroom": "Inget klassrum (privat lektion)",
+      "selectWords": "Välj ord för att skapa en gloslektion"
     }
   }
 };

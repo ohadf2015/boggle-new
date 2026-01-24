@@ -12,7 +12,7 @@ import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
 import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useGameActions } from '@/hooks/gameState';
 import logger from '@/utils/logger';
 import type { AchievementPayload } from '@/shared/types/socket';
 
@@ -34,7 +34,7 @@ export function usePlayerSessionEvents({
   queueAchievement,
   intentionalExitRef,
 }: UsePlayerSessionEventsProps): void {
-  // Get state setters from context (no more prop drilling!)
+  // Get state setters from Zustand store (actions never trigger re-renders)
   const {
     setPlayers: setPlayersReady,
     setShufflingGrid,
@@ -43,7 +43,7 @@ export function usePlayerSessionEvents({
     setLeaderboard,
     setXpGainedData,
     setLevelUpData,
-  } = useGameStateContext();
+  } = useGameActions();
   // Create memoized handlers using shared utilities
   const connectionHandlers = useMemo(
     () => createConnectionHandlers(t, 'PLAYER'),

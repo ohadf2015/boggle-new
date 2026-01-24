@@ -129,7 +129,7 @@ describe('AdventureGrid Contrast', () => {
       // THEN
       const cells = screen.getAllByRole('gridcell');
       // Framer motion applies scale via style, check the class indicates selection
-      expect(cells[0]).toHaveClass('tile-selected');
+      expect(cells[0]).toHaveClass('tile-selected-enhanced');
       expect(cells[0]).toHaveClass('z-10');
     });
   });

@@ -14,7 +14,7 @@ import {
   sendStartGameAck,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useLetterGrid, useGameLanguage, useGameActions } from '@/hooks/gameState';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { StartGameBroadcast } from '@/shared/types/socket';
@@ -82,10 +82,12 @@ export function usePlayerGameEvents({
   gameTimer,
   onGameStart,
 }: UsePlayerGameEventsProps): UsePlayerGameEventsReturn {
-  // Get all game state and setters from context (no more massive prop drilling!)
+  // Get state values from Zustand store (selective subscriptions for performance)
+  const letterGrid = useLetterGrid();
+  const gameLanguage = useGameLanguage();
+
+  // Get all setters from Zustand store (actions never trigger re-renders)
   const {
-    letterGrid,
-    gameLanguage,
     setFoundWords,
     setAchievements,
     setLetterGrid,
@@ -104,7 +106,7 @@ export function usePlayerGameEvents({
     setLevelUpData,
     setBoardTheme,
     setTotalBoardWords,
-  } = useGameStateContext();
+  } = useGameActions();
 
   // Track if was in active game (TODO: move to GameState context)
   const setWasInActiveGame = useRef<(value: boolean) => void>(() => {});

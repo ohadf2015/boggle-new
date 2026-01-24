@@ -10,6 +10,26 @@ import { render, screen } from '@testing-library/react';
 import AdventureTile from '../AdventureTile';
 import type { TileState } from '@/types/adventure';
 
+// Mock LanguageContext to provide translation function
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      // Return translated labels for tile types
+      const translations: Record<string, string> = {
+        'adventure.tiles.gold': 'Gold (3x points)',
+        'adventure.tiles.ice': 'Ice (obstacle)',
+        'adventure.tiles.bomb': 'Bomb (clears row)',
+        'adventure.tiles.rainbow': 'Rainbow (wildcard)',
+        'adventure.tiles.chain': 'Chain (link bonus)',
+        'adventure.tiles.time': 'Time (+5 seconds)',
+      };
+      return translations[key] || key;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
 // ==============================================
 // TEST FIXTURES
 // ==============================================
@@ -177,15 +197,15 @@ describe('AdventureTile', () => {
       expect(bombIcon).toBeInTheDocument();
     });
 
-    it('should have pulse animation class', () => {
+    it('should have enhanced animation class', () => {
       // GIVEN
       const tile = createTileState({ type: 'bomb' });
 
       // WHEN
       const { container } = render(<AdventureTile tile={tile} />);
 
-      // THEN
-      expect(container.querySelector('.bomb-pulse')).toBeInTheDocument();
+      // THEN - Enhanced CSS animations are applied via tile-bomb-enhanced class
+      expect(container.firstChild).toHaveClass('tile-bomb-enhanced');
     });
   });
 
@@ -208,19 +228,115 @@ describe('AdventureTile', () => {
       // WHEN
       render(<AdventureTile tile={tile} />);
 
-      // THEN
-      expect(screen.getByText('*')).toBeInTheDocument();
+      // THEN - Wildcard badge uses ✦ symbol
+      expect(screen.getByText('✦')).toBeInTheDocument();
     });
 
-    it('should have rainbow gradient animation', () => {
+    it('should have rainbow enhanced animation', () => {
       // GIVEN
       const tile = createTileState({ type: 'rainbow' });
 
       // WHEN
       const { container } = render(<AdventureTile tile={tile} />);
 
+      // THEN - Rainbow gradient is now applied via CSS animation class
+      expect(container.firstChild).toHaveClass('tile-rainbow-enhanced');
+    });
+  });
+
+  describe('Chain Tile', () => {
+    it('should render with chain styling', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'chain' });
+
+      // WHEN
+      const { container } = render(<AdventureTile tile={tile} />);
+
       // THEN
-      expect(container.querySelector('.rainbow-gradient')).toBeInTheDocument();
+      expect(container.firstChild).toHaveClass('tile-chain');
+    });
+
+    it('should display chain link icon', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'chain' });
+
+      // WHEN
+      render(<AdventureTile tile={tile} />);
+
+      // THEN - Check for chain icon via testId
+      const chainIcon = screen.getByTestId('chain-icon');
+      expect(chainIcon).toBeInTheDocument();
+    });
+
+    it('should have chain enhanced animation class', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'chain' });
+
+      // WHEN
+      const { container } = render(<AdventureTile tile={tile} />);
+
+      // THEN - Enhanced CSS animations are applied via tile-chain-enhanced class
+      expect(container.firstChild).toHaveClass('tile-chain-enhanced');
+    });
+
+    it('should render chain energy line effects when enableEffects is true', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'chain' });
+
+      // WHEN
+      const { container } = render(<AdventureTile tile={tile} enableEffects={true} />);
+
+      // THEN - Chain effects should include energy lines
+      const chainLines = container.querySelectorAll('.tile-chain-line');
+      expect(chainLines.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Time Tile', () => {
+    it('should render with time styling', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'time' });
+
+      // WHEN
+      const { container } = render(<AdventureTile tile={tile} />);
+
+      // THEN
+      expect(container.firstChild).toHaveClass('tile-time');
+    });
+
+    it('should display clock icon', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'time' });
+
+      // WHEN
+      render(<AdventureTile tile={tile} />);
+
+      // THEN - Check for time icon via testId
+      const timeIcon = screen.getByTestId('time-icon');
+      expect(timeIcon).toBeInTheDocument();
+    });
+
+    it('should have time enhanced animation class', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'time' });
+
+      // WHEN
+      const { container } = render(<AdventureTile tile={tile} />);
+
+      // THEN - Enhanced CSS animations are applied via tile-time-enhanced class
+      expect(container.firstChild).toHaveClass('tile-time-enhanced');
+    });
+
+    it('should render time particle effects when enableEffects is true', () => {
+      // GIVEN
+      const tile = createTileState({ type: 'time' });
+
+      // WHEN
+      const { container } = render(<AdventureTile tile={tile} enableEffects={true} />);
+
+      // THEN - Time effects should include particles
+      const timeParticles = container.querySelectorAll('.tile-time-particle');
+      expect(timeParticles.length).toBeGreaterThan(0);
     });
   });
 
@@ -234,8 +350,8 @@ describe('AdventureTile', () => {
         <AdventureTile tile={tile} isSelected={true} />
       );
 
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-selected');
+      // THEN - Selection now uses enhanced class with additional effects
+      expect(container.firstChild).toHaveClass('tile-selected-enhanced');
     });
 
     it('should NOT apply selected styling when isSelected is false', () => {
@@ -248,7 +364,7 @@ describe('AdventureTile', () => {
       );
 
       // THEN
-      expect(container.firstChild).not.toHaveClass('tile-selected');
+      expect(container.firstChild).not.toHaveClass('tile-selected-enhanced');
     });
   });
 
@@ -285,11 +401,11 @@ describe('AdventureTile', () => {
       // WHEN
       render(<AdventureTile tile={tile} />);
 
-      // THEN
+      // THEN - Aria label should include translated tile type
       const tileElement = screen.getByRole('gridcell');
       expect(tileElement).toHaveAttribute(
         'aria-label',
-        expect.stringContaining('gold')
+        expect.stringContaining('Gold')
       );
     });
   });

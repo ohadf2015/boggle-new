@@ -283,10 +283,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // --- PORTRAIT / DESKTOP ---
   return (
-    <div className="relative">
+    <div className="min-h-dvh flex flex-col">
       {/* MOBILE VIEW */}
-      <div className="md:hidden flex flex-col min-h-full">
-        <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area px-2 pb-28">
+      <div className="md:hidden flex flex-col flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-[--mobile-bottom-safe]">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div

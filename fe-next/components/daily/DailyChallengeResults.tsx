@@ -398,7 +398,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area"
+      className="flex-1 min-h-0 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area"
     >
       {/* Back button */}
       <motion.div className="absolute top-24 sm:top-28 start-4">

@@ -369,10 +369,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           }
         }
 
-        // Mark path tiles as cleared (for used tiles in word)
-        for (const pos of path) {
-          newTiles[pos.row][pos.col].isCleared = true;
-        }
+        // NOTE: Standard tiles should NOT be marked as cleared after word submission.
+        // Only special tiles (ice - when cleared by adjacent tiles, bomb row tiles)
+        // should be marked as cleared. This allows tiles to be reused across words.
+        // The ice and bomb clearing logic above already handles those cases.
       }
 
       // Apply time bonus (capped at level's original timer duration)

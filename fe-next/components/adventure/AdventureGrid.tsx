@@ -9,12 +9,14 @@
 
 import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Bomb, Link2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType } from '@/types/adventure';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
+import './AdventureTile.css';
 import {
   type GridMeasurements,
   measureAdventureGrid,
@@ -533,20 +535,28 @@ const AdventureGrid = memo(
                   // Type-specific classes
                   TILE_TYPE_CLASSES[tile.type],
 
+                  // Enhanced effect classes for special tiles
+                  enableComplexAnimations && tile.type === 'gold' && 'tile-gold-enhanced',
+                  enableComplexAnimations && tile.type === 'ice' && 'tile-ice-enhanced',
+                  enableComplexAnimations && tile.type === 'bomb' && 'tile-bomb-enhanced',
+                  enableComplexAnimations && tile.type === 'rainbow' && 'tile-rainbow-enhanced',
+                  enableComplexAnimations && tile.type === 'chain' && 'tile-chain-enhanced',
+                  enableComplexAnimations && tile.type === 'time' && 'tile-time-enhanced',
+
                   // State classes
                   tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
                   // Enhanced selection: bright ring + glow shadow for visibility
-                  isSelected && 'tile-selected ring-2 ring-neo-lime z-10 shadow-[0_0_12px_rgba(191,255,0,0.6)]',
+                  isSelected && 'tile-selected-enhanced ring-2 ring-neo-lime z-10 shadow-[0_0_16px_rgba(191,255,0,0.7)]',
                   tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
 
                   // Standard tile background
                   tile.type === 'standard' &&
-                    'bg-gradient-to-br from-neo-white via-gray-100 to-gray-200 text-neo-black',
+                    'bg-gradient-to-br from-neo-white via-gray-100 to-gray-200 text-neo-black overflow-hidden',
 
                   // Gold tile - golden glow
                   tile.type === 'gold' && [
                     'bg-gradient-to-br from-neo-yellow via-yellow-400 to-amber-500',
-                    'text-neo-black shadow-[0_0_12px_rgba(255,225,53,0.6)]',
+                    'text-neo-black',
                     'border-amber-600/60',
                   ],
 
@@ -564,9 +574,8 @@ const AdventureGrid = memo(
                     'border-red-700/60',
                   ],
 
-                  // Rainbow tile - multi-color
+                  // Rainbow tile - animated via CSS
                   tile.type === 'rainbow' && [
-                    'bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500',
                     'text-neo-black',
                     'border-purple-500/60',
                   ],
@@ -574,20 +583,83 @@ const AdventureGrid = memo(
                   // Chain tile - purple link
                   tile.type === 'chain' && [
                     'bg-gradient-to-br from-purple-400 via-violet-500 to-violet-600',
-                    'text-neo-white shadow-[0_0_10px_rgba(138,43,226,0.5)]',
+                    'text-neo-white',
                     'border-purple-700/60',
                   ],
 
                   // Time tile - emerald clock
                   tile.type === 'time' && [
                     'bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600',
-                    'text-neo-white shadow-[0_0_10px_rgba(16,185,129,0.5)]',
+                    'text-neo-white',
                     'border-emerald-600/60',
                   ]
                 )}
               >
+                {/* ========== GOLD TILE EFFECTS ========== */}
+                {tile.type === 'gold' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-gold-sparkle tile-gold-sparkle--1" />
+                    <div className="tile-gold-sparkle tile-gold-sparkle--2" />
+                    <div className="tile-gold-sparkle tile-gold-sparkle--3" />
+                  </>
+                )}
+
+                {/* ========== ICE TILE EFFECTS ========== */}
+                {tile.type === 'ice' && enableComplexAnimations && (
+                  <>
+                    <span className="tile-ice-snowflake tile-ice-snowflake--1">❄</span>
+                    <span className="tile-ice-snowflake tile-ice-snowflake--2">❄</span>
+                    <span className="tile-ice-snowflake tile-ice-snowflake--3">❄</span>
+                  </>
+                )}
+
+                {/* ========== BOMB TILE EFFECTS ========== */}
+                {tile.type === 'bomb' && !tile.isCleared && enableComplexAnimations && (
+                  <>
+                    <div className="tile-bomb-rings">
+                      <div className="tile-bomb-ring" />
+                      <div className="tile-bomb-ring tile-bomb-ring--2" />
+                      <div className="tile-bomb-ring tile-bomb-ring--3" />
+                    </div>
+                    <div className="tile-bomb-spark" />
+                  </>
+                )}
+
+                {/* ========== RAINBOW TILE EFFECTS ========== */}
+                {tile.type === 'rainbow' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-rainbow-particle tile-rainbow-particle--1" />
+                    <div className="tile-rainbow-particle tile-rainbow-particle--2" />
+                    <div className="tile-rainbow-particle tile-rainbow-particle--3" />
+                    <div className="tile-rainbow-star" />
+                  </>
+                )}
+
+                {/* ========== CHAIN TILE EFFECTS ========== */}
+                {tile.type === 'chain' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-chain-line tile-chain-line--top" />
+                    <div className="tile-chain-line tile-chain-line--bottom" />
+                  </>
+                )}
+
+                {/* ========== TIME TILE EFFECTS ========== */}
+                {tile.type === 'time' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-time-hand" />
+                    <div className="tile-time-particle tile-time-particle--1" />
+                    <div className="tile-time-particle tile-time-particle--2" />
+                    <div className="tile-time-particle tile-time-particle--3" />
+                  </>
+                )}
+
                 {/* Letter */}
-                <span className={cn('relative z-10 select-none', letterGlowClass)}>
+                <span className={cn(
+                  'relative z-10 select-none',
+                  letterGlowClass,
+                  'drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]',
+                  (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
+                )}>
                   {tile.letter}
                 </span>
 
@@ -595,12 +667,14 @@ const AdventureGrid = memo(
                 {tile.type === 'gold' && (
                   <span
                     className={cn(
-                      'absolute -top-1 -right-1 z-20',
-                      'min-w-[18px] h-[18px]',
+                      'tile-gold-badge',
+                      'absolute -top-1.5 -right-1.5 z-20',
+                      'min-w-[20px] h-[20px]',
                       'flex items-center justify-center',
                       'bg-neo-black text-neo-yellow',
                       'text-[10px] font-black',
-                      'rounded-full border-2 border-neo-yellow'
+                      'rounded-full border-2 border-neo-yellow',
+                      'shadow-[0_0_10px_rgba(255,225,53,0.7)]'
                     )}
                   >
                     3x
@@ -611,48 +685,65 @@ const AdventureGrid = memo(
                 {tile.type === 'rainbow' && (
                   <span
                     className={cn(
-                      'absolute -top-1 -right-1 z-20',
-                      'min-w-[18px] h-[18px]',
+                      'absolute -top-1.5 -right-1.5 z-20',
+                      'min-w-[20px] h-[20px]',
                       'flex items-center justify-center',
                       'bg-neo-black text-neo-white',
-                      'text-[12px] font-black',
-                      'rounded-full border-2 border-purple-500'
+                      'text-[14px] font-black',
+                      'rounded-full border-2 border-purple-400',
+                      'shadow-[0_0_10px_rgba(168,85,247,0.6)]'
                     )}
                   >
-                    *
+                    ✦
                   </span>
+                )}
+
+                {/* Bomb icon badge */}
+                {tile.type === 'bomb' && (
+                  <div
+                    className={cn(
+                      'absolute -top-1 -right-1 z-20',
+                      'w-5 h-5',
+                      'flex items-center justify-center',
+                      'bg-neo-black rounded-full',
+                      'border-2 border-orange-500',
+                      'shadow-[0_0_8px_rgba(255,100,0,0.6)]'
+                    )}
+                  >
+                    <Bomb className="w-3 h-3 text-neo-yellow" />
+                  </div>
                 )}
 
                 {/* Chain link badge */}
                 {tile.type === 'chain' && (
-                  <span
+                  <div
                     className={cn(
                       'absolute -top-1 -right-1 z-20',
-                      'min-w-[18px] h-[18px]',
+                      'w-5 h-5',
                       'flex items-center justify-center',
-                      'bg-neo-black text-purple-400',
-                      'text-[10px] font-black',
-                      'rounded-full border-2 border-purple-500'
+                      'bg-neo-black rounded-full',
+                      'border-2 border-purple-400',
+                      'shadow-[0_0_8px_rgba(138,43,226,0.6)]'
                     )}
                   >
-                    🔗
-                  </span>
+                    <Link2 className="w-3 h-3 text-purple-400" />
+                  </div>
                 )}
 
                 {/* Time bonus badge */}
                 {tile.type === 'time' && (
-                  <span
+                  <div
                     className={cn(
                       'absolute -top-1 -right-1 z-20',
-                      'min-w-[18px] h-[18px]',
+                      'w-5 h-5',
                       'flex items-center justify-center',
-                      'bg-neo-black text-emerald-400',
-                      'text-[9px] font-black',
-                      'rounded-full border-2 border-emerald-500'
+                      'bg-neo-black rounded-full',
+                      'border-2 border-emerald-400',
+                      'shadow-[0_0_8px_rgba(16,185,129,0.6)]'
                     )}
                   >
-                    +5s
-                  </span>
+                    <Clock className="w-3 h-3 text-emerald-400" />
+                  </div>
                 )}
 
                 {/* Frost overlay for frozen ice tiles */}
@@ -660,9 +751,9 @@ const AdventureGrid = memo(
                   <div
                     className={cn(
                       'frost-overlay absolute inset-0 rounded-neo',
-                      'bg-gradient-to-br from-white/40 via-cyan-100/30 to-blue-200/40',
-                      'backdrop-blur-[1px]',
-                      'pointer-events-none'
+                      'bg-gradient-to-br from-white/50 via-cyan-100/40 to-blue-200/50',
+                      'backdrop-blur-[2px]',
+                      'pointer-events-none z-5'
                     )}
                   />
                 )}

@@ -383,7 +383,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col h-full overflow-hidden"
+      className="flex-1 flex flex-col min-h-0 h-dvh"
     >
       {/* Compact Header */}
       <div className="flex-shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
@@ -406,7 +406,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area px-3 pb-20 md:pb-6 relative">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-[--mobile-bottom-safe] md:pb-6 relative">
         {/* Screenshot protection overlay */}
         {isProtected && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">

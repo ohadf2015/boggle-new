@@ -1,0 +1,833 @@
+/**
+ * AdventureTile CSS Animations
+ *
+ * Performance-optimized CSS keyframe animations for special adventure tiles.
+ * Uses GPU-accelerated properties (transform, opacity, filter) for smooth 60fps.
+ */
+
+/* ==============================================
+   GOLD TILE EFFECTS
+   ============================================== */
+
+/* Shimmer sweep effect - diagonal light ray */
+@keyframes gold-shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(200%) translateY(200%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Sparkle stars around gold tile */
+@keyframes gold-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1) rotate(90deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.8) rotate(180deg);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1) rotate(270deg);
+  }
+}
+
+/* Coin shine pulse */
+@keyframes gold-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(255, 225, 53, 0.4),
+      0 0 16px rgba(255, 193, 7, 0.2),
+      inset 0 0 8px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 225, 53, 0.7),
+      0 0 40px rgba(255, 193, 7, 0.4),
+      inset 0 0 12px rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Badge bounce */
+@keyframes badge-bounce {
+  0%, 100% {
+    transform: scale(1) rotate(-3deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(3deg);
+  }
+}
+
+.tile-gold-enhanced {
+  position: relative;
+  overflow: hidden;
+  animation: gold-glow-pulse 2s ease-in-out infinite;
+}
+
+.tile-gold-enhanced::before {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 50%;
+  height: 300%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: gold-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.tile-gold-sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.tile-gold-sparkle::before,
+.tile-gold-sparkle::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+}
+
+.tile-gold-sparkle::before {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.tile-gold-sparkle::after {
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.tile-gold-sparkle--1 {
+  top: 10%;
+  right: 15%;
+  animation: gold-sparkle 2s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.tile-gold-sparkle--2 {
+  bottom: 15%;
+  left: 10%;
+  animation: gold-sparkle 2s ease-in-out infinite;
+  animation-delay: 0.6s;
+  transform: scale(0.7);
+}
+
+.tile-gold-sparkle--3 {
+  top: 50%;
+  left: 5%;
+  animation: gold-sparkle 2s ease-in-out infinite;
+  animation-delay: 1.2s;
+  transform: scale(0.5);
+}
+
+.tile-gold-badge {
+  animation: badge-bounce 1.5s ease-in-out infinite;
+}
+
+/* ==============================================
+   ICE TILE EFFECTS
+   ============================================== */
+
+/* Frost crystallization shimmer */
+@keyframes ice-shimmer {
+  0% {
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+}
+
+/* Snowflake drift */
+@keyframes ice-snowflake {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(40px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Frozen glow */
+@keyframes ice-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(0, 255, 255, 0.3),
+      0 0 20px rgba(100, 200, 255, 0.2),
+      inset 0 0 8px rgba(255, 255, 255, 0.4);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(0, 255, 255, 0.5),
+      0 0 40px rgba(100, 200, 255, 0.3),
+      inset 0 0 15px rgba(255, 255, 255, 0.6);
+    filter: brightness(1.1);
+  }
+}
+
+/* Crystal refraction */
+@keyframes ice-refract {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+}
+
+.tile-ice-enhanced {
+  position: relative;
+  overflow: hidden;
+  animation: ice-glow 3s ease-in-out infinite;
+}
+
+.tile-ice-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    repeating-linear-gradient(
+      60deg,
+      transparent 0px,
+      transparent 10px,
+      rgba(255, 255, 255, 0.15) 10px,
+      rgba(255, 255, 255, 0.15) 12px
+    );
+  background-size: 200% 200%, 20px 20px;
+  animation: ice-shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Crystal facets overlay */
+.tile-ice-enhanced::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse at 30% 20%,
+    rgba(255, 255, 255, 0.6) 0%,
+    transparent 40%
+  );
+  pointer-events: none;
+  z-index: 4;
+}
+
+.tile-ice-snowflake {
+  position: absolute;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  z-index: 5;
+  animation: ice-snowflake 4s linear infinite;
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.8);
+}
+
+.tile-ice-snowflake--1 {
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.tile-ice-snowflake--2 {
+  left: 60%;
+  animation-delay: 1.3s;
+}
+
+.tile-ice-snowflake--3 {
+  left: 80%;
+  animation-delay: 2.6s;
+  font-size: 8px;
+}
+
+/* ==============================================
+   BOMB TILE EFFECTS
+   ============================================== */
+
+/* Danger pulse - urgent warning */
+@keyframes bomb-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(255, 50, 50, 0.5),
+      0 0 16px rgba(255, 100, 0, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 50, 50, 0.8),
+      0 0 40px rgba(255, 100, 0, 0.5),
+      0 0 60px rgba(255, 0, 0, 0.2);
+    transform: scale(1.02);
+  }
+}
+
+/* Fuse spark animation */
+@keyframes bomb-fuse-spark {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(10px) translateY(-5px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Warning ring expansion */
+@keyframes bomb-warning-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+    border-color: rgba(255, 100, 0, 0.8);
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+    border-color: rgba(255, 50, 50, 0.2);
+  }
+}
+
+/* Explosion particles ready state */
+@keyframes bomb-particle-ready {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+.tile-bomb-enhanced {
+  position: relative;
+  overflow: visible;
+  animation: bomb-pulse 1s ease-in-out infinite;
+}
+
+/* Warning rings container */
+.tile-bomb-rings {
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tile-bomb-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 100, 0, 0.6);
+  border-radius: inherit;
+  animation: bomb-warning-ring 1.5s ease-out infinite;
+}
+
+.tile-bomb-ring--2 {
+  animation-delay: 0.5s;
+}
+
+.tile-bomb-ring--3 {
+  animation-delay: 1s;
+}
+
+/* Fuse spark */
+.tile-bomb-spark {
+  position: absolute;
+  top: -2px;
+  right: 10px;
+  width: 4px;
+  height: 4px;
+  background: #ffff00;
+  border-radius: 50%;
+  box-shadow:
+    0 0 6px 2px #ffff00,
+    0 0 12px 4px #ff8800;
+  animation: bomb-fuse-spark 0.3s ease-out infinite;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Danger gradient overlay */
+.tile-bomb-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 30%,
+    rgba(255, 0, 0, 0.15) 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ==============================================
+   RAINBOW TILE EFFECTS
+   ============================================== */
+
+/* Continuous rainbow flow */
+@keyframes rainbow-flow {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) saturate(1.5) brightness(1.1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(180deg) saturate(2) brightness(1.2);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(360deg) saturate(1.5) brightness(1.1);
+  }
+}
+
+/* Prismatic glow */
+@keyframes rainbow-glow {
+  0% {
+    box-shadow:
+      0 0 15px rgba(255, 0, 128, 0.5),
+      0 0 30px rgba(255, 100, 0, 0.3);
+  }
+  33% {
+    box-shadow:
+      0 0 15px rgba(0, 255, 128, 0.5),
+      0 0 30px rgba(0, 255, 255, 0.3);
+  }
+  66% {
+    box-shadow:
+      0 0 15px rgba(128, 0, 255, 0.5),
+      0 0 30px rgba(255, 0, 255, 0.3);
+  }
+  100% {
+    box-shadow:
+      0 0 15px rgba(255, 0, 128, 0.5),
+      0 0 30px rgba(255, 100, 0, 0.3);
+  }
+}
+
+/* Star burst for wildcard */
+@keyframes rainbow-star {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Particle orbit */
+@keyframes rainbow-particle-orbit {
+  0% {
+    transform: rotate(0deg) translateX(20px) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) translateX(20px) rotate(-360deg);
+    opacity: 0.6;
+  }
+}
+
+.tile-rainbow-enhanced {
+  position: relative;
+  overflow: visible;
+  background: linear-gradient(
+    90deg,
+    #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b
+  );
+  background-size: 300% 100%;
+  animation:
+    rainbow-flow 3s linear infinite,
+    rainbow-glow 4s ease-in-out infinite;
+}
+
+/* Shimmer overlay */
+.tile-rainbow-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Orbiting particles */
+.tile-rainbow-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  top: 50%;
+  left: 50%;
+  margin: -3px;
+}
+
+.tile-rainbow-particle--1 {
+  background: #ff6b6b;
+  animation: rainbow-particle-orbit 3s linear infinite;
+}
+
+.tile-rainbow-particle--2 {
+  background: #48dbfb;
+  animation: rainbow-particle-orbit 3s linear infinite;
+  animation-delay: -1s;
+}
+
+.tile-rainbow-particle--3 {
+  background: #feca57;
+  animation: rainbow-particle-orbit 3s linear infinite;
+  animation-delay: -2s;
+}
+
+/* Star burst overlay */
+.tile-rainbow-star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 4;
+  animation: rainbow-star 4s ease-in-out infinite;
+}
+
+.tile-rainbow-star::before,
+.tile-rainbow-star::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.tile-rainbow-star::before {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.tile-rainbow-star::after {
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* ==============================================
+   CHAIN TILE EFFECTS
+   ============================================== */
+
+/* Chain link pulse */
+@keyframes chain-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(138, 43, 226, 0.4),
+      0 0 20px rgba(75, 0, 130, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(138, 43, 226, 0.7),
+      0 0 40px rgba(75, 0, 130, 0.4),
+      0 0 60px rgba(148, 0, 211, 0.2);
+  }
+}
+
+/* Chain connection animation */
+@keyframes chain-connect {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Linking energy */
+@keyframes chain-energy {
+  0% {
+    opacity: 0.3;
+    transform: scaleX(0.5);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scaleX(0.5);
+  }
+}
+
+.tile-chain-enhanced {
+  position: relative;
+  overflow: visible;
+  animation: chain-pulse 2s ease-in-out infinite;
+}
+
+.tile-chain-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px dashed rgba(148, 0, 211, 0.5);
+  border-radius: inherit;
+  animation: chain-energy 1.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Energy lines */
+.tile-chain-line {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #9400d3, transparent);
+  pointer-events: none;
+  animation: chain-energy 1.5s ease-in-out infinite;
+  z-index: 3;
+}
+
+.tile-chain-line--top {
+  top: -4px;
+  left: 20%;
+  right: 20%;
+}
+
+.tile-chain-line--bottom {
+  bottom: -4px;
+  left: 20%;
+  right: 20%;
+  animation-delay: 0.75s;
+}
+
+/* ==============================================
+   TIME TILE EFFECTS
+   ============================================== */
+
+/* Clock tick animation */
+@keyframes time-tick {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(270deg);
+  }
+}
+
+/* Time warp pulse */
+@keyframes time-warp {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(16, 185, 129, 0.4),
+      0 0 20px rgba(5, 150, 105, 0.2);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(16, 185, 129, 0.7),
+      0 0 40px rgba(5, 150, 105, 0.4),
+      0 0 60px rgba(52, 211, 153, 0.2);
+    filter: brightness(1.15);
+  }
+}
+
+/* Hourglass sand flow */
+@keyframes time-sand {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.tile-time-enhanced {
+  position: relative;
+  overflow: hidden;
+  animation: time-warp 2s ease-in-out infinite;
+}
+
+/* Clock hand overlay */
+.tile-time-hand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.6);
+  transform-origin: left center;
+  animation: time-tick 4s steps(4) infinite;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 2px;
+}
+
+/* Time particles (sand/energy) */
+.tile-time-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(52, 211, 153, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 4;
+  animation: time-sand 2s linear infinite;
+  box-shadow: 0 0 4px rgba(52, 211, 153, 0.6);
+}
+
+.tile-time-particle--1 {
+  left: 30%;
+  animation-delay: 0s;
+}
+
+.tile-time-particle--2 {
+  left: 50%;
+  animation-delay: 0.5s;
+}
+
+.tile-time-particle--3 {
+  left: 70%;
+  animation-delay: 1s;
+}
+
+/* Radial time ripple */
+.tile-time-enhanced::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(52, 211, 153, 0.3) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ==============================================
+   SHARED UTILITIES
+   ============================================== */
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .tile-gold-enhanced,
+  .tile-ice-enhanced,
+  .tile-bomb-enhanced,
+  .tile-rainbow-enhanced,
+  .tile-chain-enhanced,
+  .tile-time-enhanced,
+  .tile-gold-enhanced::before,
+  .tile-ice-enhanced::before,
+  .tile-rainbow-enhanced::before,
+  .tile-gold-sparkle,
+  .tile-ice-snowflake,
+  .tile-bomb-ring,
+  .tile-bomb-spark,
+  .tile-rainbow-particle,
+  .tile-rainbow-star,
+  .tile-chain-line,
+  .tile-time-hand,
+  .tile-time-particle,
+  .tile-gold-badge {
+    animation: none !important;
+  }
+}
+
+/* Selected state enhancement */
+.tile-selected-enhanced {
+  z-index: 20 !important;
+}
+
+.tile-selected-enhanced::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 3px solid var(--neo-lime, #BFFF00);
+  border-radius: inherit;
+  box-shadow:
+    0 0 20px rgba(191, 255, 0, 0.6),
+    inset 0 0 10px rgba(191, 255, 0, 0.2);
+  pointer-events: none;
+  z-index: 30;
+}

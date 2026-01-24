@@ -495,84 +495,84 @@ const es = {
   },
   "multiplayerFlow": {
     "roomList": {
-      "activeRooms": "Salas activas",
-      "online": "en línea",
-      "noRooms": "Sin salas activas",
-      "beFirst": "¡Sé el primero en crear una!",
-      "createButton": "Crear sala",
-      "refreshed": "¡Salas actualizadas!",
-      "quickPlay": "Juego rápido",
-      "orJoinRoom": "o únete a una sala"
+      "activeRooms": "¡Métete!",
+      "online": "en batalla",
+      "noRooms": "No hay batallas ahorita",
+      "beFirst": "¡Arma la fiesta!",
+      "createButton": "Crear batalla",
+      "refreshed": "¡Listo!",
+      "quickPlay": "Partida rápida",
+      "orJoinRoom": "o únete a la acción"
     },
     "joinModal": {
-      "title": "Unirse a sala",
-      "yourName": "Tu nombre",
-      "namePlaceholder": "Tu nombre",
-      "joinButton": "Unirse",
-      "joining": "Uniéndose..."
+      "title": "Únete al combate",
+      "yourName": "Me dicen...",
+      "namePlaceholder": "Tu nombre de batalla",
+      "joinButton": "¡Vamos!",
+      "joining": "Entrando..."
     },
     "createModal": {
-      "title": "Crear sala",
-      "yourName": "Tu nombre",
-      "namePlaceholder": "Tu nombre",
+      "title": "Arma tu batalla",
+      "yourName": "Me dicen...",
+      "namePlaceholder": "Tu nombre de batalla",
       "roomNameLabel": "Nombre de sala",
       "optional": "opcional",
-      "createButton": "Crear sala",
-      "creating": "Creando..."
+      "createButton": "¡A darle!",
+      "creating": "Preparando arena..."
     },
     "profileSetup": {
-      "title": "Tu Perfil",
+      "title": "¿Listo?",
       "progress": "Paso 1 de 2",
-      "forCreate": "Configura tu perfil para continuar.",
-      "forJoin": "Configura tu perfil para unirte.",
-      "usernameLabel": "Tu nombre",
-      "usernamePlaceholder": "Ingresa nombre",
+      "forCreate": "¿Quién arma?",
+      "forJoin": "¿Quién se mete?",
+      "usernameLabel": "Nombre",
+      "usernamePlaceholder": "Nombre de batalla",
       "usernameHint": "2-20 caracteres",
-      "avatarLabel": "Elige avatar",
-      "avatarHint": "Elige un avatar para representarte",
-      "avatarRequired": "¡Elige un avatar para entrar a la batalla!",
+      "avatarLabel": "Look",
+      "avatarHint": "Elige tu cara de batalla",
+      "avatarRequired": "¡Primero elige tu look!",
       "usingProfileAvatar": "Avatar de perfil",
       "usingGameAvatar": "Avatar del juego",
       "tapToChange": "Cambiar",
-      "continueButton": "Continuar",
-      "selectAvatar": "Seleccionar Avatar"
+      "continueButton": "Siguiente",
+      "selectAvatar": "Elige Avatar"
     },
     "createForm": {
-      "title": "Crear Sala",
+      "title": "¡Ya casi!",
       "progress": "Paso 2 de 2",
-      "profileLabel": "Tu Perfil",
-      "roomNameLabel": "Nombre de Sala",
-      "roomNamePlaceholder": "Nombre (opcional)",
-      "roomNameHint": "Visible en el lobby",
+      "profileLabel": "Tú",
+      "roomNameLabel": "Sala",
+      "roomNamePlaceholder": "Nombra tu arena",
+      "roomNameHint": "Se ve en el lobby",
       "languageHint": "Idioma del juego",
-      "createButton": "Crear",
-      "creating": "Creando..."
+      "createButton": "¡Lanzar!",
+      "creating": "Creando arena..."
     },
     "joinForm": {
-      "title": "Unirse",
+      "title": "Únete a la acción",
       "progress": "Paso 2 de 2",
-      "profileLabel": "Tu Perfil",
-      "codeLabel": "Código de Sala",
+      "profileLabel": "Tú",
+      "codeLabel": "¿Tienes código?",
       "codePlaceholder": "ABC123",
-      "codeHint": "Pide el código a tu amigo",
-      "roomsLabel": "O elige una sala",
+      "codeHint": "¡Pídelo a tu amigo!",
+      "roomsLabel": "O salta a",
       "refreshButton": "Actualizar",
-      "noRooms": "Sin salas. ¡Pide un código!",
-      "joinButton": "Unirse",
+      "noRooms": "No hay salas. ¿Tienes código?",
+      "joinButton": "¡Entrar!",
       "joining": "Entrando..."
     }
   },
   "hostView": {
-    "lobby": "Sala",
-    "waitingForPlayers": "Esperando...",
-    "startGame": "Iniciar",
+    "lobby": "Cuartel",
+    "waitingForPlayers": "Reuniendo guerreros...",
+    "startGame": "¡GO!",
     "roomCode": "Código",
     "host": "Anfitrión",
-    "inviteFriends": "¡Invita amigos a jugar!",
-    "playersJoined": "Jugadores",
-    "gameSettings": "Configuración",
-    "quickSetup": "Presets",
-    "selectPreset": "Modo de Juego",
+    "inviteFriends": "¡Junta a tu crew!",
+    "playersJoined": "Guerreros",
+    "gameSettings": "Config. de batalla",
+    "quickSetup": "Rápido",
+    "selectPreset": "Estilo de batalla",
     "min": "min",
     "timer": "Tiempo",
     "difficulty": "Dificultad",
@@ -3699,7 +3699,9 @@ const es = {
       "gold": "Oro (3x puntos)",
       "ice": "Hielo (obstáculo)",
       "bomb": "Bomba (despeja fila)",
-      "rainbow": "Arcoíris (comodín)"
+      "rainbow": "Arcoíris (comodín)",
+      "chain": "Cadena (bonificación de enlace)",
+      "time": "Tiempo (+5 segundos)"
     },
     "errors": {
       "tooShort": "La palabra es muy corta",
@@ -3754,6 +3756,129 @@ const es = {
         "star2": "¡Excelente trabajo!",
         "star3": "¡Puntuación perfecta!"
       }
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "Mis Lecciones",
+      "subtitle": "Practica vocabulario y sigue tu progreso"
+    },
+    "lessons": {
+      "lesson": "Lección",
+      "words": "Palabras",
+      "mastered": "Dominadas",
+      "practice": "Practicar",
+      "review": "Repasar",
+      "empty": {
+        "title": "Sin lecciones asignadas",
+        "subtitle": "Únete a un aula para empezar a practicar"
+      },
+      "sort": {
+        "recent": "Recientes",
+        "progress": "Progreso"
+      }
+    },
+    "practice": {
+      "title": "Modo Práctica",
+      "definition": "Definición",
+      "yourAnswer": "Tu respuesta",
+      "submit": "Enviar",
+      "next": "Siguiente",
+      "correct": "¡Correcto!",
+      "incorrect": "Inténtalo de nuevo",
+      "hint": "Pista",
+      "skip": "Saltar",
+      "complete": {
+        "title": "¡Lección Completa!",
+        "subtitle": "Dominaste todas las palabras",
+        "backToLessons": "Volver a Lecciones"
+      },
+      "progress": {
+        "wordsLeft": "{{count}} palabras restantes",
+        "streak": "{{count}} en racha",
+        "mastered": "¡Dominada!"
+      }
+    }
+  },
+  "teacher": {
+    "accessRequired": "Acceso de Profesor Requerido",
+    "accessDenied": "Necesitas permisos de profesor para esta página.",
+    "dashboard": {
+      "title": "Panel del Profesor",
+      "classrooms": "Aulas",
+      "lessons": "Lecciones de Vocabulario",
+      "students": "Estudiantes",
+      "progress": "Progreso"
+    },
+    "classroom": {
+      "create": "Crear Aula",
+      "edit": "Editar Aula",
+      "delete": "Eliminar Aula",
+      "confirmDelete": "¿Eliminar aula? Los estudiantes perderán acceso.",
+      "name": "Nombre del Aula",
+      "joinCode": "Código de Acceso",
+      "copyCode": "Copiar Código",
+      "codeCopied": "¡Código copiado!",
+      "members": "{{count}} estudiantes",
+      "member": "1 estudiante",
+      "noMembers": "Sin estudiantes aún",
+      "language": "Idioma",
+      "created": "Creado {{date}}",
+      "noClassrooms": "Sin aulas aún",
+      "createFirst": "Crea tu primera aula para empezar"
+    },
+    "lesson": {
+      "create": "Crear Lección",
+      "edit": "Editar Lección",
+      "delete": "Eliminar Lección",
+      "confirmDelete": "¿Eliminar lección? Se perderá el progreso.",
+      "name": "Nombre de Lección",
+      "description": "Descripción (opcional)",
+      "words": "{{count}} palabras",
+      "word": "1 palabra",
+      "noWords": "Sin palabras aún",
+      "addWord": "Agregar Palabra",
+      "removeWord": "Quitar",
+      "wordPlaceholder": "Escribe una palabra...",
+      "canIntegrate": "Se puede usar en juegos",
+      "cannotIntegrate": "Solo seguimiento",
+      "assignToClassroom": "Asignar a Aula",
+      "noClassroomSelected": "Sin aula (lección personal)",
+      "isPublic": "Hacer pública",
+      "publicDescription": "Otros profesores pueden descubrir esta lección",
+      "save": "Guardar Lección",
+      "saving": "Guardando...",
+      "saved": "¡Lección guardada!",
+      "noLessons": "Sin lecciones aún",
+      "createFirst": "Crea tu primera lección de vocabulario"
+    },
+    "progress": {
+      "title": "Progreso de Estudiantes",
+      "student": "Estudiante",
+      "wordsAttempted": "Intentadas",
+      "wordsMastered": "Dominadas",
+      "accuracy": "Precisión",
+      "lastActive": "Última Actividad",
+      "noData": "Sin datos de progreso",
+      "assignLessons": "Asigna lecciones para ver el progreso",
+      "chartTitle": "Progreso del Aula",
+      "wordsLearned": "Palabras Aprendidas",
+      "expandDetails": "Ver detalles"
+    },
+    "stats": {
+      "totalStudents": "Total Estudiantes",
+      "completionRate": "Tasa de Completado",
+      "averageAccuracy": "Precisión Promedio",
+      "wordsAttempted": "Palabras Intentadas",
+      "wordsMastered": "Palabras Dominadas"
+    },
+    "wordSelector": {
+      "title": "Seleccionar Vocabulario",
+      "saveAsLesson": "Guardar como Lección",
+      "saveLessonTitle": "Guardar Lección",
+      "lessonNamePlaceholder": "Nombre de la lección...",
+      "noClassroom": "Sin aula (lección personal)",
+      "selectWords": "Selecciona palabras para crear una lección"
     }
   }
 };

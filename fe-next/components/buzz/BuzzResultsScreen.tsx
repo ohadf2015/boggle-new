@@ -170,7 +170,7 @@ export default function BuzzResultsScreen({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area relative"
+      className="flex-1 min-h-0 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area relative"
     >
       {/* Celebration background effect for high scores */}
       {scorePercentage >= 60 && (

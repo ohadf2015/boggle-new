@@ -499,71 +499,71 @@ const he = {
   },
   "multiplayerFlow": {
     "roomList": {
-      "activeRooms": "חדרים פעילים",
-      "online": "מחוברים",
-      "noRooms": "אין חדרים פעילים",
-      "beFirst": "היה הראשון ליצור אחד!",
-      "createButton": "צור חדר",
-      "refreshed": "החדרים רועננו",
+      "activeRooms": "קפוץ פנימה!",
+      "online": "בקרב",
+      "noRooms": "אין קרבות עכשיו",
+      "beFirst": "תתחיל את המסיבה!",
+      "createButton": "פתח קרב",
+      "refreshed": "רשימה עודכנה!",
       "quickPlay": "משחק מהיר",
-      "orJoinRoom": "או הצטרף לחדר"
+      "orJoinRoom": "או תצטרף לפעולה"
     },
     "joinModal": {
-      "title": "הצטרף לחדר",
-      "yourName": "השם שלך",
-      "namePlaceholder": "השם שלך",
-      "joinButton": "הצטרף למשחק",
-      "joining": "מצטרף..."
+      "title": "הצטרף לקרב",
+      "yourName": "קוראים לי...",
+      "namePlaceholder": "שם הקרב שלך",
+      "joinButton": "יאללה!",
+      "joining": "נכנס..."
     },
     "createModal": {
-      "title": "צור חדר",
-      "yourName": "השם שלך",
-      "namePlaceholder": "השם שלך",
+      "title": "פתח קרב",
+      "yourName": "קוראים לי...",
+      "namePlaceholder": "שם הקרב שלך",
       "roomNameLabel": "שם החדר",
       "optional": "אופציונלי",
-      "createButton": "צור חדר",
-      "creating": "יוצר..."
+      "createButton": "התחל קרב",
+      "creating": "מכין זירה..."
     },
     "profileSetup": {
-      "title": "הגדרה",
+      "title": "מוכן?",
       "progress": "1 מתוך 2",
-      "forCreate": "הגדר פרופיל ליצירת חדר",
-      "forJoin": "הגדר פרופיל להצטרפות",
+      "forCreate": "מי מארח?",
+      "forJoin": "מי מצטרף?",
       "usernameLabel": "שם",
-      "usernamePlaceholder": "שם",
+      "usernamePlaceholder": "שם קרב",
       "usernameHint": "2-20 תווים",
-      "avatarLabel": "אווטאר",
-      "avatarHint": "בחר אווטאר שייצג אותך",
-      "avatarRequired": "בחרו אווטאר להצטרפות לקרב!",
+      "avatarLabel": "מראה",
+      "avatarHint": "בחר את הפרצוף שלך",
+      "avatarRequired": "קודם תבחר מראה!",
       "usingProfileAvatar": "אווטאר פרופיל",
       "usingGameAvatar": "אווטאר משחק",
-      "tapToChange": "לחץ לשינוי",
-      "continueButton": "המשך",
+      "tapToChange": "לחץ להחלפה",
+      "continueButton": "הבא",
       "selectAvatar": "בחר אווטאר"
     },
     "createForm": {
-      "title": "צור",
+      "title": "כמעט שם!",
       "progress": "2 מתוך 2",
-      "profileLabel": "פרופיל",
+      "profileLabel": "אתה",
       "roomNameLabel": "חדר",
-      "roomNamePlaceholder": "שם חדר (אופציונלי)",
+      "roomNamePlaceholder": "תן שם לזירה",
       "roomNameHint": "מוצג בלובי",
       "languageHint": "שפת מילים",
-      "createButton": "צור",
-      "creating": "יוצר..."
+      "createButton": "שיגור!",
+      "creating": "יוצר זירה..."
     },
     "joinForm": {
-      "title": "הצטרף",
+      "title": "הצטרף לפעולה",
       "progress": "2 מתוך 2",
-      "profileLabel": "פרופיל",
-      "codeLabel": "קוד",
+      "profileLabel": "אתה",
+      "codeLabel": "יש לך קוד?",
       "codePlaceholder": "ABC123",
-      "codeHint": "בקש קוד מחבר",
-      "roomsLabel": "או בחר חדר",
+      "codeHint": "תבקש מהחבר!",
+      "roomsLabel": "או קפוץ ל",
       "refreshButton": "רענן",
-      "noRooms": "אין חדרים. קבל קוד!",
-      "joinButton": "הצטרף",
-      "joining": "מצטרף..."
+      "noRooms": "אין חדרים פתוחים. יש קוד?",
+      "joinButton": "קפוץ פנימה!",
+      "joining": "נכנס..."
     }
   },
   "multiplayer": {
@@ -576,16 +576,16 @@ const he = {
     "level": "רמה"
   },
   "hostView": {
-    "lobby": "לובי",
-    "waitingForPlayers": "ממתין...",
-    "startGame": "התחל",
+    "lobby": "חדר מלחמה",
+    "waitingForPlayers": "אוספים לוחמים...",
+    "startGame": "GO!",
     "roomCode": "קוד",
     "host": "מארח",
-    "inviteFriends": "הזמינו חברים לשחק!",
-    "playersJoined": "שחקנים",
-    "gameSettings": "הגדרות",
-    "quickSetup": "תבניות",
-    "selectPreset": "מצב משחק",
+    "inviteFriends": "גייס את החבר'ה!",
+    "playersJoined": "לוחמים",
+    "gameSettings": "הגדרות קרב",
+    "quickSetup": "הגדרה מהירה",
+    "selectPreset": "סגנון קרב",
     "min": "דק׳",
     "timer": "טיימר",
     "difficulty": "רמת קושי",
@@ -837,13 +837,13 @@ const he = {
     }
   },
   "waiting": {
-    "milestoneFirst": "שחקן ראשון!",
-    "milestoneParty": "המסיבה מתחילה!",
-    "milestoneFull": "בית מלא!",
-    "waitingForPlayers": "ממתינים לשחקנים...",
-    "oneMoreNeeded": "הזמינו חברים כדי להתחיל!",
-    "readyToStart": "מוכנים להתחיל! יותר שחקנים = יותר כיף!",
-    "fullHouse": "בית מלא! שהקרב יתחיל!"
+    "milestoneFirst": "ראשון בפנים!",
+    "milestoneParty": "הצוות מתאסף!",
+    "milestoneFull": "צוות מלא!",
+    "waitingForPlayers": "אוספים מתמודדים...",
+    "oneMoreNeeded": "גייס את החבר'ה!",
+    "readyToStart": "מוכנים לקרב! יותר = יותר כיף!",
+    "fullHouse": "הזירה מלאה! יאללה קראש!"
   },
   "roomCode": {
     "title": "קוד חדר",
@@ -3703,7 +3703,9 @@ const he = {
       "gold": "זהב (x3 נקודות)",
       "ice": "קרח (מכשול)",
       "bomb": "פצצה (מנקה שורה)",
-      "rainbow": "קשת (ג'וקר)"
+      "rainbow": "קשת (ג'וקר)",
+      "chain": "שרשרת (בונוס קישור)",
+      "time": "זמן (+5 שניות)"
     },
     "errors": {
       "tooShort": "המילה קצרה מדי",
@@ -3758,6 +3760,129 @@ const he = {
         "star2": "עבודה מצוינת!",
         "star3": "ניקוד מושלם!"
       }
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "השיעורים שלי",
+      "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות"
+    },
+    "lessons": {
+      "lesson": "שיעור",
+      "words": "מילים",
+      "mastered": "נשלטו",
+      "practice": "תרגול",
+      "review": "חזרה",
+      "empty": {
+        "title": "אין שיעורים עדיין",
+        "subtitle": "הצטרפו לכיתה כדי להתחיל לתרגל"
+      },
+      "sort": {
+        "recent": "אחרונים",
+        "progress": "התקדמות"
+      }
+    },
+    "practice": {
+      "title": "מצב תרגול",
+      "definition": "הגדרה",
+      "yourAnswer": "התשובה שלך",
+      "submit": "שלח",
+      "next": "מילה הבאה",
+      "correct": "נכון!",
+      "incorrect": "נסו שוב",
+      "hint": "רמז",
+      "skip": "דלג",
+      "complete": {
+        "title": "סיימת!",
+        "subtitle": "שלטת בכל המילים",
+        "backToLessons": "חזרה לשיעורים"
+      },
+      "progress": {
+        "wordsLeft": "נותרו {{count}} מילים",
+        "streak": "רצף של {{count}}",
+        "mastered": "נשלט!"
+      }
+    }
+  },
+  "teacher": {
+    "accessRequired": "נדרשת גישת מורה",
+    "accessDenied": "צריך הרשאות מורה לדף זה.",
+    "dashboard": {
+      "title": "לוח המורה",
+      "classrooms": "כיתות",
+      "lessons": "שיעורי אוצר מילים",
+      "students": "תלמידים",
+      "progress": "התקדמות"
+    },
+    "classroom": {
+      "create": "צור כיתה",
+      "edit": "ערוך כיתה",
+      "delete": "מחק כיתה",
+      "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
+      "name": "שם הכיתה",
+      "joinCode": "קוד הצטרפות",
+      "copyCode": "העתק קוד",
+      "codeCopied": "הקוד הועתק!",
+      "members": "{{count}} תלמידים",
+      "member": "תלמיד אחד",
+      "noMembers": "אין תלמידים עדיין",
+      "language": "שפה",
+      "created": "נוצר ב-{{date}}",
+      "noClassrooms": "אין כיתות עדיין",
+      "createFirst": "צרו את הכיתה הראשונה שלכם"
+    },
+    "lesson": {
+      "create": "צור שיעור",
+      "edit": "ערוך שיעור",
+      "delete": "מחק שיעור",
+      "confirmDelete": "למחוק את השיעור? התקדמות התלמידים תאבד.",
+      "name": "שם השיעור",
+      "description": "תיאור (אופציונלי)",
+      "words": "{{count}} מילים",
+      "word": "מילה אחת",
+      "noWords": "אין מילים עדיין",
+      "addWord": "הוסף מילה",
+      "removeWord": "הסר",
+      "wordPlaceholder": "הקלידו מילה...",
+      "canIntegrate": "ניתן לשלב במשחקים",
+      "cannotIntegrate": "מעקב בלבד",
+      "assignToClassroom": "שייך לכיתה",
+      "noClassroomSelected": "ללא כיתה (שיעור אישי)",
+      "isPublic": "הפוך לציבורי",
+      "publicDescription": "מורים אחרים יוכלו להשתמש בשיעור",
+      "save": "שמור שיעור",
+      "saving": "שומר...",
+      "saved": "השיעור נשמר!",
+      "noLessons": "אין שיעורים עדיין",
+      "createFirst": "צרו את שיעור אוצר המילים הראשון"
+    },
+    "progress": {
+      "title": "התקדמות תלמידים",
+      "student": "תלמיד",
+      "wordsAttempted": "ניסו",
+      "wordsMastered": "שלטו",
+      "accuracy": "דיוק",
+      "lastActive": "פעילות אחרונה",
+      "noData": "אין נתונים עדיין",
+      "assignLessons": "שייכו שיעורים כדי לעקוב אחר התקדמות",
+      "chartTitle": "התקדמות הכיתה",
+      "wordsLearned": "מילים שנלמדו",
+      "expandDetails": "הצג פירוט"
+    },
+    "stats": {
+      "totalStudents": "סה״כ תלמידים",
+      "completionRate": "אחוז השלמה",
+      "averageAccuracy": "דיוק ממוצע",
+      "wordsAttempted": "מילים שניסו",
+      "wordsMastered": "מילים שנשלטו"
+    },
+    "wordSelector": {
+      "title": "בחירת מילים",
+      "saveAsLesson": "שמור כשיעור",
+      "saveLessonTitle": "שמירת שיעור",
+      "lessonNamePlaceholder": "הקלידו שם שיעור...",
+      "noClassroom": "ללא כיתה (שיעור אישי)",
+      "selectWords": "בחרו מילים ליצירת שיעור"
     }
   }
 };

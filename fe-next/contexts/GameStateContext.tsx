@@ -159,33 +159,40 @@ export function GameStateProvider({ children }: GameStateProviderProps) {
 // ==========================================
 
 /**
- * Custom hook to access game state and actions via Context
+ * @deprecated Use Zustand selector hooks directly for better performance.
+ * This context wrapper causes all consumers to re-render on ANY state change.
  *
- * NOTE: For better performance, consider using Zustand hooks directly:
+ * Migration guide:
  * - useGameActive() - only re-renders when gameActive changes
  * - useLeaderboard() - only re-renders when leaderboard changes
+ * - useFoundWords() - only re-renders when foundWords changes
  * - useGameActions() - get all action methods (never causes re-renders)
- *
- * @throws Error if used outside of GameStateProvider
- * @returns Game state values and action methods
  *
  * @example
  * ```tsx
- * // Legacy approach (works but causes more re-renders)
- * function MyComponent() {
- *   const { gameActive, setGameActive } = useGameStateContext();
- *   return <button onClick={() => setGameActive(true)}>Start</button>;
- * }
+ * // BEFORE (deprecated - causes excessive re-renders):
+ * const { gameActive, setGameActive, foundWords } = useGameStateContext();
  *
- * // Recommended approach (better performance)
- * function MyComponent() {
- *   const gameActive = useGameActive();
- *   const { setGameActive } = useGameActions();
- *   return <button onClick={() => setGameActive(true)}>Start</button>;
- * }
+ * // AFTER (recommended - selective subscriptions):
+ * import { useGameActive, useFoundWords, useGameActions } from '@/hooks/gameState';
+ * const gameActive = useGameActive();
+ * const foundWords = useFoundWords();
+ * const { setGameActive } = useGameActions();
  * ```
+ *
+ * @throws Error if used outside of GameStateProvider
+ * @returns Game state values and action methods
  */
 export function useGameStateContext(): UseGameStateReturn {
+  // Warn in development about deprecated usage
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(
+      '[PERF] useGameStateContext is deprecated. ' +
+      'Use Zustand selector hooks (useGameActive, useFoundWords, useGameActions, etc.) ' +
+      'from @/hooks/gameState for better performance.'
+    );
+  }
+
   const context = useContext(GameStateContext);
 
   if (!context) {

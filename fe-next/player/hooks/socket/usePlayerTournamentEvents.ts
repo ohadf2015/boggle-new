@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useGameActions } from '@/hooks/gameState';
 
 interface UsePlayerTournamentEventsProps {
   socket: Socket | null;
@@ -22,8 +22,8 @@ export function usePlayerTournamentEvents({
   socket,
   t,
 }: UsePlayerTournamentEventsProps): void {
-  // Get state setters from context (no more prop drilling!)
-  const { setTournamentData, setTournamentStandings, setShowTournamentStandings } = useGameStateContext();
+  // Get state setters from Zustand store (actions never trigger re-renders)
+  const { setTournamentData, setTournamentStandings, setShowTournamentStandings } = useGameActions();
   useEffect(() => {
     if (!socket) return;
 

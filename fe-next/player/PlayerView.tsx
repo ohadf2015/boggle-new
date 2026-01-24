@@ -31,7 +31,16 @@ import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
 import { resetComboState, calculateComboChainWindow } from '@/shared/utils/comboUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import {
+  useFoundWords,
+  useBoardTheme,
+  useTotalBoardWords,
+  useWaitingForResults,
+  useLetterGrid,
+  useShufflingGrid,
+  useLeaderboard,
+  useGameActions,
+} from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
@@ -109,23 +118,20 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
-  // Use game state from GameStateContext (shared with usePlayerWordEvents and usePlayerGameEvents)
-  // CRITICAL: letterGrid, shufflingGrid, and leaderboard MUST come from context, not local state
-  // The socket handlers in usePlayerGameEvents and usePlayerSessionEvents update the CONTEXT,
-  // so we must read from context to see real-time updates
-  const {
-    foundWords,
-    setFoundWords,
-    boardTheme,
-    totalBoardWords,
-    waitingForResults,
-    setWaitingForResults,
-    letterGrid,
-    setLetterGrid,
-    shufflingGrid,
-    setShufflingGrid,
-    leaderboard,
-  } = useGameStateContext();
+  // Use game state from Zustand store (selective subscriptions for performance)
+  // CRITICAL: letterGrid, shufflingGrid, and leaderboard MUST come from store, not local state
+  // The socket handlers in usePlayerGameEvents and usePlayerSessionEvents update the STORE,
+  // so we must read from store to see real-time updates
+  const foundWords = useFoundWords();
+  const boardTheme = useBoardTheme();
+  const totalBoardWords = useTotalBoardWords();
+  const waitingForResults = useWaitingForResults();
+  const letterGrid = useLetterGrid();
+  const shufflingGrid = useShufflingGrid();
+  const leaderboard = useLeaderboard();
+
+  // Get setters from Zustand store (actions never trigger re-renders)
+  const { setFoundWords, setWaitingForResults, setLetterGrid, setShufflingGrid } = useGameActions();
 
   // Game state
   const [gameActive, setGameActive] = useState<boolean>(false);

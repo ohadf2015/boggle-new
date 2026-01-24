@@ -12,6 +12,9 @@ import type { Server as HttpServer } from 'http';
 // Track cleanup timers for graceful shutdown
 const cleanupTimers: Set<NodeJS.Timeout> = new Set();
 
+// Maximum concurrent connections allowed (prevents resource exhaustion)
+const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '1000', 10);
+
 /**
  * Create and configure Socket.IO server
  * @param httpServer - HTTP server instance
@@ -36,7 +39,21 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     upgradeTimeout: 30000,
     maxHttpBufferSize: 100 * 1024,
     transports: ['websocket', 'polling'],
-    allowUpgrades: true
+    allowUpgrades: true,
+    // Connection limits to prevent resource exhaustion on low-end servers
+    connectionStateRecovery: {
+      maxDisconnectionDuration: 2 * 60 * 1000 // 2 minutes
+    }
+  });
+
+  // Connection limit middleware - prevents resource exhaustion on low-end devices
+  io.use((socket, next) => {
+    const currentConnections = io.sockets.sockets.size;
+    if (currentConnections >= MAX_CONNECTIONS) {
+      console.warn(`[SOCKET.IO] Connection rejected: limit reached (${currentConnections}/${MAX_CONNECTIONS})`);
+      return next(new Error('Server at capacity, please try again later'));
+    }
+    next();
   });
 
   // Initialize event handlers

@@ -299,6 +299,84 @@ describe('useAdventureGame', () => {
     });
   });
 
+  describe('Tile Reusability', () => {
+    it('should NOT mark standard tiles as cleared after word submission', () => {
+      // GIVEN - A grid with no special tiles
+      const levelConfig = createMockLevelConfig({
+        specialTiles: [], // No special tiles
+      });
+      const grid = createMockGrid();
+      const { result } = renderHook(() =>
+        useAdventureGame({ levelConfig, initialGrid: grid })
+      );
+
+      // Verify tiles are not cleared initially
+      expect(result.current.tiles[0][0].isCleared).toBe(false);
+      expect(result.current.tiles[0][1].isCleared).toBe(false);
+
+      // WHEN - Submit a word using those tiles
+      act(() => {
+        result.current.submitWordWithPath('TEST', 100, [
+          { row: 0, col: 0 },
+          { row: 0, col: 1 },
+          { row: 0, col: 2 },
+          { row: 0, col: 3 },
+        ]);
+      });
+
+      // THEN - Standard tiles should NOT be marked as cleared
+      // (They should remain usable for subsequent words)
+      expect(result.current.tiles[0][0].isCleared).toBe(false);
+      expect(result.current.tiles[0][1].isCleared).toBe(false);
+      expect(result.current.tiles[0][2].isCleared).toBe(false);
+      expect(result.current.tiles[0][3].isCleared).toBe(false);
+    });
+
+    it('should allow gold tile to be used in multiple words', () => {
+      // GIVEN - A grid with a gold tile
+      const levelConfig = createMockLevelConfig({
+        specialTiles: [{ row: 0, col: 0, type: 'gold' }],
+      });
+      const grid = createMockGrid();
+      const { result } = renderHook(() =>
+        useAdventureGame({ levelConfig, initialGrid: grid })
+      );
+
+      // WHEN - Submit first word using gold tile
+      act(() => {
+        result.current.submitWordWithPath('FIRST', 100, [
+          { row: 0, col: 0 }, // Gold tile
+          { row: 0, col: 1 },
+          { row: 0, col: 2 },
+          { row: 0, col: 3 },
+          { row: 1, col: 3 },
+        ]);
+      });
+
+      // THEN - Gold tile should NOT be marked as cleared
+      expect(result.current.tiles[0][0].isCleared).toBe(false);
+      expect(result.current.tiles[0][0].type).toBe('gold');
+
+      // AND - Submit second word using the same gold tile
+      act(() => {
+        result.current.submitWordWithPath('SECOND', 100, [
+          { row: 0, col: 0 }, // Same gold tile
+          { row: 1, col: 0 },
+          { row: 2, col: 0 },
+          { row: 3, col: 0 },
+          { row: 3, col: 1 },
+          { row: 3, col: 2 },
+        ]);
+      });
+
+      // THEN - Score should include gold multiplier for both words
+      // First word: 100 * 3 = 300
+      // Second word: 100 * 3 = 300
+      // Total: 600
+      expect(result.current.gameState.score).toBe(600);
+    });
+  });
+
   describe('Special Tile Effects', () => {
     it('should apply 3x multiplier for gold tiles', () => {
       // GIVEN

@@ -22,7 +22,7 @@ import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
-import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
+import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import { sanitizeRoomName } from '@/utils/consts';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
@@ -150,11 +150,9 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   // Late joiner & spectator state
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
-  const [isLateJoiner, setIsLateJoiner] = useState<boolean>(false);
 
   // Training gateway state - show prompt before allowing multiplayer for new players
   const [showTrainingGateway, setShowTrainingGateway] = useState<boolean>(false);
-  const [showLateJoinerWelcome, setShowLateJoinerWelcome] = useState<boolean>(false);
   const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>([]);
 
   const socketRef = useRef<Socket | null>(null);
@@ -640,11 +638,6 @@ export default function MultiplayerPage(): React.JSX.Element {
         setIsSpectator(false);
         setIsActive(true);
         setPlayersInRoom(data.users || []);
-
-        if (data.lateJoin) {
-          setIsLateJoiner(true);
-          setShowLateJoinerWelcome(true);
-        }
 
         toast.success(t('spectator.upgraded') || 'You can now play!', {
           duration: 3000,

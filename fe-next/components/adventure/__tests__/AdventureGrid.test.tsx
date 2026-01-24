@@ -243,10 +243,10 @@ describe('AdventureGrid', () => {
 
       // THEN
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[0]).toHaveClass('tile-selected');
-      expect(cells[1]).toHaveClass('tile-selected');
-      expect(cells[5]).toHaveClass('tile-selected');
-      expect(cells[2]).not.toHaveClass('tile-selected');
+      expect(cells[0]).toHaveClass('tile-selected-enhanced');
+      expect(cells[1]).toHaveClass('tile-selected-enhanced');
+      expect(cells[5]).toHaveClass('tile-selected-enhanced');
+      expect(cells[2]).not.toHaveClass('tile-selected-enhanced');
     });
 
     it('should call onTileSelect when tile is clicked', () => {

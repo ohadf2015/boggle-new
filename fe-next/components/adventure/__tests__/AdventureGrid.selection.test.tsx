@@ -312,7 +312,7 @@ describe('AdventureGrid Selection', () => {
       // THEN
       const cells = screen.getAllByRole('gridcell');
       // Selected cells should have selection visual indicator
-      expect(cells[0]).toHaveClass('tile-selected');
+      expect(cells[0]).toHaveClass('tile-selected-enhanced');
       expect(cells[0]).toHaveClass('z-10'); // Elevated z-index
     });
 

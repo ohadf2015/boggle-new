@@ -498,71 +498,71 @@ const ja = {
   },
   "multiplayerFlow": {
     "roomList": {
-      "activeRooms": "アクティブルーム",
-      "online": "オンライン",
-      "noRooms": "アクティブなルームなし",
-      "beFirst": "最初に作成しよう！",
-      "createButton": "ルーム作成",
-      "refreshed": "ルーム更新完了",
-      "quickPlay": "クイックプレイ",
-      "orJoinRoom": "またはルームに参加"
+      "activeRooms": "飛び込め！",
+      "online": "バトル中",
+      "noRooms": "バトルなし",
+      "beFirst": "パーティー始めよう！",
+      "createButton": "バトル開始",
+      "refreshed": "更新完了！",
+      "quickPlay": "クイックマッチ",
+      "orJoinRoom": "またはアクションに参加"
     },
     "joinModal": {
-      "title": "ルームに参加",
-      "yourName": "あなたの名前",
-      "namePlaceholder": "あなたの名前",
-      "joinButton": "参加",
-      "joining": "参加中..."
+      "title": "バトルに参戦",
+      "yourName": "呼び名は...",
+      "namePlaceholder": "バトルネーム",
+      "joinButton": "いくぞ！",
+      "joining": "転送中..."
     },
     "createModal": {
-      "title": "ルーム作成",
-      "yourName": "あなたの名前",
-      "namePlaceholder": "あなたの名前",
+      "title": "バトルを開催",
+      "yourName": "呼び名は...",
+      "namePlaceholder": "バトルネーム",
       "roomNameLabel": "ルーム名",
       "optional": "任意",
-      "createButton": "ルーム作成",
-      "creating": "作成中..."
+      "createButton": "バトル開始！",
+      "creating": "アリーナ準備中..."
     },
     "profileSetup": {
-      "title": "設定",
+      "title": "準備OK？",
       "progress": "1/2",
-      "forCreate": "ルーム作成の設定",
-      "forJoin": "参加の設定",
+      "forCreate": "ホストは誰？",
+      "forJoin": "参戦者は？",
       "usernameLabel": "名前",
-      "usernamePlaceholder": "名前",
+      "usernamePlaceholder": "バトルネーム",
       "usernameHint": "2-20文字",
-      "avatarLabel": "アバター",
-      "avatarHint": "あなたを表すアバターを選んでください",
-      "avatarRequired": "アバターを選んでバトルに参加！",
+      "avatarLabel": "見た目",
+      "avatarHint": "バトルの顔を選んで",
+      "avatarRequired": "まず見た目を選んで！",
       "usingProfileAvatar": "プロフィールアバター",
       "usingGameAvatar": "ゲームアバター",
       "tapToChange": "タップで変更",
-      "continueButton": "続ける",
-      "selectAvatar": "アバターを選択"
+      "continueButton": "次へ",
+      "selectAvatar": "アバター選択"
     },
     "createForm": {
-      "title": "作成",
+      "title": "もうすぐ！",
       "progress": "2/2",
-      "profileLabel": "プロフィール",
+      "profileLabel": "あなた",
       "roomNameLabel": "ルーム",
-      "roomNamePlaceholder": "ルーム名（任意）",
+      "roomNamePlaceholder": "アリーナに名前をつけて",
       "roomNameHint": "ロビーに表示",
       "languageHint": "言語",
-      "createButton": "作成",
-      "creating": "作成中..."
+      "createButton": "発射！",
+      "creating": "アリーナ作成中..."
     },
     "joinForm": {
-      "title": "参加",
+      "title": "アクションに参加",
       "progress": "2/2",
-      "profileLabel": "プロフィール",
-      "codeLabel": "コード",
+      "profileLabel": "あなた",
+      "codeLabel": "コードある？",
       "codePlaceholder": "ABC123",
-      "codeHint": "友達にコード確認",
-      "roomsLabel": "またはルーム選択",
+      "codeHint": "友達に聞いて！",
+      "roomsLabel": "または飛び込む",
       "refreshButton": "更新",
-      "noRooms": "ルームなし。コード入手！",
-      "joinButton": "参加",
-      "joining": "参加中..."
+      "noRooms": "ルームなし。コードある？",
+      "joinButton": "飛び込む！",
+      "joining": "転送中..."
     }
   },
   "hostView": {
@@ -3710,7 +3710,9 @@ const ja = {
       "gold": "ゴールド（3倍ポイント）",
       "ice": "氷（障害物）",
       "bomb": "爆弾（行をクリア）",
-      "rainbow": "レインボー（ワイルドカード）"
+      "rainbow": "レインボー（ワイルドカード）",
+      "chain": "チェーン（リンクボーナス）",
+      "time": "タイム（+5秒）"
     },
     "errors": {
       "tooShort": "単語が短すぎます",
@@ -3765,6 +3767,129 @@ const ja = {
         "star2": "素晴らしい!",
         "star3": "完璧!"
       }
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "マイレッスン",
+      "subtitle": "語彙を練習して上達しよう"
+    },
+    "lessons": {
+      "lesson": "レッスン",
+      "words": "単語",
+      "mastered": "習得済み",
+      "practice": "練習",
+      "review": "復習",
+      "empty": {
+        "title": "レッスンがありません",
+        "subtitle": "クラスに参加して語彙練習を始めよう"
+      },
+      "sort": {
+        "recent": "新しい順",
+        "progress": "進捗順"
+      }
+    },
+    "practice": {
+      "title": "練習モード",
+      "definition": "意味",
+      "yourAnswer": "あなたの回答",
+      "submit": "送信",
+      "next": "次の単語",
+      "correct": "正解！",
+      "incorrect": "もう一度",
+      "hint": "ヒント",
+      "skip": "スキップ",
+      "complete": {
+        "title": "レッスン完了！",
+        "subtitle": "全単語を習得しました",
+        "backToLessons": "レッスンに戻る"
+      },
+      "progress": {
+        "wordsLeft": "残り{{count}}単語",
+        "streak": "{{count}}連続",
+        "mastered": "習得！"
+      }
+    }
+  },
+  "teacher": {
+    "accessRequired": "教師権限が必要です",
+    "accessDenied": "このページには教師権限が必要です",
+    "dashboard": {
+      "title": "教師ダッシュボード",
+      "classrooms": "クラス",
+      "lessons": "語彙レッスン",
+      "students": "生徒",
+      "progress": "進捗"
+    },
+    "classroom": {
+      "create": "クラス作成",
+      "edit": "クラス編集",
+      "delete": "クラス削除",
+      "confirmDelete": "クラスを削除しますか？生徒はレッスンにアクセスできなくなります",
+      "name": "クラス名",
+      "joinCode": "参加コード",
+      "copyCode": "コードをコピー",
+      "codeCopied": "参加コードをコピーしました！",
+      "members": "{{count}}人の生徒",
+      "member": "1人の生徒",
+      "noMembers": "まだ生徒がいません",
+      "language": "言語",
+      "created": "{{date}}に作成",
+      "noClassrooms": "まだクラスがありません",
+      "createFirst": "最初のクラスを作成しましょう"
+    },
+    "lesson": {
+      "create": "レッスン作成",
+      "edit": "レッスン編集",
+      "delete": "レッスン削除",
+      "confirmDelete": "レッスンを削除しますか？生徒の進捗が失われます",
+      "name": "レッスン名",
+      "description": "説明（任意）",
+      "words": "{{count}}単語",
+      "word": "1単語",
+      "noWords": "まだ単語がありません",
+      "addWord": "単語を追加",
+      "removeWord": "削除",
+      "wordPlaceholder": "単語を入力...",
+      "canIntegrate": "ゲーム連携可能",
+      "cannotIntegrate": "進捗のみ記録",
+      "assignToClassroom": "クラスに割り当て",
+      "noClassroomSelected": "クラスなし（個人レッスン）",
+      "isPublic": "公開する",
+      "publicDescription": "他の教師がこのレッスンを使用できます",
+      "save": "保存",
+      "saving": "保存中...",
+      "saved": "保存しました！",
+      "noLessons": "まだレッスンがありません",
+      "createFirst": "最初の語彙レッスンを作成しましょう"
+    },
+    "progress": {
+      "title": "生徒の進捗",
+      "student": "生徒",
+      "wordsAttempted": "挑戦済み",
+      "wordsMastered": "習得済み",
+      "accuracy": "正答率",
+      "lastActive": "最終活動",
+      "noData": "まだ進捗データがありません",
+      "assignLessons": "レッスンを割り当てて進捗を追跡しましょう",
+      "chartTitle": "クラスの進捗推移",
+      "wordsLearned": "習得単語数",
+      "expandDetails": "詳細を見る"
+    },
+    "stats": {
+      "totalStudents": "生徒数",
+      "completionRate": "完了率",
+      "averageAccuracy": "平均正答率",
+      "wordsAttempted": "挑戦単語数",
+      "wordsMastered": "習得単語数"
+    },
+    "wordSelector": {
+      "title": "語彙を選択",
+      "saveAsLesson": "レッスンとして保存",
+      "saveLessonTitle": "語彙レッスンを保存",
+      "lessonNamePlaceholder": "レッスン名を入力...",
+      "noClassroom": "クラスなし（個人レッスン）",
+      "selectWords": "単語を選んで語彙レッスンを作成"
     }
   }
 };

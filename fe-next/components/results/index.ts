@@ -80,6 +80,9 @@ export type { UseWordCategoriesResult } from './useWordCategories';
 export { default as useGameResults, useGameResults as useGameResultsHook } from './useGameResults';
 export type { GameResultsConfig, GameResultsData } from './useGameResults';
 
+export { default as useResultsSocketEvents, useResultsSocketEvents as useResultsSocketEventsHook } from './useResultsSocketEvents';
+export type { ResultsSocketEventsState, ResultsSocketEventsActions, UseResultsSocketEventsProps } from './useResultsSocketEvents';
+
 // ============================================================
 // UTILITIES
 // ============================================================

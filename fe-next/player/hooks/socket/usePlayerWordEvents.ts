@@ -16,7 +16,7 @@ import {
   neoWarningToast,
 } from '../../../components/NeoToast';
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useFoundWords, useGameActions } from '@/hooks/gameState';
 import { useSafeSocketEvents } from '@/hooks/useSafeSocketEvent';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import logger from '@/utils/logger';
@@ -70,8 +70,9 @@ export function usePlayerWordEvents({
   comboTimeoutRef,
   comboShieldsUsedRef,
 }: UsePlayerWordEventsProps): void {
-  // Get foundWords state from context (no more prop drilling!)
-  const { foundWords, setFoundWords } = useGameStateContext();
+  // Get foundWords state from Zustand store (selective subscription for performance)
+  const foundWords = useFoundWords();
+  const { setFoundWords } = useGameActions();
 
   // Haptic feedback for word events
   const { customHaptic } = useHapticFeedback();

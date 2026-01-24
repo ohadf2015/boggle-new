@@ -16,11 +16,9 @@ import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
-import type { ResultsPageProps, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
-import type { NearMiss } from '@/components/results/NearMissCard';
-import type { MysteryReward } from '@/components/engagement/MysteryRewardPopup';
-import type { ReferralMilestone } from '@/shared/types/socket';
+import type { ResultsPageProps } from '@/types/components';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
 // Dynamic imports for heavy components (loaded after initial render)
@@ -97,33 +95,28 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     previousStreak: number;
   } | null>(null);
 
-  // Word feedback state for crowd-sourced word validation (self-healing system)
-  const [showWordFeedback, setShowWordFeedback] = useState<boolean>(false);
-  const [wordToVote, setWordToVote] = useState<WordToVote | null>(null);
-  const [wordQueue, setWordQueue] = useState<WordToVote[]>([]);
-
-  // XP and Level state (received via socket after game ends)
-  const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
-  const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
-  const [showLevelUpCelebration, setShowLevelUpCelebration] = useState<boolean>(false);
-
-  // Near-miss notifications (received via socket after game ends)
-  const [nearMisses, setNearMisses] = useState<NearMiss[]>([]);
-
-  // Mystery reward state (received via socket after game ends)
-  const [mysteryReward, setMysteryReward] = useState<MysteryReward | null>(null);
-  const [showMysteryReward, setShowMysteryReward] = useState<boolean>(false);
-  const mysteryRewardQueueRef = useRef<MysteryReward[]>([]);
-
-  // Referral milestone state (received via socket when friend reaches milestone)
-  const [referralMilestone, setReferralMilestone] = useState<ReferralMilestone | null>(null);
-  const [showReferralMilestone, setShowReferralMilestone] = useState<boolean>(false);
-
-  // Track which players are ready for next game (received from socket)
-  const [readyUsernames, setReadyUsernames] = useState<string[]>([]);
-
-  // Track if current player has confirmed they're ready
-  const [isCurrentPlayerReady, setIsCurrentPlayerReady] = useState<boolean>(false);
+  // Socket events for word feedback, XP, engagement features, and player ready state
+  const {
+    showWordFeedback,
+    wordToVote,
+    wordQueue,
+    xpGainedData,
+    levelUpData,
+    showLevelUpCelebration,
+    setShowLevelUpCelebration,
+    nearMisses,
+    mysteryReward,
+    showMysteryReward,
+    referralMilestone,
+    showReferralMilestone,
+    readyUsernames,
+    isCurrentPlayerReady,
+    handleVote,
+    handleFeedbackSkip,
+    handleMysteryRewardClose,
+    handleReferralMilestoneClose,
+    handleMarkReady,
+  } = useResultsSocketEvents({ socket, username });
 
   // State for sticky action bar visibility (must be declared before any conditional returns)
   const [showStickyActions, setShowStickyActions] = useState<boolean>(true);
@@ -571,217 +564,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
 
   // Note: Confetti is now handled by ResultsWinnerBanner with rank-specific colors
-
-
-  // Socket event listeners for word feedback (crowd-sourced word validation) and XP
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleShowWordFeedback = (data: {
-      word: string;
-      submittedBy: string;
-      submitterAvatar?: { emoji: string; color: string } | null;
-      voteInfo?: { votesFor?: number; votesAgainst?: number; approvalCount?: number; disapprovalCount?: number };
-      timeoutSeconds?: number;
-      gameCode: string;
-      language: string;
-      wordQueue?: WordToVote[];
-    }) => {
-      logger.log('[RESULTS] Received word feedback request:', data);
-
-      // Handle new word queue format (self-healing system)
-      // Limit to 2 words to avoid overwhelming the user with modals
-      if (data.wordQueue && data.wordQueue.length > 0) {
-        const limitedQueue = data.wordQueue.slice(0, 2);
-        setWordQueue(limitedQueue);
-        logger.log('[RESULTS] Word queue limited to', limitedQueue.length, 'of', data.wordQueue.length, 'words for voting');
-      }
-
-      // Transform voteInfo to match expected VoteInfo interface
-      const transformedVoteInfo = data.voteInfo ? {
-        approvalCount: data.voteInfo.votesFor ?? data.voteInfo.approvalCount,
-        disapprovalCount: data.voteInfo.votesAgainst ?? data.voteInfo.disapprovalCount
-      } : undefined;
-
-      setWordToVote({
-        word: data.word,
-        submittedBy: data.submittedBy,
-        submitterAvatar: data.submitterAvatar,
-        voteInfo: transformedVoteInfo,
-        timeoutSeconds: data.timeoutSeconds || 10,
-        gameCode: data.gameCode,
-        language: data.language
-      });
-      setShowWordFeedback(true);
-    };
-
-    const handleVoteRecorded = (data: { success: boolean; message?: string }) => {
-      logger.log('[RESULTS] Vote recorded:', data);
-    };
-
-    // XP and Level Up handlers
-    const handleXpGained = (data: XpGainedData) => {
-      logger.log('[RESULTS] XP gained:', data);
-      setXpGainedData(data);
-    };
-
-    const handleLevelUp = (data: LevelUpData) => {
-      logger.log('[RESULTS] Level up!', data);
-      setLevelUpData(data);
-      // Show epic level-up celebration (handles its own confetti)
-      setShowLevelUpCelebration(true);
-    };
-
-    // Near-miss notifications handler
-    const handleNearMisses = (data: { nearMisses: NearMiss[] }) => {
-      logger.log('[RESULTS] Near-miss notifications:', data);
-      if (data.nearMisses && data.nearMisses.length > 0) {
-        setNearMisses(data.nearMisses);
-      }
-    };
-
-    // Mystery reward handler - queue rewards to show one at a time
-    const handleMysteryReward = (data: { reward: MysteryReward }) => {
-      logger.log('[RESULTS] Mystery reward received:', data);
-      if (data.reward) {
-        // Add to queue
-        mysteryRewardQueueRef.current.push(data.reward);
-        // If not currently showing a reward, show this one
-        if (!showMysteryReward) {
-          setMysteryReward(data.reward);
-          setShowMysteryReward(true);
-        }
-      }
-    };
-
-    // Handle referral milestone notifications
-    const handleReferralMilestone = (data: { milestone: ReferralMilestone }) => {
-      logger.log('[RESULTS] Referral milestone received:', data);
-      if (data.milestone) {
-        setReferralMilestone(data.milestone);
-        setShowReferralMilestone(true);
-      }
-    };
-
-    socket.on('showWordFeedback', handleShowWordFeedback);
-    socket.on('voteRecorded', handleVoteRecorded);
-    socket.on('xpGained', handleXpGained);
-    socket.on('levelUp', handleLevelUp);
-    socket.on('engagement:nearMisses', handleNearMisses);
-    socket.on('engagement:mysteryReward', handleMysteryReward);
-    socket.on('engagement:referralMilestone', handleReferralMilestone);
-
-    return () => {
-      socket.off('showWordFeedback', handleShowWordFeedback);
-      socket.off('voteRecorded', handleVoteRecorded);
-      socket.off('xpGained', handleXpGained);
-      socket.off('levelUp', handleLevelUp);
-      socket.off('engagement:nearMisses', handleNearMisses);
-      socket.off('engagement:mysteryReward', handleMysteryReward);
-      socket.off('engagement:referralMilestone', handleReferralMilestone);
-    };
-  }, [socket, t, showMysteryReward]);
-
-  // Socket listener for players ready for next game updates
-  useEffect(() => {
-    if (!socket) return;
-
-    const handlePlayersReadyUpdate = (data: {
-      readyCount: number;
-      totalPlayers: number;
-      username?: string;
-      readyUsernames?: string[];
-    }) => {
-      logger.log('[RESULTS] Players ready update:', data);
-      // If we receive the full list of ready usernames, use it
-      if (data.readyUsernames) {
-        setReadyUsernames(data.readyUsernames);
-        // Check if current player is in the ready list
-        if (username && data.readyUsernames.includes(username)) {
-          setIsCurrentPlayerReady(true);
-        }
-      } else if (data.username) {
-        // Otherwise, add the new ready username to the list
-        setReadyUsernames(prev => {
-          if (prev.includes(data.username!)) return prev;
-          return [...prev, data.username!];
-        });
-        // Check if current player just became ready
-        if (data.username === username) {
-          setIsCurrentPlayerReady(true);
-        }
-      }
-    };
-
-    socket.on('playersReadyUpdate', handlePlayersReadyUpdate);
-
-    // Request initial ready state
-    socket.emit('getPlayersReadyCount');
-
-    return () => {
-      socket.off('playersReadyUpdate', handlePlayersReadyUpdate);
-    };
-  }, [socket, username]);
-
-  // Handle word feedback vote (supports multi-word queue from self-healing system)
-  // Memoized to prevent recreation on every render
-  const handleVote = useCallback((voteType: 'like' | 'dislike', votedWord?: string) => {
-    if (!socket || !wordToVote) return;
-
-    // Use the specific word being voted on, or fall back to current word
-    const wordToSubmit = votedWord || wordToVote.word;
-
-    // Send 'like'/'dislike' directly - database expects these values
-    logger.log('[RESULTS] Submitting vote:', { word: wordToSubmit, voteType });
-    socket.emit('submitWordVote', {
-      word: wordToSubmit,
-      language: wordToVote.language,
-      gameCode: wordToVote.gameCode,
-      voteType: voteType,
-      submittedBy: wordToVote.submittedBy
-    });
-
-    // Note: Modal handles moving to next word internally via word queue
-    // Only close when modal calls onSkip/onTimeout (after all words)
-  }, [socket, wordToVote]);
-
-  // Handle word feedback skip/timeout (clears queue for self-healing system)
-  const handleFeedbackSkip = useCallback(() => {
-    logger.log('[RESULTS] Skipping word feedback');
-    setShowWordFeedback(false);
-    setWordToVote(null);
-    setWordQueue([]); // Clear the queue
-  }, []);
-
-  // Handle mystery reward popup close - show next in queue if any
-  const handleMysteryRewardClose = useCallback(() => {
-    setShowMysteryReward(false);
-    // Remove the current reward from queue
-    mysteryRewardQueueRef.current.shift();
-    // If there are more rewards, show the next one after a short delay
-    if (mysteryRewardQueueRef.current.length > 0) {
-      setTimeout(() => {
-        setMysteryReward(mysteryRewardQueueRef.current[0]);
-        setShowMysteryReward(true);
-      }, 500);
-    } else {
-      setMysteryReward(null);
-    }
-  }, []);
-
-  // Handle referral milestone popup close
-  const handleReferralMilestoneClose = useCallback(() => {
-    setShowReferralMilestone(false);
-    setReferralMilestone(null);
-  }, []);
-
-  // Handle marking the player as ready for the next game
-  const handleMarkReady = useCallback(() => {
-    if (!socket || isCurrentPlayerReady) return;
-    logger.log('[RESULTS] Marking player as ready for next game');
-    socket.emit('confirmReadyForNextGame');
-    setIsCurrentPlayerReady(true);
-  }, [socket, isCurrentPlayerReady]);
 
   // Handle host starting a new game directly from results page
   const handleStartGame = useCallback(() => {
@@ -1330,7 +1112,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   return (
     <>
       {overlayModals}
-      <div className="screen-fit lg:min-h-full lg:h-auto bg-neo-navy transition-colors duration-300 relative">
+      <div className="min-h-dvh flex flex-col bg-neo-navy transition-colors duration-300 relative">
         {/* Neo-brutalist halftone dot pattern overlay */}
         <div
           className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
@@ -1341,14 +1123,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         />
 
       {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
-      <div className="md:hidden flex flex-col h-full">
+      <div className="md:hidden flex flex-col flex-1 min-h-0">
         {/* Exit Button Header */}
         <div className="flex-shrink-0 w-full flex items-center justify-end px-2 py-2">
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-10 h-10 min-w-[40px] min-h-[40px] p-0" />
         </div>
 
         {/* Tab Content - Scrollable area */}
-        <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area px-2 pb-20">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-[--mobile-bottom-safe]">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div
