@@ -1,32 +1,35 @@
-import { checkWordIntegration } from '../useWordIntegration';
+import { checkWordIntegration, checkWordIntegrationAsync, useWordIntegration } from '../useWordIntegration';
+import { renderHook } from '@testing-library/react';
 
-// Mock the dictionary module
-jest.mock('@/backend/dictionary', () => ({
-  isDictionaryWord: jest.fn(),
-}));
+// Mock fetch for async dictionary checks
+global.fetch = jest.fn();
 
-import { isDictionaryWord } from '@/backend/dictionary';
-
-const mockIsDictionaryWord = isDictionaryWord as jest.MockedFunction<typeof isDictionaryWord>;
+const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
 
 describe('checkWordIntegration', () => {
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
 
-    // Default: simulate dictionary loaded, word validation based on common words
-    mockIsDictionaryWord.mockImplementation((word: string, language: string) => {
-      // Simulate common English words
+    // Default: simulate API response for dictionary validation
+    mockFetch.mockImplementation(async (_url, options) => {
+      const body = JSON.parse((options as RequestInit).body as string);
+      const word = body.word;
+
+      // Simulate common words in dictionary
       const commonWords = ['cat', 'dog', 'hello', 'appreciation', 'world'];
-      // Simulate common words in other languages (basic check)
       const hebrewWords = ['שלום'];
       const swedishWords = ['hej'];
       const japaneseWords = ['日本'];
       const spanishWords = ['hola'];
 
       const allWords = [...commonWords, ...hebrewWords, ...swedishWords, ...japaneseWords, ...spanishWords];
+      const isValid = allWords.includes(word.toLowerCase());
 
-      return allWords.includes(word.toLowerCase());
+      return {
+        ok: true,
+        json: async () => ({ isValid }),
+      } as Response;
     });
   });
   // Valid dictionary words
@@ -74,15 +77,15 @@ describe('checkWordIntegration', () => {
     });
   });
 
-  // Non-dictionary words
+  // Non-dictionary words (using async function for dictionary validation)
   describe('Non-dictionary words', () => {
-    it('should return canIntegrate=false for non-dictionary word', () => {
+    it('should return canIntegrate=false for non-dictionary word', async () => {
       // GIVEN: A word not in dictionary
       const word = 'XYZABC';
       const language = 'en' as const;
 
-      // WHEN: Checking word integration
-      const result = checkWordIntegration(word, language);
+      // WHEN: Checking word integration (async for dictionary check)
+      const result = await checkWordIntegrationAsync(word, language);
 
       // THEN: Should not be integrable with reason
       expect(result).toEqual({
@@ -92,13 +95,13 @@ describe('checkWordIntegration', () => {
       });
     });
 
-    it('should handle made-up words', () => {
+    it('should handle made-up words', async () => {
       // GIVEN: A nonsense word
-      const word = 'QWERTY123';
+      const word = 'QWERTYZ';
       const language = 'en' as const;
 
-      // WHEN: Checking word integration
-      const result = checkWordIntegration(word, language);
+      // WHEN: Checking word integration (async for dictionary check)
+      const result = await checkWordIntegrationAsync(word, language);
 
       // THEN: Should not be integrable
       expect(result.canIntegrate).toBe(false);
@@ -273,26 +276,26 @@ describe('checkWordIntegration', () => {
       expect(result.reason).toBe('word_too_short');
     });
 
-    it('should handle numeric characters in word', () => {
+    it('should handle numeric characters in word', async () => {
       // GIVEN: A word with numbers (not in dictionary)
       const word = 'TEST123';
       const language = 'en' as const;
 
-      // WHEN: Checking word integration
-      const result = checkWordIntegration(word, language);
+      // WHEN: Checking word integration (async for dictionary check)
+      const result = await checkWordIntegrationAsync(word, language);
 
       // THEN: Should not be in dictionary
       expect(result.canIntegrate).toBe(false);
       expect(result.reason).toBe('word_not_in_dictionary');
     });
 
-    it('should handle special characters in word', () => {
+    it('should handle special characters in word', async () => {
       // GIVEN: A word with special chars (not in dictionary)
       const word = 'HELLO!';
       const language = 'en' as const;
 
-      // WHEN: Checking word integration
-      const result = checkWordIntegration(word, language);
+      // WHEN: Checking word integration (async for dictionary check)
+      const result = await checkWordIntegrationAsync(word, language);
 
       // THEN: Should not be in dictionary
       expect(result.canIntegrate).toBe(false);
@@ -302,17 +305,16 @@ describe('checkWordIntegration', () => {
 
   // React hook batch checking
   describe('useWordIntegration hook', () => {
-    it('should provide batch checking functionality', () => {
+    it('should provide batch checking functionality', async () => {
       // GIVEN: Multiple words to check
       const words = ['cat', 'dog', 'xyzabc', 'supercalifragilistic', 'ab'];
       const language = 'en' as const;
 
-      // Import the hook
-      const { useWordIntegration } = require('../useWordIntegration');
-      const { checkWords } = useWordIntegration();
+      // Use renderHook to properly test the hook
+      const { result } = renderHook(() => useWordIntegration());
 
-      // WHEN: Checking words in batch
-      const results = checkWords(words, language);
+      // WHEN: Checking words in batch (async)
+      const results = await result.current.checkWords(words, language);
 
       // THEN: Should return array of results
       expect(results).toHaveLength(5);
@@ -323,16 +325,16 @@ describe('checkWordIntegration', () => {
       expect(results[4].canIntegrate).toBe(false); // too short
     });
 
-    it('should handle empty word array', () => {
+    it('should handle empty word array', async () => {
       // GIVEN: Empty array
       const words: string[] = [];
       const language = 'en' as const;
 
-      const { useWordIntegration } = require('../useWordIntegration');
-      const { checkWords } = useWordIntegration();
+      // Use renderHook to properly test the hook
+      const { result } = renderHook(() => useWordIntegration());
 
-      // WHEN: Checking empty array
-      const results = checkWords(words, language);
+      // WHEN: Checking empty array (async)
+      const results = await result.current.checkWords(words, language);
 
       // THEN: Should return empty array
       expect(results).toEqual([]);
