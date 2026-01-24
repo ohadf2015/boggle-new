@@ -13,8 +13,8 @@
 @keyframes particle-float {
   0%, 100% {
     transform: translate(
-      calc(var(--parallax-x, 0px) * 0.3),
-      calc(var(--parallax-y, 0px) * 0.3)
+      calc(var(--parallax-x, 0px) * 0.5),
+      calc(var(--parallax-y, 0px) * 0.5)
     );
     opacity: 0.4;
   }

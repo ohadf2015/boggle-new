@@ -18,15 +18,41 @@ jest.mock('react-hot-toast', () => ({
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
-    button: ({ children, whileTap, ...props }: React.ComponentProps<'button'> & { whileTap?: unknown }) => (
+    button: ({ children, whileTap, animate, transition, ...props }: React.ComponentProps<'button'> & { whileTap?: unknown; animate?: unknown; transition?: unknown }) => (
       <button {...props}>{children}</button>
     ),
+    div: ({ children, initial, animate, exit, transition, ...props }: React.ComponentProps<'div'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }) => (
+      <div {...props}>{children}</div>
+    ),
   },
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+// Mock qrcode.react
+jest.mock('qrcode.react', () => ({
+  QRCodeSVG: ({ value, size, ...props }: { value: string; size: number }) => (
+    <svg data-testid="qr-code-svg" data-value={value} width={size} height={size} {...props} />
+  ),
+}));
+
+// Mock social icons
+jest.mock('../../../../components/icons/SocialIcons', () => ({
+  WhatsAppIcon: ({ size }: { size?: number }) => <svg data-testid="whatsapp-icon" width={size} height={size} />,
+  TelegramIcon: ({ size }: { size?: number }) => <svg data-testid="telegram-icon" width={size} height={size} />,
 }));
 
 // Mock getJoinUrl
+// Mock window.open for social sharing
+const mockWindowOpen = jest.fn();
+Object.defineProperty(window, 'open', {
+  value: mockWindowOpen,
+  writable: true,
+});
+
 jest.mock('../../../../utils/share', () => ({
   getJoinUrl: jest.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
+  shareViaWhatsApp: jest.fn(),
+  shareViaTelegram: jest.fn(),
 }));
 
 // Translation mock
@@ -38,6 +64,13 @@ const mockT = (key: string) => {
     'share.title': 'Join my LexiClash game!',
     'share.text': 'Join my game!',
     'share.buttonLabel': 'Share',
+    'share.joinInstructions': 'Go to lexiclash.com and enter code',
+    'share.showQrCode': 'Show QR Code',
+    'share.hideQrCode': 'Hide QR Code',
+    'share.scanQrCode': 'Scan to join instantly',
+    'share.orShareVia': 'Or share via',
+    'share.telegram': 'Telegram',
+    'share.moreWays': 'More ways to share',
     'common.error': 'Failed to copy',
     'common.copied': 'Copied!',
   };
@@ -332,6 +365,169 @@ describe('MobileShareSection', () => {
       expect(copyButton.className).toContain('min-h-[44px]');
       expect(copyButton.className).toContain('min-w-[44px]');
       expect(shareButton.className).toContain('min-h-[44px]');
+    });
+  });
+
+  describe('instructions text', () => {
+    it('renders join instructions text', () => {
+      render(<MobileShareSection gameCode="INST123" t={mockT} />);
+
+      expect(screen.getByText(/lexiclash\.com/i)).toBeInTheDocument();
+    });
+
+    it('displays instructions with link icon', () => {
+      render(<MobileShareSection gameCode="INST123" t={mockT} />);
+
+      const instructionsBanner = screen.getByTestId('mobile-share-instructions');
+      expect(instructionsBanner).toBeInTheDocument();
+    });
+  });
+
+  describe('social share buttons', () => {
+    it('renders WhatsApp share button', () => {
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      expect(screen.getByTestId('mobile-whatsapp-button')).toBeInTheDocument();
+    });
+
+    it('calls shareViaWhatsApp when WhatsApp button clicked', async () => {
+      const { shareViaWhatsApp } = require('../../../../utils/share');
+
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
+      await act(async () => {
+        fireEvent.click(whatsappBtn);
+      });
+
+      expect(shareViaWhatsApp).toHaveBeenCalledWith('SOCIAL123', '', mockT);
+    });
+
+    it('renders Telegram share button', () => {
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      expect(screen.getByTestId('mobile-telegram-button')).toBeInTheDocument();
+    });
+
+    it('calls shareViaTelegram when Telegram button clicked', async () => {
+      const { shareViaTelegram, getJoinUrl } = require('../../../../utils/share');
+
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      const telegramBtn = screen.getByTestId('mobile-telegram-button');
+      await act(async () => {
+        fireEvent.click(telegramBtn);
+      });
+
+      expect(shareViaTelegram).toHaveBeenCalled();
+    });
+
+    it('renders more options button', () => {
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      expect(screen.getByTestId('mobile-more-share-button')).toBeInTheDocument();
+    });
+
+    it('WhatsApp button has brand-whatsapp background color', () => {
+      render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
+
+      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
+      expect(whatsappBtn.className).toContain('bg-brand-whatsapp');
+    });
+
+    it('social buttons meet minimum touch target size', () => {
+      render(<MobileShareSection gameCode="TOUCH123" t={mockT} />);
+
+      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
+      const telegramBtn = screen.getByTestId('mobile-telegram-button');
+
+      expect(whatsappBtn.className).toContain('min-h-[44px]');
+      expect(telegramBtn.className).toContain('min-h-[44px]');
+    });
+  });
+
+  describe('QR code section', () => {
+    it('renders QR code toggle button', () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      expect(screen.getByTestId('mobile-qr-toggle')).toBeInTheDocument();
+    });
+
+    it('does not render QR code by default', () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      expect(screen.queryByTestId('mobile-qr-code')).not.toBeInTheDocument();
+    });
+
+    it('shows QR code when toggle is clicked', async () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
+
+      expect(screen.getByTestId('mobile-qr-code')).toBeInTheDocument();
+    });
+
+    it('hides QR code when toggle is clicked again', async () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+
+      // Show QR
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
+      expect(screen.getByTestId('mobile-qr-code')).toBeInTheDocument();
+
+      // Hide QR
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
+      expect(screen.queryByTestId('mobile-qr-code')).not.toBeInTheDocument();
+    });
+
+    it('QR toggle has aria-expanded attribute', () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('QR toggle aria-expanded is true when QR is visible', async () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
+
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('displays scan instruction text when QR is visible', async () => {
+      render(<MobileShareSection gameCode="QR123" t={mockT} />);
+
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
+
+      expect(screen.getByText(/scan to join/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('RTL support', () => {
+    it('renders correctly in RTL context', () => {
+      render(
+        <div dir="rtl">
+          <MobileShareSection gameCode="RTL123" t={mockT} />
+        </div>
+      );
+
+      expect(screen.getByTestId('mobile-share-section')).toBeInTheDocument();
+      expect(screen.getByText('RTL123')).toBeInTheDocument();
     });
   });
 });

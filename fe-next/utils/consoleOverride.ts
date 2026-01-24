@@ -21,6 +21,8 @@ const IGNORED_ERROR_PATTERNS = [
   // Audio decoding failures - common on mobile devices, non-critical feature
   /Decoding audio data failed/i,
   /Failed to load.*Track/i,
+  /\[AdventureMusic\].*Failed to load/i,
+  /\[AdventureMusic\].*Failed to play/i,
   // React hydration warnings - handled by React itself
   /Hydration failed/i,
   /Text content does not match/i,
@@ -28,6 +30,9 @@ const IGNORED_ERROR_PATTERNS = [
   /ResizeObserver loop/i,
   // Recharts dimension warnings - occur briefly during mobile layout, non-critical
   /width\(-?\d+\) and height\(-?\d+\) of chart should be greater than 0/i,
+  // Socket.IO user-facing errors - handled gracefully with toast messages
+  /Game code already in use/i,
+  /already in use/i,
 ] as const;
 
 // Store original console methods

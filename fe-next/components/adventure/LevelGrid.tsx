@@ -63,73 +63,73 @@ interface ParticleConfig {
 
 const WORLD_PARTICLES: Record<number, ParticleConfig> = {
   1: { // Meadows - flowers, leaves, butterflies
-    count: 15,
+    count: 10,
     emoji: ['🌸', '🍃', '🦋', '✿', '❀'],
     colors: ['#a3e635', '#84cc16', '#22c55e', '#fbbf24'],
-    sizeRange: [14, 24],
+    sizeRange: [8, 14],
     speedRange: [15, 30],
   },
   2: { // Springs - water, sparkles
-    count: 18,
+    count: 12,
     emoji: ['💧', '✨', '💎', '🫧'],
     colors: ['#22d3ee', '#06b6d4', '#67e8f9', '#a5f3fc'],
-    sizeRange: [12, 20],
+    sizeRange: [8, 14],
     speedRange: [10, 25],
   },
   3: { // Caverns - crystals, roots
-    count: 12,
+    count: 8,
     emoji: ['💜', '🔮', '💎', '✦'],
     colors: ['#a855f7', '#8b5cf6', '#c084fc', '#d8b4fe'],
-    sizeRange: [14, 22],
+    sizeRange: [8, 16],
     speedRange: [20, 35],
   },
   4: { // Archipelago - islands, waves
-    count: 14,
+    count: 10,
     emoji: ['🌊', '🐚', '🌴', '☀️'],
     colors: ['#fb923c', '#f97316', '#fbbf24', '#fdba74'],
-    sizeRange: [14, 22],
+    sizeRange: [8, 16],
     speedRange: [12, 28],
   },
   5: { // Canyon - rocks, dust
-    count: 10,
+    count: 8,
     emoji: ['🔶', '🧱', '⬛', '🏜️'],
     colors: ['#ef4444', '#dc2626', '#f97316', '#fbbf24'],
-    sizeRange: [12, 20],
+    sizeRange: [8, 14],
     speedRange: [18, 32],
   },
   6: { // Labyrinth - puzzles, letters
-    count: 16,
+    count: 12,
     emoji: ['🔷', '🔶', '✧', '◇'],
     colors: ['#ec4899', '#f472b6', '#f9a8d4', '#db2777'],
-    sizeRange: [12, 18],
+    sizeRange: [8, 14],
     speedRange: [15, 28],
   },
   7: { // Palace - ice, mirrors
-    count: 14,
+    count: 10,
     emoji: ['❄️', '💠', '✧', '◈'],
     colors: ['#22d3ee', '#06b6d4', '#e0f2fe', '#ffffff'],
-    sizeRange: [14, 22],
+    sizeRange: [8, 16],
     speedRange: [12, 25],
   },
   8: { // Nebula - stars, cosmic
-    count: 20,
+    count: 14,
     emoji: ['⭐', '✨', '💫', '🌟'],
     colors: ['#a855f7', '#ec4899', '#8b5cf6', '#f472b6'],
-    sizeRange: [10, 20],
+    sizeRange: [6, 14],
     speedRange: [8, 22],
   },
   9: { // Peaks - aurora, mountains
-    count: 12,
+    count: 8,
     emoji: ['🏔️', '✦', '❄️', '🌌'],
     colors: ['#22d3ee', '#a3e635', '#67e8f9', '#84cc16'],
-    sizeRange: [14, 24],
+    sizeRange: [8, 16],
     speedRange: [15, 30],
   },
   10: { // Throne - gold, crowns
-    count: 16,
+    count: 12,
     emoji: ['👑', '⭐', '💫', '✧'],
     colors: ['#fbbf24', '#f59e0b', '#fcd34d', '#fef08a'],
-    sizeRange: [14, 24],
+    sizeRange: [8, 16],
     speedRange: [10, 25],
   },
 };
@@ -205,6 +205,60 @@ const FloatingParticle = memo(({
 FloatingParticle.displayName = 'FloatingParticle';
 
 /**
+ * DifficultyIndicator - Visual difficulty indicator using bars
+ * Shows 1 bar for EASY, 2 for MEDIUM, 3 for HARD
+ * More intuitive than cryptic single letters (E, M, H)
+ */
+const DifficultyIndicator = memo(({
+  difficulty,
+}: {
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+}) => {
+  const filledBars = difficulty === 'EASY' ? 1 : difficulty === 'MEDIUM' ? 2 : 3;
+  const colorClass =
+    difficulty === 'EASY'
+      ? 'bg-neo-lime'
+      : difficulty === 'MEDIUM'
+        ? 'bg-neo-orange'
+        : 'bg-neo-red';
+  const containerColorClass =
+    difficulty === 'EASY'
+      ? 'text-neo-lime'
+      : difficulty === 'MEDIUM'
+        ? 'text-neo-orange'
+        : 'text-neo-red';
+
+  return (
+    <div
+      data-testid="difficulty-indicator"
+      aria-label={`Difficulty: ${difficulty.toLowerCase()}`}
+      className={cn(
+        'absolute top-2 right-2 rtl:right-auto rtl:left-2',
+        'flex items-end gap-0.5 px-1.5 py-1 rounded-sm',
+        'bg-neo-black/50 border border-neo-black/30',
+        containerColorClass
+      )}
+    >
+      {[1, 2, 3].map((barNum) => (
+        <div
+          key={barNum}
+          data-filled={barNum <= filledBars ? 'true' : 'false'}
+          className={cn(
+            'w-1 rounded-sm transition-all',
+            barNum === 1 && 'h-1.5',
+            barNum === 2 && 'h-2.5',
+            barNum === 3 && 'h-3.5',
+            barNum <= filledBars ? colorClass : 'bg-neo-white/20'
+          )}
+        />
+      ))}
+    </div>
+  );
+});
+
+DifficultyIndicator.displayName = 'DifficultyIndicator';
+
+/**
  * LevelGrid - Displays all levels for a selected world
  * Features: World-themed parallax background, floating particles, glass-morphism cards
  */
@@ -216,12 +270,13 @@ export default function LevelGrid({
   const { t } = useLanguage();
 
   // Interactive parallax from gyroscope/mouse/touch
+  // Higher intensity (1.0) and faster ambient (0.6) for more reactive movement
   const { x: parallaxX, y: parallaxY } = useParallax({
-    intensity: 0.6,
+    intensity: 1.0,
     enableGyroscope: true,
     enableGesture: true,
     enableAmbient: true,
-    ambientSpeed: 0.3,
+    ambientSpeed: 0.6,
   });
 
   // Generate levels for this world
@@ -314,12 +369,12 @@ export default function LevelGrid({
             transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
           }}
         >
-          {/* Radial glow from world color */}
+          {/* Radial glow from world color - smaller for less visual clutter */}
           <div
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-30"
+            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full opacity-25"
             style={{
-              background: `radial-gradient(circle, ${glowColor}60 0%, transparent 70%)`,
-              filter: 'blur(60px)',
+              background: `radial-gradient(circle, ${glowColor}50 0%, transparent 70%)`,
+              filter: 'blur(50px)',
             }}
           />
         </div>
@@ -594,18 +649,8 @@ export default function LevelGrid({
                 </div>
               )}
 
-              {/* Difficulty Badge - Enhanced visibility */}
-              <div
-                className={cn(
-                  'absolute top-2 right-2 rtl:right-auto rtl:left-2 text-[10px] sm:text-xs font-black px-2 py-1 rounded-sm uppercase tracking-wider',
-                  'border border-neo-black/30',
-                  config.difficulty === 'EASY' && 'bg-neo-lime/40 text-neo-lime',
-                  config.difficulty === 'MEDIUM' && 'bg-neo-orange/40 text-neo-orange',
-                  config.difficulty === 'HARD' && 'bg-neo-red/40 text-neo-red'
-                )}
-              >
-                {config.difficulty[0]}
-              </div>
+              {/* Difficulty Indicator - Visual bars instead of cryptic letters */}
+              <DifficultyIndicator difficulty={config.difficulty} />
 
               {/* Perfect completion indicator */}
               {isPerfect && (

@@ -360,22 +360,19 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'bomb'
         );
         if (bombPos) {
-          // Set explosion effect on the bomb tile
-          const bombTile = newTiles[bombPos.row]?.[bombPos.col];
-          if (bombTile) {
-            bombTile.activationEffect = 'explode';
-            bombTile.activationTimestamp = activationTimestamp;
-          }
           for (let col = 0; col < newTiles[bombPos.row].length; col++) {
             const tile = newTiles[bombPos.row][col];
             // Count ice tiles in the row before clearing
             if (tile.type === 'ice' && !tile.isCleared) {
               iceClearedCount++;
               tile.isFrozen = false; // Unfreeze ice tiles
-              // Set melt effect on ice tiles in bomb row
+              // Ice tiles get 'melt' effect (water animation)
               tile.activationEffect = 'melt';
-              tile.activationTimestamp = activationTimestamp;
+            } else {
+              // All other tiles in the row get 'explode' effect (shockwave animation)
+              tile.activationEffect = 'explode';
             }
+            tile.activationTimestamp = activationTimestamp;
             tile.isCleared = true;
           }
         }

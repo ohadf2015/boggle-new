@@ -29,6 +29,7 @@ import { useSurvivalClues } from './useSurvivalClues';
 import { useSurvivalHints } from './useSurvivalHints';
 import { survivalGameReducer, createInitialState } from './survivalGameReducer';
 import { useSafeTimeout, useSafeInterval } from '@/hooks/useSafeTimeout';
+import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 
 export interface UseSurvivalGameLogicProps {
   grid: LetterGrid;
@@ -453,6 +454,7 @@ export function useSurvivalGameLogic({
     if (!isWordOnBoard(word, grid, language)) {
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
       showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
+      recordNotOnBoard(word, language, 'daily_word_hunt');
       return;
     }
 
@@ -460,6 +462,7 @@ export function useSurvivalGameLogic({
     if (!isValidWord) {
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -NOT_IN_DICTIONARY_PENALTY } });
       showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`);
+      recordNotInDictionary(word, language, 'daily_word_hunt');
       return;
     }
 
@@ -526,6 +529,7 @@ export function useSurvivalGameLogic({
         // Word can't be formed on board - only apply "not on board" penalty
         dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
         showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
+        recordNotOnBoard(displayWord, language, 'daily_word_hunt');
       }
     } else {
       // Different length word - process as discovery AND show feedback

@@ -334,7 +334,14 @@ const sv = {
     "sms": "SMS",
     "discordCopied": "Kopierat för Discord! Klistra in i din server 💬",
     "morePlatforms": "Fler plattformar",
-    "lessOptions": "Färre alternativ"
+    "lessOptions": "Färre alternativ",
+    "joinInstructions": "Gå till lexiclash.com och ange kod",
+    "showQrCode": "Visa QR-kod",
+    "hideQrCode": "Dölj QR-kod",
+    "scanQrCode": "Skanna för att gå med direkt",
+    "orShareVia": "Eller dela via",
+    "telegram": "Telegram",
+    "moreWays": "Fler sätt att dela"
   },
   "errors": {
     "unstableConnection": "Anslutningen vinglar - kopplar upp dig...",

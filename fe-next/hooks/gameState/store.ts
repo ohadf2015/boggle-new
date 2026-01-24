@@ -28,6 +28,7 @@
 
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
 import type { LetterGrid, LeaderboardEntry, Language, WordDetail } from '@/shared/types/game';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
@@ -482,8 +483,22 @@ export const useLevelUpData = () => useGameStore((state) => state.levelUpData);
 // Board theme selector
 export const useBoardTheme = () => useGameStore((state) => state.boardTheme);
 
-// Action selectors (these never change, so components subscribing won't re-render)
-export const useGameActions = () => useGameStore((state) => ({
+// ==========================================
+// Actions Object (static, no re-renders)
+// ==========================================
+
+// CRITICAL FIX for React Error #185 (Maximum update depth exceeded):
+// Instead of using a selector that creates a new object on every call,
+// we extract actions once as a static object. Zustand actions are stable
+// (they don't change), so we can safely cache them.
+//
+// Old approach (causes infinite loop):
+// export const useGameActions = () => useGameStore((state) => ({ ...actions }), shallow);
+// ^ This creates new object every call, causing useEffect deps to re-trigger
+//
+// New approach (stable reference):
+// Get actions from store once, return the same object reference always
+const getActions = (state: GameStore) => ({
   setGameActive: state.setGameActive,
   setLetterGrid: state.setLetterGrid,
   setRemainingTime: state.setRemainingTime,
@@ -515,4 +530,20 @@ export const useGameActions = () => useGameStore((state) => ({
   setBoardTheme: state.setBoardTheme,
   resetForNewRound: state.resetForNewRound,
   resetAll: state.resetAll,
-}));
+});
+
+// Cache the actions object - it never changes since Zustand actions are stable
+let cachedActions: ReturnType<typeof getActions> | null = null;
+
+/**
+ * Get game actions (stable reference, never causes re-renders)
+ *
+ * This hook returns a stable object containing all store actions.
+ * Unlike state selectors, actions don't change, so we cache the result.
+ */
+export const useGameActions = () => {
+  if (!cachedActions) {
+    cachedActions = getActions(useGameStore.getState());
+  }
+  return cachedActions;
+};

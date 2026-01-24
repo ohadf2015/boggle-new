@@ -334,7 +334,14 @@ const ja = {
     "sms": "SMS",
     "discordCopied": "Discordにコピー！サーバーに貼り付けて 💬",
     "morePlatforms": "他のプラットフォーム",
-    "lessOptions": "オプションを減らす"
+    "lessOptions": "オプションを減らす",
+    "joinInstructions": "lexiclash.comにアクセスしてコードを入力",
+    "showQrCode": "QRコードを表示",
+    "hideQrCode": "QRコードを非表示",
+    "scanQrCode": "スキャンして即参加",
+    "orShareVia": "または共有",
+    "telegram": "Telegram",
+    "moreWays": "他の共有方法"
   },
   "errors": {
     "unstableConnection": "接続がふらついてる - 戻すね...",

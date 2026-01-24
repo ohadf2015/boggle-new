@@ -334,7 +334,14 @@ const he = {
     "sms": "SMS",
     "discordCopied": "הועתק לדיסקורד! הדביקו בשרת שלכם 💬",
     "morePlatforms": "עוד פלטפורמות",
-    "lessOptions": "פחות אפשרויות"
+    "lessOptions": "פחות אפשרויות",
+    "joinInstructions": "כנסו ל-lexiclash.com והזינו את הקוד",
+    "showQrCode": "הצג קוד QR",
+    "hideQrCode": "הסתר קוד QR",
+    "scanQrCode": "סרקו להצטרפות מיידית",
+    "orShareVia": "או שתפו דרך",
+    "telegram": "טלגרם",
+    "moreWays": "עוד דרכים לשתף"
   },
   "errors": {
     "unstableConnection": "החיבור מתנדנד - מחזירים אותך...",

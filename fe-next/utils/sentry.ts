@@ -164,6 +164,8 @@ const EXPECTED_ERROR_PATTERNS = [
   /username taken/i,
   /room not found/i,
   /game not found/i,
+  /game code already/i,
+  /already in use/i,
   /already referred/i,
   /cannot refer yourself/i,
 

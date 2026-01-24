@@ -313,7 +313,7 @@ describe('AdventureGrid Selection', () => {
       const cells = screen.getAllByRole('gridcell');
       // Selected cells should have selection visual indicator
       expect(cells[0]).toHaveClass('tile-selected-enhanced');
-      expect(cells[0]).toHaveClass('z-10'); // Elevated z-index
+      expect(cells[0]).toHaveClass('z-20'); // Higher z-index for better layering
     });
 
     it('should show sparkle effect when cell is first selected', () => {
@@ -382,7 +382,8 @@ describe('AdventureGrid Selection', () => {
 
       // THEN
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[0]).toHaveClass('ring-2');
+      // Enhanced selection with thicker ring (ring-4) for better visibility
+      expect(cells[0]).toHaveClass('ring-4');
       expect(cells[0]).toHaveClass('ring-neo-lime');
     });
   });

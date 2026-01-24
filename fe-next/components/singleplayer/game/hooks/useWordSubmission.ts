@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
+import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ComboSystemReturn } from '@/hooks/useComboSystem';
@@ -185,6 +186,7 @@ export function useWordSubmission({
       hapticError();
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       combo.resetCombo();
+      recordNotOnBoard(normalizedWord, language, 'single_player');
       return;
     }
 
@@ -291,6 +293,7 @@ export function useWordSubmission({
             word: normalizedWord.toUpperCase(),
             timestamp: now,
           });
+          recordNotInDictionary(normalizedWord, language, 'single_player');
         }
       })
       .catch(() => {

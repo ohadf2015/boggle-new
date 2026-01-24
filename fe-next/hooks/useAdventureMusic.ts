@@ -221,7 +221,9 @@ export function useAdventureMusic({
         logger.log(`[AdventureMusic] Failed to load ${trackName}:`, err);
       },
       onplayerror: (id, err) => {
-        logger.error(`[AdventureMusic] Failed to play ${trackName}:`, err);
+        // Log at info level - audio playback can fail on some mobile devices due to autoplay policies
+        // This is a non-critical feature, game works fine without music
+        logger.log(`[AdventureMusic] Failed to play ${trackName}:`, err);
         // Try to resume AudioContext
         if (Howler.ctx && Howler.ctx.state === 'suspended') {
           Howler.ctx.resume().catch(() => {});

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 /**
  * Hook to track container dimensions and only render when valid
@@ -10,76 +10,102 @@ import { useRef, useState, useEffect } from 'react';
  * - Client-side hydration check to avoid SSR/hydration dimension mismatches
  * - Delayed initial measurement to allow layout to stabilize
  * - Multiple measurement attempts for mobile browsers with slow layout
- * - Extended delays for framer-motion animations
+ * - Extended delays for framer-motion animations (300ms+ delays on page)
  * - Uses getBoundingClientRect for more accurate dimensions
+ * - Validates dimensions are positive numbers (not NaN, not -1)
  *
- * @param minDimension - Minimum dimension required (default: 100)
+ * @param minDimension - Minimum dimension required (default: 50)
  * @returns containerRef, dimensions, and isReady flag
  */
-export function useContainerDimensions(minDimension: number = 100) {
+export function useContainerDimensions(minDimension: number = 50) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const measuredRef = useRef(false);
 
   // Hydration safety: only run dimension checks on client
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  const checkDimensions = useCallback(() => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const width = Math.floor(rect.width);
+    const height = Math.floor(rect.height);
+
+    // Strict validation: must be positive finite numbers >= minDimension
+    // This guards against -1, 0, NaN, Infinity from mobile browser edge cases
+    const isValidWidth = Number.isFinite(width) && width >= minDimension;
+    const isValidHeight = Number.isFinite(height) && height >= minDimension;
+
+    if (isValidWidth && isValidHeight) {
+      // Only update if dimensions actually changed to prevent re-renders
+      setDimensions(prev => {
+        if (prev?.width === width && prev?.height === height) {
+          return prev;
+        }
+        return { width, height };
+      });
+      measuredRef.current = true;
+    } else if (measuredRef.current) {
+      // Only reset if we had valid dimensions before (prevents flicker during mount)
+      // This handles cases where container becomes hidden/collapsed
+      setDimensions(null);
+      measuredRef.current = false;
+    }
+  }, [minDimension]);
+
   useEffect(() => {
     // Skip dimension checks during SSR/hydration
     if (!isClient) return;
 
-    const checkDimensions = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const width = Math.floor(rect.width);
-        const height = Math.floor(rect.height);
-        // Only mark as ready if dimensions are valid (>= minDimension)
-        // Also check for positive values to prevent -1 errors from Recharts
-        // Mobile browsers can report -1 or 0 during layout transitions
-        if (width > 0 && height > 0 && width >= minDimension && height >= minDimension) {
-          setDimensions({ width, height });
-        } else {
-          // Reset if dimensions become invalid (including -1 from mobile browsers)
-          setDimensions(null);
-        }
-      }
-    };
+    // Initial delay: 350ms to account for framer-motion animations (up to 0.3s delay + 0.3s duration)
+    // This is critical for mobile Chrome Android which has slow layout reflows
+    const initialDelay = setTimeout(checkDimensions, 350);
 
-    // Delay initial check to allow layout to settle after animations
-    // Using 150ms to allow framer-motion entrance animations to complete
-    // This is especially important for mobile Chrome where layout can be slow
-    const initialDelay = setTimeout(checkDimensions, 150);
+    // Secondary check after 500ms for very slow devices
+    const secondaryDelay = setTimeout(checkDimensions, 500);
 
     // Also check after multiple animation frames for slow mobile browsers
     let frameCount = 0;
-    const maxFrames = 5;
+    const maxFrames = 10; // Increased from 5 for slower devices
+    let frameId: number;
     const checkAfterFrames = () => {
       frameCount++;
       checkDimensions();
       if (frameCount < maxFrames) {
-        requestAnimationFrame(checkAfterFrames);
+        frameId = requestAnimationFrame(checkAfterFrames);
       }
     };
-    const frameId = requestAnimationFrame(checkAfterFrames);
+    frameId = requestAnimationFrame(checkAfterFrames);
 
     // Set up resize observer for dynamic changes
-    const observer = new ResizeObserver(checkDimensions);
+    const observer = new ResizeObserver(() => {
+      // Debounce resize observer callbacks
+      requestAnimationFrame(checkDimensions);
+    });
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }
 
     // Add polling as fallback for edge cases (reduced frequency)
-    const pollInterval = setInterval(checkDimensions, 250);
+    // Stop polling once dimensions are valid to save battery on mobile
+    const pollInterval = setInterval(() => {
+      if (!measuredRef.current) {
+        checkDimensions();
+      }
+    }, 300);
 
     return () => {
       clearTimeout(initialDelay);
+      clearTimeout(secondaryDelay);
       cancelAnimationFrame(frameId);
       observer.disconnect();
       clearInterval(pollInterval);
     };
-  }, [isClient, minDimension]);
+  }, [isClient, checkDimensions]);
 
   return { containerRef, dimensions, isReady: isClient && dimensions !== null };
 }

@@ -10,6 +10,8 @@
  */
 
 import { useState, useCallback, useMemo, useRef } from 'react';
+import { recordNotInDictionary } from '@/utils/invalidWordTracker';
+import type { Language } from '@/types';
 
 // ==============================================
 // TYPES
@@ -271,6 +273,8 @@ export function useAdventureWordValidation({
           };
           setLastValidationResult(result);
           setIsValidating(false);
+          // Track invalid word for admin review
+          recordNotInDictionary(word, language as Language, 'adventure');
           return result;
         }
       } catch (error) {

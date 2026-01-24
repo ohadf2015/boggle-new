@@ -504,9 +504,9 @@ const AdventureGrid = memo(
                   scale: 0.8,
                 } : undefined}
                 animate={{
-                  y: isSelected ? -2 : 0,
+                  y: isSelected ? -4 : 0,
                   opacity: 1,
-                  scale: isSelected ? 1.1 : 1,
+                  scale: isSelected ? 1.15 : 1,
                   rotate: isSelected && !prefersReducedMotion ? [0, -2, 2, 0] : 0,
                 }}
                 transition={
@@ -559,8 +559,14 @@ const AdventureGrid = memo(
 
                   // State classes
                   tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
-                  // Enhanced selection: bright ring + glow shadow for visibility
-                  isSelected && 'tile-selected-enhanced ring-2 ring-neo-lime z-10 shadow-[0_0_16px_rgba(191,255,0,0.7)]',
+                  // Enhanced selection: thick ring + outline + glow + pulsing animation
+                  isSelected && [
+                    'tile-selected-enhanced',
+                    'ring-4 ring-neo-lime',
+                    'outline outline-[3px] outline-neo-black',
+                    'z-20',
+                    'shadow-[0_0_24px_rgba(191,255,0,0.9),0_0_48px_rgba(191,255,0,0.5)]',
+                  ],
                   tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
 
                   // Bomb row preview: highlight tiles in bomb's row when bomb is selected
@@ -778,18 +784,24 @@ const AdventureGrid = memo(
 
                 {/* Bomb icon badge */}
                 {tile.type === 'bomb' && (
-                  <div
-                    className={cn(
-                      'absolute -top-1 -right-1 z-20',
-                      'w-5 h-5',
-                      'flex items-center justify-center',
-                      'bg-neo-black rounded-full',
-                      'border-2 border-orange-500',
-                      'shadow-[0_0_8px_rgba(255,100,0,0.6)]'
-                    )}
-                  >
-                    <Bomb className="w-3 h-3 text-neo-yellow" />
-                  </div>
+                  <>
+                    <div
+                      className={cn(
+                        'absolute -top-1 -right-1 z-20',
+                        'w-5 h-5',
+                        'flex items-center justify-center',
+                        'bg-neo-black rounded-full',
+                        'border-2 border-orange-500',
+                        'shadow-[0_0_8px_rgba(255,100,0,0.6)]'
+                      )}
+                    >
+                      <Bomb className="w-3 h-3 text-neo-yellow" />
+                    </div>
+                    {/* Row indicator - shows bomb clears entire row */}
+                    <div className="tile-bomb-row-indicator">
+                      <span />
+                    </div>
+                  </>
                 )}
 
                 {/* Chain link badge */}

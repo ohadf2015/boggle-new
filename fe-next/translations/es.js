@@ -334,7 +334,14 @@ const es = {
     "sms": "SMS",
     "discordCopied": "¡Copiado para Discord! Pega en tu servidor 💬",
     "morePlatforms": "Más plataformas",
-    "lessOptions": "Menos opciones"
+    "lessOptions": "Menos opciones",
+    "joinInstructions": "Ve a lexiclash.com e ingresa el código",
+    "showQrCode": "Mostrar código QR",
+    "hideQrCode": "Ocultar código QR",
+    "scanQrCode": "Escanea para unirte al instante",
+    "orShareVia": "O comparte por",
+    "telegram": "Telegram",
+    "moreWays": "Más formas de compartir"
   },
   "errors": {
     "unstableConnection": "La conexión tambalea - te reconectamos...",

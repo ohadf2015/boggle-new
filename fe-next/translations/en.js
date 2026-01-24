@@ -334,7 +334,14 @@ const en = {
     "sms": "SMS",
     "discordCopied": "Copied for Discord! Paste in your server 💬",
     "morePlatforms": "More platforms",
-    "lessOptions": "Less options"
+    "lessOptions": "Less options",
+    "joinInstructions": "Go to lexiclash.com and enter code",
+    "showQrCode": "Show QR Code",
+    "hideQrCode": "Hide QR Code",
+    "scanQrCode": "Scan to join instantly",
+    "orShareVia": "Or share via",
+    "telegram": "Telegram",
+    "moreWays": "More ways to share"
   },
   "errors": {
     "unstableConnection": "Connection's wobbling - getting you back in...",
