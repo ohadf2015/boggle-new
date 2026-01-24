@@ -559,15 +559,16 @@ export async function updateProgress(
       const wordsAttempted = existing.words_attempted || {};
       const currentAttempt = wordsAttempted[word] || { attempts: 0, correct: 0, lastAttemptAt: now };
 
+      // If incorrect, reset the "correct" streak counter (3 correct IN A ROW)
       const updatedAttempt: WordAttempt = {
         attempts: currentAttempt.attempts + 1,
-        correct: currentAttempt.correct + (correct ? 1 : 0),
+        correct: correct ? currentAttempt.correct + 1 : 0,  // Reset on incorrect
         lastAttemptAt: now
       };
 
       wordsAttempted[word] = updatedAttempt;
 
-      // Check if word should be marked as mastered (3+ correct attempts)
+      // Check if word should be marked as mastered (3 correct IN A ROW)
       const wordsMastered = existing.words_mastered || [];
       if (correct && updatedAttempt.correct >= 3 && !wordsMastered.includes(word)) {
         wordsMastered.push(word);
@@ -599,7 +600,7 @@ export async function updateProgress(
         }
       };
 
-      const wordsMastered = correct ? [] : []; // Need 3 correct for mastery
+      const wordsMastered = []; // Need 3 correct IN A ROW for mastery
 
       const { data: created, error: createError } = await supabase
         .from('student_lesson_progress')

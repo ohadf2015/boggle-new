@@ -380,9 +380,9 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
                 )}
               </AnimatePresence>
 
-              {/* Mastery celebration */}
+              {/* Mastery celebration (shows when reaching 3 correct in a row) */}
               <AnimatePresence>
-                {showFeedback && isCorrect && currentWord && currentWord.correctAttempts >= 2 && (
+                {showFeedback && isCorrect && currentWord && currentWord.isMastered && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
