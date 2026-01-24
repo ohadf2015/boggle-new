@@ -26,6 +26,7 @@ const {
 } = require('./engagementHandler');
 const { registerEarthquakeHandlers, clearGameEarthquakeState } = require('./earthquakeHandler');
 const { registerScorecardHandlers } = require('./scorecardHandler');
+const { registerVocabularyHandlers } = require('./vocabularyHandler');
 const {
   startGameTimer,
   endGame,
@@ -54,6 +55,10 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerEngagementHandlers(io, socket);
   registerEarthquakeHandlers(io, socket);
   registerScorecardHandlers(io, socket);
+  registerVocabularyHandlers(socket, (code: string) => {
+    const { getGame } = require('../modules/gameStateManager');
+    return getGame(code);
+  });
 }
 
 module.exports = {
@@ -76,6 +81,7 @@ module.exports = {
   registerEngagementHandlers,
   registerEarthquakeHandlers,
   registerScorecardHandlers,
+  registerVocabularyHandlers,
 
   // Engagement utilities (for use in other handlers)
   processGameEndEngagement,
@@ -111,6 +117,7 @@ export {
   registerEngagementHandlers,
   registerEarthquakeHandlers,
   registerScorecardHandlers,
+  registerVocabularyHandlers,
   processGameEndEngagement,
   processLongWordEngagement,
   processAchievementEngagement,
