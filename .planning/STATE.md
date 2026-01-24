@@ -3,18 +3,18 @@
 ## Current Position
 
 **Phase:** 11 of 11 (teacher-vocabulary-builder)
-**Plan:** 02 of 05 (Word Integration Check)
+**Plan:** 03 of 05 (Data Fetching Hooks)
 **Status:** In progress
-**Last activity:** 2026-01-24 - Completed 11-02-PLAN.md
+**Last activity:** 2026-01-24 - Completed 11-03-PLAN.md
 
-**Progress:** ██░░░░░░░░░░░░░░░░░░ 40% (Phase 11 - 2/5 plans complete)
+**Progress:** ███░░░░░░░░░░░░░░░░░ 60% (Phase 11 - 3/5 plans complete)
 
 ## Recent Completions
 
 ### Phase 11: Teacher Vocabulary Builder (IN PROGRESS)
 - ✅ **11-01**: Database schema (5 tables, 27 RLS policies, role-based access)
 - ✅ **11-02**: Word integration check (TDD hook, 100% coverage, 22 tests)
-- ⏳ **11-03**: Frontend UI (teacher dashboard, classroom management)
+- ✅ **11-03**: Data fetching hooks (4 hooks, Supabase queries, optimistic updates)
 - ⏳ **11-04**: Student features (join classroom, practice lessons)
 - ⏳ **11-05**: Integration and testing
 
@@ -25,6 +25,10 @@
 - **Access control**: 27 RLS policies for granular permissions
 - **Word validation hook**: checkWordIntegration with 100% test coverage
 - **Multi-language support**: Validates words in 4 languages (en, he, sv, ja, es)
+- **Data layer**: 14 Supabase query functions, 6 React hooks
+- **Teacher hooks**: useClassrooms, useClassroom, useLessons, useLesson
+- **Student hooks**: useJoinClassroom, useStudentProgress, useClassProgress, useLessonStats
+- **Optimistic updates**: All mutations update UI instantly before server confirmation
 
 ### Phase 10: Bug Fixes & Stabilization (COMPLETE)
 - ✅ **10-01**: Bug discovery and research (10 bugs identified)
@@ -44,6 +48,10 @@
 | teacher-vocab-005 | Treat dictionary-not-loaded (null) as not-integrable | Safer default - prevents unintegrable words from being flagged as integrable | 11-02 | Word Validation |
 | teacher-vocab-006 | Validate in order - empty > length > dictionary | Performance optimization - fast checks first, expensive dictionary lookup last | 11-02 | Performance |
 | teacher-vocab-007 | Export both standalone function and React hook | Flexibility for different usage contexts (utils vs components) | 11-02 | API Design |
+| teacher-vocab-008 | Use custom hooks with useState/useCallback instead of React Query | Project doesn't use React Query; follows existing patterns (useFriends, useCoins) | 11-03 | Data Fetching |
+| teacher-vocab-009 | Implement optimistic updates in all mutation hooks | Provides instant UI feedback while maintaining data consistency | 11-03 | UX |
+| teacher-vocab-010 | Mastery threshold is 3+ correct attempts per word | Balances between too easy (1 correct) and too strict (5+ correct) | 11-03 | Progress Tracking |
+| teacher-vocab-011 | Separate hooks for lists vs single items (useClassrooms vs useClassroom) | Follows React best practices and allows focused state management | 11-03 | Architecture |
 | multilang-001 | Use document.documentElement.lang and .dir for language/direction testing | Standard DOM API for verifying language and text direction settings | 10-04 | Testing |
 | multilang-002 | Test character length with .length property for all languages | JavaScript .length correctly counts Unicode characters for Hebrew, Japanese, Swedish | 10-04 | Testing |
 | multilang-003 | Verify RTL shadow flipping via CSS [dir='rtl'] selectors | CSS handles shadow direction changes automatically, tests verify attribute is set | 10-04 | Testing |
@@ -62,9 +70,9 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Session Continuity
 
-**Last session:** 2026-01-24 09:00 UTC
-**Stopped at:** Completed 11-02-PLAN.md (Word Integration Check)
-**Resume file:** None (ready for 11-03)
+**Last session:** 2026-01-24 11:05 UTC
+**Stopped at:** Completed 11-03-PLAN.md (Data Fetching Hooks)
+**Resume file:** None (ready for 11-04)
 
 ## Key Metrics
 
@@ -79,6 +87,10 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Tech Stack Additions
 
+### Phase 11-03
+- **Hook patterns**: Custom hooks with useState/useCallback, optimistic updates, useMounted pattern
+- **Data fetching**: Supabase query utilities, error handling, state management
+
 ### Phase 11-02
 - **Testing patterns**: TDD with RED-GREEN-REFACTOR, Jest mocking, Given-When-Then structure
 - **Validation patterns**: Early returns, validation order optimization, multi-language support
@@ -91,7 +103,7 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Brief Alignment Status
 
-**Phase 11: IN PROGRESS (40% complete)**
+**Phase 11: IN PROGRESS (60% complete)**
 
 **Completed:**
 - ✅ Database schema with 5 tables
@@ -100,12 +112,14 @@ All critical bugs fixed in Phase 10 Wave 1.
 - ✅ Auto-generated join codes
 - ✅ Word integration check hook (TDD, 100% coverage)
 - ✅ Multi-language word validation (en, he, sv, ja, es)
+- ✅ Data fetching layer (14 Supabase queries, 6 React hooks)
+- ✅ Optimistic updates for all mutations
+- ✅ Progress tracking with mastery threshold (3+ correct)
 
 **Next Steps:**
-- ⏳ Teacher dashboard UI (11-03)
 - ⏳ Student features (11-04)
 - ⏳ Integration and testing (11-05)
 
 **Blockers:** None
 
-Ready to proceed with teacher dashboard UI implementation.
+Ready to proceed with student features implementation.
