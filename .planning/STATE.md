@@ -3,16 +3,17 @@
 ## Current Position
 
 **Phase:** 12 of 13 (Asset WebP Migration Completion)
-**Plan:** 01 of 01 (Background and Parallax Restoration)
-**Status:** Plan complete
-**Last activity:** 2026-01-24 - Completed 12-01-PLAN.md
+**Plan:** 02 of 03 (Git Configuration and Migration Verification)
+**Status:** In progress
+**Last activity:** 2026-01-24 - Completed 12-02-PLAN.md
 
-**Progress:** █████████████████████ 100% (Phase 12 - 1/1 plans complete)
+**Progress:** █████████████████████ 67% (Phase 12 - 2/3 plans complete)
 
 ## Recent Completions
 
-### Phase 12: Asset WebP Migration Completion (COMPLETE)
+### Phase 12: Asset WebP Migration Completion (IN PROGRESS)
 - ✅ **12-01**: Background and parallax restoration (11 WebP files, 3 backgrounds, 8 parallax layers)
+- ✅ **12-02**: Git configuration and migration verification (backup folders gitignored, zero stale .png refs)
 
 ### Phase 11: Teacher Vocabulary Builder (COMPLETE)
 - ✅ **11-01**: Database schema (5 tables, 27 RLS policies, role-based access)
@@ -76,6 +77,7 @@
 | multilang-001 | Use document.documentElement.lang and .dir for language/direction testing | Standard DOM API for verifying language and text direction settings | 10-04 | Testing |
 | multilang-002 | Test character length with .length property for all languages | JavaScript .length correctly counts Unicode characters for Hebrew, Japanese, Swedish | 10-04 | Testing |
 | multilang-003 | Verify RTL shadow flipping via CSS [dir='rtl'] selectors | CSS handles shadow direction changes automatically, tests verify attribute is set | 10-04 | Testing |
+| asset-webp-001 | Use specific backup folder paths in .gitignore (not broad wildcards) | Explicit paths like public/images/adventure-png-backup/ prevent accidental exclusions | 12-02 | Git, Asset Management |
 
 ## Blockers & Concerns
 
@@ -91,8 +93,8 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Session Continuity
 
-**Last session:** 2026-01-24 13:40 UTC
-**Stopped at:** Completed 12-01-PLAN.md (Background and Parallax Restoration) - Phase 12 complete
+**Last session:** 2026-01-24 13:44 UTC
+**Stopped at:** Completed 12-02-PLAN.md (Git Configuration and Migration Verification)
 **Resume file:** None
 
 ## Key Metrics
