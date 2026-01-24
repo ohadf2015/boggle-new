@@ -3,11 +3,11 @@
 ## Current Position
 
 **Phase:** 11 of 11 (teacher-vocabulary-builder)
-**Plan:** 04 of 05 (Socket Event Handlers)
+**Plan:** 05 of 06 (Host Word Selector)
 **Status:** In progress
-**Last activity:** 2026-01-24 - Completed 11-04-PLAN.md
+**Last activity:** 2026-01-24 - Completed 11-06-PLAN.md
 
-**Progress:** ████░░░░░░░░░░░░░░░░ 80% (Phase 11 - 4/5 plans complete)
+**Progress:** █████░░░░░░░░░░░░░░░ 83% (Phase 11 - 5/6 plans complete)
 
 ## Recent Completions
 
@@ -16,7 +16,9 @@
 - ✅ **11-02**: Word integration check (TDD hook, 100% coverage, 22 tests)
 - ✅ **11-03**: Data fetching hooks (4 hooks, Supabase queries, optimistic updates)
 - ✅ **11-04**: Socket event handlers (vocabulary selection, TDD, 10 tests)
-- ⏳ **11-05**: Integration and testing
+- ✅ **11-05**: Teacher dashboard (Wave 4 components)
+- ✅ **11-06**: Host word selector (multiplayer results UI)
+- ⏳ **11-07**: Integration and testing
 
 ### Phase 11 Deliverables (So Far)
 - **Database schema**: 5 tables with RLS policies
@@ -30,6 +32,8 @@
 - **Student hooks**: useJoinClassroom, useStudentProgress, useClassProgress, useLessonStats
 - **Optimistic updates**: All mutations update UI instantly before server confirmation
 - **Socket handlers**: Vocabulary word selection with host validation and integration checks
+- **Teacher dashboard**: Complete Wave 4 UI components (classroom/lesson management, progress tracking)
+- **Host word selector**: Multiplayer results UI for vocabulary word selection with integration status
 
 ### Phase 10: Bug Fixes & Stabilization (COMPLETE)
 - ✅ **10-01**: Bug discovery and research (10 bugs identified)
@@ -56,6 +60,10 @@
 | teacher-vocab-012 | Socket handlers use getGameBySocketId to find game context | Consistent with multiplayer patterns, no need to pass gameCode in payload | 11-04 | Socket Architecture |
 | teacher-vocab-013 | selectedVocabulary stored as Set<string> for O(1) lookups | Performance optimization for frequent add/remove/has operations | 11-04 | Data Structure |
 | teacher-vocab-014 | Words stored in original case (not normalized) for teacher UI | Maintains game context, normalization happens in checkWordIntegration | 11-04 | Data Representation |
+| teacher-vocab-015 | Only show word selector to hosts who are teachers when game is finished | Prevents students/non-teachers from accessing teacher tools | 11-06 | UI Visibility |
+| teacher-vocab-016 | Sort words by score (highest first) in word selector | Prioritizes high-value vocabulary for teacher review | 11-06 | UX |
+| teacher-vocab-017 | Use checkmark/warning icons to indicate integration status | Visual indicators show which words can be embedded in grids vs track-only | 11-06 | UI Design |
+| teacher-vocab-018 | Show selected word count in save button | "Save as Lesson (3)" provides clarity on how many words will be saved | 11-06 | UX |
 | multilang-001 | Use document.documentElement.lang and .dir for language/direction testing | Standard DOM API for verifying language and text direction settings | 10-04 | Testing |
 | multilang-002 | Test character length with .length property for all languages | JavaScript .length correctly counts Unicode characters for Hebrew, Japanese, Swedish | 10-04 | Testing |
 | multilang-003 | Verify RTL shadow flipping via CSS [dir='rtl'] selectors | CSS handles shadow direction changes automatically, tests verify attribute is set | 10-04 | Testing |
@@ -74,9 +82,9 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Session Continuity
 
-**Last session:** 2026-01-24 09:12 UTC
-**Stopped at:** Completed 11-04-PLAN.md (Socket Event Handlers)
-**Resume file:** None (ready for 11-05)
+**Last session:** 2026-01-24 09:22 UTC
+**Stopped at:** Completed 11-06-PLAN.md (Host Word Selector)
+**Resume file:** None (ready for 11-07)
 
 ## Key Metrics
 
@@ -112,7 +120,7 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Brief Alignment Status
 
-**Phase 11: IN PROGRESS (80% complete)**
+**Phase 11: IN PROGRESS (83% complete)**
 
 **Completed:**
 - ✅ Database schema with 5 tables
@@ -127,9 +135,11 @@ All critical bugs fixed in Phase 10 Wave 1.
 - ✅ Socket event handlers for vocabulary selection (TDD, 10 tests)
 - ✅ Host validation and game state validation
 - ✅ Integration with checkWordIntegration for canIntegrate status
+- ✅ Teacher dashboard (Wave 4 components)
+- ✅ Host word selector UI in multiplayer results
 
 **Next Steps:**
-- ⏳ Integration and testing (11-05)
+- ⏳ Integration and testing (11-07)
 
 **Blockers:** None
 
