@@ -3762,6 +3762,48 @@ const en = {
       }
     }
   },
+  "student": {
+    "dashboard": {
+      "title": "My Lessons",
+      "subtitle": "Practice vocabulary and track your progress"
+    },
+    "lessons": {
+      "lesson": "Lesson",
+      "words": "Words",
+      "mastered": "Mastered",
+      "practice": "Practice",
+      "review": "Review",
+      "empty": {
+        "title": "No lessons assigned yet",
+        "subtitle": "Join a classroom to get started with vocabulary practice"
+      },
+      "sort": {
+        "recent": "Recent",
+        "progress": "Progress"
+      }
+    },
+    "practice": {
+      "title": "Practice Mode",
+      "definition": "Definition",
+      "yourAnswer": "Your answer",
+      "submit": "Submit",
+      "next": "Next Word",
+      "correct": "Correct!",
+      "incorrect": "Try again",
+      "hint": "Hint",
+      "skip": "Skip",
+      "complete": {
+        "title": "Lesson Complete!",
+        "subtitle": "You've mastered all words",
+        "backToLessons": "Back to Lessons"
+      },
+      "progress": {
+        "wordsLeft": "{{count}} words left",
+        "streak": "{{count}} streak",
+        "mastered": "Mastered!"
+      }
+    }
+  },
   "teacher": {
     "accessRequired": "Teacher Access Required",
     "accessDenied": "You need teacher privileges to access this page.",
