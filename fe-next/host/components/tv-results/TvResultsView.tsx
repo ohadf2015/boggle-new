@@ -3,6 +3,7 @@
 import { memo, useMemo, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Maximize, Minimize } from 'lucide-react';
+import { Socket } from 'socket.io-client';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
 import TvResultsStatsGrid from './TvResultsStatsGrid';
 import TvResultsAwards from './TvResultsAwards';
@@ -10,6 +11,7 @@ import TvResultsLeaderboard from './TvResultsLeaderboard';
 import TvResultsControls from './TvResultsControls';
 import TournamentStandings from '../../../components/TournamentStandings';
 import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
+import { HostWordSelector } from '../../../components/multiplayer/HostWordSelector';
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
 import { cn } from '../../../lib/utils';
@@ -17,6 +19,7 @@ import { useSoundEffects } from '../../../contexts/SoundEffectsContext';
 import { useMusic } from '../../../contexts/MusicContext';
 import type { PlayerResult } from '@/types/components';
 import type { TournamentStanding } from '@/shared/types/game';
+import type { Language } from '@/shared/types';
 
 // Sound paths for results
 const RESULTS_SOUNDS: Record<SoundType, string> = {
@@ -53,6 +56,16 @@ interface TvResultsViewProps {
   /** Optional close handler - reserved for future use */
   onClose?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** Socket.IO client instance for vocabulary selection */
+  socket?: Socket | null;
+  /** Game code for vocabulary selection */
+  gameCode?: string;
+  /** Game language */
+  language?: Language;
+  /** Whether current user is a teacher */
+  isTeacher?: boolean;
+  /** All words found during the game */
+  allWords?: Array<{ word: string; score: number; foundBy?: string[] }>;
 }
 
 /**
@@ -71,6 +84,11 @@ const TvResultsView = memo<TvResultsViewProps>(({
   onShowQR,
   onClose: _onClose,
   t,
+  socket = null,
+  gameCode = '',
+  language = 'en',
+  isTeacher = false,
+  allWords = [],
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { sfxMuted, sfxVolume } = useSoundEffects();
@@ -337,6 +355,23 @@ const TvResultsView = memo<TvResultsViewProps>(({
                   isHost={true}
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Teacher Word Selector - Only for teachers */}
+        {isTeacher && allWords.length > 0 && (
+          <div className="px-8 py-4">
+            <div className="max-w-6xl mx-auto">
+              <HostWordSelector
+                socket={socket}
+                gameCode={gameCode}
+                language={language}
+                isHost={true}
+                gameState="finished"
+                allWords={allWords}
+                t={t}
+              />
             </div>
           </div>
         )}
