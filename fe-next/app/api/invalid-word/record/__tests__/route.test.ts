@@ -108,7 +108,7 @@ describe('Record Invalid Word API Logic', () => {
     });
 
     it('should not skip not_in_dictionary reason', () => {
-      const reason = 'not_in_dictionary';
+      const reason: string = 'not_in_dictionary';
       const shouldSkip = reason === 'too_short';
       expect(shouldSkip).toBe(false);
     });
