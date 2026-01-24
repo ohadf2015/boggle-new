@@ -60,16 +60,26 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
     }));
   }, [lesson, currentProgress]);
 
-  // Prioritize unmastered words, randomize within categories
-  const practiceWords = useMemo(() => {
+  // Prioritize unmastered words, then mastered (randomized once on mount)
+  const [practiceWords, setPracticeWords] = useState<typeof wordList>([]);
+
+  useEffect(() => {
+    if (wordList.length === 0) return;
+
     const unmastered = wordList.filter((w) => !w.isMastered);
     const mastered = wordList.filter((w) => w.isMastered);
 
-    // Randomize unmastered words
-    const shuffledUnmastered = [...unmastered].sort(() => Math.random() - 0.5);
-    const shuffledMastered = [...mastered].sort(() => Math.random() - 0.5);
+    // Fisher-Yates shuffle
+    const shuffleArray = <T,>(array: T[]): T[] => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
 
-    return [...shuffledUnmastered, ...shuffledMastered];
+    setPracticeWords([...shuffleArray(unmastered), ...shuffleArray(mastered)]);
   }, [wordList]);
 
   const currentWord = practiceWords[currentWordIndex];
@@ -83,6 +93,19 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
       setShowCompletion(true);
     }
   }, [totalWords, masteredCount, showCompletion]);
+
+  // Handle next word
+  const handleNext = useCallback(() => {
+    setShowFeedback(false);
+    setAnswer('');
+
+    if (currentWordIndex < practiceWords.length - 1) {
+      setCurrentWordIndex((prev) => prev + 1);
+    } else {
+      // Loop back to start
+      setCurrentWordIndex(0);
+    }
+  }, [currentWordIndex, practiceWords.length]);
 
   // Handle answer submission
   const handleSubmit = useCallback(
@@ -129,21 +152,8 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
         handleNext();
       }, 1500);
     },
-    [currentWord, answer, isChecking, lessonId, recordAttempt, t]
+    [currentWord, answer, isChecking, lessonId, recordAttempt, t, handleNext]
   );
-
-  // Handle next word
-  const handleNext = useCallback(() => {
-    setShowFeedback(false);
-    setAnswer('');
-
-    if (currentWordIndex < practiceWords.length - 1) {
-      setCurrentWordIndex((prev) => prev + 1);
-    } else {
-      // Loop back to start
-      setCurrentWordIndex(0);
-    }
-  }, [currentWordIndex, practiceWords.length]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
