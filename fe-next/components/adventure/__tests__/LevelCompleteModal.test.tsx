@@ -262,13 +262,27 @@ describe('LevelCompleteModal', () => {
       expect(container.querySelector('.celebration-effect')).toBeInTheDocument();
     });
 
-    it('should NOT show celebration effect for less than 3 stars', () => {
-      // GIVEN / WHEN
+    it('should show celebration effect for 1-2 stars (scaled down)', () => {
+      // GIVEN / WHEN - 2 stars should show celebration with green particles
       const { container } = render(
         <LevelCompleteModal {...defaultProps} stars={2} />
       );
 
-      // THEN
+      // THEN - celebration effect shows for any star completion
+      const celebrationEffect = container.querySelector('.celebration-effect');
+      expect(celebrationEffect).toBeInTheDocument();
+      // Particles should be green for 2 stars (not yellow like 3 stars)
+      const particles = celebrationEffect?.querySelectorAll('.bg-neo-lime');
+      expect(particles?.length).toBeGreaterThan(0);
+    });
+
+    it('should NOT show celebration effect for 0 stars (failed)', () => {
+      // GIVEN / WHEN
+      const { container } = render(
+        <LevelCompleteModal {...defaultProps} stars={0} />
+      );
+
+      // THEN - no celebration for failed levels
       expect(container.querySelector('.celebration-effect')).not.toBeInTheDocument();
     });
 

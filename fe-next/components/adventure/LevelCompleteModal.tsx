@@ -96,19 +96,26 @@ const StarDisplay = memo<{ filled: boolean; index: number }>(
         'transition-all duration-300'
       )}
       initial={{ scale: 0, rotate: -180 }}
-      animate={{ scale: 1, rotate: 0 }}
+      animate={filled ? {
+        scale: [0, 1.3, 1], // Overshoot for pop effect
+        rotate: [180, -10, 0]
+      } : {
+        scale: 1,
+        rotate: 0
+      }}
       transition={{
-        delay: 0.3 + index * 0.2,
+        delay: 0.4 + index * 0.25, // Slightly longer stagger for emphasis
         type: 'spring',
-        stiffness: 200,
-        damping: 15,
+        stiffness: 180,
+        damping: 12,
+        bounce: 0.6, // More bounce for celebratory feel
       }}
     >
       <Star
         className={cn(
           'w-12 h-12 md:w-16 md:h-16',
           filled
-            ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.8)]'
+            ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_15px_rgba(255,225,53,0.9)]'
             : 'text-neo-white/30 fill-transparent'
         )}
       />
@@ -176,13 +183,17 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             'bg-neo-black/80 backdrop-blur-sm'
           )}
         >
-          {/* Celebration particles for perfect score */}
-          {isPerfect && (
+          {/* Celebration particles for any star completion (scaled by star count) */}
+          {stars > 0 && (
             <div className="celebration-effect absolute inset-0 pointer-events-none overflow-hidden">
-              {particleConfigs.map((config, i) => (
+              {particleConfigs.slice(0, Math.floor(PARTICLE_COUNT * (stars / 3))).map((config, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-2 h-2 rounded-full bg-neo-yellow"
+                  className={cn(
+                    'absolute w-2 h-2 rounded-full',
+                    // Color varies based on stars
+                    isPerfect ? 'bg-neo-yellow' : stars === 2 ? 'bg-neo-lime' : 'bg-neo-cyan'
+                  )}
                   initial={{
                     x: '50vw',
                     y: '50vh',
@@ -196,7 +207,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   transition={{
                     duration: 2,
                     delay: config.delay,
-                    repeat: Infinity,
+                    repeat: isPerfect ? Infinity : 0, // Only loop for perfect
                     repeatDelay: config.repeatDelay,
                   }}
                 />
@@ -345,10 +356,10 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     'bg-neo-lime text-neo-black',
                     'font-black text-lg',
                     'border-3 border-neo-black rounded-neo',
-                    'shadow-hard hover:shadow-hard-sm',
-                    'transition-all duration-200',
-                    'hover:translate-x-[2px] hover:translate-y-[2px]',
-                    'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none'
+                    'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
+                    'active:translate-y-0.5 active:shadow-hard-pressed',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                    'transition-all duration-200'
                   )}
                 >
                   {t('adventure.continueToNext')}
@@ -367,10 +378,10 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     : 'bg-neo-white/10 text-neo-white',
                   'font-black text-lg',
                   'border-3 border-neo-black rounded-neo',
-                  'shadow-hard hover:shadow-hard-sm',
-                  'transition-all duration-200',
-                  'hover:translate-x-[2px] hover:translate-y-[2px]',
-                  'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none'
+                  'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                  'transition-all duration-200'
                 )}
               >
                 <RotateCcw className="w-5 h-5" />
@@ -385,8 +396,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   'flex items-center justify-center gap-2',
                   'bg-transparent text-neo-white/70',
                   'font-bold text-base',
-                  'hover:text-neo-white',
-                  'transition-colors duration-200'
+                  'hover:text-neo-white hover:bg-neo-white/5',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
+                  'rounded-neo transition-all duration-200'
                 )}
               >
                 <LogOut className="w-4 h-4" />

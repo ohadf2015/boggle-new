@@ -643,10 +643,10 @@ const AdventureGame = memo<AdventureGameProps>(
             className={cn(
               'flex-shrink-0 lg:w-64 flex flex-col gap-4',
               'lg:border-l-2 lg:border-neo-black/20 lg:pl-4',
-              // Glass effect for better visibility over world backgrounds
+              // Enhanced glass effect with higher opacity for better readability
               'p-4 rounded-neo',
-              'bg-neo-navy/85 backdrop-blur-md',
-              'border-2 border-neo-white/15',
+              'bg-neo-navy/95 backdrop-blur-lg',
+              'border-2 border-neo-white/20',
               'shadow-hard'
             )}
           >
@@ -700,7 +700,9 @@ const AdventureGame = memo<AdventureGameProps>(
                   'bg-neo-lime text-neo-black',
                   'font-black text-lg',
                   'border-3 border-neo-black rounded-neo',
-                  'shadow-hard hover:shadow-hard-sm',
+                  'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                   'transition-all duration-200'
                 )}
               >
@@ -715,8 +717,9 @@ const AdventureGame = memo<AdventureGameProps>(
                   'bg-neo-white/10 text-neo-white',
                   'font-bold',
                   'border-2 border-neo-white/20 rounded-neo',
-                  'hover:bg-neo-white/20',
-                  'transition-colors duration-200'
+                  'hover:bg-neo-white/20 hover:border-neo-white/30',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
+                  'transition-all duration-200'
                 )}
               >
                 <LogOut className="w-5 h-5" />
