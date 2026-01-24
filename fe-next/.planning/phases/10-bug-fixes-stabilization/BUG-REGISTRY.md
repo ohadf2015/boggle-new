@@ -271,3 +271,111 @@ VARIABLE KEYS (8 found):
 4. Document any additional bugs discovered
 
 **Note:** Test suite is comprehensive and ready to run once infrastructure issue is resolved.
+
+---
+
+## Performance Validation Bugs (Plan 10-02)
+
+### BUG-009: Next.js 16 Turbopack Production Build Failure
+
+**Severity:** Critical
+**Status:** OPEN
+**Discovered:** 2026-01-24 (Plan 10-02)
+**Component:** Build System / Next.js 16
+**Language:** All
+
+**Steps to Reproduce:**
+1. Run `rm -rf .next && npm run build`
+2. Build compiles successfully
+3. TypeScript check passes
+4. Failure occurs during "Collecting page data" phase
+5. Error: `ENOENT: no such file or directory, open '.next/static/[hash]/_clientMiddlewareManifest.json'`
+
+**Impact:**
+- Blocks all production builds
+- Blocks Lighthouse CI performance validation
+- Blocks deployment to production
+- Prevents establishing performance baseline
+
+**Technical Details:**
+- Next.js version: 16.0.10
+- Turbopack enabled (experimental.turbopackUseSystemTlsCerts: true)
+- Occurs consistently across multiple build attempts
+- Compilation succeeds but static generation fails
+- Also occurs with Turbopack disabled (NEXT_DISABLE_TURBOPACK=1)
+
+**Attempted Fixes:**
+- [x] Remove `.next` directory
+- [x] Kill running processes
+- [x] Clear node_modules cache
+- [x] Disable Turbopack (still fails)
+- [x] Stop dev server completely
+- [ ] Downgrade Next.js version
+- [ ] Investigate middleware edge runtime
+- [ ] Check for conflicting webpack/turbopack configs
+
+**Workaround:** None found yet
+
+**References:**
+- Plan: 10-02-PLAN.md Task 1
+- PERFORMANCE-REPORT.md Issue 1
+- Next.js issue tracker: TBD
+
+**Fix Plan:** 10-02 or escalate to Next.js team
+
+---
+
+### BUG-010: Performance Tests Timeout Due to API Configuration
+
+**Severity:** High
+**Status:** OPEN
+**Discovered:** 2026-01-24 (Plan 10-02)
+**Component:** Testing Infrastructure / API Configuration
+**Language:** All
+
+**Steps to Reproduce:**
+1. Run `npx playwright test e2e/performance-validation.spec.ts --project=chromium`
+2. Tests navigate to `/en/daily/word-hunt`
+3. API calls fail: "Invalid API key"
+4. Page never reaches `networkidle` state
+5. Tests timeout after 60 seconds
+
+**Impact:**
+- Cannot execute memory leak detection tests
+- Cannot validate FCP performance targets
+- Cannot measure DOM node accumulation
+- Blocks performance validation entirely
+
+**Technical Details:**
+- Error: "SERVICE KEY VALIDATION FAILED: Invalid API key"
+- Failing endpoint: `/api/check-played`
+- Environment: Test environment lacks Supabase credentials
+- Also affects: Community words loading, dictionary validation
+- Timeout: 60 seconds (test times out)
+
+**Console Errors:**
+```
+[API] GOOGLE_CREDENTIALS_JSON not set - AI hints will use fallback
+[SUPABASE] SERVICE KEY VALIDATION FAILED: Invalid API key
+[CommunityWords] Error loading from database: Invalid API key
+[API] Check played error: Invalid API key
+[Daily Puzzle] Failed to save grid: TypeError: isSupabaseConfigured is not a function
+```
+
+**Attempted Fixes:**
+- [ ] Configure test environment variables
+- [ ] Mock API responses for tests
+- [ ] Use staging environment credentials
+- [ ] Modify tests to wait for specific elements instead of networkidle
+
+**Workaround:**
+Option 1: Configure Supabase credentials in test environment
+Option 2: Modify tests to mock API responses
+Option 3: Change tests to not wait for networkidle
+
+**References:**
+- Test file: `e2e/performance-validation.spec.ts`
+- Plan: 10-02-PLAN.md Task 2
+- PERFORMANCE-REPORT.md Execution Status
+
+**Fix Plan:** 10-02 (test configuration) or 10-04 (mock infrastructure)
