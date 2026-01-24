@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -24,6 +24,13 @@ import MusicControls from '@/components/MusicControls';
 
 // View state type for navigation
 type ViewState = 'worldMap' | 'levelGrid' | 'playing';
+
+// History state interface for browser back button support
+interface AdventureHistoryState {
+  adventureView: ViewState;
+  worldId?: number | null;
+  levelId?: number | null;
+}
 
 // Timer state for music hook coordination
 interface GameTimerState {
@@ -108,18 +115,84 @@ export default function AdventureView(): React.JSX.Element {
         )
       : null;
 
+  // Track if we're handling a popstate event to avoid pushing state during back nav
+  const isHandlingPopstateRef = useRef(false);
+  // Track if we've initialized history state
+  const historyInitializedRef = useRef(false);
+
+  // Push initial history state on mount (for worldMap view)
+  useEffect(() => {
+    if (typeof window === 'undefined' || historyInitializedRef.current) return;
+
+    // Replace current state with our adventure state (don't push, replace)
+    const initialState: AdventureHistoryState = {
+      adventureView: 'worldMap',
+      worldId: null,
+      levelId: null,
+    };
+    window.history.replaceState(initialState, '');
+    historyInitializedRef.current = true;
+  }, []);
+
+  // Handle browser back button (popstate event)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopstate = (event: PopStateEvent) => {
+      const state = event.state as AdventureHistoryState | null;
+
+      // If no state or not our state, let browser handle it (navigate away)
+      if (!state || !state.adventureView) {
+        return;
+      }
+
+      // Set flag to prevent pushing state during this navigation
+      isHandlingPopstateRef.current = true;
+
+      // Navigate to the state from history
+      setViewState(state.adventureView);
+      setSelectedWorld(state.worldId ?? null);
+      setSelectedLevel(state.levelId ?? null);
+
+      // Reset flag after state updates are processed
+      setTimeout(() => {
+        isHandlingPopstateRef.current = false;
+      }, 0);
+    };
+
+    window.addEventListener('popstate', handlePopstate);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, []);
+
+  // Push history state when view changes (forward navigation only)
+  const pushHistoryState = useCallback((newView: ViewState, worldId: number | null, levelId: number | null) => {
+    if (typeof window === 'undefined' || isHandlingPopstateRef.current) return;
+
+    const state: AdventureHistoryState = {
+      adventureView: newView,
+      worldId,
+      levelId,
+    };
+    window.history.pushState(state, '');
+  }, []);
+
   // Handle world selection from WorldMap
   const handleWorldSelect = useCallback((worldId: number) => {
     setSelectedWorld(worldId);
     setViewState('levelGrid');
-  }, []);
+    pushHistoryState('levelGrid', worldId, null);
+  }, [pushHistoryState]);
 
   // Handle level selection from LevelGrid
   const handleLevelSelect = useCallback((worldId: number, levelId: number) => {
     setSelectedWorld(worldId);
     setSelectedLevel(levelId);
     setViewState('playing');
-  }, []);
+    pushHistoryState('playing', worldId, levelId);
+  }, [pushHistoryState]);
 
   // Handle game completion
   const handleLevelComplete = useCallback(
@@ -137,8 +210,13 @@ export default function AdventureView(): React.JSX.Element {
           console.error('Failed to save progress:', err);
         }
         // Navigate back to level grid regardless of save success
-        setViewState('levelGrid');
-        setSelectedLevel(null);
+        // Use history.back() to maintain proper back button behavior
+        if (typeof window !== 'undefined') {
+          window.history.back();
+        } else {
+          setViewState('levelGrid');
+          setSelectedLevel(null);
+        }
       }
     },
     [selectedWorld, selectedLevel, completeLevel]
@@ -146,18 +224,29 @@ export default function AdventureView(): React.JSX.Element {
 
   // Handle exit from game
   const handleGameExit = useCallback(() => {
-    setViewState('levelGrid');
-    setSelectedLevel(null);
+    // Use history.back() to maintain proper back button behavior
+    if (typeof window !== 'undefined') {
+      window.history.back();
+    } else {
+      setViewState('levelGrid');
+      setSelectedLevel(null);
+    }
   }, []);
 
   // Handle back navigation based on current view
   const handleBack = useCallback(() => {
-    if (viewState === 'playing') {
-      setViewState('levelGrid');
-      setSelectedLevel(null);
-    } else if (viewState === 'levelGrid') {
-      setViewState('worldMap');
-      setSelectedWorld(null);
+    // Use history.back() to navigate, which triggers popstate handler
+    if (typeof window !== 'undefined') {
+      window.history.back();
+    } else {
+      // Fallback for SSR
+      if (viewState === 'playing') {
+        setViewState('levelGrid');
+        setSelectedLevel(null);
+      } else if (viewState === 'levelGrid') {
+        setViewState('worldMap');
+        setSelectedWorld(null);
+      }
     }
   }, [viewState]);
 

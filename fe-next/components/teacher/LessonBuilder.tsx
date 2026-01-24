@@ -88,8 +88,8 @@ export default function LessonBuilder() {
       } : null,
     }));
 
-    // Navigate to host page with lesson flag
-    router.push(`/${language}/host?fromLesson=true`);
+    // Navigate to multiplayer page with lesson flag
+    router.push(`/${language}/multiplayer?fromLesson=true`);
   };
 
   // Get default template for a lesson

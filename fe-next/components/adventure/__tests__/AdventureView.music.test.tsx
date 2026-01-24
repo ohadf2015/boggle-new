@@ -336,6 +336,42 @@ describe('AdventureView Music Integration', () => {
   });
 
   describe('Navigation transitions', () => {
+    // Track navigation for proper back navigation simulation
+    let navigationStack: Array<{ view: string; worldId: number | null }> = [];
+
+    beforeEach(() => {
+      navigationStack = [{ view: 'worldMap', worldId: null }];
+
+      // Mock history.pushState to track navigation
+      jest.spyOn(window.history, 'pushState').mockImplementation((state: unknown) => {
+        const adventureState = state as { adventureView: string; worldId: number | null };
+        if (adventureState?.adventureView) {
+          navigationStack.push({ view: adventureState.adventureView, worldId: adventureState.worldId });
+        }
+      });
+
+      // Mock history.replaceState
+      jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+
+      // Mock history.back to dispatch popstate with correct state
+      jest.spyOn(window.history, 'back').mockImplementation(() => {
+        if (navigationStack.length > 1) {
+          navigationStack.pop();
+          const previousState = navigationStack[navigationStack.length - 1];
+          const popstateState = {
+            adventureView: previousState.view,
+            worldId: previousState.worldId,
+            levelId: null,
+          };
+          window.dispatchEvent(new PopStateEvent('popstate', { state: popstateState }));
+        }
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should continue music when navigating WorldMap → LevelGrid → WorldMap', () => {
       // GIVEN
       render(<AdventureView />);

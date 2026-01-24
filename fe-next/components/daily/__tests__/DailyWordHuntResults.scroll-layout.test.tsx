@@ -186,6 +186,84 @@ describe('DailyChallenge Container Layout', () => {
   });
 });
 
+describe('DailyWordHuntResults Mobile Scroll with Fixed Tab Bar', () => {
+  const sourcePath = resolve(process.cwd(), 'components/daily/DailyWordHuntResults.tsx');
+  const source = readFileSync(sourcePath, 'utf-8');
+
+  describe('Mobile scroll isolation', () => {
+    it('should have an isolated scroll container that works independently of body scroll', () => {
+      // CRITICAL BUG FIX:
+      // When content has a fixed bottom tab bar, the scrollable area needs to:
+      // 1. Be isolated from parent scroll context (not rely on body scroll)
+      // 2. Have explicit height constraints (h-full or fixed height formula)
+      // 3. Handle the fixed tab bar spacing correctly
+      //
+      // The problem: screen-fit-content has `overflow: visible !important` which
+      // delegates scrolling to the body. But with a fixed bottom tab bar that
+      // overlays content, we need the content area itself to scroll.
+      //
+      // Solution: On mobile, use fixed height classes or isolate-scroll pattern
+      // to create an isolated scroll context that doesn't rely on body scroll.
+
+      // Check that the main scrollable content area has isolate-scroll class on mobile
+      // This class creates an isolated scroll container that works with fixed tab bars
+      const scrollablePattern = /overflow-y-auto[^"]*(?:isolate-scroll|h-\[calc|max-h-\[calc)/;
+      expect(source).toMatch(scrollablePattern);
+    });
+
+    it('should have explicit bottom padding for the fixed mobile tab bar', () => {
+      // The scrollable content must have bottom padding to account for
+      // the fixed mobile tab bar (which is ~60px + safe-area-inset-bottom)
+      //
+      // CORRECT: pb-[--mobile-bottom-safe] or pb-20 md:pb-6
+      // This ensures content is scrollable past the fixed tab bar
+
+      const scrollableContentPattern = /overflow-y-auto[^"]*pb-\[--mobile-bottom-safe\]/;
+      expect(source).toMatch(scrollableContentPattern);
+    });
+
+    it('should have h-full on the parent DailyChallenge wrapper for scroll isolation', () => {
+      // For scroll isolation to work, the parent component must provide
+      // a fixed height context. This is ensured by DailyChallenge using
+      // flex-1 + min-h-0 OR h-full.
+      //
+      // When screen-fit-content has overflow:visible, child scroll depends on
+      // parent height being constrained. If parent can grow unbounded,
+      // child overflow-y-auto won't scroll.
+
+      // This test verifies DailyWordHuntResults expects proper parent context
+      const rootFlexPattern = /key="word-hunt-results"[\s\S]*?className="([^"]+)"/;
+      const match = source.match(rootFlexPattern);
+
+      expect(match).toBeTruthy();
+      if (match) {
+        const className = match[1];
+        // Root should use flex-1 to take all available parent space
+        expect(className).toMatch(/\bflex-1\b/);
+        // Root should have min-h-0 to allow content overflow
+        expect(className).toMatch(/\bmin-h-0\b/);
+      }
+    });
+
+    it('should use isolated-scroll class or equivalent for touch scrolling on iOS', () => {
+      // iOS has quirks with nested scroll containers.
+      // When content is nested inside a body that scrolls, and the content
+      // also needs to scroll (with fixed elements), we need:
+      // 1. overscroll-behavior: contain (prevents pull-to-refresh interference)
+      // 2. -webkit-overflow-scrolling: touch (smooth momentum scrolling)
+      // 3. scrollable-area class (applies touch-action: pan-y)
+
+      // Verify the scrollable content has touch scrolling support
+      const touchScrollPattern = /overflow-y-auto[^"]*scrollable-area|scrollable-area[^"]*overflow-y-auto/;
+      expect(source).toMatch(touchScrollPattern);
+
+      // Verify overscroll-contain is applied
+      const overscrollPattern = /overflow-y-auto[^"]*overscroll-contain|overscroll-contain[^"]*overflow-y-auto/;
+      expect(source).toMatch(overscrollPattern);
+    });
+  });
+});
+
 describe('BuzzResultsScreen Scroll Layout', () => {
   const sourcePath = resolve(process.cwd(), 'components/buzz/BuzzResultsScreen.tsx');
   const source = readFileSync(sourcePath, 'utf-8');

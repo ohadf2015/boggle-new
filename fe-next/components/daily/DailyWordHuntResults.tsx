@@ -405,8 +405,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-[--mobile-bottom-safe] md:pb-6 relative">
+      {/* Main Content - uses isolate-scroll on mobile for fixed tab bar compatibility */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll px-3 pb-[--mobile-bottom-safe] md:pb-6 relative">
         {/* Screenshot protection overlay */}
         {isProtected && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">

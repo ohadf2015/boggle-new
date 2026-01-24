@@ -323,6 +323,18 @@ describe('AdventureView Integration', () => {
   });
 
   describe('Level Grid → Back to World Map', () => {
+    beforeEach(() => {
+      // Mock history.back to dispatch popstate with correct state
+      jest.spyOn(window.history, 'back').mockImplementation(() => {
+        const worldMapState = { adventureView: 'worldMap', worldId: null, levelId: null };
+        window.dispatchEvent(new PopStateEvent('popstate', { state: worldMapState }));
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should return to world map when back button is clicked', () => {
       // GIVEN
       renderAdventureView();
@@ -335,6 +347,140 @@ describe('AdventureView Integration', () => {
       // THEN
       expect(screen.getByTestId('world-map')).toBeInTheDocument();
       expect(screen.queryByTestId('level-grid')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Browser Back Button Navigation', () => {
+    // Create a mock history stack that properly simulates browser behavior
+    let historyStack: Array<{ state: unknown }> = [];
+    let currentIndex = -1;
+    let originalPushState: typeof window.history.pushState;
+    let originalReplaceState: typeof window.history.replaceState;
+    let originalBack: typeof window.history.back;
+
+    beforeEach(() => {
+      // Reset history stack
+      historyStack = [];
+      currentIndex = -1;
+
+      // Save original methods
+      originalPushState = window.history.pushState;
+      originalReplaceState = window.history.replaceState;
+      originalBack = window.history.back;
+
+      // Mock pushState to track history
+      jest.spyOn(window.history, 'pushState').mockImplementation((state) => {
+        currentIndex++;
+        historyStack.splice(currentIndex, historyStack.length - currentIndex, { state });
+      });
+
+      // Mock replaceState to update current entry
+      jest.spyOn(window.history, 'replaceState').mockImplementation((state) => {
+        if (currentIndex < 0) {
+          currentIndex = 0;
+          historyStack = [{ state }];
+        } else {
+          historyStack[currentIndex] = { state };
+        }
+      });
+
+      // Mock back to dispatch popstate with correct state
+      jest.spyOn(window.history, 'back').mockImplementation(() => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          const previousState = historyStack[currentIndex]?.state || null;
+          window.dispatchEvent(new PopStateEvent('popstate', { state: previousState }));
+        }
+      });
+    });
+
+    afterEach(() => {
+      // Restore original methods
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+      window.history.back = originalBack;
+      jest.restoreAllMocks();
+    });
+
+    it('should navigate from level grid to world map when browser back is pressed', async () => {
+      // GIVEN
+      renderAdventureView();
+      fireEvent.click(screen.getByTestId('world-1'));
+      expect(screen.getByTestId('level-grid')).toBeInTheDocument();
+
+      // WHEN - simulate browser back button via popstate with worldMap state
+      const worldMapState = { adventureView: 'worldMap', worldId: null, levelId: null };
+      window.dispatchEvent(new PopStateEvent('popstate', { state: worldMapState }));
+
+      // THEN - should go back to world map, not landing page
+      await waitFor(() => {
+        expect(screen.getByTestId('world-map')).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId('level-grid')).not.toBeInTheDocument();
+    });
+
+    it('should navigate from playing to level grid when browser back is pressed', async () => {
+      // GIVEN
+      renderAdventureView();
+      fireEvent.click(screen.getByTestId('world-1'));
+      fireEvent.click(screen.getByTestId('level-button-1'));
+      expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
+
+      // WHEN - simulate browser back button via popstate with levelGrid state
+      const levelGridState = { adventureView: 'levelGrid', worldId: 1, levelId: null };
+      window.dispatchEvent(new PopStateEvent('popstate', { state: levelGridState }));
+
+      // THEN - should go back to level grid, not world map or landing page
+      await waitFor(() => {
+        expect(screen.getByTestId('level-grid')).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId('adventure-game')).not.toBeInTheDocument();
+    });
+
+    it('should push history state when navigating to level grid', () => {
+      // GIVEN
+      renderAdventureView();
+      const pushStateSpy = jest.spyOn(window.history, 'pushState');
+
+      // WHEN
+      fireEvent.click(screen.getByTestId('world-1'));
+
+      // THEN - history.pushState should have been called with levelGrid state
+      expect(pushStateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ adventureView: 'levelGrid', worldId: 1 }),
+        ''
+      );
+    });
+
+    it('should push history state when navigating to playing', () => {
+      // GIVEN
+      renderAdventureView();
+      fireEvent.click(screen.getByTestId('world-1'));
+      const pushStateSpy = jest.spyOn(window.history, 'pushState');
+      pushStateSpy.mockClear(); // Clear calls from world selection
+
+      // WHEN
+      fireEvent.click(screen.getByTestId('level-button-1'));
+
+      // THEN - history.pushState should have been called with playing state
+      expect(pushStateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ adventureView: 'playing', worldId: 1, levelId: 1 }),
+        ''
+      );
+    });
+
+    it('should use history.back() when clicking in-app back button on level grid', () => {
+      // GIVEN
+      renderAdventureView();
+      fireEvent.click(screen.getByTestId('world-1'));
+      expect(screen.getByTestId('level-grid')).toBeInTheDocument();
+      const backSpy = jest.spyOn(window.history, 'back');
+
+      // WHEN
+      fireEvent.click(screen.getByRole('button', { name: /world map/i }));
+
+      // THEN - should call history.back()
+      expect(backSpy).toHaveBeenCalled();
     });
   });
 
@@ -366,6 +512,18 @@ describe('AdventureView Integration', () => {
   });
 
   describe('Playing → Back to Level Grid', () => {
+    beforeEach(() => {
+      // Mock history.back to dispatch popstate with level grid state
+      jest.spyOn(window.history, 'back').mockImplementation(() => {
+        const levelGridState = { adventureView: 'levelGrid', worldId: 1, levelId: null };
+        window.dispatchEvent(new PopStateEvent('popstate', { state: levelGridState }));
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should return to level grid when exit button is clicked in header', () => {
       // GIVEN
       renderAdventureView();
@@ -383,6 +541,39 @@ describe('AdventureView Integration', () => {
   });
 
   describe('Full Navigation Flow', () => {
+    // Track navigation state for proper back navigation simulation
+    let navigationStack: Array<{ view: string; worldId: number | null }> = [];
+
+    beforeEach(() => {
+      navigationStack = [{ view: 'worldMap', worldId: null }];
+
+      // Mock history.pushState to track navigation
+      jest.spyOn(window.history, 'pushState').mockImplementation((state: unknown) => {
+        const adventureState = state as { adventureView: string; worldId: number | null };
+        if (adventureState?.adventureView) {
+          navigationStack.push({ view: adventureState.adventureView, worldId: adventureState.worldId });
+        }
+      });
+
+      // Mock history.back to pop from stack and dispatch popstate
+      jest.spyOn(window.history, 'back').mockImplementation(() => {
+        if (navigationStack.length > 1) {
+          navigationStack.pop();
+          const previousState = navigationStack[navigationStack.length - 1];
+          const popstateState = {
+            adventureView: previousState.view,
+            worldId: previousState.worldId,
+            levelId: null,
+          };
+          window.dispatchEvent(new PopStateEvent('popstate', { state: popstateState }));
+        }
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should support complete navigation: world → level → play → back → world', () => {
       // GIVEN
       renderAdventureView();
