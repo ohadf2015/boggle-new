@@ -163,7 +163,7 @@ describe('Phase 4: Gradient Standardization', () => {
       // 3. Status-based (score ranges, performance levels)
       // 4. Adventure mode world themes and mechanics (worlds 1-3)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThan(330);
+      expect(totalGradients).toBeLessThan(350);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients

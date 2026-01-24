@@ -218,7 +218,6 @@ export default function ClassroomManager() {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
           <Dialog.Content
-            aria-describedby={undefined}
             className={cn(
               'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
               'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50',
@@ -228,6 +227,11 @@ export default function ClassroomManager() {
             <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4">
               {isCreateDialogOpen ? t('teacher.classroom.create') : t('teacher.classroom.edit')}
             </Dialog.Title>
+            <Dialog.Description className="sr-only">
+              {isCreateDialogOpen
+                ? 'Form to create a new classroom with name and language settings'
+                : 'Form to edit classroom name and language settings'}
+            </Dialog.Description>
 
             <div className="space-y-4">
               <div>

@@ -11,7 +11,7 @@ import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from '
 import { motion } from 'framer-motion';
 import { Bomb, Link2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { GridTileState, TileType } from '@/types/adventure';
+import type { GridTileState, TileType, TileActivationEffect } from '@/types/adventure';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
@@ -543,6 +543,9 @@ const AdventureGrid = memo(
                   enableComplexAnimations && tile.type === 'chain' && 'tile-chain-enhanced',
                   enableComplexAnimations && tile.type === 'time' && 'tile-time-enhanced',
 
+                  // Activation effect classes (one-time animation when tile effect triggers)
+                  enableComplexAnimations && tile.activationEffect && `tile-effect-${tile.activationEffect}`,
+
                   // State classes
                   tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
                   // Enhanced selection: bright ring + glow shadow for visibility
@@ -651,6 +654,66 @@ const AdventureGrid = memo(
                     <div className="tile-time-particle tile-time-particle--1" />
                     <div className="tile-time-particle tile-time-particle--2" />
                     <div className="tile-time-particle tile-time-particle--3" />
+                  </>
+                )}
+
+                {/* ========== ACTIVATION EFFECT PARTICLES ========== */}
+                {/* Melt effect - water drops and splash */}
+                {tile.activationEffect === 'melt' && enableComplexAnimations && (
+                  <div className="tile-melt-splash" />
+                )}
+
+                {/* Explode effect - shockwaves and debris */}
+                {tile.activationEffect === 'explode' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-explode-shockwave" />
+                    <div className="tile-explode-shockwave tile-explode-shockwave--2" />
+                    <div className="tile-explode-shockwave tile-explode-shockwave--3" />
+                    <div className="tile-explode-debris tile-explode-debris--1" />
+                    <div className="tile-explode-debris tile-explode-debris--2" />
+                    <div className="tile-explode-debris tile-explode-debris--3" />
+                    <div className="tile-explode-debris tile-explode-debris--4" />
+                    <div className="tile-explode-debris tile-explode-debris--5" />
+                    <div className="tile-explode-debris tile-explode-debris--6" />
+                  </>
+                )}
+
+                {/* Collect effect - coins and sparkle */}
+                {tile.activationEffect === 'collect' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-collect-sparkle" />
+                    <div className="tile-collect-coin tile-collect-coin--1" />
+                    <div className="tile-collect-coin tile-collect-coin--2" />
+                    <div className="tile-collect-coin tile-collect-coin--3" />
+                    <div className="tile-collect-coin tile-collect-coin--4" />
+                  </>
+                )}
+
+                {/* Wildcard effect - rainbow rings and star */}
+                {tile.activationEffect === 'wildcard' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-wildcard-ring tile-wildcard-ring--1" />
+                    <div className="tile-wildcard-ring tile-wildcard-ring--2" />
+                    <div className="tile-wildcard-ring tile-wildcard-ring--3" />
+                    <div className="tile-wildcard-star" />
+                  </>
+                )}
+
+                {/* Link effect - pulse rings and icon */}
+                {tile.activationEffect === 'link' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-link-pulse" />
+                    <div className="tile-link-pulse tile-link-pulse--2" />
+                    <div className="tile-link-icon">🔗</div>
+                  </>
+                )}
+
+                {/* Time bonus effect - floating +5s and clock */}
+                {tile.activationEffect === 'timeBonus' && enableComplexAnimations && (
+                  <>
+                    <div className="tile-time-plus" />
+                    <div className="tile-time-clock" />
+                    <div className="tile-time-ring" />
                   </>
                 )}
 

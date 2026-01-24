@@ -13,6 +13,23 @@ import * as Sentry from "@sentry/nextjs";
 
 const isProduction = typeof window !== 'undefined' && process.env.NODE_ENV === 'production';
 
+/**
+ * Patterns for non-critical errors that should be silently ignored
+ * These are expected on some devices/browsers and don't indicate bugs
+ */
+const IGNORED_ERROR_PATTERNS = [
+  // Audio decoding failures - common on mobile devices, non-critical feature
+  /Decoding audio data failed/i,
+  /Failed to load.*Track/i,
+  // React hydration warnings - handled by React itself
+  /Hydration failed/i,
+  /Text content does not match/i,
+  // Browser extension interference
+  /ResizeObserver loop/i,
+  // Recharts dimension warnings - occur briefly during mobile layout, non-critical
+  /width\(-?\d+\) and height\(-?\d+\) of chart should be greater than 0/i,
+] as const;
+
 // Store original console methods
 const originalConsole = {
   error: console.error,
@@ -31,6 +48,17 @@ export function initConsoleOverride(): void {
 
   // Override console.error
   console.error = (...args: unknown[]): void => {
+    // Check if this error should be ignored
+    const message = args.map(arg =>
+      typeof arg === 'string' ? arg : String(arg)
+    ).join(' ');
+
+    const shouldIgnore = IGNORED_ERROR_PATTERNS.some(pattern => pattern.test(message));
+    if (shouldIgnore) {
+      // Silently ignore non-critical errors
+      return;
+    }
+
     const firstArg = args[0];
 
     if (firstArg instanceof Error) {

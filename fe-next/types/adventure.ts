@@ -22,6 +22,18 @@
 export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time';
 
 /**
+ * Types of activation effects that can play when a special tile is used
+ */
+export type TileActivationEffect =
+  | 'melt'      // Ice tile melted by adjacent word
+  | 'explode'   // Bomb tile detonated
+  | 'collect'   // Gold tile 3x multiplier collected
+  | 'wildcard'  // Rainbow tile used as wildcard
+  | 'link'      // Chain tile linked neighbors
+  | 'timeBonus' // Time tile added seconds
+  | null;
+
+/**
  * State of an individual tile in the game grid
  */
 export interface TileState {
@@ -41,6 +53,10 @@ export interface TileState {
   chainedWith?: number[];
   /** Bonus time value in seconds (for time tiles) */
   bonusTime?: number;
+  /** Activation effect currently playing (clears after animation completes) */
+  activationEffect?: TileActivationEffect;
+  /** Timestamp when activation effect started (for animation timing) */
+  activationTimestamp?: number;
 }
 
 /**

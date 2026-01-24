@@ -1,6 +1,6 @@
 /**
  * Test for loading state layout consistency
- * Ensures loading.tsx uses the modern PageLoader with proper layout
+ * Ensures loading.tsx uses proper skeleton layout matching the landing page
  */
 import { render } from '@testing-library/react';
 import Loading from '@/app/[locale]/loading';
@@ -30,7 +30,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 describe('Loading Layout', () => {
-  it('should use modern screen-fit layout instead of old min-h-screen', () => {
+  it('should use modern flex layout with page-content-safe', () => {
     const { container } = render(<Loading />);
 
     const loadingContainer = container.firstChild as HTMLElement;
@@ -38,8 +38,12 @@ describe('Loading Layout', () => {
     // Should NOT use old min-h-screen approach
     expect(loadingContainer.className).not.toContain('min-h-screen');
 
-    // Should use modern layout approach
-    expect(loadingContainer.className).toContain('screen-fit');
+    // Should use modern flex layout with page-content-safe for proper spacing
+    expect(loadingContainer.className).toContain('flex-1');
+    expect(loadingContainer.className).toContain('flex');
+    expect(loadingContainer.className).toContain('flex-col');
+    expect(loadingContainer.className).toContain('page-content-safe');
+    expect(loadingContainer.className).toContain('h-full');
   });
 
   it('should have proper background styling consistent with landing page', () => {
@@ -48,26 +52,36 @@ describe('Loading Layout', () => {
     const loadingContainer = container.firstChild as HTMLElement;
 
     // Should use neo-brutalist background consistent with landing page
+    // Uses dark:bg-neo-navy for dark mode
     expect(loadingContainer.className).toContain('bg-neo-navy');
   });
 
-  it('should render NeoLoader component with mascot variant', () => {
+  it('should render skeleton structure matching landing page', () => {
     const { container } = render(<Loading />);
 
-    // The loader should render with proper structure
-    // Check for the presence of the loader elements
-    const loaderContent = container.querySelector('.flex.flex-col');
-    expect(loaderContent).toBeTruthy();
+    // Should have header skeleton
+    const header = container.querySelector('header');
+    expect(header).toBeTruthy();
+    expect(header?.className).toContain('animate-pulse');
+
+    // Should have main content area
+    const main = container.querySelector('main');
+    expect(main).toBeTruthy();
+    expect(main?.className).toContain('flex-1');
   });
 
-  it('should have centered content within the loader', () => {
+  it('should have skeleton mode cards for seamless transition', () => {
     const { container } = render(<Loading />);
 
-    const loadingContainer = container.firstChild as HTMLElement;
+    // Should render skeleton cards (4 mode cards + 1 daily banner)
+    // Check for the grid structure
+    const grid = container.querySelector('.grid');
+    expect(grid).toBeTruthy();
+    expect(grid?.className).toContain('grid-cols-1');
+    expect(grid?.className).toContain('sm:grid-cols-2');
 
-    // Should have centering classes
-    expect(loadingContainer.className).toContain('flex');
-    expect(loadingContainer.className).toContain('items-center');
-    expect(loadingContainer.className).toContain('justify-center');
+    // Should have multiple skeleton card elements with animate-pulse
+    const skeletonCards = container.querySelectorAll('.animate-pulse');
+    expect(skeletonCards.length).toBeGreaterThan(0);
   });
 });

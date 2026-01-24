@@ -18,6 +18,7 @@ import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
+import { ModeCardSkeleton } from './ModeCardSkeleton';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -192,12 +193,6 @@ const LandingView: React.FC = () => {
 
   useEffect(() => {
     setEnableHeavyBackground(getPerfVariant() === 'control');
-  }, []);
-
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
   }, []);
 
   // Play lobby music on landing page (same as multiplayer lobby)

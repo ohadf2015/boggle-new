@@ -16,6 +16,7 @@ import { useSocket } from '../../utils/SocketContext';
 import { PresetSelector, GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
 import { MobileBottomNav, type MobileTab } from './pre-game/MobileBottomNav';
+import { MobileShareSection } from './pre-game/MobileShareSection';
 import { PresetInfoDrawer } from './pre-game/PresetInfoDrawer';
 import {
   DesktopLobbyLayout,
@@ -167,6 +168,9 @@ function HostPreGameView({
   // Render Lobby Tab Content
   const renderLobbyContent = (): React.ReactElement => (
     <div className="flex flex-col h-full p-3 gap-3 overflow-y-auto overscroll-contain scrollable-area min-h-0">
+      {/* Share Section - Top priority for inviting friends */}
+      <MobileShareSection gameCode={gameCode} t={t} />
+
       <PresetSelector
         selectedPreset={selectedPreset}
         onPresetClick={setPresetInfoOpen}

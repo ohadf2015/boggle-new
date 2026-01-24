@@ -12,6 +12,7 @@ import type {
   LevelObjective,
   AdventureGameState,
   TileType,
+  TileActivationEffect,
 } from '@/types/adventure';
 import { WORLDS_COUNT, LEVELS_PER_WORLD } from '@/lib/adventure';
 
@@ -61,6 +62,8 @@ interface UseAdventureGameReturn {
   isWildcard: (row: number, col: number) => boolean;
   /** Mark cascade animation as complete */
   markCascadeComplete: () => void;
+  /** Clear all activation effects from tiles */
+  clearActivationEffects: () => void;
 }
 
 // ==============================================
@@ -82,7 +85,8 @@ type GameAction =
   | { type: 'COMPLETE_LEVEL' }
   | { type: 'RESET_GAME'; payload: { initialState: GameState } }
   | { type: 'COMBO_TIMEOUT' }
-  | { type: 'CASCADE_COMPLETE' };
+  | { type: 'CASCADE_COMPLETE' }
+  | { type: 'CLEAR_ACTIVATION_EFFECTS' };
 
 interface GameState {
   gameState: AdventureGameState;
@@ -277,53 +281,100 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       let newTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })));
       let iceClearedCount = 0;
       let timeBonusSeconds = 0;
+      const activationTimestamp = Date.now();
+
+      // Clear any previous activation effects before setting new ones
+      for (const row of newTiles) {
+        for (const tile of row) {
+          tile.activationEffect = null;
+          tile.activationTimestamp = undefined;
+        }
+      }
 
       if (path && path.length > 0) {
-        // Check for gold tile multiplier (3x)
-        const hasGold = path.some(
+        // Check for gold tile multiplier (3x) and set activation effect
+        const goldPositions = path.filter(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'gold'
         );
-        if (hasGold) {
+        if (goldPositions.length > 0) {
           finalScore *= GOLD_MULTIPLIER;
+          // Set collect effect on gold tiles
+          for (const pos of goldPositions) {
+            const tile = newTiles[pos.row]?.[pos.col];
+            if (tile) {
+              tile.activationEffect = 'collect';
+              tile.activationTimestamp = activationTimestamp;
+            }
+          }
         }
 
-        // Check for rainbow/wildcard tile bonus (+25%)
-        const hasRainbow = path.some(
+        // Check for rainbow/wildcard tile bonus (+25%) and set activation effect
+        const rainbowPositions = path.filter(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'rainbow'
         );
-        if (hasRainbow) {
+        if (rainbowPositions.length > 0) {
           finalScore = Math.floor(finalScore * RAINBOW_SCORE_MULTIPLIER);
+          // Set wildcard effect on rainbow tiles
+          for (const pos of rainbowPositions) {
+            const tile = newTiles[pos.row]?.[pos.col];
+            if (tile) {
+              tile.activationEffect = 'wildcard';
+              tile.activationTimestamp = activationTimestamp;
+            }
+          }
         }
 
-        // Check for chain tile combo bonus
-        const hasChain = path.some(
+        // Check for chain tile combo bonus and set activation effect
+        const chainPositions = path.filter(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'chain'
         );
-        if (hasChain && state.gameState.comboCount > 0) {
+        if (chainPositions.length > 0 && state.gameState.comboCount > 0) {
           // Apply enhanced combo bonus for chain tiles
           const comboBonus = state.gameState.comboCount * 0.1 * CHAIN_COMBO_MULTIPLIER;
           finalScore = Math.floor(finalScore * (1 + comboBonus));
         }
-
-        // Calculate time bonus from time tiles
-        for (const pos of path) {
+        // Set link effect on chain tiles (even without combo bonus for visual feedback)
+        for (const pos of chainPositions) {
           const tile = newTiles[pos.row]?.[pos.col];
-          if (tile?.type === 'time') {
-            timeBonusSeconds += tile.bonusTime ?? TIME_TILE_BONUS_SECONDS;
+          if (tile) {
+            tile.activationEffect = 'link';
+            tile.activationTimestamp = activationTimestamp;
           }
         }
 
-        // Handle bomb tile - clear entire row (including ice tiles)
+        // Calculate time bonus from time tiles and set activation effect
+        const timePositions = path.filter(
+          (pos) => newTiles[pos.row]?.[pos.col]?.type === 'time'
+        );
+        for (const pos of timePositions) {
+          const tile = newTiles[pos.row]?.[pos.col];
+          if (tile) {
+            timeBonusSeconds += tile.bonusTime ?? TIME_TILE_BONUS_SECONDS;
+            tile.activationEffect = 'timeBonus';
+            tile.activationTimestamp = activationTimestamp;
+          }
+        }
+
+        // Handle bomb tile - clear entire row (including ice tiles) and set explosion effect
         const bombPos = path.find(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'bomb'
         );
         if (bombPos) {
+          // Set explosion effect on the bomb tile
+          const bombTile = newTiles[bombPos.row]?.[bombPos.col];
+          if (bombTile) {
+            bombTile.activationEffect = 'explode';
+            bombTile.activationTimestamp = activationTimestamp;
+          }
           for (let col = 0; col < newTiles[bombPos.row].length; col++) {
             const tile = newTiles[bombPos.row][col];
             // Count ice tiles in the row before clearing
             if (tile.type === 'ice' && !tile.isCleared) {
               iceClearedCount++;
               tile.isFrozen = false; // Unfreeze ice tiles
+              // Set melt effect on ice tiles in bomb row
+              tile.activationEffect = 'melt';
+              tile.activationTimestamp = activationTimestamp;
             }
             tile.isCleared = true;
           }
@@ -341,6 +392,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
               if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
                 const neighborTile = newTiles[nr][nc];
                 if (neighborTile.type === 'ice' && neighborTile.isFrozen) {
+                  // Set melt effect before converting to standard
+                  neighborTile.activationEffect = 'melt';
+                  neighborTile.activationTimestamp = activationTimestamp;
                   // Convert ice to standard tile (melted ice becomes usable)
                   neighborTile.type = 'standard';
                   neighborTile.isFrozen = false;
@@ -353,18 +407,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         }
 
         // Mark adjacent tiles as chained when chain tile is used
-        if (hasChain) {
-          for (const pos of path) {
-            if (newTiles[pos.row]?.[pos.col]?.type === 'chain') {
-              // Mark all 8 neighbors as chained
-              for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                  if (dr === 0 && dc === 0) continue;
-                  const nr = pos.row + dr;
-                  const nc = pos.col + dc;
-                  if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
-                    newTiles[nr][nc].isChained = true;
-                  }
+        if (chainPositions.length > 0) {
+          for (const pos of chainPositions) {
+            // Mark all 8 neighbors as chained
+            for (let dr = -1; dr <= 1; dr++) {
+              for (let dc = -1; dc <= 1; dc++) {
+                if (dr === 0 && dc === 0) continue;
+                const nr = pos.row + dr;
+                const nc = pos.col + dc;
+                if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
+                  newTiles[nr][nc].isChained = true;
                 }
               }
             }
@@ -485,6 +537,21 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         cascadeComplete: true,
       };
+
+    case 'CLEAR_ACTIVATION_EFFECTS': {
+      // Clear all activation effects from tiles
+      const clearedTiles = state.tiles.map((row) =>
+        row.map((tile) => ({
+          ...tile,
+          activationEffect: null as TileActivationEffect,
+          activationTimestamp: undefined,
+        }))
+      );
+      return {
+        ...state,
+        tiles: clearedTiles,
+      };
+    }
 
     case 'COMPLETE_LEVEL': {
       // Update time bonus objective if applicable
@@ -652,6 +719,10 @@ export function useAdventureGame({
     dispatch({ type: 'CASCADE_COMPLETE' });
   }, []);
 
+  const clearActivationEffects = useCallback(() => {
+    dispatch({ type: 'CLEAR_ACTIVATION_EFFECTS' });
+  }, []);
+
   return {
     gameState: state.gameState,
     tiles: state.tiles,
@@ -668,5 +739,6 @@ export function useAdventureGame({
     resetGame,
     isWildcard,
     markCascadeComplete,
+    clearActivationEffects,
   };
 }
