@@ -1442,3 +1442,94 @@
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
   }
 }
+
+/* ==============================================
+   BOMB ROW PREVIEW
+   Shows which tiles will be cleared when bomb detonates
+   ============================================== */
+
+@keyframes bomb-row-pulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 8px rgba(255, 100, 0, 0.4),
+      0 0 12px rgba(255, 50, 50, 0.3);
+    border-color: rgba(255, 100, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 16px rgba(255, 100, 0, 0.6),
+      0 0 20px rgba(255, 50, 50, 0.5);
+    border-color: rgba(255, 50, 50, 0.8);
+  }
+}
+
+.bomb-row-preview {
+  animation: bomb-row-pulse 0.8s ease-in-out infinite;
+  border-color: rgba(255, 100, 0, 0.6) !important;
+  position: relative;
+  z-index: 5;
+}
+
+/* Red tint overlay to indicate danger zone */
+.bomb-row-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 50, 50, 0.15) 0%,
+    rgba(255, 100, 0, 0.1) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Don't apply preview overlay to the bomb tile itself */
+.tile-bomb.bomb-row-preview::before {
+  display: none;
+}
+
+/* Reduced motion: static glow instead of animation */
+@media (prefers-reduced-motion: reduce) {
+  .bomb-row-preview {
+    animation: none !important;
+    box-shadow:
+      inset 0 0 12px rgba(255, 100, 0, 0.5),
+      0 0 16px rgba(255, 50, 50, 0.4);
+  }
+}
+
+/* ==============================================
+   BOMB ROW INDICATOR BADGE
+   Shows horizontal line icon indicating row effect
+   ============================================== */
+
+.tile-bomb-row-indicator {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  z-index: 25;
+  padding: 1px 3px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+}
+
+/* Three horizontal bars indicating row clear */
+.tile-bomb-row-indicator::before,
+.tile-bomb-row-indicator::after,
+.tile-bomb-row-indicator span {
+  display: block;
+  width: 6px;
+  height: 2px;
+  background: #ff6b00;
+  border-radius: 1px;
+}
+
+.tile-bomb-row-indicator span {
+  width: 4px;
+}

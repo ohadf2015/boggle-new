@@ -230,6 +230,17 @@ const AdventureGrid = memo(
       [selectedIndices]
     );
 
+    // Detect if a bomb tile is selected and get its row for preview highlighting
+    const bombRowPreview = useMemo(() => {
+      for (const idx of selectedIndices) {
+        const tile = tiles[idx];
+        if (tile?.type === 'bomb') {
+          return tile.row;
+        }
+      }
+      return null;
+    }, [selectedIndices, tiles]);
+
     // Build formed word from selected tiles
     const formedWord = useMemo(() => {
       return selectedIndices.map((idx) => tiles[idx]?.letter || '').join('');
@@ -551,6 +562,9 @@ const AdventureGrid = memo(
                   // Enhanced selection: bright ring + glow shadow for visibility
                   isSelected && 'tile-selected-enhanced ring-2 ring-neo-lime z-10 shadow-[0_0_16px_rgba(191,255,0,0.7)]',
                   tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
+
+                  // Bomb row preview: highlight tiles in bomb's row when bomb is selected
+                  bombRowPreview !== null && tile.row === bombRowPreview && 'bomb-row-preview',
 
                   // Standard tile background
                   tile.type === 'standard' &&
