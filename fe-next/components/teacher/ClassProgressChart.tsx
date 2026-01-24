@@ -21,6 +21,34 @@ const CHART_COLORS = {
   tooltipBorder: '#00FFFF',
 };
 
+// Custom tooltip component (must be outside render)
+const CustomTooltip = ({ active, payload, t }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  return (
+    <div
+      className="bg-neo-navy border-2 border-neo-cyan shadow-hard p-3 rounded-neo"
+      style={{ backgroundColor: CHART_COLORS.tooltip, borderColor: CHART_COLORS.tooltipBorder }}
+    >
+      <p className="text-neo-white font-neo-body font-bold mb-2">{payload[0].payload.formattedDate}</p>
+      <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.wordsLearned }} />
+          <span className="text-neo-cyan text-sm">
+            {t('teacher.progress.wordsLearned')}: {payload[0].value}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.accuracy }} />
+          <span className="text-neo-pink text-sm">
+            {t('teacher.progress.accuracy')}: {payload[1].value}%
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ClassProgressChart() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -88,34 +116,6 @@ export default function ClassProgressChart() {
       };
     });
   }, [progress, language]);
-
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload || !payload.length) return null;
-
-    return (
-      <div
-        className="bg-neo-navy border-2 border-neo-cyan shadow-hard p-3 rounded-neo"
-        style={{ backgroundColor: CHART_COLORS.tooltip, borderColor: CHART_COLORS.tooltipBorder }}
-      >
-        <p className="text-neo-white font-neo-body font-bold mb-2">{payload[0].payload.formattedDate}</p>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.wordsLearned }} />
-            <span className="text-neo-cyan text-sm">
-              {t('teacher.progress.wordsLearned')}: {payload[0].value}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.accuracy }} />
-            <span className="text-neo-pink text-sm">
-              {t('teacher.progress.accuracy')}: {payload[1].value}%
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   if (loadingClassrooms || loadingLessons) {
     return (
@@ -243,7 +243,7 @@ export default function ClassProgressChart() {
                     style: { fill: CHART_COLORS.accuracy, fontFamily: 'Rubik', fontSize: '14px' },
                   }}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip t={t} />} />
                 <Legend
                   wrapperStyle={{ fontFamily: 'Rubik', fontSize: '14px', color: CHART_COLORS.text }}
                 />

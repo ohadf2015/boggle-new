@@ -93,13 +93,13 @@ export function HostWordSelector({
   const [selectedClassroom, setSelectedClassroom] = useState<string | undefined>();
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Only show if host and game is finished
-  if (!canSelect) return null;
-
-  // Sort words by score (highest first)
+  // Sort words by score (highest first) - must be before early return
   const sortedWords = useMemo(() => {
     return [...allWords].sort((a, b) => b.score - a.score);
   }, [allWords]);
+
+  // Only show if host and game is finished
+  if (!canSelect) return null;
 
   /**
    * Handle save lesson button click
