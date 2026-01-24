@@ -51,7 +51,7 @@ const QuickPlayButton: React.FC<QuickPlayButtonProps> = ({
       whileHover={!disabled && !isLoading ? { scale: 1.02 } : undefined}
       whileTap={!disabled && !isLoading ? { scale: 0.98 } : undefined}
       className={cn(
-        'relative overflow-hidden',
+        'group relative overflow-hidden',
         'rounded-neo-lg border-4 border-neo-black',
         'font-black uppercase tracking-wide',
         'transition-all duration-200',
@@ -114,8 +114,15 @@ const QuickPlayButton: React.FC<QuickPlayButtonProps> = ({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
+              className="inline-flex"
             >
-              <Zap className={cn(isHero ? 'w-7 h-7' : 'w-5 h-5')} />
+              <Zap className={cn(
+                isHero ? 'w-7 h-7' : 'w-5 h-5',
+                'transition-all duration-200',
+                // Subtle glow effect on parent hover
+                'drop-shadow-[0_0_3px_rgba(0,0,0,0.3)]',
+                'group-hover:drop-shadow-[0_0_8px_rgba(255,225,53,0.6)]'
+              )} />
             </motion.span>
           )}
         </AnimatePresence>

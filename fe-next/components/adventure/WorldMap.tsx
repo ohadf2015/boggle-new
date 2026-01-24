@@ -24,18 +24,18 @@ interface WorldMapProps {
   onWorldSelect: (worldId: number) => void;
 }
 
-// World images mapping
+// World images mapping (WebP for 91% smaller file sizes)
 const WORLD_IMAGES: Record<number, string> = {
-  1: '/images/adventure/world-meadows-3d.png',     // Alphabet Meadows
-  2: '/images/adventure/world-springs-3d.png',     // Synonym Springs
-  3: '/images/adventure/world-caverns-3d.png',     // Root Caverns
-  4: '/images/adventure/world-archipelago-3d.png', // Idiom Archipelago
-  5: '/images/adventure/world-canyon-3d.png',      // Compound Canyon
-  6: '/images/adventure/world-labyrinth-3d.png',   // Anagram Labyrinth
-  7: '/images/adventure/world-palace-3d.png',      // Mirror Palace
-  8: '/images/adventure/world-nebula-3d.png',      // Neologism Nebula
-  9: '/images/adventure/world-peaks-3d.png',       // Polyglot Peaks
-  10: '/images/adventure/world-throne-3d.png',     // The Lexicon Throne
+  1: '/images/adventure/world-meadows-3d.webp',     // Alphabet Meadows
+  2: '/images/adventure/world-springs-3d.webp',     // Synonym Springs
+  3: '/images/adventure/world-caverns-3d.webp',     // Root Caverns
+  4: '/images/adventure/world-archipelago-3d.webp', // Idiom Archipelago
+  5: '/images/adventure/world-canyon-3d.webp',      // Compound Canyon
+  6: '/images/adventure/world-labyrinth-3d.webp',   // Anagram Labyrinth
+  7: '/images/adventure/world-palace-3d.webp',      // Mirror Palace
+  8: '/images/adventure/world-nebula-3d.webp',      // Neologism Nebula
+  9: '/images/adventure/world-peaks-3d.webp',       // Polyglot Peaks
+  10: '/images/adventure/world-throne-3d.webp',     // The Lexicon Throne
 };
 
 
@@ -60,7 +60,7 @@ const Cloud = ({
       } as React.CSSProperties}
     >
       <Image
-        src="/images/adventure/cloud.png"
+        src="/images/adventure/cloud.webp"
         alt=""
         fill
         className="object-contain"
@@ -276,8 +276,8 @@ const WorldNode = ({
             onClick={onClick}
             disabled={!isUnlocked}
             data-testid={`world-${world.id}`}
-            whileHover={isUnlocked ? { scale: 1.08, y: -4 } : undefined}
-            whileTap={isUnlocked ? { scale: 0.95 } : undefined}
+            whileHover={isUnlocked ? { scale: 1.08, y: -4, rotate: 2 } : undefined}
+            whileTap={isUnlocked ? { scale: 0.95, rotate: -1 } : undefined}
             className={cn(
               'relative flex-shrink-0',
               'focus:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime rounded-full',
@@ -700,11 +700,21 @@ export default function WorldMap({
             <div className="w-2 h-10 bg-neo-yellow mb-3" />
           </div>
 
-          {/* Start banner - larger and more prominent */}
+          {/* Start banner - larger and more prominent with pulsing glow */}
           <motion.div
             className="px-8 py-4 bg-neo-lime border-4 border-neo-black rounded-neo shadow-hard-lg"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.98, y: 0 }}
+            whileHover={{ scale: 1.05, y: -2, rotate: 1 }}
+            whileTap={{ scale: 0.98, y: 0, rotate: -0.5 }}
+            animate={{
+              boxShadow: [
+                '4px 4px 0px rgba(0,0,0,1), 0 0 20px rgba(191,255,0,0.3)',
+                '4px 4px 0px rgba(0,0,0,1), 0 0 35px rgba(191,255,0,0.5)',
+                '4px 4px 0px rgba(0,0,0,1), 0 0 20px rgba(191,255,0,0.3)',
+              ],
+            }}
+            transition={{
+              boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+            }}
           >
             <span className="text-neo-black font-black text-lg sm:text-xl tracking-tight">
               Start Your Journey!

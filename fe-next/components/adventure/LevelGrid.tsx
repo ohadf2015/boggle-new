@@ -471,10 +471,10 @@ export default function LevelGrid({
               disabled={!isUnlocked}
               onClick={() => isUnlocked && onLevelSelect(world.id, levelNum)}
               data-testid={`level-button-${levelNum}`}
-              whileHover={isUnlocked ? { scale: 1.05, y: -4 } : undefined}
-              whileTap={isUnlocked ? { scale: 0.97 } : undefined}
+              whileHover={isUnlocked ? { scale: 1.05, y: -4, rotate: 1 } : undefined}
+              whileTap={isUnlocked ? { scale: 0.97, rotate: -0.5 } : undefined}
               className={cn(
-                'relative p-4 sm:p-5 rounded-neo-lg transition-all duration-200',
+                'group relative p-4 sm:p-5 rounded-neo-lg transition-all duration-200',
                 'border-4 border-neo-black',
                 // Focus states for accessibility (keyboard navigation)
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
@@ -524,17 +524,18 @@ export default function LevelGrid({
                 )}
               </div>
 
-              {/* Stars Display */}
-              <div className="flex items-center gap-1.5 mb-3">
+              {/* Stars Display - shimmer on hover */}
+              <div className="flex items-center gap-1.5 mb-3 group-hover:animate-pulse-subtle">
                 {Array.from({ length: MAX_STARS_PER_LEVEL }).map((_, i) => (
                   <Star
                     key={i}
                     className={cn(
                       'w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300',
                       i < stars
-                        ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.7)]'
-                        : 'text-neo-white/20'
+                        ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.7)] group-hover:drop-shadow-[0_0_10px_rgba(255,225,53,0.9)]'
+                        : 'text-neo-white/20 group-hover:text-neo-white/30'
                     )}
+                    style={i < stars ? { transitionDelay: `${i * 50}ms` } : undefined}
                   />
                 ))}
               </div>
