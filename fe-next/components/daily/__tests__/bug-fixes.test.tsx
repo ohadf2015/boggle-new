@@ -1,0 +1,281 @@
+/**
+ * Bug Fix Tests - RED-GREEN-REFACTOR Cycle
+ *
+ * This file contains tests for bugs discovered in Phase 10 (Bug Discovery)
+ * Each test follows TDD methodology:
+ * 1. RED: Write failing test that reproduces the bug
+ * 2. GREEN: Fix the bug to make test pass
+ * 3. REFACTOR: Clean up code while keeping tests passing
+ *
+ * Bug references: .planning/phases/10-bug-fixes-stabilization/BUG-REGISTRY.md
+ */
+
+import React from 'react';
+import { renderHook, waitFor, act } from '@testing-library/react';
+import { useResultSubmission } from '../results/useResultSubmission';
+import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
+import * as dailyChallengeUtils from '@/utils/dailyChallenge';
+
+// Mock fetch globally
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
+// Mock dailyChallenge utilities
+jest.mock('@/utils/dailyChallenge', () => ({
+  getTodaysWordHuntResult: jest.fn().mockReturnValue(null),
+  markWordHuntResultSubmitted: jest.fn(),
+}));
+
+describe('Bug Fixes - Phase 10', () => {
+  const createMockResult = (attemptsUsed: number): WordHuntResult => ({
+    puzzleNumber: 100,
+    puzzleDate: '2025-01-24',
+    language: 'en',
+    solved: true,
+    attemptsUsed,
+    targetWord: 'TESTS',
+    attempts: [
+      {
+        word: 'TESTS',
+        feedback: [
+          { letter: 'T', feedback: 'green', position: 0 },
+          { letter: 'E', feedback: 'green', position: 1 },
+          { letter: 'S', feedback: 'green', position: 2 },
+          { letter: 'T', feedback: 'green', position: 3 },
+          { letter: 'S', feedback: 'green', position: 4 },
+        ],
+        timestamp: Date.now(),
+      },
+    ],
+    wordsDiscovered: [],
+    lifeRemaining: 50,
+    clueTokensEarned: 0,
+    clueTokensSpent: 0,
+    hintsUnlocked: 0,
+    efficiencyScore: 85,
+    streakDays: 1,
+    completedAt: new Date().toISOString(),
+  });
+
+  const mockProfile = {
+    id: 'user-123-uuid',
+    username: 'testuser',
+    display_name: 'Test User',
+    avatar_emoji: '🏆',
+    avatar_color: '#FFD700',
+    avatar_image: null,
+    profile_picture_url: null,
+  };
+
+  const mockOnSubmitSuccess = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFetch.mockReset();
+
+    // Default: successful API responses
+    mockFetch.mockImplementation((url: string) => {
+      if (url === '/api/geolocation') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ countryCode: 'US' }),
+        });
+      }
+      if (url === '/api/daily-challenge/word-hunt/submit') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, data: { id: 'test-id' } }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+    });
+  });
+
+  describe('BUG-002: Invalid Attempt Count Blocks Result Submission', () => {
+    /**
+     * Severity: High (data loss)
+     * Component: components/daily/results/useResultSubmission.ts
+     *
+     * Bug: When attemptsUsed < 1 or > 10 (data corruption scenario):
+     * - Result is marked as submitted (hasSubmittedRef.current = true)
+     * - markWordHuntResultSubmitted(language) is called
+     * - But result is NEVER sent to server (early return)
+     * - Player loses their score/progress permanently
+     *
+     * Root Cause: Lines 92-98 mark result as submitted before validation,
+     * preventing retries even though server never received the data.
+     *
+     * Expected: Invalid data should NOT be marked as submitted.
+     * System should show error to user and allow retry/correction.
+     */
+
+    it('should not mark as submitted when attempt count is zero (BUG-002)', async () => {
+      // GIVEN: Result with invalid attempt count (0)
+      const invalidResult = createMockResult(0);
+
+      const props = {
+        result: invalidResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-24',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null,
+        isAuthenticated: true,
+        profile: mockProfile,
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      // WHEN: Rendering the hook
+      renderHook(() => useResultSubmission(props));
+
+      // Wait for async operations
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      });
+
+      // THEN: Should NOT mark as submitted
+      // This test will FAIL initially (RED phase) because current code marks it as submitted
+      expect(dailyChallengeUtils.markWordHuntResultSubmitted).not.toHaveBeenCalled();
+
+      // AND: Should NOT submit to server
+      const submitCalls = mockFetch.mock.calls.filter(
+        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
+      );
+      expect(submitCalls).toHaveLength(0);
+
+      // AND: Should NOT call onSubmitSuccess
+      expect(mockOnSubmitSuccess).not.toHaveBeenCalled();
+    });
+
+    it('should not mark as submitted when attempt count is negative (BUG-002)', async () => {
+      // GIVEN: Result with invalid attempt count (-1)
+      const invalidResult = createMockResult(-1);
+
+      const props = {
+        result: invalidResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-24',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null,
+        isAuthenticated: true,
+        profile: mockProfile,
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      // WHEN: Rendering the hook
+      renderHook(() => useResultSubmission(props));
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      });
+
+      // THEN: Should NOT mark as submitted
+      expect(dailyChallengeUtils.markWordHuntResultSubmitted).not.toHaveBeenCalled();
+
+      // AND: Should NOT submit to server
+      const submitCalls = mockFetch.mock.calls.filter(
+        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
+      );
+      expect(submitCalls).toHaveLength(0);
+    });
+
+    it('should not mark as submitted when attempt count exceeds maximum (BUG-002)', async () => {
+      // GIVEN: Result with invalid attempt count (11)
+      const invalidResult = createMockResult(11);
+
+      const props = {
+        result: invalidResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-24',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null,
+        isAuthenticated: true,
+        profile: mockProfile,
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      // WHEN: Rendering the hook
+      renderHook(() => useResultSubmission(props));
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      });
+
+      // THEN: Should NOT mark as submitted
+      expect(dailyChallengeUtils.markWordHuntResultSubmitted).not.toHaveBeenCalled();
+
+      // AND: Should NOT submit to server
+      const submitCalls = mockFetch.mock.calls.filter(
+        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
+      );
+      expect(submitCalls).toHaveLength(0);
+    });
+
+    it('should mark as submitted when attempt count is valid (BUG-002 - control test)', async () => {
+      // GIVEN: Result with VALID attempt count (3)
+      const validResult = createMockResult(3);
+
+      const props = {
+        result: validResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-24',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null,
+        isAuthenticated: true,
+        profile: mockProfile,
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      // WHEN: Rendering the hook
+      renderHook(() => useResultSubmission(props));
+
+      // THEN: Should mark as submitted after successful API call
+      await waitFor(() => {
+        expect(dailyChallengeUtils.markWordHuntResultSubmitted).toHaveBeenCalledWith('en');
+      }, { timeout: 3000 });
+
+      // AND: Should submit to server
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/daily-challenge/word-hunt/submit',
+          expect.anything()
+        );
+      }, { timeout: 3000 });
+
+      // AND: Should call onSubmitSuccess
+      expect(mockOnSubmitSuccess).toHaveBeenCalled();
+    });
+  });
+
+  /**
+   * BUG-003: Known Letters Not Cleaned Up When All Occurrences Become Green
+   *
+   * Status: FIXED (test already exists and passes)
+   * Location: components/daily/survival/__tests__/useSurvivalClues.test.ts:444-447
+   *
+   * This bug was already fixed. The test in useSurvivalClues.test.ts verifies:
+   * - Target word "STYLE"
+   * - Discover "TEST" which reveals T at position 1, S at position 0
+   * - After discovery: T and S should be REMOVED from knownLetters (yellow set)
+   * - Test passes, confirming bug is fixed
+   */
+
+  /**
+   * BUG-001: E2E Test Server Port Conflict
+   * BUG-010: Performance Tests Timeout Due to API Configuration
+   *
+   * These are infrastructure bugs, not code bugs. They require configuration changes
+   * rather than code fixes. Documented in BUG-REGISTRY.md for Plan 10-02.
+   */
+});
