@@ -23,6 +23,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 9: Invalid Word System** - Admin queue and approval workflow
 - [x] **Phase 10: Bug Fixes & Stabilization** - Daily challenge fixes and loose ends
 - [x] **Phase 11: Teacher Vocabulary Builder** - Multiplayer word selection, grid integration preview, teacher lessons & student tracking
+- [ ] **Phase 12: Asset WebP Migration Completion** - Restore parallax/background directories, stage new WebP files, verify integration
+- [ ] **Phase 13: Translation Completion** - Add missing Phase 11 translation keys (372 keys across 4 languages)
 
 ## Phase Details
 
@@ -229,10 +231,45 @@ Plans:
 - [x] 11-07-PLAN.md — Student lesson view and practice mode
 - [x] 11-08-PLAN.md — Verification and phase completion
 
+### Phase 12: Asset WebP Migration Completion
+**Goal**: Complete PNG→WebP migration by restoring missing subdirectories and staging converted files
+**Depends on**: Phase 6 (original asset generation)
+**Requirements**: ADV-01, CONT-01, CONT-02, CONT-03, CONT-05, CONT-06, CONT-07, CONT-08, CONT-09
+**Gap Closure**: Closes asset gaps from v1 audit (parallax 404s, missing backgrounds)
+**Success Criteria** (what must be TRUE):
+  1. `public/images/adventure/backgrounds/` contains meadows.webp, springs.webp, caverns.webp
+  2. `public/images/adventure/parallax/` contains all 8 parallax layer files
+  3. All new WebP files staged and tracked by git (no untracked asset files)
+  4. WorldBackground component loads parallax images without 404 errors
+  5. PNG backup folders can be safely deleted (or moved to .gitignore)
+**Plans**: 3 plans in 1 wave
+
+Plans:
+- [ ] 12-01-PLAN.md — Restore backgrounds and parallax directories from backup
+- [ ] 12-02-PLAN.md — Stage WebP files and update any hardcoded .png references
+- [ ] 12-03-PLAN.md — Verification and cleanup (remove backups, test integration)
+
+### Phase 13: Translation Completion
+**Goal**: Add all missing translation keys for Phase 11 Teacher Vocabulary Builder feature
+**Depends on**: Phase 11 (feature implementation complete)
+**Requirements**: Multi-language support (he, sv, ja, es)
+**Gap Closure**: Closes translation gaps from v1 audit (372 missing keys)
+**Success Criteria** (what must be TRUE):
+  1. All 93 teacher/student/lesson/practice keys exist in Hebrew (he.js)
+  2. All 93 keys exist in Swedish (sv.js)
+  3. All 93 keys exist in Japanese (ja.js)
+  4. All 93 keys exist in Spanish (es.js)
+  5. Translation report shows 0 missing keys for Phase 11 features
+**Plans**: 2 plans in 1 wave
+
+Plans:
+- [ ] 13-01-PLAN.md — Generate translations for all 93 keys across 4 languages
+- [ ] 13-02-PLAN.md — Verification and translation report update
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11
+Phases execute in numeric order: 1 -> 2 -> ... -> 11 -> 12 -> 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -247,7 +284,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. Invalid Word System | 4/4 | Complete | 2026-01-23 |
 | 10. Bug Fixes & Stabilization | 5/5 | Complete | 2026-01-24 |
 | 11. Teacher Vocabulary Builder | 8/8 | Complete | 2026-01-24 |
+| 12. Asset WebP Migration | 0/3 | Pending | - |
+| 13. Translation Completion | 0/2 | Pending | - |
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-24 (All phases complete - milestone achieved)*
+*Last updated: 2026-01-24 (Gap closure phases 12-13 added from audit)*
