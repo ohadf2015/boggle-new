@@ -55,7 +55,7 @@ interface PlayerData {
   username: string;
   avatar?: { profilePictureUrl?: string; avatarImage?: string } | null;
   isHost?: boolean;
-  presenceStatus?: 'active' | 'idle' | 'away';
+  presenceStatus?: 'active' | 'idle' | 'afk';
   isBot?: boolean;
 }
 
