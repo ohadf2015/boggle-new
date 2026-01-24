@@ -3,11 +3,11 @@
 ## Current Position
 
 **Phase:** 11 of 11 (teacher-vocabulary-builder)
-**Plan:** 03 of 05 (Data Fetching Hooks)
+**Plan:** 04 of 05 (Socket Event Handlers)
 **Status:** In progress
-**Last activity:** 2026-01-24 - Completed 11-03-PLAN.md
+**Last activity:** 2026-01-24 - Completed 11-04-PLAN.md
 
-**Progress:** ███░░░░░░░░░░░░░░░░░ 60% (Phase 11 - 3/5 plans complete)
+**Progress:** ████░░░░░░░░░░░░░░░░ 80% (Phase 11 - 4/5 plans complete)
 
 ## Recent Completions
 
@@ -15,7 +15,7 @@
 - ✅ **11-01**: Database schema (5 tables, 27 RLS policies, role-based access)
 - ✅ **11-02**: Word integration check (TDD hook, 100% coverage, 22 tests)
 - ✅ **11-03**: Data fetching hooks (4 hooks, Supabase queries, optimistic updates)
-- ⏳ **11-04**: Student features (join classroom, practice lessons)
+- ✅ **11-04**: Socket event handlers (vocabulary selection, TDD, 10 tests)
 - ⏳ **11-05**: Integration and testing
 
 ### Phase 11 Deliverables (So Far)
@@ -29,6 +29,7 @@
 - **Teacher hooks**: useClassrooms, useClassroom, useLessons, useLesson
 - **Student hooks**: useJoinClassroom, useStudentProgress, useClassProgress, useLessonStats
 - **Optimistic updates**: All mutations update UI instantly before server confirmation
+- **Socket handlers**: Vocabulary word selection with host validation and integration checks
 
 ### Phase 10: Bug Fixes & Stabilization (COMPLETE)
 - ✅ **10-01**: Bug discovery and research (10 bugs identified)
@@ -52,6 +53,9 @@
 | teacher-vocab-009 | Implement optimistic updates in all mutation hooks | Provides instant UI feedback while maintaining data consistency | 11-03 | UX |
 | teacher-vocab-010 | Mastery threshold is 3+ correct attempts per word | Balances between too easy (1 correct) and too strict (5+ correct) | 11-03 | Progress Tracking |
 | teacher-vocab-011 | Separate hooks for lists vs single items (useClassrooms vs useClassroom) | Follows React best practices and allows focused state management | 11-03 | Architecture |
+| teacher-vocab-012 | Socket handlers use getGameBySocketId to find game context | Consistent with multiplayer patterns, no need to pass gameCode in payload | 11-04 | Socket Architecture |
+| teacher-vocab-013 | selectedVocabulary stored as Set<string> for O(1) lookups | Performance optimization for frequent add/remove/has operations | 11-04 | Data Structure |
+| teacher-vocab-014 | Words stored in original case (not normalized) for teacher UI | Maintains game context, normalization happens in checkWordIntegration | 11-04 | Data Representation |
 | multilang-001 | Use document.documentElement.lang and .dir for language/direction testing | Standard DOM API for verifying language and text direction settings | 10-04 | Testing |
 | multilang-002 | Test character length with .length property for all languages | JavaScript .length correctly counts Unicode characters for Hebrew, Japanese, Swedish | 10-04 | Testing |
 | multilang-003 | Verify RTL shadow flipping via CSS [dir='rtl'] selectors | CSS handles shadow direction changes automatically, tests verify attribute is set | 10-04 | Testing |
@@ -70,9 +74,9 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Session Continuity
 
-**Last session:** 2026-01-24 11:05 UTC
-**Stopped at:** Completed 11-03-PLAN.md (Data Fetching Hooks)
-**Resume file:** None (ready for 11-04)
+**Last session:** 2026-01-24 09:12 UTC
+**Stopped at:** Completed 11-04-PLAN.md (Socket Event Handlers)
+**Resume file:** None (ready for 11-05)
 
 ## Key Metrics
 
@@ -86,6 +90,11 @@ All critical bugs fixed in Phase 10 Wave 1.
 - **Phase verification**: ✅ All 5 success criteria met
 
 ## Tech Stack Additions
+
+### Phase 11-04
+- **Socket patterns**: Event handler registration, host validation, game state validation
+- **TDD patterns**: RED-GREEN-REFACTOR cycle, comprehensive test coverage before implementation
+- **Set usage**: Set<string> for O(1) operations on vocabulary selection
 
 ### Phase 11-03
 - **Hook patterns**: Custom hooks with useState/useCallback, optimistic updates, useMounted pattern
@@ -103,7 +112,7 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Brief Alignment Status
 
-**Phase 11: IN PROGRESS (60% complete)**
+**Phase 11: IN PROGRESS (80% complete)**
 
 **Completed:**
 - ✅ Database schema with 5 tables
@@ -115,11 +124,13 @@ All critical bugs fixed in Phase 10 Wave 1.
 - ✅ Data fetching layer (14 Supabase queries, 6 React hooks)
 - ✅ Optimistic updates for all mutations
 - ✅ Progress tracking with mastery threshold (3+ correct)
+- ✅ Socket event handlers for vocabulary selection (TDD, 10 tests)
+- ✅ Host validation and game state validation
+- ✅ Integration with checkWordIntegration for canIntegrate status
 
 **Next Steps:**
-- ⏳ Student features (11-04)
 - ⏳ Integration and testing (11-05)
 
 **Blockers:** None
 
-Ready to proceed with student features implementation.
+Ready to proceed with integration and end-to-end testing.
