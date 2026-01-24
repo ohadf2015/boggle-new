@@ -600,7 +600,7 @@ export async function updateProgress(
         }
       };
 
-      const wordsMastered = []; // Need 3 correct IN A ROW for mastery
+      const wordsMastered: string[] = []; // Need 3 correct IN A ROW for mastery
 
       const { data: created, error: createError } = await supabase
         .from('student_lesson_progress')

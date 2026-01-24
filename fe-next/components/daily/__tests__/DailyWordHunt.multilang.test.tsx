@@ -491,16 +491,18 @@ describe('English Baseline', () => {
 });
 
 describe('Cross-Language Validation', () => {
-  const languages: Language[] = ['en', 'he', 'sv', 'ja'];
+  // Subset of languages tested in this spec
+  type TestedLanguage = 'en' | 'he' | 'sv' | 'ja';
+  const languages: TestedLanguage[] = ['en', 'he', 'sv', 'ja'];
 
-  const grids: Record<Language, LetterGrid> = {
+  const grids: Record<TestedLanguage, LetterGrid> = {
     en: englishGrid,
     he: hebrewGrid,
     sv: swedishGrid,
     ja: japaneseGrid,
   };
 
-  const targetWords: Record<Language, string> = {
+  const targetWords: Record<TestedLanguage, string> = {
     en: 'HOUSE',
     he: 'שלום',
     sv: 'ÅLDER',
