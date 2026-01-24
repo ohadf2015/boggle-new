@@ -102,6 +102,14 @@ jest.mock('../lib/utils', () => ({
   cn: (...classes: (string | undefined | boolean)[]) => classes.filter(Boolean).join(' '),
 }));
 
+// Mock TvTutorialOverlay to avoid UI library dependency issues in tests
+jest.mock('../host/components/tv-broadcast/TvTutorialOverlay', () => ({
+  __esModule: true,
+  default: () => null,
+  isTvTutorialComplete: () => true,
+  TvHelpButton: () => null,
+}));
+
 // Translation mock with preset-related keys
 const mockTranslations: Record<string, string> = {
   'hostView.presetFast': 'Quick',

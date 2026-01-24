@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot } from 'lucide-react';
 import Avatar from '../../../../components/Avatar';
@@ -28,6 +28,8 @@ export interface EnhancedPlayerListProps {
   t: (path: string, params?: Record<string, string | number>) => string;
   /** Additional className */
   className?: string;
+  /** TV mode enabled - when true, host is filtered from the list (they're spectating, not playing) */
+  tvMode?: boolean;
 }
 
 // ==================== Component ====================
@@ -46,7 +48,23 @@ export function EnhancedPlayerList({
   currentUsername,
   t,
   className,
+  tvMode = false,
 }: EnhancedPlayerListProps): React.ReactElement {
+  // Filter out host when TV mode is enabled (host is spectating, not playing)
+  const filteredPlayers = useMemo(() => {
+    if (!tvMode) return players;
+
+    return players.filter(player => {
+      const name = typeof player === 'string' ? player : player.username;
+      const isHostPlayer = typeof player === 'object' ? player.isHost : false;
+
+      // Filter out player if they are the host (by isHost flag OR by matching currentUsername)
+      if (isHostPlayer || name === currentUsername) {
+        return false;
+      }
+      return true;
+    });
+  }, [players, tvMode, currentUsername]);
   return (
     <div
       data-testid="enhanced-player-list"
@@ -62,14 +80,14 @@ export function EnhancedPlayerList({
       <div className="flex items-center gap-2 px-4 py-3 border-b border-neo-black/30 flex-shrink-0">
         <Users className="w-5 h-5 text-neo-pink" />
         <span className="text-sm font-black uppercase text-neo-cream">
-          {t('hostView.playersJoined')} ({players.length})
+          {t('hostView.playersJoined')} ({filteredPlayers.length})
         </span>
       </div>
 
       {/* Player List */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-3 space-y-2">
         <AnimatePresence mode="popLayout">
-          {players.map((player, index) => {
+          {filteredPlayers.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
             const avatar = typeof player === 'object' ? player.avatar : null;
             const isHostPlayer = typeof player === 'object' ? player.isHost : false;
@@ -161,7 +179,7 @@ export function EnhancedPlayerList({
         </AnimatePresence>
 
         {/* Empty State */}
-        {players.length === 0 && (
+        {filteredPlayers.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

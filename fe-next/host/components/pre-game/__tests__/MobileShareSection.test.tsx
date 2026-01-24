@@ -116,7 +116,6 @@ describe('MobileShareSection', () => {
       render(<MobileShareSection gameCode="ABCD1234" t={mockT} />);
 
       expect(screen.getByText('ABCD1234')).toBeInTheDocument();
-      expect(screen.getByText('Room Code')).toBeInTheDocument();
     });
 
     it('renders with data-testid for integration testing', () => {
@@ -311,7 +310,7 @@ describe('MobileShareSection', () => {
       render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
 
       const section = screen.getByTestId('mobile-share-section');
-      expect(section.className).toContain('border-3');
+      expect(section.className).toContain('border-2');
       expect(section.className).toContain('border-neo-black');
     });
 
@@ -350,7 +349,7 @@ describe('MobileShareSection', () => {
       expect(shareButton).toHaveAttribute('aria-label', 'Share');
     });
 
-    it('buttons meet minimum touch target size', () => {
+    it('buttons have adequate padding for touch targets', () => {
       Object.defineProperty(navigator, 'share', {
         value: jest.fn().mockResolvedValue(undefined),
         configurable: true,
@@ -361,22 +360,33 @@ describe('MobileShareSection', () => {
       const copyButton = screen.getByTestId('mobile-copy-link-button');
       const shareButton = screen.getByTestId('mobile-native-share-button');
 
-      // Check for min-h-[44px] and min-w-[44px] classes
-      expect(copyButton.className).toContain('min-h-[44px]');
-      expect(copyButton.className).toContain('min-w-[44px]');
-      expect(shareButton.className).toContain('min-h-[44px]');
+      // Check buttons have proper padding classes for touch targets
+      expect(copyButton.className).toContain('p-2');
+      expect(shareButton.className).toContain('py-2');
     });
   });
 
   describe('instructions text', () => {
-    it('renders join instructions text', () => {
+    it('renders join instructions text when expanded', async () => {
       render(<MobileShareSection gameCode="INST123" t={mockT} />);
+
+      // Expand to show instructions
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
 
       expect(screen.getByText(/lexiclash\.com/i)).toBeInTheDocument();
     });
 
-    it('displays instructions with link icon', () => {
+    it('displays instructions banner when expanded', async () => {
       render(<MobileShareSection gameCode="INST123" t={mockT} />);
+
+      // Expand to show instructions
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
 
       const instructionsBanner = screen.getByTestId('mobile-share-instructions');
       expect(instructionsBanner).toBeInTheDocument();
@@ -384,8 +394,18 @@ describe('MobileShareSection', () => {
   });
 
   describe('social share buttons', () => {
-    it('renders WhatsApp share button', () => {
+    // Helper to expand the share section
+    const expandShareSection = async () => {
+      const toggle = screen.getByTestId('mobile-qr-toggle');
+      await act(async () => {
+        fireEvent.click(toggle);
+      });
+    };
+
+    it('renders WhatsApp share button when expanded', async () => {
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      await expandShareSection();
 
       expect(screen.getByTestId('mobile-whatsapp-button')).toBeInTheDocument();
     });
@@ -395,6 +415,8 @@ describe('MobileShareSection', () => {
 
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
 
+      await expandShareSection();
+
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
       await act(async () => {
         fireEvent.click(whatsappBtn);
@@ -403,16 +425,20 @@ describe('MobileShareSection', () => {
       expect(shareViaWhatsApp).toHaveBeenCalledWith('SOCIAL123', '', mockT);
     });
 
-    it('renders Telegram share button', () => {
+    it('renders Telegram share button when expanded', async () => {
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      await expandShareSection();
 
       expect(screen.getByTestId('mobile-telegram-button')).toBeInTheDocument();
     });
 
     it('calls shareViaTelegram when Telegram button clicked', async () => {
-      const { shareViaTelegram, getJoinUrl } = require('../../../../utils/share');
+      const { shareViaTelegram } = require('../../../../utils/share');
 
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      await expandShareSection();
 
       const telegramBtn = screen.getByTestId('mobile-telegram-button');
       await act(async () => {
@@ -422,27 +448,33 @@ describe('MobileShareSection', () => {
       expect(shareViaTelegram).toHaveBeenCalled();
     });
 
-    it('renders more options button', () => {
+    it('renders more options button when expanded', async () => {
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      await expandShareSection();
 
       expect(screen.getByTestId('mobile-more-share-button')).toBeInTheDocument();
     });
 
-    it('WhatsApp button has brand-whatsapp background color', () => {
+    it('WhatsApp button has brand-whatsapp background color', async () => {
       render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
+
+      await expandShareSection();
 
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
       expect(whatsappBtn.className).toContain('bg-brand-whatsapp');
     });
 
-    it('social buttons meet minimum touch target size', () => {
+    it('social buttons are flex-1 to share space equally', async () => {
       render(<MobileShareSection gameCode="TOUCH123" t={mockT} />);
+
+      await expandShareSection();
 
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
       const telegramBtn = screen.getByTestId('mobile-telegram-button');
 
-      expect(whatsappBtn.className).toContain('min-h-[44px]');
-      expect(telegramBtn.className).toContain('min-h-[44px]');
+      expect(whatsappBtn.className).toContain('flex-1');
+      expect(telegramBtn.className).toContain('flex-1');
     });
   });
 

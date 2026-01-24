@@ -202,17 +202,19 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             />
           ))}
 
-          {/* Combo Timer Arc - shows time remaining before combo expires */}
-          {timeRemaining !== null && timeRemaining > 0 && !skipSparkles && (
+          {/* Combo Timer Arc - shows time remaining before combo expires
+              NOTE: Always show timer arc regardless of device performance (essential gameplay feedback)
+              Positioned to the left of combo text, vertically centered with small gap */}
+          {timeRemaining !== null && timeRemaining > 0 && (
             <div
               className={cn(
-                'absolute pointer-events-none',
-                compact ? '-left-3 -top-2' : '-left-4 -top-2'
+                'absolute pointer-events-none top-1/2 -translate-y-1/2',
+                compact ? '-left-8' : '-left-10'
               )}
             >
               <svg
                 className={cn(
-                  compact ? 'w-6 h-6' : 'w-7 h-7'
+                  compact ? 'w-6 h-6' : 'w-8 h-8'
                 )}
                 viewBox="0 0 36 36"
               >
@@ -243,11 +245,13 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                   strokeLinecap="round"
                   strokeDasharray={`${(timeRemaining / 100) * 94.25} 94.25`}
                   transform="rotate(-90 18 18)"
-                  animate={isDanger ? { opacity: [1, 0.6, 1] } : undefined}
-                  transition={isDanger ? { duration: 0.5, repeat: Infinity } : undefined}
-                  style={{
-                    filter: `drop-shadow(0 0 4px ${isDanger ? '#FF4444' : rarityColors.shadow})`,
-                  }}
+                  animate={isDanger && !skipSparkles ? { opacity: [1, 0.6, 1] } : undefined}
+                  transition={isDanger && !skipSparkles ? { duration: 0.5, repeat: Infinity } : undefined}
+                  style={
+                    skipSparkles
+                      ? undefined // Skip filter on low-end devices for better performance
+                      : { filter: `drop-shadow(0 0 4px ${isDanger ? '#FF4444' : rarityColors.shadow})` }
+                  }
                 />
               </svg>
             </div>

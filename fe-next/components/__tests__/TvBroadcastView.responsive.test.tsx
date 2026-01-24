@@ -137,9 +137,9 @@ describe('TvBroadcastView - Responsive Layout', () => {
     expect(grid).toHaveClass('min-h-[200px]');
     expect(leaderboard).toHaveClass('min-h-[150px]');
 
-    // Both should have overflow-hidden to prevent content from escaping
+    // Grid uses overflow-hidden, leaderboard uses overflow-auto for scrolling
     expect(grid).toHaveClass('overflow-hidden');
-    expect(leaderboard).toHaveClass('overflow-hidden');
+    expect(leaderboard).toHaveClass('overflow-auto');
   });
 
   it('should constrain content within parent container', () => {

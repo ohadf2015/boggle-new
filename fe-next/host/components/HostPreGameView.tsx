@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Users, Crown, Bot, Monitor, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '../../components/ui/button';
@@ -24,6 +24,7 @@ import {
   InviteCard,
   EnhancedPlayerList,
 } from './pre-game/desktop';
+import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -102,6 +103,7 @@ function HostPreGameView({
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
+  const [showTvTutorial, setShowTvTutorial] = useState(false);
 
   const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite();
 
@@ -125,6 +127,22 @@ function HostPreGameView({
       setHasInitialized(true);
     }
   }, [hasInitialized, setTimerValue, setDifficulty, setMinWordLength]);
+
+  // Track previous hostPlaying value to detect when TV mode is enabled
+  const prevHostPlayingRef = useRef(hostPlaying);
+
+  // Show TV tutorial when TV mode is enabled (hostPlaying changes from true to false)
+  useEffect(() => {
+    const wasHostPlaying = prevHostPlayingRef.current;
+    const isNowTvMode = !hostPlaying;
+
+    // If user just enabled TV mode and hasn't seen the tutorial yet, show it
+    if (wasHostPlaying && isNowTvMode && !isTvTutorialComplete()) {
+      setShowTvTutorial(true);
+    }
+
+    prevHostPlayingRef.current = hostPlaying;
+  }, [hostPlaying]);
 
   // Apply preset
   const handleApplyPreset = useCallback(
@@ -163,7 +181,25 @@ function HostPreGameView({
     }
   }, [mobileTab]);
 
-  const isStartDisabled = !timerValue || playersReady.length === 0 || tournamentCreating;
+  // Filter out host when TV mode is enabled (host is spectating, not playing)
+  const filteredPlayersForDisplay = useMemo(() => {
+    // When host is playing, show all players
+    if (hostPlaying) return playersReady;
+
+    // When TV mode is enabled, filter out the host
+    return playersReady.filter(player => {
+      const name = typeof player === 'string' ? player : player.username;
+      const isHostPlayer = typeof player === 'object' ? player.isHost : false;
+
+      // Filter out player if they are the host (by isHost flag OR by matching username)
+      if (isHostPlayer || name === username) {
+        return false;
+      }
+      return true;
+    });
+  }, [playersReady, hostPlaying, username]);
+
+  const isStartDisabled = !timerValue || filteredPlayersForDisplay.length === 0 || tournamentCreating;
 
   // Render Lobby Tab Content
   const renderLobbyContent = (): React.ReactElement => (
@@ -198,12 +234,12 @@ function HostPreGameView({
         <div className="flex items-center gap-2 px-2 py-1.5 border-b border-neo-black/30 flex-shrink-0">
           <Users className="w-4 h-4 text-neo-pink" />
           <span className="text-xs font-bold uppercase text-neo-cream">
-            {t('hostView.playersJoined')} ({playersReady.length})
+            {t('hostView.playersJoined')} ({filteredPlayersForDisplay.length})
           </span>
         </div>
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-2 space-y-1">
           <AnimatePresence>
-            {playersReady.map((player, index) => {
+            {filteredPlayersForDisplay.map((player, index) => {
               const name = typeof player === 'string' ? player : player.username;
               const avatar = typeof player === 'object' ? player.avatar : null;
               const isHostPlayer = typeof player === 'object' ? player.isHost : false;
@@ -241,7 +277,7 @@ function HostPreGameView({
               );
             })}
           </AnimatePresence>
-          {playersReady.length === 0 && (
+          {filteredPlayersForDisplay.length === 0 && (
             <p className="text-xs text-center text-neo-cream/50 py-3">
               {t('hostView.waitingForPlayers')}
             </p>
@@ -346,7 +382,7 @@ function HostPreGameView({
                   onStartGame={onStartGame}
                   disabled={isStartDisabled}
                   tournamentCreating={tournamentCreating}
-                  playerCount={playersReady.length}
+                  playerCount={filteredPlayersForDisplay.length}
                   t={t}
                   className="max-w-md"
                 />
@@ -365,6 +401,7 @@ function HostPreGameView({
                   currentUsername={username}
                   t={t}
                   className="flex-1"
+                  tvMode={!hostPlaying}
                 />
                 <div
                   data-testid="desktop-chat-area"
@@ -418,7 +455,7 @@ function HostPreGameView({
           onStartGame={onStartGame}
           disabled={isStartDisabled}
           tournamentCreating={tournamentCreating}
-          playerCount={playersReady.length}
+          playerCount={filteredPlayersForDisplay.length}
           t={t}
         />
       </div>
@@ -427,7 +464,7 @@ function HostPreGameView({
       <MobileBottomNav
         activeTab={mobileTab}
         onTabChange={handleMobileTabChange}
-        playerCount={playersReady.length}
+        playerCount={filteredPlayersForDisplay.length}
         unreadChatCount={unreadChatCount}
         t={t}
       />
@@ -438,6 +475,14 @@ function HostPreGameView({
         onClose={() => setPresetInfoOpen(null)}
         onSelectPreset={handleSelectAndApplyPreset}
         t={t}
+      />
+
+      {/* TV Mode Tutorial - shown when user enables TV mode for the first time */}
+      <TvTutorialOverlay
+        onComplete={() => setShowTvTutorial(false)}
+        onSkip={() => setShowTvTutorial(false)}
+        t={t}
+        forceShow={showTvTutorial}
       />
     </div>
   );

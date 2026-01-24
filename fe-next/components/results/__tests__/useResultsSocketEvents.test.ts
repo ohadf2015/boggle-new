@@ -387,6 +387,98 @@ describe('useResultsSocketEvents', () => {
       expect(result.current.mysteryReward).toEqual(rewardData.reward);
       expect(result.current.showMysteryReward).toBe(true);
     });
+
+    it('should only show ONE mystery reward per game - ignore subsequent rewards', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+      );
+
+      const firstReward = {
+        reward: {
+          type: 'coins',
+          amount: 100,
+          rarity: 'rare',
+        },
+      };
+
+      const secondReward = {
+        reward: {
+          type: 'xp_bonus',
+          amount: 200,
+          rarity: 'epic',
+        },
+      };
+
+      // WHEN - First reward arrives
+      act(() => {
+        triggerSocketEvent(mockSocket, 'engagement:mysteryReward', firstReward);
+      });
+
+      // THEN - First reward should be shown
+      expect(result.current.mysteryReward).toEqual(firstReward.reward);
+      expect(result.current.showMysteryReward).toBe(true);
+
+      // WHEN - Second reward arrives while first is still showing
+      act(() => {
+        triggerSocketEvent(mockSocket, 'engagement:mysteryReward', secondReward);
+      });
+
+      // THEN - Should still show first reward (second is ignored)
+      expect(result.current.mysteryReward).toEqual(firstReward.reward);
+      expect(result.current.showMysteryReward).toBe(true);
+    });
+
+    it('should ignore mystery reward if one was already shown and closed', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+      );
+
+      const firstReward = {
+        reward: {
+          type: 'coins',
+          amount: 100,
+          rarity: 'rare',
+        },
+      };
+
+      const secondReward = {
+        reward: {
+          type: 'xp_bonus',
+          amount: 200,
+          rarity: 'epic',
+        },
+      };
+
+      // WHEN - First reward arrives and is shown
+      act(() => {
+        triggerSocketEvent(mockSocket, 'engagement:mysteryReward', firstReward);
+      });
+
+      // Verify first reward is shown
+      expect(result.current.mysteryReward).toEqual(firstReward.reward);
+      expect(result.current.showMysteryReward).toBe(true);
+
+      // Close the first reward
+      act(() => {
+        result.current.handleMysteryRewardClose();
+      });
+
+      // Verify popup is closed
+      expect(result.current.showMysteryReward).toBe(false);
+
+      // WHEN - Second reward arrives after first was closed
+      act(() => {
+        triggerSocketEvent(mockSocket, 'engagement:mysteryReward', secondReward);
+      });
+
+      // THEN - Second reward should be ignored (only ONE reward per session)
+      // The hasShownMysteryRewardRef prevents any new rewards from showing
+      expect(result.current.showMysteryReward).toBe(false);
+      // mysteryReward should still be null (cleared by close)
+      expect(result.current.mysteryReward).toBeNull();
+    });
   });
 
   describe('Referral Milestone Events', () => {

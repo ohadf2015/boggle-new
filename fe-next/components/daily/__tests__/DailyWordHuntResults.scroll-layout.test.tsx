@@ -120,6 +120,72 @@ describe('DailyChallengeResults Scroll Layout', () => {
   });
 });
 
+describe('DailyChallenge Container Layout', () => {
+  const sourcePath = resolve(process.cwd(), 'components/daily/DailyChallenge.tsx');
+  const source = readFileSync(sourcePath, 'utf-8');
+
+  describe('Root container constraints', () => {
+    it('should have proper height constraints for child scroll containers', () => {
+      // The DailyChallenge wrapper must constrain height so child scroll works.
+      // CRITICAL: Using `min-h-full` alone does NOT constrain height - content can
+      // grow beyond viewport and break child scroll containers.
+      //
+      // CORRECT PATTERNS (constrain height):
+      // - `h-full flex flex-col` (fixed to parent height)
+      // - `flex-1 flex flex-col min-h-0` (flex-constrained)
+      //
+      // INCORRECT PATTERNS (allow unbounded growth):
+      // - `min-h-full flex flex-col` (can grow beyond parent, breaks child scroll)
+      // - `flex flex-col` without height constraint
+      //
+      // When a container uses min-h-full, it says "be at least as tall as parent"
+      // but allows the container to grow taller. This means child elements with
+      // overflow-y-auto can't scroll because the parent grows to fit all content.
+
+      // Find the root container div in DailyChallenge render
+      const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className="([^"]+)"/;
+      const match = source.match(rootContainerPattern);
+
+      expect(match).toBeTruthy();
+      if (match) {
+        const className = match[1];
+        // Should NOT use min-h-full alone (breaks child scroll)
+        const hasMinHFull = /\bmin-h-full\b/.test(className);
+        // Must either use h-full OR flex-1 with min-h-0 to properly constrain height
+        const hasHFull = /\bh-full\b/.test(className);
+        const hasFlex1WithMinH0 = /\bflex-1\b/.test(className) && /\bmin-h-0\b/.test(className);
+
+        // ASSERTION: Must have proper height constraint (not just min-h-full)
+        // Should have flex-1 + min-h-0 OR h-full (but NOT min-h-full alone)
+        expect(hasHFull || hasFlex1WithMinH0).toBe(true);
+
+        // If min-h-full is present, it must be accompanied by proper constraints
+        if (hasMinHFull) {
+          expect(hasHFull || hasFlex1WithMinH0).toBe(true);
+        }
+      }
+    });
+
+    it('should NOT use min-h-full without height constraints', () => {
+      // min-h-full alone is a known bug pattern that prevents child scroll
+      const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className="([^"]+)"/;
+      const match = source.match(rootContainerPattern);
+
+      expect(match).toBeTruthy();
+      if (match) {
+        const className = match[1];
+        const hasMinHFullAlone =
+          /\bmin-h-full\b/.test(className) &&
+          !/\bflex-1\b/.test(className) &&
+          !/\bh-full\b/.test(className);
+
+        // Should NOT have min-h-full without flex-1 or h-full
+        expect(hasMinHFullAlone).toBe(false);
+      }
+    });
+  });
+});
+
 describe('BuzzResultsScreen Scroll Layout', () => {
   const sourcePath = resolve(process.cwd(), 'components/buzz/BuzzResultsScreen.tsx');
   const source = readFileSync(sourcePath, 'utf-8');

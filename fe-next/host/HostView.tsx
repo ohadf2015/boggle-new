@@ -42,12 +42,22 @@ import { useHideNavigation } from '../contexts/NavigationContext';
 // Props
 // ==========================================
 
+interface GameStartData {
+  letterGrid: string[][];
+  timerSeconds: number;
+  language: Language;
+}
+
 interface HostViewProps {
   gameCode: string;
   roomLanguage?: Language;
   initialPlayers?: Player[];
   username: string;
   onShowResults: (data: unknown) => void;
+  /** Pending game start data from page-level socket handler (for host returning from results) */
+  pendingGameStart?: GameStartData | null;
+  /** Callback when pending game start has been consumed */
+  onGameStartConsumed?: () => void;
 }
 
 // ==========================================
@@ -60,6 +70,8 @@ const HostView: React.FC<HostViewProps> = memo(({
   initialPlayers = [],
   username,
   onShowResults,
+  pendingGameStart,
+  onGameStartConsumed,
 }) => {
   const { t, language, dir } = useLanguage();
   const { socket } = useSocket();
@@ -239,6 +251,36 @@ const HostView: React.FC<HostViewProps> = memo(({
       socket.off('startGame', handleResetGame);
     };
   }, [socket]);
+
+  // Handle pending game start (when host returns from results page)
+  // The startGame event was captured at page level while HostView was unmounted
+  // We need to initialize the game state with that data
+  useEffect(() => {
+    if (!pendingGameStart) return;
+
+    // Initialize game state from pending data
+    if (pendingGameStart.letterGrid) {
+      state.setTableData(pendingGameStart.letterGrid);
+    }
+    if (pendingGameStart.timerSeconds !== undefined) {
+      state.setRemainingTime(pendingGameStart.timerSeconds);
+    }
+
+    // Reset states for new game and trigger animation
+    state.setWaitingForResults(false);
+    state.setShowStartAnimation(true);
+    state.setPlayerWordCounts({});
+    state.setPlayerScores({});
+    state.setHostFoundWords([]);
+    state.setHostAchievements([]);
+    state.setFinalScores(null);
+
+    // Trigger music change for game start
+    fadeToTrack(TRACKS.IN_GAME, 800, 800);
+
+    // Mark pending game start as consumed
+    onGameStartConsumed?.();
+  }, [pendingGameStart, onGameStartConsumed, state, fadeToTrack, TRACKS.IN_GAME]);
 
   // Destructure for cleaner JSX
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;

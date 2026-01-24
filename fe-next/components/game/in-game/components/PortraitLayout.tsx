@@ -207,18 +207,18 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
-          {/* Stats section with vertical stacking on mobile */}
+          {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex flex-col gap-1 w-full px-1 md:px-2"
+              className="flex flex-col gap-0 w-full px-1 md:px-2"
               role="status"
               aria-label="Game status"
             >
               {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
               {isPlaying && (
                 <div
-                  className="flex lg:hidden justify-center items-center h-[40px]"
+                  className="flex lg:hidden justify-center items-center h-[32px]"
                   data-testid="combo-row-mobile"
                 >
                   <ComboDisplay
@@ -232,7 +232,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center lg:justify-between relative min-h-[80px] md:min-h-[100px] lg:min-h-[120px]"
+                className="flex w-full items-center justify-center lg:justify-between relative min-h-[70px] md:min-h-[90px] lg:min-h-[120px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -320,9 +320,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </div>
           )}
 
-          {/* Word Forming Area */}
+          {/* Word Forming Area - tight spacing to board */}
           {isPlaying && (
-            <div className="flex items-center justify-center flex-shrink-0 mb-0">
+            <div className="flex items-center justify-center flex-shrink-0 -mt-1 mb-0">
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
                 letterCount={isTypingMode ? typedWord.length : letterCount}
@@ -363,8 +363,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </motion.div>
           )}
 
-          {/* Grid */}
-          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden">
+          {/* Grid - uses items-start on mobile to stay close to word forming area, centers on desktop */}
+          <div className="flex-1 flex items-start md:items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}

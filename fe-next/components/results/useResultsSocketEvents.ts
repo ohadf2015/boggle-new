@@ -81,6 +81,7 @@ export function useResultsSocketEvents({
   const [mysteryReward, setMysteryReward] = useState<MysteryReward | null>(null);
   const [showMysteryReward, setShowMysteryReward] = useState(false);
   const mysteryRewardQueueRef = useRef<MysteryReward[]>([]);
+  const hasShownMysteryRewardRef = useRef<boolean>(false); // Track if ANY reward was shown this session
 
   // Referral milestone state
   const [referralMilestone, setReferralMilestone] = useState<ReferralMilestone | null>(null);
@@ -156,12 +157,13 @@ export function useResultsSocketEvents({
 
     const handleMysteryReward = (data: { reward: MysteryReward }) => {
       logger.log('[RESULTS] Mystery reward received:', data);
-      if (data.reward) {
+      // Only show ONE mystery reward per game session to avoid overwhelming users
+      // Use ref to track if any reward was already shown (persists across closes)
+      if (data.reward && !hasShownMysteryRewardRef.current) {
+        hasShownMysteryRewardRef.current = true;
         mysteryRewardQueueRef.current.push(data.reward);
-        if (!showMysteryReward) {
-          setMysteryReward(data.reward);
-          setShowMysteryReward(true);
-        }
+        setMysteryReward(data.reward);
+        setShowMysteryReward(true);
       }
     };
 

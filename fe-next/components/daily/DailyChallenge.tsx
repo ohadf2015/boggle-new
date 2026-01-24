@@ -706,9 +706,12 @@ const DailyChallenge: React.FC = () => {
   }, [gameLanguage, isAuthenticated, profile, t]);
 
   // Render based on phase
+  // CRITICAL: Use flex-1 + min-h-0 to establish proper height constraint for child scroll containers.
+  // Using min-h-full alone allows unbounded growth which breaks overflow-y-auto on children.
+  // The parent screen-fit-content has flex: 1, so flex-1 here inherits the constrained height.
   return (
     <div
-      className="flex flex-col min-h-full bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip]"
+      className="flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip]"
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show when not playing */}

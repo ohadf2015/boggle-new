@@ -50,6 +50,14 @@ jest.mock('../../components/BotControls', () => ({
   default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
 }));
 
+// Mock TvTutorialOverlay to avoid UI library dependency issues in tests
+jest.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
+  __esModule: true,
+  default: () => null,
+  isTvTutorialComplete: () => true,
+  TvHelpButton: () => null,
+}));
+
 const mockT = (key: string) => key;
 
 const defaultProps = {

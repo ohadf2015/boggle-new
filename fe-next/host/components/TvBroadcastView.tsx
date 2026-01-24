@@ -204,7 +204,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         <TvJoinBar
           gameCode={gameCode}
           roomName={roomName}
-          playerCount={playersReady.length}
+          playerCount={leaderboardData.length}
           t={t}
         />
       </motion.div>
@@ -236,8 +236,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           )}
         </div>
 
-        {/* Right: Leaderboard - fills grid cell */}
-        <div className="min-h-[150px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+        {/* Right: Leaderboard - fills grid cell, needs overflow-auto for scrolling */}
+        <div className="min-h-[150px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-auto">
           <TvLeaderboard
             players={leaderboardData}
             playerCombos={playerCombos}
@@ -252,7 +252,6 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         notifications={notifications}
         onDismiss={dismissNotification}
         maxVisible={1}
-        t={t}
       />
 
       {/* Tutorial Overlay - shown on first visit or when help button clicked */}

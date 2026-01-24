@@ -202,7 +202,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
                 'text-sm font-bold',
                 isDarkMode ? 'text-gray-200' : 'text-neo-black'
               )}>
-                {nextTier.min - currentStreak} {t('growth.winsAway') || 'wins away'}
+                {nextTier.min - currentStreak} {t('growth.daysAway') || 'days away'}
               </span>
             </div>
           </div>
@@ -219,7 +219,9 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
             <motion.div
               initial={{ width: 0 }}
               animate={{
-                width: `${((currentStreak - tier.min) / (nextTier.min - tier.min)) * 100}%`,
+                // Add 1 to numerator so day 1 shows progress (not 0%)
+                // Example: streak=1, tier.min=1, nextTier.min=3 → (1-1+1)/(3-1) = 50%
+                width: `${((currentStreak - tier.min + 1) / (nextTier.min - tier.min)) * 100}%`,
               }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
               className={cn('h-full', tier.bar)}

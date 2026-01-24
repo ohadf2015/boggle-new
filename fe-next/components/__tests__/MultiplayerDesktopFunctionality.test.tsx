@@ -66,6 +66,13 @@ jest.mock('../../components/BotControls', () => ({
   default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
 }));
 
+// Mock TvTutorialOverlay component
+jest.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
+  __esModule: true,
+  default: () => null,
+  isTvTutorialComplete: () => true,
+}));
+
 import HostPreGameView from '../../host/components/HostPreGameView';
 import PlayerWaitingView from '../../player/components/PlayerWaitingView';
 

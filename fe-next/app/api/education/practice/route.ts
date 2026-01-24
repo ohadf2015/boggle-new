@@ -1,0 +1,315 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { z } from 'zod';
+import logger from '@/utils/logger';
+
+// Validation schemas
+const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list']);
+
+const startSessionSchema = z.object({
+  lessonId: z.string().uuid(),
+  practiceType: practiceTypeSchema,
+});
+
+const updateSessionSchema = z.object({
+  sessionId: z.string().uuid(),
+  // Flashcard updates
+  cardsReviewed: z.number().min(0).optional(),
+  cardsCorrect: z.number().min(0).optional(),
+  // Board practice updates
+  wordsFound: z.array(z.string()).optional(),
+  vocabularyWordsFound: z.array(z.string()).optional(),
+  totalScore: z.number().min(0).optional(),
+  // Common
+  timeSpentSeconds: z.number().min(0).optional(),
+  completed: z.boolean().optional(),
+});
+
+const getProgressSchema = z.object({
+  lessonId: z.string().uuid(),
+  studentId: z.string().uuid().optional(), // For teachers viewing student progress
+});
+
+/**
+ * GET /api/education/practice
+ * Get practice sessions or progress
+ * Query params:
+ *   - sessionId: Get specific session
+ *   - lessonId: Get all sessions for a lesson
+ *   - progress: If true, get aggregated progress
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const sessionId = searchParams.get('sessionId');
+    const lessonId = searchParams.get('lessonId');
+    const studentId = searchParams.get('studentId');
+    const getProgress = searchParams.get('progress') === 'true';
+
+    // Get single session by ID
+    if (sessionId) {
+      const { data: session, error } = await supabase
+        .from('practice_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (error) {
+        logger.error('Error fetching session:', error);
+        return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+      }
+
+      // Verify ownership (student or teacher of the lesson)
+      if (session.student_id !== user.id) {
+        const { data: lesson } = await supabase
+          .from('vocabulary_lessons')
+          .select('teacher_id')
+          .eq('id', session.lesson_id)
+          .single();
+
+        if (!lesson || lesson.teacher_id !== user.id) {
+          return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+        }
+      }
+
+      return NextResponse.json({ session });
+    }
+
+    // Get progress or sessions for a lesson
+    if (!lessonId) {
+      return NextResponse.json({ error: 'lessonId is required' }, { status: 400 });
+    }
+
+    // Determine whose sessions to fetch
+    const targetStudentId = studentId || user.id;
+
+    // If viewing another student's data, verify teacher access
+    if (studentId && studentId !== user.id) {
+      const { data: lesson } = await supabase
+        .from('vocabulary_lessons')
+        .select('teacher_id')
+        .eq('id', lessonId)
+        .single();
+
+      if (!lesson || lesson.teacher_id !== user.id) {
+        return NextResponse.json({ error: 'Not authorized to view student data' }, { status: 403 });
+      }
+    }
+
+    // Get aggregated progress
+    if (getProgress) {
+      const { data: progress, error } = await supabase
+        .from('student_practice_progress')
+        .select('*')
+        .eq('student_id', targetStudentId)
+        .eq('lesson_id', lessonId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // Not found is ok
+        logger.error('Error fetching progress:', error);
+        return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 500 });
+      }
+
+      // Get mastery level
+      const { data: masteryResult } = await supabase
+        .rpc('calculate_lesson_mastery', {
+          p_student_id: targetStudentId,
+          p_lesson_id: lessonId,
+        });
+
+      return NextResponse.json({
+        progress: progress || {
+          student_id: targetStudentId,
+          lesson_id: lessonId,
+          total_flashcards_reviewed: 0,
+          total_flashcards_correct: 0,
+          total_practice_score: 0,
+          total_vocabulary_words_found: 0,
+          flashcard_sessions: 0,
+          solo_board_sessions: 0,
+          warmup_sessions: 0,
+          word_list_views: 0,
+          total_practice_time_seconds: 0,
+          last_practice_at: null,
+        },
+        mastery: masteryResult || 'not_started',
+      });
+    }
+
+    // Get all sessions for the lesson
+    const { data: sessions, error } = await supabase
+      .from('practice_sessions')
+      .select('*')
+      .eq('student_id', targetStudentId)
+      .eq('lesson_id', lessonId)
+      .order('started_at', { ascending: false });
+
+    if (error) {
+      logger.error('Error fetching sessions:', error);
+      return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 });
+    }
+
+    return NextResponse.json({ sessions: sessions || [] });
+  } catch (error) {
+    logger.error('GET practice error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/education/practice
+ * Start a new practice session
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const parseResult = startSessionSchema.safeParse(body);
+
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parseResult.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { lessonId, practiceType } = parseResult.data;
+
+    // Verify student has access to this lesson (assigned via classroom)
+    const { data: hasAccess } = await supabase
+      .from('lesson_assignments')
+      .select(`
+        id,
+        classroom:classrooms!inner(
+          id,
+          students:classroom_students!inner(student_id)
+        )
+      `)
+      .eq('lesson_id', lessonId)
+      .eq('classroom.students.student_id', user.id)
+      .eq('classroom.students.status', 'active')
+      .limit(1)
+      .single();
+
+    // Also check if user is the teacher (they can practice their own lessons)
+    const { data: lesson } = await supabase
+      .from('vocabulary_lessons')
+      .select('teacher_id')
+      .eq('id', lessonId)
+      .single();
+
+    if (!hasAccess && lesson?.teacher_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Not authorized to practice this lesson' },
+        { status: 403 }
+      );
+    }
+
+    // Create practice session
+    const { data: session, error } = await supabase
+      .from('practice_sessions')
+      .insert({
+        student_id: user.id,
+        lesson_id: lessonId,
+        practice_type: practiceType,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      logger.error('Error creating practice session:', error);
+      return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
+    }
+
+    return NextResponse.json({ session }, { status: 201 });
+  } catch (error) {
+    logger.error('POST practice error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * PATCH /api/education/practice
+ * Update a practice session (progress, completion)
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const parseResult = updateSessionSchema.safeParse(body);
+
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parseResult.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { sessionId, completed, ...updateData } = parseResult.data;
+
+    // Verify user owns the session
+    const { data: existing, error: existingError } = await supabase
+      .from('practice_sessions')
+      .select('id, student_id')
+      .eq('id', sessionId)
+      .eq('student_id', user.id)
+      .single();
+
+    if (existingError || !existing) {
+      return NextResponse.json(
+        { error: 'Session not found or not authorized' },
+        { status: 403 }
+      );
+    }
+
+    // Build update object with snake_case keys
+    const updateObj: Record<string, unknown> = {};
+    if (updateData.cardsReviewed !== undefined) updateObj.cards_reviewed = updateData.cardsReviewed;
+    if (updateData.cardsCorrect !== undefined) updateObj.cards_correct = updateData.cardsCorrect;
+    if (updateData.wordsFound !== undefined) updateObj.words_found = updateData.wordsFound;
+    if (updateData.vocabularyWordsFound !== undefined) updateObj.vocabulary_words_found = updateData.vocabularyWordsFound;
+    if (updateData.totalScore !== undefined) updateObj.total_score = updateData.totalScore;
+    if (updateData.timeSpentSeconds !== undefined) updateObj.time_spent_seconds = updateData.timeSpentSeconds;
+    if (completed) updateObj.completed_at = new Date().toISOString();
+
+    // Update session
+    const { data: session, error } = await supabase
+      .from('practice_sessions')
+      .update(updateObj)
+      .eq('id', sessionId)
+      .select()
+      .single();
+
+    if (error) {
+      logger.error('Error updating session:', error);
+      return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
+    }
+
+    return NextResponse.json({ session });
+  } catch (error) {
+    logger.error('PATCH practice error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

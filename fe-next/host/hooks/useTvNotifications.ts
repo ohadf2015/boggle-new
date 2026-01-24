@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
-import type { TvNotificationData, TvNotificationType, NotificationTier } from '../components/tv-broadcast/TvNotification';
+import {
+  NOTIFICATION_LAYOUTS,
+  NOTIFICATION_MASCOTS,
+  type TvNotificationData,
+  type TvNotificationType,
+  type NotificationTier,
+  type NotificationLayout,
+} from '../components/tv-broadcast/TvNotification';
+import type { MascotVariant } from '../../components/ui/Mascot';
 
 interface PlayerFoundWordPayload {
   username: string;
@@ -49,6 +57,10 @@ const NOTIFICATION_DURATION: Record<NotificationTier, number> = {
   mega: 5000,
 };
 
+// Throttling configuration
+const THROTTLE_WINDOW_MS = 5000;
+const MAX_SUBTLE_PER_WINDOW = 3;
+
 /**
  * useTvNotifications - Detects game events and creates TV broadcast notifications
  */
@@ -65,6 +77,7 @@ export function useTvNotifications({
   const lastWordPerPlayerRef = useRef<Record<string, { word: string; time: number }>>({});
   const previousCombosRef = useRef<Record<string, number>>({});
   const notificationIdRef = useRef(0);
+  const recentSubtleNotificationsRef = useRef<number[]>([]);
 
   // Generate unique notification ID
   const generateId = useCallback(() => {
@@ -72,7 +85,7 @@ export function useTvNotifications({
     return `tv-notif-${Date.now()}-${notificationIdRef.current}`;
   }, []);
 
-  // Add a notification to the queue
+  // Add a notification to the queue with throttling for subtle tier
   const addNotification = useCallback((
     type: TvNotificationType,
     tier: NotificationTier,
@@ -80,21 +93,42 @@ export function useTvNotifications({
     subtext?: string,
     player?: string,
   ) => {
+    const now = Date.now();
+
+    // Throttle subtle notifications during busy moments
+    if (tier === 'subtle') {
+      const recentSubtle = recentSubtleNotificationsRef.current.filter(
+        time => now - time < THROTTLE_WINDOW_MS
+      );
+
+      if (recentSubtle.length >= MAX_SUBTLE_PER_WINDOW) {
+        // Skip this subtle notification - too many recent ones
+        return;
+      }
+
+      recentSubtleNotificationsRef.current = [...recentSubtle, now];
+    }
+
+    // Get layout and mascot variant from mappings
+    const layout: NotificationLayout = NOTIFICATION_LAYOUTS[type];
+    const mascotVariant: MascotVariant = NOTIFICATION_MASCOTS[type];
+
     const notification: TvNotificationData = {
       id: generateId(),
       type,
       tier,
+      layout,
+      mascotVariant,
       headline,
       subtext,
       player,
       duration: NOTIFICATION_DURATION[tier],
-      timestamp: Date.now(),
+      timestamp: now,
     };
 
-    // Priority queue: mega notifications can bump lower priority
+    // Priority queue: mega notifications go to the front
     setNotifications(prev => {
       if (tier === 'mega') {
-        // Mega notifications go to the front
         return [notification, ...prev];
       }
       return [...prev, notification];
@@ -123,6 +157,7 @@ export function useTvNotifications({
       previousRankingsRef.current = {};
       lastWordPerPlayerRef.current = {};
       previousCombosRef.current = {};
+      recentSubtleNotificationsRef.current = [];
       setNotifications([]);
     };
 
@@ -132,6 +167,7 @@ export function useTvNotifications({
       previousRankingsRef.current = {};
       lastWordPerPlayerRef.current = {};
       previousCombosRef.current = {};
+      recentSubtleNotificationsRef.current = [];
     };
 
     socket.on('resetGame', handleResetGame);

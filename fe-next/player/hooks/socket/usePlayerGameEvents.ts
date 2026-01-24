@@ -86,6 +86,18 @@ export function usePlayerGameEvents({
   const letterGrid = useLetterGrid();
   const gameLanguage = useGameLanguage();
 
+  // Refs to access current values without causing useEffect re-registration
+  // CRITICAL: letterGrid and gameLanguage are used inside socket handlers
+  // but should NOT be in useEffect deps - changing them would clear fire round countdown
+  const letterGridRef = useRef(letterGrid);
+  const gameLanguageRef = useRef(gameLanguage);
+  useEffect(() => {
+    letterGridRef.current = letterGrid;
+  }, [letterGrid]);
+  useEffect(() => {
+    gameLanguageRef.current = gameLanguage;
+  }, [gameLanguage]);
+
   // Get all setters from Zustand store (actions never trigger re-renders)
   const {
     setFoundWords,
@@ -229,16 +241,17 @@ export function usePlayerGameEvents({
       }
       setRemainingTime(data.remainingTime);
 
-      if (data.letterGrid && !letterGrid) {
+      // Use refs to access current values without causing effect re-registration
+      if (data.letterGrid && !letterGridRef.current) {
         logger.log('[PLAYER] Received letterGrid in timeUpdate - late join sync');
         setLetterGrid(data.letterGrid);
       }
-      if (data.language && !gameLanguage) {
+      if (data.language && !gameLanguageRef.current) {
         setGameLanguage(data.language);
       }
 
       const isGameActive = gameActiveRef.current;
-      const hasGrid = letterGrid || data.letterGrid;
+      const hasGrid = letterGridRef.current || data.letterGrid;
       if (!isGameActive && data.remainingTime > 0 && hasGrid) {
         logger.log('[PLAYER] Timer started on server, activating game via timeUpdate');
         setGameActive(true);
@@ -382,12 +395,13 @@ export function usePlayerGameEvents({
       socket.off('totalBoardWords', handleTotalBoardWords);
     };
     // Setters from context are stable (wrapped in useCallback)
+    // NOTE: letterGrid and gameLanguage are accessed via refs (letterGridRef, gameLanguageRef)
+    // to avoid re-registering socket listeners when they change. This is critical because
+    // fireRoundStart changes the grid, and re-registering would clear the fire round countdown.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     socket,
     t,
-    letterGrid,
-    gameLanguage,
     setFoundWords,
     setAchievements,
     setLetterGrid,

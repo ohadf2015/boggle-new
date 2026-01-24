@@ -206,7 +206,8 @@ async function endGame(io: Server, gameCode: string): Promise<void> {
 
   logger.info('GAME', `Game ${gameCode} ended. ${nonDictWords.length} non-dictionary words found, ${playerCount} players.`);
 
-  // Send word feedback to each player
+  // Send word feedback to each player (help us build the dictionary)
+  // Delayed by 20 seconds to allow players to review results first
   if (nonDictWords.length > 0 && playerCount > 1) {
     const wordsPerPlayer = Math.min(SELF_HEALING_CONFIG.WORDS_PER_PLAYER, nonDictWords.length);
 
@@ -230,7 +231,7 @@ async function endGame(io: Server, gameCode: string): Promise<void> {
           }
         }
       }
-    }, 500);
+    }, 20000); // 20 second delay to allow players to review results first
   }
 
   // Handle peer validation for AI-approved words
@@ -584,13 +585,16 @@ async function recordGameResultsToSupabase(io: Server, gameCode: string, scoresA
       };
 
       // Process engagement (daily challenges, near-misses, mystery rewards)
+      // Mystery rewards are delayed by 15 seconds to avoid overwhelming users immediately after game ends
       if (playerSocket && playerId) {
-        await processGameEndEngagement(playerSocket, playerId, gameStats, gameCode);
+        setTimeout(async () => {
+          await processGameEndEngagement(playerSocket, playerId, gameStats, gameCode);
 
-        // Process achievement engagement for mystery rewards
-        for (const achievement of (playerResult.achievements || [])) {
-          await processAchievementEngagement(playerSocket, playerId, achievement.key, gameCode);
-        }
+          // Process achievement engagement for mystery rewards
+          for (const achievement of (playerResult.achievements || [])) {
+            await processAchievementEngagement(playerSocket, playerId, achievement.key, gameCode);
+          }
+        }, 15000); // 15 second delay
       }
     }
 

@@ -1423,7 +1423,15 @@ export default function MultiplayerPage(): React.JSX.Element {
     if (isHost) {
       return (
         <FeatureErrorBoundary featureName="Host Game">
-          <HostView gameCode={gameCode} roomLanguage={roomLanguage ?? undefined} initialPlayers={playersInRoom} username={username} onShowResults={handleShowResults} />
+          <HostView
+            gameCode={gameCode}
+            roomLanguage={roomLanguage ?? undefined}
+            initialPlayers={playersInRoom}
+            username={username}
+            onShowResults={handleShowResults}
+            pendingGameStart={pendingGameStart}
+            onGameStartConsumed={() => setPendingGameStart(null)}
+          />
         </FeatureErrorBoundary>
       );
     }

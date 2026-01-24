@@ -1,22 +1,26 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
+import { useTemplates, type CreateTemplateData, type UpdateTemplateData } from '@/hooks/useLessonTemplate';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import LessonTemplateEditor from './LessonTemplateEditor';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Plus, CheckCircle, AlertCircle, X, Trash2 } from 'lucide-react';
+import { Plus, CheckCircle, AlertCircle, X, Trash2, Play, Settings, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { Language, VocabularyWord } from '@/lib/supabase/teacher';
+import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/teacher';
 
 export default function LessonBuilder() {
   const { t, language } = useLanguage();
+  const router = useRouter();
   const isRTL = language === 'he';
   const { lessons, isLoading, createLesson } = useLessons();
   const { classrooms } = useClassrooms();
@@ -33,6 +37,65 @@ export default function LessonBuilder() {
   const [words, setWords] = useState<VocabularyWord[]>([]);
   const [currentWord, setCurrentWord] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Template editor state
+  const [selectedLesson, setSelectedLesson] = useState<VocabularyLesson | null>(null);
+  const [isTemplateEditorOpen, setIsTemplateEditorOpen] = useState(false);
+  const [isTemplateSaving, setIsTemplateSaving] = useState(false);
+
+  // Template hook for the selected lesson
+  const { templates, createTemplate, updateTemplate, getDefaultTemplate } = useTemplates(selectedLesson?.id);
+
+  const handleOpenTemplateEditor = (lesson: VocabularyLesson) => {
+    setSelectedLesson(lesson);
+    setIsTemplateEditorOpen(true);
+  };
+
+  const handleSaveTemplate = async (data: CreateTemplateData | ({ id: string } & UpdateTemplateData)) => {
+    setIsTemplateSaving(true);
+    try {
+      if ('id' in data) {
+        const { id, ...updates } = data;
+        return await updateTemplate(id, updates);
+      } else {
+        return await createTemplate(data as CreateTemplateData);
+      }
+    } finally {
+      setIsTemplateSaving(false);
+    }
+  };
+
+  const handleStartGame = (lesson: VocabularyLesson) => {
+    // Get the vocabulary words that can be integrated
+    const vocabularyWords = lesson.words
+      .filter((w) => w.canIntegrate)
+      .map((w) => w.word);
+
+    // Get default template settings if available
+    const defaultTemplate = templates.find((t) => t.is_default && t.lesson_id === lesson.id);
+
+    // Store lesson info in sessionStorage for the host page to use
+    sessionStorage.setItem('lessonGameData', JSON.stringify({
+      lessonId: lesson.id,
+      lessonName: lesson.name,
+      vocabularyWords,
+      language: lesson.language,
+      templateSettings: defaultTemplate ? {
+        timerSeconds: defaultTemplate.timer_seconds,
+        difficulty: defaultTemplate.difficulty,
+        minWordLength: defaultTemplate.min_word_length,
+        allowLateJoin: defaultTemplate.allow_late_join,
+      } : null,
+    }));
+
+    // Navigate to host page with lesson flag
+    router.push(`/${language}/host?fromLesson=true`);
+  };
+
+  // Get default template for a lesson
+  const getLessonDefaultTemplate = (lessonId: string) => {
+    return templates.find((t) => t.is_default && t.lesson_id === lessonId);
+  };
 
   const handleAddWord = () => {
     if (!currentWord.trim()) return;
@@ -143,46 +206,87 @@ export default function LessonBuilder() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {lessons.map((lesson) => (
-            <Card
-              key={lesson.id}
-              className="border-neo border-neo-black shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all"
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl font-neo-display text-neo-white">
-                  {lesson.name}
-                </CardTitle>
-                {lesson.description && (
-                  <p className="text-sm text-slate-400 mt-1">{lesson.description}</p>
-                )}
-                <p className="text-sm text-slate-400 mt-1">
-                  {lesson.language.toUpperCase()} •{' '}
-                  {lesson.words.length === 1
-                    ? t('teacher.lesson.word')
-                    : t('teacher.lesson.words').replace('{{count}}', String(lesson.words.length))}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {lesson.words.slice(0, 5).map((word, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-sm">
-                      {word.canIntegrate ? (
-                        <CheckCircle className="w-4 h-4 text-neo-cyan shrink-0" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4 text-neo-yellow shrink-0" />
-                      )}
-                      <span className="text-neo-white font-neo-body">{word.word}</span>
-                    </div>
-                  ))}
-                  {lesson.words.length > 5 && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      +{lesson.words.length - 5} more words
-                    </p>
+          {lessons.map((lesson) => {
+            const defaultTemplate = getLessonDefaultTemplate(lesson.id);
+            return (
+              <Card
+                key={lesson.id}
+                className="border-neo border-neo-black shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all flex flex-col"
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl font-neo-display text-neo-white">
+                    {lesson.name}
+                  </CardTitle>
+                  {lesson.description && (
+                    <p className="text-sm text-slate-400 mt-1">{lesson.description}</p>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <p className="text-sm text-slate-400 mt-1">
+                    {lesson.language.toUpperCase()} •{' '}
+                    {lesson.words.length === 1
+                      ? t('teacher.lesson.word')
+                      : t('teacher.lesson.words').replace('{{count}}', String(lesson.words.length))}
+                  </p>
+                  {/* Show default template info if exists */}
+                  {defaultTemplate && (
+                    <div className="flex items-center gap-2 mt-2 text-xs text-neo-cyan">
+                      <Clock className="w-3 h-3" />
+                      <span>
+                        {Math.floor(defaultTemplate.timer_seconds / 60)}min •{' '}
+                        {defaultTemplate.difficulty}
+                      </span>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col">
+                  <div className="space-y-2 flex-1">
+                    {lesson.words.slice(0, 5).map((word, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        {word.canIntegrate ? (
+                          <CheckCircle className="w-4 h-4 text-neo-cyan shrink-0" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 text-neo-yellow shrink-0" />
+                        )}
+                        <span className="text-neo-white font-neo-body">{word.word}</span>
+                      </div>
+                    ))}
+                    {lesson.words.length > 5 && (
+                      <p className="text-xs text-slate-500 mt-2">
+                        +{lesson.words.length - 5} more words
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Lesson Actions */}
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-neo-black/30">
+                    <Button
+                      size="sm"
+                      onClick={() => handleStartGame(lesson)}
+                      className={cn(
+                        'flex-1 bg-neo-cyan text-neo-black font-bold',
+                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
+                        'transition-all text-xs'
+                      )}
+                    >
+                      <Play className={cn('w-4 h-4', isRTL ? 'ml-1' : 'mr-1')} />
+                      {t('education.template.startGame') || 'Start Game'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleOpenTemplateEditor(lesson)}
+                      className={cn(
+                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
+                        'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
+                        'transition-all'
+                      )}
+                    >
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -378,6 +482,22 @@ export default function LessonBuilder() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {/* Template Editor Dialog */}
+      {selectedLesson && (
+        <LessonTemplateEditor
+          isOpen={isTemplateEditorOpen}
+          onClose={() => {
+            setIsTemplateEditorOpen(false);
+            setSelectedLesson(null);
+          }}
+          lessonId={selectedLesson.id}
+          lessonName={selectedLesson.name}
+          existingTemplate={getDefaultTemplate()}
+          onSave={handleSaveTemplate}
+          isSaving={isTemplateSaving}
+        />
+      )}
     </div>
   );
 }
