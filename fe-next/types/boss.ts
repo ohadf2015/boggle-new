@@ -121,6 +121,52 @@ export interface BossConfig {
 // ==============================================
 
 /**
+ * Boss battle phases
+ * - intro: Pre-battle cutscene showing
+ * - active: Normal gameplay, player dealing damage
+ * - enraged: Boss below 25% HP, mechanics intensify
+ * - victory: Player defeated boss (HP reached 0)
+ * - defeat: Player lost (timer expired)
+ */
+export type BossPhase = 'intro' | 'active' | 'enraged' | 'victory' | 'defeat';
+
+/**
+ * Boss health state managed by useBossHealth hook
+ */
+export interface BossHealthState {
+  /** Current boss HP (0 to maxHP) */
+  currentHP: number;
+  /** Maximum HP for this boss */
+  maxHP: number;
+  /** Current battle phase */
+  phase: BossPhase;
+  /** Total damage dealt this battle */
+  totalDamageDealt: number;
+  /** Whether boss battle is active (not in intro/victory/defeat) */
+  isActive: boolean;
+}
+
+/**
+ * Return type for useBossHealth hook
+ */
+export interface UseBossHealthReturn {
+  /** Current boss health state */
+  healthState: BossHealthState;
+  /** Deal damage to boss (returns actual damage dealt) */
+  dealDamage: (baseDamage: number, comboCount: number, mechanicMultiplier: number) => number;
+  /** Start the boss battle (transition from intro to active) */
+  startBattle: () => void;
+  /** End the battle (player ran out of time) */
+  endBattle: (isVictory: boolean) => void;
+  /** Reset boss health to initial state */
+  resetHealth: () => void;
+  /** HP percentage (0-100) */
+  hpPercentage: number;
+  /** Whether boss is enraged (below 25% HP) */
+  isEnraged: boolean;
+}
+
+/**
  * Runtime state for an active boss battle
  * Managed by useBossMechanics hook
  */
