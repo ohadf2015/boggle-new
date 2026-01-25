@@ -85,7 +85,7 @@ export default function LessonAssignmentDialog({
 
               {isLoadingClassrooms ? (
                 <div className="flex justify-center py-4">
-                  <NeoLoader variant="spinner" size="sm" />
+                  <NeoLoader variant="dots" size="sm" />
                 </div>
               ) : classrooms.length === 0 ? (
                 <div className="bg-neo-black/30 border-2 border-neo-yellow p-4 rounded-neo">
