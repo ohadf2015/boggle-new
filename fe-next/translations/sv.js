@@ -3856,6 +3856,7 @@ const sv = {
       "readyToFight": "Kör igång!",
       "enraged": "RASANDE!",
       "common": {
+        "anagramPair": "Anagrampar hittade! Kritisk träff!",
         "requirementMet": "Krav uppfyllt!",
         "requirementMissed": "Krav missades"
       },

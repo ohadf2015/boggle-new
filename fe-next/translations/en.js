@@ -3843,6 +3843,7 @@ const en = {
       "readyToFight": "Let's Go!",
       "enraged": "ENRAGED!",
       "common": {
+        "anagramPair": "Anagram pair found! Critical hit!",
         "requirementMet": "Requirement met!",
         "requirementMissed": "Missed requirement"
       },

@@ -3856,6 +3856,7 @@ const ja = {
       "readyToFight": "いくぞ！",
       "enraged": "激怒!",
       "common": {
+        "anagramPair": "アナグラムペア発見！クリティカルヒット！",
         "requirementMet": "条件達成!",
         "requirementMissed": "条件未達成"
       },

@@ -3849,6 +3849,7 @@ const he = {
       "readyToFight": "קדימה!",
       "enraged": "זועם!",
       "common": {
+        "anagramPair": "נמצא זוג אנגרמות! פגיעה קריטית!",
         "requirementMet": "דרישה התקיימה!",
         "requirementMissed": "דרישה לא התקיימה"
       },
