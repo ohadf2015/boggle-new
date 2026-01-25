@@ -3,9 +3,9 @@
 ## Current Position
 
 **Phase:** 19 of 23 (Achievement System) - IN PROGRESS
-**Plan:** 2 complete (19-01, 19-02)
-**Status:** Completed plan 19-02
-**Last activity:** 2026-01-25 - Completed 19-02-PLAN.md (Classroom Leaderboard)
+**Plan:** 4 complete (19-01, 19-02, 19-03, 19-04)
+**Status:** Completed plan 19-04
+**Last activity:** 2026-01-25 - Completed 19-04-PLAN.md (Profile Badge Display)
 
 **Progress:** ██████████████░░░░░░░░░░ 19/23 phases (83% of milestone complete, v1.1 in progress)
 
@@ -14,6 +14,8 @@
 ### Phase 19: Achievement System (IN PROGRESS)
 - ✅ **19-01**: Achievement system foundation (18 badges, 4-tier progression, TDD achievement manager)
 - ✅ **19-02**: Classroom leaderboard (top 3 + rank, inactive detection, Neo-Brutalist styling)
+- ✅ **19-03**: Achievement unlock detection + celebration (useAchievementUnlock hook, tier-appropriate modals, confetti, 30 tests)
+- ✅ **19-04**: Profile badge display (AchievementProgressCard, EducationBadgeGrid, pin functionality, 33 tests)
 
 ### Phase 18: Education XP System (COMPLETE)
 - ✅ **18-01**: Database XP columns and triggers
@@ -142,6 +144,11 @@
 | leaderboard-002 | Show top 3 + current user rank | Balances motivation (see top performers) with privacy (limited exposure) | 19-02 | UX |
 | leaderboard-003 | Aggregate XP across all lessons in classroom | Reflects overall student effort, not just single lesson | 19-02 | Data Aggregation |
 | leaderboard-004 | Mark students inactive after 7 days | Visual indicator for teachers/students, encourages re-engagement | 19-02 | Student Engagement |
+| profile-badges-001 | Display achievements with tier-colored icon circles | Visual tier hierarchy (bronze/silver/gold/platinum) using color coding | 19-04 | UI Design |
+| profile-badges-002 | Max 3 pinned badges in featured section | Balances student customization with focused showcase | 19-04 | UX |
+| profile-badges-003 | Show ??? for secret badges until bronze unlocked | Creates discovery moments without spoiling surprises | 19-04 | UX |
+| profile-badges-004 | Collapsible category sections with earned count | Reduces visual clutter while showing progress at a glance | 19-04 | UI Design |
+| profile-badges-005 | Sort earned badges before locked, by tier desc within earned | Highlights achievements first, showcases highest tiers | 19-04 | UX |
 
 ## Blockers & Concerns
 
@@ -157,8 +164,8 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Session Continuity
 
-**Last session:** 2026-01-25 23:38 UTC
-**Stopped at:** Completed 19-02-PLAN.md (Classroom Leaderboard)
+**Last session:** 2026-01-26 00:05 UTC
+**Stopped at:** Completed 19-04-PLAN.md (Profile Badge Display)
 **Resume file:** None
 
 ## Key Metrics
