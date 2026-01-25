@@ -4085,6 +4085,15 @@ const sv = {
       "noClassrooms": "Inga klassrum än",
       "createFirst": "Skapa ditt första klassrum för att börja"
     },
+    "classrooms": {
+      "students": {
+        "count": "{{count}} elever",
+        "empty": "Inga elever än",
+        "emptyHint": "Dela kod {{code}} med dina elever",
+        "error": "Kunde inte ladda elever",
+        "unknown": "Okänd elev"
+      }
+    },
     "lesson": {
       "create": "Skapa lektion",
       "edit": "Redigera lektion",

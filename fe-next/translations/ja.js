@@ -4085,6 +4085,15 @@ const ja = {
       "noClassrooms": "まだクラスがありません",
       "createFirst": "最初のクラスを作成しましょう"
     },
+    "classrooms": {
+      "students": {
+        "count": "{{count}}人の生徒",
+        "empty": "まだ生徒がいません",
+        "emptyHint": "生徒に参加コード {{code}} を共有してください",
+        "error": "生徒の読み込みに失敗しました",
+        "unknown": "不明な生徒"
+      }
+    },
     "lesson": {
       "create": "レッスン作成",
       "edit": "レッスン編集",

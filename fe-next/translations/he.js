@@ -4078,6 +4078,15 @@ const he = {
       "noClassrooms": "אין כיתות עדיין",
       "createFirst": "צרו את הכיתה הראשונה שלכם"
     },
+    "classrooms": {
+      "students": {
+        "count": "{{count}} תלמידים",
+        "empty": "אין תלמידים עדיין",
+        "emptyHint": "שתפו את קוד ההצטרפות {{code}} עם התלמידים",
+        "error": "שגיאה בטעינת התלמידים",
+        "unknown": "תלמיד לא ידוע"
+      }
+    },
     "lesson": {
       "create": "צור שיעור",
       "edit": "ערוך שיעור",

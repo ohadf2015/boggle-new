@@ -4072,6 +4072,15 @@ const en = {
       "noClassrooms": "No classrooms yet",
       "createFirst": "Create your first classroom to get started"
     },
+    "classrooms": {
+      "students": {
+        "count": "{{count}} students",
+        "empty": "No students yet",
+        "emptyHint": "Share join code {{code}} with your students",
+        "error": "Failed to load students",
+        "unknown": "Unknown Student"
+      }
+    },
     "lesson": {
       "create": "Create Lesson",
       "edit": "Edit Lesson",
