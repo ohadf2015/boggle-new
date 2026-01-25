@@ -3,9 +3,9 @@
 ## Current Position
 
 **Phase:** 19 of 23 (Achievement System) - IN PROGRESS
-**Plan:** 1 complete (19-01)
-**Status:** Completed plan 19-01
-**Last activity:** 2026-01-25 - Completed 19-01-PLAN.md (Achievement System Foundation)
+**Plan:** 2 complete (19-01, 19-02)
+**Status:** Completed plan 19-02
+**Last activity:** 2026-01-25 - Completed 19-02-PLAN.md (Classroom Leaderboard)
 
 **Progress:** ██████████████░░░░░░░░░░ 19/23 phases (83% of milestone complete, v1.1 in progress)
 
@@ -13,6 +13,7 @@
 
 ### Phase 19: Achievement System (IN PROGRESS)
 - ✅ **19-01**: Achievement system foundation (18 badges, 4-tier progression, TDD achievement manager)
+- ✅ **19-02**: Classroom leaderboard (top 3 + rank, inactive detection, Neo-Brutalist styling)
 
 ### Phase 18: Education XP System (COMPLETE)
 - ✅ **18-01**: Database XP columns and triggers
@@ -137,6 +138,10 @@
 | achievement-003 | 2 secret achievements (~11% of total) | Creates discovery moments without overwhelming students | 19-01 | Gamification |
 | achievement-004 | Secret achievements return null tier until bronze unlocked | Hides progress tracking to preserve surprise element | 19-01 | UX |
 | achievement-005 | Tier calculation uses cascading threshold checks (platinum → gold → silver → bronze) | Efficient O(1) tier determination without loops | 19-01 | Performance |
+| leaderboard-001 | Classroom-scoped leaderboard (not global) | Privacy-conscious design - students only compete within their classroom (FERPA compliance) | 19-02 | UX, Privacy |
+| leaderboard-002 | Show top 3 + current user rank | Balances motivation (see top performers) with privacy (limited exposure) | 19-02 | UX |
+| leaderboard-003 | Aggregate XP across all lessons in classroom | Reflects overall student effort, not just single lesson | 19-02 | Data Aggregation |
+| leaderboard-004 | Mark students inactive after 7 days | Visual indicator for teachers/students, encourages re-engagement | 19-02 | Student Engagement |
 
 ## Blockers & Concerns
 
@@ -152,8 +157,8 @@ All critical bugs fixed in Phase 10 Wave 1.
 
 ## Session Continuity
 
-**Last session:** 2026-01-25 21:27 UTC
-**Stopped at:** Completed 19-01-PLAN.md (Achievement System Foundation)
+**Last session:** 2026-01-25 23:38 UTC
+**Stopped at:** Completed 19-02-PLAN.md (Classroom Leaderboard)
 **Resume file:** None
 
 ## Key Metrics
@@ -168,6 +173,15 @@ All critical bugs fixed in Phase 10 Wave 1.
 - **Phase verification**: ✅ All 5 success criteria met
 
 ## Tech Stack Additions
+
+### Phase 19-02
+- **Leaderboard patterns**: Classroom-scoped XP aggregation, inactive student detection, top-N + current rank display
+- **Data patterns**: Multi-lesson XP aggregation via student_lesson_progress table
+- **UI patterns**: Rank badges (emoji + color coding), inactive indicators, current user highlighting
+
+### Phase 19-01
+- **Achievement patterns**: Tier-based progression (bronze/silver/gold/platinum), cascading threshold checks
+- **Badge system**: Grouped badges (dedication, mastery, wins, exploration), icon + emoji system
 
 ### Phase 12-01
 - **Asset patterns**: Backup directory structure, WebP migration from backup
