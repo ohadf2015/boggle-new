@@ -1290,7 +1290,11 @@ const sv = {
       }
     },
     "swipeHint": "← Svep för att navigera →",
-    "stepLabel": "Steg {current} av {total}"
+    "stepLabel": "Steg {current} av {total}",
+    "callout": {
+      "title": "Svep på bokstäverna!",
+      "tryWord": "Prova:"
+    }
   },
   "training": {
     "gateway": {

@@ -2058,7 +2058,11 @@ const es = {
         "start": "¡Empezar!"
       }
     },
-    "swipeHint": "← Desliza para navegar →"
+    "swipeHint": "← Desliza para navegar →",
+    "callout": {
+      "title": "¡Desliza las letras!",
+      "tryWord": "Prueba:"
+    }
   },
   "training": {
     "gateway": {

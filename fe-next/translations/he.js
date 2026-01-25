@@ -1300,7 +1300,11 @@ const he = {
         "start": "יאללה!"
       }
     },
-    "swipeHint": "החלק לניווט → ←"
+    "swipeHint": "החלק לניווט → ←",
+    "callout": {
+      "title": "החלק על האותיות!",
+      "tryWord": "נסה:"
+    }
   },
   "training": {
     "gateway": {

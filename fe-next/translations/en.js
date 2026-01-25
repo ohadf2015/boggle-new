@@ -1293,7 +1293,11 @@ const en = {
       }
     },
     "swipeHint": "← Swipe to navigate →",
-    "stepLabel": "Step {current} of {total}"
+    "stepLabel": "Step {current} of {total}",
+    "callout": {
+      "title": "Swipe the letters!",
+      "tryWord": "Try:"
+    }
   },
   "training": {
     "gateway": {

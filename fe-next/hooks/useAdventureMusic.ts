@@ -214,7 +214,9 @@ export function useAdventureMusic({
       loop: false, // Manual looping for crossfade
       volume: 0,
       preload: true, // Preload immediately so tracks are ready when needed
-      html5: false,
+      // Using HTML5 Audio API (html5: true) for iOS Safari compatibility
+      // iOS Safari has strict Web Audio API restrictions that cause audio to not play
+      html5: true,
       onload: () => {
         logger.log(`[AdventureMusic] ${trackName} loaded successfully`);
       },

@@ -26,6 +26,7 @@ import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
+import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
@@ -480,6 +481,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           compact
         />
       </div>
+
+      {/* Tutorial Callout - Shows above grid for new players */}
+      <TutorialCallout
+        isVisible={!!firstPlayTutorial.tutorialPath && !isGameOver}
+        tutorialWord={firstPlayTutorial.tutorialWord}
+        position="above-grid"
+        compact
+      />
 
       {/* Game Grid */}
       <div className={cn(

@@ -9,6 +9,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
+import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { DesktopStatsPanel, DesktopWordList } from '../../desktop';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
@@ -46,6 +47,8 @@ export interface DesktopGameLayoutProps {
   keyboardInput: KeyboardInputState;
   // Tutorial path
   tutorialPath: Array<{ row: number; col: number }> | null;
+  /** The word being shown in the tutorial */
+  tutorialWord?: string;
   // Reveal highlight
   highlightedPath: Array<{ row: number; col: number }>;
   lastWordFoundTimeRef: React.RefObject<number>;
@@ -108,6 +111,7 @@ export function DesktopGameLayout({
   currentFeedback,
   keyboardInput,
   tutorialPath,
+  tutorialWord,
   highlightedPath,
   lastWordFoundTimeRef,
   fireRoundActive,
@@ -239,6 +243,13 @@ export function DesktopGameLayout({
               compact={false}
             />
           </div>
+
+          {/* Tutorial Callout - Shows above grid for new players */}
+          <TutorialCallout
+            isVisible={!!tutorialPath && !isPaused && !isGameOver}
+            tutorialWord={tutorialWord}
+            position="above-grid"
+          />
 
           {/* Game Grid - centered with aspect ratio maintained */}
           {/* Parent container uses container-type: size for responsive grid sizing */}

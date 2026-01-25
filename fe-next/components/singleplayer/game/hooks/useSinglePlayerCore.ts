@@ -808,6 +808,7 @@ export function useSinglePlayerCore({
     keyboardInput: keyboardInputState,
     // Tutorial
     tutorialPath: firstPlayTutorial.tutorialPath,
+    tutorialWord: firstPlayTutorial.tutorialWord,
     // Reveal
     revealState,
     revealableWordCount,

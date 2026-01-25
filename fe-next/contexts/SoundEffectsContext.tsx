@@ -162,7 +162,10 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
         src: [src],
         volume: 0.6,
         preload: false, // Defer loading for slow connections - load on demand
-        html5: false, // Web Audio API for pitch control
+        // Using HTML5 Audio API (html5: true) for iOS Safari compatibility
+        // Note: html5 mode has limited pitch control, but iOS compatibility is critical
+        // iOS Safari has strict Web Audio API restrictions that cause audio to not play
+        html5: true,
         onload: () => {
           logger.log(`[SFX] Loaded: ${key}`);
         },

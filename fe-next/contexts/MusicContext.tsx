@@ -150,9 +150,12 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 loop: false, // All tracks use manual crossfade looping for smooth transitions
                 volume: 0,
                 preload: false, // Defer loading for slow connections - load on demand
-                // Using Web Audio API (html5: false) for better autoplay support
-                // html5 mode has stricter autoplay restrictions on some browsers
-                html5: false,
+                // Using HTML5 Audio API (html5: true) for iOS Safari compatibility
+                // iOS Safari has strict Web Audio API restrictions:
+                // 1. Web Audio respects the device mute switch (no audio in silent mode)
+                // 2. AudioContext can throw InvalidStateError on device issues
+                // 3. html5: true bypasses these issues and plays reliably on iOS
+                html5: true,
                 onloaderror: (id, err) => {
                     logger.error(`[Music] Failed to load ${key}:`, err);
                 },

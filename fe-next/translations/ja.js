@@ -1290,7 +1290,11 @@ const ja = {
         "start": "スタート！"
       }
     },
-    "swipeHint": "← スワイプで移動 →"
+    "swipeHint": "← スワイプで移動 →",
+    "callout": {
+      "title": "文字をスワイプ！",
+      "tryWord": "試してみて:"
+    }
   },
   "training": {
     "gateway": {

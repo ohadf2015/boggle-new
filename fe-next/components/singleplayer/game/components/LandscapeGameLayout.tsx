@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { LandscapeTutorialOverlay } from './LandscapeTutorialOverlay';
+import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
@@ -48,6 +49,8 @@ export interface LandscapeGameLayoutProps {
   keyboardInput: KeyboardInputState;
   // Tutorial path
   tutorialPath: Array<{ row: number; col: number }> | null;
+  /** The word being shown in the tutorial */
+  tutorialWord?: string;
   // Reveal highlight
   highlightedPath: Array<{ row: number; col: number }>;
   lastWordFoundTimeRef: React.RefObject<number>;
@@ -111,6 +114,7 @@ export function LandscapeGameLayout({
   currentFeedback,
   keyboardInput,
   tutorialPath,
+  tutorialWord,
   highlightedPath,
   lastWordFoundTimeRef,
   fireRoundActive,
@@ -244,6 +248,13 @@ export function LandscapeGameLayout({
               compact
             />
           </div>
+          {/* Tutorial Callout - Shows above grid for new players */}
+          <TutorialCallout
+            isVisible={!!tutorialPath && !isPaused && !isGameOver}
+            tutorialWord={tutorialWord}
+            position="above-grid"
+            compact
+          />
           <div className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0" style={{ aspectRatio: '1/1' }}>
             <GridComponent
               grid={grid}
