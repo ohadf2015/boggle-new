@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 17 of 23 (Boss Mechanic Expansion) — IN PROGRESS
-Plan: 2/5 complete
+Plan: 4/5 complete
 Status: In progress
-Last activity: 2026-01-25 — Completed 17-02-PLAN.md (finalWord mechanic tests)
+Last activity: 2026-01-25 — Completed 17-04-PLAN.md (stub mechanic tests)
 
 Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in progress)
 
@@ -30,9 +30,9 @@ Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 11 (Phase 15 complete, Phase 16 complete, Phase 17 plans 1-2)
+- Plans completed: 13 (Phase 15 complete, Phase 16 complete, Phase 17 plans 1-4)
 - Current phase: 17 (Boss Mechanic Expansion) — IN PROGRESS
-- Next plan: 17-03 (additional mechanic tests)
+- Next plan: 17-05 (remaining mechanic tests)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -60,8 +60,10 @@ Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in 
 |------|------|----------|--------|
 | 17-01 | Mechanic Test Coverage | 3min | ✅ Complete |
 | 17-02 | finalWord Mechanic Tests | 3min | ✅ Complete |
+| 17-03 | TBD | - | Pending |
+| 17-04 | Stub Mechanic Tests | 3min | ✅ Complete |
 
-**Phase 17 Total (so far):** 6 minutes, 137 tests added
+**Phase 17 Total (so far):** 9 minutes, 220 tests added
 
 ## Accumulated Context
 
@@ -91,6 +93,8 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **16-03**: BossOverlay compound component → Encapsulates all boss UI, reduces AdventureGame.tsx complexity (2026-01-25)
 - **16-03**: Mechanic multiplier 2x when met → Rewards strategic play without making non-mechanic words useless (2026-01-25)
 - **17-01**: Boss mechanic test isolation pattern → One test file per mechanic for targeted testing (2026-01-25)
+- **17-04**: Stub mechanics use length thresholds → MVP placeholder (idiom/assembly/babel deferred to Phase 24) (2026-01-25)
+- **17-04**: babelSummit returns 1.5x for short words → Unique pattern unlike other stubs (not 1.0x) (2026-01-25)
 
 ### Pending Todos
 
@@ -115,7 +119,8 @@ None.
 - ✅ mirrorMatch mechanic tested — 44 tests, palindrome detection verified
 - ✅ stellarForge mechanic tested — 52 tests, supernova letter Q/X/Z detection verified
 - ✅ finalWord mechanic tested — 41 tests, phase cycling and delegation verified
-- Remaining plans: 17-03, 17-04, 17-05
+- ✅ Stub mechanics tested — 83 tests (idiomBattle, assemblyLine, babelSummit)
+- Remaining plans: 17-05
 
 **Phase 18 (Education XP):**
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
@@ -128,11 +133,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 17-02-PLAN.md
+Stopped at: Completed 17-04-PLAN.md
 Resume file: None
 
-**Next action:** Continue Phase 17 with 17-03-PLAN.md
+**Next action:** Continue Phase 17 with 17-05-PLAN.md
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Plan 17-02 complete)*
+*Last updated: 2026-01-25 (Plan 17-04 complete)*
