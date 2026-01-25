@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 18 of 23 (Education XP System)
-Plan: 1/4 complete
+Plan: 2/4 complete
 Status: In progress
-Last activity: 2026-01-25 — Completed 18-01-PLAN.md (Education XP Foundation)
+Last activity: 2026-01-25 — Completed 18-02-PLAN.md (XP Hook and Translations)
 
 Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in progress)
 
@@ -30,9 +30,9 @@ Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 15 (Phase 15-17 complete, Phase 18 plan 01 complete)
+- Plans completed: 16 (Phase 15-17 complete, Phase 18 plans 01-02 complete)
 - Current phase: 18 (Education XP System) — IN PROGRESS
-- Next plan: 18-02 (XP Progress Bar UI)
+- Next plan: 18-03 (Level-Up Celebration)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -70,11 +70,11 @@ Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in 
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
 | 18-01 | Education XP Foundation | 5min | ✅ Complete |
-| 18-02 | XP Progress Bar UI | - | Pending |
+| 18-02 | XP Hook and Translations | 6min | ✅ Complete |
 | 18-03 | Level-Up Celebration | - | Pending |
 | 18-04 | Streak Bonus System | - | Pending |
 
-**Phase 18 Progress:** 1/4 plans complete, 32 tests added
+**Phase 18 Progress:** 2/4 plans complete, 48 tests added
 
 ## Accumulated Context
 
@@ -110,6 +110,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **18-01**: Mastery messages before XP amounts → Research pitfall 1: extrinsic rewards undermine intrinsic motivation (2026-01-25)
 - **18-01**: Math.round for streak bonus → Floating point precision (0.75 * 70 = 52.5) (2026-01-25)
 - **18-01**: Migration 062 (not 059) → 059 already exists (adventure_level_attempts) (2026-01-25)
+- **18-02**: pendingUpdate pattern → Hook tracks pending updates, database persistence deferred to Plan 05 (2026-01-25)
+- **18-02**: useMemo for xpProgress → Derived state recalculates only when totalXp changes (2026-01-25)
+- **18-02**: Streak update on every practice → Builds loss aversion for intrinsic motivation (2026-01-25)
 
 ### Pending Todos
 
@@ -141,6 +144,8 @@ None.
 **Phase 18 (Education XP) — IN PROGRESS:**
 - ✅ XP calculation foundation — educationXpManager.ts with 32 tests, 98.6% coverage
 - ✅ Database schema — Migration 062 adds XP/level/streak columns
+- ✅ useEducationXp hook — State management with 16 tests, pendingUpdate for persistence
+- ✅ Translation keys — education.xp section in 4 languages (en, he, sv, ja)
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
 - XP curve validation — Test if Adventure Mode curve works for education context
 
@@ -151,11 +156,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 18-01-PLAN.md (Education XP Foundation)
+Stopped at: Completed 18-02-PLAN.md (XP Hook and Translations)
 Resume file: None
 
-**Next action:** `/gsd:execute-phase 18` to continue with 18-02 (XP Progress Bar UI)
+**Next action:** `/gsd:execute-phase 18` to continue with 18-03 (Level-Up Celebration)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 18 plan 01 complete)*
+*Last updated: 2026-01-25 (Phase 18 plan 02 complete)*
