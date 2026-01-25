@@ -156,6 +156,12 @@ jest.mock('../themed/WorldBackground', () => {
   };
 });
 
+jest.mock('../themed/GameplayBackground', () => {
+  return function MockGameplayBackground() {
+    return <div data-testid="gameplay-background" />;
+  };
+});
+
 jest.mock('@/components/animations', () => ({
   ScorePopupFly: () => null,
 }));
@@ -214,7 +220,7 @@ describe('AdventureGame Layout Stability', () => {
 
       // THEN - feedback container should have min-height
       const feedbackContainer = container.querySelector('[data-testid="feedback-container"]');
-      expect(feedbackContainer).toHaveClass('min-h-[40px]');
+      expect(feedbackContainer).toHaveClass('min-h-[28px]');
     });
   });
 });

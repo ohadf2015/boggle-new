@@ -110,6 +110,11 @@ jest.mock('../themed/WorldBackground', () => ({
   default: () => <div data-testid="world-background">Background</div>,
 }));
 
+jest.mock('../themed/GameplayBackground', () => ({
+  __esModule: true,
+  default: () => <div data-testid="gameplay-background">Background</div>,
+}));
+
 // Minimal level config
 const mockLevelConfig = {
   level: 1,

@@ -1,0 +1,170 @@
+# Requirements: LexiClash v1.1
+
+**Defined:** 2026-01-25
+**Core Value:** Adventure mode must feel immersive and connected to its themed worlds
+
+## v1.1 Requirements
+
+Requirements for Adventure & Education Expansion milestone. Each maps to roadmap phases.
+
+### Boss Battles
+
+- [ ] **BOSS-01**: User can battle end-of-world bosses with phase transitions (intro → phase1 → phase2 → enraged → victory/defeat)
+- [ ] **BOSS-02**: User sees boss HP bar with phase indicators during battle
+- [ ] **BOSS-03**: Boss mechanic popQuiz — random word requirements each turn
+- [ ] **BOSS-04**: Boss mechanic hiveMind — sticky tiles that persist between turns
+- [ ] **BOSS-05**: Boss mechanic synonymShift — bonus damage for synonym pairs
+- [ ] **BOSS-06**: Boss mechanic idiomIslands — complete idiom phrases for bonus
+- [ ] **BOSS-07**: Boss mechanic compoundMerge — merge compound words for combo
+- [ ] **BOSS-08**: Boss mechanic anagramScramble — solve anagrams for critical hits
+- [ ] **BOSS-09**: Boss mechanic palindromeMirror — palindrome words deal double damage
+- [ ] **BOSS-10**: Boss mechanic neologismNebula — rare words grant power-ups
+- [ ] **BOSS-11**: Boss mechanic polyglotPeaks — multilingual hints for bonus
+- [ ] **BOSS-12**: Boss mechanic allMechanics — final boss combining all mechanics
+- [ ] **BOSS-13**: Boss difficulty adapts based on player's average performance (80% completion target)
+
+### Chain Combos
+
+- [ ] **COMBO-01**: User can link chain tiles for 1.5x combo multiplier
+- [ ] **COMBO-02**: User sees combo meter with tiered visual feedback (Nice! → Great! → Amazing! → LEGENDARY!)
+- [ ] **COMBO-03**: User sees themed particle effects on combo completion
+- [ ] **COMBO-04**: User sees letter cascade animations during chain reactions
+- [ ] **COMBO-05**: Combo scoring integrates with existing scoring engine
+
+### Education Gamification
+
+- [ ] **GAMIFY-01**: Student earns XP from practice activities (flashcards, solo board, lesson completion)
+- [ ] **GAMIFY-02**: Student sees XP progress bar toward next level
+- [ ] **GAMIFY-03**: Student levels up based on XP accumulation
+- [ ] **GAMIFY-04**: Student sees classroom leaderboard (top students by XP, classroom-scoped)
+- [ ] **GAMIFY-05**: Student can earn 15-20 meaningful achievements (Bronze/Silver/Gold/Platinum tiers)
+- [ ] **GAMIFY-06**: Student sees achievement unlock modal when earning badge
+- [ ] **GAMIFY-07**: Student can view earned achievement badges in profile
+- [ ] **GAMIFY-08**: Student earns streak bonuses for consecutive practice days
+
+### Student Analytics
+
+- [ ] **ANALYTICS-01**: Teacher can view analytics dashboard with student progress
+- [ ] **ANALYTICS-02**: Teacher can see individual student progress metrics
+- [ ] **ANALYTICS-03**: Teacher can view lesson effectiveness charts
+- [ ] **ANALYTICS-04**: Teacher can see vocabulary mastery heatmap by student
+- [ ] **ANALYTICS-05**: Teacher sees real-time progress updates during class sessions
+
+### Lesson Delivery
+
+- [ ] **LESSON-01**: Student sees rich vocabulary explanations (definitions, pronunciation, usage)
+- [ ] **LESSON-02**: Student sees contextual examples from Daily Buzz trending content
+- [ ] **LESSON-03**: Student can practice with swipe-based flashcard review
+
+### World Theming (Worlds 4-5)
+
+- [ ] **WORLD-01**: World 4 Idiom Archipelago has parallax backgrounds (3-5 layers, tropical islands)
+- [ ] **WORLD-02**: World 4 Idiom Archipelago has themed particles (palm fronds, seashells, waves)
+- [ ] **WORLD-03**: World 4 Idiom Archipelago has board decorations (tiki borders, island accents)
+- [ ] **WORLD-04**: World 4 has AI-generated background assets (WebP, <200KB)
+- [ ] **WORLD-05**: World 5 Compound Canyon has parallax backgrounds (3-5 layers, desert cliffs)
+- [ ] **WORLD-06**: World 5 Compound Canyon has themed particles (dust, tumbleweeds, heat shimmer)
+- [ ] **WORLD-07**: World 5 Compound Canyon has board decorations (canyon rock borders, desert accents)
+- [ ] **WORLD-08**: World 5 has AI-generated background assets (WebP, <200KB)
+
+### Tech Debt
+
+- [ ] **DEBT-01**: Entry sequence timing optimized from 2.38s to 2s target
+- [ ] **DEBT-02**: Video MP4 rendering pipeline functional (Remotion render script)
+- [ ] **DEBT-03**: Bug fixes for BUG-004 through BUG-008 resolved
+- [ ] **DEBT-04**: Lexi stuck detection implemented (30s inactivity triggers help)
+
+## Future Requirements
+
+Deferred to v1.2+ milestones.
+
+### Advanced Features
+
+- **ADV-01**: Worlds 6-10 full theming (after 4-5 proven)
+- **ADV-02**: Audio theming per world (world-specific sound loops)
+- **ADV-03**: Haptic feedback for combos and boss hits
+- **ADV-04**: Social leaderboards (school-wide, requires privacy review)
+- **ADV-05**: Video celebrations for boss victories
+
+### Education Expansion
+
+- **EDU-01**: Parent progress reports
+- **EDU-02**: Curriculum alignment mapping
+- **EDU-03**: Custom achievement creation by teachers
+- **EDU-04**: Class average benchmarking
+
+## Out of Scope
+
+Explicitly excluded from v1.1 milestone.
+
+| Feature | Reason |
+|---------|--------|
+| Multiplayer adventure mode | Scope creep, single-player polish first |
+| 3D effects or environments | Not aligned with Neo-Brutalist style, performance concerns |
+| Per-level custom mechanics | Cognitive load, tutorial fatigue |
+| Procedurally generated levels | Quality control, hand-crafted preferred |
+| Lengthy unskippable cutscenes | Accessibility violation, player frustration |
+| Complex AI boss behavior | Start with rule-based, defer adaptive AI |
+| Mobile app (native) | Web-first strategy |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| BOSS-01 | TBD | Pending |
+| BOSS-02 | TBD | Pending |
+| BOSS-03 | TBD | Pending |
+| BOSS-04 | TBD | Pending |
+| BOSS-05 | TBD | Pending |
+| BOSS-06 | TBD | Pending |
+| BOSS-07 | TBD | Pending |
+| BOSS-08 | TBD | Pending |
+| BOSS-09 | TBD | Pending |
+| BOSS-10 | TBD | Pending |
+| BOSS-11 | TBD | Pending |
+| BOSS-12 | TBD | Pending |
+| BOSS-13 | TBD | Pending |
+| COMBO-01 | TBD | Pending |
+| COMBO-02 | TBD | Pending |
+| COMBO-03 | TBD | Pending |
+| COMBO-04 | TBD | Pending |
+| COMBO-05 | TBD | Pending |
+| GAMIFY-01 | TBD | Pending |
+| GAMIFY-02 | TBD | Pending |
+| GAMIFY-03 | TBD | Pending |
+| GAMIFY-04 | TBD | Pending |
+| GAMIFY-05 | TBD | Pending |
+| GAMIFY-06 | TBD | Pending |
+| GAMIFY-07 | TBD | Pending |
+| GAMIFY-08 | TBD | Pending |
+| ANALYTICS-01 | TBD | Pending |
+| ANALYTICS-02 | TBD | Pending |
+| ANALYTICS-03 | TBD | Pending |
+| ANALYTICS-04 | TBD | Pending |
+| ANALYTICS-05 | TBD | Pending |
+| LESSON-01 | TBD | Pending |
+| LESSON-02 | TBD | Pending |
+| LESSON-03 | TBD | Pending |
+| WORLD-01 | TBD | Pending |
+| WORLD-02 | TBD | Pending |
+| WORLD-03 | TBD | Pending |
+| WORLD-04 | TBD | Pending |
+| WORLD-05 | TBD | Pending |
+| WORLD-06 | TBD | Pending |
+| WORLD-07 | TBD | Pending |
+| WORLD-08 | TBD | Pending |
+| DEBT-01 | TBD | Pending |
+| DEBT-02 | TBD | Pending |
+| DEBT-03 | TBD | Pending |
+| DEBT-04 | TBD | Pending |
+
+**Coverage:**
+- v1.1 requirements: 44 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 44
+
+---
+*Requirements defined: 2026-01-25*
+*Last updated: 2026-01-25 after initial definition*
