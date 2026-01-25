@@ -132,10 +132,14 @@ Plans:
   5. User earns power-ups from rare words (neologismNebula mechanic)
   6. User receives multilingual hints for bonus (polyglotPeaks mechanic)
   7. Final boss combines all mechanics for ultimate challenge (allMechanics)
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 17-01: TBD during plan-phase
+- [ ] 17-01-PLAN.md — Verify mirrorMatch and stellarForge mechanics with TDD tests (Wave 1)
+- [ ] 17-02-PLAN.md — Verify finalWord multi-phase mechanic with TDD tests (Wave 1)
+- [ ] 17-03-PLAN.md — Enhance scrambledReality with anagram pair detection + translations (Wave 2)
+- [ ] 17-04-PLAN.md — Test stub mechanics (idiom, assembly, babel) with documentation (Wave 2)
+- [ ] 17-05-PLAN.md — E2E integration tests for all 10 boss battles (Wave 3)
 
 #### Phase 18: Education XP System
 **Goal**: Enable student progression through XP and leveling
@@ -243,7 +247,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 |-------|-----------|----------------|--------|-----------|
 | 15. Chain Combo System | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
 | 16. Boss Battle Foundation | v1.1 | 4/4 | ✅ Complete | 2026-01-25 |
-| 17. Boss Mechanic Expansion | v1.1 | 0/TBD | Not started | - |
+| 17. Boss Mechanic Expansion | v1.1 | 0/5 | Planned | - |
 | 18. Education XP System | v1.1 | 0/TBD | Not started | - |
 | 19. Achievement System | v1.1 | 0/TBD | Not started | - |
 | 20. Student Analytics Dashboard | v1.1 | 0/TBD | Not started | - |
