@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 15 - Chain Combo System
+**Current focus:** Phase 16 - Boss Battle Foundation (next)
 
 ## Current Position
 
-Phase: 15 of 23 (Chain Combo System)
-Plan: 04 of 05 completed (just finished)
-Status: In progress
-Last activity: 2026-01-25 — Completed 15-04-PLAN.md (Chain Cascade Animation)
+Phase: 15 of 23 (Chain Combo System) — COMPLETE
+Plan: 5/5 complete
+Status: Verified
+Last activity: 2026-01-25 — Phase 15 complete, all 5 plans executed, goal verified
 
-Progress: [██░░░░░░░░] 14/23 phases (61% milestone complete, v1.1 in progress)
+Progress: [███░░░░░░░] 15/23 phases (65% milestone complete, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -30,18 +30,20 @@ Progress: [██░░░░░░░░] 14/23 phases (61% milestone complete,
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 4 (15-01, 15-02, 15-03, 15-04)
-- Current phase: 15 (Chain Combo System) - 4/5 plans done
+- Plans completed: 5 (Phase 15 complete)
+- Current phase: 15 (Chain Combo System) — VERIFIED
 - Next phase: 16 (Boss Battle Foundation)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
 | 15-01 | Chain Tile Calculation | 17min | ✅ Complete |
-| 15-02 | Combo Tier Feedback | 12min | ✅ Complete |
-| 15-03 | Chain Particle Effects | 8min | ✅ Complete |
-| 15-04 | Chain Cascade Animation | 6min | ✅ Complete (just finished) |
-| 15-05 | Combo State Machine | - | 📋 Ready |
+| 15-02 | Combo Tier Feedback | 13min | ✅ Complete |
+| 15-03 | Chain Particle Effects | 17min | ✅ Complete |
+| 15-04 | Chain Cascade Animation | 6min | ✅ Complete |
+| 15-05 | Adventure Game Integration | 14min | ✅ Complete |
+
+**Phase 15 Total:** 67 minutes, 83 tests added
 
 ## Accumulated Context
 
@@ -56,25 +58,24 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **v1.1**: Research-informed phase ordering → Combo foundation before bosses/XP (prevents rework)
 - **15-01**: Math.round for chain bonus → Handles floating point precision (0.1 * 1.5 issue) (2026-01-25)
 - **15-01**: Chain tile structural sharing → Only clone affected rows, 25-57% memory reduction (2026-01-25)
+- **15-02**: Tier thresholds 2/4/7/10 → Progressive feel, not linear (2026-01-25)
+- **15-03**: Particle counts 4/12/20 for device tiers → Balance satisfaction with performance (2026-01-25)
 - **15-04**: 50ms stagger for chain cascades → Slower than regular 30ms for visual emphasis (2026-01-25)
-- **15-04**: Chain cascade priority → Overrides regular tile.cascadeDelay for chain reactions (2026-01-25)
+- **15-05**: useRef for grid position calculation → Enables accurate particle positioning (2026-01-25)
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-**Phase 15 (Chain Combos):**
-- ✅ Chain tile logic verified — 15 tests passing, Math.round handles precision (15-01 complete)
-- ✅ Integration tested — 45 tests total, no regressions in special tiles (15-01 complete)
-- ✅ Combo tier feedback — ComboTierBadge with 4 tiers, 30 tests passing (15-02 complete)
-- ✅ Chain particles — ChainParticleBurst with 10 world configs, 13 tests passing (15-03 complete)
-- ✅ Cascade animation — useCascadeAnimation hook, 16 tests passing, grid integration (15-04 complete)
-- ⚠️ Combo state performance — Must use state machine pattern in 15-05
-- ⚠️ iOS Safari battery testing — Validate particle + sound together in 15-05 integration
+**Phase 15 (Chain Combos) — RESOLVED:**
+- ✅ Chain tile logic verified — 15 tests passing, Math.round handles precision
+- ✅ Integration tested — 83 tests total, no regressions
+- ✅ RTL tested — Hebrew rendering verified for combo badges
+- ✅ Multiplayer isolation — 854 backend tests passing, zero imports crossed
 
-**Phase 16 (Boss Battles):**
+**Phase 16 (Boss Battles) — NEXT:**
 - Difficulty mismatch risk — Design as "puzzle under pressure" not "action challenge," target 80% completion (research pitfall 1)
 - Playtesting required — Must validate with puzzle players (Wordle audience), NOT action gamers
 
@@ -89,11 +90,11 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 15-04-PLAN.md (Chain Cascade Animation)
+Stopped at: Phase 15 complete and verified
 Resume file: None
 
-**Next action:** Execute 15-05 (Combo State Machine) to complete Phase 15
+**Next action:** `/gsd:discuss-phase 16` to start Boss Battle Foundation
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 15:05 (completed 15-04 cascade animation)*
+*Last updated: 2026-01-25 (Phase 15 complete)*
