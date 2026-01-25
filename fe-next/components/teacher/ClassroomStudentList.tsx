@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomStudents, type ClassroomStudent } from '@/lib/supabase/teacher';
 import { cn } from '@/lib/utils';
@@ -92,10 +93,13 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   {avatarUrl ? (
-                    <img
+                    <Image
                       src={avatarUrl}
                       alt={username}
-                      className="w-12 h-12 rounded-full border-2 border-neo-cyan"
+                      width={48}
+                      height={48}
+                      className="w-12 h-12 rounded-full border-2 border-neo-cyan object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-neo-cyan/20 border-2 border-neo-cyan flex items-center justify-center">
