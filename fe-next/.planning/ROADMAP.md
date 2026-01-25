@@ -103,18 +103,21 @@ Plans:
 #### Phase 16: Boss Battle Foundation
 **Goal**: Enable end-of-world boss battles with phase transitions
 **Depends on**: Phase 15 (uses combo scoring for damage calculations)
-**Requirements**: BOSS-01, BOSS-02, BOSS-03, BOSS-04, BOSS-05, BOSS-13
+**Requirements**: BOSS-01, BOSS-02, BOSS-03 (BOSS-04, BOSS-05, BOSS-13 deferred to Phase 17/18)
 **Success Criteria** (what must be TRUE):
   1. User can battle end-of-world bosses with clear phase transitions (intro → active → enraged → victory/defeat)
   2. User sees boss HP bar with phase indicators updating in real-time during battle
-  3. Boss difficulty adapts based on player's average performance (80% completion target)
-  4. User experiences popQuiz mechanic (random word requirements each turn)
-  5. User experiences hiveMind mechanic (sticky tiles persist between turns)
-  6. User experiences synonymShift mechanic (bonus damage for synonym pairs)
-**Plans**: TBD
+  3. User experiences popQuiz mechanic (random word requirements each turn)
+  4. Combo scoring from Phase 15 integrates with boss damage calculations
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 16-01: TBD during plan-phase
+- [ ] 16-01-PLAN.md — Boss HP tracking hook (TDD) with phase state machine
+- [ ] 16-02-PLAN.md — BossHPBar component with real-time updates
+- [ ] 16-03-PLAN.md — Integration into AdventureGame
+- [ ] 16-04-PLAN.md — popQuiz mechanic verification and tests
+
+**Scope Note**: BOSS-04 (hiveMind/sticky tiles), BOSS-05 (synonymShift), and BOSS-13 (adaptive difficulty) deferred to Phase 17/18 per research analysis.
 
 #### Phase 17: Boss Mechanic Expansion
 **Goal**: Complete remaining boss mechanics for variety
