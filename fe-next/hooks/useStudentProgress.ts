@@ -228,6 +228,7 @@ export function useStudentProgress(lessonId?: string): UseStudentProgressReturn 
     } else {
       setState({
         progress: [],
+        lessons: [],
         isLoading: false,
         error: null,
       });
