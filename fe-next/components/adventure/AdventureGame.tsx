@@ -691,7 +691,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage]
     );
 
     // Handle level complete continue
