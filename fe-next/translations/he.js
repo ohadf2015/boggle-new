@@ -69,6 +69,8 @@ const he = {
   "common": {
     "loading": "מערבב אותיות...",
     "error": "אופס!",
+    "creating": "יוצר...",
+    "guest": "אורח",
     "back": "חזור",
     "backToHome": "חזרה לדף הבית",
     "next": "הבא",

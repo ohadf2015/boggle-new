@@ -69,6 +69,8 @@ const sv = {
   "common": {
     "loading": "Blandar bokstäver...",
     "error": "Hoppsan!",
+    "creating": "Skapar...",
+    "guest": "Gäst",
     "back": "Tillbaka",
     "backToHome": "Tillbaka till startsidan",
     "next": "Nästa",

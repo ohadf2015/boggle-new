@@ -69,6 +69,8 @@ const ja = {
   "common": {
     "loading": "文字をシャッフル中...",
     "error": "おっと！",
+    "creating": "作成中...",
+    "guest": "ゲスト",
     "back": "戻る",
     "backToHome": "ホームに戻る",
     "next": "次へ",

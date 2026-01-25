@@ -70,6 +70,8 @@ const en = {
     "loading": "Shuffling letters...",
     "error": "Whoops!",
     "retry": "Try Again",
+    "creating": "Creating...",
+    "guest": "Guest",
     "back": "Back",
     "backToHome": "Back to Home",
     "next": "Next",

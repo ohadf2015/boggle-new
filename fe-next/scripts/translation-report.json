@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 2505,
     "keyCountByLanguage": {
-      "en": 3324,
-      "he": 3324,
-      "sv": 3324,
-      "ja": 3324,
-      "es": 3324
+      "en": 3326,
+      "he": 3326,
+      "sv": 3326,
+      "ja": 3326,
+      "es": 3326
     },
-    "missingFromEnglish": 2,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,26 +130,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "common.creating",
-      "usages": [
-        {
-          "file": "components/singleplayer/results/components/ChallengeButton.tsx",
-          "line": 151
-        }
-      ]
-    },
-    {
-      "key": "common.guest",
-      "usages": [
-        {
-          "file": "components/singleplayer/results/components/ChallengeButton.tsx",
-          "line": 66
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],

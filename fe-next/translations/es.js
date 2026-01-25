@@ -69,6 +69,8 @@ const es = {
   "common": {
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
+    "creating": "Creando...",
+    "guest": "Invitado",
     "back": "Atrás",
     "backToHome": "Volver al Inicio",
     "next": "Siguiente",
