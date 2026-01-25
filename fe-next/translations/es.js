@@ -4292,6 +4292,16 @@ const es = {
         "month": "¡MAESTRO MENSUAL!",
         "monthDesc": "¡30 días de excelencia!"
       }
+    },
+    "leaderboard": {
+      "title": "Tabla de Clasificación del Aula",
+      "yourPosition": "Tu Posición",
+      "youAreRank": "Estás en el puesto #{rank}",
+      "studentsInClass": "{count} estudiantes",
+      "inactive": "Inactivo",
+      "noStudentsYet": "Aún no hay estudiantes en esta aula",
+      "level": "Nv. {level}",
+      "xp": "{xp} XP"
     }
   }
 };
