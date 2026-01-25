@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 18 of 23 (Education XP System)
-Plan: 2/4 complete
+Plan: 3/5 complete
 Status: In progress
-Last activity: 2026-01-25 — Completed 18-02-PLAN.md (XP Hook and Translations)
+Last activity: 2026-01-25 — Completed 18-04-PLAN.md (LevelUpCelebration Component)
 
 Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in progress)
 
@@ -30,51 +30,52 @@ Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 16 (Phase 15-17 complete, Phase 18 plans 01-02 complete)
+- Plans completed: 17 (Phase 15-17 complete, Phase 18 plans 01-02-04 complete)
 - Current phase: 18 (Education XP System) — IN PROGRESS
-- Next plan: 18-03 (Level-Up Celebration)
+- Next plan: 18-03 (XP Progress Bar) or 18-05 (Integration)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 15-01 | Chain Tile Calculation | 17min | ✅ Complete |
-| 15-02 | Combo Tier Feedback | 13min | ✅ Complete |
-| 15-03 | Chain Particle Effects | 17min | ✅ Complete |
-| 15-04 | Chain Cascade Animation | 6min | ✅ Complete |
-| 15-05 | Adventure Game Integration | 14min | ✅ Complete |
+| 15-01 | Chain Tile Calculation | 17min | Complete |
+| 15-02 | Combo Tier Feedback | 13min | Complete |
+| 15-03 | Chain Particle Effects | 17min | Complete |
+| 15-04 | Chain Cascade Animation | 6min | Complete |
+| 15-05 | Adventure Game Integration | 14min | Complete |
 
 **Phase 15 Total:** 67 minutes, 83 tests added
 
 **Phase 16 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 16-01 | Boss HP Tracking | 12min | ✅ Complete |
-| 16-02 | Boss HP Bar UI | 11min | ✅ Complete |
-| 16-03 | Boss Overlay Integration | 14min | ✅ Complete |
-| 16-04 | PopQuiz Mechanic Verification | 9min | ✅ Complete |
+| 16-01 | Boss HP Tracking | 12min | Complete |
+| 16-02 | Boss HP Bar UI | 11min | Complete |
+| 16-03 | Boss Overlay Integration | 14min | Complete |
+| 16-04 | PopQuiz Mechanic Verification | 9min | Complete |
 
 **Phase 16 Total:** 46 minutes, 57 tests added
 
 **Phase 17 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 17-01 | Mechanic Test Coverage | 3min | ✅ Complete |
-| 17-02 | finalWord Mechanic Tests | 3min | ✅ Complete |
-| 17-03 | scrambledReality Anagram Enhancement | 4min | ✅ Complete |
-| 17-04 | Stub Mechanic Tests | 2min | ✅ Complete |
-| 17-05 | Boss Integration Tests | 26min | ✅ Complete |
+| 17-01 | Mechanic Test Coverage | 3min | Complete |
+| 17-02 | finalWord Mechanic Tests | 3min | Complete |
+| 17-03 | scrambledReality Anagram Enhancement | 4min | Complete |
+| 17-04 | Stub Mechanic Tests | 2min | Complete |
+| 17-05 | Boss Integration Tests | 26min | Complete |
 
 **Phase 17 Total:** 38 minutes, 230 tests added
 
 **Phase 18 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 18-01 | Education XP Foundation | 5min | ✅ Complete |
-| 18-02 | XP Hook and Translations | 6min | ✅ Complete |
-| 18-03 | Level-Up Celebration | - | Pending |
-| 18-04 | Streak Bonus System | - | Pending |
+| 18-01 | Education XP Foundation | 5min | Complete |
+| 18-02 | XP Hook and Translations | 6min | Complete |
+| 18-03 | XP Progress Bar | - | Pending |
+| 18-04 | LevelUpCelebration Component | 6min | Complete |
+| 18-05 | Integration | - | Pending |
 
-**Phase 18 Progress:** 2/4 plans complete, 48 tests added
+**Phase 18 Progress:** 3/5 plans complete, 68 tests added
 
 ## Accumulated Context
 
@@ -82,10 +83,10 @@ Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in 
 
 Key decisions affecting v1.1 work (see PROJECT.md for full log):
 
-- **v1.0**: Focus on Worlds 1-3 only → Ship polished subset before expanding (✓ Good)
-- **v1.0**: Skip boss battles for now → Core adventure loop more important (✓ Good)
-- **v1.0**: Combined parallax (gyro+gesture+ambient) → "Always alive" feel (✓ Good)
-- **v1.0**: Education as separate section → Distinct flow from main game (✓ Good)
+- **v1.0**: Focus on Worlds 1-3 only → Ship polished subset before expanding (Good)
+- **v1.0**: Skip boss battles for now → Core adventure loop more important (Good)
+- **v1.0**: Combined parallax (gyro+gesture+ambient) → "Always alive" feel (Good)
+- **v1.0**: Education as separate section → Distinct flow from main game (Good)
 - **v1.1**: Research-informed phase ordering → Combo foundation before bosses/XP (prevents rework)
 - **15-01**: Math.round for chain bonus → Handles floating point precision (0.1 * 1.5 issue) (2026-01-25)
 - **15-01**: Chain tile structural sharing → Only clone affected rows, 25-57% memory reduction (2026-01-25)
@@ -113,6 +114,8 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **18-02**: pendingUpdate pattern → Hook tracks pending updates, database persistence deferred to Plan 05 (2026-01-25)
 - **18-02**: useMemo for xpProgress → Derived state recalculates only when totalXp changes (2026-01-25)
 - **18-02**: Streak update on every practice → Builds loss aversion for intrinsic motivation (2026-01-25)
+- **18-04**: fireLevelUpConfetti preset → Consistent celebration effect using neo-brutalist palette (2026-01-25)
+- **18-04**: useId for aria-labelledby → React 18 hook for guaranteed unique accessibility IDs (2026-01-25)
 
 ### Pending Todos
 
@@ -121,31 +124,32 @@ None.
 ### Blockers/Concerns
 
 **Phase 15 (Chain Combos) — RESOLVED:**
-- ✅ Chain tile logic verified — 15 tests passing, Math.round handles precision
-- ✅ Integration tested — 83 tests total, no regressions
-- ✅ RTL tested — Hebrew rendering verified for combo badges
-- ✅ Multiplayer isolation — 854 backend tests passing, zero imports crossed
+- Chain tile logic verified — 15 tests passing, Math.round handles precision
+- Integration tested — 83 tests total, no regressions
+- RTL tested — Hebrew rendering verified for combo badges
+- Multiplayer isolation — 854 backend tests passing, zero imports crossed
 
 **Phase 16 (Boss Battles) — RESOLVED:**
-- ✅ Boss HP tracking implemented — 21 tests passing, 5-phase state machine
-- ✅ BossHPBar component — 18 tests, spring animations, enraged indicator
-- ✅ Integration complete — BossOverlay compound component, damage wired
-- ✅ popQuiz mechanic verified — 18 tests, all 4 requirement types working
-- ⚠️ Playtesting still needed — Must validate with puzzle players before launch
+- Boss HP tracking implemented — 21 tests passing, 5-phase state machine
+- BossHPBar component — 18 tests, spring animations, enraged indicator
+- Integration complete — BossOverlay compound component, damage wired
+- popQuiz mechanic verified — 18 tests, all 4 requirement types working
+- Playtesting still needed — Must validate with puzzle players before launch
 
 **Phase 17 (Boss Expansion) — COMPLETE:**
-- ✅ mirrorMatch mechanic tested — 44 tests, palindrome detection verified
-- ✅ stellarForge mechanic tested — 52 tests, supernova letter Q/X/Z detection verified
-- ✅ finalWord mechanic tested — 41 tests, phase cycling and delegation verified
-- ✅ scrambledReality enhanced — 42 tests, areAnagrams + foundWords tracking + translations
-- ✅ Stub mechanic tests — All 10 boss mechanics have dedicated test files
-- ✅ Boss integration tests — 51 tests using real hooks for all 10 worlds
+- mirrorMatch mechanic tested — 44 tests, palindrome detection verified
+- stellarForge mechanic tested — 52 tests, supernova letter Q/X/Z detection verified
+- finalWord mechanic tested — 41 tests, phase cycling and delegation verified
+- scrambledReality enhanced — 42 tests, areAnagrams + foundWords tracking + translations
+- Stub mechanic tests — All 10 boss mechanics have dedicated test files
+- Boss integration tests — 51 tests using real hooks for all 10 worlds
 
 **Phase 18 (Education XP) — IN PROGRESS:**
-- ✅ XP calculation foundation — educationXpManager.ts with 32 tests, 98.6% coverage
-- ✅ Database schema — Migration 062 adds XP/level/streak columns
-- ✅ useEducationXp hook — State management with 16 tests, pendingUpdate for persistence
-- ✅ Translation keys — education.xp section in 4 languages (en, he, sv, ja)
+- XP calculation foundation — educationXpManager.ts with 32 tests, 98.6% coverage
+- Database schema — Migration 062 adds XP/level/streak columns
+- useEducationXp hook — State management with 16 tests, pendingUpdate for persistence
+- Translation keys — education.xp section in 4 languages (en, he, sv, ja)
+- LevelUpCelebration component — 20 tests, confetti integration, accessible modal
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
 - XP curve validation — Test if Adventure Mode curve works for education context
 
@@ -156,11 +160,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 18-02-PLAN.md (XP Hook and Translations)
+Stopped at: Completed 18-04-PLAN.md (LevelUpCelebration Component)
 Resume file: None
 
-**Next action:** `/gsd:execute-phase 18` to continue with 18-03 (Level-Up Celebration)
+**Next action:** `/gsd:execute-phase 18` to continue with 18-03 (XP Progress Bar) or 18-05 (Integration)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 18 plan 02 complete)*
+*Last updated: 2026-01-25 (Phase 18 plan 04 complete)*
