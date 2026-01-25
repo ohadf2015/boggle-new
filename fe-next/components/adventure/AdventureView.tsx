@@ -122,6 +122,8 @@ export default function AdventureView(): React.JSX.Element {
   const isHandlingPopstateRef = useRef(false);
   // Track if we've initialized history state
   const historyInitializedRef = useRef(false);
+  // Track popstate flag reset timeout for cleanup (prevents memory leak)
+  const popstateFlagTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Push initial history state on mount (for worldMap view)
   useEffect(() => {
@@ -157,9 +159,13 @@ export default function AdventureView(): React.JSX.Element {
       setSelectedWorld(state.worldId ?? null);
       setSelectedLevel(state.levelId ?? null);
 
-      // Reset flag after state updates are processed
-      setTimeout(() => {
+      // Reset flag after state updates are processed (with tracked timeout for cleanup)
+      if (popstateFlagTimeoutRef.current) {
+        clearTimeout(popstateFlagTimeoutRef.current);
+      }
+      popstateFlagTimeoutRef.current = setTimeout(() => {
         isHandlingPopstateRef.current = false;
+        popstateFlagTimeoutRef.current = null;
       }, 0);
     };
 
@@ -167,6 +173,11 @@ export default function AdventureView(): React.JSX.Element {
 
     return () => {
       window.removeEventListener('popstate', handlePopstate);
+      // Clean up any pending flag reset timeout to prevent memory leaks
+      if (popstateFlagTimeoutRef.current) {
+        clearTimeout(popstateFlagTimeoutRef.current);
+        popstateFlagTimeoutRef.current = null;
+      }
     };
   }, []);
 
@@ -299,8 +310,8 @@ export default function AdventureView(): React.JSX.Element {
       initialLevel={selectedLevel || 1}
     >
     <div className="min-h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
-      {/* Header - Sticky at top */}
-      <header className="sticky top-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm border-b border-neo-white/10 flex-shrink-0">
+      {/* Header - Sticky at top with solid background for visibility */}
+      <header className="sticky top-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Back / World Map button */}
           {viewState !== 'worldMap' ? (

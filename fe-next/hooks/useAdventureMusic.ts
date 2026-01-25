@@ -108,6 +108,9 @@ export function useAdventureMusic({
   const pausedByBlurRef = useRef(false);
   const pausedByVisibilityRef = useRef(false);
 
+  // Track crossfade timeouts for cleanup (prevents memory leaks)
+  const crossfadeTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
   // Keep refs in sync
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
@@ -301,7 +304,8 @@ export function useAdventureMusic({
     // Fade out track 2 if playing
     if (track2Ref.current?.playing()) {
       track2Ref.current.fade(track2Ref.current.volume(), 0, CROSSFADE_MS);
-      setTimeout(() => track2Ref.current?.stop(), CROSSFADE_MS);
+      const timeoutId = setTimeout(() => track2Ref.current?.stop(), CROSSFADE_MS);
+      crossfadeTimeoutsRef.current.push(timeoutId);
     }
 
     // Start track 1
@@ -328,7 +332,8 @@ export function useAdventureMusic({
     // Crossfade from track 1 to track 2
     if (track1Ref.current?.playing()) {
       track1Ref.current.fade(track1Ref.current.volume(), 0, CROSSFADE_MS);
-      setTimeout(() => track1Ref.current?.stop(), CROSSFADE_MS);
+      const timeoutId = setTimeout(() => track1Ref.current?.stop(), CROSSFADE_MS);
+      crossfadeTimeoutsRef.current.push(timeoutId);
     }
 
     // Start track 2
@@ -346,11 +351,13 @@ export function useAdventureMusic({
 
     if (track1Ref.current?.playing()) {
       track1Ref.current.fade(track1Ref.current.volume(), 0, fadeOutMs);
-      setTimeout(() => track1Ref.current?.stop(), fadeOutMs);
+      const timeoutId = setTimeout(() => track1Ref.current?.stop(), fadeOutMs);
+      crossfadeTimeoutsRef.current.push(timeoutId);
     }
     if (track2Ref.current?.playing()) {
       track2Ref.current.fade(track2Ref.current.volume(), 0, fadeOutMs);
-      setTimeout(() => track2Ref.current?.stop(), fadeOutMs);
+      const timeoutId = setTimeout(() => track2Ref.current?.stop(), fadeOutMs);
+      crossfadeTimeoutsRef.current.push(timeoutId);
     }
     currentTrackRef.current = null;
   }, []);
@@ -373,6 +380,11 @@ export function useAdventureMusic({
     return () => {
       // Cleanup on unmount
       logger.log(`[AdventureMusic] Cleaning up`);
+
+      // Clear all pending crossfade timeouts to prevent memory leaks
+      crossfadeTimeoutsRef.current.forEach(clearTimeout);
+      crossfadeTimeoutsRef.current = [];
+
       if (track1Ref.current) {
         track1Ref.current.unload();
         track1Ref.current = null;

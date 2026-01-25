@@ -687,41 +687,6 @@ export default function WorldMap({
           );
         })}
 
-        {/* Journey Start section - at the END of the trail (bottom) */}
-        <motion.div
-          className="relative mt-10 flex flex-col items-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-        >
-          {/* Connection to last world - thicker and with glow */}
-          <div className="relative">
-            <div className="absolute inset-0 w-2 bg-neo-yellow/40 blur-sm" />
-            <div className="w-2 h-10 bg-neo-yellow mb-3" />
-          </div>
-
-          {/* Start banner - larger and more prominent with pulsing glow */}
-          <motion.div
-            className="px-8 py-4 bg-neo-lime border-4 border-neo-black rounded-neo shadow-hard-lg"
-            whileHover={{ scale: 1.05, y: -2, rotate: 1 }}
-            whileTap={{ scale: 0.98, y: 0, rotate: -0.5 }}
-            animate={{
-              boxShadow: [
-                '4px 4px 0px rgba(0,0,0,1), 0 0 20px rgba(191,255,0,0.3)',
-                '4px 4px 0px rgba(0,0,0,1), 0 0 35px rgba(191,255,0,0.5)',
-                '4px 4px 0px rgba(0,0,0,1), 0 0 20px rgba(191,255,0,0.3)',
-              ],
-            }}
-            transition={{
-              boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          >
-            <span className="text-neo-black font-black text-lg sm:text-xl tracking-tight">
-              Start Your Journey!
-            </span>
-          </motion.div>
-        </motion.div>
-
         {/* Bottom scroll anchor */}
         <div ref={bottomRef} className="h-8" />
       </div>

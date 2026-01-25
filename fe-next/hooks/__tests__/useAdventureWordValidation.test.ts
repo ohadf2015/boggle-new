@@ -6,7 +6,7 @@
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useAdventureWordValidation } from '../useAdventureWordValidation';
+import { useAdventureWordValidation, clearWordValidationCache } from '../useAdventureWordValidation';
 
 // ==============================================
 // TEST FIXTURES
@@ -63,6 +63,8 @@ describe('useAdventureWordValidation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockFetch.mockReset();
+    // Clear word validation cache to ensure test isolation
+    clearWordValidationCache();
     // Default implementation for any unexpected fetch calls (e.g., from invalidWordTracker)
     // This prevents "Cannot read properties of undefined (reading 'catch')" errors
     mockFetch.mockImplementation(() =>

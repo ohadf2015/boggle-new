@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Crown, Bot, Monitor, LogOut, ChevronDown } from 'lucide-react';
+import { Clock, Users, Crown, Bot, Monitor, LogOut, ChevronDown, BookOpen } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Checkbox } from '../../components/ui/checkbox';
 import Avatar from '../../components/Avatar';
@@ -45,6 +45,19 @@ interface TournamentData {
   isComplete?: boolean;
 }
 
+interface LessonData {
+  lessonId: string;
+  lessonName: string;
+  vocabularyWords: string[];
+  language: Language;
+  templateSettings?: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  } | null;
+}
+
 interface HostPreGameViewProps {
   gameCode: string;
   roomLanguage: Language;
@@ -76,6 +89,8 @@ interface HostPreGameViewProps {
   onCancelTournament: () => void;
   onRegenerateBoard?: () => void;
   tournamentCreating: boolean;
+  /** Lesson data when starting from teacher dashboard */
+  lessonData?: LessonData | null;
 }
 
 // ==================== Component ====================
@@ -95,6 +110,7 @@ function HostPreGameView({
   onStartGame,
   onExitRoom,
   tournamentCreating,
+  lessonData,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
   const [selectedPreset, setSelectedPreset] = useState<PresetKey>('party');
@@ -329,6 +345,24 @@ function HostPreGameView({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-5xl lg:mx-auto">
+      {/* Lesson Mode Banner */}
+      {lessonData && (
+        <div className="flex-shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-neo-purple" />
+            <span className="text-sm font-bold text-neo-purple">
+              {t('hostView.lessonMode') || 'Lesson Mode'}:
+            </span>
+            <span className="text-sm text-neo-cream">
+              {lessonData.lessonName}
+            </span>
+            <span className="text-xs text-neo-cream/60">
+              ({lessonData.vocabularyWords.length} {t('hostView.words') || 'words'})
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Header - Compact: Timer + Exit only (room code in InviteCard) */}
       <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">

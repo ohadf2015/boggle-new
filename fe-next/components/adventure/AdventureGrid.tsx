@@ -174,6 +174,12 @@ const AdventureGrid = memo(
       // Cascade animation state
       const [cascadeComplete, setCascadeComplete] = useState(!showCascade);
 
+      // Ref for cascade callback to avoid effect re-runs when callback reference changes
+      const onCascadeCompleteRef = useRef(onCascadeComplete);
+      useEffect(() => {
+        onCascadeCompleteRef.current = onCascadeComplete;
+      }, [onCascadeComplete]);
+
       // World theming - default to world 1 if theme context is not available
       // This allows AdventureGrid to work both inside and outside AdventureThemeProvider
       // Always call useContext unconditionally (Rules of Hooks), then check if value is null
@@ -204,6 +210,7 @@ const AdventureGrid = memo(
     }, []);
 
     // Cascade completion effect
+    // Uses ref for callback to prevent effect re-running when parent re-renders
     useEffect(() => {
       if (!showCascade || cascadeComplete) return;
 
@@ -213,19 +220,19 @@ const AdventureGrid = memo(
 
       const timer = setTimeout(() => {
         setCascadeComplete(true);
-        onCascadeComplete?.();
+        onCascadeCompleteRef.current?.();
       }, totalDuration);
 
       return () => clearTimeout(timer);
-    }, [showCascade, cascadeComplete, gridSize, onCascadeComplete]);
+    }, [showCascade, cascadeComplete, gridSize]);
 
     // Instant completion for reduced motion
     useEffect(() => {
       if (showCascade && prefersReducedMotion && !cascadeComplete) {
         setCascadeComplete(true);
-        onCascadeComplete?.();
+        onCascadeCompleteRef.current?.();
       }
-    }, [showCascade, prefersReducedMotion, cascadeComplete, onCascadeComplete]);
+    }, [showCascade, prefersReducedMotion, cascadeComplete]);
 
     // Build selected set for quick lookup
     const selectedSet = useMemo(

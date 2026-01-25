@@ -671,6 +671,8 @@ const he = {
     "settings": "הגדרות",
     "regenerateBoard": "ערבב מחדש",
     "boardRegenerated": "הלוח עורבב מחדש!",
+    "lessonMode": "מצב שיעור",
+    "lessonModeActive": "משתמש במילון מהשיעור",
     "noPlayers": "אין שחקנים בלובי",
     "connectionLost": "החיבור נותק. רענן כדי לחזור!",
     "presetFast": "מהיר",

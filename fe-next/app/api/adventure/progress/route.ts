@@ -80,12 +80,23 @@ export async function GET() {
     // Use service role client for database operations (bypasses RLS)
     const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch progression
-    const { data: progressionRow, error: progressionError } = await supabase
-      .from('player_progression')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+    // Fetch progression and completions in parallel for ~50-100ms faster response
+    const [progressionResult, completionsResult] = await Promise.all([
+      supabase
+        .from('player_progression')
+        .select('*')
+        .eq('user_id', userId)
+        .single(),
+      supabase
+        .from('level_completions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('world', { ascending: true })
+        .order('level', { ascending: true }),
+    ]);
+
+    const { data: progressionRow, error: progressionError } = progressionResult;
+    const { data: completionsRows, error: completionsError } = completionsResult;
 
     // If no progression exists, return initial state
     if (progressionError && progressionError.code === 'PGRST116') {
@@ -98,14 +109,6 @@ export async function GET() {
       console.error('[ADVENTURE API] Progression fetch error:', progressionError);
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });
     }
-
-    // Fetch completions
-    const { data: completionsRows, error: completionsError } = await supabase
-      .from('level_completions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('world', { ascending: true })
-      .order('level', { ascending: true });
 
     if (completionsError) {
       console.error('[ADVENTURE API] Completions fetch error:', completionsError);

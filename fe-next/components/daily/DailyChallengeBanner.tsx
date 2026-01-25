@@ -80,10 +80,13 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   }, [language]);
 
   // Update countdown timer
+  // Performance: Skip updates when tab is hidden to reduce CPU usage
   useEffect(() => {
     if (!isClient) return;
 
     const updateCountdown = () => {
+      // Skip update if tab is not visible (saves CPU cycles)
+      if (document.visibilityState === 'hidden') return;
       const seconds = getSecondsUntilNextDaily();
       setCountdown(formatCountdown(seconds));
     };
@@ -91,7 +94,18 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(interval);
+    // Update immediately when tab becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateCountdown();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isClient]);
 
   // Refresh status when language changes

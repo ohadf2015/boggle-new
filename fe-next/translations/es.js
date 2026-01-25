@@ -652,6 +652,8 @@ const es = {
     "settings": "Ajustes",
     "regenerateBoard": "Regenerar tablero",
     "boardRegenerated": "¡Tablero regenerado!",
+    "lessonMode": "Modo Lección",
+    "lessonModeActive": "Usando vocabulario de la lección",
     "noPlayers": "No hay jugadores en la sala",
     "connectionLost": "Conexión perdida. ¡Refresca para volver!",
     "presetFast": "Rápido",

@@ -278,14 +278,41 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
       // Calculate score with special tile effects
       let finalScore = score;
-      let newTiles = state.tiles.map((row) => row.map((tile) => ({ ...tile })));
+      // Structural sharing: only clone rows that will be modified
+      // Collect all rows that need modification first
+      const rowsToClone = new Set<number>();
+      const gridSize = state.levelConfig.gridSize;
+
+      // Track rows from path
+      if (path) {
+        for (const pos of path) {
+          rowsToClone.add(pos.row);
+          // Also track adjacent rows for ice melting
+          if (pos.row > 0) rowsToClone.add(pos.row - 1);
+          if (pos.row < gridSize - 1) rowsToClone.add(pos.row + 1);
+        }
+        // Check for bomb tiles - they affect their entire row
+        for (const pos of path) {
+          if (state.tiles[pos.row]?.[pos.col]?.type === 'bomb') {
+            rowsToClone.add(pos.row);
+          }
+        }
+      }
+
+      // Clone only affected rows (structural sharing optimization)
+      const newTiles: TileState[][] = state.tiles.map((row, rowIndex) =>
+        rowsToClone.has(rowIndex)
+          ? row.map((tile) => ({ ...tile }))
+          : row
+      );
+
       let iceClearedCount = 0;
       let timeBonusSeconds = 0;
       const activationTimestamp = Date.now();
 
-      // Clear any previous activation effects before setting new ones
-      for (const row of newTiles) {
-        for (const tile of row) {
+      // Clear any previous activation effects only on cloned rows
+      for (const rowIndex of rowsToClone) {
+        for (const tile of newTiles[rowIndex]) {
           tile.activationEffect = null;
           tile.activationTimestamp = undefined;
         }
@@ -378,7 +405,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         }
 
         // Melt ice tiles adjacent to used tiles - convert to standard usable tiles
-        const gridSize = state.levelConfig.gridSize;
         for (const pos of path) {
           // Check all 8 neighbors
           for (let dr = -1; dr <= 1; dr++) {

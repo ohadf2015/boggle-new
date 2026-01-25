@@ -295,7 +295,7 @@ const AdventureGame = memo<AdventureGameProps>(
     );
 
     // Lexi reaction state - transform game state to reaction format
-    // Using ref + selective update to avoid recreating object on every timer tick
+    // Using ref + effect to avoid recreating object on every timer tick (60 runs/minute → ~6 runs/minute)
     const lexiGameStateRef = useRef<GameStateForReactions>({
       wordsFound: [],
       comboCount: 0,
@@ -305,32 +305,31 @@ const AdventureGame = memo<AdventureGameProps>(
       worldId: 1,
     });
 
-    // Only update ref when non-timer values change (timer ticks shouldn't trigger reactions)
-    const lexiGameState = useMemo(() => {
-      const ref = lexiGameStateRef.current;
-      // Check if significant values changed (not just timeRemaining)
-      const significantChange =
-        ref.wordsFound !== gameState.wordsFound ||
-        ref.comboCount !== gameState.comboCount ||
-        ref.isComplete !== gameState.isComplete ||
-        ref.stars !== gameState.stars ||
-        ref.worldId !== levelConfig.world;
+    // Update ref only when significant values change (not timer ticks)
+    // This prevents useLexiReactions from re-running every second
+    useEffect(() => {
+      lexiGameStateRef.current = {
+        wordsFound: gameState.wordsFound,
+        comboCount: gameState.comboCount,
+        timeRemaining, // Include current time for completeness
+        isComplete: gameState.isComplete,
+        stars: gameState.stars,
+        worldId: levelConfig.world,
+      };
+    }, [gameState.wordsFound, gameState.comboCount, gameState.isComplete, gameState.stars, levelConfig.world, timeRemaining]);
 
-      if (significantChange) {
-        lexiGameStateRef.current = {
-          wordsFound: gameState.wordsFound,
-          comboCount: gameState.comboCount,
-          timeRemaining,
-          isComplete: gameState.isComplete,
-          stars: gameState.stars,
-          worldId: levelConfig.world,
-        };
-      } else {
-        // Update timeRemaining without creating new object
-        ref.timeRemaining = timeRemaining;
-      }
-      return lexiGameStateRef.current;
-    }, [gameState.wordsFound, gameState.comboCount, timeRemaining, gameState.isComplete, gameState.stars, levelConfig.world]);
+    // Memoize based only on significant changes (not timeRemaining)
+    // The ref is updated by the effect above, this just provides stable object identity
+    const lexiGameState = useMemo(() => {
+      return {
+        wordsFound: gameState.wordsFound,
+        comboCount: gameState.comboCount,
+        timeRemaining: lexiGameStateRef.current.timeRemaining,
+        isComplete: gameState.isComplete,
+        stars: gameState.stars,
+        worldId: levelConfig.world,
+      };
+    }, [gameState.wordsFound, gameState.comboCount, gameState.isComplete, gameState.stars, levelConfig.world]);
 
     // Lexi reactions hook
     const { reaction, dismissReaction } = useLexiReactions({
@@ -670,13 +669,27 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Safety mechanism: clear stuck popups after max duration
     useEffect(() => {
-      if (currentPopup && !popupQueueTimeoutRef.current) {
+      // Clear any existing timeout when popup changes (prevents stale timeout accumulation)
+      if (popupQueueTimeoutRef.current) {
+        clearTimeout(popupQueueTimeoutRef.current);
+        popupQueueTimeoutRef.current = null;
+      }
+
+      if (currentPopup) {
         const POPUP_MAX_DURATION_MS = 3000; // Max 3 seconds per popup
         popupQueueTimeoutRef.current = setTimeout(() => {
           setPopupQueue(prev => prev.slice(1));
           popupQueueTimeoutRef.current = null;
         }, POPUP_MAX_DURATION_MS);
       }
+
+      // Cleanup on unmount or when popup changes
+      return () => {
+        if (popupQueueTimeoutRef.current) {
+          clearTimeout(popupQueueTimeoutRef.current);
+          popupQueueTimeoutRef.current = null;
+        }
+      };
     }, [currentPopup]);
 
     // Calculate star count for display

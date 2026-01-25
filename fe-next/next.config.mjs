@@ -22,8 +22,10 @@ const isCrazyGamesEnabled = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable system TLS certs for Turbopack to fetch Google Fonts
+  // optimizePackageImports automatically tree-shakes common packages like lucide-react
   experimental: {
     turbopackUseSystemTlsCerts: true,
+    optimizePackageImports: ['lucide-react'],
   },
 
   // Transpile Three.js packages to fix HMR issues with Turbopack

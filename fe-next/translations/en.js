@@ -664,6 +664,8 @@ const en = {
     "settings": "Settings",
     "regenerateBoard": "Regenerate Board",
     "boardRegenerated": "Board regenerated!",
+    "lessonMode": "Lesson Mode",
+    "lessonModeActive": "Using vocabulary from lesson",
     "noPlayers": "No players in lobby",
     "connectionLost": "Connection lost. Refresh to reconnect!",
     "presetFast": "Quick",

@@ -218,11 +218,20 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
   // Refs
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onAutoHintRef = useRef(onAutoHint);
+  // Refs for timer callback to avoid stale closures and prevent effect re-runs
+  const gridRef = useRef(grid);
+  const remainingHintWordsRef = useRef<string[]>([]);
 
-  // Keep callback ref updated
+  // Keep refs updated
   useEffect(() => {
     onAutoHintRef.current = onAutoHint;
   }, [onAutoHint]);
+
+  useEffect(() => {
+    gridRef.current = grid;
+  }, [grid]);
+
+  // Note: remainingHintWordsRef is updated after remainingHintWords is declared below
 
   // Fetch valid words from solve-grid API
   useEffect(() => {
@@ -294,6 +303,11 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     return remaining;
   }, [allWords, foundWords]);
 
+  // Keep remainingHintWordsRef updated for timer callback
+  useEffect(() => {
+    remainingHintWordsRef.current = remainingHintWords;
+  }, [remainingHintWords]);
+
   // Check if hints are available
   const hasHintsAvailable = !isLoading && !error && remainingHintWords.length > 0;
 
@@ -335,14 +349,14 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     // Hide any auto-hint
     setShowAutoHint(false);
 
-    // Start new timer if playing
+    // Start new timer if playing (use refs to avoid stale closures)
     if (isPlaying && hasHintsAvailable) {
       timerStartedRef.current = true;
       inactivityTimerRef.current = setTimeout(() => {
-        triggerAutoHint(remainingHintWords, grid, setCurrentHint, setShowAutoHint, onAutoHintRef);
+        triggerAutoHint(remainingHintWordsRef.current, gridRef.current, setCurrentHint, setShowAutoHint, onAutoHintRef);
       }, inactivityThresholdMs);
     }
-  }, [isPlaying, hasHintsAvailable, inactivityThresholdMs, remainingHintWords, grid]);
+  }, [isPlaying, hasHintsAvailable, inactivityThresholdMs]);
 
   // Dismiss auto-hint
   const dismissAutoHint = useCallback(() => {
@@ -355,6 +369,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
   }, []);
 
   // Start inactivity timer when playing and hints available
+  // Uses refs for remainingHintWords and grid to avoid effect re-runs on their changes
   useEffect(() => {
     // Only start timer once when conditions are first met
     if (isPlaying && hasHintsAvailable && !isLoading && !timerStartedRef.current) {
@@ -366,7 +381,8 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
       }
 
       inactivityTimerRef.current = setTimeout(() => {
-        triggerAutoHint(remainingHintWords, grid, setCurrentHint, setShowAutoHint, onAutoHintRef);
+        // Use refs to get current values, avoiding stale closures
+        triggerAutoHint(remainingHintWordsRef.current, gridRef.current, setCurrentHint, setShowAutoHint, onAutoHintRef);
       }, inactivityThresholdMs);
     }
 
@@ -383,7 +399,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
         inactivityTimerRef.current = null;
       }
     };
-  }, [isPlaying, hasHintsAvailable, isLoading, inactivityThresholdMs, remainingHintWords, grid]);
+  }, [isPlaying, hasHintsAvailable, isLoading, inactivityThresholdMs]);
 
   return {
     isLoading,

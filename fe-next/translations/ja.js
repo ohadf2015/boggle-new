@@ -661,6 +661,8 @@ const ja = {
     "settings": "設定",
     "regenerateBoard": "ボード再生成",
     "boardRegenerated": "ボードが再生成されました！",
+    "lessonMode": "レッスンモード",
+    "lessonModeActive": "レッスンの単語を使用中",
     "noPlayers": "ロビーにプレイヤーがいません",
     "connectionLost": "接続切れ。更新して復帰！",
     "presetFast": "クイック",

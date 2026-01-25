@@ -148,6 +148,20 @@ export default function MultiplayerPage(): React.JSX.Element {
   const [isJoining, setIsJoining] = useState<boolean>(false); // Track join/create loading state
   const [authLoadingStartTime, setAuthLoadingStartTime] = useState<number | null>(null); // Track when auth loading started
 
+  // Lesson integration state - vocabulary words from teacher's lesson to use for board generation
+  const [lessonData, setLessonData] = useState<{
+    lessonId: string;
+    lessonName: string;
+    vocabularyWords: string[];
+    language: Language;
+    templateSettings?: {
+      timerSeconds: number;
+      difficulty: string;
+      minWordLength: number;
+      allowLateJoin: boolean;
+    } | null;
+  } | null>(null);
+
   // Late joiner & spectator state
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
 
@@ -247,9 +261,28 @@ export default function MultiplayerPage(): React.JSX.Element {
     const initializeState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const roomFromUrl = urlParams.get('room');
-      logger.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl);
+      const fromLesson = urlParams.get('fromLesson') === 'true';
+      logger.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl, '| fromLesson:', fromLesson);
       const savedUsername = getStoredUsername() || '';
       const savedSession = getSession();
+
+      // Check for lesson data from teacher dashboard
+      if (fromLesson) {
+        try {
+          const storedLessonData = sessionStorage.getItem('lessonGameData');
+          if (storedLessonData) {
+            const parsed = JSON.parse(storedLessonData);
+            logger.log('[LESSON] Loaded lesson data:', parsed.lessonName, 'with', parsed.vocabularyWords?.length, 'words');
+            setLessonData(parsed);
+            // Set room language from lesson if available
+            if (parsed.language) {
+              setRoomLanguage(parsed.language as Language);
+            }
+          }
+        } catch (err) {
+          logger.error('[LESSON] Failed to parse lesson data:', err);
+        }
+      }
 
       let joiningNewRoomViaInvitation = false;
       const hasSession = savedSession && savedSession.gameCode;
@@ -1431,6 +1464,7 @@ export default function MultiplayerPage(): React.JSX.Element {
             onShowResults={handleShowResults}
             pendingGameStart={pendingGameStart}
             onGameStartConsumed={() => setPendingGameStart(null)}
+            lessonData={lessonData}
           />
         </FeatureErrorBoundary>
       );

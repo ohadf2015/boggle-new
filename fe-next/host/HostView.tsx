@@ -48,6 +48,19 @@ interface GameStartData {
   language: Language;
 }
 
+interface LessonData {
+  lessonId: string;
+  lessonName: string;
+  vocabularyWords: string[];
+  language: Language;
+  templateSettings?: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  } | null;
+}
+
 interface HostViewProps {
   gameCode: string;
   roomLanguage?: Language;
@@ -58,6 +71,8 @@ interface HostViewProps {
   pendingGameStart?: GameStartData | null;
   /** Callback when pending game start has been consumed */
   onGameStartConsumed?: () => void;
+  /** Lesson data for vocabulary-based games started from teacher dashboard */
+  lessonData?: LessonData | null;
 }
 
 // ==========================================
@@ -72,6 +87,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   onShowResults,
   pendingGameStart,
   onGameStartConsumed,
+  lessonData,
 }) => {
   const { t, language, dir } = useLanguage();
   const { socket } = useSocket();
@@ -213,20 +229,34 @@ const HostView: React.FC<HostViewProps> = memo(({
     tournamentTimeoutRef: state.refs.tournamentTimeoutRef,
   });
 
+  // Destructure stable setters for useEffect dependencies
+  const { setWordsForBoard } = state;
+  const roomLanguage = state.roomLanguage;
+  const difficulty = state.settings.difficulty;
+
   // Request words for board embedding
+  // If lesson data is available, use vocabulary words from the lesson instead of random server words
   useEffect(() => {
     if (!socket) return;
-    if (state.roomLanguage === 'ja') return;
+    if (roomLanguage === 'ja') return;
 
-    const difficultyConfig = DIFFICULTIES[state.settings.difficulty];
+    // If we have lesson vocabulary, use those words instead of requesting random ones
+    if (lessonData?.vocabularyWords && lessonData.vocabularyWords.length > 0) {
+      // Use lesson vocabulary for board embedding
+      setWordsForBoard(lessonData.vocabularyWords.map(w => w.toUpperCase()));
+      return;
+    }
+
+    // Otherwise request random themed words from server
+    const difficultyConfig = DIFFICULTIES[difficulty];
     socket.emit('getWordsForBoard', {
-      language: state.roomLanguage,
+      language: roomLanguage,
       boardSize: {
         rows: difficultyConfig.rows,
         cols: difficultyConfig.cols,
       },
     });
-  }, [socket, state.settings.difficulty, state.roomLanguage]);
+  }, [socket, difficulty, roomLanguage, lessonData, setWordsForBoard]);
 
   // Listen for players ready updates
   useEffect(() => {
@@ -500,6 +530,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           onCancelTournament={actions.handleCancelTournamentDialog}
           onRegenerateBoard={actions.regenerateBoard}
           tournamentCreating={tournament.tournamentCreating}
+          lessonData={lessonData}
         />
       )}
 

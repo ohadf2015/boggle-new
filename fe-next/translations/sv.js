@@ -661,6 +661,8 @@ const sv = {
     "settings": "Inställningar",
     "regenerateBoard": "Regenerera bräda",
     "boardRegenerated": "Brädan har regenererats!",
+    "lessonMode": "Lektionsläge",
+    "lessonModeActive": "Använder ordförråd från lektion",
     "noPlayers": "Inga spelare i lobbyn",
     "connectionLost": "Anslutningen förlorades. Uppdatera för att återansluta!",
     "presetFast": "Snabb",

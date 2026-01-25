@@ -78,6 +78,57 @@ const GOLD_MULTIPLIER = 3;
 /** Rainbow tile score multiplier */
 const RAINBOW_MULTIPLIER = 1.25;
 
+/** Maximum cache size to prevent memory leaks */
+const MAX_CACHE_SIZE = 500;
+
+// ==============================================
+// WORD VALIDATION CACHE
+// Module-level cache persists across component re-mounts
+// Provides instant validation for previously checked words
+// ==============================================
+
+/** Cache key format: "language:word" (lowercase) */
+type CacheKey = string;
+
+/** Cached validation result (true = valid, false = invalid) */
+const wordValidationCache = new Map<CacheKey, boolean>();
+
+/**
+ * Get cache key for a word+language combination
+ */
+function getCacheKey(word: string, language: string): CacheKey {
+  return `${language}:${word.toLowerCase()}`;
+}
+
+/**
+ * Get cached validation result if available
+ */
+function getCachedValidation(word: string, language: string): boolean | undefined {
+  return wordValidationCache.get(getCacheKey(word, language));
+}
+
+/**
+ * Store validation result in cache with LRU eviction
+ */
+function setCachedValidation(word: string, language: string, isValid: boolean): void {
+  const key = getCacheKey(word, language);
+
+  // Simple LRU: if cache is full, delete oldest entries (first 100)
+  if (wordValidationCache.size >= MAX_CACHE_SIZE) {
+    const keysToDelete = Array.from(wordValidationCache.keys()).slice(0, 100);
+    keysToDelete.forEach(k => wordValidationCache.delete(k));
+  }
+
+  wordValidationCache.set(key, isValid);
+}
+
+/**
+ * Clear the word validation cache (exported for testing)
+ */
+export function clearWordValidationCache(): void {
+  wordValidationCache.clear();
+}
+
 // ==============================================
 // HELPER FUNCTIONS
 // ==============================================
@@ -239,7 +290,27 @@ export function useAdventureWordValidation({
         return result;
       }
 
-      // 5. Validate against dictionary (API call)
+      // 5. Check client-side cache first (instant validation for repeated words)
+      const cachedResult = getCachedValidation(word, language);
+      if (cachedResult !== undefined) {
+        if (cachedResult) {
+          const result: WordValidationResult = {
+            isValid: true,
+            score: calculateScore(word.length, tiles, path),
+          };
+          setLastValidationResult(result);
+          return result;
+        } else {
+          const result: WordValidationResult = {
+            isValid: false,
+            errorKey: 'adventure.errors.notInDictionary',
+          };
+          setLastValidationResult(result);
+          return result;
+        }
+      }
+
+      // 6. Validate against dictionary (API call)
       // Cancel any previous in-flight request (request deduplication)
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -259,6 +330,9 @@ export function useAdventureWordValidation({
         const data = await response.json();
 
         if (data.isValid) {
+          // Cache the valid result
+          setCachedValidation(word, language, true);
+
           const result: WordValidationResult = {
             isValid: true,
             score: calculateScore(word.length, tiles, path),
@@ -267,6 +341,9 @@ export function useAdventureWordValidation({
           setIsValidating(false);
           return result;
         } else {
+          // Cache the invalid result
+          setCachedValidation(word, language, false);
+
           const result: WordValidationResult = {
             isValid: false,
             errorKey: 'adventure.errors.notInDictionary',
