@@ -335,6 +335,9 @@ const es = {
     "discordCopied": "¡Copiado para Discord! Pega en tu servidor 💬",
     "morePlatforms": "Más plataformas",
     "lessOptions": "Menos opciones",
+    "hideShareOptions": "Ocultar opciones",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
     "joinInstructions": "Ve a lexiclash.com e ingresa el código",
     "showQrCode": "Mostrar código QR",
     "hideQrCode": "Ocultar código QR",
@@ -604,6 +607,9 @@ const es = {
     "copyLink": "Copiar",
     "shareWhatsapp": "WhatsApp",
     "qrCode": "QR",
+    "showQrCode": "Mostrar código QR",
+    "scanToJoin": "Escanea para Unirte",
+    "orEnterCode": "O ingresa el código",
     "scanQr": "Escanea para unirte",
     "hostPlays": "Jugar",
     "broadcastModeTitle": "Modo TV/Proyector",
@@ -2181,6 +2187,7 @@ const es = {
   },
   "growth": {
     "dayStreak": "racha de días",
+    "daysAway": "días para",
     "winsAway": "victorias más",
     "nextTier": "Siguiente nivel",
     "newBest": "¡Nuevo Mejor!",
@@ -4007,11 +4014,15 @@ const es = {
       "lesson": "Lección",
       "words": "Palabras",
       "mastered": "Dominadas",
+      "new": "NUEVO",
+      "start": "Iniciar",
+      "continue": "Continuar",
       "practice": "Practicar",
       "review": "Repasar",
       "empty": {
         "title": "Sin lecciones asignadas",
-        "subtitle": "Únete a un aula para empezar a practicar"
+        "subtitle": "Únete a un aula para empezar a practicar",
+        "joinClassroom": "Unirse a un Aula"
       },
       "sort": {
         "recent": "Recientes",
@@ -4067,6 +4078,15 @@ const es = {
       "noClassrooms": "Sin aulas aún",
       "createFirst": "Crea tu primera aula para empezar"
     },
+    "classrooms": {
+      "students": {
+        "count": "{{count}} estudiantes",
+        "empty": "Sin estudiantes aún",
+        "emptyHint": "Comparte el código {{code}} con tus estudiantes",
+        "error": "Error al cargar estudiantes",
+        "unknown": "Estudiante Desconocido"
+      }
+    },
     "lesson": {
       "create": "Crear Lección",
       "edit": "Editar Lección",
@@ -4091,6 +4111,21 @@ const es = {
       "saved": "¡Lección guardada!",
       "noLessons": "Sin lecciones aún",
       "createFirst": "Crea tu primera lección de vocabulario"
+    },
+    "lessons": {
+      "assign": {
+        "trigger": "Asignar a Aula",
+        "title": "Asignar Lección",
+        "lessonLabel": "Lección",
+        "classroomLabel": "Aula",
+        "selectClassroom": "Selecciona un aula",
+        "noClassrooms": "Sin aulas disponibles",
+        "button": "Asignar Lección",
+        "assigning": "Asignando...",
+        "success": "¡Lección asignada!",
+        "alreadyAssigned": "Esta lección ya está asignada a esta aula",
+        "error": "Error al asignar lección"
+      }
     },
     "progress": {
       "title": "Progreso de Estudiantes",
@@ -4119,6 +4154,94 @@ const es = {
       "lessonNamePlaceholder": "Nombre de la lección...",
       "noClassroom": "Sin aula (lección personal)",
       "selectWords": "Selecciona palabras para crear una lección"
+    }
+  },
+  "education": {
+    "landing": {
+      "title": "Modo Educativo",
+      "teacher": "Soy Profesor",
+      "teacherDesc": "Crea aulas, lecciones de vocabulario y sigue el progreso",
+      "student": "Soy Estudiante",
+      "studentDesc": "Únete a tu aula y practica vocabulario",
+      "signInRequired": "Requiere iniciar sesión"
+    },
+    "template": {
+      "create": "Crear Plantilla",
+      "edit": "Editar Plantilla",
+      "description": "Configura los ajustes del juego para esta lección",
+      "name": "Nombre de Plantilla",
+      "namePlaceholder": "ej. Repaso Rápido",
+      "nameRequired": "El nombre es requerido",
+      "timer": "Duración del Juego",
+      "difficulty": "Tamaño del Tablero",
+      "boardPreview": "El tablero será de",
+      "minWordLength": "Longitud Mínima de Palabra",
+      "allowLateJoin": "Permitir Unirse Tarde",
+      "allowLateJoinDesc": "Los jugadores pueden unirse después de iniciar",
+      "setDefault": "Usar por Defecto",
+      "setDefaultDesc": "Usar esta configuración por defecto para esta lección",
+      "save": "Guardar Plantilla",
+      "saving": "Guardando...",
+      "saved": "¡Plantilla guardada!",
+      "startGame": "Iniciar Juego",
+      "roomSettings": "Configuración del Juego"
+    },
+    "practice": {
+      "title": "Modo Práctica",
+      "flashcards": "Tarjetas de Repaso",
+      "flashcardsDesc": "Repasa palabras con tarjetas",
+      "soloBoard": "Tablero Individual",
+      "soloBoardDesc": "Encuentra palabras a tu ritmo",
+      "wordList": "Lista de Palabras",
+      "wordListDesc": "Ver todo el vocabulario",
+      "warmup": "Calentamiento",
+      "warmupDesc": "Practica con pistas habilitadas",
+      "gotIt": "¡Entendido!",
+      "dontKnow": "No lo sé",
+      "complete": "¡Práctica Completa!",
+      "progress": "Tu Progreso",
+      "wordsFound": "Palabras Encontradas",
+      "cardsReviewed": "Tarjetas Revisadas",
+      "accuracy": "Precisión",
+      "timeSpent": "Tiempo Empleado",
+      "word": "Palabra",
+      "definition": "Definición",
+      "tapToFlip": "Toca para voltear",
+      "tapCard": "Toca la tarjeta para ver la respuesta",
+      "chooseAnswer": "Elige tu respuesta",
+      "finish": "Terminar",
+      "hints": "Pistas",
+      "searchWords": "Buscar palabras...",
+      "noResults": "Sin resultados",
+      "noWords": "Sin palabras disponibles",
+      "noDefinition": "Sin definición disponible",
+      "mastery": {
+        "not_started": "Sin Empezar",
+        "started": "Empezando",
+        "practicing": "Practicando",
+        "mastered": "Dominado"
+      }
+    },
+    "student": {
+      "dashboard": "Mis Lecciones",
+      "joinClassroom": "Unirse a Aula",
+      "enterCode": "Ingresa el código del aula",
+      "progress": "Tu Progreso",
+      "startPractice": "Empezar Práctica",
+      "noLessons": "Sin lecciones asignadas aún",
+      "askTeacher": "Pide el código a tu profesor",
+      "join": {
+        "title": "Unirse a Aula",
+        "subtitle": "Ingresa el código de tu profesor",
+        "codeLabel": "Código del Aula",
+        "codeHint": "Pide el código de 6 caracteres a tu profesor",
+        "button": "Unirse al Aula",
+        "joining": "Uniéndose...",
+        "pasteButton": "Pegar código",
+        "success": "¡Te uniste al aula!",
+        "invalidCode": "Código inválido",
+        "alreadyMember": "Ya eres miembro de esta aula"
+      }
     }
   }
 };
