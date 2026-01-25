@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { getWorldParticleConfig } from '@/lib/adventure/worldThemes';
@@ -59,6 +59,12 @@ export function ChainParticleBurst({
   const [isActive, setIsActive] = useState(false);
   const [particles, setParticles] = useState<ChainParticle[]>([]);
 
+  // Use ref for callback to avoid effect re-running
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
   // Get world-specific configuration
   const config = getWorldParticleConfig(world);
 
@@ -74,17 +80,19 @@ export function ChainParticleBurst({
     if (trigger && !isActive) {
       setIsActive(true);
 
+      // Get config inside effect to avoid dependency issues
+      const worldConfig = getWorldParticleConfig(world);
       const count = getParticleCount();
       const newParticles: ChainParticle[] = Array.from({ length: count }, (_, i) => {
-        const useEmojiForThis = i % 3 === 0 && config.emoji;
+        const useEmojiForThis = i % 3 === 0 && worldConfig.emoji;
         return {
           id: Date.now() + i,
           angle: (360 / count) * i + (Math.random() - 0.5) * 20,
-          distance: config.distance.min + Math.random() * (config.distance.max - config.distance.min),
-          size: config.size.min + Math.random() * (config.size.max - config.size.min),
+          distance: worldConfig.distance.min + Math.random() * (worldConfig.distance.max - worldConfig.distance.min),
+          size: worldConfig.size.min + Math.random() * (worldConfig.size.max - worldConfig.size.min),
           delay: Math.random() * 0.1,
           useEmoji: useEmojiForThis,
-          color: i % 2 === 0 ? config.color : (config.secondaryColor || config.color),
+          color: i % 2 === 0 ? worldConfig.color : (worldConfig.secondaryColor || worldConfig.color),
         };
       });
 
@@ -94,13 +102,13 @@ export function ChainParticleBurst({
       const timer = setTimeout(() => {
         setIsActive(false);
         setParticles([]);
-        onComplete?.();
-      }, config.duration + 100);
+        onCompleteRef.current?.();
+      }, worldConfig.duration + 100);
 
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [trigger, isActive, getParticleCount, config, onComplete]);
+  }, [trigger, isActive, getParticleCount, world]);
 
   // Reduced motion fallback - static emoji badge
   if (prefersReducedMotion) {
