@@ -4269,6 +4269,36 @@ const ja = {
         "invalidCode": "無効なクラスコードです",
         "alreadyMember": "すでにこのクラスのメンバーです"
       }
+    },
+    "xp": {
+      "level": "レベル",
+      "nextLevel": "次のレベル",
+      "xpGained": "獲得XP",
+      "totalXp": "合計XP",
+      "progress": "進捗",
+      "levelUp": "レベルアップ！",
+      "newLevel": "レベル達成",
+      "streak": "日連続",
+      "streakBonus": "連続ボーナス",
+      "keepGoing": "練習を続けてレベルアップしよう！",
+      "newTitleUnlocked": "新しい称号を獲得！",
+      "continue": "続ける",
+      "mastery": {
+        "perfectFlashcard": "完璧！{count}個の単語をマスター！",
+        "learnedWords": "{count}個の単語を学びました！",
+        "discoveredVocab": "{count}個の新しい単語を発見！",
+        "greatPractice": "素晴らしい練習！単語を探し続けよう！",
+        "lessonMastered": "レッスンマスター！これらの単語を覚えました！",
+        "keepPracticing": "よくできました！練習を続けてレッスンをマスターしよう。"
+      },
+      "streakMilestone": {
+        "week": "1週間連続！",
+        "weekDesc": "一週間の学習達成！",
+        "twoWeeks": "2週間連続！",
+        "twoWeeksDesc": "二週間の努力！",
+        "month": "月間マスター！",
+        "monthDesc": "30日間の素晴らしい成果！"
+      }
     }
   }
 };

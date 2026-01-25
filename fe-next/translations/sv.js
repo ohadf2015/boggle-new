@@ -4269,6 +4269,36 @@ const sv = {
         "invalidCode": "Ogiltig klassrumskod",
         "alreadyMember": "Du är redan medlem i detta klassrum"
       }
+    },
+    "xp": {
+      "level": "Nivå",
+      "nextLevel": "Nästa nivå",
+      "xpGained": "XP intjänat",
+      "totalXp": "Totalt XP",
+      "progress": "Framsteg",
+      "levelUp": "Nivå upp!",
+      "newLevel": "Du nådde nivå",
+      "streak": "Dagars svit",
+      "streakBonus": "Svitbonus",
+      "keepGoing": "Fortsätt öva för att nå nästa nivå!",
+      "newTitleUnlocked": "Ny titel upplåst!",
+      "continue": "Fortsätt",
+      "mastery": {
+        "perfectFlashcard": "Perfekt! Du behärskar alla {count} ord!",
+        "learnedWords": "Du lärde dig {count} ord!",
+        "discoveredVocab": "Du upptäckte {count} nya ord!",
+        "greatPractice": "Bra övning! Fortsätt hitta ord!",
+        "lessonMastered": "Lektion behärskad! Du kan dessa ord!",
+        "keepPracticing": "Bra jobbat! Fortsätt öva för att behärska lektionen."
+      },
+      "streakMilestone": {
+        "week": "1 VECKAS SVIT!",
+        "weekDesc": "En hel vecka av lärande!",
+        "twoWeeks": "2 VECKORS SVIT!",
+        "twoWeeksDesc": "Två veckors engagemang!",
+        "month": "MÅNADSMASTER!",
+        "monthDesc": "30 dagar av excellens!"
+      }
     }
   }
 };

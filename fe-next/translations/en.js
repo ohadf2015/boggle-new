@@ -4272,6 +4272,36 @@ const en = {
         "invalidCode": "Invalid classroom code",
         "alreadyMember": "You are already a member of this classroom"
       }
+    },
+    "xp": {
+      "level": "Level",
+      "nextLevel": "Next Level",
+      "xpGained": "XP Earned",
+      "totalXp": "Total XP",
+      "progress": "Progress",
+      "levelUp": "Level Up!",
+      "newLevel": "You reached level",
+      "streak": "Day Streak",
+      "streakBonus": "Streak Bonus",
+      "keepGoing": "Keep practicing to level up!",
+      "newTitleUnlocked": "New Title Unlocked!",
+      "continue": "Continue",
+      "mastery": {
+        "perfectFlashcard": "Perfect! You mastered all {count} words!",
+        "learnedWords": "You learned {count} words!",
+        "discoveredVocab": "You discovered {count} new vocabulary words!",
+        "greatPractice": "Great practice! Keep finding those words!",
+        "lessonMastered": "Lesson mastered! You know these words!",
+        "keepPracticing": "Nice work! Keep practicing to master this lesson."
+      },
+      "streakMilestone": {
+        "week": "1 WEEK STREAK!",
+        "weekDesc": "A full week of learning!",
+        "twoWeeks": "2 WEEKS STRONG!",
+        "twoWeeksDesc": "Two weeks of dedication!",
+        "month": "MONTHLY MASTER!",
+        "monthDesc": "30 days of excellence!"
+      }
     }
   }
 };

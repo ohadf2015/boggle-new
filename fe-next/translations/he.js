@@ -4262,6 +4262,36 @@ const he = {
         "invalidCode": "קוד כיתה לא תקין",
         "alreadyMember": "אתה כבר חבר בכיתה זו"
       }
+    },
+    "xp": {
+      "level": "רמה",
+      "nextLevel": "רמה הבאה",
+      "xpGained": "נקודות ניסיון",
+      "totalXp": "סה\"כ נקודות",
+      "progress": "התקדמות",
+      "levelUp": "עלית רמה!",
+      "newLevel": "הגעת לרמה",
+      "streak": "ימים ברצף",
+      "streakBonus": "בונוס רצף",
+      "keepGoing": "המשך לתרגל כדי לעלות רמה!",
+      "newTitleUnlocked": "תואר חדש נפתח!",
+      "continue": "המשך",
+      "mastery": {
+        "perfectFlashcard": "מושלם! שלטת ב-{count} מילים!",
+        "learnedWords": "למדת {count} מילים!",
+        "discoveredVocab": "גילית {count} מילים חדשות!",
+        "greatPractice": "תרגול מעולה! המשך לחפש מילים!",
+        "lessonMastered": "שלטת בשיעור! אתה מכיר את המילים האלה!",
+        "keepPracticing": "עבודה יפה! המשך לתרגל כדי לשלוט בשיעור."
+      },
+      "streakMilestone": {
+        "week": "שבוע ברצף!",
+        "weekDesc": "שבוע שלם של למידה!",
+        "twoWeeks": "שבועיים ברצף!",
+        "twoWeeksDesc": "שבועיים של מסירות!",
+        "month": "חודש ברצף!",
+        "monthDesc": "30 יום של מצוינות!"
+      }
     }
   }
 };
