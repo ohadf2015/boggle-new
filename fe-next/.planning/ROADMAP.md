@@ -90,10 +90,14 @@
   3. User sees themed particle effects burst on combo completion
   4. User sees letter cascade animations during chain reactions
   5. Combo scoring integrates seamlessly with existing scoring engine without breaking multiplayer
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 15-01: TBD during plan-phase
+- [ ] 15-01-PLAN.md — Chain tile combo logic TDD (activate 1.5x multiplier, adjacent linking)
+- [ ] 15-02-PLAN.md — ComboTierBadge component with i18n (Nice! → LEGENDARY! in 5 languages)
+- [ ] 15-03-PLAN.md — ChainParticleBurst with world theming (10 world configs, device-aware)
+- [ ] 15-04-PLAN.md — Cascade animation hook (wave pattern from chain tile origin)
+- [ ] 15-05-PLAN.md — Integration into AdventureGame with multiplayer isolation verification
 
 #### Phase 16: Boss Battle Foundation
 **Goal**: Enable end-of-world boss battles with phase transitions
