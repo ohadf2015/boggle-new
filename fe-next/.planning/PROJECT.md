@@ -1,22 +1,77 @@
-# LexiClash - Stabilization Milestone
+# LexiClash
 
 ## What This Is
 
-LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, adventure mode, daily challenges, and AI-powered word validation. This milestone focuses on stabilizing existing features and bringing adventure mode to production quality — making the game feel polished and ready for real users.
+LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, immersive adventure mode, daily challenges, AI-powered word validation, and an education mode for teachers to create vocabulary lessons.
 
 ## Core Value
 
 **Adventure mode must feel immersive and connected to its themed worlds** — when playing "Crystal Caves," it should FEEL like Crystal Caves, not generic Boggle with a different label.
 
+## Current State
+
+**Shipped:** v1.0 Stabilization (2026-01-25)
+
+**Tech Stack:**
+- Next.js 16 + React 19 + TypeScript
+- Socket.IO for real-time
+- Supabase + Redis for data
+- Framer Motion for animations
+- Remotion for video compositions
+- Neo-Brutalist design system (dark, bold, hard shadows)
+
+**Codebase:**
+- 309,792 lines TypeScript
+- 3,481 tests (99.6% pass rate)
+- 71 optimized WebP assets
+- 4 languages (EN, HE, SV, JA)
+
 ## Requirements
 
 ### Validated
 
-<!-- Existing working features from codebase -->
+<!-- Requirements shipped in v1.0 -->
 
+**Adventure Polish:**
+- ✓ World-specific parallax backgrounds for Worlds 1-3 — v1.0
+- ✓ World-specific floating particles — v1.0
+- ✓ Dynamic board theming — v1.0
+- ✓ Word selection trail animation — v1.0
+- ✓ Letter pop animation on valid word — v1.0
+- ✓ Score pop-up animation with combo multipliers — v1.0
+- ✓ Level entry tile cascade animation — v1.0
+- ✓ Objective cards slide-in reveal — v1.0
+- ✓ Level title burst animation — v1.0
+- ✓ Lexi mascot celebration reactions — v1.0
+- ✓ Lexi contextual feedback — v1.0
+- ✓ Level complete star burst animation — v1.0
+
+**Content Creation:**
+- ✓ AI-generated backgrounds for all 3 worlds — v1.0
+- ✓ Special tile graphics (CSS overlays) — v1.0
+- ✓ Background removal pipeline — v1.0
+- ✓ Video compositions (level intro, world transition, tutorial) — v1.0
+
+**Infrastructure:**
+- ✓ Remotion workspace with React 19 — v1.0
+- ✓ AI image generation pipeline — v1.0
+- ✓ Asset optimization (WebP, <200KB) — v1.0
+- ✓ Video delivery strategy — v1.0
+
+**Content Pipeline:**
+- ✓ Wikipedia word extraction — v1.0
+- ✓ Admin bulk approve UI — v1.0
+- ✓ Invalid word tracking and approval — v1.0
+
+**Education:**
+- ✓ Teacher vocabulary builder — v1.0
+- ✓ Student classroom join flow — v1.0
+- ✓ Lesson assignment system — v1.0
+- ✓ Student practice mode — v1.0
+
+**Existing (pre-v1):**
 - ✓ Multiplayer real-time gameplay — existing
 - ✓ World map navigation in adventure mode — existing
-- ✓ Basic adventure gameplay (grid, word finding, timer) — existing
 - ✓ Daily challenge system — existing
 - ✓ AI word validation pipeline — existing
 - ✓ Multi-language support (EN, HE, SV, JA) — existing
@@ -25,72 +80,55 @@ LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, adv
 
 ### Active
 
-<!-- Current scope for this milestone -->
+<!-- Next milestone scope - to be defined -->
 
-**Adventure Mode Polish:**
-- [ ] In-game UI reflects world themes (not generic)
-- [ ] Level entry animations and dramatic reveals
-- [ ] World-specific atmospheres (particles, backgrounds)
-- [ ] Special tiles working (gold, ice, bomb, rainbow)
-- [ ] Level progression feels rewarding (stars, unlocks)
-- [ ] Celebration effects on completion
-
-**Wikipedia Words:**
-- [ ] Fix word extraction from Wikipedia pages
-- [ ] Words sync properly from admin dashboard to game
-
-**Invalid Word System:**
-- [ ] Track frequently rejected words
-- [ ] Admin review queue for popular invalid submissions
-- [ ] Ability to approve words from queue
-
-**Daily Challenge Bugs:**
-- [ ] Fix word hunt issues (discover specifics during work)
-- [ ] General stabilization
-
-**Content Creation (Remotion + AI Images):**
-- [ ] World backgrounds for Worlds 1-3 (meadows, springs, caverns)
-- [ ] Character assets (Lexi mascot, enemies, NPCs)
-- [ ] UI elements (themed buttons, frames, decorations)
-- [ ] Special tile graphics (gold, ice, bomb, rainbow)
-- [ ] Level intro cutscenes (Remotion videos)
-- [ ] World transition animations (Remotion videos)
-- [ ] Tutorial/onboarding videos (Remotion videos)
-- [ ] Background removal pipeline (Python script)
-
-**General:**
-- [ ] Fix loose ends and bugs discovered during work
+No active requirements. Run `/gsd:new-milestone` to define next milestone.
 
 ### Out of Scope
 
 - Boss battles (Crystal Dragon, etc.) — future milestone
 - Chain/cascade auto-combo system — future milestone
-- New worlds beyond World 3 — future milestone
+- Worlds 4+ content — future milestone
 - Mobile app — web-first for now
-- New multiplayer modes — stabilize existing first
+- 3D effects — not aligned with neo-brutalist style
+- Unskippable cutscenes — players resent forced waits
+- Per-level unique mechanics — save for future milestone
+- Multiplayer adventure mode — focus on single-player polish first
 
 ## Context
 
-**Existing Plans:**
-Adventure mode has detailed design specs in `.claude/agents/plans/`:
-- `adventure-mode-design-spec.md` — full vision with UI mockups
-- `adventure-mode-level-design-enhancement.md` — visual polish plan
-- Sprint plans (1-5) — implementation breakdown
+**What was built in v1.0:**
+- Adventure mode with full world theming (parallax, particles, board decorations)
+- Core game juice (word trails, letter pops, score animations)
+- Level entry experience (cascade, objectives, title burst)
+- Lexi mascot reactions integrated throughout
+- AI content pipeline (backgrounds, WebP optimization)
+- Video composition infrastructure (Remotion)
+- Wikipedia integration with auto-promotion
+- Invalid word admin system
+- Teacher vocabulary builder with classrooms and lessons
+- Education landing page and student join flow
 
-**Current State:**
-- Adventure mode is partially implemented
-- World map works, basic gameplay works
-- In-game UI is generic — doesn't connect to world themes
-- Wikipedia word extraction is broken
-- No admin queue for invalid words
-- Daily challenge has unspecified bugs
+**Known Tech Debt:**
+- Entry sequence timing 2.38s exceeds 2s target by 380ms
+- Video MP4 files not rendered (render script ready)
+- Medium/low bugs documented (BUG-004 through BUG-008)
+- Stuck detection for Lexi deferred
 
-**Tech Stack:**
-- Next.js 16 + React 19 + TypeScript
-- Socket.IO for real-time
-- Supabase + Redis for data
-- Framer Motion for animations
-- Neo-Brutalist design system (dark, bold, hard shadows)
+## Key Decisions
+
+| Decision | Rationale | Outcome |
+|----------|-----------|---------|
+| Focus on Worlds 1-3 only | Ship polished subset before expanding | ✓ Good |
+| Skip boss battles for now | Core adventure loop more important | ✓ Good |
+| Admin queue over auto-approve | Human review ensures quality | ✓ Good |
+| Remotion 4.0.381 with React 19 | Native support, no isolation needed | ✓ Good |
+| birefnet-general for background removal | 95%+ accuracy vs U2Net 90% | ✓ Good |
+| Score threshold 80 for auto-promotion | High-confidence words only | ✓ Good |
+| CSS overlays for tile graphics | Simpler than image assets | ✓ Good |
+| 3s cooldown between Lexi reactions | Prevents spam, respects player | ✓ Good |
+| Combined parallax (gyro+gesture+ambient) | "Always alive" feel | ✓ Good |
+| Education as separate section | Distinct flow from main game | ✓ Good |
 
 ## Constraints
 
@@ -100,13 +138,5 @@ Adventure mode has detailed design specs in `.claude/agents/plans/`:
 - **Performance**: Animations must support reduced-motion preference
 - **File Size**: Max 500 lines per file, split larger
 
-## Key Decisions
-
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Focus on Worlds 1-3 only | Ship polished subset before expanding | — Pending |
-| Skip boss battles for now | Core adventure loop more important | — Pending |
-| Admin queue over auto-approve | Human review ensures quality | — Pending |
-
 ---
-*Last updated: 2026-01-22 after initialization*
+*Last updated: 2026-01-25 after v1.0 milestone*
