@@ -4313,6 +4313,128 @@ const sv = {
       "noStudentsYet": "Inga elever i klassrummet än",
       "level": "Nivå {level}",
       "xp": "{xp} XP"
+    },
+    "achievements": {
+      "title": "Prestationer",
+      "completion": "{percent}% Slutfört - {earned}/{total} märken",
+      "featured": "Utvalda Märken",
+      "progress": "{current}/{next}",
+      "toNext": "{percent}% till {tier}",
+      "maxTier": "Max Nivå!",
+      "pin": "Fäst märke",
+      "unpin": "Ta bort märke",
+      "maxPinsReached": "Ta bort ett annat märke först",
+      "locked": "Låst",
+      "secret": "Hemlig Prestation",
+      "unlocked": "Prestation Upplåst!",
+      "upgraded": "Uppgraderad till {tier}!",
+      "continue": "Fortsätt",
+      "newBadge": "Nytt Märke!",
+      "tierUpgrade": "Nivåuppgradering!",
+      "tiers": {
+        "bronze": "Brons",
+        "silver": "Silver",
+        "gold": "Guld",
+        "platinum": "Platina"
+      },
+      "categories": {
+        "progress": "Framstegsmål",
+        "skill": "Färdighetsbaserade Bedrifter",
+        "consistency": "Konsekvent Vanor",
+        "exploration": "Utforskning"
+      },
+      "earned": "{count}/{total} uppnådda",
+      "secretRemaining": "{count} hemliga märken är fortfarande dolda...",
+      "first_lesson": {
+        "name": "Första Lektionen",
+        "description": "Slutför din första lektion",
+        "hint": "Slutför 1 lektion för att låsa upp"
+      },
+      "word_master": {
+        "name": "Ordmästare",
+        "description": "Bemästra ordförråd genom övning",
+        "hint": "Bemästra 50 ord för att låsa upp"
+      },
+      "level_climber": {
+        "name": "Nivåklättrare",
+        "description": "Nå nya XP-nivåer",
+        "hint": "Nå nivå 5 för att låsa upp"
+      },
+      "xp_collector": {
+        "name": "XP-samlare",
+        "description": "Tjäna erfarenhetspoäng genom övning",
+        "hint": "Tjäna 500 XP för att låsa upp"
+      },
+      "practice_veteran": {
+        "name": "Övningsveteran",
+        "description": "Slutför många övningstillfällen",
+        "hint": "Slutför 10 övningstillfällen för att låsa upp"
+      },
+      "speed_demon": {
+        "name": "Hastighetsdemon",
+        "description": "Hitta många ord i ett enda spel",
+        "hint": "Hitta 10 ord i ett spel för att låsa upp"
+      },
+      "perfect_streak": {
+        "name": "Perfekt Serie",
+        "description": "Uppnå perfekt precision i spel",
+        "hint": "Få 100% precision i 5 spel för att låsa upp"
+      },
+      "boss_slayer": {
+        "name": "Bossdödare",
+        "description": "Besegra utmanande bossstrider",
+        "hint": "Besegra 1 boss för att låsa upp"
+      },
+      "combo_master": {
+        "name": "Kombomästare",
+        "description": "Bygg imponerande ordkombon",
+        "hint": "Bygg 5 kombon för att låsa upp"
+      },
+      "streak_starter": {
+        "name": "Seriestartare",
+        "description": "Öva flera dagar i rad",
+        "hint": "Öva 3 dagar i rad för att låsa upp"
+      },
+      "early_bird": {
+        "name": "Morgonfågel",
+        "description": "Öva före kl. 9",
+        "hint": "Öva före kl. 9 5 gånger för att låsa upp"
+      },
+      "dedicated_learner": {
+        "name": "Dedikerad Elev",
+        "description": "Öva många dagar denna månad",
+        "hint": "Öva 5 olika dagar denna månad för att låsa upp"
+      },
+      "weekly_warrior": {
+        "name": "Veckokrigare",
+        "description": "Öva 5+ dagar per vecka",
+        "hint": "Slutför 1 vecka med 5+ övningsdagar för att låsa upp"
+      },
+      "streak_champion": {
+        "name": "Seriemästare",
+        "description": "Upprätthåll de längsta övningsserierna",
+        "hint": "Dold tills upptäckt..."
+      },
+      "mode_explorer": {
+        "name": "Lägesutforskare",
+        "description": "Prova olika övningslägen",
+        "hint": "Prova 2 olika övningslägen för att låsa upp"
+      },
+      "lesson_collector": {
+        "name": "Lektionssamlare",
+        "description": "Slutför många olika lektioner",
+        "hint": "Slutför 3 olika lektioner för att låsa upp"
+      },
+      "classroom_contributor": {
+        "name": "Klassrumsmedverkare",
+        "description": "Gå med och delta i klassrum",
+        "hint": "Gå med i 1 klassrum för att låsa upp"
+      },
+      "word_variety": {
+        "name": "Ordvariation",
+        "description": "Upptäck många unika ordförrådsord",
+        "hint": "Dold tills upptäckt..."
+      }
     }
   }
 };

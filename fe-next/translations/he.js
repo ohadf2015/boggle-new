@@ -4306,6 +4306,128 @@ const he = {
       "noStudentsYet": "עדיין אין תלמידים בכיתה",
       "level": "רמה {level}",
       "xp": "{xp} נקודות ניסיון"
+    },
+    "achievements": {
+      "title": "הישגים",
+      "completion": "{percent}% הושלמו - {earned}/{total} תגים",
+      "featured": "תגים מומלצים",
+      "progress": "{current}/{next}",
+      "toNext": "{percent}% לדרגה {tier}",
+      "maxTier": "דרגה מקסימלית!",
+      "pin": "הצמד תג",
+      "unpin": "בטל הצמדה",
+      "maxPinsReached": "בטל הצמדת תג אחר תחילה",
+      "locked": "נעול",
+      "secret": "הישג סודי",
+      "unlocked": "הישג נפתח!",
+      "upgraded": "שודרג ל-{tier}!",
+      "continue": "המשך",
+      "newBadge": "תג חדש!",
+      "tierUpgrade": "שדרוג דרגה!",
+      "tiers": {
+        "bronze": "ארד",
+        "silver": "כסף",
+        "gold": "זהב",
+        "platinum": "פלטינה"
+      },
+      "categories": {
+        "progress": "אבני דרך בהתקדמות",
+        "skill": "הישגי מיומנות",
+        "consistency": "הרגלי עקביות",
+        "exploration": "חקירה"
+      },
+      "earned": "{count}/{total} הושגו",
+      "secretRemaining": "{count} תגים סודיים נותרו מוסתרים...",
+      "first_lesson": {
+        "name": "השיעור הראשון",
+        "description": "השלם את השיעור הראשון שלך",
+        "hint": "השלם שיעור אחד כדי לפתוח"
+      },
+      "word_master": {
+        "name": "מומחה מילים",
+        "description": "שלוט במילים באמצעות תרגול",
+        "hint": "שלוט ב-50 מילים כדי לפתוח"
+      },
+      "level_climber": {
+        "name": "מטפס רמות",
+        "description": "הגע לרמות ניסיון חדשות",
+        "hint": "הגע לרמה 5 כדי לפתוח"
+      },
+      "xp_collector": {
+        "name": "אוסף נקודות ניסיון",
+        "description": "צבור נקודות ניסיון דרך תרגול",
+        "hint": "צבור 500 נקודות ניסיון כדי לפתוח"
+      },
+      "practice_veteran": {
+        "name": "ותיק תרגול",
+        "description": "השלם מפגשי תרגול רבים",
+        "hint": "השלם 10 מפגשי תרגול כדי לפתוח"
+      },
+      "speed_demon": {
+        "name": "שד מהירות",
+        "description": "מצא מילים רבות במשחק אחד",
+        "hint": "מצא 10 מילים במשחק אחד כדי לפתוח"
+      },
+      "perfect_streak": {
+        "name": "רצף מושלם",
+        "description": "השג דיוק מושלם במשחקים",
+        "hint": "קבל 100% דיוק ב-5 משחקים כדי לפתוח"
+      },
+      "boss_slayer": {
+        "name": "מחסל בוסים",
+        "description": "נצח קרבות בוס מאתגרים",
+        "hint": "נצח בוס אחד כדי לפתוח"
+      },
+      "combo_master": {
+        "name": "מומחה קומבו",
+        "description": "בנה קומבו מילים מרשים",
+        "hint": "בנה 5 קומבו כדי לפתוח"
+      },
+      "streak_starter": {
+        "name": "מתחיל רצף",
+        "description": "תרגל מספר ימים ברצף",
+        "hint": "תרגל 3 ימים ברצף כדי לפתוח"
+      },
+      "early_bird": {
+        "name": "ציפור מוקדמת",
+        "description": "תרגל לפני 9 בבוקר",
+        "hint": "תרגל לפני 9 בבוקר 5 פעמים כדי לפתוח"
+      },
+      "dedicated_learner": {
+        "name": "לומד מסור",
+        "description": "תרגל ימים רבים החודש",
+        "hint": "תרגל 5 ימים שונים החודש כדי לפתוח"
+      },
+      "weekly_warrior": {
+        "name": "לוחם שבועי",
+        "description": "תרגל 5+ ימים בשבוע",
+        "hint": "השלם שבוע עם 5+ ימי תרגול כדי לפתוח"
+      },
+      "streak_champion": {
+        "name": "אלוף רצף",
+        "description": "שמור על רצפי תרגול הארוכים ביותר",
+        "hint": "מוסתר עד שיתגלה..."
+      },
+      "mode_explorer": {
+        "name": "חוקר מצבים",
+        "description": "נסה מצבי תרגול שונים",
+        "hint": "נסה 2 מצבי תרגול שונים כדי לפתוח"
+      },
+      "lesson_collector": {
+        "name": "אוסף שיעורים",
+        "description": "השלם שיעורים שונים רבים",
+        "hint": "השלם 3 שיעורים שונים כדי לפתוח"
+      },
+      "classroom_contributor": {
+        "name": "תורם כיתה",
+        "description": "הצטרף והשתתף בכיתות",
+        "hint": "הצטרף לכיתה אחת כדי לפתוח"
+      },
+      "word_variety": {
+        "name": "מגוון מילים",
+        "description": "גלה מילות אוצר ייחודיות רבות",
+        "hint": "מוסתר עד שיתגלה..."
+      }
     }
   }
 };

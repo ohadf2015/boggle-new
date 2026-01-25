@@ -4302,6 +4302,128 @@ const es = {
       "noStudentsYet": "Aún no hay estudiantes en esta aula",
       "level": "Nv. {level}",
       "xp": "{xp} XP"
+    },
+    "achievements": {
+      "title": "Logros",
+      "completion": "{percent}% Completado - {earned}/{total} insignias",
+      "featured": "Insignias Destacadas",
+      "progress": "{current}/{next}",
+      "toNext": "{percent}% hasta {tier}",
+      "maxTier": "¡Nivel Máximo!",
+      "pin": "Fijar insignia",
+      "unpin": "Desfijar insignia",
+      "maxPinsReached": "Desfija otra insignia primero",
+      "locked": "Bloqueado",
+      "secret": "Logro Secreto",
+      "unlocked": "¡Logro Desbloqueado!",
+      "upgraded": "¡Mejorado a {tier}!",
+      "continue": "Continuar",
+      "newBadge": "¡Nueva Insignia!",
+      "tierUpgrade": "¡Mejora de Nivel!",
+      "tiers": {
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro",
+        "platinum": "Platino"
+      },
+      "categories": {
+        "progress": "Hitos de Progreso",
+        "skill": "Hazañas Basadas en Habilidad",
+        "consistency": "Hábitos de Consistencia",
+        "exploration": "Exploración"
+      },
+      "earned": "{count}/{total} obtenidos",
+      "secretRemaining": "{count} insignias secretas permanecen ocultas...",
+      "first_lesson": {
+        "name": "Primera Lección",
+        "description": "Completa tu primera lección",
+        "hint": "Completa 1 lección para desbloquear"
+      },
+      "word_master": {
+        "name": "Maestro de Palabras",
+        "description": "Domina el vocabulario a través de la práctica",
+        "hint": "Domina 50 palabras para desbloquear"
+      },
+      "level_climber": {
+        "name": "Escalador de Niveles",
+        "description": "Alcanza nuevos niveles de XP",
+        "hint": "Alcanza el nivel 5 para desbloquear"
+      },
+      "xp_collector": {
+        "name": "Coleccionista de XP",
+        "description": "Gana puntos de experiencia practicando",
+        "hint": "Gana 500 XP para desbloquear"
+      },
+      "practice_veteran": {
+        "name": "Veterano de Práctica",
+        "description": "Completa muchas sesiones de práctica",
+        "hint": "Completa 10 sesiones de práctica para desbloquear"
+      },
+      "speed_demon": {
+        "name": "Demonio de Velocidad",
+        "description": "Encuentra muchas palabras en un solo juego",
+        "hint": "Encuentra 10 palabras en un juego para desbloquear"
+      },
+      "perfect_streak": {
+        "name": "Racha Perfecta",
+        "description": "Logra precisión perfecta en los juegos",
+        "hint": "Obtén 100% de precisión en 5 juegos para desbloquear"
+      },
+      "boss_slayer": {
+        "name": "Cazador de Jefes",
+        "description": "Derrota batallas de jefes desafiantes",
+        "hint": "Derrota 1 jefe para desbloquear"
+      },
+      "combo_master": {
+        "name": "Maestro de Combos",
+        "description": "Construye combos de palabras impresionantes",
+        "hint": "Construye 5 combos para desbloquear"
+      },
+      "streak_starter": {
+        "name": "Iniciador de Rachas",
+        "description": "Practica varios días seguidos",
+        "hint": "Practica 3 días seguidos para desbloquear"
+      },
+      "early_bird": {
+        "name": "Madrugador",
+        "description": "Practica antes de las 9 am",
+        "hint": "Practica antes de las 9 am 5 veces para desbloquear"
+      },
+      "dedicated_learner": {
+        "name": "Aprendiz Dedicado",
+        "description": "Practica muchos días este mes",
+        "hint": "Practica 5 días diferentes este mes para desbloquear"
+      },
+      "weekly_warrior": {
+        "name": "Guerrero Semanal",
+        "description": "Practica 5+ días por semana",
+        "hint": "Completa 1 semana con 5+ días de práctica para desbloquear"
+      },
+      "streak_champion": {
+        "name": "Campeón de Rachas",
+        "description": "Mantén las rachas de práctica más largas",
+        "hint": "Oculto hasta descubrirlo..."
+      },
+      "mode_explorer": {
+        "name": "Explorador de Modos",
+        "description": "Prueba diferentes modos de práctica",
+        "hint": "Prueba 2 modos de práctica diferentes para desbloquear"
+      },
+      "lesson_collector": {
+        "name": "Coleccionista de Lecciones",
+        "description": "Completa muchas lecciones diferentes",
+        "hint": "Completa 3 lecciones diferentes para desbloquear"
+      },
+      "classroom_contributor": {
+        "name": "Contribuidor del Aula",
+        "description": "Únete y participa en las aulas",
+        "hint": "Únete a 1 aula para desbloquear"
+      },
+      "word_variety": {
+        "name": "Variedad de Palabras",
+        "description": "Descubre muchas palabras de vocabulario únicas",
+        "hint": "Oculto hasta descubrirlo..."
+      }
     }
   }
 };

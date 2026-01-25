@@ -4313,6 +4313,128 @@ const ja = {
       "noStudentsYet": "まだこのクラスに生徒がいません",
       "level": "レベル{level}",
       "xp": "{xp} XP"
+    },
+    "achievements": {
+      "title": "実績",
+      "completion": "{percent}%完了 - {earned}/{total}バッジ",
+      "featured": "注目のバッジ",
+      "progress": "{current}/{next}",
+      "toNext": "{tier}まで{percent}%",
+      "maxTier": "最高ランク！",
+      "pin": "バッジをピン留め",
+      "unpin": "ピン留めを解除",
+      "maxPinsReached": "まず他のバッジのピン留めを解除してください",
+      "locked": "ロック中",
+      "secret": "秘密の実績",
+      "unlocked": "実績アンロック！",
+      "upgraded": "{tier}にアップグレード！",
+      "continue": "続ける",
+      "newBadge": "新しいバッジ！",
+      "tierUpgrade": "ランクアップ！",
+      "tiers": {
+        "bronze": "ブロンズ",
+        "silver": "シルバー",
+        "gold": "ゴールド",
+        "platinum": "プラチナ"
+      },
+      "categories": {
+        "progress": "進捗マイルストーン",
+        "skill": "スキルベースの偉業",
+        "consistency": "継続習慣",
+        "exploration": "探索"
+      },
+      "earned": "{count}/{total}獲得",
+      "secretRemaining": "{count}個の秘密のバッジが隠されています...",
+      "first_lesson": {
+        "name": "初めてのレッスン",
+        "description": "最初のレッスンを完了する",
+        "hint": "1つのレッスンを完了してアンロック"
+      },
+      "word_master": {
+        "name": "単語マスター",
+        "description": "練習を通じて語彙をマスターする",
+        "hint": "50個の単語をマスターしてアンロック"
+      },
+      "level_climber": {
+        "name": "レベルクライマー",
+        "description": "新しいXPレベルに到達する",
+        "hint": "レベル5に到達してアンロック"
+      },
+      "xp_collector": {
+        "name": "XPコレクター",
+        "description": "練習を通じて経験値を獲得する",
+        "hint": "500 XPを獲得してアンロック"
+      },
+      "practice_veteran": {
+        "name": "練習ベテラン",
+        "description": "多くの練習セッションを完了する",
+        "hint": "10回の練習セッションを完了してアンロック"
+      },
+      "speed_demon": {
+        "name": "スピードデーモン",
+        "description": "1つのゲームで多くの単語を見つける",
+        "hint": "1つのゲームで10個の単語を見つけてアンロック"
+      },
+      "perfect_streak": {
+        "name": "完璧な連続",
+        "description": "ゲームで完璧な精度を達成する",
+        "hint": "5つのゲームで100%の精度を達成してアンロック"
+      },
+      "boss_slayer": {
+        "name": "ボススレイヤー",
+        "description": "挑戦的なボスバトルを倒す",
+        "hint": "1体のボスを倒してアンロック"
+      },
+      "combo_master": {
+        "name": "コンボマスター",
+        "description": "印象的な単語コンボを構築する",
+        "hint": "5つのコンボを構築してアンロック"
+      },
+      "streak_starter": {
+        "name": "連続スターター",
+        "description": "複数日連続で練習する",
+        "hint": "3日連続で練習してアンロック"
+      },
+      "early_bird": {
+        "name": "早起きの鳥",
+        "description": "午前9時前に練習する",
+        "hint": "午前9時前に5回練習してアンロック"
+      },
+      "dedicated_learner": {
+        "name": "献身的な学習者",
+        "description": "今月たくさん練習する",
+        "hint": "今月5日練習してアンロック"
+      },
+      "weekly_warrior": {
+        "name": "週間戦士",
+        "description": "週5日以上練習する",
+        "hint": "週5日以上練習する週を1週間完了してアンロック"
+      },
+      "streak_champion": {
+        "name": "連続チャンピオン",
+        "description": "最長の練習連続記録を維持する",
+        "hint": "発見されるまで隠されています..."
+      },
+      "mode_explorer": {
+        "name": "モード探索者",
+        "description": "さまざまな練習モードを試す",
+        "hint": "2つの異なる練習モードを試してアンロック"
+      },
+      "lesson_collector": {
+        "name": "レッスンコレクター",
+        "description": "多くの異なるレッスンを完了する",
+        "hint": "3つの異なるレッスンを完了してアンロック"
+      },
+      "classroom_contributor": {
+        "name": "クラスルーム貢献者",
+        "description": "クラスルームに参加して貢献する",
+        "hint": "1つのクラスルームに参加してアンロック"
+      },
+      "word_variety": {
+        "name": "単語バラエティ",
+        "description": "多くのユニークな語彙を発見する",
+        "hint": "発見されるまで隠されています..."
+      }
     }
   }
 };

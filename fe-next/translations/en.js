@@ -4316,6 +4316,128 @@ const en = {
       "noStudentsYet": "No students in this classroom yet",
       "level": "Lv. {level}",
       "xp": "{xp} XP"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "completion": "{percent}% Complete - {earned}/{total} badges",
+      "featured": "Featured Badges",
+      "progress": "{current}/{next}",
+      "toNext": "{percent}% to {tier}",
+      "maxTier": "Max Tier!",
+      "pin": "Pin badge",
+      "unpin": "Unpin badge",
+      "maxPinsReached": "Unpin another badge first",
+      "locked": "Locked",
+      "secret": "Secret Achievement",
+      "unlocked": "Achievement Unlocked!",
+      "upgraded": "Upgraded to {tier}!",
+      "continue": "Continue",
+      "newBadge": "New Badge!",
+      "tierUpgrade": "Tier Upgrade!",
+      "tiers": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum"
+      },
+      "categories": {
+        "progress": "Progress Milestones",
+        "skill": "Skill-Based Feats",
+        "consistency": "Consistency Habits",
+        "exploration": "Exploration"
+      },
+      "earned": "{count}/{total} earned",
+      "secretRemaining": "{count} secret badges remain hidden...",
+      "first_lesson": {
+        "name": "First Lesson",
+        "description": "Complete your first lesson",
+        "hint": "Complete 1 lesson to unlock"
+      },
+      "word_master": {
+        "name": "Word Master",
+        "description": "Master vocabulary words through practice",
+        "hint": "Master 50 words to unlock"
+      },
+      "level_climber": {
+        "name": "Level Climber",
+        "description": "Reach new XP levels",
+        "hint": "Reach level 5 to unlock"
+      },
+      "xp_collector": {
+        "name": "XP Collector",
+        "description": "Earn experience points through practice",
+        "hint": "Earn 500 XP to unlock"
+      },
+      "practice_veteran": {
+        "name": "Practice Veteran",
+        "description": "Complete many practice sessions",
+        "hint": "Complete 10 practice sessions to unlock"
+      },
+      "speed_demon": {
+        "name": "Speed Demon",
+        "description": "Find many words in a single game",
+        "hint": "Find 10 words in one game to unlock"
+      },
+      "perfect_streak": {
+        "name": "Perfect Streak",
+        "description": "Achieve perfect accuracy in games",
+        "hint": "Get 100% accuracy in 5 games to unlock"
+      },
+      "boss_slayer": {
+        "name": "Boss Slayer",
+        "description": "Defeat challenging boss battles",
+        "hint": "Defeat 1 boss to unlock"
+      },
+      "combo_master": {
+        "name": "Combo Master",
+        "description": "Build impressive word combos",
+        "hint": "Build 5 combos to unlock"
+      },
+      "streak_starter": {
+        "name": "Streak Starter",
+        "description": "Practice multiple days in a row",
+        "hint": "Practice 3 days in a row to unlock"
+      },
+      "early_bird": {
+        "name": "Early Bird",
+        "description": "Practice before 9am",
+        "hint": "Practice before 9am 5 times to unlock"
+      },
+      "dedicated_learner": {
+        "name": "Dedicated Learner",
+        "description": "Practice many days this month",
+        "hint": "Practice 5 different days this month to unlock"
+      },
+      "weekly_warrior": {
+        "name": "Weekly Warrior",
+        "description": "Practice 5+ days per week",
+        "hint": "Complete 1 week with 5+ practice days to unlock"
+      },
+      "streak_champion": {
+        "name": "Streak Champion",
+        "description": "Maintain the longest practice streaks",
+        "hint": "Hidden until discovered..."
+      },
+      "mode_explorer": {
+        "name": "Mode Explorer",
+        "description": "Try different practice modes",
+        "hint": "Try 2 different practice modes to unlock"
+      },
+      "lesson_collector": {
+        "name": "Lesson Collector",
+        "description": "Complete many different lessons",
+        "hint": "Complete 3 different lessons to unlock"
+      },
+      "classroom_contributor": {
+        "name": "Classroom Contributor",
+        "description": "Join and participate in classrooms",
+        "hint": "Join 1 classroom to unlock"
+      },
+      "word_variety": {
+        "name": "Word Variety",
+        "description": "Discover many unique vocabulary words",
+        "hint": "Hidden until discovered..."
+      }
     }
   }
 };
