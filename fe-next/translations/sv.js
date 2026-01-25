@@ -3666,6 +3666,12 @@ const sv = {
     "retryLevel": "Försök igen",
     "loadError": "Kunde inte ladda framsteg",
     "boss": "Boss",
+    "combo": {
+      "nice": "Snyggt!",
+      "great": "Toppen!",
+      "amazing": "Fantastiskt!",
+      "legendary": "LEGENDARISKT!"
+    },
     "worlds": {
       "alphabetMeadows": "Alfabetsängarna",
       "synonymSprings": "Synonymkällorna",

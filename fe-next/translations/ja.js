@@ -3666,6 +3666,12 @@ const ja = {
     "retryLevel": "リトライ",
     "loadError": "進捗の読み込みに失敗しました",
     "boss": "ボス",
+    "combo": {
+      "nice": "ナイス!",
+      "great": "グレイト!",
+      "amazing": "すごい!",
+      "legendary": "伝説級!"
+    },
     "worlds": {
       "alphabetMeadows": "アルファベットの草原",
       "synonymSprings": "同義語の泉",

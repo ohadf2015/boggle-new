@@ -3655,6 +3655,12 @@ const es = {
     "retryLevel": "Reintentar",
     "loadError": "Error al cargar el progreso",
     "boss": "Jefe",
+    "combo": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "amazing": "¡Increíble!",
+      "legendary": "¡LEGENDARIO!"
+    },
     "worlds": {
       "alphabetMeadows": "Praderas del Alfabeto",
       "synonymSprings": "Manantiales de Sinónimos",

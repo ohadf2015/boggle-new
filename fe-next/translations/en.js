@@ -3654,6 +3654,12 @@ const en = {
     "devPreview": "Development Preview",
     "devPreviewDesc": "Adventure Mode is under development. This preview shows the world map and level configuration.",
     "boss": "Boss",
+    "combo": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "amazing": "Amazing!",
+      "legendary": "LEGENDARY!"
+    },
     "worlds": {
       "alphabetMeadows": "Alphabet Meadows",
       "synonymSprings": "Synonym Springs",

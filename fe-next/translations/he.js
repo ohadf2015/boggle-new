@@ -3659,6 +3659,12 @@ const he = {
     "retryLevel": "נסה שוב",
     "loadError": "נכשל לטעון התקדמות",
     "boss": "בוס",
+    "combo": {
+      "nice": "!יפה",
+      "great": "!מעולה",
+      "amazing": "!מדהים",
+      "legendary": "!אגדי"
+    },
     "worlds": {
       "alphabetMeadows": "אחו האותיות",
       "synonymSprings": "מעיינות המילים הנרדפות",
