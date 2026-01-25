@@ -77,13 +77,13 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
 
   // Auto-dismiss toast after timeout
   useEffect(() => {
-    if (unlock && isToast) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, TOAST_DISMISS_MS);
+    if (!unlock || !isToast) return;
 
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+      onClose();
+    }, TOAST_DISMISS_MS);
+
+    return () => clearTimeout(timer);
   }, [unlock, isToast, onClose]);
 
   // Don't render if no unlock data
