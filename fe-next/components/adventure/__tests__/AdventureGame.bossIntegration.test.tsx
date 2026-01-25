@@ -894,3 +894,557 @@ describe('AdventureGame - Boss Battle Integration', () => {
     });
   });
 });
+
+// ==============================================
+// BOSS MECHANIC HOOK INTEGRATION TESTS
+// ==============================================
+
+/**
+ * Hook Integration Tests for All 10 Boss Mechanics
+ *
+ * These tests verify the real hooks work correctly when integrated:
+ * - World 1: Ms. Grammar (popQuiz) - Verified in Phase 16
+ * - World 2: Spelling Bee (hiveMind)
+ * - World 3: Professor Thesaurus (etymologyDig)
+ * - World 4: Captain Metaphor (idiomBattle)
+ * - World 5: Baron Buildaword (assemblyLine)
+ * - World 6: Puzzle Master (scrambledReality)
+ * - World 7: Reflection King (mirrorMatch)
+ * - World 8: Cosmic Wordsmith (stellarForge)
+ * - World 9: Linguist Sage (babelSummit)
+ * - World 10: Lexicon Dragon (finalWord)
+ *
+ * Tests verify:
+ * - Mechanics evaluate words correctly
+ * - HP damage scales with multipliers
+ * - Phase transitions work (World 10)
+ */
+
+// Import real hooks for integration testing using requireActual to bypass mocks
+import { renderHook, act as hookAct } from '@testing-library/react';
+const { useBossMechanics: realUseBossMechanics } = jest.requireActual('@/hooks/useBossMechanics');
+const { useBossHealth: realUseBossHealth } = jest.requireActual('@/hooks/useBossHealth');
+import { getBossConfig } from '@/lib/adventure/bossConfig';
+
+// Boss test data for all 10 worlds
+const BOSS_WORLDS = [
+  { world: 1, id: 'msGrammar', mechanic: 'popQuiz', testWord: 'LETTERS' },
+  { world: 2, id: 'spellingBee', mechanic: 'hiveMind', testWord: 'BOOKS' },
+  { world: 3, id: 'professorThesaurus', mechanic: 'etymologyDig', testWord: 'TELEGRAPH' },
+  { world: 4, id: 'captainMetaphor', mechanic: 'idiomBattle', testWord: 'PHRASE' },
+  { world: 5, id: 'baronBuildaword', mechanic: 'assemblyLine', testWord: 'BUILD' },
+  { world: 6, id: 'puzzleMaster', mechanic: 'scrambledReality', testWord: 'WORD' },
+  { world: 7, id: 'reflectionKing', mechanic: 'mirrorMatch', testWord: 'RACECAR' },
+  { world: 8, id: 'cosmicWordsmith', mechanic: 'stellarForge', testWord: 'QUIZ' },
+  { world: 9, id: 'linguistSage', mechanic: 'babelSummit', testWord: 'GLOBAL' },
+  { world: 10, id: 'lexiconDragon', mechanic: 'finalWord', testWord: 'LETTERS' },
+];
+
+describe('Boss Mechanic Hook Integration', () => {
+  // Use fake timers for taunt tests
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  // ==============================================
+  // WORLD 1-5 BOSS MECHANICS
+  // ==============================================
+
+  describe('World 1-5 Boss Mechanics', () => {
+    test.each([
+      { world: 1, mechanic: 'popQuiz', word: 'LETTERS', description: 'Ms. Grammar' },
+      { world: 2, mechanic: 'hiveMind', word: 'BOOKS', description: 'Spelling Bee' },
+      { world: 3, mechanic: 'etymologyDig', word: 'TELEGRAPH', description: 'Professor Thesaurus' },
+      { world: 4, mechanic: 'idiomBattle', word: 'PHRASE', description: 'Captain Metaphor' },
+      { world: 5, mechanic: 'assemblyLine', word: 'BUILD', description: 'Baron Buildaword' },
+    ])('World $world ($description) should load boss config correctly', ({ world }) => {
+      // GIVEN boss config for world
+      const boss = getBossConfig(world);
+
+      // THEN boss should be defined
+      expect(boss).toBeDefined();
+      expect(boss!.worldId).toBe(world);
+    });
+
+    test.each([
+      { world: 1, word: 'LETTERS', expectedBonus: true },
+      { world: 2, word: 'BOOKS', expectedBonus: true },
+      { world: 3, word: 'TELEGRAPH', expectedBonus: true },
+      { world: 4, word: 'PHRASE', expectedBonus: true },
+      { world: 5, word: 'BUILD', expectedBonus: true },
+    ])('World $world should evaluate $word via useBossMechanics', ({ world, word }) => {
+      // GIVEN hook for world
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: world }));
+
+      // THEN hook should be active
+      expect(result.current.isActive).toBe(true);
+      expect(result.current.boss).not.toBeNull();
+
+      // WHEN word is checked
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord(word);
+      });
+
+      // THEN should return valid result
+      expect(mechanicResult!).toBeDefined();
+      expect(typeof mechanicResult!.meetsRequirement).toBe('boolean');
+      expect(typeof mechanicResult!.scoreMultiplier).toBe('number');
+    });
+
+    it('World 1 Ms. Grammar should apply penalty for non-matching words', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 1 }));
+
+      // WHEN checking a very short word that won't meet any requirement
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('X');
+      });
+
+      // THEN should return penalty multiplier
+      expect(mechanicResult!.scoreMultiplier).toBeLessThanOrEqual(1);
+    });
+
+    it('World 2 Spelling Bee should reward longer words', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 2 }));
+
+      // WHEN checking a word with 5+ letters
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('HONEY');
+      });
+
+      // THEN should meet requirement (hiveMind rewards 5+ letter words)
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+      expect(mechanicResult!.scoreMultiplier).toBeGreaterThan(1);
+    });
+
+    it('World 3 Professor Thesaurus should reward root fragment words', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 3 }));
+
+      // WHEN checking word containing root 'graph'
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('TELEGRAPH');
+      });
+
+      // THEN should meet requirement and give feedback
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+      expect(mechanicResult!.feedbackKey).toBe('adventure.bosses.common.rootFound');
+    });
+
+    it('World 4 Captain Metaphor should reward long words', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 4 }));
+
+      // WHEN checking 6+ letter word
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('SAILING');
+      });
+
+      // THEN should meet requirement
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+      expect(mechanicResult!.scoreMultiplier).toBeGreaterThan(1);
+    });
+
+    it('World 5 Baron Buildaword should reward compound-length words', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 5 }));
+
+      // WHEN checking 5+ letter word
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('BUILD');
+      });
+
+      // THEN should meet requirement
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+      expect(mechanicResult!.feedbackKey).toBe('adventure.bosses.common.compoundDetected');
+    });
+  });
+
+  // ==============================================
+  // WORLD 6-10 BOSS MECHANICS
+  // ==============================================
+
+  describe('World 6-10 Boss Mechanics', () => {
+    test.each([
+      { world: 6, mechanic: 'scrambledReality', word: 'WORD', description: 'Puzzle Master' },
+      { world: 7, mechanic: 'mirrorMatch', word: 'RACECAR', description: 'Reflection King' },
+      { world: 8, mechanic: 'stellarForge', word: 'QUIZ', description: 'Cosmic Wordsmith' },
+      { world: 9, mechanic: 'babelSummit', word: 'GLOBAL', description: 'Linguist Sage' },
+      { world: 10, mechanic: 'finalWord', word: 'LETTERS', description: 'Lexicon Dragon' },
+    ])('World $world ($description) should load boss config correctly', ({ world }) => {
+      // GIVEN boss config for world
+      const boss = getBossConfig(world);
+
+      // THEN boss should be defined
+      expect(boss).toBeDefined();
+      expect(boss!.worldId).toBe(world);
+    });
+
+    test.each([
+      { world: 6, word: 'WORD' },
+      { world: 7, word: 'RACECAR' },
+      { world: 8, word: 'QUIZ' },
+      { world: 9, word: 'GLOBAL' },
+      { world: 10, word: 'LETTERS' },
+    ])('World $world should evaluate $word via useBossMechanics', ({ world, word }) => {
+      // GIVEN hook for world
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: world }));
+
+      // THEN hook should be active
+      expect(result.current.isActive).toBe(true);
+
+      // WHEN word is checked
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord(word);
+      });
+
+      // THEN should return valid result
+      expect(mechanicResult!).toBeDefined();
+      expect(typeof mechanicResult!.scoreMultiplier).toBe('number');
+    });
+
+    it('World 6 Puzzle Master should reward unique letters', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 6 }));
+
+      // WHEN checking word with 4+ unique letters
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('WORD');
+      });
+
+      // THEN should meet requirement (scrambledReality: unique letters >= 4 or anagram pair)
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+    });
+
+    it('World 6 Puzzle Master should detect anagram pairs', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 6 }));
+
+      // WHEN submitting two words that are anagrams of each other
+      hookAct(() => {
+        result.current.checkWord('LISTEN');
+      });
+
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('SILENT');
+      });
+
+      // THEN second word should trigger anagram pair feedback
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+      expect(mechanicResult!.feedbackKey).toBe('adventure.bosses.common.anagramPair');
+    });
+
+    it('World 7 Reflection King should detect palindromes', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 7 }));
+
+      // WHEN checking palindrome
+      let racecarResult: ReturnType<typeof result.current.checkWord>;
+      let levelResult: ReturnType<typeof result.current.checkWord>;
+      let helloResult: ReturnType<typeof result.current.checkWord>;
+
+      hookAct(() => {
+        racecarResult = result.current.checkWord('RACECAR');
+        levelResult = result.current.checkWord('LEVEL');
+        helloResult = result.current.checkWord('HELLO');
+      });
+
+      // THEN palindromes should meet requirement
+      expect(racecarResult!.meetsRequirement).toBe(true);
+      expect(levelResult!.meetsRequirement).toBe(true);
+      expect(helloResult!.meetsRequirement).toBe(false);
+    });
+
+    it('World 8 Cosmic Wordsmith should detect supernova letters', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 8 }));
+
+      // WHEN checking words with and without Q, X, Z
+      let quizResult: ReturnType<typeof result.current.checkWord>;
+      let xenonResult: ReturnType<typeof result.current.checkWord>;
+      let helloResult: ReturnType<typeof result.current.checkWord>;
+
+      hookAct(() => {
+        quizResult = result.current.checkWord('QUIZ');
+        xenonResult = result.current.checkWord('XENON');
+        helloResult = result.current.checkWord('HELLO');
+      });
+
+      // THEN words with supernova letters should meet requirement
+      expect(quizResult!.meetsRequirement).toBe(true);
+      expect(xenonResult!.meetsRequirement).toBe(true);
+      expect(helloResult!.meetsRequirement).toBe(false);
+    });
+
+    it('World 9 Linguist Sage should reward long universal words', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 9 }));
+
+      // WHEN checking 6+ letter word
+      let mechanicResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mechanicResult = result.current.checkWord('GLOBAL');
+      });
+
+      // THEN should meet requirement
+      expect(mechanicResult!.meetsRequirement).toBe(true);
+      expect(mechanicResult!.scoreMultiplier).toBeGreaterThan(1);
+    });
+  });
+
+  // ==============================================
+  // WORLD 10 LEXICON DRAGON (finalWord)
+  // ==============================================
+
+  describe('World 10 Lexicon Dragon (finalWord)', () => {
+    it('should start with popQuiz phase', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 10 }));
+
+      // THEN should start with first phase
+      expect(result.current.bossState.phase).toBe('popQuiz');
+      expect(result.current.bossState.mechanicState.currentPhase).toBe('popQuiz');
+    });
+
+    it('should cycle through phases on advancePhase', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 10 }));
+      const phases: string[] = [result.current.bossState.phase!];
+
+      // WHEN advancing through 3 phases
+      for (let i = 0; i < 3; i++) {
+        hookAct(() => {
+          result.current.advancePhase();
+        });
+        phases.push(result.current.bossState.phase!);
+      }
+
+      // THEN should have advanced through distinct phases
+      const uniquePhases = new Set(phases);
+      expect(uniquePhases.size).toBe(4);
+      expect(phases).toEqual(['popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle']);
+    });
+
+    it('should delegate to current phase mechanic', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 10 }));
+
+      // WHEN in popQuiz phase, word with double letters should succeed
+      let popQuizResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        popQuizResult = result.current.checkWord('LETTERS');
+      });
+
+      // THEN should evaluate against current phase mechanic
+      expect(popQuizResult!).toBeDefined();
+      expect(typeof popQuizResult!.meetsRequirement).toBe('boolean');
+    });
+
+    it('should handle all 9 phase transitions', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 10 }));
+      const PHASE_ORDER = [
+        'popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle',
+        'assemblyLine', 'scrambledReality', 'mirrorMatch', 'stellarForge', 'babelSummit'
+      ];
+
+      // WHEN advancing through all phases
+      for (let i = 0; i < PHASE_ORDER.length; i++) {
+        const expectedPhase = PHASE_ORDER[i];
+        expect(result.current.bossState.phase).toBe(expectedPhase);
+        hookAct(() => {
+          result.current.advancePhase();
+        });
+      }
+
+      // THEN should wrap back to first phase
+      expect(result.current.bossState.phase).toBe('popQuiz');
+    });
+
+    it('should evaluate words differently in different phases', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 10 }));
+
+      // popQuiz phase - double letters
+      let popQuizResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        popQuizResult = result.current.checkWord('LETTERS');
+      });
+      expect(popQuizResult!).toBeDefined();
+
+      // Advance to mirrorMatch phase (index 6)
+      for (let i = 0; i < 6; i++) {
+        hookAct(() => {
+          result.current.advancePhase();
+        });
+      }
+
+      // THEN should be in mirrorMatch phase
+      expect(result.current.bossState.phase).toBe('mirrorMatch');
+
+      // mirrorMatch phase - palindromes
+      let mirrorResult: ReturnType<typeof result.current.checkWord>;
+      hookAct(() => {
+        mirrorResult = result.current.checkWord('RACECAR');
+      });
+
+      // THEN palindrome should work in mirrorMatch phase
+      expect(mirrorResult!.meetsRequirement).toBe(true);
+      expect(mirrorResult!.scoreMultiplier).toBe(3.0);
+    });
+
+    it('phase and mechanicState.currentPhase should stay in sync', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossMechanics({ worldId: 10 }));
+
+      // Verify initial state
+      expect(result.current.bossState.phase).toBe(
+        result.current.bossState.mechanicState.currentPhase
+      );
+
+      // WHEN advancing through a few phases
+      for (let i = 0; i < 5; i++) {
+        hookAct(() => {
+          result.current.advancePhase();
+        });
+        // THEN should stay in sync
+        expect(result.current.bossState.phase).toBe(
+          result.current.bossState.mechanicState.currentPhase
+        );
+      }
+    });
+  });
+
+  // ==============================================
+  // BOSS HEALTH INTEGRATION
+  // ==============================================
+
+  describe('Boss Health Integration', () => {
+    it('should initialize with correct max HP', () => {
+      // GIVEN
+      const maxHP = 1000;
+      const { result } = renderHook(() => realUseBossHealth(maxHP));
+
+      // THEN
+      expect(result.current.healthState.maxHP).toBe(1000);
+      expect(result.current.healthState.currentHP).toBe(1000);
+      expect(result.current.healthState.phase).toBe('intro');
+    });
+
+    it('should calculate damage with combo and mechanic multipliers', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossHealth(1000));
+
+      // Start the battle first
+      hookAct(() => {
+        result.current.startBattle();
+      });
+
+      // WHEN dealing damage with multipliers
+      // baseDamage=100, comboCount=5 (1.5x), mechanicMultiplier=2.0
+      // Expected: 100 * 1.5 * 2.0 = 300
+      let actualDamage: number = 0;
+      hookAct(() => {
+        actualDamage = result.current.dealDamage(100, 5, 2.0);
+      });
+
+      // THEN damage should be 100 * 1.5 * 2.0 = 300
+      expect(actualDamage).toBe(300);
+      expect(result.current.healthState.currentHP).toBe(700);
+    });
+
+    it('should transition to enraged at 25% HP', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossHealth(1000));
+
+      // Start the battle
+      hookAct(() => {
+        result.current.startBattle();
+      });
+
+      // First deal 740 damage to get to 26%
+      hookAct(() => {
+        result.current.dealDamage(740, 0, 1.0);
+      });
+      expect(result.current.healthState.phase).toBe('active');
+
+      // WHEN dealing enough damage to drop below 25%
+      hookAct(() => {
+        result.current.dealDamage(20, 0, 1.0); // HP now at 240 (24%)
+      });
+
+      // THEN should be enraged
+      expect(result.current.healthState.phase).toBe('enraged');
+      expect(result.current.isEnraged).toBe(true);
+    });
+
+    it('should transition to victory when HP reaches 0', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossHealth(1000));
+
+      // Start the battle
+      hookAct(() => {
+        result.current.startBattle();
+      });
+
+      // WHEN dealing lethal damage
+      hookAct(() => {
+        result.current.dealDamage(1000, 0, 1.0);
+      });
+
+      // THEN should be in victory phase
+      expect(result.current.healthState.phase).toBe('victory');
+      expect(result.current.healthState.currentHP).toBe(0);
+    });
+
+    it('should not deal damage during intro phase', () => {
+      // GIVEN
+      const { result } = renderHook(() => realUseBossHealth(1000));
+
+      // WHEN trying to deal damage without starting battle
+      let actualDamage: number = 0;
+      hookAct(() => {
+        actualDamage = result.current.dealDamage(500, 0, 1.0);
+      });
+
+      // THEN no damage should be dealt
+      expect(actualDamage).toBe(0);
+      expect(result.current.healthState.currentHP).toBe(1000);
+    });
+  });
+
+  // ==============================================
+  // ALL 10 BOSSES EXISTENCE CHECK
+  // ==============================================
+
+  describe('All 10 Bosses Existence', () => {
+    test.each(BOSS_WORLDS)(
+      'World $world ($id) should have valid boss config',
+      ({ world, id, mechanic }) => {
+        const boss = getBossConfig(world);
+
+        expect(boss).toBeDefined();
+        expect(boss!.id).toBe(id);
+        expect(boss!.twistMechanic.type).toBe(mechanic);
+        expect(boss!.taunts).toBeDefined();
+        expect(boss!.taunts.onStart).toBeDefined();
+        expect(boss!.taunts.onVictory).toBeDefined();
+        expect(boss!.taunts.onDefeat).toBeDefined();
+      }
+    );
+  });
+});
