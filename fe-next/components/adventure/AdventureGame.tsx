@@ -18,6 +18,7 @@ import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
+import { useBossHealth } from '@/hooks/useBossHealth';
 import { ScorePopupFly } from '@/components/animations';
 import { ComboTierBadge } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
@@ -27,9 +28,7 @@ import AdventureTimer from './AdventureTimer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import LexiReaction from './LexiReaction';
-import BossIntro from './BossIntro';
-import BossDialogue from './BossDialogue';
-import BossVictory from './BossVictory';
+import { BossOverlay } from './boss';
 import GameplayBackground from './themed/GameplayBackground';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
@@ -297,6 +296,18 @@ const AdventureGame = memo<AdventureGameProps>(
       worldId: isBossLevel ? levelConfig.world : null,
     });
 
+    // Boss health hook (tracks HP and phase transitions)
+    const bossMaxHP = isBossLevel ? 100 : 0; // Boss HP (could be configured per boss in future)
+    const {
+      healthState: bossHealthState,
+      dealDamage: dealBossDamage,
+      startBattle: startBossBattle,
+      endBattle: endBossBattle,
+      resetHealth: resetBossHealth,
+      hpPercentage: bossHPPercentage,
+      isEnraged: isBossEnraged,
+    } = useBossHealth(bossMaxHP);
+
     // Boss intro state (shown before gameplay on boss levels)
     const [showBossIntro, setShowBossIntro] = useState(
       isBossLevel && levelConfig.showBossIntro === true
@@ -420,20 +431,22 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle boss intro start (player ready to fight)
     const handleBossIntroStart = useCallback(() => {
       setShowBossIntro(false);
+      startBossBattle(); // Transition from intro → active phase
       if (!isPlaying) {
         startGame();
       }
       // Trigger start taunt after intro dismissal
       triggerBossTaunt('onStart');
-    }, [isPlaying, startGame, triggerBossTaunt]);
+    }, [isPlaying, startGame, triggerBossTaunt, startBossBattle]);
 
     // Handle boss intro skip
     const handleBossIntroSkip = useCallback(() => {
       setShowBossIntro(false);
+      startBossBattle(); // Transition from intro → active phase
       if (!isPlaying) {
         startGame();
       }
-    }, [isPlaying, startGame]);
+    }, [isPlaying, startGame, startBossBattle]);
 
     // Check for level completion and record attempt
     useEffect(() => {
@@ -441,9 +454,17 @@ const AdventureGame = memo<AdventureGameProps>(
         setShowLevelComplete(true);
         pauseGame();
 
-        // Trigger boss victory/defeat taunt
-        if (isBossActive) {
-          const isVictory = gameState.stars > 0;
+        // Handle boss battle completion
+        if (isBossActive && isBossLevel) {
+          // Timer expired or objectives complete
+          const isVictory = bossHealthState.phase === 'victory' || gameState.stars > 0;
+
+          // End boss battle (only if not already in victory/defeat phase)
+          if (bossHealthState.phase !== 'victory' && bossHealthState.phase !== 'defeat') {
+            endBossBattle(isVictory);
+          }
+
+          // Trigger boss victory/defeat taunt
           triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
         }
 
@@ -477,6 +498,9 @@ const AdventureGame = memo<AdventureGameProps>(
       gameState.stars,
       objectives,
       isBossActive,
+      isBossLevel,
+      bossHealthState.phase,
+      endBossBattle,
       triggerBossTaunt,
     ]);
 
@@ -607,6 +631,12 @@ const AdventureGame = memo<AdventureGameProps>(
           if (isBossActive && bossConfig) {
             const mechResult = checkBossWord(currentWord);
             scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
+
+            // Deal damage to boss
+            // Base damage = word score / 10 (scaled to reasonable HP pool)
+            const baseDamage = Math.floor(scoreValue / 10);
+            const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
+            const damageDealt = dealBossDamage(baseDamage, gameState.comboCount, mechanicMultiplier);
 
             // Trigger taunt based on mechanic result
             if (mechResult.triggerTaunt) {
@@ -958,25 +988,25 @@ const AdventureGame = memo<AdventureGameProps>(
           </aside>
         </main>
 
-        {/* Boss Intro Overlay (shown before gameplay on boss levels) */}
-        {showBossIntro && bossConfig && (
-          <BossIntro
-            boss={bossConfig}
-            worldNumber={levelConfig.world}
-            onStart={handleBossIntroStart}
-            onSkip={handleBossIntroSkip}
-          />
-        )}
-
-        {/* Boss Dialogue Overlay (taunt display during gameplay) */}
-        {isBossActive && bossConfig && bossTaunt && (
-          <BossDialogue
-            boss={bossConfig}
-            currentTaunt={bossTaunt}
-            isVisible={showBossTaunt}
-            position="top"
-          />
-        )}
+        {/* Boss Battle Overlay (all boss UI components) */}
+        <BossOverlay
+          boss={bossConfig}
+          healthState={bossHealthState}
+          currentTaunt={bossTaunt}
+          showTaunt={showBossTaunt}
+          showIntro={showBossIntro}
+          onStartBattle={handleBossIntroStart}
+          onSkipIntro={handleBossIntroSkip}
+          showVictory={showLevelComplete && bossHealthState.phase === 'victory'}
+          showDefeat={showLevelComplete && bossHealthState.phase === 'defeat'}
+          stars={starsEarned}
+          score={gameState.score}
+          wordsFound={gameState.wordsFound}
+          gameState={gameState}
+          onContinue={handleContinue}
+          onRetry={handleRetry}
+          worldNumber={levelConfig.world}
+        />
 
         {/* Pause Overlay */}
         {isPaused && !showLevelComplete && (
@@ -1035,19 +1065,8 @@ const AdventureGame = memo<AdventureGameProps>(
           onComplete={handleTitleComplete}
         />
 
-        {/* Level Complete: Boss Victory/Defeat or Standard Modal */}
-        {showLevelComplete && isBossActive && bossConfig ? (
-          <BossVictory
-            boss={bossConfig}
-            isVictory={gameState.stars > 0}
-            stars={starsEarned}
-            score={gameState.score}
-            wordsFound={gameState.wordsFound}
-            gameState={gameState}
-            onContinue={handleContinue}
-            onRetry={handleRetry}
-          />
-        ) : (
+        {/* Level Complete: Standard Modal (boss levels use BossOverlay) */}
+        {!isBossLevel && (
           <LevelCompleteModal
             isOpen={showLevelComplete}
             stars={starsEarned}
