@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, renderHook, act as hookAct } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import AdventureGame from '../AdventureGame';
@@ -921,7 +921,6 @@ describe('AdventureGame - Boss Battle Integration', () => {
  */
 
 // Import real hooks for integration testing using requireActual to bypass mocks
-import { renderHook, act as hookAct } from '@testing-library/react';
 const { useBossMechanics: realUseBossMechanics } = jest.requireActual('@/hooks/useBossMechanics');
 const { useBossHealth: realUseBossHealth } = jest.requireActual('@/hooks/useBossHealth');
 import { getBossConfig } from '@/lib/adventure/bossConfig';
