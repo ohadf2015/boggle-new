@@ -153,10 +153,14 @@ Plans:
   3. Student levels up with visual celebration when XP threshold reached
   4. Student earns streak bonuses for consecutive practice days
   5. XP accumulation emphasizes mastery ("You learned 50 new words!") over points
-**Plans**: TBD
+**Plans**: 5 plans in 4 waves
 
 Plans:
-- [ ] 18-01: TBD during plan-phase
+- [ ] 18-01-PLAN.md — Database migration + educationXpManager (TDD)
+- [ ] 18-02-PLAN.md — useEducationXp hook + translations (all 4 languages)
+- [ ] 18-03-PLAN.md — XpProgressBar + StreakBonusIndicator components
+- [ ] 18-04-PLAN.md — LevelUpCelebration modal with confetti
+- [ ] 18-05-PLAN.md — Practice flow integration (flashcard + board pages)
 
 #### Phase 19: Achievement System
 **Goal**: Reward genuine student milestones with meaningful badges
@@ -250,7 +254,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 15. Chain Combo System | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
 | 16. Boss Battle Foundation | v1.1 | 4/4 | ✅ Complete | 2026-01-25 |
 | 17. Boss Mechanic Expansion | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
-| 18. Education XP System | v1.1 | 0/TBD | Not started | - |
+| 18. Education XP System | v1.1 | 0/5 | Ready to execute | - |
 | 19. Achievement System | v1.1 | 0/TBD | Not started | - |
 | 20. Student Analytics Dashboard | v1.1 | 0/TBD | Not started | - |
 | 21. Rich Lesson Delivery | v1.1 | 0/TBD | Not started | - |
@@ -260,4 +264,4 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-25 after Phase 17 completion*
+*Last updated: 2026-01-25 after Phase 18 planning*
