@@ -44,6 +44,14 @@ jest.mock('framer-motion', () => {
     current: 0,
   });
 
+  // Mock useSpring (used by ComboTierBadge)
+  const useSpring = (initial: any) => ({
+    get: () => initial,
+    set: jest.fn(),
+    onChange: jest.fn(),
+    current: initial,
+  });
+
   return {
     motion: {
       div: createMockMotion('div'),
@@ -57,6 +65,7 @@ jest.mock('framer-motion', () => {
     AnimatePresence: ({ children }: any) => children,
     useMotionValue,
     useTransform,
+    useSpring,
   };
 });
 

@@ -40,6 +40,19 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
+// Mock ComboTierBadge to avoid framer-motion useSpring dependency
+jest.mock('@/components/animations/ComboTierBadge', () => ({
+  ComboTierBadge: ({ comboCount }: { comboCount: number }) => {
+    if (comboCount < 2) return null;
+    return React.createElement('div', { 'data-testid': 'combo-tier-badge' }, `Combo ${comboCount}`);
+  },
+}));
+
+// Mock ChainParticleBurst to avoid framer-motion useSpring dependency
+jest.mock('@/components/animations/ChainParticleBurst', () => ({
+  ChainParticleBurst: () => null,
+}));
+
 // Mock word validation to always return valid
 jest.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
