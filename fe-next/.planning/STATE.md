@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 15 of 23 (Chain Combo System)
-Plan: 01 of 05 completed (just finished)
+Plan: 04 of 05 completed (just finished)
 Status: In progress
-Last activity: 2026-01-25 — Completed 15-01-PLAN.md (Chain Tile Calculation with TDD)
+Last activity: 2026-01-25 — Completed 15-04-PLAN.md (Chain Cascade Animation)
 
 Progress: [██░░░░░░░░] 14/23 phases (61% milestone complete, v1.1 in progress)
 
@@ -30,17 +30,17 @@ Progress: [██░░░░░░░░] 14/23 phases (61% milestone complete,
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 1 (15-01)
-- Current phase: 15 (Chain Combo System) - 1/5 plans done
+- Plans completed: 4 (15-01, 15-02, 15-03, 15-04)
+- Current phase: 15 (Chain Combo System) - 4/5 plans done
 - Next phase: 16 (Boss Battle Foundation)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 15-01 | Chain Tile Calculation | 17min | ✅ Complete (just finished) |
-| 15-02 | Combo Tier Feedback | - | 📋 Ready |
-| 15-03 | Chain Particle Effects | - | 📋 Ready |
-| 15-04 | Chain Audio System | - | 📋 Ready |
+| 15-01 | Chain Tile Calculation | 17min | ✅ Complete |
+| 15-02 | Combo Tier Feedback | 12min | ✅ Complete |
+| 15-03 | Chain Particle Effects | 8min | ✅ Complete |
+| 15-04 | Chain Cascade Animation | 6min | ✅ Complete (just finished) |
 | 15-05 | Combo State Machine | - | 📋 Ready |
 
 ## Accumulated Context
@@ -56,6 +56,8 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **v1.1**: Research-informed phase ordering → Combo foundation before bosses/XP (prevents rework)
 - **15-01**: Math.round for chain bonus → Handles floating point precision (0.1 * 1.5 issue) (2026-01-25)
 - **15-01**: Chain tile structural sharing → Only clone affected rows, 25-57% memory reduction (2026-01-25)
+- **15-04**: 50ms stagger for chain cascades → Slower than regular 30ms for visual emphasis (2026-01-25)
+- **15-04**: Chain cascade priority → Overrides regular tile.cascadeDelay for chain reactions (2026-01-25)
 
 ### Pending Todos
 
@@ -66,9 +68,10 @@ None yet.
 **Phase 15 (Chain Combos):**
 - ✅ Chain tile logic verified — 15 tests passing, Math.round handles precision (15-01 complete)
 - ✅ Integration tested — 45 tests total, no regressions in special tiles (15-01 complete)
+- ✅ Combo tier feedback — ComboTierBadge with 4 tiers, 30 tests passing (15-02 complete)
+- ✅ Chain particles — ChainParticleBurst with 10 world configs, 13 tests passing (15-03 complete)
+- ✅ Cascade animation — useCascadeAnimation hook, 16 tests passing, grid integration (15-04 complete)
 - ⚠️ Combo state performance — Must use state machine pattern in 15-05
-- ⚠️ Animation cascade prevention — Max 3 simultaneous, test in 15-04/15-05
-- ⚠️ RTL layout testing — Test combo UI with Hebrew in 15-02
 - ⚠️ iOS Safari battery testing — Validate particle + sound together in 15-05 integration
 
 **Phase 16 (Boss Battles):**
@@ -86,11 +89,11 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 15-01-PLAN.md (Chain Tile Calculation with TDD)
+Stopped at: Completed 15-04-PLAN.md (Chain Cascade Animation)
 Resume file: None
 
-**Next action:** Execute 15-02 (Combo Tier Feedback) or 15-03 (Chain Particle Effects)
+**Next action:** Execute 15-05 (Combo State Machine) to complete Phase 15
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 14:55 (completed 15-01 with TDD)*
+*Last updated: 2026-01-25 15:05 (completed 15-04 cascade animation)*
