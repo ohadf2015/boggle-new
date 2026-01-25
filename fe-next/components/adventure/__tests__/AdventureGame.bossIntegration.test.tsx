@@ -364,16 +364,16 @@ describe('AdventureGame - Boss Battle Integration', () => {
         />
       );
 
-      // Wait for intro to render - check for "Ready to Fight" button
+      // Wait for intro to render - check for "Let's Go!" button (translation key: adventure.bosses.readyToFight)
       await waitFor(
         () => {
-          expect(screen.getByRole('button', { name: /ready to fight/i })).toBeInTheDocument();
+          expect(screen.getByRole('button', { name: /let's go/i })).toBeInTheDocument();
         },
         { timeout: 3000 }
       );
     });
 
-    it('should start battle when player clicks Ready to Fight', async () => {
+    it('should start battle when player clicks Let\'s Go', async () => {
       const user = userEvent.setup();
       const levelConfig = createBossLevelConfig();
 
@@ -411,8 +411,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
 
-      // Click Ready to Fight button
-      const fightButton = screen.getByRole('button', { name: /ready to fight/i });
+      // Click Let's Go button (translation key: adventure.bosses.readyToFight)
+      const fightButton = screen.getByRole('button', { name: /let's go/i });
       await user.click(fightButton);
 
       // startBattle should be called
@@ -457,8 +457,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
 
-      // Click Skip button
-      const skipButton = screen.getByRole('button', { name: /skip intro/i });
+      // Click Skip button (translation key 'adventure.bosses.skipIntro' = 'Skip')
+      const skipButton = screen.getByRole('button', { name: /skip/i });
       await user.click(skipButton);
 
       // startBattle should be called

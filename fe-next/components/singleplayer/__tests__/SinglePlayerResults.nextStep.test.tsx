@@ -210,6 +210,7 @@ jest.mock('../results', () => ({
   BotWordsSection: () => null,
   MobileResultsTab: () => null,
   MobileDetailsTab: () => null,
+  ChallengeButton: () => null,
 }));
 
 describe('SinglePlayerResults NextStep navigation bug', () => {

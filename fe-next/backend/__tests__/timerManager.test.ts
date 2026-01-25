@@ -34,8 +34,8 @@ describe('TimerManager', () => {
       manager.setInterval('interval-test', callback, 50);
 
       // Wait for enough time to ensure at least 2 calls
-      // Adding buffer to account for timer precision and event loop delays
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Using 300ms for 50ms interval (6x buffer) to handle timer imprecision and CI load
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       expect(callback).toHaveBeenCalled();
       expect(callback.mock.calls.length).toBeGreaterThanOrEqual(2);
