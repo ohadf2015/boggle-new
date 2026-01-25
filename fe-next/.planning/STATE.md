@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 12 complete - Asset WebP migration finished
+**Current focus:** Phase 14 - Education Mode Complete (dedicated landing, join flow, lesson assignment)
 
 ## Current Position
 
-Phase: 12 of 13 (Asset WebP Migration Completion) - COMPLETE
-Plan: 3 of 3 complete
-Status: Verified (5/5 must-haves)
-Last activity: 2026-01-24 - Completed Phase 12 verification
+Phase: 14 of 14 (Education Mode Complete) - IN PROGRESS
+Plan: 5 of 6
+Status: Wave 2 execution - Student list view complete
+Last activity: 2026-01-25 - Completed 14-05-PLAN.md
 
-Progress: [████████░░] 92% (12 phases complete, 54/56 total plans)
+Progress: [█████████░] 95% (13 phases complete, 61/62 total plans)
 
 ## Performance Metrics
 
@@ -39,6 +39,7 @@ Progress: [████████░░] 92% (12 phases complete, 54/56 total 
 | 10 Bug Fixes & Stabilization | 5/5 | ~60min | 12min |
 | 11 Teacher Vocabulary Builder | 8/8 | ~95min | 12min |
 | 12 Asset WebP Migration | 3/3 | ~12min | 4min |
+| 14 Education Mode Complete | 5/6 | ~17min | 3.4min |
 
 **Recent Trend:**
 - Phase 1 completed efficiently (10min avg)
@@ -413,13 +414,24 @@ None.
 - Backup folders gitignored for safety (can delete after 30-60 days)
 - Total WebP migration: 61 production files with ~40-60% size reduction
 
+## Phase 14 Deliverables
+
+| Plan | Description | Status |
+|------|-------------|--------|
+| 14-01 | Education landing page with role selection | ✓ |
+| 14-02 | Student join classroom flow | ✓ |
+| 14-03 | Teacher lesson assignment UI | ✓ |
+| 14-04 | Student available lessons view | ✓ |
+| 14-05 | Teacher student list view | ✓ |
+| 14-06 | Practice-before-game requirement | ○ |
+
 ## Session Continuity
 
-Last session: 2026-01-24
-Stopped at: Completed Phase 12 (Asset WebP Migration Completion)
-Resume file: None
-Next: Phase 13 (Translation Completion)
+Last session: 2026-01-25
+Stopped at: Completed 14-05-PLAN.md (Student list view)
+Resume file: .planning/phases/14-education-mode-complete/14-05-SUMMARY.md
+Next: Execute 14-06 (Practice-before-game requirement)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-24 (Phase 12 complete - all 3 plans verified)*
+*Last updated: 2026-01-25 (Phase 14 added - Education Mode Complete)*
