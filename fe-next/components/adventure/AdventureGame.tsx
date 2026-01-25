@@ -19,6 +19,7 @@ import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiRea
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { ScorePopupFly } from '@/components/animations';
+import { ComboTierBadge } from '@/components/animations/ComboTierBadge';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -765,7 +766,13 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Main Game Area - Compact layout to maximize screen usage */}
         <main className="flex-1 flex flex-col lg:flex-row gap-2 p-2 overflow-y-auto min-h-0">
           {/* Grid Section */}
-          <div className="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center gap-1 min-h-0">
+          <div className="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center gap-1 min-h-0 relative">
+            {/* Combo Tier Badge - Positioned above grid */}
+            <ComboTierBadge
+              comboCount={gameState.comboCount}
+              className="absolute top-[10%] left-1/2 -translate-x-1/2 z-50"
+            />
+
             {/* Feedback Container - Minimal height, absolute positioning prevents layout shift */}
             <div
               data-testid="feedback-container"
