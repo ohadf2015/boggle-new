@@ -3845,6 +3845,7 @@ const es = {
       "readyToFight": "¡Vamos!",
       "enraged": "¡ENFURECIDO!",
       "common": {
+        "anagramPair": "¡Par de anagramas encontrado! ¡Golpe crítico!",
         "requirementMet": "¡Requisito cumplido!",
         "requirementMissed": "Requisito no cumplido"
       },
