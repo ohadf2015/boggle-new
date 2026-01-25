@@ -4300,6 +4300,7 @@ const es = {
       "studentsInClass": "{count} estudiantes",
       "inactive": "Inactivo",
       "noStudentsYet": "Aún no hay estudiantes en esta aula",
+      "joinClassroomPrompt": "Únete a un aula para ver la tabla de clasificación",
       "level": "Nv. {level}",
       "xp": "{xp} XP"
     },

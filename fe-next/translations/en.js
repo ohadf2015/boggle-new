@@ -4314,6 +4314,7 @@ const en = {
       "studentsInClass": "{count} students",
       "inactive": "Inactive",
       "noStudentsYet": "No students in this classroom yet",
+      "joinClassroomPrompt": "Join a classroom to see the leaderboard",
       "level": "Lv. {level}",
       "xp": "{xp} XP"
     },

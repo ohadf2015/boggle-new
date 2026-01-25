@@ -4311,6 +4311,7 @@ const ja = {
       "studentsInClass": "{count}人の生徒",
       "inactive": "非アクティブ",
       "noStudentsYet": "まだこのクラスに生徒がいません",
+      "joinClassroomPrompt": "リーダーボードを見るにはクラスに参加してください",
       "level": "レベル{level}",
       "xp": "{xp} XP"
     },

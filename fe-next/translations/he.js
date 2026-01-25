@@ -4304,6 +4304,7 @@ const he = {
       "studentsInClass": "{count} תלמידים",
       "inactive": "לא פעיל",
       "noStudentsYet": "עדיין אין תלמידים בכיתה",
+      "joinClassroomPrompt": "הצטרף לכיתה כדי לראות את לוח המובילים",
       "level": "רמה {level}",
       "xp": "{xp} נקודות ניסיון"
     },

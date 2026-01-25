@@ -1,7 +1,7 @@
 /**
  * Student Dashboard Page
  *
- * Shows assigned vocabulary lessons with progress tracking
+ * Shows assigned vocabulary lessons with progress tracking + classroom leaderboard
  */
 
 'use client';
@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
+import { ClassroomLeaderboard } from '@/components/education';
 import { cn } from '@/lib/utils';
 
 export default function StudentPage() {
@@ -44,6 +45,9 @@ export default function StudentPage() {
     return null;
   }
 
+  // Get classroom ID from profile
+  const classroomId = profile?.classroom_id;
+
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
       <Header />
@@ -59,8 +63,30 @@ export default function StudentPage() {
           </p>
         </div>
 
-        {/* Lesson List */}
-        <StudentLessonView />
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Lesson List - Takes up 2 columns on desktop */}
+          <div className="lg:col-span-2">
+            <StudentLessonView />
+          </div>
+
+          {/* Classroom Leaderboard - Sidebar on desktop, below lessons on mobile */}
+          {classroomId ? (
+            <aside className="lg:col-span-1">
+              <ClassroomLeaderboard
+                classroomId={classroomId}
+                currentUserId={user.id}
+                className="sticky top-6"
+              />
+            </aside>
+          ) : (
+            <aside className="lg:col-span-1 p-6 rounded-neo border-neo border-neo-black bg-neo-navy/50 text-center">
+              <p className="text-neo-white/70 font-neo-body">
+                {t('education.leaderboard.joinClassroomPrompt')}
+              </p>
+            </aside>
+          )}
+        </div>
       </div>
     </div>
   );

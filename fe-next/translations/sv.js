@@ -4311,6 +4311,7 @@ const sv = {
       "studentsInClass": "{count} elever",
       "inactive": "Inaktiv",
       "noStudentsYet": "Inga elever i klassrummet än",
+      "joinClassroomPrompt": "Gå med i ett klassrum för att se topplistan",
       "level": "Nivå {level}",
       "xp": "{xp} XP"
     },
