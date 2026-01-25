@@ -5,6 +5,8 @@
  * These types support the progression system, level configuration, and gameplay state.
  */
 
+import type { BossTwistType } from './boss';
+
 // ==============================================
 // TILE TYPES
 // ==============================================
@@ -153,6 +155,10 @@ export interface LevelConfig {
   levelInChapter: 1 | 2 | 3;
   /** Whether this is a boss level (last level of world) */
   isBossLevel: boolean;
+  /** Boss twist mechanic type (only present for boss levels) */
+  bossTwist?: BossTwistType;
+  /** Whether to show the boss intro cutscene */
+  showBossIntro?: boolean;
 }
 
 // ==============================================

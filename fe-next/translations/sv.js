@@ -3829,6 +3829,185 @@ const sv = {
         "star2": "Utmarkt arbete!",
         "star3": "Perfekt poang!"
       }
+    },
+    "bosses": {
+      "fightBoss": "Bekampa bossen",
+      "bossIntro": "Bosskamp!",
+      "bossDefeated": "Bossen besegrad!",
+      "bossWins": "Bossen vinner...",
+      "twistMechanic": "Boss-twist",
+      "skipIntro": "Hoppa over",
+      "readyToFight": "Kör igång!",
+      "msGrammar": {
+        "name": "Fröken Grammatik",
+        "mechanic": "Prov-protokollet - Hitta ord som matchar mina krav!",
+        "taunts": {
+          "start1": "Lektionen har börjat! Låt oss se om ni har pluggat...",
+          "start2": "Överraskningsprov! Jag hoppas ni är förberedda!",
+          "goodWord1": "Godkänt. Men förvänta er inga bonuspoäng för minimum.",
+          "goodWord2": "Hmm, inte hemskt. Ni kanske klarar er ändå.",
+          "badWord1": "Det är inte ett ord! Det hamnar i ert permanenta register.",
+          "badWord2": "Har ni ens PLUGGAT? Jag drar av poäng.",
+          "mechanic1": "Har ni ens LÄST uppgiften? Jag bad om {requirement}!",
+          "mechanic2": "Följ kraven! Det här är inte fri lek!",
+          "lowTime1": "Tiden är nästan slut! Precis som en elev som inte pluggat...",
+          "victory": "Nåja... det verkar som ni KAN följa instruktioner. En guldstjärna!",
+          "defeat": "Kom till mig efter lektionen... för extra ordförrådsträning."
+        }
+      },
+      "spellingBee": {
+        "name": "Stavningsbiet",
+        "mechanic": "Bikupans kaos - Klibbiga brickor och synonymutmaningar!",
+        "taunts": {
+          "start1": "Välkomna till MIN bikupa. Hoppas ni gillar honung... och NEDERLAG.",
+          "start2": "Surr surr! Det är ljudet av ert öde. Jag är dessutom ett bi.",
+          "goodWord1": "Inte illa för en icke-bi. Jag tillåter det.",
+          "goodWord2": "Å, ni hittade en synonym? Hur obi-troligt tillräckligt.",
+          "badWord1": "Det ordet? Sötnos, snälla.",
+          "badWord2": "Mina arbetare hittade bättre ord, och de har pyttesmå hjärnor.",
+          "mechanic1": "Hitta synonymer för att lossa de klibbiga brickorna, sötnos!",
+          "mechanic2": "Kupan kräver SYNONYMER! Stora ord som BETYDER något!",
+          "lowTime1": "Tick tack! Inte ens min honung tar så lång tid!",
+          "victory": "Ni... slog mig? DROTTNINGEN? Jag bi-r tillbaka. (Fattar ni? Bi? Jag är ett bi.)",
+          "defeat": "Ännu en stucken! Min kuprekord förbi-r obesegrat."
+        }
+      },
+      "professorThesaurus": {
+        "name": "Professor Thesaurus",
+        "mechanic": "Etymologisk utgrävning - Ord med gemensamma rötter skapar kombos!",
+        "taunts": {
+          "start1": "Ah, en utmanare närmar sig! Eller ska jag säga, en motståndare avancerar?",
+          "start2": "Jag har glömt fler ord än ni någonsin kommer lära er. Bokstavligen. Jag är väldigt gammal.",
+          "goodWord1": "Adekvat. Eller ska jag säga, tillfredsställande, godtagbart, tillräckligt...",
+          "goodWord2": "Det ordet är från 1100-talet. Lite modernt, men jag tillåter det.",
+          "badWord1": "Ert ordförråd verkar... begränsat. Inskränkt. Kringskuret.",
+          "badWord2": "Ni hittade 'gå.' Fotgängare! Kanske pröva 'promenera'?",
+          "mechanic1": "Leta efter gemensamma rötter! Bio, graf, tele - etymologi är NYCKELN!",
+          "mechanic2": "Vanliga bokstäver begravs! Gräv djupare, unga forskare!",
+          "lowTime1": "Tiden avtar, löper ut, krymper... ni förstår, eller?",
+          "victory": "Jag medger! Ni har visat ansenlig... usch... 'skicklighet.'",
+          "defeat": "Återvänd när ert ordförråd har... mognat. Utvecklats. Blomstrat."
+        }
+      },
+      "captainMetaphor": {
+        "name": "Kapten Metafor",
+        "mechanic": "Figurativt flottslag - Hitta bokstavliga ord från mina idiom!",
+        "taunts": {
+          "start1": "Ohoj! Ni skäller på fel träd! Vilket är konstigt för vi är till HAVS!",
+          "start2": "Skaka mina metaforer! En ny utmanare går plankan av ödet!",
+          "goodWord1": "Slå mig i backen! Det ordet träffade spiken på huvudet!",
+          "goodWord2": "En diamant i det råa! Apropå, hitta DIAMANT!",
+          "badWord1": "Det är en vild gåsjakt av ett ord! Helt fel fågel!",
+          "badWord2": "Räkna inte era kycklingar! Jag behöver KYCKLING, RÄKNA och INNAN!",
+          "mechanic1": "Det regnar katter och hundar! Hitta REGN, KATTER och HUNDAR!",
+          "mechanic2": "Bryt ett ben! Inte bokstavligen! Hitta ORDEN i idiomet!",
+          "lowTime1": "Tiden flyger! Till skillnad från mitt skepp! Som också flyger! Det är en metafor!",
+          "victory": "Ni sänkte mitt slagskepp! Vänta, fel spel. Ni slog mina idiom!",
+          "defeat": "Morgonstunden har guld i mun, och NI är inte guldiga! Arr!"
+        }
+      },
+      "baronBuildaword": {
+        "name": "Baron Byggaord",
+        "mechanic": "Löpandebands-attack - Bygg sammansatta ord för enorma bonusar!",
+        "taunts": {
+          "start1": "INEFFEKTIVT! Ni kunde SAMMANSÄTTA! Tänk FJÄRIL, inte 'fjär'!",
+          "start2": "Min Ord-Monterings-Maskin 3000 är redo! Låt oss se er ingenjörskonst!",
+          "goodWord1": "Inte illa! Men är det SAMMANSATT? Allt borde vara sammansatt!",
+          "goodWord2": "Godkänd produktion! Mina maskiner godkänner. Marginellt.",
+          "badWord1": "Det är inte sammansatt! Det är bara... ett ord. Så oingenjörsmässigt!",
+          "badWord2": "Min Ord-Monterings-Maskin 3000 AVVISAR detta! Försök hårdare!",
+          "mechanic1": "Löpande bandet rör sig! Fånga bokstäverna innan de passerar!",
+          "mechanic2": "SAMMANSÄTT! SAMMANSÄTT! SOL+SKEN! FJÄDER+BOLL!",
+          "lowTime1": "Löpande bandet väntar på ingen! SNABBARE!",
+          "victory": "Ni har... överträffat min ingenjörskonst? OMÖJLIGT! Jag bygger bättre!",
+          "defeat": "Ännu en ineffektiv utmanare besegrad! Maskinen vinner igen!"
+        }
+      },
+      "puzzleMaster": {
+        "name": "Pusselmästaren",
+        "mechanic": "Förvrängd verklighet - Bokstäver blandas! Hitta anagram för bonusar!",
+        "taunts": {
+          "start1": "Ordna om 'NOTER' och berätta vad ni hittar. Jag väntar. Jag har nio liv.",
+          "start2": "Allt är ett pussel. Även denna mening. Särskilt denna mening.",
+          "goodWord1": "Ni hittade ett ord. Men såg ni dess ANAGRAM gömma sig?",
+          "goodWord2": "Smart. Men 'RESA' har vänner: SERA, ARSE. Hittade ni alla?",
+          "badWord1": "Ett rakt svar? Hur TRÅKIGT.",
+          "badWord2": "Det är inte ett ord i NÅGON ordning. Lita på mig, jag kollade alla.",
+          "mechanic1": "Verkligheten förvrängs! Bokstäverna skiftar! Kan ni hänga med?",
+          "mechanic2": "Hitta anagramparet! De väntar!",
+          "lowTime1": "Tiden rinner ut... eller rinner den in? Beror på anagrammet.",
+          "victory": "Ni löste mitt pussel?! Jag är... faktiskt imponerad. Berätta inte.",
+          "defeat": "Pusslet förblir olöst! Kom tillbaka när ni kan tänka sidledes."
+        }
+      },
+      "reflectionKing": {
+        "name": "Reflektionskungen",
+        "mechanic": "Spegelkampens kaos - Rutnätet speglas! Hitta palindromer för kraft!",
+        "taunts": {
+          "start1": "Skåda min perfektion! Leta också efter palindromer - de enda orden vackra nog!",
+          "start2": "Denna kamp ska bli LEGENDARISK! De skriver EPOS om... mest mig.",
+          "goodWord1": "Ett värdigt ord! Nästan lika magnifikt som min spegelbild!",
+          "goodWord2": "Inte illa! Men är det en palindrom? Bara PERFEKTION läses åt båda håll!",
+          "badWord1": "Ni spricker min is? TRAGEDIN! ...Egentligen, gör det igen.",
+          "badWord2": "Det ordet är inte värdigt mitt spegelpalats! Försök hårdare!",
+          "mechanic1": "Spegeln reflekterar! Era drag påverkar BÅDA sidor!",
+          "mechanic2": "Hitta palindromer för Perfekta Reflektioner!",
+          "lowTime1": "Inte ens min skönhet kan stoppa tiden! Skynda er!",
+          "victory": "Ni har... fördunklat min spegelbild?! Jag behöver en stund. Och en spegel.",
+          "defeat": "SJÄLVKLART vann jag! Har ni SETT mig? Perfektion är oundviklig!"
+        }
+      },
+      "cosmicWordsmith": {
+        "name": "Kosmiska Ordsmeden",
+        "mechanic": "Stjärnordsmedjan - Bokstäver utvecklas! Sällsynta bokstäver skapar supernovor!",
+        "taunts": {
+          "start1": "Jag var NÄRVARANDE när era förfäder grymtade sina första ord. Jag förväntade mig mer.",
+          "start2": "Ni använder 'bokstavligen' bildligt. Jag UPPFANN båda. Ironin är KOSMISK.",
+          "goodWord1": "Det ordet? Jag arbetade på sjutton versioner. Varsågod.",
+          "goodWord2": "Acceptabel användning av MIN skapelse. Jag tillåter den att existera.",
+          "badWord1": "Jag har sett stjärnor dö med mer vältalighet än det ordförsöket.",
+          "badWord2": "Även svarta hål har mer substans än det där... icke-ordet.",
+          "mechanic1": "Bokstäver utvecklas! A blir E blir I! Kosmos kräver anpassning!",
+          "mechanic2": "Använd Q, X eller Z för en SUPERNOVA! Sällsynta bokstäver har kosmisk kraft!",
+          "lowTime1": "Inte ens jag kan bromsa tiden. Och jag är bokstavligen kosmisk.",
+          "victory": "Ni har... bemästrat MINA ord?! Kanske är dödliga inte helt hopplösa.",
+          "defeat": "Återvänd om ett årtusende. Ni behöver mer... övning. Eoner av det."
+        }
+      },
+      "linguistSage": {
+        "name": "Lingvistiske Visen",
+        "mechanic": "Babels topp - Språket skiftar! Universella ord ger enorma bonusar!",
+        "taunts": {
+          "start1": "Ah, 'hej'! Eller 'konnichiwa.' Eller 'bonjour.' Eller... vad höll vi på med?",
+          "start2": "Varje ord är lånat! 'Kindergarten' är tyska! 'Safari' är swahili!",
+          "goodWord1": "Vackert ord! Det fungerar på engelska OCH... hmm, kollar mina anteckningar...",
+          "goodWord2": "Magnifique! Wunderbar! Subarashii! ...Jag kanske blandar språk igen.",
+          "badWord1": "Det ordet finns på NOLL språk. Jag kollade. Alla.",
+          "badWord2": "Även mina getvänner hittar bättre ord. Och de äter plåtburkar.",
+          "mechanic1": "Språket skiftar! Anpassa ert ordförråd!",
+          "mechanic2": "Hitta ord som fungerar på FLERA språk för Universell Förståelse!",
+          "lowTime1": "Tiden rinner ut på ALLA språk! Schnell! Hayaku! Rapido!",
+          "victory": "Ni talar segerns universella språk! Hur... upplysande.",
+          "defeat": "Toppen förblir obestigen. Återvänd när ni studerat fler språk."
+        }
+      },
+      "lexiconDragon": {
+        "name": "Lexikondraken",
+        "mechanic": "Det Sista Ordet - ALLA mekaniker kombinerade! Bygg LEXIKON-STREJKEN!",
+        "taunts": {
+          "start1": "Å VAD EN UTMANARE! Vill ni se min orddagbok? Det är bara 47 volymer!",
+          "start2": "Jag har VÄNTAT på att någon ska leka med! Alltså... FRUKTA MIG! Rawr!",
+          "goodWord1": "Ni hittade 'DRAKE'! DET ÄR JAG! Hitta nu 'MAGNIFIK' för det är OCKSÅ jag!",
+          "goodWord2": "FANTASTISKT ord! Jag skriver det i dagboken! Volym 48!",
+          "badWord1": "Det är inte ett ord! ...Eller ÄR det? Låt mig kolla volym 1 till 47...",
+          "badWord2": "Jag vill verkligen godkänna det men min inre ordnörd säger NEJ!",
+          "mechanic1": "Fasskifte! En ny mekanism dyker upp! Klarar ni ALLA?",
+          "mechanic2": "LEXIKON-STREJKEN laddar! Fortsätt hitta fantastiska ord!",
+          "lowTime1": "Å NEJ tiden rinner ut! Men jag hade så ROLIGT!",
+          "victory": "Ni VANN! Betyder det att vi är VÄNNER nu?! Bästa dagen NÅGONSIN!",
+          "defeat": "Jag vann men... jag mår dåligt? Vill ni ha revansch? Snälla säg ja!"
+        }
+      }
     }
   },
   "student": {

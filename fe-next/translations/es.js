@@ -3811,6 +3811,185 @@ const es = {
         "star2": "¡Excelente trabajo!",
         "star3": "¡Puntuación perfecta!"
       }
+    },
+    "bosses": {
+      "fightBoss": "Luchar contra el jefe",
+      "bossIntro": "¡Batalla de jefe!",
+      "bossDefeated": "¡Jefe derrotado!",
+      "bossWins": "El jefe gana...",
+      "twistMechanic": "Giro del jefe",
+      "skipIntro": "Saltar",
+      "readyToFight": "¡Vamos!",
+      "msGrammar": {
+        "name": "Srta. Gramática",
+        "mechanic": "Protocolo de examen sorpresa - ¡Encuentra palabras que cumplan mis requisitos!",
+        "taunts": {
+          "start1": "¡La clase ha comenzado! Veamos si habéis estudiado...",
+          "start2": "¡Examen sorpresa! ¡Espero que estéis preparados!",
+          "goodWord1": "Aceptable. Pero no esperéis puntos extra por lo mínimo.",
+          "goodWord2": "Hmm, no está terrible. Quizás aprobéis después de todo.",
+          "badWord1": "¡Eso no es una palabra! Esto va a vuestro expediente permanente.",
+          "badWord2": "¿Habéis ESTUDIADO siquiera? Descuento puntos.",
+          "mechanic1": "¿Habéis LEÍDO la tarea siquiera? ¡Pedí {requirement}!",
+          "mechanic2": "¡Seguid los requisitos! ¡Esto no es tiempo libre!",
+          "lowTime1": "¡El tiempo casi se acaba! Como un estudiante que no estudió...",
+          "victory": "Vaya, vaya... parece que SÍ podéis seguir instrucciones. ¡Una estrella dorada!",
+          "defeat": "Venid a verme después de clase... para vocabulario de refuerzo."
+        }
+      },
+      "spellingBee": {
+        "name": "La Abeja Ortográfica",
+        "mechanic": "Caos de la colmena - ¡Fichas pegajosas y desafíos de sinónimos!",
+        "taunts": {
+          "start1": "Bienvenidos a MI colmena. Espero que os guste la miel... y el FRACASO.",
+          "start2": "¡Buzz buzz! Ese es el sonido de vuestro destino. Además soy una abeja.",
+          "goodWord1": "No está mal para un no-abeja. Lo permito.",
+          "goodWord2": "Oh, ¿encontrasteis un sinónimo? Qué increíble-abeja-mente adecuado.",
+          "badWord1": "¿Esa palabra? Cariño, por favor.",
+          "badWord2": "Mis obreras encontraron mejores palabras, y tienen cerebros diminutos.",
+          "mechanic1": "¡Encontrad sinónimos para despegar las fichas, cariño!",
+          "mechanic2": "¡La colmena exige SINÓNIMOS! ¡Palabras grandes que SIGNIFIQUEN algo!",
+          "lowTime1": "¡Tic tac! ¡Ni mi miel tarda tanto en cuajar!",
+          "victory": "¿Me... vencisteis? ¿A la REINA? Volveré. (¿Lo pilláis? Abeja? Soy una abeja.)",
+          "defeat": "¡Otro picado! Mi récord de colmena sigue INVICTO."
+        }
+      },
+      "professorThesaurus": {
+        "name": "Profesor Tesauro",
+        "mechanic": "Excavación etimológica - ¡Las palabras con raíces compartidas crean combos!",
+        "taunts": {
+          "start1": "Ah, ¡un retador se acerca! ¿O debería decir, un adversario avanza?",
+          "start2": "He olvidado más palabras de las que jamás aprenderéis. Literalmente. Soy muy viejo.",
+          "goodWord1": "Adecuado. O debería decir, satisfactorio, aceptable, suficiente...",
+          "goodWord2": "Esa palabra es del siglo XII. Un poco moderna, pero la acepto.",
+          "badWord1": "Vuestro léxico parece... limitado. Restringido. Circunscrito.",
+          "badWord2": "Encontrasteis 'andar.' ¡Pedestre! ¿Quizás probar 'deambular'?",
+          "mechanic1": "¡Buscad raíces compartidas! Bio, graf, tele - ¡la etimología es CLAVE!",
+          "mechanic2": "¡Las letras comunes se entierran! ¡Cavad más profundo, jóvenes eruditos!",
+          "lowTime1": "El tiempo mengua, expira, disminuye... ¿entendéis, verdad?",
+          "victory": "¡Lo admito! Habéis demostrado considerable... ugh... 'habilidad.'",
+          "defeat": "Volved cuando vuestro vocabulario haya... madurado. Desarrollado. Florecido."
+        }
+      },
+      "captainMetaphor": {
+        "name": "Capitán Metáfora",
+        "mechanic": "Batalla de la flota figurativa - ¡Encontrad las palabras literales de mis modismos!",
+        "taunts": {
+          "start1": "¡Alto! ¡Estáis ladrando al árbol equivocado! ¡Lo cual es raro porque estamos en el MAR!",
+          "start2": "¡Temblad mis metáforas! ¡Un nuevo retador camina por la tabla del destino!",
+          "goodWord1": "¡Por mis barbas! ¡Esa palabra dio en el clavo!",
+          "goodWord2": "¡Un diamante en bruto! ¡A propósito, encontrad DIAMANTE!",
+          "badWord1": "¡Eso es una caza de gansos salvajes! ¡Pájaro totalmente equivocado!",
+          "badWord2": "¡No contéis los pollos antes de nacer! ¡Necesito POLLO, CONTAR y ANTES!",
+          "mechanic1": "¡Están lloviendo gatos y perros! ¡Encontrad LLUVIA, GATOS y PERROS!",
+          "mechanic2": "¡Romped una pierna! ¡No literalmente! ¡Encontrad las PALABRAS del modismo!",
+          "lowTime1": "¡El tiempo vuela! ¡A diferencia de mi barco! ¡Que también vuela! ¡Es una metáfora!",
+          "victory": "¡Hundisteis mi barco! Espera, juego equivocado. ¡Vencisteis mis modismos!",
+          "defeat": "¡El que madruga atrapa el gusano, y VOSOTROS sois el gusano! ¡Arr!"
+        }
+      },
+      "baronBuildaword": {
+        "name": "Barón Construyepalabras",
+        "mechanic": "Asalto de la línea de ensamblaje - ¡Construid palabras compuestas para bonos enormes!",
+        "taunts": {
+          "start1": "¡INEFICIENTE! ¡Podríais estar COMPONIENDO! ¡Pensad MARIPOSA, no 'mari'!",
+          "start2": "¡Mi Ensambla-Palabras 3000 está lista! ¡Veamos vuestra ingeniería!",
+          "goodWord1": "¡No está mal! ¿Pero es COMPUESTA? ¡Todo debería ser compuesto!",
+          "goodWord2": "¡Producción aceptable! Mis máquinas aprueban. Marginalmente.",
+          "badWord1": "¡Eso no es compuesto! Es simplemente... una palabra. ¡Qué poco ingenieril!",
+          "badWord2": "¡Mi Ensambla-Palabras 3000 RECHAZA esto! ¡Intentad más!",
+          "mechanic1": "¡La cinta transportadora se mueve! ¡Atrapad las letras antes de que pasen!",
+          "mechanic2": "¡COMPONED! ¡COMPONED! ¡GIRASOL! ¡MARIPOSA! ¡RASCACIELOS!",
+          "lowTime1": "¡La línea de ensamblaje no espera a nadie! ¡MÁS RÁPIDO!",
+          "victory": "¿Habéis... superado mi ingeniería? ¡IMPOSIBLE! ¡Construiré mejor!",
+          "defeat": "¡Otro retador ineficiente derrotado! ¡La máquina gana de nuevo!"
+        }
+      },
+      "puzzleMaster": {
+        "name": "Maestro del Puzzle",
+        "mechanic": "Realidad revuelta - ¡Las letras se mezclan! ¡Encontrad anagramas para bonos!",
+        "taunts": {
+          "start1": "Reordenad 'NOTAS' y decidme qué encontráis. Esperaré. Tengo nueve vidas.",
+          "start2": "Todo es un puzzle. Incluso esta frase. Especialmente esta frase.",
+          "goodWord1": "Encontrasteis una palabra. ¿Pero visteis su ANAGRAMA escondido?",
+          "goodWord2": "Listo. Pero 'ARCO' tiene amigos: ROCA, CARO. ¿Los encontrasteis todos?",
+          "badWord1": "¿Una respuesta directa? Qué ABURRIDO.",
+          "badWord2": "Eso no es una palabra en NINGÚN orden. Confiad en mí, los comprobé todos.",
+          "mechanic1": "¡La realidad se mezcla! ¡Las letras cambian! ¿Podéis seguir el ritmo?",
+          "mechanic2": "¡Encontrad el par de anagramas! ¡Están esperando!",
+          "lowTime1": "El tiempo se acaba... ¿o empieza? Depende del anagrama.",
+          "victory": "¿Resolvisteis mi puzzle?! Estoy... genuinamente impresionado. No se lo digáis a nadie.",
+          "defeat": "¡El puzzle sigue sin resolver! Volved cuando podáis pensar lateralmente."
+        }
+      },
+      "reflectionKing": {
+        "name": "Rey del Reflejo",
+        "mechanic": "Caos del combate espejo - ¡La cuadrícula se refleja! ¡Encontrad palíndromos para poder!",
+        "taunts": {
+          "start1": "¡Contemplad mi perfección! También buscad palíndromos - ¡las únicas palabras bastante hermosas!",
+          "start2": "¡Esta batalla será LEGENDARIA! Escribirán EPOPEYAS sobre... principalmente yo.",
+          "goodWord1": "¡Una palabra digna! ¡Casi tan magnífica como mi reflejo!",
+          "goodWord2": "¡No está mal! ¿Pero es un palíndromo? ¡Solo la PERFECCIÓN se lee en ambos sentidos!",
+          "badWord1": "¿Agrietáis mi hielo? ¡La TRAGEDIA! ...De hecho, hacedlo otra vez.",
+          "badWord2": "¡Esa palabra no es digna de mi palacio de espejos! ¡Intentad más!",
+          "mechanic1": "¡El espejo refleja! ¡Vuestros movimientos afectan AMBOS lados!",
+          "mechanic2": "¡Encontrad palíndromos para Reflejos Perfectos!",
+          "lowTime1": "¡Ni mi belleza puede detener el tiempo! ¡Daos prisa!",
+          "victory": "¿Habéis... empañado mi reflejo?! Necesito un momento. Y un espejo.",
+          "defeat": "¡POR SUPUESTO que gané! ¿Me habéis VISTO? ¡La perfección es inevitable!"
+        }
+      },
+      "cosmicWordsmith": {
+        "name": "Forjador Cósmico de Palabras",
+        "mechanic": "Forja estelar de palabras - ¡Las letras evolucionan! ¡Letras raras crean supernovas!",
+        "taunts": {
+          "start1": "Estuve PRESENTE cuando vuestros ancestros gruñeron sus primeras palabras. Esperaba más.",
+          "start2": "Usáis 'literalmente' para decir 'figuradamente.' Inventé ambas. La ironía es CÓSMICA.",
+          "goodWord1": "¿Esa palabra? Trabajé diecisiete versiones. De nada.",
+          "goodWord2": "Uso aceptable de MI creación. Permito que exista.",
+          "badWord1": "He visto estrellas morir con más elocuencia que ese intento de palabra.",
+          "badWord2": "Incluso los agujeros negros tienen más sustancia que esa... no-palabra.",
+          "mechanic1": "¡Las letras evolucionan! ¡A se convierte en E se convierte en I! ¡El cosmos exige adaptación!",
+          "mechanic2": "¡Usad Q, X o Z para una SUPERNOVA! ¡Las letras raras tienen poder cósmico!",
+          "lowTime1": "Ni yo puedo frenar el tiempo. Y soy literalmente cósmico. Literalmente literalmente.",
+          "victory": "¿Habéis... dominado MIS palabras?! Quizás los mortales no son completamente inútiles.",
+          "defeat": "Volved en un milenio. Necesitáis más... práctica. Eones de ella."
+        }
+      },
+      "linguistSage": {
+        "name": "Sabio Lingüista",
+        "mechanic": "La cumbre de Babel - ¡El idioma cambia! ¡Palabras universales ganan bonos enormes!",
+        "taunts": {
+          "start1": "Ah, '¡hola!' O 'konnichiwa.' O 'bonjour.' O... ¿qué estábamos haciendo?",
+          "start2": "¡Toda palabra es prestada! '¡Kindergarten' es alemán! '¡Safari' es suajili!",
+          "goodWord1": "¡Hermosa palabra! Funciona en inglés Y... hmm, revisando mis notas...",
+          "goodWord2": "¡Magnifique! ¡Wunderbar! ¡Subarashii! ...Quizás mezclo idiomas otra vez.",
+          "badWord1": "Esa palabra existe en CERO idiomas. Lo comprobé. Todos.",
+          "badWord2": "Incluso mis amigos cabras encuentran mejores palabras. Y comen latas.",
+          "mechanic1": "¡El idioma cambia! ¡Adaptad vuestro vocabulario!",
+          "mechanic2": "¡Encontrad palabras que funcionen en MÚLTIPLES idiomas para Comprensión Universal!",
+          "lowTime1": "¡El tiempo se acaba en TODOS los idiomas! ¡Schnell! ¡Hayaku! ¡Rapido!",
+          "victory": "¡Habláis el idioma universal de la victoria! Qué... iluminador.",
+          "defeat": "La cumbre permanece sin escalar. Volved cuando hayáis estudiado más idiomas."
+        }
+      },
+      "lexiconDragon": {
+        "name": "Dragón del Léxico",
+        "mechanic": "La Última Palabra - ¡TODAS las mecánicas combinadas! ¡Construid el GOLPE LÉXICO!",
+        "taunts": {
+          "start1": "¡GUAU UN RETADOR! ¿Queréis ver mi diario de palabras? ¡Son solo 47 tomos!",
+          "start2": "¡He estado ESPERANDO a alguien con quien jugar! O sea... ¡TEMEDME! ¡Rawr!",
+          "goodWord1": "¡Encontrasteis 'DRAGÓN'! ¡ESE SOY YO! ¡Ahora encontrad 'MAGNÍFICO' porque ESO TAMBIÉN soy yo!",
+          "goodWord2": "¡INCREÍBLE palabra! ¡La escribo en mi diario! ¡Tomo 48!",
+          "badWord1": "¡Eso no es una palabra! ...¿O SÍ? Dejadme revisar tomos 1 al 47...",
+          "badWord2": "¡De verdad quiero aceptar eso pero mi nerd interior de palabras dice NO!",
+          "mechanic1": "¡Cambio de fase! ¡Una nueva mecánica emerge! ¿Podéis con TODAS?",
+          "mechanic2": "¡El GOLPE LÉXICO se carga! ¡Seguid encontrando grandes palabras!",
+          "lowTime1": "¡OH NO se acaba el tiempo! ¡Pero me estaba divirtiendo TANTO!",
+          "victory": "¡GANASTEIS! ¿Eso significa que ahora somos AMIGOS?! ¡Mejor día de TODOS!",
+          "defeat": "Gané pero... ¿me siento mal? ¿Queréis revancha? ¡Por favor decid que sí!"
+        }
+      }
     }
   },
   "student": {

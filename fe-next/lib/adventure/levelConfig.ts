@@ -22,6 +22,7 @@ import {
   getDifficultyForWorld,
 } from './constants';
 import { VOWELS } from './gridGenerator';
+import { getBossConfig } from './bossConfig';
 
 // ==============================================
 // WORLD CONFIGURATION
@@ -281,6 +282,15 @@ export function getLevelConfig(
   const hiddenWordKey = `${world}-${level}`;
   if (HIDDEN_WORDS[hiddenWordKey]) {
     config.hiddenWord = HIDDEN_WORDS[hiddenWordKey];
+  }
+
+  // Add boss twist mechanic for boss levels
+  if (isBossLevel) {
+    const bossConfig = getBossConfig(world);
+    if (bossConfig) {
+      config.bossTwist = bossConfig.twistMechanic.type;
+      config.showBossIntro = true;
+    }
   }
 
   return config;

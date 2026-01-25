@@ -1,0 +1,271 @@
+/**
+ * BossVictory Component
+ *
+ * Displays boss battle results with boss-specific personality-driven messages.
+ * Replaces LevelCompleteModal for boss levels (level 7 of each world).
+ * Victory shows celebratory green/lime theme, defeat shows encouraging red/orange theme.
+ */
+
+'use client';
+
+import React, { memo, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, RotateCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { BossVictoryProps } from '@/types/boss';
+
+// ==============================================
+// CONSTANTS
+// ==============================================
+
+const STAR_SLOTS = [0, 1, 2] as const;
+
+// ==============================================
+// HELPER COMPONENTS
+// ==============================================
+
+const BossStarDisplay = memo<{ filled: boolean; index: number }>(
+  ({ filled, index }) => (
+    <motion.div
+      data-testid={filled ? 'star-filled' : 'star-empty'}
+      initial={{ scale: 0, rotate: -180 }}
+      animate={filled ? {
+        scale: [0, 1.3, 1],
+        rotate: [180, -10, 0],
+      } : {
+        scale: 1,
+        rotate: 0,
+      }}
+      transition={{
+        delay: 0.5 + index * 0.2,
+        type: 'spring',
+        stiffness: 180,
+        damping: 12,
+      }}
+    >
+      <Star
+        className={cn(
+          'w-10 h-10 md:w-14 md:h-14',
+          filled
+            ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_15px_rgba(255,225,53,0.9)]'
+            : 'text-neo-white/30 fill-transparent'
+        )}
+      />
+    </motion.div>
+  )
+);
+
+BossStarDisplay.displayName = 'BossStarDisplay';
+
+// ==============================================
+// COMPONENT
+// ==============================================
+
+const BossVictory = memo<BossVictoryProps>(
+  ({ boss, isVictory, stars, score, wordsFound, onContinue, onRetry }) => {
+    const { t } = useLanguage();
+
+    const formattedScore = useMemo(
+      () => score.toLocaleString(),
+      [score]
+    );
+
+    // Resolve boss taunt based on outcome
+    const bossTaunt = useMemo(
+      () => t(isVictory ? boss.taunts.onVictory : boss.taunts.onDefeat),
+      [t, isVictory, boss.taunts.onVictory, boss.taunts.onDefeat]
+    );
+
+    const bossName = useMemo(() => t(boss.displayName), [t, boss.displayName]);
+
+    return (
+      <AnimatePresence>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="boss-victory-title"
+          className={cn(
+            'fixed inset-0 z-50',
+            'flex items-center justify-center',
+            'bg-neo-black/85 backdrop-blur-sm'
+          )}
+        >
+          {/* Themed background glow */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <motion.div
+              className="absolute inset-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              style={{
+                background: isVictory
+                  ? 'radial-gradient(ellipse at 50% 30%, rgba(163,230,53,0.2) 0%, transparent 60%)'
+                  : 'radial-gradient(ellipse at 50% 30%, rgba(239,68,68,0.15) 0%, transparent 60%)',
+              }}
+            />
+          </div>
+
+          {/* Modal Content */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 20 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            className={cn(
+              'relative w-full max-w-md mx-4',
+              'bg-neo-navy border-4 border-neo-black',
+              'rounded-neo shadow-hard-lg',
+              'p-6 md:p-8'
+            )}
+          >
+            {/* Title */}
+            <motion.h2
+              id="boss-victory-title"
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className={cn(
+                'text-center text-2xl md:text-3xl font-black mb-2',
+                isVictory ? 'text-neo-lime' : 'text-neo-red'
+              )}
+            >
+              {isVictory
+                ? t('adventure.bosses.bossDefeated')
+                : t('adventure.bosses.bossWins')}
+            </motion.h2>
+
+            {/* Boss Image */}
+            <motion.div
+              className="flex justify-center mb-3"
+              initial={{ scale: 0 }}
+              animate={isVictory
+                ? { scale: [0, 1.1, 1], rotate: [0, -5, 0] }
+                : { scale: [0, 1.1, 1] }
+              }
+              transition={{
+                delay: 0.2,
+                type: 'spring',
+                stiffness: 180,
+                damping: 15,
+              }}
+            >
+              <motion.img
+                src={boss.imagePath}
+                alt={bossName}
+                className={cn(
+                  'w-24 h-24 md:w-32 md:h-32',
+                  'object-contain',
+                  'border-3 border-neo-black rounded-neo',
+                  isVictory
+                    ? 'grayscale-[50%] opacity-80'
+                    : 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)]'
+                )}
+              />
+            </motion.div>
+
+            {/* Boss Name */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-center text-lg font-black text-neo-white mb-1"
+            >
+              {bossName}
+            </motion.p>
+
+            {/* Boss Taunt */}
+            <motion.p
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className={cn(
+                'text-center text-sm font-bold italic mb-4',
+                isVictory ? 'text-neo-lime/80' : 'text-neo-orange/80'
+              )}
+            >
+              &ldquo;{bossTaunt}&rdquo;
+            </motion.p>
+
+            {/* Stars */}
+            <div className="flex justify-center gap-2 mb-4">
+              {STAR_SLOTS.map((i) => (
+                <BossStarDisplay key={i} filled={i < stars} index={i} />
+              ))}
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {/* Score */}
+              <div className="text-center">
+                <p className="text-neo-white/60 text-xs font-bold uppercase tracking-wide">
+                  {t('common.score')}
+                </p>
+                <p className="text-2xl md:text-3xl font-black text-neo-white">
+                  {formattedScore}
+                </p>
+              </div>
+
+              {/* Words Found */}
+              <div className="text-center">
+                <p className="text-neo-white/60 text-xs font-bold uppercase tracking-wide">
+                  {t('adventure.game.wordsFound')}
+                </p>
+                <p className="text-2xl md:text-3xl font-black text-neo-white">
+                  {wordsFound.length}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3">
+              {/* Continue Button (victory only) */}
+              {isVictory && (
+                <button
+                  onClick={onContinue}
+                  className={cn(
+                    'w-full py-3 px-4',
+                    'bg-neo-lime text-neo-black',
+                    'font-black text-lg',
+                    'border-3 border-neo-black rounded-neo',
+                    'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
+                    'active:translate-y-0.5 active:shadow-hard-pressed',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                    'transition-all duration-200'
+                  )}
+                >
+                  {t('adventure.continueToNext')}
+                </button>
+              )}
+
+              {/* Retry Button */}
+              <button
+                onClick={onRetry}
+                className={cn(
+                  'w-full py-3 px-4',
+                  'flex items-center justify-center gap-2',
+                  !isVictory
+                    ? 'bg-neo-orange text-neo-black'
+                    : 'bg-neo-white/10 text-neo-white',
+                  'font-black text-lg',
+                  'border-3 border-neo-black rounded-neo',
+                  'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                  'transition-all duration-200'
+                )}
+              >
+                <RotateCcw className="w-5 h-5" />
+                {t('adventure.retryLevel')}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </AnimatePresence>
+    );
+  }
+);
+
+BossVictory.displayName = 'BossVictory';
+
+export default BossVictory;

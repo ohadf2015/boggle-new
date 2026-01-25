@@ -17,6 +17,7 @@ import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
+import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { ScorePopupFly } from '@/components/animations';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
@@ -24,6 +25,9 @@ import AdventureTimer from './AdventureTimer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import LexiReaction from './LexiReaction';
+import BossIntro from './BossIntro';
+import BossDialogue from './BossDialogue';
+import BossVictory from './BossVictory';
 import WorldBackground from './themed/WorldBackground';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
@@ -271,6 +275,25 @@ const AdventureGame = memo<AdventureGameProps>(
       inactivityThresholdMs: 15000, // 15 seconds
     });
 
+    // Boss mechanics hook (active only on boss levels)
+    const isBossLevel = levelConfig.isBossLevel;
+    const {
+      isActive: isBossActive,
+      boss: bossConfig,
+      currentTaunt: bossTaunt,
+      showTaunt: showBossTaunt,
+      checkWord: checkBossWord,
+      triggerTaunt: triggerBossTaunt,
+      bossState,
+    } = useBossMechanics({
+      worldId: isBossLevel ? levelConfig.world : null,
+    });
+
+    // Boss intro state (shown before gameplay on boss levels)
+    const [showBossIntro, setShowBossIntro] = useState(
+      isBossLevel && levelConfig.showBossIntro === true
+    );
+
     // Lexi reaction state - transform game state to reaction format
     // Using ref + selective update to avoid recreating object on every timer tick
     const lexiGameStateRef = useRef<GameStateForReactions>({
@@ -350,6 +373,19 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, levelConfig.timerSeconds]);
 
+    // Boss low-time taunt trigger (when timer drops below 15 seconds)
+    const bossLowTimeTriggedRef = useRef(false);
+    useEffect(() => {
+      if (isBossActive && isPlaying && timeRemaining <= 15 && timeRemaining > 0 && !bossLowTimeTriggedRef.current) {
+        bossLowTimeTriggedRef.current = true;
+        triggerBossTaunt('onLowTime');
+      }
+      // Reset trigger on game reset
+      if (timeRemaining > 15) {
+        bossLowTimeTriggedRef.current = false;
+      }
+    }, [isBossActive, isPlaying, timeRemaining, triggerBossTaunt]);
+
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
@@ -361,9 +397,32 @@ const AdventureGame = memo<AdventureGameProps>(
       setEntryPhase('title');
     }, []);
 
-    // Handle title animation completion to start gameplay
+    // Handle title animation completion to start gameplay (or show boss intro)
     const handleTitleComplete = useCallback(() => {
-      setEntryPhase('playing');
+      if (showBossIntro && bossConfig) {
+        // Boss levels: show intro cutscene before starting gameplay
+        setEntryPhase('playing');
+      } else {
+        setEntryPhase('playing');
+        if (!isPlaying) {
+          startGame();
+        }
+      }
+    }, [isPlaying, startGame, showBossIntro, bossConfig]);
+
+    // Handle boss intro start (player ready to fight)
+    const handleBossIntroStart = useCallback(() => {
+      setShowBossIntro(false);
+      if (!isPlaying) {
+        startGame();
+      }
+      // Trigger start taunt after intro dismissal
+      triggerBossTaunt('onStart');
+    }, [isPlaying, startGame, triggerBossTaunt]);
+
+    // Handle boss intro skip
+    const handleBossIntroSkip = useCallback(() => {
+      setShowBossIntro(false);
       if (!isPlaying) {
         startGame();
       }
@@ -374,6 +433,12 @@ const AdventureGame = memo<AdventureGameProps>(
       if (gameState.isComplete || timeRemaining === 0) {
         setShowLevelComplete(true);
         pauseGame();
+
+        // Trigger boss victory/defeat taunt
+        if (isBossActive) {
+          const isVictory = gameState.stars > 0;
+          triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
+        }
 
         // Record attempt (including failures) for partial progress tracking
         // Build objective progress map from current objectives
@@ -404,6 +469,8 @@ const AdventureGame = memo<AdventureGameProps>(
       gameState.score,
       gameState.stars,
       objectives,
+      isBossActive,
+      triggerBossTaunt,
     ]);
 
     // Helper to calculate popup start position from last selected tile
@@ -496,7 +563,26 @@ const AdventureGame = memo<AdventureGameProps>(
         if (result.isValid && result.score) {
           // Get position BEFORE clearing selection
           const startPos = getPopupStartPosition();
-          const scoreValue = result.score;
+          let scoreValue = result.score;
+
+          // Apply boss mechanic multiplier on boss levels
+          let bossBonus: string | undefined;
+          if (isBossActive && bossConfig) {
+            const mechResult = checkBossWord(currentWord);
+            scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
+
+            // Trigger taunt based on mechanic result
+            if (mechResult.triggerTaunt) {
+              triggerBossTaunt(mechResult.triggerTaunt);
+            } else if (scoreValue >= 50) {
+              triggerBossTaunt('onGoodWord');
+            }
+
+            if (mechResult.meetsRequirement) {
+              bossBonus = 'BOSS!';
+            }
+          }
+
           const comboBonus = gameState.comboCount > 1 ? `${gameState.comboCount}x` : undefined;
 
           // Add score popup to queue
@@ -506,7 +592,7 @@ const AdventureGame = memo<AdventureGameProps>(
             x: startPos.x,
             y: startPos.y,
             word: currentWord,
-            bonus: comboBonus,
+            bonus: bossBonus || comboBonus,
           }]);
 
           // Valid word - submit with calculated score and path for special tile effects
@@ -527,13 +613,18 @@ const AdventureGame = memo<AdventureGameProps>(
           setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
           clearSelection();
 
+          // Trigger boss bad word taunt on boss levels
+          if (isBossActive) {
+            triggerBossTaunt('onBadWord');
+          }
+
           // Clear error after 2 seconds with proper cleanup
           validationErrorTimeoutRef.current = setTimeout(() => {
             setValidationFeedback(prev => ({ ...prev, error: null }));
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt]
     );
 
     // Handle level complete continue
@@ -814,6 +905,26 @@ const AdventureGame = memo<AdventureGameProps>(
           </aside>
         </main>
 
+        {/* Boss Intro Overlay (shown before gameplay on boss levels) */}
+        {showBossIntro && bossConfig && (
+          <BossIntro
+            boss={bossConfig}
+            worldNumber={levelConfig.world}
+            onStart={handleBossIntroStart}
+            onSkip={handleBossIntroSkip}
+          />
+        )}
+
+        {/* Boss Dialogue Overlay (taunt display during gameplay) */}
+        {isBossActive && bossConfig && bossTaunt && (
+          <BossDialogue
+            boss={bossConfig}
+            currentTaunt={bossTaunt}
+            isVisible={showBossTaunt}
+            position="top"
+          />
+        )}
+
         {/* Pause Overlay */}
         {isPaused && !showLevelComplete && (
           <div
@@ -871,20 +982,33 @@ const AdventureGame = memo<AdventureGameProps>(
           onComplete={handleTitleComplete}
         />
 
-        {/* Level Complete Modal */}
-        <LevelCompleteModal
-          isOpen={showLevelComplete}
-          stars={starsEarned}
-          score={gameState.score}
-          objectives={objectives}
-          levelNumber={levelConfig.level}
-          worldNumber={levelConfig.world}
-          onContinue={handleContinue}
-          onRetry={handleRetry}
-          onExit={handleExit}
-          totalStars={totalStars}
-          bestAttempt={bestAttempt}
-        />
+        {/* Level Complete: Boss Victory/Defeat or Standard Modal */}
+        {showLevelComplete && isBossActive && bossConfig ? (
+          <BossVictory
+            boss={bossConfig}
+            isVictory={gameState.stars > 0}
+            stars={starsEarned}
+            score={gameState.score}
+            wordsFound={gameState.wordsFound}
+            gameState={gameState}
+            onContinue={handleContinue}
+            onRetry={handleRetry}
+          />
+        ) : (
+          <LevelCompleteModal
+            isOpen={showLevelComplete}
+            stars={starsEarned}
+            score={gameState.score}
+            objectives={objectives}
+            levelNumber={levelConfig.level}
+            worldNumber={levelConfig.world}
+            onContinue={handleContinue}
+            onRetry={handleRetry}
+            onExit={handleExit}
+            totalStars={totalStars}
+            bestAttempt={bestAttempt}
+          />
+        )}
 
         {/* Score Popup Animation */}
         <ScorePopupFly

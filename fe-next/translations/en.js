@@ -3816,6 +3816,185 @@ const en = {
         "star2": "Excellent work!",
         "star3": "Perfect score!"
       }
+    },
+    "bosses": {
+      "fightBoss": "Fight Boss",
+      "bossIntro": "Boss Battle!",
+      "bossDefeated": "Boss Defeated!",
+      "bossWins": "Boss Wins...",
+      "twistMechanic": "Boss Twist",
+      "skipIntro": "Skip",
+      "readyToFight": "Let's Go!",
+      "msGrammar": {
+        "name": "Ms. Grammar",
+        "mechanic": "Pop Quiz Protocol - Find words matching my requirements!",
+        "taunts": {
+          "start1": "Class is in session! Let's see if you've been studying...",
+          "start2": "Pop quiz time! I hope you're prepared!",
+          "goodWord1": "Acceptable. But don't expect extra credit for the bare minimum.",
+          "goodWord2": "Hmm, not terrible. You might pass after all.",
+          "badWord1": "That's not a word! This goes on your permanent record.",
+          "badWord2": "Did you even STUDY? I'm deducting points.",
+          "mechanic1": "Did you even READ the assignment? I asked for {requirement}!",
+          "mechanic2": "Follow the requirements! This isn't free play!",
+          "lowTime1": "Time's almost up! Just like a student who didn't study...",
+          "victory": "Well, well... it seems you CAN follow instructions. A gold star for you!",
+          "defeat": "See me after class... for remedial vocabulary."
+        }
+      },
+      "spellingBee": {
+        "name": "Spelling Bee",
+        "mechanic": "Hive Mind Havoc - Sticky tiles and synonym challenges!",
+        "taunts": {
+          "start1": "Welcome to MY hive. I hope you like honey... and FAILURE.",
+          "start2": "Buzz buzz! That's the sound of your doom. Also I'm a bee.",
+          "goodWord1": "Not bad for a non-bee. I'll allow it.",
+          "goodWord2": "Oh, you found a synonym? How un-bee-lievably adequate.",
+          "badWord1": "That word? Honey, please.",
+          "badWord2": "My workers found better words, and they have tiny brains.",
+          "mechanic1": "Find synonyms to un-stick those tiles, sweetheart!",
+          "mechanic2": "The hive demands SYNONYMS! Big words that MEAN things!",
+          "lowTime1": "Tick tock! Even my honey doesn't take this long to set!",
+          "victory": "You... beat me? The QUEEN? I'll bee back. (Get it? Bee? I'm a bee.)",
+          "defeat": "Another one stung! My hive record remains UNBEATEN."
+        }
+      },
+      "professorThesaurus": {
+        "name": "Professor Thesaurus",
+        "mechanic": "Etymology Excavation - Words with shared roots create combos!",
+        "taunts": {
+          "start1": "Ah, a challenger approaches! Or should I say, an adversary advances?",
+          "start2": "I've forgotten more words than you'll ever learn. Literally. I'm very old.",
+          "goodWord1": "Adequate. Or should I say, satisfactory, passable, sufficient...",
+          "goodWord2": "That word is from the 12th century. A bit modern, but I'll allow it.",
+          "badWord1": "Your lexicon appears... limited. Restricted. Circumscribed.",
+          "badWord2": "You found 'walk.' Pedestrian! Perhaps try 'perambulate'?",
+          "mechanic1": "Look for shared roots! Bio, graph, tele - etymology is KEY!",
+          "mechanic2": "Common letters getting buried! Dig deeper, young scholar!",
+          "lowTime1": "Time wanes, expires, diminishes... you understand, yes?",
+          "victory": "I concede! You've demonstrated considerable... ugh... 'skill.'",
+          "defeat": "Return when your vocabulary has... matured. Developed. Blossomed."
+        }
+      },
+      "captainMetaphor": {
+        "name": "Captain Metaphor",
+        "mechanic": "Figurative Fleet Battle - Find literal words from my idioms!",
+        "taunts": {
+          "start1": "Avast! You're barking up the wrong tree! Which is strange because we're at SEA!",
+          "start2": "Shiver me metaphors! A new challenger walks the plank of destiny!",
+          "goodWord1": "Well blow me down! That word hit the nail on the head!",
+          "goodWord2": "A diamond in the rough! Speaking of which, find DIAMOND!",
+          "badWord1": "That's a wild goose chase of a word! Wrong fowl entirely!",
+          "badWord2": "Don't count your chickens! I need CHICKEN, COUNT, and BEFORE!",
+          "mechanic1": "It's raining cats and dogs! Find RAIN, CATS, and DOGS!",
+          "mechanic2": "Break a leg! Not literally! Find the WORDS in the idiom!",
+          "lowTime1": "Time flies! Unlike my ship! Which also flies! It's a metaphor!",
+          "victory": "You sank my battleship! Wait, wrong game. You beat my idioms!",
+          "defeat": "The early bird catches the worm, and YOU are the worm! Arr!"
+        }
+      },
+      "baronBuildaword": {
+        "name": "Baron Buildaword",
+        "mechanic": "Assembly Line Assault - Build compound words for massive bonuses!",
+        "taunts": {
+          "start1": "INEFFICIENT! You could be COMPOUNDING! Think BUTTER-FLY, not 'butter'!",
+          "start2": "My Word-Assembly-Matic 3000 is ready! Let's see your engineering!",
+          "goodWord1": "Not bad! But is it COMPOUND? Everything should be compound!",
+          "goodWord2": "Acceptable output! My machines approve. Marginally.",
+          "badWord1": "That's not compound! It's merely... a word. How un-engineered!",
+          "badWord2": "My Word-Assembly-Matic 3000 REJECTS this! Try harder!",
+          "mechanic1": "The conveyor moves! Catch those letters before they pass!",
+          "mechanic2": "COMPOUND! COMPOUND! BUTTER+FLY! SUN+FLOWER! BRAIN+STORM!",
+          "lowTime1": "The assembly line waits for no one! FASTER!",
+          "victory": "You've... out-engineered me? IMPOSSIBLE! I'll build a better machine!",
+          "defeat": "Another inefficient challenger defeated! The machine wins again!"
+        }
+      },
+      "puzzleMaster": {
+        "name": "Puzzle Master",
+        "mechanic": "Scrambled Reality - Letters scramble! Find anagrams for bonuses!",
+        "taunts": {
+          "start1": "Rearrange 'NOTES' and tell me what you find. I'll wait. I have nine lives.",
+          "start2": "Everything is a puzzle. Even this sentence. Especially this sentence.",
+          "goodWord1": "You found one word. But did you see its ANAGRAM hiding in plain sight?",
+          "goodWord2": "Clever. But 'CARE' has friends: RACE, ACRE. Did you find them all?",
+          "badWord1": "A straight answer? How BORING. ROBING. Figure it out.",
+          "badWord2": "That's not a word in ANY arrangement. Trust me, I checked all of them.",
+          "mechanic1": "Reality scrambles! The letters are shifting! Can you keep up?",
+          "mechanic2": "Find the anagram pair! LISTEN and SILENT are waiting!",
+          "lowTime1": "Time is running out... or is it running IN? Depends on the anagram.",
+          "victory": "You solved my puzzle?! I'm... actually impressed. Don't tell anyone.",
+          "defeat": "The puzzle remains unsolved! Come back when you can think sideways."
+        }
+      },
+      "reflectionKing": {
+        "name": "Reflection King",
+        "mechanic": "Mirror Match Mayhem - The grid mirrors! Find palindromes for power!",
+        "taunts": {
+          "start1": "Behold my perfection! Also look for palindromes - the only words beautiful enough!",
+          "start2": "This battle shall be LEGENDARY! They'll write EPICS about... mainly me.",
+          "goodWord1": "A worthy word! Almost as magnificent as my reflection!",
+          "goodWord2": "Not bad! But is it a palindrome? Only PERFECTION reads both ways!",
+          "badWord1": "You crack my ice? The TRAGEDY! ...Actually, do it again.",
+          "badWord2": "That word isn't worthy of my mirror palace! Try harder!",
+          "mechanic1": "The mirror reflects! Your moves affect BOTH sides!",
+          "mechanic2": "RADAR! LEVEL! CIVIC! Find palindromes for Perfect Reflections!",
+          "lowTime1": "Even my beauty can't stop time! Hurry up!",
+          "victory": "You've... dimmed my reflection?! I need a moment. And a mirror.",
+          "defeat": "Of COURSE I won! Have you SEEN me? Perfection is inevitable!"
+        }
+      },
+      "cosmicWordsmith": {
+        "name": "Cosmic Wordsmith",
+        "mechanic": "Stellar Word Forge - Letters evolve! Use rare letters for supernovas!",
+        "taunts": {
+          "start1": "I was PRESENT when your ancestors grunted their first words. I expected more by now.",
+          "start2": "You use 'literally' to mean 'figuratively.' I INVENTED both. The irony is COSMIC.",
+          "goodWord1": "That word? I workshopped seventeen versions. You're welcome.",
+          "goodWord2": "Acceptable usage of MY creation. I shall allow it to exist.",
+          "badWord1": "I've seen stars die with more eloquence than that word attempt.",
+          "badWord2": "Even black holes have more substance than that... non-word.",
+          "mechanic1": "Letters evolve! A becomes E becomes I! The cosmos demands adaptation!",
+          "mechanic2": "Use Q, X, or Z for a SUPERNOVA! Rare letters have cosmic power!",
+          "lowTime1": "Even I can't slow time. And I'm literally cosmic. Literally literally.",
+          "victory": "You've... mastered MY words?! Perhaps mortals aren't entirely hopeless.",
+          "defeat": "Return in a millennium. You need more... practice. Eons of it."
+        }
+      },
+      "linguistSage": {
+        "name": "Linguist Sage",
+        "mechanic": "Babel's Summit - Language shifts! Universal words earn huge bonuses!",
+        "taunts": {
+          "start1": "Ah, 'hello'! Or 'konnichiwa.' Or 'bonjour.' Or... what were we doing?",
+          "start2": "Every word is borrowed! 'Kindergarten' is German! 'Safari' is Swahili!",
+          "goodWord1": "Beautiful word! It works in English AND... hmm, checking my notes...",
+          "goodWord2": "Magnifique! Wunderbar! Subarashii! ...I may be mixing languages again.",
+          "badWord1": "That word exists in ZERO languages. I checked. All of them.",
+          "badWord2": "Even my goat friends could find better words. And they eat tin cans.",
+          "mechanic1": "The language shifts! Adapt your vocabulary to the new tongue!",
+          "mechanic2": "Find words that work in MULTIPLE languages for Universal Understanding!",
+          "lowTime1": "Time's running out in EVERY language! Schnell! Hayaku! Rapido!",
+          "victory": "You speak the universal language of victory! How... enlightening.",
+          "defeat": "The summit remains unclimbed. Return when you've studied more languages."
+        }
+      },
+      "lexiconDragon": {
+        "name": "Lexicon Dragon",
+        "mechanic": "The Final Word - ALL mechanics combined! Build the LEXICON STRIKE!",
+        "taunts": {
+          "start1": "OH WOW A CHALLENGER! Want to see my word journal? It's only 47 volumes!",
+          "start2": "I've been WAITING for someone to play with! I mean... FEAR ME! Rawr!",
+          "goodWord1": "You found 'DRAGON'! THAT'S ME! Now find 'MAGNIFICENT' because that's ALSO me!",
+          "goodWord2": "AMAZING word! I'm writing it in my journal! Volume 48!",
+          "badWord1": "That's not a word! ...Or IS it? Let me check volumes 1 through 47...",
+          "badWord2": "I really want to accept that but my inner word nerd says NO!",
+          "mechanic1": "Phase shift! A new mechanic emerges! Can you handle ALL of them?",
+          "mechanic2": "LEXICON STRIKE charging! Keep finding great words!",
+          "lowTime1": "OH NO time's running out! I was having so much FUN though!",
+          "victory": "You WIN! Does this mean we're FRIENDS now?! Best day EVER!",
+          "defeat": "I won but... I feel bad? Want a rematch? Please say yes!"
+        }
+      }
     }
   },
   "student": {
