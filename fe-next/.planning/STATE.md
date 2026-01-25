@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 17 - Boss Mechanic Expansion (in progress)
+**Current focus:** Phase 18 - Education XP System (in progress)
 
 ## Current Position
 
-Phase: 17 of 23 (Boss Mechanic Expansion) — VERIFIED
-Plan: 5/5 complete
-Status: Verified
-Last activity: 2026-01-25 — Phase 17 complete, all 5 plans executed, goal verified
+Phase: 18 of 23 (Education XP System)
+Plan: 1/4 complete
+Status: In progress
+Last activity: 2026-01-25 — Completed 18-01-PLAN.md (Education XP Foundation)
 
-Progress: [█████████░] 17/23 phases (74% milestone, v1.1 in progress)
+Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [█████████░] 17/23 phases (74% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 14 (Phase 15 complete, Phase 16 complete, Phase 17 complete)
-- Current phase: 17 (Boss Mechanic Expansion) — COMPLETE
-- Next phase: 18 (Education XP System)
+- Plans completed: 15 (Phase 15-17 complete, Phase 18 plan 01 complete)
+- Current phase: 18 (Education XP System) — IN PROGRESS
+- Next plan: 18-02 (XP Progress Bar UI)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -66,6 +66,16 @@ Progress: [█████████░] 17/23 phases (74% milestone, v1.1 in 
 
 **Phase 17 Total:** 38 minutes, 230 tests added
 
+**Phase 18 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 18-01 | Education XP Foundation | 5min | ✅ Complete |
+| 18-02 | XP Progress Bar UI | - | Pending |
+| 18-03 | Level-Up Celebration | - | Pending |
+| 18-04 | Streak Bonus System | - | Pending |
+
+**Phase 18 Progress:** 1/4 plans complete, 32 tests added
+
 ## Accumulated Context
 
 ### Decisions
@@ -97,6 +107,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **17-03**: areAnagrams uses sorted letter comparison → Excludes same word (LISTEN vs LISTEN) (2026-01-25)
 - **17-03**: scrambledReality fallback to unique letters >= 4 → When no anagram pair found (2026-01-25)
 - **17-05**: jest.requireActual for hook integration tests → Bypass module mocks to test real hooks in same file (2026-01-25)
+- **18-01**: Mastery messages before XP amounts → Research pitfall 1: extrinsic rewards undermine intrinsic motivation (2026-01-25)
+- **18-01**: Math.round for streak bonus → Floating point precision (0.75 * 70 = 52.5) (2026-01-25)
+- **18-01**: Migration 062 (not 059) → 059 already exists (adventure_level_attempts) (2026-01-25)
 
 ### Pending Todos
 
@@ -125,7 +138,9 @@ None.
 - ✅ Stub mechanic tests — All 10 boss mechanics have dedicated test files
 - ✅ Boss integration tests — 51 tests using real hooks for all 10 worlds
 
-**Phase 18 (Education XP):**
+**Phase 18 (Education XP) — IN PROGRESS:**
+- ✅ XP calculation foundation — educationXpManager.ts with 32 tests, 98.6% coverage
+- ✅ Database schema — Migration 062 adds XP/level/streak columns
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
 - XP curve validation — Test if Adventure Mode curve works for education context
 
@@ -136,11 +151,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 17 complete and verified
+Stopped at: Completed 18-01-PLAN.md (Education XP Foundation)
 Resume file: None
 
-**Next action:** `/gsd:discuss-phase 18` to start Education XP System
+**Next action:** `/gsd:execute-phase 18` to continue with 18-02 (XP Progress Bar UI)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 17 complete)*
+*Last updated: 2026-01-25 (Phase 18 plan 01 complete)*
