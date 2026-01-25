@@ -4106,6 +4106,36 @@ const en = {
       "noLessons": "No lessons yet",
       "createFirst": "Create your first vocabulary lesson"
     },
+    "lessons": {
+      "assign": {
+        "trigger": "Assign to Classroom",
+        "title": "Assign Lesson",
+        "lessonLabel": "Lesson",
+        "classroomLabel": "Classroom",
+        "selectClassroom": "Select a classroom",
+        "noClassrooms": "No classrooms available",
+        "button": "Assign Lesson",
+        "assigning": "Assigning...",
+        "success": "Lesson assigned successfully!",
+        "alreadyAssigned": "This lesson is already assigned to this classroom",
+        "error": "Failed to assign lesson"
+      }
+    },
+    "lessons": {
+      "assign": {
+        "trigger": "Assign to Classroom",
+        "title": "Assign Lesson to Classroom",
+        "lessonLabel": "Lesson",
+        "classroomLabel": "Select Classroom",
+        "selectClassroom": "Please select a classroom",
+        "noClassrooms": "No classrooms available. Create a classroom first to assign lessons.",
+        "button": "Assign Lesson",
+        "assigning": "Assigning...",
+        "success": "Lesson assigned successfully!",
+        "error": "Failed to assign lesson",
+        "alreadyAssigned": "This lesson is already assigned to this classroom"
+      }
+    },
     "progress": {
       "title": "Student Progress",
       "student": "Student",

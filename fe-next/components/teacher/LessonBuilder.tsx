@@ -13,8 +13,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import LessonTemplateEditor from './LessonTemplateEditor';
+import LessonAssignmentDialog from './LessonAssignmentDialog';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Plus, CheckCircle, AlertCircle, X, Trash2, Play, Settings, Clock } from 'lucide-react';
+import { Plus, CheckCircle, AlertCircle, X, Trash2, Play, Settings, Clock, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/teacher';
 
@@ -42,6 +43,9 @@ export default function LessonBuilder() {
   const [selectedLesson, setSelectedLesson] = useState<VocabularyLesson | null>(null);
   const [isTemplateEditorOpen, setIsTemplateEditorOpen] = useState(false);
   const [isTemplateSaving, setIsTemplateSaving] = useState(false);
+
+  // Assignment dialog state
+  const [assigningLesson, setAssigningLesson] = useState<VocabularyLesson | null>(null);
 
   // Template hook for the selected lesson
   const { templates, createTemplate, updateTemplate, getDefaultTemplate } = useTemplates(selectedLesson?.id);
@@ -273,6 +277,19 @@ export default function LessonBuilder() {
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => setAssigningLesson(lesson)}
+                      className={cn(
+                        'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
+                        'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
+                        'transition-all'
+                      )}
+                      title={t('teacher.lessons.assign.trigger')}
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleOpenTemplateEditor(lesson)}
                       className={cn(
                         'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
@@ -496,6 +513,16 @@ export default function LessonBuilder() {
           existingTemplate={getDefaultTemplate()}
           onSave={handleSaveTemplate}
           isSaving={isTemplateSaving}
+        />
+      )}
+
+      {/* Assignment Dialog */}
+      {assigningLesson && (
+        <LessonAssignmentDialog
+          isOpen={!!assigningLesson}
+          onClose={() => setAssigningLesson(null)}
+          lessonId={assigningLesson.id}
+          lessonName={assigningLesson.name}
         />
       )}
     </div>

@@ -4119,6 +4119,21 @@ const ja = {
       "noLessons": "まだレッスンがありません",
       "createFirst": "最初の語彙レッスンを作成しましょう"
     },
+    "lessons": {
+      "assign": {
+        "trigger": "クラスに割り当て",
+        "title": "クラスにレッスンを割り当てる",
+        "lessonLabel": "レッスン",
+        "classroomLabel": "クラスを選択",
+        "selectClassroom": "クラスを選択してください",
+        "noClassrooms": "利用可能なクラスがありません。まずクラスを作成してください。",
+        "button": "レッスンを割り当てる",
+        "assigning": "割り当て中...",
+        "success": "レッスンを割り当てました！",
+        "error": "レッスンの割り当てに失敗しました",
+        "alreadyAssigned": "このレッスンは既にこのクラスに割り当てられています"
+      }
+    },
     "progress": {
       "title": "生徒の進捗",
       "student": "生徒",

@@ -4112,6 +4112,21 @@ const he = {
       "noLessons": "אין שיעורים עדיין",
       "createFirst": "צרו את שיעור אוצר המילים הראשון"
     },
+    "lessons": {
+      "assign": {
+        "trigger": "שייך לכיתה",
+        "title": "שייך שיעור לכיתה",
+        "lessonLabel": "שיעור",
+        "classroomLabel": "בחר כיתה",
+        "selectClassroom": "אנא בחרו כיתה",
+        "noClassrooms": "אין כיתות זמינות. צרו כיתה כדי לשייך שיעורים.",
+        "button": "שייך שיעור",
+        "assigning": "משייך...",
+        "success": "השיעור שויך בהצלחה!",
+        "error": "שגיאה בשיוך השיעור",
+        "alreadyAssigned": "השיעור כבר משויך לכיתה זו"
+      }
+    },
     "progress": {
       "title": "התקדמות תלמידים",
       "student": "תלמיד",

@@ -4119,6 +4119,21 @@ const sv = {
       "noLessons": "Inga lektioner än",
       "createFirst": "Skapa din första gloslektion"
     },
+    "lessons": {
+      "assign": {
+        "trigger": "Tilldela till klassrum",
+        "title": "Tilldela lektion till klassrum",
+        "lessonLabel": "Lektion",
+        "classroomLabel": "Välj klassrum",
+        "selectClassroom": "Välj ett klassrum",
+        "noClassrooms": "Inga klassrum tillgängliga. Skapa ett klassrum först.",
+        "button": "Tilldela lektion",
+        "assigning": "Tilldelar...",
+        "success": "Lektionen har tilldelats!",
+        "error": "Kunde inte tilldela lektion",
+        "alreadyAssigned": "Lektionen är redan tilldelad detta klassrum"
+      }
+    },
     "progress": {
       "title": "Elevframsteg",
       "student": "Elev",
