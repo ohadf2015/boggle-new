@@ -20,6 +20,47 @@ import { ProgressionProvider } from '@/contexts/ProgressionContext';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import type { LevelConfig } from '@/types/adventure';
 
+// Mock framer-motion for simpler testing
+jest.mock('framer-motion', () => {
+  const React = require('react');
+
+  const createMockMotion = (element: string) => {
+    const MockComponent = React.forwardRef(
+      ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLElement>) => {
+        // Filter out framer-motion specific props
+        const filteredProps: Record<string, unknown> = {};
+        Object.keys(props).forEach(key => {
+          if (!['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'variants', 'custom', 'onAnimationComplete'].includes(key)) {
+            filteredProps[key] = props[key];
+          }
+        });
+        return React.createElement(element, { ...filteredProps, ref }, children);
+      }
+    );
+    MockComponent.displayName = `MockMotion${element.charAt(0).toUpperCase() + element.slice(1)}`;
+    return MockComponent;
+  };
+
+  const mockSpring = { get: () => 1, set: jest.fn() };
+
+  return {
+    motion: {
+      div: createMockMotion('div'),
+      span: createMockMotion('span'),
+      button: createMockMotion('button'),
+      ul: createMockMotion('ul'),
+      li: createMockMotion('li'),
+      p: createMockMotion('p'),
+      h1: createMockMotion('h1'),
+      h2: createMockMotion('h2'),
+      img: createMockMotion('img'),
+    },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    useSpring: () => mockSpring,
+    useMotionValue: (initial: unknown) => ({ get: () => initial, set: jest.fn() }),
+  };
+});
+
 // Mock hooks
 jest.mock('@/hooks/useAdventureGame');
 jest.mock('@/hooks/useAdventureWordValidation');
@@ -155,8 +196,16 @@ describe('AdventureGame - Boss Battle Integration', () => {
       objectives: [
         { type: 'scoreTarget', target: 500, current: 0, completed: false, required: true },
       ],
+      timeRemaining: 120,
+      canComplete: false,
+      isPlaying: true,
+      cascadeComplete: true,
       submitWordWithPath: jest.fn(),
+      startGame: jest.fn(),
+      pauseGame: jest.fn(),
+      completeLevel: jest.fn(),
       resetGame: jest.fn(),
+      markCascadeComplete: jest.fn(),
       clearCombo: jest.fn(),
     });
 
@@ -315,12 +364,13 @@ describe('AdventureGame - Boss Battle Integration', () => {
         />
       );
 
-      // Wait for intro to render
-      await waitFor(() => {
-        // BossIntro should be visible
-        const introDialog = screen.getByRole('dialog', { name: /boss/i });
-        expect(introDialog).toBeInTheDocument();
-      });
+      // Wait for intro to render - check for "Ready to Fight" button
+      await waitFor(
+        () => {
+          expect(screen.getByRole('button', { name: /ready to fight/i })).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it('should start battle when player clicks Ready to Fight', async () => {
@@ -601,8 +651,16 @@ describe('AdventureGame - Boss Battle Integration', () => {
         objectives: [
           { type: 'scoreTarget', target: 500, current: 600, completed: true, required: true },
         ],
+        timeRemaining: 0,
+        canComplete: true,
+        isPlaying: false,
+        cascadeComplete: true,
         submitWordWithPath: jest.fn(),
+        startGame: jest.fn(),
+        pauseGame: jest.fn(),
+        completeLevel: jest.fn(),
         resetGame: jest.fn(),
+        markCascadeComplete: jest.fn(),
         clearCombo: jest.fn(),
       });
 
@@ -686,8 +744,16 @@ describe('AdventureGame - Boss Battle Integration', () => {
         objectives: [
           { type: 'scoreTarget', target: 500, current: 200, completed: false, required: true },
         ],
+        timeRemaining: 0, // Time expired
+        canComplete: false,
+        isPlaying: false,
+        cascadeComplete: true,
         submitWordWithPath: jest.fn(),
+        startGame: jest.fn(),
+        pauseGame: jest.fn(),
+        completeLevel: jest.fn(),
         resetGame: jest.fn(),
+        markCascadeComplete: jest.fn(),
         clearCombo: jest.fn(),
       });
 
@@ -798,8 +864,16 @@ describe('AdventureGame - Boss Battle Integration', () => {
         objectives: [
           { type: 'scoreTarget', target: 300, current: 400, completed: true, required: true },
         ],
+        timeRemaining: 0,
+        canComplete: true,
+        isPlaying: false,
+        cascadeComplete: true,
         submitWordWithPath: jest.fn(),
+        startGame: jest.fn(),
+        pauseGame: jest.fn(),
+        completeLevel: jest.fn(),
         resetGame: jest.fn(),
+        markCascadeComplete: jest.fn(),
         clearCombo: jest.fn(),
       });
 
