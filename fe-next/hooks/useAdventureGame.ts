@@ -358,7 +358,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         if (chainPositions.length > 0 && state.gameState.comboCount > 0) {
           // Apply enhanced combo bonus for chain tiles
           const comboBonus = state.gameState.comboCount * 0.1 * CHAIN_COMBO_MULTIPLIER;
-          finalScore = Math.floor(finalScore * (1 + comboBonus));
+          // Use Math.round to handle floating point precision issues
+          // (e.g., 0.1 * 1.5 = 0.15000000000000002 causes 100 * 1.15 = 114.99999999999999)
+          finalScore = Math.round(finalScore * (1 + comboBonus));
         }
         // Set link effect on chain tiles (even without combo bonus for visual feedback)
         for (const pos of chainPositions) {

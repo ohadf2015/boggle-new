@@ -108,8 +108,7 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
 
     // THEN - Chain bonus should apply: finalScore * (1 + comboCount * 0.1 * 1.5)
     // Base score: 100
-    // Combo multiplier without chain: 100 * (1 + 1 * 0.1) = 110
-    // Combo multiplier WITH chain: 100 * (1 + 1 * 0.1 * 1.5) = 100 * 1.15 = 115
+    // Chain bonus: 100 * (1 + 1 * 0.1 * 1.5) = 100 * 1.15 = 115 (rounded)
     const expectedScoreGain = 115;
     expect(result.current.gameState.score).toBe(scoreBeforeChain + expectedScoreGain);
   });
@@ -160,9 +159,9 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       result.current.startGame();
     });
 
-    // Build combo to 3
+    // Build combo to 3 (use different words to avoid duplicate rejection)
     act(() => {
-      result.current.submitWordWithPath('WORD', 100, [
+      result.current.submitWordWithPath('FIRST', 100, [
         { row: 0, col: 0 },
         { row: 0, col: 1 },
         { row: 0, col: 2 },
@@ -170,7 +169,7 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       ]);
     });
     act(() => {
-      result.current.submitWordWithPath('WORD', 100, [
+      result.current.submitWordWithPath('SECOND', 100, [
         { row: 1, col: 0 },
         { row: 1, col: 1 },
         { row: 1, col: 2 },
@@ -178,7 +177,7 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       ]);
     });
     act(() => {
-      result.current.submitWordWithPath('WORD', 100, [
+      result.current.submitWordWithPath('THIRD', 100, [
         { row: 3, col: 0 },
         { row: 3, col: 1 },
         { row: 3, col: 2 },
@@ -204,7 +203,7 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
     expect(result.current.gameState.score).toBe(scoreBeforeChain + expectedScoreGain);
   });
 
-  it('should correctly floor the score after chain bonus calculation', () => {
+  it('should correctly round the score after chain bonus calculation', () => {
     // GIVEN - Level with chain tile
     const levelConfig = createMockLevelConfig({
       specialTiles: [{ row: 0, col: 1, type: 'chain' }],
@@ -240,8 +239,8 @@ describe('Chain Tile 1.5x Combo Multiplier', () => {
       ]);
     });
 
-    // THEN - Should floor: 97 * 1.15 = 111.55 → 111
-    const expectedScoreGain = 111;
+    // THEN - Should round: 97 * 1.15 = 111.55 → 112 (Math.round)
+    const expectedScoreGain = 112;
     expect(result.current.gameState.score).toBe(scoreBeforeChain + expectedScoreGain);
   });
 });
