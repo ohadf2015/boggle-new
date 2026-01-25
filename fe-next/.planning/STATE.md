@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 18 - Education XP System (in progress)
+**Current focus:** Phase 18 - Education XP System (COMPLETE)
 
 ## Current Position
 
-Phase: 18 of 23 (Education XP System)
-Plan: 4/5 complete
-Status: In progress
-Last activity: 2026-01-25 — Completed 18-03-PLAN.md (Progress UI Components)
+Phase: 18 of 23 (Education XP System) — COMPLETE
+Plan: 5/5 complete
+Status: Phase complete
+Last activity: 2026-01-25 — Completed 18-05-PLAN.md (Practice XP Integration)
 
-Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in progress)
+Progress: [██████████] 18/23 phases (78% milestone, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 18 (Phase 15-17 complete, Phase 18 plans 01-04 complete)
-- Current phase: 18 (Education XP System) — IN PROGRESS
-- Next plan: 18-05 (Supabase Integration)
+- Plans completed: 19 (Phase 15-18 complete)
+- Current phase: 18 (Education XP System) — COMPLETE
+- Next phase: 19 (Education Teacher Dashboard)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -73,9 +73,9 @@ Progress: [█████████░] 18/23 phases (78% milestone, v1.1 in 
 | 18-02 | XP Hook and Translations | 6min | Complete |
 | 18-03 | Progress UI Components | 11min | Complete |
 | 18-04 | LevelUpCelebration Component | 6min | Complete |
-| 18-05 | Integration | - | Pending |
+| 18-05 | Practice XP Integration | 7min | Complete |
 
-**Phase 18 Progress:** 4/5 plans complete, 99 tests added
+**Phase 18 Total:** 35 minutes, 114 tests added (15 new in 18-05)
 
 ## Accumulated Context
 
@@ -119,6 +119,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **18-03**: Neo-yellow for XP progress fill → High visibility against neo-navy background (2026-01-25)
 - **18-03**: Neo-orange for streak badge → Differentiate from XP progress bar (2026-01-25)
 - **18-03**: Streak bonus thresholds 7/14/30 → +50%/+75%/+100% XP multipliers (2026-01-25)
+- **18-05**: PracticeSessionProvider context → Wraps practice activities with XP state and persistence (2026-01-25)
+- **18-05**: Fixed XP header during practice → Progress bar and streak visible without disrupting UI (2026-01-25)
+- **18-05**: Optional xpSessionData prop → Practice components work with or without XP integration (2026-01-25)
 
 ### Pending Todos
 
@@ -147,7 +150,7 @@ None.
 - Stub mechanic tests — All 10 boss mechanics have dedicated test files
 - Boss integration tests — 51 tests using real hooks for all 10 worlds
 
-**Phase 18 (Education XP) — IN PROGRESS:**
+**Phase 18 (Education XP) — COMPLETE:**
 - XP calculation foundation — educationXpManager.ts with 32 tests, 98.6% coverage
 - Database schema — Migration 062 adds XP/level/streak columns
 - useEducationXp hook — State management with 16 tests, pendingUpdate for persistence
@@ -155,8 +158,10 @@ None.
 - LevelUpCelebration component — 20 tests, confetti integration, accessible modal
 - XpProgressBar component — 15 tests, animated level progress, RTL support
 - StreakBonusIndicator component — 16 tests, bonus thresholds, badge/inline variants
-- Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
-- XP curve validation — Test if Adventure Mode curve works for education context
+- PracticeSessionProvider — 15 tests, wraps practice with XP context
+- Practice integration complete — FlashcardReview and SoloPracticeBoard with XP display
+- Supabase persistence — XP saved on session completion
+- Total: 114 tests, full XP system functional
 
 **Phase 20 (Analytics):**
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
@@ -165,11 +170,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 18-03-PLAN.md (Progress UI Components)
+Stopped at: Completed 18-05-PLAN.md (Practice XP Integration) — Phase 18 COMPLETE
 Resume file: None
 
-**Next action:** `/gsd:execute-phase 18` to continue with 18-05 (Supabase Integration)
+**Next action:** `/gsd:execute-phase 19` to start Phase 19 (Education Teacher Dashboard)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 18 plan 03 complete)*
+*Last updated: 2026-01-25 (Phase 18 COMPLETE)*
