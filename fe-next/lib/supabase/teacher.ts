@@ -66,6 +66,18 @@ export interface ClassroomWithMembers extends Classroom {
   member_count: number;
 }
 
+export interface ClassroomStudent {
+  id: string;
+  student_id: string;
+  classroom_id: string;
+  joined_at: string;
+  profiles: {
+    username: string;
+    email: string;
+    avatar_url?: string;
+  } | null;
+}
+
 // =============================================
 // CLASSROOM QUERIES
 // =============================================
@@ -299,6 +311,44 @@ export async function joinClassroom(
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in joinClassroom:', error);
     return { data: null, error: { message: error } };
+  }
+}
+
+/**
+ * Get all students in a classroom with their profile information
+ */
+export async function getClassroomStudents(
+  classroomId: string
+): Promise<{ data: ClassroomStudent[]; error: { message: string } | null }> {
+  if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await supabase
+      .from('classroom_memberships')
+      .select(`
+        id,
+        student_id,
+        classroom_id,
+        joined_at,
+        profiles:student_id (
+          username,
+          email,
+          avatar_url
+        )
+      `)
+      .eq('classroom_id', classroomId)
+      .order('joined_at', { ascending: true });
+
+    if (error) {
+      logger.error('Error fetching classroom students:', error);
+      return { data: [], error: { message: error.message } };
+    }
+
+    return { data: data || [], error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getClassroomStudents:', error);
+    return { data: [], error: { message: error } };
   }
 }
 
