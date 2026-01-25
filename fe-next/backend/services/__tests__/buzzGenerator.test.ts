@@ -783,9 +783,6 @@ describe('Wordle challenge validation', () => {
     const today = new Date();
     const result = await generateDailyBuzz(today, 'en');
 
-    // DEBUG: Log all challenges to understand what's being returned
-    console.log('[TEST DEBUG] Challenge types:', result.challenges.map(c => ({ type: c.type, answer: c.answer })));
-
     // The wordle_guess with 5-letter answer should be included
     const wordleChallenges = result.challenges.filter(c => c.type === 'wordle_guess');
     expect(wordleChallenges.length).toBe(1);
