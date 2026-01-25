@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 11: Teacher Vocabulary Builder** - Multiplayer word selection, grid integration preview, teacher lessons & student tracking
 - [x] **Phase 12: Asset WebP Migration Completion** - Restore parallax/background directories, stage new WebP files, verify integration
 - [x] **Phase 13: Translation Completion** - Verified all Phase 11 translation keys present (CORRECTED: audit was inaccurate)
-- [ ] **Phase 14: Education Mode Complete** - Dedicated education landing page, student join classroom, lesson assignment, practice-before-game
+- [x] **Phase 14: Education Mode Complete** - Dedicated education landing page, student join classroom, lesson assignment, practice-before-game
 
 ## Phase Details
 
@@ -282,12 +282,12 @@ Plans:
 **Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 14-01-PLAN.md — Education landing page and lesson assignment APIs
-- [ ] 14-02-PLAN.md — Student join classroom flow
-- [ ] 14-03-PLAN.md — Teacher lesson assignment UI
-- [ ] 14-04-PLAN.md — Student assigned lessons view
-- [ ] 14-05-PLAN.md — Teacher student list view
-- [ ] 14-06-PLAN.md — Human verification checkpoint
+- [x] 14-01-PLAN.md — Education landing page and lesson assignment APIs
+- [x] 14-02-PLAN.md — Student join classroom flow
+- [x] 14-03-PLAN.md — Teacher lesson assignment UI
+- [x] 14-04-PLAN.md — Student assigned lessons view
+- [x] 14-05-PLAN.md — Teacher student list view
+- [x] 14-06-PLAN.md — Human verification checkpoint
 
 ## Progress
 
@@ -309,8 +309,8 @@ Phases execute in numeric order: 1 -> 2 -> ... -> 11 -> 12 -> 13 -> 14
 | 11. Teacher Vocabulary Builder | 8/8 | Complete | 2026-01-24 |
 | 12. Asset WebP Migration | 3/3 | Complete | 2026-01-24 |
 | 13. Translation Completion | 1/1 | Complete | 2026-01-24 |
-| 14. Education Mode Complete | 0/6 | Planned | - |
+| 14. Education Mode Complete | 6/6 | Complete | 2026-01-25 |
 
 ---
 *Roadmap created: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 14 planning complete - 6 plans in 3 waves)*
+*Last updated: 2026-01-25 (Phase 14 complete - Education Mode Complete)*
