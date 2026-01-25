@@ -3855,6 +3855,10 @@ const sv = {
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",
       "enraged": "RASANDE!",
+      "common": {
+        "requirementMet": "Krav uppfyllt!",
+        "requirementMissed": "Krav missades"
+      },
       "msGrammar": {
         "name": "Fröken Grammatik",
         "mechanic": "Prov-protokollet - Hitta ord som matchar mina krav!",

@@ -3844,6 +3844,10 @@ const es = {
       "skipIntro": "Saltar",
       "readyToFight": "¡Vamos!",
       "enraged": "¡ENFURECIDO!",
+      "common": {
+        "requirementMet": "¡Requisito cumplido!",
+        "requirementMissed": "Requisito no cumplido"
+      },
       "msGrammar": {
         "name": "Srta. Gramática",
         "mechanic": "Protocolo de examen sorpresa - ¡Encuentra palabras que cumplan mis requisitos!",

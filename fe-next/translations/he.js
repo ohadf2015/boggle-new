@@ -3848,6 +3848,10 @@ const he = {
       "skipIntro": "דלג",
       "readyToFight": "קדימה!",
       "enraged": "זועם!",
+      "common": {
+        "requirementMet": "דרישה התקיימה!",
+        "requirementMissed": "דרישה לא התקיימה"
+      },
       "msGrammar": {
         "name": "גב' דקדוק",
         "mechanic": "פרוטוקול בוחן פתע - מצאו מילים שתואמות לדרישות שלי!",

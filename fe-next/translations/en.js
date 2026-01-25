@@ -3842,6 +3842,10 @@ const en = {
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
       "enraged": "ENRAGED!",
+      "common": {
+        "requirementMet": "Requirement met!",
+        "requirementMissed": "Missed requirement"
+      },
       "msGrammar": {
         "name": "Ms. Grammar",
         "mechanic": "Pop Quiz Protocol - Find words matching my requirements!",
