@@ -14,6 +14,7 @@ import {
   syncLocalJSONToDatabase
 } from '@/backend/services/wikipediaWordPopulator';
 import { triggerWikipediaWordPopulation } from '@/backend/services/cronScheduler';
+import { createClient } from '@supabase/supabase-js';
 import type { Language } from '@/shared/types/game';
 
 // Allow 90 seconds for Wikipedia API calls + AI scoring
@@ -37,6 +38,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
   const language = (searchParams.get('language') || 'en') as Language;
+  const excludeExisting = searchParams.get('excludeExisting') === 'true';
+  const statusFilter = searchParams.get('status'); // 'pending', 'valid', 'invalid'
 
   // Validate date format
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -55,7 +58,33 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const candidates = await getWordCandidatesForAdmin(language, new Date(date));
+    let candidates = await getWordCandidatesForAdmin(language, new Date(date));
+
+    // Filter by status if requested
+    if (statusFilter && ['pending', 'valid', 'invalid'].includes(statusFilter)) {
+      candidates = candidates.filter(c => c.status === statusFilter);
+    }
+
+    // Exclude words that already exist in community_words if requested
+    if (excludeExisting && candidates.length > 0) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      // Get all words in community_words for this language
+      const { data: existingWords } = await supabase
+        .from('community_words')
+        .select('word')
+        .eq('language', language);
+
+      if (existingWords && existingWords.length > 0) {
+        const existingSet = new Set(existingWords.map(w => w.word.toUpperCase()));
+        const originalCount = candidates.length;
+        candidates = candidates.filter(c => !existingSet.has(c.word.toUpperCase()));
+        console.log(`[Admin Wikipedia] Filtered out ${originalCount - candidates.length} existing words`);
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -63,7 +92,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         date,
         language,
         candidates,
-        total: candidates.length
+        total: candidates.length,
+        filters: { excludeExisting, status: statusFilter }
       }
     });
   } catch (error) {
@@ -165,9 +195,333 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         });
       }
 
+      case 'auto-approve-existing': {
+        // Automatically approve candidates that already exist in dictionary
+        console.log('[Admin Wikipedia] Starting auto-approve existing words...');
+        const targetLanguage = language as Language;
+
+        if (!targetLanguage) {
+          return NextResponse.json(
+            { error: 'language is required for auto-approve-existing' },
+            { status: 400 }
+          );
+        }
+
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Get all pending candidates for this language
+        const { data: pendingCandidates, error: fetchError } = await supabase
+          .from('wikipedia_word_candidates')
+          .select('id, word')
+          .eq('language', targetLanguage)
+          .eq('validation_status', 'pending');
+
+        if (fetchError) {
+          console.error('[Admin Wikipedia] Error fetching pending candidates:', fetchError);
+          return NextResponse.json(
+            { error: 'Failed to fetch pending candidates' },
+            { status: 500 }
+          );
+        }
+
+        if (!pendingCandidates || pendingCandidates.length === 0) {
+          return NextResponse.json({
+            success: true,
+            message: 'No pending candidates to process',
+            approved: 0,
+            remaining: 0
+          });
+        }
+
+        // Get all existing words from community_words
+        const { data: existingWords } = await supabase
+          .from('community_words')
+          .select('word')
+          .eq('language', targetLanguage);
+
+        const existingSet = new Set(
+          (existingWords || []).map(w => w.word.toUpperCase())
+        );
+
+        // Find candidates that match existing dictionary words
+        const toApprove = pendingCandidates.filter(c =>
+          existingSet.has(c.word.toUpperCase())
+        );
+
+        if (toApprove.length === 0) {
+          return NextResponse.json({
+            success: true,
+            message: 'No candidates match existing dictionary words',
+            approved: 0,
+            remaining: pendingCandidates.length
+          });
+        }
+
+        // Bulk update matching candidates to 'valid'
+        const { error: updateError } = await supabase
+          .from('wikipedia_word_candidates')
+          .update({ validation_status: 'valid' })
+          .in('id', toApprove.map(c => c.id));
+
+        if (updateError) {
+          console.error('[Admin Wikipedia] Error updating candidates:', updateError);
+          return NextResponse.json(
+            { error: 'Failed to update candidate statuses' },
+            { status: 500 }
+          );
+        }
+
+        const duration = Date.now() - startTime;
+        console.log(`[Admin Wikipedia] Auto-approved ${toApprove.length} existing words in ${duration}ms`);
+
+        return NextResponse.json({
+          success: true,
+          message: `Auto-approved ${toApprove.length} words that exist in dictionary`,
+          approved: toApprove.length,
+          remaining: pendingCandidates.length - toApprove.length,
+          approvedWords: toApprove.slice(0, 20).map(c => c.word) // Sample of approved words
+        });
+      }
+
+      case 'approve-all-pending': {
+        // Approve all pending candidates (add to dictionary without AI validation)
+        console.log('[Admin Wikipedia] Approving all pending candidates...');
+        const targetLanguage = language as Language;
+
+        if (!targetLanguage) {
+          return NextResponse.json(
+            { error: 'language is required for approve-all-pending' },
+            { status: 400 }
+          );
+        }
+
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Get all pending candidates
+        const { data: pendingCandidates, error: fetchError } = await supabase
+          .from('wikipedia_word_candidates')
+          .select('id, word')
+          .eq('language', targetLanguage)
+          .eq('validation_status', 'pending');
+
+        if (fetchError) {
+          return NextResponse.json(
+            { error: 'Failed to fetch pending candidates' },
+            { status: 500 }
+          );
+        }
+
+        if (!pendingCandidates || pendingCandidates.length === 0) {
+          return NextResponse.json({
+            success: true,
+            message: 'No pending candidates to approve',
+            approved: 0
+          });
+        }
+
+        // Get existing dictionary words
+        const { data: existingWords } = await supabase
+          .from('community_words')
+          .select('word')
+          .eq('language', targetLanguage);
+
+        const existingSet = new Set(
+          (existingWords || []).map(w => w.word.toUpperCase())
+        );
+
+        // Filter to only new words
+        const newWords = pendingCandidates.filter(c =>
+          !existingSet.has(c.word.toUpperCase())
+        );
+
+        // Insert new words into community_words
+        if (newWords.length > 0) {
+          const wordsToInsert = newWords.map(c => ({
+            word: c.word.toUpperCase(),
+            language: targetLanguage,
+            approval_count: 1,
+            first_approved_at: new Date().toISOString(),
+            last_approved_at: new Date().toISOString()
+          }));
+
+          const { error: insertError } = await supabase
+            .from('community_words')
+            .upsert(wordsToInsert, {
+              onConflict: 'word,language',
+              ignoreDuplicates: true
+            });
+
+          if (insertError) {
+            console.error('[Admin Wikipedia] Error inserting words:', insertError);
+          }
+        }
+
+        // Update all candidates to 'valid'
+        await supabase
+          .from('wikipedia_word_candidates')
+          .update({ validation_status: 'valid' })
+          .in('id', pendingCandidates.map(c => c.id));
+
+        const duration = Date.now() - startTime;
+        console.log(`[Admin Wikipedia] Approved ${pendingCandidates.length} candidates (${newWords.length} new) in ${duration}ms`);
+
+        return NextResponse.json({
+          success: true,
+          message: `Approved ${pendingCandidates.length} candidates`,
+          approved: pendingCandidates.length,
+          newWordsAdded: newWords.length,
+          alreadyInDictionary: pendingCandidates.length - newWords.length
+        });
+      }
+
+      case 'schedule-for-daily': {
+        // Schedule approved Wikipedia words as daily challenge target words
+        console.log('[Admin Wikipedia] Scheduling words for daily challenges...');
+        const targetLanguage = language as Language;
+        const startDate = body.startDate; // YYYY-MM-DD format
+        const limit = body.limit || 30; // Number of words to schedule
+        const minWordLength = body.minWordLength || 3;
+        const maxWordLength = body.maxWordLength || 8;
+
+        if (!targetLanguage) {
+          return NextResponse.json(
+            { error: 'language is required for schedule-for-daily' },
+            { status: 400 }
+          );
+        }
+
+        if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+          return NextResponse.json(
+            { error: 'startDate is required in YYYY-MM-DD format' },
+            { status: 400 }
+          );
+        }
+
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Get approved Wikipedia words that meet criteria
+        const { data: approvedWords, error: fetchError } = await supabase
+          .from('wikipedia_word_candidates')
+          .select('id, word, interestingness_score, source_article_title')
+          .eq('language', targetLanguage)
+          .eq('validation_status', 'valid')
+          .order('interestingness_score', { ascending: false })
+          .limit(limit * 3); // Fetch extra to account for filtering
+
+        if (fetchError) {
+          console.error('[Admin Wikipedia] Error fetching approved words:', fetchError);
+          return NextResponse.json(
+            { error: 'Failed to fetch approved words' },
+            { status: 500 }
+          );
+        }
+
+        if (!approvedWords || approvedWords.length === 0) {
+          return NextResponse.json({
+            success: true,
+            message: 'No approved Wikipedia words available to schedule',
+            scheduled: 0
+          });
+        }
+
+        // Filter by word length and deduplicate
+        const validWords = approvedWords.filter(w => {
+          const len = w.word.length;
+          return len >= minWordLength && len <= maxWordLength;
+        });
+
+        // Get already scheduled words to avoid duplicates
+        const { data: existingScheduled } = await supabase
+          .from('daily_target_words')
+          .select('target_word')
+          .eq('language', targetLanguage);
+
+        const scheduledSet = new Set(
+          (existingScheduled || []).map(w => w.target_word?.toUpperCase())
+        );
+
+        // Filter out already scheduled words
+        const newWords = validWords.filter(w =>
+          !scheduledSet.has(w.word.toUpperCase())
+        ).slice(0, limit);
+
+        if (newWords.length === 0) {
+          return NextResponse.json({
+            success: true,
+            message: 'All approved words are already scheduled',
+            scheduled: 0
+          });
+        }
+
+        // Calculate puzzle numbers and dates
+        const DAILY_CHALLENGE_EPOCH = new Date('2025-12-30T00:00:00Z');
+        const scheduledEntries = newWords.map((word, index) => {
+          const puzzleDate = new Date(startDate + 'T00:00:00Z');
+          puzzleDate.setDate(puzzleDate.getDate() + index);
+          const dateStr = puzzleDate.toISOString().split('T')[0];
+          const daysSinceEpoch = Math.floor(
+            (puzzleDate.getTime() - DAILY_CHALLENGE_EPOCH.getTime()) / (24 * 60 * 60 * 1000)
+          );
+          const puzzleNumber = daysSinceEpoch + 1;
+
+          return {
+            puzzle_date: dateStr,
+            language: targetLanguage,
+            puzzle_number: puzzleNumber,
+            target_word: word.word.toUpperCase(),
+            ai_selected: false,
+            ai_reason: `Wikipedia trending word (score: ${word.interestingness_score})`,
+            word_source: 'wikipedia',
+            source_article_url: word.source_article_title
+          };
+        });
+
+        // Insert into daily_target_words with upsert
+        const { data: inserted, error: insertError } = await supabase
+          .from('daily_target_words')
+          .upsert(scheduledEntries, {
+            onConflict: 'puzzle_date,language',
+            ignoreDuplicates: false
+          })
+          .select();
+
+        if (insertError) {
+          console.error('[Admin Wikipedia] Error scheduling words:', insertError);
+          return NextResponse.json(
+            { error: `Failed to schedule words: ${insertError.message}` },
+            { status: 500 }
+          );
+        }
+
+        const duration = Date.now() - startTime;
+        console.log(`[Admin Wikipedia] Scheduled ${inserted?.length || 0} words in ${duration}ms`);
+
+        return NextResponse.json({
+          success: true,
+          message: `Scheduled ${inserted?.length || 0} Wikipedia words as daily challenges`,
+          scheduled: inserted?.length || 0,
+          startDate,
+          endDate: scheduledEntries[scheduledEntries.length - 1]?.puzzle_date,
+          words: scheduledEntries.map(e => ({
+            date: e.puzzle_date,
+            word: e.target_word,
+            puzzleNumber: e.puzzle_number
+          }))
+        });
+      }
+
       default:
         return NextResponse.json(
-          { error: `Unknown action: ${action}. Use: add, populate, sync-json` },
+          { error: `Unknown action: ${action}. Use: add, populate, sync-json, auto-approve-existing, approve-all-pending, schedule-for-daily` },
           { status: 400 }
         );
     }

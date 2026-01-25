@@ -7,8 +7,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { createClient } from '@supabase/supabase-js';
+import { clearPromptTemplateCache } from '@/backend/services/buzz/promptTemplateLoader';
 
-const TEMPLATE_TYPES = ['riddle', 'image', 'challenge_general', 'social_content'] as const;
+// Section-based template types (new modular system)
+const SECTION_TEMPLATE_TYPES = [
+  'section_intro',
+  'section_tone_guide',
+  'section_trends_context',
+  'section_priority_keywords',
+  'section_creative_philosophy',
+  'section_challenge_requirements',
+  'section_challenge_types',
+  'section_output_format',
+  'section_trending_summary_examples',
+  'section_social_media_instructions',
+  'section_final_checklist',
+] as const;
+
+// Legacy template types (kept for backward compatibility)
+const LEGACY_TEMPLATE_TYPES = ['riddle', 'image', 'challenge_general', 'social_content'] as const;
+
+// All valid template types
+const TEMPLATE_TYPES = [...SECTION_TEMPLATE_TYPES, ...LEGACY_TEMPLATE_TYPES] as const;
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 
 type TemplateType = typeof TEMPLATE_TYPES[number];
@@ -199,6 +219,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     console.log(`[Admin Buzz] Created new ${template_type} template: ${name}`);
+
+    // Clear prompt template cache so new template is available immediately
+    clearPromptTemplateCache();
 
     return NextResponse.json({
       success: true,

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Grid3X3, Delete } from 'lucide-react';
+import { Grid3X3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 
@@ -30,7 +30,7 @@ const KEYBOARD_LAYOUTS: Record<string, string[][]> = {
   en: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'],
   ],
   // Hebrew keyboard follows standard Israeli keyboard layout (no final letters)
   // Final letters (sofit) are excluded - they appear automatically at word end in typing
@@ -38,23 +38,23 @@ const KEYBOARD_LAYOUTS: Record<string, string[][]> = {
   he: [
     ['ק', 'ר', 'א', 'ט', 'ו', 'נ', 'מ', 'פ'],
     ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל'],
-    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'צ', 'ת', 'BACKSPACE'],
+    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'צ', 'ת'],
   ],
   sv: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'Å'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'],
   ],
   ja: [
     // Japanese uses hiragana - simplified layout for 5-letter words
     ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ'],
     ['さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と'],
-    ['ENTER', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'BACKSPACE'],
+    ['ENTER', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ'],
   ],
   es: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'],
   ],
 };
 
@@ -297,7 +297,7 @@ export default function WordleChallenge({
   // Render keyboard key
   const renderKey = (key: string) => {
     const state = keyboardStates[key] || 'empty';
-    const isWide = key === 'ENTER' || key === 'BACKSPACE';
+    const isWide = key === 'ENTER';
 
     const stateStyles: Record<LetterState, string> = {
       correct: 'bg-green-500 text-white border-green-500',
@@ -317,7 +317,7 @@ export default function WordleChallenge({
         disabled={gameStatus !== 'playing'}
         className={`${isWide ? 'px-3 sm:px-4' : 'w-8 sm:w-10'} h-12 sm:h-14 flex items-center justify-center text-xs sm:text-sm font-bold rounded-md border-2 transition-colors disabled:opacity-50 ${stateStyles[state]}`}
       >
-        {key === 'BACKSPACE' ? <Delete className="w-5 h-5" /> : key}
+        {key}
       </motion.button>
     );
   };

@@ -29,9 +29,15 @@ import {
   getFallbackTopics,
   selectTrendsForChallenge,
 } from './trendsService';
+import { filterTrendsWithAI } from './contentModerationService';
 import { generateWithGemini, generateSingleChallengeWithAI, getGeminiModel } from './vertexAIClient';
 import { validateChallenges, validateSingleChallenge, parseAIResponse } from './challengeValidator';
-import { buildAIPrompt, buildSingleChallengePrompt, buildPartialChallengePrompt } from './promptBuilder';
+import {
+  buildAIPrompt,
+  buildAIPromptAsync,
+  buildSingleChallengePrompt,
+  buildPartialChallengePrompt,
+} from './promptBuilder';
 import {
   storeDailyBuzz,
   getDailyBuzz,
@@ -58,7 +64,13 @@ async function generateChallengesWithAI(
 ): Promise<AIGenerationResult> {
   const selectedTrends = selectTrendsForChallenge(trends);
   const examples = await getPromptExamples(language, 20);
-  const prompt = buildAIPrompt(trends, language, region, examples);
+
+  // Use async version to load database-customized templates
+  const { prompt, sectionsFromDatabase } = await buildAIPromptAsync(trends, language, region, examples);
+
+  if (sectionsFromDatabase.length > 0) {
+    console.log(`[BUZZ] Using ${sectionsFromDatabase.length} custom templates from database: ${sectionsFromDatabase.join(', ')}`);
+  }
 
   try {
     const responseText = await generateWithGemini(prompt);
@@ -127,28 +139,55 @@ export async function generateDailyBuzz(
     }
   }
 
-  // Step 2: Fetch recently used trends to avoid repetition
+  // Step 2: AI Content Moderation - Filter for child-friendly and non-political content
+  // This runs BEFORE keyword-based filtering to ensure inappropriate content is removed early
+  console.log(`[BUZZ] Running AI content moderation on ${trends.length} trends...`);
+  const moderationResult = await filterTrendsWithAI(trends, language);
+
+  if (moderationResult.rejected.length > 0) {
+    console.log(`[BUZZ] AI moderation rejected ${moderationResult.rejected.length} trends:`);
+    moderationResult.rejected.forEach(r =>
+      console.log(`  - "${r.topic.query}" (${r.category}: ${r.reason})`)
+    );
+  }
+
+  // Use only AI-approved trends for further processing
+  let moderatedTrends = moderationResult.approved;
+
+  // If AI moderation filtered out too many, include some rejected ones as fallback
+  if (moderatedTrends.length < 5 && trends.length > moderatedTrends.length) {
+    console.warn(`[BUZZ] AI moderation left only ${moderatedTrends.length} trends, may need fallback`);
+  }
+
+  // Step 3: Fetch recently used trends to avoid repetition
   const recentlyUsedTrends = await getRecentlyUsedTrends(language, 7);
 
-  // Step 3: Filter and select appropriate trends
-  const filteredTrends = filterTrends(trends, language, recentlyUsedTrends);
+  // Step 4: Apply keyword-based filtering (NSFW, sports limits, script matching)
+  const filteredTrends = filterTrends(moderatedTrends, language, recentlyUsedTrends);
   if (filteredTrends.length < 3) {
     console.error('[BUZZ] Insufficient trends after filtering');
     console.log('[BUZZ] Retrying without deduplication filter...');
-    const fallbackFiltered = filterTrends(trends, language);
+    const fallbackFiltered = filterTrends(moderatedTrends, language);
     if (fallbackFiltered.length < 3) {
-      throw new Error('Not enough suitable trends for challenges');
+      // Last resort: try with original trends (before AI moderation) minus recently used
+      console.log('[BUZZ] Trying with original trends as last fallback...');
+      const originalFiltered = filterTrends(trends, language, recentlyUsedTrends);
+      if (originalFiltered.length < 3) {
+        throw new Error('Not enough suitable trends for challenges');
+      }
+      console.log(`[BUZZ] Using original trends fallback (${originalFiltered.length} trends)`);
+    } else {
+      console.log(`[BUZZ] Using fallback filter (${fallbackFiltered.length} trends)`);
     }
-    console.log(`[BUZZ] Using fallback filter (${fallbackFiltered.length} trends)`);
   }
 
-  // Step 4: Generate challenges with AI
+  // Step 5: Generate challenges with AI
   const { challenges, selectedTrends, social_content } = await generateChallengesWithAI(filteredTrends, language, region);
 
-  // Step 5: Validate challenges
+  // Step 6: Validate challenges
   const validatedChallenges = validateChallenges(challenges, language);
 
-  // Step 6: Generate hero image
+  // Step 7: Generate hero image
   let imageUrl: string | null = null;
   let imagePrompt: string | null = null;
   let imageCategory: string | null = null;
@@ -184,7 +223,7 @@ export async function generateDailyBuzz(
     console.error('[BUZZ] Image generation failed:', errorMessage);
   }
 
-  // Step 7: Store in database
+  // Step 8: Store in database
   const buzzData: DailyBuzzData = {
     puzzle_date: date.toISOString().split('T')[0],
     language,

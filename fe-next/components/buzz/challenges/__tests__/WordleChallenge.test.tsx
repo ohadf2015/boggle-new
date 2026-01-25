@@ -493,7 +493,6 @@ describe('WordleChallenge', () => {
     // Check some keys exist
     expect(screen.getByTestId('key-Q')).toBeInTheDocument();
     expect(screen.getByTestId('key-ENTER')).toBeInTheDocument();
-    expect(screen.getByTestId('key-BACKSPACE')).toBeInTheDocument();
   });
 
   it('handles on-screen keyboard clicks', async () => {

@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { createClient } from '@supabase/supabase-js';
+import { clearPromptTemplateCache } from '@/backend/services/buzz/promptTemplateLoader';
 
 interface UpdateTemplateBody {
   name?: string;
@@ -179,6 +180,9 @@ export async function PUT(
 
     console.log(`[Admin Buzz] Updated template ${templateId} to version ${data.version}`);
 
+    // Clear prompt template cache so changes take effect immediately
+    clearPromptTemplateCache();
+
     return NextResponse.json({
       success: true,
       message: 'Template updated successfully',
@@ -249,6 +253,9 @@ export async function DELETE(
     }
 
     console.log(`[Admin Buzz] Deleted template ${templateId}: ${existing.name}`);
+
+    // Clear prompt template cache so deletion takes effect immediately
+    clearPromptTemplateCache();
 
     return NextResponse.json({
       success: true,

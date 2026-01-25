@@ -232,7 +232,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center lg:justify-between relative min-h-[70px] md:min-h-[90px] lg:min-h-[120px]"
+                className="flex w-full items-center justify-center lg:justify-between relative min-h-[110px] md:min-h-[120px] lg:min-h-[140px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -260,7 +260,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
                   </div>
                   <div className="md:hidden">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
                   </div>
                 </motion.div>
 
@@ -363,8 +363,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </motion.div>
           )}
 
-          {/* Grid - uses items-start on mobile to stay close to word forming area, centers on desktop */}
-          <div className="flex-1 flex items-start md:items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0">
+          {/* Grid - no expansion on mobile to stay close to word forming area, centers on desktop */}
+          <div className="flex-grow-0 md:flex-1 flex items-start md:items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}

@@ -28,7 +28,7 @@ import LexiReaction from './LexiReaction';
 import BossIntro from './BossIntro';
 import BossDialogue from './BossDialogue';
 import BossVictory from './BossVictory';
-import WorldBackground from './themed/WorldBackground';
+import GameplayBackground from './themed/GameplayBackground';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -718,62 +718,58 @@ const AdventureGame = memo<AdventureGameProps>(
           'text-neo-white'
         )}
       >
-        {/* Themed World Background - reduced parallax for gameplay focus */}
-        <WorldBackground
-          className="absolute inset-0 -z-10"
-          parallaxIntensity={0.2}
-          enableAmbient={false}
-        />
+        {/* Simplified ambient background for gameplay - less distracting than full WorldBackground */}
+        <GameplayBackground className="absolute inset-0 -z-10" />
 
-        {/* Header */}
+        {/* Header - Compact */}
         <header
           className={cn(
             'flex items-center justify-between',
-            'px-4 py-3',
+            'px-3 py-1.5',
             'bg-neo-navy/80 border-b-2 border-neo-black/30'
           )}
         >
           {/* Level Info */}
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-black">{t('adventure.level')} {levelConfig.level}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-lg font-black">{t('adventure.level')} {levelConfig.level}</h1>
             <div
               ref={scoreDisplayRef}
               data-testid="score-display"
-              className="font-mono font-bold"
+              className="font-mono font-bold text-sm"
             >
               {gameState.score}
             </div>
           </div>
 
           {/* Timer and Pause */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <AdventureTimer timeRemaining={timeRemaining} size="compact" />
             <button
               onClick={handlePauseToggle}
               aria-label={isPaused ? 'Resume' : 'Pause'}
               className={cn(
-                'p-2 rounded-neo',
+                'p-1.5 rounded-neo',
                 'bg-neo-white/10 hover:bg-neo-white/20',
                 'transition-colors duration-200'
               )}
             >
               {isPaused ? (
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4" />
               ) : (
-                <Pause className="w-5 h-5" />
+                <Pause className="w-4 h-4" />
               )}
             </button>
           </div>
         </header>
 
-        {/* Main Game Area */}
-        <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-y-auto min-h-0">
+        {/* Main Game Area - Compact layout to maximize screen usage */}
+        <main className="flex-1 flex flex-col lg:flex-row gap-2 p-2 overflow-y-auto min-h-0">
           {/* Grid Section */}
-          <div className="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center gap-3 min-h-0">
-            {/* Feedback Container - Always reserve space to prevent layout shift */}
+          <div className="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center gap-1 min-h-0">
+            {/* Feedback Container - Minimal height, absolute positioning prevents layout shift */}
             <div
               data-testid="feedback-container"
-              className="min-h-[40px] flex items-center justify-center"
+              className="min-h-[28px] flex items-center justify-center"
             >
               {/* Validation Feedback */}
               {validationFeedback.error && (
@@ -823,13 +819,13 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           </div>
 
-          {/* Sidebar - Objectives & Combo */}
+          {/* Sidebar - Objectives & Combo - Compact */}
           <aside
             className={cn(
-              'flex-shrink-0 lg:w-64 flex flex-col gap-4',
-              'lg:border-l-2 lg:border-neo-black/20 lg:pl-4',
+              'flex-shrink-0 lg:w-56 flex flex-col gap-2',
+              'lg:border-l-2 lg:border-neo-black/20 lg:pl-2',
               // Enhanced glass effect with higher opacity for better readability
-              'p-4 rounded-neo',
+              'p-2 rounded-neo',
               'bg-neo-navy/95 backdrop-blur-lg',
               'border-2 border-neo-white/20',
               'shadow-hard'
@@ -837,7 +833,7 @@ const AdventureGame = memo<AdventureGameProps>(
           >
             {/* Objectives */}
             <div>
-              <h2 className="text-sm font-bold text-neo-white/80 uppercase tracking-wide mb-2">
+              <h2 className="text-xs font-bold text-neo-white/80 uppercase tracking-wide mb-1">
                 {t('adventure.game.objectives')}
               </h2>
               <AdventureObjectives
@@ -847,70 +843,70 @@ const AdventureGame = memo<AdventureGameProps>(
               />
             </div>
 
-            {/* Combo Display */}
+            {/* Combo Display - Compact */}
             <div
               data-testid="combo-display"
               className={cn(
-                'p-3 rounded-neo',
+                'p-2 rounded-neo',
                 'bg-neo-black/30 border-2 border-neo-cyan/30'
               )}
             >
-              <p className="text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-1">
+              <p className="text-xs font-bold text-neo-white/70 uppercase tracking-wide">
                 {t('adventure.game.combo')}
               </p>
-              <p className="text-2xl font-black text-neo-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]">
+              <p className="text-xl font-black text-neo-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]">
                 x{gameState.comboCount}
               </p>
             </div>
 
-            {/* Hint Button */}
+            {/* Hint Button - Compact */}
             <button
               onClick={handleHintClick}
               disabled={!hasHintsAvailable}
               data-testid="hint-button"
               aria-label={t('adventure.game.hint')}
               className={cn(
-                'flex items-center justify-center gap-2',
-                'p-3 rounded-neo',
-                'font-bold transition-all duration-200',
+                'flex items-center justify-center gap-1.5',
+                'p-2 rounded-neo',
+                'text-sm font-bold transition-all duration-200',
                 hasHintsAvailable
-                  ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
+                  ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
                   : 'bg-neo-black/30 text-neo-white/40 border-2 border-neo-white/10 cursor-not-allowed'
               )}
             >
-              <Lightbulb className="w-5 h-5" />
+              <Lightbulb className="w-4 h-4" />
               {t('adventure.game.hint')}
             </button>
 
-            {/* Auto-Hint Prompt */}
+            {/* Auto-Hint Prompt - Compact */}
             {showAutoHint && (
               <div
                 data-testid="auto-hint-prompt"
                 className={cn(
-                  'p-3 rounded-neo',
+                  'p-2 rounded-neo',
                   'bg-neo-yellow/20 border-2 border-neo-yellow/50',
                   'animate-neo-pop'
                 )}
               >
-                <p className="text-sm font-bold text-neo-yellow text-center">
+                <p className="text-xs font-bold text-neo-yellow text-center">
                   {t('adventure.game.hintAvailable')}
                 </p>
               </div>
             )}
 
-            {/* Current Hint Display */}
+            {/* Current Hint Display - Compact */}
             {currentHint && (
               <div
                 data-testid="current-hint-display"
                 className={cn(
-                  'p-3 rounded-neo',
+                  'p-2 rounded-neo',
                   'bg-neo-lime/20 border-2 border-neo-lime/50'
                 )}
               >
-                <p className="text-sm font-bold text-neo-lime text-center">
+                <p className="text-xs font-bold text-neo-lime text-center">
                   {t('adventure.game.hintUsed')}
                 </p>
-                <p className="text-lg font-black text-neo-white text-center mt-1">
+                <p className="text-base font-black text-neo-white text-center">
                   {currentHint.word}
                 </p>
               </div>

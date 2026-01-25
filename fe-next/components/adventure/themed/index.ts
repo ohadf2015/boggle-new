@@ -6,6 +6,7 @@
  */
 
 export { default as WorldBackground } from './WorldBackground';
+export { default as GameplayBackground } from './GameplayBackground';
 export { default as ThemedTile } from './ThemedTile';
 export { default as ModifierBadge } from './ModifierBadge';
 export { default as ChapterIndicator } from './ChapterIndicator';

@@ -164,6 +164,69 @@ export const BANNED_KEYWORDS = [
 ];
 
 /**
+ * Political keywords to filter out from trends (not child-friendly topics)
+ * Multi-language support for political content detection
+ */
+export const POLITICAL_KEYWORDS_BY_LANGUAGE: Record<string, string[]> = {
+  en: [
+    'election', 'elections', 'vote', 'voting', 'ballot', 'campaign', 'candidate',
+    'republican', 'democrat', 'liberal', 'conservative', 'congress', 'senate',
+    'parliament', 'president', 'prime minister', 'politician', 'politics', 'political',
+    'trump', 'biden', 'obama', 'clinton', 'maga', 'gop', 'dnc', 'rnc',
+    'impeach', 'scandal', 'corruption', 'protest', 'rally', 'riot',
+    'abortion', 'gun control', 'immigration', 'border', 'refugee',
+    'left wing', 'right wing', 'extremist', 'radical', 'activist',
+    'war', 'military', 'army', 'weapon', 'missile', 'bomb', 'attack', 'invasion',
+    'sanctions', 'treaty', 'diplomacy', 'nato', 'un ',
+  ],
+  he: [
+    'בחירות', 'הצבעה', 'קלפי', 'קמפיין', 'מועמד', 'מפלגה',
+    'ליכוד', 'עבודה', 'ימין', 'שמאל', 'כנסת', 'ממשלה',
+    'ראש ממשלה', 'נתניהו', 'ביבי', 'פוליטיקה', 'פוליטי',
+    'הפגנה', 'מחאה', 'שחיתות', 'פרשה',
+    'מלחמה', 'צבא', 'צה"ל', 'טיל', 'פצצה', 'התקפה', 'פלישה',
+    'פלסטין', 'עזה', 'חמאס', 'חיזבאללה', 'טרור',
+  ],
+  sv: [
+    'val', 'rösta', 'röstning', 'kampanj', 'kandidat', 'parti',
+    'riksdag', 'regering', 'statsminister', 'politiker', 'politik', 'politisk',
+    'vänster', 'höger', 'socialdemokrat', 'moderat',
+    'protest', 'demonstration', 'korruption', 'skandal',
+    'krig', 'militär', 'armé', 'vapen', 'missil', 'bomb', 'attack', 'invasion',
+  ],
+  ja: [
+    '選挙', '投票', 'キャンペーン', '候補者', '政党',
+    '国会', '政府', '首相', '総理', '政治家', '政治', '政治的',
+    '左翼', '右翼', '自民党', '民主党',
+    'デモ', '抗議', '汚職', 'スキャンダル',
+    '戦争', '軍', '軍事', '武器', 'ミサイル', '爆弾', '攻撃', '侵攻',
+  ],
+  es: [
+    'elección', 'elecciones', 'votar', 'votación', 'campaña', 'candidato',
+    'congreso', 'parlamento', 'gobierno', 'presidente', 'político', 'política',
+    'izquierda', 'derecha', 'liberal', 'conservador',
+    'protesta', 'manifestación', 'corrupción', 'escándalo',
+    'guerra', 'militar', 'ejército', 'arma', 'misil', 'bomba', 'ataque', 'invasión',
+  ],
+};
+
+/**
+ * Timeout for AI content moderation (shorter than challenge generation)
+ */
+export const AI_CONTENT_MODERATION_TIMEOUT_MS = 15_000; // 15 seconds
+
+/**
+ * Content moderation categories for AI filtering
+ */
+export const CONTENT_MODERATION_CATEGORIES = {
+  CHILD_INAPPROPRIATE: 'child_inappropriate',
+  POLITICAL: 'political',
+  VIOLENT: 'violent',
+  ADULT: 'adult',
+  CONTROVERSIAL: 'controversial',
+} as const;
+
+/**
  * Stop words by language for filtering keyword extraction
  */
 export const STOP_WORDS_BY_LANGUAGE: Record<string, string[]> = {
