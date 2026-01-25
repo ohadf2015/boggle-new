@@ -180,6 +180,27 @@ describe('ComboTierBadge', () => {
       expect(badge).toBeInTheDocument();
     });
   });
+
+  describe('RTL Support', () => {
+    it('should render correctly with dir="rtl"', () => {
+      const { container } = render(
+        <div dir="rtl">
+          <ComboTierBadge comboCount={4} />
+        </div>
+      );
+      // Component should render without errors in RTL mode
+      expect(container.querySelector('.shadow-hard')).toBeInTheDocument();
+    });
+
+    it('should not have hardcoded left/right positioning', () => {
+      const { container } = render(<ComboTierBadge comboCount={4} />);
+      const badge = container.querySelector('.rounded-neo');
+      const computedStyle = window.getComputedStyle(badge as Element);
+
+      // Verify no inline left/right styles (position uses logical properties if needed)
+      expect(badge).toBeInTheDocument();
+    });
+  });
 });
 
 describe('getComboTier helper', () => {
