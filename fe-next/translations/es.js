@@ -2388,7 +2388,9 @@ const es = {
     "settingRecord": "¡Estableciendo tu primer récord!",
     "aheadOfRecord": "¡+{diff} por delante del récord!",
     "behindRecord": "{diff} para superar tu récord",
-    "tiedWithRecord": "¡Empatado con tu récord!"
+    "tiedWithRecord": "¡Empatado con tu récord!",
+    "challengeFriend": "Desafía a un amigo",
+    "shareHint": "Comparte el mismo tablero con amigos"
   },
   "rules": {
     "pageTitle": "LexiClash: Batalla de Palabras en Tiempo Real",

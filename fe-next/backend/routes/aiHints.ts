@@ -198,6 +198,34 @@ const HINT_UNLOCK_COSTS = {
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 500;
 
+// Timeout configuration for AI operations (prevents indefinite hangs)
+const AI_HINT_TIMEOUT_MS = 20_000; // 20 seconds per attempt
+
+/**
+ * Wraps a promise with a timeout to prevent indefinite hangs.
+ * This is critical for AI calls which can sometimes hang without responding.
+ */
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  operationName: string
+): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(
+        `${operationName} timed out after ${timeoutMs / 1000}s. ` +
+        `The AI model may be overloaded. Please try again.`
+      ));
+    }, timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId);
+  });
+}
+
 // ============================================
 // Cache Management (LRU-style)
 // ============================================
@@ -685,7 +713,9 @@ async function generateAIEnhancedData(
         await delay(backoffMs);
       }
 
-      const result = await geminiModel.generateContent(fullPrompt);
+      // Add timeout to prevent indefinite hangs during AI hint generation
+      const aiPromise = geminiModel.generateContent(fullPrompt);
+      const result = await withTimeout(aiPromise, AI_HINT_TIMEOUT_MS, 'AI hint generation');
       const response = result.response;
       const text = response?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 

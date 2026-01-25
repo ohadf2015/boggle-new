@@ -3,6 +3,36 @@ import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
 
+// Timeout for SendGrid API calls (prevents indefinite hangs)
+const SENDGRID_TIMEOUT_MS = 10_000; // 10 seconds
+
+/**
+ * Fetch with timeout using AbortController
+ */
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number = SENDGRID_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`SendGrid request timed out after ${timeoutMs / 1000}s`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 /**
  * Contact Form API Endpoint
  *
@@ -50,7 +80,7 @@ async function sendEmailNotification(name: string, email: string, message: strin
   }
 
   try {
-    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+    const response = await fetchWithTimeout('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${sendgridApiKey}`,

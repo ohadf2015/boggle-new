@@ -319,28 +319,45 @@ export async function getClassroomStudents(
   if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
 
   try {
-    const { data, error } = await supabase
+    // First, get all memberships for this classroom
+    const { data: memberships, error: membershipError } = await supabase
       .from('classroom_memberships')
-      .select(`
-        id,
-        student_id,
-        classroom_id,
-        joined_at,
-        profiles:student_id (
-          username,
-          email,
-          avatar_url
-        )
-      `)
+      .select('id, student_id, classroom_id, joined_at')
       .eq('classroom_id', classroomId)
       .order('joined_at', { ascending: true });
 
-    if (error) {
-      logger.error('Error fetching classroom students:', error);
-      return { data: [], error: { message: error.message } };
+    if (membershipError) {
+      logger.error('Error fetching classroom memberships:', membershipError);
+      return { data: [], error: { message: membershipError.message } };
     }
 
-    return { data: (data || []) as ClassroomStudent[], error: null };
+    if (!memberships || memberships.length === 0) {
+      return { data: [], error: null };
+    }
+
+    // Then, fetch profiles for all student_ids
+    // profiles.id = auth.users.id = classroom_memberships.student_id
+    const studentIds = memberships.map(m => m.student_id);
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_emoji, avatar_color, profile_picture_url')
+      .in('id', studentIds);
+
+    if (profilesError) {
+      logger.error('Error fetching student profiles:', profilesError);
+      // Return memberships without profile data rather than failing completely
+    }
+
+    // Create a map of profiles by id for quick lookup
+    const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+    // Combine memberships with their profiles
+    const studentsWithProfiles = memberships.map(membership => ({
+      ...membership,
+      profiles: profileMap.get(membership.student_id) || null,
+    }));
+
+    return { data: studentsWithProfiles as ClassroomStudent[], error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getClassroomStudents:', error);

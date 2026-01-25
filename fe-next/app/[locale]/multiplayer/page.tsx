@@ -1032,7 +1032,7 @@ export default function MultiplayerPage(): React.JSX.Element {
             ...authContext,
             avatar: currentProfile ? {
               emoji: currentProfile.avatar_emoji,
-              color: currentProfile.avatar_color,
+              color: sanitizeAvatarColor(currentProfile.avatar_color, currentProfile.avatar_image),
             } : getAvatarForName(currentUsername),
             profilePictureUrl: currentProfile?.profile_picture_url,
           });

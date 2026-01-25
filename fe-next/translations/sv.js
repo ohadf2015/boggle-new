@@ -2391,7 +2391,9 @@ const sv = {
     "settingRecord": "Sätter ditt första rekord!",
     "aheadOfRecord": "+{diff} före rekordet!",
     "behindRecord": "{diff} för att slå ditt rekord",
-    "tiedWithRecord": "Lika med ditt rekord!"
+    "tiedWithRecord": "Lika med ditt rekord!",
+    "challengeFriend": "Utmana en vän",
+    "shareHint": "Dela samma bräde med vänner"
   },
   "rules": {
     "pageTitle": "LexiClash: Ordstrid i Realtid",

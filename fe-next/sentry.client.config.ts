@@ -75,6 +75,9 @@ Sentry.init({
     /adsbygoogle/i,
     "AdSense head tag doesn't support data-nscript attribute",
     /adsense.*data-nscript/i,
+    // Recharts library warning - non-actionable, occurs during initial render
+    // before container dimensions stabilize. Chart renders correctly after delay.
+    /width\(-?\d+\) and height\(-?\d+\) of chart should be greater than 0/i,
   ],
 
   denyUrls: [

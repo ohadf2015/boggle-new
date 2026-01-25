@@ -101,6 +101,14 @@ const RETRY_CONFIG = {
   maxDelayMs: 8000,
 };
 
+// Timeout configuration for AI operations (prevents indefinite hangs)
+const AI_TIMEOUT_CONFIG = {
+  singleValidation: 30_000,   // 30 seconds for single word validation
+  bulkGeneration: 45_000,    // 45 seconds for bulk word generation
+  themedBoard: 30_000,       // 30 seconds for themed board generation
+  hint: 15_000,              // 15 seconds for hint generation
+};
+
 // =============================================================================
 // In-Memory LRU Cache for Word Validations
 // =============================================================================
@@ -424,6 +432,31 @@ class GameAIService {
   }
 
   /**
+   * Wraps a promise with a timeout to prevent indefinite hangs.
+   * This is critical for AI calls which can sometimes hang without responding.
+   */
+  private withTimeout<T>(
+    promise: Promise<T>,
+    timeoutMs: number,
+    operationName: string
+  ): Promise<T> {
+    let timeoutId: NodeJS.Timeout;
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error(
+          `${operationName} timed out after ${timeoutMs / 1000}s. ` +
+          `The AI model may be overloaded. Please try again.`
+        ));
+      }, timeoutMs);
+    });
+
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+      clearTimeout(timeoutId);
+    });
+  }
+
+  /**
    * Initialize the service. Called lazily on first use.
    */
   private async initialize(): Promise<void> {
@@ -648,7 +681,9 @@ Respond with ONLY valid JSON (no markdown):
     try {
       let result;
       try {
-        result = await this.model.generateContent(prompt);
+        // Add timeout to prevent indefinite hangs during word validation
+        const aiPromise = this.model.generateContent(prompt);
+        result = await this.withTimeout(aiPromise, AI_TIMEOUT_CONFIG.singleValidation, 'Word validation');
       } catch (sdkError) {
         // Catch SyntaxError from SDK when Vertex AI returns HTML (rate limit page)
         // The SDK tries to parse JSON but gets HTML like "<!DOCTYPE html>..."
@@ -1003,10 +1038,16 @@ Respond with ONLY valid JSON (no markdown):
 
     const languageName = languageNames[language] || language;
 
-    const prompt = `Generate a JSON array of ${count} distinct words related to the theme '${theme}' in ${languageName}. Words must be between 3 to 10 letters long. No spaces, no hyphens. Output raw JSON only.`;
+    // Use language-specific word length limits (Japanese uses shorter kanji compounds)
+    const minWordLength = language === 'ja' ? 2 : 4;
+    const maxWordLength = language === 'ja' ? 4 : 10;
+
+    const prompt = `Generate a JSON array of ${count} distinct words related to the theme '${theme}' in ${languageName}. Words must be between ${minWordLength} to ${maxWordLength} letters long. No spaces, no hyphens. Output raw JSON only.`;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      // Add timeout to prevent indefinite hangs during themed board generation
+      const aiPromise = this.model.generateContent(prompt);
+      const result = await this.withTimeout(aiPromise, AI_TIMEOUT_CONFIG.themedBoard, 'Themed board generation');
       const response = result.response;
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
@@ -1021,10 +1062,10 @@ Respond with ONLY valid JSON (no markdown):
       const parsed = JSON.parse(jsonMatch[0]);
       const validated = ThemedWordsResponseSchema.parse(parsed);
 
-      // Filter to ensure word constraints
+      // Filter to ensure word constraints (using language-specific limits)
       const filteredWords = validated
         .map((w) => w.toLowerCase().trim())
-        .filter((w) => w.length >= 3 && w.length <= 10 && /^[a-zA-Z\u00C0-\u024F]+$/.test(w));
+        .filter((w) => w.length >= minWordLength && w.length <= maxWordLength && /^[a-zA-Z\u00C0-\u024F]+$/.test(w));
 
       return filteredWords;
     } catch (error) {
@@ -1113,8 +1154,9 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
 
     try {
       const result = await this.withRetry(async () => {
-        const response = await this.model!.generateContent(prompt);
-        return response;
+        // Add timeout to prevent indefinite hangs during hint generation
+        const aiPromise = this.model!.generateContent(prompt);
+        return await this.withTimeout(aiPromise, AI_TIMEOUT_CONFIG.hint, 'Hint generation');
       }, 'generateHint');
 
       const response = result.response;
@@ -1290,39 +1332,70 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
       ? `\n\nYou may use words from this existing list if they fit: ${existingWordList.join(', ')}`
       : '';
 
-    const prompt = `You are generating daily words for a word puzzle game called "Word Hunt" (similar to Wordle).
+    // Language-specific examples for richer vocabulary
+    const languageExamples: Record<string, { good: string; avoid: string }> = {
+      en: {
+        good: 'APEX, LYNX, JADE, CRYSTAL, PHOENIX, THUNDER, GLACIER, ECLIPSE, NEBULA, WHISPER, PRISM, ZENITH, VELVET, RHYTHM, GLYPH, QUARTZ, SWIFT, PLASMA, COSMIC, CIPHER',
+        avoid: 'CAT, DOG, TREE, BOOK, HAND, FOOT, BIKE, KITE, HOME, LOVE, GAME, TIME'
+      },
+      he: {
+        good: 'חושך, מראה, ניצוץ, עננה, קרקע, שמיים, אוצר, גיבור, נהדר, מסתורי, אבקה, כוכב, לילה, בוקר, סערה, אגדה, עתיק, קסום, זוהר, מרהיב',
+        avoid: 'בית, יום, מים, אדם, שנה, עבודה, עולם, חיים'
+      },
+      sv: {
+        good: 'SKYMNING, DIMMA, STJÄRNA, VINTER, ÅSKA, FJÄRIL, MYSTISK, FÖRUNDRA, GLITTER, KRISTALL, SMARAGD, FROSTIG, TROLLDOM, LABYRINT, GRYNING, OCEAN, VULKAN, GALAX, DIMMA, SKUGGA',
+        avoid: 'HUS, DAG, ÅR, TID, MAN, BARN, LAND, VAD'
+      },
+      ja: {
+        good: '神秘, 星空, 幻想, 黎明, 蒼穹, 瞬間, 輝石, 氷晶, 旋風, 彗星',
+        avoid: '日本, 東京, 時間, 仕事, 学校, 毎日'
+      },
+      es: {
+        good: 'CRISTAL, TRUENO, GLACIAR, ECLIPSE, PRISMA, CENIZA, VIENTO, CUMBRE, ABISMO, DESTELLO, BRUMA, CREPÚSCULO, ENIGMA, ZAFIRO, AURORA, OCÉANO, VOLCÁN, NIEBLA, COSMOS, TORMENTA',
+        avoid: 'CASA, AGUA, VIDA, AMOR, TIEMPO, MUNDO, GENTE, BIEN'
+      },
+      fr: {
+        good: 'CRISTAL, TONNERRE, GLACIER, ÉCLIPSE, PRISME, CENDRE, BRUME, ABÎME, AURORE, ÉNIGME, SAPHIR, VOLCAN, COSMOS, TEMPÊTE, LUEUR, MYSTÈRE, ZÉNITH, OMBRE, AUBE, VORTEX',
+        avoid: 'MAISON, MONDE, TEMPS, JOUR, NUIT, VIE, BIEN, TOUT'
+      },
+      de: {
+        good: 'KRISTALL, DONNER, GLETSCHER, PRISMA, ASCHE, NEBEL, ABGRUND, AURORA, RÄTSEL, SAPHIR, VULKAN, KOSMOS, STURM, GLANZ, MYSTERIUM, ZENIT, SCHATTEN, VORTEX, FROST, BLITZ',
+        avoid: 'HAUS, ZEIT, JAHR, WELT, LAND, MANN, FRAU, KIND'
+      }
+    };
+
+    const examples = languageExamples[language] || languageExamples.en;
+
+    const prompt = `Generate ${count} rich, diverse words for a word puzzle game.
 
 LANGUAGE: ${languageName}
-WORD FORMAT: ${wordLengthDescription}
-NUMBER OF WORDS NEEDED: ${count}
+FORMAT: ${wordLengthDescription}
+COUNT: ${count}
 
-REQUIREMENTS:
-1. Generate ${count} unique, interesting ${wordLengthDescription}
-2. Words should be common enough to be guessable but not too basic
-3. Avoid very simple/common words like CAT, DOG, TREE, BOOK
-4. Prefer words with good character variety (avoid repeated letters)
-5. Words should be real, valid words in ${languageName}
-6. NO REPEATS - each word must be different
-7. MIX word lengths - include both shorter (4-5 letter) and longer (6-8 letter) words for variety
+VOCABULARY DIVERSITY REQUIREMENTS:
+- Include NOUNS (objects, places, phenomena): 40%
+- Include VERBS (actions, states): 30%
+- Include ADJECTIVES (descriptive): 20%
+- Include other (adverbs, rare words): 10%
+- Prefer evocative, interesting words players enjoy discovering
+- Mix word lengths: short (${lengthRange.min}-5), medium (5-6), long (6-${lengthRange.max})
+- Prioritize character variety (avoid double letters like BOOK, TREE)
+- Must be real, valid ${languageName} words
 
-EXCLUDED WORDS (recently used, do NOT use these):
-${exclusionList || 'None'}${existingListStr}
+GOOD EXAMPLES: ${examples.good}
+AVOID BASIC WORDS: ${examples.avoid}
+EXCLUDED (recently used): ${exclusionList || 'None'}${existingListStr}
 
-GOOD EXAMPLES for English: APEX, LYNX, JADE, CRYSTAL, PHOENIX, THUNDER, GLACIER, ECLIPSE, NEBULA, WHISPER
-AVOID for English: CAT, DOG, TREE, BOOK, HAND, FOOT, BIKE, KITE
+Output ONLY valid JSON:
+{"words":[{"word":"WORD","reason":"category/theme"}]}`;
 
-Generate exactly ${count} words. Respond with ONLY valid JSON (no markdown):
-{
-  "words": [
-    {"word": "WORD1", "reason": "brief reason (max 30 chars)"},
-    {"word": "WORD2", "reason": "brief reason (max 30 chars)"}
-  ]
-}`;
 
     try {
-      // Use retry logic to handle transient failures
+      // Use retry logic with timeout to handle transient failures and prevent indefinite hangs
       const result = await this.withRetry(async () => {
-        return await this.model!.generateContent(prompt);
+        // Each AI call has a timeout to prevent indefinite hanging
+        const aiPromise = this.model!.generateContent(prompt);
+        return await this.withTimeout(aiPromise, AI_TIMEOUT_CONFIG.bulkGeneration, 'Bulk word generation');
       }, 'generateBulkWords');
 
       const response = result.response;

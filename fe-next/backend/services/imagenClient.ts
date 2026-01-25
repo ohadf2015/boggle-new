@@ -36,6 +36,9 @@ const RETRY_CONFIG = {
   backoffMultiplier: 2, // Double each retry
 };
 
+// Timeout configuration for image generation (prevents indefinite hangs)
+const IMAGEN_TIMEOUT_MS = 60_000; // 60 seconds per attempt (image gen is slow)
+
 // Category mood descriptors for image generation
 const MOOD_MAP: Record<string, string> = {
   sports: 'energetic and dynamic',
@@ -453,14 +456,29 @@ async function callImagenApi(prompt: string): Promise<Buffer> {
     },
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  });
+  // Add timeout using AbortController to prevent indefinite hangs
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), IMAGEN_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Imagen API timed out after ${IMAGEN_TIMEOUT_MS / 1000}s. The service may be overloaded.`);
+    }
+    throw error;
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     const errorText = await response.text();

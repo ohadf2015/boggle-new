@@ -24,6 +24,11 @@ interface EarthquakeHandlerDeps {
   /** Also update tableDataRef for host */
   tableDataRef?: MutableRefObject<LetterGrid | null>;
   gameSessionIdRef: MutableRefObject<number>;
+  /**
+   * Ref to store fire round interval ID - MUST be provided by the calling component
+   * This ensures the interval persists across handler recreations (e.g., when useEffect re-runs)
+   */
+  fireRoundIntervalRef: MutableRefObject<NodeJS.Timeout | null>;
   role: 'HOST' | 'PLAYER';
 }
 
@@ -46,23 +51,27 @@ interface EarthquakeSocketHandlers {
 
 // ==================== Implementation ====================
 
-// Track active fire round countdown interval per handler instance
-// Using WeakMap to allow garbage collection when handlers are cleaned up
-const fireRoundIntervals = new Map<string, NodeJS.Timeout>();
-
 /**
  * Creates earthquake socket event handlers for host or player
+ *
+ * IMPORTANT: The fireRoundIntervalRef MUST be created with useRef in the calling component.
+ * This ensures the interval ID persists across handler recreations, which happens when
+ * the useEffect that registers socket listeners re-runs due to dependency changes.
  *
  * @param deps - Dependencies including state setters and refs
  * @returns Object with handlers to register on socket and cleanup function
  *
  * @example
+ * // In your component:
+ * const fireRoundIntervalRef = useRef<NodeJS.Timeout | null>(null);
+ *
  * const handlers = createEarthquakeSocketHandlers({
  *   setEarthquakeState,
  *   setFireRoundActive,
  *   setFireRoundRemaining,
  *   setLetterGrid, // for player
  *   gameSessionIdRef,
+ *   fireRoundIntervalRef, // CRITICAL: pass the ref!
  *   role: 'PLAYER',
  * });
  *
@@ -81,23 +90,24 @@ export function createEarthquakeSocketHandlers(deps: EarthquakeHandlerDeps): Ear
     setTableData,
     tableDataRef,
     gameSessionIdRef,
+    fireRoundIntervalRef,
     role,
   } = deps;
 
   // Use whichever grid setter is available
   const setGrid = setLetterGrid || setTableData;
 
-  // Unique ID for this handler instance to manage its interval
-  const handlerId = `${role}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  logger.log(`[${role}] Creating earthquake handlers`);
 
   /**
-   * Clear any existing fire round countdown for this handler
+   * Clear any existing fire round countdown
+   * Uses the ref to ensure we can clear the interval even if handler was recreated
    */
   const clearFireRoundInterval = () => {
-    const existingInterval = fireRoundIntervals.get(handlerId);
-    if (existingInterval) {
-      clearInterval(existingInterval);
-      fireRoundIntervals.delete(handlerId);
+    if (fireRoundIntervalRef.current) {
+      logger.log(`[${role}] Clearing fire round interval`);
+      clearInterval(fireRoundIntervalRef.current);
+      fireRoundIntervalRef.current = null;
     }
   };
 
@@ -135,7 +145,7 @@ export function createEarthquakeSocketHandlers(deps: EarthquakeHandlerDeps): Ear
    */
   const handleFireRoundStart = (data: FireRoundStartData): void => {
     if (!isCurrentSession(data)) return;
-    logger.log(`[${role}] Fire round started - grid:`, data.grid);
+    logger.log(`[${role}] Fire round started, grid:`, data.grid);
 
     // Clear any existing countdown
     clearFireRoundInterval();
@@ -155,18 +165,23 @@ export function createEarthquakeSocketHandlers(deps: EarthquakeHandlerDeps): Ear
     setFireRoundActive(true);
     const duration = data.duration || 15;
     setFireRoundRemaining(duration);
+    logger.log(`[${role}] Fire round: starting countdown from ${duration}s`);
 
     // Start countdown for fire round remaining time display
     let remaining = duration;
     const intervalId = setInterval(() => {
       remaining -= 1;
+      logger.log(`[${role}] Fire round countdown: ${remaining}s remaining`);
       setFireRoundRemaining(remaining);
       if (remaining <= 0) {
+        logger.log(`[${role}] Fire round: countdown complete, clearing interval`);
         clearFireRoundInterval();
       }
     }, 1000);
 
-    fireRoundIntervals.set(handlerId, intervalId);
+    // Store in ref - this persists across handler recreations
+    fireRoundIntervalRef.current = intervalId;
+    logger.log(`[${role}] Fire round: interval set`);
   };
 
   /**
@@ -188,6 +203,7 @@ export function createEarthquakeSocketHandlers(deps: EarthquakeHandlerDeps): Ear
    * Cleanup function - call when unmounting or cleaning up socket listeners
    */
   const cleanup = (): void => {
+    logger.log(`[${role}] Cleanup called`);
     clearFireRoundInterval();
   };
 

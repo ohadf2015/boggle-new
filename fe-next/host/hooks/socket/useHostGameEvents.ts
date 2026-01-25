@@ -122,6 +122,10 @@ export function useHostGameEvents({
   // State version for triggering re-renders when session changes
   const [gameSessionId, setGameSessionId] = useState<number>(0);
 
+  // Fire round interval ref - persists across handler recreations
+  // This is critical for ensuring the countdown continues even if useEffect re-runs
+  const fireRoundIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // Helper to reset combo state using shared utility
   const resetComboState = useCallback(() => {
     resetComboStateUtil(
@@ -138,6 +142,7 @@ export function useHostGameEvents({
   }, [socket, username, t, intentionalExitRef]);
 
   // Memoized earthquake handlers using shared utility
+  // Note: fireRoundIntervalRef is intentionally NOT in deps - it's a stable ref
   const earthquakeHandlers = useMemo(() => createEarthquakeSocketHandlers({
     setEarthquakeState,
     setFireRoundActive,
@@ -145,6 +150,7 @@ export function useHostGameEvents({
     setTableData,
     tableDataRef,
     gameSessionIdRef,
+    fireRoundIntervalRef,
     role: 'HOST',
   }), [setEarthquakeState, setFireRoundActive, setFireRoundRemaining, setTableData]);
 

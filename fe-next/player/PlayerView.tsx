@@ -349,7 +349,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     // Only track time if we have an active combo
     if (comboLevel > 0 && lastWordTime !== null) {
       const comboWindow = calculateComboChainWindow(comboLevel);
-      lastDisplayedComboTimeRef.current = 100; // Reset for new combo
+      lastDisplayedComboTimeRef.current = 100;
+
+      // Immediately set initial timer value to ensure arc is visible
+      setComboTimeRemaining(100);
+      setComboDanger(false);
 
       const updateTimeRemaining = () => {
         const now = Date.now();

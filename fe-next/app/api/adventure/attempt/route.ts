@@ -132,6 +132,17 @@ export async function POST(request: Request) {
 
     if (attemptError) {
       console.error('[ADVENTURE ATTEMPT API] Record attempt error:', attemptError);
+      // Check for common database issues
+      if (attemptError.code === '42883') {
+        // Function does not exist - migration not applied
+        console.error('[ADVENTURE ATTEMPT API] record_level_attempt function not found - run migration 059');
+        return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+      }
+      if (attemptError.code === '42P01') {
+        // Table does not exist - migration not applied
+        console.error('[ADVENTURE ATTEMPT API] level_attempts table not found - run migration 059');
+        return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+      }
       return NextResponse.json({ error: 'Failed to record attempt' }, { status: 500 });
     }
 

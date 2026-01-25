@@ -2391,7 +2391,9 @@ const ja = {
     "settingRecord": "初めての記録を設定中！",
     "aheadOfRecord": "記録より+{diff}リード！",
     "behindRecord": "記録を破るまであと{diff}",
-    "tiedWithRecord": "記録と同点！"
+    "tiedWithRecord": "記録と同点！",
+    "challengeFriend": "友だちに挑戦",
+    "shareHint": "同じボードを友達とシェア"
   },
   "rules": {
     "pageTitle": "LexiClash: リアルタイム単語バトル",

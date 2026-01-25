@@ -4,6 +4,17 @@ import { getSupabaseAdmin } from '@/lib/admin/server';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
+// Minimum word length by language (must match wikipediaWordProcessor.ts)
+const MIN_WORD_LENGTH: Record<Language, number> = {
+  en: 4,
+  he: 4,
+  sv: 4,
+  ja: 2, // Japanese kanji compounds are typically 2-4 characters
+  es: 4,
+  fr: 4,
+  de: 4,
+};
+
 /**
  * POST /api/admin/daily-word/replace
  * Replace the daily word for a specific date and optionally reset all attempts
@@ -34,20 +45,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate word format (3-10 letters, uppercase)
-    const formattedWord = newWord.toUpperCase().trim();
-    if (formattedWord.length < 3 || formattedWord.length > 10) {
+    // Validate language first (needed for min length check)
+    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'] as const;
+    if (!validLanguages.includes(language)) {
       return NextResponse.json(
-        { error: 'Word must be between 3 and 10 letters' },
+        { error: 'Invalid language code' },
         { status: 400 }
       );
     }
 
-    // Validate language
-    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'];
-    if (!validLanguages.includes(language)) {
+    // Validate word format using language-specific minimum
+    const formattedWord = newWord.toUpperCase().trim();
+    const minLength = MIN_WORD_LENGTH[language as Language] || 4;
+    const maxLength = language === 'ja' ? 4 : 10;
+
+    if (formattedWord.length < minLength || formattedWord.length > maxLength) {
       return NextResponse.json(
-        { error: 'Invalid language code' },
+        { error: `Word must be between ${minLength} and ${maxLength} letters for ${language}` },
         { status: 400 }
       );
     }

@@ -9,7 +9,9 @@ import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import RewardsSummary from '@/components/results/RewardsSummary';
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import { GlobalRankBadge } from './GlobalRankBadge';
+import ChallengeButton from './ChallengeButton';
 import type { SinglePlayerMode } from '../../SinglePlayerView';
+import type { LetterGrid, Language } from '@/shared/types/game';
 import type { WinStreakDisplayData } from '../hooks/useWinStreakTracking';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type { Participant } from '../useResultsData';
@@ -19,8 +21,12 @@ import type { BrainPointsReward } from '@/components/results/BrainPointsDisplay'
 interface MobileResultsTabProps {
   results: {
     playerScore: number;
+    playerWords: string[];
     botScores: { name: string; score: number }[];
     achievements?: { key: string; icon: string }[];
+    grid: LetterGrid;
+    gameDuration: number;
+    language?: Language;
   };
   mode: SinglePlayerMode;
   nextStepMode: NextStepMode;
@@ -135,6 +141,18 @@ export function MobileResultsTab({
       )}
 
       <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="mobile" />
+
+      {/* Challenge a Friend - share the same board */}
+      {results.grid && (
+        <ChallengeButton
+          grid={results.grid}
+          score={results.playerScore}
+          words={results.playerWords}
+          gameLanguage={results.language || 'en'}
+          gameDuration={results.gameDuration}
+          variant="compact"
+        />
+      )}
     </div>
   );
 }

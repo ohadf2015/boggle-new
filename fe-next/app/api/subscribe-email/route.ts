@@ -2,6 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
 
+// Timeout for external email service calls (prevents indefinite hangs)
+const EMAIL_SERVICE_TIMEOUT_MS = 15_000; // 15 seconds
+
+/**
+ * Fetch with timeout using AbortController
+ */
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number = EMAIL_SERVICE_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 /**
  * Email Subscription API Endpoint
  *
@@ -67,7 +97,7 @@ export async function POST(request: NextRequest) {
       const mailchimpServer = process.env.MAILCHIMP_API_KEY.split('-')[1];
       const mailchimpUrl = `https://${mailchimpServer}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}/members`;
 
-      const response = await fetch(mailchimpUrl, {
+      const response = await fetchWithTimeout(mailchimpUrl, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.MAILCHIMP_API_KEY}`,
@@ -94,7 +124,7 @@ export async function POST(request: NextRequest) {
     }
     // Option 2: SendGrid Integration (if configured)
     else if (process.env.SENDGRID_API_KEY) {
-      const response = await fetch('https://api.sendgrid.com/v3/marketing/contacts', {
+      const response = await fetchWithTimeout('https://api.sendgrid.com/v3/marketing/contacts', {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,

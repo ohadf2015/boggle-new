@@ -2401,7 +2401,9 @@ const he = {
     "settingRecord": "קובע את השיא הראשון שלך!",
     "aheadOfRecord": "+{diff} מעל השיא!",
     "behindRecord": "{diff} להכות את השיא שלך",
-    "tiedWithRecord": "שוויון עם השיא שלך!"
+    "tiedWithRecord": "שוויון עם השיא שלך!",
+    "challengeFriend": "אתגר חבר",
+    "shareHint": "שתפו את אותו הלוח עם חברים"
   },
   "rules": {
     "pageTitle": "לקסיקלאש: קרב מילים בזמן אמת",

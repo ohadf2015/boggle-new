@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 15 of 23 (Chain Combo System) — COMPLETE
-Plan: 5/5 complete
-Status: Verified
-Last activity: 2026-01-25 — Phase 15 complete, all 5 plans executed, goal verified
+Phase: 16 of 23 (Boss Battle Foundation) — IN PROGRESS
+Plan: 1/5 complete
+Status: Executing
+Last activity: 2026-01-25 — Completed 16-01-PLAN.md (Boss HP Tracking)
 
-Progress: [███░░░░░░░] 15/23 phases (65% milestone complete, v1.1 in progress)
+Progress: [███░░░░░░░] 16/23 phases (69% milestone complete, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [███░░░░░░░] 15/23 phases (65% milestone complete,
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 5 (Phase 15 complete)
-- Current phase: 15 (Chain Combo System) — VERIFIED
-- Next phase: 16 (Boss Battle Foundation)
+- Plans completed: 6 (Phase 15 complete, Phase 16 started)
+- Current phase: 16 (Boss Battle Foundation) — IN PROGRESS
+- Next plan: 16-02 (Boss HP Bar UI)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -44,6 +44,17 @@ Progress: [███░░░░░░░] 15/23 phases (65% milestone complete,
 | 15-05 | Adventure Game Integration | 14min | ✅ Complete |
 
 **Phase 15 Total:** 67 minutes, 83 tests added
+
+**Phase 16 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 16-01 | Boss HP Tracking | 12min | ✅ Complete |
+| 16-02 | Boss HP Bar UI | — | ⏸️ Pending |
+| 16-03 | Boss Mechanics | — | ⏸️ Pending |
+| 16-04 | Boss Battle Flow | — | ⏸️ Pending |
+| 16-05 | Boss Integration | — | ⏸️ Pending |
+
+**Phase 16 Progress:** 1/5 plans, 12 minutes, 21 tests added
 
 ## Accumulated Context
 
@@ -62,6 +73,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **15-03**: Particle counts 4/12/20 for device tiers → Balance satisfaction with performance (2026-01-25)
 - **15-04**: 50ms stagger for chain cascades → Slower than regular 30ms for visual emphasis (2026-01-25)
 - **15-05**: useRef for grid position calculation → Enables accurate particle positioning (2026-01-25)
+- **16-01**: 5-phase state machine (intro/active/enraged/victory/defeat) → Clear game flow stages (2026-01-25)
+- **16-01**: Enraged at 25% HP → Industry standard, creates urgency without feeling unfair (2026-01-25)
+- **16-01**: Combo multiplier 1 + (count * 0.1) → Linear scaling, predictable damage calculation (2026-01-25)
+- **16-01**: useRef pattern for phase → Avoids closure issues in batched React state updates (2026-01-25)
 
 ### Pending Todos
 
@@ -90,11 +105,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Phase 15 complete and verified
+Stopped at: Completed 16-01-PLAN.md (Boss HP Tracking system)
 Resume file: None
 
-**Next action:** `/gsd:discuss-phase 16` to start Boss Battle Foundation
+**Next action:** Execute 16-02-PLAN.md (Boss HP Bar UI)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 15 complete)*
+*Last updated: 2026-01-25 (16-01 complete)*

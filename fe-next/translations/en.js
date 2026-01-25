@@ -2394,7 +2394,9 @@ const en = {
     "settingRecord": "Setting first record!",
     "aheadOfRecord": "+{diff} ahead!",
     "behindRecord": "{diff} to beat record",
-    "tiedWithRecord": "Tied!"
+    "tiedWithRecord": "Tied!",
+    "challengeFriend": "Challenge a Friend",
+    "shareHint": "Share the same board with friends"
   },
   "rules": {
     "pageTitle": "LexiClash: Real-Time Word Battle",

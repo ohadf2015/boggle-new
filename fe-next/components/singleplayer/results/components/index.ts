@@ -14,3 +14,4 @@ export { AchievementsSection } from './AchievementsSection';
 export { BotWordsSection } from './BotWordsSection';
 export { MobileResultsTab } from './MobileResultsTab';
 export { MobileDetailsTab } from './MobileDetailsTab';
+export { default as ChallengeButton } from './ChallengeButton';

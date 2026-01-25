@@ -47,6 +47,7 @@ import {
   BotWordsSection,
   MobileResultsTab,
   MobileDetailsTab,
+  ChallengeButton,
 } from './results';
 import { TrainingAnalysisModal } from '@/components/training';
 
@@ -286,7 +287,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="min-h-dvh flex flex-col">
       {/* MOBILE VIEW */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-[--mobile-bottom-safe]">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll px-2 pb-[--mobile-bottom-safe]">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div
@@ -406,6 +407,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <div ref={actionButtonsRef}>
               <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="desktop" />
             </div>
+            {/* Challenge a Friend - share the same board */}
+            {results.grid && (
+              <ChallengeButton
+                grid={results.grid}
+                score={results.playerScore}
+                words={results.playerWords}
+                gameLanguage={gameLanguage}
+                gameDuration={results.gameDuration}
+                variant="default"
+              />
+            )}
           </div>
 
           {/* RIGHT COLUMN */}

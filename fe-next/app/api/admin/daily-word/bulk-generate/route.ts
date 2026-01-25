@@ -3,19 +3,26 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import type { Language } from '@/types';
 import { gameAIService } from '@/lib/ai-service';
+import {
+  getWordsFromWordBank,
+  getWordsFromStaticList,
+  markWordAsUsed,
+} from '@/lib/dailyChallenge/wordBankService';
 
-// Increase timeout for AI generation
-export const maxDuration = 60; // 60 seconds
+// Increase timeout for AI generation (allows for retries and slow responses)
+export const maxDuration = 120; // 120 seconds for bulk generation with retries
 
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const NO_REPEAT_DAYS = 30;
 
 // Word length range by language (min, max)
+// IMPORTANT: Minimum length must be 4 for all languages except Japanese (kanji compounds)
+// This matches the validation in wikipediaWordProcessor.ts
 const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
   en: { min: 4, max: 8 },
-  he: { min: 3, max: 8 },
-  sv: { min: 3, max: 8 },
-  ja: { min: 2, max: 4 }, // Japanese uses kanji compounds
+  he: { min: 4, max: 8 },
+  sv: { min: 4, max: 8 },
+  ja: { min: 2, max: 4 }, // Japanese uses kanji compounds (2-4 characters)
   es: { min: 4, max: 8 },
   fr: { min: 4, max: 8 },
   de: { min: 4, max: 8 },
@@ -99,38 +106,124 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Use AI to generate words
-    let generatedWords: Array<{ date: string; word: string; reason: string }> = [];
+    // Generate words using multiple sources (word bank → static list → AI)
+    let generatedWords: Array<{ date: string; word: string; reason: string; source: string }> = [];
     let aiConfigured = false;
 
-    // Check if Vertex AI is configured
-    try {
-      aiConfigured = await gameAIService.isConfigured();
+    // Step 1: Try to get words from word bank first
+    const wordBankWords = await getWordsFromWordBank(
+      supabase,
+      language as Language,
+      datesToGenerate.length,
+      recentlyUsedWords
+    );
 
-      if (aiConfigured) {
-        generatedWords = await generateWordsWithAI(
-          language as Language,
-          datesToGenerate,
-          recentlyUsedWords,
-          existingWords || []
-        );
-      } else {
-        console.warn('Vertex AI not configured - GOOGLE_CREDENTIALS_JSON required');
-        generatedWords = datesToGenerate.map(date => ({
+    // Step 2: If not enough from word bank, supplement with static list
+    const combinedFallbackWords = [...wordBankWords];
+    if (combinedFallbackWords.length < datesToGenerate.length) {
+      const usedFromBank = new Set(wordBankWords.map(w => w.word));
+      const combinedExclude = new Set([...recentlyUsedWords, ...usedFromBank]);
+      const staticWords = getWordsFromStaticList(
+        language as Language,
+        datesToGenerate.length - combinedFallbackWords.length,
+        combinedExclude
+      );
+      combinedFallbackWords.push(...staticWords);
+    }
+
+    // If we have enough words from word bank + static, use those
+    if (combinedFallbackWords.length >= datesToGenerate.length) {
+      generatedWords = datesToGenerate.map((date, i) => ({
+        date,
+        word: combinedFallbackWords[i]?.word || '',
+        reason: combinedFallbackWords[i]?.source === 'word_bank'
+          ? 'Selected from curated word bank'
+          : 'Selected from static word list',
+        source: combinedFallbackWords[i]?.source || 'static',
+      }));
+    } else {
+      // Step 3: Use AI to generate remaining words
+      try {
+        aiConfigured = await gameAIService.isConfigured();
+
+        if (aiConfigured) {
+          // Add words we already have from fallback
+          const prefilledWords: Array<{ date: string; word: string; reason: string; source: string }> = [];
+          const datesToGenerateWithAI: string[] = [];
+
+          for (let i = 0; i < datesToGenerate.length; i++) {
+            if (combinedFallbackWords[i]) {
+              prefilledWords.push({
+                date: datesToGenerate[i],
+                word: combinedFallbackWords[i].word,
+                reason: combinedFallbackWords[i].source === 'word_bank'
+                  ? 'Selected from curated word bank'
+                  : 'Selected from static word list',
+                source: combinedFallbackWords[i].source,
+              });
+            } else {
+              datesToGenerateWithAI.push(datesToGenerate[i]);
+            }
+          }
+
+          // Generate remaining with AI
+          if (datesToGenerateWithAI.length > 0) {
+            const usedWords = new Set([...recentlyUsedWords, ...combinedFallbackWords.map(w => w.word)]);
+            const aiWords = await generateWordsWithAI(
+              language as Language,
+              datesToGenerateWithAI,
+              usedWords,
+              existingWords || []
+            );
+
+            // Combine prefilled and AI-generated
+            let aiIndex = 0;
+            for (let i = 0; i < datesToGenerate.length; i++) {
+              if (combinedFallbackWords[i]) {
+                generatedWords.push(prefilledWords.find(w => w.date === datesToGenerate[i])!);
+              } else {
+                const aiWord = aiWords[aiIndex++];
+                generatedWords.push({
+                  ...aiWord,
+                  source: 'ai',
+                });
+              }
+            }
+          } else {
+            generatedWords = prefilledWords;
+          }
+        } else {
+          console.warn('Vertex AI not configured - using fallback words only');
+          generatedWords = datesToGenerate.map((date, i) => ({
+            date,
+            word: combinedFallbackWords[i]?.word || '',
+            reason: combinedFallbackWords[i]
+              ? 'Selected from fallback list'
+              : 'No word available - please enter manually',
+            source: combinedFallbackWords[i]?.source || 'manual',
+          }));
+        }
+      } catch (error) {
+        console.error('AI service check failed:', error);
+        aiConfigured = false;
+        generatedWords = datesToGenerate.map((date, i) => ({
           date,
-          word: '',
-          reason: 'Vertex AI not configured - enter manually',
+          word: combinedFallbackWords[i]?.word || '',
+          reason: combinedFallbackWords[i]
+            ? 'Selected from fallback list (AI unavailable)'
+            : error instanceof Error ? error.message : 'AI unavailable - please enter manually',
+          source: combinedFallbackWords[i]?.source || 'manual',
         }));
       }
-    } catch (error) {
-      console.error('AI service check failed:', error);
-      aiConfigured = false;
-      generatedWords = datesToGenerate.map(date => ({
-        date,
-        word: '',
-        reason: 'AI service unavailable - enter manually',
-      }));
     }
+
+    // Count words by source
+    const sourceStats = {
+      word_bank: generatedWords.filter(w => w.source === 'word_bank').length,
+      static: generatedWords.filter(w => w.source === 'static').length,
+      ai: generatedWords.filter(w => w.source === 'ai').length,
+      manual: generatedWords.filter(w => w.source === 'manual' || !w.word).length,
+    };
 
     return NextResponse.json({
       success: true,
@@ -146,6 +239,7 @@ export async function POST(request: NextRequest) {
         existingDates: scheduledDates.size,
         generatedDates: datesToGenerate.length,
         excludedWordsCount: recentlyUsedWords.size,
+        sourceStats,
       },
     });
   } catch (error) {
@@ -241,6 +335,11 @@ export async function PUT(request: NextRequest) {
           results.push({ date, word: formattedWord, status: 'created' });
         }
       }
+
+      // Mark word as used in word bank (fire and forget - don't fail if word isn't in bank)
+      markWordAsUsed(supabase, formattedWord, language as Language).catch(() => {
+        // Silently ignore - word may not be in word bank
+      });
     }
 
     const created = results.filter(r => r.status === 'created').length;

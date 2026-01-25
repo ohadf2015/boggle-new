@@ -150,6 +150,10 @@ export function usePlayerGameEvents({
   // Track game session ID
   const gameSessionIdRef = useRef<number>(0);
 
+  // Fire round interval ref - persists across handler recreations
+  // This is critical for ensuring the countdown continues even if useEffect re-runs
+  const fireRoundIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // Memoized room closed handler
   const handleHostLeftRoomClosing = useMemo(() => {
     if (!socket) return () => {};
@@ -157,12 +161,14 @@ export function usePlayerGameEvents({
   }, [socket, username, t, intentionalExitRef]);
 
   // Memoized earthquake handlers using shared utility
+  // Note: fireRoundIntervalRef is intentionally NOT in deps - it's a stable ref
   const earthquakeHandlers = useMemo(() => createEarthquakeSocketHandlers({
     setEarthquakeState,
     setFireRoundActive,
     setFireRoundRemaining,
     setLetterGrid,
     gameSessionIdRef,
+    fireRoundIntervalRef,
     role: 'PLAYER',
   }), [setEarthquakeState, setFireRoundActive, setFireRoundRemaining, setLetterGrid]);
 
