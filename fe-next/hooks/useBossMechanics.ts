@@ -110,7 +110,7 @@ function evaluateWordForMechanic(
       return evaluateAssemblyLine(word, params);
 
     case 'scrambledReality':
-      return evaluateScrambledReality(word, params);
+      return evaluateScrambledReality(word, params, mechanicState);
 
     case 'mirrorMatch':
       return evaluateMirrorMatch(word, params);
@@ -235,14 +235,52 @@ function evaluateAssemblyLine(
   );
 }
 
+/**
+ * Check if two words are anagrams of each other.
+ * Anagrams have the same letters in different order.
+ * Words must be different (same word is not an anagram of itself).
+ */
+function areAnagrams(word1: string, word2: string): boolean {
+  if (word1.length !== word2.length) return false;
+  if (word1.length === 0) return false;
+  const upper1 = word1.toUpperCase();
+  const upper2 = word2.toUpperCase();
+  if (upper1 === upper2) return false; // Same word is not an anagram of itself
+  const sorted1 = upper1.split('').sort().join('');
+  const sorted2 = upper2.split('').sort().join('');
+  return sorted1 === sorted2;
+}
+
 function evaluateScrambledReality(
   word: string,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  mechanicState: Record<string, unknown> = {}
 ): BossMechanicResult {
   const anagramBonusMultiplier =
     (params.anagramBonusMultiplier as number) ?? 2.0;
+  const foundWords = (mechanicState.foundWords as string[]) ?? [];
+
+  // Check if word is anagram of any previously found word
+  const hasAnagramPair = foundWords.some((prevWord) =>
+    areAnagrams(word, prevWord)
+  );
+
+  // Fallback: Check unique letters >= 4
   const uniqueLetters = new Set(word.toUpperCase().split('')).size;
-  return buildThresholdResult(uniqueLetters >= 4, anagramBonusMultiplier);
+  const meetsRequirement = hasAnagramPair || uniqueLetters >= 4;
+
+  // Special feedback only for anagram pair detection
+  const feedbackKey = hasAnagramPair
+    ? 'adventure.bosses.common.anagramPair'
+    : undefined;
+
+  return {
+    meetsRequirement,
+    scoreMultiplier: meetsRequirement ? anagramBonusMultiplier : 1.0,
+    triggerTaunt: meetsRequirement ? 'onMechanic' : undefined,
+    feedbackKey,
+    triggerEffect: meetsRequirement,
+  };
 }
 
 function evaluateMirrorMatch(
@@ -428,7 +466,23 @@ export function useBossMechanics({
         return { meetsRequirement: false, scoreMultiplier: 1.0 };
       }
 
-      return evaluateWordForMechanic(word, boss, bossState.mechanicState);
+      const result = evaluateWordForMechanic(word, boss, bossState.mechanicState);
+
+      // Track found words for anagram detection (scrambledReality mechanic)
+      if (boss.twistMechanic.type === 'scrambledReality') {
+        setBossState((prev) => {
+          const existingWords = (prev.mechanicState.foundWords as string[]) ?? [];
+          return {
+            ...prev,
+            mechanicState: {
+              ...prev.mechanicState,
+              foundWords: [...existingWords, word.toUpperCase()],
+            },
+          };
+        });
+      }
+
+      return result;
     },
     [boss, bossState.mechanicState]
   );

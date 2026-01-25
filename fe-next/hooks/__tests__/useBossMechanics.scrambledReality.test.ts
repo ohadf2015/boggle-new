@@ -33,7 +33,8 @@ const NON_ANAGRAMS = [
 ];
 
 // Words with 4+ unique letters (fallback requirement)
-const WORDS_WITH_4_PLUS_UNIQUE = ['ABCD', 'WORD', 'GAME', 'PLAY', 'TEST', 'LISTEN'];
+// TEST has only 3 unique (T, E, S) - T repeats
+const WORDS_WITH_4_PLUS_UNIQUE = ['ABCD', 'WORD', 'GAME', 'PLAY', 'QUIZ', 'LISTEN'];
 
 // Words with < 4 unique letters (fail fallback)
 const WORDS_WITH_LESS_THAN_4_UNIQUE = ['AAA', 'ABBA', 'AAB', 'MAMA'];
@@ -312,8 +313,8 @@ describe('useBossMechanics - scrambledReality', () => {
         useBossMechanics({ worldId: WORLD_6 })
       );
 
-      // WHEN checking a word with 4+ unique letters
-      const mechanicResult = result.current.checkWord('TEST');
+      // WHEN checking a word with 4+ unique letters (PLAY has 4 unique: P, L, A, Y)
+      const mechanicResult = result.current.checkWord('PLAY');
 
       // THEN should trigger effect
       expect(mechanicResult.triggerEffect).toBe(true);
