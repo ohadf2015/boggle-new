@@ -4039,6 +4039,8 @@ const he = {
       "continue": "המשך",
       "practice": "תרגול",
       "review": "חזרה",
+      "playGame": "שחק משחק",
+      "playGameHint": "תרגלו במשחק מרובה משתתפים עם אוצר המילים הזה",
       "empty": {
         "title": "אין שיעורים עדיין",
         "subtitle": "הצטרפו לכיתה כדי להתחיל לתרגל",
@@ -4090,6 +4092,8 @@ const he = {
       "joinCode": "קוד הצטרפות",
       "copyCode": "העתק קוד",
       "codeCopied": "הקוד הועתק!",
+      "copyLink": "העתק קישור הזמנה",
+      "linkCopied": "קישור ההזמנה הועתק!",
       "members": "{{count}} תלמידים",
       "member": "תלמיד אחד",
       "noMembers": "אין תלמידים עדיין",

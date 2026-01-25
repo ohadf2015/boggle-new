@@ -4046,6 +4046,8 @@ const ja = {
       "continue": "続ける",
       "practice": "練習",
       "review": "復習",
+      "playGame": "ゲームで遊ぶ",
+      "playGameHint": "この語彙でマルチプレイヤーゲームを練習",
       "empty": {
         "title": "レッスンがありません",
         "subtitle": "クラスに参加して語彙練習を始めよう",
@@ -4097,6 +4099,8 @@ const ja = {
       "joinCode": "参加コード",
       "copyCode": "コードをコピー",
       "codeCopied": "参加コードをコピーしました！",
+      "copyLink": "招待リンクをコピー",
+      "linkCopied": "招待リンクがコピーされました！",
       "members": "{{count}}人の生徒",
       "member": "1人の生徒",
       "noMembers": "まだ生徒がいません",

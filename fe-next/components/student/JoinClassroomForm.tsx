@@ -23,13 +23,20 @@ import toast from 'react-hot-toast';
  * - Real-time validation
  * - Neo-brutalist design
  * - RTL support
+ * - Optional initialCode prop for shareable invite links
  */
-const JoinClassroomForm: React.FC = () => {
+
+interface JoinClassroomFormProps {
+  /** Optional pre-filled code from shareable invite link */
+  initialCode?: string;
+}
+
+const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' }) => {
   const { t, dir } = useLanguage();
   const router = useRouter();
   const { joinClassroom } = useJoinClassroom();
 
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(initialCode);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeError, setCodeError] = useState(false);
 

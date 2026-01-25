@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Clock, TrendingUp, Award } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, Award, Gamepad2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function StudentLessonView() {
@@ -26,6 +26,35 @@ export default function StudentLessonView() {
   const { lessons, isLoading, error } = useStudentProgress();
 
   const [sortBy, setSortBy] = useState<'dueDate' | 'progress' | 'recent'>('recent');
+
+  // Start a multiplayer game with lesson vocabulary (mirrors teacher LessonBuilder pattern)
+  const handleStartGame = (studentLesson: typeof lessons[0]) => {
+    const lesson = studentLesson.lesson;
+    if (!lesson) return;
+
+    // Get vocabulary words that can be integrated into the game board
+    const vocabularyWords = (lesson.words || [])
+      .filter((w) => w.canIntegrate)
+      .map((w) => w.word);
+
+    // Store lesson info in sessionStorage for the multiplayer page to use
+    sessionStorage.setItem('lessonGameData', JSON.stringify({
+      lessonId: studentLesson.lessonId,
+      lessonName: lesson.name || 'Practice Game',
+      vocabularyWords,
+      language: lesson.language || language,
+    }));
+
+    // Navigate to multiplayer with lesson flag
+    router.push(`/${language}/multiplayer?fromLesson=true`);
+  };
+
+  // Check if a lesson has vocabulary words that can be used in a game
+  const hasPlayableWords = (studentLesson: typeof lessons[0]) => {
+    const lesson = studentLesson.lesson;
+    if (!lesson?.words) return false;
+    return lesson.words.some((w) => w.canIntegrate);
+  };
 
   // Sort lessons based on selected criteria
   const sortedLessons = useMemo(() => {
@@ -237,22 +266,41 @@ export default function StudentLessonView() {
                   </div>
                 )}
 
-                {/* Action Button */}
-                <Button
-                  onClick={() => router.push(`/${language}/student/lessons/${studentLesson.lessonId}`)}
-                  className={cn(
-                    'w-full font-neo-display text-base',
-                    status === 'assigned'
-                      ? 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black'
-                      : 'bg-neo-pink hover:bg-neo-pink/90 text-neo-white',
-                    'shadow-hard hover:shadow-hard-sm',
-                    'transition-all'
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => router.push(`/${language}/student/lessons/${studentLesson.lessonId}`)}
+                    className={cn(
+                      'flex-1 font-neo-display text-base',
+                      status === 'assigned'
+                        ? 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black'
+                        : 'bg-neo-pink hover:bg-neo-pink/90 text-neo-white',
+                      'shadow-hard hover:shadow-hard-sm',
+                      'transition-all'
+                    )}
+                  >
+                    {status === 'assigned' && t('student.lessons.start')}
+                    {status === 'started' && t('student.lessons.continue')}
+                    {status === 'completed' && t('student.lessons.review')}
+                  </Button>
+
+                  {/* Play Game button - only show if lesson has playable vocabulary */}
+                  {hasPlayableWords(studentLesson) && (
+                    <Button
+                      onClick={() => handleStartGame(studentLesson)}
+                      variant="outline"
+                      className={cn(
+                        'font-neo-display text-base',
+                        'border-neo-yellow text-neo-yellow hover:bg-neo-yellow/20',
+                        'shadow-hard hover:shadow-hard-sm',
+                        'transition-all'
+                      )}
+                      title={t('student.lessons.playGameHint')}
+                    >
+                      <Gamepad2 className="w-5 h-5" />
+                    </Button>
                   )}
-                >
-                  {status === 'assigned' && t('student.lessons.start')}
-                  {status === 'started' && t('student.lessons.continue')}
-                  {status === 'completed' && t('student.lessons.review')}
-                </Button>
+                </div>
               </CardContent>
             </Card>
           );

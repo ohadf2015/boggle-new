@@ -4033,6 +4033,8 @@ const en = {
       "continue": "Continue",
       "practice": "Practice",
       "review": "Review",
+      "playGame": "Play Game",
+      "playGameHint": "Practice with a multiplayer game using this vocabulary",
       "empty": {
         "title": "No lessons assigned yet",
         "subtitle": "Join a classroom to get started with vocabulary practice",
@@ -4084,6 +4086,8 @@ const en = {
       "joinCode": "Join Code",
       "copyCode": "Copy Code",
       "codeCopied": "Join code copied!",
+      "copyLink": "Copy Invite Link",
+      "linkCopied": "Invite link copied to clipboard!",
       "members": "{{count}} students",
       "member": "1 student",
       "noMembers": "No students yet",

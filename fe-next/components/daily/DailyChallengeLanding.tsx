@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock, X } from 'lucide-react';
+import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock, X, Frown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
@@ -76,108 +76,108 @@ export function DailyChallengeLanding({
     return () => clearInterval(interval);
   }, []);
 
+  // Word Hunt status check - synchronous local storage check with win/loss
+  const checkWordHunt = () => {
+    const wordHuntStatus = getWordHuntStatusToday(currentLanguage);
+    if (!wordHuntStatus) {
+      setStatus(prev => ({ ...prev, wordHunt: 'new' }));
+    } else {
+      setStatus(prev => ({
+        ...prev,
+        wordHunt: wordHuntStatus.solved ? 'won' : 'lost'
+      }));
+    }
+    setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
+  };
+
+  // Buzz status check - async API calls
+  const checkBuzzStatus = async () => {
+    const today = new Date().toISOString().split('T')[0];
+
+    // First check if buzz challenge is available for this language
+    let buzzAvailable = true;
+    try {
+      const availabilityResponse = await fetch(
+        `/api/buzz/check-availability/${currentLanguage}`
+      );
+      if (availabilityResponse.ok) {
+        const availabilityData = await availabilityResponse.json();
+        buzzAvailable = availabilityData.available;
+      }
+    } catch (err) {
+      console.error('Failed to check buzz availability:', err);
+    }
+
+    // If not available, set status and skip further checks
+    if (!buzzAvailable) {
+      setStatus(prev => ({ ...prev, buzz: 'unavailable' }));
+      setBuzzPreview({ available: false });
+      setLoadingStatus(prev => ({ ...prev, buzz: false }));
+      return;
+    }
+
+    let buzzPlayed = false;
+    let buzzCompleted = false;
+    try {
+      // Build query params for user identification
+      const checkParams = new URLSearchParams();
+      if (user?.id) {
+        checkParams.set('player_id', user.id);
+      } else {
+        const fingerprint = getGuestFingerprint();
+        if (fingerprint) {
+          checkParams.set('guest_fingerprint', fingerprint);
+        }
+      }
+
+      if (checkParams.toString()) {
+        const response = await fetch(
+          `/api/buzz/check-played/${today}/${currentLanguage}?${checkParams.toString()}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          buzzPlayed = data.data?.played || false;
+          buzzCompleted = data.data?.completed || false;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to check buzz status:', err);
+    }
+
+    // Fetch buzz preview data for image display (separate from status)
+    try {
+      const buzzResponse = await fetch(`/api/buzz/${today}/${currentLanguage}`);
+      if (buzzResponse.ok) {
+        const buzzData = await buzzResponse.json();
+        if (buzzData.success && buzzData.data) {
+          setBuzzPreview({
+            imageUrl: buzzData.data.imageUrl,
+            trendingSummary: buzzData.data.trendingSummary,
+            available: true,
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch buzz preview:', err);
+    }
+
+    // Set buzz status based on played and completed flags
+    if (!buzzPlayed) {
+      setStatus(prev => ({ ...prev, buzz: 'new' }));
+    } else {
+      setStatus(prev => ({
+        ...prev,
+        buzz: buzzCompleted ? 'won' : 'lost'
+      }));
+    }
+    setLoadingStatus(prev => ({ ...prev, buzz: false }));
+  };
+
   // Check completion status for both challenges and fetch buzz preview
   // Status checks happen in the background - cards render immediately
   useEffect(() => {
     // Reset loading states when language changes
     setLoadingStatus({ wordHunt: true, buzz: true });
-
-    // Word Hunt status check - synchronous local storage check with win/loss
-    const checkWordHunt = () => {
-      const wordHuntStatus = getWordHuntStatusToday(currentLanguage);
-      if (!wordHuntStatus) {
-        setStatus(prev => ({ ...prev, wordHunt: 'new' }));
-      } else {
-        setStatus(prev => ({
-          ...prev,
-          wordHunt: wordHuntStatus.solved ? 'won' : 'lost'
-        }));
-      }
-      setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
-    };
-
-    // Buzz status check - async API calls
-    const checkBuzzStatus = async () => {
-      const today = new Date().toISOString().split('T')[0];
-
-      // First check if buzz challenge is available for this language
-      let buzzAvailable = true;
-      try {
-        const availabilityResponse = await fetch(
-          `/api/buzz/check-availability/${currentLanguage}`
-        );
-        if (availabilityResponse.ok) {
-          const availabilityData = await availabilityResponse.json();
-          buzzAvailable = availabilityData.available;
-        }
-      } catch (err) {
-        console.error('Failed to check buzz availability:', err);
-      }
-
-      // If not available, set status and skip further checks
-      if (!buzzAvailable) {
-        setStatus(prev => ({ ...prev, buzz: 'unavailable' }));
-        setBuzzPreview({ available: false });
-        setLoadingStatus(prev => ({ ...prev, buzz: false }));
-        return;
-      }
-
-      let buzzPlayed = false;
-      let buzzCompleted = false;
-      try {
-        // Build query params for user identification
-        const checkParams = new URLSearchParams();
-        if (user?.id) {
-          checkParams.set('player_id', user.id);
-        } else {
-          const fingerprint = getGuestFingerprint();
-          if (fingerprint) {
-            checkParams.set('guest_fingerprint', fingerprint);
-          }
-        }
-
-        if (checkParams.toString()) {
-          const response = await fetch(
-            `/api/buzz/check-played/${today}/${currentLanguage}?${checkParams.toString()}`
-          );
-          if (response.ok) {
-            const data = await response.json();
-            buzzPlayed = data.data?.played || false;
-            buzzCompleted = data.data?.completed || false;
-          }
-        }
-      } catch (err) {
-        console.error('Failed to check buzz status:', err);
-      }
-
-      // Fetch buzz preview data for image display (separate from status)
-      try {
-        const buzzResponse = await fetch(`/api/buzz/${today}/${currentLanguage}`);
-        if (buzzResponse.ok) {
-          const buzzData = await buzzResponse.json();
-          if (buzzData.success && buzzData.data) {
-            setBuzzPreview({
-              imageUrl: buzzData.data.imageUrl,
-              trendingSummary: buzzData.data.trendingSummary,
-              available: true,
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch buzz preview:', err);
-      }
-
-      // Set buzz status based on played and completed flags
-      if (!buzzPlayed) {
-        setStatus(prev => ({ ...prev, buzz: 'new' }));
-      } else {
-        setStatus(prev => ({
-          ...prev,
-          buzz: buzzCompleted ? 'won' : 'lost'
-        }));
-      }
-      setLoadingStatus(prev => ({ ...prev, buzz: false }));
-    };
 
     // Check Word Hunt immediately (local storage is sync)
     checkWordHunt();
@@ -185,6 +185,24 @@ export function DailyChallengeLanding({
     checkBuzzStatus();
     // Reset request state when language changes
     setRequestState('idle');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLanguage, user?.id]);
+
+  // Refresh status when page becomes visible (user returns from playing)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Re-check status when returning to page
+        checkWordHunt();
+        checkBuzzStatus();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
   // Handle requesting a buzz challenge
@@ -282,6 +300,7 @@ export function DailyChallengeLanding({
       >
         {/* Word Hunt Card - TIMED */}
         <CompactChallengeCard
+          challengeId="wordHunt"
           icon={<Timer className="w-7 h-7 sm:w-10 sm:h-10" />}
           title={t('daily.wordHunt.title')}
           tagline={t('daily.wordHunt.desc')}
@@ -303,6 +322,7 @@ export function DailyChallengeLanding({
 
         {/* Daily Buzz Card - NO TIMER */}
         <CompactChallengeCard
+          challengeId="buzz"
           icon={<Hourglass className="w-8 h-8 sm:w-10 sm:h-10" />}
           title={t('buzz.title')}
           tagline={status.buzz === 'unavailable'
@@ -463,6 +483,8 @@ function WordHuntMiniGrid({ isHovered, language }: { isHovered: boolean; languag
 
 // Compact Challenge Card Component
 interface CompactChallengeCardProps {
+  /** Unique identifier for the challenge (used for test IDs) */
+  challengeId: 'wordHunt' | 'buzz';
   icon: ReactNode;
   title: string;
   tagline: string;
@@ -491,6 +513,7 @@ interface CompactChallengeCardProps {
 }
 
 function CompactChallengeCard({
+  challengeId,
   icon,
   title,
   tagline,
@@ -747,7 +770,7 @@ function CompactChallengeCard({
         </motion.div>
 
         {/* Preview: Custom Grid, Image, or Icon - fixed height container for consistent card heights */}
-        <div className="w-full h-32 sm:h-44 flex items-center justify-center mb-2 sm:mb-3">
+        <div className="relative w-full h-32 sm:h-44 flex items-center justify-center mb-2 sm:mb-3">
           {customPreview === 'word-hunt-grid' ? (
             <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
           ) : imageElement ? (
@@ -764,6 +787,52 @@ function CompactChallengeCard({
               )}
             >
               {icon}
+            </motion.div>
+          )}
+
+          {/* Prominent Completion Overlay - Shows when challenge is completed */}
+          {(status === 'won' || status === 'lost') && !isLoadingStatus && (
+            <motion.div
+              data-testid={`completion-overlay-${challengeId}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className={cn(
+                'absolute inset-0 z-30 flex flex-col items-center justify-center',
+                'rounded-xl border-3 border-neo-black backdrop-blur-sm',
+                status === 'won'
+                  ? 'bg-neo-lime/90'
+                  : 'bg-neo-pink/90'
+              )}
+            >
+              {/* Glow effect behind */}
+              <motion.div
+                className="absolute inset-0 rounded-xl -z-10"
+                animate={{
+                  boxShadow: status === 'won'
+                    ? ['0 0 20px rgba(191, 255, 0, 0.5)', '0 0 40px rgba(191, 255, 0, 0.7)', '0 0 20px rgba(191, 255, 0, 0.5)']
+                    : ['0 0 20px rgba(255, 20, 147, 0.5)', '0 0 40px rgba(255, 20, 147, 0.7)', '0 0 20px rgba(255, 20, 147, 0.5)'],
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+
+              {/* Icon */}
+              <motion.div
+                animate={{ rotate: status === 'won' ? [0, 10, -10, 0] : [0, -5, 5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="mb-1 sm:mb-2"
+              >
+                {status === 'won' ? (
+                  <Trophy className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black drop-shadow-lg" strokeWidth={2.5} />
+                ) : (
+                  <Frown className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black drop-shadow-lg" strokeWidth={2.5} />
+                )}
+              </motion.div>
+
+              {/* Completion Text */}
+              <span className="font-neo-display font-black text-lg sm:text-2xl text-neo-black uppercase tracking-wide">
+                {status === 'won' ? t('daily.completed') : t('daily.failed')}
+              </span>
             </motion.div>
           )}
         </div>

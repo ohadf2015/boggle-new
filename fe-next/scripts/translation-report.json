@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 2506,
+    "totalKeysInCode": 2515,
     "keyCountByLanguage": {
-      "en": 3330,
-      "he": 3330,
-      "sv": 3330,
-      "ja": 3330,
+      "en": 3354,
+      "he": 3354,
+      "sv": 3354,
+      "ja": 3354,
       "es": 3330
     },
     "missingFromEnglish": 0,
@@ -135,7 +135,32 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "education.xp.level",
+      "education.xp.nextLevel",
+      "education.xp.xpGained",
+      "education.xp.totalXp",
+      "education.xp.progress",
+      "education.xp.levelUp",
+      "education.xp.newLevel",
+      "education.xp.streak",
+      "education.xp.streakBonus",
+      "education.xp.keepGoing",
+      "education.xp.newTitleUnlocked",
+      "education.xp.continue",
+      "education.xp.mastery.perfectFlashcard",
+      "education.xp.mastery.learnedWords",
+      "education.xp.mastery.discoveredVocab",
+      "education.xp.mastery.greatPractice",
+      "education.xp.mastery.lessonMastered",
+      "education.xp.mastery.keepPracticing",
+      "education.xp.streakMilestone.week",
+      "education.xp.streakMilestone.weekDesc",
+      "education.xp.streakMilestone.twoWeeks",
+      "education.xp.streakMilestone.twoWeeksDesc",
+      "education.xp.streakMilestone.month",
+      "education.xp.streakMilestone.monthDesc"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

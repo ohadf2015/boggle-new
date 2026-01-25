@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Plus, Copy, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language } from '@/lib/supabase/teacher';
 import ClassroomStudentList from './ClassroomStudentList';
@@ -90,6 +90,13 @@ export default function ClassroomManager() {
     toast.success(t('teacher.classroom.codeCopied'));
   };
 
+  const copyInviteLink = (code: string) => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const link = `${baseUrl}/${language}/join/${code}`;
+    navigator.clipboard.writeText(link);
+    toast.success(t('teacher.classroom.linkCopied'));
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -165,14 +172,26 @@ export default function ClassroomManager() {
                     <code className="text-2xl font-neo-display text-neo-yellow tracking-wider">
                       {classroom.join_code}
                     </code>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => copyJoinCode(classroom.join_code)}
-                      className="text-neo-yellow hover:bg-neo-yellow/20"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyJoinCode(classroom.join_code)}
+                        className="text-neo-yellow hover:bg-neo-yellow/20"
+                        title={t('teacher.classroom.copyCode')}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyInviteLink(classroom.join_code)}
+                        className="text-neo-cyan hover:bg-neo-cyan/20"
+                        title={t('teacher.classroom.copyLink')}
+                      >
+                        <Link2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
 

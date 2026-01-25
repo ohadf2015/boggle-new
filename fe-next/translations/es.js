@@ -4035,6 +4035,8 @@ const es = {
       "continue": "Continuar",
       "practice": "Practicar",
       "review": "Repasar",
+      "playGame": "Jugar",
+      "playGameHint": "Practica con un juego multijugador usando este vocabulario",
       "empty": {
         "title": "Sin lecciones asignadas",
         "subtitle": "Únete a un aula para empezar a practicar",
@@ -4086,6 +4088,8 @@ const es = {
       "joinCode": "Código de Acceso",
       "copyCode": "Copiar Código",
       "codeCopied": "¡Código copiado!",
+      "copyLink": "Copiar enlace de invitación",
+      "linkCopied": "¡Enlace de invitación copiado!",
       "members": "{{count}} estudiantes",
       "member": "1 estudiante",
       "noMembers": "Sin estudiantes aún",

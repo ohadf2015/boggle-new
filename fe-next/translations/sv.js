@@ -4046,6 +4046,8 @@ const sv = {
       "continue": "Fortsätt",
       "practice": "Öva",
       "review": "Repetera",
+      "playGame": "Spela spel",
+      "playGameHint": "Öva med ett multiplayer-spel med dessa ord",
       "empty": {
         "title": "Inga lektioner än",
         "subtitle": "Gå med i ett klassrum för att börja öva",
@@ -4097,6 +4099,8 @@ const sv = {
       "joinCode": "Gå med-kod",
       "copyCode": "Kopiera kod",
       "codeCopied": "Koden kopierad!",
+      "copyLink": "Kopiera inbjudningslänk",
+      "linkCopied": "Inbjudningslänken har kopierats!",
       "members": "{{count}} elever",
       "member": "1 elev",
       "noMembers": "Inga elever än",

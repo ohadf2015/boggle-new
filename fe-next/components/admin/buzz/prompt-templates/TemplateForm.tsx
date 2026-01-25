@@ -21,6 +21,7 @@ interface TemplateFormProps {
   formData: TemplateFormData;
   isCreateMode: boolean;
   isSaving: boolean;
+  isLoadingDefault?: boolean;
   templateName?: string;
   onFormChange: (data: TemplateFormData) => void;
   onSave: () => void;
@@ -31,6 +32,7 @@ export function TemplateForm({
   formData,
   isCreateMode,
   isSaving,
+  isLoadingDefault = false,
   templateName,
   onFormChange,
   onSave,
@@ -92,13 +94,22 @@ export function TemplateForm({
         <div>
           <div className="flex items-center justify-between mb-1">
             <label className="text-xs text-slate-400">Template Content</label>
-            <div className="text-xs text-slate-500">Available placeholders: {placeholderHints}</div>
+            <div className="flex items-center gap-2">
+              {isLoadingDefault && (
+                <span className="flex items-center gap-1 text-xs text-neo-cyan">
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                  Loading default...
+                </span>
+              )}
+              <div className="text-xs text-slate-500">Available placeholders: {placeholderHints}</div>
+            </div>
           </div>
           <textarea
             value={formData.template_content}
             onChange={(e) => handleFieldChange('template_content', e.target.value)}
             className="w-full h-64 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-neo-white font-mono resize-y"
-            placeholder="Enter your prompt template here. Use {placeholder} syntax for dynamic values."
+            placeholder={isLoadingDefault ? 'Loading default template...' : 'Enter your prompt template here. Use {placeholder} syntax for dynamic values.'}
+            disabled={isLoadingDefault}
           />
         </div>
 

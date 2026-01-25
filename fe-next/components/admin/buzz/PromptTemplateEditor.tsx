@@ -33,6 +33,7 @@ export default function PromptTemplateEditor({ onClose }: Props): React.ReactEle
     new Set<TemplateType>(['riddle', 'image'])
   );
   const [saving, setSaving] = useState(false);
+  const [fetchingDefault, setFetchingDefault] = useState(false);
   const [formData, setFormData] = useState<TemplateFormData>({
     template_type: 'riddle',
     language: null,
@@ -136,7 +137,11 @@ export default function PromptTemplateEditor({ onClose }: Props): React.ReactEle
     await fetchTemplates();
   }
 
-  function startCreate(type: TemplateType): void {
+  async function startCreate(type: TemplateType): Promise<void> {
+    setFetchingDefault(true);
+    setError(null);
+
+    // Set initial form data with empty content (will be updated after fetch)
     setFormData({
       template_type: type,
       language: null,
@@ -148,6 +153,34 @@ export default function PromptTemplateEditor({ onClose }: Props): React.ReactEle
     setCreateMode(true);
     setEditMode(true);
     setSelectedTemplate(null);
+
+    // Fetch default template content
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        setFetchingDefault(false);
+        return;
+      }
+
+      const response = await fetch(`/api/admin/buzz/prompt-templates/default?type=${type}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data?.content) {
+          setFormData((prev) => ({
+            ...prev,
+            template_content: data.data.content,
+          }));
+        }
+      }
+    } catch {
+      // Silently fail - user can still create template with empty content
+      console.warn('Failed to fetch default template content');
+    } finally {
+      setFetchingDefault(false);
+    }
   }
 
   function startEdit(template: PromptTemplate): void {
@@ -220,6 +253,7 @@ export default function PromptTemplateEditor({ onClose }: Props): React.ReactEle
           formData={formData}
           isCreateMode={createMode}
           isSaving={saving}
+          isLoadingDefault={fetchingDefault}
           templateName={selectedTemplate?.name}
           onFormChange={setFormData}
           onSave={handleSave}
