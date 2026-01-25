@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 17 of 23 (Boss Mechanic Expansion) — IN PROGRESS
-Plan: 3/5 complete
-Status: In progress
-Last activity: 2026-01-25 — Completed 17-03-PLAN.md (scrambledReality anagram enhancement)
+Phase: 17 of 23 (Boss Mechanic Expansion) — COMPLETE
+Plan: 5/5 complete
+Status: Phase complete
+Last activity: 2026-01-25 — Completed 17-05-PLAN.md (boss integration tests)
 
-Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in progress)
+Progress: [█████████░] 17/23 phases (74% milestone, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 12 (Phase 15 complete, Phase 16 complete, Phase 17 plans 1-3)
-- Current phase: 17 (Boss Mechanic Expansion) — IN PROGRESS
-- Next plan: 17-04 (stub mechanic tests)
+- Plans completed: 14 (Phase 15 complete, Phase 16 complete, Phase 17 complete)
+- Current phase: 17 (Boss Mechanic Expansion) — COMPLETE
+- Next phase: 18 (Education XP System)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -61,9 +61,10 @@ Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in 
 | 17-01 | Mechanic Test Coverage | 3min | ✅ Complete |
 | 17-02 | finalWord Mechanic Tests | 3min | ✅ Complete |
 | 17-03 | scrambledReality Anagram Enhancement | 4min | ✅ Complete |
-| 17-04 | Stub Mechanic Tests | - | Pending |
+| 17-04 | Stub Mechanic Tests | 2min | ✅ Complete |
+| 17-05 | Boss Integration Tests | 26min | ✅ Complete |
 
-**Phase 17 Total (so far):** 10 minutes, 179 tests added
+**Phase 17 Total:** 38 minutes, 230 tests added
 
 ## Accumulated Context
 
@@ -95,6 +96,7 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **17-01**: Boss mechanic test isolation pattern → One test file per mechanic for targeted testing (2026-01-25)
 - **17-03**: areAnagrams uses sorted letter comparison → Excludes same word (LISTEN vs LISTEN) (2026-01-25)
 - **17-03**: scrambledReality fallback to unique letters >= 4 → When no anagram pair found (2026-01-25)
+- **17-05**: jest.requireActual for hook integration tests → Bypass module mocks to test real hooks in same file (2026-01-25)
 
 ### Pending Todos
 
@@ -115,12 +117,13 @@ None.
 - ✅ popQuiz mechanic verified — 18 tests, all 4 requirement types working
 - ⚠️ Playtesting still needed — Must validate with puzzle players before launch
 
-**Phase 17 (Boss Expansion) — IN PROGRESS:**
+**Phase 17 (Boss Expansion) — COMPLETE:**
 - ✅ mirrorMatch mechanic tested — 44 tests, palindrome detection verified
 - ✅ stellarForge mechanic tested — 52 tests, supernova letter Q/X/Z detection verified
 - ✅ finalWord mechanic tested — 41 tests, phase cycling and delegation verified
 - ✅ scrambledReality enhanced — 42 tests, areAnagrams + foundWords tracking + translations
-- Remaining plans: 17-04, 17-05
+- ✅ Stub mechanic tests — All 10 boss mechanics have dedicated test files
+- ✅ Boss integration tests — 51 tests using real hooks for all 10 worlds
 
 **Phase 18 (Education XP):**
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
@@ -133,11 +136,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 17-03-PLAN.md
+Stopped at: Completed 17-05-PLAN.md (Phase 17 complete)
 Resume file: None
 
-**Next action:** Continue Phase 17 with 17-04-PLAN.md
+**Next action:** Begin Phase 18 (Education XP System)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Plan 17-03 complete)*
+*Last updated: 2026-01-25 (Phase 17 complete)*
