@@ -4018,11 +4018,15 @@ const he = {
       "lesson": "שיעור",
       "words": "מילים",
       "mastered": "נשלטו",
+      "new": "חדש",
+      "start": "התחל",
+      "continue": "המשך",
       "practice": "תרגול",
       "review": "חזרה",
       "empty": {
         "title": "אין שיעורים עדיין",
-        "subtitle": "הצטרפו לכיתה כדי להתחיל לתרגל"
+        "subtitle": "הצטרפו לכיתה כדי להתחיל לתרגל",
+        "joinClassroom": "הצטרפו לכיתה"
       },
       "sort": {
         "recent": "אחרונים",

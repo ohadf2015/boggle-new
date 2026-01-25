@@ -4025,11 +4025,15 @@ const sv = {
       "lesson": "Lektion",
       "words": "Ord",
       "mastered": "Bemästrad",
+      "new": "NY",
+      "start": "Starta",
+      "continue": "Fortsätt",
       "practice": "Öva",
       "review": "Repetera",
       "empty": {
         "title": "Inga lektioner än",
-        "subtitle": "Gå med i ett klassrum för att börja öva"
+        "subtitle": "Gå med i ett klassrum för att börja öva",
+        "joinClassroom": "Gå med i ett klassrum"
       },
       "sort": {
         "recent": "Senaste",

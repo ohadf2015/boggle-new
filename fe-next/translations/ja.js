@@ -4025,11 +4025,15 @@ const ja = {
       "lesson": "レッスン",
       "words": "単語",
       "mastered": "習得済み",
+      "new": "新規",
+      "start": "開始",
+      "continue": "続ける",
       "practice": "練習",
       "review": "復習",
       "empty": {
         "title": "レッスンがありません",
-        "subtitle": "クラスに参加して語彙練習を始めよう"
+        "subtitle": "クラスに参加して語彙練習を始めよう",
+        "joinClassroom": "クラスに参加"
       },
       "sort": {
         "recent": "新しい順",

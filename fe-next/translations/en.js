@@ -4012,11 +4012,15 @@ const en = {
       "lesson": "Lesson",
       "words": "Words",
       "mastered": "Mastered",
+      "new": "NEW",
+      "start": "Start",
+      "continue": "Continue",
       "practice": "Practice",
       "review": "Review",
       "empty": {
         "title": "No lessons assigned yet",
-        "subtitle": "Join a classroom to get started with vocabulary practice"
+        "subtitle": "Join a classroom to get started with vocabulary practice",
+        "joinClassroom": "Join a Classroom"
       },
       "sort": {
         "recent": "Recent",
