@@ -33,14 +33,14 @@ Requirements for Adventure & Education Expansion milestone. Each maps to roadmap
 
 ### Education Gamification
 
-- [ ] **GAMIFY-01**: Student earns XP from practice activities (flashcards, solo board, lesson completion)
-- [ ] **GAMIFY-02**: Student sees XP progress bar toward next level
-- [ ] **GAMIFY-03**: Student levels up based on XP accumulation
+- [x] **GAMIFY-01**: Student earns XP from practice activities (flashcards, solo board, lesson completion)
+- [x] **GAMIFY-02**: Student sees XP progress bar toward next level
+- [x] **GAMIFY-03**: Student levels up based on XP accumulation
 - [ ] **GAMIFY-04**: Student sees classroom leaderboard (top students by XP, classroom-scoped)
 - [ ] **GAMIFY-05**: Student can earn 15-20 meaningful achievements (Bronze/Silver/Gold/Platinum tiers)
 - [ ] **GAMIFY-06**: Student sees achievement unlock modal when earning badge
 - [ ] **GAMIFY-07**: Student can view earned achievement badges in profile
-- [ ] **GAMIFY-08**: Student earns streak bonuses for consecutive practice days
+- [x] **GAMIFY-08**: Student earns streak bonuses for consecutive practice days
 
 ### Student Analytics
 
@@ -131,14 +131,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMBO-03 | Phase 15 | Pending |
 | COMBO-04 | Phase 15 | Pending |
 | COMBO-05 | Phase 15 | Pending |
-| GAMIFY-01 | Phase 18 | Pending |
-| GAMIFY-02 | Phase 18 | Pending |
-| GAMIFY-03 | Phase 18 | Pending |
+| GAMIFY-01 | Phase 18 | Complete |
+| GAMIFY-02 | Phase 18 | Complete |
+| GAMIFY-03 | Phase 18 | Complete |
 | GAMIFY-04 | Phase 19 | Pending |
 | GAMIFY-05 | Phase 19 | Pending |
 | GAMIFY-06 | Phase 19 | Pending |
 | GAMIFY-07 | Phase 19 | Pending |
-| GAMIFY-08 | Phase 18 | Pending |
+| GAMIFY-08 | Phase 18 | Complete |
 | ANALYTICS-01 | Phase 20 | Pending |
 | ANALYTICS-02 | Phase 20 | Pending |
 | ANALYTICS-03 | Phase 20 | Pending |
