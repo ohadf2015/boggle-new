@@ -4296,6 +4296,16 @@ const he = {
         "month": "חודש ברצף!",
         "monthDesc": "30 יום של מצוינות!"
       }
+    },
+    "leaderboard": {
+      "title": "לוח מובילים כיתתי",
+      "yourPosition": "המיקום שלך",
+      "youAreRank": "אתה במקום #{rank}",
+      "studentsInClass": "{count} תלמידים",
+      "inactive": "לא פעיל",
+      "noStudentsYet": "עדיין אין תלמידים בכיתה",
+      "level": "רמה {level}",
+      "xp": "{xp} נקודות ניסיון"
     }
   }
 };

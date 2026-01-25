@@ -5,6 +5,7 @@
  * - XP Progress UI (XpProgressBar, StreakBonusIndicator)
  * - Level Up Celebration (LevelUpCelebration)
  * - Practice Session Context (PracticeSessionProvider)
+ * - Classroom Leaderboard (ClassroomLeaderboard)
  */
 
 export { default as XpProgressBar } from './XpProgressBar';
@@ -25,3 +26,6 @@ export type {
   PracticeSessionProviderProps,
   CompletePracticeSessionData,
 } from './PracticeSessionProvider';
+
+export { default as ClassroomLeaderboard } from './ClassroomLeaderboard';
+export type { ClassroomLeaderboardProps } from './ClassroomLeaderboard';

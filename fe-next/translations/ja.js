@@ -4303,6 +4303,16 @@ const ja = {
         "month": "月間マスター！",
         "monthDesc": "30日間の素晴らしい成果！"
       }
+    },
+    "leaderboard": {
+      "title": "クラスリーダーボード",
+      "yourPosition": "あなたの順位",
+      "youAreRank": "あなたは#{rank}位です",
+      "studentsInClass": "{count}人の生徒",
+      "inactive": "非アクティブ",
+      "noStudentsYet": "まだこのクラスに生徒がいません",
+      "level": "レベル{level}",
+      "xp": "{xp} XP"
     }
   }
 };

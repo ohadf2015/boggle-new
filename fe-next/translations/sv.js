@@ -4303,6 +4303,16 @@ const sv = {
         "month": "MÅNADSMASTER!",
         "monthDesc": "30 dagar av excellens!"
       }
+    },
+    "leaderboard": {
+      "title": "Klassrumets Topplista",
+      "yourPosition": "Din Position",
+      "youAreRank": "Du är #{rank}",
+      "studentsInClass": "{count} elever",
+      "inactive": "Inaktiv",
+      "noStudentsYet": "Inga elever i klassrummet än",
+      "level": "Nivå {level}",
+      "xp": "{xp} XP"
     }
   }
 };

@@ -4306,6 +4306,16 @@ const en = {
         "month": "MONTHLY MASTER!",
         "monthDesc": "30 days of excellence!"
       }
+    },
+    "leaderboard": {
+      "title": "Classroom Leaderboard",
+      "yourPosition": "Your Position",
+      "youAreRank": "You're #{rank}",
+      "studentsInClass": "{count} students",
+      "inactive": "Inactive",
+      "noStudentsYet": "No students in this classroom yet",
+      "level": "Lv. {level}",
+      "xp": "{xp} XP"
     }
   }
 };
