@@ -7,7 +7,19 @@
 
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useEducationXp } from '../useEducationXp';
-import type { PracticeSessionXp } from '@/backend/modules/educationXpManager';
+
+// Type import (separate from mock)
+type PracticeSessionXp = {
+  type: 'flashcard' | 'solo_board' | 'lesson_completion';
+  sessionData: {
+    cardsReviewed?: number;
+    cardsCorrect?: number;
+    vocabularyWordsFound?: string[];
+    newWordsFound?: string[];
+    masteryLevel?: 'not_started' | 'started' | 'practicing' | 'mastered';
+  };
+  streakDays?: number;
+};
 
 // Mock the educationXpManager module
 jest.mock('@/backend/modules/educationXpManager', () => ({
@@ -42,6 +54,7 @@ jest.mock('@/utils/dailyChallenge/streaks', () => ({
   getStreakMilestoneMessage: jest.fn(),
 }));
 
+// Import mocked functions for assertions
 import {
   calculatePracticeXp,
   getMasteryMessage,
