@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useStudentProgress } from '@/hooks/useStudentProgress';
 import Header from '@/components/Header';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
@@ -17,11 +18,12 @@ import { ClassroomLeaderboard } from '@/components/education';
 import { cn } from '@/lib/utils';
 
 export default function StudentPage() {
-  const { user, profile, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
   const [isChecking, setIsChecking] = useState(true);
+  const { lessons } = useStudentProgress();
 
   useEffect(() => {
     // Check authentication
@@ -45,8 +47,8 @@ export default function StudentPage() {
     return null;
   }
 
-  // Get classroom ID from profile
-  const classroomId = profile?.classroom_id;
+  // Get classroom ID from first lesson (all lessons should have same classroom_id)
+  const classroomId = lessons.length > 0 ? lessons[0].classroomId : null;
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
