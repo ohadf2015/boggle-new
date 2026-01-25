@@ -14,9 +14,10 @@ interface PageLoaderProps {
   /** Mascot variant when using mascot or mascot-letters mode */
   mascotVariant?: MascotVariant;
   /**
-   * When true, uses flex-1 instead of screen-fit (100dvh).
-   * Use nested=true for Suspense fallbacks inside page content.
-   * Use nested=false (default) for loading.tsx files.
+   * When true, uses min-h-0 for nested flex contexts.
+   * Both nested=true and nested=false now use flex-1 to fill parent space.
+   * The screen-fit class was removed as it caused centering issues when
+   * PageLoader is inside the layout's flex container.
    */
   nested?: boolean;
 }
@@ -42,10 +43,13 @@ export const PageLoader = memo(function PageLoader({
   mascotVariant = 'happy',
   nested = false,
 }: PageLoaderProps) {
-  // Use flex-1 for nested Suspense fallbacks, screen-fit for full-page loading.tsx
+  // Both modes use flex-1 to fill the parent layout's flex container.
+  // nested=true adds min-h-0 for deeply nested flex contexts.
+  // screen-fit was removed as it caused centering issues (100dvh min-height
+  // conflicted with the layout's flex-based sizing).
   const containerClass = nested
     ? 'flex-1 min-h-0 flex items-center justify-center bg-neo-navy'
-    : 'screen-fit flex items-center justify-center bg-neo-navy';
+    : 'flex-1 flex items-center justify-center bg-neo-navy';
 
   return (
     <div className={containerClass} data-testid="page-loader">

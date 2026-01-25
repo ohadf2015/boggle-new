@@ -64,7 +64,8 @@ describe('PageLoader', () => {
     const { container } = render(<PageLoader />);
 
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).toHaveClass('screen-fit');
+    // Uses flex-1 instead of screen-fit to properly fill parent layout container
+    expect(wrapper).toHaveClass('flex-1');
     expect(wrapper).toHaveClass('flex');
     expect(wrapper).toHaveClass('items-center');
     expect(wrapper).toHaveClass('justify-center');
@@ -91,13 +92,22 @@ describe('PageLoader', () => {
     expect(loader).toHaveAttribute('data-variant', 'letters');
   });
 
+  it('should not use min-h-0 in non-nested mode (default)', () => {
+    const { container } = render(<PageLoader />);
+
+    const wrapper = container.firstChild as HTMLElement;
+    // Non-nested mode uses flex-1 without min-h-0
+    // (nested mode adds min-h-0 for deeply nested flex contexts)
+    expect(wrapper).not.toHaveClass('min-h-0');
+  });
+
   describe('nested mode (for Suspense fallbacks)', () => {
-    it('should use flex-1 instead of screen-fit when nested=true', () => {
+    it('should use flex-1 with min-h-0 when nested=true', () => {
       const { container } = render(<PageLoader nested />);
 
       const wrapper = container.firstChild as HTMLElement;
       expect(wrapper).toHaveClass('flex-1');
-      expect(wrapper).not.toHaveClass('screen-fit');
+      expect(wrapper).toHaveClass('min-h-0');
       expect(wrapper).toHaveClass('flex');
       expect(wrapper).toHaveClass('items-center');
       expect(wrapper).toHaveClass('justify-center');

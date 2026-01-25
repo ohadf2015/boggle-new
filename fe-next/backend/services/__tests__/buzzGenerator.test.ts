@@ -574,7 +574,28 @@ describe('Wordle challenge validation', () => {
   });
 
   it('should reject wordle_guess challenges with non-5-letter answers', async () => {
-    // AI returns a wordle_guess challenge with 6 letters (SNACKS instead of SNACK)
+    // First mock: AI content moderation response (approves all trends)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify([
+                    { index: 1, approved: true, category: 'approved' },
+                    { index: 2, approved: true, category: 'approved' },
+                    { index: 3, approved: true, category: 'approved' },
+                  ]),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Second mock: AI returns a wordle_guess challenge with 6 letters (SNACKS instead of SNACK)
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         candidates: [
@@ -669,7 +690,28 @@ describe('Wordle challenge validation', () => {
   });
 
   it('should accept wordle_guess challenges with exactly 5-letter answers', async () => {
-    // AI returns a wordle_guess challenge with correct 5 letters
+    // First mock: AI content moderation response (approves all trends)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify([
+                    { index: 1, approved: true, category: 'approved' },
+                    { index: 2, approved: true, category: 'approved' },
+                    { index: 3, approved: true, category: 'approved' },
+                  ]),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Second mock: AI returns a wordle_guess challenge with correct 5 letters
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         candidates: [
@@ -740,6 +782,9 @@ describe('Wordle challenge validation', () => {
 
     const today = new Date();
     const result = await generateDailyBuzz(today, 'en');
+
+    // DEBUG: Log all challenges to understand what's being returned
+    console.log('[TEST DEBUG] Challenge types:', result.challenges.map(c => ({ type: c.type, answer: c.answer })));
 
     // The wordle_guess with 5-letter answer should be included
     const wordleChallenges = result.challenges.filter(c => c.type === 'wordle_guess');
@@ -1108,7 +1153,28 @@ describe('Japanese 2-letter word validation', () => {
   });
 
   it('should accept 2-letter Japanese answers (kanji compounds)', async () => {
-    // AI returns challenges with valid 2-letter Japanese answers
+    // First mock: AI content moderation response (approves all Japanese trends)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify([
+                    { index: 1, approved: true, category: 'approved' },
+                    { index: 2, approved: true, category: 'approved' },
+                    { index: 3, approved: true, category: 'approved' },
+                  ]),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Second mock: AI returns challenges with valid 2-letter Japanese answers
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         candidates: [
@@ -1197,7 +1263,28 @@ describe('Japanese 2-letter word validation', () => {
   });
 
   it('should still reject 2-letter English answers', async () => {
-    // AI returns a challenge with invalid 2-letter English answer
+    // First mock: AI content moderation response (approves all trends)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify([
+                    { index: 1, approved: true, category: 'approved' },
+                    { index: 2, approved: true, category: 'approved' },
+                    { index: 3, approved: true, category: 'approved' },
+                  ]),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Second mock: AI returns a challenge with invalid 2-letter English answer
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         candidates: [
