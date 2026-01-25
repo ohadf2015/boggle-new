@@ -4128,6 +4128,14 @@ const en = {
     }
   },
   "education": {
+    "landing": {
+      "title": "Education Mode",
+      "teacher": "I'm a Teacher",
+      "teacherDesc": "Create classrooms, build vocabulary lessons, and track student progress",
+      "student": "I'm a Student",
+      "studentDesc": "Join your classroom and practice vocabulary lessons",
+      "signInRequired": "Sign in required"
+    },
     "template": {
       "create": "Create Template",
       "edit": "Edit Template",
@@ -4192,7 +4200,19 @@ const en = {
       "progress": "Your Progress",
       "startPractice": "Start Practice",
       "noLessons": "No lessons assigned yet",
-      "askTeacher": "Ask your teacher for a classroom code"
+      "askTeacher": "Ask your teacher for a classroom code",
+      "join": {
+        "title": "Join Classroom",
+        "subtitle": "Enter the code from your teacher",
+        "codeLabel": "Classroom Code",
+        "codeHint": "Ask your teacher for the 6-character classroom code",
+        "button": "Join Classroom",
+        "joining": "Joining...",
+        "pasteButton": "Paste code",
+        "success": "Successfully joined classroom!",
+        "invalidCode": "Invalid classroom code",
+        "alreadyMember": "You are already a member of this classroom"
+      }
     }
   }
 };

@@ -4140,6 +4140,14 @@ const sv = {
     }
   },
   "education": {
+    "landing": {
+      "title": "Utbildningsläge",
+      "teacher": "Jag är lärare",
+      "teacherDesc": "Skapa klassrum, bygg ordförrådslektioner och spåra elevernas framsteg",
+      "student": "Jag är elev",
+      "studentDesc": "Gå med i ditt klassrum och öva ordförrådslektioner",
+      "signInRequired": "Inloggning krävs"
+    },
     "template": {
       "create": "Skapa mall",
       "edit": "Redigera mall",
@@ -4204,7 +4212,19 @@ const sv = {
       "progress": "Din framsteg",
       "startPractice": "Börja öva",
       "noLessons": "Inga lektioner tilldelade ännu",
-      "askTeacher": "Be din lärare om en klassrumskod"
+      "askTeacher": "Be din lärare om en klassrumskod",
+      "join": {
+        "title": "Gå med i klassrum",
+        "subtitle": "Ange koden från din lärare",
+        "codeLabel": "Klassrumskod",
+        "codeHint": "Be din lärare om den 6-siffriga klassrumskoden",
+        "button": "Gå med i klassrum",
+        "joining": "Går med...",
+        "pasteButton": "Klistra in kod",
+        "success": "Har gått med i klassrummet!",
+        "invalidCode": "Ogiltig klassrumskod",
+        "alreadyMember": "Du är redan medlem i detta klassrum"
+      }
     }
   }
 };

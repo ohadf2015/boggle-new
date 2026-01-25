@@ -4140,6 +4140,14 @@ const ja = {
     }
   },
   "education": {
+    "landing": {
+      "title": "教育モード",
+      "teacher": "私は教師です",
+      "teacherDesc": "クラスルームを作成し、語彙レッスンを構築し、生徒の進捗を追跡します",
+      "student": "私は生徒です",
+      "studentDesc": "クラスルームに参加して語彙レッスンを練習します",
+      "signInRequired": "サインインが必要です"
+    },
     "template": {
       "create": "テンプレート作成",
       "edit": "テンプレート編集",
@@ -4204,7 +4212,19 @@ const ja = {
       "progress": "あなたの進捗",
       "startPractice": "練習開始",
       "noLessons": "まだレッスンが割り当てられていません",
-      "askTeacher": "先生にクラスコードを聞いてください"
+      "askTeacher": "先生にクラスコードを聞いてください",
+      "join": {
+        "title": "クラスに参加",
+        "subtitle": "先生からのコードを入力してください",
+        "codeLabel": "クラスコード",
+        "codeHint": "6文字のクラスコードを先生に聞いてください",
+        "button": "クラスに参加",
+        "joining": "参加中...",
+        "pasteButton": "コードを貼り付け",
+        "success": "クラスに参加しました！",
+        "invalidCode": "無効なクラスコードです",
+        "alreadyMember": "すでにこのクラスのメンバーです"
+      }
     }
   }
 };
