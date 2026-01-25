@@ -4262,6 +4262,36 @@ const es = {
         "invalidCode": "Código inválido",
         "alreadyMember": "Ya eres miembro de esta aula"
       }
+    },
+    "xp": {
+      "level": "Nivel",
+      "nextLevel": "Siguiente Nivel",
+      "xpGained": "XP Ganado",
+      "totalXp": "XP Total",
+      "progress": "Progreso",
+      "levelUp": "¡Subiste de Nivel!",
+      "newLevel": "Alcanzaste el nivel",
+      "streak": "Racha de Días",
+      "streakBonus": "Bonus de Racha",
+      "keepGoing": "¡Sigue practicando para subir de nivel!",
+      "newTitleUnlocked": "¡Nuevo Título Desbloqueado!",
+      "continue": "Continuar",
+      "mastery": {
+        "perfectFlashcard": "¡Perfecto! ¡Dominaste las {count} palabras!",
+        "learnedWords": "¡Aprendiste {count} palabras!",
+        "discoveredVocab": "¡Descubriste {count} palabras de vocabulario nuevas!",
+        "greatPractice": "¡Excelente práctica! ¡Sigue encontrando palabras!",
+        "lessonMastered": "¡Lección dominada! ¡Ya sabes estas palabras!",
+        "keepPracticing": "¡Buen trabajo! Sigue practicando para dominar esta lección."
+      },
+      "streakMilestone": {
+        "week": "¡RACHA DE 1 SEMANA!",
+        "weekDesc": "¡Una semana completa aprendiendo!",
+        "twoWeeks": "¡2 SEMANAS SEGUIDAS!",
+        "twoWeeksDesc": "¡Dos semanas de dedicación!",
+        "month": "¡MAESTRO MENSUAL!",
+        "monthDesc": "¡30 días de excelencia!"
+      }
     }
   }
 };
