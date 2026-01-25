@@ -287,7 +287,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       if (path) {
         for (const pos of path) {
           rowsToClone.add(pos.row);
-          // Also track adjacent rows for ice melting
+          // Also track adjacent rows for ice melting and chain tile linking
           if (pos.row > 0) rowsToClone.add(pos.row - 1);
           if (pos.row < gridSize - 1) rowsToClone.add(pos.row + 1);
         }
@@ -295,6 +295,15 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         for (const pos of path) {
           if (state.tiles[pos.row]?.[pos.col]?.type === 'bomb') {
             rowsToClone.add(pos.row);
+          }
+        }
+        // Check for chain tiles - they affect adjacent rows
+        for (const pos of path) {
+          if (state.tiles[pos.row]?.[pos.col]?.type === 'chain') {
+            // Add all 3 rows (row above, current row, row below) for adjacent tile marking
+            if (pos.row > 0) rowsToClone.add(pos.row - 1);
+            rowsToClone.add(pos.row);
+            if (pos.row < gridSize - 1) rowsToClone.add(pos.row + 1);
           }
         }
       }

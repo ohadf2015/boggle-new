@@ -84,7 +84,11 @@ export function ChainParticleBurst({
       const worldConfig = getWorldParticleConfig(world);
       const count = getParticleCount();
       const newParticles: ChainParticle[] = Array.from({ length: count }, (_, i) => {
-        const useEmojiForThis = i % 3 === 0 && worldConfig.emoji;
+        // Use emoji for every 3rd particle if the world theme has one defined
+        const useEmojiForThis: boolean | string =
+          i % 3 === 0 && typeof worldConfig.emoji === 'string'
+            ? worldConfig.emoji
+            : false;
         return {
           id: Date.now() + i,
           angle: (360 / count) * i + (Math.random() - 0.5) * 20,
