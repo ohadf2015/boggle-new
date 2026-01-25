@@ -12,6 +12,8 @@ import userEvent from '@testing-library/user-event';
 // Mock dependencies
 const mockAwardPracticeXp = jest.fn();
 const mockAcknowledgePersistence = jest.fn();
+const mockCheckForUnlocks = jest.fn();
+const mockAcknowledgeUnlock = jest.fn();
 
 // Mock Supabase
 const mockSupabaseUpsert = jest.fn().mockResolvedValue({ data: null, error: null });
@@ -68,6 +70,24 @@ jest.mock('@/hooks/useEducationXp', () => ({
     error: null,
     pendingUpdate: null,
   })),
+}));
+
+// Mock useAchievementUnlock hook
+jest.mock('@/hooks/useAchievementUnlock', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    pendingUnlocks: [],
+    currentUnlock: null,
+    acknowledgeUnlock: mockAcknowledgeUnlock,
+    checkForUnlocks: mockCheckForUnlocks,
+    isChecking: false,
+  })),
+}));
+
+// Mock AchievementUnlockModal component
+jest.mock('./AchievementUnlockModal', () => ({
+  __esModule: true,
+  default: jest.fn(() => <div data-testid="achievement-modal">Achievement Modal</div>),
 }));
 
 // Mock LanguageContext
@@ -421,6 +441,169 @@ describe('PracticeSessionProvider', () => {
       await waitFor(() => {
         expect(screen.getByTestId('session-xp')).toHaveTextContent('100');
       });
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Achievement Integration', () => {
+    beforeEach(() => {
+      mockCheckForUnlocks.mockClear();
+      mockAcknowledgeUnlock.mockClear();
+    });
+
+    it('calls checkForUnlocks after XP is awarded', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalled();
+      });
+    });
+
+    it('passes correct progress data to checkForUnlocks', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
+          expect.objectContaining({
+            total_xp: 600, // 500 initial + 100 earned
+            current_level: 3,
+            current_streak: 5,
+            total_practice_sessions: 1,
+          })
+        );
+      });
+    });
+
+    it('increments total practice sessions on each completion', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      // First completion
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
+          expect.objectContaining({
+            total_practice_sessions: 1,
+          })
+        );
+      });
+
+      // Second completion
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
+          expect.objectContaining({
+            total_practice_sessions: 2,
+          })
+        );
+      });
+    });
+
+    it('tracks total words mastered from flashcard sessions', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      // Complete flashcard with 9 correct
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
+          expect.objectContaining({
+            total_words_mastered: 9, // cardsCorrect from first session
+          })
+        );
+      });
+    });
+
+    it('renders AchievementUnlockModal', () => {
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      expect(screen.getByTestId('achievement-modal')).toBeInTheDocument();
+    });
+
+    it('updates level in progress data when leveling up', async () => {
+      const user = userEvent.setup();
+
+      // Configure mock to return level up
+      mockAwardPracticeXp.mockResolvedValueOnce({
+        totalXp: 200,
+        breakdown: {},
+        masteryMessage: 'Level up!',
+        leveledUp: true,
+        newLevel: 4,
+        newTitles: ['Word Master'],
+      });
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
+          expect.objectContaining({
+            current_level: 4, // New level from XP award
+          })
+        );
+      });
+    });
+
+    it('does not re-trigger achievement check if XP award fails', async () => {
+      const user = userEvent.setup();
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockAwardPracticeXp.mockRejectedValueOnce(new Error('XP award failed'));
+
+      render(
+        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+          <TestConsumer />
+        </PracticeSessionProvider>
+      );
+
+      await user.click(screen.getByTestId('complete-btn'));
+
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalled();
+      });
+
+      // Should not call checkForUnlocks when award fails
+      expect(mockCheckForUnlocks).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
     });

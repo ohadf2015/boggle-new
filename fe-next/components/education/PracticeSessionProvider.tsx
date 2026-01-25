@@ -8,6 +8,7 @@
  * - XP state from useEducationXp hook
  * - Session-specific tracking (XP earned this session)
  * - Level up modal state
+ * - Achievement unlock detection
  * - Supabase persistence on session completion
  *
  * Design: Mastery-focused (research pitfall 1 - intrinsic > extrinsic)
@@ -25,6 +26,8 @@ import useEducationXp, {
   type XpProgress,
   type DailyStreak,
 } from '@/hooks/useEducationXp';
+import useAchievementUnlock from '@/hooks/useAchievementUnlock';
+import AchievementUnlockModal from './AchievementUnlockModal';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
@@ -115,11 +118,19 @@ export function PracticeSessionProvider({
     initialStreak,
   });
 
+  // Achievement unlock detection
+  const { currentUnlock, acknowledgeUnlock, checkForUnlocks } = useAchievementUnlock({
+    studentId,
+    enabled: true,
+  });
+
   // Session-specific state
   const [sessionXpEarned, setSessionXpEarned] = useState<number>(0);
   const [sessionMasteryMessage, setSessionMasteryMessage] = useState<string | null>(null);
   const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
   const [isPersisting, setIsPersisting] = useState<boolean>(false);
+  const [totalPracticeSessions, setTotalPracticeSessions] = useState<number>(0);
+  const [totalWordsMastered, setTotalWordsMastered] = useState<number>(0);
 
   /**
    * Complete a practice session and award XP
@@ -171,13 +182,45 @@ export function PracticeSessionProvider({
           streak.currentStreak,
           Math.max(streak.longestStreak, streak.currentStreak)
         );
+
+        // Increment session counter
+        const newSessionCount = totalPracticeSessions + 1;
+        setTotalPracticeSessions(newSessionCount);
+
+        // Track total words mastered (estimate from flashcard correct answers)
+        let newWordsMastered = totalWordsMastered;
+        if (sessionData.type === 'flashcard' && sessionData.cardsCorrect) {
+          newWordsMastered = totalWordsMastered + sessionData.cardsCorrect;
+          setTotalWordsMastered(newWordsMastered);
+        }
+
+        // Check for achievement unlocks after XP is awarded
+        checkForUnlocks({
+          total_xp: totalXp + result.totalXp,
+          total_words_mastered: newWordsMastered,
+          current_level: result.newLevel || currentLevel,
+          current_streak: streak.currentStreak,
+          total_practice_sessions: newSessionCount,
+          bosses_defeated: 0, // TODO: Track when boss mode is added
+          combos_achieved: 0, // TODO: Track from board practice
+        });
       } catch (error) {
         logger.error('Error completing practice session:', error);
       } finally {
         setIsPersisting(false);
       }
     },
-    [awardPracticeXp, streak, currentLevel, totalXp, studentId, lessonId]
+    [
+      awardPracticeXp,
+      streak,
+      currentLevel,
+      totalXp,
+      studentId,
+      lessonId,
+      checkForUnlocks,
+      totalPracticeSessions,
+      totalWordsMastered,
+    ]
   );
 
   /**
@@ -228,6 +271,12 @@ export function PracticeSessionProvider({
   return (
     <PracticeSessionContext.Provider value={value}>
       {children}
+
+      {/* Achievement unlock celebration modal */}
+      <AchievementUnlockModal
+        unlock={currentUnlock}
+        onClose={acknowledgeUnlock}
+      />
     </PracticeSessionContext.Provider>
   );
 }
