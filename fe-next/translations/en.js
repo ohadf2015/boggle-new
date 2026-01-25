@@ -4264,6 +4264,7 @@ const en = {
       "startPractice": "Start Practice",
       "noLessons": "No lessons assigned yet",
       "askTeacher": "Ask your teacher for a classroom code",
+      "lessonsAssigned": "Lessons Assigned",
       "join": {
         "title": "Join Classroom",
         "subtitle": "Enter the code from your teacher",

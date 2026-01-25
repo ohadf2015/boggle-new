@@ -4261,6 +4261,7 @@ const sv = {
       "startPractice": "Börja öva",
       "noLessons": "Inga lektioner tilldelade ännu",
       "askTeacher": "Be din lärare om en klassrumskod",
+      "lessonsAssigned": "Tilldelade lektioner",
       "join": {
         "title": "Gå med i klassrum",
         "subtitle": "Ange koden från din lärare",

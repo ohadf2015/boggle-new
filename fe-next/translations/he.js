@@ -4254,6 +4254,7 @@ const he = {
       "startPractice": "התחל תרגול",
       "noLessons": "אין שיעורים שהוקצו עדיין",
       "askTeacher": "בקש מהמורה קוד כיתה",
+      "lessonsAssigned": "שיעורים שהוקצו",
       "join": {
         "title": "הצטרף לכיתה",
         "subtitle": "הזן את הקוד מהמורה שלך",

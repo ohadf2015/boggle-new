@@ -4250,6 +4250,7 @@ const es = {
       "startPractice": "Empezar Práctica",
       "noLessons": "Sin lecciones asignadas aún",
       "askTeacher": "Pide el código a tu profesor",
+      "lessonsAssigned": "Lecciones Asignadas",
       "join": {
         "title": "Unirse a Aula",
         "subtitle": "Ingresa el código de tu profesor",

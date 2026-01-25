@@ -4261,6 +4261,7 @@ const ja = {
       "startPractice": "練習開始",
       "noLessons": "まだレッスンが割り当てられていません",
       "askTeacher": "先生にクラスコードを聞いてください",
+      "lessonsAssigned": "割り当てられたレッスン",
       "join": {
         "title": "クラスに参加",
         "subtitle": "先生からのコードを入力してください",
