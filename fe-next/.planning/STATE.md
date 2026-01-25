@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 16 - Boss Battle Foundation (next)
+**Current focus:** Phase 17 - Boss Mechanic Expansion (next)
 
 ## Current Position
 
-Phase: 16 of 23 (Boss Battle Foundation) — IN PROGRESS
-Plan: 3/5 complete
-Status: Executing
-Last activity: 2026-01-25 — Completed 16-03-PLAN.md (Boss Overlay Integration)
+Phase: 16 of 23 (Boss Battle Foundation) — COMPLETE
+Plan: 4/4 complete
+Status: Verified
+Last activity: 2026-01-25 — Phase 16 complete, all 4 plans executed, goal verified
 
-Progress: [███░░░░░░░] 16/23 phases (69% milestone complete, v1.1 in progress)
+Progress: [████░░░░░░] 16/23 phases (70% milestone complete, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [███░░░░░░░] 16/23 phases (69% milestone complete,
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 8 (Phase 15 complete, Phase 16 in progress)
-- Current phase: 16 (Boss Battle Foundation) — IN PROGRESS
-- Next plan: 16-04 (PopQuiz Mechanic Verification)
+- Plans completed: 9 (Phase 15 complete, Phase 16 complete)
+- Current phase: 16 (Boss Battle Foundation) — VERIFIED
+- Next phase: 17 (Boss Mechanic Expansion)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -51,10 +51,9 @@ Progress: [███░░░░░░░] 16/23 phases (69% milestone complete,
 | 16-01 | Boss HP Tracking | 12min | ✅ Complete |
 | 16-02 | Boss HP Bar UI | 11min | ✅ Complete |
 | 16-03 | Boss Overlay Integration | 14min | ✅ Complete |
-| 16-04 | PopQuiz Mechanic Verification | — | ⏸️ Pending |
-| 16-05 | Boss Integration | — | ⏸️ Pending |
+| 16-04 | PopQuiz Mechanic Verification | 9min | ✅ Complete |
 
-**Phase 16 Progress:** 3/5 plans, 37 minutes, 50 tests added
+**Phase 16 Total:** 46 minutes, 57 tests added
 
 ## Accumulated Context
 
@@ -96,9 +95,15 @@ None.
 - ✅ RTL tested — Hebrew rendering verified for combo badges
 - ✅ Multiplayer isolation — 854 backend tests passing, zero imports crossed
 
-**Phase 16 (Boss Battles) — NEXT:**
-- Difficulty mismatch risk — Design as "puzzle under pressure" not "action challenge," target 80% completion (research pitfall 1)
-- Playtesting required — Must validate with puzzle players (Wordle audience), NOT action gamers
+**Phase 16 (Boss Battles) — RESOLVED:**
+- ✅ Boss HP tracking implemented — 21 tests passing, 5-phase state machine
+- ✅ BossHPBar component — 18 tests, spring animations, enraged indicator
+- ✅ Integration complete — BossOverlay compound component, damage wired
+- ✅ popQuiz mechanic verified — 18 tests, all 4 requirement types working
+- ⚠️ Playtesting still needed — Must validate with puzzle players before launch
+
+**Phase 17 (Boss Expansion) — NEXT:**
+- Extend state machine for additional mechanics (idiomIslands, compoundMerge, etc.)
 
 **Phase 18 (Education XP):**
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
@@ -111,11 +116,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 16-03-PLAN.md (Boss Overlay Integration)
+Stopped at: Phase 16 complete and verified
 Resume file: None
 
-**Next action:** Execute 16-04-PLAN.md (PopQuiz Mechanic Verification)
+**Next action:** `/gsd:discuss-phase 17` to start Boss Mechanic Expansion
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (16-03 complete)*
+*Last updated: 2026-01-25 (Phase 16 complete)*
