@@ -1,0 +1,467 @@
+/**
+ * AchievementProgressCard Tests
+ * Tests for individual achievement card display with tier, progress, and pinning
+ */
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import AchievementProgressCard from './AchievementProgressCard';
+
+// Mock LanguageContext
+jest.mock('../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, vars?: Record<string, any>) => {
+      const translations: Record<string, string> = {
+        'education.achievements.word_master.name': 'Word Master',
+        'education.achievements.word_master.hint': 'Master 50 words to unlock',
+        'education.achievements.streak_champion.name': 'Secret Achievement',
+        'education.achievements.streak_champion.hint': 'Hidden until discovered...',
+        'education.achievements.tiers.bronze': 'Bronze',
+        'education.achievements.tiers.silver': 'Silver',
+        'education.achievements.tiers.gold': 'Gold',
+        'education.achievements.tiers.platinum': 'Platinum',
+        'education.achievements.maxTier': 'Max Tier!',
+        'education.achievements.toNext': '{percent}% to {tier}',
+        'education.achievements.progress': '{current}/{next}',
+        'education.achievements.pin': 'Pin badge',
+        'education.achievements.unpin': 'Unpin badge',
+        'education.achievements.maxPinsReached': 'Unpin another badge first',
+        'education.achievements.locked': 'Locked',
+        'education.achievements.secret': 'Secret Achievement',
+      };
+
+      let result = translations[key] || key;
+      if (vars) {
+        Object.keys(vars).forEach(varKey => {
+          result = result.replace(`{${varKey}}`, String(vars[varKey]));
+        });
+      }
+      return result;
+    },
+    language: 'en',
+    direction: 'ltr',
+  }),
+}));
+
+describe('AchievementProgressCard', () => {
+  describe('Earned Badge Display', () => {
+    it('renders earned badge with correct tier color', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByText('Word Master')).toBeInTheDocument();
+      expect(screen.getByText('Bronze')).toBeInTheDocument();
+      expect(screen.getByText('🎓')).toBeInTheDocument();
+    });
+
+    it('shows progress bar with current/next values', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByText('75/150')).toBeInTheDocument();
+    });
+
+    it('shows percent to next tier', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 100,
+        nextThreshold: 150,
+        currentThreshold: 50, // Bronze threshold
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      // Progress from bronze (50) to silver (150): (100-50)/(150-50) = 50%
+      expect(screen.getByText(/50% to Silver/)).toBeInTheDocument();
+    });
+
+    it('shows "Max Tier!" when at platinum', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'platinum' as const,
+        progressValue: 1000,
+        nextThreshold: null,
+        isMaxTier: true,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByText('Max Tier!')).toBeInTheDocument();
+      expect(screen.getByText('Platinum')).toBeInTheDocument();
+    });
+
+    it('applies correct tier color classes', () => {
+      const tierColors = ['bronze', 'silver', 'gold', 'platinum'];
+
+      tierColors.forEach((tier) => {
+        const { container } = render(
+          <AchievementProgressCard
+            achievement={{
+              key: 'word_master',
+              category: 'progress',
+              icon: '🎓',
+              isSecret: false,
+              currentTier: tier as any,
+              progressValue: 100,
+              nextThreshold: tier === 'platinum' ? null : 200,
+              isMaxTier: tier === 'platinum',
+            }}
+            isPinned={false}
+            onTogglePin={jest.fn()}
+            canPin={true}
+          />
+        );
+
+        // Check that tier-specific class is applied
+        const badge = container.querySelector(`[data-tier="${tier}"]`);
+        expect(badge).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Locked Badge Display', () => {
+    it('renders locked badge with hint', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: null,
+        progressValue: 25,
+        nextThreshold: 50,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByText('Word Master')).toBeInTheDocument();
+      expect(screen.getByText('Master 50 words to unlock')).toBeInTheDocument();
+      expect(screen.getByText('Locked')).toBeInTheDocument();
+    });
+
+    it('applies muted styling to locked badges', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: null,
+        progressValue: 25,
+        nextThreshold: 50,
+        isMaxTier: false,
+      };
+
+      const { container } = render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      const card = container.querySelector('[data-locked="true"]');
+      expect(card).toBeInTheDocument();
+    });
+
+    it('does not show pin button for locked badges', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: null,
+        progressValue: 25,
+        nextThreshold: 50,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.queryByLabelText(/pin/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Secret Badge Display', () => {
+    it('renders secret badge as "???"', () => {
+      const achievement = {
+        key: 'streak_champion',
+        category: 'consistency' as const,
+        icon: '👑',
+        isSecret: true,
+        currentTier: null,
+        progressValue: 5,
+        nextThreshold: 7,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByText('Secret Achievement')).toBeInTheDocument();
+      expect(screen.getByText('Hidden until discovered...')).toBeInTheDocument();
+      expect(screen.getByText('???')).toBeInTheDocument();
+    });
+
+    it('shows revealed secret when unlocked', () => {
+      const achievement = {
+        key: 'streak_champion',
+        category: 'consistency' as const,
+        icon: '👑',
+        isSecret: true,
+        currentTier: 'bronze' as const,
+        progressValue: 10,
+        nextThreshold: 30,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByText('Secret Achievement')).toBeInTheDocument();
+      expect(screen.getByText('👑')).toBeInTheDocument();
+      expect(screen.queryByText('???')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Pin Functionality', () => {
+    it('pin button toggles on click', () => {
+      const onTogglePin = jest.fn();
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={onTogglePin}
+          canPin={true}
+        />
+      );
+
+      const pinButton = screen.getByLabelText('Pin badge');
+      fireEvent.click(pinButton);
+
+      expect(onTogglePin).toHaveBeenCalledWith('word_master');
+    });
+
+    it('shows filled star when pinned', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={true}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      const unpinButton = screen.getByLabelText('Unpin badge');
+      expect(unpinButton).toBeInTheDocument();
+    });
+
+    it('pin button disabled when canPin=false', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={false}
+        />
+      );
+
+      const pinButton = screen.getByLabelText('Pin badge');
+      expect(pinButton).toBeDisabled();
+    });
+
+    it('shows tooltip when max pins reached', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={false}
+        />
+      );
+
+      const pinButton = screen.getByLabelText('Pin badge');
+      expect(pinButton).toHaveAttribute('title', 'Unpin another badge first');
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('has proper ARIA labels for screen readers', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      expect(screen.getByRole('article')).toHaveAttribute('aria-label', 'Word Master achievement');
+      expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    });
+
+    it('progress bar has correct aria-valuenow and aria-valuemax', () => {
+      const achievement = {
+        key: 'word_master',
+        category: 'progress' as const,
+        icon: '🎓',
+        isSecret: false,
+        currentTier: 'bronze' as const,
+        progressValue: 75,
+        nextThreshold: 150,
+        isMaxTier: false,
+      };
+
+      render(
+        <AchievementProgressCard
+          achievement={achievement}
+          isPinned={false}
+          onTogglePin={jest.fn()}
+          canPin={true}
+        />
+      );
+
+      const progressBar = screen.getByRole('progressbar');
+      expect(progressBar).toHaveAttribute('aria-valuenow', '75');
+      expect(progressBar).toHaveAttribute('aria-valuemax', '150');
+    });
+  });
+});
