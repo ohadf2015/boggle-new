@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import type { GridTileState, TileType, TileActivationEffect } from '@/types/adventure';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
 import './AdventureTile.css';
@@ -201,6 +202,9 @@ const AdventureGrid = memo(
         key: number;
       }>({ position: null, key: 0 });
 
+      // Chain cascade animation for chain tile reactions
+      const chainCascade = useCascadeAnimation();
+
     // Calculate cascade delay per tile (diagonal wave pattern)
     const getCascadeDelay = useCallback((row: number, col: number): number => {
       // Diagonal wave: tiles closer to top-left appear first
@@ -233,6 +237,32 @@ const AdventureGrid = memo(
         onCascadeCompleteRef.current?.();
       }
     }, [showCascade, prefersReducedMotion, cascadeComplete]);
+
+    // Detect chain tile activation and trigger cascade
+    useEffect(() => {
+      // Find chain tile with 'link' activation effect
+      const chainTile = tiles.find(
+        (tile) => tile.type === 'chain' && tile.activationEffect === 'link' && tile.activationTimestamp
+      );
+
+      if (!chainTile) return;
+
+      // Find all tiles marked as chained
+      const chainedIndices = tiles
+        .map((tile, idx) => (tile.isChained ? idx : -1))
+        .filter((idx) => idx !== -1);
+
+      if (chainedIndices.length === 0) return;
+
+      // Trigger cascade animation from chain tile position
+      chainCascade.startCascade({
+        origin: { row: chainTile.row, col: chainTile.col },
+        affectedIndices: chainedIndices,
+        gridSize,
+        staggerMs: 50, // Slower than regular cascade (30ms) for emphasis
+        animationType: 'wave',
+      });
+    }, [tiles, gridSize, chainCascade]);
 
     // Build selected set for quick lookup
     const selectedSet = useMemo(
@@ -503,6 +533,10 @@ const AdventureGrid = memo(
             const borderClass = isStandardTile ? BORDER_CLASSES[worldId] : '';
             const letterGlowClass = LETTER_GLOW_CLASSES[worldId] || LETTER_GLOW_CLASSES[1];
 
+            // Chain cascade delay for chained tiles (takes priority over tile.cascadeDelay)
+            const chainCascadeDelay = tile.isChained ? chainCascade.delays.get(index) : undefined;
+            const effectiveCascadeDelay = chainCascadeDelay ?? tile.cascadeDelay;
+
             return (
               <motion.div
                 key={tile.id}
@@ -546,8 +580,8 @@ const AdventureGrid = memo(
                 }
                 whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
                 style={{
-                  animationDelay: tile.cascadeDelay
-                    ? `${tile.cascadeDelay}ms`
+                  animationDelay: effectiveCascadeDelay
+                    ? `${effectiveCascadeDelay}ms`
                     : undefined,
                 }}
                 className={cn(
