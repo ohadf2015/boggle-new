@@ -3847,6 +3847,7 @@ const he = {
       "twistMechanic": "טוויסט הבוס",
       "skipIntro": "דלג",
       "readyToFight": "קדימה!",
+      "enraged": "זועם!",
       "msGrammar": {
         "name": "גב' דקדוק",
         "mechanic": "פרוטוקול בוחן פתע - מצאו מילים שתואמות לדרישות שלי!",

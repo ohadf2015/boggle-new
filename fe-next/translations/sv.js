@@ -3854,6 +3854,7 @@ const sv = {
       "twistMechanic": "Boss-twist",
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",
+      "enraged": "RASANDE!",
       "msGrammar": {
         "name": "Fröken Grammatik",
         "mechanic": "Prov-protokollet - Hitta ord som matchar mina krav!",

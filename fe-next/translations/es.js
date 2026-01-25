@@ -3843,6 +3843,7 @@ const es = {
       "twistMechanic": "Giro del jefe",
       "skipIntro": "Saltar",
       "readyToFight": "¡Vamos!",
+      "enraged": "¡ENFURECIDO!",
       "msGrammar": {
         "name": "Srta. Gramática",
         "mechanic": "Protocolo de examen sorpresa - ¡Encuentra palabras que cumplan mis requisitos!",

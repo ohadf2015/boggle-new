@@ -3854,6 +3854,7 @@ const ja = {
       "twistMechanic": "ボスツイスト",
       "skipIntro": "スキップ",
       "readyToFight": "いくぞ！",
+      "enraged": "激怒!",
       "msGrammar": {
         "name": "ミス・グラマー",
         "mechanic": "抜き打ちテスト - 私の要件に合う単語を見つけて！",

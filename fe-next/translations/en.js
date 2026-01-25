@@ -3841,6 +3841,7 @@ const en = {
       "twistMechanic": "Boss Twist",
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
+      "enraged": "ENRAGED!",
       "msGrammar": {
         "name": "Ms. Grammar",
         "mechanic": "Pop Quiz Protocol - Find words matching my requirements!",
