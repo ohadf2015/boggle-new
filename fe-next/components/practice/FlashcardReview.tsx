@@ -22,6 +22,11 @@ interface FlashcardReviewProps {
   onComplete: (results: { correct: number; total: number }) => void;
   onBack: () => void;
   onCardReviewed?: (correct: boolean) => void;
+  /** XP session data to display on results screen (optional) */
+  xpSessionData?: {
+    sessionXpEarned: number;
+    sessionMasteryMessage: string | null;
+  };
 }
 
 export default function FlashcardReview({
@@ -29,6 +34,7 @@ export default function FlashcardReview({
   onComplete,
   onBack,
   onCardReviewed,
+  xpSessionData,
 }: FlashcardReviewProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -95,6 +101,20 @@ export default function FlashcardReview({
               <p className="text-slate-400 mt-2">
                 {correctCount} / {words.length} correct
               </p>
+
+              {/* XP Session Summary - Mastery message shown FIRST (research requirement) */}
+              {xpSessionData && (
+                <div className="mt-4 pt-4 border-t border-neo-black/30">
+                  {xpSessionData.sessionMasteryMessage && (
+                    <p className="font-neo-display text-lg text-neo-yellow mb-2">
+                      {xpSessionData.sessionMasteryMessage}
+                    </p>
+                  )}
+                  <p className="text-neo-white/80 font-neo-body">
+                    +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained') || 'XP'}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Word results summary */}

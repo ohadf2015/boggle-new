@@ -27,6 +27,11 @@ interface SoloPracticeBoardProps {
   onComplete: (results: { wordsFound: string[]; vocabularyWordsFound: string[]; score: number }) => void;
   onBack: () => void;
   onWordFound?: (word: string, isVocabularyWord: boolean) => void;
+  /** XP session data to display on results screen (optional) */
+  xpSessionData?: {
+    sessionXpEarned: number;
+    sessionMasteryMessage: string | null;
+  };
 }
 
 export default function SoloPracticeBoard({
@@ -37,6 +42,7 @@ export default function SoloPracticeBoard({
   onComplete,
   onBack,
   onWordFound,
+  xpSessionData,
 }: SoloPracticeBoardProps) {
   const { t, language: uiLanguage } = useLanguage();
   const isRTL = uiLanguage === 'he';
@@ -143,6 +149,20 @@ export default function SoloPracticeBoard({
                 </div>
               </div>
             </div>
+
+            {/* XP Session Summary - Mastery message shown FIRST (research requirement) */}
+            {xpSessionData && (
+              <div className="mb-4 pt-4 border-t border-neo-black/30">
+                {xpSessionData.sessionMasteryMessage && (
+                  <p className="font-neo-display text-lg text-neo-yellow mb-2">
+                    {xpSessionData.sessionMasteryMessage}
+                  </p>
+                )}
+                <p className="text-neo-white/80 font-neo-body">
+                  +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained') || 'XP'}
+                </p>
+              </div>
+            )}
 
             {/* Vocabulary words found */}
             {vocabularyFound.length > 0 && (
