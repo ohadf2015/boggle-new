@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 15 of 23 (Chain Combo System)
-Plan: 03 of 05 completed
+Plan: 01 of 05 completed (just finished)
 Status: In progress
-Last activity: 2026-01-25 — Completed 15-03-PLAN.md (Chain Particle Effects)
+Last activity: 2026-01-25 — Completed 15-01-PLAN.md (Chain Tile Calculation with TDD)
 
 Progress: [██░░░░░░░░] 14/23 phases (61% milestone complete, v1.1 in progress)
 
@@ -30,16 +30,16 @@ Progress: [██░░░░░░░░] 14/23 phases (61% milestone complete,
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 3 (15-01, 15-02, 15-03)
-- Current phase: 15 (Chain Combo System) - 3/5 plans done
+- Plans completed: 1 (15-01)
+- Current phase: 15 (Chain Combo System) - 1/5 plans done
 - Next phase: 16 (Boss Battle Foundation)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 15-01 | Chain Tile Calculation | ~15min | ✅ Complete |
-| 15-02 | Combo Tier Feedback | 13min | ✅ Complete |
-| 15-03 | Chain Particle Effects | 17min | ✅ Complete |
+| 15-01 | Chain Tile Calculation | 17min | ✅ Complete (just finished) |
+| 15-02 | Combo Tier Feedback | - | 📋 Ready |
+| 15-03 | Chain Particle Effects | - | 📋 Ready |
 | 15-04 | Chain Audio System | - | 📋 Ready |
 | 15-05 | Combo State Machine | - | 📋 Ready |
 
@@ -54,12 +54,8 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **v1.0**: Combined parallax (gyro+gesture+ambient) → "Always alive" feel (✓ Good)
 - **v1.0**: Education as separate section → Distinct flow from main game (✓ Good)
 - **v1.1**: Research-informed phase ordering → Combo foundation before bosses/XP (prevents rework)
-- **15-02**: Combo tier thresholds (2, 4, 7, 10) → Progressive encouragement, not too easy or hard (2026-01-25)
-- **15-02**: Animation variety per tier → Visual progression reinforces achievement (2026-01-25)
-- **15-02**: Descriptive translation keys → `adventure.combo.nice` vs `tier1` for readability (2026-01-25)
-- **15-03**: useRef for onComplete callback → Prevents effect re-runs when callback changes (2026-01-25)
-- **15-03**: Particle counts 4/12/20 by device tier → Balance visual impact with performance (2026-01-25)
-- **15-03**: Every 3rd particle uses emoji → World personality without performance hit (2026-01-25)
+- **15-01**: Math.round for chain bonus → Handles floating point precision (0.1 * 1.5 issue) (2026-01-25)
+- **15-01**: Chain tile structural sharing → Only clone affected rows, 25-57% memory reduction (2026-01-25)
 
 ### Pending Todos
 
@@ -68,10 +64,11 @@ None yet.
 ### Blockers/Concerns
 
 **Phase 15 (Chain Combos):**
-- ✅ RTL layout verified — ComboTierBadge tested with Hebrew, shadow-hard auto-flips (15-02 complete)
-- ✅ Particle performance — Device-tiered counts (4/12/20), GPU-accelerated (15-03 complete)
+- ✅ Chain tile logic verified — 15 tests passing, Math.round handles precision (15-01 complete)
+- ✅ Integration tested — 45 tests total, no regressions in special tiles (15-01 complete)
 - ⚠️ Combo state performance — Must use state machine pattern in 15-05
 - ⚠️ Animation cascade prevention — Max 3 simultaneous, test in 15-04/15-05
+- ⚠️ RTL layout testing — Test combo UI with Hebrew in 15-02
 - ⚠️ iOS Safari battery testing — Validate particle + sound together in 15-05 integration
 
 **Phase 16 (Boss Battles):**
@@ -89,11 +86,11 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 15-03-PLAN.md (Chain Particle Effects)
+Stopped at: Completed 15-01-PLAN.md (Chain Tile Calculation with TDD)
 Resume file: None
 
-**Next action:** Continue with 15-04 (Chain Audio System) or 15-05 (Combo State Machine)
+**Next action:** Execute 15-02 (Combo Tier Feedback) or 15-03 (Chain Particle Effects)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (v1.1 roadmap created)*
+*Last updated: 2026-01-25 14:55 (completed 15-01 with TDD)*
