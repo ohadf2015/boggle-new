@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 16 of 23 (Boss Battle Foundation) — IN PROGRESS
-Plan: 2/5 complete
+Plan: 4/5 complete
 Status: Executing
-Last activity: 2026-01-25 — Completed 16-02-PLAN.md (Boss HP Bar UI)
+Last activity: 2026-01-25 — Completed 16-04-PLAN.md (PopQuiz Mechanic Verification)
 
 Progress: [███░░░░░░░] 16/23 phases (69% milestone complete, v1.1 in progress)
 
@@ -30,9 +30,9 @@ Progress: [███░░░░░░░] 16/23 phases (69% milestone complete,
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 7 (Phase 15 complete, Phase 16 in progress)
+- Plans completed: 9 (Phase 15 complete, Phase 16 in progress)
 - Current phase: 16 (Boss Battle Foundation) — IN PROGRESS
-- Next plan: 16-03 (Boss Mechanics)
+- Next plan: 16-05 (Boss Integration)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -50,11 +50,11 @@ Progress: [███░░░░░░░] 16/23 phases (69% milestone complete,
 |------|------|----------|--------|
 | 16-01 | Boss HP Tracking | 12min | ✅ Complete |
 | 16-02 | Boss HP Bar UI | 11min | ✅ Complete |
-| 16-03 | Boss Mechanics | — | ⏸️ Pending |
-| 16-04 | Boss Battle Flow | — | ⏸️ Pending |
+| 16-03 | Boss Overlay Integration | — | ✅ Complete |
+| 16-04 | PopQuiz Mechanic Verification | 9min | ✅ Complete |
 | 16-05 | Boss Integration | — | ⏸️ Pending |
 
-**Phase 16 Progress:** 2/5 plans, 23 minutes, 39 tests added
+**Phase 16 Progress:** 4/5 plans, 32 minutes, 57 tests added
 
 ## Accumulated Context
 
@@ -80,6 +80,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **16-02**: Spring physics for HP animation → Smooth, natural-feeling HP depletion enhances battle feedback (2026-01-25)
 - **16-02**: Green → Red color transition → Universal color language (healthy → danger), better accessibility (2026-01-25)
 - **16-02**: Hide HP bar during intro/victory/defeat → Cleaner UI, reduced visual clutter (2026-01-25)
+- **16-04**: bosses.common translation section → Shared feedback keys avoid duplication across 10 boss configs (2026-01-25)
+- **16-04**: Test all 4 requirement types → Comprehensive coverage ensures each popQuiz variant works correctly (2026-01-25)
+- **16-04**: Full i18n support (5 languages) → No technical debt, all languages ready for boss battle launch (2026-01-25)
 
 ### Pending Todos
 
@@ -108,11 +111,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 16-02-PLAN.md (Boss HP Bar UI component)
+Stopped at: Completed 16-04-PLAN.md (PopQuiz Mechanic Verification)
 Resume file: None
 
-**Next action:** Execute 16-03-PLAN.md (Boss Mechanics)
+**Next action:** Execute 16-05-PLAN.md (Boss Integration)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (16-02 complete)*
+*Last updated: 2026-01-25 (16-04 complete)*
