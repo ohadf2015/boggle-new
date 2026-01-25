@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 17 of 23 (Boss Mechanic Expansion) — IN PROGRESS
-Plan: 1/? complete
+Plan: 2/5 complete
 Status: In progress
-Last activity: 2026-01-25 — Completed 17-01-PLAN.md (mechanic test coverage)
+Last activity: 2026-01-25 — Completed 17-02-PLAN.md (finalWord mechanic tests)
 
 Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in progress)
 
@@ -30,9 +30,9 @@ Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in 
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 10 (Phase 15 complete, Phase 16 complete, Phase 17 plan 1)
+- Plans completed: 11 (Phase 15 complete, Phase 16 complete, Phase 17 plans 1-2)
 - Current phase: 17 (Boss Mechanic Expansion) — IN PROGRESS
-- Next plan: 17-02 (TBD)
+- Next plan: 17-03 (additional mechanic tests)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -59,8 +59,9 @@ Progress: [████░░░░░░] 17/23 phases (74% milestone, v1.1 in 
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
 | 17-01 | Mechanic Test Coverage | 3min | ✅ Complete |
+| 17-02 | finalWord Mechanic Tests | 3min | ✅ Complete |
 
-**Phase 17 Total (so far):** 3 minutes, 96 tests added
+**Phase 17 Total (so far):** 6 minutes, 137 tests added
 
 ## Accumulated Context
 
@@ -113,7 +114,8 @@ None.
 **Phase 17 (Boss Expansion) — IN PROGRESS:**
 - ✅ mirrorMatch mechanic tested — 44 tests, palindrome detection verified
 - ✅ stellarForge mechanic tested — 52 tests, supernova letter Q/X/Z detection verified
-- Remaining mechanics need test coverage (hiveMind, etymologyDig, idiomBattle, etc.)
+- ✅ finalWord mechanic tested — 41 tests, phase cycling and delegation verified
+- Remaining plans: 17-03, 17-04, 17-05
 
 **Phase 18 (Education XP):**
 - Intrinsic motivation design — Emphasize mastery over points, needs teacher co-design (research pitfall 3)
@@ -126,11 +128,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 17-01-PLAN.md
+Stopped at: Completed 17-02-PLAN.md
 Resume file: None
 
-**Next action:** Continue Phase 17 with next plan
+**Next action:** Continue Phase 17 with 17-03-PLAN.md
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Plan 17-01 complete)*
+*Last updated: 2026-01-25 (Plan 17-02 complete)*
