@@ -20,6 +20,7 @@ import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { ScorePopupFly } from '@/components/animations';
 import { ComboTierBadge } from '@/components/animations/ComboTierBadge';
+import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -194,6 +195,12 @@ const AdventureGame = memo<AdventureGameProps>(
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
     const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
+
+    // Chain particle burst state
+    const [chainBurstConfig, setChainBurstConfig] = useState<{
+      trigger: boolean;
+      position: { x: number; y: number };
+    } | null>(null);
 
     // Consolidated validation feedback state
     const [validationFeedback, setValidationFeedback] = useState<ValidationFeedback>({
@@ -494,6 +501,36 @@ const AdventureGame = memo<AdventureGameProps>(
 
       return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     }, [selectedIndices]);
+
+    // Helper to calculate tile center position for chain particle burst
+    const calculateTileCenter = useCallback((row: number, col: number) => {
+      if (!gridRef.current) return { x: 0, y: 0 };
+      const gridRect = gridRef.current.getBoundingClientRect();
+      const tileSize = gridRect.width / levelConfig.gridSize;
+      return {
+        x: gridRect.left + col * tileSize + tileSize / 2,
+        y: gridRect.top + row * tileSize + tileSize / 2,
+      };
+    }, [levelConfig.gridSize]);
+
+    // Detect chain tile activation and trigger particle burst
+    useEffect(() => {
+      // Find tiles with 'link' activation effect
+      const chainActivatedTiles = tiles.filter(
+        tile => tile.activationEffect === 'link' && tile.activationTimestamp
+      );
+
+      if (chainActivatedTiles.length > 0) {
+        // Use the first chain tile (in case multiple activate simultaneously)
+        const chainTile = chainActivatedTiles[0];
+        const position = calculateTileCenter(chainTile.row, chainTile.col);
+
+        setChainBurstConfig({
+          trigger: true,
+          position,
+        });
+      }
+    }, [tiles, calculateTileCenter]);
 
     // Handle pause toggle
     const handlePauseToggle = useCallback(() => {
@@ -1042,6 +1079,16 @@ const AdventureGame = memo<AdventureGameProps>(
           reaction={reaction}
           onDismiss={dismissReaction}
         />
+
+        {/* Chain Particle Burst */}
+        {chainBurstConfig && (
+          <ChainParticleBurst
+            trigger={chainBurstConfig.trigger}
+            position={chainBurstConfig.position}
+            world={levelConfig.world}
+            onComplete={() => setChainBurstConfig(null)}
+          />
+        )}
       </div>
     );
   }
