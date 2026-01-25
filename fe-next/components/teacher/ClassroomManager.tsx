@@ -10,9 +10,10 @@ import { Input } from '@/components/ui/input';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Plus, Copy, Edit2, Trash2, Users, X } from 'lucide-react';
+import { Plus, Copy, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language } from '@/lib/supabase/teacher';
+import ClassroomStudentList from './ClassroomStudentList';
 
 export default function ClassroomManager() {
   const { t, language } = useLanguage();
@@ -24,6 +25,7 @@ export default function ClassroomManager() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
+  const [expandedClassroomId, setExpandedClassroomId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', language: language as Language });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -173,6 +175,34 @@ export default function ClassroomManager() {
                     </Button>
                   </div>
                 </div>
+
+                {/* View Students Button */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)}
+                  className={cn(
+                    'w-full border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20',
+                    'flex items-center justify-between'
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    {t('teacher.classrooms.students.count').replace('{{count}}', String(classroom.member_count || 0))}
+                  </span>
+                  {expandedClassroomId === classroom.id ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                </Button>
+
+                {/* Student List (Expanded) */}
+                {expandedClassroomId === classroom.id && (
+                  <div className="mt-4">
+                    <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-2">
