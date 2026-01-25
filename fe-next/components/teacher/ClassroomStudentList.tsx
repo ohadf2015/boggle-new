@@ -75,8 +75,11 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
   return (
     <div className="space-y-3">
       {students.map((student) => {
-        const username = student.profiles?.username || t('teacher.classrooms.students.unknown');
-        const email = student.profiles?.email || '';
+        // Handle Supabase returning profiles as array or object
+        const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles;
+        const username = profile?.username || t('teacher.classrooms.students.unknown');
+        const email = profile?.email || '';
+        const avatarUrl = profile?.avatar_url;
         const joinedAt = formatDistanceToNow(new Date(student.joined_at), { addSuffix: true });
 
         return (
@@ -88,9 +91,9 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
               <div className="flex items-center gap-4">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                  {student.profiles?.avatar_url ? (
+                  {avatarUrl ? (
                     <img
-                      src={student.profiles.avatar_url}
+                      src={avatarUrl}
                       alt={username}
                       className="w-12 h-12 rounded-full border-2 border-neo-cyan"
                     />

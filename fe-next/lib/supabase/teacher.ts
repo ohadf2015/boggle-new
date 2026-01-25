@@ -71,11 +71,7 @@ export interface ClassroomStudent {
   student_id: string;
   classroom_id: string;
   joined_at: string;
-  profiles: {
-    username: string;
-    email: string;
-    avatar_url?: string;
-  } | null;
+  profiles: any; // Supabase returns array, need to normalize
 }
 
 // =============================================
@@ -344,7 +340,7 @@ export async function getClassroomStudents(
       return { data: [], error: { message: error.message } };
     }
 
-    return { data: data || [], error: null };
+    return { data: (data || []) as ClassroomStudent[], error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getClassroomStudents:', error);
