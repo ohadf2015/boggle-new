@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** v1.0 shipped — ready for next milestone
+**Current focus:** v1.1 Adventure & Education Expansion
 
 ## Current Position
 
-Phase: Ready for next milestone
-Plan: N/A
-Status: v1.0 complete — run `/gsd:new-milestone` to start next
-Last activity: 2026-01-25 — v1.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v1.1
+Last activity: 2026-01-25 — Milestone v1.1 started
 
-Progress: v1.0 ████████████████████ 100% SHIPPED
+Progress: v1.1 ░░░░░░░░░░░░░░░░░░░░ 0%
 
 ## Milestone History
 
@@ -25,10 +25,10 @@ Progress: v1.0 ████████████████████ 100%
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: v1.0 milestone completion
-Resume file: None (milestone archived)
-Next: `/gsd:new-milestone` to start v1.1 or v2.0
+Stopped at: Milestone v1.1 initialization
+Resume file: None
+Next: Define requirements → Create roadmap
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (v1.0 milestone complete)*
+*Last updated: 2026-01-25 (v1.1 milestone start)*

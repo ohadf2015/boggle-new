@@ -80,9 +80,24 @@ LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, imm
 
 ### Active
 
-<!-- Next milestone scope - to be defined -->
+<!-- v1.1 milestone scope -->
 
-No active requirements. Run `/gsd:new-milestone` to define next milestone.
+**Adventure Expansion:**
+- [ ] World 4: Idiom Archipelago full theming (parallax, particles, board decorations, AI backgrounds)
+- [ ] World 5: Compound Canyon full theming (parallax, particles, board decorations, AI backgrounds)
+- [ ] Boss battle system (end-of-world challenges with special mechanics)
+- [ ] Chain/combo auto-cascade system (satisfying chain reactions)
+
+**Education Enhancements:**
+- [ ] Student analytics dashboard (progress tracking, mastery metrics, performance reports)
+- [ ] Gamification system (XP, achievements, streaks, classroom leaderboards)
+- [ ] Rich lesson delivery (vocabulary explanations, examples, contextual content)
+
+**Tech Debt & Polish:**
+- [ ] Entry sequence timing optimization (2.38s → 2s target)
+- [ ] Video MP4 rendering pipeline
+- [ ] Bug fixes (BUG-004 through BUG-008)
+- [ ] Lexi stuck detection
 
 ### Out of Scope
 
@@ -138,5 +153,18 @@ No active requirements. Run `/gsd:new-milestone` to define next milestone.
 - **Performance**: Animations must support reduced-motion preference
 - **File Size**: Max 500 lines per file, split larger
 
+## Current Milestone: v1.1 Adventure & Education Expansion
+
+**Goal:** Expand adventure mode with Worlds 4-5, boss battles, and chain combos while enhancing education mode with analytics and gamification.
+
+**Target features:**
+- World 4 (Idiom Archipelago) and World 5 (Compound Canyon) with full theming
+- Boss battle system for end-of-world challenges
+- Chain/combo auto-cascade for satisfying gameplay
+- Student analytics and progress tracking
+- Education gamification (XP, achievements, streaks)
+- Rich lesson content delivery
+- Tech debt cleanup (timing, video rendering, bugs)
+
 ---
-*Last updated: 2026-01-25 after v1.0 milestone*
+*Last updated: 2026-01-25 after v1.1 milestone start*
