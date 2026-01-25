@@ -173,10 +173,14 @@ Plans:
   3. Student sees achievement unlock modal with celebration animation when earning badge
   4. Student can view earned achievement badges in profile with completion progress
   5. Achievements celebrate genuine milestones ("First Boss Defeated") not trivial actions
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves (95+ tests)
 
 Plans:
-- [ ] 19-01: TBD during plan-phase
+- [ ] 19-01-PLAN.md — Database schema + achievementManager TDD (Wave 1, 35+ tests)
+- [ ] 19-02-PLAN.md — Classroom leaderboard hook + component (Wave 1, 28+ tests)
+- [ ] 19-03-PLAN.md — Achievement unlock modal + hook (Wave 2, 29+ tests)
+- [ ] 19-04-PLAN.md — Profile badge grid + progress cards (Wave 2, 28+ tests)
+- [ ] 19-05-PLAN.md — Integration into student dashboard/profile (Wave 3, 8+ tests)
 
 #### Phase 20: Student Analytics Dashboard
 **Goal**: Give teachers actionable insights into student progress
@@ -256,7 +260,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 16. Boss Battle Foundation | v1.1 | 4/4 | ✅ Complete | 2026-01-25 |
 | 17. Boss Mechanic Expansion | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
 | 18. Education XP System | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
-| 19. Achievement System | v1.1 | 0/TBD | Not started | - |
+| 19. Achievement System | v1.1 | 0/5 | Planned | - |
 | 20. Student Analytics Dashboard | v1.1 | 0/TBD | Not started | - |
 | 21. Rich Lesson Delivery | v1.1 | 0/TBD | Not started | - |
 | 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |

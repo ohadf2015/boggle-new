@@ -20,7 +20,7 @@ jest.mock('@/utils/confettiUtils', () => ({
 jest.mock('framer-motion', () => {
   // Create a factory function that generates mock components
   const createMockComponent = (Element: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const Component = React.forwardRef((props: any, ref: any) => {
       const {
         children,
