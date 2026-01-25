@@ -722,7 +722,7 @@ const AdventureGame = memo<AdventureGameProps>(
         >
           {/* Level Info */}
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-black">Level {levelConfig.level}</h1>
+            <h1 className="text-xl font-black">{t('adventure.level')} {levelConfig.level}</h1>
             <div
               ref={scoreDisplayRef}
               data-testid="score-display"

@@ -143,6 +143,23 @@ export const OBJECTIVE_TYPES = {
 } as const;
 
 // ==============================================
+// OBJECTIVE TRANSLATION KEYS
+// ==============================================
+
+/**
+ * Maps ObjectiveType to translation keys for UI display.
+ * Shared across components that render objective labels.
+ */
+export const OBJECTIVE_TRANSLATION_KEYS: Record<string, string> = {
+  wordCount: 'adventure.objectives.wordCount',
+  scoreTarget: 'adventure.objectives.scoreTarget',
+  longWords: 'adventure.objectives.longWords',
+  clearIce: 'adventure.objectives.clearIce',
+  timeBonus: 'adventure.objectives.timeBonus',
+  collectGems: 'adventure.objectives.collectGems',
+};
+
+// ==============================================
 // GRID SIZE CONFIGURATION
 // ==============================================
 

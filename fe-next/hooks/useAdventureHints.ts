@@ -163,6 +163,34 @@ function dfsPath(
 }
 
 // ==============================================
+// AUTO-HINT TRIGGER
+// ==============================================
+
+/**
+ * Trigger an auto-hint: find the first remaining word, resolve its path,
+ * set it as the current hint, and invoke the callback.
+ */
+function triggerAutoHint(
+  remainingWords: string[],
+  grid: string[][],
+  setCurrentHint: (hint: HintResult | null) => void,
+  setShowAutoHint: (show: boolean) => void,
+  onAutoHintRef: { current: ((hint: HintResult) => void) | undefined }
+): void {
+  setShowAutoHint(true);
+
+  const word = remainingWords[0];
+  if (!word) return;
+
+  const path = findWordPath(grid, word);
+  if (!path) return;
+
+  const hint = { word, path };
+  setCurrentHint(hint);
+  onAutoHintRef.current?.(hint);
+}
+
+// ==============================================
 // HOOK
 // ==============================================
 
@@ -311,18 +339,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     if (isPlaying && hasHintsAvailable) {
       timerStartedRef.current = true;
       inactivityTimerRef.current = setTimeout(() => {
-        setShowAutoHint(true);
-
-        // Get hint and trigger callback
-        const word = remainingHintWords[0];
-        if (word) {
-          const path = findWordPath(grid, word);
-          if (path) {
-            const hint = { word, path };
-            setCurrentHint(hint);
-            onAutoHintRef.current?.(hint);
-          }
-        }
+        triggerAutoHint(remainingHintWords, grid, setCurrentHint, setShowAutoHint, onAutoHintRef);
       }, inactivityThresholdMs);
     }
   }, [isPlaying, hasHintsAvailable, inactivityThresholdMs, remainingHintWords, grid]);
@@ -349,18 +366,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
       }
 
       inactivityTimerRef.current = setTimeout(() => {
-        setShowAutoHint(true);
-
-        // Get hint and trigger callback
-        const word = remainingHintWords[0];
-        if (word) {
-          const path = findWordPath(grid, word);
-          if (path) {
-            const hint = { word, path };
-            setCurrentHint(hint);
-            onAutoHintRef.current?.(hint);
-          }
-        }
+        triggerAutoHint(remainingHintWords, grid, setCurrentHint, setShowAutoHint, onAutoHintRef);
       }, inactivityThresholdMs);
     }
 

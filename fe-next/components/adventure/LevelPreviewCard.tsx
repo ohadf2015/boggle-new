@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import type { LevelConfig, LevelAttempt, TileType, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
@@ -49,16 +50,6 @@ interface LevelPreviewCardProps {
 // ==============================================
 // CONSTANTS
 // ==============================================
-
-/** Map objective types to translation keys */
-const OBJECTIVE_TRANSLATION_KEYS: Record<ObjectiveType, string> = {
-  wordCount: 'adventure.objectives.wordCount',
-  scoreTarget: 'adventure.objectives.scoreTarget',
-  longWords: 'adventure.objectives.longWords',
-  clearIce: 'adventure.objectives.clearIce',
-  timeBonus: 'adventure.objectives.timeBonus',
-  collectGems: 'adventure.objectives.collectGems',
-};
 
 /** Map tile types to icons and translation keys */
 const TILE_TYPE_INFO: Record<Exclude<TileType, 'standard'>, { icon: React.ComponentType<{ className?: string }>; key: string; color: string }> = {
@@ -139,15 +130,15 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
               )}
             >
               <Crown className="w-4 h-4" />
-              BOSS
+              {t('adventure.boss')}
             </div>
           )}
 
           <p className="text-sm text-neo-white/60 uppercase tracking-wide">
-            World {worldNumber}
+            {t('adventure.worldLabel')} {worldNumber}
           </p>
           <h2 className="text-3xl font-black text-neo-white">
-            Level {levelNumber}
+            {t('adventure.level')} {levelNumber}
           </h2>
         </div>
 
@@ -243,11 +234,11 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
             <div className="grid grid-cols-2 gap-3">
               <div className="p-2 rounded-neo bg-neo-black/20 text-center">
                 <p className="text-xl font-black text-neo-cyan">{bestAttempt.bestWords}</p>
-                <p className="text-xs text-neo-white/60">Words</p>
+                <p className="text-xs text-neo-white/60">{t('common.wordsFound')}</p>
               </div>
               <div className="p-2 rounded-neo bg-neo-black/20 text-center">
                 <p className="text-xl font-black text-neo-lime">{bestAttempt.bestScore}</p>
-                <p className="text-xs text-neo-white/60">Score</p>
+                <p className="text-xs text-neo-white/60">{t('common.score')}</p>
               </div>
             </div>
           ) : (

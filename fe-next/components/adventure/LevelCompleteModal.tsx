@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParallax } from '@/hooks/useParallax';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
+import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import type { LevelObjective, ObjectiveType, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
@@ -51,19 +52,6 @@ interface LevelCompleteModalProps {
 // CONSTANTS
 // ==============================================
 
-/**
- * Maps ObjectiveType to translation keys.
- * Actual translation is done via t() in component render.
- */
-const OBJECTIVE_TRANSLATION_KEYS: Record<ObjectiveType, string> = {
-  wordCount: 'adventure.objectives.wordCount',
-  scoreTarget: 'adventure.objectives.scoreTarget',
-  longWords: 'adventure.objectives.longWords',
-  clearIce: 'adventure.objectives.clearIce',
-  timeBonus: 'adventure.objectives.timeBonus',
-  collectGems: 'adventure.objectives.collectGems',
-};
-
 const PARTICLE_COUNT = 20;
 
 /**
@@ -78,6 +66,23 @@ function getMascotVariantForStars(stars: number): ExtendedMascotVariant {
   if (stars >= 2) return 'celebrating';  // Great! Celebration dance
   if (stars >= 1) return 'happy';        // Nice! Happy face
   return 'thinking';                      // No stars? Thoughtful
+}
+
+/**
+ * Get the background glow gradient based on stars earned.
+ * Higher star counts produce warmer, more vibrant glows.
+ */
+function getGlowGradient(stars: number): string {
+  if (stars >= 3) {
+    return 'radial-gradient(ellipse at 50% 30%, rgba(255,225,53,0.2) 0%, transparent 60%)';
+  }
+  if (stars >= 2) {
+    return 'radial-gradient(ellipse at 50% 30%, rgba(163,230,53,0.15) 0%, transparent 60%)';
+  }
+  if (stars >= 1) {
+    return 'radial-gradient(ellipse at 50% 30%, rgba(34,211,238,0.12) 0%, transparent 60%)';
+  }
+  return 'radial-gradient(ellipse at 50% 30%, rgba(239,68,68,0.1) 0%, transparent 60%)';
 }
 
 // Simple seeded pseudo-random number generator for deterministic particles
@@ -152,7 +157,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     const isFailed = stars === 0;
 
     // Enhanced parallax for celebration - dramatic intensity scales with stars
-    const parallaxIntensity = stars === 3 ? 1.5 : stars === 2 ? 1.0 : stars === 1 ? 0.6 : 0.3;
+    const PARALLAX_INTENSITY_BY_STARS: Record<number, number> = { 3: 1.5, 2: 1.0, 1: 0.6 };
+    const parallaxIntensity = PARALLAX_INTENSITY_BY_STARS[stars] ?? 0.3;
     const { x: parallaxX, y: parallaxY } = useParallax({
       intensity: parallaxIntensity,
       enableGyroscope: true,
@@ -204,13 +210,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               className="absolute inset-0"
               style={{
                 transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px)`,
-                background: isPerfect
-                  ? 'radial-gradient(ellipse at 50% 30%, rgba(255,225,53,0.2) 0%, transparent 60%)'
-                  : stars >= 2
-                    ? 'radial-gradient(ellipse at 50% 30%, rgba(163,230,53,0.15) 0%, transparent 60%)'
-                    : stars >= 1
-                      ? 'radial-gradient(ellipse at 50% 30%, rgba(34,211,238,0.12) 0%, transparent 60%)'
-                      : 'radial-gradient(ellipse at 50% 30%, rgba(239,68,68,0.1) 0%, transparent 60%)',
+                background: getGlowGradient(stars),
               }}
               animate={isPerfect ? {
                 scale: [1, 1.1, 1],

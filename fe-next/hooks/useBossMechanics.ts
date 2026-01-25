@@ -171,21 +171,32 @@ function evaluatePopQuiz(
   };
 }
 
+/**
+ * Build a standard mechanic result for threshold-based checks.
+ * Many mechanics share the same pattern: if the word meets a condition,
+ * apply a bonus multiplier and trigger a taunt.
+ */
+function buildThresholdResult(
+  meets: boolean,
+  bonusMultiplier: number,
+  feedbackKey?: string
+): BossMechanicResult {
+  return {
+    meetsRequirement: meets,
+    scoreMultiplier: meets ? bonusMultiplier : 1.0,
+    triggerTaunt: meets ? 'onMechanic' : undefined,
+    feedbackKey: meets ? feedbackKey : undefined,
+    triggerEffect: meets,
+  };
+}
+
 function evaluateHiveMind(
   word: string,
   params: Record<string, unknown>
 ): BossMechanicResult {
-  // HiveMind rewards longer words (synonym pairs = longer = better)
   const synonymBonusMultiplier =
     (params.synonymBonusMultiplier as number) ?? 2.0;
-  const meets = word.length >= 5;
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? synonymBonusMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(word.length >= 5, synonymBonusMultiplier);
 }
 
 function evaluateEtymologyDig(
@@ -195,32 +206,20 @@ function evaluateEtymologyDig(
   const rootFragments = (params.rootFragments as string[]) ?? [];
   const rootComboMultiplier =
     (params.rootComboMultiplier as number) ?? 1.8;
-  const meets = containsRootFragment(word, rootFragments);
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? rootComboMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    feedbackKey: meets ? 'adventure.bosses.common.rootFound' : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(
+    containsRootFragment(word, rootFragments),
+    rootComboMultiplier,
+    'adventure.bosses.common.rootFound'
+  );
 }
 
 function evaluateIdiomBattle(
   word: string,
   params: Record<string, unknown>
 ): BossMechanicResult {
-  // IdiomBattle rewards longer, more complex words
   const idiomBonusMultiplier =
     (params.idiomBonusMultiplier as number) ?? 2.5;
-  const meets = word.length >= 6;
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? idiomBonusMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(word.length >= 6, idiomBonusMultiplier);
 }
 
 function evaluateAssemblyLine(
@@ -229,35 +228,21 @@ function evaluateAssemblyLine(
 ): BossMechanicResult {
   const compoundBonusMultiplier =
     (params.compoundBonusMultiplier as number) ?? 3.0;
-  const meets = word.length >= ASSEMBLY_LINE_MIN_LENGTH;
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? compoundBonusMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    feedbackKey: meets
-      ? 'adventure.bosses.common.compoundDetected'
-      : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(
+    word.length >= ASSEMBLY_LINE_MIN_LENGTH,
+    compoundBonusMultiplier,
+    'adventure.bosses.common.compoundDetected'
+  );
 }
 
 function evaluateScrambledReality(
   word: string,
   params: Record<string, unknown>
 ): BossMechanicResult {
-  // ScrambledReality rewards words with unusual letter patterns
   const anagramBonusMultiplier =
     (params.anagramBonusMultiplier as number) ?? 2.0;
   const uniqueLetters = new Set(word.toUpperCase().split('')).size;
-  const meets = uniqueLetters >= 4;
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? anagramBonusMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(uniqueLetters >= 4, anagramBonusMultiplier);
 }
 
 function evaluateMirrorMatch(
@@ -266,15 +251,11 @@ function evaluateMirrorMatch(
 ): BossMechanicResult {
   const palindromeBonusMultiplier =
     (params.palindromeBonusMultiplier as number) ?? 3.0;
-  const meets = isPalindrome(word);
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? palindromeBonusMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    feedbackKey: meets ? 'adventure.bosses.common.palindromeFound' : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(
+    isPalindrome(word),
+    palindromeBonusMultiplier,
+    'adventure.bosses.common.palindromeFound'
+  );
 }
 
 function evaluateStellarForge(
@@ -288,17 +269,11 @@ function evaluateStellarForge(
   ];
   const supernovaBonusMultiplier =
     (params.supernovaBonusMultiplier as number) ?? 2.5;
-  const meets = hasSupernovaLetters(word, supernovaLetters);
-
-  return {
-    meetsRequirement: meets,
-    scoreMultiplier: meets ? supernovaBonusMultiplier : 1.0,
-    triggerTaunt: meets ? 'onMechanic' : undefined,
-    feedbackKey: meets
-      ? 'adventure.bosses.common.supernovaWord'
-      : undefined,
-    triggerEffect: meets,
-  };
+  return buildThresholdResult(
+    hasSupernovaLetters(word, supernovaLetters),
+    supernovaBonusMultiplier,
+    'adventure.bosses.common.supernovaWord'
+  );
 }
 
 function evaluateBabelSummit(
@@ -487,11 +462,7 @@ export function useBossMechanics({
     });
   }, [boss]);
 
-  // Current requirement description
-  const currentRequirement = useMemo(() => {
-    if (!boss) return undefined;
-    return boss.twistMechanic.description;
-  }, [boss]);
+  const currentRequirement = boss?.twistMechanic.description;
 
   return {
     isActive: boss !== null,

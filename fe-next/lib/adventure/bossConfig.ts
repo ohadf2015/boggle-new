@@ -6,7 +6,56 @@
  * Translation keys reference entries in translations/*.js files.
  */
 
-import type { BossConfig, BossTauntEvent } from '@/types/boss';
+import type { BossConfig, BossTaunts, BossTauntEvent, BossTwistMechanic } from '@/types/boss';
+
+// ==============================================
+// TAUNT BUILDER
+// ==============================================
+
+/**
+ * Build the taunts object from a boss ID.
+ * All bosses follow the same translation key pattern:
+ *   adventure.bosses.{bossId}.taunts.{event}{N}
+ */
+function buildTaunts(bossId: string): BossTaunts {
+  const prefix = `adventure.bosses.${bossId}.taunts`;
+  return {
+    onStart: [`${prefix}.start1`, `${prefix}.start2`],
+    onGoodWord: [`${prefix}.goodWord1`, `${prefix}.goodWord2`],
+    onBadWord: [`${prefix}.badWord1`, `${prefix}.badWord2`],
+    onMechanic: [`${prefix}.mechanic1`, `${prefix}.mechanic2`],
+    onLowTime: [`${prefix}.lowTime1`],
+    onVictory: `${prefix}.victory`,
+    onDefeat: `${prefix}.defeat`,
+  };
+}
+
+/**
+ * Shorthand to build a full BossConfig.
+ * Eliminates repetitive boilerplate across 10 boss definitions.
+ */
+function defineBoss(
+  worldId: number,
+  id: string,
+  personality: string,
+  visualTheme: string,
+  imageSlug: string,
+  twistMechanic: BossTwistMechanic
+): BossConfig {
+  return {
+    id,
+    worldId,
+    displayName: `adventure.bosses.${id}.name`,
+    personality,
+    visualTheme,
+    imagePath: `/images/adventure/bosses/${imageSlug}.webp`,
+    twistMechanic: {
+      ...twistMechanic,
+      description: `adventure.bosses.${id}.mechanic`,
+    },
+    taunts: buildTaunts(id),
+  };
+}
 
 // ==============================================
 // BOSS CONFIGURATIONS
@@ -16,446 +65,155 @@ import type { BossConfig, BossTauntEvent } from '@/types/boss';
  * Boss configurations indexed by world number (1-10)
  */
 export const BOSS_CONFIGS: Record<number, BossConfig> = {
-  1: {
-    id: 'msGrammar',
-    worldId: 1,
-    displayName: 'adventure.bosses.msGrammar.name',
-    personality:
-      'A prim owl schoolteacher who treats every game as a pop quiz. Secretly roots for players.',
-    visualTheme: 'school-owl',
-    imagePath: '/images/adventure/bosses/ms-grammar.webp',
-    twistMechanic: {
+  1: defineBoss(1, 'msGrammar',
+    'A prim owl schoolteacher who treats every game as a pop quiz. Secretly roots for players.',
+    'school-owl', 'ms-grammar',
+    {
       type: 'popQuiz',
-      description: 'adventure.bosses.msGrammar.mechanic',
+      description: '',
       params: {
-        requirementTypes: [
-          'doubleLetters',
-          'startsWith',
-          'exactLength',
-          'containsVowel',
-        ],
+        requirementTypes: ['doubleLetters', 'startsWith', 'exactLength', 'containsVowel'],
         requirementDuration: 20,
         bonusMultiplier: 1.5,
         penaltyMultiplier: 0.8,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.msGrammar.taunts.start1',
-        'adventure.bosses.msGrammar.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.msGrammar.taunts.goodWord1',
-        'adventure.bosses.msGrammar.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.msGrammar.taunts.badWord1',
-        'adventure.bosses.msGrammar.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.msGrammar.taunts.mechanic1',
-        'adventure.bosses.msGrammar.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.msGrammar.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.msGrammar.taunts.victory',
-      onDefeat: 'adventure.bosses.msGrammar.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  2: {
-    id: 'spellingBee',
-    worldId: 2,
-    displayName: 'adventure.bosses.spellingBee.name',
-    personality:
-      'A giant queen bee who runs a honey empire. Annoyed people expect her to spell.',
-    visualTheme: 'hive-queen',
-    imagePath: '/images/adventure/bosses/spelling-bee.webp',
-    twistMechanic: {
+  2: defineBoss(2, 'spellingBee',
+    'A giant queen bee who runs a honey empire. Annoyed people expect her to spell.',
+    'hive-queen', 'spelling-bee',
+    {
       type: 'hiveMind',
-      description: 'adventure.bosses.spellingBee.mechanic',
+      description: '',
       params: {
         stickyTileCount: 3,
         synonymBonusMultiplier: 2.0,
         workerBeeBlockDuration: 5,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.spellingBee.taunts.start1',
-        'adventure.bosses.spellingBee.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.spellingBee.taunts.goodWord1',
-        'adventure.bosses.spellingBee.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.spellingBee.taunts.badWord1',
-        'adventure.bosses.spellingBee.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.spellingBee.taunts.mechanic1',
-        'adventure.bosses.spellingBee.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.spellingBee.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.spellingBee.taunts.victory',
-      onDefeat: 'adventure.bosses.spellingBee.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  3: {
-    id: 'professorThesaurus',
-    worldId: 3,
-    displayName: 'adventure.bosses.professorThesaurus.name',
-    personality:
-      'Ancient tortoise academic who forgot more words than most will learn. Speaks in synonyms.',
-    visualTheme: 'tweed-scholar',
-    imagePath: '/images/adventure/bosses/professor-thesaurus.webp',
-    twistMechanic: {
+  3: defineBoss(3, 'professorThesaurus',
+    'Ancient tortoise academic who forgot more words than most will learn. Speaks in synonyms.',
+    'tweed-scholar', 'professor-thesaurus',
+    {
       type: 'etymologyDig',
-      description: 'adventure.bosses.professorThesaurus.mechanic',
+      description: '',
       params: {
         rootFragments: ['bio', 'graph', 'tele', 'phon', 'log', 'morph'],
         rootComboMultiplier: 1.8,
         burialInterval: 15,
         commonLettersToBury: ['E', 'T', 'A'],
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.professorThesaurus.taunts.start1',
-        'adventure.bosses.professorThesaurus.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.professorThesaurus.taunts.goodWord1',
-        'adventure.bosses.professorThesaurus.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.professorThesaurus.taunts.badWord1',
-        'adventure.bosses.professorThesaurus.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.professorThesaurus.taunts.mechanic1',
-        'adventure.bosses.professorThesaurus.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.professorThesaurus.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.professorThesaurus.taunts.victory',
-      onDefeat: 'adventure.bosses.professorThesaurus.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  4: {
-    id: 'captainMetaphor',
-    worldId: 4,
-    displayName: 'adventure.bosses.captainMetaphor.name',
-    personality:
-      'Theatrical pirate who ONLY speaks in idioms. Genuinely confused why this confuses people.',
-    visualTheme: 'pirate-parrot',
-    imagePath: '/images/adventure/bosses/captain-metaphor.webp',
-    twistMechanic: {
+  4: defineBoss(4, 'captainMetaphor',
+    'Theatrical pirate who ONLY speaks in idioms. Genuinely confused why this confuses people.',
+    'pirate-parrot', 'captain-metaphor',
+    {
       type: 'idiomBattle',
-      description: 'adventure.bosses.captainMetaphor.mechanic',
+      description: '',
       params: {
         idiomChallengeInterval: 25,
         wordsPerIdiom: 3,
         anchorTileLockDuration: 10,
         idiomBonusMultiplier: 2.5,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.captainMetaphor.taunts.start1',
-        'adventure.bosses.captainMetaphor.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.captainMetaphor.taunts.goodWord1',
-        'adventure.bosses.captainMetaphor.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.captainMetaphor.taunts.badWord1',
-        'adventure.bosses.captainMetaphor.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.captainMetaphor.taunts.mechanic1',
-        'adventure.bosses.captainMetaphor.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.captainMetaphor.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.captainMetaphor.taunts.victory',
-      onDefeat: 'adventure.bosses.captainMetaphor.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  5: {
-    id: 'baronBuildaword',
-    worldId: 5,
-    displayName: 'adventure.bosses.baronBuildaword.name',
-    personality:
-      'Steampunk inventor obsessed with word efficiency. Baffled that everything is not a compound word.',
-    visualTheme: 'steampunk-weasel',
-    imagePath: '/images/adventure/bosses/baron-buildaword.webp',
-    twistMechanic: {
+  5: defineBoss(5, 'baronBuildaword',
+    'Steampunk inventor obsessed with word efficiency. Baffled that everything is not a compound word.',
+    'steampunk-weasel', 'baron-buildaword',
+    {
       type: 'assemblyLine',
-      description: 'adventure.bosses.baronBuildaword.mechanic',
+      description: '',
       params: {
         conveyorSpeed: 3,
         compoundBonusMultiplier: 3.0,
         machineInterval: 20,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.baronBuildaword.taunts.start1',
-        'adventure.bosses.baronBuildaword.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.baronBuildaword.taunts.goodWord1',
-        'adventure.bosses.baronBuildaword.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.baronBuildaword.taunts.badWord1',
-        'adventure.bosses.baronBuildaword.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.baronBuildaword.taunts.mechanic1',
-        'adventure.bosses.baronBuildaword.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.baronBuildaword.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.baronBuildaword.taunts.victory',
-      onDefeat: 'adventure.bosses.baronBuildaword.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  6: {
-    id: 'puzzleMaster',
-    worldId: 6,
-    displayName: 'adventure.bosses.puzzleMaster.name',
-    personality:
-      'Enigmatic cat in a domino mask who speaks in riddles. Finds straightforward communication offensive.',
-    visualTheme: 'mystery-cat',
-    imagePath: '/images/adventure/bosses/puzzle-master.webp',
-    twistMechanic: {
+  6: defineBoss(6, 'puzzleMaster',
+    'Enigmatic cat in a domino mask who speaks in riddles. Finds straightforward communication offensive.',
+    'mystery-cat', 'puzzle-master',
+    {
       type: 'scrambledReality',
-      description: 'adventure.bosses.puzzleMaster.mechanic',
+      description: '',
       params: {
         scrambleInterval: 10,
         anagramBonusMultiplier: 2.0,
         riddleTileCount: 2,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.puzzleMaster.taunts.start1',
-        'adventure.bosses.puzzleMaster.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.puzzleMaster.taunts.goodWord1',
-        'adventure.bosses.puzzleMaster.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.puzzleMaster.taunts.badWord1',
-        'adventure.bosses.puzzleMaster.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.puzzleMaster.taunts.mechanic1',
-        'adventure.bosses.puzzleMaster.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.puzzleMaster.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.puzzleMaster.taunts.victory',
-      onDefeat: 'adventure.bosses.puzzleMaster.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  7: {
-    id: 'reflectionKing',
-    worldId: 7,
-    displayName: 'adventure.bosses.reflectionKing.name',
-    personality:
-      'Dramatic ice monarch who believes he is the protagonist. Incredibly vain but not evil.',
-    visualTheme: 'crystal-peacock',
-    imagePath: '/images/adventure/bosses/reflection-king.webp',
-    twistMechanic: {
+  7: defineBoss(7, 'reflectionKing',
+    'Dramatic ice monarch who believes he is the protagonist. Incredibly vain but not evil.',
+    'crystal-peacock', 'reflection-king',
+    {
       type: 'mirrorMatch',
-      description: 'adventure.bosses.reflectionKing.mechanic',
+      description: '',
       params: {
         mirrorAxis: 'vertical',
         iceCrackThreshold: 2,
         palindromeBonusMultiplier: 3.0,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.reflectionKing.taunts.start1',
-        'adventure.bosses.reflectionKing.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.reflectionKing.taunts.goodWord1',
-        'adventure.bosses.reflectionKing.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.reflectionKing.taunts.badWord1',
-        'adventure.bosses.reflectionKing.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.reflectionKing.taunts.mechanic1',
-        'adventure.bosses.reflectionKing.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.reflectionKing.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.reflectionKing.taunts.victory',
-      onDefeat: 'adventure.bosses.reflectionKing.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  8: {
-    id: 'cosmicWordsmith',
-    worldId: 8,
-    displayName: 'adventure.bosses.cosmicWordsmith.name',
-    personality:
-      'Ancient space entity who invented several languages. Deeply disappointed mortals use words wrong.',
-    visualTheme: 'cosmic-jellyfish',
-    imagePath: '/images/adventure/bosses/cosmic-wordsmith.webp',
-    twistMechanic: {
+  8: defineBoss(8, 'cosmicWordsmith',
+    'Ancient space entity who invented several languages. Deeply disappointed mortals use words wrong.',
+    'cosmic-jellyfish', 'cosmic-wordsmith',
+    {
       type: 'stellarForge',
-      description: 'adventure.bosses.cosmicWordsmith.mechanic',
+      description: '',
       params: {
         vowelCycleInterval: 8,
         supernovaLetters: ['Q', 'X', 'Z'],
         supernovaBonusMultiplier: 2.5,
         blackHoleDevourTime: 12,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.cosmicWordsmith.taunts.start1',
-        'adventure.bosses.cosmicWordsmith.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.cosmicWordsmith.taunts.goodWord1',
-        'adventure.bosses.cosmicWordsmith.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.cosmicWordsmith.taunts.badWord1',
-        'adventure.bosses.cosmicWordsmith.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.cosmicWordsmith.taunts.mechanic1',
-        'adventure.bosses.cosmicWordsmith.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.cosmicWordsmith.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.cosmicWordsmith.taunts.victory',
-      onDefeat: 'adventure.bosses.cosmicWordsmith.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  9: {
-    id: 'linguistSage',
-    worldId: 9,
-    displayName: 'adventure.bosses.linguistSage.name',
-    personality:
-      'Wise mountain goat who achieved enlightenment through ALL languages. Mixes them chaotically.',
-    visualTheme: 'mountain-goat',
-    imagePath: '/images/adventure/bosses/linguist-sage.webp',
-    twistMechanic: {
+  9: defineBoss(9, 'linguistSage',
+    'Wise mountain goat who achieved enlightenment through ALL languages. Mixes them chaotically.',
+    'mountain-goat', 'linguist-sage',
+    {
       type: 'babelSummit',
-      description: 'adventure.bosses.linguistSage.mechanic',
+      description: '',
       params: {
         languageSwitchInterval: 15,
         loanwordBonusMultiplier: 1.5,
         universalWordBonusMultiplier: 3.0,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.linguistSage.taunts.start1',
-        'adventure.bosses.linguistSage.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.linguistSage.taunts.goodWord1',
-        'adventure.bosses.linguistSage.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.linguistSage.taunts.badWord1',
-        'adventure.bosses.linguistSage.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.linguistSage.taunts.mechanic1',
-        'adventure.bosses.linguistSage.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.linguistSage.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.linguistSage.taunts.victory',
-      onDefeat: 'adventure.bosses.linguistSage.taunts.defeat',
-    },
-  },
+    }
+  ),
 
-  10: {
-    id: 'lexiconDragon',
-    worldId: 10,
-    displayName: 'adventure.bosses.lexiconDragon.name',
-    personality:
-      'Ultimate word nerd transcended into dragon form. Anxious and overenthusiastic - wants to make friends!',
-    visualTheme: 'golden-dragon',
-    imagePath: '/images/adventure/bosses/lexicon-dragon.webp',
-    twistMechanic: {
+  10: defineBoss(10, 'lexiconDragon',
+    'Ultimate word nerd transcended into dragon form. Anxious and overenthusiastic - wants to make friends!',
+    'golden-dragon', 'lexicon-dragon',
+    {
       type: 'finalWord',
-      description: 'adventure.bosses.lexiconDragon.mechanic',
+      description: '',
       params: {
         phaseOrder: [
-          'popQuiz',
-          'hiveMind',
-          'etymologyDig',
-          'idiomBattle',
-          'assemblyLine',
-          'scrambledReality',
-          'mirrorMatch',
-          'stellarForge',
-          'babelSummit',
+          'popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle',
+          'assemblyLine', 'scrambledReality', 'mirrorMatch',
+          'stellarForge', 'babelSummit',
         ],
         phaseDuration: 15,
         lexiconStrikeThreshold: 5,
         dragonHoardGoldTileCount: 6,
         dragonHoardMinWordLength: 5,
       },
-    },
-    taunts: {
-      onStart: [
-        'adventure.bosses.lexiconDragon.taunts.start1',
-        'adventure.bosses.lexiconDragon.taunts.start2',
-      ],
-      onGoodWord: [
-        'adventure.bosses.lexiconDragon.taunts.goodWord1',
-        'adventure.bosses.lexiconDragon.taunts.goodWord2',
-      ],
-      onBadWord: [
-        'adventure.bosses.lexiconDragon.taunts.badWord1',
-        'adventure.bosses.lexiconDragon.taunts.badWord2',
-      ],
-      onMechanic: [
-        'adventure.bosses.lexiconDragon.taunts.mechanic1',
-        'adventure.bosses.lexiconDragon.taunts.mechanic2',
-      ],
-      onLowTime: [
-        'adventure.bosses.lexiconDragon.taunts.lowTime1',
-      ],
-      onVictory: 'adventure.bosses.lexiconDragon.taunts.victory',
-      onDefeat: 'adventure.bosses.lexiconDragon.taunts.defeat',
-    },
-  },
+    }
+  ),
 };
 
 // ==============================================

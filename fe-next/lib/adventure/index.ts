@@ -24,6 +24,7 @@ export {
   // Tile and objective constants
   TILE_TYPES,
   OBJECTIVE_TYPES,
+  OBJECTIVE_TRANSLATION_KEYS,
   // Grid and timer configuration
   GRID_SIZES,
   TIMER_DURATIONS,

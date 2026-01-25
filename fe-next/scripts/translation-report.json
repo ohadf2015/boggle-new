@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 2455,
+    "totalKeysInCode": 2472,
     "keyCountByLanguage": {
-      "en": 3141,
-      "he": 3141,
-      "sv": 3141,
-      "ja": 3141,
-      "es": 3076
+      "en": 3278,
+      "he": 3278,
+      "sv": 3278,
+      "ja": 3278,
+      "es": 3213
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
       "fallbackUsages": 0,
-      "variableKeys": 8
+      "variableKeys": 9
     }
   },
   "runtimeRisks": {
@@ -49,6 +49,14 @@
     ],
     "fallbackUsages": [],
     "variableKeys": [
+      {
+        "pattern": "t(currentTaunt)",
+        "variable": "currentTaunt",
+        "file": "components/adventure/BossDialogue.tsx",
+        "line": 53,
+        "context": "const translatedTaunt = t(currentTaunt);",
+        "type": "variable_key"
+      },
       {
         "pattern": "t(messageKey)",
         "variable": "messageKey",

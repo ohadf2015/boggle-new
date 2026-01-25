@@ -57,6 +57,7 @@ const mockTranslations: Record<string, string> = {
   'adventure.game.objectives': 'Objectives',
   'adventure.game.combo': 'Combo',
   'adventure.game.paused': 'Paused',
+  'adventure.level': 'Level',
   'adventure.objectives.wordCount': 'Find words',
   'adventure.objectives.scoreTarget': 'Reach score',
   'adventure.objectives.longWords': 'Long words (5+)',

@@ -20,6 +20,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
 
 // ==============================================
@@ -48,19 +49,6 @@ const OBJECTIVE_ICONS: Record<ObjectiveType, React.ComponentType<{ className?: s
   clearIce: Snowflake,
   timeBonus: Clock,
   collectGems: Gem,
-};
-
-/**
- * Maps ObjectiveType to translation keys.
- * Actual translation is done via t() in component render.
- */
-const OBJECTIVE_TRANSLATION_KEYS: Record<ObjectiveType, string> = {
-  wordCount: 'adventure.objectives.wordCount',
-  scoreTarget: 'adventure.objectives.scoreTarget',
-  longWords: 'adventure.objectives.longWords',
-  clearIce: 'adventure.objectives.clearIce',
-  timeBonus: 'adventure.objectives.timeBonus',
-  collectGems: 'adventure.objectives.collectGems',
 };
 
 // ==============================================
