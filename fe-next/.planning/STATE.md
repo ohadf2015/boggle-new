@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 24 of 25 (CrazyGames Portal Integration) — COMPLETE
-Plan: 6/6 complete
+Phase: 25 of 25 (Capacitor Native Apps) — COMPLETE
+Plan: 5/5 complete
 Status: Complete
-Last activity: 2026-01-26 — Completed 24-06-PLAN.md (Enhanced SDK Integration)
+Last activity: 2026-01-26 — Completed 25-05-PLAN.md (Wire Orphaned Native Integrations)
 
-Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
+Progress: [███████████░] 19/25 phases (76% milestone, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -96,8 +96,9 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 | 25-02 | Platform Detection & Native Features | 10min | Complete |
 | 25-03 | Safe Area & Offline Fallback | 20min | Complete |
 | 25-04 | Native Build Testing | 10min | Complete |
+| 25-05 | Wire Orphaned Native Integrations | 8min | Complete |
 
-**Phase 25 Total:** 44 minutes, native app infrastructure complete
+**Phase 25 Total:** 52 minutes, 93 tests added (24 new in 25-05), native app infrastructure complete
 
 ## Accumulated Context
 
@@ -173,6 +174,12 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **25-04**: --release flag for production → Explicit opt-in prevents accidental release builds (2026-01-26)
 - **25-04**: Xcode for iOS debug, CLI for release → Better debugging UX, automation for distribution (2026-01-26)
 - **25-04**: Environment variables for credentials → Never commit secrets, explicit configuration (2026-01-26)
+- **25-05**: NetworkStatusHandler only activates in native → Web browsers have built-in offline indicators (2026-01-26)
+- **25-05**: NetworkStatusHandler wraps NativeAppProvider → Offline fallback needs LanguageContext for translations (2026-01-26)
+- **25-05**: Socket reconnects on foreground, not disconnect on background → iOS/Android handle connections appropriately (2026-01-26)
+- **25-05**: GamePageWrapper uses CSS custom properties → Decouples safe area detection from UI rendering (2026-01-26)
+- **25-05**: Retry button reloads entire page → Simplest way to recover from offline state (2026-01-26)
+- **25-05**: useSafeArea returns SafeAreaInsets object → Hook can be used for both CSS vars and inline styles (2026-01-26)
 
 ### Pending Todos
 
@@ -238,18 +245,22 @@ None.
 - CSS custom properties — Combined approach uses max() of env() and Capacitor values (25-03 complete)
 - Build scripts complete — iOS/Android build automation with npm workflow (25-04 complete)
 - Socket.IO verified working — Native WebView multiplayer tested and approved by user (25-04 complete)
-- Test coverage: 69 tests passing — All native infrastructure tests passing
-- Total duration: 44 minutes across 4 plans
+- Native integrations wired — NativeAppProvider and NetworkStatusHandler in provider tree (25-05 complete)
+- Safe area in GamePageWrapper — CSS custom properties applied with fallback (25-05 complete)
+- Network status monitoring — useOnlineStatus hook with offline detection (25-05 complete)
+- Socket reconnection on foreground — App lifecycle integration complete (25-05 complete)
+- Test coverage: 93 tests passing — All native infrastructure tests passing
+- Total duration: 52 minutes across 5 plans
 - Ready for App Store/Play Store submission
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 25-04-PLAN.md (Native Build Testing) — Phase 25 COMPLETE
+Stopped at: Completed 25-05-PLAN.md (Wire Orphaned Native Integrations) — Phase 25 COMPLETE
 Resume file: None
 
-**Next action:** Phase 25 complete. Native app infrastructure ready for production.
+**Next action:** Phase 25 complete. All native integrations wired. Ready for native testing in simulators.
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 25 plan 04 complete - PHASE COMPLETE)*
+*Last updated: 2026-01-26 (Phase 25 plan 05 complete - PHASE COMPLETE)*
