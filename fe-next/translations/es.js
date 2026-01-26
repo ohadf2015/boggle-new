@@ -4430,6 +4430,14 @@ const es = {
         "hint": "Oculto hasta descubrirlo..."
       }
     }
+  },
+  "native": {
+    "offline": {
+      "title": "Sin Conexión",
+      "message": "No podemos conectar con el servidor del juego. Por favor, verifica tu conexión a Internet.",
+      "retry": "Intentar de Nuevo",
+      "retrying": "Conectando..."
+    }
   }
 };
 
