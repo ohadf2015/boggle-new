@@ -285,10 +285,12 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 25-01-PLAN.md — Capacitor core setup (packages, config, platforms) (Wave 1)
-- [ ] 25-02-PLAN.md — Platform detection & native hooks (Wave 1)
-- [ ] 25-03-PLAN.md — Safe area integration & offline fallback (Wave 2)
-- [ ] 25-04-PLAN.md — Build scripts & app store preparation (Wave 3)
+- [x] 25-01-PLAN.md — Capacitor core setup (packages, config, platforms) (Wave 1)
+- [x] 25-02-PLAN.md — Platform detection & native hooks (Wave 1)
+- [x] 25-03-PLAN.md — Safe area integration & offline fallback (Wave 2)
+- [x] 25-04-PLAN.md — Build scripts & app store preparation (Wave 3)
+- [x] 25-05-PLAN.md — Wire orphaned native integrations (Wave 1, gap closure)
+- [x] 25-06-PLAN.md — Generic haptics abstraction layer (Wave 1, gap closure)
 
 ## Progress
 
@@ -314,10 +316,10 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 21. Rich Lesson Delivery | v1.1 | 0/TBD | Not started | - |
 | 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |
 | 23. Tech Debt Cleanup | v1.1 | 0/TBD | Not started | - |
-| 24. CrazyGames Portal Integration | v1.2 | 0/5 | Planned | - |
-| 25. Capacitor Native Apps | v1.2 | 0/4 | Planned | - |
+| 24. CrazyGames Portal Integration | v1.2 | 6/7 | In Progress | - |
+| 25. Capacitor Native Apps | v1.2 | 6/6 | ✅ Complete | 2026-01-26 |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-26 after Phase 25 planning complete*
+*Last updated: 2026-01-26 after Phase 25 execution complete*
