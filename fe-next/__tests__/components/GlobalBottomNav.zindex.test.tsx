@@ -45,6 +45,17 @@ jest.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: jest.fn(() => ({ theme: 'dark' })),
+}));
+
+jest.mock('@/components/auth/AuthModal', () => ({
+  __esModule: true,
+  default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+    isOpen ? <div data-testid="auth-modal" onClick={onClose}>AuthModal</div> : null
+  ),
+}));
+
 jest.mock('@/hooks/useSafeArea', () => ({
   useSafeArea: () => ({
     top: 0,

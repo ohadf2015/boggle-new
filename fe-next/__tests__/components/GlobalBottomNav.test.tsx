@@ -30,6 +30,17 @@ jest.mock('../../hooks/useSafeArea', () => ({
     useSafeArea: jest.fn(),
 }));
 
+jest.mock('../../utils/ThemeContext', () => ({
+    useTheme: jest.fn(() => ({ theme: 'dark' })),
+}));
+
+jest.mock('../../components/auth/AuthModal', () => ({
+    __esModule: true,
+    default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+        isOpen ? <div data-testid="auth-modal" onClick={onClose}>AuthModal</div> : null
+    ),
+}));
+
 describe('GlobalBottomNav', () => {
     const mockPush = jest.fn();
     const mockT = jest.fn((key: string) => {
@@ -252,7 +263,7 @@ describe('GlobalBottomNav', () => {
     });
 
     describe('Authentication State', () => {
-        it('should disable brain button when not authenticated', () => {
+        it('should show AuthModal when brain button clicked while not authenticated', async () => {
             (useAuth as jest.Mock).mockReturnValue({
                 isAuthenticated: false,
             });
@@ -260,11 +271,19 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             const brainButton = screen.getByRole('button', { name: /brain/i });
-            expect(brainButton).toBeDisabled();
-            expect(brainButton).toHaveClass('opacity-50');
+            // Button should not be disabled
+            expect(brainButton).not.toBeDisabled();
+
+            // Click brain button
+            fireEvent.click(brainButton);
+
+            // AuthModal should appear
+            await waitFor(() => {
+                expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
+            });
         });
 
-        it('should disable profile button when not authenticated', () => {
+        it('should show AuthModal when profile button clicked while not authenticated', async () => {
             (useAuth as jest.Mock).mockReturnValue({
                 isAuthenticated: false,
             });
@@ -272,8 +291,16 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             const profileButton = screen.getByRole('button', { name: /profile/i });
-            expect(profileButton).toBeDisabled();
-            expect(profileButton).toHaveClass('opacity-50');
+            // Button should not be disabled
+            expect(profileButton).not.toBeDisabled();
+
+            // Click profile button
+            fireEvent.click(profileButton);
+
+            // AuthModal should appear
+            await waitFor(() => {
+                expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
+            });
         });
 
         it('should enable all buttons when authenticated', () => {

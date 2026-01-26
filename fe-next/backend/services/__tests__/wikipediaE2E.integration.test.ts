@@ -38,6 +38,9 @@ jest.mock('@/lib/ai-service', () => ({
 }));
 
 describe('Wikipedia Pipeline E2E', () => {
+  // Increase Jest timeout for this suite to allow Wikipedia API calls
+  jest.setTimeout(100000);
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -213,6 +216,9 @@ describe('Wikipedia Pipeline E2E', () => {
 });
 
 describe('Wikipedia Pipeline Fallback Behavior', () => {
+  // Increase Jest timeout for this suite to allow Wikipedia API calls
+  jest.setTimeout(100000);
+
   it('should fallback to local JSON when Wikipedia unavailable', async () => {
     const { populateWikipediaWords } = await import('../wikipediaWordPopulator');
 

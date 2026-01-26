@@ -166,10 +166,12 @@ describe('GlobalBottomNav Clickability on Landing Page', () => {
       expect(globalBottomNavSource).toContain('aria-current');
     });
 
-    it('should disable buttons when not authenticated', () => {
-      // Then: Should check isAuthenticated and disable buttons
-      expect(globalBottomNavSource).toContain('disabled={!isAuthenticated}');
-      expect(globalBottomNavSource).toContain('opacity-50');
+    it('should show AuthModal when unauthenticated users click Brain/Profile', () => {
+      // Then: Should render AuthModal component
+      expect(globalBottomNavSource).toContain('AuthModal');
+      expect(globalBottomNavSource).toContain('showAuthModal');
+      // Buttons should trigger modal, not be disabled
+      expect(globalBottomNavSource).toContain('setShowAuthModal(true)');
     });
 
     it('should have aria-hidden on icons', () => {
