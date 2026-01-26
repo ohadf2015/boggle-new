@@ -43,3 +43,24 @@ When running in CrazyGames portal:
 2. **Feature Gating**: Only change SDK/auth behavior, not CSS/layout
 3. **CSS Isolation**: Ensure game styles are not affected by parent frame styles
 4. **Viewport Handling**: Respect iframe dimensions without breaking responsive design
+
+## Enhanced CrazyGames Integration (User Request)
+
+Beyond basic compliance, enhance the experience with additional SDK features:
+
+1. **Ads Module** - Integrate midgame and rewarded video ads at natural break points
+2. **Data Module** - Cloud save for cross-device progress sync (CrazyGames users only)
+3. **Game Settings** - Respect platform-level audio mute and chat disable settings
+4. **Happytime Events** - Trigger celebration effects for major achievements (boss defeats, high scores)
+5. **Instant Multiplayer** - Streamlined flow when launched via multiplayer invite
+6. **QR Code Display** - Show QR codes for easy mobile-to-desktop room joining
+
+**Monetization Strategy:**
+- Midgame ads: Between adventure levels, after boss battles, between daily challenges
+- Rewarded ads: Optional extra lives, continue after defeat, bonus XP boosts
+- Never interrupt active gameplay or word submission
+
+**Cloud Save Strategy:**
+- Use CrazyGames data module when logged in to CrazyGames
+- Fall back to Supabase for direct website access
+- Sync: Adventure progress, XP/level, achievements, preferences
