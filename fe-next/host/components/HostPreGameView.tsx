@@ -121,18 +121,6 @@ function HostPreGameView({
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
 
-  const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite();
-
-  // Show CrazyGames invite button
-  useEffect(() => {
-    if (gameCode) {
-      showInviteButton(gameCode);
-    }
-    return () => {
-      if (isInviteButtonVisible) hideInviteButton();
-    };
-  }, [gameCode, showInviteButton, hideInviteButton, isInviteButtonVisible]);
-
   // Apply default preset on mount
   useEffect(() => {
     if (!hasInitialized) {
@@ -214,6 +202,26 @@ function HostPreGameView({
       return true;
     });
   }, [playersReady, hostPlaying, username]);
+
+  // CrazyGames invite integration with room lifecycle
+  const maxPlayers = 8; // Standard max players for multiplayer
+  const gameState: 'waiting' | 'playing' | 'ended' = 'waiting'; // Pre-game is always waiting
+
+  const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite({
+    maxPlayers,
+    currentPlayers: filteredPlayersForDisplay.length,
+    gameState,
+  });
+
+  // Show CrazyGames invite button when room is created
+  useEffect(() => {
+    if (gameCode && gameState === 'waiting') {
+      showInviteButton(gameCode);
+    }
+    return () => {
+      if (isInviteButtonVisible) hideInviteButton();
+    };
+  }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible]);
 
   const isStartDisabled = !timerValue || filteredPlayersForDisplay.length === 0 || tournamentCreating;
 
