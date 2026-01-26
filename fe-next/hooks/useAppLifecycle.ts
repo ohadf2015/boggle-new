@@ -4,7 +4,8 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { App, type PluginListenerHandle } from '@capacitor/app';
+import { App } from '@capacitor/app';
+import type { PluginListenerHandle } from '@capacitor/core';
 import { isNative } from '../utils/platform';
 
 interface UseAppLifecycleOptions {
@@ -53,22 +54,27 @@ export function useAppLifecycle({
 
     let listener: PluginListenerHandle | null = null;
 
-    try {
-      listener = App.addListener('appStateChange', (state) => {
-        try {
-          if (state.isActive) {
-            onForegroundRef.current?.();
-          } else {
-            onBackgroundRef.current?.();
+    // Register listener asynchronously
+    const registerListener = async () => {
+      try {
+        listener = await App.addListener('appStateChange', (state) => {
+          try {
+            if (state.isActive) {
+              onForegroundRef.current?.();
+            } else {
+              onBackgroundRef.current?.();
+            }
+          } catch (error) {
+            // Silently catch callback errors to prevent crash
+            console.error('App lifecycle callback error:', error);
           }
-        } catch (error) {
-          // Silently catch callback errors to prevent crash
-          console.error('App lifecycle callback error:', error);
-        }
-      });
-    } catch (error) {
-      console.error('Failed to register app lifecycle listener:', error);
-    }
+        });
+      } catch (error) {
+        console.error('Failed to register app lifecycle listener:', error);
+      }
+    };
+
+    registerListener();
 
     // Cleanup listener on unmount
     return () => {

@@ -28,11 +28,18 @@ describe('useAppLifecycle', () => {
       (platformUtils.isNative as jest.Mock).mockReturnValue(true);
     });
 
-    it('should register appStateChange listener on mount', () => {
+    it('should register appStateChange listener on mount', async () => {
       const onForeground = jest.fn();
       const onBackground = jest.fn();
 
+      (App.addListener as jest.Mock).mockResolvedValue({
+        remove: jest.fn(),
+      } as PluginListenerHandle);
+
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(App.addListener).toHaveBeenCalledWith(
         'appStateChange',
@@ -40,17 +47,20 @@ describe('useAppLifecycle', () => {
       );
     });
 
-    it('should call onForeground when app becomes active', () => {
+    it('should call onForeground when app becomes active', async () => {
       const onForeground = jest.fn();
       const onBackground = jest.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation((event, callback) => {
+      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
         return { remove: jest.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       // Simulate app becoming active
       capturedCallback({ isActive: true });
@@ -59,17 +69,20 @@ describe('useAppLifecycle', () => {
       expect(onBackground).not.toHaveBeenCalled();
     });
 
-    it('should call onBackground when app becomes inactive', () => {
+    it('should call onBackground when app becomes inactive', async () => {
       const onForeground = jest.fn();
       const onBackground = jest.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation((event, callback) => {
+      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
         return { remove: jest.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       // Simulate app becoming inactive
       capturedCallback({ isActive: false });
@@ -78,17 +91,20 @@ describe('useAppLifecycle', () => {
       expect(onForeground).not.toHaveBeenCalled();
     });
 
-    it('should handle multiple state changes', () => {
+    it('should handle multiple state changes', async () => {
       const onForeground = jest.fn();
       const onBackground = jest.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation((event, callback) => {
+      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
         return { remove: jest.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       capturedCallback({ isActive: false });
       capturedCallback({ isActive: true });
@@ -99,12 +115,12 @@ describe('useAppLifecycle', () => {
       expect(onForeground).toHaveBeenCalledTimes(2);
     });
 
-    it('should clean up listener on unmount', () => {
+    it('should clean up listener on unmount', async () => {
       const onForeground = jest.fn();
       const onBackground = jest.fn();
       const removeMock = jest.fn();
 
-      (App.addListener as jest.Mock).mockReturnValue({
+      (App.addListener as jest.Mock).mockResolvedValue({
         remove: removeMock,
       } as PluginListenerHandle);
 
@@ -112,40 +128,49 @@ describe('useAppLifecycle', () => {
         useAppLifecycle({ onForeground, onBackground })
       );
 
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       unmount();
 
       expect(removeMock).toHaveBeenCalledTimes(1);
     });
 
-    it('should not crash if callbacks throw errors', () => {
+    it('should not crash if callbacks throw errors', async () => {
       const onForeground = jest.fn().mockImplementation(() => {
         throw new Error('Foreground error');
       });
       const onBackground = jest.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation((event, callback) => {
+      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
         return { remove: jest.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
 
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       expect(() => {
         capturedCallback({ isActive: true });
       }).not.toThrow();
     });
 
-    it('should handle optional callbacks', () => {
+    it('should handle optional callbacks', async () => {
       const onForeground = jest.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation((event, callback) => {
+      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
         return { remove: jest.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground }));
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(() => {
         capturedCallback({ isActive: false });
@@ -184,10 +209,10 @@ describe('useAppLifecycle', () => {
       (platformUtils.isNative as jest.Mock).mockReturnValue(true);
     });
 
-    it('should use latest callback reference', () => {
+    it('should use latest callback reference', async () => {
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation((event, callback) => {
+      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
         return { remove: jest.fn() } as PluginListenerHandle;
       });
@@ -199,6 +224,9 @@ describe('useAppLifecycle', () => {
           initialProps: { onForeground: firstCallback },
         }
       );
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       const secondCallback = jest.fn();
       rerender({ onForeground: secondCallback });
@@ -215,32 +243,38 @@ describe('useAppLifecycle', () => {
       (platformUtils.isNative as jest.Mock).mockReturnValue(true);
     });
 
-    it('should handle App.addListener throwing error', () => {
+    it('should handle App.addListener throwing error', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       const onForeground = jest.fn();
 
-      (App.addListener as jest.Mock).mockImplementation(() => {
-        throw new Error('Listener registration failed');
-      });
+      (App.addListener as jest.Mock).mockRejectedValue(
+        new Error('Listener registration failed')
+      );
 
       expect(() => {
         renderHook(() => useAppLifecycle({ onForeground }));
       }).not.toThrow();
 
+      // Wait for async error handling
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       consoleErrorSpy.mockRestore();
     });
 
-    it('should handle cleanup error gracefully', () => {
+    it('should handle cleanup error gracefully', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       const onForeground = jest.fn();
 
-      (App.addListener as jest.Mock).mockReturnValue({
+      (App.addListener as jest.Mock).mockResolvedValue({
         remove: jest.fn().mockImplementation(() => {
           throw new Error('Cleanup failed');
         }),
       } as PluginListenerHandle);
 
       const { unmount } = renderHook(() => useAppLifecycle({ onForeground }));
+
+      // Wait for async registration
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(() => unmount()).not.toThrow();
 
