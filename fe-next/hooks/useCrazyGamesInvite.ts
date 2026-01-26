@@ -10,6 +10,12 @@ interface UseCrazyGamesInviteOptions {
   onInstantMultiplayer?: () => void;
   /** Auto-show invite button when room is created */
   autoShowInviteButton?: boolean;
+  /** Maximum players for this room */
+  maxPlayers?: number;
+  /** Current player count */
+  currentPlayers?: number;
+  /** Game state (waiting, playing, ended) */
+  gameState?: 'waiting' | 'playing' | 'ended';
 }
 
 interface UseCrazyGamesInviteReturn {
@@ -64,6 +70,9 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
     onInviteJoin,
     onInstantMultiplayer,
     autoShowInviteButton = true,
+    maxPlayers,
+    currentPlayers,
+    gameState,
   } = options;
 
   const {
@@ -138,6 +147,22 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
     sdkHideInvite();
     setIsInviteButtonVisible(false);
   }, [isAvailable, sdkHideInvite]);
+
+  // Auto-hide invite button based on room state
+  useEffect(() => {
+    if (!isInviteButtonVisible) return;
+
+    // Hide if room is full
+    if (maxPlayers !== undefined && currentPlayers !== undefined && currentPlayers >= maxPlayers) {
+      hideInviteButton();
+      return;
+    }
+
+    // Hide if game is no longer waiting
+    if (gameState !== undefined && gameState !== 'waiting') {
+      hideInviteButton();
+    }
+  }, [maxPlayers, currentPlayers, gameState, isInviteButtonVisible, hideInviteButton]);
 
   // Cleanup on unmount
   useEffect(() => {
