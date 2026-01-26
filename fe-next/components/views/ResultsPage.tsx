@@ -59,6 +59,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180 }) => {
   const { t } = useLanguage();
@@ -153,6 +154,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   const winner = sortedScores[0];
   const isCurrentUserWinner = winner?.username === username;
+
+  // CrazyGames lifecycle - stop gameplay when results page loads
+  // Call happytime if winner (throttled to once per 30s)
+  useCrazyGamesLifecycle({
+    isGameActive: false, // Results = not playing
+    isGameOver: true,
+    isWinner: isCurrentUserWinner,
+  });
 
   // Get games played for first win detection
   const guestStats = useMemo(() => getGuestStatsSummary(), []);
