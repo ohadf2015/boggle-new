@@ -34,11 +34,39 @@ let cachedContext: ReturnType<typeof useCrazyGames> | null = null;
 function getSDKContext() {
   if (!cachedContext) {
     // Initialize with no-op implementation
+    // Type assertion is safe because we only use saveData/loadData/removeData in this file
     cachedContext = {
       isAvailable: false,
+      isOnCrazyGamesPlatform: false,
+      environment: null,
+      isLoading: false,
+      deviceType: 'desktop',
+      isLandscape: true,
+      viewportSize: { width: 0, height: 0 },
+      gameplayStart: () => {},
+      gameplayStop: () => {},
+      loadingStart: () => {},
+      loadingStop: () => {},
+      happyTime: () => {},
+      showMidgameAd: () => {},
+      showRewardedAd: () => {},
+      hasAdblock: async () => false,
+      requestBanner: () => {},
+      requestResponsiveBanner: () => {},
+      clearBanner: () => {},
+      clearAllBanners: () => {},
       saveData: async () => {},
       loadData: async () => null,
       removeData: async () => {},
+      getUser: async () => null,
+      showAuthPrompt: async () => null,
+      isUserAccountAvailable: async () => false,
+      getSystemInfo: async () => null,
+      inviteLink: () => null,
+      showInviteButton: () => {},
+      hideInviteButton: () => {},
+      getInviteParam: () => null,
+      isInstantMultiplayer: false,
     } as ReturnType<typeof useCrazyGames>;
   }
   return cachedContext;

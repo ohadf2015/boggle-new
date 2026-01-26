@@ -18,7 +18,7 @@ import JoinClassroomForm from '@/components/student/JoinClassroomForm';
 export default function JoinWithCodePage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const { t, language } = useLanguage();
   const [isChecking, setIsChecking] = useState(true);
 
@@ -27,7 +27,12 @@ export default function JoinWithCodePage() {
   const code = rawCode?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) || '';
 
   useEffect(() => {
-    // Check authentication
+    // Wait for auth to finish loading before checking authentication
+    if (loading) {
+      return; // Still loading, don't make any decisions yet
+    }
+
+    // Check authentication (only after loading completes)
     if (!isAuthenticated) {
       // Store return URL so user can come back after login
       if (typeof window !== 'undefined' && code) {
@@ -38,10 +43,10 @@ export default function JoinWithCodePage() {
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, router, language, code]);
+  }, [isAuthenticated, loading, router, language, code]);
 
-  // Show loader during auth check
-  if (isChecking) {
+  // Show loader during auth check or while auth is loading
+  if (isChecking || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neo-navy">
         <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
