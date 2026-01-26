@@ -35,11 +35,11 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
       {/* Logo */}
       <div className="mb-8">
         <Image
-          src="/logos/logo-text.webp"
+          src="/logos/lexiclash_logo_english-min.webp"
           alt="LexiClash"
-          width={200}
-          height={60}
-          className="h-auto w-auto"
+          width={240}
+          height={180}
+          className="h-auto w-auto max-w-[240px]"
           priority
         />
       </div>
