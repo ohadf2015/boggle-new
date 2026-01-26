@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { fetchWithAuth, postWithAuth } from '@/utils/authFetch';
 
 interface CalendarStatus {
   month: number;
@@ -41,17 +41,12 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchCalendarStatus = useCallback(async () => {
-    if (!user?.id || !supabase) return;
+    if (!user?.id) return;
 
     try {
       setIsLoading(true);
       setFetchError(null);
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch('/api/engagement/calendar', {
-        headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`
-        }
-      });
+      const response = await fetchWithAuth('/api/engagement/calendar');
       if (response.ok) {
         const data = await response.json();
         setCalendarStatus(data);
@@ -80,17 +75,11 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   }, [isOpen, user?.id, fetchCalendarStatus]);
 
   const handleClaimReward = async () => {
-    if (!calendarStatus?.canClaimToday || isClaiming || !supabase) return;
+    if (!calendarStatus?.canClaimToday || isClaiming) return;
 
     try {
       setIsClaiming(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch('/api/engagement/calendar', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`
-        }
-      });
+      const response = await postWithAuth('/api/engagement/calendar');
 
       if (response.ok) {
         const data = await response.json();

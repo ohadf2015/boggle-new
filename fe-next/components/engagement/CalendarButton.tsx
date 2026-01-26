@@ -5,9 +5,9 @@ import { Calendar, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CalendarRewardsModal } from './CalendarRewardsModal';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 interface CalendarButtonProps {
   className?: string;
@@ -20,15 +20,10 @@ export function CalendarButton({ className, variant = 'icon' }: CalendarButtonPr
   const [hasUnclaimedReward, setHasUnclaimedReward] = useState(false);
 
   const checkUnclaimedReward = useCallback(async () => {
-    if (!user?.id || !supabase) return;
+    if (!user?.id) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch('/api/engagement/calendar', {
-        headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`
-        }
-      });
+      const response = await fetchWithAuth('/api/engagement/calendar');
       if (response.ok) {
         const data = await response.json();
         setHasUnclaimedReward(data.canClaimToday);

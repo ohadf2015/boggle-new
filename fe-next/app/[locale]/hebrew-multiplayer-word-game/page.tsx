@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'משחק מילים מרובה משתתפים בעברית - כמו בוגל, סקראבל ווורדל אונליין | לקסיקלאש',
   description: 'אוהבים בוגל, סקראבל או וורדל? לקסיקלאש הוא משחק מילים מרובה משתתפים בעברית! צרו חדר, שלחו לינק לחברים והתחרו בזמן אמת. 10,000+ מילים בעברית, ללא הרשמה, חינם לגמרי. מושלם לערבי משפחה, מסיבות וגיבוש צוותי. פותח באהבה בישראל 🇮🇱',

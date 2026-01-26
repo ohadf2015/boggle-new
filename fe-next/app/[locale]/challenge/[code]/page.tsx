@@ -1,29 +1,8 @@
-'use client';
-
-import React from 'react';
-import nextDynamic from 'next/dynamic';
-import { useParams } from 'next/navigation';
-import { NeoLoader } from '@/components/ui/NeoLoader';
-
-// Dynamic import for code splitting
-const ChallengeView = nextDynamic(() => import('@/components/challenge/ChallengeView'), {
-  loading: () => (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <NeoLoader variant="mascot-letters" size="lg" text="Loading challenge..." />
-    </div>
-  ),
-  ssr: false,
-});
-
+// This page uses client-side contexts, so it must be rendered dynamically
 export const dynamic = 'force-dynamic';
 
-/**
- * Challenge page route
- * Handles "Beat My Score" challenges where players compete on the same board
- */
-export default function ChallengePage(): React.JSX.Element {
-  const params = useParams();
-  const challengeCode = params.code as string;
+import ChallengePageClient from './PageClient';
 
-  return <ChallengeView challengeCode={challengeCode} />;
+export default function ChallengePage() {
+  return <ChallengePageClient />;
 }

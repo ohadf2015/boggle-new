@@ -29,6 +29,8 @@ const GAME_ROUTES = [
   '/party-screen',
   '/teacher',
   '/student',
+  '/auth/callback',  // Auth callback needs full providers
+  '/hebrew-multiplayer-word-game',  // SEO page
 ];
 
 // Routes that need partial providers (auth but not game state)
@@ -37,6 +39,8 @@ const AUTH_ROUTES = [
   '/settings',
   '/friends',
   '/leaderboard',
+  '/education',
+  '/admin',
 ];
 
 /**

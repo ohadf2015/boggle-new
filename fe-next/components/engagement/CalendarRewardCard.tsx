@@ -54,11 +54,11 @@ function getRewardIcon(type: CalendarReward['type'], rarity?: string) {
     case 'streak_freeze':
       return <Shield className={cn(iconClass, "text-neo-lime")} />;
     case 'mystery_box':
-      return <Gift className={cn(iconClass, rarity === 'legendary' ? 'text-neo-lime' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-black/70')} />;
+      return <Gift className={cn(iconClass, rarity === 'legendary' ? 'text-neo-lime' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-black')} />;
     case 'exclusive_title':
       return <Crown className={cn(iconClass, "text-neo-pink")} />;
     default:
-      return <Gift className={cn(iconClass, "text-neo-black/70")} />;
+      return <Gift className={cn(iconClass, "text-neo-black")} />;
   }
 }
 
@@ -99,9 +99,9 @@ export function CalendarRewardCard({
         "min-h-[42px] sm:min-h-[56px] md:min-h-[70px]",
         "border-1 sm:border-2",
         // Base styles
-        isClaimed && "bg-neo-lime/10 border-neo-lime/30",
-        !isClaimed && !isPast && !isToday && "bg-neo-black/5 border-neo-black/20",
-        isPast && !isClaimed && "bg-neo-black/5 border-neo-black/10 opacity-40",
+        isClaimed && "bg-neo-lime/20 border-neo-lime",
+        !isClaimed && !isPast && !isToday && "bg-neo-cream/50 border-neo-black/40",
+        isPast && !isClaimed && "bg-neo-black/10 border-neo-black/30 opacity-50",
         // Today styles
         isToday && canClaim && [
           "bg-gradient-to-br",
@@ -120,7 +120,7 @@ export function CalendarRewardCard({
       {/* Day number */}
       <span className={cn(
         "text-[10px] sm:text-xs font-bold absolute top-0.5 sm:top-1 left-1 sm:left-1.5",
-        isClaimed ? "text-neo-black/40" : "text-neo-black/60",
+        isClaimed ? "text-neo-black/70" : "text-neo-black",
         isToday && "text-neo-black font-black",
       )}>
         {reward.day}
@@ -135,7 +135,7 @@ export function CalendarRewardCard({
 
       {isPast && !isClaimed && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-neo-black/30" />
+          <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-neo-black/60" />
         </div>
       )}
 
@@ -145,7 +145,7 @@ export function CalendarRewardCard({
           {getRewardIcon(reward.type, reward.rarity)}
           <span className={cn(
             "text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase leading-tight text-center",
-            isToday ? "text-neo-black" : "text-neo-black/70",
+            isToday ? "text-neo-black" : "text-neo-black",
           )}>
             {getRewardLabel(reward)}
           </span>
