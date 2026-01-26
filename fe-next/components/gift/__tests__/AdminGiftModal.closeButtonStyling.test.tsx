@@ -54,6 +54,7 @@ describe('AdminGiftModal - Close Button Styling', () => {
     coin_amount: 50,
     badge_id: null,
     badge: null,
+    sender: undefined,
   };
 
   const defaultProps = {
