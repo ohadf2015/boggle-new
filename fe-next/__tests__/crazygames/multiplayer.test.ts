@@ -14,7 +14,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 
 // Mock CrazyGames SDK BEFORE importing the hook
 let mockIsInstantMultiplayer = false;
-let mockGetInviteParam = jest.fn(() => null);
+let mockGetInviteParam: jest.Mock<string | null, [string]> = jest.fn<string | null, [string]>(() => null);
 const mockInviteLink = jest.fn((params) => `https://crazygames.com/game/lexiclash?roomId=${params.roomId}`);
 const mockShowInviteButton = jest.fn();
 const mockHideInviteButton = jest.fn();
@@ -40,7 +40,7 @@ describe('CrazyGames Multiplayer Invites', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsInstantMultiplayer = false;
-    mockGetInviteParam = jest.fn(() => null);
+    mockGetInviteParam = jest.fn<string | null, [string]>(() => null);
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe('CrazyGames Multiplayer Invites', () => {
       const onInviteJoin = jest.fn();
 
       // Mock SDK to return roomId from URL
-      mockGetInviteParam = jest.fn((param) => (param === 'roomId' ? 'ABC123' : null));
+      mockGetInviteParam = jest.fn<string | null, [string]>((param) => (param === 'roomId' ? 'ABC123' : null));
 
       const { result } = renderHook(() =>
         useCrazyGamesInvite({ onInviteJoin })
@@ -206,13 +206,13 @@ describe('CrazyGames Multiplayer Invites', () => {
 
     it('should auto-hide invite button when game starts', () => {
       const { result, rerender } = renderHook(
-        ({ gameState }) =>
+        ({ gameState }: { gameState: 'waiting' | 'playing' | 'ended' }) =>
           useCrazyGamesInvite({
             maxPlayers: 4,
             currentPlayers: 2,
             gameState,
           }),
-        { initialProps: { gameState: 'waiting' as const } }
+        { initialProps: { gameState: 'waiting' as 'waiting' | 'playing' | 'ended' } }
       );
 
       // Show invite button
@@ -225,7 +225,7 @@ describe('CrazyGames Multiplayer Invites', () => {
 
       // Start game
       act(() => {
-        rerender({ gameState: 'playing' as const });
+        rerender({ gameState: 'playing' });
       });
 
       // VERIFY: Invite button auto-hidden (at least once)
@@ -346,7 +346,7 @@ describe('CrazyGames Multiplayer Invites', () => {
       const onInviteJoin = jest.fn();
 
       // Mock getInviteParam to be called multiple times
-      mockGetInviteParam = jest.fn((param) => {
+      mockGetInviteParam = jest.fn<string | null, [string]>((param) => {
         if (param === 'roomId') return 'ABC123';
         if (param === 'otherParam') return 'value';
         return null;
@@ -381,7 +381,7 @@ describe('CrazyGames Multiplayer Invites', () => {
     it('should only trigger onInviteJoin once on mount', async () => {
       const onInviteJoin = jest.fn();
 
-      mockGetInviteParam = jest.fn(() => 'ABC123');
+      mockGetInviteParam = jest.fn<string | null, [string]>(() => 'ABC123');
 
       const { rerender } = renderHook(() =>
         useCrazyGamesInvite({ onInviteJoin })

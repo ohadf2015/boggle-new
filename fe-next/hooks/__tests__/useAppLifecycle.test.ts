@@ -6,7 +6,12 @@
 import { renderHook } from '@testing-library/react';
 import { useAppLifecycle } from '../useAppLifecycle';
 import * as platformUtils from '../../utils/platform';
-import { App, type PluginListenerHandle } from '@capacitor/app';
+import { App } from '@capacitor/app';
+
+// Define PluginListenerHandle type locally
+interface PluginListenerHandle {
+  remove: () => void;
+}
 
 // Mock platform detection
 jest.mock('../../utils/platform');

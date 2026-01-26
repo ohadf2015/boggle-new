@@ -21,9 +21,10 @@ describe('CrazyGames Bundle Size Verification', () => {
     it('should not load audio files on initial page load', async () => {
       // Track all fetch requests
       const audioRequests: string[] = [];
-      const mockFetch = jest.fn((url: string) => {
-        if (typeof url === 'string' && (url.includes('.mp3') || url.includes('.wav') || url.includes('.ogg'))) {
-          audioRequests.push(url);
+      const mockFetch = jest.fn((url: RequestInfo | URL) => {
+        const urlString = typeof url === 'string' ? url : url.toString();
+        if (urlString.includes('.mp3') || urlString.includes('.wav') || urlString.includes('.ogg')) {
+          audioRequests.push(urlString);
         }
         return Promise.resolve({
           ok: true,
@@ -31,7 +32,7 @@ describe('CrazyGames Bundle Size Verification', () => {
         } as Response);
       });
 
-      global.fetch = mockFetch;
+      global.fetch = mockFetch as typeof fetch;
 
       // Simulate initial page load (no audio should be requested)
       await new Promise(resolve => setTimeout(resolve, 100));

@@ -121,9 +121,9 @@ describe('useSafeArea', () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
 
-    let listenerCallback: ((data: { insets: SafeAreaInsets }) => void) | null = null;
+    let listenerCallback: ((data: { insets: SafeAreaInsets }) => void) = () => {};
     mockSafeArea.addListener.mockImplementation((eventName, callback) => {
-      listenerCallback = callback;
+      listenerCallback = callback as (data: { insets: SafeAreaInsets }) => void;
       return Promise.resolve({ remove: jest.fn() });
     });
 
@@ -136,9 +136,7 @@ describe('useSafeArea', () => {
 
     // Simulate orientation change
     const newInsets: SafeAreaInsets = { top: 0, bottom: 0, left: 47, right: 47 };
-    if (listenerCallback) {
-      listenerCallback({ insets: newInsets });
-    }
+    listenerCallback({ insets: newInsets });
 
     await waitFor(() => {
       expect(result.current).toEqual(newInsets);

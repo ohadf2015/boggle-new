@@ -29,7 +29,7 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
     // Default theme mock
     mockUseTheme.mockReturnValue({
       theme: 'dark',
-      setTheme: jest.fn(),
+      toggleTheme: jest.fn(),
     });
 
     // Default language mock

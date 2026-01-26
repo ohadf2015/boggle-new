@@ -21,16 +21,36 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
     // Default SDK mock (available and ready)
     mockUseCrazyGames.mockReturnValue({
       isAvailable: true,
+      isOnCrazyGamesPlatform: false,
+      environment: null,
       isLoading: false,
+      deviceType: 'desktop',
+      isLandscape: true,
+      viewportSize: { width: 1024, height: 768 },
       isInstantMultiplayer: false,
       getInviteParam: mockGetInviteParam,
       inviteLink: mockInviteLink,
       showInviteButton: mockSdkShowInvite,
       hideInviteButton: mockSdkHideInvite,
-      init: jest.fn(),
-      happytime: jest.fn(),
+      happyTime: jest.fn(),
       gameplayStart: jest.fn(),
       gameplayStop: jest.fn(),
+      loadingStart: jest.fn(),
+      loadingStop: jest.fn(),
+      showMidgameAd: jest.fn(),
+      showRewardedAd: jest.fn(),
+      hasAdblock: jest.fn(),
+      requestBanner: jest.fn(),
+      requestResponsiveBanner: jest.fn(),
+      clearBanner: jest.fn(),
+      clearAllBanners: jest.fn(),
+      saveData: jest.fn(),
+      loadData: jest.fn(),
+      removeData: jest.fn(),
+      getUser: jest.fn(),
+      showAuthPrompt: jest.fn(),
+      isUserAccountAvailable: jest.fn(),
+      getSystemInfo: jest.fn(),
     });
   });
 
@@ -138,10 +158,10 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
   describe('auto-hide when game state changes', () => {
     it('should hide invite button when game state changes from waiting to playing', async () => {
       const { result, rerender } = renderHook(
-        ({ gameState }) => useCrazyGamesInvite({ gameState }),
+        ({ gameState }: { gameState: 'waiting' | 'playing' | 'ended' }) => useCrazyGamesInvite({ gameState }),
         {
           initialProps: {
-            gameState: 'waiting' as const,
+            gameState: 'waiting' as 'waiting' | 'playing' | 'ended',
           },
         }
       );
@@ -153,7 +173,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       expect(result.current.isInviteButtonVisible).toBe(true);
 
       // Game starts
-      rerender({ gameState: 'playing' as const });
+      rerender({ gameState: 'playing' });
 
       await waitFor(() => {
         expect(mockSdkHideInvite).toHaveBeenCalled();
@@ -163,10 +183,10 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
 
     it('should hide invite button when game state changes to ended', async () => {
       const { result, rerender } = renderHook(
-        ({ gameState }) => useCrazyGamesInvite({ gameState }),
+        ({ gameState }: { gameState: 'waiting' | 'playing' | 'ended' }) => useCrazyGamesInvite({ gameState }),
         {
           initialProps: {
-            gameState: 'waiting' as const,
+            gameState: 'waiting' as 'waiting' | 'playing' | 'ended',
           },
         }
       );
@@ -178,7 +198,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       expect(result.current.isInviteButtonVisible).toBe(true);
 
       // Game ends
-      rerender({ gameState: 'ended' as const });
+      rerender({ gameState: 'ended' });
 
       await waitFor(() => {
         expect(mockSdkHideInvite).toHaveBeenCalled();
@@ -214,13 +234,13 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
   describe('combined auto-hide conditions', () => {
     it('should hide on EITHER room full OR game state change', async () => {
       const { result, rerender } = renderHook(
-        ({ maxPlayers, currentPlayers, gameState }) =>
+        ({ maxPlayers, currentPlayers, gameState }: { maxPlayers: number; currentPlayers: number; gameState: 'waiting' | 'playing' | 'ended' }) =>
           useCrazyGamesInvite({ maxPlayers, currentPlayers, gameState }),
         {
           initialProps: {
             maxPlayers: 4,
             currentPlayers: 2,
-            gameState: 'waiting' as const,
+            gameState: 'waiting' as 'waiting' | 'playing' | 'ended',
           },
         }
       );
@@ -235,7 +255,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       rerender({
         maxPlayers: 4,
         currentPlayers: 2,
-        gameState: 'playing' as const,
+        gameState: 'playing',
       });
 
       await waitFor(() => {
@@ -248,10 +268,10 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
   describe('does not hide if already hidden', () => {
     it('should not trigger auto-hide effect if already hidden', async () => {
       const { result, rerender } = renderHook(
-        ({ gameState }) => useCrazyGamesInvite({ gameState }),
+        ({ gameState }: { gameState: 'waiting' | 'playing' | 'ended' }) => useCrazyGamesInvite({ gameState }),
         {
           initialProps: {
-            gameState: 'waiting' as const,
+            gameState: 'waiting' as 'waiting' | 'playing' | 'ended',
           },
         }
       );
@@ -264,7 +284,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       jest.clearAllMocks();
 
       // Game starts - should hide
-      rerender({ gameState: 'playing' as const });
+      rerender({ gameState: 'playing' });
 
       await waitFor(() => {
         expect(result.current.isInviteButtonVisible).toBe(false);
@@ -276,7 +296,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       jest.clearAllMocks();
 
       // Game ends - should NOT trigger hide again (already hidden)
-      rerender({ gameState: 'ended' as const });
+      rerender({ gameState: 'ended' });
 
       await new Promise((resolve) => setTimeout(resolve, 100));
       // No additional SDK calls because button is already hidden
@@ -300,16 +320,36 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
 
       mockUseCrazyGames.mockReturnValue({
         isAvailable: true,
+        isOnCrazyGamesPlatform: false,
+        environment: null,
         isLoading: false,
+        deviceType: 'desktop',
+        isLandscape: true,
+        viewportSize: { width: 1024, height: 768 },
         isInstantMultiplayer: true,
         getInviteParam: mockGetInviteParam,
         inviteLink: mockInviteLink,
         showInviteButton: mockSdkShowInvite,
         hideInviteButton: mockSdkHideInvite,
-        init: jest.fn(),
-        happytime: jest.fn(),
+        happyTime: jest.fn(),
         gameplayStart: jest.fn(),
         gameplayStop: jest.fn(),
+        loadingStart: jest.fn(),
+        loadingStop: jest.fn(),
+        showMidgameAd: jest.fn(),
+        showRewardedAd: jest.fn(),
+        hasAdblock: jest.fn(),
+        requestBanner: jest.fn(),
+        requestResponsiveBanner: jest.fn(),
+        clearBanner: jest.fn(),
+        clearAllBanners: jest.fn(),
+        saveData: jest.fn(),
+        loadData: jest.fn(),
+        removeData: jest.fn(),
+        getUser: jest.fn(),
+        showAuthPrompt: jest.fn(),
+        isUserAccountAvailable: jest.fn(),
+        getSystemInfo: jest.fn(),
       });
 
       const onInstantMultiplayer = jest.fn();

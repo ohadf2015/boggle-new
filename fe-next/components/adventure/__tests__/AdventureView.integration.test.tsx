@@ -150,6 +150,14 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
+// Mock HapticsContext - required by MusicControls component
+jest.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({
+    enabled: true,
+    setEnabled: jest.fn(),
+  }),
+}));
+
 // Mock ProgressionContext with controllable state
 let mockProgressionState: {
   progression: PlayerProgression | null;
