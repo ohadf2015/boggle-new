@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 25 of 25 (Capacitor Native Apps) — COMPLETE
-Plan: 4/4 complete
+Phase: 24 of 25 (CrazyGames Portal Integration) — COMPLETE
+Plan: 6/6 complete
 Status: Complete
-Last activity: 2026-01-26 — Completed 25-04-PLAN.md (Native Build Testing)
+Last activity: 2026-01-26 — Completed 24-06-PLAN.md (Enhanced SDK Integration)
 
 Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
@@ -85,9 +85,9 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 | 24-03 | SDK Lifecycle Integration | 3min | Complete |
 | 24-04 | Multiplayer Invites | 7min | Complete |
 | 24-05 | Testing & Compliance | 8min | Complete |
-| 24-06 | Ad Integration & Polish | - | Pending |
+| 24-06 | Enhanced SDK Integration | 35min | Complete |
 
-**Phase 24 Progress:** 5/6 plans complete, 23 minutes
+**Phase 24 Total:** 58 minutes (excluding 24-01 TBD), 60 tests added, CrazyGames portal integration complete
 
 **Phase 25 Plans:**
 | Plan | Name | Duration | Status |
@@ -153,6 +153,11 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **24-04**: Auto-hide invite button based on room state → Better UX, removes invite when room full or game starts (2026-01-26)
 - **24-04**: Optional room lifecycle parameters → Backward compatibility, hook works without parameters (2026-01-26)
 - **24-04**: SDK loading state in MultiplayerFlow → Prevents UI flash when instant multiplayer/invite redirects (2026-01-26)
+- **24-06**: Ads only at natural break points → Never interrupt gameplay, better UX (2026-01-26)
+- **24-06**: Audio mute during ads via Howler → Platform requirement, automatic management (2026-01-26)
+- **24-06**: Cloud save for CrazyGames users → Dual persistence (CG data module + Supabase fallback) (2026-01-26)
+- **24-06**: Platform mute syncs with Howler → Respects user's platform-level audio preference (2026-01-26)
+- **24-06**: Happytime triggers for achievements → Better platform analytics, visibility boost (2026-01-26)
 - **25-01**: WebView approach for native apps → Preserves SSR, Server Components, Socket.IO without code changes (2026-01-26)
 - **25-01**: Do NOT install @capacitor/http → Prevents Socket.IO WebSocket breakage (2026-01-26)
 - **25-01**: Gitignore /ios/ and /android/ → Large native projects should be regenerated, not committed (2026-01-26)
@@ -213,7 +218,7 @@ None.
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
 - Teacher co-design needed — Build dashboard with teachers, not for them (research pitfall 9)
 
-**Phase 24 (CrazyGames Portal Integration) — IN PROGRESS:**
+**Phase 24 (CrazyGames Portal Integration) — COMPLETE:**
 - Visual consistency verified — CSS isolation + viewport hook implemented (24-02 complete)
 - SDK lifecycle integration — gameplayStart/Stop tracking with visibility handling (24-03 complete)
 - Multiplayer invites complete — Auto-hide on room full/start, instant multiplayer, 11 tests (24-04 complete)
