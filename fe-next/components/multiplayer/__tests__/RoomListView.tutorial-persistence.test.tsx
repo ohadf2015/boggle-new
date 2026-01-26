@@ -6,7 +6,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RoomListView from '../RoomListView';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { hasPlayedAnyGame, markGameAsPlayed } from '@/utils/playerProgressStorage';
+import { hasPlayedAnyGame } from '@/utils/playerProgressStorage';
 
 // Mock dependencies
 jest.mock('@/utils/playerProgressStorage');
@@ -31,7 +31,6 @@ jest.mock('next/link', () => {
 });
 
 const mockHasPlayedAnyGame = hasPlayedAnyGame as jest.MockedFunction<typeof hasPlayedAnyGame>;
-const mockMarkGameAsPlayed = markGameAsPlayed as jest.MockedFunction<typeof markGameAsPlayed>;
 
 describe('RoomListView - Tutorial Persistence', () => {
   const mockProps = {
