@@ -31,6 +31,62 @@ jest.mock('@/lib/supabase', () => ({
   getSession: jest.fn(),
 }));
 
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    currentTrack: null,
+    isPlaying: false,
+    volume: 0.5,
+    play: jest.fn(),
+    pause: jest.fn(),
+    setVolume: jest.fn(),
+  }),
+}));
+
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playSound: jest.fn(),
+    stopSound: jest.fn(),
+    stopAllSounds: jest.fn(),
+  }),
+}));
+
+jest.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({
+    enabled: true,
+    setEnabled: jest.fn(),
+  }),
+}));
+
+// Mock all components to avoid deep rendering issues
+jest.mock('@/components/Header', () => ({
+  __esModule: true,
+  default: () => <div data-testid="header">Header</div>,
+}));
+
+jest.mock('@/components/admin/LiveMonitor', () => ({
+  LiveMonitor: () => <div data-testid="live-monitor">LiveMonitor</div>,
+}));
+
+jest.mock('@/components/admin/TodayGamesHistory', () => ({
+  TodayGamesHistory: () => <div data-testid="games-history">GamesHistory</div>,
+}));
+
+jest.mock('@/components/admin/GamesDiagnostic', () => ({
+  GamesDiagnostic: () => <div data-testid="games-diagnostic">GamesDiagnostic</div>,
+}));
+
+jest.mock('@/components/admin/EmailTestPanel', () => ({
+  EmailTestPanel: () => <div data-testid="email-panel">EmailPanel</div>,
+}));
+
+jest.mock('@/components/ui/PullToRefreshWrapper', () => ({
+  PullToRefreshWrapper: ({ children }: any) => <div>{children}</div>,
+}));
+
+jest.mock('@/utils/mobileAccessibility', () => ({
+  isMobileDevice: () => false,
+}));
+
 describe('Admin Dashboard Authentication', () => {
   beforeEach(() => {
     jest.clearAllMocks();

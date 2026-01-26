@@ -73,8 +73,8 @@ export default function AdminPage() {
     );
   }
 
-  // Loading state
-  if (authLoading || isProfileLoading || !authToken) {
+  // Loading state - ONLY show while checking auth/profile, NOT while fetching authToken
+  if (authLoading || isProfileLoading) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
@@ -104,7 +104,7 @@ export default function AdminPage() {
                 {t('admin.dashboard') || 'Admin Dashboard'}
               </h1>
               <p className="text-sm text-slate-400">
-                {t('admin.live.subtitle') || 'Real-time game monitoring'}
+                {authToken ? (t('admin.live.subtitle') || 'Real-time game monitoring') : 'Loading...'}
               </p>
             </div>
           </div>
@@ -117,6 +117,7 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Show navigation grid and content even if authToken is still loading */}
         {/* Navigation Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card
@@ -203,25 +204,35 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        {/* Live Monitor Component */}
-        <LiveMonitor authToken={authToken} />
+        {/* Live Monitor Component - show loading state if authToken not ready */}
+        {authToken ? (
+          <LiveMonitor authToken={authToken} />
+        ) : (
+          <div className="bg-slate-800/50 rounded-neo border-neo border-black p-8 text-center">
+            <NeoLoader variant="dots" size="sm" text="Loading authentication..." />
+          </div>
+        )}
 
         {/* Today's Games History */}
-        <TodayGamesHistory authToken={authToken} />
+        {authToken && <TodayGamesHistory authToken={authToken} />}
 
         {/* Database Diagnostic Tools */}
-        <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
-          <GamesDiagnostic authToken={authToken} />
-        </div>
+        {authToken && (
+          <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
+            <GamesDiagnostic authToken={authToken} />
+          </div>
+        )}
 
         {/* Email Testing Section */}
-        <div id="email-testing" className="mt-8">
-          <EmailTestPanel
-            authToken={authToken}
-            userEmail={user?.email}
-            userName={profile?.display_name || profile?.username}
-          />
-        </div>
+        {authToken && (
+          <div id="email-testing" className="mt-8">
+            <EmailTestPanel
+              authToken={authToken}
+              userEmail={user?.email}
+              userName={profile?.display_name || profile?.username}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

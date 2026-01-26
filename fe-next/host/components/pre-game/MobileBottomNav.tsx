@@ -28,7 +28,7 @@ export const MobileBottomNav = memo<MobileBottomNavProps>(function MobileBottomN
   t,
 }) {
   return (
-    <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden relative z-[65]">
+    <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden relative z-[75]">
       <div className="flex items-center h-12">
         {/* Lobby Tab */}
         <button
