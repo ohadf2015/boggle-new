@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 18 of 23 (Education XP System) — COMPLETE
-Plan: 5/5 complete
-Status: Phase complete
-Last activity: 2026-01-25 — Completed 18-05-PLAN.md (Practice XP Integration)
+Phase: 24 of 25 (CrazyGames Portal Integration) — IN PROGRESS
+Plan: 2/6 complete
+Status: In progress
+Last activity: 2026-01-26 — Completed 24-02-PLAN.md (Visual Consistency Fixes)
 
-Progress: [██████████] 18/23 phases (78% milestone, v1.1 in progress)
+Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -77,6 +77,18 @@ Progress: [██████████] 18/23 phases (78% milestone, v1.1 in 
 
 **Phase 18 Total:** 35 minutes, 114 tests added (15 new in 18-05)
 
+**Phase 24 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 24-01 | Audio Lazy Loading | TBD | Complete |
+| 24-02 | Visual Consistency Fixes | 5min | Complete |
+| 24-03 | Asset Size Optimization | - | Pending |
+| 24-04 | Auth Integration | - | Pending |
+| 24-05 | Multiplayer Integration | - | Pending |
+| 24-06 | Ads Integration | - | Pending |
+
+**Phase 24 Progress:** 2/6 plans complete, 5 minutes
+
 ## Accumulated Context
 
 ### Decisions
@@ -122,6 +134,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **18-05**: PracticeSessionProvider context → Wraps practice activities with XP state and persistence (2026-01-25)
 - **18-05**: Fixed XP header during practice → Progress bar and streak visible without disrupting UI (2026-01-25)
 - **18-05**: Optional xpSessionData prop → Practice components work with or without XP integration (2026-01-25)
+- **24-02**: CSS isolation with 'all: initial' → Prevents parent frame styles from bleeding through iframe (2026-01-26)
+- **24-02**: 100vh/100dvh fallback pattern → 100vh = parent height, 100dvh = iframe height (2026-01-26)
+- **24-02**: Viewport hook delegation → Separate concerns, reusable outside provider (2026-01-26)
 
 ### Pending Todos
 
@@ -167,14 +182,19 @@ None.
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
 - Teacher co-design needed — Build dashboard with teachers, not for them (research pitfall 9)
 
+**Phase 24 (CrazyGames Portal Integration) — IN PROGRESS:**
+- Visual consistency verified — CSS isolation + viewport hook implemented (24-02 complete)
+- Manual testing needed — Screenshot comparison for visual parity validation
+- Next: Asset size optimization (24-03) — Target <20MB initial load for mobile homepage
+
 ## Session Continuity
 
-Last session: 2026-01-25
-Stopped at: Completed 18-05-PLAN.md (Practice XP Integration) — Phase 18 COMPLETE
+Last session: 2026-01-26
+Stopped at: Completed 24-02-PLAN.md (Visual Consistency Fixes) — 2/6 plans complete
 Resume file: None
 
-**Next action:** `/gsd:execute-phase 19` to start Phase 19 (Education Teacher Dashboard)
+**Next action:** Continue Phase 24 with plan 24-03 (Asset Size Optimization)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-25 (Phase 18 COMPLETE)*
+*Last updated: 2026-01-26 (Phase 24 plan 02 complete)*
