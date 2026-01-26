@@ -295,9 +295,9 @@ const LandingView: React.FC = () => {
             {/* Landscape-only: Show compact welcome text (mobile portrait shows hero section above) */}
             {isLandscape && (
               <div className="text-center mb-2 animate-fade-in-fast">
-                <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
+                <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
                   {t('landing.welcomeTitle') || 'Ready to Play?'}
-                </h1>
+                </h2>
                 <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/85">
                   {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
                 </p>
@@ -325,12 +325,10 @@ const LandingView: React.FC = () => {
           <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-fr content-center">
             {/* Multiplayer Card - Compact with glow */}
             <motion.div
-              whileHover={{
-                scale: 1.03,
-                boxShadow: '0 0 25px rgba(255, 20, 147, 0.5), 0 0 50px rgba(255, 20, 147, 0.3), 6px 6px 0px black'
-              }}
+              whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+              className="group"
             >
               <Link
                 href={`/${language}/multiplayer`}
@@ -338,7 +336,8 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-pink to-pink-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  'transition-all duration-200 min-h-[100px] sm:min-h-[120px]',
+                  'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(255,20,147,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
@@ -366,12 +365,10 @@ const LandingView: React.FC = () => {
 
             {/* Single Player Card - Compact with glow */}
             <motion.div
-              whileHover={{
-                scale: 1.03,
-                boxShadow: '0 0 25px rgba(0, 255, 255, 0.5), 0 0 50px rgba(0, 255, 255, 0.3), 6px 6px 0px black'
-              }}
+              whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+              className="group"
             >
               <Link
                 href={`/${language}/singleplayer`}
@@ -379,7 +376,8 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-cyan to-cyan-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  'transition-all duration-200 min-h-[100px] sm:min-h-[120px]',
+                  'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(0,255,255,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
@@ -397,13 +395,10 @@ const LandingView: React.FC = () => {
 
             {/* Adventure Mode Card - Compact - spans full width as single row */}
             <motion.div
-              className="col-span-2"
-              whileHover={{
-                scale: 1.03,
-                boxShadow: '0 0 25px rgba(163, 230, 53, 0.5), 0 0 50px rgba(163, 230, 53, 0.3), 6px 6px 0px black'
-              }}
+              className="col-span-2 group"
+              whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <Link
                 href={`/${language}/adventure`}
@@ -411,7 +406,8 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
                   'bg-gradient-to-br from-neo-lime to-lime-500',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[80px] sm:min-h-[100px]',
+                  'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
+                  'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
@@ -500,61 +496,23 @@ const LandingView: React.FC = () => {
       {/* sm:bottom-24 clears the footer (visible at sm:) which is ~72px tall */}
       <motion.button
         onClick={handleOpenTutorial}
-        className="
-          fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8
-          flex items-center justify-center gap-2
-          min-w-[48px] min-h-[48px]
-          px-4 py-3
-          bg-neo-purple text-neo-white
-          font-bold text-sm
-          border-3 border-neo-black
-          rounded-neo shadow-hard-lg
-          hover:scale-105 hover:shadow-hard-xl
-          active:scale-95 active:shadow-hard
-          transition-all duration-150
-          rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8
-        "
+        className={cn(
+          "fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8",
+          "flex items-center justify-center gap-2",
+          "min-w-[48px] min-h-[48px]",
+          "px-4 py-3",
+          "bg-neo-purple text-neo-white",
+          "font-bold text-sm",
+          "border-3 border-neo-black",
+          "rounded-neo shadow-hard-lg",
+          "hover:shadow-hard-xl active:shadow-hard",
+          "transition-shadow duration-150",
+          "rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8",
+          isFirstTimeUser && "animate-pulse-subtle"
+        )}
         initial={{ opacity: 0, y: 20 }}
-        animate={
-          isFirstTimeUser
-            ? {
-                // Enhanced animation for first-time users
-                opacity: 1,
-                y: 0,
-                scale: [1, 1.08, 1, 1.05, 1],
-                boxShadow: [
-                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
-                  '6px 6px 0px black, 0 0 30px rgba(139, 92, 246, 0.8), 0 0 50px rgba(139, 92, 246, 0.4)',
-                  '4px 4px 0px black, 0 0 20px rgba(139, 92, 246, 0.6)',
-                  '6px 6px 0px black, 0 0 30px rgba(139, 92, 246, 0.8), 0 0 50px rgba(139, 92, 246, 0.4)',
-                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
-                ],
-              }
-            : {
-                // Subtle animation for returning users
-                opacity: 1,
-                y: 0,
-                boxShadow: [
-                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
-                  '4px 4px 0px black, 0 0 20px rgba(139, 92, 246, 0.6)',
-                  '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
-                ],
-              }
-        }
-        transition={
-          isFirstTimeUser
-            ? {
-                opacity: { duration: 0.3 },
-                y: { duration: 0.3 },
-                scale: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
-                boxShadow: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
-              }
-            : {
-                opacity: { duration: 0.3 },
-                y: { duration: 0.3 },
-                boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-              }
-        }
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label={t('landing.tutorial') || 'Tutorial'}

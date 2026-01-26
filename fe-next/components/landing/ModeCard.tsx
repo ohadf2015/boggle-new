@@ -167,10 +167,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
       style={{
         // Container-relative padding using cqw - smaller for secondary
         padding: secondary ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
-        // Hover glow effect for premium feel
-        boxShadow: isHovered && !locked
-          ? `0 0 30px ${styles.glowColor}, 0 0 60px ${styles.glowColor}, 6px 6px 0px rgb(var(--neo-black))`
-          : undefined,
+        // Hover glow effect via CSS filter (GPU-accelerated) instead of boxShadow
+        filter: isHovered && !locked ? `drop-shadow(0 0 20px ${styles.glowColor})` : undefined,
         ...tiltStyle,
       }}
       {...handlers}
