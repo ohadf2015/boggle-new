@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Brain, User } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -8,6 +8,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeArea } from '../hooks/useSafeArea';
+import AuthModal from './auth/AuthModal';
 
 /**
  * GlobalBottomNav - Mobile-only bottom navigation bar
@@ -32,6 +33,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const router = useRouter();
     const pathname = usePathname();
     const safeArea = useSafeArea();
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     // Determine active tab based on current pathname
     const activeTab = useMemo(() => {
@@ -51,18 +53,18 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     }, [router, language]);
 
     const navigateToBrain = useCallback(() => {
-        // Brain training requires authentication
+        // Brain training requires authentication - show modal if not logged in
         if (!isAuthenticated) {
-            router.push(`/${language}`); // Redirect to home to sign up
+            setShowAuthModal(true);
             return;
         }
         router.push(`/${language}/brain`);
     }, [router, language, isAuthenticated]);
 
     const navigateToProfile = useCallback(() => {
-        // Profile requires authentication
+        // Profile requires authentication - show modal if not logged in
         if (!isAuthenticated) {
-            router.push(`/${language}`); // Redirect to home to sign up
+            setShowAuthModal(true);
             return;
         }
         router.push(`/${language}/profile`);
@@ -156,12 +158,10 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "relative",
                         activeTab === 'brain'
                             ? "text-neo-purple"
-                            : "text-neo-white/60 hover:text-neo-white/80",
-                        !isAuthenticated && "opacity-50" // Dim if not authenticated
+                            : "text-neo-white/60 hover:text-neo-white/80"
                     )}
                     aria-label={t('nav.brain') || 'Brain Training'}
                     aria-current={activeTab === 'brain' ? 'page' : undefined}
-                    disabled={!isAuthenticated}
                 >
                     <Brain
                         className={cn(
@@ -196,12 +196,10 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "relative",
                         activeTab === 'profile'
                             ? "text-neo-cyan"
-                            : "text-neo-white/60 hover:text-neo-white/80",
-                        !isAuthenticated && "opacity-50" // Dim if not authenticated
+                            : "text-neo-white/60 hover:text-neo-white/80"
                     )}
                     aria-label={t('nav.profile') || 'Profile'}
                     aria-current={activeTab === 'profile' ? 'page' : undefined}
-                    disabled={!isAuthenticated}
                 >
                     <User
                         className={cn(
@@ -225,6 +223,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                     )}
                 </button>
             </div>
+
+            {/* Auth Modal - shown when unauthenticated users tap Brain or Profile */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+            />
         </nav>
     );
 });
