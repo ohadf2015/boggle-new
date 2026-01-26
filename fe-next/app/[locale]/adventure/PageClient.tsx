@@ -6,14 +6,16 @@ import { NeoLoader } from '@/components/ui/NeoLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 
 // Loading fallback component with playful design
-const LoadingFallback = () => (
-  <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
-    <PlayfulBackground intensity="medium" colorScheme="game" />
-    <div className="relative z-10">
-      <NeoLoader variant="mascot-letters" size="lg" text="Loading adventure..." />
+function LoadingFallback(): React.JSX.Element {
+  return (
+    <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
+      <PlayfulBackground intensity="medium" colorScheme="game" />
+      <div className="relative z-10">
+        <NeoLoader variant="mascot-letters" size="lg" text="Loading adventure..." />
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 // Dynamic import for code splitting
 const AdventureView = nextDynamic(

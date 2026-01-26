@@ -99,7 +99,7 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
 // QuickJoinView removed - invitation flow now uses MultiplayerFlow with InvitationQuickJoin
 
 // Loading skeleton component with playful design
-function ViewLoadingSkeleton() {
+function ViewLoadingSkeleton(): React.JSX.Element {
   return (
     <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
