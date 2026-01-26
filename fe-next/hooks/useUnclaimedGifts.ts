@@ -222,7 +222,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       xpAwarded: result.xpAwarded || 0,
       coinsAwarded: result.coinsAwarded || 0,
     };
-  }, [unclaimedCount, setCachedCount]);
+  }, [setCachedCount]);
 
   // Refresh function
   const refresh = useCallback(async () => {
