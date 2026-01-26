@@ -496,12 +496,12 @@ const LandingView: React.FC = () => {
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button with enhanced animation for first-time users */}
-      {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
+      {/* Position accounts for GlobalBottomNav (64px h-16 + safe area) on mobile */}
       {/* sm:bottom-24 clears the footer (visible at sm:) which is ~72px tall */}
       <motion.button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-[max(env(safe-area-inset-right,0px),1rem)] z-[45] sm:bottom-24 sm:right-6 lg:right-8
+          fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8
           flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3

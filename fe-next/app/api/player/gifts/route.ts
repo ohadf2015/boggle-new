@@ -64,7 +64,7 @@ export async function GET() {
         sender:profiles!admin_gift_messages_sender_id_fkey(username, display_name)
       `)
       .eq('recipient_id', user.id)
-      .order('claimed', { ascending: true })
+      .eq('claimed', false) // FIX: Only fetch unclaimed gifts
       .order('created_at', { ascending: false });
 
     if (giftsError) {

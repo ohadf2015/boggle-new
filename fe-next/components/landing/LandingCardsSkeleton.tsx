@@ -32,7 +32,8 @@ export const LandingCardsSkeleton: React.FC<LandingCardsSkeletonProps> = ({
       {/* Daily Challenge Banner Skeleton */}
       <div
         className={cn(
-          'w-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 animate-pulse',
+          // Simplified: solid color instead of gradient, no animate-pulse
+          'w-full rounded-neo border-3 border-neo-black shadow-hard-lg bg-neo-yellow',
           compact ? 'p-2 sm:p-3 mb-4' : 'p-3 sm:p-4 col-span-1 sm:col-span-2 mb-3 sm:mb-4 lg:mb-5'
         )}
         style={{ minHeight: compact ? '60px' : '72px' }}

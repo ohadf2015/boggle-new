@@ -1,12 +1,11 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, User, Brain, Accessibility, Settings, Volume2, Sparkles } from 'lucide-react';
+import { ChevronDown, User, Brain, Accessibility, Settings, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
-import MusicControls from './MusicControls';
 
 /**
  * HeaderMenuDropdown - Enhanced Neo-Brutalist styled dropdown menu
@@ -99,7 +98,7 @@ const HeaderMenuDropdown = memo(() => {
                             "border-4 border-neo-black dark:border-slate-600",
                             "rounded-neo-lg shadow-hard-xl",
                             "p-4 space-y-3",
-                            "z-50",
+                            "z-60",
                             "overflow-hidden"
                         )}
                     >
@@ -151,11 +150,11 @@ const HeaderMenuDropdown = memo(() => {
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
                                         "group flex items-center gap-3 px-4 py-3",
-                                        "bg-gradient-to-br from-neo-purple/80 to-purple-400/80 text-neo-black",
+                                        "bg-gradient-to-br from-neo-purple to-purple-500 text-neo-white",
                                         "border-3 border-neo-black",
                                         "rounded-neo shadow-hard-sm",
                                         "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
-                                        "hover:from-neo-purple hover:to-purple-400",
+                                        "hover:from-purple-600 hover:to-purple-700",
                                         "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
                                         "transition-all duration-150",
                                         "font-bold text-sm",
@@ -250,29 +249,6 @@ const HeaderMenuDropdown = memo(() => {
                                 {t('settings.moreSettings') || 'More Settings'}
                             </span>
                         </Link>
-
-                        {/* Decorative divider */}
-                        <div className="flex items-center gap-2 px-2">
-                            <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-neo-black/20 to-transparent dark:via-slate-600" />
-                        </div>
-
-                        {/* Sound & Music Section */}
-                        <div className="flex items-center gap-2 px-2 mb-1">
-                            <Volume2 size={14} className="text-neo-pink" />
-                            <span className="text-[10px] font-black uppercase tracking-wider text-neo-black/60 dark:text-slate-400">
-                                {t('settings.music') || 'Sound & Music'}
-                            </span>
-                        </div>
-
-                        {/* Music Controls */}
-                        <div className={cn(
-                            "flex items-center justify-center px-4 py-3",
-                            "bg-gradient-to-br from-neo-pink/10 to-neo-pink/5 dark:from-slate-700/80 dark:to-slate-700/60",
-                            "border-3 border-neo-black dark:border-slate-500",
-                            "rounded-neo shadow-hard-sm"
-                        )}>
-                            <MusicControls />
-                        </div>
 
                         {/* Decorative divider */}
                         <div className="flex items-center gap-2 px-2">

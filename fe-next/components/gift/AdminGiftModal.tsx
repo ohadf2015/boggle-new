@@ -305,10 +305,18 @@ export function AdminGiftModal({
             {phase === 'ready' && (
               <button
                 onClick={onDismiss}
-                className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className={cn(
+                  'absolute top-3 ltr:right-3 rtl:left-3 z-20',
+                  'w-12 h-12 min-w-[48px] min-h-[48px]', // Increased from w-10 h-10 (40px) to meet WCAG touch target
+                  'rounded-full',
+                  'bg-white/10 hover:bg-white/20 active:bg-white/30',
+                  'transition-colors duration-200',
+                  'flex items-center justify-center',
+                  'border-2 border-white/20 hover:border-white/30' // Added border for better visual definition
+                )}
                 aria-label={t('common.close') || 'Close'}
               >
-                <X className="w-4 h-4 text-white/70" />
+                <X className="w-6 h-6 text-white/90" /> {/* Increased from w-5 h-5, improved contrast */}
               </button>
             )}
 

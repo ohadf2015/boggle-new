@@ -188,7 +188,7 @@ export default function BrainTrainingPage() {
           title={t('brain.title')}
           backText={t('common.back')}
         />
-        <div className="px-4 py-6 max-w-4xl mx-auto flex-1">
+        <div className="px-4 py-6 pb-24 max-w-4xl mx-auto flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -241,7 +241,7 @@ export default function BrainTrainingPage() {
           title={t('brain.title')}
           backText={t('common.back')}
         />
-        <div className="px-4 py-6 max-w-4xl mx-auto flex-1">
+        <div className="px-4 py-6 pb-24 max-w-4xl mx-auto flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -301,7 +301,7 @@ export default function BrainTrainingPage() {
           title={t('brain.title')}
           backText={t('common.back')}
         />
-        <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto flex-1">
+        <div className="px-4 py-6 pb-24 space-y-6 max-w-4xl mx-auto flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -358,7 +358,7 @@ export default function BrainTrainingPage() {
       />
 
       {/* Main Content */}
-      <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto flex-1">
+      <div className="px-4 py-6 pb-24 space-y-6 max-w-4xl mx-auto flex-1">
         {/* Brain Score Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

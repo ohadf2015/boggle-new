@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to ensure fresh leaderboard data
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -87,7 +90,7 @@ export default function LeaderboardPage(): React.ReactNode {
             className="mt-6 bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
-            {t('leaderboard.backToGame') || 'Back to Game'}
+            {t('common.backToMenu')}
           </Button>
         </div>
       </PageLayout>
@@ -306,7 +309,7 @@ export default function LeaderboardPage(): React.ReactNode {
             className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg rounded-neo"
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
-            {t('leaderboard.backToGame') || 'Back to Game'}
+            {t('common.backToMenu')}
           </Button>
         </div>
       </div>

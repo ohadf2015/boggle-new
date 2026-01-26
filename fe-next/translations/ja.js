@@ -73,6 +73,7 @@ const ja = {
     "guest": "ゲスト",
     "back": "戻る",
     "backToHome": "ホームに戻る",
+    "backToMenu": "メニューに戻る",
     "next": "次へ",
     "previous": "前へ",
     "confirm": "確認",
@@ -2641,11 +2642,11 @@ const ja = {
     "wordHunt": {
       "title": "ワードハント",
       "subtitle": "サバイバルモード",
-      "desc": "時間切れになる前に3x3グリッドで隠された単語を見つけよう！",
+      "desc": "色ヒントで謎の単語を解き明かせ！",
       "feature1": "90秒",
       "feature2": "コンボシステム",
       "feature3": "グローバルランキング",
-      "details": "スワイプして文字をつなぎ、単語を見つけよう。10ライフ、90秒のアドレナリン！"
+      "details": "10回の推測、色ヒント、90秒。ボーナスワードでライフ追加！"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ デイリーワードハントが待っています！",
@@ -2661,9 +2662,9 @@ const ja = {
   },
   "buzz": {
     "title": "デイリーバズ",
-    "tagline": "今日のトレンドトピックに基づくワードパズル",
+    "tagline": "今日のトレンドがワードパズルに",
     "subtitle": "今日のバズは？",
-    "details": "トレンドニュースとトピックについてのワードパズルを解こう。時間制限なし、考えるだけ！",
+    "details": "まったり、タイマーなし。あなた対今日のバズ！",
     "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "速報",

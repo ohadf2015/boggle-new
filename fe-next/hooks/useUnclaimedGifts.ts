@@ -158,9 +158,13 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       const data = await response.json();
       const fetchedGifts: GiftMessage[] = data.gifts || [];
 
-      // Merge fetched gifts with locally claimed status
-      // This handles eventual consistency - API may return stale claimed status
-      const mergedGifts = fetchedGifts.map(fetchedGift => {
+      // Safety filter: API should only return unclaimed gifts (claimed = false filter in query)
+      // but we defensively filter here too in case of any edge cases
+      const unclaimedOnly = fetchedGifts.filter(g => !g.claimed);
+
+      // Merge with locally claimed status to handle eventual consistency
+      // If we locally marked a gift as claimed, preserve that status
+      const mergedGifts = unclaimedOnly.map(fetchedGift => {
         // If we locally marked this gift as claimed, preserve that status
         if (locallyClaimedIdsRef.current.has(fetchedGift.id)) {
           return { ...fetchedGift, claimed: true, claimed_at: fetchedGift.claimed_at || new Date().toISOString() };

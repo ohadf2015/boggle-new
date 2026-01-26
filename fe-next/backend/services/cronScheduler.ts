@@ -14,6 +14,15 @@ import type { Language } from '@/shared/types/game';
 const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
 
 export function startDailyBuzzCron() {
+  // Validate Google credentials on startup
+  const credentialsConfigured = !!process.env.GOOGLE_CREDENTIALS_JSON;
+  if (!credentialsConfigured) {
+    console.warn('⚠️  [CRON] GOOGLE_CREDENTIALS_JSON not configured - Daily Buzz generation will fail!');
+    console.warn('⚠️  [CRON] See DAILY_BUZZ_README.md for setup instructions');
+  } else {
+    console.log('✅ [CRON] Google Vertex AI credentials configured');
+  }
+
   // Run every day at 00:00 UTC (midnight)
   // Cron pattern: '0 0 * * *' = At 00:00
   const task = cron.schedule('0 0 * * *', async () => {

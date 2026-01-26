@@ -74,6 +74,7 @@ const en = {
     "guest": "Guest",
     "back": "Back",
     "backToHome": "Back to Home",
+    "backToMenu": "Back to Menu",
     "next": "Next",
     "previous": "Previous",
     "confirm": "Confirm",
@@ -2636,11 +2637,11 @@ const en = {
 "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Survival Mode",
-      "desc": "Find hidden words in a 3x3 grid before time runs out!",
+      "desc": "Crack the mystery word with letter clues!",
       "feature1": "90 seconds",
       "feature2": "Combo system",
       "feature3": "Global leaderboard",
-      "details": "Swipe to connect letters and find words. 10 lives, 90 seconds of adrenaline!"
+      "details": "10 guesses, color clues, 90 seconds. Find bonus words for extra lives!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daily Word Hunt Awaits!",
@@ -2656,10 +2657,10 @@ const en = {
   },
   "buzz": {
     "title": "Daily Buzz",
-    "tagline": "Word puzzles based on today's trending topics",
+    "tagline": "Today's trending topics as word puzzles",
     "subtitle": "What's buzzing today?",
     "badge": "BETA",
-    "details": "Solve word puzzles about trending news and topics. No time pressure, just think!",
+    "details": "Chill vibes, no timer. Just you vs. today's buzz!",
     "betaPreview": "BETA",
     "breaking": "BREAKING",
     "tapToCelebrate": "Tap to celebrate",

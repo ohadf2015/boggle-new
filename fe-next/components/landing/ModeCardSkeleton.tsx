@@ -25,12 +25,13 @@ export const ModeCardSkeleton: React.FC<ModeCardSkeletonProps> = ({
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
 
+  // Simplified solid colors for better performance (no gradients)
   const variantStyles = {
-    cyan: 'bg-gradient-to-br from-neo-cyan via-cyan-400 to-neo-cyan-dark',
-    pink: 'bg-gradient-to-br from-neo-pink via-pink-400 to-neo-pink-dark',
-    purple: 'bg-gradient-to-br from-neo-purple via-purple-400 to-neo-purple-dark',
-    orange: 'bg-gradient-to-br from-neo-orange via-amber-500 to-amber-600',
-    lime: 'bg-gradient-to-br from-neo-lime via-lime-400 to-neo-lime-dark',
+    cyan: 'bg-neo-cyan',
+    pink: 'bg-neo-pink',
+    purple: 'bg-neo-purple',
+    orange: 'bg-neo-orange',
+    lime: 'bg-neo-lime',
   };
 
   return (
@@ -41,7 +42,7 @@ export const ModeCardSkeleton: React.FC<ModeCardSkeletonProps> = ({
         'rounded-neo-lg border-neo-black',
         secondary ? 'border-2 shadow-hard' : 'border-3 shadow-hard-lg',
         'h-full relative overflow-hidden',
-        'animate-pulse',
+        // Remove animate-pulse - causes constant repaints
         variantStyles[variant],
         className
       )}

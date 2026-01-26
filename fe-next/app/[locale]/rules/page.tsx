@@ -368,7 +368,7 @@ export default function RulesPage(): React.JSX.Element {
                             "
                         >
                             <ArrowLeft className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'rotate-180' : ''}`} />
-                            {t('rules.backToHome')}
+                            {t('common.backToMenu')}
                         </Link>
                     </motion.div>
                 </div>

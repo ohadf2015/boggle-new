@@ -352,7 +352,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </svg>
                 </motion.button>
 
-                {/* Desktop Controls: visible on sm+ - Keep only: Coins, Gifts, Language, Menu */}
+                {/* Desktop Controls: visible on sm+ - Keep only: Coins, Gifts, Language, Music, Menu */}
                 <div className="hidden sm:flex items-center gap-3 md:gap-3 lg:gap-4 xl:gap-4 2xl:gap-5 flex-shrink-0">
                     {/* Coin Balance - shown for authenticated users */}
                     {isAuthenticated && profile && (
@@ -392,6 +392,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                     {/* Quick Language Switcher - visible for ALL users */}
                     <QuickLanguageSwitcher compact />
+
+                    {/* Music Controls - visible for ALL users on desktop */}
+                    <MusicControls />
 
                     {/* Menu Dropdown - contains all other items */}
                     <HeaderMenuDropdown />

@@ -73,6 +73,7 @@ const es = {
     "guest": "Invitado",
     "back": "Atrás",
     "backToHome": "Volver al Inicio",
+    "backToMenu": "Volver al Menú",
     "next": "Siguiente",
     "previous": "Anterior",
     "confirm": "Confirmar",
@@ -2627,11 +2628,11 @@ const es = {
 "wordHunt": {
       "title": "Caza Palabras",
       "subtitle": "Modo Supervivencia",
-      "desc": "¡Encuentra palabras ocultas en una cuadrícula 3x3 antes de que se acabe el tiempo!",
+      "desc": "¡Descubre la palabra misteriosa con pistas de colores!",
       "feature1": "90 segundos",
       "feature2": "Sistema de combos",
       "feature3": "Tabla global",
-      "details": "¡Desliza para conectar letras y encontrar palabras. 10 vidas, 90 segundos de adrenalina!"
+      "details": "10 intentos, pistas de color, 90 segundos. ¡Encuentra palabras extra para más vidas!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ ¡Te Espera Word Hunt Diario!",
@@ -2650,9 +2651,9 @@ const es = {
   },
   "buzz": {
     "title": "Daily Buzz",
-    "tagline": "Rompecabezas de palabras basados en los temas de tendencia de hoy",
+    "tagline": "Temas de hoy convertidos en rompecabezas",
     "subtitle": "¿Qué está buzzeando hoy?",
-    "details": "Resuelve rompecabezas de palabras sobre noticias y temas de tendencia. ¡Sin presión de tiempo, solo piensa!",
+    "details": "Sin prisa, sin reloj. Solo tú contra el buzz de hoy!",
     "type": {
       "scrambled": "REVUELTO",
       "fillBlank": "COMPLETA",

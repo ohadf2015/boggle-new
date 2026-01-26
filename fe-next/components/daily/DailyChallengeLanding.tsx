@@ -820,24 +820,27 @@ function CompactChallengeCard({
           )}
         </div>
 
-        {/* Title */}
-        <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-1 sm:mb-1.5', styles.text)}>
-          {title}
-        </h2>
+        {/* Content container - grows to push button to bottom */}
+        <div className="flex-1 flex flex-col items-center w-full">
+          {/* Title */}
+          <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-1 sm:mb-1.5', styles.text)}>
+            {title}
+          </h2>
 
-        {/* Tagline */}
-        <p className="text-[11px] sm:text-sm text-slate-400 mb-1 sm:mb-1.5 line-clamp-2 px-1 sm:px-2">
-          {tagline}
-        </p>
-
-        {/* Details - Additional description */}
-        {details && (
-          <p className="text-[10px] sm:text-xs text-slate-500 mb-2 sm:mb-3 line-clamp-2 px-1 sm:px-2 italic">
-            {details}
+          {/* Tagline */}
+          <p className="text-[11px] sm:text-sm text-slate-400 mb-1 sm:mb-1.5 line-clamp-2 px-1 sm:px-2">
+            {tagline}
           </p>
-        )}
 
-        {/* Play/Request Button with shine effect */}
+          {/* Details - Additional description */}
+          {details && (
+            <p className="text-[10px] sm:text-xs text-slate-500 mb-2 sm:mb-3 line-clamp-2 px-1 sm:px-2 italic">
+              {details}
+            </p>
+          )}
+        </div>
+
+        {/* Play/Request Button with shine effect - aligned to bottom */}
         {isUnavailable ? (
           <div
             className={cn(

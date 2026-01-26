@@ -178,13 +178,9 @@ describe('GlobalBottomNav', () => {
             expect(brainButton).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should mark profile as active on profile path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/profile');
-            render(<GlobalBottomNav />);
-
-            const profileButton = screen.getByRole('button', { name: /profile/i });
-            expect(profileButton).toHaveAttribute('aria-current', 'page');
-        });
+        // Note: Profile tab is no longer testable for activation because
+        // all /profile paths are now hidden (profile has its own MobileTabBar)
+        // This is tested in the "Visibility Control" section instead
 
         it('should default to home when path does not match any tab', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/some-other-page');
@@ -228,6 +224,20 @@ describe('GlobalBottomNav', () => {
 
         it('should hide on adventure path (has own nav)', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/adventure');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('should hide on profile path (has own MobileTabBar)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/profile');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('should hide on profile sub-paths (has own MobileTabBar)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/profile/settings');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
@@ -358,11 +368,11 @@ describe('GlobalBottomNav', () => {
             expect(nav).toHaveClass('shadow-[0_-4px_0_0_rgba(0,0,0,1)]');
         });
 
-        it('should apply neo-navy background', () => {
+        it('should apply neo-navy background with 95% opacity', () => {
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
 
-            expect(nav).toHaveClass('bg-neo-navy/98');
+            expect(nav).toHaveClass('bg-neo-navy/95');
         });
 
         it('should apply border styling', () => {

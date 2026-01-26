@@ -176,8 +176,10 @@ describe('HeaderMenuDropdown', () => {
             // Should show public items
             expect(screen.getByText(/settings.accessibility/i)).toBeInTheDocument();
             expect(screen.getByText(/settings.title/i)).toBeInTheDocument();
-            expect(screen.getByTestId('mock-music-controls')).toBeInTheDocument();
             expect(screen.getByTestId('mock-auth-button')).toBeInTheDocument();
+
+            // Music controls are now in the header, NOT in the dropdown
+            expect(screen.queryByTestId('mock-music-controls')).not.toBeInTheDocument();
         });
     });
 

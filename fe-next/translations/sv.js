@@ -73,6 +73,7 @@ const sv = {
     "guest": "Gäst",
     "back": "Tillbaka",
     "backToHome": "Tillbaka till startsidan",
+    "backToMenu": "Tillbaka till menyn",
     "next": "Nästa",
     "previous": "Föregående",
     "confirm": "Bekräfta",
@@ -2641,11 +2642,11 @@ const sv = {
     "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Överlevnadsläge",
-      "desc": "Hitta gömda ord i ett 3x3 rutnät innan tiden tar slut!",
+      "desc": "Knäck det mystiska ordet med färgledtrådar!",
       "feature1": "90 sekunder",
       "feature2": "Kombosystem",
       "feature3": "Global topplista",
-      "details": "Svep för att koppla bokstäver och hitta ord. 10 liv, 90 sekunder av adrenalin!"
+      "details": "10 gissningar, färgledtrådar, 90 sekunder. Hitta bonusord för extra liv!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
@@ -2661,9 +2662,9 @@ const sv = {
   },
   "buzz": {
     "title": "Daily Buzz",
-    "tagline": "Ordpussel baserade på dagens trendiga ämnen",
+    "tagline": "Dagens trender som ordpussel",
     "subtitle": "Vad buzzer idag?",
-    "details": "Lös ordpussel om trendande nyheter och ämnen. Ingen tidspress, bara tänk!",
+    "details": "Chill stämning, ingen timer. Bara du mot dagens buzz!",
     "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "JUST NU",
