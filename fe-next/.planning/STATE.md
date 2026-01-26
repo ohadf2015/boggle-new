@@ -82,12 +82,12 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 |------|------|----------|--------|
 | 24-01 | Audio Lazy Loading | TBD | Complete |
 | 24-02 | Visual Consistency Fixes | 5min | Complete |
-| 24-03 | Asset Size Optimization | - | Pending |
-| 24-04 | Auth Integration | - | Pending |
-| 24-05 | Multiplayer Integration | - | Pending |
-| 24-06 | Ads Integration | - | Pending |
+| 24-03 | SDK Lifecycle Integration | 3min | Complete |
+| 24-04 | Multiplayer Invites | - | Pending |
+| 24-05 | Ad Integration | - | Pending |
+| 24-06 | Testing & Polish | - | Pending |
 
-**Phase 24 Progress:** 2/6 plans complete, 5 minutes
+**Phase 24 Progress:** 3/6 plans complete, 8 minutes
 
 **Phase 25 Plans:**
 | Plan | Name | Duration | Status |
@@ -147,6 +147,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **24-02**: CSS isolation with 'all: initial' → Prevents parent frame styles from bleeding through iframe (2026-01-26)
 - **24-02**: 100vh/100dvh fallback pattern → 100vh = parent height, 100dvh = iframe height (2026-01-26)
 - **24-02**: Viewport hook delegation → Separate concerns, reusable outside provider (2026-01-26)
+- **24-03**: Throttled happytime (30s) → CrazyGames SDK recommendation to avoid spamming happiness events (2026-01-26)
+- **24-03**: Visibility API for tab pause → Accurate gameplay time measurement, better ad timing (2026-01-26)
+- **24-03**: Dev mode lifecycle logging → Makes debugging lifecycle issues easier during QA (2026-01-26)
 - **25-01**: WebView approach for native apps → Preserves SSR, Server Components, Socket.IO without code changes (2026-01-26)
 - **25-01**: Do NOT install @capacitor/http → Prevents Socket.IO WebSocket breakage (2026-01-26)
 - **25-01**: Gitignore /ios/ and /android/ → Large native projects should be regenerated, not committed (2026-01-26)
@@ -198,8 +201,9 @@ None.
 
 **Phase 24 (CrazyGames Portal Integration) — IN PROGRESS:**
 - Visual consistency verified — CSS isolation + viewport hook implemented (24-02 complete)
-- Manual testing needed — Screenshot comparison for visual parity validation
-- Next: Asset size optimization (24-03) — Target <20MB initial load for mobile homepage
+- SDK lifecycle integration — gameplayStart/Stop tracking with visibility handling (24-03 complete)
+- Manual testing needed — CrazyGames QA tool to verify lifecycle events
+- Next: Multiplayer invites (24-04) — Deep linking and invite link generation
 
 **Phase 25 (Capacitor Native Apps) — IN PROGRESS:**
 - Capacitor 8.x installed — Core, CLI, iOS/Android platforms, 8 plugins (25-01 complete)
@@ -211,11 +215,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 25-01-PLAN.md (Capacitor Installation) — 1/4 plans complete
+Stopped at: Completed 24-03-PLAN.md (SDK Lifecycle Integration) — 3/6 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 25 with plan 25-02 (Splash Screen Assets)
+**Next action:** Continue Phase 24 with plan 24-04 (Multiplayer Invites)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 25 plan 01 complete)*
+*Last updated: 2026-01-26 (Phase 24 plan 03 complete)*
