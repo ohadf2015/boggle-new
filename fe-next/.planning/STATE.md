@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 25 of 25 (Capacitor Native Apps) — IN PROGRESS
-Plan: 1/4 complete
+Phase: 24 of 25 (CrazyGames Portal Integration) — IN PROGRESS
+Plan: 4/6 complete
 Status: In progress
-Last activity: 2026-01-26 — Completed 25-01-PLAN.md (Capacitor Installation)
+Last activity: 2026-01-26 — Completed 24-04-PLAN.md (Multiplayer Invites)
 
 Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
@@ -83,11 +83,11 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 | 24-01 | Audio Lazy Loading | TBD | Complete |
 | 24-02 | Visual Consistency Fixes | 5min | Complete |
 | 24-03 | SDK Lifecycle Integration | 3min | Complete |
-| 24-04 | Multiplayer Invites | - | Pending |
+| 24-04 | Multiplayer Invites | 7min | Complete |
 | 24-05 | Ad Integration | - | Pending |
 | 24-06 | Testing & Polish | - | Pending |
 
-**Phase 24 Progress:** 3/6 plans complete, 8 minutes
+**Phase 24 Progress:** 4/6 plans complete, 15 minutes
 
 **Phase 25 Plans:**
 | Plan | Name | Duration | Status |
@@ -150,6 +150,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **24-03**: Throttled happytime (30s) → CrazyGames SDK recommendation to avoid spamming happiness events (2026-01-26)
 - **24-03**: Visibility API for tab pause → Accurate gameplay time measurement, better ad timing (2026-01-26)
 - **24-03**: Dev mode lifecycle logging → Makes debugging lifecycle issues easier during QA (2026-01-26)
+- **24-04**: Auto-hide invite button based on room state → Better UX, removes invite when room full or game starts (2026-01-26)
+- **24-04**: Optional room lifecycle parameters → Backward compatibility, hook works without parameters (2026-01-26)
+- **24-04**: SDK loading state in MultiplayerFlow → Prevents UI flash when instant multiplayer/invite redirects (2026-01-26)
 - **25-01**: WebView approach for native apps → Preserves SSR, Server Components, Socket.IO without code changes (2026-01-26)
 - **25-01**: Do NOT install @capacitor/http → Prevents Socket.IO WebSocket breakage (2026-01-26)
 - **25-01**: Gitignore /ios/ and /android/ → Large native projects should be regenerated, not committed (2026-01-26)
@@ -202,8 +205,9 @@ None.
 **Phase 24 (CrazyGames Portal Integration) — IN PROGRESS:**
 - Visual consistency verified — CSS isolation + viewport hook implemented (24-02 complete)
 - SDK lifecycle integration — gameplayStart/Stop tracking with visibility handling (24-03 complete)
-- Manual testing needed — CrazyGames QA tool to verify lifecycle events
-- Next: Multiplayer invites (24-04) — Deep linking and invite link generation
+- Multiplayer invites complete — Auto-hide on room full/start, instant multiplayer, 11 tests (24-04 complete)
+- Manual testing needed — Verify invite button in CrazyGames footer, auto-hide behavior, instant multiplayer
+- Next: Ad integration (24-05) — adBreak API for rewarded and midgame ads
 
 **Phase 25 (Capacitor Native Apps) — IN PROGRESS:**
 - Capacitor 8.x installed — Core, CLI, iOS/Android platforms, 8 plugins (25-01 complete)
@@ -215,11 +219,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 24-03-PLAN.md (SDK Lifecycle Integration) — 3/6 plans complete
+Stopped at: Completed 24-04-PLAN.md (Multiplayer Invites) — 4/6 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 24 with plan 24-04 (Multiplayer Invites)
+**Next action:** Continue Phase 24 with plan 24-05 (Ad Integration)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 24 plan 03 complete)*
+*Last updated: 2026-01-26 (Phase 24 plan 04 complete)*
