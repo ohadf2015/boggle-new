@@ -174,6 +174,12 @@ const es = {
     "clearSearch": "Limpiar búsqueda",
     "opensInNewTab": "se abre en nueva pestaña"
   },
+  "nav": {
+    "bottomNavigation": "Navegación inferior",
+    "home": "Inicio",
+    "brain": "Cerebro",
+    "profile": "Perfil"
+  },
   "connection": {
     "reconnecting": "Te regresamos...",
     "disconnected": "Conexión perdida",

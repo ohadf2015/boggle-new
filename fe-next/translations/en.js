@@ -174,6 +174,12 @@ const en = {
     "clearSearch": "Clear search",
     "opensInNewTab": "opens in new tab"
   },
+  "nav": {
+    "bottomNavigation": "Bottom navigation",
+    "home": "Home",
+    "brain": "Brain",
+    "profile": "Profile"
+  },
   "connection": {
     "reconnecting": "Getting you back in...",
     "disconnected": "Lost ya for a sec!",

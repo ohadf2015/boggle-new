@@ -10,6 +10,7 @@
 
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid animation issues in tests
@@ -168,15 +169,23 @@ describe('Header Settings Access', () => {
       });
     });
 
-    it('should render Settings button on desktop for guest users', () => {
+    it('should render Settings button on desktop for guest users', async () => {
+      const user = userEvent.setup();
       render(<Header />);
 
       // Find the desktop controls section (hidden on mobile with sm:flex)
       const desktopControls = document.querySelector('.sm\\:flex');
       expect(desktopControls).toBeInTheDocument();
 
-      // Find Settings link by aria-label
-      const settingsLink = screen.getByRole('link', { name: 'Settings' });
+      // Open the menu dropdown first (Settings is now inside HeaderMenuDropdown)
+      // Note: There are two "Open menu" buttons (desktop and mobile), get the desktop one
+      const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
+      const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
+      expect(desktopMenuButton).toBeInTheDocument();
+      await user.click(desktopMenuButton!);
+
+      // Find Settings link inside the opened dropdown
+      const settingsLink = screen.getByRole('link', { name: 'More Settings' });
       expect(settingsLink).toBeInTheDocument();
       expect(settingsLink).toHaveAttribute('href', '/en/settings');
     });
@@ -219,11 +228,20 @@ describe('Header Settings Access', () => {
       });
     });
 
-    it('should render Settings button on desktop for authenticated users', () => {
+    it('should render Settings button on desktop for authenticated users', async () => {
+      const user = userEvent.setup();
       render(<Header />);
 
-      // Find Settings link by aria-label
-      const settingsLink = screen.getByRole('link', { name: 'Settings' });
+      // Open the menu dropdown first (Settings is now inside HeaderMenuDropdown)
+      // Note: There are two "Open menu" buttons (desktop and mobile), get the desktop one
+      const desktopControls = document.querySelector('.sm\\:flex');
+      const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
+      const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
+      expect(desktopMenuButton).toBeInTheDocument();
+      await user.click(desktopMenuButton!);
+
+      // Find Settings link inside the opened dropdown
+      const settingsLink = screen.getByRole('link', { name: 'More Settings' });
       expect(settingsLink).toBeInTheDocument();
       expect(settingsLink).toHaveAttribute('href', '/en/settings');
     });
@@ -236,11 +254,19 @@ describe('Header Settings Access', () => {
       expect(languageSwitcher).toBeInTheDocument();
     });
 
-    it('should ALSO render profile link for authenticated users', () => {
+    it('should ALSO render profile link for authenticated users', async () => {
+      const user = userEvent.setup();
       render(<Header />);
 
+      // Open the menu dropdown to access Settings
+      const desktopControls = document.querySelector('.sm\\:flex');
+      const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
+      const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
+      expect(desktopMenuButton).toBeInTheDocument();
+      await user.click(desktopMenuButton!);
+
       // Authenticated users should see both settings AND profile
-      const settingsLink = screen.getByRole('link', { name: 'Settings' });
+      const settingsLink = screen.getByRole('link', { name: 'More Settings' });
       const profileLink = screen.getByRole('link', { name: 'Profile' });
 
       expect(settingsLink).toBeInTheDocument();
@@ -267,10 +293,18 @@ describe('Header Settings Access', () => {
       });
     });
 
-    it('should include current language in Settings URL', () => {
+    it('should include current language in Settings URL', async () => {
+      const user = userEvent.setup();
       render(<Header />);
 
-      const settingsLink = screen.getByRole('link', { name: 'Settings' });
+      // Open the menu dropdown to access Settings
+      const desktopControls = document.querySelector('.sm\\:flex');
+      const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
+      const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
+      expect(desktopMenuButton).toBeInTheDocument();
+      await user.click(desktopMenuButton!);
+
+      const settingsLink = screen.getByRole('link', { name: 'More Settings' });
       // URL should be locale-prefixed: /en/settings
       expect(settingsLink).toHaveAttribute('href', '/en/settings');
     });
@@ -286,24 +320,25 @@ describe('Header Settings Access', () => {
       });
     });
 
-    it('should have Settings button before QuickLanguageSwitcher', () => {
+    it('should have QuickLanguageSwitcher before Menu dropdown (which contains Settings)', () => {
       render(<Header />);
 
-      // Get all interactive elements in desktop controls
-      const settingsLink = screen.getByRole('link', { name: 'Settings' });
+      // Get desktop control elements
       const languageSwitcher = screen.getByRole('combobox', { name: 'Change Language' });
+      const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
 
       // Both should exist
-      expect(settingsLink).toBeInTheDocument();
       expect(languageSwitcher).toBeInTheDocument();
+      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
 
-      // Check DOM order - Settings should come before language switcher
-      const allElements = document.querySelectorAll(
-        '.sm\\:flex a[aria-label="Settings"], .sm\\:flex button[aria-label="Change Language"]'
-      );
+      // Verify they're in the desktop controls section (hidden on mobile)
+      const desktopControls = document.querySelector('.sm\\:flex');
+      expect(desktopControls).toBeInTheDocument();
+      expect(desktopControls).toContainElement(languageSwitcher);
 
-      // Settings link should be first in the matched elements
-      expect(allElements.length).toBeGreaterThanOrEqual(2);
+      // At least one menu button should be in desktop controls
+      const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
+      expect(desktopMenuButton).toBeInTheDocument();
     });
   });
 });
@@ -322,8 +357,16 @@ describe('Header Mobile Menu Settings', () => {
   it('should render mobile hamburger menu button', () => {
     render(<Header />);
 
-    // Mobile menu button has aria-label "Open menu"
-    const menuButton = screen.getByRole('button', { name: 'Open menu' });
-    expect(menuButton).toBeInTheDocument();
+    // Both desktop and mobile have "Open menu" buttons, so get all and check mobile
+    const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
+    expect(menuButtons.length).toBeGreaterThanOrEqual(1);
+
+    // The mobile menu container has class "sm:hidden"
+    const mobileControls = document.querySelector('.sm\\:hidden');
+    expect(mobileControls).toBeInTheDocument();
+
+    // Verify at least one menu button exists in mobile controls
+    const mobileMenuButton = menuButtons.find(button => mobileControls?.contains(button));
+    expect(mobileMenuButton).toBeInTheDocument();
   });
 });

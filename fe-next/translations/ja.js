@@ -174,6 +174,12 @@ const ja = {
     "clearSearch": "検索をクリア",
     "opensInNewTab": "新しいタブで開きます"
   },
+  "nav": {
+    "bottomNavigation": "下部ナビゲーション",
+    "home": "ホーム",
+    "brain": "脳トレ",
+    "profile": "プロフィール"
+  },
   "connection": {
     "reconnecting": "戻しています...",
     "disconnected": "接続が切断されました",

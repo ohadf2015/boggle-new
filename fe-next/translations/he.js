@@ -174,6 +174,12 @@ const he = {
     "clearSearch": "נקה חיפוש",
     "opensInNewTab": "נפתח בלשונית חדשה"
   },
+  "nav": {
+    "bottomNavigation": "ניווט תחתון",
+    "home": "בית",
+    "brain": "מוח",
+    "profile": "פרופיל"
+  },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
     "disconnected": "החיבור נפל",

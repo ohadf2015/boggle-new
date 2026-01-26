@@ -127,9 +127,9 @@ describe('Header - Avatar Display', () => {
       // Hamburger button should ALWAYS show Menu icon, never avatar
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
 
-      // Menu icon should be present
-      const menuButton = screen.getByLabelText(/menu/i);
-      expect(menuButton).toBeInTheDocument();
+      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should ALWAYS show Menu icon on hamburger button, never avatar (authenticated user with profile picture)', () => {
@@ -156,9 +156,9 @@ describe('Header - Avatar Display', () => {
       // Hamburger button should ALWAYS show Menu icon, never avatar
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
 
-      // Menu icon should be present
-      const menuButton = screen.getByLabelText(/menu/i);
-      expect(menuButton).toBeInTheDocument();
+      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should ALWAYS show Menu icon on hamburger button (any authenticated user)', () => {
@@ -186,9 +186,9 @@ describe('Header - Avatar Display', () => {
       // Hamburger button should ALWAYS show Menu icon, never avatar
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
 
-      // Menu icon should be present
-      const menuButton = screen.getByLabelText(/menu/i);
-      expect(menuButton).toBeInTheDocument();
+      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show Menu icon when user is not authenticated', () => {
@@ -205,9 +205,9 @@ describe('Header - Avatar Display', () => {
       // Avatar should NOT be in the document
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
 
-      // Menu icon should be present
-      const menuButton = screen.getByLabelText(/menu/i);
-      expect(menuButton).toBeInTheDocument();
+      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show Menu icon when profile is null', () => {
@@ -223,9 +223,9 @@ describe('Header - Avatar Display', () => {
 
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
 
-      // Menu icon should be present
-      const menuButton = screen.getByLabelText(/menu/i);
-      expect(menuButton).toBeInTheDocument();
+      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
   });
 });

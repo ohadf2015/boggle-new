@@ -174,6 +174,12 @@ const sv = {
     "clearSearch": "Rensa sökning",
     "opensInNewTab": "öppnas i ny flik"
   },
+  "nav": {
+    "bottomNavigation": "Nedre navigering",
+    "home": "Hem",
+    "brain": "Hjärna",
+    "profile": "Profil"
+  },
   "connection": {
     "reconnecting": "Återansluter...",
     "disconnected": "Anslutning förlorad",

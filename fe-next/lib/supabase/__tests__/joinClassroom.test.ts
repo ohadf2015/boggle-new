@@ -9,12 +9,15 @@ import { joinClassroom } from '../teacher';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
-const mockFrom = jest.fn();
+// Note: jest.mock is hoisted, so we use a factory function
 jest.mock('@/lib/supabase', () => ({
   supabase: {
-    from: mockFrom,
+    from: jest.fn(),
   },
 }));
+
+// Access the mocked function after the mock is set up
+const mockFrom = supabase.from as jest.MockedFunction<typeof supabase.from>;
 
 describe('joinClassroom', () => {
   const mockStudentId = 'student-123';
@@ -27,7 +30,6 @@ describe('joinClassroom', () => {
     it('should accept valid join code "4HCDMS" that exists in database', async () => {
       // GIVEN: A valid classroom with code "4HCDMS" exists
       const mockClassroom = { id: 'classroom-456' };
-      const mockFrom = jest.fn().mockReturnThis();
       const mockSelect = jest.fn().mockReturnThis();
       const mockEq = jest.fn().mockReturnThis();
       const mockSingle = jest.fn().mockResolvedValue({
@@ -73,12 +75,11 @@ describe('joinClassroom', () => {
 
     it('should return error when code "4HCDMS" does not exist in database', async () => {
       // GIVEN: No classroom with code "4HCDMS" exists
-      const mockFrom = jest.fn().mockReturnThis();
       const mockSelect = jest.fn().mockReturnThis();
       const mockEq = jest.fn().mockReturnThis();
       const mockSingle = jest.fn().mockResolvedValue({
         data: null,
-        error: { message: 'No rows returned', code: 'PGRST116' }
+        error: null  // maybeSingle returns null error when no rows found
       });
 
       mockFrom.mockImplementation(() => ({
@@ -90,16 +91,15 @@ describe('joinClassroom', () => {
       // WHEN: Student tries to join with non-existent code
       const result = await joinClassroom('4HCDMS', mockStudentId);
 
-      // THEN: Should return error
+      // THEN: Should return user-friendly error
       expect(result.error).not.toBeNull();
-      expect(result.error?.message).toContain('code');
+      expect(result.error?.message).toContain('Classroom not found');
       expect(result.data).toBeNull();
     });
 
     it('should handle lowercase code input by converting to uppercase', async () => {
       // GIVEN: Classroom exists with code "4HCDMS" (uppercase)
       const mockClassroom = { id: 'classroom-789' };
-      const mockFrom = jest.fn().mockReturnThis();
       const mockSelect = jest.fn().mockReturnThis();
       const mockEq = jest.fn().mockReturnThis();
       const mockSingle = jest.fn().mockResolvedValue({
@@ -155,7 +155,6 @@ describe('joinClassroom', () => {
         // NOTE: Current implementation doesn't validate format before DB query
         // This test documents expected behavior (should add validation)
 
-        const mockFrom = jest.fn().mockReturnThis();
         const mockSelect = jest.fn().mockReturnThis();
         const mockEq = jest.fn().mockReturnThis();
         const mockSingle = jest.fn().mockResolvedValue({
@@ -184,7 +183,6 @@ describe('joinClassroom', () => {
       const mockClassroom = { id: 'classroom-999' };
       const mockExisting = { id: 'membership-123' };
 
-      const mockFrom = jest.fn().mockReturnThis();
       const mockSelect = jest.fn().mockReturnThis();
       const mockEq = jest.fn().mockReturnThis();
       const mockSingle = jest.fn().mockResolvedValue({
