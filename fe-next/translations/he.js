@@ -4435,6 +4435,21 @@ const he = {
       }
     }
   },
+  "crazygames": {
+    "ads": {
+      "watchForReward": "Watch ad for {{reward}}",
+      "adPlaying": "Ad playing...",
+      "adError": "Ad unavailable",
+      "adblockDetected": "Adblock detected - some features may be limited",
+      "thanksForWatching": "Thanks for watching!"
+    },
+    "cloudSave": {
+      "syncing": "Syncing progress...",
+      "syncSuccess": "Progress synced!",
+      "syncError": "Sync failed - will retry",
+      "conflictResolved": "Progress updated from cloud"
+    }
+  },
   "native": {
     "offline": {
       "title": "אין חיבור",
