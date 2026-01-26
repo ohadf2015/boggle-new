@@ -268,7 +268,7 @@ Plans:
 - [x] 24-04-PLAN.md — Multiplayer invite system integration (Wave 2)
 - [x] 24-05-PLAN.md — Testing & verification (Wave 3)
 - [x] 24-06-PLAN.md — Enhanced SDK Integration (Wave 3)
-- [ ] 24-07-PLAN.md — Gap closure: build fix & OAuth hiding (Wave 4)
+- [x] 24-07-PLAN.md — Gap closure: build fix & OAuth hiding (Wave 4)
 
 #### Phase 25: Capacitor Native Apps Integration
 **Goal**: Integrate Capacitor to create native iOS and Android apps from the Next.js webapp with minimal code maintenance overhead
@@ -316,10 +316,10 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 21. Rich Lesson Delivery | v1.1 | 0/TBD | Not started | - |
 | 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |
 | 23. Tech Debt Cleanup | v1.1 | 0/TBD | Not started | - |
-| 24. CrazyGames Portal Integration | v1.2 | 6/7 | In Progress | - |
+| 24. CrazyGames Portal Integration | v1.2 | 7/7 | ✅ Complete | 2026-01-26 |
 | 25. Capacitor Native Apps | v1.2 | 6/6 | ✅ Complete | 2026-01-26 |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-26 after Phase 25 execution complete*
+*Last updated: 2026-01-26 after Phase 24 execution complete*
