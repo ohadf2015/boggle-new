@@ -241,7 +241,7 @@ describe('PromptTemplateEditor', () => {
           json: async () => ({
             success: true,
             message: 'Template created successfully',
-            data: { id: 2, ...mockTemplates[0] },
+            data: { ...mockTemplates[0], id: 2 },
           }),
         })
         // Refresh templates after save
@@ -249,7 +249,7 @@ describe('PromptTemplateEditor', () => {
           ok: true,
           json: async () => ({
             success: true,
-            data: [{ id: 2, ...mockTemplates[0] }],
+            data: [{ ...mockTemplates[0], id: 2 }],
             count: 1,
           }),
         });

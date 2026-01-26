@@ -18,7 +18,7 @@ const mockUseClassroomLeaderboard = useClassroomLeaderboardHook.useClassroomLead
 >;
 
 // Helper to render with language context
-const renderWithLanguage = (ui: React.ReactElement, language = 'en') => {
+const renderWithLanguage = (ui: React.ReactElement, language: 'en' | 'he' | 'sv' | 'ja' | 'es' = 'en') => {
   return render(
     <LanguageProvider initialLanguage={language}>
       {ui}

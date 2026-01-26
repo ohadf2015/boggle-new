@@ -59,7 +59,7 @@ describe('EducationBadgeGrid', () => {
   const mockAchievements = [
     {
       achievement_key: 'word_master',
-      current_tier: 'bronze',
+      current_tier: 'bronze' as const,
       progress_value: 75,
       next_threshold: 150,
       percent_complete: 50,
@@ -70,7 +70,7 @@ describe('EducationBadgeGrid', () => {
     },
     {
       achievement_key: 'first_lesson',
-      current_tier: 'silver',
+      current_tier: 'silver' as const,
       progress_value: 5,
       next_threshold: 10,
       percent_complete: 50,
@@ -325,7 +325,7 @@ describe('EducationBadgeGrid', () => {
         ...mockAchievements.slice(0, 3),
         {
           ...mockAchievements[3],
-          current_tier: 'bronze', // Unlocked
+          current_tier: 'bronze' as const, // Unlocked
         },
       ];
 
@@ -358,7 +358,7 @@ describe('EducationBadgeGrid', () => {
     it('shows 100% when all achievements unlocked', () => {
       const allUnlocked = mockAchievements.map(a => ({
         ...a,
-        current_tier: 'platinum',
+        current_tier: 'platinum' as const,
       }));
 
       render(

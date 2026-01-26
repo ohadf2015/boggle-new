@@ -68,7 +68,13 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           words_attempted: { word1: { attempts: 5, correct: 3, lastAttemptAt: '2025-01-23T10:00:00Z' } },
           words_mastered: ['word1'],
           started_at: '2025-01-22T10:00:00Z',
-          completed_at: null
+          completed_at: null,
+          total_xp: 0,
+          current_level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+          last_practice_date: null,
+          total_practice_sessions: 0
         }
       ];
 
@@ -153,7 +159,13 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           words_attempted: { word1: { attempts: 2, correct: 1, lastAttemptAt: '2025-01-23T10:00:00Z' } },
           words_mastered: [],
           started_at: '2025-01-22T10:00:00Z',
-          completed_at: null
+          completed_at: null,
+          total_xp: 0,
+          current_level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+          last_practice_date: null,
+          total_practice_sessions: 0
         }
       ];
 
@@ -190,7 +202,13 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           words_attempted: { word1: { attempts: 5, correct: 3, lastAttemptAt: '2025-01-23T10:00:00Z' } },
           words_mastered: ['word1'],
           started_at: '2025-01-22T10:00:00Z',
-          completed_at: '2025-01-23T10:00:00Z'
+          completed_at: '2025-01-23T10:00:00Z',
+          total_xp: 0,
+          current_level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+          last_practice_date: null,
+          total_practice_sessions: 0
         }
       ];
 
@@ -250,7 +268,13 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           words_attempted: { word1: { attempts: 2, correct: 1, lastAttemptAt: '2025-01-23T10:00:00Z' } },
           words_mastered: [],
           started_at: '2025-01-22T10:00:00Z',
-          completed_at: null
+          completed_at: null,
+          total_xp: 0,
+          current_level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+          last_practice_date: null,
+          total_practice_sessions: 0
         },
         {
           id: 'progress-completed',
@@ -260,7 +284,13 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           words_attempted: { word1: { attempts: 5, correct: 3, lastAttemptAt: '2025-01-23T10:00:00Z' } },
           words_mastered: ['word1'],
           started_at: '2025-01-21T10:00:00Z',
-          completed_at: '2025-01-23T10:00:00Z'
+          completed_at: '2025-01-23T10:00:00Z',
+          total_xp: 0,
+          current_level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+          last_practice_date: null,
+          total_practice_sessions: 0
         }
       ];
 
@@ -322,7 +352,13 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           words_attempted: { word1: { attempts: 2, correct: 1, lastAttemptAt: '2025-01-23T10:00:00Z' } },
           words_mastered: [],
           started_at: '2025-01-22T10:00:00Z',
-          completed_at: null
+          completed_at: null,
+          total_xp: 0,
+          current_level: 1,
+          current_streak: 0,
+          longest_streak: 0,
+          last_practice_date: null,
+          total_practice_sessions: 0
         }
       ];
 
