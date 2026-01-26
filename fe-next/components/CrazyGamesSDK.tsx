@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { createContext, useContext, useCallback, useState, useEffect, ReactNode } from 'react';
+import { useCrazyGamesViewport, type CrazyGamesDeviceType } from '@/hooks/useCrazyGamesViewport';
 
 // CrazyGames SDK Type Definitions
 declare global {
@@ -116,6 +117,13 @@ interface CrazyGamesContextType {
   isOnCrazyGamesPlatform: boolean;
   environment: CrazyGamesEnvironment | null;
   isLoading: boolean;
+  // Viewport information (based on iframe size, not parent window)
+  /** Device type based on iframe viewport (not parent window) */
+  deviceType: CrazyGamesDeviceType;
+  /** Whether viewport is landscape orientation */
+  isLandscape: boolean;
+  /** Current viewport dimensions */
+  viewportSize: { width: number; height: number };
   // Gameplay events
   gameplayStart: () => void;
   gameplayStop: () => void;
@@ -183,6 +191,9 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInstantMultiplayer, setIsInstantMultiplayer] = useState(false);
+
+  // Use viewport hook for CrazyGames-specific viewport handling
+  const { deviceType, isLandscape, viewportSize } = useCrazyGamesViewport();
 
   // Initialize SDK and set up CrazyGames-specific handlers
   useEffect(() => {
@@ -546,6 +557,10 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     isOnCrazyGamesPlatform: environment === 'crazygames',
     environment,
     isLoading,
+    // Viewport information
+    deviceType,
+    isLandscape,
+    viewportSize,
     // Gameplay events
     gameplayStart,
     gameplayStop,
@@ -597,6 +612,10 @@ export function useCrazyGames(): CrazyGamesContextType {
       isOnCrazyGamesPlatform: false,
       environment: null,
       isLoading: false,
+      // Viewport information
+      deviceType: 'desktop',
+      isLandscape: true,
+      viewportSize: { width: 1024, height: 768 },
       // Gameplay events
       gameplayStart: () => {},
       gameplayStop: () => {},
