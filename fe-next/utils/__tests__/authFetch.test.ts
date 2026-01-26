@@ -4,10 +4,33 @@
  * Verifies automatic token refresh and retry logic
  */
 
-import { Response } from 'node-fetch';
+// Simple Response mock for testing (jsdom doesn't include fetch API)
+class MockResponse {
+  status: number;
+  statusText: string;
+  ok: boolean;
+  headers: Headers;
+  body: string;
 
-// Polyfill Response for Node environment
-global.Response = Response as any;
+  constructor(body: string, init: { status?: number; statusText?: string; headers?: Record<string, string> } = {}) {
+    this.body = body;
+    this.status = init.status ?? 200;
+    this.statusText = init.statusText ?? '';
+    this.ok = this.status >= 200 && this.status < 300;
+    this.headers = new Headers(init.headers || {});
+  }
+
+  async json() {
+    return JSON.parse(this.body);
+  }
+
+  async text() {
+    return this.body;
+  }
+}
+
+// Set as global Response for tests
+global.Response = MockResponse as any;
 
 // Mock fetch globally
 global.fetch = jest.fn();
