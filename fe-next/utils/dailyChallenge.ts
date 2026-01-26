@@ -139,12 +139,13 @@ export {
   getSameLengthWords,
 } from './dailyChallenge/wordLists';
 
-// Grid generation
+// Grid generation (client-safe functions only)
+// NOTE: Server-only functions (generateDailyPuzzleAsync, regenerateDailyPuzzle)
+// have been moved to gridGeneration.server.ts to prevent bundling server code into client.
+// Import those directly from '@/utils/dailyChallenge/gridGeneration.server' in API routes.
 export {
   generateDailyGrid,
   generateDailyPuzzle,
-  generateDailyPuzzleAsync,
-  regenerateDailyPuzzle,
   getTodaysDailyPuzzle,
   isWordOnGrid,
   selectDailyTargetWord,

@@ -9,7 +9,8 @@ const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer
 const { getCachedDailyPuzzle, cacheDailyPuzzle, getCachedDailyLeaderboard, cacheDailyLeaderboard } = require('../redisClient');
 const { coalesce } = require('../utils/requestCoalescing');
 import logger from '../utils/logger';
-import { generateDailyPuzzle, generateDailyPuzzleAsync, getPuzzleNumber } from '../../utils/dailyChallenge';
+import { generateDailyPuzzle, getPuzzleNumber } from '../../utils/dailyChallenge';
+import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
 import { isDictionaryWord } from '../dictionary';
 import { isWordCommunityValid } from '../modules/communityWordManager';
 import { normalizeHebrewWord } from '../../shared/utils/wordNormalization';

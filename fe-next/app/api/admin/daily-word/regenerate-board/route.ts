@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
-import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
+import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
 import type { Language } from '@/types';
 
 /**

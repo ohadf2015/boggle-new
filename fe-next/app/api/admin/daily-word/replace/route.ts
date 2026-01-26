@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
-import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
+import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
 import type { Language } from '@/types';
 
 // Minimum word length by language (must match wikipediaWordProcessor.ts)
