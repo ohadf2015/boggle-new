@@ -654,18 +654,16 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <Link
                                                     href={`/${language}/admin`}
                                                     onClick={() => setShowMobileMenu(false)}
-                                                    className="
-                                                    flex items-center justify-center
-                                                    min-w-[48px] min-h-[48px] w-12 h-12
-                                                    bg-neo-pink text-white
-                                                    border-3 border-neo-black
-                                                    rounded-neo shadow-hard-sm
-                                                    active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
-                                                    transition-all duration-100
-                                                "
-                                                    aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
+                                                    className={cn(
+                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                        "bg-gradient-to-r from-neo-pink to-pink-400 hover:from-neo-pink/90 hover:to-pink-400/90 text-white",
+                                                        "shadow-hard-sm hover:shadow-hard"
+                                                    )}
                                                 >
-                                                    <BarChart3 className="text-base" size={16} aria-hidden="true" />
+                                                    <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-navy border-3 border-neo-black text-neo-pink">
+                                                        <BarChart3 className="w-4 h-4" aria-hidden="true" />
+                                                    </span>
+                                                    <span>{t('common.adminDashboard') || 'Admin Dashboard'}</span>
                                                 </Link>
                                             </div>
                                         </>
