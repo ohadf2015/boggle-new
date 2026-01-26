@@ -24,8 +24,6 @@ const AdventureView = nextDynamic(
   }
 );
 
-export const dynamic = 'force-dynamic';
-
 /**
  * Adventure Mode page route
  * Shows the world map and level selection for Adventure Mode

@@ -133,7 +133,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode }: Vo
   );
 }
 
-export default function SettingsPageClient(): React.ReactNode {
+export default function SettingsPageClient(): React.JSX.Element {
   const { theme, toggleTheme } = useTheme();
   const { t, language, setLanguage } = useLanguage();
   const { volume: musicVolume, setVolume: setMusicVolume, isMuted: musicMuted, toggleMute: toggleMusicMute } = useMusic();

@@ -30,7 +30,7 @@ interface LeaderboardEntry {
   games_played?: number;
 }
 
-export default function LeaderboardPageClient(): React.ReactNode {
+export default function LeaderboardPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const { user, profile, isSupabaseEnabled } = useAuth();

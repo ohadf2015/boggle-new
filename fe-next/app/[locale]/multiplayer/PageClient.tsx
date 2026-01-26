@@ -110,9 +110,6 @@ function ViewLoadingSkeleton() {
   );
 }
 
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = 'force-dynamic';
-
 const SOCKET_CONFIG = {
   RECONNECTION_ATTEMPTS: 10,
   RECONNECTION_DELAY: 1000,

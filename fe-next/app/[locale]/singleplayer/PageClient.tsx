@@ -21,8 +21,6 @@ const SinglePlayerView = nextDynamic(() => import('@/components/singleplayer/Sin
   ssr: false,
 });
 
-export const dynamic = 'force-dynamic';
-
 /**
  * Single Player page route
  * Handles all single player game modes: Solo vs Bots, Practice, Challenge

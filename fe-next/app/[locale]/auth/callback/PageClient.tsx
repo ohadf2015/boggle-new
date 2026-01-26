@@ -67,7 +67,7 @@ interface LoadingUIProps {
 }
 
 // Loading UI component with countdown and retry
-function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIProps): React.ReactNode {
+function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIProps): React.JSX.Element {
   const { t } = useLanguage();
   const isRtl = locale === 'he';
 
@@ -113,7 +113,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): 
 }
 
 // Inner component that uses useSearchParams - must be wrapped in Suspense
-function AuthCallbackContent(): React.ReactNode {
+function AuthCallbackContent(): React.JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
@@ -488,7 +488,7 @@ function SuspenseFallback(): React.ReactNode {
 }
 
 // Main export with Suspense boundary - required for useSearchParams in Next.js App Router
-export default function AuthCallbackPageClient(): React.ReactNode {
+export default function AuthCallbackPageClient(): React.JSX.Element {
   return (
     <Suspense fallback={<SuspenseFallback />}>
       <AuthCallbackContent />

@@ -16,7 +16,7 @@ import { InstagramIcon } from '@/components/icons/SocialIcons';
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-export default function ContactPageClient(): React.ReactNode {
+export default function ContactPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const router = useRouter();

@@ -42,7 +42,7 @@ interface GameSession {
 
 type MobileTab = 'overview' | 'stats' | 'achievements' | 'collection';
 
-export default function ProfilePageClient(): React.ReactNode {
+export default function ProfilePageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
