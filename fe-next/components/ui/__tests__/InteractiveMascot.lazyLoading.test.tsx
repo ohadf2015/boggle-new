@@ -21,6 +21,7 @@ let originalImage: typeof window.Image;
 jest.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage({ src, alt, ...props }: any) {
+    // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} data-testid="mascot-image" {...props} />;
   },
 }));

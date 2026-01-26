@@ -13,6 +13,11 @@ const eslintConfig = defineConfig([
     // Python virtual environment (contains third-party JS from packages like gradio)
     ".venv/**",
     ".venv-rembg/**",
+    // Android build artifacts
+    "android/**",
+    // Test coverage reports
+    "coverage/**",
+    "backend/coverage/**",
   ]),
   {
     rules: {
