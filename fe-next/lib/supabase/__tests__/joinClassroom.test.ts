@@ -17,7 +17,7 @@ jest.mock('@/lib/supabase', () => ({
 }));
 
 // Access the mocked function after the mock is set up
-const mockFrom = supabase.from as jest.MockedFunction<typeof supabase.from>;
+const mockFrom = (supabase?.from || jest.fn()) as jest.MockedFunction<any>;
 
 describe('joinClassroom', () => {
   const mockStudentId = 'student-123';
@@ -50,16 +50,16 @@ describe('joinClassroom', () => {
             select: mockSelect.mockReturnThis(),
             eq: mockEq.mockReturnThis(),
             maybeSingle: mockSingle,
-          };
+          } as any;
         } else if (table === 'classroom_memberships') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
             maybeSingle: mockMaybeSingle,
             insert: mockInsert,
-          };
+          } as any;
         }
-        return mockFrom();
+        return {} as any;
       });
 
       // WHEN: Student joins with code "4HCDMS"
@@ -86,7 +86,7 @@ describe('joinClassroom', () => {
         select: mockSelect,
         eq: mockEq,
         maybeSingle: mockSingle,
-      }));
+      } as any));
 
       // WHEN: Student tries to join with non-existent code
       const result = await joinClassroom('4HCDMS', mockStudentId);
@@ -120,16 +120,16 @@ describe('joinClassroom', () => {
             select: mockSelect.mockReturnThis(),
             eq: mockEq.mockReturnThis(),
             maybeSingle: mockSingle,
-          };
+          } as any;
         } else if (table === 'classroom_memberships') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
             maybeSingle: mockMaybeSingle,
             insert: mockInsert,
-          };
+          } as any;
         }
-        return mockFrom();
+        return {} as any;
       });
 
       // WHEN: Student enters code in lowercase
@@ -200,15 +200,15 @@ describe('joinClassroom', () => {
             select: mockSelect.mockReturnThis(),
             eq: mockEq.mockReturnThis(),
             maybeSingle: mockSingle,
-          };
+          } as any;
         } else if (table === 'classroom_memberships') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
             maybeSingle: mockMaybeSingle,
-          };
+          } as any;
         }
-        return mockFrom();
+        return {} as any;
       });
 
       // WHEN: Student tries to join again
