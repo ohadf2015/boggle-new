@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useCallback, useMe
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
-import { hapticAchievement, hapticForComboLevel, hapticComboBreak, hapticComboSaved } from '@/utils/haptics';
+import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY } from '@/lib/audio/audioLoader';
 
@@ -305,14 +305,14 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);
 
     playSound('combo', { rate, volume: volumeBoost });
-    hapticForComboLevel(comboLevel);
+    haptics.tap();
   }, [audioUnlocked, sfxMuted, playSound]);
 
   // Play achievement unlock sound with haptic feedback
   // Achievements can trigger on results screen, so don't require game active
   const playAchievementSound = useCallback(() => {
     playSound('achievement', { volume: 0.8, requiresGameActive: false });
-    hapticAchievement();
+    haptics.success();
   }, [playSound]);
 
   // Play word accepted sound
@@ -362,7 +362,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
     playSound('comboMilestone', { rate, volume });
     // Milestone also triggers a celebratory haptic
-    hapticForComboLevel(milestoneLevel);
+    haptics.success();
   }, [audioUnlocked, sfxMuted, playSound]);
 
   /**
@@ -377,7 +377,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const volume = Math.min(0.3 + (lostLevel * 0.04), 0.6);
 
     playSound('comboBreak', { volume });
-    hapticComboBreak(lostLevel);
+    haptics.error();
   }, [audioUnlocked, sfxMuted, playSound]);
 
   /**
@@ -387,7 +387,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     playSound('comboSaved', { volume: 0.5 });
-    hapticComboSaved();
+    haptics.success();
   }, [audioUnlocked, sfxMuted, playSound]);
 
   // Earthquake/Fire Round sound effects
