@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import Header from '../Header';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -134,14 +134,21 @@ describe('Header Color Consistency - Desktop Mode', () => {
     describe('Utility Button Color Consistency', () => {
         it('should use consistent neutral background for all utility buttons (Profile, Settings, Accessibility)', () => {
             const { container } = render(<Header />);
-            const desktopControls = container.querySelector('.hidden.sm\\:flex');
 
-            // Get utility buttons (non-notification buttons)
-            const profileButton = Array.from(desktopControls?.querySelectorAll('a[href*="profile"]') || [])
-                .find(btn => btn.querySelector('svg.lucide-user'));
-            const settingsButton = Array.from(desktopControls?.querySelectorAll('a[href*="settings"]') || [])
-                .find(el => el.getAttribute('href') === '/en/settings');
-            const a11yButton = desktopControls?.querySelector('a[href*="accessibility"]');
+            // Find and click the desktop menu button (inside .hidden.sm:flex container)
+            const desktopControls = container.querySelector('.hidden.sm\\:flex');
+            const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+            if (desktopMenuButton) {
+                fireEvent.click(desktopMenuButton);
+            }
+
+            // Find the dropdown menu container (it's absolutely positioned)
+            const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+
+            // Get utility buttons from WITHIN the dropdown menu only
+            const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
+            const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
+            const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
             // All utility buttons should have the SAME neutral background
             expect(profileButton).toHaveClass('bg-neo-cream');
@@ -151,21 +158,29 @@ describe('Header Color Consistency - Desktop Mode', () => {
 
         it('should NOT use special accent colors for utility buttons', () => {
             const { container } = render(<Header />);
+
+            // Find and click the desktop menu button (inside .hidden.sm:flex container)
             const desktopControls = container.querySelector('.hidden.sm\\:flex');
+            const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+            if (desktopMenuButton) {
+                fireEvent.click(desktopMenuButton);
+            }
 
-            const profileButton = Array.from(desktopControls?.querySelectorAll('a[href*="profile"]') || [])
-                .find(btn => btn.querySelector('svg.lucide-user'));
-            const settingsButton = Array.from(desktopControls?.querySelectorAll('a[href*="settings"]') || [])
-                .find(el => el.getAttribute('href') === '/en/settings');
-            const a11yButton = desktopControls?.querySelector('a[href*="accessibility"]');
+            // Find the dropdown menu container (it's absolutely positioned)
+            const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
 
-            // No purple, amber, pink, or other accent colors for utility buttons
+            // Get utility buttons from WITHIN the dropdown menu only
+            const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
+            const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
+            const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
+
+            // No purple, amber, pink, or other accent colors for utility buttons (except hover cyan which is allowed)
             const utilityButtons = [profileButton, settingsButton, a11yButton];
             utilityButtons.forEach(button => {
                 const classList = Array.from(button!.classList);
                 const hasAccentColor = classList.some(cls =>
                     cls.includes('purple') || cls.includes('amber') || cls.includes('pink') ||
-                    cls.includes('cyan') && !cls.includes('hover:bg-neo-cyan')
+                    (cls.includes('orange') && !cls.includes('neo-orange'))
                 );
                 expect(hasAccentColor).toBe(false);
             });
@@ -187,13 +202,21 @@ describe('Header Color Consistency - Desktop Mode', () => {
     describe('Hover State Uniformity', () => {
         it('should use consistent hover background pattern for all utility buttons', () => {
             const { container } = render(<Header />);
-            const desktopControls = container.querySelector('.hidden.sm\\:flex');
 
-            const profileButton = Array.from(desktopControls?.querySelectorAll('a[href*="profile"]') || [])
-                .find(btn => btn.querySelector('svg.lucide-user'));
-            const settingsButton = Array.from(desktopControls?.querySelectorAll('a[href*="settings"]') || [])
-                .find(el => el.getAttribute('href') === '/en/settings');
-            const a11yButton = desktopControls?.querySelector('a[href*="accessibility"]');
+            // Find and click the desktop menu button (inside .hidden.sm:flex container)
+            const desktopControls = container.querySelector('.hidden.sm\\:flex');
+            const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+            if (desktopMenuButton) {
+                fireEvent.click(desktopMenuButton);
+            }
+
+            // Find the dropdown menu container (it's absolutely positioned)
+            const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+
+            // Get utility buttons from WITHIN the dropdown menu only
+            const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
+            const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
+            const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
             // All should have the same hover background (neo-cyan/30)
             expect(profileButton).toHaveClass('hover:bg-neo-cyan/30');

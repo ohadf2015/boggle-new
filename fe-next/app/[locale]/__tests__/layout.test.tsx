@@ -59,6 +59,33 @@ jest.mock('@/components/celebration/NewYearCountdown', () => ({
     default: () => null,
 }));
 
+// Mock the providers with minimal context
+const mockLanguageContext = {
+    t: (key: string) => key,
+    language: 'en' as const,
+    setLanguage: jest.fn(),
+    dir: 'ltr' as const,
+    currentFlag: '🇺🇸',
+};
+
+const mockNavigationContext = {
+    shouldHideNav: false,
+};
+
+jest.mock('@/contexts/LanguageContext', () => ({
+    LanguageContext: {
+        Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    },
+    useLanguage: () => mockLanguageContext,
+}));
+
+jest.mock('@/contexts/NavigationContext', () => ({
+    NavigationContext: {
+        Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    },
+    useNavigation: () => mockNavigationContext,
+}));
+
 jest.mock('../../providers', () => ({
     Providers: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));

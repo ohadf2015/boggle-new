@@ -123,17 +123,26 @@ describe('Header - Hamburger Menu Avatar Bugs', () => {
 
     render(<Header />);
 
-    // Find the hamburger button
-    const hamburgerButton = screen.getByLabelText(/menu/i);
+    // Find all menu buttons (there are multiple: desktop dropdown + mobile hamburger)
+    const menuButtons = screen.getAllByLabelText(/menu/i);
+
+    // Mobile hamburger is in a container with class "sm:hidden"
+    // Find the button that's in the mobile container
+    const mobileMenuButton = menuButtons.find(button => {
+      const parent = button.parentElement;
+      return parent?.className.includes('sm:hidden');
+    });
+
+    expect(mobileMenuButton).toBeDefined();
 
     // BUG: Currently shows avatar, but should ALWAYS show Menu icon
     // Expected: Menu icon should be shown
     // Actual: Avatar is shown
-    const avatar = hamburgerButton.querySelector('[data-testid="header-avatar"]');
+    const avatar = mobileMenuButton!.querySelector('[data-testid="header-avatar"]');
     expect(avatar).not.toBeInTheDocument(); // Should NOT show avatar
 
     // Should show Menu icon instead
-    const menuIcon = hamburgerButton.querySelector('svg');
+    const menuIcon = mobileMenuButton!.querySelector('svg');
     expect(menuIcon).toBeInTheDocument();
   });
 
@@ -158,15 +167,24 @@ describe('Header - Hamburger Menu Avatar Bugs', () => {
 
     render(<Header />);
 
-    // Find the hamburger button
-    const hamburgerButton = screen.getByLabelText(/menu/i);
+    // Find all menu buttons (there are multiple: desktop dropdown + mobile hamburger)
+    const menuButtons = screen.getAllByLabelText(/menu/i);
+
+    // Mobile hamburger is in a container with class "sm:hidden"
+    // Find the button that's in the mobile container
+    const mobileMenuButton = menuButtons.find(button => {
+      const parent = button.parentElement;
+      return parent?.className.includes('sm:hidden');
+    });
+
+    expect(mobileMenuButton).toBeDefined();
 
     // Should ALWAYS show Menu icon, not avatar
-    const avatar = hamburgerButton.querySelector('[data-testid="header-avatar"]');
+    const avatar = mobileMenuButton!.querySelector('[data-testid="header-avatar"]');
     expect(avatar).not.toBeInTheDocument();
 
     // Should show Menu icon
-    const menuIcon = hamburgerButton.querySelector('svg');
+    const menuIcon = mobileMenuButton!.querySelector('svg');
     expect(menuIcon).toBeInTheDocument();
   });
 });

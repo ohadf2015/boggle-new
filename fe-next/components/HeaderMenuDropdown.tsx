@@ -122,11 +122,11 @@ const HeaderMenuDropdown = memo(() => {
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
                                         "group flex items-center gap-3 px-4 py-3",
-                                        "bg-white dark:bg-slate-700/80 text-neo-black dark:text-white",
+                                        "bg-neo-cream dark:bg-slate-700/80 text-neo-black dark:text-white",
                                         "border-3 border-neo-black dark:border-slate-500",
                                         "rounded-neo shadow-hard-sm",
                                         "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
-                                        "hover:bg-gradient-to-br hover:from-neo-cyan/20 hover:to-neo-lime/20 dark:hover:bg-slate-600",
+                                        "hover:bg-neo-cyan/30 dark:hover:bg-slate-600",
                                         "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
                                         "transition-all duration-150",
                                         "font-bold text-sm"
@@ -199,11 +199,11 @@ const HeaderMenuDropdown = memo(() => {
                             onClick={() => setIsOpen(false)}
                             className={cn(
                                 "group flex items-center gap-3 px-4 py-3",
-                                "bg-white dark:bg-slate-700/80 text-neo-black dark:text-white",
+                                "bg-neo-cream dark:bg-slate-700/80 text-neo-black dark:text-white",
                                 "border-3 border-neo-black dark:border-slate-500",
                                 "rounded-neo shadow-hard-sm",
                                 "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
-                                "hover:bg-gradient-to-br hover:from-neo-cyan/20 hover:to-blue-200/30 dark:hover:bg-slate-600",
+                                "hover:bg-neo-cyan/30 dark:hover:bg-slate-600",
                                 "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
                                 "transition-all duration-150",
                                 "font-bold text-sm"
@@ -228,11 +228,11 @@ const HeaderMenuDropdown = memo(() => {
                             onClick={() => setIsOpen(false)}
                             className={cn(
                                 "group flex items-center gap-3 px-4 py-3",
-                                "bg-white dark:bg-slate-700/80 text-neo-black dark:text-white",
+                                "bg-neo-cream dark:bg-slate-700/80 text-neo-black dark:text-white",
                                 "border-3 border-neo-black dark:border-slate-500",
                                 "rounded-neo shadow-hard-sm",
                                 "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
-                                "hover:bg-gradient-to-br hover:from-neo-orange/20 hover:to-amber-200/30 dark:hover:bg-slate-600",
+                                "hover:bg-neo-cyan/30 dark:hover:bg-slate-600",
                                 "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
                                 "transition-all duration-150",
                                 "font-bold text-sm"

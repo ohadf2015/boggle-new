@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Header from '../Header';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -160,11 +160,16 @@ describe('Header Button Consistency', () => {
     it('should render profile button with neutral background', () => {
         const { container } = render(<Header />);
 
-        // Get desktop controls section
+        // Open the dropdown menu
         const desktopControls = container.querySelector('.hidden.sm\\:flex');
-        // Find profile button specifically (not the CoinBalance link) - it has User icon
-        const profileButtons = Array.from(desktopControls?.querySelectorAll('a[href*="profile"]') || []);
-        const profileButton = profileButtons.find(btn => btn.querySelector('svg.lucide-user'));
+        const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+        if (desktopMenuButton) {
+            fireEvent.click(desktopMenuButton);
+        }
+
+        // Find profile button inside the dropdown menu
+        const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+        const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
 
         expect(profileButton).toHaveClass('bg-neo-cream');
         expect(profileButton).toHaveClass('border-3');
@@ -184,9 +189,16 @@ describe('Header Button Consistency', () => {
     it('should render accessibility button with neutral background', () => {
         const { container } = render(<Header />);
 
-        // Get desktop controls section
+        // Open the dropdown menu
         const desktopControls = container.querySelector('.hidden.sm\\:flex');
-        const a11yButton = desktopControls?.querySelector('a[href*="accessibility"]');
+        const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+        if (desktopMenuButton) {
+            fireEvent.click(desktopMenuButton);
+        }
+
+        // Find accessibility button inside the dropdown menu
+        const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+        const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
         expect(a11yButton).toHaveClass('bg-neo-cream');
         expect(a11yButton).toHaveClass('border-3');
@@ -195,10 +207,16 @@ describe('Header Button Consistency', () => {
     it('should render settings button with neutral background', () => {
         const { container } = render(<Header />);
 
-        // Get desktop controls section and find settings link (not the accessibility one)
+        // Open the dropdown menu
         const desktopControls = container.querySelector('.hidden.sm\\:flex');
-        const settingsButton = Array.from(desktopControls?.querySelectorAll('a[href*="settings"]') || [])
-            .find(el => el.getAttribute('href') === '/en/settings');
+        const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+        if (desktopMenuButton) {
+            fireEvent.click(desktopMenuButton);
+        }
+
+        // Find settings button inside the dropdown menu
+        const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+        const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
 
         expect(settingsButton).toHaveClass('bg-neo-cream');
         expect(settingsButton).toHaveClass('border-3');
