@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 24 of 25 (CrazyGames Portal Integration) — IN PROGRESS
-Plan: 4/6 complete
+Phase: 25 of 25 (Capacitor Native Apps) — IN PROGRESS
+Plan: 2/4 complete
 Status: In progress
-Last activity: 2026-01-26 — Completed 24-04-PLAN.md (Multiplayer Invites)
+Last activity: 2026-01-26 — Completed 25-02-PLAN.md (Platform Detection & Native Features)
 
 Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
@@ -93,11 +93,11 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
 | 25-01 | Capacitor Installation | 4min | Complete |
-| 25-02 | Splash Screen Assets | - | Pending |
-| 25-03 | App Icons | - | Pending |
+| 25-02 | Platform Detection & Native Features | 10min | Complete |
+| 25-03 | Audio Loading Hook | - | Pending |
 | 25-04 | Native Build Testing | - | Pending |
 
-**Phase 25 Progress:** 1/4 plans complete, 4 minutes
+**Phase 25 Progress:** 2/4 plans complete, 14 minutes
 
 ## Accumulated Context
 
@@ -157,6 +157,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **25-01**: Do NOT install @capacitor/http → Prevents Socket.IO WebSocket breakage (2026-01-26)
 - **25-01**: Gitignore /ios/ and /android/ → Large native projects should be regenerated, not committed (2026-01-26)
 - **25-01**: CAPACITOR_DEV_URL env var → Enables local development testing against localhost (2026-01-26)
+- **25-02**: Try-catch wrapper for Capacitor → Tree-shaking safe platform detection without complex imports (2026-01-26)
+- **25-02**: Native → Web → Silent fail haptics → Progressive enhancement ensures best UX on all platforms (2026-01-26)
+- **25-02**: useRef for lifecycle callbacks → Latest callback version without listener re-registration (2026-01-26)
+- **25-02**: Async listener registration → Matches Capacitor API (Promise<PluginListenerHandle>) (2026-01-26)
 
 ### Pending Todos
 
@@ -213,17 +217,21 @@ None.
 - Capacitor 8.x installed — Core, CLI, iOS/Android platforms, 8 plugins (25-01 complete)
 - WebView configuration complete — Points to https://www.lexiclash.live production webapp
 - @capacitor/http NOT installed — Prevents Socket.IO WebSocket interference
+- Platform detection utilities complete — isNative/isIOS/isAndroid/isWeb with tree-shaking (25-02 complete)
+- Native haptics with web fallback — vibrateTap/Success/Error progressive enhancement (25-02 complete)
+- App lifecycle hooks — useAppLifecycle for foreground/background callbacks (25-02 complete)
+- Test coverage: 56 tests passing — Platform detection, haptics, lifecycle, React hooks
 - Java version issue — Gradle requires Java 11+ for Android builds (will resolve in 25-04)
-- Next: Splash screen assets (25-02) — Create iOS/Android splash images with neo-navy background
+- Next: Audio loading hook (25-03) — Use platform detection to route Capacitor vs web audio
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 24-04-PLAN.md (Multiplayer Invites) — 4/6 plans complete
+Stopped at: Completed 25-02-PLAN.md (Platform Detection & Native Features) — 2/4 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 24 with plan 24-05 (Ad Integration)
+**Next action:** Continue Phase 25 with plan 25-03 (Audio Loading Hook)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 24 plan 04 complete)*
+*Last updated: 2026-01-26 (Phase 25 plan 02 complete)*
