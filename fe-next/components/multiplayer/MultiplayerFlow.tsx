@@ -236,6 +236,15 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     handleJoin(true, defaultLanguage, gameCode, roomName);
   }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
 
+  // Show brief loading while CrazyGames SDK initializes (prevents flash of wrong UI)
+  if (!isCrazyGamesReady) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-neo-navy">
+        <div className="text-neo-cream text-lg font-bold">Loading...</div>
+      </div>
+    );
+  }
+
   // Always show RoomListView as base, with modals as overlays
   return (
     <>
