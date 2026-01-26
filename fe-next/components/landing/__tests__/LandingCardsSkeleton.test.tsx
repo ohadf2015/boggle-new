@@ -29,8 +29,8 @@ describe('LandingCardsSkeleton', () => {
       render(<LandingCardsSkeleton />);
 
       const container = screen.getByTestId('landing-cards-skeleton');
-      // Banner has the orange gradient
-      const banner = container.querySelector('.from-yellow-300');
+      // Banner has solid yellow background (performance optimization)
+      const banner = container.querySelector('.bg-neo-yellow');
       expect(banner).toBeInTheDocument();
     });
   });
@@ -41,13 +41,13 @@ describe('LandingCardsSkeleton', () => {
 
       const skeletons = screen.getAllByTestId('mode-card-skeleton');
 
-      // Primary cards
-      expect(skeletons[0]).toHaveClass('from-neo-pink'); // Multiplayer
-      expect(skeletons[1]).toHaveClass('from-neo-cyan'); // Single Player
+      // Primary cards (solid colors for performance)
+      expect(skeletons[0]).toHaveClass('bg-neo-pink'); // Multiplayer
+      expect(skeletons[1]).toHaveClass('bg-neo-cyan'); // Single Player
 
       // Secondary cards
-      expect(skeletons[2]).toHaveClass('from-neo-lime'); // Adventure
-      expect(skeletons[3]).toHaveClass('from-neo-purple'); // Brain Training
+      expect(skeletons[2]).toHaveClass('bg-neo-lime'); // Adventure
+      expect(skeletons[3]).toHaveClass('bg-neo-purple'); // Brain Training
     });
 
     it('should render secondary cards with smaller styling', () => {
@@ -92,12 +92,13 @@ describe('LandingCardsSkeleton', () => {
   });
 
   describe('animation', () => {
-    it('should have pulse animation on banner', () => {
+    it('should NOT have pulse animation (removed for performance)', () => {
       render(<LandingCardsSkeleton />);
 
       const container = screen.getByTestId('landing-cards-skeleton');
-      const banner = container.querySelector('.from-yellow-300');
-      expect(banner).toHaveClass('animate-pulse');
+      const banner = container.querySelector('.bg-neo-yellow');
+      // Pulse animation removed to prevent constant repaints
+      expect(banner).not.toHaveClass('animate-pulse');
     });
   });
 });

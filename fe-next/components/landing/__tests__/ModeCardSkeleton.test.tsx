@@ -59,39 +59,39 @@ describe('ModeCardSkeleton', () => {
   });
 
   describe('variant styles', () => {
-    it('should apply cyan variant gradient background', () => {
+    it('should apply cyan variant solid background', () => {
       render(<ModeCardSkeleton variant="cyan" />);
 
       const skeleton = screen.getByTestId('mode-card-skeleton');
-      expect(skeleton).toHaveClass('from-neo-cyan');
+      expect(skeleton).toHaveClass('bg-neo-cyan');
     });
 
-    it('should apply pink variant gradient background', () => {
+    it('should apply pink variant solid background', () => {
       render(<ModeCardSkeleton variant="pink" />);
 
       const skeleton = screen.getByTestId('mode-card-skeleton');
-      expect(skeleton).toHaveClass('from-neo-pink');
+      expect(skeleton).toHaveClass('bg-neo-pink');
     });
 
-    it('should apply purple variant gradient background', () => {
+    it('should apply purple variant solid background', () => {
       render(<ModeCardSkeleton variant="purple" />);
 
       const skeleton = screen.getByTestId('mode-card-skeleton');
-      expect(skeleton).toHaveClass('from-neo-purple');
+      expect(skeleton).toHaveClass('bg-neo-purple');
     });
 
-    it('should apply lime variant gradient background', () => {
+    it('should apply lime variant solid background', () => {
       render(<ModeCardSkeleton variant="lime" />);
 
       const skeleton = screen.getByTestId('mode-card-skeleton');
-      expect(skeleton).toHaveClass('from-neo-lime');
+      expect(skeleton).toHaveClass('bg-neo-lime');
     });
 
-    it('should apply orange variant gradient background', () => {
+    it('should apply orange variant solid background', () => {
       render(<ModeCardSkeleton variant="orange" />);
 
       const skeleton = screen.getByTestId('mode-card-skeleton');
-      expect(skeleton).toHaveClass('from-neo-orange');
+      expect(skeleton).toHaveClass('bg-neo-orange');
     });
   });
 
@@ -112,11 +112,12 @@ describe('ModeCardSkeleton', () => {
   });
 
   describe('animation', () => {
-    it('should have pulse animation', () => {
+    it('should NOT have pulse animation (removed for performance)', () => {
       render(<ModeCardSkeleton variant="cyan" />);
 
       const skeleton = screen.getByTestId('mode-card-skeleton');
-      expect(skeleton).toHaveClass('animate-pulse');
+      // Pulse animation removed to prevent constant repaints
+      expect(skeleton).not.toHaveClass('animate-pulse');
     });
   });
 

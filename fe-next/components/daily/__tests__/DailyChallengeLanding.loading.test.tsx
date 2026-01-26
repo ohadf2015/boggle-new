@@ -111,8 +111,12 @@ describe('DailyChallengeLanding Loading State', () => {
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     // Cards should be visible immediately - not blocked by loading
-    expect(screen.getByText(/word hunt/i)).toBeInTheDocument();
-    expect(screen.getByText(/buzz/i)).toBeInTheDocument();
+    // Use getAllByText since there might be multiple instances
+    const wordHuntElements = screen.getAllByText(/word hunt/i);
+    expect(wordHuntElements.length).toBeGreaterThan(0);
+
+    const buzzElements = screen.getAllByText(/buzz/i);
+    expect(buzzElements.length).toBeGreaterThan(0);
 
     // Play buttons should be visible immediately (not showing "Loading...")
     const playButtons = screen.getAllByText(/play/i);
@@ -182,11 +186,15 @@ describe('DailyChallengeLanding Loading State', () => {
 
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
-    // Title should be immediately visible
-    expect(screen.getByText(/word hunt/i)).toBeInTheDocument();
+    // Title should be immediately visible (use getAllByText since multiple instances)
+    const wordHuntElements = screen.getAllByText(/word hunt/i);
+    expect(wordHuntElements.length).toBeGreaterThan(0);
 
     // Time mode badges should be visible (uses translation keys)
-    expect(screen.getByText(/fast pace/i)).toBeInTheDocument();
-    expect(screen.getByText(/no timer/i)).toBeInTheDocument();
+    const fastPaceElements = screen.getAllByText(/fast pace/i);
+    expect(fastPaceElements.length).toBeGreaterThan(0);
+
+    const noTimerElements = screen.getAllByText(/no timer/i);
+    expect(noTimerElements.length).toBeGreaterThan(0);
   });
 });
