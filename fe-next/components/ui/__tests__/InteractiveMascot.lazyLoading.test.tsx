@@ -20,9 +20,10 @@ let originalImage: typeof window.Image;
 // Mock Next.js Image component - just render a simple img
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: function MockImage({ src, alt, ...props }: any) {
+  default: function MockImage({ src, alt, width, height }: any) {
+    // Only pass standard HTML img attributes, filter out Next.js-specific props
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} data-testid="mascot-image" {...props} />;
+    return <img src={src} alt={alt} width={width} height={height} data-testid="mascot-image" />;
   },
 }));
 
