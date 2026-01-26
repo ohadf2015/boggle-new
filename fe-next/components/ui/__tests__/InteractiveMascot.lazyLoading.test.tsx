@@ -45,12 +45,13 @@ describe('InteractiveMascot - Lazy Loading', () => {
 
     // Mock Image constructor to track preload attempts
     (window.Image as any) = function MockImageConstructor() {
+      let srcValue = '';
       const img = {
-        src: '',
         onload: null as (() => void) | null,
         onerror: null as (() => void) | null,
         // Track when src is set (this is the preload call)
         set src(value: string) {
+          srcValue = value;
           mockImageConstructorCalls.push(value);
           // Simulate async load
           setTimeout(() => {
@@ -60,7 +61,7 @@ describe('InteractiveMascot - Lazy Loading', () => {
           }, 0);
         },
         get src() {
-          return '';
+          return srcValue;
         },
       };
       return img;
