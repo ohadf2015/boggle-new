@@ -16,6 +16,7 @@ import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail }
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { Language } from '@/types';
 
 // Brand icon SVG components
@@ -64,6 +65,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const [success, setSuccess] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
 
   // Email/password form state
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
@@ -365,33 +367,53 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
           {!success && (
             <>
-              {/* OAuth Buttons */}
-              <div className="space-y-3">
-                {providers.map((provider) => (
+              {/* OAuth Buttons - Hidden on CrazyGames platform */}
+              {isOnCrazyGamesPlatform ? (
+                <div className="space-y-3">
                   <Button
-                    key={provider.id}
-                    onClick={() => handleSignIn(provider.id)}
+                    onClick={() => showAuthPrompt()}
                     disabled={isAnyLoading}
                     className={cn(
                       'w-full h-12 text-base font-medium rounded-xl transition-all',
-                      provider.color
+                      'bg-neo-orange text-white hover:bg-neo-orange/90'
                     )}
                     asChild={false}
                   >
-                    {isLoading === provider.id ? (
+                    {isLoading === 'crazygames' ? (
                       <NeoLoader variant="dots" size="sm" />
                     ) : (
-                      <provider.icon className="w-5 h-5" />
+                      <span>{t('auth.loginCrazyGames')}</span>
                     )}
-                    <span className="ml-2">
-                      {t('auth.signInWith', { provider: provider.label })}
-                    </span>
                   </Button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {providers.map((provider) => (
+                    <Button
+                      key={provider.id}
+                      onClick={() => handleSignIn(provider.id)}
+                      disabled={isAnyLoading}
+                      className={cn(
+                        'w-full h-12 text-base font-medium rounded-xl transition-all',
+                        provider.color
+                      )}
+                      asChild={false}
+                    >
+                      {isLoading === provider.id ? (
+                        <NeoLoader variant="dots" size="sm" />
+                      ) : (
+                        <provider.icon className="w-5 h-5" />
+                      )}
+                      <span className="ml-2">
+                        {t('auth.signInWith', { provider: provider.label })}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              )}
 
-              {/* Email Form Toggle */}
-              {!showEmailForm ? (
+              {/* Email Form Toggle - Hidden on CrazyGames platform */}
+              {!isOnCrazyGamesPlatform && !showEmailForm ? (
                 <button
                   onClick={() => setShowEmailForm(true)}
                   className={cn(
@@ -402,7 +424,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <Mail className="w-4 h-4" />
                   <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
                 </button>
-              ) : (
+              ) : !isOnCrazyGamesPlatform && showEmailForm ? (
                 <motion.form
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -504,7 +526,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       : (t('auth.noAccount') || "Don't have an account? Sign up")}
                   </button>
                 </motion.form>
-              )}
+              ) : null}
 
               {/* Error Message */}
               {error && (
