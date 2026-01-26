@@ -133,6 +133,8 @@ export function useRandomMascotActivity({
 
   const nextActivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activityResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const preloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const rescheduleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduleNextActivityRef = useRef<(() => void) | null>(null);
   const isFirstActivityRef = useRef(true);
   const lastBaseIndexRef = useRef(0);
@@ -145,6 +147,12 @@ export function useRandomMascotActivity({
       }
       if (activityResetTimeoutRef.current) {
         clearTimeout(activityResetTimeoutRef.current);
+      }
+      if (preloadTimeoutRef.current) {
+        clearTimeout(preloadTimeoutRef.current);
+      }
+      if (rescheduleTimeoutRef.current) {
+        clearTimeout(rescheduleTimeoutRef.current);
       }
     };
   }, []);
@@ -243,7 +251,7 @@ export function useRandomMascotActivity({
     const preloadDelay = Math.max(0, interval - 2000);
 
     // Schedule preload
-    setTimeout(() => {
+    preloadTimeoutRef.current = setTimeout(() => {
       const nextActivity = getRandomActivity();
       preloadMascotImage(nextActivity);
     }, preloadDelay);
@@ -252,7 +260,7 @@ export function useRandomMascotActivity({
     nextActivityTimeoutRef.current = setTimeout(() => {
       triggerActivity();
       // Schedule the next one after this activity completes
-      setTimeout(() => {
+      rescheduleTimeoutRef.current = setTimeout(() => {
         scheduleNextActivityRef.current?.();
       }, activityDuration);
     }, interval);
