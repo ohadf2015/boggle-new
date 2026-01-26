@@ -53,7 +53,7 @@ describe('useSafeArea', () => {
   it('should fetch safe area insets on native', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
-    mockSafeArea.addListener.mockReturnValue({ remove: jest.fn() });
+    mockSafeArea.addListener.mockResolvedValue({ remove: jest.fn() });
 
     const { result } = renderHook(() => useSafeArea());
 
@@ -65,7 +65,7 @@ describe('useSafeArea', () => {
   it('should set CSS custom properties on native', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
-    mockSafeArea.addListener.mockReturnValue({ remove: jest.fn() });
+    mockSafeArea.addListener.mockResolvedValue({ remove: jest.fn() });
 
     renderHook(() => useSafeArea());
 
@@ -78,7 +78,7 @@ describe('useSafeArea', () => {
   it('should handle errors gracefully', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockRejectedValue(new Error('Plugin error'));
-    mockSafeArea.addListener.mockReturnValue({ remove: jest.fn() });
+    mockSafeArea.addListener.mockResolvedValue({ remove: jest.fn() });
 
     const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
@@ -103,9 +103,15 @@ describe('useSafeArea', () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
     const mockRemove = jest.fn();
-    mockSafeArea.addListener.mockReturnValue({ remove: mockRemove });
+    mockSafeArea.addListener.mockResolvedValue({ remove: mockRemove });
 
     const { unmount } = renderHook(() => useSafeArea());
+
+    // Wait for listener to be set up
+    await waitFor(() => {
+      expect(mockSafeArea.addListener).toHaveBeenCalled();
+    });
+
     unmount();
 
     expect(mockRemove).toHaveBeenCalled();
@@ -118,7 +124,7 @@ describe('useSafeArea', () => {
     let listenerCallback: ((data: { insets: SafeAreaInsets }) => void) | null = null;
     mockSafeArea.addListener.mockImplementation((eventName, callback) => {
       listenerCallback = callback;
-      return { remove: jest.fn() };
+      return Promise.resolve({ remove: jest.fn() });
     });
 
     const { result } = renderHook(() => useSafeArea());

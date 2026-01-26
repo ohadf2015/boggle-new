@@ -47,6 +47,8 @@ export function useSafeArea(): SafeAreaInsets {
       return;
     }
 
+    let listenerHandle: { remove: () => Promise<void> } | null = null;
+
     // Set CSS custom properties
     const updateCSSProperties = (newInsets: SafeAreaInsets) => {
       document.documentElement.style.setProperty('--cap-safe-area-top', `${newInsets.top}px`);
@@ -67,13 +69,17 @@ export function useSafeArea(): SafeAreaInsets {
       });
 
     // Listen for changes (e.g., orientation change)
-    const listener = SafeArea.addListener('safeAreaChanged', ({ insets: newInsets }) => {
+    SafeArea.addListener('safeAreaChanged', ({ insets: newInsets }) => {
       setInsets(newInsets);
       updateCSSProperties(newInsets);
+    }).then((handle) => {
+      listenerHandle = handle;
     });
 
     return () => {
-      listener.remove();
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
     };
   }, []);
 
