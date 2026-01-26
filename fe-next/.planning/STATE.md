@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 24 of 25 (CrazyGames Portal Integration) — COMPLETE
-Plan: 7/7 complete
+Phase: 25 of 25 (Capacitor Native Apps Integration) — COMPLETE
+Plan: 6/6 complete
 Status: Complete
-Last activity: 2026-01-26 — Completed 24-07-PLAN.md (OAuth Hiding Gap Closure)
+Last activity: 2026-01-26 — Completed 25-06-PLAN.md (Generic Haptics Abstraction Layer)
 
-Progress: [███████████░] 19/25 phases (76% milestone, v1.1 in progress)
+Progress: [████████████] 20/25 phases (80% milestone, v1.1 in progress)
 
 ## Performance Metrics
 
@@ -98,8 +98,9 @@ Progress: [███████████░] 19/25 phases (76% milestone, v1
 | 25-03 | Safe Area & Offline Fallback | 20min | Complete |
 | 25-04 | Native Build Testing | 10min | Complete |
 | 25-05 | Wire Orphaned Native Integrations | 8min | Complete |
+| 25-06 | Generic Haptics Abstraction Layer | 18min | Complete |
 
-**Phase 25 Total:** 52 minutes, 93 tests added (24 new in 25-05), native app infrastructure complete
+**Phase 25 Total:** 70 minutes, 118 tests added (25 new in 25-06), native app infrastructure COMPLETE
 
 ## Accumulated Context
 
@@ -183,6 +184,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **25-05**: GamePageWrapper uses CSS custom properties → Decouples safe area detection from UI rendering (2026-01-26)
 - **25-05**: Retry button reloads entire page → Simplest way to recover from offline state (2026-01-26)
 - **25-05**: useSafeArea returns SafeAreaInsets object → Hook can be used for both CSS vars and inline styles (2026-01-26)
+- **25-06**: Strategy Pattern for haptics abstraction → Automatic platform detection eliminates developer confusion (2026-01-26)
+- **25-06**: Facade Pattern with convenience methods → Simple tap/success/error while supporting custom patterns (2026-01-26)
+- **25-06**: Backwards compatibility exports → Gradual migration path without breaking changes (2026-01-26)
+- **25-06**: HapticsContext for configuration → Infrastructure ready for future settings UI (2026-01-26)
 
 ### Pending Todos
 
