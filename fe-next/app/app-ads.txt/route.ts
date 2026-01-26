@@ -19,23 +19,11 @@ export async function GET() {
 # LexiClash - Real-Time Multiplayer Word Strategy Game
 # https://www.lexiclash.live
 #
-# This file declares authorized advertising partners.
-# Replace the placeholder entries below with your actual ad network IDs.
-#
+# This file declares authorized advertising partners for LexiClash.
 # Format: <domain>, <publisher-id>, <relationship>, <certification-authority-id>
 #
-# Example entries (uncomment and replace with your actual IDs):
-# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
-# facebook.com, XXXXXXXXXXXXXXXX, DIRECT
-# unity3d.com, XXXXXXXX, DIRECT
-#
-# For Google AdMob:
-# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
-#
-# For AdSense:
-# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
-#
-# Add your authorized advertising partners below this line:
+# Google AdSense - Primary Ad Network
+google.com, pub-1896836706464880, DIRECT, f08c47fec0942fa0
 `;
 
   return new NextResponse(content, {

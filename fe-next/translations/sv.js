@@ -2068,10 +2068,12 @@ const sv = {
     "privacyPolicy": "Integritetspolicy",
     "backToGame": "Tillbaka till spelet",
     "lastUpdated": "Senast uppdaterad",
+    "lastUpdatedDate": "26 januari, 2026",
     "copyright": "© 2025 LexiClash Ltd. Alla rättigheter förbehållna.",
     "index": {
       "title": "Juridisk information",
       "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
+      "aboutDescription": "Lär dig mer om vårt företag, uppdrag och team",
       "termsDescription": "Regler och riktlinjer för användning av LexiClash",
       "privacyDescription": "Hur vi samlar in, använder och skyddar dina data"
     },
@@ -2160,24 +2162,34 @@ const sv = {
         "discord": "Discord - För OAuth-autentisering",
         "noSale": "Vi säljer inte din personliga information till tredje part."
       },
+      "advertising": {
+        "title": "4. Tredjepartsannonsering",
+        "intro": "Vi använder tredjepartsannonseringsföretag för att visa annonser när du besöker vår webbplats. Dessa företag kan använda information om dina besök för att erbjuda annonser om varor och tjänster som kan intressera dig.",
+        "googleAdsense": "Google AdSense: Vi visar annonser via Google AdSense, som kan använda cookies och webbfyrar för att samla in information om ditt surfbeteende för annonspersonalisering.",
+        "cookies": "Annonskookies: Tredjepartsannonsörer kan placera cookies på din enhet för att spåra din surfning över webbplatser och visa relevanta annonser.",
+        "personalization": "Annonspersonalisering: Annonser kan personaliseras baserat på dina intressen, surfhistorik och demografisk information som samlas in av annonspartners.",
+        "thirdPartyAccess": "Tredjepartsåtkomst: Annonspartners kan komma åt data om ditt besök, inklusive visade sidor, tid spenderad och klick på annonser, i enlighet med sina egna integritetspolicyer.",
+        "optOut": "Du kan avanmäla personliga annonser genom att besöka Googles annonsinställningar på https://www.google.com/settings/ads eller genom att använda branschverktyg för avanmälan.",
+        "learnMore": "För mer information om hur Google använder data när du använder vår webbplats, besök https://policies.google.com/technologies/partner-sites"
+      },
       "cookies": {
-        "title": "4. Cookies och lokal lagring",
+        "title": "5. Cookies och lokal lagring",
         "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Vi använder inte reklam- eller spårningscookies."
       },
       "dataRetention": {
-        "title": "5. Datalagring",
+        "title": "6. Datalagring",
         "content": "Konto- och profildata behålls tills du begär radering. Spelstatistik behålls för att upprätthålla topplistans integritet. Tillfälligt speltillstånd (Redis) raderas automatiskt inom 1 timme. Analysdata behålls enligt LogRockets policyer."
       },
       "security": {
-        "title": "6. Datasäkerhet",
+        "title": "7. Datasäkerhet",
         "content": "Vi implementerar branschstandardsäkerhetsåtgärder inklusive: krypterade anslutningar (HTTPS), säker OAuth-autentisering, krypterad databaslagring via Supabase, och säkra WebSocket-anslutningar för realtidsspel."
       },
       "yourRights": {
-        "title": "7. Dina rättigheter",
+        "title": "8. Dina rättigheter",
         "content": "Du har rätt att: få tillgång till dina personuppgifter via din profilsida, uppdatera din profilinformation när som helst, radera ditt konto och tillhörande data, och begära information om hur dina data används."
       },
       "international": {
-        "title": "8. Internationella användare",
+        "title": "9. Internationella användare",
         "content": "Dina data kan överföras till och lagras i länder utanför ditt hemland, inklusive länder som kan ha andra dataskyddslagar. Genom att använda LexiClash samtycker du till sådana överföringar."
       },
       "changes": {
@@ -2187,6 +2199,38 @@ const sv = {
       "governingLaw": {
         "title": "10. Tillämplig lag",
         "content": "Denna integritetspolicy styrs av lagarna i staten Israel. Alla tvister ska lösas i domstolar i Israel."
+      }
+    },
+    "about": {
+      "title": "Om LexiClash",
+      "whoWeAre": {
+        "title": "Vilka vi är",
+        "content": "LexiClash är ett multiplayer-ordstrategispel i realtid utvecklat av LexiClash Ltd. Vi skapar engagerande, pedagogiska och tävlingsinriktade ordspel för spelare världen över på flera språk."
+      },
+      "mission": {
+        "title": "Vårt uppdrag",
+        "content": "Vårt uppdrag är att göra språkinlärning roligt och tävlingsinriktat. Vi tror att spel är det bästa sättet att förbättra ordförråd, stavning och snabbt tänkande samtidigt som man kopplar ihop med vänner och spelare globalt."
+      },
+      "whatWeDo": {
+        "title": "Vad vi gör",
+        "content": "Vi utvecklar multiplayer-ordspel som kombinerar hastighet, strategi och ordkunskaper. LexiClash stödjer hebreiska, engelska, svenska, japanska och spanska, vilket gör det tillgängligt för spelare världen över."
+      },
+      "team": {
+        "title": "Vårt team",
+        "content": "LexiClash grundades av ett team av passionerade ordspelsentusiaster och mjukvaruingenjörer. Vi är dedikerade till att skapa den bästa multiplayer-ordspelsupplevelsen."
+      },
+      "contact": {
+        "title": "Kontakta oss",
+        "content": "Har du frågor eller feedback? Vi skulle gärna höra från dig!"
+      },
+      "businessInfo": {
+        "title": "Företagsinformation",
+        "companyLabel": "Företagsnamn",
+        "company": "LexiClash Ltd",
+        "emailLabel": "E-post",
+        "email": "lexiclash.game@gmail.com",
+        "instagramLabel": "Instagram",
+        "instagram": "@lexi.clash"
       }
     }
   },

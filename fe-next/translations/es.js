@@ -1625,10 +1625,12 @@ const es = {
     "privacyPolicy": "Política de Privacidad",
     "backToGame": "Volver al Juego",
     "lastUpdated": "Última actualización",
+    "lastUpdatedDate": "26 de enero de 2026",
     "copyright": "© 2025 LexiClash Ltd. Todos los derechos reservados.",
     "index": {
       "title": "Información Legal",
       "intro": "Revisa nuestros documentos legales para entender tus derechos y cómo protegemos tus datos cuando usas LexiClash.",
+      "aboutDescription": "Conoce nuestra empresa, misión y equipo",
       "termsDescription": "Reglas y directrices para usar LexiClash",
       "privacyDescription": "Cómo recopilamos, usamos y protegemos tus datos"
     },
@@ -1717,6 +1719,16 @@ const es = {
         "logrocket": "LogRocket (análisis y registro de errores)",
         "noSale": "No vendemos su información personal a terceros."
       },
+      "advertising": {
+        "title": "Publicidad de Terceros",
+        "intro": "Utilizamos empresas de publicidad de terceros para mostrar anuncios cuando visitas nuestro sitio web. Estas empresas pueden utilizar información sobre tus visitas para ofrecer anuncios sobre bienes y servicios que puedan interesarte.",
+        "googleAdsense": "Google AdSense: Mostramos anuncios a través de Google AdSense, que puede utilizar cookies y balizas web para recopilar información sobre tu comportamiento de navegación para personalización de anuncios.",
+        "cookies": "Cookies publicitarias: Los anunciantes de terceros pueden colocar cookies en tu dispositivo para rastrear tu navegación en sitios web y mostrar anuncios relevantes.",
+        "personalization": "Personalización de anuncios: Los anuncios pueden personalizarse según tus intereses, historial de navegación e información demográfica recopilada por socios publicitarios.",
+        "thirdPartyAccess": "Acceso de terceros: Los socios publicitarios pueden acceder a datos sobre tu visita, incluidas las páginas vistas, el tiempo de permanencia y los clics en anuncios, de acuerdo con sus propias políticas de privacidad.",
+        "optOut": "Puedes optar por no recibir anuncios personalizados visitando la configuración de anuncios de Google en https://www.google.com/settings/ads o utilizando herramientas de exclusión de la industria.",
+        "learnMore": "Para obtener más información sobre cómo Google utiliza los datos cuando utilizas nuestro sitio, visita https://policies.google.com/technologies/partner-sites"
+      },
       "cookies": {
         "title": "Cookies y Almacenamiento Local",
         "content": "Usamos cookies y almacenamiento local del navegador para mantener su sesión."
@@ -1744,6 +1756,38 @@ const es = {
       "governingLaw": {
         "title": "Ley Aplicable",
         "content": "Esta política se rige por las leyes aplicables."
+      }
+    },
+    "about": {
+      "title": "Acerca de LexiClash",
+      "whoWeAre": {
+        "title": "Quiénes Somos",
+        "content": "LexiClash es un juego de estrategia de palabras multijugador en tiempo real desarrollado por LexiClash Ltd. Creamos juegos de palabras atractivos, educativos y competitivos para jugadores de todo el mundo en múltiples idiomas."
+      },
+      "mission": {
+        "title": "Nuestra Misión",
+        "content": "Nuestra misión es hacer que el aprendizaje de idiomas sea divertido y competitivo. Creemos que los juegos son la mejor manera de mejorar el vocabulario, la ortografía y el pensamiento rápido mientras te conectas con amigos y jugadores de todo el mundo."
+      },
+      "whatWeDo": {
+        "title": "Lo Que Hacemos",
+        "content": "Desarrollamos juegos de palabras multijugador que combinan velocidad, estrategia y habilidades de vocabulario. LexiClash admite hebreo, inglés, sueco, japonés y español, haciéndolo accesible para jugadores de todo el mundo."
+      },
+      "team": {
+        "title": "Nuestro Equipo",
+        "content": "LexiClash fue fundado por un equipo de entusiastas de juegos de palabras e ingenieros de software apasionados. Estamos dedicados a crear la mejor experiencia de juego de palabras multijugador."
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "content": "¿Tienes preguntas o comentarios? ¡Nos encantaría saber de ti!"
+      },
+      "businessInfo": {
+        "title": "Información Comercial",
+        "companyLabel": "Nombre de la Empresa",
+        "company": "LexiClash Ltd",
+        "emailLabel": "Correo Electrónico",
+        "email": "lexiclash.game@gmail.com",
+        "instagramLabel": "Instagram",
+        "instagram": "@lexi.clash"
       }
     }
   },

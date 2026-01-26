@@ -26,6 +26,7 @@ import { composeProviders } from '@/utils/composeProviders';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { initConsoleOverride } from '@/utils/consoleOverride';
+import { initializeHowlerConfig } from '@/lib/audio/howlerConfig';
 import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
 import ProfileCustomizationWrapper from './components/ProfileCustomizationWrapper';
 
@@ -89,6 +90,23 @@ const initConsole = () => {
 // Critical for capturing all console errors/warnings from the very start
 if (typeof window !== 'undefined') {
     initConsole();
+}
+
+// Initialize Howler.js global configuration immediately
+// This MUST happen before any audio playback to prevent HTML5 audio pool exhaustion
+// Fixes JAVASCRIPT-NEXTJS-9J: HTML5 Audio pool exhausted
+let howlerConfigInitialized = false;
+const initHowler = () => {
+    if (howlerConfigInitialized) return;
+    if (typeof window === 'undefined') return;
+
+    howlerConfigInitialized = true;
+    initializeHowlerConfig();
+};
+
+// Call immediately at module level - this runs before any audio context is created
+if (typeof window !== 'undefined') {
+    initHowler();
 }
 
 // Suppress benign ResizeObserver errors

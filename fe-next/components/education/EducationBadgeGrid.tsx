@@ -14,7 +14,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import AchievementProgressCard from './AchievementProgressCard';
-import { ACHIEVEMENT_DEFINITIONS } from '../../backend/modules/educationAchievementManager';
 
 // ============================================
 // TYPES
@@ -171,10 +170,6 @@ export default function EducationBadgeGrid({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pinnedBadges.map(achievement => {
-              const definition = ACHIEVEMENT_DEFINITIONS.find(
-                d => d.key === achievement.achievement_key
-              );
-
               return (
                 <AchievementProgressCard
                   key={achievement.achievement_key}
@@ -186,8 +181,8 @@ export default function EducationBadgeGrid({
                     currentTier: achievement.current_tier,
                     progressValue: achievement.progress_value,
                     nextThreshold: achievement.next_threshold,
-                    currentThreshold: definition?.tiers[achievement.current_tier || 'bronze'],
                     isMaxTier: achievement.current_tier === 'platinum',
+                    percentComplete: achievement.percent_complete,
                   }}
                   isPinned={true}
                   onTogglePin={handleTogglePin}
@@ -241,10 +236,6 @@ export default function EducationBadgeGrid({
               }`}
             >
               {categoryAchievements.map(achievement => {
-                const definition = ACHIEVEMENT_DEFINITIONS.find(
-                  d => d.key === achievement.achievement_key
-                );
-
                 const canPin = achievement.is_pinned || pinnedCount < 3;
 
                 return (
@@ -258,8 +249,8 @@ export default function EducationBadgeGrid({
                       currentTier: achievement.current_tier,
                       progressValue: achievement.progress_value,
                       nextThreshold: achievement.next_threshold,
-                      currentThreshold: definition?.tiers[achievement.current_tier || 'bronze'],
                       isMaxTier: achievement.current_tier === 'platinum',
+                      percentComplete: achievement.percent_complete,
                     }}
                     isPinned={achievement.is_pinned}
                     onTogglePin={handleTogglePin}

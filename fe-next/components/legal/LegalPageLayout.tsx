@@ -95,12 +95,68 @@ export default function LegalPageLayout({
           </Button>
         </div>
 
-        {/* Copyright Footer */}
+        {/* Footer with Links */}
         <footer className={cn(
-          'mt-12 pt-6 border-t text-center text-sm',
-          isDarkMode ? 'border-slate-700 text-gray-600' : 'border-gray-200 text-gray-600'
+          'mt-12 pt-6 border-t text-center',
+          isDarkMode ? 'border-slate-700' : 'border-gray-200'
         )}>
-          {t('legal.copyright')}
+          {/* Footer Links */}
+          <nav className="mb-4">
+            <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <li>
+                <a
+                  href={`/${language}/about`}
+                  className={cn(
+                    'hover:underline font-medium',
+                    isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {t('legal.about.title')}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`/${language}/legal/terms`}
+                  className={cn(
+                    'hover:underline font-medium',
+                    isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {t('legal.termsOfService')}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`/${language}/legal/privacy`}
+                  className={cn(
+                    'hover:underline font-medium',
+                    isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {t('legal.privacyPolicy')}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`/${language}/contact`}
+                  className={cn(
+                    'hover:underline font-medium',
+                    isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {t('contact.title')}
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+          {/* Copyright */}
+          <p className={cn(
+            'text-sm',
+            isDarkMode ? 'text-gray-600' : 'text-gray-600'
+          )}>
+            {t('legal.copyright')}
+          </p>
         </footer>
       </div>
     </div>

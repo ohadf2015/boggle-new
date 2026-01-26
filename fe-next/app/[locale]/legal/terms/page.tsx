@@ -29,7 +29,7 @@ export default function TermsOfServicePage(): React.ReactElement {
   ] as const;
 
   return (
-    <LegalPageLayout title={t('legal.terms.title')}>
+    <LegalPageLayout title={t('legal.terms.title')} lastUpdated={t('legal.lastUpdatedDate')}>
       {/* Introduction */}
       <p className={cn(
         'text-lg mb-6',

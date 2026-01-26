@@ -155,12 +155,15 @@ export function SocketProvider({ children }: SocketProviderProps) {
     };
 
     const handleConnectError = (error: Error) => {
-      // Use warn for transient WebSocket errors (they auto-recover via polling fallback)
-      // These are common during dev server restarts or network hiccups
+      // Use log for transient WebSocket errors (they auto-recover via polling fallback)
+      // These are common during mobile connections or network hiccups
+      // Fixes JAVASCRIPT-NEXTJS-1B and JAVASCRIPT-NEXTJS-1R (transient errors shouldn't spam Sentry)
       const isTransient = error.message === 'websocket error' || error.message === 'timeout';
       if (isTransient) {
-        logger.warn('[SOCKET.IO] Connection error (will retry):', error.message);
+        // Use log (not warn) to avoid sending to Sentry - these are expected behaviors
+        logger.log('[SOCKET.IO] Connection error (will retry):', error.message);
       } else {
+        // Only send non-transient errors to Sentry (truly actionable problems)
         logger.error('[SOCKET.IO] Connection error:', error.message);
       }
       setConnectionError(error.message);
@@ -181,10 +184,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
     };
 
     const handleReconnectError = (error: Error) => {
-      logger.error('[SOCKET.IO] Reconnection error:', error.message);
+      // Individual reconnection errors are transient - Socket.IO will retry
+      // Only log to console (not Sentry) to avoid noise
+      logger.log('[SOCKET.IO] Reconnection error:', error.message);
     };
 
     const handleReconnectFailed = () => {
+      // This is a fatal error - user needs to know reconnection completely failed
       logger.error('[SOCKET.IO] Reconnection failed after all attempts');
       setIsReconnecting(false);
       setConnectionError('Failed to reconnect to server');

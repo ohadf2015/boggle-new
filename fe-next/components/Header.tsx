@@ -16,6 +16,7 @@ import { AdminGiftModal } from './gift/AdminGiftModal';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
 import { useSafeArea } from '@/hooks/useSafeArea';
+import HeaderMenuDropdown from './HeaderMenuDropdown';
 
 /**
  * Header Props
@@ -351,7 +352,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </svg>
                 </motion.button>
 
-                {/* Desktop Controls: visible on sm+ */}
+                {/* Desktop Controls: visible on sm+ - Keep only: Coins, Gifts, Language, Menu */}
                 <div className="hidden sm:flex items-center gap-3 md:gap-3 lg:gap-4 xl:gap-4 2xl:gap-5 flex-shrink-0">
                     {/* Coin Balance - shown for authenticated users */}
                     {isAuthenticated && profile && (
@@ -365,46 +366,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 size="sm"
                                 showAnimation={false}
                             />
-                        </Link>
-                    )}
-
-                    {/* Profile Link - only show for authenticated users */}
-                    {isAuthenticated && profile && (
-                        <Link
-                            href={`/${language}/profile`}
-                            className={cn(
-                                "flex items-center justify-center",
-                                "w-10 h-10",
-                                "bg-neo-cream text-neo-black",
-                                "border-3 border-neo-black",
-                                "rounded-neo shadow-hard-sm",
-                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                                "transition-all duration-100"
-                            )}
-                            aria-label={t('brain.nav.profile') || 'Profile'}
-                        >
-                            <User size={20} />
-                        </Link>
-                    )}
-
-                    {/* Brain Training Link - only show for authenticated users */}
-                    {isAuthenticated && (
-                        <Link
-                            href={`/${language}/brain`}
-                            className={cn(
-                                "flex items-center justify-center",
-                                "w-10 h-10",
-                                "bg-gradient-to-br from-neo-purple to-purple-400 text-neo-black",
-                                "border-3 border-neo-black",
-                                "rounded-neo shadow-hard-sm",
-                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:from-neo-purple-light hover:to-neo-purple",
-                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                                "transition-all duration-100"
-                            )}
-                            aria-label={t('landing.brainTraining') || 'Brain Training'}
-                        >
-                            <Brain size={20} />
                         </Link>
                     )}
 
@@ -429,47 +390,11 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </button>
                     )}
 
-                    {/* Accessibility Quick Access - visible for ALL users */}
-                    <Link
-                        href={`/${language}/settings#accessibility`}
-                        className={cn(
-                            "flex items-center justify-center",
-                            "w-10 h-10",
-                            "bg-neo-cream text-neo-black",
-                            "border-3 border-neo-black",
-                            "rounded-neo shadow-hard-sm",
-                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                            "transition-all duration-100"
-                        )}
-                        aria-label={t('settings.accessibility') || 'Accessibility Settings'}
-                    >
-                        <Accessibility size={20} />
-                    </Link>
-
-                    {/* Settings Link - visible for ALL users (guests and authenticated) */}
-                    <Link
-                        href={`/${language}/settings`}
-                        className={cn(
-                            "flex items-center justify-center",
-                            "w-10 h-10",
-                            "bg-neo-cream text-neo-black",
-                            "border-3 border-neo-black",
-                            "rounded-neo shadow-hard-sm",
-                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                            "transition-all duration-100"
-                        )}
-                        aria-label={t('settings.title') || 'Settings'}
-                    >
-                        <Settings size={20} />
-                    </Link>
-
                     {/* Quick Language Switcher - visible for ALL users */}
                     <QuickLanguageSwitcher compact />
 
-                    <MusicControls />
-                    <AuthButton />
+                    {/* Menu Dropdown - contains all other items */}
+                    <HeaderMenuDropdown />
                 </div>
 
                 {/* Mobile: Volume + Hamburger - simplified grouping */}

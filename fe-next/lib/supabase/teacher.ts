@@ -272,15 +272,33 @@ export async function joinClassroom(
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
+    // Normalize the join code (trim whitespace and uppercase)
+    const normalizedCode = joinCode.trim().toUpperCase();
+
+    // Validate code format BEFORE database query (fail fast)
+    if (!normalizedCode || normalizedCode.length !== 6) {
+      return { data: null, error: { message: 'Invalid join code format (must be 6 characters)' } };
+    }
+
+    if (!/^[A-Z0-9]+$/.test(normalizedCode)) {
+      return { data: null, error: { message: 'Invalid join code format (letters and numbers only)' } };
+    }
+
     // Find classroom by join code
     const { data: classroom, error: classroomError } = await supabase
       .from('classrooms')
       .select('id')
-      .eq('join_code', joinCode.toUpperCase())
-      .single();
+      .eq('join_code', normalizedCode)
+      .maybeSingle();
 
-    if (classroomError || !classroom) {
-      return { data: null, error: { message: 'Invalid join code' } };
+    if (classroomError) {
+      logger.error('Error querying classroom:', classroomError);
+      return { data: null, error: { message: classroomError.message } };
+    }
+
+    if (!classroom) {
+      // Classroom not found - clearer error message
+      return { data: null, error: { message: 'Classroom not found. Please check the code with your teacher.' } };
     }
 
     // Check if already a member
@@ -292,6 +310,7 @@ export async function joinClassroom(
       .maybeSingle();
 
     if (existing) {
+      // Already a member - return success with classroom_id
       return { data: { classroom_id: classroom.id }, error: null };
     }
 
@@ -832,10 +851,10 @@ export async function getClassroomLeaderboard(
   }
 
   try {
-    // Get all students in classroom with their progress
+    // Get all students in classroom (student_id only)
     const { data: memberships, error: memberError } = await supabase
       .from('classroom_memberships')
-      .select('student_id, profiles(id, display_name, avatar_emoji, avatar_color)')
+      .select('student_id')
       .eq('classroom_id', classroomId);
 
     if (memberError) {
@@ -854,6 +873,20 @@ export async function getClassroomLeaderboard(
     }
 
     const studentIds = memberships.map(m => m.student_id);
+
+    // Fetch profiles for all student_ids separately (profiles.id = auth.users.id = student_id)
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, display_name, avatar_emoji, avatar_color')
+      .in('id', studentIds);
+
+    if (profilesError) {
+      logger.error('Error fetching student profiles:', profilesError);
+      // Continue without profile data rather than failing completely
+    }
+
+    // Create a map of profiles by id for quick lookup
+    const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
     // Get progress for all students in this classroom
     // For weekly scope: filter by last_practice_date within last 7 days
@@ -909,7 +942,7 @@ export async function getClassroomLeaderboard(
 
     // Build leaderboard entries
     const entries: LeaderboardEntry[] = memberships.map(m => {
-      const profile = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
+      const profile = profileMap.get(m.student_id);
       const xpData = studentXpMap.get(m.student_id);
       const totalXp = xpData?.totalXp || 0;
       const currentLevel = xpData?.currentLevel || 1;

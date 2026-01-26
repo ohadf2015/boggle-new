@@ -33,6 +33,8 @@ const IGNORED_ERROR_PATTERNS = [
   // Socket.IO user-facing errors - handled gracefully with toast messages
   /Game code already in use/i,
   /already in use/i,
+  // Gifts network errors - transient errors with automatic retry (JAVASCRIPT-NEXTJS-8A, JAVASCRIPT-NEXTJS-74)
+  /\[Gifts\].*Network error.*will retry/i,
 ] as const;
 
 // Store original console methods
@@ -99,9 +101,17 @@ export function initConsoleOverride(): void {
 
   // Override console.warn
   console.warn = (...args: unknown[]): void => {
+    // Check if this warning should be ignored (same as console.error)
+    // Fixes JAVASCRIPT-NEXTJS-1V (Recharts dimension warnings during mobile layout)
     const message = args.map(arg =>
-      typeof arg === 'string' ? arg : JSON.stringify(arg)
+      typeof arg === 'string' ? arg : String(arg)
     ).join(' ');
+
+    const shouldIgnore = IGNORED_ERROR_PATTERNS.some(pattern => pattern.test(message));
+    if (shouldIgnore) {
+      // Silently ignore non-critical warnings
+      return;
+    }
 
     Sentry.captureMessage(message, {
       level: 'warning',

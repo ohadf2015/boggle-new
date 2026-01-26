@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
   const isDarkMode = theme === 'dark';
 
   return (
-    <LegalPageLayout title={t('legal.privacy.title')}>
+    <LegalPageLayout title={t('legal.privacy.title')} lastUpdated={t('legal.lastUpdatedDate')}>
       {/* Introduction */}
       <p className={cn(
         'text-lg mb-6',
@@ -94,7 +94,44 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 4: Cookies */}
+      {/* Section 4: Third-Party Advertising */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.privacy.advertising.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed mb-3',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.privacy.advertising.intro')}
+        </p>
+        <ul className={cn(
+          'list-disc pl-6 space-y-2 mb-3',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          <li>{t('legal.privacy.advertising.googleAdsense')}</li>
+          <li>{t('legal.privacy.advertising.cookies')}</li>
+          <li>{t('legal.privacy.advertising.personalization')}</li>
+          <li>{t('legal.privacy.advertising.thirdPartyAccess')}</li>
+        </ul>
+        <p className={cn(
+          'leading-relaxed mb-2',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.privacy.advertising.optOut')}
+        </p>
+        <p className={cn(
+          'leading-relaxed text-sm',
+          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+        )}>
+          {t('legal.privacy.advertising.learnMore')}
+        </p>
+      </section>
+
+      {/* Section 5: Cookies */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',
@@ -110,7 +147,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 5: Data Retention */}
+      {/* Section 6: Data Retention */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',
@@ -126,7 +163,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 6: Security */}
+      {/* Section 7: Security */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',
@@ -142,7 +179,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 7: Your Rights */}
+      {/* Section 8: Your Rights */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',
@@ -158,7 +195,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 8: International Users */}
+      {/* Section 9: International Users */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',
@@ -174,7 +211,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 9: Changes */}
+      {/* Section 10: Changes */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',
@@ -190,7 +227,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </p>
       </section>
 
-      {/* Section 10: Governing Law */}
+      {/* Section 11: Governing Law */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',

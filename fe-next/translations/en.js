@@ -1816,10 +1816,12 @@ const en = {
     "privacyPolicy": "Privacy Policy",
     "backToGame": "Back to Game",
     "lastUpdated": "Last updated",
+    "lastUpdatedDate": "January 26, 2026",
     "copyright": "© 2025 LexiClash Ltd. All rights reserved.",
     "index": {
       "title": "Legal Information",
       "intro": "Review our legal documents to understand your rights and how we protect your data when using LexiClash.",
+      "aboutDescription": "Learn about our company, mission, and team",
       "termsDescription": "Rules and guidelines for using LexiClash",
       "privacyDescription": "How we collect, use, and protect your data"
     },
@@ -1908,33 +1910,75 @@ const en = {
         "discord": "Discord - For OAuth authentication",
         "noSale": "We do not sell your personal information to third parties."
       },
+      "advertising": {
+        "title": "4. Third-Party Advertising",
+        "intro": "We use third-party advertising companies to serve ads when you visit our website. These companies may use information about your visits to provide advertisements about goods and services of interest to you.",
+        "googleAdsense": "Google AdSense: We display ads via Google AdSense, which may use cookies and web beacons to collect information about your browsing behavior for ad personalization.",
+        "cookies": "Advertising Cookies: Third-party advertisers may place cookies on your device to track your browsing across websites and serve relevant ads.",
+        "personalization": "Ad Personalization: Ads may be personalized based on your interests, browsing history, and demographic information collected by advertising partners.",
+        "thirdPartyAccess": "Third-Party Access: Advertising partners may access data about your visit, including pages viewed, time spent, and clicks on ads, in accordance with their own privacy policies.",
+        "optOut": "You can opt out of personalized advertising by visiting Google's Ads Settings at https://www.google.com/settings/ads or by using industry opt-out tools.",
+        "learnMore": "For more information about how Google uses data when you use our site, visit https://policies.google.com/technologies/partner-sites"
+      },
       "cookies": {
-        "title": "4. Cookies and Local Storage",
+        "title": "5. Cookies and Local Storage",
         "content": "We use essential cookies and local storage for: authentication tokens (Supabase), username and preferences (localStorage), theme settings (dark/light mode), and language preferences. We also use LogRocket cookies for analytics purposes. We do not use advertising or tracking cookies."
       },
       "dataRetention": {
-        "title": "5. Data Retention",
+        "title": "6. Data Retention",
         "content": "Account and profile data is retained until you request deletion. Game statistics are retained to maintain leaderboard integrity. Temporary game state (Redis) is automatically deleted within 1 hour. Analytics data is retained according to LogRocket's policies."
       },
       "security": {
-        "title": "6. Data Security",
+        "title": "7. Data Security",
         "content": "We implement industry-standard security measures including: encrypted connections (HTTPS), secure OAuth authentication, encrypted database storage via Supabase, and secure WebSocket connections for real-time gameplay."
       },
       "yourRights": {
-        "title": "7. Your Rights",
+        "title": "8. Your Rights",
         "content": "You have the right to: access your personal data through your profile page, update your profile information at any time, delete your account and associated data, and request information about how your data is used."
       },
       "international": {
-        "title": "8. International Users",
+        "title": "9. International Users",
         "content": "Your data may be transferred to and stored in countries outside your country of residence, including countries that may have different data protection laws. By using LexiClash, you consent to such transfers."
       },
       "changes": {
-        "title": "9. Changes to This Policy",
+        "title": "10. Changes to This Policy",
         "content": "We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date. Your continued use of LexiClash after changes constitutes acceptance of the updated policy."
       },
       "governingLaw": {
-        "title": "10. Governing Law",
+        "title": "11. Governing Law",
         "content": "This Privacy Policy is governed by the laws of the State of Israel. Any disputes shall be resolved in the courts located in Israel."
+      }
+    },
+    "about": {
+      "title": "About LexiClash",
+      "whoWeAre": {
+        "title": "Who We Are",
+        "content": "LexiClash is a real-time multiplayer word strategy game developed by LexiClash Ltd. We create engaging, educational, and competitive word games for players worldwide in multiple languages."
+      },
+      "mission": {
+        "title": "Our Mission",
+        "content": "Our mission is to make language learning fun and competitive. We believe that games are the best way to improve vocabulary, spelling, and quick thinking while connecting with friends and players globally."
+      },
+      "whatWeDo": {
+        "title": "What We Do",
+        "content": "We develop multiplayer word games that combine speed, strategy, and vocabulary skills. LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish, making it accessible to players worldwide."
+      },
+      "team": {
+        "title": "Our Team",
+        "content": "LexiClash was founded by a team of passionate word game enthusiasts and software engineers. We're dedicated to creating the best multiplayer word gaming experience."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "Have questions or feedback? We'd love to hear from you!"
+      },
+      "businessInfo": {
+        "title": "Business Information",
+        "companyLabel": "Company Name",
+        "company": "LexiClash Ltd",
+        "emailLabel": "Email",
+        "email": "lexiclash.game@gmail.com",
+        "instagramLabel": "Instagram",
+        "instagram": "@lexi.clash"
       }
     }
   },

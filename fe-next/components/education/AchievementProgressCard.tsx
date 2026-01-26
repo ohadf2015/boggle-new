@@ -26,8 +26,8 @@ export interface AchievementProgressCardProps {
     currentTier: 'bronze' | 'silver' | 'gold' | 'platinum' | null;
     progressValue: number;
     nextThreshold: number | null;
-    currentThreshold?: number; // Current tier's threshold (for percent calculation)
     isMaxTier: boolean;
+    percentComplete: number; // Already calculated percent progress (0-100)
   };
   isPinned: boolean;
   onTogglePin: (key: string) => void;
@@ -79,16 +79,10 @@ export default function AchievementProgressCard({
   // Get tier-specific colors
   const tierColors = achievement.currentTier ? TIER_COLORS[achievement.currentTier] : null;
 
-  // Calculate percent to next tier (for earned badges)
+  // Get percent to next tier (already calculated from backend)
   const calculatePercentToNext = (): number => {
     if (!isEarned || achievement.isMaxTier || !achievement.nextThreshold) return 0;
-
-    // Use provided currentThreshold or default to 0 (for bronze)
-    const currentBase = achievement.currentThreshold || 0;
-    const range = achievement.nextThreshold - currentBase;
-    const progressInRange = achievement.progressValue - currentBase;
-
-    return Math.min(100, Math.round((progressInRange / range) * 100));
+    return Math.min(100, Math.round(achievement.percentComplete));
   };
 
   // Get next tier name for display

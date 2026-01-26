@@ -26,8 +26,9 @@ import {
 import type { AuthStateSetters } from '../authTypes';
 
 // Constants for timeout values
-const SESSION_FETCH_TIMEOUT_MS = 2000;
-const LOADING_SAFETY_TIMEOUT_MS = 3000;
+// Increased from 2s to 5s to accommodate slower mobile connections (fixes JAVASCRIPT-NEXTJS-11)
+const SESSION_FETCH_TIMEOUT_MS = 5000;
+const LOADING_SAFETY_TIMEOUT_MS = 6000; // Increased to match new session timeout
 const TAB_VISIBILITY_LOADING_TIMEOUT_MS = 1500;
 const TEN_MINUTES_MS = 10 * 60 * 1000;
 
@@ -264,7 +265,8 @@ async function handleInitError(
   clearAuthState: (reason: string) => Promise<void>
 ): Promise<void> {
   if (error.message === 'Session fetch timeout' || error.code === 'TIMEOUT') {
-    logger.warn('Auth session fetch timed out - continuing without blocking');
+    // Changed from warn to info - this is expected behavior on slow connections (JAVASCRIPT-NEXTJS-11)
+    logger.info('Auth session fetch timed out after 5s - continuing without blocking');
   } else if (isRefreshTokenError(error)) {
     await clearAuthState('Invalid or expired refresh token');
   } else if (isRecoverableError(error)) {

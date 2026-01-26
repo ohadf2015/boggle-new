@@ -17,6 +17,12 @@ export default function LegalIndexPage(): React.ReactElement {
 
   const legalPages = [
     {
+      href: `/${locale}/about`,
+      titleKey: 'legal.about.title',
+      descriptionKey: 'legal.index.aboutDescription',
+      icon: 'ℹ️',
+    },
+    {
       href: `/${locale}/legal/terms`,
       titleKey: 'legal.terms.title',
       descriptionKey: 'legal.index.termsDescription',
