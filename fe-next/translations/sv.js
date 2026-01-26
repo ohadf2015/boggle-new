@@ -4441,6 +4441,14 @@ const sv = {
         "hint": "Dold tills upptäckt..."
       }
     }
+  },
+  "native": {
+    "offline": {
+      "title": "Ingen anslutning",
+      "message": "Vi kan inte nå spelservern. Kontrollera din internetanslutning.",
+      "retry": "Försök igen",
+      "retrying": "Ansluter..."
+    }
   }
 };
 

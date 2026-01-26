@@ -4444,6 +4444,14 @@ const en = {
         "hint": "Hidden until discovered..."
       }
     }
+  },
+  "native": {
+    "offline": {
+      "title": "No Connection",
+      "message": "We can't reach the game server. Please check your internet connection.",
+      "retry": "Try Again",
+      "retrying": "Connecting..."
+    }
   }
 };
 

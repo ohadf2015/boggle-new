@@ -1,0 +1,93 @@
+'use client';
+
+import React from 'react';
+import Image from 'next/image';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { WifiOff, RefreshCw } from 'lucide-react';
+
+interface OfflineFallbackProps {
+  /** Callback when retry button is clicked */
+  onRetry: () => void;
+  /** Whether a retry is in progress */
+  isRetrying?: boolean;
+}
+
+/**
+ * OfflineFallback - Displayed when native app can't reach the server
+ *
+ * Used in Capacitor native apps when the WebView can't load the webapp.
+ * Provides branded offline experience with retry functionality.
+ *
+ * @example
+ * <OfflineFallback
+ *   onRetry={() => window.location.reload()}
+ *   isRetrying={isConnecting}
+ * />
+ */
+export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallbackProps): React.ReactElement {
+  const { t, dir } = useLanguage();
+
+  return (
+    <div
+      className="fixed inset-0 flex flex-col items-center justify-center bg-neo-navy text-neo-white p-6"
+      dir={dir}
+    >
+      {/* Logo */}
+      <div className="mb-8">
+        <Image
+          src="/logos/logo-text.webp"
+          alt="LexiClash"
+          width={200}
+          height={60}
+          className="h-auto w-auto"
+          priority
+        />
+      </div>
+
+      {/* Offline Icon */}
+      <div className="mb-6 rounded-full bg-neo-orange/20 p-6">
+        <WifiOff className="h-16 w-16 text-neo-orange" aria-hidden="true" />
+      </div>
+
+      {/* Title */}
+      <h1 className="mb-3 text-2xl font-bold font-neo-display text-center">
+        {t('native.offline.title')}
+      </h1>
+
+      {/* Message */}
+      <p className="mb-8 text-center text-neo-white/80 max-w-xs">
+        {t('native.offline.message')}
+      </p>
+
+      {/* Retry Button */}
+      <button
+        type="button"
+        onClick={onRetry}
+        disabled={isRetrying}
+        className={`
+          flex items-center gap-2 px-8 py-3
+          font-neo-body font-bold text-lg
+          rounded-neo border-neo border-black
+          transition-all duration-150
+          ${isRetrying
+            ? 'bg-neo-yellow/50 cursor-not-allowed'
+            : 'bg-neo-yellow shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]'
+          }
+        `}
+      >
+        <RefreshCw
+          className={`h-5 w-5 ${isRetrying ? 'animate-spin' : ''}`}
+          aria-hidden="true"
+        />
+        {isRetrying ? t('native.offline.retrying') : t('native.offline.retry')}
+      </button>
+
+      {/* Subtle version info */}
+      <p className="mt-auto pt-8 text-xs text-neo-white/40">
+        LexiClash
+      </p>
+    </div>
+  );
+}
+
+export default OfflineFallback;
