@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Stabilization** - Phases 1-14 (shipped 2026-01-25)
 - 🚧 **v1.1 Adventure & Education Expansion** - Phases 15-23 (in progress)
-- 🚧 **v1.2 Platform Integration** - Phase 24 (in progress)
+- 🚧 **v1.2 Platform Integration** - Phases 24-25 (in progress)
 
 ## Phases
 
@@ -244,7 +244,7 @@ Plans:
 
 ### 🚧 v1.2 Platform Integration (In Progress)
 
-**Milestone Goal:** Enable game distribution through CrazyGames portal with full SDK integration.
+**Milestone Goal:** Enable game distribution through CrazyGames portal and native mobile apps.
 
 #### Phase 24: CrazyGames Portal Integration
 **Goal**: Complete CrazyGames SDK integration for portal distribution
@@ -268,10 +268,30 @@ Plans:
 - [ ] 24-04-PLAN.md — Multiplayer invite system integration (Wave 2)
 - [ ] 24-05-PLAN.md — Testing & verification (Wave 3)
 
+#### Phase 25: Capacitor Native Apps Integration
+**Goal**: Integrate Capacitor to create native iOS and Android apps from the Next.js webapp with minimal code maintenance overhead
+**Depends on**: Nothing (independent platform work)
+**Requirements**: Native app distribution via App Store and Google Play, consistent UI across platforms
+**Success Criteria** (what must be TRUE):
+  1. Native apps load production webapp in WebView (server.url approach)
+  2. All webapp features work including SSR, Server Components, and Socket.IO multiplayer
+  3. Safe areas display correctly on notched devices (iPhone X+, Android cutouts)
+  4. Native haptics enhance user feedback on iOS and Android
+  5. Offline fallback screen appears when server unreachable
+  6. Build scripts generate iOS and Android app bundles
+  7. UI looks consistent across desktop, mobile web, and native apps
+**Plans**: 4 plans in 3 waves
+
+Plans:
+- [ ] 25-01-PLAN.md — Capacitor core setup (packages, config, platforms) (Wave 1)
+- [ ] 25-02-PLAN.md — Platform detection & native hooks (Wave 1)
+- [ ] 25-03-PLAN.md — Safe area integration & offline fallback (Wave 2)
+- [ ] 25-04-PLAN.md — Build scripts & app store preparation (Wave 3)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24
+Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24 → 25
 
 **Dependencies:**
 - Phase 16 (Boss Foundation) depends on Phase 15 (Combo scoring)
@@ -279,7 +299,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 - Phase 18 (XP System) depends on Phase 15 (Combo scoring for XP calculations)
 - Phase 19 (Achievements) depends on Phase 18 (XP milestones)
 - Phase 20 (Analytics) depends on Phase 18 (XP data to analyze)
-- Phases 21, 22, 23, 24 are parallel (no dependencies)
+- Phases 21, 22, 23, 24, 25 are parallel (no dependencies)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -293,8 +313,9 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |
 | 23. Tech Debt Cleanup | v1.1 | 0/TBD | Not started | - |
 | 24. CrazyGames Portal Integration | v1.2 | 0/5 | Planned | - |
+| 25. Capacitor Native Apps | v1.2 | 0/4 | Planned | - |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-26 after Phase 24 planning complete*
+*Last updated: 2026-01-26 after Phase 25 planning complete*
