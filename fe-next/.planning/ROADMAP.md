@@ -259,14 +259,16 @@ Plans:
   6. QR code functionality works with CrazyGames invite links
   7. Landscape mode on desktop displays without scrollbars
   8. Mobile responsive behavior preserved in iframe embedding
-**Plans**: 5 plans in 3 waves
+**Plans**: 7 plans in 4 waves
 
 Plans:
-- [ ] 24-01-PLAN.md — Lazy audio loading (Wave 1)
-- [ ] 24-02-PLAN.md — Visual consistency & viewport fixes (Wave 1)
-- [ ] 24-03-PLAN.md — SDK lifecycle event integration (Wave 2)
-- [ ] 24-04-PLAN.md — Multiplayer invite system integration (Wave 2)
-- [ ] 24-05-PLAN.md — Testing & verification (Wave 3)
+- [x] 24-01-PLAN.md — Lazy audio loading (Wave 1)
+- [x] 24-02-PLAN.md — Visual consistency & viewport fixes (Wave 1)
+- [x] 24-03-PLAN.md — SDK lifecycle event integration (Wave 2)
+- [x] 24-04-PLAN.md — Multiplayer invite system integration (Wave 2)
+- [x] 24-05-PLAN.md — Testing & verification (Wave 3)
+- [x] 24-06-PLAN.md — Enhanced SDK Integration (Wave 3)
+- [ ] 24-07-PLAN.md — Gap closure: build fix & OAuth hiding (Wave 4)
 
 #### Phase 25: Capacitor Native Apps Integration
 **Goal**: Integrate Capacitor to create native iOS and Android apps from the Next.js webapp with minimal code maintenance overhead
