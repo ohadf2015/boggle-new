@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 25 of 25 (Capacitor Native Apps) — COMPLETE
-Plan: 5/5 complete
+Phase: 24 of 25 (CrazyGames Portal Integration) — COMPLETE
+Plan: 7/7 complete
 Status: Complete
-Last activity: 2026-01-26 — Completed 25-05-PLAN.md (Wire Orphaned Native Integrations)
+Last activity: 2026-01-26 — Completed 24-07-PLAN.md (OAuth Hiding Gap Closure)
 
 Progress: [███████████░] 19/25 phases (76% milestone, v1.1 in progress)
 
@@ -86,8 +86,9 @@ Progress: [███████████░] 19/25 phases (76% milestone, v1
 | 24-04 | Multiplayer Invites | 7min | Complete |
 | 24-05 | Testing & Compliance | 8min | Complete |
 | 24-06 | Enhanced SDK Integration | 35min | Complete |
+| 24-07 | OAuth Hiding Gap Closure | 11min | Complete |
 
-**Phase 24 Total:** 58 minutes (excluding 24-01 TBD), 60 tests added, CrazyGames portal integration complete
+**Phase 24 Total:** 69 minutes (excluding 24-01 TBD), 68 tests added, CrazyGames portal integration COMPLETE with OAuth hiding
 
 **Phase 25 Plans:**
 | Plan | Name | Duration | Status |
@@ -159,6 +160,8 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **24-06**: Cloud save for CrazyGames users → Dual persistence (CG data module + Supabase fallback) (2026-01-26)
 - **24-06**: Platform mute syncs with Howler → Respects user's platform-level audio preference (2026-01-26)
 - **24-06**: Happytime triggers for achievements → Better platform analytics, visibility boost (2026-01-26)
+- **24-07**: Skip settings sync implementation → SDK v3 lacks game.settings API, audio mute handled per-ad instead (2026-01-26)
+- **24-07**: CrazyGames SDK auth only → External OAuth (Google/Discord) hidden on platform, showAuthPrompt() integration (2026-01-26)
 - **25-01**: WebView approach for native apps → Preserves SSR, Server Components, Socket.IO without code changes (2026-01-26)
 - **25-01**: Do NOT install @capacitor/http → Prevents Socket.IO WebSocket breakage (2026-01-26)
 - **25-01**: Gitignore /ios/ and /android/ → Large native projects should be regenerated, not committed (2026-01-26)
@@ -230,8 +233,10 @@ None.
 - SDK lifecycle integration — gameplayStart/Stop tracking with visibility handling (24-03 complete)
 - Multiplayer invites complete — Auto-hide on room full/start, instant multiplayer, 11 tests (24-04 complete)
 - Testing & compliance complete — 48 tests verify bundle size, lifecycle, multiplayer (24-05 complete)
-- Manual verification completed — Bundle analyzer, visual parity, lifecycle events, multiplayer flow
-- Next: Ad integration & polish (24-06) — adBreak API for rewarded and midgame ads
+- Enhanced SDK integration — Ads, cloud save, settings hook placeholder (24-06 complete)
+- OAuth hiding complete — External OAuth hidden on platform, CrazyGames SDK auth integrated (24-07 complete)
+- Total: 68 tests passing, all verification gaps closed
+- Ready for CrazyGames portal deployment
 
 **Phase 25 (Capacitor Native Apps) — COMPLETE:**
 - Capacitor 8.x installed — Core, CLI, iOS/Android platforms, 8 plugins (25-01 complete)
@@ -256,11 +261,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 25-05-PLAN.md (Wire Orphaned Native Integrations) — Phase 25 COMPLETE
+Stopped at: Completed 24-07-PLAN.md (OAuth Hiding Gap Closure) — Phase 24 COMPLETE
 Resume file: None
 
-**Next action:** Phase 25 complete. All native integrations wired. Ready for native testing in simulators.
+**Next action:** Phase 24 complete. CrazyGames portal integration ready for deployment testing.
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 25 plan 05 complete - PHASE COMPLETE)*
+*Last updated: 2026-01-26 (Phase 24 plan 07 complete - PHASE COMPLETE)*

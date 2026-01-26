@@ -13,6 +13,7 @@ import { CoinProvider } from '@/contexts/CoinContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { NativeAppProvider } from '@/components/native/NativeAppProvider';
+import { HapticsProvider } from '@/contexts/HapticsContext';
 import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
 import { SocketProvider } from '@/utils/SocketContext';
 import { GameStateProvider } from '@/contexts/GameStateContext';
@@ -185,8 +186,9 @@ export function Providers({ children, lang }: ProvidersProps) {
             <>
                 <ThemeProvider>
                     <LanguageProvider initialLanguage={lang}>
-                        <NetworkStatusHandler>
-                            <NativeAppProvider>
+                        <HapticsProvider>
+                            <NetworkStatusHandler>
+                                <NativeAppProvider>
                                 <CrazyGamesProvider>
                                     <SocketProvider>
                                         <GameStateProvider>
@@ -206,7 +208,8 @@ export function Providers({ children, lang }: ProvidersProps) {
                                 </CrazyGamesProvider>
                             </NativeAppProvider>
                         </NetworkStatusHandler>
-                    </LanguageProvider>
+                    </HapticsProvider>
+                </LanguageProvider>
                 </ThemeProvider>
                 <Toaster
                     position="top-center"
