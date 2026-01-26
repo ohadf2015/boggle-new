@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Trophy, Timer, Hourglass, Bell, Check, Loader2, X, Frown } from 'lucide-react';
@@ -49,6 +50,7 @@ export function DailyChallengeLanding({
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const pathname = usePathname();
   // Status is set once API calls complete - cards render immediately without waiting
   const [status, setStatus] = useState<ChallengeStatus>({
     wordHunt: 'new',
@@ -190,6 +192,33 @@ export function DailyChallengeLanding({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
+
+  // Refresh status when user navigates back (browser back/forward button)
+  useEffect(() => {
+    const handlePopState = () => {
+      // Re-check status when user navigates back to this page
+      checkWordHunt();
+      checkBuzzStatus();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLanguage, user?.id]);
+
+  // Refresh status when pathname changes (Next.js router.push navigation)
+  // This handles the case where user completes challenge and navigates back via router.push()
+  // which doesn't fire popstate event but does change the pathname
+  useEffect(() => {
+    // Only refresh if we're actually on the daily challenges page
+    if (pathname && pathname.endsWith('/daily')) {
+      checkWordHunt();
+      checkBuzzStatus();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Handle requesting a buzz challenge
   const handleRequestChallenge = async () => {

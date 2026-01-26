@@ -15,6 +15,7 @@ import { GiftNotificationBadge } from './gift/GiftNotificationBadge';
 import { AdminGiftModal } from './gift/AdminGiftModal';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
+import { useSafeArea } from '@/hooks/useSafeArea';
 
 /**
  * Header Props
@@ -34,6 +35,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const safeArea = useSafeArea(); // Get safe area insets for native apps
 
     // Gift notification state
     const { unclaimedCount, gifts, refresh: refreshGifts, claimGift } = useUnclaimedGifts();
@@ -249,7 +251,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     return (
         <header
             className={cn(
-                "w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pt-2 sm:pt-2 lg:pt-3 pb-1 lg:pb-2",
+                "w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pb-1 lg:pb-2",
                 // Sticky only on mobile/tablet, not on desktop (lg+)
                 "sticky top-0 lg:static",
                 "z-[60] bg-slate-50 dark:bg-slate-900",
@@ -258,6 +260,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
                 className
             )}
+            style={{
+                // Add safe area padding for native apps (status bar spacing)
+                paddingTop: safeArea.top > 0 ? `${safeArea.top + 8}px` : undefined,
+            }}
         >
             {/* NEO-BRUTALIST Header Bar */}
             <div

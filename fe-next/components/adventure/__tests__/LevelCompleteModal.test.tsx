@@ -382,4 +382,51 @@ describe('LevelCompleteModal', () => {
       expect(screen.queryByText(/new high score/i)).not.toBeInTheDocument();
     });
   });
+
+  describe('Lexi Mascot Integration', () => {
+    it('should render victory mascot for 3 stars', () => {
+      // GIVEN / WHEN
+      render(<LevelCompleteModal {...defaultProps} stars={3} />);
+
+      // THEN - Check that InteractiveMascot is rendered
+      // Note: InteractiveMascot uses different variants based on stars:
+      // 3 stars = victory (trophy pose)
+      const mascot = screen.getByTestId('interactive-mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'victory');
+    });
+
+    it('should render celebrating mascot for 2 stars', () => {
+      // GIVEN / WHEN
+      render(<LevelCompleteModal {...defaultProps} stars={2} />);
+
+      // THEN - Check that InteractiveMascot is rendered
+      // 2 stars = celebrating (celebration dance)
+      const mascot = screen.getByTestId('interactive-mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'celebrating');
+    });
+
+    it('should render happy mascot for 1 star', () => {
+      // GIVEN / WHEN
+      render(<LevelCompleteModal {...defaultProps} stars={1} />);
+
+      // THEN - Check that InteractiveMascot is rendered
+      // 1 star = happy (happy face)
+      const mascot = screen.getByTestId('interactive-mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'happy');
+    });
+
+    it('should render thinking mascot for 0 stars', () => {
+      // GIVEN / WHEN
+      render(<LevelCompleteModal {...defaultProps} stars={0} />);
+
+      // THEN - Check that InteractiveMascot is rendered
+      // 0 stars = thinking (thoughtful)
+      const mascot = screen.getByTestId('interactive-mascot');
+      expect(mascot).toBeInTheDocument();
+      expect(mascot).toHaveAttribute('data-variant', 'thinking');
+    });
+  });
 });

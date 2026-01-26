@@ -33,6 +33,12 @@ jest.mock('@/contexts/CoinContext', () => ({
     updateCoins: jest.fn(),
   }),
 }));
+jest.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({
+    isEnabled: true,
+    toggle: jest.fn(),
+  }),
+}));
 jest.mock('@/hooks/useLiveRoomStats', () => ({
   useLiveRoomStats: () => ({
     openRooms: 0,

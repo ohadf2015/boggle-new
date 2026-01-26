@@ -421,6 +421,8 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   return (
     <div className={`relative inline-block ${className}`}>
       <motion.div
+        data-testid="interactive-mascot"
+        data-variant={variant}
         className={`relative ${SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}

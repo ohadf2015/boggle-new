@@ -42,14 +42,18 @@ export async function signInWithGoogle() {
 
   // Include current locale in the callback URL so we can redirect back correctly
   const currentLocale = getCurrentLocale();
-  const redirectUrl = new URL('/auth/callback', window.location.origin);
-  if (currentLocale) {
-    redirectUrl.searchParams.set('locale', currentLocale);
-  }
+
+  // Use deep link scheme for native apps, web URL for browser
+  const isNativeApp = typeof window !== 'undefined' &&
+    (window.location.protocol === 'capacitor:' || window.location.protocol === 'ionic:');
+
+  const redirectUrl = isNativeApp
+    ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
+    : new URL('/auth/callback' + (currentLocale ? `?locale=${currentLocale}` : ''), window.location.origin).toString();
 
   return supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: redirectUrl.toString() }
+    options: { redirectTo: redirectUrl }
   });
 }
 
@@ -58,14 +62,18 @@ export async function signInWithDiscord() {
 
   // Include current locale in the callback URL so we can redirect back correctly
   const currentLocale = getCurrentLocale();
-  const redirectUrl = new URL('/auth/callback', window.location.origin);
-  if (currentLocale) {
-    redirectUrl.searchParams.set('locale', currentLocale);
-  }
+
+  // Use deep link scheme for native apps, web URL for browser
+  const isNativeApp = typeof window !== 'undefined' &&
+    (window.location.protocol === 'capacitor:' || window.location.protocol === 'ionic:');
+
+  const redirectUrl = isNativeApp
+    ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
+    : new URL('/auth/callback' + (currentLocale ? `?locale=${currentLocale}` : ''), window.location.origin).toString();
 
   return supabase.auth.signInWithOAuth({
     provider: 'discord',
-    options: { redirectTo: redirectUrl.toString() }
+    options: { redirectTo: redirectUrl }
   });
 }
 

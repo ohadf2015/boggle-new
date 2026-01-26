@@ -100,15 +100,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   // Show fullscreen button only when: supported AND not on CrazyGames platform
   const showFullscreenButton = isFullscreenSupported && !isOnCrazyGamesPlatform;
 
-  // Tutorial state - show on first visit
+  // Tutorial state - only shown when help button is clicked
+  // Note: Initial tutorial trigger is handled by HostPreGameView when user toggles TV mode
   const [showTutorial, setShowTutorial] = useState(false);
-
-  useEffect(() => {
-    // Check if tutorial should be shown (first visit)
-    if (!isTvTutorialComplete()) {
-      setShowTutorial(true);
-    }
-  }, []);
 
   const handleTutorialComplete = () => {
     setShowTutorial(false);

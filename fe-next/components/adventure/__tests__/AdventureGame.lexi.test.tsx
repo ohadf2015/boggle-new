@@ -372,12 +372,3 @@ describe('AdventureGame Lexi Integration', () => {
   });
 });
 
-describe('LevelCompleteModal Lexi Integration', () => {
-  // These tests would require importing LevelCompleteModal directly
-  // and testing with different star counts
-
-  it.todo('shows victory mascot for 3 stars');
-  it.todo('shows celebrating mascot for 2 stars');
-  it.todo('shows happy mascot for 1 star');
-  it.todo('shows thinking mascot for 0 stars');
-});

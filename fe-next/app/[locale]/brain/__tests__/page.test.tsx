@@ -15,6 +15,12 @@ jest.mock('@/contexts/AuthContext');
 jest.mock('@/hooks/useBrainScore');
 jest.mock('@/contexts/LanguageContext');
 jest.mock('@/utils/ThemeContext');
+jest.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({
+    isEnabled: true,
+    toggle: jest.fn(),
+  }),
+}));
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));

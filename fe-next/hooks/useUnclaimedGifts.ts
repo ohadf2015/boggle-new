@@ -209,8 +209,14 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
     setGifts(prev => prev.map(g =>
       g.id === giftId ? { ...g, claimed: true, claimed_at: new Date().toISOString() } : g
     ));
-    setUnclaimedCount(prev => Math.max(0, prev - 1));
-    setCachedCount(Math.max(0, unclaimedCount - 1));
+
+    // Use functional form to avoid stale closure over unclaimedCount
+    let newCount = 0;
+    setUnclaimedCount(prev => {
+      newCount = Math.max(0, prev - 1);
+      return newCount;
+    });
+    setCachedCount(newCount);
 
     return {
       xpAwarded: result.xpAwarded || 0,
