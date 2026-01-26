@@ -11,6 +11,7 @@ import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
+import AnimationsLoader from '@/components/AnimationsLoader';
 import { fredoka, rubik } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -683,6 +684,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
+                {/* Preload hero mascot for faster LCP (200-300ms improvement) */}
+                <link rel="preload" as="image" href="/mascot/main-nobg.gif" type="image/gif" />
                 {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
                 <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
@@ -721,6 +724,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <CrazyGamesScript />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
+                {/* Defer loading animations.css (60KB) after page mount */}
+                <AnimationsLoader />
                 <ConditionalProviders lang={validLocale}>
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
                         <main id="main-content" className="screen-fit-content relative z-10 overflow-visible pb-16 sm:pb-0" tabIndex={-1}>

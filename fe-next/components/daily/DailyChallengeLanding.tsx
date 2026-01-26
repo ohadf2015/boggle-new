@@ -636,10 +636,11 @@ function CompactChallengeCard({
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleClick()}
         className={cn(
-          'relative w-full min-h-[420px] sm:min-h-[480px] bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
+          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
           'shadow-hard transition-shadow duration-200',
           'flex flex-col items-center text-center cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
+          'h-full', // Fill grid cell height for equal heights on desktop
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
           (status === 'won' || status === 'lost') && 'opacity-85',
           isUnavailable && 'opacity-60'
@@ -752,8 +753,8 @@ function CompactChallengeCard({
           <span>{timeModeLabel}</span>
         </motion.div>
 
-        {/* Preview: Custom Grid, Image, or Icon - fixed height container for consistent card heights */}
-        <div className="relative w-full h-32 sm:h-44 flex items-center justify-center mb-2 sm:mb-3">
+        {/* Preview: Custom Grid, Image, or Icon - responsive height that fits content */}
+        <div className="relative w-full h-28 sm:h-40 flex items-center justify-center mb-2 sm:mb-3">
           {customPreview === 'word-hunt-grid' ? (
             <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
           ) : imageElement ? (

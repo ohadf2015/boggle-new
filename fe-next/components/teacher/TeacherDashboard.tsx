@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import { cn } from '@/lib/utils';
@@ -8,7 +9,18 @@ import * as Tabs from '@radix-ui/react-tabs';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import StudentProgressView from './StudentProgressView';
-import ClassProgressChart from './ClassProgressChart';
+
+// Dynamic import for ClassProgressChart (Recharts is ~150KB)
+// Chart only loads when "Progress" tab is clicked
+const ClassProgressChart = dynamic(
+  () => import('./ClassProgressChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 bg-slate-800/50 rounded-neo border-3 border-neo-black animate-pulse" />
+    )
+  }
+);
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();

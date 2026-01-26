@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import SlotMachineCell from './SlotMachineCell';
 import { cn } from '../lib/utils';
 import type { Language, LetterGrid, GridPosition } from '@/types';
-import 'animate.css';
 
 // Pre-generate duration variations for cells using seeded values (deterministic)
 // Using a simple seeded approach to avoid SSR/client mismatch

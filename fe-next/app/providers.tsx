@@ -23,7 +23,6 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { composeProviders } from '@/utils/composeProviders';
-import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initializeHowlerConfig } from '@/lib/audio/howlerConfig';
@@ -131,19 +130,8 @@ if (typeof window !== 'undefined') {
     initResizeObserverErrorHandler();
 }
 
-// Lazy load LogRocket after user interaction to save ~100KB on initial load
-let logRocketInitialized = false;
-const initLogRocket = () => {
-    if (logRocketInitialized) return;
-    if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
-
-    logRocketInitialized = true;
-    import('logrocket').then(({ default: LogRocket }) => {
-        LogRocket.init('ioiov9/lexiclash');
-        // Link LogRocket session to Sentry for error replay correlation
-        linkLogRocketSession();
-    });
-};
+// LogRocket now initialized in essential-providers.tsx (loaded on ALL pages with deferred loading)
+// Removed from here to avoid duplicate initialization
 
 // Composed provider groups for cleaner organization
 // Audio providers (Music + Sound Effects)
@@ -173,31 +161,8 @@ export function Providers({ children, lang }: ProvidersProps) {
         initSessionTracking();
     }, []);
 
-    // Defer LogRocket initialization for slow connections
-    // Load after 3 seconds or on first user interaction, whichever comes first
-    useEffect(() => {
-        const timeoutId = setTimeout(initLogRocket, 3000);
-
-        const events = ['click', 'touchstart', 'keydown'] as const;
-        const handleInteraction = () => {
-            clearTimeout(timeoutId);
-            initLogRocket();
-            events.forEach(event => {
-                window.removeEventListener(event, handleInteraction);
-            });
-        };
-
-        events.forEach(event => {
-            window.addEventListener(event, handleInteraction, { once: true, passive: true });
-        });
-
-        return () => {
-            clearTimeout(timeoutId);
-            events.forEach(event => {
-                window.removeEventListener(event, handleInteraction);
-            });
-        };
-    }, []);
+    // LogRocket initialization removed - now handled in essential-providers.tsx
+    // This avoids duplicate initialization and ensures LogRocket loads on ALL pages with deferred loading
 
     return (
         <ErrorBoundary>

@@ -20,8 +20,8 @@ import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
-import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
+import { linkLogRocketSession } from '@/utils/sentry';
 
 import type { Language } from '@/shared/types/game';
 
@@ -77,7 +77,8 @@ if (typeof window !== 'undefined') {
     initResizeObserverErrorHandler();
 }
 
-// Lazy load LogRocket after user interaction
+// Lazy load LogRocket after user interaction to avoid blocking initial load
+// Deferred to 3 seconds OR first user interaction (whichever comes first)
 let logRocketInitialized = false;
 const initLogRocket = () => {
     if (logRocketInitialized) return;
@@ -86,6 +87,7 @@ const initLogRocket = () => {
     logRocketInitialized = true;
     import('logrocket').then(({ default: LogRocket }) => {
         LogRocket.init('ioiov9/lexiclash');
+        // Link LogRocket session to Sentry for error replay correlation
         linkLogRocketSession();
     });
 };
@@ -93,6 +95,7 @@ const initLogRocket = () => {
 /**
  * EssentialProviders - Minimal provider stack for landing page
  * Loads ~50KB of essential JavaScript
+ * LogRocket (~100KB) is deferred to avoid blocking initial load
  */
 export function EssentialProviders({ children, lang }: EssentialProvidersProps) {
     // Initialize session tracking for analytics
@@ -100,11 +103,12 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
         initSessionTracking();
     }, []);
 
-    // Defer LogRocket initialization
+    // Defer LogRocket initialization for optimal performance
+    // Load after 3 seconds or on first user interaction, whichever comes first
     useEffect(() => {
         const timeoutId = setTimeout(initLogRocket, 3000);
 
-        const events = ['click', 'touchstart', 'keydown'] as const;
+        const events = ['click', 'touchstart', 'keydown', 'scroll'] as const;
         const handleInteraction = () => {
             clearTimeout(timeoutId);
             initLogRocket();

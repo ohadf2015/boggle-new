@@ -34,7 +34,8 @@ export { default as PlayerInsights } from './PlayerInsights';
 
 export { default as MissedWords } from './MissedWords';
 
-export { default as PerformanceChart } from './PerformanceChart';
+// Dynamic import to save ~150KB on non-stats pages
+export { default as PerformanceChart } from './PerformanceChartDynamic';
 
 export { default as ShareWinPrompt } from './ShareWinPrompt';
 
