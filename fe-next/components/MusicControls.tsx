@@ -8,7 +8,7 @@ import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
-import { isHapticsEnabled, setHapticsEnabled } from '../utils/haptics';
+import { useHapticsConfig } from '../contexts/HapticsContext';
 
 /**
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders
@@ -18,9 +18,9 @@ const MusicControls: React.FC = memo(() => {
   const { volume, setVolume, isMuted, toggleMute, isPlaying, audioUnlocked, unlockAudio } = useMusic();
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
   const { t, language } = useLanguage();
+  const { enabled: hapticsEnabled, setEnabled: setHapticsEnabled } = useHapticsConfig();
   const [showSlider, setShowSlider] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [hapticsEnabled, setHapticsEnabledState] = useState(true);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, right: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isRTL = language === 'he';
@@ -28,8 +28,6 @@ const MusicControls: React.FC = memo(() => {
   // Prevent hydration mismatch by only rendering dynamic icon after mount
   useEffect(() => {
     setHasMounted(true);
-    // Load haptics preference after mount
-    setHapticsEnabledState(isHapticsEnabled());
   }, []);
 
   // Calculate dropdown position when showing
@@ -47,13 +45,12 @@ const MusicControls: React.FC = memo(() => {
   // Toggle haptics and persist
   const handleToggleHaptics = useCallback(() => {
     const newValue = !hapticsEnabled;
-    setHapticsEnabledState(newValue);
     setHapticsEnabled(newValue);
     // Give tactile feedback when enabling
     if (newValue && 'vibrate' in navigator) {
       navigator.vibrate(15);
     }
-  }, [hapticsEnabled]);
+  }, [hapticsEnabled, setHapticsEnabled]);
 
   // Responsive icon class for consistent sizing with button
   const iconClass = "w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6";
