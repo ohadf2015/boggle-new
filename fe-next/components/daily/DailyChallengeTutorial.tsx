@@ -133,7 +133,7 @@ const Step1Welcome: React.FC<{ onNext: () => void }> = ({ onNext }) => {
       <p className="text-lg mb-6">
         {t('tutorial.wordHunt.welcome.description') || 'Find the hidden word! You have 10 attempts.'}
       </p>
-      <Button onClick={onNext} className="w-full bg-neo-pink text-white">
+      <Button onClick={onNext} className="w-full max-w-btn bg-neo-pink text-white">
         {t('tutorial.wordHunt.welcome.next') || 'Next'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
       </Button>
     </div>
@@ -357,7 +357,7 @@ const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Button onClick={onNext} className="w-full bg-neo-pink text-white text-lg py-6">
+        <Button onClick={onNext} className="w-full max-w-btn bg-neo-pink text-white text-lg py-6">
           {t('tutorial.wordHunt.complete.start') || 'Start Daily Challenge'} 🚀
         </Button>
         <Button onClick={onPrev} variant="outline" size="sm">

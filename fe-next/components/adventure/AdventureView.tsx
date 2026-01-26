@@ -310,8 +310,8 @@ export default function AdventureView(): React.JSX.Element {
       initialLevel={selectedLevel || 1}
     >
     <div className="min-h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
-      {/* Header - Sticky at top with solid background for visibility */}
-      <header className="sticky top-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
+      {/* Header - Fixed at top (not sticky) because child components have their own scroll containers */}
+      <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Back / World Map button */}
           {viewState !== 'worldMap' ? (
@@ -378,6 +378,9 @@ export default function AdventureView(): React.JSX.Element {
           </div>
         </div>
       </header>
+
+      {/* Spacer for fixed header (approx 56px height) */}
+      <div className="h-14 flex-shrink-0" />
 
       {/* Main Content - Takes remaining height, children handle their own scroll */}
       <main className="relative z-10 flex-1 min-h-0">

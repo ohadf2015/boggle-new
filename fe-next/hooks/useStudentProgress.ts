@@ -126,7 +126,7 @@ export function useStudentProgress(lessonId?: string): UseStudentProgressReturn 
           assignment,
           lesson: assignment?.vocabulary_lessons,
           classroomId: assignment?.classroom_id,
-          assignedAt: assignment?.assigned_at,
+          assignedAt: assignment?.created_at,
           dueDate: assignment?.due_date
         });
 
@@ -142,7 +142,7 @@ export function useStudentProgress(lessonId?: string): UseStudentProgressReturn 
           assignment,
           lesson: assignment.vocabulary_lessons,
           classroomId: assignment.classroom_id,
-          assignedAt: assignment.assigned_at,
+          assignedAt: assignment.created_at,
           dueDate: assignment.due_date
         });
       });

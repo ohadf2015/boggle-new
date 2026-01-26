@@ -50,7 +50,6 @@ export function useAssignLesson(): UseAssignLessonReturn {
         const { data, error } = await assignLessonAPI(
           lessonId,
           classroomId,
-          user.id,
           dueDate
         );
 

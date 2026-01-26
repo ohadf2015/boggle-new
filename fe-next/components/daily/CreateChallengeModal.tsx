@@ -355,7 +355,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   >
                     <Button
                       onClick={handleCreate}
-                      className="relative w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
+                      className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         <Zap className="w-6 h-6" strokeWidth={2.5} fill="currentColor" />
@@ -535,7 +535,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   >
                     <Button
                       onClick={handleNativeShare}
-                      className="w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
                       <Share2 className="w-6 h-6 mr-2" strokeWidth={2.5} />
                       {t('daily.shareChallenge')}
@@ -543,7 +543,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
                     <Button
                       onClick={() => setStep('stats')}
-                      className="w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
                       <BarChart3 className="w-6 h-6 mr-2" strokeWidth={2.5} />
                       {t('daily.viewStats')}
@@ -552,7 +552,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <Button
                       variant="ghost"
                       onClick={handleClose}
-                      className="w-full text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg py-3"
+                      className="w-full max-w-btn text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg py-3"
                     >
                       {t('daily.close')}
                     </Button>

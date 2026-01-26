@@ -154,7 +154,7 @@ export function NextChallengePrompt({ completedChallenge, locale }: NextChalleng
               onClick={handleCTAClick}
               whileHover={{ scale: 1.02, x: 2, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full px-6 py-4 bg-neo-black text-neo-white font-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all duration-100 uppercase text-sm flex items-center justify-center gap-2 group"
+              className="w-full max-w-btn px-6 py-4 bg-neo-black text-neo-white font-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all duration-100 uppercase text-sm flex items-center justify-center gap-2 group"
             >
               {copy.cta}
               <motion.div

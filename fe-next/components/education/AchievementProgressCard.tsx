@@ -17,7 +17,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 // TYPES
 // ============================================
 
-interface AchievementProgressCardProps {
+export interface AchievementProgressCardProps {
   achievement: {
     key: string;
     category: string;

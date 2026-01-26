@@ -24,6 +24,11 @@ interface WorldMapProps {
   onWorldSelect: (worldId: number) => void;
 }
 
+// Motion variants - extracted to constants to prevent re-creation on every render
+// This improves performance by avoiding unnecessary animation recalculations
+const WORLD_HOVER_VARIANT = { scale: 1.08, y: -4, rotate: 2 };
+const WORLD_TAP_VARIANT = { scale: 0.95, rotate: -1 };
+
 // World images mapping (WebP for 91% smaller file sizes)
 const WORLD_IMAGES: Record<number, string> = {
   1: '/images/adventure/world-meadows-3d.webp',     // Alphabet Meadows
@@ -102,32 +107,33 @@ const OrbitingLetter = ({
   </div>
 );
 
-// Letters that orbit around a world node
+// Letters that orbit around a world node - uses localized world name
 const WorldOrbitingLetters = ({
   worldId,
+  worldName,
   isUnlocked,
   colorPrimary,
 }: {
   worldId: number;
+  worldName: string; // Translated world name from parent
   isUnlocked: boolean;
   colorPrimary: string;
 }) => {
-  // Generate 3-4 letters per world based on world name
+  // Extract 3-4 unique characters from the localized world name
   const worldLetters = useMemo(() => {
-    const letterSets: Record<number, string[]> = {
-      1: ['A', 'B', 'C'],           // Alphabet Meadows
-      2: ['S', 'Y', 'N'],           // Synonym Springs
-      3: ['R', 'O', 'T'],           // Root Caverns
-      4: ['I', 'D', 'M'],           // Idiom Archipelago
-      5: ['C', 'M', 'P', 'D'],      // Compound Canyon
-      6: ['A', 'N', 'G', 'M'],      // Anagram Labyrinth
-      7: ['M', 'I', 'R'],           // Mirror Palace
-      8: ['N', 'E', 'O'],           // Neologism Nebula
-      9: ['P', 'O', 'L', 'Y'],      // Polyglot Peaks
-      10: ['L', 'E', 'X'],          // Lexicon Throne
-    };
-    return letterSets[worldId] || ['W', 'O', 'R', 'D'];
-  }, [worldId]);
+    // Get unique characters, filtering out spaces and punctuation
+    const chars = worldName
+      .split('')
+      .filter(char => /\p{L}/u.test(char)) // Only letters (works with all scripts)
+      .map(char => char.toUpperCase());
+
+    // Get unique characters, preserving order
+    const uniqueChars = [...new Set(chars)];
+
+    // Take 3-4 characters (prefer 3 for cleaner look)
+    const count = uniqueChars.length >= 4 ? 4 : Math.min(3, uniqueChars.length);
+    return uniqueChars.slice(0, count);
+  }, [worldName]);
 
   // Map colors to text classes
   const colorClasses: Record<string, string> = {
@@ -140,7 +146,7 @@ const WorldOrbitingLetters = ({
     'neo-yellow': 'text-neo-yellow',
   };
 
-  if (!isUnlocked) return null;
+  if (!isUnlocked || worldLetters.length === 0) return null;
 
   return (
     <>
@@ -149,8 +155,8 @@ const WorldOrbitingLetters = ({
           key={`${worldId}-${letter}-${i}`}
           letter={letter}
           radius={65 + i * 14} // Larger radius to match bigger world nodes
-          duration={6 + i * 2}
-          delay={i * 1.5}
+          duration={8 + i * 3} // Slower, more varied durations
+          delay={i * 2.5} // More staggered delays
           clockwise={i % 2 === 0}
           color={colorClasses[colorPrimary] || 'text-neo-white/60'}
         />
@@ -185,31 +191,47 @@ const TrailPath = ({
         preserveAspectRatio="none"
         style={{ overflow: 'visible' }}
       >
-        {/* Stronger glow for unlocked paths */}
+        {/* Subtle glow for unlocked paths - more blended */}
         {isUnlocked && (
           <path
             d={path}
             fill="none"
             stroke="#FFE135"
-            strokeWidth="12"
-            strokeLinecap="butt"
-            opacity={0.35}
-            style={{ filter: 'blur(8px)' }}
+            strokeWidth="10"
+            strokeLinecap="round"
+            opacity={0.2}
+            style={{ filter: 'blur(12px)' }}
           />
         )}
-        {/* Main trail path - thicker and bolder */}
+        {/* Main trail path - thinner and softer */}
         <path
           d={path}
           fill="none"
           stroke={isUnlocked ? '#FFE135' : 'rgba(255,255,255,0.12)'}
-          strokeWidth="6"
-          strokeLinecap="butt"
+          strokeWidth="4"
+          strokeLinecap="round"
           strokeDasharray={isUnlocked ? '0' : '10 8'}
+          opacity={isUnlocked ? 0.7 : 1}
         />
-        {/* Animated particle on unlocked path - larger */}
+        {/* Animated particle traveling bottom-to-top (reversed with keyPoints) */}
         {isUnlocked && (
-          <circle r="5" fill="#FFFFFF" opacity={0.9}>
-            <animateMotion dur="2.5s" repeatCount="indefinite" path={path} />
+          <circle r="3" fill="#FFFFFF" opacity={0.8}>
+            <animateMotion
+              dur="3s"
+              repeatCount="indefinite"
+              path={path}
+              keyPoints="1;0"
+              keyTimes="0;1"
+              calcMode="spline"
+              keySplines="0.4 0 0.2 1"
+            />
+            {/* Subtle pulse effect */}
+            <animate
+              attributeName="opacity"
+              values="0.6;1;0.6"
+              dur="3s"
+              repeatCount="indefinite"
+            />
           </circle>
         )}
       </svg>
@@ -268,6 +290,7 @@ const WorldNode = ({
           {/* Orbiting letters around unlocked worlds */}
           <WorldOrbitingLetters
             worldId={world.id}
+            worldName={worldName}
             isUnlocked={isUnlocked}
             colorPrimary={world.colorPrimary}
           />
@@ -276,8 +299,8 @@ const WorldNode = ({
             onClick={onClick}
             disabled={!isUnlocked}
             data-testid={`world-${world.id}`}
-            whileHover={isUnlocked ? { scale: 1.08, y: -4, rotate: 2 } : undefined}
-            whileTap={isUnlocked ? { scale: 0.95, rotate: -1 } : undefined}
+            whileHover={isUnlocked ? WORLD_HOVER_VARIANT : undefined}
+            whileTap={isUnlocked ? WORLD_TAP_VARIANT : undefined}
             className={cn(
               'relative flex-shrink-0',
               'focus:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime rounded-full',

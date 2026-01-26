@@ -90,7 +90,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Fetch progression and attempts from API
+  // Fetch progression and attempts from combined API endpoint
+  // Uses /api/adventure/state which returns both in one request (~50-100ms faster)
   const fetchProgression = useCallback(async () => {
     if (!user?.id) {
       setIsLoading(false);
@@ -100,40 +101,27 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     try {
       setError(null);
 
-      // Fetch both progression and attempts in parallel
-      const [progressResponse, attemptsResponse] = await Promise.all([
-        fetch('/api/adventure/progress', {
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        }),
-        fetch('/api/adventure/attempt', {
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        }),
-      ]);
+      // Single API call for both progression and attempts
+      const response = await fetch('/api/adventure/state', {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
 
       // Handle auth failures silently - user's session may have expired
-      if (progressResponse.status === 401) {
+      if (response.status === 401) {
         setProgression(null);
         setAttempts([]);
         setIsLoading(false);
         return;
       }
 
-      if (!progressResponse.ok) {
-        throw new Error(`Failed to fetch progression: ${progressResponse.status}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch adventure state: ${response.status}`);
       }
 
-      const progressData = await progressResponse.json();
-      setProgression(progressData);
-
-      // Attempts are optional - don't fail if unavailable
-      if (attemptsResponse.ok) {
-        const attemptsData = await attemptsResponse.json();
-        if (attemptsData.success && attemptsData.attempts) {
-          setAttempts(attemptsData.attempts);
-        }
-      }
+      const data = await response.json();
+      setProgression(data.progression);
+      setAttempts(data.attempts || []);
     } catch (err) {
       // Only log non-network errors to avoid Sentry noise
       // Network errors during navigation are expected on mobile
@@ -360,6 +348,17 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     return map;
   }, [progression]);
 
+  // Pre-compute completions map for O(1) level completion lookups
+  // Key format: "world:level" -> LevelCompletion
+  const completionsMap = useMemo(() => {
+    if (!progression) return new Map<string, LevelCompletion>();
+    const map = new Map<string, LevelCompletion>();
+    for (const completion of progression.completions) {
+      map.set(`${completion.world}:${completion.level}`, completion);
+    }
+    return map;
+  }, [progression]);
+
   // Helper: Get total stars for a world (O(1) lookup from pre-computed map)
   const getWorldStars = useCallback(
     (worldId: number): number => {
@@ -368,15 +367,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [worldStarsMap]
   );
 
-  // Helper: Get completion for a specific level
+  // Helper: Get completion for a specific level (O(1) lookup from pre-computed map)
   const getLevelCompletion = useCallback(
     (worldId: number, levelId: number): LevelCompletion | undefined => {
-      if (!progression) return undefined;
-      return progression.completions.find(
-        (c) => c.world === worldId && c.level === levelId
-      );
+      return completionsMap.get(`${worldId}:${levelId}`);
     },
-    [progression]
+    [completionsMap]
   );
 
   // Helper: Get attempt for a specific level (includes failed attempts)

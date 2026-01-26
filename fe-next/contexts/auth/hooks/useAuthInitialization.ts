@@ -309,6 +309,16 @@ async function handleAuthStateChange(
               setLoading(false);
             }
           }
+          // Check for pending classroom join after successful sign-in
+          if (typeof window !== 'undefined') {
+            const pendingJoinCode = sessionStorage.getItem('joinClassroomReturnCode');
+            if (pendingJoinCode) {
+              sessionStorage.removeItem('joinClassroomReturnCode');
+              // Redirect to join page with the code
+              const currentLocale = window.location.pathname.split('/')[1] || 'en';
+              window.location.href = `/${currentLocale}/join/${pendingJoinCode}`;
+            }
+          }
         }
       }
       break;

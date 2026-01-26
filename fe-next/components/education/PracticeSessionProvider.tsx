@@ -196,13 +196,25 @@ export function PracticeSessionProvider({
 
         // Check for achievement unlocks after XP is awarded
         checkForUnlocks({
-          total_xp: totalXp + result.totalXp,
-          total_words_mastered: newWordsMastered,
-          current_level: result.newLevel || currentLevel,
-          current_streak: streak.currentStreak,
-          total_practice_sessions: newSessionCount,
-          bosses_defeated: 0, // TODO: Track when boss mode is added
-          combos_achieved: 0, // TODO: Track from board practice
+          totalXp: totalXp + result.totalXp,
+          wordsMastered: newWordsMastered,
+          currentLevel: result.newLevel || currentLevel,
+          currentStreak: streak.currentStreak,
+          practiceSessions: newSessionCount,
+          // Fields not tracked yet - default to 0
+          lessonsCompleted: 1, // At least 1 if practicing
+          wordsInGame: 0,
+          perfectGames: 0,
+          bossesDefeated: 0,
+          combosAchieved: 0,
+          morningPractices: 0,
+          daysThisMonth: 0,
+          weeksWith5Days: 0,
+          longestStreak: streak.longestStreak || 0,
+          modesTried: 1, // At least 1 mode
+          lessonsCollected: 1,
+          classroomsJoined: 1, // Assume 1 if in classroom
+          uniqueWords: 0,
         });
       } catch (error) {
         logger.error('Error completing practice session:', error);

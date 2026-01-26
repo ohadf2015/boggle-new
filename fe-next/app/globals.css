@@ -498,6 +498,30 @@ body {
     border: var(--border-neo-thick) solid rgb(var(--neo-black));
   }
 
+  /* ====================================
+     ACTION BUTTON MAX-WIDTH UTILITIES
+     Prevents full-width buttons from becoming
+     oversized on desktop viewports
+     ==================================== */
+
+  /* Standard action button max-width (320px) - ideal for primary CTAs */
+  .max-w-btn {
+    max-width: 320px;
+    margin-inline: auto;
+  }
+
+  /* Large action button max-width (400px) - for prominent actions */
+  .max-w-btn-lg {
+    max-width: 400px;
+    margin-inline: auto;
+  }
+
+  /* Extra large action button max-width (480px) - for full-width sections */
+  .max-w-btn-xl {
+    max-width: 480px;
+    margin-inline: auto;
+  }
+
   /* Fire Glow Utility - Applied to grid cells during fire round */
   .fire-glow {
     animation: fire-glow 0.8s ease-in-out infinite !important;

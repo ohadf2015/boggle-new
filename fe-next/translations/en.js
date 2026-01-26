@@ -2586,10 +2586,11 @@ const en = {
 "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Survival Mode",
-      "desc": "Find words. Stay alive.",
+      "desc": "Find hidden words in a 3x3 grid before time runs out!",
       "feature1": "90 seconds",
       "feature2": "Combo system",
-      "feature3": "Global leaderboard"
+      "feature3": "Global leaderboard",
+      "details": "Swipe to connect letters and find words. 10 lives, 90 seconds of adrenaline!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daily Word Hunt Awaits!",
@@ -2605,9 +2606,10 @@ const en = {
   },
   "buzz": {
     "title": "Daily Buzz",
-    "tagline": "Word challenges from today's trends",
+    "tagline": "Word puzzles based on today's trending topics",
     "subtitle": "What's buzzing today?",
     "badge": "BETA",
+    "details": "Solve word puzzles about trending news and topics. No time pressure, just think!",
     "betaPreview": "BETA",
     "breaking": "BREAKING",
     "tapToCelebrate": "Tap to celebrate",
@@ -3159,7 +3161,8 @@ const en = {
     "nav": {
       "profile": "Profile",
       "home": "Home",
-      "brain": "Brain Training"
+      "brain": "Brain Training",
+      "dashboard": "Cognitive Dashboard"
     },
     "domains": {
       "processingSpeed": "Processing Speed",

@@ -78,39 +78,43 @@ export default function PromptTemplateEditor({ onClose }: Props): React.ReactEle
     setSaving(true);
     setError(null);
 
-    const { data: { session } } = await getSession();
-    if (!session?.access_token) {
-      setError('No active session');
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        setError('No active session');
+        return;
+      }
+
+      const url = createMode
+        ? '/api/admin/buzz/prompt-templates'
+        : `/api/admin/buzz/prompt-templates/${selectedTemplate?.id}`;
+
+      const response = await fetch(url, {
+        method: createMode ? 'POST' : 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ ...formData, language: formData.language || null }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || 'Failed to save template');
+        return;
+      }
+
+      showSuccess(createMode ? 'Template created successfully' : 'Template updated successfully');
+      setEditMode(false);
+      setCreateMode(false);
+      setSelectedTemplate(null);
+      await fetchTemplates();
+    } catch (err) {
+      console.error('Failed to save template:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save template');
+    } finally {
       setSaving(false);
-      return;
     }
-
-    const url = createMode
-      ? '/api/admin/buzz/prompt-templates'
-      : `/api/admin/buzz/prompt-templates/${selectedTemplate?.id}`;
-
-    const response = await fetch(url, {
-      method: createMode ? 'POST' : 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ ...formData, language: formData.language || null }),
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      setError(data.error || 'Failed to save template');
-      setSaving(false);
-      return;
-    }
-
-    showSuccess(createMode ? 'Template created successfully' : 'Template updated successfully');
-    setEditMode(false);
-    setCreateMode(false);
-    setSelectedTemplate(null);
-    setSaving(false);
-    await fetchTemplates();
   }
 
   async function handleDelete(templateId: number): Promise<void> {

@@ -86,9 +86,11 @@ const SelectContent = React.forwardRef<
       ref={ref}
       className={cn(
         "relative z-100 max-h-96 min-w-[8rem] overflow-hidden",
-        "bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white",
+        // Neo-brutalist styling
+        "bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white",
         "border-3 border-neo-black dark:border-slate-500 rounded-neo",
-        "shadow-hard",
+        "shadow-hard-lg",
+        // Animations
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -97,7 +99,7 @@ const SelectContent = React.forwardRef<
         "data-[side=right]:slide-in-from-left-2",
         "data-[side=top]:slide-in-from-bottom-2",
         position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          "data-[side=bottom]:translate-y-2 data-[side=left]:-translate-x-2 data-[side=right]:translate-x-2 data-[side=top]:-translate-y-2",
         className
       )}
       position={position}
@@ -106,7 +108,7 @@ const SelectContent = React.forwardRef<
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={cn(
-          "p-1",
+          "p-1.5",
           position === "popper" &&
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
         )}
@@ -141,18 +143,27 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center",
-      "rounded-sm py-1.5 pl-8 rtl:pl-2 rtl:pr-8 pr-2 text-sm font-medium",
+      "relative flex w-full cursor-pointer select-none items-center",
+      // Neo-brutalist item styling
+      "rounded-neo py-2.5 pl-9 rtl:pl-3 rtl:pr-9 pr-3 text-sm font-bold",
       "outline-none",
+      // Hover: playful lime highlight
+      "hover:bg-neo-lime/80 hover:text-neo-black",
+      // Focus: same as hover for keyboard navigation
       "focus:bg-neo-lime focus:text-neo-black",
+      // Selected state: cyan highlight
+      "data-[state=checked]:bg-neo-cyan data-[state=checked]:text-neo-black",
+      // Disabled state
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      // Transition
+      "transition-colors duration-100",
       className
     )}
     {...props}
   >
-    <span className="absolute left-2 rtl:left-auto rtl:right-2 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute left-2.5 rtl:left-auto rtl:right-2.5 flex h-4 w-4 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        <Check className="h-4 w-4 stroke-[3]" />
       </SelectPrimitive.ItemIndicator>
     </span>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { ChevronDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -36,9 +37,10 @@ interface QuickLanguageSwitcherProps {
 }
 
 /**
- * QuickLanguageSwitcher - Compact language selector for header/menu
+ * QuickLanguageSwitcher - Neo-Brutalist language selector for header/menu
  *
  * Shows current language flag and allows quick switching between languages.
+ * Features chunky borders, hard shadows, and playful hover states.
  * Memoized to prevent unnecessary re-renders.
  */
 export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
@@ -54,44 +56,76 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
     <Select value={language} onValueChange={(val) => setLanguage(val as Language)}>
       <SelectTrigger
         className={cn(
-          "flex items-center justify-center gap-1.5",
-          compact ? "w-10 h-10 px-0" : showLabel ? "w-auto h-10 px-3" : "w-12 h-10 px-1",
+          "flex items-center justify-center gap-1",
+          compact ? "w-10 h-10 px-0" : showLabel ? "w-auto h-10 px-3" : "w-14 h-10 px-1.5",
+          // Neo-brutalist base styling
           "bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white",
-          "border-2 border-neo-black dark:border-slate-500",
+          "border-3 border-neo-black dark:border-slate-500",
           "rounded-neo shadow-hard-sm",
-          "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-          "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+          // Hover: lift up with bigger shadow
+          "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
+          "hover:bg-neo-lime/40 dark:hover:bg-neo-lime/20",
+          // Active: press down
+          "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
           "transition-all duration-100",
-          "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1",
-          // Override default SelectTrigger styling that adds chevron spacing
-          "[&>svg]:hidden",
+          // Focus ring
+          "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+          // Override default SelectTrigger chevron
+          "[&>svg:last-child]:hidden",
           className
         )}
         aria-label={t('settings.changeLanguage') || 'Change Language'}
       >
         <SelectValue>
-          <div className="flex items-center justify-center gap-1.5">
+          <div className="flex items-center justify-center gap-1">
             <span className={cn("leading-none", compact ? "text-lg" : "text-xl")} role="img" aria-label={selectedOption ? t(selectedOption.labelKey) : ''}>
               {currentFlag}
             </span>
             {showLabel && selectedOption && (
-              <span className="font-semibold text-sm">{t(selectedOption.labelKey)}</span>
+              <span className="font-bold text-sm">{t(selectedOption.labelKey)}</span>
+            )}
+            {!compact && (
+              <ChevronDown className="w-4 h-4 text-neo-black/60 dark:text-white/60" aria-hidden="true" />
             )}
           </div>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent
+        className={cn(
+          // Override default content styling with neo-brutalist look
+          "min-w-[180px]",
+          "bg-neo-cream dark:bg-slate-800",
+          "border-3 border-neo-black dark:border-slate-500",
+          "rounded-neo shadow-hard-lg",
+          "p-1"
+        )}
+      >
         {LANGUAGE_OPTIONS.map((option) => (
           <SelectItem
             key={option.code}
             value={option.code}
-            className="cursor-pointer"
+            className={cn(
+              "cursor-pointer rounded-neo",
+              "px-3 py-2.5",
+              "font-bold text-neo-black dark:text-white",
+              // Hover state - playful lime highlight
+              "hover:bg-neo-lime hover:text-neo-black",
+              "focus:bg-neo-lime focus:text-neo-black",
+              // Selected state
+              "data-[state=checked]:bg-neo-cyan data-[state=checked]:text-neo-black",
+              // Remove default focus bg
+              "focus:outline-none"
+            )}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-lg leading-none" role="img" aria-label={t(option.labelKey)}>
+            <div className="flex items-center gap-3">
+              <span
+                className="text-xl leading-none"
+                role="img"
+                aria-label={t(option.labelKey)}
+              >
                 {option.flag}
               </span>
-              <span className="font-medium">{t(option.labelKey)}</span>
+              <span className="font-bold">{t(option.labelKey)}</span>
             </div>
           </SelectItem>
         ))}

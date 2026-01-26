@@ -2577,10 +2577,11 @@ const es = {
 "wordHunt": {
       "title": "Caza Palabras",
       "subtitle": "Modo Supervivencia",
-      "desc": "Encuentra palabras contra el reloj. ¡Halla todas las que puedas antes de que se acabe el tiempo!",
+      "desc": "¡Encuentra palabras ocultas en una cuadrícula 3x3 antes de que se acabe el tiempo!",
       "feature1": "90 segundos",
       "feature2": "Sistema de combos",
-      "feature3": "Tabla global"
+      "feature3": "Tabla global",
+      "details": "¡Desliza para conectar letras y encontrar palabras. 10 vidas, 90 segundos de adrenalina!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ ¡Te Espera Word Hunt Diario!",
@@ -2599,8 +2600,9 @@ const es = {
   },
   "buzz": {
     "title": "Daily Buzz",
-    "tagline": "Retos de lo que está trending",
+    "tagline": "Rompecabezas de palabras basados en los temas de tendencia de hoy",
     "subtitle": "¿Qué está buzzeando hoy?",
+    "details": "Resuelve rompecabezas de palabras sobre noticias y temas de tendencia. ¡Sin presión de tiempo, solo piensa!",
     "type": {
       "scrambled": "REVUELTO",
       "fillBlank": "COMPLETA",
@@ -3153,7 +3155,8 @@ const es = {
     "nav": {
       "profile": "Perfil",
       "home": "Inicio",
-      "brain": "Entrenamiento Mental"
+      "brain": "Entrenamiento Mental",
+      "dashboard": "Panel Cognitivo"
     },
     "domains": {
       "processingSpeed": "Velocidad de Procesamiento",

@@ -478,7 +478,7 @@ export default function BuzzResultsScreen({
           {/* Primary CTA */}
           <Button
             onClick={handleNativeShare}
-            className="group relative w-full py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all overflow-hidden"
+            className="group relative w-full max-w-btn py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all overflow-hidden"
           >
             {/* Shine effect */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -490,7 +490,7 @@ export default function BuzzResultsScreen({
           <Button
             onClick={handleCopy}
             variant="outline"
-            className="w-full py-3 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-cyan hover:bg-neo-cyan/10 rounded-neo font-bold transition-all"
+            className="w-full max-w-btn py-3 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-cyan hover:bg-neo-cyan/10 rounded-neo font-bold transition-all"
           >
             {copied ? (
               <>

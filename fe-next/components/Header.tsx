@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility, Brain, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -382,6 +382,26 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </Link>
                     )}
 
+                    {/* Brain Training Link - only show for authenticated users */}
+                    {isAuthenticated && (
+                        <Link
+                            href={`/${language}/brain`}
+                            className={cn(
+                                "flex items-center justify-center",
+                                "w-10 h-10",
+                                "bg-gradient-to-br from-neo-purple to-purple-400 text-neo-black",
+                                "border-3 border-neo-black",
+                                "rounded-neo shadow-hard-sm",
+                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:from-neo-purple-light hover:to-neo-purple",
+                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                "transition-all duration-100"
+                            )}
+                            aria-label={t('landing.brainTraining') || 'Brain Training'}
+                        >
+                            <Brain size={20} />
+                        </Link>
+                    )}
+
                     {/* Gift Notification Button - only show for authenticated users with unclaimed gifts */}
                     {isAuthenticated && unclaimedCount > 0 && (
                         <button
@@ -659,6 +679,32 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             <span>{t('settings.moreSettings') || 'More Settings'}</span>
                                         </Link>
                                     </div>
+
+                                    {/* Divider */}
+                                    <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+
+                                    {/* Brain Training Section - only shown for authenticated users */}
+                                    {isAuthenticated && (
+                                        <div className="flex flex-col gap-2">
+                                            <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                                {t('landing.brainTraining') || 'Brain Training'}
+                                            </span>
+                                            <Link
+                                                href={`/${language}/brain`}
+                                                onClick={() => setShowMobileMenu(false)}
+                                                className={cn(
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "bg-gradient-to-r from-neo-purple/80 to-purple-400/80 hover:from-neo-purple hover:to-purple-400 text-neo-black",
+                                                    "shadow-hard-sm hover:shadow-hard"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-navy border-3 border-neo-black text-neo-purple-light">
+                                                    <Brain className="w-4 h-4" aria-hidden="true" />
+                                                </span>
+                                                <span>{t('brain.nav.dashboard') || 'Cognitive Dashboard'}</span>
+                                            </Link>
+                                        </div>
+                                    )}
 
                                     {/* Admin Controls Section - only shown for admin users */}
                                     {isAdmin && (

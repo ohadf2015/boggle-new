@@ -303,7 +303,7 @@ export default function BuzzReadyScreen({
           <Button
             onClick={onStart}
             disabled={hasPlayedToday}
-            className="group relative w-full py-5 sm:py-6 text-lg sm:text-xl font-black uppercase bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-hard-lg overflow-hidden"
+            className="group relative w-full max-w-btn py-5 sm:py-6 text-lg sm:text-xl font-black uppercase bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-hard-lg overflow-hidden"
           >
             {/* Animated shine effect */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -319,7 +319,7 @@ export default function BuzzReadyScreen({
             <Button
               onClick={() => setShowSkipConfirm(true)}
               variant="ghost"
-              className="w-full py-3 text-sm font-bold text-slate-400 hover:text-neo-pink border-2 border-slate-700 hover:border-neo-pink/50 rounded-neo transition-all"
+              className="w-full max-w-btn py-3 text-sm font-bold text-slate-400 hover:text-neo-pink border-2 border-slate-700 hover:border-neo-pink/50 rounded-neo transition-all"
             >
               <FastForward className="w-4 h-4 me-2" />
               {t('buzz.skipToAnswers')}

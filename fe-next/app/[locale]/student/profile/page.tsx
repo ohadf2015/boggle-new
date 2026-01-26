@@ -184,7 +184,7 @@ export default function StudentProfilePage() {
               {t('education.practice.wordsFound')}
             </div>
             <div className="text-3xl font-neo-display font-black text-neo-yellow">
-              {studentProgress?.total_words_mastered || 0}
+              {studentProgress?.words_mastered?.length || 0}
             </div>
           </div>
 

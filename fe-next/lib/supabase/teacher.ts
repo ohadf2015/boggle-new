@@ -50,15 +50,21 @@ export interface StudentLessonProgress {
   words_mastered: string[];
   started_at: string;
   completed_at: string | null;
+  // XP tracking fields (from migration 062)
+  total_xp: number;
+  current_level: number;
+  current_streak: number;
+  longest_streak: number;
+  last_practice_date: string | null;
+  total_practice_sessions: number;
 }
 
 export interface LessonAssignment {
   id: string;
   lesson_id: string;
   classroom_id: string;
-  assigned_by: string;
   due_date: string | null;
-  assigned_at: string;
+  created_at: string;
   vocabulary_lessons?: VocabularyLesson;
 }
 
@@ -711,7 +717,6 @@ export async function updateProgress(
 export async function assignLesson(
   lessonId: string,
   classroomId: string,
-  teacherId: string,
   dueDate?: string
 ): Promise<{ data: LessonAssignment | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
@@ -722,7 +727,6 @@ export async function assignLesson(
       .insert({
         lesson_id: lessonId,
         classroom_id: classroomId,
-        assigned_by: teacherId,
         due_date: dueDate || null
       })
       .select()
@@ -772,7 +776,7 @@ export async function getStudentAssignedLessons(
       .from('lesson_assignments')
       .select('*, vocabulary_lessons(*)')
       .in('classroom_id', classroomIds)
-      .order('assigned_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (assignmentError) {
       logger.error('Error fetching lesson assignments:', assignmentError);

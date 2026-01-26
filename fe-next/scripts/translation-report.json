@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 2519,
+    "totalKeysInCode": 2554,
     "keyCountByLanguage": {
-      "en": 3358,
-      "he": 3358,
-      "sv": 3358,
-      "ja": 3358,
-      "es": 3358
+      "en": 3450,
+      "he": 3450,
+      "sv": 3450,
+      "ja": 3450,
+      "es": 3450
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -42,7 +42,7 @@
       {
         "pattern": "adventure.worlds.${world.name}",
         "file": "components/adventure/WorldMap.tsx",
-        "line": 245,
+        "line": 267,
         "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;",
         "type": "template_literal"
       }
@@ -130,7 +130,17 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "brain.nav.dashboard",
+      "usages": [
+        {
+          "file": "components/Header.tsx",
+          "line": 704
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

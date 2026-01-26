@@ -115,42 +115,59 @@
   animation: cloud-float var(--cloud-duration, 15s) ease-in-out infinite;
 }
 
-/* Orbit animation - pre-calculated circular path */
+/* Orbit animation - organic floating path with natural easing
+ * Uses irregular keyframe positions and varied scale/opacity for lifelike movement
+ * The path follows a slightly elliptical orbit with gentle bobbing
+ */
 @keyframes orbit-clockwise {
   0% {
     transform: translate(
       calc(var(--orbit-radius) * 1 - 8px),
-      calc(var(--orbit-radius) * 0 - 8px)
-    ) scale(0.9);
-    opacity: 0.3;
+      calc(var(--orbit-radius) * 0.1 - 8px)
+    ) scale(0.85) rotate(-5deg);
+    opacity: 0.4;
   }
-  25% {
+  18% {
     transform: translate(
-      calc(var(--orbit-radius) * 0 - 8px),
-      calc(var(--orbit-radius) * 1 - 8px)
-    ) scale(1.1);
-    opacity: 0.5;
+      calc(var(--orbit-radius) * 0.4 - 8px),
+      calc(var(--orbit-radius) * 0.85 - 8px)
+    ) scale(1.05) rotate(3deg);
+    opacity: 0.6;
   }
-  50% {
+  35% {
+    transform: translate(
+      calc(var(--orbit-radius) * -0.3 - 8px),
+      calc(var(--orbit-radius) * 0.95 - 8px)
+    ) scale(0.95) rotate(-2deg);
+    opacity: 0.55;
+  }
+  52% {
     transform: translate(
       calc(var(--orbit-radius) * -1 - 8px),
-      calc(var(--orbit-radius) * 0 - 8px)
-    ) scale(0.9);
-    opacity: 0.3;
+      calc(var(--orbit-radius) * 0.15 - 8px)
+    ) scale(0.9) rotate(4deg);
+    opacity: 0.45;
   }
-  75% {
+  68% {
     transform: translate(
-      calc(var(--orbit-radius) * 0 - 8px),
-      calc(var(--orbit-radius) * -1 - 8px)
-    ) scale(1.1);
+      calc(var(--orbit-radius) * -0.5 - 8px),
+      calc(var(--orbit-radius) * -0.8 - 8px)
+    ) scale(1.1) rotate(-3deg);
+    opacity: 0.65;
+  }
+  85% {
+    transform: translate(
+      calc(var(--orbit-radius) * 0.6 - 8px),
+      calc(var(--orbit-radius) * -0.7 - 8px)
+    ) scale(0.92) rotate(2deg);
     opacity: 0.5;
   }
   100% {
     transform: translate(
       calc(var(--orbit-radius) * 1 - 8px),
-      calc(var(--orbit-radius) * 0 - 8px)
-    ) scale(0.9);
-    opacity: 0.3;
+      calc(var(--orbit-radius) * 0.1 - 8px)
+    ) scale(0.85) rotate(-5deg);
+    opacity: 0.4;
   }
 }
 
@@ -158,37 +175,51 @@
   0% {
     transform: translate(
       calc(var(--orbit-radius) * 1 - 8px),
-      calc(var(--orbit-radius) * 0 - 8px)
-    ) scale(0.9);
-    opacity: 0.3;
+      calc(var(--orbit-radius) * -0.1 - 8px)
+    ) scale(0.88) rotate(4deg);
+    opacity: 0.45;
   }
-  25% {
+  15% {
     transform: translate(
-      calc(var(--orbit-radius) * 0 - 8px),
-      calc(var(--orbit-radius) * -1 - 8px)
-    ) scale(1.1);
-    opacity: 0.5;
+      calc(var(--orbit-radius) * 0.5 - 8px),
+      calc(var(--orbit-radius) * -0.9 - 8px)
+    ) scale(1.08) rotate(-2deg);
+    opacity: 0.62;
+  }
+  33% {
+    transform: translate(
+      calc(var(--orbit-radius) * -0.4 - 8px),
+      calc(var(--orbit-radius) * -0.85 - 8px)
+    ) scale(0.93) rotate(3deg);
+    opacity: 0.52;
   }
   50% {
     transform: translate(
       calc(var(--orbit-radius) * -1 - 8px),
-      calc(var(--orbit-radius) * 0 - 8px)
-    ) scale(0.9);
-    opacity: 0.3;
+      calc(var(--orbit-radius) * -0.1 - 8px)
+    ) scale(0.87) rotate(-4deg);
+    opacity: 0.42;
   }
-  75% {
+  70% {
     transform: translate(
-      calc(var(--orbit-radius) * 0 - 8px),
-      calc(var(--orbit-radius) * 1 - 8px)
-    ) scale(1.1);
-    opacity: 0.5;
+      calc(var(--orbit-radius) * -0.45 - 8px),
+      calc(var(--orbit-radius) * 0.88 - 8px)
+    ) scale(1.05) rotate(2deg);
+    opacity: 0.58;
+  }
+  88% {
+    transform: translate(
+      calc(var(--orbit-radius) * 0.55 - 8px),
+      calc(var(--orbit-radius) * 0.75 - 8px)
+    ) scale(0.95) rotate(-3deg);
+    opacity: 0.48;
   }
   100% {
     transform: translate(
       calc(var(--orbit-radius) * 1 - 8px),
-      calc(var(--orbit-radius) * 0 - 8px)
-    ) scale(0.9);
-    opacity: 0.3;
+      calc(var(--orbit-radius) * -0.1 - 8px)
+    ) scale(0.88) rotate(4deg);
+    opacity: 0.45;
   }
 }
 
@@ -199,15 +230,16 @@
   pointer-events: none;
   font-weight: 900;
   will-change: transform, opacity;
+  text-shadow: 0 0 8px currentColor;
 }
 
 .world-map-orbit-letter--clockwise {
-  animation: orbit-clockwise var(--orbit-duration, 6s) linear infinite;
+  animation: orbit-clockwise var(--orbit-duration, 8s) cubic-bezier(0.4, 0, 0.2, 1) infinite;
   animation-delay: var(--orbit-delay, 0s);
 }
 
 .world-map-orbit-letter--counter-clockwise {
-  animation: orbit-counter-clockwise var(--orbit-duration, 6s) linear infinite;
+  animation: orbit-counter-clockwise var(--orbit-duration, 8s) cubic-bezier(0.4, 0, 0.2, 1) infinite;
   animation-delay: var(--orbit-delay, 0s);
 }
 

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Lock, Map } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Map } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -395,8 +395,9 @@ const LandingView: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Adventure Mode Card - Compact */}
+            {/* Adventure Mode Card - Compact - spans full width as single row */}
             <motion.div
+              className="col-span-2"
               whileHover={{
                 scale: 1.03,
                 boxShadow: '0 0 25px rgba(163, 230, 53, 0.5), 0 0 50px rgba(163, 230, 53, 0.3), 6px 6px 0px black'
@@ -410,7 +411,7 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
                   'bg-gradient-to-br from-neo-lime to-lime-500',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  'transition-all min-h-[80px] sm:min-h-[100px]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
@@ -423,73 +424,6 @@ const LandingView: React.FC = () => {
                 <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.adventureMode') || 'Adventure'}</span>
               </Link>
             </motion.div>
-
-            {/* Brain Training Card - Compact */}
-            {/* Show loading state during auth check to prevent UI flicker */}
-            {authLoading ? (
-              <div
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                  'bg-gradient-to-br from-neo-purple to-purple-400',
-                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
-                  'cursor-wait'
-                )}
-                aria-label={`${t('landing.brainTraining') || 'Brain Training'} - Loading`}
-                aria-busy="true"
-              >
-                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black animate-pulse" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
-              </div>
-            ) : isAuthenticated ? (
-              <motion.div
-                whileHover={{
-                  scale: 1.03,
-                  boxShadow: '0 0 25px rgba(139, 92, 246, 0.5), 0 0 50px rgba(139, 92, 246, 0.3), 6px 6px 0px black'
-                }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Link
-                  href={`/${language}/brain`}
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                    'bg-gradient-to-br from-neo-purple to-purple-400',
-                    'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                    'transition-all min-h-[100px] sm:min-h-[120px]',
-                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-                  )}
-                  aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
-                >
-                  <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                  <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
-                </Link>
-              </motion.div>
-            ) : (
-              <motion.button
-                onClick={() => setShowAuthModal(true)}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
-                  'bg-gradient-to-br from-neo-purple to-purple-400 grayscale',
-                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-                )}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.signInToUnlock') || 'Sign in to unlock'}`}
-              >
-                {/* Centered lock badge */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                  <span className="inline-flex items-center gap-2 px-3 py-2 bg-neo-navy text-neo-white font-bold rounded-neo border-3 border-neo-black shadow-hard text-sm transform -rotate-3">
-                    <Lock className="w-4 h-4" />
-                    {t('landing.signInToUnlock') || 'Sign in to unlock'}
-                  </span>
-                </div>
-                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
-              </motion.button>
-            )}
           </div>
           </div>
         ) : (
@@ -543,7 +477,7 @@ const LandingView: React.FC = () => {
                 variant="cyan"
               />
 
-              {/* Secondary cards - Adventure Mode and Brain Training */}
+              {/* Secondary card - Adventure Mode (spans full width) */}
               <ModeCard
                 title={t('landing.adventureMode') || 'Adventure'}
                 description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
@@ -552,18 +486,7 @@ const LandingView: React.FC = () => {
                 variant="lime"
                 secondary
                 badge="BETA"
-              />
-              <ModeCard
-                title={t('landing.brainTraining') || 'Brain Training'}
-                description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
-                href={`/${language}/brain`}
-                icon={<Brain className="w-6 h-6" />}
-                variant="purple"
-                secondary
-                loading={authLoading}
-                locked={!isAuthenticated}
-                lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
-                onLockedClick={() => setShowAuthModal(true)}
+                className="sm:col-span-2"
               />
             </div>
           </div>

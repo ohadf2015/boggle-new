@@ -2591,10 +2591,11 @@ const ja = {
     "wordHunt": {
       "title": "ワードハント",
       "subtitle": "サバイバルモード",
-      "desc": "単語を見つけて生き残れ。",
+      "desc": "時間切れになる前に3x3グリッドで隠された単語を見つけよう！",
       "feature1": "90秒",
       "feature2": "コンボシステム",
-      "feature3": "グローバルランキング"
+      "feature3": "グローバルランキング",
+      "details": "スワイプして文字をつなぎ、単語を見つけよう。10ライフ、90秒のアドレナリン！"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ デイリーワードハントが待っています！",
@@ -2610,8 +2611,9 @@ const ja = {
   },
   "buzz": {
     "title": "デイリーバズ",
-    "tagline": "今日のトレンドで言葉パズル",
+    "tagline": "今日のトレンドトピックに基づくワードパズル",
     "subtitle": "今日のバズは？",
+    "details": "トレンドニュースとトピックについてのワードパズルを解こう。時間制限なし、考えるだけ！",
     "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "速報",
@@ -3164,7 +3166,8 @@ const ja = {
     "nav": {
       "profile": "プロフィール",
       "home": "ホーム",
-      "brain": "脳トレ"
+      "brain": "脳トレ",
+      "dashboard": "認知ダッシュボード"
     },
     "domains": {
       "processingSpeed": "処理速度",

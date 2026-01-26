@@ -120,7 +120,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
           >
             <Button
               onClick={handleSignUpClick}
-              className="w-full py-4 text-base font-black uppercase bg-neo-black text-neo-lime border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-black/90 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all tracking-wide"
+              className="w-full max-w-btn py-4 text-base font-black uppercase bg-neo-black text-neo-lime border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-black/90 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all tracking-wide"
             >
               {t('daily.createChallengeFeature.ctaButton')}
             </Button>

@@ -42,6 +42,7 @@ export function usePlayerCollectibles(userId: string | undefined): UsePlayerColl
             name_key,
             description_key,
             icon,
+            image_url,
             category,
             rarity,
             cost,

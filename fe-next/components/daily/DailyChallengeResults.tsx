@@ -525,7 +525,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           {/* Primary CTA */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
+            className="w-full max-w-btn py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
           >
             <Share2 className="mr-2 w-5 h-5" />
             {t('daily.shareScore')}

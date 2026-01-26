@@ -324,7 +324,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <Button
               onClick={() => setShowCreateChallenge(true)}
               variant="outline"
-              className="w-full py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
+              className="w-full max-w-btn py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
             >
               <span className="text-xl">🛠️</span>
               {t('daily.createCustomChallenge')}

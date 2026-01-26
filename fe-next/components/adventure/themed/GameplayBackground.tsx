@@ -1,15 +1,14 @@
 /**
  * GameplayBackground Component
  *
- * A simplified ambient background for active gameplay that is less distracting
- * than the full WorldBackground. Uses subtle gradients and soft glows instead
- * of parallax layers, particles, and textures.
+ * Single-layer static background for active gameplay.
+ * Performance optimized: No parallax, no animations, minimal DOM elements.
+ * All gradients combined into a single CSS background for best performance.
  */
 
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
 
@@ -29,21 +28,21 @@ interface GameplayBackgroundProps {
 // ==============================================
 
 /**
- * Get ambient glow colors based on world ID
- * These are soft, non-distracting colors that maintain world identity
+ * Get ambient glow color based on world ID
+ * Single color for simplified single-layer background
  */
-function getAmbientColors(worldId: number): { primary: string; secondary: string } {
-  const colorMap: Record<number, { primary: string; secondary: string }> = {
-    1: { primary: 'rgba(144, 238, 144, 0.08)', secondary: 'rgba(255, 215, 0, 0.05)' }, // Meadows - soft green/gold
-    2: { primary: 'rgba(100, 200, 255, 0.08)', secondary: 'rgba(0, 150, 200, 0.05)' }, // Springs - soft cyan/blue
-    3: { primary: 'rgba(180, 100, 255, 0.08)', secondary: 'rgba(255, 100, 200, 0.05)' }, // Caverns - soft purple/pink
-    4: { primary: 'rgba(255, 180, 100, 0.08)', secondary: 'rgba(255, 140, 50, 0.05)' }, // Desert - soft orange/amber
-    5: { primary: 'rgba(100, 200, 150, 0.08)', secondary: 'rgba(50, 180, 120, 0.05)' }, // Forest - soft teal/green
-    6: { primary: 'rgba(200, 200, 220, 0.08)', secondary: 'rgba(150, 150, 180, 0.05)' }, // Mountains - soft gray/blue
-    7: { primary: 'rgba(255, 150, 180, 0.08)', secondary: 'rgba(255, 100, 150, 0.05)' }, // Palace - soft pink/rose
-    8: { primary: 'rgba(100, 150, 255, 0.08)', secondary: 'rgba(150, 100, 255, 0.05)' }, // Nebula - soft blue/violet
-    9: { primary: 'rgba(200, 220, 255, 0.08)', secondary: 'rgba(150, 200, 255, 0.05)' }, // Peaks - soft ice blue
-    10: { primary: 'rgba(255, 200, 100, 0.08)', secondary: 'rgba(255, 215, 0, 0.05)' }, // Throne - soft gold
+function getAmbientColor(worldId: number): string {
+  const colorMap: Record<number, string> = {
+    1: 'rgba(144, 238, 144, 0.06)',  // Meadows - soft green
+    2: 'rgba(100, 200, 255, 0.06)',  // Springs - soft cyan
+    3: 'rgba(180, 100, 255, 0.06)',  // Caverns - soft purple
+    4: 'rgba(255, 180, 100, 0.06)',  // Desert - soft orange
+    5: 'rgba(100, 200, 150, 0.06)',  // Forest - soft teal
+    6: 'rgba(200, 200, 220, 0.06)',  // Mountains - soft gray
+    7: 'rgba(255, 150, 180, 0.06)',  // Palace - soft pink
+    8: 'rgba(100, 150, 255, 0.06)',  // Nebula - soft blue
+    9: 'rgba(200, 220, 255, 0.06)',  // Peaks - soft ice blue
+    10: 'rgba(255, 200, 100, 0.06)', // Throne - soft gold
   };
   return colorMap[worldId] || colorMap[1];
 }
@@ -55,7 +54,7 @@ function getAmbientColors(worldId: number): { primary: string; secondary: string
 const GameplayBackground = memo<GameplayBackgroundProps>(({ className, children }) => {
   const { theme } = useAdventureTheme();
   const worldId = theme?.id || 1;
-  const colors = getAmbientColors(worldId);
+  const ambientColor = getAmbientColor(worldId);
 
   return (
     <div
@@ -64,39 +63,16 @@ const GameplayBackground = memo<GameplayBackgroundProps>(({ className, children 
         className
       )}
     >
-      {/* Base dark gradient - smooth and non-distracting */}
-      <div className="absolute inset-0 bg-gradient-to-b from-neo-navy via-slate-900 to-slate-950" />
-
-      {/* Subtle ambient glow - center */}
-      <motion.div
+      {/* Single unified background layer - combines gradient, ambient glow, and vignette
+          Performance: Single DOM element with combined CSS background */}
+      <div
         className="absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        style={{
-          background: `radial-gradient(ellipse at 50% 40%, ${colors.primary} 0%, transparent 60%)`,
-        }}
-      />
-
-      {/* Secondary ambient glow - bottom corners for depth */}
-      <motion.div
-        className="absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, delay: 0.3 }}
         style={{
           background: `
-            radial-gradient(ellipse at 20% 80%, ${colors.secondary} 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 80%, ${colors.secondary} 0%, transparent 50%)
+            radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%),
+            radial-gradient(ellipse at 50% 40%, ${ambientColor} 0%, transparent 50%),
+            linear-gradient(to bottom, #1a1a2e 0%, #0f172a 50%, #020617 100%)
           `,
-        }}
-      />
-
-      {/* Very subtle vignette for focus on center content */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 100%)',
         }}
       />
 

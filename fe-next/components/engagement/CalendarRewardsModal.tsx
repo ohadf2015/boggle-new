@@ -243,7 +243,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                   <Button
                     onClick={handleClaimReward}
                     disabled={isClaiming}
-                    className="w-full bg-neo-lime text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
+                    className="w-full max-w-btn bg-neo-lime text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
                   >
                     {isClaiming ? (
                       <NeoLoader variant="dots" size="sm" />

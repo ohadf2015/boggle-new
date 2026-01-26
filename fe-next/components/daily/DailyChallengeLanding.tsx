@@ -3,12 +3,11 @@
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock, X, Frown } from 'lucide-react';
+import { Trophy, Timer, Hourglass, Bell, Check, Loader2, X, Frown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
-import { getSecondsUntilNextDaily, formatCountdown } from '@/utils/dailyChallenge';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { Language } from '@/types';
@@ -62,19 +61,6 @@ export function DailyChallengeLanding({
   });
   const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
   const [requestState, setRequestState] = useState<'idle' | 'loading' | 'sent'>('idle');
-  const [countdown, setCountdown] = useState<string>('');
-
-  // Update countdown timer every second
-  useEffect(() => {
-    const updateCountdown = () => {
-      const seconds = getSecondsUntilNextDaily();
-      setCountdown(formatCountdown(seconds));
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Word Hunt status check - synchronous local storage check with win/loss
   const checkWordHunt = () => {
@@ -242,43 +228,6 @@ export function DailyChallengeLanding({
       animate={{ opacity: 1 }}
       className="flex-1 flex flex-col items-center justify-center px-2 py-2 sm:px-4 sm:py-4 max-w-2xl mx-auto w-full"
     >
-      {/* Compact Countdown Banner with glow */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: -10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="mb-2 sm:mb-4 relative"
-      >
-        {/* Animated glow ring behind */}
-        <motion.div
-          className="absolute -inset-1 sm:-inset-2 rounded-xl sm:rounded-2xl blur-md -z-10"
-          animate={{
-            opacity: [0.3, 0.5, 0.3],
-            scale: [1, 1.02, 1],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.3) 0%, transparent 70%)' }}
-        />
-        <div className="inline-flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-5 sm:py-3 bg-neo-navy-light/90 backdrop-blur-sm border-2 sm:border-3 border-neo-lime/50 rounded-lg sm:rounded-xl shadow-hard">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-          >
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-neo-lime" />
-          </motion.div>
-          <span className="text-[10px] sm:text-xs font-bold text-neo-lime/90 uppercase tracking-wide hidden xs:inline">
-            {t('daily.nextPuzzleIn')}
-          </span>
-          <motion.span
-            className="text-base sm:text-xl font-black text-neo-lime tabular-nums min-w-[5em] sm:min-w-[6em] text-center"
-            animate={{ textShadow: ['0 0 10px rgba(191,255,0,0.5)', '0 0 20px rgba(191,255,0,0.8)', '0 0 10px rgba(191,255,0,0.5)'] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            {countdown}
-          </motion.span>
-        </div>
-      </motion.div>
-
       {/* Enhanced Header with gradient - more compact on mobile */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -304,6 +253,7 @@ export function DailyChallengeLanding({
           icon={<Timer className="w-7 h-7 sm:w-10 sm:h-10" />}
           title={t('daily.wordHunt.title')}
           tagline={t('daily.wordHunt.desc')}
+          details={t('daily.wordHunt.details')}
           color="orange"
           status={status.wordHunt}
           isLoadingStatus={loadingStatus.wordHunt}
@@ -329,6 +279,7 @@ export function DailyChallengeLanding({
             ? t('buzz.unavailableTagline')
             : t('buzz.tagline')
           }
+          details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
           color="yellow"
           status={status.buzz}
           isLoadingStatus={loadingStatus.buzz}
@@ -488,6 +439,8 @@ interface CompactChallengeCardProps {
   icon: ReactNode;
   title: string;
   tagline: string;
+  /** Additional details text to clarify what the challenge is about */
+  details?: string;
   color: 'orange' | 'yellow';
   status: 'new' | 'won' | 'lost' | 'unavailable';
   /** Whether status is still being determined (only affects status badge) */
@@ -517,6 +470,7 @@ function CompactChallengeCard({
   icon,
   title,
   tagline,
+  details,
   color,
   status,
   isLoadingStatus = false,
@@ -653,7 +607,7 @@ function CompactChallengeCard({
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleClick()}
         className={cn(
-          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
+          'relative w-full min-h-[420px] sm:min-h-[480px] bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
           'shadow-hard transition-shadow duration-200',
           'flex flex-col items-center text-center cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
@@ -838,14 +792,21 @@ function CompactChallengeCard({
         </div>
 
         {/* Title */}
-        <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-0.5 sm:mb-1', styles.text)}>
+        <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-1 sm:mb-1.5', styles.text)}>
           {title}
         </h2>
 
         {/* Tagline */}
-        <p className="text-[11px] sm:text-sm text-slate-400 mb-2 sm:mb-3 line-clamp-2 px-1 sm:px-2">
+        <p className="text-[11px] sm:text-sm text-slate-400 mb-1 sm:mb-1.5 line-clamp-2 px-1 sm:px-2">
           {tagline}
         </p>
+
+        {/* Details - Additional description */}
+        {details && (
+          <p className="text-[10px] sm:text-xs text-slate-500 mb-2 sm:mb-3 line-clamp-2 px-1 sm:px-2 italic">
+            {details}
+          </p>
+        )}
 
         {/* Play/Request Button with shine effect */}
         {isUnavailable ? (

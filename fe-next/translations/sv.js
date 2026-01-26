@@ -2591,10 +2591,11 @@ const sv = {
     "wordHunt": {
       "title": "Word Hunt",
       "subtitle": "Överlevnadsläge",
-      "desc": "Hitta ord. Överlev.",
+      "desc": "Hitta gömda ord i ett 3x3 rutnät innan tiden tar slut!",
       "feature1": "90 sekunder",
       "feature2": "Kombosystem",
-      "feature3": "Global topplista"
+      "feature3": "Global topplista",
+      "details": "Svep för att koppla bokstäver och hitta ord. 10 liv, 90 sekunder av adrenalin!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
@@ -2610,8 +2611,9 @@ const sv = {
   },
   "buzz": {
     "title": "Daily Buzz",
-    "tagline": "Ordutmaningar från dagens trender",
+    "tagline": "Ordpussel baserade på dagens trendiga ämnen",
     "subtitle": "Vad buzzer idag?",
+    "details": "Lös ordpussel om trendande nyheter och ämnen. Ingen tidspress, bara tänk!",
     "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "JUST NU",
@@ -3164,7 +3166,8 @@ const sv = {
     "nav": {
       "profile": "Profil",
       "home": "Hem",
-      "brain": "Hjärnträning"
+      "brain": "Hjärnträning",
+      "dashboard": "Kognitiv instrumentpanel"
     },
     "domains": {
       "processingSpeed": "Bearbetningshastighet",

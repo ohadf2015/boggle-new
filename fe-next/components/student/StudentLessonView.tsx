@@ -185,7 +185,7 @@ export default function StudentLessonView() {
 
           // Get date for display
           const displayDate = status === 'assigned'
-            ? assignment?.assigned_at
+            ? assignment?.created_at
             : progress?.started_at;
 
           return (

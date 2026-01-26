@@ -39,9 +39,8 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           id: 'assignment-1',
           lesson_id: 'lesson-1',
           classroom_id: 'classroom-1',
-          assigned_by: 'teacher-1',
           due_date: null,
-          assigned_at: '2025-01-20T10:00:00Z',
+          created_at: '2025-01-20T10:00:00Z',
           vocabulary_lessons: {
             id: 'lesson-1',
             teacher_id: 'teacher-1',
@@ -102,9 +101,8 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           id: 'assignment-1',
           lesson_id: 'lesson-1',
           classroom_id: 'classroom-1',
-          assigned_by: 'teacher-1',
           due_date: null,
-          assigned_at: '2025-01-20T10:00:00Z',
+          created_at: '2025-01-20T10:00:00Z',
           vocabulary_lessons: {
             id: 'lesson-1',
             teacher_id: 'teacher-1',
@@ -225,9 +223,8 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           id: 'assignment-1',
           lesson_id: 'lesson-assigned',
           classroom_id: 'classroom-1',
-          assigned_by: 'teacher-1',
           due_date: null,
-          assigned_at: '2025-01-20T10:00:00Z',
+          created_at: '2025-01-20T10:00:00Z',
           vocabulary_lessons: {
             id: 'lesson-assigned',
             teacher_id: 'teacher-1',
@@ -298,9 +295,8 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
           id: 'assignment-1',
           lesson_id: 'lesson-1',
           classroom_id: 'classroom-1',
-          assigned_by: 'teacher-1',
           due_date: null,
-          assigned_at: '2025-01-20T10:00:00Z',
+          created_at: '2025-01-20T10:00:00Z',
           vocabulary_lessons: {
             id: 'lesson-1',
             teacher_id: 'teacher-1',
