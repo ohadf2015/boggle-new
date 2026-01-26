@@ -89,7 +89,7 @@ function useContainerDimensions() {
   return { containerRef, dimensions, isReady: isClient && dimensions !== null };
 }
 
-interface PerformanceChartProps {
+export interface PerformanceChartProps {
   /** Current game score to highlight */
   currentScore?: number;
   /** Number of games to display */

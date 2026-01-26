@@ -1092,35 +1092,33 @@ body.crazygames-embed .game-view-container,
 }
 
 /* Mobile-optimized touch targets (minimum 44x44px per WCAG) */
-@layer base {
 
-  input,
-  select,
-  button,
-  [role="button"],
-  .touch-target {
-    min-height: 44px;
-  }
+input,
+select,
+button,
+[role="button"],
+.touch-target {
+  min-height: 44px;
+}
 
-  /* Prevent iOS zoom on input focus (requires 16px min font) */
-  input,
-  select,
-  textarea {
-    font-size: max(16px, 1rem);
-  }
+/* Prevent iOS zoom on input focus (requires 16px min font) */
+input,
+select,
+textarea {
+  font-size: max(16px, 1rem);
+}
 
-  /* Game grid cells: enforce minimum touch target size for accessibility */
+/* Game grid cells: enforce minimum touch target size for accessibility */
+.game-board-frame [role="gridcell"] {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+/* On mobile, enforce stricter minimum for better touch accuracy */
+@media (max-width: 768px) {
   .game-board-frame [role="gridcell"] {
-    min-width: 40px;
-    min-height: 40px;
-  }
-
-  /* On mobile, enforce stricter minimum for better touch accuracy */
-  @media (max-width: 768px) {
-    .game-board-frame [role="gridcell"] {
-      min-width: 44px;
-      min-height: 44px;
-    }
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
@@ -1294,23 +1292,21 @@ body.crazygames-embed {
    ==================================== */
 
 /* Enhanced focus ring for all interactive elements */
-@layer base {
 
-  /* Default focus ring */
-  *:focus-visible {
-    outline: 3px solid var(--neo-cyan);
-    outline-offset: 2px;
-  }
+/* Default focus ring */
+*:focus-visible {
+  outline: 3px solid var(--neo-cyan);
+  outline-offset: 2px;
+}
 
-  /* Focus ring for dark backgrounds */
-  .focus-ring-light:focus-visible {
-    outline-color: var(--neo-yellow);
-  }
+/* Focus ring for dark backgrounds */
+.focus-ring-light:focus-visible {
+  outline-color: var(--neo-yellow);
+}
 
-  /* No focus ring for mouse users */
-  *:focus:not(:focus-visible) {
-    outline: none;
-  }
+/* No focus ring for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* ====================================

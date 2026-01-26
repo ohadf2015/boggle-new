@@ -986,6 +986,25 @@ body {
     padding-top: clamp(0.75rem, 4cqw, 2rem);
     padding-bottom: clamp(0.75rem, 4cqw, 2rem);
   }
+
+  /* ====================================
+     TOUCH SCROLL UTILITIES
+     ==================================== */
+
+  /* Touch-optimized vertical scrolling */
+  .scrollable-area {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+
+  /* Conditional scrolling with touch optimization */
+  .scroll-if-needed {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
 }
 
 @layer components {
@@ -1414,4 +1433,5 @@ body {
 .low-end-device .letter-glow-springs,
 .low-end-device .letter-glow-caverns {
   text-shadow: none !important;
+
 }
