@@ -10,6 +10,7 @@
 import React, { useEffect, ReactNode } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
@@ -94,8 +95,12 @@ const initLogRocket = () => {
 
 /**
  * EssentialProviders - Minimal provider stack for landing page
- * Loads ~50KB of essential JavaScript
+ * Loads ~50KB of essential JavaScript + AuthProvider
  * LogRocket (~100KB) is deferred to avoid blocking initial load
+ *
+ * IMPORTANT: AuthProvider is included to ensure profile dropdown works on ALL pages
+ * Bug fix: Profile dropdown was only appearing after visiting settings page
+ * Root cause: AuthProvider was missing from EssentialProviders
  */
 export function EssentialProviders({ children, lang }: EssentialProvidersProps) {
     // Initialize session tracking for analytics
@@ -133,19 +138,21 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
         <ErrorBoundary>
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang}>
-                    <MusicProvider>
-                        <SoundEffectsProvider>
-                            <HapticsProvider>
-                                <AccessibilityProvider>
-                                    <MotionConfigProvider>
-                                        <NavigationProvider>
-                                            {children}
-                                        </NavigationProvider>
-                                    </MotionConfigProvider>
-                                </AccessibilityProvider>
-                            </HapticsProvider>
-                        </SoundEffectsProvider>
-                    </MusicProvider>
+                    <AuthProvider>
+                        <MusicProvider>
+                            <SoundEffectsProvider>
+                                <HapticsProvider>
+                                    <AccessibilityProvider>
+                                        <MotionConfigProvider>
+                                            <NavigationProvider>
+                                                {children}
+                                            </NavigationProvider>
+                                        </MotionConfigProvider>
+                                    </AccessibilityProvider>
+                                </HapticsProvider>
+                            </SoundEffectsProvider>
+                        </MusicProvider>
+                    </AuthProvider>
                 </LanguageProvider>
             </ThemeProvider>
             <Toaster
