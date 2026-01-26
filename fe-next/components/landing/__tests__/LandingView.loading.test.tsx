@@ -211,72 +211,11 @@ describe('LandingView Loading State', () => {
     });
   });
 
-  it('should show Brain Training card on desktop', async () => {
+  it('should show Adventure Mode card on desktop', async () => {
     render(<LandingView />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('mode-card-landing.brainTraining')).toBeInTheDocument();
-    });
-  });
-
-  describe('Brain Training auth loading state', () => {
-    it('should show loading state for Brain Training card while auth is loading', async () => {
-      // Set auth to loading state
-      mockAuthState = {
-        isAuthenticated: false,
-        loading: true,
-      };
-
-      render(<LandingView />);
-
-      await waitFor(() => {
-        // When auth is loading, Brain Training card should show loading state, not locked state
-        const brainCard = screen.getByTestId('mode-card-landing.brainTraining');
-        expect(brainCard).toBeInTheDocument();
-      });
-
-      // Should show loading indicator, NOT locked indicator
-      expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
-      expect(screen.queryByTestId('locked-indicator')).not.toBeInTheDocument();
-    });
-
-    it('should show locked state for Brain Training card when auth finishes and user is not authenticated', async () => {
-      // Auth finished loading, user not authenticated
-      mockAuthState = {
-        isAuthenticated: false,
-        loading: false,
-      };
-
-      render(<LandingView />);
-
-      await waitFor(() => {
-        // When not authenticated, should show locked state
-        const brainCard = screen.getByTestId('mode-card-landing.brainTraining');
-        expect(brainCard).toBeInTheDocument();
-      });
-
-      // Should show locked indicator, NOT loading indicator
-      expect(screen.getByTestId('locked-indicator')).toBeInTheDocument();
-      expect(screen.queryByTestId('loading-indicator')).not.toBeInTheDocument();
-    });
-
-    it('should show unlocked Brain Training card when user is authenticated', async () => {
-      // User is authenticated
-      mockAuthState = {
-        isAuthenticated: true,
-        loading: false,
-      };
-
-      render(<LandingView />);
-
-      await waitFor(() => {
-        const brainCard = screen.getByTestId('mode-card-landing.brainTraining');
-        expect(brainCard).toBeInTheDocument();
-      });
-
-      // Should NOT show locked or loading state
-      expect(screen.queryByTestId('locked-indicator')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('loading-indicator')).not.toBeInTheDocument();
+      expect(screen.getByTestId('mode-card-landing.adventureMode')).toBeInTheDocument();
     });
   });
 });

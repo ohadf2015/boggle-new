@@ -482,10 +482,10 @@ describe('PracticeSessionProvider', () => {
       await waitFor(() => {
         expect(mockCheckForUnlocks).toHaveBeenCalledWith(
           expect.objectContaining({
-            total_xp: 600, // 500 initial + 100 earned
-            current_level: 3,
-            current_streak: 5,
-            total_practice_sessions: 1,
+            totalXp: 600, // 500 initial + 100 earned
+            currentLevel: 3,
+            currentStreak: 5,
+            practiceSessions: 1,
           })
         );
       });
@@ -506,7 +506,7 @@ describe('PracticeSessionProvider', () => {
       await waitFor(() => {
         expect(mockCheckForUnlocks).toHaveBeenCalledWith(
           expect.objectContaining({
-            total_practice_sessions: 1,
+            practiceSessions: 1,
           })
         );
       });
@@ -517,7 +517,7 @@ describe('PracticeSessionProvider', () => {
       await waitFor(() => {
         expect(mockCheckForUnlocks).toHaveBeenCalledWith(
           expect.objectContaining({
-            total_practice_sessions: 2,
+            practiceSessions: 2,
           })
         );
       });
@@ -538,7 +538,7 @@ describe('PracticeSessionProvider', () => {
       await waitFor(() => {
         expect(mockCheckForUnlocks).toHaveBeenCalledWith(
           expect.objectContaining({
-            total_words_mastered: 9, // cardsCorrect from first session
+            wordsMastered: 9, // cardsCorrect from first session
           })
         );
       });
@@ -578,7 +578,7 @@ describe('PracticeSessionProvider', () => {
       await waitFor(() => {
         expect(mockCheckForUnlocks).toHaveBeenCalledWith(
           expect.objectContaining({
-            current_level: 4, // New level from XP award
+            currentLevel: 4, // New level from XP award
           })
         );
       });

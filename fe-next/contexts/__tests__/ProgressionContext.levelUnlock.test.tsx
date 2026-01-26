@@ -63,7 +63,7 @@ describe('ProgressionContext - Level Unlock Bug', () => {
       });
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       });
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -128,7 +128,7 @@ describe('ProgressionContext - Level Unlock Bug', () => {
       });
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       });
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -188,7 +188,7 @@ describe('ProgressionContext - Level Unlock Bug', () => {
       });
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       });
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -243,7 +243,7 @@ describe('ProgressionContext - Level Unlock Bug', () => {
       });
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       });
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -304,7 +304,7 @@ describe('ProgressionContext - Level Unlock Bug', () => {
       });
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       });
 
       const { result } = renderHook(() => useProgression(), { wrapper });

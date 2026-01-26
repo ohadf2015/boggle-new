@@ -55,17 +55,25 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ProgressionProvider>{children}</ProgressionProvider>
 );
 
-// Helper to create a mock that handles both progression and attempts endpoints
-function createFetchMock(progressionResponse: object | null, attemptsResponse = mockAttemptsResponse) {
+// Helper to create a mock that handles the combined adventure state endpoint
+function createFetchMock(progressionResponse: object | null) {
   return jest.fn((url: string) => {
-    if (url.includes('/api/adventure/attempt')) {
-      return Promise.resolve(attemptsResponse);
-    }
-    if (url.includes('/api/adventure/progress')) {
+    if (url.includes('/api/adventure/state')) {
       if (progressionResponse === null) {
         return new Promise(() => {}); // Never resolves
       }
       return Promise.resolve(progressionResponse);
+    }
+    if (url.includes('/api/adventure/complete')) {
+      // Return a mock completion response
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          success: true,
+          progression: progressionResponse,
+          completion: { world: 1, level: 1, stars: 3, bestScore: 450, bestWords: 15, completedAt: new Date().toISOString() },
+        }),
+      });
     }
     return Promise.resolve({ ok: true, json: async () => ({}) });
   });
@@ -94,7 +102,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression();
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       // WHEN
@@ -134,7 +142,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression({ totalStars: 42 });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       // WHEN
@@ -156,7 +164,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression({ completions });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       // WHEN
@@ -173,7 +181,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression({ playerLevel: 10, xp: 5000 });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       // WHEN
@@ -193,7 +201,7 @@ describe('ProgressionContext', () => {
       const initialProgression = createMockProgression({ totalStars: 5 });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -247,7 +255,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression();
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -315,7 +323,7 @@ describe('ProgressionContext', () => {
       const initialProgression = createMockProgression({ xp: 1000 });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => initialProgression,
+        json: async () => ({ progression: initialProgression, attempts: [] }),
       }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -328,7 +336,7 @@ describe('ProgressionContext', () => {
       const refreshedProgression = createMockProgression({ xp: 1500 });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => refreshedProgression,
+        json: async () => ({ progression: refreshedProgression, attempts: [] }),
       }));
 
       // WHEN
@@ -347,7 +355,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression({ totalStars: 20 });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -374,7 +382,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression({ completions });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
@@ -404,7 +412,7 @@ describe('ProgressionContext', () => {
       const mockProgression = createMockProgression({ completions });
       mockFetch.mockImplementation(createFetchMock({
         ok: true,
-        json: async () => mockProgression,
+        json: async () => ({ progression: mockProgression, attempts: [] }),
       }));
 
       const { result } = renderHook(() => useProgression(), { wrapper });
