@@ -180,7 +180,7 @@ describe('Header - Music Controls Placement', () => {
 
             // Find the menu dropdown button in the desktop section (hidden sm:flex)
             const desktopControls = container.querySelector('.hidden.sm\\:flex');
-            const desktopMenuButton = desktopControls?.querySelector('button[aria-expanded="false"]');
+            const desktopMenuButton = desktopControls?.querySelector('button[aria-expanded="false"]') as HTMLElement | null;
             expect(desktopMenuButton).toBeInTheDocument();
 
             // Click to open dropdown

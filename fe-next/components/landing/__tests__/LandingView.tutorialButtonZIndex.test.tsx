@@ -110,8 +110,16 @@ jest.mock('../../ui/IdleMascot', () => ({
 jest.mock('../../ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
-jest.mock('../../OnboardingModal', () => () => null);
-jest.mock('../../auth/AuthModal', () => () => null);
+jest.mock('../../OnboardingModal', () => {
+  const MockOnboardingModal = () => null;
+  MockOnboardingModal.displayName = 'MockOnboardingModal';
+  return MockOnboardingModal;
+});
+jest.mock('../../auth/AuthModal', () => {
+  const MockAuthModal = () => null;
+  MockAuthModal.displayName = 'MockAuthModal';
+  return MockAuthModal;
+});
 jest.mock('../../daily/DailyChallengeBanner', () => {
   const MockDailyChallengeBanner = () => <div data-testid="daily-banner">Banner</div>;
   MockDailyChallengeBanner.displayName = 'MockDailyChallengeBanner';
