@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 25 of 25 (Capacitor Native Apps) — IN PROGRESS
-Plan: 2/4 complete
+Plan: 3/4 complete
 Status: In progress
-Last activity: 2026-01-26 — Completed 25-02-PLAN.md (Platform Detection & Native Features)
+Last activity: 2026-01-26 — Completed 25-03-PLAN.md (Safe Area & Offline Fallback)
 
 Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
@@ -94,10 +94,10 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 |------|------|----------|--------|
 | 25-01 | Capacitor Installation | 4min | Complete |
 | 25-02 | Platform Detection & Native Features | 10min | Complete |
-| 25-03 | Audio Loading Hook | - | Pending |
+| 25-03 | Safe Area & Offline Fallback | 20min | Complete |
 | 25-04 | Native Build Testing | - | Pending |
 
-**Phase 25 Progress:** 2/4 plans complete, 14 minutes
+**Phase 25 Progress:** 3/4 plans complete, 34 minutes
 
 ## Accumulated Context
 
@@ -161,6 +161,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **25-02**: Native → Web → Silent fail haptics → Progressive enhancement ensures best UX on all platforms (2026-01-26)
 - **25-02**: useRef for lifecycle callbacks → Latest callback version without listener re-registration (2026-01-26)
 - **25-02**: Async listener registration → Matches Capacitor API (Promise<PluginListenerHandle>) (2026-01-26)
+- **25-03**: Combined safe area approach → max() merges env() fallback with Capacitor plugin values (2026-01-26)
+- **25-03**: Async listener cleanup → Store handle in local variable, cleanup in effect return (2026-01-26)
+- **25-03**: Full-screen offline fallback → Branded neo-brutalist design maintains UX consistency (2026-01-26)
 
 ### Pending Todos
 
@@ -220,18 +223,21 @@ None.
 - Platform detection utilities complete — isNative/isIOS/isAndroid/isWeb with tree-shaking (25-02 complete)
 - Native haptics with web fallback — vibrateTap/Success/Error progressive enhancement (25-02 complete)
 - App lifecycle hooks — useAppLifecycle for foreground/background callbacks (25-02 complete)
-- Test coverage: 56 tests passing — Platform detection, haptics, lifecycle, React hooks
+- Safe area handling complete — useSafeArea hook with CSS custom properties (25-03 complete)
+- Offline fallback complete — OfflineFallback component with translations in 5 languages (25-03 complete)
+- CSS custom properties — Combined approach uses max() of env() and Capacitor values (25-03 complete)
+- Test coverage: 69 tests passing — +13 tests (6 hook, 7 component)
 - Java version issue — Gradle requires Java 11+ for Android builds (will resolve in 25-04)
-- Next: Audio loading hook (25-03) — Use platform detection to route Capacitor vs web audio
+- Next: Native Build Testing (25-04) — iOS/Android builds, splash screen, icon setup
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 25-02-PLAN.md (Platform Detection & Native Features) — 2/4 plans complete
+Stopped at: Completed 25-03-PLAN.md (Safe Area & Offline Fallback) — 3/4 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 25 with plan 25-03 (Audio Loading Hook)
+**Next action:** Continue Phase 25 with plan 25-04 (Native Build Testing)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 25 plan 02 complete)*
+*Last updated: 2026-01-26 (Phase 25 plan 03 complete)*
