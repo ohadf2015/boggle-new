@@ -66,6 +66,8 @@ interface CrazyGamesLifecycleReturn {
   hasStarted: boolean;
   /** Whether gameplay has ended */
   hasEnded: boolean;
+  /** Whether gameplay is currently active (not paused by visibility) */
+  isPlaying: boolean;
   /** Manually trigger happyTime (if not already triggered) */
   triggerHappyTime: () => void;
   /** Show a midgame ad with pause/resume callbacks */
@@ -140,14 +142,21 @@ export function useCrazyGamesLifecycle({
   const hasStartedRef = useRef(false);
   const hasEndedRef = useRef(false);
   const hasTriggeredHappyTimeRef = useRef(false);
+  const lastHappyTimeRef = useRef(0); // Timestamp of last happyTime trigger
   const lastScoreRef = useRef(0);
   const lastMaxComboRef = useRef(0);
   const lastWordsFoundRef = useRef(0);
+  const isPlayingRef = useRef(false); // Track if gameplay is active (not paused by visibility)
 
-  // Trigger happyTime with callback support
+  // Throttled happyTime trigger (max once per 30 seconds per CrazyGames recommendation)
   const triggerHappyTimeInternal = useCallback(() => {
-    if (!hasTriggeredHappyTimeRef.current) {
+    const now = Date.now();
+    const timeSinceLastHappyTime = now - lastHappyTimeRef.current;
+    const HAPPYTIME_THROTTLE_MS = 30000; // 30 seconds
+
+    if (!hasTriggeredHappyTimeRef.current || timeSinceLastHappyTime >= HAPPYTIME_THROTTLE_MS) {
       hasTriggeredHappyTimeRef.current = true;
+      lastHappyTimeRef.current = now;
       happyTime();
       onHappyTime?.();
     }
@@ -188,8 +197,13 @@ export function useCrazyGamesLifecycle({
       hasStartedRef.current = true;
       hasEndedRef.current = false;
       hasTriggeredHappyTimeRef.current = false;
+      isPlayingRef.current = true;
       gameplayStart();
       onGameplayStart?.();
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[CrazyGames Lifecycle] gameplayStart called');
+      }
     }
   }, [isGameActive, isGameOver, gameplayStart, onGameplayStart]);
 
@@ -197,8 +211,13 @@ export function useCrazyGamesLifecycle({
   useEffect(() => {
     if (isGameOver && hasStartedRef.current && !hasEndedRef.current) {
       hasEndedRef.current = true;
+      isPlayingRef.current = false;
       gameplayStop();
       onGameplayStop?.();
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[CrazyGames Lifecycle] gameplayStop called (game over)');
+      }
     }
   }, [isGameOver, gameplayStop, onGameplayStop]);
 
@@ -242,12 +261,47 @@ export function useCrazyGamesLifecycle({
     lastWordsFoundRef.current = wordsFound;
   }, [wordsFound, wordsThreshold, triggerHappyTimeInternal]);
 
+  // Handle visibility change - pause gameplay when tab hidden
+  useEffect(() => {
+    if (!hasStartedRef.current || hasEndedRef.current) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab hidden - pause gameplay
+        if (isPlayingRef.current) {
+          isPlayingRef.current = false;
+          gameplayStop();
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[CrazyGames Lifecycle] gameplayStop called (tab hidden)');
+          }
+        }
+      } else {
+        // Tab visible - resume gameplay (only if game is still active)
+        if (!isPlayingRef.current && isGameActive && !isGameOver) {
+          isPlayingRef.current = true;
+          gameplayStart();
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[CrazyGames Lifecycle] gameplayStart called (tab visible)');
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isGameActive, isGameOver, gameplayStart, gameplayStop]);
+
   // Cleanup on unmount - ensure gameplayStop is called
   useEffect(() => {
     return () => {
       if (hasStartedRef.current && !hasEndedRef.current) {
+        isPlayingRef.current = false;
         gameplayStop();
         onGameplayStop?.();
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[CrazyGames Lifecycle] gameplayStop called (unmount)');
+        }
       }
     };
   }, [gameplayStop, onGameplayStop]);
@@ -257,6 +311,7 @@ export function useCrazyGamesLifecycle({
     isOnCrazyGamesPlatform,
     hasStarted: hasStartedRef.current,
     hasEnded: hasEndedRef.current,
+    isPlaying: isPlayingRef.current,
     triggerHappyTime,
     showMidgameAd,
   };
