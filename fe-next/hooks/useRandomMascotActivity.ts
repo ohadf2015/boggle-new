@@ -1,7 +1,33 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { ExtendedMascotVariant, ActivityVariant } from '@/components/ui/InteractiveMascot';
-import type { MascotVariant } from '@/components/ui/Mascot';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { getMascotImagePath, MASCOT_IMAGES, type MascotVariant } from '@/components/ui/Mascot';
+import { getBaseVariant, type ExtendedMascotVariant, type ActivityVariant } from '@/components/ui/InteractiveMascot';
+
+/**
+ * Preload cache to track already preloaded images
+ */
+const preloadedImages = new Set<string>();
+
+/**
+ * Lazy preload a mascot image
+ */
+function preloadMascotImage(variant: ExtendedMascotVariant): void {
+  const baseVariant = getBaseVariant(variant);
+  const src = getMascotImagePath(baseVariant);
+
+  if (preloadedImages.has(src)) return;
+
+  if (typeof window === 'undefined') return;
+
+  const img = new window.Image();
+  img.onload = () => {
+    preloadedImages.add(src);
+  };
+  img.onerror = () => {
+    preloadedImages.add(src); // Mark as attempted to avoid retries
+  };
+  img.src = src;
+}
 
 /**
  * Default fun activities that can be randomly displayed
@@ -213,6 +239,16 @@ export function useRandomMascotActivity({
 
     const interval = getRandomInterval();
 
+    // Preload the next activity image 2 seconds before showing it
+    const preloadDelay = Math.max(0, interval - 2000);
+
+    // Schedule preload
+    setTimeout(() => {
+      const nextActivity = getRandomActivity();
+      preloadMascotImage(nextActivity);
+    }, preloadDelay);
+
+    // Schedule the activity display
     nextActivityTimeoutRef.current = setTimeout(() => {
       triggerActivity();
       // Schedule the next one after this activity completes
@@ -220,7 +256,7 @@ export function useRandomMascotActivity({
         scheduleNextActivityRef.current?.();
       }, activityDuration);
     }, interval);
-  }, [enabled, prefersReducedMotion, getRandomInterval, triggerActivity, activityDuration]);
+  }, [enabled, prefersReducedMotion, getRandomInterval, triggerActivity, activityDuration, getRandomActivity]);
 
   // Update ref whenever callback changes
   useEffect(() => {

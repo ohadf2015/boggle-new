@@ -231,7 +231,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       </main>
 
       {/* Bottom Tab Bar - 2 Tabs, mobile only */}
-      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden relative z-50">
         <div className="flex items-center h-12">
           {/* Players Tab */}
           <button

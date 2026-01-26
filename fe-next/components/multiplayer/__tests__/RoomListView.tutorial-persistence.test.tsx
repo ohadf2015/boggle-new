@@ -6,10 +6,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RoomListView from '../RoomListView';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { hasPlayedAnyGame } from '@/utils/playerProgressStorage';
+import * as contextualGuidanceStorage from '@/utils/contextualGuidanceStorage';
 
 // Mock dependencies
-jest.mock('@/utils/playerProgressStorage');
+jest.mock('@/utils/contextualGuidanceStorage');
 jest.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
@@ -30,7 +30,8 @@ jest.mock('next/link', () => {
   return MockLink;
 });
 
-const mockHasPlayedAnyGame = hasPlayedAnyGame as jest.MockedFunction<typeof hasPlayedAnyGame>;
+const mockShouldShowGuidance = contextualGuidanceStorage.shouldShowGuidance as jest.MockedFunction<typeof contextualGuidanceStorage.shouldShowGuidance>;
+const mockMarkGuidanceShown = contextualGuidanceStorage.markGuidanceShown as jest.MockedFunction<typeof contextualGuidanceStorage.markGuidanceShown>;
 
 describe('RoomListView - Tutorial Persistence', () => {
   const mockProps = {
@@ -47,9 +48,9 @@ describe('RoomListView - Tutorial Persistence', () => {
     jest.clearAllMocks();
   });
 
-  it('shows tutorial modal on first visit when no games played', async () => {
-    // GIVEN: User has never played any game
-    mockHasPlayedAnyGame.mockReturnValue(false);
+  it('shows tutorial modal on first visit when tutorial has not been shown', async () => {
+    // GIVEN: User has never seen the multiplayer tutorial
+    mockShouldShowGuidance.mockReturnValue(true);
 
     // WHEN: Component mounts
     render(
@@ -62,11 +63,14 @@ describe('RoomListView - Tutorial Persistence', () => {
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
+
+    // AND: Tutorial should be marked as shown
+    expect(mockMarkGuidanceShown).toHaveBeenCalledWith('multiplayerTutorialShown');
   });
 
   it('does NOT show tutorial modal on return visits', () => {
-    // GIVEN: User has played games before
-    mockHasPlayedAnyGame.mockReturnValue(true);
+    // GIVEN: User has already seen the multiplayer tutorial
+    mockShouldShowGuidance.mockReturnValue(false);
 
     // WHEN: Component mounts
     render(
@@ -77,13 +81,16 @@ describe('RoomListView - Tutorial Persistence', () => {
 
     // THEN: Tutorial modal should NOT be visible
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // AND: markGuidanceShown should NOT be called
+    expect(mockMarkGuidanceShown).not.toHaveBeenCalled();
   });
 
   it('does NOT show tutorial again after dismissal on same session', async () => {
     const user = userEvent.setup();
 
     // GIVEN: First-time user
-    mockHasPlayedAnyGame.mockReturnValue(false);
+    mockShouldShowGuidance.mockReturnValueOnce(true);
 
     // WHEN: Component mounts and user dismisses tutorial
     const { rerender } = render(
@@ -97,12 +104,15 @@ describe('RoomListView - Tutorial Persistence', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
+    // Verify tutorial was marked as shown on mount
+    expect(mockMarkGuidanceShown).toHaveBeenCalledWith('multiplayerTutorialShown');
+
     // User closes modal (click outside or close button)
     const closeButton = screen.getByRole('button', { name: /close/i });
     await user.click(closeButton);
 
-    // Mark as played (simulating the actual flow)
-    mockHasPlayedAnyGame.mockReturnValue(true);
+    // Mark as shown (simulating the actual storage update)
+    mockShouldShowGuidance.mockReturnValue(false);
 
     // WHEN: Component re-mounts (e.g., navigation back)
     rerender(
@@ -120,8 +130,8 @@ describe('RoomListView - Tutorial Persistence', () => {
   it('allows user to manually open tutorial via help button after dismissal', async () => {
     const user = userEvent.setup();
 
-    // GIVEN: User has already played (tutorial dismissed)
-    mockHasPlayedAnyGame.mockReturnValue(true);
+    // GIVEN: User has already seen tutorial (auto-show dismissed)
+    mockShouldShowGuidance.mockReturnValue(false);
 
     // WHEN: Component mounts
     render(
@@ -144,8 +154,8 @@ describe('RoomListView - Tutorial Persistence', () => {
   });
 
   it('does NOT show tutorial modal every time component mounts after first dismissal', async () => {
-    // GIVEN: User dismissed tutorial
-    mockHasPlayedAnyGame.mockReturnValue(true);
+    // GIVEN: User has seen tutorial before
+    mockShouldShowGuidance.mockReturnValue(false);
 
     // WHEN: Component mounts first time
     const { unmount } = render(
@@ -167,5 +177,8 @@ describe('RoomListView - Tutorial Persistence', () => {
     );
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // Verify markGuidanceShown was never called (tutorial already shown)
+    expect(mockMarkGuidanceShown).not.toHaveBeenCalled();
   });
 });

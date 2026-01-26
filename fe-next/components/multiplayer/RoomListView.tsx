@@ -17,7 +17,7 @@ import HowToPlay from '@/components/HowToPlay';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import QuickPlayButton from './QuickPlayButton';
 import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
-import { hasPlayedAnyGame } from '@/utils/playerProgressStorage';
+import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 
 interface RoomListViewProps {
   activeRooms: ActiveRoom[];
@@ -45,11 +45,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   const { t, dir } = useLanguage();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
 
-  // Auto-show HowToPlay modal for first-time players
+  // Auto-show HowToPlay modal for first-time players (only once)
   useEffect(() => {
-    const isFirstTime = !hasPlayedAnyGame();
-    if (isFirstTime) {
+    // Check if user has seen the multiplayer tutorial before
+    if (shouldShowGuidance('multiplayerTutorialShown')) {
       setShowHowToPlay(true);
+      // Mark as shown immediately to prevent re-showing on navigation back
+      markGuidanceShown('multiplayerTutorialShown');
     }
   }, []);
 

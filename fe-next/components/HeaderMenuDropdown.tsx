@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, User, Brain, Accessibility, Settings, Sparkles } from 'lucide-react';
+import { ChevronDown, User, Brain, Accessibility, Settings, Sparkles, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,7 +13,7 @@ import AuthButton from './auth/AuthButton';
  */
 const HeaderMenuDropdown = memo(() => {
     const { t, language } = useLanguage();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAdmin } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -174,6 +174,56 @@ const HeaderMenuDropdown = memo(() => {
                                     </div>
                                     <span className="relative group-hover:translate-x-0.5 transition-transform duration-150">
                                         {t('landing.brainTraining') || 'Brain Training'}
+                                    </span>
+                                </Link>
+
+                                {/* Decorative divider */}
+                                <div className="flex items-center gap-2 px-2">
+                                    <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-neo-black/20 to-transparent dark:via-slate-600" />
+                                </div>
+                            </>
+                        )}
+
+                        {/* Admin Section - only shown for admin users */}
+                        {isAdmin && (
+                            <>
+                                <div className="flex items-center gap-2 px-2 mb-1">
+                                    <BarChart3 size={14} className="text-neo-pink" />
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-neo-black/60 dark:text-slate-400">
+                                        {t('common.admin') || 'Admin'}
+                                    </span>
+                                </div>
+
+                                {/* Admin Dashboard Link */}
+                                <Link
+                                    href={`/${language}/admin`}
+                                    onClick={() => setIsOpen(false)}
+                                    className={cn(
+                                        "group flex items-center gap-3 px-4 py-3",
+                                        "bg-gradient-to-br from-neo-pink to-pink-500 text-neo-white",
+                                        "border-3 border-neo-black",
+                                        "rounded-neo shadow-hard-sm",
+                                        "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
+                                        "hover:from-pink-600 hover:to-pink-700",
+                                        "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+                                        "transition-all duration-150",
+                                        "font-bold text-sm",
+                                        "relative overflow-hidden"
+                                    )}
+                                >
+                                    {/* Shine effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+
+                                    <div className={cn(
+                                        "relative flex items-center justify-center w-8 h-8 rounded-md",
+                                        "bg-neo-black/20 border-2 border-neo-black",
+                                        "group-hover:scale-110 group-hover:-rotate-6",
+                                        "transition-all duration-150"
+                                    )}>
+                                        <BarChart3 size={16} className="text-neo-white" />
+                                    </div>
+                                    <span className="relative group-hover:translate-x-0.5 transition-transform duration-150">
+                                        {t('common.adminDashboard') || 'Admin Dashboard'}
                                     </span>
                                 </Link>
 

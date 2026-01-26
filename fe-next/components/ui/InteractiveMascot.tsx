@@ -82,7 +82,7 @@ const BASE_VARIANTS: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', '
  * Get the base GIF variant for any ExtendedMascotVariant
  * ALL extended variants map to one of 7 GIF variants: happy, gaming, thinking, oops, celebration, dj, trophy
  */
-function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
+export function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
   // If it's already a base variant, return as-is
   if (BASE_VARIANTS.includes(variant as MascotVariant)) {
     return variant as MascotVariant;
@@ -301,35 +301,22 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
  * />
  */
 /**
- * Preload all mascot images once globally
- * This ensures images are cached in browser before they're needed
+ * Lazy preload specific mascot images when needed
+ * Only preloads the image if it hasn't been preloaded before
  */
 const preloadedImages = new Set<string>();
-let preloadPromise: Promise<void> | null = null;
 
-function preloadAllMascotImages(): Promise<void> {
-  if (preloadPromise) return preloadPromise;
+function preloadMascotImage(src: string): void {
+  if (preloadedImages.has(src)) return;
 
-  preloadPromise = Promise.all(
-    Object.values(MASCOT_IMAGES).map((src) => {
-      if (preloadedImages.has(src)) return Promise.resolve();
-
-      return new Promise<void>((resolve) => {
-        const img = new window.Image();
-        img.onload = () => {
-          preloadedImages.add(src);
-          resolve();
-        };
-        img.onerror = () => {
-          preloadedImages.add(src); // Mark as attempted
-          resolve();
-        };
-        img.src = src;
-      });
-    })
-  ).then(() => undefined);
-
-  return preloadPromise;
+  const img = new window.Image();
+  img.onload = () => {
+    preloadedImages.add(src);
+  };
+  img.onerror = () => {
+    preloadedImages.add(src); // Mark as attempted to avoid retries
+  };
+  img.src = src;
 }
 
 export const InteractiveMascot = memo(function InteractiveMascot({
@@ -355,15 +342,30 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  const hasPreloadedRef = useRef(false);
 
-  // Preload all mascot images once on first mount (globally cached)
+  // Lazy preload hover/click variants when interaction is enabled
+  // This ensures smooth transitions without upfront preloading cost
   useEffect(() => {
-    if (!hasPreloadedRef.current) {
-      hasPreloadedRef.current = true;
-      preloadAllMascotImages();
+    if (!enableHover && !enableClick) return;
+
+    // Preload hover variant if enabled
+    if (enableHover) {
+      const hoverTarget = hoverVariant || DEFAULT_HOVER_TRANSITIONS[variant];
+      if (hoverTarget) {
+        const hoverSrc = getImageSource(hoverTarget);
+        preloadMascotImage(hoverSrc);
+      }
     }
-  }, []);
+
+    // Preload click variant if enabled
+    if (enableClick) {
+      const clickTarget = clickVariant || DEFAULT_CLICK_TRANSITIONS[variant];
+      if (clickTarget) {
+        const clickSrc = getImageSource(clickTarget);
+        preloadMascotImage(clickSrc);
+      }
+    }
+  }, [variant, enableHover, enableClick, hoverVariant, clickVariant]);
 
   const shouldAnimate = animated && !prefersReducedMotion && enableComplexAnimations;
   const isInteractive = (enableHover || enableClick) && !prefersReducedMotion;

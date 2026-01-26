@@ -226,6 +226,11 @@ export const Mascot = memo(function Mascot({
   const isGif = isGifVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
+  // Automatically prioritize 'happy' variant (main mascot) if priority not explicitly set
+  const shouldPrioritize = priority ?? (variant === 'happy');
+  // Use lazy loading for non-priority mascots
+  const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
+
   return (
     <motion.div
       className={`relative ${SIZE_CLASSES[size]} ${className}`}
@@ -238,7 +243,8 @@ export const Mascot = memo(function Mascot({
         width={SIZE_PIXELS[size]}
         height={SIZE_PIXELS[size]}
         className="object-contain drop-shadow-lg"
-        priority={priority}
+        priority={shouldPrioritize}
+        loading={loadingStrategy as 'lazy' | undefined}
         unoptimized={isGif}
       />
     </motion.div>
@@ -266,6 +272,11 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const isGif = isGifVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
+  // Automatically prioritize 'happy' variant (main mascot) if priority not explicitly set
+  const shouldPrioritize = priority ?? (variant === 'happy');
+  // Use lazy loading for non-priority mascots
+  const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
+
   return (
     <motion.div
       className={`relative ${SIZE_CLASSES[size]} ${className}`}
@@ -289,7 +300,8 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
           className="object-contain drop-shadow-lg"
-          priority={priority}
+          priority={shouldPrioritize}
+          loading={loadingStrategy as 'lazy' | undefined}
           unoptimized={isGif}
         />
       </motion.div>

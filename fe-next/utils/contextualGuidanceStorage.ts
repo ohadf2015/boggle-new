@@ -25,6 +25,8 @@ export interface GuidanceState {
   dragTutorialShown: boolean;
   /** Whether the user has completed the first-play tutorial by making a word with combined directions */
   firstPlayTutorialCompleted: boolean;
+  /** Whether the user has seen the multiplayer "How to Play" tutorial modal */
+  multiplayerTutorialShown: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -36,6 +38,7 @@ const DEFAULT_STATE: GuidanceState = {
   effectsPreferenceShown: false,
   dragTutorialShown: false,
   firstPlayTutorialCompleted: false,
+  multiplayerTutorialShown: false,
 };
 
 /**
