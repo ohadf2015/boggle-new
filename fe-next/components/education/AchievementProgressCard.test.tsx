@@ -56,6 +56,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -82,6 +83,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -107,6 +109,7 @@ describe('AchievementProgressCard', () => {
         nextThreshold: 150,
         currentThreshold: 50, // Bronze threshold
         isMaxTier: false,
+        percentComplete: 50, // (100-50)/(150-50) = 50%
       };
 
       render(
@@ -132,6 +135,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 1000,
         nextThreshold: null,
         isMaxTier: true,
+        percentComplete: 100, // Max tier reached
       };
 
       render(
@@ -162,6 +166,7 @@ describe('AchievementProgressCard', () => {
               progressValue: 100,
               nextThreshold: tier === 'platinum' ? null : 200,
               isMaxTier: tier === 'platinum',
+              percentComplete: tier === 'platinum' ? 100 : 50, // 100/200 = 50%
             }}
             isPinned={false}
             onTogglePin={jest.fn()}
@@ -187,6 +192,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 25,
         nextThreshold: 50,
         isMaxTier: false,
+        percentComplete: 0, // Locked - no progress yet
       };
 
       render(
@@ -213,6 +219,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 25,
         nextThreshold: 50,
         isMaxTier: false,
+        percentComplete: 0, // Locked - no progress yet
       };
 
       const { container } = render(
@@ -238,6 +245,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 25,
         nextThreshold: 50,
         isMaxTier: false,
+        percentComplete: 0, // Locked - no progress yet
       };
 
       render(
@@ -264,6 +272,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 5,
         nextThreshold: 7,
         isMaxTier: false,
+        percentComplete: 0, // Locked secret - no progress yet
       };
 
       render(
@@ -290,6 +299,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 10,
         nextThreshold: 30,
         isMaxTier: false,
+        percentComplete: 33, // 10/30 = 33%
       };
 
       render(
@@ -319,6 +329,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -346,6 +357,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -371,6 +383,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -396,6 +409,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -423,6 +437,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(
@@ -448,6 +463,7 @@ describe('AchievementProgressCard', () => {
         progressValue: 75,
         nextThreshold: 150,
         isMaxTier: false,
+        percentComplete: 50, // 75/150 = 50%
       };
 
       render(

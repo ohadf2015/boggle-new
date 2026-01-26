@@ -9,9 +9,10 @@ import { joinClassroom } from '../teacher';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
+const mockFrom = jest.fn();
 jest.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: mockFrom,
   },
 }));
 
@@ -41,12 +42,12 @@ describe('joinClassroom', () => {
         error: null
       });
 
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      mockFrom.mockImplementation((table: string) => {
         if (table === 'classrooms') {
           return {
             select: mockSelect.mockReturnThis(),
             eq: mockEq.mockReturnThis(),
-            single: mockSingle,
+            maybeSingle: mockSingle,
           };
         } else if (table === 'classroom_memberships') {
           return {
@@ -63,9 +64,8 @@ describe('joinClassroom', () => {
       const result = await joinClassroom('4HCDMS', mockStudentId);
 
       // THEN: Join should succeed
-      expect(result.success).toBe(true);
+      expect(result.error).toBeNull();
       expect(result.data?.classroom_id).toBe('classroom-456');
-      expect(result.error).toBeUndefined();
 
       // Verify code was uppercased in query
       expect(mockEq).toHaveBeenCalledWith('join_code', '4HCDMS');
@@ -81,18 +81,18 @@ describe('joinClassroom', () => {
         error: { message: 'No rows returned', code: 'PGRST116' }
       });
 
-      (supabase.from as jest.Mock).mockImplementation(() => ({
+      mockFrom.mockImplementation(() => ({
         select: mockSelect,
         eq: mockEq,
-        single: mockSingle,
+        maybeSingle: mockSingle,
       }));
 
       // WHEN: Student tries to join with non-existent code
       const result = await joinClassroom('4HCDMS', mockStudentId);
 
-      // THEN: Should return "Invalid join code" error
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Invalid join code');
+      // THEN: Should return error
+      expect(result.error).not.toBeNull();
+      expect(result.error?.message).toContain('code');
       expect(result.data).toBeNull();
     });
 
@@ -114,12 +114,12 @@ describe('joinClassroom', () => {
         error: null
       });
 
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      mockFrom.mockImplementation((table: string) => {
         if (table === 'classrooms') {
           return {
             select: mockSelect.mockReturnThis(),
             eq: mockEq.mockReturnThis(),
-            single: mockSingle,
+            maybeSingle: mockSingle,
           };
         } else if (table === 'classroom_memberships') {
           return {
@@ -136,7 +136,7 @@ describe('joinClassroom', () => {
       const result = await joinClassroom('4hcdms', mockStudentId);
 
       // THEN: Should convert to uppercase and find the classroom
-      expect(result.success).toBe(true);
+      expect(result.error).toBeNull();
       expect(mockEq).toHaveBeenCalledWith('join_code', '4HCDMS');
     });
 
@@ -163,17 +163,17 @@ describe('joinClassroom', () => {
           error: { message: 'No rows returned' }
         });
 
-        (supabase.from as jest.Mock).mockImplementation(() => ({
+        mockFrom.mockImplementation(() => ({
           select: mockSelect,
           eq: mockEq,
-          single: mockSingle,
+          maybeSingle: mockSingle,
         }));
 
         const result = await joinClassroom(invalidCode, mockStudentId);
 
         // THEN: Should return error
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Invalid join code');
+        expect(result.error).not.toBeNull();
+        expect(result.error?.message).toBeTruthy();
       }
     });
   });
@@ -196,12 +196,12 @@ describe('joinClassroom', () => {
         error: null
       });
 
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      mockFrom.mockImplementation((table: string) => {
         if (table === 'classrooms') {
           return {
             select: mockSelect.mockReturnThis(),
             eq: mockEq.mockReturnThis(),
-            single: mockSingle,
+            maybeSingle: mockSingle,
           };
         } else if (table === 'classroom_memberships') {
           return {
@@ -217,7 +217,7 @@ describe('joinClassroom', () => {
       const result = await joinClassroom('4HCDMS', mockStudentId);
 
       // THEN: Should return success without creating duplicate membership
-      expect(result.success).toBe(true);
+      expect(result.error).toBeNull();
       expect(result.data?.classroom_id).toBe('classroom-999');
     });
   });

@@ -35,15 +35,25 @@ const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
 
 describe('HeaderMenuDropdown', () => {
     const defaultAuthState = {
+        // State
+        user: null,
         isAuthenticated: false,
         isAdmin: false,
+        isGuest: true,
         profile: null,
+        rankedProgress: null,
         loading: false,
-        signIn: jest.fn(),
-        signUp: jest.fn(),
-        signOut: jest.fn(),
-        refreshProfile: jest.fn(),
+        isSupabaseEnabled: false,
+
+        // Computed
+        canPlayRanked: false,
+        gamesUntilRanked: 10,
+        needsProfileCustomization: false,
+
+        // Actions
+        setupProfile: jest.fn(),
         updateProfile: jest.fn(),
+        refreshProfile: jest.fn(),
     };
 
     const defaultLanguageState = {
@@ -51,7 +61,7 @@ describe('HeaderMenuDropdown', () => {
         language: 'en' as const,
         setLanguage: jest.fn(),
         currentFlag: '🇺🇸',
-        isRTL: false,
+        dir: 'ltr' as const,
     };
 
     beforeEach(() => {
@@ -231,7 +241,7 @@ describe('HeaderMenuDropdown', () => {
             mockUseLanguage.mockReturnValue({
                 ...defaultLanguageState,
                 language: 'he',
-                isRTL: true,
+                dir: 'rtl',
             });
 
             render(<HeaderMenuDropdown />);
@@ -309,9 +319,9 @@ describe('HeaderMenuDropdown', () => {
 
             await waitFor(() => {
                 const dropdown = screen.getByText(/settings.accessibility/i).closest('div.absolute');
-                expect(dropdown).toHaveClass('border-3');
-                expect(dropdown).toHaveClass('rounded-neo');
-                expect(dropdown).toHaveClass('shadow-hard-lg');
+                expect(dropdown).toHaveClass('border-4');
+                expect(dropdown).toHaveClass('rounded-neo-lg');
+                expect(dropdown).toHaveClass('shadow-hard-xl');
             });
         });
     });
