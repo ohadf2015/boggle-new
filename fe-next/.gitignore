@@ -57,3 +57,10 @@ public/images/adventure-png-backup/
 public/collectibles/*-png-backup/
 public/logos-png-backup/
 
+# Capacitor native platforms (generated, don't commit)
+/ios/
+/android/
+
+# Capacitor build artifacts
+.capacitor/
+
