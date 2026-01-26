@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo, ReactNode } from 'react';
 import { Howl, Howler } from 'howler';
 import logger from '@/utils/logger';
+import { createLazyHowl, preloadAudioOnDemand } from '@/lib/audio/audioLoader';
 
 type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa';
 
@@ -18,6 +19,7 @@ interface MusicContextType {
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   unlockAudio: () => void;
+  preloadMusicTrack: (trackKey: TrackKey) => Promise<void>;
   TRACKS: {
     LOBBY: 'lobby';
     BEFORE_GAME: 'beforeGame';
@@ -145,17 +147,11 @@ export function MusicProvider({ children }: MusicProviderProps) {
             // Warning track (almostOutOfTime) loops from beginning, others from 10s mark
             const isWarningTrack = key === 'almostOutOfTime';
 
-            howlsRef.current[key as TrackKey] = new Howl({
-                src: [src],
+            howlsRef.current[key as TrackKey] = createLazyHowl(src, {
                 loop: false, // All tracks use manual crossfade looping for smooth transitions
                 volume: 0,
-                preload: false, // Defer loading for slow connections - load on demand
-                // Using HTML5 Audio API (html5: true) for iOS Safari compatibility
-                // iOS Safari has strict Web Audio API restrictions:
-                // 1. Web Audio respects the device mute switch (no audio in silent mode)
-                // 2. AudioContext can throw InvalidStateError on device issues
-                // 3. html5: true bypasses these issues and plays reliably on iOS
-                html5: true,
+                // html5: true set by createLazyHowl for iOS Safari compatibility
+                // preload: false set by createLazyHowl to prevent automatic loading
                 onloaderror: (id, err) => {
                     logger.error(`[Music] Failed to load ${key}:`, err);
                 },
@@ -434,7 +430,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
     const fadeToTrackRef = useRef<((trackKey: TrackKey, fadeOutMs?: number, fadeInMs?: number) => void) | null>(null);
 
     // Crossfade to a new track - MUST be defined before useEffects that reference it
-    const fadeToTrack = useCallback((trackKey: TrackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
+    const fadeToTrack = useCallback(async (trackKey: TrackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
         if (!trackKey) return;
 
         logger.log('[Music] fadeToTrack called:', trackKey, 'audioUnlocked:', audioUnlockedRef.current);
@@ -460,10 +456,16 @@ export function MusicProvider({ children }: MusicProviderProps) {
             return;
         }
 
-        // Load the track on-demand if not loaded yet (lazy loading for slow connections)
+        // Preload the track on-demand if not loaded yet
         if (newHowl.state() === 'unloaded') {
-            logger.log('[Music] Loading track on demand:', trackKey);
-            newHowl.load();
+            logger.log('[Music] Preloading track on demand:', trackKey);
+            try {
+                await preloadAudioOnDemand(newHowl);
+                logger.log('[Music] Track loaded successfully:', trackKey);
+            } catch (err) {
+                logger.error('[Music] Failed to load track:', trackKey, err);
+                return; // Don't try to play if loading failed
+            }
         }
 
         // If same track, just ensure it's playing (use ref to avoid dependency)
@@ -681,6 +683,27 @@ export function MusicProvider({ children }: MusicProviderProps) {
         }
     }, [isMuted, volume]);
 
+    // Preload a specific music track (for eager loading, e.g., in game lobby)
+    const preloadMusicTrack = useCallback(async (trackKey: TrackKey) => {
+        const howl = howlsRef.current[trackKey];
+        if (!howl) {
+            logger.warn(`[Music] Cannot preload track: ${trackKey} not found`);
+            return;
+        }
+
+        if (howl.state() === 'unloaded') {
+            logger.log('[Music] Preloading track:', trackKey);
+            try {
+                await preloadAudioOnDemand(howl);
+                logger.log('[Music] Track preloaded successfully:', trackKey);
+            } catch (err) {
+                logger.warn('[Music] Failed to preload track:', trackKey, err);
+            }
+        } else {
+            logger.log('[Music] Track already loaded:', trackKey);
+        }
+    }, []);
+
     // Memoize TRACKS object to prevent recreation on every render
     const TRACKS_CONST = useMemo(() => ({
         LOBBY: 'lobby' as const,
@@ -707,6 +730,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
         setVolume,
         toggleMute,
         unlockAudio,
+        preloadMusicTrack,
 
         // Track keys for convenience
         TRACKS: TRACKS_CONST,
@@ -722,6 +746,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
         setVolume,
         toggleMute,
         unlockAudio,
+        preloadMusicTrack,
         TRACKS_CONST,
     ]);
 
