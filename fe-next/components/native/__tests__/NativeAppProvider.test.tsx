@@ -39,7 +39,7 @@ describe('NativeAppProvider', () => {
   describe('initialization', () => {
     it('should call useSafeArea on mount', () => {
       // GIVEN
-      mockUseSafeArea.mockImplementation(() => {});
+      mockUseSafeArea.mockReturnValue({ top: 0, bottom: 0, left: 0, right: 0 });
 
       // WHEN
       render(

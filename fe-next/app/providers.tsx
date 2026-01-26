@@ -12,6 +12,8 @@ import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { CoinProvider } from '@/contexts/CoinContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
+import { NativeAppProvider } from '@/components/native/NativeAppProvider';
+import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
 import { SocketProvider } from '@/utils/SocketContext';
 import { GameStateProvider } from '@/contexts/GameStateContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
@@ -183,23 +185,27 @@ export function Providers({ children, lang }: ProvidersProps) {
             <>
                 <ThemeProvider>
                     <LanguageProvider initialLanguage={lang}>
-                        <CrazyGamesProvider>
-                            <SocketProvider>
-                                <GameStateProvider>
-                                    <SocketEventBusProvider>
-                                        <AudioProviders>
-                                            <GameProviders>
-                                                <NavigationProvider>
-                                                    {children}
-                                                    <WinnerOnboardingWrapper />
-                                                    <ProfileCustomizationWrapper />
-                                                </NavigationProvider>
-                                            </GameProviders>
-                                        </AudioProviders>
-                                    </SocketEventBusProvider>
-                                </GameStateProvider>
-                            </SocketProvider>
-                        </CrazyGamesProvider>
+                        <NetworkStatusHandler>
+                            <NativeAppProvider>
+                                <CrazyGamesProvider>
+                                    <SocketProvider>
+                                        <GameStateProvider>
+                                            <SocketEventBusProvider>
+                                                <AudioProviders>
+                                                    <GameProviders>
+                                                        <NavigationProvider>
+                                                            {children}
+                                                            <WinnerOnboardingWrapper />
+                                                            <ProfileCustomizationWrapper />
+                                                        </NavigationProvider>
+                                                    </GameProviders>
+                                                </AudioProviders>
+                                            </SocketEventBusProvider>
+                                        </GameStateProvider>
+                                    </SocketProvider>
+                                </CrazyGamesProvider>
+                            </NativeAppProvider>
+                        </NetworkStatusHandler>
                     </LanguageProvider>
                 </ThemeProvider>
                 <Toaster
