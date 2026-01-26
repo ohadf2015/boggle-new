@@ -1,0 +1,63 @@
+/**
+ * Platform Detection Utility
+ * Detects native vs web environment with graceful degradation
+ */
+
+import { Capacitor } from '@capacitor/core';
+
+/**
+ * Check if running in native environment (iOS/Android via Capacitor)
+ * @returns true if native, false if web or Capacitor unavailable
+ */
+export function isNative(): boolean {
+  try {
+    return Capacitor.isNativePlatform();
+  } catch {
+    // Capacitor not available (web build or tree-shaken)
+    return false;
+  }
+}
+
+/**
+ * Check if running on iOS native
+ * @returns true if iOS native, false otherwise
+ */
+export function isIOS(): boolean {
+  try {
+    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if running on Android native
+ * @returns true if Android native, false otherwise
+ */
+export function isAndroid(): boolean {
+  try {
+    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if running in web environment
+ * @returns true if web, false if native
+ */
+export function isWeb(): boolean {
+  return !isNative();
+}
+
+/**
+ * Get current platform identifier
+ * @returns 'ios' | 'android' | 'web'
+ */
+export function getPlatform(): 'ios' | 'android' | 'web' {
+  try {
+    return Capacitor.getPlatform() as 'ios' | 'android' | 'web';
+  } catch {
+    return 'web';
+  }
+}
