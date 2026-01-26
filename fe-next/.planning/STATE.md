@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 24 of 25 (CrazyGames Portal Integration) — IN PROGRESS
-Plan: 2/6 complete
+Phase: 25 of 25 (Capacitor Native Apps) — IN PROGRESS
+Plan: 1/4 complete
 Status: In progress
-Last activity: 2026-01-26 — Completed 24-02-PLAN.md (Visual Consistency Fixes)
+Last activity: 2026-01-26 — Completed 25-01-PLAN.md (Capacitor Installation)
 
 Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
@@ -89,6 +89,16 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 
 **Phase 24 Progress:** 2/6 plans complete, 5 minutes
 
+**Phase 25 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 25-01 | Capacitor Installation | 4min | Complete |
+| 25-02 | Splash Screen Assets | - | Pending |
+| 25-03 | App Icons | - | Pending |
+| 25-04 | Native Build Testing | - | Pending |
+
+**Phase 25 Progress:** 1/4 plans complete, 4 minutes
+
 ## Accumulated Context
 
 ### Decisions
@@ -137,6 +147,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **24-02**: CSS isolation with 'all: initial' → Prevents parent frame styles from bleeding through iframe (2026-01-26)
 - **24-02**: 100vh/100dvh fallback pattern → 100vh = parent height, 100dvh = iframe height (2026-01-26)
 - **24-02**: Viewport hook delegation → Separate concerns, reusable outside provider (2026-01-26)
+- **25-01**: WebView approach for native apps → Preserves SSR, Server Components, Socket.IO without code changes (2026-01-26)
+- **25-01**: Do NOT install @capacitor/http → Prevents Socket.IO WebSocket breakage (2026-01-26)
+- **25-01**: Gitignore /ios/ and /android/ → Large native projects should be regenerated, not committed (2026-01-26)
+- **25-01**: CAPACITOR_DEV_URL env var → Enables local development testing against localhost (2026-01-26)
 
 ### Pending Todos
 
@@ -187,14 +201,21 @@ None.
 - Manual testing needed — Screenshot comparison for visual parity validation
 - Next: Asset size optimization (24-03) — Target <20MB initial load for mobile homepage
 
+**Phase 25 (Capacitor Native Apps) — IN PROGRESS:**
+- Capacitor 8.x installed — Core, CLI, iOS/Android platforms, 8 plugins (25-01 complete)
+- WebView configuration complete — Points to https://www.lexiclash.live production webapp
+- @capacitor/http NOT installed — Prevents Socket.IO WebSocket interference
+- Java version issue — Gradle requires Java 11+ for Android builds (will resolve in 25-04)
+- Next: Splash screen assets (25-02) — Create iOS/Android splash images with neo-navy background
+
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 24-02-PLAN.md (Visual Consistency Fixes) — 2/6 plans complete
+Stopped at: Completed 25-01-PLAN.md (Capacitor Installation) — 1/4 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 24 with plan 24-03 (Asset Size Optimization)
+**Next action:** Continue Phase 25 with plan 25-02 (Splash Screen Assets)
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 24 plan 02 complete)*
+*Last updated: 2026-01-26 (Phase 25 plan 01 complete)*
