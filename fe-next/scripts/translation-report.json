@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 2554,
     "keyCountByLanguage": {
-      "en": 3450,
-      "he": 3450,
-      "sv": 3450,
-      "ja": 3450,
-      "es": 3450
+      "en": 3451,
+      "he": 3451,
+      "sv": 3451,
+      "ja": 3451,
+      "es": 3451
     },
-    "missingFromEnglish": 1,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,17 +130,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "brain.nav.dashboard",
-      "usages": [
-        {
-          "file": "components/Header.tsx",
-          "line": 704
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],

@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
@@ -111,9 +112,11 @@ export default function StudentProfilePage() {
           <div className="flex items-center gap-6">
             {/* Avatar */}
             {profile?.avatar_image ? (
-              <img
+              <Image
                 src={profile.avatar_image}
                 alt={`${profile.display_name || profile.username}'s avatar`}
+                width={96}
+                height={96}
                 className="w-24 h-24 rounded-full border-4 border-neo-black shadow-hard"
               />
             ) : (

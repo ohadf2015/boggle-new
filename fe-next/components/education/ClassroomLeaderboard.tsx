@@ -15,6 +15,7 @@
  */
 
 import { memo } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
@@ -127,9 +128,11 @@ const LeaderboardEntryCard = memo<LeaderboardEntryCardProps>(
 
         {/* Avatar */}
         {avatarUrl ? (
-          <img
+          <Image
             src={avatarUrl}
             alt={`${displayName}'s avatar`}
+            width={48}
+            height={48}
             className="w-12 h-12 rounded-full border-neo border-neo-black"
           />
         ) : (
@@ -271,9 +274,11 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
 
               {/* Avatar */}
               {currentUserRank.avatarUrl ? (
-                <img
+                <Image
                   src={currentUserRank.avatarUrl}
                   alt={`${currentUserRank.displayName}'s avatar`}
+                  width={48}
+                  height={48}
                   className="w-12 h-12 rounded-full border-neo border-neo-black"
                 />
               ) : (
