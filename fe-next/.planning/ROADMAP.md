@@ -4,6 +4,7 @@
 
 - ✅ **v1.0 Stabilization** - Phases 1-14 (shipped 2026-01-25)
 - 🚧 **v1.1 Adventure & Education Expansion** - Phases 15-23 (in progress)
+- 🚧 **v1.2 Platform Integration** - Phase 24 (in progress)
 
 ## Phases
 
@@ -241,10 +242,36 @@ Plans:
 Plans:
 - [ ] 23-01: TBD during plan-phase
 
+### 🚧 v1.2 Platform Integration (In Progress)
+
+**Milestone Goal:** Enable game distribution through CrazyGames portal with full SDK integration.
+
+#### Phase 24: CrazyGames Portal Integration
+**Goal**: Complete CrazyGames SDK integration for portal distribution
+**Depends on**: Nothing (independent platform work)
+**Requirements**: CG-01 through CG-10 (from CONTEXT.md)
+**Success Criteria** (what must be TRUE):
+  1. Initial download size <50MB (currently 131MB public folder, 57MB music alone)
+  2. Game looks identical when embedded in CrazyGames iframe vs standalone
+  3. External OAuth hidden, CrazyGames SDK authentication used instead
+  4. Multiplayer invite system uses CrazyGames SDK inviteLink/showInviteButton
+  5. Gameplay lifecycle events (start/stop/happytime) fire correctly for metrics
+  6. QR code functionality works with CrazyGames invite links
+  7. Landscape mode on desktop displays without scrollbars
+  8. Mobile responsive behavior preserved in iframe embedding
+**Plans**: 5 plans in 3 waves
+
+Plans:
+- [ ] 24-01-PLAN.md — Lazy audio loading (Wave 1)
+- [ ] 24-02-PLAN.md — Visual consistency & viewport fixes (Wave 1)
+- [ ] 24-03-PLAN.md — SDK lifecycle event integration (Wave 2)
+- [ ] 24-04-PLAN.md — Multiplayer invite system integration (Wave 2)
+- [ ] 24-05-PLAN.md — Testing & verification (Wave 3)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23
+Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24
 
 **Dependencies:**
 - Phase 16 (Boss Foundation) depends on Phase 15 (Combo scoring)
@@ -252,7 +279,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 - Phase 18 (XP System) depends on Phase 15 (Combo scoring for XP calculations)
 - Phase 19 (Achievements) depends on Phase 18 (XP milestones)
 - Phase 20 (Analytics) depends on Phase 18 (XP data to analyze)
-- Phases 21, 22, 23 are parallel (no dependencies)
+- Phases 21, 22, 23, 24 are parallel (no dependencies)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -265,8 +292,9 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 21. Rich Lesson Delivery | v1.1 | 0/TBD | Not started | - |
 | 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |
 | 23. Tech Debt Cleanup | v1.1 | 0/TBD | Not started | - |
+| 24. CrazyGames Portal Integration | v1.2 | 0/5 | Planned | - |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-25 after Phase 18 complete*
+*Last updated: 2026-01-26 after Phase 24 planning complete*
