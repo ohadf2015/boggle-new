@@ -6,6 +6,7 @@ import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
 import { hapticAchievement, hapticForComboLevel, hapticComboBreak, hapticComboSaved } from '@/utils/haptics';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
+import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY } from '@/lib/audio/audioLoader';
 
 interface SoundEffectOptions {
   volume?: number;
@@ -64,6 +65,26 @@ const SOUND_EFFECTS = {
   fireRoundStart: '/sounds/fire-round-start.wav',
   fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
 } as const;
+
+// Sound effect priority levels for progressive loading
+const SOUND_PRIORITIES: Record<keyof typeof SOUND_EFFECTS, AUDIO_LOAD_PRIORITY> = {
+  // Critical - load on first user interaction
+  wordAccepted: AUDIO_LOAD_PRIORITY.CRITICAL,
+  comboBreak: AUDIO_LOAD_PRIORITY.CRITICAL,
+  // High - load during idle time
+  combo: AUDIO_LOAD_PRIORITY.HIGH,
+  countdownBeep: AUDIO_LOAD_PRIORITY.HIGH,
+  comboMilestone: AUDIO_LOAD_PRIORITY.HIGH,
+  // Normal - load on-demand
+  message: AUDIO_LOAD_PRIORITY.NORMAL,
+  comboSaved: AUDIO_LOAD_PRIORITY.NORMAL,
+  // Low - rare, load only when needed
+  achievement: AUDIO_LOAD_PRIORITY.LOW,
+  earthquakeRumble: AUDIO_LOAD_PRIORITY.LOW,
+  earthquakeShake: AUDIO_LOAD_PRIORITY.LOW,
+  fireRoundStart: AUDIO_LOAD_PRIORITY.LOW,
+  fireCrackleLoop: AUDIO_LOAD_PRIORITY.LOW,
+};
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
 const DEFAULT_SFX_SETTINGS: SfxSettings = { volume: 0.7, muted: false };
@@ -138,6 +159,40 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
   }, []);
 
+  // Progressive preload on first user interaction
+  useEffect(() => {
+    if (typeof window === 'undefined' || !audioUnlocked) return;
+
+    // Create sound and priority maps for preloadByPriority
+    const soundsMap = new Map<string, Howl>(Object.entries(soundsRef.current));
+    const prioritiesMap = new Map<string, AUDIO_LOAD_PRIORITY>(Object.entries(SOUND_PRIORITIES));
+
+    // Progressive loading strategy:
+    // 1. Load CRITICAL sounds immediately on audio unlock
+    // 2. Load HIGH priority sounds during idle time
+    // 3. LOW priority sounds stay lazy (load only when triggered)
+
+    (async () => {
+      // Load CRITICAL sounds immediately
+      logger.log('[SFX] Preloading CRITICAL sounds on audio unlock');
+      await preloadByPriority(soundsMap, prioritiesMap, AUDIO_LOAD_PRIORITY.CRITICAL);
+
+      // Load HIGH priority sounds during idle time
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => {
+          logger.log('[SFX] Preloading HIGH priority sounds during idle time');
+          preloadByPriority(soundsMap, prioritiesMap, AUDIO_LOAD_PRIORITY.HIGH);
+        });
+      } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+          logger.log('[SFX] Preloading HIGH priority sounds (setTimeout fallback)');
+          preloadByPriority(soundsMap, prioritiesMap, AUDIO_LOAD_PRIORITY.HIGH);
+        }, 1000);
+      }
+    })();
+  }, [audioUnlocked]);
+
   // Track tab visibility to block sounds when tab is hidden
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -156,16 +211,11 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     if (typeof window === 'undefined') return;
     if (soundsLoadedRef.current) return; // Prevent re-initialization
 
-    // Create Howl instances for each sound effect with deferred loading for slow connections
+    // Create Howl instances for each sound effect using lazy loading
     Object.entries(SOUND_EFFECTS).forEach(([key, src]) => {
-      soundsRef.current[key] = new Howl({
-        src: [src],
+      soundsRef.current[key] = createLazyHowl(src, {
         volume: 0.6,
-        preload: false, // Defer loading for slow connections - load on demand
-        // Using HTML5 Audio API (html5: true) for iOS Safari compatibility
-        // Note: html5 mode has limited pitch control, but iOS compatibility is critical
-        // iOS Safari has strict Web Audio API restrictions that cause audio to not play
-        html5: true,
+        // html5: true and preload: false set by createLazyHowl
         onload: () => {
           logger.log(`[SFX] Loaded: ${key}`);
         },
@@ -194,7 +244,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   }, []);
 
   // Play a sound effect
-  const playSound = useCallback((soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
+  const playSound = useCallback(async (soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
     // Check basic conditions
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
 
@@ -208,10 +258,15 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       return;
     }
 
-    // Load on-demand for slow connections - only load when actually needed
+    // Preload on-demand if not loaded - wait for loading to complete
     if (howl.state() === 'unloaded') {
-      logger.log(`[SFX] Loading sound on demand: ${soundKey}`);
-      howl.load();
+      logger.log(`[SFX] Preloading sound on demand: ${soundKey}`);
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        logger.warn(`[SFX] Failed to load ${soundKey}, skipping playback:`, err);
+        return; // Don't try to play if loading failed
+      }
     }
 
     // Apply volume (uses separate SFX volume)
@@ -353,7 +408,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   }, [playSound]);
 
   // Start fire crackle ambient loop (plays for 15 seconds)
-  const startFireCrackleLoop = useCallback(() => {
+  const startFireCrackleLoop = useCallback(async () => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     const howl = soundsRef.current['fireCrackleLoop'];
@@ -368,10 +423,15 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       fireCrackleLoopIdRef.current = null;
     }
 
-    // Load on-demand if needed
+    // Preload on-demand if needed
     if (howl.state() === 'unloaded') {
-      logger.log('[SFX] Loading fire crackle loop on demand');
-      howl.load();
+      logger.log('[SFX] Preloading fire crackle loop on demand');
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        logger.warn('[SFX] Failed to load fire crackle loop, skipping:', err);
+        return;
+      }
     }
 
     // Configure as loop
