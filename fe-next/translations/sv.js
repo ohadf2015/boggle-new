@@ -4517,6 +4517,9 @@ const sv = {
       "retry": "Försök igen",
       "retrying": "Ansluter..."
     }
+  },
+  "system": {
+    "updatingToNewVersion": "Uppdaterar till ny version..."
   }
 };
 

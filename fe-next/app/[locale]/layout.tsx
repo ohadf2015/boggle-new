@@ -10,6 +10,7 @@ import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import VersionChecker from '@/components/VersionChecker';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import { fredoka, rubik } from '../fonts';
@@ -724,6 +725,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <CrazyGamesScript />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
+                <VersionChecker />
                 {/* Defer loading animations.css (60KB) after page mount */}
                 <AnimationsLoader />
                 <ConditionalProviders lang={validLocale}>

@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 2590,
+    "totalKeysInCode": 2591,
     "keyCountByLanguage": {
       "en": 3499,
       "he": 3499,
@@ -8,7 +8,7 @@
       "ja": 3499,
       "es": 3499
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,7 +130,17 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "system.updatingToNewVersion",
+      "usages": [
+        {
+          "file": "components/VersionChecker.tsx",
+          "line": 130
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

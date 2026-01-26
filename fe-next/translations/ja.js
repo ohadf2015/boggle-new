@@ -4517,6 +4517,9 @@ const ja = {
       "retry": "再試行",
       "retrying": "接続中..."
     }
+  },
+  "system": {
+    "updatingToNewVersion": "新しいバージョンに更新中..."
   }
 };
 

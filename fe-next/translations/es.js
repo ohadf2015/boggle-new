@@ -4506,6 +4506,9 @@ const es = {
       "retry": "Intentar de Nuevo",
       "retrying": "Conectando..."
     }
+  },
+  "system": {
+    "updatingToNewVersion": "Actualizando a nueva versión..."
   }
 };
 

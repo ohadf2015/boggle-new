@@ -4520,6 +4520,9 @@ const en = {
       "retry": "Try Again",
       "retrying": "Connecting..."
     }
+  },
+  "system": {
+    "updatingToNewVersion": "Updating to new version..."
   }
 };
 

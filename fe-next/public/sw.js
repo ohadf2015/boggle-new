@@ -8,7 +8,7 @@
  * - Offline fallback page
  */
 
-const CACHE_VERSION = 'lexiclash-v4'; // v4: Remove fake offline page, let browser handle errors
+const CACHE_VERSION = 'lexiclash-v5'; // v5: Add aggressive cache busting with VersionChecker
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 

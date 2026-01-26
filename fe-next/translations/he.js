@@ -4510,6 +4510,9 @@ const he = {
       "retry": "נסה שוב",
       "retrying": "מתחבר..."
     }
+  },
+  "system": {
+    "updatingToNewVersion": "מעדכן לגרסה חדשה..."
   }
 };
 
