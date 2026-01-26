@@ -78,6 +78,27 @@ Sentry.init({
     // Recharts library warning - non-actionable, occurs during initial render
     // before container dimensions stabilize. Chart renders correctly after delay.
     /width\(-?\d+\) and height\(-?\d+\) of chart should be greater than 0/i,
+    // Auth session timeout warning - expected behavior on slow mobile connections
+    // The app continues without blocking, handles gracefully with 5s timeout
+    "Auth session fetch timed out",
+    /auth session fetch timed out/i,
+    // Socket.IO connection warnings - transient network errors with auto-retry
+    "[SOCKET.IO] Connection error",
+    /\[socket\.io\].*connection error/i,
+    // Avatar color validation error - client sends invalid hex, server rejects (expected)
+    "avatar.color: Invalid string",
+    /avatar\.color.*must match pattern/i,
+    // Word Hunt storage validation - skipping corrupt localStorage data (expected filtering)
+    "[Storage] Skipping invalid result",
+    /\[storage\].*skipping invalid.*attemptsUsed.*0/i,
+    "[Storage] Invalid attemptsUsed",
+    /\[storage\].*invalid attemptsUsed/i,
+    // Room name validation - server correctly rejects invalid characters
+    "roomName: Room name can only contain",
+    /roomName.*can only contain/i,
+    // Auth context errors - should not occur with proper provider setup (historical)
+    "useAuth must be used within an AuthProvider",
+    /useAuth must be used within.*provider/i,
   ],
 
   denyUrls: [

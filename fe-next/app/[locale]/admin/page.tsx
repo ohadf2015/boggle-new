@@ -206,31 +206,32 @@ export default function AdminPage() {
 
         {/* Live Monitor Component - show loading state if authToken not ready */}
         {authToken ? (
-          <LiveMonitor authToken={authToken} />
+          <>
+            <LiveMonitor authToken={authToken} />
+
+            {/* Today's Games History */}
+            <TodayGamesHistory authToken={authToken} />
+
+            {/* Database Diagnostic Tools */}
+            <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
+              <GamesDiagnostic authToken={authToken} />
+            </div>
+
+            {/* Email Testing Section */}
+            <div id="email-testing" className="mt-8">
+              <EmailTestPanel
+                authToken={authToken}
+                userEmail={user?.email}
+                userName={profile?.display_name || profile?.username}
+              />
+            </div>
+          </>
         ) : (
-          <div className="bg-slate-800/50 rounded-neo border-neo border-black p-8 text-center">
-            <NeoLoader variant="dots" size="sm" text="Loading authentication..." />
-          </div>
-        )}
-
-        {/* Today's Games History */}
-        {authToken && <TodayGamesHistory authToken={authToken} />}
-
-        {/* Database Diagnostic Tools */}
-        {authToken && (
-          <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
-            <GamesDiagnostic authToken={authToken} />
-          </div>
-        )}
-
-        {/* Email Testing Section */}
-        {authToken && (
-          <div id="email-testing" className="mt-8">
-            <EmailTestPanel
-              authToken={authToken}
-              userEmail={user?.email}
-              userName={profile?.display_name || profile?.username}
-            />
+          <div className="bg-slate-800/50 rounded-neo border-neo border-black p-12 text-center">
+            <NeoLoader variant="dots" size="md" text={t('admin.loadingDashboard') || 'Loading dashboard...'} />
+            <p className="text-slate-400 mt-4 text-sm">
+              {t('admin.preparingTools') || 'Preparing admin tools...'}
+            </p>
           </div>
         )}
       </div>

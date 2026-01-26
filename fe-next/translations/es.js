@@ -3452,6 +3452,8 @@ const es = {
     "accessRequired": "Acceso de Administrador Requerido",
     "accessDenied": "Necesitas privilegios de administrador para acceder a esta página.",
     "welcome": "Bienvenido,",
+    "loadingDashboard": "Cargando panel...",
+    "preparingTools": "Preparando herramientas de administración...",
     "nav": {
       "players": "Jugadores",
       "dictionary": "Diccionario",

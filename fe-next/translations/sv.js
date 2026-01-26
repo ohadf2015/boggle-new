@@ -3463,6 +3463,8 @@ const sv = {
     "accessRequired": "Adminbehörighet krävs",
     "accessDenied": "Du behöver administratörsbehörighet för att komma åt denna sida.",
     "welcome": "Välkommen,",
+    "loadingDashboard": "Laddar instrumentpanel...",
+    "preparingTools": "Förbereder adminverktyg...",
     "nav": {
       "players": "Spelare",
       "dictionary": "Ordbok",

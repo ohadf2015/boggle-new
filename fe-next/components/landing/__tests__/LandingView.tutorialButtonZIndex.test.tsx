@@ -161,9 +161,10 @@ describe('LandingView - Tutorial Button Z-Index', () => {
     const tutorialZIndex = parseInt(tutorialZMatch![1], 10);
     const bottomNavZIndex = parseInt(bottomNavZMatch![1], 10);
 
-    // Tutorial button MUST have higher z-index than GlobalBottomNav to avoid being hidden
-    // Tutorial button: z-[55], GlobalBottomNav: z-50
-    expect(tutorialZIndex).toBeGreaterThan(bottomNavZIndex);
+    // GlobalBottomNav MUST have higher z-index than tutorial button to be clickable
+    // Tutorial button: z-[55], GlobalBottomNav: z-[80]
+    // Bottom navigation must be above all other elements to remain clickable
+    expect(bottomNavZIndex).toBeGreaterThan(tutorialZIndex);
   });
 
   it('should position tutorial button above GlobalBottomNav on mobile', () => {

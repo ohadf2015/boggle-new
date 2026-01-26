@@ -3456,6 +3456,8 @@ const he = {
     "accessRequired": "נדרשת הרשאת מנהל",
     "accessDenied": "יש צורך בהרשאות מנהל כדי לגשת לעמוד זה.",
     "welcome": "שלום,",
+    "loadingDashboard": "טוען לוח בקרה...",
+    "preparingTools": "מכין כלי ניהול...",
     "nav": {
       "players": "שחקנים",
       "dictionary": "מילון",

@@ -3530,6 +3530,8 @@ const ja = {
     "accessRequired": "管理者アクセスが必要です",
     "accessDenied": "このページにアクセスするには管理者権限が必要です。",
     "welcome": "ようこそ、",
+    "loadingDashboard": "ダッシュボードを読み込んでいます...",
+    "preparingTools": "管理ツールを準備しています...",
     "nav": {
       "players": "プレイヤー",
       "dictionary": "辞書",

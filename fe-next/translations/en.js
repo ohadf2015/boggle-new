@@ -3458,6 +3458,8 @@ const en = {
     "accessRequired": "Admin Access Required",
     "accessDenied": "You need administrator privileges to access this page.",
     "welcome": "Welcome,",
+    "loadingDashboard": "Loading dashboard...",
+    "preparingTools": "Preparing admin tools...",
     "nav": {
       "players": "Players",
       "dictionary": "Dictionary",

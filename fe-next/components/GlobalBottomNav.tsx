@@ -94,7 +94,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     return (
         <nav
             className={cn(
-                "fixed bottom-0 left-0 right-0 z-50",
+                "fixed bottom-0 left-0 right-0 z-[80]",
                 "bg-neo-navy/95 backdrop-blur-sm",
                 "border-t-3 border-neo-black",
                 "shadow-[0_-4px_0_0_rgba(0,0,0,1)]", // Hard shadow upward
