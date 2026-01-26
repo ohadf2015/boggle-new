@@ -112,7 +112,11 @@ jest.mock('../../ui/PullToRefreshIndicator', () => ({
 }));
 jest.mock('../../OnboardingModal', () => () => null);
 jest.mock('../../auth/AuthModal', () => () => null);
-jest.mock('../../daily/DailyChallengeBanner', () => () => <div data-testid="daily-banner">Banner</div>);
+jest.mock('../../daily/DailyChallengeBanner', () => {
+  const MockDailyChallengeBanner = () => <div data-testid="daily-banner">Banner</div>;
+  MockDailyChallengeBanner.displayName = 'MockDailyChallengeBanner';
+  return MockDailyChallengeBanner;
+});
 jest.mock('../../daily/DailyChallenge', () => ({ useDailyChallenge: () => ({ completedToday: false, loading: false }) }));
 jest.mock('../../../utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => false,
