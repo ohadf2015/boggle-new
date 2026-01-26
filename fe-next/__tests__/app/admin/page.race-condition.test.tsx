@@ -101,6 +101,7 @@ describe('AdminPage - Race Condition Tests', () => {
     },
     language: 'en' as const,
     setLanguage: jest.fn(),
+    dir: 'ltr' as const,
     currentFlag: '🇺🇸',
   };
 
@@ -194,7 +195,6 @@ describe('AdminPage - Race Condition Tests', () => {
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: {
           id: 'user-1',
-          user_id: 'user-1',
           username: 'admin',
           display_name: 'Admin User',
           is_admin: true, // NOW admin is true
@@ -232,7 +232,6 @@ describe('AdminPage - Race Condition Tests', () => {
         user: { id: 'user-1', email: 'user@test.com' } as any,
         profile: {
           id: 'user-1',
-          user_id: 'user-1',
           username: 'regular-user',
           display_name: 'Regular User',
           is_admin: false, // NOT admin
@@ -271,7 +270,6 @@ describe('AdminPage - Race Condition Tests', () => {
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: {
           id: 'user-1',
-          user_id: 'user-1',
           username: 'admin',
           display_name: 'Admin User',
           is_admin: true,

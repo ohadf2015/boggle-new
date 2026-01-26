@@ -14,16 +14,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('Cache Busting Mechanisms', () => {
-  let mockServiceWorker: {
-    register: jest.Mock;
-    controller: ServiceWorker | null;
-    getRegistrations: jest.Mock;
-  };
-  let mockCaches: {
-    keys: jest.Mock;
-    delete: jest.Mock;
-    open: jest.Mock;
-  };
+  let mockServiceWorker: any;
+  let mockCaches: any;
 
   beforeEach(() => {
     // Mock service worker
@@ -81,8 +73,8 @@ describe('Cache Busting Mechanisms', () => {
         'lexiclash-v2-dynamic',
       ];
       const currentCache = 'lexiclash-v4-static';
-      mockCaches.keys.mockResolvedValue([...oldCaches, currentCache]);
-      mockCaches.delete.mockResolvedValue(true);
+      mockCaches.keys.mockResolvedValue([...oldCaches, currentCache] as any);
+      mockCaches.delete.mockResolvedValue(true as any);
 
       // When: Service worker activates
       const event = new Event('activate') as any;
@@ -90,7 +82,7 @@ describe('Cache Busting Mechanisms', () => {
 
       // Simulate service worker activation
       const activateHandler = async () => {
-        const keys = await mockCaches.keys();
+        const keys: string[] = await mockCaches.keys();
         await Promise.all(
           keys
             .filter((key: string) =>
@@ -152,8 +144,8 @@ describe('Cache Busting Mechanisms', () => {
         'lexiclash-v3-dynamic',
         'lexiclash-v4-static',
       ];
-      mockCaches.keys.mockResolvedValue(allCaches);
-      mockCaches.delete.mockResolvedValue(true);
+      mockCaches.keys.mockResolvedValue(allCaches as any);
+      mockCaches.delete.mockResolvedValue(true as any);
 
       // When: Clear all caches (version upgrade)
       const clearAllCaches = async () => {
@@ -174,11 +166,13 @@ describe('Cache Busting Mechanisms', () => {
 
     it('should unregister old service workers on version mismatch', async () => {
       // Given: Mock service worker registration
+      const mockUnregister: any = jest.fn();
+      mockUnregister.mockResolvedValue(true);
       const mockRegistration = {
-        unregister: jest.fn().mockResolvedValue(true),
+        unregister: mockUnregister,
         update: jest.fn(),
-      };
-      mockServiceWorker.getRegistrations.mockResolvedValue([mockRegistration]);
+      } as unknown as ServiceWorkerRegistration;
+      mockServiceWorker.getRegistrations.mockResolvedValue([mockRegistration] as any);
 
       // When: Unregister all service workers (force clean start)
       const unregisterAll = async () => {
