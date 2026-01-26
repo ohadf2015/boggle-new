@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 24 of 25 (CrazyGames Portal Integration) — IN PROGRESS
-Plan: 5/6 complete
-Status: In progress
-Last activity: 2026-01-26 — Completed 24-05-PLAN.md (Testing & Compliance)
+Phase: 25 of 25 (Capacitor Native Apps) — COMPLETE
+Plan: 4/4 complete
+Status: Complete
+Last activity: 2026-01-26 — Completed 25-04-PLAN.md (Native Build Testing)
 
 Progress: [██████████░░] 18/25 phases (72% milestone, v1.1 in progress)
 
@@ -95,9 +95,9 @@ Progress: [██████████░░] 18/25 phases (72% milestone, v1
 | 25-01 | Capacitor Installation | 4min | Complete |
 | 25-02 | Platform Detection & Native Features | 10min | Complete |
 | 25-03 | Safe Area & Offline Fallback | 20min | Complete |
-| 25-04 | Native Build Testing | - | Pending |
+| 25-04 | Native Build Testing | 10min | Complete |
 
-**Phase 25 Progress:** 3/4 plans complete, 34 minutes
+**Phase 25 Total:** 44 minutes, native app infrastructure complete
 
 ## Accumulated Context
 
@@ -164,6 +164,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **25-03**: Combined safe area approach → max() merges env() fallback with Capacitor plugin values (2026-01-26)
 - **25-03**: Async listener cleanup → Store handle in local variable, cleanup in effect return (2026-01-26)
 - **25-03**: Full-screen offline fallback → Branded neo-brutalist design maintains UX consistency (2026-01-26)
+- **25-04**: Bash scripts wrapped by npm → Complex build logic easier in bash, npm provides convenience (2026-01-26)
+- **25-04**: --release flag for production → Explicit opt-in prevents accidental release builds (2026-01-26)
+- **25-04**: Xcode for iOS debug, CLI for release → Better debugging UX, automation for distribution (2026-01-26)
+- **25-04**: Environment variables for credentials → Never commit secrets, explicit configuration (2026-01-26)
 
 ### Pending Todos
 
@@ -217,7 +221,7 @@ None.
 - Manual verification completed — Bundle analyzer, visual parity, lifecycle events, multiplayer flow
 - Next: Ad integration & polish (24-06) — adBreak API for rewarded and midgame ads
 
-**Phase 25 (Capacitor Native Apps) — IN PROGRESS:**
+**Phase 25 (Capacitor Native Apps) — COMPLETE:**
 - Capacitor 8.x installed — Core, CLI, iOS/Android platforms, 8 plugins (25-01 complete)
 - WebView configuration complete — Points to https://www.lexiclash.live production webapp
 - @capacitor/http NOT installed — Prevents Socket.IO WebSocket interference
@@ -227,18 +231,20 @@ None.
 - Safe area handling complete — useSafeArea hook with CSS custom properties (25-03 complete)
 - Offline fallback complete — OfflineFallback component with translations in 5 languages (25-03 complete)
 - CSS custom properties — Combined approach uses max() of env() and Capacitor values (25-03 complete)
-- Test coverage: 69 tests passing — +13 tests (6 hook, 7 component)
-- Java version issue — Gradle requires Java 11+ for Android builds (will resolve in 25-04)
-- Next: Native Build Testing (25-04) — iOS/Android builds, splash screen, icon setup
+- Build scripts complete — iOS/Android build automation with npm workflow (25-04 complete)
+- Socket.IO verified working — Native WebView multiplayer tested and approved by user (25-04 complete)
+- Test coverage: 69 tests passing — All native infrastructure tests passing
+- Total duration: 44 minutes across 4 plans
+- Ready for App Store/Play Store submission
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 24-05-PLAN.md (Testing & Compliance) — 5/6 plans complete
+Stopped at: Completed 25-04-PLAN.md (Native Build Testing) — Phase 25 COMPLETE
 Resume file: None
 
-**Next action:** Continue Phase 24 with plan 24-06 (Ad Integration & Polish)
+**Next action:** Phase 25 complete. Native app infrastructure ready for production.
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 25 plan 03 complete)*
+*Last updated: 2026-01-26 (Phase 25 plan 04 complete - PHASE COMPLETE)*
