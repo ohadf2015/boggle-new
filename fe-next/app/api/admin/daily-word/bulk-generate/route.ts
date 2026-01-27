@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
 import { gameAIService } from '@/lib/ai-service';
 import {
@@ -245,7 +246,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('Bulk generate error:', errorMessage);
+    console.error('Bulk generate error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/bulk-generate',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
@@ -355,7 +361,12 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('Bulk save error:', errorMessage);
+    console.error('Bulk save error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/bulk-generate',
+      { method: 'PUT', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

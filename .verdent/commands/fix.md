@@ -11,7 +11,7 @@ Fix errors systematically - reproduce, test, fix root cause (not symptoms), veri
 
 ## Project Context
 - `AGENTS.md` - Architecture and patterns
-- `fe-next/claude.md` - Code standards
+- `fe-next/CLAUDE.md` - Code standards
 
 ## Process
 

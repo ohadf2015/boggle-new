@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
+import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
 
 // Minimum word length by language (must match wikipediaWordProcessor.ts)
@@ -92,6 +93,12 @@ export async function POST(request: NextRequest) {
         .eq('id', existing.id);
 
       if (updateError) {
+        console.error('Update word error:', updateError);
+        captureApiError(new Error(updateError.message), '/api/admin/daily-word/replace', {
+          method: 'POST',
+          statusCode: 500,
+          body: { puzzleDate, language }
+        });
         return NextResponse.json(
           { error: `Failed to update word: ${updateError.message}` },
           { status: 500 }
@@ -123,6 +130,12 @@ export async function POST(request: NextRequest) {
         });
 
       if (insertError) {
+        console.error('Insert word error:', insertError);
+        captureApiError(new Error(insertError.message), '/api/admin/daily-word/replace', {
+          method: 'POST',
+          statusCode: 500,
+          body: { puzzleDate, language }
+        });
         return NextResponse.json(
           { error: `Failed to create word entry: ${insertError.message}` },
           { status: 500 }
@@ -150,7 +163,12 @@ export async function POST(request: NextRequest) {
         };
       } catch (regenerateError) {
         const errorMessage = regenerateError instanceof Error ? regenerateError.message : 'Unknown error';
-        console.error('Board regeneration error:', errorMessage);
+        console.error('Board regeneration error:', regenerateError);
+        captureApiError(
+          regenerateError instanceof Error ? regenerateError : new Error('Unknown error'),
+          '/api/admin/daily-word/replace',
+          { method: 'POST', statusCode: 500 }
+        );
         boardRegenerateResult = {
           success: false,
           error: errorMessage
@@ -183,7 +201,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('Replace word error:', errorMessage);
+    console.error('Replace word error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/replace',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

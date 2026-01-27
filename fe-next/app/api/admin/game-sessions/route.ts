@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 
 // Import backend services
 let getGameSessions: any;
@@ -107,7 +108,12 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/game-sessions] Error:', errorMessage);
+    console.error('[admin/game-sessions] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/game-sessions',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

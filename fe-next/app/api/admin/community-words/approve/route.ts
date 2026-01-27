@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * POST - Approve a community word
@@ -62,13 +63,18 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('[admin/approve] Error updating word:', updateError);
+      captureApiError(new Error(updateError.message), '/api/admin/community-words/approve', {
+        method: 'POST',
+        statusCode: 500,
+        body: { word, language }
+      });
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
     // If addToDictionary is true, persist to approved dictionary file
     if (addToDictionary) {
       try {
-        const { addToCommunityCache } = require('@/backend/modules/communityWordManager');
+        const { addToCommunityCache } = await import('@/backend/modules/communityWordManager');
         await addToCommunityCache(word, language);
       } catch (error) {
         console.warn('[admin/approve] Failed to add to dictionary cache:', error);
@@ -83,7 +89,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/approve] Error:', errorMessage);
+    console.error('[admin/approve] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/community-words/approve',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

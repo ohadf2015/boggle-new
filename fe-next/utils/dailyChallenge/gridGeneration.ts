@@ -987,25 +987,20 @@ export function selectDailyTargetWord(
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  // Import word validation to check if word is actually on board
-  const { isWordOnBoard } = require('../clientWordValidator');
-
   // Try each word in shuffled order - must validate with actual path-finding
+  // Note: Using isWordOnGrid here instead of lazy require to prevent CommonJS bundling issues
   for (const word of shuffled) {
     // Normalize Hebrew final letters before checking
     const normalizedWord = language === 'he' ? normalizeHebrewFinalLetters(word) : word;
 
-    // First do quick letter count check
-    if (canWordExistOnGrid(normalizedWord, grid, language)) {
-      // Then validate with proper path-finding algorithm
-      if (isWordOnBoard(normalizedWord, grid, language)) {
-        return {
-          word: normalizedWord,
-          puzzleDate: dateString,
-          language,
-          puzzleNumber: getPuzzleNumber(dateString),
-        };
-      }
+    // First do quick letter count check, then validate with proper path-finding
+    if (canWordExistOnGrid(normalizedWord, grid, language) && isWordOnGrid(normalizedWord, grid)) {
+      return {
+        word: normalizedWord,
+        puzzleDate: dateString,
+        language,
+        puzzleNumber: getPuzzleNumber(dateString),
+      };
     }
   }
 

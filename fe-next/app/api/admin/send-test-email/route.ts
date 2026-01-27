@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { sendTestEmail, isEmailServiceConfigured } from '@/lib/email';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * POST /api/admin/send-test-email
@@ -105,6 +106,11 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('[Admin] ====== ERROR after', Date.now() - startTime, 'ms ======');
     console.error('[Admin] Error details:', errorMessage);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/send-test-email',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json({
       error: errorMessage,
     }, { status: 500 });

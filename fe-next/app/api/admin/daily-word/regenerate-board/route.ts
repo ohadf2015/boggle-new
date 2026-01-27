@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
+import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
 
 /**
@@ -66,7 +67,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Regenerate board error:', errorMessage);
+    console.error('Regenerate board error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/regenerate-board',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

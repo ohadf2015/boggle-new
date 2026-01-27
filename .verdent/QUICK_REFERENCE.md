@@ -31,7 +31,7 @@
 
 ### Implement New Feature
 ```
-1. Read: AGENTS.md, fe-next/claude.md, package.json
+1. Read: AGENTS.md, fe-next/CLAUDE.md, package.json
 2. Search: Find similar features (spawn_subagent file-navigator)
 3. Clarify: Ask questions (clarification_tool)
 4. Plan: Present implementation plan, wait for approval
@@ -426,7 +426,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 - **Commands**: `.verdent/commands/`
 - **Agents**: `.verdent/agents/`
 - **Skills**: `.verdent/skills/`
-- **Main docs**: `AGENTS.md`, `fe-next/claude.md`
+- **Main docs**: `AGENTS.md`, `fe-next/CLAUDE.md`
 - **Game design**: `GAME_DESIGN_DOCUMENT.md`
 
 ---

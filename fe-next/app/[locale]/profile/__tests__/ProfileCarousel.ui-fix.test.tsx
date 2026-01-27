@@ -106,26 +106,26 @@ import ProfilePageClient from '../PageClient';
 
 describe('Profile Carousel UI Improvements', () => {
   describe('Progress Indicators', () => {
-    it('should use subtle progress indicator sizing', () => {
+    it('should use small dot sizing for indicators', () => {
       const { container } = render(<ProfilePageClient />);
 
       // Find all section indicator buttons
       const indicators = container.querySelectorAll('button[aria-label*="section"]');
       expect(indicators.length).toBeGreaterThan(0);
 
-      // Active indicator should NOT use w-8 (too aggressive, 4x wider)
-      // Should use w-6 h-2 at most (3x wider is more subtle)
+      // Active indicator should use small dots (w-2.5 or w-2)
       const activeIndicator = Array.from(indicators).find(btn =>
         btn.className.includes('bg-neo-yellow')
       );
       expect(activeIndicator).toBeInTheDocument();
-      expect(activeIndicator?.className).not.toContain('w-8');
 
-      // Should use w-6 or smaller
-      const hasSubtleWidth = activeIndicator?.className.includes('w-6') ||
-                            activeIndicator?.className.includes('w-5') ||
-                            activeIndicator?.className.includes('w-4');
-      expect(hasSubtleWidth).toBe(true);
+      // Should NOT use large sizes like w-6 or w-8
+      expect(activeIndicator?.className).not.toContain('w-8');
+      expect(activeIndicator?.className).not.toContain('w-6');
+
+      // Should use small dot sizing (w-2 or w-2.5)
+      const hasSmallDotSize = activeIndicator?.className.includes('w-2');
+      expect(hasSmallDotSize).toBe(true);
     });
 
     it('should have subtle inactive indicator styling', () => {

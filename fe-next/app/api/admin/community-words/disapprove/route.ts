@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * POST - Disapprove/reject a community word
@@ -61,6 +62,11 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('[admin/disapprove] Error updating word:', updateError);
+      captureApiError(new Error(updateError.message), '/api/admin/community-words/disapprove', {
+        method: 'POST',
+        statusCode: 500,
+        body: { word, language }
+      });
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
@@ -77,7 +83,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/disapprove] Error:', errorMessage);
+    console.error('[admin/disapprove] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/community-words/disapprove',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

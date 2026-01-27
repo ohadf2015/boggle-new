@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 import {
   regenerateSingleChallenge,
   regenerateChallengesByType,
@@ -247,7 +248,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Regeneration error:', errorMessage);
+    console.error('[Admin Buzz] Regeneration error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/regenerate',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

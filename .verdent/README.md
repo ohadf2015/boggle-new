@@ -81,7 +81,7 @@ Reusable skill modules in `.verdent/skills/`:
 Always reference these before starting work:
 
 1. **AGENTS.md** - Commands, architecture, development hints
-2. **fe-next/claude.md** - Coding standards, design system, tech stack
+2. **fe-next/CLAUDE.md** - Coding standards, design system, tech stack
 3. **GAME_DESIGN_DOCUMENT.md** - Game mechanics, scoring, progression
 4. **claude.md** - Project overview and quick start
 
@@ -172,7 +172,7 @@ Complex multi-step workflows in `.verdent/workflows/`:
 
 ## Getting Started
 
-1. **Read project context**: Start with `AGENTS.md` and `fe-next/claude.md`
+1. **Read project context**: Start with `AGENTS.md` and `fe-next/CLAUDE.md`
 2. **Choose a workflow**: Pick a command based on your task type
 3. **Follow the process**: Each command has clear steps
 4. **Use available tools**: Leverage Verdent's tools and subagents
@@ -232,7 +232,7 @@ p-[2cqi]      /* 2% of container inline size */
 
 ## Support & Documentation
 
-- **Main project docs**: See root `AGENTS.md` and `fe-next/claude.md`
+- **Main project docs**: See root `AGENTS.md` and `fe-next/CLAUDE.md`
 - **Game design**: `GAME_DESIGN_DOCUMENT.md`
 - **Architecture**: `AGENTS.md` → "Architecture" section
 - **Commands**: `.verdent/commands/` directory

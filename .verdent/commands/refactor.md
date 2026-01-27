@@ -12,7 +12,7 @@ Intelligently refactor and improve code quality while preserving external behavi
 
 ## Project Context
 - `AGENTS.md` - Architecture patterns
-- `fe-next/claude.md` - Code quality standards
+- `fe-next/CLAUDE.md` - Code quality standards
 - `.verdent/agents/code-quality-pragmatist.md` - Anti-slop methodology
 
 ## CRITICAL PRINCIPLES

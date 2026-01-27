@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 import { createClient } from '@supabase/supabase-js';
 import { clearPromptTemplateCache } from '@/backend/services/buzz/promptTemplateLoader';
 
@@ -70,7 +71,12 @@ export async function GET(
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Error:', errorMessage);
+    console.error('[Admin Buzz] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/prompt-templates/[id]',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
@@ -191,7 +197,12 @@ export async function PUT(
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Error:', errorMessage);
+    console.error('[Admin Buzz] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/prompt-templates/[id]',
+      { method: 'PUT', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
@@ -265,7 +276,12 @@ export async function DELETE(
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Error:', errorMessage);
+    console.error('[Admin Buzz] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/prompt-templates/[id]',
+      { method: 'DELETE', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

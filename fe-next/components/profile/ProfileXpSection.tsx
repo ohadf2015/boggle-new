@@ -37,10 +37,10 @@ export function ProfileXpSection({
       <div className="flex items-center justify-between mb-3">
         <h2 className={cn(
           'font-bold flex items-center gap-2',
-          compact ? 'text-base' : 'text-lg',
+          compact ? 'text-lg' : 'text-xl',
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
-          <span className={compact ? 'text-lg' : 'text-xl'}>⚡</span>
+          <span className={compact ? 'text-xl' : 'text-2xl'}>⚡</span>
           {t('xp.title') || 'Player Level'}
         </h2>
         <LevelBadge

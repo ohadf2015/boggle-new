@@ -516,7 +516,7 @@ When working with Verdent, you have access to:
 ### Integration with Project Standards
 
 All Verdent commands and workflows are designed to:
-- Enforce `.verdent/claude.md` coding standards
+- Enforce `fe-next/CLAUDE.md` coding standards
 - Respect translation-first development (4 languages)
 - Follow Neo-Brutalist design system
 - Maintain type safety (no `any` types)

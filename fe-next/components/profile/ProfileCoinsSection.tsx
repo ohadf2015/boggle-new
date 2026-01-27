@@ -36,10 +36,10 @@ export function ProfileCoinsSection({
       <div className="flex items-center justify-between mb-3">
         <h2 className={cn(
           'font-bold flex items-center gap-2',
-          compact ? 'text-base' : 'text-lg',
+          compact ? 'text-lg' : 'text-xl',
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
-          <span className={compact ? 'text-lg' : 'text-xl'}>💰</span>
+          <span className={compact ? 'text-xl' : 'text-2xl'}>💰</span>
           {t('coins.title') || 'Coins & Rewards'}
         </h2>
         <CoinBalance coins={profile?.total_coins || 0} size={compact ? 'sm' : 'md'} />

@@ -5,6 +5,7 @@
 
 import type { Server as HttpServer } from 'http';
 import type { Server } from 'socket.io';
+import * as Sentry from '@sentry/nextjs';
 
 import * as dictionary from '../backend/dictionary';
 import { restoreTournamentsFromRedis } from '../backend/modules/tournamentManager';
@@ -186,4 +187,69 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
 export function registerShutdownHandlers(shutdownHandler: ShutdownHandler): void {
   process.on('SIGTERM', shutdownHandler);
   process.on('SIGINT', shutdownHandler);
+}
+
+/**
+ * Register process-level error handlers to capture uncaught errors to Sentry
+ * Must be called during server initialization
+ */
+export function registerProcessErrorHandlers(): void {
+  // Capture unhandled promise rejections
+  process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+    console.error('[PROCESS] Unhandled Promise Rejection:', reason);
+
+    // Capture to Sentry in production
+    if (process.env.NODE_ENV === 'production') {
+      if (reason instanceof Error) {
+        Sentry.withScope((scope) => {
+          scope.setTag('error.type', 'unhandled_rejection');
+          scope.setContext('promise', {
+            promise: String(promise),
+          });
+          Sentry.captureException(reason);
+        });
+      } else {
+        Sentry.withScope((scope) => {
+          scope.setTag('error.type', 'unhandled_rejection');
+          Sentry.captureMessage(`Unhandled Rejection: ${String(reason)}`, 'error');
+        });
+      }
+    }
+  });
+
+  // Capture uncaught exceptions
+  process.on('uncaughtException', (error: Error) => {
+    console.error('[PROCESS] Uncaught Exception:', error);
+
+    // Capture to Sentry in production
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.withScope((scope) => {
+        scope.setTag('error.type', 'uncaught_exception');
+        Sentry.captureException(error);
+      });
+    }
+
+    // Exit process after logging (uncaught exceptions are fatal)
+    // Give Sentry time to send the error
+    setTimeout(() => {
+      process.exit(1);
+    }, 2000);
+  });
+
+  // Capture warnings (non-fatal)
+  process.on('warning', (warning: Error) => {
+    console.warn('[PROCESS] Warning:', warning.name, warning.message);
+
+    // Only capture high-severity warnings to Sentry in production
+    if (
+      process.env.NODE_ENV === 'production' &&
+      warning.name === 'DeprecationWarning'
+    ) {
+      Sentry.withScope((scope) => {
+        scope.setLevel('warning');
+        scope.setTag('warning.type', warning.name);
+        Sentry.captureMessage(`Process Warning: ${warning.message}`, 'warning');
+      });
+    }
+  });
 }

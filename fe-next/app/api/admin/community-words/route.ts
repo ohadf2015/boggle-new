@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * Determine word status based on net_score and is_potentially_valid
@@ -82,7 +83,11 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
-      console.error('[admin/community-words] Query error:', errorMessage);
+      console.error('[admin/community-words] Query error:', error);
+      captureApiError(new Error(errorMessage), '/api/admin/community-words', {
+        method: 'GET',
+        statusCode: 500
+      });
       return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
@@ -113,7 +118,12 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[admin/community-words] Error:', errorMessage);
+    console.error('[admin/community-words] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/community-words',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 import { createClient } from '@supabase/supabase-js';
 import { clearPromptTemplateCache } from '@/backend/services/buzz/promptTemplateLoader';
 
@@ -126,7 +127,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Error:', errorMessage);
+    console.error('[Admin Buzz] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/prompt-templates',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
@@ -232,7 +238,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Error:', errorMessage);
+    console.error('[Admin Buzz] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/prompt-templates',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

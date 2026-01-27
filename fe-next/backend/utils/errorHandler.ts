@@ -12,6 +12,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import type { Socket, Server } from 'socket.io';
+import * as Sentry from '@sentry/nextjs';
 import logger from './logger';
 
 // ==========================================
@@ -445,6 +446,29 @@ export function emitAppError(socket: Socket, error: Error | AppError): void {
       error.message,
       error.toLogObject()
     );
+
+    // Capture high/critical severity errors to Sentry in production
+    if (
+      process.env.NODE_ENV === 'production' &&
+      (error.severity === ErrorSeverity.HIGH || error.severity === ErrorSeverity.CRITICAL)
+    ) {
+      Sentry.withScope((scope) => {
+        scope.setTag('error.type', 'socket_app_error');
+        scope.setTag('app.error_code', error.code);
+        scope.setTag('app.error_severity', error.severity);
+        scope.setContext('app_error', {
+          code: error.code,
+          severity: error.severity,
+          httpStatus: error.httpStatus,
+          details: error.details,
+          correlationId: error.correlationId,
+        });
+        scope.setContext('socket', {
+          socketId: socket.id,
+        });
+        Sentry.captureException(error);
+      });
+    }
   } else {
     // Wrap unknown errors
     const appError = new AppError(ErrorCodes.INTERNAL_ERROR, {
@@ -452,6 +476,17 @@ export function emitAppError(socket: Socket, error: Error | AppError): void {
     });
     socket.emit('error', appError.toClientError());
     logger.error('SOCKET_ERROR', 'Unhandled error', { error: error.message, stack: error.stack });
+
+    // Capture unknown errors to Sentry in production
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.withScope((scope) => {
+        scope.setTag('error.type', 'socket_unhandled_error');
+        scope.setContext('socket', {
+          socketId: socket.id,
+        });
+        Sentry.captureException(error);
+      });
+    }
   }
 }
 
@@ -483,6 +518,20 @@ export function wrapSocketHandler(handler: SocketHandler, eventName: string): (i
         stack: (error as Error).stack
       });
 
+      // Capture error to Sentry in production
+      if (process.env.NODE_ENV === 'production') {
+        Sentry.withScope((scope) => {
+          scope.setTag('error.type', 'socket_handler_error');
+          scope.setTag('socket.event', eventName);
+          scope.setContext('socket_handler', {
+            event: eventName,
+            socketId: socket.id,
+            correlationId,
+          });
+          Sentry.captureException(error as Error);
+        });
+      }
+
       if (error instanceof AppError) {
         error.correlationId = correlationId;
         emitAppError(socket, error);
@@ -513,6 +562,22 @@ export function wrapRouteHandler(handler: RouteHandler): (req: Request, res: Res
         error: (error as Error).message,
         stack: (error as Error).stack
       });
+
+      // Capture error to Sentry in production
+      if (process.env.NODE_ENV === 'production') {
+        Sentry.withScope((scope) => {
+          scope.setTag('error.type', 'route_error');
+          scope.setTag('http.method', req.method);
+          scope.setTag('http.path', req.path);
+          scope.setContext('http_request', {
+            method: req.method,
+            path: req.path,
+            correlationId,
+            url: req.url,
+          });
+          Sentry.captureException(error as Error);
+        });
+      }
 
       if (error instanceof AppError) {
         error.correlationId = correlationId;

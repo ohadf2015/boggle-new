@@ -16,13 +16,10 @@
  * - Multi-word voting queue: Increase vote collection per game
  */
 
- 
-const { getSupabase, isSupabaseConfigured } = require('./supabaseServer');
- 
-const { normalizeWord } = require('../dictionary');
- 
-const logger = require('../utils/logger');
-
+import { getSupabase, isSupabaseConfigured } from './supabaseServer';
+import { normalizeWord } from '../dictionary';
+import type { Language } from '@/shared/types';
+import logger from '../utils/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Interfaces
@@ -343,7 +340,7 @@ export async function recordVote({
     return { success: false, isNowValid: false, error: 'Supabase not configured' };
   }
 
-  const normalizedWord = normalizeWord(word, language || 'en');
+  const normalizedWord = normalizeWord(word, (language || 'en') as Language);
   const lang = (language || 'en') as LanguageCode;
 
   try {
@@ -430,7 +427,7 @@ export async function recordAIVote({
     return { success: false, netScore: 0, isProminentlyValid: false, isValidForScoring: false, error: 'Supabase not configured' };
   }
 
-  const normalizedWord = normalizeWord(word, language || 'en');
+  const normalizedWord = normalizeWord(word, (language || 'en') as Language);
   const lang = (language || 'en') as LanguageCode;
   const votePoints = isValid ? AI_VOTE_POINTS : -AI_VOTE_POINTS;
 
@@ -517,7 +514,7 @@ export async function getWordValidationInfo(word: string, language: string): Pro
     return { netScore: 0, isProminentlyValid: false, isValidForScoring: false };
   }
 
-  const normalizedWord = normalizeWord(word, language || 'en');
+  const normalizedWord = normalizeWord(word, (language || 'en') as Language);
   const lang = language || 'en';
 
   try {
@@ -806,7 +803,7 @@ export async function hasUserVoted(
   const client = getSupabase() as SupabaseClient | null;
   if (!client) return false;
 
-  const normalizedWord = normalizeWord(word, language || 'en');
+  const normalizedWord = normalizeWord(word, (language || 'en') as Language);
 
   try {
     let query = client
@@ -845,7 +842,7 @@ export async function getWordStats(word: string, language: string): Promise<Word
   const client = getSupabase() as SupabaseClient | null;
   if (!client) return { likes: 0, dislikes: 0, netScore: 0, isValid: false };
 
-  const normalizedWord = normalizeWord(word, language || 'en');
+  const normalizedWord = normalizeWord(word, (language || 'en') as Language);
 
   try {
     const { data, error } = await client

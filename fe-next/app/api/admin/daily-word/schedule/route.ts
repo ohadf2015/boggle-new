@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
 
 export async function GET(request: NextRequest) {
@@ -53,7 +54,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ data });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    console.error('Error fetching schedule:', errorMessage);
+    console.error('Error fetching schedule:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/schedule',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

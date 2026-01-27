@@ -15,7 +15,7 @@
 import './preload';
 
 import 'dotenv/config';
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import * as http from 'http';
 import next from 'next';
 import * as url from 'url';
@@ -27,11 +27,13 @@ import { configureMiddleware } from './middleware';
 import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } from './socketSetup';
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
+import { errorHandler, notFoundHandler } from './errorMiddleware';
 import {
   initializeServer,
   setupEventLoopMonitoring,
   createShutdownHandler,
-  registerShutdownHandlers
+  registerShutdownHandlers,
+  registerProcessErrorHandlers
 } from './lifecycle';
 
 // Route modules
@@ -102,7 +104,7 @@ async function start(): Promise<void> {
   app.use('/api', aiHintsRoutes);
 
   // Next.js request handler (catch-all)
-  app.use(async (req: Request, res: Response): Promise<void> => {
+  app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const parsedUrl = url.parse(req.url, true);
       const { pathname } = parsedUrl;
@@ -115,13 +117,19 @@ async function start(): Promise<void> {
 
       await handle(req, res, parsedUrl);
     } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      if (!res.headersSent) {
-        res.statusCode = 500;
-        res.end('internal server error');
-      }
+      // Pass to error handler instead of handling inline
+      next(err);
     }
   });
+
+  // 404 handler (must be after all routes)
+  app.use(notFoundHandler);
+
+  // Global error handler (must be last)
+  app.use(errorHandler);
+
+  // Register process-level error handlers (must be early)
+  registerProcessErrorHandlers();
 
   // Initialize server components
   await initializeServer(io);

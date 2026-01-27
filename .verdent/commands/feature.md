@@ -14,7 +14,7 @@ Implement new features thoroughly - understand context first, ask questions, wri
 ## Project Context
 Before starting, read:
 - `AGENTS.md` - Commands, architecture, patterns
-- `fe-next/claude.md` - Coding standards, design system
+- `fe-next/CLAUDE.md` - Coding standards, design system
 - `fe-next/package.json` - Dependencies and scripts
 
 ## Process
@@ -24,7 +24,7 @@ Before starting, read:
 **Read project documentation:**
 ```
 file_read(AGENTS.md)
-file_read(fe-next/claude.md) 
+file_read(fe-next/CLAUDE.md) 
 file_read(fe-next/package.json)
 ```
 

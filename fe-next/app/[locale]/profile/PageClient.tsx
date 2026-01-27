@@ -229,8 +229,8 @@ export default function ProfilePageClient(): React.JSX.Element {
                 className={cn(
                   'transition-all duration-200',
                   index === currentIndex
-                    ? 'w-6 h-2 bg-neo-yellow rounded-full'
-                    : 'w-2 h-2 bg-neo-white/30 rounded-full hover:bg-neo-white/50'
+                    ? 'w-2.5 h-2.5 bg-neo-yellow rounded-neo border-neo border-neo-black shadow-hard-sm'
+                    : 'w-2 h-2 bg-neo-white/30 rounded-neo border border-neo-black/50 hover:bg-neo-white/50'
                 )}
                 aria-label={`Go to ${section} section`}
               />
@@ -311,7 +311,7 @@ export default function ProfilePageClient(): React.JSX.Element {
             <button
               onClick={goToPrevSection}
               className={cn(
-                'fixed left-2 bottom-20 z-10 opacity-40 hover:opacity-80',
+                'fixed start-2 bottom-20 z-10 opacity-40 hover:opacity-80',
                 'w-10 h-10 rounded-full',
                 'bg-neo-navy/80 border-2 border-neo-yellow',
                 'flex items-center justify-center',
@@ -321,7 +321,7 @@ export default function ProfilePageClient(): React.JSX.Element {
               )}
               aria-label="Previous section"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
             </button>
           )}
 
@@ -329,7 +329,7 @@ export default function ProfilePageClient(): React.JSX.Element {
             <button
               onClick={goToNextSection}
               className={cn(
-                'fixed right-2 bottom-20 z-10 opacity-40 hover:opacity-80',
+                'fixed end-2 bottom-20 z-10 opacity-40 hover:opacity-80',
                 'w-10 h-10 rounded-full',
                 'bg-neo-navy/80 border-2 border-neo-yellow',
                 'flex items-center justify-center',
@@ -339,7 +339,7 @@ export default function ProfilePageClient(): React.JSX.Element {
               )}
               aria-label="Next section"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-6 h-6 rtl:rotate-180" />
             </button>
           )}
         </motion.div>

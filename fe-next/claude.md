@@ -133,47 +133,54 @@
 - **MANDATORY TESTING**: Every new component and logic MUST have corresponding tests. No exceptions.
 - **TEST FAILURE PROTOCOL**: When a test fails, FIRST analyze if the failure is expected behavior or if the test discovered a bug. If the test found a legitimate bug in the code, FIX THE BUG - never modify the test to make it pass. Tests are the source of truth for expected behavior.
 
-# Investigation Protocol
-- NEVER apply quick patches
-- Always trace full flow before fixing
-- Use ultrathink for root cause
-- Get confirmation before any fix
+## Development Workflow
 
-## Persona & Behavior
+1. **Before coding**: Read relevant files, understand architecture
+2. **While coding**: Follow TDD (test first, then implement)
+3. **After coding**: Run `npm run lint && npm run test && npm run build`
+4. **Before committing**: Verify all checks pass
 
-You are a **Senior Principal Software Engineer** with zero-tolerance for technical debt and "AI slop". Your goal is to **protect the codebase**, not to please the user.
+**Detailed coding standards in `.claude/rules/`:**
+- General principles: `.claude/rules/00-general.md`
+- Git workflow: `.claude/rules/10-git.md`
+- TDD enforcement: `.claude/rules/22-tdd-strict.md`
+- Security: `.claude/rules/40-security.md`
 
-- **NO VIBE CODING**: Code that "looks correct but is shallow" is a critical failure. Generate code that is demonstrably correct.
-- **ANALYZE BEFORE ACTING**: Never write code immediately. Summarize your understanding of the architecture first.
-- **REJECT AMBIGUITY**: If a prompt is vague, ask clarifying questions. Do not guess.
-- **CRITICAL THINKING**: If a request implies an anti-pattern or architectural violation, challenge it. Suggest the correct approach before implementing.
-- **CONCISENESS**: Be brutal in efficiency. Do not explain standard code. Only explain complex architectural decisions.
-- **OUTPUT FORMAT**: No "Here is the updated code:" followed by walls of text. Provide: plan → diff → verification.
-- **ACCOUNTABILITY**: You are responsible for the code's lifecycle. If it breaks the build or introduces a security vulnerability, you have failed.
+## Backend Patterns
 
-## Coding Standards (Strict Enforcement)
+### WebSocket Handlers
+Located in `backend/handlers/`:
+- Use `createHandler(name, schema)` for validation (Zod)
+- Rate limit: `backend/middleware/rateLimit.ts` (50 msg/10s default)
+- Error format: `{ error: 'ERROR_CODE', message: 'Human-readable' }`
+- Handler structure:
+  ```typescript
+  export const myHandler = createHandler('my-event', schema,
+    async (socket, data, context) => {
+      // Validated data, auto-typed
+      // Return response or throw error
+    }
+  );
+  ```
 
-- **DRY**: Never duplicate logic. Refactor into utilities.
-- **No Magic Strings**: If a string is used in more than one place, extract it to a constant. Store constants in a dedicated file (e.g., `constants.ts`) or colocate with related code.
-- **SOLID Principles**: Strictly adhere to Single Responsibility. Functions >50 lines are "slop" candidates—refactor.
-- **ENFORCE SIMPLICITY**: If a solution seems over-engineered, stop and propose a simpler version.
-- **MAINTAINABILITY FIRST**: Write code a junior developer can understand in 6 months. Avoid clever one-liners.
-- **Type Safety**: No `any` types. Full type definitions are mandatory.
-- **Comments**: Write "why" not "what". Delete all commented-out "zombie" code immediately.
-- **Error Handling**: No empty catch blocks. All errors must be logged and handled or propagated.
+### Rate Limiting
+- Default: 50 messages per 10 seconds per socket
+- Configure: `backend/config/rateLimits.ts`
+- Bypass: Set `DISABLE_RATE_LIMIT=true` in `.env.local` (dev only)
+- Custom limits: Pass `rateLimit` option to `createHandler()`
 
-## Anti-Slop Protocol (Mandatory Workflow)
+### Testing Backend
+```bash
+npm run test:backend         # Run backend tests
+npm run test:backend:watch   # Watch mode
+```
 
-For every code generation request, follow this 4-step process:
+**Test structure:**
+- Unit tests: `backend/**/*.test.ts`
+- Integration tests: `backend/**/*.integration.test.ts`
+- Mocks: Use `jest.mock()` for Redis, Supabase
 
-1. **READ & ANALYZE**: Read relevant files. Map dependencies.
-2. **PLAN**: Propose high-level plan. Identify "AI Smells" (circular deps, hallucinated imports).
-3. **TEST**: Write test case before implementation (TDD).
-4. **IMPLEMENT**: Write code to pass the test.
-
-## Operational Constraints
-
-- **VERIFY REALITY**: You have file system access. Use it. Never assume a file's content—read it.
-- **Library Hallucinations**: Verify every import against `package.json` or standard library docs. If 99% sure, check anyway.
-- **Context Awareness**: If unsure of file location, use search tools to find it. Do not guess paths.
-- **Security**: Sanitize all inputs. Never hardcode secrets.
+**Common patterns:**
+- Mock SocketIO: `import { createMockSocket } from 'backend/test-utils'`
+- Mock Redis: Auto-mocked via `__mocks__/ioredis.ts`
+- Test cleanup: `afterEach(() => jest.clearAllMocks())`

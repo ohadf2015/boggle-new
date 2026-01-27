@@ -16,6 +16,7 @@
 
 import crypto from 'crypto';
 import { AsyncLocalStorage } from 'async_hooks';
+import * as Sentry from '@sentry/nextjs';
 import type { Request, Response, NextFunction } from 'express';
 import type { Socket } from 'socket.io';
 
@@ -271,13 +272,76 @@ class Logger {
     switch (level) {
       case LOG_LEVELS.ERROR:
         console.error(formatted);
+        // Capture errors to Sentry in production
+        if (process.env.NODE_ENV === 'production') {
+          this.captureToSentry('error', category, message, data);
+        }
         break;
       case LOG_LEVELS.WARN:
         console.warn(formatted);
+        // Capture warnings to Sentry in production
+        if (process.env.NODE_ENV === 'production') {
+          this.captureToSentry('warning', category, message, data);
+        }
         break;
       default:
         console.log(formatted);
     }
+  }
+
+  /**
+   * Capture log entry to Sentry (production only)
+   */
+  private captureToSentry(
+    level: 'error' | 'warning',
+    category: string,
+    message: string,
+    data?: unknown
+  ): void {
+    const context = this.getMergedContext();
+
+    Sentry.withScope((scope) => {
+      // Set log metadata
+      scope.setLevel(level);
+      scope.setTag('log.category', category);
+
+      // Add context tags
+      if (context.correlationId) {
+        scope.setTag('log.correlation_id', context.correlationId);
+      }
+      if (context.gameCode) {
+        scope.setTag('log.game_code', context.gameCode);
+      }
+      if (context.socketId) {
+        scope.setTag('log.socket_id', context.socketId);
+      }
+
+      // Add structured context
+      scope.setContext('logger', {
+        category,
+        correlationId: context.correlationId,
+        gameCode: context.gameCode,
+        socketId: context.socketId,
+        method: context.method,
+        path: context.path,
+      });
+
+      // Add additional data
+      if (data !== undefined) {
+        const serialized = this.serializeData(data);
+        scope.setContext('log_data', { data: serialized });
+
+        // If data contains an error object, capture it as an exception
+        if (data instanceof Error) {
+          Sentry.captureException(data);
+          return;
+        }
+      }
+
+      // Capture as message
+      const fullMessage = `[${category}] ${message}`;
+      Sentry.captureMessage(fullMessage, level);
+    });
   }
 
   // Convenience methods

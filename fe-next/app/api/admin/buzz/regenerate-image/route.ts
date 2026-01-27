@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 import { generateChallengeImage, categorizeTopic } from '@/backend/services/imagenClient';
 
 // Image generation can take time - 70s to accommodate Imagen API
@@ -138,7 +139,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Image regeneration error:', errorMessage);
+    console.error('[Admin Buzz] Image regeneration error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/regenerate-image',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

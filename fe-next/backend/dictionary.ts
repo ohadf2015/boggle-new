@@ -898,26 +898,4 @@ export const getRandomLongWordsWithTheme = (language: Language, count?: number, 
 export const ensureLanguageLoaded = (language: Language): Promise<void> => dictionary.ensureLanguageLoaded(language);
 export { getCurrentTheme };
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  dictionary,
-  isDictionaryWord,
-  getAvailableDictionaries,
-  normalizeHebrewWord,
-  normalizeSpanishLetter,
-  normalizeSpanishWord,
-  normalizeWord,
-  addApprovedWord,
-  load,
-  isValidWord,
-  isValidEnglishWord,
-  isValidHebrewWord,
-  isValidSwedishWord,
-  isValidJapaneseWord,
-  isValidSpanishWord,
-  getRandomKanjiCompounds,
-  getRandomLongWords,
-  getRandomLongWordsWithTheme,
-  getCurrentTheme,
-  ensureLanguageLoaded,
-};
+// ES Module exports

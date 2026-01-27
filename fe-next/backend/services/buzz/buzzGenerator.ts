@@ -163,7 +163,7 @@ export async function generateDailyBuzz(
   const recentlyUsedTrends = await getRecentlyUsedTrends(language, 7);
 
   // Step 4: Apply keyword-based filtering (NSFW, sports limits, script matching)
-  const filteredTrends = filterTrends(moderatedTrends, language, recentlyUsedTrends);
+  let filteredTrends = filterTrends(moderatedTrends, language, recentlyUsedTrends);
   if (filteredTrends.length < 3) {
     console.error('[BUZZ] Insufficient trends after filtering');
     console.log('[BUZZ] Retrying without deduplication filter...');
@@ -176,8 +176,10 @@ export async function generateDailyBuzz(
         throw new Error('Not enough suitable trends for challenges');
       }
       console.log(`[BUZZ] Using original trends fallback (${originalFiltered.length} trends)`);
+      filteredTrends = originalFiltered;
     } else {
       console.log(`[BUZZ] Using fallback filter (${fallbackFiltered.length} trends)`);
+      filteredTrends = fallbackFiltered;
     }
   }
 

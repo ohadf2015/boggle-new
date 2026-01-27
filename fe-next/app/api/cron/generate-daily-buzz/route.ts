@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateDailyBuzz } from '@/backend/services/buzzGenerator';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 
 // Increase timeout for AI generation (SERP API + Gemini AI + image generation + DB storage)
 // Single language: ~20-30s, All 5 languages: ~60-90s
@@ -124,6 +125,11 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[Cron] Fatal error during daily buzz generation:', errorMessage);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/cron/generate-daily-buzz',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       {
         success: false,
@@ -217,6 +223,11 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[Admin] Error during manual generation:', errorMessage);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/cron/generate-daily-buzz',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       {
         success: false,

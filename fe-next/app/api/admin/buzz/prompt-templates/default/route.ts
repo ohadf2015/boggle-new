@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
 import {
   PROMPT_SECTIONS,
   type PromptSectionName,
@@ -172,7 +173,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Admin Buzz] Error fetching default template:', errorMessage);
+    console.error('[Admin Buzz] Error fetching default template:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/buzz/prompt-templates/default',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

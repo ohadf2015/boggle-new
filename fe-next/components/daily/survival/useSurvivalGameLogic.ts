@@ -23,6 +23,7 @@ import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useGameMusic } from '@/hooks/useGameMusic';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
 import { isNewDailyPlayer, incrementDailyChallengesCompleted } from '@/utils/trainingProgressStorage';
 import { useSurvivalClues } from './useSurvivalClues';
@@ -219,10 +220,16 @@ export function useSurvivalGameLogic({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Start fire round music
-  useEffect(() => {
-    fadeToTrack(TRACKS.BOSSA_ARCADE, 500, 800);
-  }, [fadeToTrack, TRACKS]);
+  // Game music - plays bossa-arcade for fire round automatically
+  // Music will auto-unlock on first user interaction and queue until ready
+  useGameMusic({
+    phase: 'playing',
+    remainingTime: null, // No timer in survival mode
+    totalTime: 180, // Default time (not used for urgent music)
+    isPaused: state.isGameOver,
+    enabled: true,
+    earthquakeState: 'fire-round', // Always fire-round for survival mode
+  });
 
   // Check if player is new (first 3 daily challenges) - calculated once
   const isNewPlayer = useRef(isNewDailyPlayer(NEW_PLAYER_THRESHOLD));
@@ -345,7 +352,7 @@ export function useSurvivalGameLogic({
     incrementDailyChallengesCompleted();
 
     onComplete(result);
-  }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, fadeToTrack, TRACKS, lifeDrainInterval]);
+  }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, lifeDrainInterval, fadeToTrack, TRACKS]);
 
   // Handle target attempt
   const handleTargetAttempt = useCallback((word: string, target: string) => {

@@ -10,7 +10,7 @@ Deep investigation to find root cause - NO fixes until fully understood. This is
 
 ## Project Context
 - `AGENTS.md` - Architecture overview
-- `fe-next/claude.md` - System design
+- `fe-next/CLAUDE.md` - System design
 
 ## CRITICAL RULES
 
