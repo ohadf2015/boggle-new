@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   RadarChart,
@@ -54,6 +54,12 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevent SSR/hydration issues - only render chart on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Track container dimensions to prevent Recharts rendering with invalid size
   const { containerRef, dimensions, isReady } = useContainerDimensions();
@@ -138,7 +144,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
 
       {/* Radar Chart */}
       <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px] min-h-[280px] min-w-[100px]" style={{ minHeight: 280, minWidth: 100 }}>
-        {isReady && dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
+        {isMounted && isReady && dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
         <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100} debounce={50}>
           <RadarChart data={chartData}>
             <defs>

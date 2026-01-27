@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   XAxis,
@@ -91,6 +91,12 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
   const { t } = useLanguage();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevent SSR/hydration issues - only render chart on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Track container dimensions to prevent Recharts rendering with invalid size
   const { containerRef, dimensions, isReady } = useContainerDimensions();
@@ -237,9 +243,9 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
           )}
         </div>
 
-        {/* Chart - only render ResponsiveContainer when dimensions are valid */}
+        {/* Chart - only render ResponsiveContainer when dimensions are valid AND mounted */}
         <div ref={containerRef} className="w-full h-48 min-h-[12rem] min-w-[100px]" style={{ minHeight: '12rem', minWidth: 100 }}>
-          {isReady && dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
+          {isMounted && isReady && dimensions && dimensions.width > 0 && dimensions.height > 0 ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100} debounce={50}>
             <AreaChart
               data={chartData}
