@@ -91,6 +91,13 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
   })
 }));
 
+jest.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({
+    isHapticsEnabled: true,
+    toggleHaptics: jest.fn()
+  })
+}));
+
 jest.mock('@/utils/session', () => ({
   getSession: () => null
 }));
@@ -124,10 +131,14 @@ describe('Profile Carousel UI Improvements', () => {
     it('should have subtle inactive indicator styling', () => {
       const { container } = render(<ProfilePageClient />);
 
-      const indicators = container.querySelectorAll('button[aria-label*="section"]');
+      // Find section indicators specifically (not navigation arrows)
+      const indicators = container.querySelectorAll('button[aria-label*="Go to"]');
       const inactiveIndicators = Array.from(indicators).filter(btn =>
         !btn.className.includes('bg-neo-yellow')
       );
+
+      // Should have at least some inactive indicators
+      expect(inactiveIndicators.length).toBeGreaterThan(0);
 
       inactiveIndicators.forEach(indicator => {
         // Inactive should be w-2 h-2 (dots)
@@ -183,12 +194,14 @@ describe('Profile Carousel UI Improvements', () => {
 
   describe('Header', () => {
     it('should display section header explaining carousel purpose', () => {
-      render(<ProfilePageClient />);
+      const { container } = render(<ProfilePageClient />);
 
-      // Should have a header above or near the indicators
-      // explaining what the sections are
-      const header = screen.queryByText(/sections|profile sections|navigate/i);
+      // Should have a header above the indicators showing the current section name
+      // The component displays section names like "Overview", "Stats", "Achievements", "Collection"
+      // Find the header text (styled with text-xs, uppercase, tracking-wide)
+      const header = container.querySelector('.text-xs.font-medium.text-neo-white\\/60');
       expect(header).toBeInTheDocument();
+      expect(header?.textContent).toMatch(/Overview|Stats|Achievements|Collection/i);
     });
   });
 });
