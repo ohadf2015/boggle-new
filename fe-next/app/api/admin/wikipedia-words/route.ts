@@ -184,7 +184,43 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         console.log('[Admin Wikipedia] Starting JSON sync...');
         const targetLanguage = language as Language | undefined;
 
+        // Create Supabase client for word bank import
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
         const result = await syncLocalJSONToDatabase(targetLanguage);
+
+        // After successful sync, import all valid candidates to word bank
+        if (result.success) {
+          const { importWikipediaWordsToBank } = await import('@/lib/dailyChallenge/wordBankService');
+
+          // result.results is a Record, convert to entries for iteration
+          for (const [lang, langResult] of Object.entries(result.results)) {
+            if (!langResult.error && langResult.synced > 0) {
+              try {
+                // Fetch all valid candidates for this language
+                const { data: validCandidates } = await supabase
+                  .from('wikipedia_word_candidates')
+                  .select('word')
+                  .eq('language', lang)
+                  .eq('validation_status', 'valid');
+
+                if (validCandidates && validCandidates.length > 0) {
+                  const words = validCandidates.map(c => c.word);
+                  const importResult = await importWikipediaWordsToBank(supabase, lang as Language, words);
+                  console.log(
+                    `[Admin Wikipedia] Auto-imported ${importResult.inserted} words to word bank for ${lang} (${importResult.skipped} skipped, ${importResult.errors} errors)`
+                  );
+                }
+              } catch (importError) {
+                console.error(`[Admin Wikipedia] Word bank import failed for ${lang}:`, importError);
+                // Don't fail the entire operation - sync succeeded
+              }
+            }
+          }
+        }
 
         const duration = Date.now() - startTime;
         console.log(`[Admin Wikipedia] JSON sync completed in ${duration}ms, success:`, result.success);

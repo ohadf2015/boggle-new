@@ -1820,6 +1820,12 @@ const ja = {
     "coins": "コイン",
     "viewProfile": "プロフィールへ",
     "viewCoins": "コインを確認",
+    "sections": {
+      "overview": "概要",
+      "stats": "統計",
+      "achievements": "実績",
+      "collection": "コレクション"
+    },
     "overview": "概要",
     "stats": "統計",
     "memberSince": "登録日",
@@ -3539,6 +3545,7 @@ const ja = {
       "invalidWords": "無効な単語",
       "dailyChallenge": "デイリーチャレンジ",
       "wikipediaWords": "Wikipedia単語",
+      "wordBank": "単語バンク",
       "dailyBuzz": "デイリーバズ",
       "webVitals": "Webパフォーマンス",
       "email": "メール"
@@ -3640,6 +3647,51 @@ const ja = {
       "missingPlaceholders": "必須プレースホルダーが不足しています",
       "unusedPlaceholders": "未使用のプレースホルダーが検出されました",
       "validTemplate": "テンプレートは有効です"
+    },
+    "wordBank": {
+      "title": "単語バンク",
+      "description": "デイリーチャレンジの単語プールを管理",
+      "word": "単語",
+      "language": "言語",
+      "source": "ソース",
+      "status": "ステータス",
+      "timesUsed": "使用回数",
+      "lastUsed": "最終使用",
+      "actions": "操作",
+      "deleteWord": "単語を削除",
+      "confirmDeleteWord": "この単語を単語バンクから削除してもよろしいですか？",
+      "wordDeleted": "単語が削除されました",
+      "stats": {
+        "title": "単語バンク統計",
+        "totalWords": "合計単語数",
+        "activeWords": "アクティブな単語",
+        "blockedWords": "ブロックされた単語",
+        "bySource": "ソース別"
+      },
+      "filters": {
+        "allLanguages": "すべての言語",
+        "allStatuses": "すべてのステータス",
+        "allSources": "すべてのソース",
+        "searchLabel": "検索",
+        "search": "単語を検索...",
+        "active": "アクティブ",
+        "blocked": "ブロック済み",
+        "used": "使用済み"
+      },
+      "sources": {
+        "static": "静的",
+        "dictionary": "辞書",
+        "wikipedia": "Wikipedia",
+        "admin": "管理者",
+        "ai": "AI"
+      },
+      "noWordsFound": "単語が見つかりません",
+      "tryAdjustingFilters": "フィルターを調整してください",
+      "loadMore": "さらに読み込む",
+      "loading": "読み込み中...",
+      "deleting": "削除中...",
+      "confirm": "確認",
+      "cancel": "キャンセル"
     }
   },
   "gift": {

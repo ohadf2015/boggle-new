@@ -1820,6 +1820,12 @@ const sv = {
     "coins": "Mynt",
     "viewProfile": "Visa Profil",
     "viewCoins": "Se dina mynt",
+    "sections": {
+      "overview": "Översikt",
+      "stats": "Statistik",
+      "achievements": "Prestationer",
+      "collection": "Samling"
+    },
     "overview": "Översikt",
     "stats": "Statistik",
     "memberSince": "Medlem sedan",
@@ -3472,6 +3478,7 @@ const sv = {
       "invalidWords": "Ogiltiga Ord",
       "dailyChallenge": "Daglig Utmaning",
       "wikipediaWords": "Wikipedia-ord",
+      "wordBank": "Ordbank",
       "dailyBuzz": "Dagligt Buzz",
       "webVitals": "Webbprestanda",
       "email": "E-post"
@@ -3573,6 +3580,51 @@ const sv = {
       "missingPlaceholders": "Saknade obligatoriska platshållare",
       "unusedPlaceholders": "Oanvända platshållare upptäckta",
       "validTemplate": "Mallen är giltig"
+    },
+    "wordBank": {
+      "title": "Ordbank",
+      "description": "Hantera ordpool för daglig utmaning",
+      "word": "Ord",
+      "language": "Språk",
+      "source": "Källa",
+      "status": "Status",
+      "timesUsed": "Använd gånger",
+      "lastUsed": "Senast använd",
+      "actions": "Åtgärder",
+      "deleteWord": "Ta bort ord",
+      "confirmDeleteWord": "Är du säker på att du vill ta bort detta ord från ordbanken?",
+      "wordDeleted": "Ord borttaget",
+      "stats": {
+        "title": "Ordbankstatistik",
+        "totalWords": "Totalt antal ord",
+        "activeWords": "Aktiva ord",
+        "blockedWords": "Blockerade ord",
+        "bySource": "Per källa"
+      },
+      "filters": {
+        "allLanguages": "Alla språk",
+        "allStatuses": "Alla statusar",
+        "allSources": "Alla källor",
+        "searchLabel": "Sök",
+        "search": "Sök ord...",
+        "active": "Aktiv",
+        "blocked": "Blockerad",
+        "used": "Använd"
+      },
+      "sources": {
+        "static": "Statisk",
+        "dictionary": "Ordbok",
+        "wikipedia": "Wikipedia",
+        "admin": "Admin",
+        "ai": "AI"
+      },
+      "noWordsFound": "Inga ord hittades",
+      "tryAdjustingFilters": "Försök justera dina filter",
+      "loadMore": "Ladda mer",
+      "loading": "Laddar...",
+      "deleting": "Tar bort...",
+      "confirm": "Bekräfta",
+      "cancel": "Avbryt"
     }
   },
   "tvTutorial": {

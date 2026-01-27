@@ -1803,6 +1803,12 @@ const es = {
     "coins": "Monedas",
     "viewProfile": "Ver Perfil",
     "viewCoins": "Ver tus monedas",
+    "sections": {
+      "overview": "Resumen",
+      "stats": "Estadísticas",
+      "achievements": "Logros",
+      "collection": "Colección"
+    },
     "overview": "General",
     "stats": "Estadísticas",
     "memberSince": "Miembro desde",
@@ -3461,6 +3467,7 @@ const es = {
       "invalidWords": "Palabras Inválidas",
       "dailyChallenge": "Desafío Diario",
       "wikipediaWords": "Palabras Wikipedia",
+      "wordBank": "Banco de Palabras",
       "dailyBuzz": "Buzz Diario",
       "webVitals": "Rendimiento Web",
       "email": "Correo"
@@ -3562,6 +3569,51 @@ const es = {
       "missingPlaceholders": "Faltan marcadores de posición requeridos",
       "unusedPlaceholders": "Se detectaron marcadores de posición no utilizados",
       "validTemplate": "La plantilla es válida"
+    },
+    "wordBank": {
+      "title": "Banco de Palabras",
+      "description": "Gestionar grupo de palabras para desafío diario",
+      "word": "Palabra",
+      "language": "Idioma",
+      "source": "Fuente",
+      "status": "Estado",
+      "timesUsed": "Veces Usada",
+      "lastUsed": "Último Uso",
+      "actions": "Acciones",
+      "deleteWord": "Eliminar Palabra",
+      "confirmDeleteWord": "¿Estás seguro de que deseas eliminar esta palabra del banco de palabras?",
+      "wordDeleted": "Palabra eliminada exitosamente",
+      "stats": {
+        "title": "Estadísticas del Banco de Palabras",
+        "totalWords": "Total de Palabras",
+        "activeWords": "Palabras Activas",
+        "blockedWords": "Palabras Bloqueadas",
+        "bySource": "Por Fuente"
+      },
+      "filters": {
+        "allLanguages": "Todos los Idiomas",
+        "allStatuses": "Todos los Estados",
+        "allSources": "Todas las Fuentes",
+        "searchLabel": "Buscar",
+        "search": "Buscar palabras...",
+        "active": "Activa",
+        "blocked": "Bloqueada",
+        "used": "Usada"
+      },
+      "sources": {
+        "static": "Estática",
+        "dictionary": "Diccionario",
+        "wikipedia": "Wikipedia",
+        "admin": "Admin",
+        "ai": "IA"
+      },
+      "noWordsFound": "No se encontraron palabras",
+      "tryAdjustingFilters": "Intenta ajustar tus filtros",
+      "loadMore": "Cargar Más",
+      "loading": "Cargando...",
+      "deleting": "Eliminando...",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
     }
   },
   "tvTutorial": {

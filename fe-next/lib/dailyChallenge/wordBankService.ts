@@ -334,6 +334,31 @@ export async function importWordsFromDictionary(
 }
 
 /**
+ * Import Wikipedia words to the word bank with automatic length filtering
+ * This is specifically for automatically importing validated Wikipedia words
+ */
+export async function importWikipediaWordsToBank(
+  supabase: SupabaseClient,
+  language: Language,
+  words: string[]
+): Promise<{ inserted: number; skipped: number; errors: number }> {
+  const lengthRange = WORD_LENGTH_RANGE[language];
+
+  // Pre-filter words by length
+  const validWords = words.filter(word => {
+    const normalizedWord = word.toUpperCase();
+    return normalizedWord.length >= lengthRange.min && normalizedWord.length <= lengthRange.max;
+  });
+
+  console.log(
+    `[Word Bank] Importing ${validWords.length}/${words.length} Wikipedia words for ${language} (filtered by length ${lengthRange.min}-${lengthRange.max})`
+  );
+
+  // Use the existing import function with 'wikipedia' source
+  return importWordsFromDictionary(supabase, language, validWords, 'wikipedia');
+}
+
+/**
  * Block a word from being used in daily challenges
  */
 export async function blockWord(

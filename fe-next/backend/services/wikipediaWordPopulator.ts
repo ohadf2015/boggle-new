@@ -22,6 +22,8 @@ import {
   validateGameWord,
   FORMAT_ONLY_FALLBACK_THRESHOLD
 } from '@/utils/dailyChallenge/wikipediaWordProcessor';
+import { importWikipediaWordsToBank } from '@/lib/dailyChallenge/wordBankService';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 // Minimum score threshold for auto-promotion to dictionary
 // Words >= this score that pass AI validation are automatically added to community_words
@@ -465,6 +467,23 @@ async function validateTopCandidates(
     console.warn(`[WikiPopulator] ${errors.length} candidates had errors:`,
       errors.map(e => `${e.word}: ${e.error}`).join(', ')
     );
+  }
+
+  // Automatically import validated words to word bank
+  if (validated.length > 0) {
+    try {
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        const validWords = validated.map(c => c.word);
+        const importResult = await importWikipediaWordsToBank(supabase, language, validWords);
+        console.log(
+          `[WikiPopulator] Auto-imported ${importResult.inserted} validated words to word bank (${importResult.skipped} skipped, ${importResult.errors} errors)`
+        );
+      }
+    } catch (importError) {
+      // Log but don't fail - word validation succeeded even if word bank import failed
+      logPipelineError('word-bank-import', importError, { language });
+    }
   }
 
   return validated;

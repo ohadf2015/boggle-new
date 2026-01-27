@@ -2001,6 +2001,12 @@ const he = {
     "coins": "מטבעות",
     "viewProfile": "לפרופיל",
     "viewCoins": "צפה במטבעות שלך",
+    "sections": {
+      "overview": "סקירה",
+      "stats": "סטטיסטיקה",
+      "achievements": "הישגים",
+      "collection": "אוסף"
+    },
     "overview": "סקירה",
     "stats": "סטטיסטיקה",
     "memberSince": "חבר מאז",
@@ -3465,6 +3471,7 @@ const he = {
       "invalidWords": "מילים לא תקינות",
       "dailyChallenge": "אתגר יומי",
       "wikipediaWords": "מילות ויקיפדיה",
+      "wordBank": "בנק מילים",
       "dailyBuzz": "באזז יומי",
       "webVitals": "ביצועי אתר",
       "email": "אימייל"
@@ -3566,6 +3573,51 @@ const he = {
       "missingPlaceholders": "חסרים משתנים נדרשים",
       "unusedPlaceholders": "זוהו משתנים שאינם בשימוש",
       "validTemplate": "התבנית תקינה"
+    },
+    "wordBank": {
+      "title": "בנק מילים",
+      "description": "ניהול מאגר מילים לאתגר היומי",
+      "word": "מילה",
+      "language": "שפה",
+      "source": "מקור",
+      "status": "סטטוס",
+      "timesUsed": "פעמים בשימוש",
+      "lastUsed": "שימוש אחרון",
+      "actions": "פעולות",
+      "deleteWord": "מחק מילה",
+      "confirmDeleteWord": "האם אתה בטוח שברצונך למחוק מילה זו מבנק המילים?",
+      "wordDeleted": "המילה נמחקה בהצלחה",
+      "stats": {
+        "title": "סטטיסטיקת בנק המילים",
+        "totalWords": "סה״כ מילים",
+        "activeWords": "מילים פעילות",
+        "blockedWords": "מילים חסומות",
+        "bySource": "לפי מקור"
+      },
+      "filters": {
+        "allLanguages": "כל השפות",
+        "allStatuses": "כל הסטטוסים",
+        "allSources": "כל המקורות",
+        "searchLabel": "חיפוש",
+        "search": "חפש מילים...",
+        "active": "פעיל",
+        "blocked": "חסום",
+        "used": "בשימוש"
+      },
+      "sources": {
+        "static": "סטטי",
+        "dictionary": "מילון",
+        "wikipedia": "ויקיפדיה",
+        "admin": "מנהל",
+        "ai": "בינה מלאכותית"
+      },
+      "noWordsFound": "לא נמצאו מילים",
+      "tryAdjustingFilters": "נסה לשנות את הסינון",
+      "loadMore": "טען עוד",
+      "loading": "טוען...",
+      "deleting": "מוחק...",
+      "confirm": "אשר",
+      "cancel": "ביטול"
     }
   },
   "tvTutorial": {

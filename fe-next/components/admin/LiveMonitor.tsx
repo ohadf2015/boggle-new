@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -92,18 +92,21 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now());
-  const [currentToken, setCurrentToken] = useState(authToken);
 
-  // Update current token when prop changes (after refresh)
+  // Use ref for token to prevent callback recreation on token changes
+  // This prevents interval accumulation bug
+  const tokenRef = useRef(authToken);
+
+  // Update token ref when prop changes (after refresh)
   useEffect(() => {
-    setCurrentToken(authToken);
+    tokenRef.current = authToken;
   }, [authToken]);
 
   const fetchLiveGames = useCallback(async (retryCount = 0): Promise<void> => {
     try {
       const response = await fetch('/api/admin/live-games', {
         headers: {
-          Authorization: `Bearer ${currentToken}`,
+          Authorization: `Bearer ${tokenRef.current}`,
         },
       });
 
@@ -113,7 +116,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
         const newToken = await onTokenExpired();
 
         if (newToken) {
-          setCurrentToken(newToken);
+          tokenRef.current = newToken;
           // Retry request with new token
           return fetchLiveGames(1);
         }
@@ -134,7 +137,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
     } finally {
       setLoading(false);
     }
-  }, [currentToken, onTokenExpired]);
+  }, [onTokenExpired]);
 
   // Initial fetch and auto-refresh every 5 seconds
   useEffect(() => {

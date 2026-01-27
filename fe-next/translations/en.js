@@ -1994,6 +1994,12 @@ const en = {
     "coins": "Coins",
     "viewProfile": "Your Profile",
     "viewCoins": "Check your stash",
+    "sections": {
+      "overview": "Overview",
+      "stats": "Stats",
+      "achievements": "Achievements",
+      "collection": "Collection"
+    },
     "overview": "At a Glance",
     "stats": "Battle Stats",
     "memberSince": "Clashing since",
@@ -3467,6 +3473,7 @@ const en = {
       "invalidWords": "Invalid Words",
       "dailyChallenge": "Daily Challenge",
       "wikipediaWords": "Wikipedia Words",
+      "wordBank": "Word Bank",
       "dailyBuzz": "Daily Buzz",
       "webVitals": "Web Vitals",
       "email": "Email"
@@ -3568,6 +3575,51 @@ const en = {
       "missingPlaceholders": "Missing required placeholders",
       "unusedPlaceholders": "Unused placeholders detected",
       "validTemplate": "Template is valid"
+    },
+    "wordBank": {
+      "title": "Word Bank",
+      "description": "Manage daily challenge word pool",
+      "word": "Word",
+      "language": "Language",
+      "source": "Source",
+      "status": "Status",
+      "timesUsed": "Times Used",
+      "lastUsed": "Last Used",
+      "actions": "Actions",
+      "deleteWord": "Delete Word",
+      "confirmDeleteWord": "Are you sure you want to delete this word from the word bank?",
+      "wordDeleted": "Word deleted successfully",
+      "stats": {
+        "title": "Word Bank Statistics",
+        "totalWords": "Total Words",
+        "activeWords": "Active Words",
+        "blockedWords": "Blocked Words",
+        "bySource": "By Source"
+      },
+      "filters": {
+        "allLanguages": "All Languages",
+        "allStatuses": "All Statuses",
+        "allSources": "All Sources",
+        "searchLabel": "Search",
+        "search": "Search words...",
+        "active": "Active",
+        "blocked": "Blocked",
+        "used": "Used"
+      },
+      "sources": {
+        "static": "Static",
+        "dictionary": "Dictionary",
+        "wikipedia": "Wikipedia",
+        "admin": "Admin",
+        "ai": "AI"
+      },
+      "noWordsFound": "No words found",
+      "tryAdjustingFilters": "Try adjusting your filters",
+      "loadMore": "Load More",
+      "loading": "Loading...",
+      "deleting": "Deleting...",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
     }
   },
   "tvTutorial": {

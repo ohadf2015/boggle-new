@@ -216,21 +216,26 @@ export default function ProfilePageClient(): React.JSX.Element {
       )}>
         <AutoHideHeader />
 
-        {/* Section indicator dots */}
-        <div className="flex items-center justify-center gap-2 py-3">
-          {sections.map((section, index) => (
-            <button
-              key={section}
-              onClick={() => setActiveSection(section)}
-              className={cn(
-                'transition-all duration-200',
-                index === currentIndex
-                  ? 'w-8 h-2 bg-neo-yellow rounded-full'
-                  : 'w-2 h-2 bg-neo-white/30 rounded-full hover:bg-neo-white/50'
-              )}
-              aria-label={`Go to ${section} section`}
-            />
-          ))}
+        {/* Section header and indicator dots */}
+        <div className="flex flex-col items-center pt-3 pb-2">
+          <div className="text-xs font-medium text-neo-white/60 mb-2 uppercase tracking-wide">
+            {t(`profile.sections.${sections[currentIndex]}`)}
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            {sections.map((section, index) => (
+              <button
+                key={section}
+                onClick={() => setActiveSection(section)}
+                className={cn(
+                  'transition-all duration-200',
+                  index === currentIndex
+                    ? 'w-6 h-2 bg-neo-yellow rounded-full'
+                    : 'w-2 h-2 bg-neo-white/30 rounded-full hover:bg-neo-white/50'
+                )}
+                aria-label={`Go to ${section} section`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* NOTE: Do NOT use overflow-y-auto here - scroll propagates to body's screen-fit */}
@@ -301,18 +306,18 @@ export default function ProfilePageClient(): React.JSX.Element {
             )}
           </AnimatePresence>
 
-          {/* Navigation arrows (optional visual hint) */}
+          {/* Navigation arrows (subtle visual hints at bottom) */}
           {currentIndex > 0 && (
             <button
               onClick={goToPrevSection}
               className={cn(
-                'fixed left-2 top-1/2 -translate-y-1/2 z-10',
+                'fixed left-2 bottom-20 z-10 opacity-40 hover:opacity-80',
                 'w-10 h-10 rounded-full',
                 'bg-neo-navy/80 border-2 border-neo-yellow',
                 'flex items-center justify-center',
                 'text-neo-yellow',
                 'shadow-hard-sm',
-                'hover:scale-110 transition-transform'
+                'transition-opacity'
               )}
               aria-label="Previous section"
             >
@@ -324,13 +329,13 @@ export default function ProfilePageClient(): React.JSX.Element {
             <button
               onClick={goToNextSection}
               className={cn(
-                'fixed right-2 top-1/2 -translate-y-1/2 z-10',
+                'fixed right-2 bottom-20 z-10 opacity-40 hover:opacity-80',
                 'w-10 h-10 rounded-full',
                 'bg-neo-navy/80 border-2 border-neo-yellow',
                 'flex items-center justify-center',
                 'text-neo-yellow',
                 'shadow-hard-sm',
-                'hover:scale-110 transition-transform'
+                'transition-opacity'
               )}
               aria-label="Next section"
             >
