@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 2614,
+    "totalKeysInCode": 2658,
     "keyCountByLanguage": {
-      "en": 3545,
-      "he": 3545,
-      "sv": 3545,
-      "ja": 3545,
-      "es": 3545
+      "en": 3609,
+      "he": 3609,
+      "sv": 3627,
+      "ja": 3627,
+      "es": 3627
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -139,8 +139,65 @@
   },
   "keysNotInEnglish": {
     "he": [],
-    "sv": [],
-    "ja": [],
-    "es": []
+    "sv": [
+      "admin.wordBank.filters.allValidationStatuses",
+      "admin.wordBank.filters.pending",
+      "admin.wordBank.filters.approved",
+      "admin.wordBank.filters.rejected",
+      "admin.wordBank.bulkImport.description",
+      "admin.wordBank.bulkImport.inputLabel",
+      "admin.wordBank.bulkImport.placeholder",
+      "admin.wordBank.bulkImport.options",
+      "admin.wordBank.bulkImport.sourcePlaceholder",
+      "admin.wordBank.bulkImport.languagePlaceholder",
+      "admin.wordBank.bulkImport.successMessage",
+      "admin.wordBank.bulkImport.errorMessage",
+      "admin.wordBank.wikipediaSync.currentLanguage",
+      "admin.wordBank.wikipediaSync.syncButton",
+      "admin.wordBank.wikipediaSync.successMessage",
+      "admin.wordBank.wikipediaSync.errorMessage",
+      "admin.wordBank.wikipediaSync.noFilesFound",
+      "admin.wordBank.wikipediaSync.lastSynced"
+    ],
+    "ja": [
+      "admin.wordBank.filters.allValidationStatuses",
+      "admin.wordBank.filters.pending",
+      "admin.wordBank.filters.approved",
+      "admin.wordBank.filters.rejected",
+      "admin.wordBank.bulkImport.description",
+      "admin.wordBank.bulkImport.inputLabel",
+      "admin.wordBank.bulkImport.placeholder",
+      "admin.wordBank.bulkImport.options",
+      "admin.wordBank.bulkImport.sourcePlaceholder",
+      "admin.wordBank.bulkImport.languagePlaceholder",
+      "admin.wordBank.bulkImport.successMessage",
+      "admin.wordBank.bulkImport.errorMessage",
+      "admin.wordBank.wikipediaSync.currentLanguage",
+      "admin.wordBank.wikipediaSync.syncButton",
+      "admin.wordBank.wikipediaSync.successMessage",
+      "admin.wordBank.wikipediaSync.errorMessage",
+      "admin.wordBank.wikipediaSync.noFilesFound",
+      "admin.wordBank.wikipediaSync.lastSynced"
+    ],
+    "es": [
+      "admin.wordBank.filters.allValidationStatuses",
+      "admin.wordBank.filters.pending",
+      "admin.wordBank.filters.approved",
+      "admin.wordBank.filters.rejected",
+      "admin.wordBank.bulkImport.description",
+      "admin.wordBank.bulkImport.inputLabel",
+      "admin.wordBank.bulkImport.placeholder",
+      "admin.wordBank.bulkImport.options",
+      "admin.wordBank.bulkImport.sourcePlaceholder",
+      "admin.wordBank.bulkImport.languagePlaceholder",
+      "admin.wordBank.bulkImport.successMessage",
+      "admin.wordBank.bulkImport.errorMessage",
+      "admin.wordBank.wikipediaSync.currentLanguage",
+      "admin.wordBank.wikipediaSync.syncButton",
+      "admin.wordBank.wikipediaSync.successMessage",
+      "admin.wordBank.wikipediaSync.errorMessage",
+      "admin.wordBank.wikipediaSync.noFilesFound",
+      "admin.wordBank.wikipediaSync.lastSynced"
+    ]
   }
 }

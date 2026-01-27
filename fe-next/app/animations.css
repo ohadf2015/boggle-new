@@ -1011,7 +1011,8 @@ body.crazygames-embed .game-view-container,
    RESPONSIVE FLEX LAYOUTS - No Scroll Pattern
    ============================================ */
 
-/* Bottom safe area spacing variable (device safe area only, no bottom nav) */
+/* Bottom safe area spacing variable - uses --mobile-bottom-safe from globals.css
+   which includes full bottom nav height (64px) + device safe area */
 :root {
   --bottom-nav-height: 0px;
   --bottom-safe-padding: calc(env(safe-area-inset-bottom, 0px) + 16px);
@@ -1023,9 +1024,19 @@ body.crazygames-embed .game-view-container,
   }
 }
 
-/* Page content with bottom nav awareness */
+/* Page content with bottom nav awareness
+   Uses --mobile-bottom-safe (nav height 64px + device safe area)
+   to prevent content from being hidden behind the fixed bottom nav */
 .page-content-safe {
-  padding-bottom: var(--bottom-safe-padding);
+  padding-bottom: var(--mobile-bottom-safe);
+}
+
+/* On large screens (lg+), GlobalBottomNav is hidden (sm:hidden),
+   so no extra padding is needed */
+@media (min-width: 640px) {
+  .page-content-safe {
+    padding-bottom: 0;
+  }
 }
 
 /* Flex column to row transition at md breakpoint */

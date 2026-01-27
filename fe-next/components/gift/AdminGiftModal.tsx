@@ -74,6 +74,10 @@ export function AdminGiftModal({
   const [startXp, setStartXp] = useState(currentXp);
   const [startCoins, setStartCoins] = useState(currentCoins);
 
+  // Ref to always have latest onDismiss callback (prevents stale closure in setTimeout)
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
+
   // VIP gold/purple color scheme
   const vipColors = ['#FFD700', '#FFA500', '#9333EA', '#FFE135', '#F59E0B'];
 
@@ -232,7 +236,8 @@ export function AdminGiftModal({
       setPhase('done');
 
       // Auto-dismiss after celebration
-      setTimeout(onDismiss, 1500);
+      // Use ref to get latest callback, avoiding stale closure issue
+      setTimeout(() => onDismissRef.current(), 1500);
     } catch (error) {
       console.error('Failed to claim gift:', error);
       setClaiming(false);
