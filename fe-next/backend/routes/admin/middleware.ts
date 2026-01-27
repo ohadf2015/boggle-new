@@ -37,7 +37,7 @@ export const adminRateLimiter = {
     }
 
     if (record.count >= this.maxRequests) {
-      logger.warn('ADMIN_API', `Rate limit exceeded for IP: ${ip}`);
+      logger.info('ADMIN_API', `Rate limit exceeded for IP: ${ip}`);
       return false;
     }
 
@@ -109,7 +109,7 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
 
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    logger.warn('ADMIN_API', `Missing auth header [${requestId}]`);
+    logger.info('ADMIN_API', `Missing auth header [${requestId}]`);
     res.status(401).json({ error: 'Missing authorization header', requestId });
     return;
   }
@@ -126,7 +126,7 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      logger.warn('ADMIN_API', `Invalid token [${requestId}]`);
+      logger.info('ADMIN_API', `Invalid token [${requestId}]`);
       res.status(401).json({ error: 'Invalid token', requestId });
       return;
     }
@@ -139,7 +139,7 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
       .single();
 
     if (profileError || !profile?.is_admin) {
-      logger.warn('ADMIN_API', `Non-admin access attempt by ${user.email} [${requestId}]`);
+      logger.info('ADMIN_API', `Non-admin access attempt by ${user.email} [${requestId}]`);
       res.status(403).json({ error: 'Admin access required', requestId });
       return;
     }

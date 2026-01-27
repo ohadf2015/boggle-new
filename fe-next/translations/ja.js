@@ -3539,6 +3539,8 @@ const ja = {
     "welcome": "ようこそ、",
     "loadingDashboard": "ダッシュボードを読み込んでいます...",
     "preparingTools": "管理ツールを準備しています...",
+    "loadingSession": "セキュアセッションを確立しています...",
+    "sessionError": "セッションエラー",
     "nav": {
       "players": "プレイヤー",
       "dictionary": "辞書",

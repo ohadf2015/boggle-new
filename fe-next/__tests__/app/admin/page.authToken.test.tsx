@@ -14,7 +14,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getSession } from '@/lib/supabase';
@@ -62,6 +62,7 @@ describe('Admin Page - authToken loading issue', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
 
     // Default language context
     mockUseLanguage.mockReturnValue({
@@ -69,6 +70,11 @@ describe('Admin Page - authToken loading issue', () => {
       language: 'en',
       setLanguage: jest.fn(),
     } as any);
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   test('should NOT show infinite loading when authToken fetch is slow', async () => {
@@ -97,19 +103,23 @@ describe('Admin Page - authToken loading issue', () => {
 
     render(<AdminPage />);
 
-    // After a reasonable time, page should render even without authToken
-    await waitFor(
-      () => {
-        // Dashboard header should appear (page rendered)
-        expect(screen.getByText(/admin\.dashboard/i)).toBeInTheDocument();
+    // Initially shows loading
+    expect(screen.getByText(/common\.loading/i)).toBeInTheDocument();
 
-        // Main "common.loading" loader should NOT be present
-        // (There might be component-level loading, but not the full-page block)
-        const mainLoader = screen.queryByTestId('neo-loader-mascot-letters');
-        expect(mainLoader).not.toBeInTheDocument();
-      },
-      { timeout: 1000 } // Should render quickly
-    );
+    // Advance timers to complete the slow fetch (5 seconds)
+    await act(async () => {
+      jest.advanceTimersByTime(5000);
+      await Promise.resolve(); // Flush promises
+    });
+
+    // After fetch completes, page should render
+    await waitFor(() => {
+      // Dashboard header should appear (page rendered)
+      expect(screen.getByText(/admin\.dashboard/i)).toBeInTheDocument();
+    });
+
+    // Main "common.loading" loader should NOT be present
+    expect(screen.queryByText(/common\.loading/i)).not.toBeInTheDocument();
   });
 
   test('should show dashboard content even if authToken is temporarily null', async () => {
@@ -122,12 +132,17 @@ describe('Admin Page - authToken loading issue', () => {
     } as any);
 
     // authToken will eventually resolve, but starts null
-    mockGetSession.mockResolvedValueOnce({
+    mockGetSession.mockResolvedValue({
       data: { session: { access_token: 'mock-token-123' } },
       error: null,
     } as any);
 
     render(<AdminPage />);
+
+    // Flush promises to let the token fetch complete
+    await act(async () => {
+      await Promise.resolve();
+    });
 
     // Dashboard should appear eventually
     await waitFor(() => {
@@ -150,14 +165,16 @@ describe('Admin Page - authToken loading issue', () => {
 
     render(<AdminPage />);
 
-    // Should not show loading forever
-    await waitFor(
-      () => {
-        // Either content or access denied (not stuck loading)
-        const loading = screen.queryByText(/common\.loading/i);
-        expect(loading).not.toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    );
+    // Flush promises to let the token fetch complete
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    // Should not show loading after token fetch completes
+    await waitFor(() => {
+      // Either content or access denied (not stuck loading)
+      const loading = screen.queryByText(/common\.loading/i);
+      expect(loading).not.toBeInTheDocument();
+    });
   });
 });

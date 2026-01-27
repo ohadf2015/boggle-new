@@ -10,12 +10,13 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AdminPage from '@/app/[locale]/admin/page';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
+import { getSession } from '@/lib/supabase';
 
 // Mock dependencies
 jest.mock('@/contexts/AuthContext');
@@ -26,6 +27,8 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/lib/supabase', () => ({
   getSession: jest.fn(),
 }));
+
+const mockGetSession = getSession as jest.MockedFunction<typeof getSession>;
 jest.mock('@/components/Header', () => {
   return function MockHeader() {
     return <div data-testid="mock-header">Header</div>;
@@ -107,8 +110,19 @@ describe('AdminPage - Race Condition Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
     mockUseRouter.mockReturnValue(mockRouter as any);
     mockUseLanguage.mockReturnValue(mockLanguageContext);
+    // Default mock for getSession (returns valid token immediately)
+    mockGetSession.mockResolvedValue({
+      data: { session: { access_token: 'mock-token-123' } },
+      error: null,
+    } as any);
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   describe('Race Condition: Auth loads before Profile', () => {
@@ -168,8 +182,6 @@ describe('AdminPage - Race Condition Tests', () => {
 
     test('SHOULD show admin dashboard after profile loads with admin=true', async () => {
       // GIVEN: Initial state - user exists, profile loading
-      const { rerender } = render(<AdminPage />);
-
       mockUseAuth.mockReturnValue({
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: null,
@@ -187,7 +199,8 @@ describe('AdminPage - Race Condition Tests', () => {
         refreshProfile: jest.fn(),
       });
 
-      rerender(<AdminPage />);
+      const { rerender } = render(<AdminPage />);
+
       expect(screen.getByText('Loading...')).toBeInTheDocument();
 
       // WHEN: Profile loads with admin privileges
@@ -218,6 +231,11 @@ describe('AdminPage - Race Condition Tests', () => {
       });
 
       rerender(<AdminPage />);
+
+      // Flush promises to let auth token fetch complete
+      await act(async () => {
+        await Promise.resolve();
+      });
 
       // THEN: Should show admin dashboard (not access denied)
       await waitFor(() => {
@@ -264,8 +282,8 @@ describe('AdminPage - Race Condition Tests', () => {
   });
 
   describe('Race Condition: authToken loading visibility', () => {
-    test('SHOULD show navigation grid immediately even if authToken is loading', () => {
-      // GIVEN: Admin user with profile loaded but authToken still fetching
+    test('SHOULD show dashboard after authToken loads for admin user', async () => {
+      // GIVEN: Admin user with profile loaded
       mockUseAuth.mockReturnValue({
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: {
@@ -292,16 +310,22 @@ describe('AdminPage - Race Condition Tests', () => {
         refreshProfile: jest.fn(),
       });
 
-      // WHEN: Admin page renders (authToken will be null initially)
+      // WHEN: Admin page renders (shows loading while authToken fetches)
       render(<AdminPage />);
 
-      // THEN: Should show navigation grid and page structure
-      expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
-      expect(screen.getByText('Admin User')).toBeInTheDocument();
+      // Initially shows loading while token is being fetched
+      expect(screen.getByText('Loading...')).toBeInTheDocument();
 
-      // Should show loading state for dashboard content
-      expect(screen.getByText('Loading dashboard...')).toBeInTheDocument();
-      expect(screen.getByText('Preparing admin tools...')).toBeInTheDocument();
+      // Flush promises to let auth token fetch complete
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      // THEN: Should show navigation grid and page structure after token loads
+      await waitFor(() => {
+        expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
+      });
+      expect(screen.getByText('Admin User')).toBeInTheDocument();
     });
   });
 });

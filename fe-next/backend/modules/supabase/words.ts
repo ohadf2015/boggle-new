@@ -1,0 +1,321 @@
+/**
+ * Words Module
+ * Community words, player words, and invalid word tracking
+ */
+
+import { getSupabase } from './client';
+
+const logger = require('../../utils/logger');
+
+export interface WordApprovalInput {
+  word: string;
+  language: string;
+  gameCode: string;
+  hostUserId?: string | null;
+  promoted?: boolean;
+}
+
+export interface PlayerWordInput {
+  word: string;
+  language: string;
+  gameCode: string;
+  playerId?: string | null;
+}
+
+/** Valid reasons for invalid word submissions */
+export type InvalidWordReason = 'not_on_board' | 'not_in_dictionary' | 'peer_rejected';
+
+/**
+ * Save a host-approved word that wasn't in the dictionary to Supabase
+ */
+export async function saveHostApprovedWord(params: WordApprovalInput): Promise<{ data: unknown; error: { message: string } | null; isNewWord: boolean }> {
+  const { word, language, gameCode, hostUserId, promoted = false } = params;
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' }, isNewWord: false };
+
+  try {
+    // Check if word already exists
+    const { data: existing, error: fetchError } = await client
+      .from('community_words')
+      .select('id, approval_count, promoted_to_dictionary')
+      .eq('word', word)
+      .eq('language', language)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      logger.error('SUPABASE', `Error checking existing word "${word}"`, fetchError.message);
+      return { data: null, error: fetchError, isNewWord: false };
+    }
+
+    let wordRecord: unknown;
+    let isNewWord = false;
+
+    if (existing) {
+      // Word exists - update approval count
+      const updates: Record<string, unknown> = {
+        approval_count: existing.approval_count + 1,
+        last_approved_by: hostUserId,
+        last_approved_in_game: gameCode,
+        last_approved_at: new Date().toISOString()
+      };
+
+      // Mark as promoted if threshold reached
+      if (promoted && !existing.promoted_to_dictionary) {
+        updates.promoted_to_dictionary = true;
+        updates.promoted_at = new Date().toISOString();
+      }
+
+      const { data: updated, error: updateError } = await client
+        .from('community_words')
+        .update(updates)
+        .eq('id', existing.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        logger.error('SUPABASE', `Error updating word "${word}"`, updateError.message);
+        return { data: null, error: updateError, isNewWord: false };
+      }
+
+      wordRecord = updated;
+    } else {
+      // New word - insert
+      isNewWord = true;
+      const { data: inserted, error: insertError } = await client
+        .from('community_words')
+        .insert({
+          word,
+          language,
+          approval_count: 1,
+          promoted_to_dictionary: promoted,
+          promoted_at: promoted ? new Date().toISOString() : null,
+          first_approved_by: hostUserId,
+          first_approved_in_game: gameCode,
+          last_approved_by: hostUserId,
+          last_approved_in_game: gameCode
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        logger.error('SUPABASE', `Error inserting word "${word}"`, insertError.message);
+        return { data: null, error: insertError, isNewWord: false };
+      }
+
+      wordRecord = inserted;
+    }
+
+    // Record the individual approval event
+    if (wordRecord) {
+      const wordData = wordRecord as { id: string };
+      const { error: approvalError } = await client
+        .from('community_word_approvals')
+        .insert({
+          word_id: wordData.id,
+          approved_by: hostUserId,
+          game_code: gameCode
+        });
+
+      if (approvalError) {
+        logger.warn('SUPABASE', `Error recording approval for "${word}"`, approvalError.message);
+      }
+    }
+
+    const wordData = wordRecord as { approval_count?: number } | null;
+    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} community word "${word}" (${language}) - approval count: ${wordData?.approval_count || 1}${promoted ? ' - PROMOTED' : ''}`);
+    return { data: wordRecord, error: null, isNewWord };
+
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unexpected error';
+    logger.error('SUPABASE', `Unexpected error saving word "${word}"`, err);
+    return { data: null, error: { message: errorMessage }, isNewWord: false };
+  }
+}
+
+/**
+ * Save a valid player word to the database for bot learning
+ */
+export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: unknown; error: { message: string } | null; isNewWord: boolean }> {
+  const { word, language, gameCode, playerId } = params;
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' }, isNewWord: false };
+
+  // Normalize word
+  const normalizedWord = word.toLowerCase().trim();
+
+  try {
+    // Check if word already exists
+    const { data: existing, error: fetchError } = await client
+      .from('player_words')
+      .select('id, times_submitted')
+      .eq('word', normalizedWord)
+      .eq('language', language)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      logger.error('SUPABASE', `Error checking existing player word "${normalizedWord}"`, fetchError.message);
+      return { data: null, error: fetchError, isNewWord: false };
+    }
+
+    let wordRecord: unknown;
+    let isNewWord = false;
+
+    if (existing) {
+      // Word exists - update submission count
+      const { data: updated, error: updateError } = await client
+        .from('player_words')
+        .update({
+          times_submitted: existing.times_submitted + 1,
+          last_submitted_by: playerId,
+          last_submitted_in_game: gameCode,
+          last_submitted_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        logger.error('SUPABASE', `Error updating player word "${normalizedWord}"`, updateError.message);
+        return { data: null, error: updateError, isNewWord: false };
+      }
+
+      wordRecord = updated;
+    } else {
+      // New word - insert
+      isNewWord = true;
+      const { data: inserted, error: insertError } = await client
+        .from('player_words')
+        .insert({
+          word: normalizedWord,
+          language,
+          times_submitted: 1,
+          first_submitted_by: playerId,
+          first_submitted_in_game: gameCode,
+          last_submitted_by: playerId,
+          last_submitted_in_game: gameCode
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        logger.error('SUPABASE', `Error inserting player word "${normalizedWord}"`, insertError.message);
+        return { data: null, error: insertError, isNewWord: false };
+      }
+
+      wordRecord = inserted;
+    }
+
+    const wordData = wordRecord as { times_submitted?: number } | null;
+    logger.debug('SUPABASE', `${isNewWord ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${wordData?.times_submitted || 1}`);
+    return { data: wordRecord, error: null, isNewWord };
+
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unexpected error';
+    logger.error('SUPABASE', `Unexpected error saving player word "${normalizedWord}"`, err);
+    return { data: null, error: { message: errorMessage }, isNewWord: false };
+  }
+}
+
+/**
+ * Get popular player words for a language (for bot word selection)
+ */
+export async function getPopularPlayerWords(language: string, limit: number = 500): Promise<{ data: string[]; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await client
+      .from('player_words')
+      .select('word, times_submitted')
+      .eq('language', language)
+      .order('times_submitted', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      logger.error('SUPABASE', `Error fetching popular player words for ${language}`, error.message);
+      return { data: [], error };
+    }
+
+    // Return just the words array
+    const words = data.map((row: { word: string }) => row.word);
+    logger.debug('SUPABASE', `Fetched ${words.length} popular player words for ${language}`);
+    return { data: words, error: null };
+
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unexpected error';
+    logger.error('SUPABASE', `Unexpected error fetching player words`, err);
+    return { data: [], error: { message: errorMessage } };
+  }
+}
+
+/**
+ * Increment bot usage counter for a word
+ */
+export async function incrementBotWordUsage(word: string, language: string): Promise<void> {
+  const client = getSupabase();
+  if (!client) return;
+
+  const normalizedWord = word.toLowerCase().trim();
+
+  try {
+    // Update times_found_by_bots
+    await client.rpc('increment_bot_word_usage', {
+      p_word: normalizedWord,
+      p_language: language
+    });
+  } catch (err: unknown) {
+    // Silently fail - this is not critical
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    logger.debug('SUPABASE', `Could not increment bot usage for "${normalizedWord}": ${errorMessage}`);
+  }
+}
+
+/**
+ * Record an invalid word submission from a player
+ * Tracks words that fail validation with submission counters.
+ * Admins can review words submitted 3+ times and approve them.
+ * @param word - The invalid word submitted
+ * @param language - Game language
+ * @param reason - Why the word was invalid (default: 'not_in_dictionary')
+ */
+export async function recordPlayerWrongWord(
+  word: string,
+  language: string,
+  reason: InvalidWordReason = 'not_in_dictionary'
+): Promise<void> {
+  const client = getSupabase();
+  if (!client) return;
+
+  const normalizedWord = word.toLowerCase().trim();
+
+  // Skip very short words (likely typos)
+  if (normalizedWord.length < 3) return;
+
+  try {
+    // Use the RPC function to upsert/increment submission count
+    const { error } = await client.rpc('record_invalid_word_submission', {
+      p_word: normalizedWord,
+      p_language: language,
+      p_reason: reason
+    });
+
+    if (error) {
+      // Ignore errors - this is non-critical functionality
+      logger.debug('SUPABASE', `Failed to record invalid word "${normalizedWord}": ${error.message}`);
+    } else {
+      logger.debug('SUPABASE', `Recorded invalid word "${normalizedWord}" (${reason}) for ${language}`);
+    }
+  } catch (err) {
+    // Ignore errors - this is non-critical functionality
+    logger.debug('SUPABASE', `Error recording invalid word: ${err}`);
+  }
+}
+
+// CommonJS exports for backward compatibility
+module.exports = {
+  saveHostApprovedWord,
+  savePlayerWord,
+  getPopularPlayerWords,
+  incrementBotWordUsage,
+  recordPlayerWrongWord,
+};

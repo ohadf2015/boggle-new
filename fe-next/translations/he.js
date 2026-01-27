@@ -3465,6 +3465,8 @@ const he = {
     "welcome": "שלום,",
     "loadingDashboard": "טוען לוח בקרה...",
     "preparingTools": "מכין כלי ניהול...",
+    "loadingSession": "מייצר חיבור מאובטח...",
+    "sessionError": "שגיאת חיבור",
     "nav": {
       "players": "שחקנים",
       "dictionary": "מילון",

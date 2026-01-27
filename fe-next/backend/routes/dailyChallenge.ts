@@ -4,179 +4,44 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-
-const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
-const { getCachedDailyPuzzle, cacheDailyPuzzle, getCachedDailyLeaderboard, cacheDailyLeaderboard } = require('../redisClient');
-const { coalesce } = require('../utils/requestCoalescing');
+import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
+import { getCachedDailyPuzzle, cacheDailyPuzzle, getCachedDailyLeaderboard, cacheDailyLeaderboard } from '../redisClient';
+import { coalesce } from '../utils/requestCoalescing';
 import logger from '../utils/logger';
 import { generateDailyPuzzle, getPuzzleNumber } from '../../utils/dailyChallenge';
 import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
-import { isDictionaryWord } from '../dictionary';
-import { isWordCommunityValid } from '../modules/communityWordManager';
-import { normalizeHebrewWord } from '../../shared/utils/wordNormalization';
 import type { Language } from '../../types';
 
-/**
- * Normalize a word for comparison based on language.
- * For Hebrew: converts final letters (ם,ך,ן,ף,ץ) to regular forms (מ,כ,נ,פ,צ)
- * For other languages: uses toUpperCase()
- */
-function normalizeWordForComparison(word: string, language: Language): string {
-  if (language === 'he') {
-    return normalizeHebrewWord(word);
-  }
-  return word.toUpperCase();
-}
-
-/**
- * Check if a word is valid for daily challenge submission.
- * Valid means: in dictionary OR community-validated (6+ net votes).
- * Pending words (awaiting community validation) are NOT valid.
- */
-function isWordValidForDailyChallenge(word: string, language: Language): boolean {
-  // Check static dictionary first
-  const inDictionary = isDictionaryWord(word, language);
-  if (inDictionary === true) {
-    return true;
-  }
-
-  // Check community-validated words (6+ net votes)
-  if (isWordCommunityValid(word, language)) {
-    return true;
-  }
-
-  // Pending words and unknown words are NOT valid
-  return false;
-}
+// Import types and utilities from extracted modules
+import {
+  VALID_LANGUAGES,
+  type ValidLanguage,
+  type LeaderboardParams,
+  type LeaderboardQuery,
+  type LeaderboardEntry,
+  type LeaderboardResponse,
+  type SubmitRequest,
+  type SubmitResponse,
+  type AttemptData,
+  type AttemptInsertData,
+  type CachedPuzzle,
+  type PuzzleStats,
+  type StatsResponse,
+  type WordHuntSubmitRequest,
+  type WordHuntStatsParams,
+  type WordHuntStatsResponse,
+  type WordHuntAttemptInsert,
+  type WordHuntLeaderboardEntry,
+  type WordHuntLeaderboardResponse,
+} from './dailyChallenge/types';
+import {
+  normalizeWordForComparison,
+  isWordValidForDailyChallenge,
+  isValidDateFormat,
+  isValidLanguage,
+} from './dailyChallenge/utils';
 
 const router: Router = express.Router();
-
-// ==================== Types ====================
-
-interface LeaderboardParams {
-  date: string;
-  language: string;
-}
-
-interface LeaderboardQuery {
-  limit?: string;
-}
-
-interface LeaderboardEntry {
-  rank_position: number;
-  player_id?: string;
-  guest_fingerprint?: string;
-  display_name: string;
-  avatar_emoji: string;
-  avatar_color: string;
-  score: number;
-  word_count: number;
-  longest_word?: string;
-  time_seconds?: number;
-}
-
-interface LeaderboardResponse {
-  data: LeaderboardEntry[];
-  totalParticipants: number;
-  totalAttempts?: number;
-  guestPlayerCount?: number;
-  date: string;
-  language: string;
-  error?: string;
-}
-
-interface SubmitRequest extends Request {
-  body: {
-    puzzleDate?: string;
-    puzzleNumber?: number;
-    language?: string;
-    playerId?: string;
-    guestFingerprint?: string;
-    displayName?: string;
-    avatarEmoji?: string;
-    avatarColor?: string;
-    avatarImage?: string;
-    profilePictureUrl?: string;
-    countryCode?: string;
-    score?: number;
-    wordCount?: number;
-    wordsByLength?: Record<string, number>;
-    timeSeconds?: number;
-    longestWord?: string;
-  };
-}
-
-interface SubmitResponse {
-  success: boolean;
-  alreadySubmitted?: boolean;
-  data?: AttemptData;
-  rank?: number | null;
-  error?: string;
-}
-
-interface AttemptData {
-  id: string;
-  puzzle_date: string;
-  puzzle_number: number;
-  language: string;
-  score: number;
-  word_count: number;
-  words_by_length: Record<string, number>;
-  time_seconds: number;
-  longest_word: string | null;
-  longest_word_length: number | null;
-  completed_at: string;
-  display_name: string;
-  avatar_emoji: string;
-  avatar_color: string;
-  player_id?: string;
-  guest_fingerprint?: string;
-}
-
-interface AttemptInsertData {
-  puzzle_date: string;
-  puzzle_number: number;
-  language: string;
-  score: number;
-  word_count: number;
-  words_by_length: Record<string, number>;
-  time_seconds: number;
-  longest_word: string | null;
-  longest_word_length: number | null;
-  completed_at: string;
-  display_name: string;
-  avatar_emoji: string;
-  avatar_color: string;
-  avatar_image?: string;
-  profile_picture_url?: string;
-  country_code?: string;
-  player_id?: string;
-  guest_fingerprint?: string;
-}
-
-interface CachedPuzzle {
-  grid: string[][];
-  targetWord: string;
-  puzzleDate: string;
-  puzzleNumber: number;
-  language: string;
-}
-
-interface PuzzleStats {
-  total_attempts: number;
-  total_completions: number;
-  average_score: number;
-  average_words: number;
-  top_score: number;
-}
-
-interface StatsResponse {
-  data: PuzzleStats;
-  error?: string;
-}
-
-const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
-type ValidLanguage = typeof VALID_LANGUAGES[number];
 
 /**
  * GET /api/daily-challenge/puzzle/:date/:language
@@ -188,13 +53,13 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
     const { date, language } = req.params;
 
     // Validate date format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (!isValidDateFormat(date)) {
       res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
       return;
     }
 
     // Validate language
-    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+    if (!isValidLanguage(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
@@ -264,13 +129,13 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
 
     // Validate date format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (!isValidDateFormat(date)) {
       res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
       return;
     }
 
     // Validate language
-    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+    if (!isValidLanguage(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
@@ -290,6 +155,9 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       }
 
       const supabase = getSupabase();
+      if (!supabase) {
+        throw new Error('Database connection unavailable');
+      }
 
       const { data, error } = await supabase
         .from('daily_puzzle_leaderboard')
@@ -405,6 +273,10 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
     }
 
     const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
 
     // NOTE: We use atomic insert with unique constraint fallback instead of check-then-insert
     // This prevents race conditions where two concurrent requests both pass the "check" phase
@@ -490,6 +362,10 @@ router.get('/stats/:date/:language', async (req: Request<LeaderboardParams>, res
     const { date, language } = req.params;
 
     const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
 
     const { data, error } = await supabase
       .from('daily_puzzles')
@@ -521,70 +397,7 @@ router.get('/stats/:date/:language', async (req: Request<LeaderboardParams>, res
 });
 
 // ==================== Word Hunt Routes ====================
-
-interface WordHuntSubmitRequest extends Request {
-  body: {
-    puzzleDate?: string;
-    puzzleNumber?: number;
-    language?: string;
-    playerId?: string;
-    guestFingerprint?: string;
-    displayName?: string;
-    avatarEmoji?: string;
-    avatarColor?: string;
-    countryCode?: string;
-    solved?: boolean;
-    attemptsUsed?: number;
-    targetWord?: string;
-    attemptWords?: Array<{
-      word: string;
-      feedback: Array<{
-        letter: string;
-        feedback: 'green' | 'yellow' | 'gray';
-        position: number;
-      }>;
-      timestamp: number;
-    }>;
-    // Survival mode fields
-    wordsDiscovered?: Array<{
-      word: string;
-      timestamp: number;
-      lifeGained: number;
-      tokensGained: number;
-    }>;
-    lifeRemaining?: number;
-    clueTokensEarned?: number;
-    clueTokensSpent?: number;
-    hintsUnlocked?: number;
-    efficiencyScore?: number;
-  };
-}
-
-interface WordHuntStatsParams {
-  date: string;
-  language: string;
-}
-
-interface WordHuntStatsResponse {
-  totalPlayers: number;
-  solvedCount: number;
-  solveRate: number;
-  attemptDistribution: Record<string, number>;
-  avgAttemptsSolved: number | null;
-  // Survival mode stats
-  avgLifeRemaining?: number | null;
-  avgEfficiencyScore?: number | null;
-  maxEfficiencyScore?: number | null;
-  avgWordsDiscovered?: number | null;
-  yourStats?: {
-    solved: boolean;
-    attemptsUsed: number;
-    percentile: number;
-    rank?: number;
-    efficiencyScore?: number;
-    efficiencyPercentile?: number;
-  };
-}
+// Types imported from ./dailyChallenge/types
 
 /**
  * POST /api/daily-challenge/word-hunt/submit
@@ -656,7 +469,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       const submittedTargetWord = normalizeWordForComparison(targetWord, language as Language);
 
       if (expectedTargetWord !== submittedTargetWord) {
-        logger.warn('API', `Word Hunt validation failed: expected ${expectedTargetWord}, got ${submittedTargetWord} for ${puzzleDate}/${language}`);
+        logger.info('API', `Word Hunt validation failed: expected ${expectedTargetWord}, got ${submittedTargetWord} for ${puzzleDate}/${language}`);
         res.status(400).json({ error: 'Invalid target word for this puzzle' });
         return;
       }
@@ -664,7 +477,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       // Verify puzzle number matches
       const expectedPuzzleNumber = getPuzzleNumber(puzzleDate);
       if (expectedPuzzleNumber !== puzzleNumber) {
-        logger.warn('API', `Word Hunt validation failed: expected puzzle #${expectedPuzzleNumber}, got #${puzzleNumber}`);
+        logger.info('API', `Word Hunt validation failed: expected puzzle #${expectedPuzzleNumber}, got #${puzzleNumber}`);
         res.status(400).json({ error: 'Invalid puzzle number' });
         return;
       }
@@ -674,7 +487,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
         const lastAttempt = attemptWords[attemptWords.length - 1];
         const normalizedLastAttempt = normalizeWordForComparison(lastAttempt.word, language as Language);
         if (normalizedLastAttempt !== expectedTargetWord) {
-          logger.warn('API', `Word Hunt validation failed: solved=true but last attempt "${lastAttempt.word}" doesn't match target "${expectedTargetWord}"`);
+          logger.info('API', `Word Hunt validation failed: solved=true but last attempt "${lastAttempt.word}" doesn't match target "${expectedTargetWord}"`);
           res.status(400).json({ error: 'Invalid solve claim' });
           return;
         }
@@ -682,7 +495,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
 
       // Validate target word is in dictionary or community-validated
       if (!isWordValidForDailyChallenge(expectedTargetWord, language as Language)) {
-        logger.warn('API', `Word Hunt validation failed: target word "${expectedTargetWord}" is not valid for language ${language}`);
+        logger.info('API', `Word Hunt validation failed: target word "${expectedTargetWord}" is not valid for language ${language}`);
         res.status(400).json({ error: 'Invalid target word - not in dictionary' });
         return;
       }
@@ -699,7 +512,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
           }
         }
         if (invalidWords.length > 0) {
-          logger.warn('API', `Word Hunt validation failed: invalid words submitted: ${invalidWords.join(', ')} for language ${language}`);
+          logger.info('API', `Word Hunt validation failed: invalid words submitted: ${invalidWords.join(', ')} for language ${language}`);
           res.status(400).json({
             error: 'Invalid words submitted - not in dictionary',
             invalidWords
@@ -714,6 +527,10 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
     }
 
     const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
 
     // NOTE: We use atomic insert with unique constraint fallback instead of check-then-insert
     // This prevents race conditions where two concurrent requests both pass the "check" phase
@@ -849,13 +666,13 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
     const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
 
     // Validate date format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (!isValidDateFormat(date)) {
       res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
       return;
     }
 
     // Validate language
-    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+    if (!isValidLanguage(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
@@ -1002,6 +819,10 @@ router.get('/word-hunt/stats/:date/:language', async (req: Request<WordHuntStats
     const guestFingerprint = req.query.guestFingerprint as string | undefined;
 
     const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
 
     // Fetch aggregate stats from the view
     const { data: stats, error: statsError } = await supabase
@@ -1144,13 +965,13 @@ router.get('/word-hunt/check-played/:date/:language', async (req: Request<{ date
     const guestFingerprint = req.query.guestFingerprint as string | undefined;
 
     // Validate date format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (!isValidDateFormat(date)) {
       res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
       return;
     }
 
     // Validate language
-    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+    if (!isValidLanguage(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
@@ -1162,6 +983,10 @@ router.get('/word-hunt/check-played/:date/:language', async (req: Request<{ date
     }
 
     const supabase = getSupabase();
+    if (!supabase) {
+      res.json({ hasPlayed: false });
+      return;
+    }
 
     // Check if attempt exists in database
     let query = supabase
@@ -1226,7 +1051,7 @@ router.get('/word-hunt/alltime-leaderboard/:language', async (req: Request<{ lan
     const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
 
     // Validate language
-    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+    if (!isValidLanguage(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }

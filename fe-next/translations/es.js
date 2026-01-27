@@ -3461,6 +3461,8 @@ const es = {
     "welcome": "Bienvenido,",
     "loadingDashboard": "Cargando panel...",
     "preparingTools": "Preparando herramientas de administración...",
+    "loadingSession": "Estableciendo sesión segura...",
+    "sessionError": "Error de Sesión",
     "nav": {
       "players": "Jugadores",
       "dictionary": "Diccionario",

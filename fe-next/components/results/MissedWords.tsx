@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 
-interface MissedWord {
+export interface MissedWord {
   word: string;
   score: number;
   foundBy: string[];

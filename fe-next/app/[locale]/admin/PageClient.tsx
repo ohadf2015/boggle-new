@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle, Database } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle, Database, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ export default function AdminPageClient() {
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
 
   // Use admin auth hook for automatic token management
-  const { authToken, refreshToken } = useAdminAuth();
+  const { authToken, refreshToken, isLoading: tokenLoading, error: tokenError } = useAdminAuth();
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if mobile on mount
@@ -57,11 +57,39 @@ export default function AdminPageClient() {
     );
   }
 
-  // Loading state - ONLY show while checking auth/profile, NOT while fetching authToken
-  if (authLoading || isProfileLoading) {
+  // Loading state - Show while checking auth/profile OR waiting for initial token
+  if (authLoading || isProfileLoading || tokenLoading) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
+        <div className="text-center">
+          <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
+          {tokenLoading && !authLoading && (
+            <p className="text-slate-400 mt-4 text-sm">
+              {t('admin.loadingSession') || 'Establishing secure session...'}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // If token fetch failed after retries, show error
+  if (tokenError && !authToken) {
+    return (
+      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-neo-display text-neo-white mb-2">
+            {t('admin.sessionError') || 'Session Error'}
+          </h1>
+          <p className="text-slate-400 mb-6 max-w-md">
+            {tokenError}
+          </p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            {t('common.retry') || 'Retry'}
+          </Button>
+        </div>
       </div>
     );
   }

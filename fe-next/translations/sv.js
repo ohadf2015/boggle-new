@@ -3472,6 +3472,8 @@ const sv = {
     "welcome": "Välkommen,",
     "loadingDashboard": "Laddar instrumentpanel...",
     "preparingTools": "Förbereder adminverktyg...",
+    "loadingSession": "Etablerar säker session...",
+    "sessionError": "Sessionsfel",
     "nav": {
       "players": "Spelare",
       "dictionary": "Ordbok",

@@ -71,7 +71,7 @@ describe('useAdminAuth', () => {
     });
 
     test('should handle missing session', async () => {
-      // GIVEN: Supabase returns null session
+      // GIVEN: Supabase returns null session (will retry 3 times)
       (supabaseLib.getSession as jest.Mock).mockResolvedValue({
         data: { session: null },
       });
@@ -79,38 +79,56 @@ describe('useAdminAuth', () => {
       // WHEN: Hook is rendered
       const { result } = renderHook(() => useAdminAuth());
 
-      // Wait for error to be set
+      // Advance through retry delays (1s, 2s, 4s exponential backoff)
+      // Total: 4 attempts (initial + 3 retries)
+      for (let i = 0; i < 4; i++) {
+        await act(async () => {
+          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          await Promise.resolve(); // Flush promises
+        });
+      }
+
+      // Wait for error to be set after all retries exhausted
       await waitFor(() => {
         expect(result.current.error).not.toBeNull();
-      }, { timeout: 3000 });
+      });
 
-      // THEN: Error should be set
+      // THEN: Error should be set after max retries
       expect(result.current.authToken).toBeNull();
-      expect(result.current.error).toBe('No access token available');
+      expect(result.current.error).toBe('Session not available - please log in again');
       expect(loggerModule.default.warn).toHaveBeenCalledWith(
         'ADMIN_AUTH',
-        'No access token in session'
+        'No access token after max retries'
       );
     });
 
     test('should handle session error via exception', async () => {
-      // GIVEN: getSession throws an error
+      // GIVEN: getSession throws an error (will retry 3 times)
       const sessionError = new Error('Session expired');
       (supabaseLib.getSession as jest.Mock).mockRejectedValue(sessionError);
 
       // WHEN: Hook is rendered
       const { result } = renderHook(() => useAdminAuth());
 
+      // Advance through retry delays (1s, 2s, 4s exponential backoff)
+      for (let i = 0; i < 4; i++) {
+        await act(async () => {
+          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          await Promise.resolve(); // Flush promises
+        });
+      }
+
+      // Wait for error to be set after all retries exhausted
       await waitFor(() => {
         expect(result.current.error).not.toBeNull();
-      }, { timeout: 3000 });
+      });
 
-      // THEN: Error should be set
+      // THEN: Error should be set after max retries
       expect(result.current.authToken).toBeNull();
       expect(result.current.error).toBe('Session expired');
       expect(loggerModule.default.error).toHaveBeenCalledWith(
         'ADMIN_AUTH',
-        'Token fetch error: Session expired'
+        `Token fetch failed after max retries: Session expired`
       );
     });
   });
@@ -192,9 +210,20 @@ describe('useAdminAuth', () => {
       // WHEN: Hook is rendered
       const { result } = renderHook(() => useAdminAuth());
 
+      // Advance through retry delays (1s, 2s, 4s exponential backoff)
+      for (let i = 0; i < 4; i++) {
+        await act(async () => {
+          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          await Promise.resolve(); // Flush promises
+        });
+      }
+
+      // Wait for all retries to complete
       await waitFor(() => {
-        expect(result.current.authToken).toBeNull();
+        expect(result.current.error).not.toBeNull();
       });
+
+      expect(result.current.authToken).toBeNull();
 
       // THEN: No refresh interval setup log
       expect(loggerModule.default.debug).not.toHaveBeenCalledWith(
@@ -294,18 +323,32 @@ describe('useAdminAuth', () => {
         expect(result.current.authToken).toBe(mockToken);
       });
 
-      // GIVEN: Refresh fails
-      (supabaseLib.getSession as jest.Mock).mockRejectedValueOnce(
-        new Error('Refresh failed')
-      );
+      // GIVEN: Refresh fails (mock all retry attempts)
+      const refreshError = new Error('Refresh failed');
+      (supabaseLib.getSession as jest.Mock)
+        .mockRejectedValueOnce(refreshError)
+        .mockRejectedValueOnce(refreshError)
+        .mockRejectedValueOnce(refreshError)
+        .mockRejectedValueOnce(refreshError);
 
       // WHEN: Manual refresh is triggered
-      let refreshedToken: string | null = null;
-      await act(async () => {
-        refreshedToken = await result.current.refreshToken();
+      let refreshPromise: Promise<string | null>;
+      act(() => {
+        refreshPromise = result.current.refreshToken();
       });
 
-      // THEN: Refresh should fail gracefully
+      // Advance through retry delays (1s, 2s, 4s exponential backoff)
+      for (let i = 0; i < 4; i++) {
+        await act(async () => {
+          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          await Promise.resolve(); // Flush promises
+        });
+      }
+
+      // Wait for refresh to complete
+      const refreshedToken = await refreshPromise!;
+
+      // THEN: Refresh should fail gracefully after retries
       expect(refreshedToken).toBeNull();
       expect(result.current.error).toBe('Refresh failed');
     });

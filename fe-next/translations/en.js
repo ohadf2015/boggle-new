@@ -3467,6 +3467,8 @@ const en = {
     "welcome": "Welcome,",
     "loadingDashboard": "Loading dashboard...",
     "preparingTools": "Preparing admin tools...",
+    "loadingSession": "Establishing secure session...",
+    "sessionError": "Session Error",
     "nav": {
       "players": "Players",
       "dictionary": "Dictionary",

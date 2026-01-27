@@ -1,0 +1,87 @@
+/**
+ * Leaderboard Module
+ * Leaderboard entries and ranked progress tracking
+ */
+
+import { getSupabase } from './client';
+
+/**
+ * Update leaderboard entry for a player
+ */
+export async function updateLeaderboardEntry(playerId: string): Promise<{ data: unknown; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' } };
+
+  // Get updated profile stats
+  const { data: profile, error: fetchError } = await client
+    .from('profiles')
+    .select('username, display_name, avatar_emoji, avatar_color, total_score, total_games, ranked_wins, casual_wins, ranked_mmr')
+    .eq('id', playerId)
+    .single();
+
+  if (fetchError) return { data: null, error: fetchError };
+
+  // Upsert leaderboard entry
+  const { data, error } = await client
+    .from('leaderboard')
+    .upsert({
+      player_id: playerId,
+      username: profile.username,
+      display_name: profile.display_name,
+      avatar_emoji: profile.avatar_emoji,
+      avatar_color: profile.avatar_color,
+      total_score: profile.total_score || 0,
+      games_played: profile.total_games || 0,
+      games_won: (profile.casual_wins || 0) + (profile.ranked_wins || 0),
+      ranked_mmr: profile.ranked_mmr || 1000,
+      last_updated: new Date().toISOString()
+    }, {
+      onConflict: 'player_id'
+    })
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+/**
+ * Update ranked progress for a player
+ */
+export async function updateRankedProgress(playerId: string): Promise<{ data: unknown; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' } };
+
+  // Get current profile casual games count
+  const { data: profile, error: fetchError } = await client
+    .from('profiles')
+    .select('casual_games')
+    .eq('id', playerId)
+    .single();
+
+  if (fetchError) return { data: null, error: fetchError };
+
+  const casualGames = profile.casual_games || 0;
+  const isUnlocked = casualGames >= 10;
+
+  // Upsert ranked progress
+  const { data, error } = await client
+    .from('ranked_progress')
+    .upsert({
+      player_id: playerId,
+      casual_games_played: casualGames,
+      unlocked_at: isUnlocked ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'player_id'
+    })
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+// CommonJS exports for backward compatibility
+module.exports = {
+  updateLeaderboardEntry,
+  updateRankedProgress,
+};

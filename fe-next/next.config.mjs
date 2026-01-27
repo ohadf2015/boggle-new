@@ -28,12 +28,15 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react'],
   },
 
-  // Transpile Three.js packages to fix HMR issues with Turbopack
+  // Transpile packages to fix HMR/ESM issues with Turbopack
+  // - Three.js packages: Fix HMR issues
+  // - @supabase/ssr: Fix "module is not defined" error (CommonJS/ESM interop)
   transpilePackages: [
     'three',
     '@react-three/fiber',
     '@react-three/drei',
     '@react-three/postprocessing',
+    '@supabase/ssr',
   ],
 
   // Compiler optimizations
