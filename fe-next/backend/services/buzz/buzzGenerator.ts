@@ -4,7 +4,7 @@
  * Uses Google Vertex AI Gemini for puzzle generation + Imagen for images
  */
 
-import { getTrendsFromDbCache, fetchGoogleTrends } from '../serpApiClient';
+import { getTrendsFromDbCache, fetchGoogleTrends, storeTrendsInDbCache } from '../serpApiClient';
 import {
   generateChallengeImage,
   checkImageCache,
@@ -129,6 +129,10 @@ export async function generateDailyBuzz(
           trends = getFallbackTopics(language);
         } else {
           console.log(`[BUZZ] Fetched ${trends.length} fresh trends from SERP API`);
+          // Store in DB cache for future use (fire and forget)
+          storeTrendsInDbCache(region, date, trends, 0).catch(err =>
+            console.error('[BUZZ] Failed to store trends in DB cache:', err)
+          );
         }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
