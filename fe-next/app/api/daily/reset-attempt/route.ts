@@ -112,7 +112,8 @@ export async function POST(request: Request) {
       deleted,
     });
   } catch (error) {
-    console.error('Reset attempt error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Reset attempt error:', errorMessage);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

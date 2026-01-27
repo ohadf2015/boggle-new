@@ -104,7 +104,8 @@ export async function GET() {
       gifts: transformedGifts,
     });
   } catch (error) {
-    console.error('Error in GET /api/player/gifts:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in GET /api/player/gifts:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/player/gifts',

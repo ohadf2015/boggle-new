@@ -63,7 +63,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('[PRESTIGE API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -158,7 +159,8 @@ export async function POST(request: NextRequest) {
       message: `Congratulations! You are now Prestige ${toRoman(newPrestigeLevel)}!`,
     });
   } catch (error) {
-    console.error('[PRESTIGE API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

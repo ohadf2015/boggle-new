@@ -217,7 +217,8 @@ export async function generateDailyChallenges(playerId: string): Promise<DailyCh
     .select();
 
   if (error) {
-    console.error('[DailyChallenges] Error generating challenges:', error);
+    const errorMessage = error.message || 'Unknown error';
+    console.error('[DailyChallenges] Error generating challenges:', errorMessage);
     return [];
   }
 

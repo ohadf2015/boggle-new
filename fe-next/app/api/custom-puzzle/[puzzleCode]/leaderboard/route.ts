@@ -91,7 +91,8 @@ export async function GET(request: Request, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error('Custom puzzle leaderboard error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Custom puzzle leaderboard error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -190,7 +190,8 @@ export async function getRecentlyUsedTrends(
     console.log(`[BUZZ] Found ${usedTrends.size} recently used trends (last ${daysBack} days)`);
     return usedTrends;
   } catch (error) {
-    console.error('[BUZZ] Error fetching recently used trends:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[BUZZ] Error fetching recently used trends:', errorMessage);
     return new Set();
   }
 }
@@ -218,7 +219,8 @@ export async function isFeatureFlagEnabled(flagName: string): Promise<boolean> {
 
     return data.enabled;
   } catch (error) {
-    console.error('[BUZZ] Failed to check feature flag:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[BUZZ] Failed to check feature flag:', errorMessage);
     return false;
   }
 }
@@ -297,7 +299,8 @@ export async function storePromptExample(
         console.debug('[BUZZ] Note: buzz_prompt_examples table not available yet (migrations pending)');
         return;
       }
-      console.error('[BUZZ] Failed to store prompt example:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[BUZZ] Failed to store prompt example:', errorMessage);
       throw new Error('Failed to store feedback');
     }
 

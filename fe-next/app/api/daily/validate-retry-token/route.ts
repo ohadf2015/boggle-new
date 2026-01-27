@@ -81,7 +81,8 @@ export async function GET(request: Request) {
       useCount: tokenData.use_count,
     });
   } catch (error) {
-    console.error('Validate retry token error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Validate retry token error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/daily/validate-retry-token',
@@ -216,7 +217,8 @@ export async function POST(request: Request) {
       attemptsReset,
     });
   } catch (error) {
-    console.error('Use retry token error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Use retry token error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/daily/validate-retry-token',

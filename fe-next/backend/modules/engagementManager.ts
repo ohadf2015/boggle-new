@@ -187,7 +187,8 @@ export async function recordLogin(playerId: string): Promise<LoginResult> {
       .single();
 
     if (error) {
-      console.error('[Engagement] Error creating record:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[Engagement] Error creating record:', errorMessage);
       return { streak: 1, isNewStreak: true, bonuses: [] };
     }
 

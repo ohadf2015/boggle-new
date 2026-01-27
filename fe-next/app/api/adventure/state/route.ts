@@ -158,7 +158,8 @@ export async function GET() {
       attempts,
     });
   } catch (error) {
-    console.error('[ADVENTURE STATE API] GET error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[ADVENTURE STATE API] GET error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -142,7 +142,8 @@ async function sendEmailNotification(name: string, email: string, message: strin
     console.log('[Contact Form] Email notification sent successfully');
     return true;
   } catch (error) {
-    console.error('[Contact Form] Failed to send email:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Contact Form] Failed to send email:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/contact',
@@ -231,7 +232,8 @@ export async function POST(request: NextRequest) {
     });
     return addRateLimitHeaders(response, rateLimitResult, CONTACT_RATE_LIMIT.maxRequests);
   } catch (error) {
-    console.error('[Contact Form] Unexpected error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Contact Form] Unexpected error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/contact',

@@ -177,7 +177,8 @@ function parseModerationResponse(responseText: string, originalTrends: TrendingT
       };
     });
   } catch (error) {
-    console.error('[MODERATION] Failed to parse moderation response:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[MODERATION] Failed to parse moderation response:', errorMessage);
     // Fallback: approve all (fail-open)
     return originalTrends.map(t => ({
       query: t.query,

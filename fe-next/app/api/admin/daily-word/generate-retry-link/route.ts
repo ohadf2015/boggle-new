@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Failed to create retry token:', insertError);
+      const errorMessage = insertError.message || 'Unknown error';
+      console.error('Failed to create retry token:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to create retry token' },
         { status: 500 }
@@ -104,9 +105,10 @@ export async function POST(request: NextRequest) {
       expiresAt: tokenData.expires_at,
     });
   } catch (error) {
-    console.error('Generate retry link error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Generate retry link error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -151,7 +153,8 @@ export async function GET(request: NextRequest) {
     const { data: tokens, error: queryError } = await query;
 
     if (queryError) {
-      console.error('Failed to fetch retry tokens:', queryError);
+      const errorMessage = queryError.message || 'Unknown error';
+      console.error('Failed to fetch retry tokens:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to fetch retry tokens' },
         { status: 500 }
@@ -163,9 +166,10 @@ export async function GET(request: NextRequest) {
       tokens,
     });
   } catch (error) {
-    console.error('List retry tokens error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('List retry tokens error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

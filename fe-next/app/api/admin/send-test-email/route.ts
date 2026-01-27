@@ -102,10 +102,11 @@ export async function POST(request: NextRequest) {
       sentTo: targetEmail,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('[Admin] ====== ERROR after', Date.now() - startTime, 'ms ======');
-    console.error('[Admin] Error details:', error);
+    console.error('[Admin] Error details:', errorMessage);
     return NextResponse.json({
-      error: error instanceof Error ? error.message : 'Internal server error',
+      error: errorMessage,
     }, { status: 500 });
   }
 }

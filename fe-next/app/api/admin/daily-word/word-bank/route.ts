@@ -99,9 +99,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Word bank GET error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Word bank GET error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -241,9 +242,10 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('Word bank POST error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Word bank POST error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

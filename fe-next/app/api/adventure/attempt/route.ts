@@ -161,7 +161,8 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('[ADVENTURE ATTEMPT API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[ADVENTURE ATTEMPT API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -217,7 +218,8 @@ export async function GET() {
       attempts: transformedAttempts,
     });
   } catch (error) {
-    console.error('[ADVENTURE ATTEMPT API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[ADVENTURE ATTEMPT API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

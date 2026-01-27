@@ -122,7 +122,8 @@ export async function GET(request: NextRequest) {
       rewards: CALENDAR_REWARDS.slice(0, Math.min(31, getDaysInMonth(currentMonth, currentYear))),
     });
   } catch (error) {
-    console.error('[API] Calendar GET error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[API] Calendar GET error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/engagement/calendar',
@@ -257,7 +258,8 @@ export async function POST(request: NextRequest) {
       nextReward: CALENDAR_REWARDS[currentDay] || null,
     });
   } catch (error) {
-    console.error('[API] Calendar POST error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[API] Calendar POST error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/engagement/calendar',

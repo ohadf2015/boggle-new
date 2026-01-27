@@ -42,13 +42,15 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | nu
       .single();
 
     if (error) {
-      console.error(`Error fetching feature flag ${flagName}:`, error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error(`Error fetching feature flag ${flagName}:`, errorMessage);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error(`Error fetching feature flag ${flagName}:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error fetching feature flag ${flagName}:`, errorMessage);
     return null;
   }
 }
@@ -108,7 +110,8 @@ export async function canAccessFeature(
     const userHash = hashUserId(userId);
     return (userHash % 100) < flag.rollout_percentage;
   } catch (error) {
-    console.error(`Error checking feature access for ${flagName}:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error checking feature access for ${flagName}:`, errorMessage);
     return false;
   }
 }
@@ -130,13 +133,15 @@ async function checkIsAdmin(userId: string): Promise<boolean> {
       .single();
 
     if (error) {
-      console.error(`Error checking admin status for user ${userId}:`, error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error(`Error checking admin status for user ${userId}:`, errorMessage);
       return false;
     }
 
     return data?.is_admin === true;
   } catch (error) {
-    console.error(`Error checking admin status:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error checking admin status:`, errorMessage);
     return false;
   }
 }
@@ -179,13 +184,15 @@ export async function setFeatureFlag(
       });
 
     if (error) {
-      console.error(`Error setting feature flag ${flagName}:`, error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error(`Error setting feature flag ${flagName}:`, errorMessage);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(`Error setting feature flag:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error setting feature flag:`, errorMessage);
     return false;
   }
 }
@@ -209,13 +216,15 @@ export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
       .eq('flag_name', flagName);
 
     if (error) {
-      console.error(`Error deleting feature flag ${flagName}:`, error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error(`Error deleting feature flag ${flagName}:`, errorMessage);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(`Error deleting feature flag:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error deleting feature flag:`, errorMessage);
     return false;
   }
 }
@@ -238,13 +247,15 @@ export async function listFeatureFlags(): Promise<FeatureFlag[]> {
       .order('flag_name');
 
     if (error) {
-      console.error('Error listing feature flags:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Error listing feature flags:', errorMessage);
       return [];
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error listing feature flags:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error listing feature flags:', errorMessage);
     return [];
   }
 }

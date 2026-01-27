@@ -67,7 +67,8 @@ export async function GET(request: NextRequest) {
     const { data: attempts, error, count } = await query.range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Fetch attempts error:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Fetch attempts error:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to fetch attempts' },
         { status: 500 }
@@ -83,9 +84,10 @@ export async function GET(request: NextRequest) {
       language,
     });
   } catch (error) {
-    console.error('Get attempts error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Get attempts error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

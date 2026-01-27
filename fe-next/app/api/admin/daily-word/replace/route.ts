@@ -149,10 +149,11 @@ export async function POST(request: NextRequest) {
           }
         };
       } catch (regenerateError) {
-        console.error('Board regeneration error:', regenerateError);
+        const errorMessage = regenerateError instanceof Error ? regenerateError.message : 'Unknown error';
+        console.error('Board regeneration error:', errorMessage);
         boardRegenerateResult = {
           success: false,
-          error: regenerateError instanceof Error ? regenerateError.message : 'Unknown error'
+          error: errorMessage
         };
       }
     }
@@ -181,9 +182,10 @@ export async function POST(request: NextRequest) {
       reset: resetResult,
     });
   } catch (error) {
-    console.error('Replace word error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Replace word error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

@@ -204,7 +204,8 @@ export async function POST(request: NextRequest) {
           }));
         }
       } catch (error) {
-        console.error('AI service check failed:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('AI service check failed:', errorMessage);
         aiConfigured = false;
         generatedWords = datesToGenerate.map((date, i) => ({
           date,
@@ -243,9 +244,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Bulk generate error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Bulk generate error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -352,9 +354,10 @@ export async function PUT(request: NextRequest) {
       results,
     });
   } catch (error) {
-    console.error('Bulk save error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Bulk save error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -381,7 +384,8 @@ async function getRecentlyUsedWords(
     .lte('puzzle_date', endDate.toISOString().split('T')[0]);
 
   if (error) {
-    console.error('Error fetching recently used words:', error);
+    const errorMessage = error.message || 'Unknown error';
+    console.error('Error fetching recently used words:', errorMessage);
     return new Set();
   }
 
@@ -447,8 +451,8 @@ async function generateWordsWithAI(
 
     return result_words;
   } catch (error) {
-    console.error('AI generation failed:', error);
     const errorMessage = error instanceof Error ? error.message : 'AI generation failed - please enter manually';
+    console.error('AI generation failed:', errorMessage);
 
     return dates.map(date => ({
       date,

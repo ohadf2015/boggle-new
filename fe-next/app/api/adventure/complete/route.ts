@@ -269,7 +269,8 @@ export async function POST(request: Request) {
       previousLevel: leveledUp ? previousLevel : undefined,
     });
   } catch (error) {
-    console.error('[ADVENTURE COMPLETE API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[ADVENTURE COMPLETE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

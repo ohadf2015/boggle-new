@@ -171,9 +171,10 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error('[Admin Buzz] Error updating template:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[Admin Buzz] Error updating template:', errorMessage);
       return NextResponse.json(
-        { error: `Failed to update template: ${error.message}` },
+        { error: `Failed to update template: ${errorMessage}` },
         { status: 500 }
       );
     }
@@ -245,9 +246,10 @@ export async function DELETE(
       .eq('id', templateId);
 
     if (error) {
-      console.error('[Admin Buzz] Error deleting template:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[Admin Buzz] Error deleting template:', errorMessage);
       return NextResponse.json(
-        { error: `Failed to delete template: ${error.message}` },
+        { error: `Failed to delete template: ${errorMessage}` },
         { status: 500 }
       );
     }

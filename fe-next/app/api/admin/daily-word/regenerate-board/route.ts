@@ -65,9 +65,10 @@ export async function POST(request: NextRequest) {
       message: `Board regenerated successfully for ${puzzleDate}/${language}`
     });
   } catch (error) {
-    console.error('Regenerate board error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Regenerate board error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

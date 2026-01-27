@@ -4576,4 +4576,4 @@ const ja = {
   }
 };
 
-module.exports = { ja };
+export { ja };

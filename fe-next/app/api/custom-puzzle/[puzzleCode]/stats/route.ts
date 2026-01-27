@@ -169,7 +169,8 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Custom puzzle stats error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Custom puzzle stats error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

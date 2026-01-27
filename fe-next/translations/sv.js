@@ -4576,4 +4576,4 @@ const sv = {
   }
 };
 
-module.exports = { sv };
+export { sv };

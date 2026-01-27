@@ -193,7 +193,8 @@ export async function POST(request: NextRequest) {
       message: 'Successfully subscribed to daily challenges',
     });
   } catch (error) {
-    console.error('[Email Subscription Error]', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Email Subscription Error]', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/subscribe-email',

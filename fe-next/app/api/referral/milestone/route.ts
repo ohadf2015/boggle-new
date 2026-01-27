@@ -200,7 +200,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in POST /api/referral/milestone:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/referral/milestone:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/referral/milestone',

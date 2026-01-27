@@ -81,8 +81,9 @@ export async function GET(request: NextRequest) {
         console.log(`[Cron] ✅ Generated buzz for ${language}`);
         return { language, success: true };
       } catch (err: any) {
-        console.error(`[Cron] ❌ Failed to generate buzz for ${language}:`, err);
-        return { language, success: false, error: err.message };
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        console.error(`[Cron] ❌ Failed to generate buzz for ${language}:`, errorMessage);
+        return { language, success: false, error: errorMessage };
       }
     });
 
@@ -121,12 +122,13 @@ export async function GET(request: NextRequest) {
       { status }
     );
   } catch (error: any) {
-    console.error('[Cron] Fatal error during daily buzz generation:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Cron] Fatal error during daily buzz generation:', errorMessage);
     return NextResponse.json(
       {
         success: false,
         error: 'Internal server error',
-        message: error.message,
+        message: errorMessage,
       },
       { status: 500 }
     );
@@ -194,8 +196,9 @@ export async function POST(request: NextRequest) {
         results[lang] = { success: true };
         console.log(`[Admin] ✅ Generated buzz for ${lang}`);
       } catch (err: any) {
-        console.error(`[Admin] ❌ Failed to generate buzz for ${lang}:`, err);
-        results[lang] = { success: false, error: err.message };
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        console.error(`[Admin] ❌ Failed to generate buzz for ${lang}:`, errorMessage);
+        results[lang] = { success: false, error: errorMessage };
       }
     }
 
@@ -212,11 +215,12 @@ export async function POST(request: NextRequest) {
       results,
     });
   } catch (error: any) {
-    console.error('[Admin] Error during manual generation:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Admin] Error during manual generation:', errorMessage);
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
+        error: errorMessage,
       },
       { status: 500 }
     );

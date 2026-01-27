@@ -120,7 +120,8 @@ export async function GET() {
 
     return NextResponse.json(progression);
   } catch (error) {
-    console.error('[ADVENTURE API] GET error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[ADVENTURE API] GET error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -184,7 +185,8 @@ export async function POST() {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[ADVENTURE API] POST error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[ADVENTURE API] POST error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

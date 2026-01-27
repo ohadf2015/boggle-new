@@ -106,9 +106,10 @@ export async function GET(request: NextRequest) {
       limit,
     });
   } catch (error) {
-    console.error('[admin/game-sessions] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('[admin/game-sessions] Error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

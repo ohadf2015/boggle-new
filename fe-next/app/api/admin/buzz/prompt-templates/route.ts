@@ -111,7 +111,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[Admin Buzz] Error fetching templates:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[Admin Buzz] Error fetching templates:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to fetch templates' },
         { status: 500 }
@@ -211,9 +212,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .single();
 
     if (error) {
-      console.error('[Admin Buzz] Error creating template:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[Admin Buzz] Error creating template:', errorMessage);
       return NextResponse.json(
-        { error: `Failed to create template: ${error.message}` },
+        { error: `Failed to create template: ${errorMessage}` },
         { status: 500 }
       );
     }

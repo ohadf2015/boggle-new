@@ -4569,4 +4569,4 @@ const he = {
   }
 };
 
-module.exports = { he };
+export { he };

@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
       count: flags.length,
     });
   } catch (error) {
-    console.error('Error in GET /api/admin/feature-flags:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in GET /api/admin/feature-flags:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -129,7 +130,8 @@ export async function POST(request: NextRequest) {
       message: 'Feature flag created/updated successfully',
     });
   } catch (error) {
-    console.error('Error in POST /api/admin/feature-flags:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/admin/feature-flags:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -189,7 +191,8 @@ export async function DELETE(request: NextRequest) {
       message: `Feature flag '${flagName}' deleted successfully`,
     });
   } catch (error) {
-    console.error('Error in DELETE /api/admin/feature-flags:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in DELETE /api/admin/feature-flags:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

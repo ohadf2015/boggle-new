@@ -55,7 +55,8 @@ export async function GET() {
       badges: badges || [],
     });
   } catch (error) {
-    console.error('Error in GET /api/admin/gift/badges:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in GET /api/admin/gift/badges:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/admin/gift/badges',

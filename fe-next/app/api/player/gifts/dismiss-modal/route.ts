@@ -46,7 +46,8 @@ export async function POST() {
       dismissedAt,
     });
   } catch (error) {
-    console.error('Error in POST /api/player/gifts/dismiss-modal:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/player/gifts/dismiss-modal:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/player/gifts/dismiss-modal',

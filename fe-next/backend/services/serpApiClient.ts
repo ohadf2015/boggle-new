@@ -147,7 +147,8 @@ export async function getTrendsFromDbCache(
 
     return data.trends_data as TrendingTopic[];
   } catch (error) {
-    console.error('[SERP] Error fetching from DB cache:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[SERP] Error fetching from DB cache:', errorMessage);
     return null;
   }
 }
@@ -183,7 +184,8 @@ export async function storeTrendsInDbCache(
 
     console.log(`[SERP] Stored ${trends.length} trends in DB cache for ${region}`);
   } catch (error) {
-    console.error('[SERP] Error storing in DB cache:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[SERP] Error storing in DB cache:', errorMessage);
   }
 }
 
@@ -214,7 +216,8 @@ async function logSerpApiRequest(
       reused_from_cache: false
     });
   } catch (error) {
-    console.error('[SERP] Failed to log request:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[SERP] Failed to log request:', errorMessage);
   }
 }
 

@@ -313,15 +313,13 @@ body {
   font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  /* Note: overflow-x handled by .screen-fit class */
+  /* Note: overflow-x and viewport height handled by .screen-fit class */
   /* Neo-brutalist background with halftone dots and retro grid - consistent across entire app */
   background-color: var(--neo-navy);
   background-image:
     var(--halftone-pattern),
     var(--retro-grid-pattern);
   background-size: 20px 20px, 60px 60px;
-  /* Ensure background extends to full viewport */
-  min-height: 100dvh;
 }
 
 * {

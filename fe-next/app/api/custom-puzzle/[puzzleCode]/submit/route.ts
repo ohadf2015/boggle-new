@@ -205,7 +205,8 @@ export async function POST(request: Request, { params }: RouteParams) {
       creatorScore: puzzle.creator_efficiency_score,
     });
   } catch (error) {
-    console.error('Submit attempt error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Submit attempt error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -81,8 +81,9 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('[admin/community-words] Query error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      const errorMessage = error.message || 'Unknown error';
+      console.error('[admin/community-words] Query error:', errorMessage);
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
     // Transform data to include status
@@ -111,9 +112,10 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[admin/community-words] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('[admin/community-words] Error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

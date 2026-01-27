@@ -52,9 +52,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error fetching schedule:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Error fetching schedule:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

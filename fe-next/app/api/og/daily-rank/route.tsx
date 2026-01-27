@@ -270,7 +270,8 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error generating OG image:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error generating OG image:', errorMessage);
     return new Response('Failed to generate image', { status: 500 });
   }
 }

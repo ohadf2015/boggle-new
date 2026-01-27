@@ -139,7 +139,8 @@ export async function POST(request: NextRequest) {
       message: `Vote recorded: ${voteType} for "${word}"`
     });
   } catch (error) {
-    console.error('Error in single-player vote API:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in single-player vote API:', errorMessage);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

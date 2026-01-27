@@ -857,9 +857,11 @@
 /* Full-screen flex container - scrollable when content overflows */
 /* This is the default for pages that may have content exceeding viewport */
 .screen-fit {
-  min-height: 100vh;
-  min-height: 100svh; /* Small viewport height fallback */
-  min-height: 100dvh; /* Dynamic viewport height - adapts to browser UI */
+  /* CRITICAL: Use height (not min-height) to force body to fill viewport on mobile */
+  /* Progressive enhancement: vh → svh (stable, excludes browser UI) → dvh (dynamic) */
+  height: 100vh; /* Fallback for older browsers */
+  height: 100svh; /* Small viewport - stable height excluding browser chrome */
+  height: 100dvh; /* Dynamic viewport - adapts to browser UI show/hide */
   display: flex;
   flex-direction: column;
   overflow-y: auto;

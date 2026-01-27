@@ -113,7 +113,8 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('Error creating puzzle:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Error creating puzzle:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to create puzzle' },
         { status: 500 }
@@ -127,7 +128,8 @@ export async function POST(request: Request) {
       creatorEfficiencyScore,
     });
   } catch (error) {
-    console.error('Create puzzle error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Create puzzle error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

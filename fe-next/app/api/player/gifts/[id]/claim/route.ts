@@ -59,7 +59,8 @@ export async function POST(
       coinsAwarded: claimResult.coins_awarded,
     });
   } catch (error) {
-    console.error('Error in POST /api/player/gifts/[id]/claim:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/player/gifts/[id]/claim:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/player/gifts/[id]/claim',

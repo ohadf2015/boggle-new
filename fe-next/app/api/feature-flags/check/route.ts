@@ -33,7 +33,8 @@ export async function POST(request: NextRequest) {
       flagName,
     });
   } catch (error) {
-    console.error('Error in POST /api/feature-flags/check:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/feature-flags/check:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

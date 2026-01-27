@@ -82,7 +82,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch words';
         setError(errorMessage);
-        console.error('Word bank fetch error:', err);
+        console.error('Word bank fetch error:', errorMessage, err);
       } finally {
         setLoading(false);
       }
@@ -109,7 +109,8 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         setStats(data.stats);
       }
     } catch (err) {
-      console.error('Stats fetch error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch stats';
+      console.error('Stats fetch error:', errorMessage, err);
     }
   }, [filters.language]);
 
@@ -148,7 +149,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to delete word';
         setError(errorMessage);
-        console.error('Delete error:', err);
+        console.error('Delete error:', errorMessage, err);
         return false;
       }
     },

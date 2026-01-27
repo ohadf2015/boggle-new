@@ -82,9 +82,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[admin/approve] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('[admin/approve] Error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

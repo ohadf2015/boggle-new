@@ -109,7 +109,8 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in GET /api/referral:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in GET /api/referral:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/referral',
@@ -269,7 +270,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in POST /api/referral:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/referral:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/referral',

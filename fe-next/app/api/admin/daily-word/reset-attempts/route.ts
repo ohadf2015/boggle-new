@@ -80,9 +80,10 @@ export async function POST(request: NextRequest) {
       errors: results.errors.length > 0 ? results.errors : undefined,
     });
   } catch (error) {
-    console.error('Reset attempts error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('Reset attempts error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

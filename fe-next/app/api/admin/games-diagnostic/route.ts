@@ -249,9 +249,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[admin/games-diagnostic] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    console.error('[admin/games-diagnostic] Error:', errorMessage);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

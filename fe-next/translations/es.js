@@ -4565,4 +4565,4 @@ const es = {
   }
 };
 
-module.exports = { es };
+export { es };

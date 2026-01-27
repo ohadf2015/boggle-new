@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Error saving web vital:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Error saving web vital:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to save metric' },
         { status: 500 }
@@ -80,7 +81,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Error processing web vital:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error processing web vital:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

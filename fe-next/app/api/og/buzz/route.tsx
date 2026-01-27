@@ -180,7 +180,8 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error generating Daily Buzz OG image:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error generating Daily Buzz OG image:', errorMessage);
     return new Response('Error generating image', { status: 500 });
   }
 }

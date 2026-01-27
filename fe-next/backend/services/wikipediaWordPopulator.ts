@@ -154,7 +154,8 @@ async function loadWordsFromJSON(
     return data.words;
 
   } catch (error) {
-    console.error(`[WikiPopulator] Error loading JSON file for ${language}:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[WikiPopulator] Error loading JSON file for ${language}:`, errorMessage);
     return null;
   }
 }
@@ -314,7 +315,8 @@ async function tryLocalJSONSource(
     return null;
 
   } catch (error) {
-    console.error(`[WikiPopulator] Error processing local JSON for ${language}:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[WikiPopulator] Error processing local JSON for ${language}:`, errorMessage);
     return null;
   }
 }
@@ -365,7 +367,8 @@ async function tryWikipediaSource(
     return null;
 
   } catch (error) {
-    console.error(`[WikiPopulator] Wikipedia fetch error for ${language}:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[WikiPopulator] Wikipedia fetch error for ${language}:`, errorMessage);
     return null;
   }
 }
@@ -573,7 +576,8 @@ export async function getWordCandidatesForAdmin(
     }));
 
   } catch (error) {
-    console.error('[WikiPopulator] Error fetching candidates for admin:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[WikiPopulator] Error fetching candidates for admin:', errorMessage);
     return [];
   }
 }
@@ -605,7 +609,8 @@ export async function adminUpdateWordStatus(
     return true;
 
   } catch (error) {
-    console.error('[WikiPopulator] Error updating word status:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[WikiPopulator] Error updating word status:', errorMessage);
     return false;
   }
 }
@@ -634,7 +639,8 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
     return true;
 
   } catch (error) {
-    console.error('[WikiPopulator] Error deleting word candidate:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[WikiPopulator] Error deleting word candidate:', errorMessage);
     return false;
   }
 }
@@ -750,7 +756,8 @@ export async function adminAddWordCandidate(
     return { success: true, id: data?.id };
 
   } catch (error) {
-    console.error('[WikiPopulator] Error adding word candidate:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[WikiPopulator] Error adding word candidate:', errorMessage);
     return { success: false };
   }
 }

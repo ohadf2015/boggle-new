@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error('[Email Preferences] Error fetching preferences:', error);
+    const errorMessage = error.message || 'Unknown error';
+    console.error('[Email Preferences] Error fetching preferences:', errorMessage);
     return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 });
   }
 

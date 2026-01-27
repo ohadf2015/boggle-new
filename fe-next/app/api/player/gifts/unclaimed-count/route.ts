@@ -40,7 +40,8 @@ export async function GET() {
       count: count || 0,
     });
   } catch (error) {
-    console.error('Error in GET /api/player/gifts/unclaimed-count:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in GET /api/player/gifts/unclaimed-count:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/player/gifts/unclaimed-count',

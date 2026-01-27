@@ -398,7 +398,8 @@ export function geolocationMiddleware(options: GeolocationMiddlewareOptions = {}
 
       next();
     } catch (error) {
-      console.error('[GEOLOCATION] Middleware error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[GEOLOCATION] Middleware error:', errorMessage);
       next(); // Continue even if geolocation fails
     }
   };

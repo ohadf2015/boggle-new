@@ -93,7 +93,8 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
-    console.error('[Email Cron] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Email Cron] Error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/email/send-daily',

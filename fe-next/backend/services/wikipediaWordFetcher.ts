@@ -665,7 +665,8 @@ export async function storeWikipediaWordCandidates(
     }
 
   } catch (error) {
-    console.error('[Wikipedia] Error storing word candidates:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Wikipedia] Error storing word candidates:', errorMessage);
   }
 }
 
@@ -707,7 +708,8 @@ export async function getValidatedWikipediaWords(
     }));
 
   } catch (error) {
-    console.error('[Wikipedia] Error fetching validated words:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Wikipedia] Error fetching validated words:', errorMessage);
     return [];
   }
 }
