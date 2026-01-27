@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { User, ArrowLeft, BarChart2, Award, Gift } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { User, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NeoLoader } from '@/components/ui/NeoLoader';
-import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -40,7 +39,7 @@ interface GameSession {
   gameCode?: string;
 }
 
-type MobileTab = 'overview' | 'stats' | 'achievements' | 'collection';
+type ProfileSection = 'overview' | 'stats' | 'achievements' | 'collection';
 
 export default function ProfilePageClient(): React.JSX.Element {
   const { theme } = useTheme();
@@ -54,7 +53,8 @@ export default function ProfilePageClient(): React.JSX.Element {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
-  const [mobileActiveTab, setMobileActiveTab] = useState<MobileTab>('overview');
+  const [activeSection, setActiveSection] = useState<ProfileSection>('overview');
+  const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
 
   // Hooks
   const { isUploading, handleProfilePictureUpload, handleRemoveProfilePicture } = useProfilePictureUpload({
@@ -77,13 +77,35 @@ export default function ProfilePageClient(): React.JSX.Element {
     threshold: 60,
   });
 
-  // Mobile tab configuration
-  const mobileTabs = [
-    { id: 'overview' as MobileTab, icon: <User className="w-5 h-5" />, label: t('profile.overview') || 'Overview' },
-    { id: 'stats' as MobileTab, icon: <BarChart2 className="w-5 h-5" />, label: t('profile.stats') || 'Stats' },
-    { id: 'achievements' as MobileTab, icon: <Award className="w-5 h-5" />, label: t('profile.achievements') || 'Achievements' },
-    { id: 'collection' as MobileTab, icon: <Gift className="w-5 h-5" />, label: t('collectibles.title') || 'Collection' },
-  ];
+  // Section navigation
+  const sections: ProfileSection[] = ['overview', 'stats', 'achievements', 'collection'];
+  const currentIndex = sections.indexOf(activeSection);
+
+  const goToNextSection = () => {
+    if (currentIndex < sections.length - 1) {
+      setActiveSection(sections[currentIndex + 1]);
+    }
+  };
+
+  const goToPrevSection = () => {
+    if (currentIndex > 0) {
+      setActiveSection(sections[currentIndex - 1]);
+    }
+  };
+
+  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 50; // Minimum drag distance to trigger navigation
+
+    if (Math.abs(info.offset.x) > threshold) {
+      if (info.offset.x > 0) {
+        // Dragged right (go to previous section)
+        goToPrevSection();
+      } else {
+        // Dragged left (go to next section)
+        goToNextSection();
+      }
+    }
+  };
 
   // Check for active game session on mount
   useEffect(() => {
@@ -194,16 +216,43 @@ export default function ProfilePageClient(): React.JSX.Element {
       )}>
         <AutoHideHeader />
 
+        {/* Section indicator dots */}
+        <div className="flex items-center justify-center gap-2 py-3">
+          {sections.map((section, index) => (
+            <button
+              key={section}
+              onClick={() => setActiveSection(section)}
+              className={cn(
+                'transition-all duration-200',
+                index === currentIndex
+                  ? 'w-8 h-2 bg-neo-yellow rounded-full'
+                  : 'w-2 h-2 bg-neo-white/30 rounded-full hover:bg-neo-white/50'
+              )}
+              aria-label={`Go to ${section} section`}
+            />
+          ))}
+        </div>
+
         {/* NOTE: Do NOT use overflow-y-auto here - scroll propagates to body's screen-fit */}
-        <div
+        <motion.div
           className="flex-1 min-h-0 px-3 pt-2 page-content-safe relative"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={handleDragEnd}
           {...pullToRefreshHandlers}
         >
           <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
 
           <AnimatePresence mode="wait">
-            {mobileActiveTab === 'overview' && (
-              <motion.div key="overview" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            {activeSection === 'overview' && (
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
                 <ProfileHeader {...profileHeaderProps} compact />
                 <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact />
                 <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
@@ -211,21 +260,39 @@ export default function ProfilePageClient(): React.JSX.Element {
               </motion.div>
             )}
 
-            {mobileActiveTab === 'stats' && (
-              <motion.div key="stats" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            {activeSection === 'stats' && (
+              <motion.div
+                key="stats"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
                 <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} />
                 <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />
               </motion.div>
             )}
 
-            {mobileActiveTab === 'achievements' && (
-              <motion.div key="achievements" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            {activeSection === 'achievements' && (
+              <motion.div
+                key="achievements"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
                 <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
               </motion.div>
             )}
 
-            {mobileActiveTab === 'collection' && (
-              <motion.div key="collection" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+            {activeSection === 'collection' && (
+              <motion.div
+                key="collection"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
                 {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-4"><ReferralCard /></motion.div>}
                 <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
                 {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><EmailPreferences isDarkMode={isDarkMode} /></motion.div>}
@@ -233,11 +300,44 @@ export default function ProfilePageClient(): React.JSX.Element {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-          <MobileTabBar tabs={mobileTabs} activeTab={mobileActiveTab} onTabChange={(tabId) => setMobileActiveTab(tabId as MobileTab)} />
-        </div>
+          {/* Navigation arrows (optional visual hint) */}
+          {currentIndex > 0 && (
+            <button
+              onClick={goToPrevSection}
+              className={cn(
+                'fixed left-2 top-1/2 -translate-y-1/2 z-10',
+                'w-10 h-10 rounded-full',
+                'bg-neo-navy/80 border-2 border-neo-yellow',
+                'flex items-center justify-center',
+                'text-neo-yellow',
+                'shadow-hard-sm',
+                'hover:scale-110 transition-transform'
+              )}
+              aria-label="Previous section"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {currentIndex < sections.length - 1 && (
+            <button
+              onClick={goToNextSection}
+              className={cn(
+                'fixed right-2 top-1/2 -translate-y-1/2 z-10',
+                'w-10 h-10 rounded-full',
+                'bg-neo-navy/80 border-2 border-neo-yellow',
+                'flex items-center justify-center',
+                'text-neo-yellow',
+                'shadow-hard-sm',
+                'hover:scale-110 transition-transform'
+              )}
+              aria-label="Next section"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+        </motion.div>
 
         <EmojiAvatarPicker
           isOpen={showEmojiPicker}

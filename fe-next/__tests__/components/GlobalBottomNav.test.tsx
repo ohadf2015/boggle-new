@@ -240,18 +240,22 @@ describe('GlobalBottomNav', () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it('should hide on profile path (has own MobileTabBar)', () => {
+        it('should remain visible on profile path (consistent navigation)', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/profile');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            // GlobalBottomNav should remain visible to maintain consistent navigation
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
+            expect(screen.getByLabelText(/profile/i)).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should hide on profile sub-paths (has own MobileTabBar)', () => {
+        it('should remain visible on profile sub-paths (consistent navigation)', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/profile/settings');
 
-            const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            render(<GlobalBottomNav />);
+            // GlobalBottomNav should remain visible on all profile sub-paths
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
+            expect(screen.getByLabelText(/profile/i)).toHaveAttribute('aria-current', 'page');
         });
 
         it('should show on regular pages (settings, rules, etc.)', () => {

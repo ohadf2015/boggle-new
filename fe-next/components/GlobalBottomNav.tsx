@@ -80,7 +80,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             '/singleplayer',
             '/daily',
             '/adventure',
-            '/profile',  // Profile has its own MobileTabBar
+            // REMOVED: '/profile' - GlobalBottomNav should remain visible on profile
+            // to avoid confusing tab switching UX
         ];
 
         return pathsWithOwnNav.some(path => cleanPath.startsWith(path));

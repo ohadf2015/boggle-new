@@ -43,6 +43,8 @@ interface LiveGamesResponse {
 
 interface LiveMonitorProps {
   authToken: string;
+  /** Callback to refresh token when it expires (401 error) */
+  onTokenExpired?: () => Promise<string | null>;
 }
 
 const LANGUAGE_FLAGS: Record<string, string> = {
@@ -84,20 +86,40 @@ function formatTimeLeft(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function LiveMonitor({ authToken }: LiveMonitorProps) {
+export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
   const { t } = useLanguage();
   const [data, setData] = useState<LiveGamesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now());
+  const [currentToken, setCurrentToken] = useState(authToken);
 
-  const fetchLiveGames = useCallback(async () => {
+  // Update current token when prop changes (after refresh)
+  useEffect(() => {
+    setCurrentToken(authToken);
+  }, [authToken]);
+
+  const fetchLiveGames = useCallback(async (retryCount = 0): Promise<void> => {
     try {
       const response = await fetch('/api/admin/live-games', {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${currentToken}`,
         },
       });
+
+      // Handle 401 (token expired) - attempt refresh and retry once
+      if (response.status === 401 && retryCount === 0 && onTokenExpired) {
+        console.log('[LiveMonitor] Token expired, refreshing...');
+        const newToken = await onTokenExpired();
+
+        if (newToken) {
+          setCurrentToken(newToken);
+          // Retry request with new token
+          return fetchLiveGames(1);
+        }
+
+        throw new Error('Authentication failed - unable to refresh token');
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch: ${response.status}`);
@@ -112,7 +134,7 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
     } finally {
       setLoading(false);
     }
-  }, [authToken]);
+  }, [currentToken, onTokenExpired]);
 
   // Initial fetch and auto-refresh every 5 seconds
   useEffect(() => {

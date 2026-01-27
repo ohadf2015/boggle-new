@@ -44,8 +44,16 @@ export const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-2.5-pro';
 /**
  * Thinking budget for extended reasoning (0 = disabled)
  * Max: 32768 for 2.5-pro, 24576 for 2.5-flash
+ *
+ * IMPORTANT: Set to 0 by default to avoid timeout issues.
+ * Gemini 2.5 Pro with thinking enabled has known latency problems
+ * that can exceed the 90-second timeout, especially during peak usage.
+ * See: https://discuss.ai.google.dev/t/very-slow-response-time-on-the-new-2-5-pro-0605-model/87456
+ *
+ * To re-enable thinking for potentially higher quality (but slower) generation,
+ * set VERTEX_AI_THINKING_BUDGET=8192 in environment variables.
  */
-export const THINKING_BUDGET = parseInt(process.env.VERTEX_AI_THINKING_BUDGET || '8192', 10);
+export const THINKING_BUDGET = parseInt(process.env.VERTEX_AI_THINKING_BUDGET || '0', 10);
 
 /**
  * Timeout for AI generation requests (in milliseconds)

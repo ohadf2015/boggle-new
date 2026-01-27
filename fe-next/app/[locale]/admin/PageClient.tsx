@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
@@ -17,6 +16,7 @@ import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export default function AdminPageClient() {
   const router = useRouter();
@@ -24,30 +24,14 @@ export default function AdminPageClient() {
   const isRTL = language === 'he';
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
 
-  const [authToken, setAuthToken] = useState<string | null>(null);
+  // Use admin auth hook for automatic token management
+  const { authToken, refreshToken } = useAdminAuth();
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if mobile on mount
   useEffect(() => {
     setIsMobile(isMobileDevice());
   }, []);
-
-  // Get auth token for API calls
-  const getAuthToken = useCallback(async () => {
-    try {
-      const { data: { session } } = await getSession();
-      return session?.access_token || null;
-    } catch {
-      return null;
-    }
-  }, []);
-
-  // Fetch auth token when admin status is confirmed
-  useEffect(() => {
-    if (!authLoading && isAdmin) {
-      getAuthToken().then(setAuthToken);
-    }
-  }, [authLoading, isAdmin, getAuthToken]);
 
   // Still loading profile - wait before showing access denied
   const isProfileLoading = !authLoading && user && !profile;
@@ -207,7 +191,7 @@ export default function AdminPageClient() {
         {/* Live Monitor Component - show loading state if authToken not ready */}
         {authToken ? (
           <>
-            <LiveMonitor authToken={authToken} />
+            <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
 
             {/* Today's Games History */}
             <TodayGamesHistory authToken={authToken} />
