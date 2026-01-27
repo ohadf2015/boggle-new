@@ -166,79 +166,62 @@ describe('Profile UI Styling', () => {
     });
   });
 
-  describe('Neo-Brutalist Carousel Indicators', () => {
-    it('should use small dot sizing for all indicators', () => {
-      const { container } = render(<ProfilePageClient />);
+  describe('Neo-Brutalist Tab Navigation', () => {
+    it('should display tab buttons with section labels', () => {
+      render(<ProfilePageClient />);
 
-      // Find carousel indicators
-      const indicators = container.querySelectorAll('button[aria-label*="Go to"]');
-      expect(indicators.length).toBeGreaterThan(1);
-
-      // All indicators should be small dots (w-2.5 h-2.5 or w-2 h-2)
-      indicators.forEach(indicator => {
-        // Should NOT use large sizes like w-6
-        expect(indicator.className).not.toContain('w-6');
-        expect(indicator.className).not.toContain('w-8');
-
-        // Should use small dot sizing (w-2 or w-2.5)
-        const hasSmallSize = indicator.className.includes('w-2');
-        expect(hasSmallSize).toBe(true);
-      });
+      // Find section tabs by role
+      const tabs = screen.getAllByRole('tab');
+      expect(tabs.length).toBe(4); // Overview, Stats, Achievements, Collection
     });
 
-    it('should use neo-brutalist styling for carousel indicators', () => {
-      const { container } = render(<ProfilePageClient />);
+    it('should use neo-brutalist styling for active tab', () => {
+      render(<ProfilePageClient />);
 
-      // Find carousel indicators
-      const indicators = container.querySelectorAll('button[aria-label*="Go to"]');
-      expect(indicators.length).toBeGreaterThan(0);
-
-      const activeIndicator = Array.from(indicators).find(btn =>
-        btn.className.includes('bg-neo-yellow')
+      // Find active tab (selected)
+      const activeTab = screen.getAllByRole('tab').find(tab =>
+        tab.getAttribute('aria-selected') === 'true'
       );
+      expect(activeTab).toBeInTheDocument();
 
-      if (activeIndicator) {
+      if (activeTab) {
         // Should NOT use fully rounded (rounded-full)
         // Neo-brutalist style uses minimal rounding (rounded-neo = 4px)
-        expect(activeIndicator.className).not.toContain('rounded-full');
+        expect(activeTab.className).not.toContain('rounded-full');
 
-        // Should use rounded-neo or similar minimal rounding
-        const hasNeoBrutalistRounding = activeIndicator.className.includes('rounded-neo') ||
-                                       activeIndicator.className.includes('rounded-sm') ||
-                                       activeIndicator.className.includes('rounded-md');
-        expect(hasNeoBrutalistRounding).toBe(true);
+        // Should use rounded-neo
+        expect(activeTab.className).toContain('rounded-neo');
+
+        // Should have neo-yellow background
+        expect(activeTab.className).toContain('bg-neo-yellow');
       }
     });
 
-    it('should use hard shadows on carousel indicators', () => {
-      const { container } = render(<ProfilePageClient />);
+    it('should use hard shadows on active tab', () => {
+      render(<ProfilePageClient />);
 
-      const indicators = container.querySelectorAll('button[aria-label*="Go to"]');
-      const activeIndicator = Array.from(indicators).find(btn =>
-        btn.className.includes('bg-neo-yellow')
+      const activeTab = screen.getAllByRole('tab').find(tab =>
+        tab.getAttribute('aria-selected') === 'true'
       );
 
-      if (activeIndicator) {
+      if (activeTab) {
         // Should use shadow-hard-* utilities (neo-brutalist hard shadows)
-        const hasHardShadow = activeIndicator.className.includes('shadow-hard');
+        const hasHardShadow = activeTab.className.includes('shadow-hard');
         expect(hasHardShadow).toBe(true);
       }
     });
 
-    it('should use chunky borders on carousel indicators', () => {
-      const { container } = render(<ProfilePageClient />);
+    it('should use chunky borders on active tab', () => {
+      render(<ProfilePageClient />);
 
-      const indicators = container.querySelectorAll('button[aria-label*="Go to"]');
-      const activeIndicator = Array.from(indicators).find(btn =>
-        btn.className.includes('bg-neo-yellow')
+      const activeTab = screen.getAllByRole('tab').find(tab =>
+        tab.getAttribute('aria-selected') === 'true'
       );
 
-      if (activeIndicator) {
-        // Should use border-neo (3px) or border-neo-thick (4px)
-        const hasChunkyBorder = activeIndicator.className.includes('border-neo') ||
-                               activeIndicator.className.includes('border-3') ||
-                               activeIndicator.className.includes('border-4');
-        expect(hasChunkyBorder).toBe(true);
+      if (activeTab) {
+        // Should use border-2 (chunky border for tabs)
+        expect(activeTab.className).toContain('border-2');
+        expect(activeTab.className).toContain('border-neo-black');
       }
     });
   });

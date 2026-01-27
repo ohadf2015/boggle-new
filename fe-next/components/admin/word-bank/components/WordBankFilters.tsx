@@ -4,12 +4,15 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/types';
+import type { ValidationStatus } from '../types';
 
 interface WordBankFiltersProps {
   selectedLanguage: Language;
   onLanguageChange: (language: Language) => void;
   selectedStatus: 'all' | 'active' | 'blocked' | 'used';
   onStatusChange: (status: 'all' | 'active' | 'blocked' | 'used') => void;
+  selectedValidationStatus: 'all' | ValidationStatus;
+  onValidationStatusChange: (status: 'all' | ValidationStatus) => void;
   selectedSource: string;
   onSourceChange: (source: string) => void;
   searchQuery: string;
@@ -22,6 +25,12 @@ const STATUSES = [
   { value: 'active', label: 'Active' },
   { value: 'blocked', label: 'Blocked' },
   { value: 'used', label: 'Used' },
+];
+const VALIDATION_STATUSES = [
+  { value: 'all', label: 'All Validation' },
+  { value: 'pending', label: 'Pending Review' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
 ];
 const SOURCES = [
   { value: 'all', label: 'All Sources' },
@@ -37,6 +46,8 @@ export function WordBankFilters({
   onLanguageChange,
   selectedStatus,
   onStatusChange,
+  selectedValidationStatus,
+  onValidationStatusChange,
   selectedSource,
   onSourceChange,
   searchQuery,
@@ -46,7 +57,7 @@ export function WordBankFilters({
 
   return (
     <div className="bg-gray-800 border-2 border-gray-700 rounded-lg p-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {/* Language Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.language')}</label>
@@ -72,6 +83,22 @@ export function WordBankFilters({
             className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neo-yellow"
           >
             {STATUSES.map(status => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Validation Status Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.validationStatus')}</label>
+          <select
+            value={selectedValidationStatus}
+            onChange={e => onValidationStatusChange(e.target.value as typeof selectedValidationStatus)}
+            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neo-yellow"
+          >
+            {VALIDATION_STATUSES.map(status => (
               <option key={status.value} value={status.value}>
                 {status.label}
               </option>

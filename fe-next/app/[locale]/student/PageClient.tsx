@@ -8,14 +8,33 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import Header from '@/components/Header';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
-import { ClassroomLeaderboard } from '@/components/education';
 import { cn } from '@/lib/utils';
+
+// Dynamic import with ssr: false to avoid CommonJS/ESM interop issues
+// with framer-motion on older mobile browsers (fixes JAVASCRIPT-NEXTJS-19)
+const ClassroomLeaderboard = dynamic(
+  () => import('@/components/education/ClassroomLeaderboard').then(mod => mod.default),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="p-6 rounded-neo border-neo border-neo-black bg-neo-navy/50 animate-pulse">
+        <div className="h-6 bg-neo-white/10 rounded mb-4 w-2/3" />
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-12 bg-neo-white/5 rounded" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
 
 export default function StudentPageClient() {
   const { user, isAuthenticated } = useAuth();

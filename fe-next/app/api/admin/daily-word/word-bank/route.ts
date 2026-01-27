@@ -13,7 +13,13 @@ import {
   importWordsFromDictionary,
   getWordsFromWordBank,
   getWordsFromStaticList,
+  updateValidationStatus,
+  bulkUpdateValidationStatus,
+  bulkImportWords,
+  getPendingWords,
+  type ValidationStatus,
 } from '@/lib/dailyChallenge/wordBankService';
+import { syncLocalJSONToDatabase } from '@/backend/services/wikipediaWordPopulator';
 
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
 
@@ -74,8 +80,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, words });
     }
 
+    // Action: Get pending words for review queue
+    if (action === 'pending') {
+      const limit = parseInt(searchParams.get('limit') || '50', 10);
+      const pendingWords = await getPendingWords(supabase, language, limit);
+      return NextResponse.json({ success: true, words: pendingWords });
+    }
+
     // Default: List words with pagination
     const status = searchParams.get('status') as 'active' | 'blocked' | 'used' | null;
+    const validation_status = searchParams.get('validation_status') as ValidationStatus | null;
     const source = searchParams.get('source');
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
@@ -83,6 +97,7 @@ export async function GET(request: NextRequest) {
 
     const result = await getWordBankWords(supabase, language, {
       status: status || undefined,
+      validation_status: validation_status || undefined,
       source: source || undefined,
       search: search || undefined,
       limit,
@@ -241,9 +256,121 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      case 'approve': {
+        const { wordId } = body;
+        if (!wordId || typeof wordId !== 'string') {
+          return NextResponse.json({ error: 'wordId is required' }, { status: 400 });
+        }
+
+        const updated = await updateValidationStatus(supabase, wordId, 'approved');
+
+        if (!updated) {
+          return NextResponse.json({ error: 'Failed to approve word' }, { status: 500 });
+        }
+
+        return NextResponse.json({
+          success: true,
+          message: 'Word has been approved',
+        });
+      }
+
+      case 'reject': {
+        const { wordId } = body;
+        if (!wordId || typeof wordId !== 'string') {
+          return NextResponse.json({ error: 'wordId is required' }, { status: 400 });
+        }
+
+        const updated = await updateValidationStatus(supabase, wordId, 'rejected');
+
+        if (!updated) {
+          return NextResponse.json({ error: 'Failed to reject word' }, { status: 500 });
+        }
+
+        return NextResponse.json({
+          success: true,
+          message: 'Word has been rejected',
+        });
+      }
+
+      case 'bulk-approve': {
+        const { wordIds } = body;
+        if (!wordIds || !Array.isArray(wordIds) || wordIds.length === 0) {
+          return NextResponse.json({ error: 'wordIds array is required' }, { status: 400 });
+        }
+
+        if (wordIds.length > 500) {
+          return NextResponse.json({ error: 'Maximum 500 words per bulk operation' }, { status: 400 });
+        }
+
+        const result = await bulkUpdateValidationStatus(supabase, wordIds, 'approved');
+
+        return NextResponse.json({
+          success: result.success,
+          message: `Approved ${result.affected} words`,
+          result,
+        });
+      }
+
+      case 'bulk-reject': {
+        const { wordIds } = body;
+        if (!wordIds || !Array.isArray(wordIds) || wordIds.length === 0) {
+          return NextResponse.json({ error: 'wordIds array is required' }, { status: 400 });
+        }
+
+        if (wordIds.length > 500) {
+          return NextResponse.json({ error: 'Maximum 500 words per bulk operation' }, { status: 400 });
+        }
+
+        const result = await bulkUpdateValidationStatus(supabase, wordIds, 'rejected');
+
+        return NextResponse.json({
+          success: result.success,
+          message: `Rejected ${result.affected} words`,
+          result,
+        });
+      }
+
+      case 'bulk-import': {
+        const { content, validationStatus = 'approved' } = body;
+        if (!content || typeof content !== 'string') {
+          return NextResponse.json({ error: 'Content is required (text or CSV format)' }, { status: 400 });
+        }
+
+        if (content.length > 1000000) { // 1MB limit
+          return NextResponse.json({ error: 'Content too large (max 1MB)' }, { status: 400 });
+        }
+
+        const importSource = source || 'admin';
+        const result = await bulkImportWords(
+          supabase,
+          language as Language,
+          content,
+          importSource as 'admin' | 'dictionary' | 'wikipedia',
+          validationStatus as ValidationStatus
+        );
+
+        return NextResponse.json({
+          success: true,
+          message: `Imported ${result.imported} words (${result.skipped} skipped, ${result.errors} errors)`,
+          result,
+        });
+      }
+
+      case 'sync-wikipedia': {
+        // Sync Wikipedia words from local JSON files to word bank
+        const targetLanguage = language as Language;
+        const result = await syncLocalJSONToDatabase(targetLanguage);
+
+        return NextResponse.json({
+          success: result.success,
+          message: `Wikipedia sync completed`,
+          result: result.results,
+        });
+      }
+
       default:
         return NextResponse.json(
-          { error: `Unknown action: ${action}. Valid actions: add, import, seed, block, unblock, delete` },
+          { error: `Unknown action: ${action}. Valid actions: add, import, seed, block, unblock, delete, approve, reject, bulk-approve, bulk-reject, bulk-import, sync-wikipedia` },
           { status: 400 }
         );
     }

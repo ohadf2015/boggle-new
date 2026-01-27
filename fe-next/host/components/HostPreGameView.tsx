@@ -134,19 +134,27 @@ function HostPreGameView({
 
   // Track previous hostPlaying value to detect when TV mode is enabled
   const prevHostPlayingRef = useRef(hostPlaying);
+  const [tvTutorialInitialized, setTvTutorialInitialized] = useState(false);
 
-  // Show TV tutorial when TV mode is enabled (hostPlaying changes from true to false)
+  // Show TV tutorial ONLY when user actively toggles TV mode (not on initial mount)
   useEffect(() => {
+    // Mark as initialized on first render (skip tutorial trigger on mount)
+    if (!tvTutorialInitialized) {
+      setTvTutorialInitialized(true);
+      prevHostPlayingRef.current = hostPlaying;
+      return;
+    }
+
     const wasHostPlaying = prevHostPlayingRef.current;
     const isNowTvMode = !hostPlaying;
 
-    // If user just enabled TV mode and hasn't seen the tutorial yet, show it
+    // Only show tutorial when user actively toggles from hostPlaying=true to hostPlaying=false
     if (wasHostPlaying && isNowTvMode && !isTvTutorialComplete()) {
       setShowTvTutorial(true);
     }
 
     prevHostPlayingRef.current = hostPlaying;
-  }, [hostPlaying]);
+  }, [hostPlaying, tvTutorialInitialized]);
 
   // Apply preset
   const handleApplyPreset = useCallback(

@@ -422,11 +422,16 @@ export async function validateWordWithAI(
 /**
  * Update validation status of a word candidate in database
  */
+/**
+ * Update validation status for a word in the UNIFIED WORD BANK
+ * NOTE: Now updates daily_challenge_word_bank instead of wikipedia_word_candidates
+ * Mapping: 'valid' -> 'approved', 'invalid' -> 'rejected'
+ */
 export async function updateWordValidationStatus(
   language: Language,
   word: string,
   fetchDate: string,
-  status: 'valid' | 'invalid',
+  status: 'valid' | 'invalid' | 'approved' | 'rejected',
   score?: number
 ): Promise<void> {
   try {
@@ -436,20 +441,29 @@ export async function updateWordValidationStatus(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Map old status values to new unified values
+    const statusMap: Record<string, string> = {
+      'valid': 'approved',
+      'invalid': 'rejected',
+      'approved': 'approved',
+      'rejected': 'rejected'
+    };
+    const mappedStatus = statusMap[status] || status;
+
     const updateData: Record<string, unknown> = {
-      validation_status: status
+      validation_status: mappedStatus
     };
 
     if (score !== undefined) {
       updateData.interestingness_score = score;
     }
 
+    // Update in unified word bank (word + language is unique)
     const { error } = await supabase
-      .from('wikipedia_word_candidates')
+      .from('daily_challenge_word_bank')
       .update(updateData)
       .eq('language', language)
-      .eq('word', word)
-      .eq('fetch_date', fetchDate);
+      .eq('word', word.toUpperCase());
 
     if (error) {
       console.error('[WordProcessor] Error updating validation status:', error.message);

@@ -118,17 +118,17 @@ describe('TvTutorial Persistence - Bug Fix', () => {
       const onComplete = jest.fn();
       const onSkip = jest.fn();
 
-      // Step 1: First render - tutorial should show (forceShow=false means check localStorage)
+      // Step 1: First render - tutorial should show (forceShow=true, parent controls visibility)
       const { rerender, unmount } = render(
         <TvTutorialOverlay
           onComplete={onComplete}
           onSkip={onSkip}
           t={mockT}
-          forceShow={false}
+          forceShow={true}
         />
       );
 
-      // Verify tutorial is shown (because localStorage is empty)
+      // Verify tutorial is shown
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.getByText('Welcome to TV Mode')).toBeInTheDocument();
 
@@ -147,7 +147,7 @@ describe('TvTutorial Persistence - Bug Fix', () => {
       // Step 3: Unmount (simulates navigating away)
       unmount();
 
-      // Step 4: Remount (simulates returning to TV mode)
+      // Step 4: Remount with forceShow=false (parent checks localStorage and doesn't force show)
       const { container } = render(
         <TvTutorialOverlay
           onComplete={jest.fn()}
@@ -235,7 +235,7 @@ describe('TvTutorial Persistence - Bug Fix', () => {
           onComplete={jest.fn()}
           onSkip={jest.fn()}
           t={mockT}
-          forceShow={false}
+          forceShow={true} // Parent controls visibility
         />
       );
 

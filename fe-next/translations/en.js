@@ -3168,6 +3168,38 @@ const en = {
     "disableNotifications": "Disable notifications",
     "selectTimezone": "Select your timezone"
   },
+  "pushNotifications": {
+    "settings": {
+      "title": "Push Notifications",
+      "description": "Get reminded about your daily puzzles",
+      "enabled": "Daily Reminder",
+      "enabledDesc": "Morning nudge to play your daily challenges",
+      "time": "Reminder Time",
+      "timeDesc": "When should we ping you?",
+      "permissionRequired": "Permission needed",
+      "permissionDenied": "Enable notifications in your device settings",
+      "permissionDeniedDesc": "Enable notifications in device settings to receive reminders",
+      "openSettings": "Open Settings",
+      "enableButton": "Turn On Reminders",
+      "saved": "Reminder set!"
+    },
+    "daily": {
+      "title1": "Your Daily Awaits! 🎯",
+      "body1": "Fresh puzzles are ready. How fast can you find them all?",
+      "title2": "Word Hunt Time! 🔥",
+      "body2": "The daily challenge just dropped. Beat yesterday's score!",
+      "title3": "Psst... Today's Grid Has... 🤫",
+      "bodyWithHint": "Spotted a '{letter}' in today's puzzle. Can you find the rest?",
+      "title4": "Streak Alert! 📈",
+      "body4": "Don't break your streak! Today's puzzles are waiting.",
+      "title5": "Secret Letter: {letter} 💡",
+      "bodyWithHint2": "That's your first clue. Now find all the words hiding in today's grid!",
+      "title6": "Good Morning, Word Hunter! ☀️",
+      "body6": "Coffee and puzzles? Perfect combo. Let's go!",
+      "title7": "Challenge Accepted? 🎮",
+      "body7": "New day, new words, new chances to climb the leaderboard."
+    }
+  },
   "unsubscribe": {
     "processing": "Working on it...",
     "successTitle": "You're off the list",
@@ -3581,13 +3613,18 @@ const en = {
     "wordBank": {
       "title": "Word Bank",
       "description": "Manage daily challenge word pool",
+      "wordList": "Word List",
       "word": "Word",
       "language": "Language",
       "source": "Source",
       "status": "Status",
+      "validationStatus": "Validation",
       "timesUsed": "Times Used",
       "lastUsed": "Last Used",
       "actions": "Actions",
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete",
       "deleteWord": "Delete Word",
       "confirmDeleteWord": "Are you sure you want to delete this word from the word bank?",
       "wordDeleted": "Word deleted successfully",
@@ -3596,6 +3633,9 @@ const en = {
         "totalWords": "Total Words",
         "activeWords": "Active Words",
         "blockedWords": "Blocked Words",
+        "pendingReview": "Pending Review",
+        "approved": "Approved",
+        "rejected": "Rejected",
         "bySource": "By Source"
       },
       "filters": {
@@ -3621,7 +3661,43 @@ const en = {
       "loading": "Loading...",
       "deleting": "Deleting...",
       "confirm": "Confirm",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "bulkImport": {
+        "title": "Bulk Import Words",
+        "button": "Bulk Import",
+        "instructions": "Enter words to import:",
+        "formatPlain": "Plain text: One word per line",
+        "formatCsv": "CSV: First column is used as the word",
+        "lengthFilter": "Words outside valid length range will be skipped",
+        "source": "Source",
+        "validationStatus": "Validation Status",
+        "wordsLabel": "Words",
+        "noContent": "Please enter words to import",
+        "importing": "Importing...",
+        "import": "Import Words",
+        "result": "Import Result",
+        "imported": "Imported",
+        "skipped": "Skipped",
+        "errors": "Errors",
+        "showErrors": "Show error details..."
+      },
+      "bulkActions": {
+        "selected": "words selected",
+        "approveAll": "Approve All",
+        "rejectAll": "Reject All",
+        "approving": "Approving...",
+        "rejecting": "Rejecting...",
+        "clearSelection": "Clear Selection",
+        "successMessage": "Successfully {{action}} {{count}} words",
+        "errorMessage": "Some words could not be processed"
+      },
+      "wikipediaSync": {
+        "title": "Wikipedia Word Sync",
+        "description": "Sync words from fetched Wikipedia articles to the word bank",
+        "syncNow": "Sync Now",
+        "syncing": "Syncing...",
+        "success": "Synced {{files}} files, imported {{words}} words"
+      }
     }
   },
   "tvTutorial": {

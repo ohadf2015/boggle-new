@@ -74,22 +74,10 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
   const [isVisible, setIsVisible] = useState(false);
 
   // Check if tutorial should be shown
+  // Tutorial is controlled by parent component via forceShow prop
+  // No auto-show logic - parent decides when to show based on user actions
   useEffect(() => {
-    if (forceShow) {
-      setIsVisible(true);
-      return;
-    }
-
-    // Check localStorage for completion
-    try {
-      const completed = localStorage.getItem(TUTORIAL_STORAGE_KEY);
-      if (!completed) {
-        setIsVisible(true);
-      }
-    } catch {
-      // If localStorage fails, show tutorial
-      setIsVisible(true);
-    }
+    setIsVisible(forceShow);
   }, [forceShow]);
 
   // Mark tutorial as complete

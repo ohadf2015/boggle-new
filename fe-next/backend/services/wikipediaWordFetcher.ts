@@ -588,8 +588,11 @@ function formatDateForApi(date: Date): string {
 const BATCH_SIZE = 500;
 
 /**
- * Store fetched Wikipedia words in database for later use
+ * Store fetched Wikipedia words in the UNIFIED WORD BANK
+ * All Wikipedia candidates are stored with 'pending' validation status for admin review
  * Uses batching to prevent timeout on large datasets (e.g., 2687 words in en.json)
+ *
+ * NOTE: This now writes to daily_challenge_word_bank (unified) instead of wikipedia_word_candidates (staging)
  */
 export async function storeWikipediaWordCandidates(
   language: Language,
@@ -610,15 +613,17 @@ export async function storeWikipediaWordCandidates(
 
     const dateStr = date.toISOString().split('T')[0];
 
-    // Prepare all insert data
+    // Prepare all insert data for UNIFIED WORD BANK
     const insertData = candidates.map(c => ({
+      word: c.word.toUpperCase(),
       language,
-      fetch_date: dateStr,
-      word: c.word,
+      source: 'wikipedia' as const,
+      status: 'active' as const,
+      validation_status: 'pending' as const,
       source_article_title: c.source,
       source_article_url: c.url,
       interestingness_score: c.score || 50,
-      validation_status: 'pending'
+      fetch_date: dateStr
     }));
 
     // Process in batches to prevent timeout on large datasets
@@ -626,19 +631,19 @@ export async function storeWikipediaWordCandidates(
     let successCount = 0;
     let errorCount = 0;
 
-    console.log(`[Wikipedia] Storing ${candidates.length} candidates for ${language} in ${totalBatches} batch(es)`);
+    console.log(`[Wikipedia] Storing ${candidates.length} candidates for ${language} in ${totalBatches} batch(es) to unified word bank`);
 
     for (let i = 0; i < insertData.length; i += BATCH_SIZE) {
       const batch = insertData.slice(i, i + BATCH_SIZE);
       const batchNum = Math.floor(i / BATCH_SIZE) + 1;
 
       try {
-        // Note: ignoreDuplicates: false allows updates to existing records
-        // This ensures re-syncing will update interestingness_score and other fields
+        // Upsert to unified word bank - (word, language) is the unique constraint
+        // ignoreDuplicates: false allows updates to existing records (re-syncing updates metadata)
         const { error } = await supabase
-          .from('wikipedia_word_candidates')
+          .from('daily_challenge_word_bank')
           .upsert(batch, {
-            onConflict: 'language,word,fetch_date',
+            onConflict: 'word,language',
             ignoreDuplicates: false
           });
 
@@ -661,7 +666,7 @@ export async function storeWikipediaWordCandidates(
     if (errorCount > 0) {
       console.warn(`[Wikipedia] Stored ${successCount}/${candidates.length} candidates for ${language} (${errorCount} failed)`);
     } else {
-      console.log(`[Wikipedia] Stored ${candidates.length} word candidates for ${language}`);
+      console.log(`[Wikipedia] Stored ${candidates.length} word candidates for ${language} in unified word bank`);
     }
 
   } catch (error) {
@@ -671,7 +676,8 @@ export async function storeWikipediaWordCandidates(
 }
 
 /**
- * Get validated Wikipedia words from database
+ * Get validated Wikipedia words from the UNIFIED WORD BANK
+ * NOTE: Now reads from daily_challenge_word_bank instead of wikipedia_word_candidates
  */
 export async function getValidatedWikipediaWords(
   language: Language,
@@ -687,13 +693,15 @@ export async function getValidatedWikipediaWords(
 
     const dateStr = date.toISOString().split('T')[0];
 
+    // Query unified word bank for approved Wikipedia words
     const { data, error } = await supabase
-      .from('wikipedia_word_candidates')
+      .from('daily_challenge_word_bank')
       .select('word, source_article_url, interestingness_score')
       .eq('language', language)
+      .eq('source', 'wikipedia')
+      .eq('validation_status', 'approved')
       .eq('fetch_date', dateStr)
-      .eq('validation_status', 'valid')
-      .order('interestingness_score', { ascending: false })
+      .order('interestingness_score', { ascending: false, nullsFirst: false })
       .limit(limit);
 
     if (error) {
@@ -704,7 +712,7 @@ export async function getValidatedWikipediaWords(
     return (data || []).map(d => ({
       word: d.word,
       url: d.source_article_url,
-      score: d.interestingness_score
+      score: d.interestingness_score || 50
     }));
 
   } catch (error) {

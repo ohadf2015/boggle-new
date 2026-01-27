@@ -12,6 +12,12 @@
 import type { Language } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+/** Validation status for words (especially Wikipedia-sourced) */
+export type ValidationStatus = 'pending' | 'approved' | 'rejected';
+
+/** Word status in the bank */
+export type WordStatus = 'active' | 'blocked' | 'used';
+
 // Word length constraints by language
 const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
   en: { min: 4, max: 8 },
@@ -286,7 +292,8 @@ export async function importWordsFromDictionary(
   supabase: SupabaseClient,
   language: Language,
   words: string[],
-  source: 'dictionary' | 'wikipedia' | 'admin' = 'dictionary'
+  source: 'dictionary' | 'wikipedia' | 'admin' = 'dictionary',
+  validationStatus: ValidationStatus = 'approved'
 ): Promise<{ inserted: number; skipped: number; errors: number }> {
   const lengthRange = WORD_LENGTH_RANGE[language];
 
@@ -311,6 +318,7 @@ export async function importWordsFromDictionary(
           language,
           source,
           status: 'active',
+          validation_status: validationStatus,
         },
         {
           onConflict: 'word,language',
@@ -336,11 +344,18 @@ export async function importWordsFromDictionary(
 /**
  * Import Wikipedia words to the word bank with automatic length filtering
  * This is specifically for automatically importing validated Wikipedia words
+ * Words are imported with 'pending' validation status for admin review
  */
 export async function importWikipediaWordsToBank(
   supabase: SupabaseClient,
   language: Language,
-  words: string[]
+  words: string[],
+  options?: {
+    validationStatus?: ValidationStatus;
+    sourceArticleTitle?: string;
+    sourceArticleUrl?: string;
+    interestingnessScore?: number;
+  }
 ): Promise<{ inserted: number; skipped: number; errors: number }> {
   const lengthRange = WORD_LENGTH_RANGE[language];
 
@@ -354,8 +369,61 @@ export async function importWikipediaWordsToBank(
     `[Word Bank] Importing ${validWords.length}/${words.length} Wikipedia words for ${language} (filtered by length ${lengthRange.min}-${lengthRange.max})`
   );
 
+  // Wikipedia words default to 'pending' for admin review
+  const validationStatus = options?.validationStatus ?? 'pending';
+
   // Use the existing import function with 'wikipedia' source
-  return importWordsFromDictionary(supabase, language, validWords, 'wikipedia');
+  return importWordsFromDictionary(supabase, language, validWords, 'wikipedia', validationStatus);
+}
+
+/**
+ * Import a single Wikipedia word with full metadata
+ */
+export async function importWikipediaWordWithMetadata(
+  supabase: SupabaseClient,
+  language: Language,
+  word: string,
+  metadata: {
+    sourceArticleTitle: string;
+    sourceArticleUrl: string;
+    interestingnessScore?: number;
+    validationStatus?: ValidationStatus;
+  }
+): Promise<boolean> {
+  const lengthRange = WORD_LENGTH_RANGE[language];
+  const normalizedWord = word.toUpperCase();
+
+  // Check length
+  if (normalizedWord.length < lengthRange.min || normalizedWord.length > lengthRange.max) {
+    return false;
+  }
+
+  const { error } = await supabase
+    .from('daily_challenge_word_bank')
+    .upsert(
+      {
+        word: normalizedWord,
+        language,
+        source: 'wikipedia',
+        status: 'active',
+        validation_status: metadata.validationStatus ?? 'pending',
+        source_article_title: metadata.sourceArticleTitle,
+        source_article_url: metadata.sourceArticleUrl,
+        interestingness_score: metadata.interestingnessScore ?? null,
+        fetch_date: new Date().toISOString().split('T')[0],
+      },
+      {
+        onConflict: 'word,language',
+        ignoreDuplicates: false, // Update existing records with new metadata
+      }
+    );
+
+  if (error) {
+    console.error('Error importing Wikipedia word:', normalizedWord, error);
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -433,15 +501,18 @@ export async function getWordBankStats(
   active: number;
   blocked: number;
   bySource: Record<string, number>;
+  pending: number;
+  approved: number;
+  rejected: number;
 }> {
   const { data, error } = await supabase
     .from('daily_challenge_word_bank')
-    .select('status, source')
+    .select('status, source, validation_status')
     .eq('language', language);
 
   if (error) {
     console.error('Error fetching word bank stats:', error);
-    return { total: 0, active: 0, blocked: 0, bySource: {} };
+    return { total: 0, active: 0, blocked: 0, bySource: {}, pending: 0, approved: 0, rejected: 0 };
   }
 
   const stats = {
@@ -449,6 +520,9 @@ export async function getWordBankStats(
     active: data.filter(w => w.status === 'active').length,
     blocked: data.filter(w => w.status === 'blocked').length,
     bySource: {} as Record<string, number>,
+    pending: data.filter(w => w.validation_status === 'pending').length,
+    approved: data.filter(w => w.validation_status === 'approved').length,
+    rejected: data.filter(w => w.validation_status === 'rejected').length,
   };
 
   for (const word of data) {
@@ -466,6 +540,7 @@ export async function getWordBankWords(
   language: Language,
   options: {
     status?: 'active' | 'blocked' | 'used';
+    validation_status?: ValidationStatus;
     source?: string;
     limit?: number;
     offset?: number;
@@ -475,12 +550,18 @@ export async function getWordBankWords(
   words: Array<{
     id: string;
     word: string;
+    language: string;
     source: string;
     status: string;
+    validation_status: ValidationStatus;
     times_used: number;
     last_used_at: string | null;
     blocked_reason: string | null;
     created_at: string;
+    source_article_title: string | null;
+    source_article_url: string | null;
+    interestingness_score: number | null;
+    fetch_date: string | null;
   }>;
   total: number;
 }> {
@@ -488,10 +569,14 @@ export async function getWordBankWords(
     .from('daily_challenge_word_bank')
     .select('*', { count: 'exact' })
     .eq('language', language)
-    .order('word', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (options.status) {
     query = query.eq('status', options.status);
+  }
+
+  if (options.validation_status) {
+    query = query.eq('validation_status', options.validation_status);
   }
 
   if (options.source) {
@@ -543,6 +628,315 @@ export async function deleteWordFromBank(
   }
 
   return true;
+}
+
+/**
+ * Update validation status for a single word
+ * When approving, also adds the word to community_words for validation
+ */
+export async function updateValidationStatus(
+  supabase: SupabaseClient,
+  wordId: string,
+  validationStatus: ValidationStatus
+): Promise<boolean> {
+  // First get the word details if we're approving
+  if (validationStatus === 'approved') {
+    const { data: wordData, error: fetchError } = await supabase
+      .from('daily_challenge_word_bank')
+      .select('word, language')
+      .eq('id', wordId)
+      .single();
+
+    if (fetchError || !wordData) {
+      console.error('Error fetching word for approval:', fetchError);
+      return false;
+    }
+
+    // Update the validation status
+    const { error: updateError } = await supabase
+      .from('daily_challenge_word_bank')
+      .update({ validation_status: validationStatus })
+      .eq('id', wordId);
+
+    if (updateError) {
+      console.error('Error updating validation status:', updateError);
+      return false;
+    }
+
+    // Add to community_words for game validation
+    await addToCommunityWords(supabase, wordData.word, wordData.language);
+    return true;
+  }
+
+  // For non-approval updates, just update the status
+  const { error } = await supabase
+    .from('daily_challenge_word_bank')
+    .update({ validation_status: validationStatus })
+    .eq('id', wordId);
+
+  if (error) {
+    console.error('Error updating validation status:', error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Add a word to the community_words table for game validation
+ * This makes approved words valid for gameplay
+ */
+async function addToCommunityWords(
+  supabase: SupabaseClient,
+  word: string,
+  language: string
+): Promise<void> {
+  const now = new Date().toISOString();
+  const normalizedWord = word.toLowerCase().trim();
+
+  // Try to insert, handle duplicate constraint
+  const { error: insertError } = await supabase
+    .from('community_words')
+    .insert({
+      word: normalizedWord,
+      language,
+      approval_count: 1,
+      first_approved_at: now,
+      last_approved_at: now,
+    });
+
+  // If unique constraint violation (23505), update the existing record
+  if (insertError?.code === '23505') {
+    const { error: updateError } = await supabase
+      .from('community_words')
+      .update({
+        // approval_count is handled by database trigger on update
+        last_approved_at: now,
+      })
+      .eq('word', normalizedWord)
+      .eq('language', language);
+
+    if (updateError) {
+      console.error('Error updating community_words:', updateError.message);
+    } else {
+      console.log(`[WordBank] Updated ${normalizedWord} in community_words for ${language}`);
+    }
+  } else if (insertError) {
+    console.error('Error inserting into community_words:', insertError.message);
+  } else {
+    console.log(`[WordBank] Added ${normalizedWord} to community_words for ${language}`);
+  }
+}
+
+/**
+ * Bulk update validation status for multiple words
+ * When approving, also adds all words to community_words for game validation
+ */
+export async function bulkUpdateValidationStatus(
+  supabase: SupabaseClient,
+  wordIds: string[],
+  validationStatus: ValidationStatus
+): Promise<{ success: boolean; affected: number; errors: Array<{ id: string; error: string }> }> {
+  const errors: Array<{ id: string; error: string }> = [];
+  let affected = 0;
+
+  // For bulk approvals, we need to fetch word details first to add to community_words
+  let wordsToAddToCommunity: Array<{ word: string; language: string }> = [];
+
+  if (validationStatus === 'approved') {
+    // Fetch all words that will be approved
+    const { data: wordData, error: fetchError } = await supabase
+      .from('daily_challenge_word_bank')
+      .select('id, word, language')
+      .in('id', wordIds);
+
+    if (fetchError) {
+      console.error('Error fetching words for bulk approval:', fetchError);
+    } else if (wordData) {
+      wordsToAddToCommunity = wordData.map(w => ({ word: w.word, language: w.language }));
+    }
+  }
+
+  // Use database function if available, otherwise update in batches
+  const { data, error } = await supabase.rpc('bulk_update_word_bank_validation', {
+    p_word_ids: wordIds,
+    p_validation_status: validationStatus,
+  });
+
+  if (error) {
+    // If RPC fails, fall back to individual updates
+    console.warn('Bulk update RPC failed, falling back to individual updates:', error);
+
+    for (const id of wordIds) {
+      const result = await updateValidationStatus(supabase, id, validationStatus);
+      if (result) {
+        affected++;
+      } else {
+        errors.push({ id, error: 'Failed to update' });
+      }
+    }
+  } else {
+    affected = data || wordIds.length;
+
+    // RPC succeeded - now add approved words to community_words
+    if (validationStatus === 'approved' && wordsToAddToCommunity.length > 0) {
+      console.log(`[WordBank] Adding ${wordsToAddToCommunity.length} bulk-approved words to community_words`);
+      for (const { word, language } of wordsToAddToCommunity) {
+        await addToCommunityWords(supabase, word, language);
+      }
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    affected,
+    errors,
+  };
+}
+
+/**
+ * Bulk import words to the word bank
+ * Supports both plain text (one word per line) and CSV format
+ */
+export async function bulkImportWords(
+  supabase: SupabaseClient,
+  language: Language,
+  content: string,
+  source: 'admin' | 'dictionary' | 'wikipedia' = 'admin',
+  validationStatus: ValidationStatus = 'approved'
+): Promise<{ imported: number; skipped: number; errors: number; errorDetails: Array<{ word: string; error: string }> }> {
+  const lengthRange = WORD_LENGTH_RANGE[language];
+  const errorDetails: Array<{ word: string; error: string }> = [];
+
+  // Parse content - detect CSV vs plain text
+  const lines = content.trim().split('\n').filter(line => line.trim());
+  const words: string[] = [];
+
+  for (const line of lines) {
+    // If line contains comma, treat as CSV and take first column
+    if (line.includes(',')) {
+      const firstColumn = line.split(',')[0].trim();
+      if (firstColumn) {
+        words.push(firstColumn);
+      }
+    } else {
+      // Plain text - each line is a word
+      const word = line.trim();
+      if (word) {
+        words.push(word);
+      }
+    }
+  }
+
+  let imported = 0;
+  let skipped = 0;
+  let errors = 0;
+
+  // Prepare batch for upsert
+  const wordsToInsert = [];
+
+  for (const word of words) {
+    const normalizedWord = word.toUpperCase();
+
+    // Skip words outside length range
+    if (normalizedWord.length < lengthRange.min || normalizedWord.length > lengthRange.max) {
+      skipped++;
+      errorDetails.push({ word: normalizedWord, error: `Length ${normalizedWord.length} outside range ${lengthRange.min}-${lengthRange.max}` });
+      continue;
+    }
+
+    // Skip words with invalid characters (basic check)
+    if (language !== 'ja' && !/^[A-ZÄÖÜÀÂÆÇÉÈÊËÎÏÔŒÙÛÜ\u0590-\u05FF]+$/i.test(normalizedWord)) {
+      skipped++;
+      errorDetails.push({ word: normalizedWord, error: 'Contains invalid characters' });
+      continue;
+    }
+
+    wordsToInsert.push({
+      word: normalizedWord,
+      language,
+      source,
+      status: 'active',
+      validation_status: validationStatus,
+    });
+  }
+
+  // Batch upsert in chunks of 100
+  const chunkSize = 100;
+  for (let i = 0; i < wordsToInsert.length; i += chunkSize) {
+    const chunk = wordsToInsert.slice(i, i + chunkSize);
+
+    const { error } = await supabase
+      .from('daily_challenge_word_bank')
+      .upsert(chunk, {
+        onConflict: 'word,language',
+        ignoreDuplicates: false, // Update existing records
+      });
+
+    if (error) {
+      console.error('Error importing batch:', error);
+      errors += chunk.length;
+      for (const w of chunk) {
+        errorDetails.push({ word: w.word, error: error.message });
+      }
+    } else {
+      imported += chunk.length;
+    }
+  }
+
+  return { imported, skipped, errors, errorDetails };
+}
+
+/**
+ * Get words pending review (for review queue)
+ */
+export async function getPendingWords(
+  supabase: SupabaseClient,
+  language: Language,
+  limit: number = 50
+): Promise<Array<{
+  id: string;
+  word: string;
+  source: string;
+  source_article_title: string | null;
+  source_article_url: string | null;
+  interestingness_score: number | null;
+  created_at: string;
+}>> {
+  const { data, error } = await supabase
+    .from('daily_challenge_word_bank')
+    .select('id, word, source, source_article_title, source_article_url, interestingness_score, created_at')
+    .eq('language', language)
+    .eq('validation_status', 'pending')
+    .order('interestingness_score', { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching pending words:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
+ * Approve a word (set validation_status to 'approved')
+ */
+export async function approveWord(
+  supabase: SupabaseClient,
+  wordId: string
+): Promise<boolean> {
+  return updateValidationStatus(supabase, wordId, 'approved');
+}
+
+/**
+ * Reject a word (set validation_status to 'rejected')
+ */
+export async function rejectWord(
+  supabase: SupabaseClient,
+  wordId: string
+): Promise<boolean> {
+  return updateValidationStatus(supabase, wordId, 'rejected');
 }
 
 // Export the static lists for direct access if needed

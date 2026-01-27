@@ -36,6 +36,11 @@ const config: CapacitorConfig = {
       style: 'dark', // Light text on dark background
       backgroundColor: '#1a1a2e',
     },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_icon_config_sample',
+      iconColor: '#FFE135', // neo-yellow
+      sound: 'default',
+    },
   },
 
   ios: {

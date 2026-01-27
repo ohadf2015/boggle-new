@@ -3166,6 +3166,38 @@ const he = {
     "disableNotifications": "כבה התראות",
     "selectTimezone": "בחר אזור זמן"
   },
+  "pushNotifications": {
+    "settings": {
+      "title": "התראות פוש",
+      "description": "קבל תזכורות על הפאזלים היומיים שלך",
+      "enabled": "תזכורת יומית",
+      "enabledDesc": "נדנדה בוקרית לשחק את האתגרים היומיים שלך",
+      "time": "שעת התזכורת",
+      "timeDesc": "מתי להעיר אותך עם פאזל טרי",
+      "permissionRequired": "דרושה הרשאה",
+      "permissionDenied": "התראות חסומות",
+      "permissionDeniedDesc": "הפעל התראות בהגדרות המכשיר כדי לקבל תזכורות",
+      "openSettings": "פתח הגדרות",
+      "enableButton": "הפעל תזכורות",
+      "saved": "התזכורת נקבעה!"
+    },
+    "daily": {
+      "title1": "האתגר היומי מחכה לך!",
+      "body1": "פאזלים טריים מוכנים. כמה מהר תמצא את כולם?",
+      "title2": "עוד בוקר, עוד מילים",
+      "body2": "המוח שלך מוכן לאימון הבוקר? הפאזלים ממתינים!",
+      "title3": "פסססט... בלוח של היום יש...",
+      "bodyWithHint": "גילינו '{letter}' בפאזל של היום. תמצא את השאר?",
+      "title4": "טיק טוק, עובר הזמן!",
+      "body4": "האתגר היומי שלך מתחדש בחצות. נצל את ההזדמנות!",
+      "title5": "אות סודית: {letter} 💡",
+      "bodyWithHint2": "זה הרמז הראשון שלך. עכשיו מצא את כל המילים שמסתתרות בלוח של היום!",
+      "title6": "בוקר טוב, ציד מילים! ☀️",
+      "body6": "קפה ופאזלים? שילוב מושלם. בואו נתחיל!",
+      "title7": "אתגר מקובל? 🎮",
+      "body7": "יום חדש, מילים חדשות, הזדמנויות חדשות לטפס בטבלה."
+    }
+  },
   "unsubscribe": {
     "processing": "עובד על זה...",
     "successTitle": "יצאת מהרשימה",
@@ -3579,13 +3611,18 @@ const he = {
     "wordBank": {
       "title": "בנק מילים",
       "description": "ניהול מאגר מילים לאתגר היומי",
+      "wordList": "רשימת מילים",
       "word": "מילה",
       "language": "שפה",
       "source": "מקור",
       "status": "סטטוס",
+      "validationStatus": "אימות",
       "timesUsed": "פעמים בשימוש",
       "lastUsed": "שימוש אחרון",
       "actions": "פעולות",
+      "approve": "אשר",
+      "reject": "דחה",
+      "delete": "מחק",
       "deleteWord": "מחק מילה",
       "confirmDeleteWord": "האם אתה בטוח שברצונך למחוק מילה זו מבנק המילים?",
       "wordDeleted": "המילה נמחקה בהצלחה",
@@ -3594,6 +3631,9 @@ const he = {
         "totalWords": "סה״כ מילים",
         "activeWords": "מילים פעילות",
         "blockedWords": "מילים חסומות",
+        "pendingReview": "ממתין לבדיקה",
+        "approved": "אושרו",
+        "rejected": "נדחו",
         "bySource": "לפי מקור"
       },
       "filters": {
@@ -3619,7 +3659,43 @@ const he = {
       "loading": "טוען...",
       "deleting": "מוחק...",
       "confirm": "אשר",
-      "cancel": "ביטול"
+      "cancel": "ביטול",
+      "bulkImport": {
+        "title": "ייבוא מילים מרוכז",
+        "button": "ייבוא מרוכז",
+        "instructions": "הזן מילים לייבוא:",
+        "formatPlain": "טקסט פשוט: מילה אחת בכל שורה",
+        "formatCsv": "CSV: העמודה הראשונה משמשת כמילה",
+        "lengthFilter": "מילים מחוץ לטווח האורך התקין יידלגו",
+        "source": "מקור",
+        "validationStatus": "סטטוס אימות",
+        "wordsLabel": "מילים",
+        "noContent": "אנא הזן מילים לייבוא",
+        "importing": "מייבא...",
+        "import": "ייבא מילים",
+        "result": "תוצאת הייבוא",
+        "imported": "יובאו",
+        "skipped": "דולגו",
+        "errors": "שגיאות",
+        "showErrors": "הצג פרטי שגיאות..."
+      },
+      "bulkActions": {
+        "selected": "מילים נבחרו",
+        "approveAll": "אשר הכל",
+        "rejectAll": "דחה הכל",
+        "approving": "מאשר...",
+        "rejecting": "דוחה...",
+        "clearSelection": "נקה בחירה",
+        "successMessage": "בוצע {{action}} ל-{{count}} מילים בהצלחה",
+        "errorMessage": "חלק מהמילים לא עובדו"
+      },
+      "wikipediaSync": {
+        "title": "סנכרון מילים מויקיפדיה",
+        "description": "סנכרן מילים ממאמרי ויקיפדיה שהובאו לבנק המילים",
+        "syncNow": "סנכרן עכשיו",
+        "syncing": "מסנכרן...",
+        "success": "סונכרנו {{files}} קבצים, יובאו {{words}} מילים"
+      }
     }
   },
   "tvTutorial": {

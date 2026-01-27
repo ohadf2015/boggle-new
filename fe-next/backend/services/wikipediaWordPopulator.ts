@@ -532,11 +532,12 @@ function getFallbackWords(
 }
 
 /**
- * Get word candidates for admin review
+ * Get word candidates for admin review from UNIFIED WORD BANK
+ * NOTE: Now reads from daily_challenge_word_bank instead of wikipedia_word_candidates
  */
 export async function getWordCandidatesForAdmin(
   language: Language,
-  date: Date
+  date?: Date
 ): Promise<Array<{
   id: string;
   word: string;
@@ -552,14 +553,21 @@ export async function getWordCandidatesForAdmin(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const dateStr = date.toISOString().split('T')[0];
-
-    const { data, error } = await supabase
-      .from('wikipedia_word_candidates')
+    // Build query for unified word bank
+    let query = supabase
+      .from('daily_challenge_word_bank')
       .select('id, word, source_article_title, source_article_url, interestingness_score, validation_status')
       .eq('language', language)
-      .eq('fetch_date', dateStr)
-      .order('interestingness_score', { ascending: false });
+      .eq('source', 'wikipedia')
+      .order('interestingness_score', { ascending: false, nullsFirst: false });
+
+    // Optionally filter by fetch_date
+    if (date) {
+      const dateStr = date.toISOString().split('T')[0];
+      query = query.eq('fetch_date', dateStr);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('[WikiPopulator] Error fetching candidates for admin:', error.message);
@@ -569,9 +577,9 @@ export async function getWordCandidatesForAdmin(
     return (data || []).map(d => ({
       id: d.id,
       word: d.word,
-      source: d.source_article_title || 'unknown',
+      source: d.source_article_title || 'wikipedia',
       url: d.source_article_url,
-      score: d.interestingness_score,
+      score: d.interestingness_score || 50,
       status: d.validation_status
     }));
 
@@ -583,11 +591,13 @@ export async function getWordCandidatesForAdmin(
 }
 
 /**
- * Admin: Update word candidate status
+ * Admin: Update word candidate status in UNIFIED WORD BANK
+ * NOTE: Now updates daily_challenge_word_bank
+ * Mapping: 'valid' -> 'approved', 'invalid' -> 'rejected', 'pending' -> 'pending'
  */
 export async function adminUpdateWordStatus(
   candidateId: string,
-  status: 'valid' | 'invalid' | 'pending'
+  status: 'valid' | 'invalid' | 'pending' | 'approved' | 'rejected'
 ): Promise<boolean> {
   try {
     const { createClient } = await import('@supabase/supabase-js');
@@ -596,9 +606,19 @@ export async function adminUpdateWordStatus(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Map old status values to new unified values
+    const statusMap: Record<string, string> = {
+      'valid': 'approved',
+      'invalid': 'rejected',
+      'pending': 'pending',
+      'approved': 'approved',
+      'rejected': 'rejected'
+    };
+    const mappedStatus = statusMap[status] || status;
+
     const { error } = await supabase
-      .from('wikipedia_word_candidates')
-      .update({ validation_status: status })
+      .from('daily_challenge_word_bank')
+      .update({ validation_status: mappedStatus })
       .eq('id', candidateId);
 
     if (error) {
@@ -616,7 +636,8 @@ export async function adminUpdateWordStatus(
 }
 
 /**
- * Admin: Delete word candidate
+ * Admin: Delete word from UNIFIED WORD BANK
+ * NOTE: Now deletes from daily_challenge_word_bank
  */
 export async function adminDeleteWordCandidate(candidateId: string): Promise<boolean> {
   try {
@@ -627,12 +648,12 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
     );
 
     const { error } = await supabase
-      .from('wikipedia_word_candidates')
+      .from('daily_challenge_word_bank')
       .delete()
       .eq('id', candidateId);
 
     if (error) {
-      console.error('[WikiPopulator] Error deleting word candidate:', error.message);
+      console.error('[WikiPopulator] Error deleting word:', error.message);
       return false;
     }
 
@@ -640,7 +661,7 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[WikiPopulator] Error deleting word candidate:', errorMessage);
+    console.error('[WikiPopulator] Error deleting word:', errorMessage);
     return false;
   }
 }
@@ -718,7 +739,8 @@ export async function syncLocalJSONToDatabase(
 }
 
 /**
- * Admin: Add custom word candidate
+ * Admin: Add custom word to UNIFIED WORD BANK
+ * NOTE: Now adds to daily_challenge_word_bank with 'admin' source
  */
 export async function adminAddWordCandidate(
   language: Language,
@@ -736,20 +758,24 @@ export async function adminAddWordCandidate(
     const dateStr = date.toISOString().split('T')[0];
 
     const { data, error } = await supabase
-      .from('wikipedia_word_candidates')
-      .insert({
-        language,
-        fetch_date: dateStr,
+      .from('daily_challenge_word_bank')
+      .upsert({
         word: word.toUpperCase(),
+        language,
+        source: 'admin',
+        status: 'active',
+        validation_status: 'approved', // Admin words are pre-approved
         source_article_title: source,
         interestingness_score: 75, // Admin-added words get high score
-        validation_status: 'valid' // Admin words are pre-validated
+        fetch_date: dateStr
+      }, {
+        onConflict: 'word,language'
       })
       .select('id')
       .single();
 
     if (error) {
-      console.error('[WikiPopulator] Error adding word candidate:', error.message);
+      console.error('[WikiPopulator] Error adding word:', error.message);
       return { success: false };
     }
 
@@ -757,7 +783,7 @@ export async function adminAddWordCandidate(
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[WikiPopulator] Error adding word candidate:', errorMessage);
+    console.error('[WikiPopulator] Error adding word:', errorMessage);
     return { success: false };
   }
 }

@@ -216,38 +216,60 @@ export default function ProfilePageClient(): React.JSX.Element {
       )}>
         <AutoHideHeader />
 
-        {/* Section header and indicator dots */}
-        <div className="flex flex-col items-center pt-3 pb-2">
-          <div className="text-xs font-medium text-neo-white/60 mb-2 uppercase tracking-wide">
-            {t(`profile.sections.${sections[currentIndex]}`)}
-          </div>
-          <div className="flex items-center justify-center gap-2">
+        {/* Tab navigation for mobile */}
+        <div className="flex items-center justify-center px-2 pt-3 pb-2">
+          <div className="flex items-center gap-1 bg-neo-navy/80 border-2 border-neo-black rounded-neo p-1">
             {sections.map((section, index) => (
               <button
                 key={section}
                 onClick={() => setActiveSection(section)}
                 className={cn(
-                  'transition-all duration-200',
+                  'px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide rounded-neo transition-all duration-150',
                   index === currentIndex
-                    ? 'w-2.5 h-2.5 bg-neo-yellow rounded-neo border-neo border-neo-black shadow-hard-sm'
-                    : 'w-2 h-2 bg-neo-white/30 rounded-neo border border-neo-black/50 hover:bg-neo-white/50'
+                    ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm'
+                    : 'text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10'
                 )}
                 aria-label={`Go to ${section} section`}
-              />
+                aria-selected={index === currentIndex}
+                role="tab"
+              >
+                {t(`profile.sections.${section}`)}
+              </button>
             ))}
           </div>
         </div>
 
         {/* NOTE: Do NOT use overflow-y-auto here - scroll propagates to body's screen-fit */}
-        <motion.div
-          className="flex-1 min-h-0 px-3 pt-2 page-content-safe relative"
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          onDragEnd={handleDragEnd}
-          {...pullToRefreshHandlers}
-        >
-          <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
+        <div className="flex-1 min-h-0 relative">
+          {/* Swipe indicator - left side */}
+          {currentIndex > 0 && (
+            <div
+              className="absolute left-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-r from-neo-navy/60 to-transparent flex items-center justify-start ps-1"
+              aria-hidden="true"
+            >
+              <ChevronLeft className="w-4 h-4 text-neo-yellow/60" />
+            </div>
+          )}
+
+          {/* Swipe indicator - right side */}
+          {currentIndex < sections.length - 1 && (
+            <div
+              className="absolute right-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-l from-neo-navy/60 to-transparent flex items-center justify-end pe-1"
+              aria-hidden="true"
+            >
+              <ChevronRight className="w-4 h-4 text-neo-yellow/60" />
+            </div>
+          )}
+
+          <motion.div
+            className="h-full px-5 pt-2 page-content-safe"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
+            {...pullToRefreshHandlers}
+          >
+            <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
 
           <AnimatePresence mode="wait">
             {activeSection === 'overview' && (
@@ -306,43 +328,46 @@ export default function ProfilePageClient(): React.JSX.Element {
             )}
           </AnimatePresence>
 
-          {/* Navigation arrows (subtle visual hints at bottom) */}
-          {currentIndex > 0 && (
-            <button
-              onClick={goToPrevSection}
-              className={cn(
-                'fixed start-2 bottom-20 z-10 opacity-40 hover:opacity-80',
-                'w-10 h-10 rounded-full',
-                'bg-neo-navy/80 border-2 border-neo-yellow',
-                'flex items-center justify-center',
-                'text-neo-yellow',
-                'shadow-hard-sm',
-                'transition-opacity'
-              )}
-              aria-label="Previous section"
-            >
-              <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
-            </button>
-          )}
+            {/* Navigation arrows at bottom - fully visible (no opacity) */}
+            {currentIndex > 0 && (
+              <button
+                onClick={goToPrevSection}
+                className={cn(
+                  'fixed start-2 bottom-20 z-10',
+                  'w-10 h-10 rounded-full',
+                  'bg-neo-navy border-2 border-neo-yellow',
+                  'flex items-center justify-center',
+                  'text-neo-yellow',
+                  'shadow-hard-sm',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  'transition-all'
+                )}
+                aria-label="Previous section"
+              >
+                <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
+              </button>
+            )}
 
-          {currentIndex < sections.length - 1 && (
-            <button
-              onClick={goToNextSection}
-              className={cn(
-                'fixed end-2 bottom-20 z-10 opacity-40 hover:opacity-80',
-                'w-10 h-10 rounded-full',
-                'bg-neo-navy/80 border-2 border-neo-yellow',
-                'flex items-center justify-center',
-                'text-neo-yellow',
-                'shadow-hard-sm',
-                'transition-opacity'
-              )}
-              aria-label="Next section"
-            >
-              <ChevronRight className="w-6 h-6 rtl:rotate-180" />
-            </button>
-          )}
-        </motion.div>
+            {currentIndex < sections.length - 1 && (
+              <button
+                onClick={goToNextSection}
+                className={cn(
+                  'fixed end-2 bottom-20 z-10',
+                  'w-10 h-10 rounded-full',
+                  'bg-neo-navy border-2 border-neo-yellow',
+                  'flex items-center justify-center',
+                  'text-neo-yellow',
+                  'shadow-hard-sm',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  'transition-all'
+                )}
+                aria-label="Next section"
+              >
+                <ChevronRight className="w-6 h-6 rtl:rotate-180" />
+              </button>
+            )}
+          </motion.div>
+        </div>
 
         <EmojiAvatarPicker
           isOpen={showEmojiPicker}

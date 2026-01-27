@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import type { Language } from '@/types';
-import type { WordBankWord, WordBankStats, WordBankFilters } from '../types';
+import type { WordBankWord, WordBankStats, WordBankFilters, ValidationStatus, BulkActionResult } from '../types';
 
 interface UseWordBankResult {
   words: WordBankWord[];
@@ -11,6 +11,10 @@ interface UseWordBankResult {
   error: string | null;
   refresh: () => Promise<void>;
   deleteWord: (word: string) => Promise<boolean>;
+  approveWord: (wordId: string) => Promise<boolean>;
+  rejectWord: (wordId: string) => Promise<boolean>;
+  bulkApprove: (wordIds: string[]) => Promise<BulkActionResult>;
+  bulkReject: (wordIds: string[]) => Promise<BulkActionResult>;
   clearError: () => void;
   hasMore: boolean;
   loadMore: () => Promise<void>;
@@ -23,6 +27,9 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
     active: 0,
     blocked: 0,
     bySource: {},
+    pending: 0,
+    approved: 0,
+    rejected: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +55,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
 
         if (filters.status) {
           params.append('status', filters.status);
+        }
+
+        if (filters.validation_status) {
+          params.append('validation_status', filters.validation_status);
         }
 
         if (filters.source) {
@@ -162,6 +173,164 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
     }
   }, [loading, hasMore, fetchWords]);
 
+  const approveWord = useCallback(
+    async (wordId: string): Promise<boolean> => {
+      try {
+        const response = await fetch('/api/admin/daily-word/word-bank', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'approve',
+            wordId,
+            language: filters.language,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to approve word');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update word in local state
+          setWords(prev =>
+            prev.map(w => (w.id === wordId ? { ...w, validation_status: 'approved' as ValidationStatus } : w))
+          );
+          await fetchStats(); // Refresh stats
+          return true;
+        } else {
+          throw new Error(data.error || 'Approve failed');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to approve word';
+        setError(errorMessage);
+        console.error('Approve error:', errorMessage, err);
+        return false;
+      }
+    },
+    [filters.language, fetchStats]
+  );
+
+  const rejectWord = useCallback(
+    async (wordId: string): Promise<boolean> => {
+      try {
+        const response = await fetch('/api/admin/daily-word/word-bank', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'reject',
+            wordId,
+            language: filters.language,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to reject word');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update word in local state
+          setWords(prev =>
+            prev.map(w => (w.id === wordId ? { ...w, validation_status: 'rejected' as ValidationStatus } : w))
+          );
+          await fetchStats(); // Refresh stats
+          return true;
+        } else {
+          throw new Error(data.error || 'Reject failed');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to reject word';
+        setError(errorMessage);
+        console.error('Reject error:', errorMessage, err);
+        return false;
+      }
+    },
+    [filters.language, fetchStats]
+  );
+
+  const bulkApprove = useCallback(
+    async (wordIds: string[]): Promise<BulkActionResult> => {
+      try {
+        const response = await fetch('/api/admin/daily-word/word-bank', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'bulk-approve',
+            wordIds,
+            language: filters.language,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to bulk approve');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update words in local state
+          setWords(prev =>
+            prev.map(w =>
+              wordIds.includes(w.id) ? { ...w, validation_status: 'approved' as ValidationStatus } : w
+            )
+          );
+          await fetchStats();
+        }
+
+        return data.result || { success: data.success, affected: wordIds.length, errors: [] };
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to bulk approve';
+        setError(errorMessage);
+        console.error('Bulk approve error:', errorMessage, err);
+        return { success: false, affected: 0, errors: [] };
+      }
+    },
+    [filters.language, fetchStats]
+  );
+
+  const bulkReject = useCallback(
+    async (wordIds: string[]): Promise<BulkActionResult> => {
+      try {
+        const response = await fetch('/api/admin/daily-word/word-bank', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'bulk-reject',
+            wordIds,
+            language: filters.language,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to bulk reject');
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update words in local state
+          setWords(prev =>
+            prev.map(w =>
+              wordIds.includes(w.id) ? { ...w, validation_status: 'rejected' as ValidationStatus } : w
+            )
+          );
+          await fetchStats();
+        }
+
+        return data.result || { success: data.success, affected: wordIds.length, errors: [] };
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to bulk reject';
+        setError(errorMessage);
+        console.error('Bulk reject error:', errorMessage, err);
+        return { success: false, affected: 0, errors: [] };
+      }
+    },
+    [filters.language, fetchStats]
+  );
+
   const clearError = useCallback((): void => {
     setError(null);
   }, []);
@@ -169,7 +338,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
   // Initial load
   useEffect(() => {
     refresh();
-  }, [filters.language, filters.status, filters.source, filters.search, refresh]);
+  }, [filters.language, filters.status, filters.validation_status, filters.source, filters.search, refresh]);
 
   return {
     words,
@@ -178,6 +347,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
     error,
     refresh,
     deleteWord,
+    approveWord,
+    rejectWord,
+    bulkApprove,
+    bulkReject,
     clearError,
     hasMore,
     loadMore,

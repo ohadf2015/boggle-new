@@ -1,10 +1,10 @@
 /**
- * Test: Profile Carousel UI Improvements
+ * Test: Profile Mobile Tab Navigation
  *
  * Verifies:
- * 1. Progress indicators use subtle sizing without aggressive width scaling
- * 2. Navigation arrows positioned to not hide content (bottom or reduced opacity)
- * 3. Header is added to describe carousel sections
+ * 1. Tab navigation is displayed with section labels
+ * 2. Navigation arrows positioned at bottom without hiding content
+ * 3. Swipe indicators show on sides to indicate more content
  */
 
 import React from 'react';
@@ -104,104 +104,95 @@ jest.mock('@/utils/session', () => ({
 
 import ProfilePageClient from '../PageClient';
 
-describe('Profile Carousel UI Improvements', () => {
-  describe('Progress Indicators', () => {
-    it('should use small dot sizing for indicators', () => {
-      const { container } = render(<ProfilePageClient />);
+describe('Profile Mobile Tab Navigation', () => {
+  describe('Tab Navigation', () => {
+    it('should display tabs with section labels', () => {
+      render(<ProfilePageClient />);
 
-      // Find all section indicator buttons
-      const indicators = container.querySelectorAll('button[aria-label*="section"]');
-      expect(indicators.length).toBeGreaterThan(0);
+      // Find all section tab buttons by role
+      const tabs = screen.getAllByRole('tab');
+      expect(tabs.length).toBe(4); // Overview, Stats, Achievements, Collection
 
-      // Active indicator should use small dots (w-2.5 or w-2)
-      const activeIndicator = Array.from(indicators).find(btn =>
-        btn.className.includes('bg-neo-yellow')
-      );
-      expect(activeIndicator).toBeInTheDocument();
-
-      // Should NOT use large sizes like w-6 or w-8
-      expect(activeIndicator?.className).not.toContain('w-8');
-      expect(activeIndicator?.className).not.toContain('w-6');
-
-      // Should use small dot sizing (w-2 or w-2.5)
-      const hasSmallDotSize = activeIndicator?.className.includes('w-2');
-      expect(hasSmallDotSize).toBe(true);
+      // Verify tab labels are visible
+      expect(screen.getByText('Overview')).toBeInTheDocument();
+      expect(screen.getByText('Stats')).toBeInTheDocument();
+      expect(screen.getByText('Achievements')).toBeInTheDocument();
+      expect(screen.getByText('Collection')).toBeInTheDocument();
     });
 
-    it('should have subtle inactive indicator styling', () => {
-      const { container } = render(<ProfilePageClient />);
+    it('should have an active tab with yellow background', () => {
+      render(<ProfilePageClient />);
 
-      // Find section indicators specifically (not navigation arrows)
-      const indicators = container.querySelectorAll('button[aria-label*="Go to"]');
-      const inactiveIndicators = Array.from(indicators).filter(btn =>
-        !btn.className.includes('bg-neo-yellow')
+      // Find active tab (selected)
+      const activeTab = screen.getAllByRole('tab').find(tab =>
+        tab.getAttribute('aria-selected') === 'true'
+      );
+      expect(activeTab).toBeInTheDocument();
+
+      // Active tab should have neo-yellow background
+      expect(activeTab?.className).toContain('bg-neo-yellow');
+    });
+
+    it('should have inactive tabs with subtle styling', () => {
+      render(<ProfilePageClient />);
+
+      // Find inactive tabs
+      const tabs = screen.getAllByRole('tab');
+      const inactiveTabs = tabs.filter(tab =>
+        tab.getAttribute('aria-selected') !== 'true'
       );
 
-      // Should have at least some inactive indicators
-      expect(inactiveIndicators.length).toBeGreaterThan(0);
+      // Should have at least 3 inactive tabs (all except active)
+      expect(inactiveTabs.length).toBe(3);
 
-      inactiveIndicators.forEach(indicator => {
-        // Inactive should be w-2 h-2 (dots)
-        expect(indicator.className).toContain('w-2');
-        expect(indicator.className).toContain('h-2');
+      inactiveTabs.forEach(tab => {
+        // Inactive should NOT have yellow background
+        expect(tab.className).not.toContain('bg-neo-yellow');
       });
     });
   });
 
   describe('Navigation Arrows', () => {
-    it('should position arrows to not hide content', () => {
-      const { container } = render(<ProfilePageClient />);
+    it('should position arrows at bottom without opacity', () => {
+      render(<ProfilePageClient />);
 
-      // Find navigation arrow buttons
-      const prevButton = screen.queryByLabelText(/previous section/i);
+      // Next button should be visible (we start on first section, so only "next" shows)
       const nextButton = screen.queryByLabelText(/next section/i);
 
-      if (prevButton) {
-        // Arrows should NOT be fixed positioned at left-2/right-2 (hides content)
-        // Should either:
-        // 1. Have reduced opacity (opacity-30 or similar) so content shows through
-        // 2. Be positioned at bottom instead of center
-        const hasReducedOpacity = prevButton.className.includes('opacity-');
-        const isBottomPositioned = prevButton.className.includes('bottom-');
-
-        expect(hasReducedOpacity || isBottomPositioned).toBe(true);
-      }
-
       if (nextButton) {
-        const hasReducedOpacity = nextButton.className.includes('opacity-');
-        const isBottomPositioned = nextButton.className.includes('bottom-');
+        // Should be positioned at bottom
+        expect(nextButton.className).toContain('bottom-');
 
-        expect(hasReducedOpacity || isBottomPositioned).toBe(true);
+        // Should NOT have reduced opacity (full visibility now)
+        expect(nextButton.className).not.toContain('opacity-40');
+        expect(nextButton.className).not.toContain('opacity-30');
       }
     });
 
-    it('should have subtle arrow styling when visible', () => {
-      const { container } = render(<ProfilePageClient />);
+    it('should have neo-brutalist arrow styling', () => {
+      render(<ProfilePageClient />);
 
-      const arrows = [
-        screen.queryByLabelText(/previous section/i),
-        screen.queryByLabelText(/next section/i)
-      ].filter(Boolean);
+      const nextButton = screen.queryByLabelText(/next section/i);
 
-      arrows.forEach(arrow => {
-        if (arrow) {
-          // Should NOT have hover:scale-110 (aggressive)
-          expect(arrow.className).not.toContain('hover:scale-110');
-        }
-      });
+      if (nextButton) {
+        // Should have neo-brutalist styling
+        expect(nextButton.className).toContain('bg-neo-navy');
+        expect(nextButton.className).toContain('border-2');
+        expect(nextButton.className).toContain('border-neo-yellow');
+
+        // Should have active press state
+        expect(nextButton.className).toContain('active:');
+      }
     });
   });
 
-  describe('Header', () => {
-    it('should display section header explaining carousel purpose', () => {
+  describe('Swipe Indicators', () => {
+    it('should show swipe indicator on right side when not on last section', () => {
       const { container } = render(<ProfilePageClient />);
 
-      // Should have a header above the indicators showing the current section name
-      // The component displays section names like "Overview", "Stats", "Achievements", "Collection"
-      // Find the header text (styled with text-xs, uppercase, tracking-wide)
-      const header = container.querySelector('.text-xs.font-medium.text-neo-white\\/60');
-      expect(header).toBeInTheDocument();
-      expect(header?.textContent).toMatch(/Overview|Stats|Achievements|Collection/i);
+      // Find the right-side swipe indicator gradient
+      const rightIndicator = container.querySelector('[aria-hidden="true"].bg-gradient-to-l');
+      expect(rightIndicator).toBeInTheDocument();
     });
   });
 });
