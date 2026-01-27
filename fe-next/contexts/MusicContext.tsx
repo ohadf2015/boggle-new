@@ -173,7 +173,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
                             });
                     }
                 },
-                onend: () => {
+                onend: async () => {
                     // When track ends, crossfade to itself for smooth looping
                     if (currentTrackRef.current === key && howlsRef.current[key as TrackKey]) {
                         // Don't restart if window is not focused or tab is hidden
@@ -188,6 +188,18 @@ export function MusicProvider({ children }: MusicProviderProps) {
                         logger.log(`[Music] Track ended, restarting from ${seekPosition}s with crossfade:`, key);
                         const howl = howlsRef.current[key as TrackKey];
                         const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
+
+                        // Ensure track is loaded before restarting (critical for lazy loading)
+                        if (howl.state() === 'unloaded') {
+                            logger.log(`[Music] Track unloaded, preloading before restart:`, key);
+                            try {
+                                await preloadAudioOnDemand(howl);
+                                logger.log(`[Music] Track preloaded successfully, restarting:`, key);
+                            } catch (err) {
+                                logger.error(`[Music] Failed to preload track for restart:`, key, err);
+                                return; // Don't try to play if loading failed
+                            }
+                        }
 
                         // Crossfade: start fading out current instance
                         howl.fade(howl.volume(), 0, 2000);
