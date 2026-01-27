@@ -66,7 +66,7 @@ module.exports = {
   },
 
   // Setup files
-  setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   // Test timeout (Socket.IO tests may need longer)
   testTimeout: 10000,
