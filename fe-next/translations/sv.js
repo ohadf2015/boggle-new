@@ -2604,6 +2604,7 @@ const sv = {
     "leaderboardLocked": "Registrera dig för att se topplistan",
     "leaderboardTeaser": "Tävla mot spelare över hela världen",
     "carousel": {
+      "header": "Hur man spelar",
       "step1Title": "Svep för att hitta ord",
       "step1Grid": "K,A,O,G,T,E,D,T,R",
       "step1Highlighted": "0,1,4,7",

@@ -2585,6 +2585,7 @@ const es = {
     "leaderboardLocked": "Regístrate para ver la clasificación",
     "leaderboardTeaser": "Compite contra jugadores de todo el mundo",
     "carousel": {
+      "header": "Cómo jugar",
       "step1Title": "Desliza para formar palabras",
       "step1Grid": "G,A,O,L,T,E,D,O,R",
       "step1Highlighted": "0,1,4,7",

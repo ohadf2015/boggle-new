@@ -2599,6 +2599,7 @@ const en = {
     "leaderboardLocked": "Sign up to see leaderboard",
     "leaderboardTeaser": "Compete against players worldwide",
     "carousel": {
+      "header": "How to Play",
       "step1Title": "Swipe to Find Words",
       "step1Grid": "C,A,O,G,T,E,D,S,R",
       "step1Highlighted": "0,1,4,7",

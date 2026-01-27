@@ -2598,6 +2598,7 @@ const he = {
     "leaderboardLocked": "הירשמו לצפות בטבלה",
     "leaderboardTeaser": "התחרו נגד שחקנים מכל העולם",
     "carousel": {
+      "header": "איך לשחק",
       "step1Title": "החליקו למילים",
       "step1Grid": "ח,ת,ב,מ,ו,ק,ש,ל,פ",
       "step1Highlighted": "0,1,4,7",

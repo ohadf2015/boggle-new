@@ -92,10 +92,19 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
         'w-full max-w-md mx-auto',
         className
       )}
-      {...swipeHandlers}
     >
+      {/* Header */}
+      <div className="text-center mb-3">
+        <h3 className="text-lg font-bold text-neo-black dark:text-neo-white uppercase tracking-wide">
+          {t('daily.carousel.header')}
+        </h3>
+      </div>
+
       {/* Carousel Content */}
-      <div className="relative overflow-hidden rounded-neo-lg border-3 border-neo-black bg-white dark:bg-neo-navy shadow-hard-lg h-[200px] sm:h-[220px]">
+      <div
+        className="relative overflow-hidden rounded-neo-lg border-3 border-neo-black bg-white dark:bg-neo-navy shadow-hard-lg h-[200px] sm:h-[220px]"
+        {...swipeHandlers}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -118,10 +127,10 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             key={i}
             onClick={() => goToStep(i)}
             className={cn(
-              'w-3 h-3 min-w-3 min-h-3 flex-none rounded-full border-2 border-neo-black transition-all duration-300 ease-out',
+              'min-w-3 min-h-3 flex-none rounded-full border-2 border-neo-black transition-all duration-300 ease-out',
               i === currentStep
-                ? 'bg-neo-pink scale-125 shadow-[2px_2px_0px_rgb(0,0,0)]'
-                : 'bg-neo-cream dark:bg-gray-600 hover:bg-neo-pink/30 hover:scale-110'
+                ? 'w-4 h-4 bg-neo-pink'
+                : 'w-3 h-3 bg-neo-cream dark:bg-gray-600 hover:bg-neo-pink/30'
             )}
             aria-label={t('daily.carousel.goToStep', { step: i + 1 }) || `Go to step ${i + 1}`}
           />

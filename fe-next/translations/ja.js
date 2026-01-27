@@ -2604,6 +2604,7 @@ const ja = {
     "leaderboardLocked": "登録してリーダーボードを見る",
     "leaderboardTeaser": "世界中のプレイヤーと競争しよう",
     "carousel": {
+      "header": "遊び方",
       "step1Title": "スワイプで単語を作ろう",
       "step1Grid": "た,の,わ,け,し,む,よ,い,る",
       "step1Highlighted": "0,1,4,7",

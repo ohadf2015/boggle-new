@@ -289,7 +289,7 @@ export default function ScientificTipsCarousel() {
                   index === activeIndex
                     ? cn(
                         'w-6 h-3',
-                        isDarkMode ? 'bg-neo-lime shadow-hard-sm' : 'bg-neo-purple shadow-hard-sm'
+                        isDarkMode ? 'bg-neo-lime' : 'bg-neo-purple'
                       )
                     : cn(
                         'w-3 h-3 hover:opacity-80',
