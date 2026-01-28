@@ -3,6 +3,9 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
+
+// Allow adequate time for bulk operations (approve/reject up to 500 words)
+export const maxDuration = 60;
 import {
   getWordBankWords,
   getWordBankStats,

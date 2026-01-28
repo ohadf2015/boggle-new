@@ -72,7 +72,16 @@ export function createVertexAIClient(): VertexAI {
  * Generate content using Vertex AI Gemini with full configuration
  */
 export async function generateWithGemini(prompt: string): Promise<string> {
-  const vertexAI = createVertexAIClient();
+  console.log('[BUZZ] Creating Vertex AI client...');
+  let vertexAI;
+  try {
+    vertexAI = createVertexAIClient();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Failed to create Vertex AI client:', errorMessage);
+    throw error;
+  }
+  console.log('[BUZZ] Vertex AI client created, getting model:', GEMINI_MODEL);
   const model = vertexAI.getGenerativeModel({ model: GEMINI_MODEL });
 
   // Build generation config with optional thinking for extended reasoning
@@ -91,6 +100,7 @@ export async function generateWithGemini(prompt: string): Promise<string> {
     console.log(`[BUZZ] Using thinking budget: ${THINKING_BUDGET} tokens`);
   }
 
+  console.log('[BUZZ] Starting Gemini API call...');
   const generatePromise = model.generateContent({
     contents: [
       {
@@ -101,11 +111,19 @@ export async function generateWithGemini(prompt: string): Promise<string> {
     generationConfig,
   } as Parameters<typeof model.generateContent>[0]);
 
-  const result = await withTimeout(
-    generatePromise,
-    AI_GENERATION_TIMEOUT_MS,
-    'AI challenge generation'
-  );
+  let result;
+  try {
+    result = await withTimeout(
+      generatePromise,
+      AI_GENERATION_TIMEOUT_MS,
+      'AI challenge generation'
+    );
+    console.log('[BUZZ] Gemini API call completed successfully');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Gemini API call failed:', errorMessage);
+    throw error;
+  }
 
   const responseText = result.response.candidates?.[0]?.content?.parts?.[0]?.text || '';
 

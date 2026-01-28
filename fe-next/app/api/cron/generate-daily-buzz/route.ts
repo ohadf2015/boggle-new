@@ -203,7 +203,11 @@ export async function POST(request: NextRequest) {
         console.log(`[Admin] ✅ Generated buzz for ${lang}`);
       } catch (err: any) {
         const errorMessage = err instanceof Error ? err.message : String(err);
+        const errorStack = err instanceof Error ? err.stack : undefined;
         console.error(`[Admin] ❌ Failed to generate buzz for ${lang}:`, errorMessage);
+        if (errorStack) {
+          console.error(`[Admin] Stack trace:`, errorStack);
+        }
         results[lang] = { success: false, error: errorMessage };
       }
     }

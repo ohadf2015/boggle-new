@@ -78,11 +78,13 @@ async function generateChallengesWithAI(
     return { challenges, selectedTrends, social_content };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
     console.error('[BUZZ] AI generation failed:', errorMessage);
-    if (errorMessage.includes('timed out')) {
-      throw new Error(errorMessage);
+    if (errorStack) {
+      console.error('[BUZZ] Error stack:', errorStack);
     }
-    throw new Error('Failed to generate challenges with AI');
+    // Preserve the original error message for debugging
+    throw new Error(`Failed to generate challenges with AI: ${errorMessage}`);
   }
 }
 
@@ -188,7 +190,9 @@ export async function generateDailyBuzz(
   }
 
   // Step 5: Generate challenges with AI
+  console.log(`[BUZZ] Step 5: Starting AI challenge generation with ${filteredTrends.length} trends for ${language}/${region}...`);
   const { challenges, selectedTrends, social_content } = await generateChallengesWithAI(filteredTrends, language, region);
+  console.log(`[BUZZ] Step 5: AI challenge generation completed with ${challenges.length} challenges`);
 
   // Step 6: Validate challenges
   const validatedChallenges = validateChallenges(challenges, language);
