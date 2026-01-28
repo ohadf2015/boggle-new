@@ -9,7 +9,9 @@
 import { render, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { App } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
+import * as platform from '@/utils/platform';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -22,6 +24,19 @@ jest.mock('@capacitor/app', () => ({
     addListener: jest.fn(),
     removeAllListeners: jest.fn(),
   },
+}));
+
+// Mock Capacitor Browser plugin
+jest.mock('@capacitor/browser', () => ({
+  Browser: {
+    close: jest.fn(),
+    open: jest.fn(),
+  },
+}));
+
+// Mock platform utils
+jest.mock('@/utils/platform', () => ({
+  isNative: jest.fn(),
 }));
 
 // Mock logger
@@ -42,6 +57,7 @@ describe('Deep Link OAuth Callback Handler', () => {
   let mockRouter: { replace: jest.Mock };
   let mockAddListener: jest.Mock;
   let mockRemove: jest.Mock;
+  const mockIsNative = platform.isNative as jest.Mock;
 
   beforeEach(() => {
     mockRouter = {
@@ -53,6 +69,12 @@ describe('Deep Link OAuth Callback Handler', () => {
     mockAddListener = App.addListener as jest.Mock;
     mockAddListener.mockClear();
     mockAddListener.mockResolvedValue({ remove: mockRemove });
+
+    // Default to native environment
+    mockIsNative.mockReturnValue(true);
+
+    // Reset Browser mock
+    (Browser.close as jest.Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -230,6 +252,195 @@ describe('Deep Link OAuth Callback Handler', () => {
     // THEN: Should cleanup appUrlOpen listener
     await waitFor(() => {
       expect(mockLocalRemove).toHaveBeenCalled();
+    });
+  });
+
+  describe('Browser close on OAuth callback', () => {
+    it('should close the in-app browser when receiving OAuth callback on native', async () => {
+      // GIVEN: Native environment with OAuth callback deep link
+      mockIsNative.mockReturnValue(true);
+      const deepLinkUrl = 'lexiclash://auth/callback?code=test-code&locale=en';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: Deep link event is fired with OAuth callback URL
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: deepLinkUrl });
+      }
+
+      // THEN: Should call Browser.close to dismiss the in-app browser
+      await waitFor(() => {
+        expect(Browser.close).toHaveBeenCalled();
+      });
+    });
+
+    it('should NOT close browser for non-auth deep links', async () => {
+      // GIVEN: Non-auth deep link
+      mockIsNative.mockReturnValue(true);
+      const deepLinkUrl = 'lexiclash://multiplayer/room/test-room';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: Deep link event is fired with non-auth URL
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: deepLinkUrl });
+      }
+
+      // THEN: Should NOT call Browser.close
+      expect(Browser.close).not.toHaveBeenCalled();
+    });
+
+    it('should NOT close browser on non-native platforms', async () => {
+      // GIVEN: Non-native environment (web)
+      mockIsNative.mockReturnValue(false);
+      const deepLinkUrl = 'lexiclash://auth/callback?code=test-code&locale=en';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: Deep link event is fired
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: deepLinkUrl });
+      }
+
+      // THEN: Should NOT call Browser.close (not native)
+      expect(Browser.close).not.toHaveBeenCalled();
+    });
+
+    it('should handle Browser.close error gracefully', async () => {
+      // GIVEN: Browser.close throws (e.g., browser already closed)
+      mockIsNative.mockReturnValue(true);
+      (Browser.close as jest.Mock).mockRejectedValue(new Error('Browser already closed'));
+      const deepLinkUrl = 'lexiclash://auth/callback?code=test-code&locale=en';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: Deep link event is fired
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: deepLinkUrl });
+      }
+
+      // THEN: Should still redirect despite Browser.close error
+      await waitFor(() => {
+        expect(mockRouter.replace).toHaveBeenCalledWith(
+          '/en/auth/callback?code=test-code'
+        );
+      });
+    });
+  });
+
+  describe('HTTPS App Links (Android)', () => {
+    it('should handle HTTPS App Link for OAuth callback', async () => {
+      // GIVEN: HTTPS App Link from Android (used instead of custom scheme)
+      mockIsNative.mockReturnValue(true);
+      const httpsAppLink = 'https://www.lexiclash.live/auth/callback?code=test-code-123&locale=en&from_app=true';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: HTTPS App Link is received
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: httpsAppLink });
+      }
+
+      // THEN: Should extract path correctly and redirect (stripping from_app param)
+      await waitFor(() => {
+        expect(mockRouter.replace).toHaveBeenCalledWith(
+          '/en/auth/callback?code=test-code-123'
+        );
+      });
+    });
+
+    it('should close browser for HTTPS App Link OAuth callback', async () => {
+      // GIVEN: HTTPS App Link for auth callback
+      mockIsNative.mockReturnValue(true);
+      const httpsAppLink = 'https://www.lexiclash.live/auth/callback?code=test-code&locale=sv';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: HTTPS App Link is received
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: httpsAppLink });
+      }
+
+      // THEN: Should close the browser
+      await waitFor(() => {
+        expect(Browser.close).toHaveBeenCalled();
+      });
+    });
+
+    it('should handle HTTPS App Link without locale', async () => {
+      // GIVEN: HTTPS App Link without locale parameter
+      mockIsNative.mockReturnValue(true);
+      const httpsAppLink = 'https://www.lexiclash.live/auth/callback?code=test-code';
+
+      let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
+      mockAddListener.mockImplementation((event: string, callback: (event: { url: string }) => Promise<void>) => {
+        if (event === 'appUrlOpen') {
+          appUrlOpenCallback = callback;
+        }
+        return Promise.resolve({ remove: mockRemove });
+      });
+
+      render(<DeepLinkHandler />);
+
+      // WHEN: HTTPS App Link is received
+      if (appUrlOpenCallback) {
+        await appUrlOpenCallback({ url: httpsAppLink });
+      }
+
+      // THEN: Should default to Hebrew locale
+      await waitFor(() => {
+        expect(mockRouter.replace).toHaveBeenCalledWith(
+          '/he/auth/callback?code=test-code'
+        );
+      });
     });
   });
 });

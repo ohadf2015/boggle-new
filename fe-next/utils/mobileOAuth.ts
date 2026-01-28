@@ -6,10 +6,16 @@
  * - Web: Supabase redirects browser to OAuth provider, then back to app
  * - Mobile: We use skipBrowserRedirect and manually open in-app browser,
  *          which returns to the app when deep link is triggered
+ *
+ * IMPORTANT for Android:
+ * Chrome Custom Tabs don't reliably handle custom URL schemes (lexiclash://).
+ * We use HTTPS App Links (https://www.lexiclash.live/auth/callback) which are
+ * properly verified via assetlinks.json and reliably trigger the app's intent filter.
  */
 
 import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/lib/supabase';
 import { isNative } from '@/utils/platform';
 import { defaultLocale, locales } from '@/lib/i18n';
@@ -34,6 +40,29 @@ function getCurrentLocale(): string {
 }
 
 /**
+ * Get the appropriate redirect URL for OAuth based on platform
+ *
+ * - iOS: Uses custom URL scheme (lexiclash://auth/callback) which works reliably
+ *        with SFSafariViewController
+ * - Android: Uses HTTPS App Links (https://www.lexiclash.live/auth/callback)
+ *           because Chrome Custom Tabs don't reliably intercept custom URL schemes.
+ *           The AndroidManifest.xml has an intent-filter with android:autoVerify="true"
+ *           that intercepts this HTTPS URL and brings the user back to the app.
+ */
+function getOAuthRedirectUrl(locale: string): string {
+  const platform = Capacitor.getPlatform();
+
+  if (platform === 'android') {
+    // Android: Use HTTPS App Links which are verified and reliably open the app
+    // The locale is passed as a query param so the app knows where to redirect after auth
+    return `https://www.lexiclash.live/auth/callback?locale=${locale}&from_app=true`;
+  } else {
+    // iOS: Custom URL scheme works reliably with SFSafariViewController
+    return `lexiclash://auth/callback${locale ? `?locale=${locale}` : ''}`;
+  }
+}
+
+/**
  * Perform OAuth sign-in on mobile using in-app browser
  * This uses Capacitor's Browser plugin to open OAuth in an in-app browser session,
  * which automatically returns to the app when the deep link callback is triggered.
@@ -53,8 +82,7 @@ export async function performMobileOAuth(
   }
 
   const currentLocale = getCurrentLocale();
-  // Deep link format: lexiclash://auth/callback?code=xxx&locale=en
-  const redirectTo = `lexiclash://auth/callback${currentLocale ? `?locale=${currentLocale}` : ''}`;
+  const redirectTo = getOAuthRedirectUrl(currentLocale);
 
   try {
     logger.log(`[MobileOAuth] Starting ${provider} OAuth with redirect: ${redirectTo}`);
@@ -89,7 +117,7 @@ export async function performMobileOAuth(
     });
 
     // The Browser plugin doesn't return when auth completes - the deep link handler
-    // (DeepLinkHandler component) catches the lexiclash://auth/callback URL and
+    // (DeepLinkHandler component) catches the callback URL and
     // navigates to /auth/callback page where the code is exchanged for session
 
     return { success: true };
