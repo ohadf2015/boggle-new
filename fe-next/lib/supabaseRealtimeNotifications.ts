@@ -30,11 +30,13 @@ export type NotificationCallback = (notification: RealtimeNotification) => void;
  * Subscribe to real-time notifications for a user
  * @param userId - The user's ID
  * @param onNewNotification - Callback when a new notification is received
+ * @param onSubscriptionError - Optional callback when subscription fails (for fallback handling)
  * @returns Cleanup function to unsubscribe
  */
 export function subscribeToNotifications(
   userId: string,
-  onNewNotification: NotificationCallback
+  onNewNotification: NotificationCallback,
+  onSubscriptionError?: (error: string) => void
 ): () => void {
   if (!userId) {
     console.warn('Cannot subscribe to notifications: no userId provided');
@@ -68,9 +70,24 @@ export function subscribeToNotifications(
       } else if (status === 'CHANNEL_ERROR') {
         // Log the actual error for debugging - Supabase passes error as second param
         const errorMessage = err instanceof Error ? err.message : (err ? String(err) : 'Unknown channel error');
-        console.error('Error subscribing to notifications channel:', errorMessage);
+
+        // Check if this is a configuration mismatch error (Supabase Dashboard issue)
+        // This requires enabling Realtime filters in Supabase Dashboard, not a code fix
+        if (errorMessage.includes('mismatch') || errorMessage.includes('bindings')) {
+          console.warn(
+            'Notifications Realtime subscription failed due to configuration mismatch. ' +
+            'This requires enabling row-level Realtime filters in Supabase Dashboard. ' +
+            'Falling back to polling for notifications.'
+          );
+        } else {
+          console.error('Error subscribing to notifications channel:', errorMessage);
+        }
+
+        // Notify caller so they can implement fallback (e.g., polling)
+        onSubscriptionError?.(errorMessage);
       } else if (status === 'TIMED_OUT') {
         console.warn('Notifications channel subscription timed out - will retry');
+        onSubscriptionError?.('Subscription timed out');
       }
     });
 

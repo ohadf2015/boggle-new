@@ -56,6 +56,9 @@ const customJestConfig = {
     '^@/shared/(.*)$': '<rootDir>/shared/$1',
     '^@/types/(.*)$': '<rootDir>/types/$1',
 
+    // Capacitor plugins (mock for web testing)
+    '^@capgo/capacitor-social-login$': '<rootDir>/__mocks__/@capgo/capacitor-social-login.ts',
+
     // Handle CSS imports (with CSS modules)
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
 

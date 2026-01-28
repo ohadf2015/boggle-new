@@ -55,6 +55,13 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   // Track if we've done initial fetch
   const hasFetchedRef = useRef(false);
 
+  // Track if realtime subscription failed (to enable polling fallback)
+  const usePollingFallbackRef = useRef(false);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Polling interval when Realtime subscription fails (30 seconds)
+  const POLLING_INTERVAL_MS = 30000;
+
   // Fetch notifications from API
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -84,11 +91,12 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     refresh().finally(() => setIsLoading(false));
   }, [user, authLoading, refresh]);
 
-  // Subscribe to real-time notifications
+  // Subscribe to real-time notifications with polling fallback
   useEffect(() => {
     if (!user) return;
 
-    const cleanup = subscribeToNotifications(user.id, (newNotification) => {
+    // Handler for new notifications (from Realtime or polling)
+    const handleNewNotification = (newNotification: RealtimeNotification) => {
       // Add to the beginning of the list
       setNotifications((prev) => [newNotification, ...prev.slice(0, 19)]);
 
@@ -97,9 +105,63 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
 
       // Set as latest for toast display
       setLatestNotification(newNotification);
-    });
+    };
 
-    return cleanup;
+    // Start polling fallback when Realtime subscription fails
+    const startPollingFallback = () => {
+      if (pollingIntervalRef.current) return; // Already polling
+
+      console.log('Starting notification polling fallback');
+      usePollingFallbackRef.current = true;
+
+      // Track the last notification we've seen to detect new ones
+      let lastSeenId: string | null = null;
+
+      pollingIntervalRef.current = setInterval(async () => {
+        try {
+          const data = await fetchNotifications({ limit: 5 });
+          setUnreadCount(data.unreadCount);
+
+          // Check for new notifications
+          if (data.notifications.length > 0) {
+            const newest = data.notifications[0];
+            if (lastSeenId && newest.id !== lastSeenId) {
+              // New notification arrived - find all new ones
+              const lastSeenIndex = data.notifications.findIndex(n => n.id === lastSeenId);
+              const newNotifications = lastSeenIndex === -1
+                ? data.notifications
+                : data.notifications.slice(0, lastSeenIndex);
+
+              // Process new notifications (oldest first so newest ends up on top)
+              newNotifications.reverse().forEach(handleNewNotification);
+            }
+            lastSeenId = newest.id;
+          }
+        } catch {
+          // Silently fail - polling is best-effort fallback
+        }
+      }, POLLING_INTERVAL_MS);
+    };
+
+    // Handle Realtime subscription errors
+    const handleSubscriptionError = () => {
+      startPollingFallback();
+    };
+
+    const cleanup = subscribeToNotifications(
+      user.id,
+      handleNewNotification,
+      handleSubscriptionError
+    );
+
+    return () => {
+      cleanup();
+      // Clear polling if active
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
   }, [user]);
 
   // Reset state when user changes

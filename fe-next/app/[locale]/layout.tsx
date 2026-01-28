@@ -14,6 +14,7 @@ import VersionChecker from '@/components/VersionChecker';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
+import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { fredoka, rubik } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -730,6 +731,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <AnimationsLoader />
                 {/* Handle deep links for OAuth callbacks on mobile (Capacitor) */}
                 <DeepLinkHandler />
+                {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
+                <NativeOAuthInitializer />
                 <ConditionalProviders lang={validLocale}>
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
