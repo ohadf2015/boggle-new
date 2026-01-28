@@ -217,7 +217,7 @@ function PracticeContent({
 }
 
 export default function LessonPracticePageClient() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const params = useParams();
@@ -229,7 +229,12 @@ export default function LessonPracticePageClient() {
   const { progress, mastery, startSession, isLoading: isLoadingProgress } = usePracticeProgress(lessonId, user?.id);
 
   useEffect(() => {
-    // Check authentication
+    // Wait for auth to finish loading before checking authentication
+    if (loading) {
+      return; // Still loading, don't make any decisions yet
+    }
+
+    // Check authentication (only after loading completes)
     if (!isAuthenticated) {
       router.push(`/${language}`);
       return;
@@ -241,9 +246,10 @@ export default function LessonPracticePageClient() {
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, lessonId, router, language]);
+  }, [isAuthenticated, loading, lessonId, router, language]);
 
-  if (isChecking || isLoadingLesson || isLoadingProgress) {
+  // Show loader during auth check or while auth is loading
+  if (isChecking || loading || isLoadingLesson || isLoadingProgress) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
         <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />

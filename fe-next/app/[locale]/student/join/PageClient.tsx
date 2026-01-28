@@ -15,23 +15,28 @@ import { NeoLoader } from '@/components/ui/NeoLoader';
 import JoinClassroomForm from '@/components/student/JoinClassroomForm';
 
 export default function StudentJoinPageClient() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Check authentication
+    // Wait for auth to finish loading before checking authentication
+    if (loading) {
+      return; // Still loading, don't make any decisions yet
+    }
+
+    // Check authentication (only after loading completes)
     if (!isAuthenticated) {
       router.push(`/${language}`);
       return;
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, router, language]);
+  }, [isAuthenticated, loading, router, language]);
 
-  // Show loader during auth check to prevent flash
-  if (isChecking) {
+  // Show loader during auth check or while auth is loading
+  if (isChecking || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neo-navy">
         <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />

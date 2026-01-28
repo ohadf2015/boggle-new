@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import BuzzReadyScreen from './BuzzReadyScreen';
 import BuzzGameScreen from './BuzzGameScreen';
@@ -63,6 +64,7 @@ type BuzzPhase = 'loading' | 'ready' | 'playing' | 'results' | 'error';
 export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeProps) {
   const { t } = useLanguage();
   const { profile } = useAuth();
+  const { unlockAudio } = useMusic();
 
   const [phase, setPhase] = useState<BuzzPhase>('loading');
   const [challengeData, setChallengeData] = useState<BuzzChallengeData | null>(null);
@@ -126,6 +128,8 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
 
   // Handle start game
   const handleStart = () => {
+    // Unlock audio immediately on user click to satisfy browser autoplay policy
+    unlockAudio();
     setPhase('playing');
   };
 

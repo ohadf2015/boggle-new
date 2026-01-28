@@ -45,6 +45,27 @@ jest.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
+// Mock MusicContext
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    unlockAudio: jest.fn(),
+    fadeToTrack: jest.fn(),
+    playTrack: jest.fn(),
+    stopMusic: jest.fn(),
+    audioUnlocked: false,
+    isMuted: false,
+    volume: 1,
+    toggleMute: jest.fn(),
+    setVolume: jest.fn(),
+    TRACKS: {
+      LOBBY: 'lobby',
+      IN_GAME: 'inGame',
+      BOSSA_ARCADE: 'bossaArcade',
+      BOSSA: 'bossa',
+    },
+  }),
+}));
+
 // Mock guest manager to avoid crypto.randomUUID in tests
 jest.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: () => 'test-fingerprint-12345',

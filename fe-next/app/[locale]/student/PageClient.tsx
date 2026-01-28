@@ -37,7 +37,7 @@ const ClassroomLeaderboard = dynamic(
 );
 
 export default function StudentPageClient() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
@@ -45,16 +45,22 @@ export default function StudentPageClient() {
   const { lessons } = useStudentProgress();
 
   useEffect(() => {
-    // Check authentication
+    // Wait for auth to finish loading before checking authentication
+    if (loading) {
+      return; // Still loading, don't make any decisions yet
+    }
+
+    // Check authentication (only after loading completes)
     if (!isAuthenticated) {
       router.push(`/${language}`);
       return;
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, router, language]);
+  }, [isAuthenticated, loading, router, language]);
 
-  if (isChecking) {
+  // Show loader during auth check or while auth is loading
+  if (isChecking || loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
         <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />

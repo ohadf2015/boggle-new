@@ -12,6 +12,7 @@ import { TrainingGatewayModal } from '@/components/training';
 import { shouldShowTrainingGateway, markGatewaySkipped, markGatewaySeen } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import {
@@ -59,6 +60,7 @@ export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' 
 const DailyChallenge: React.FC = () => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
+  const { unlockAudio } = useMusic();
   const searchParams = useSearchParams();
 
   // Game language state - separate from UI language
@@ -505,6 +507,12 @@ const DailyChallenge: React.FC = () => {
 
   // Handle game start - with safety check to prevent replay
   const handleStartGame = useCallback(async () => {
+    // CRITICAL: Unlock audio IMMEDIATELY on user click, before any async operations
+    // This ensures the browser's autoplay policy is satisfied within the user gesture
+    // Without this, the async server checks below would delay the phase transition
+    // and music playback would fail due to browser autoplay restrictions
+    unlockAudio();
+
     // Safety check: verify user hasn't already played today
     // This prevents replay if phase state somehow becomes 'ready' when it shouldn't
 
@@ -570,7 +578,7 @@ const DailyChallenge: React.FC = () => {
     }
 
     setPhase('playing');
-  }, [gameLanguage, isAuthenticated, profile, t]);
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio]);
 
   // Handle Word Hunt game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult) => {

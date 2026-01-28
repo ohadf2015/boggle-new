@@ -11,6 +11,7 @@ import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
 import AuthModal from '../auth/AuthModal';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
+import { useMusic } from '@/contexts/MusicContext';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -111,6 +112,16 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
     setPendingCreateChallenge(true);
     setShowAuthModal(true);
   };
+
+  // Preload game music tracks while on ready screen
+  // This ensures music starts instantly when game begins (no loading delay)
+  const { preloadMusicTrack, TRACKS } = useMusic();
+  useEffect(() => {
+    // Preload BOSSA_ARCADE (survival mode music) and IN_GAME (standard game music)
+    // These are the most likely tracks needed when the game starts
+    preloadMusicTrack(TRACKS.BOSSA_ARCADE);
+    preloadMusicTrack(TRACKS.IN_GAME);
+  }, [preloadMusicTrack, TRACKS]);
 
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
