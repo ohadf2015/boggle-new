@@ -79,6 +79,43 @@ export async function cacheUserRank(userId: string, rankData: unknown): Promise<
   }
 }
 
+/**
+ * Invalidate leaderboard caches for specific users only.
+ * This is much more efficient than bulk invalidation - it only removes
+ * caches for users who actually played, preventing database thrashing.
+ *
+ * @param userIds - Array of user IDs whose caches should be invalidated
+ */
+export async function invalidateUserLeaderboardCaches(userIds: string[]): Promise<void> {
+  if (!isRedisAvailable() || !getRedisClient() || userIds.length === 0) {
+    return;
+  }
+
+  try {
+    const client = getRedisClient()!;
+    const pipeline = client.pipeline();
+
+    // Delete top 100 cache (always needed as rankings may have changed)
+    pipeline.del(KEYS.leaderboardTop());
+
+    // Delete only the specific user caches that need invalidation
+    for (const userId of userIds) {
+      pipeline.del(KEYS.leaderboardUser(userId));
+    }
+
+    await circuitBreaker.execute(() => pipeline.exec());
+    logger.debug('REDIS', `Leaderboard caches invalidated for ${userIds.length} users`);
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('REDIS', `Error invalidating user leaderboard caches: ${err.message}`);
+  }
+}
+
+/**
+ * @deprecated Use invalidateUserLeaderboardCaches(userIds) for targeted invalidation.
+ * This function scans and deletes ALL user rank caches which causes database thrashing.
+ * Only use this for admin operations or full cache reset scenarios.
+ */
 export async function invalidateLeaderboardCaches(): Promise<void> {
   if (!isRedisAvailable() || !getRedisClient()) {
     return;
@@ -106,7 +143,7 @@ export async function invalidateLeaderboardCaches(): Promise<void> {
       }
     } while (cursor !== '0');
 
-    logger.debug('REDIS', 'Leaderboard caches invalidated');
+    logger.debug('REDIS', 'All leaderboard caches invalidated (bulk)');
   } catch (error: unknown) {
     const err = error as Error;
     logger.error('REDIS', `Error invalidating leaderboard caches: ${err.message}`);

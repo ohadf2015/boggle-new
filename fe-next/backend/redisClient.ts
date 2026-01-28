@@ -40,6 +40,7 @@ export {
   getCachedLeaderboardTop100,
   getCachedUserRank,
   invalidateLeaderboardCaches,
+  invalidateUserLeaderboardCaches,
 
   // Daily puzzle caching
   cacheDailyLeaderboard,
@@ -99,6 +100,7 @@ import {
   incrementWordApproval,
   initRedis,
   invalidateLeaderboardCaches,
+  invalidateUserLeaderboardCaches,
   isRedisAvailable,
   KEYS,
   releaseGameLock,
@@ -147,6 +149,7 @@ module.exports = {
   getCachedUserRank,
   cacheUserRank,
   invalidateLeaderboardCaches,
+  invalidateUserLeaderboardCaches,
 
   // Daily puzzle caching
   getCachedDailyPuzzle,

@@ -14,11 +14,16 @@ const logger = require('../../utils/logger');
 export function isRetryableError(error: unknown): boolean {
   if (!error) return false;
 
-  const err = error as { message?: string; code?: string };
+  const err = error as { message?: string; code?: string; name?: string };
   const message = (err.message || '').toLowerCase();
   const code = err.code || '';
+  const name = (err.name || '').toLowerCase();
 
   return (
+    // Named errors we explicitly throw
+    name === 'htmlresponseerror' ||
+    name === 'truncatedresponseerror' ||
+    // Message-based detection
     message.includes('network') ||
     message.includes('timeout') ||
     message.includes('rate limit') ||
@@ -29,6 +34,10 @@ export function isRetryableError(error: unknown): boolean {
     message.includes('unavailable') ||
     message.includes('econnreset') ||
     message.includes('socket hang up') ||
+    // Handle HTML responses (rate limits, auth errors return HTML instead of JSON)
+    message.includes('<!doctype') ||
+    message.includes('unexpected token') ||
+    message.includes('is not valid json') ||
     code === 'ECONNRESET' ||
     code === 'ETIMEDOUT'
   );

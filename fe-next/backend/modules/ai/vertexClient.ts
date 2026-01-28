@@ -266,7 +266,21 @@ export class VertexAIClient {
     const prompt = buildBatchPrompt(words, language);
 
     const result = await withRetry(async () => {
-      const response = await this.batchModel!.generateContent(prompt);
+      let response;
+      try {
+        response = await this.batchModel!.generateContent(prompt);
+      } catch (sdkError) {
+        // Catch SyntaxError when SDK receives HTML instead of JSON (rate limit/auth error)
+        if (sdkError instanceof SyntaxError) {
+          const htmlError = new Error(
+            `AI returned HTML instead of JSON (possible rate limit): ${sdkError.message}`
+          );
+          htmlError.name = 'HTMLResponseError';
+          throw htmlError;
+        }
+        throw sdkError;
+      }
+
       const candidate = response.response?.candidates?.[0];
       const finishReason = candidate?.finishReason;
       const partialText = candidate?.content?.parts?.[0]?.text || '';

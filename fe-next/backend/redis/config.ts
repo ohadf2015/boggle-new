@@ -29,6 +29,9 @@ export const DEFAULT_LOCK_TTL = 10000; // 10 seconds
 export const LOCK_RETRY_DELAY = 50; // 50ms between retries
 export const MAX_LOCK_RETRIES = 20; // Max 20 retries (1 second total)
 
+// Word Approval Configuration
+export const MAX_WORD_APPROVAL_GAME_IDS = 50; // Cap gameIds array to prevent unbounded growth
+
 // Redis Connection Configuration
 export const baseRedisConfig = {
   maxRetriesPerRequest: 3,

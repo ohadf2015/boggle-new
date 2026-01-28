@@ -1,7 +1,7 @@
 // wordApproval.ts - Word approval tracking with atomic operations
 
 import { circuitBreaker } from './circuitBreaker';
-import { MAX_SCAN_ITERATIONS, PIPELINE_BATCH_SIZE } from './config';
+import { MAX_SCAN_ITERATIONS, MAX_WORD_APPROVAL_GAME_IDS, PIPELINE_BATCH_SIZE } from './config';
 import {
   getRedisClient,
   getWordApprovalScriptSha,
@@ -51,16 +51,30 @@ export async function incrementWordApproval(
   if (scriptSha) {
     try {
       const result = await circuitBreaker.execute(() =>
-        client.evalsha(scriptSha, 1, key, gameId, now)
+        client.evalsha(scriptSha, 1, key, gameId, now, MAX_WORD_APPROVAL_GAME_IDS.toString())
       );
       return JSON.parse(result as string);
     } catch (error: unknown) {
       const err = error as Error;
-      // If script not found (NOSCRIPT), reload it
+      // If script not found (NOSCRIPT), reload and retry once
       if (err.message.includes('NOSCRIPT')) {
+        logger.debug('REDIS', 'Word approval script not found, reloading...');
         await loadLuaScripts();
+        // Retry with reloaded script
+        const newSha = getWordApprovalScriptSha();
+        if (newSha) {
+          try {
+            const retryResult = await circuitBreaker.execute(() =>
+              client.evalsha(newSha, 1, key, gameId, now, MAX_WORD_APPROVAL_GAME_IDS.toString())
+            );
+            return JSON.parse(retryResult as string);
+          } catch (retryError) {
+            logger.warn('REDIS', `Lua script retry failed, falling back to WATCH/MULTI`);
+          }
+        }
+      } else {
+        logger.warn('REDIS', `Lua script failed, falling back to WATCH/MULTI: ${err.message}`);
       }
-      logger.warn('REDIS', `Lua script failed, falling back to WATCH/MULTI: ${err.message}`);
     }
   }
 
@@ -81,6 +95,12 @@ export async function incrementWordApproval(
           return approvalData;
         }
         approvalData.gameIds.push(gameId);
+
+        // Cap the array to prevent unbounded growth (keep most recent entries)
+        while (approvalData.gameIds.length > MAX_WORD_APPROVAL_GAME_IDS) {
+          approvalData.gameIds.shift();
+        }
+
         approvalData.approvalCount = approvalData.gameIds.length;
         approvalData.lastApproved = now;
       } else {

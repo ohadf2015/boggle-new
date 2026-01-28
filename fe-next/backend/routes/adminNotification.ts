@@ -213,7 +213,7 @@ router.get('/history', async (req: AdminRequest, res: Response): Promise<void> =
         push_sent_at,
         read,
         created_at,
-        recipient:profiles!user_notifications_user_id_fkey(username, display_name, avatar_emoji)
+        recipient:profiles!user_notifications_user_profile_fkey(username, display_name, avatar_emoji)
       `, { count: 'exact' })
       .order('created_at', { ascending: false });
 

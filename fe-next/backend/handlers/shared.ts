@@ -13,7 +13,7 @@ const { awardFinalAchievements, checkAndAwardAchievements, getLocalizedAchieveme
 const { calculatePlayerTitles } = require('../modules/playerTitlesManager');
 const { isDictionaryWord, addApprovedWord } = require('../dictionary');
 const { processGameResults, isSupabaseConfigured } = require('../modules/supabaseServer');
-const { invalidateLeaderboardCaches, incrementWordApproval } = require('../redisClient');
+const { incrementWordApproval } = require('../redisClient');
 const { processGameEndEngagement, processAchievementEngagement } = require('./engagementHandler');
 const {
   collectNonDictionaryWords,
@@ -598,8 +598,8 @@ async function recordGameResultsToSupabase(io: Server, gameCode: string, scoresA
       }
     }
 
-    // Invalidate leaderboard caches
-    await invalidateLeaderboardCaches();
+    // Note: Leaderboard cache invalidation is now handled inside processGameResults
+    // using targeted invalidation (only affected users) to prevent database thrashing
 
     // Increment word approval counts for dictionary words
     // OPTIMIZATION: Batch all operations with Promise.all instead of sequential awaits

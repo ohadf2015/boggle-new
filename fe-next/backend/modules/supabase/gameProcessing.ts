@@ -37,13 +37,13 @@ function getLifetimeAchievementChecker() {
   return _checkLifetimeAchievements;
 }
 
-// Lazy import for Redis cache invalidation
-let _invalidateLeaderboardCaches: (() => Promise<void>) | null = null;
-function getLeaderboardCacheInvalidator() {
-  if (!_invalidateLeaderboardCaches) {
-    _invalidateLeaderboardCaches = require('../../redisClient').invalidateLeaderboardCaches;
+// Lazy import for Redis cache invalidation (targeted version)
+let _invalidateUserLeaderboardCaches: ((userIds: string[]) => Promise<void>) | null = null;
+function getTargetedLeaderboardCacheInvalidator() {
+  if (!_invalidateUserLeaderboardCaches) {
+    _invalidateUserLeaderboardCaches = require('../../redisClient').invalidateUserLeaderboardCaches;
   }
-  return _invalidateLeaderboardCaches;
+  return _invalidateUserLeaderboardCaches;
 }
 
 export interface PlayerResultOutput {
@@ -230,12 +230,19 @@ export async function processGameResults(
     }
   }
 
-  // Invalidate leaderboard caches after all updates to ensure fresh data
+  // Invalidate leaderboard caches only for players who participated (targeted invalidation)
   try {
-    const invalidateLeaderboardCaches = getLeaderboardCacheInvalidator();
-    if (invalidateLeaderboardCaches) {
-      await invalidateLeaderboardCaches();
-      logger.debug('SUPABASE', 'Leaderboard caches invalidated after game results');
+    const invalidateUserLeaderboardCaches = getTargetedLeaderboardCacheInvalidator();
+    if (invalidateUserLeaderboardCaches) {
+      // Extract authenticated user IDs from the auth map
+      const userIds = Object.values(userAuthMap)
+        .filter(auth => auth.authUserId)
+        .map(auth => auth.authUserId as string);
+
+      if (userIds.length > 0) {
+        await invalidateUserLeaderboardCaches(userIds);
+        logger.debug('SUPABASE', `Leaderboard caches invalidated for ${userIds.length} users`);
+      }
     }
   } catch (cacheError) {
     logger.warn('SUPABASE', 'Failed to invalidate leaderboard caches', cacheError);

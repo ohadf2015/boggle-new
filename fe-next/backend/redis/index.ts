@@ -65,6 +65,7 @@ export {
   getCachedLeaderboardTop100,
   getCachedUserRank,
   invalidateLeaderboardCaches,
+  invalidateUserLeaderboardCaches,
 } from './leaderboard';
 
 // Daily puzzle caching

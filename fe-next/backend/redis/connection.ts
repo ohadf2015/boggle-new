@@ -24,10 +24,12 @@ let memoryCheckInterval: NodeJS.Timeout | null = null;
 let wordApprovalScriptSha: string | null = null;
 
 // Lua script for atomic word approval increment
+// ARGV[3] = maxGameIds (cap to prevent unbounded growth)
 const WORD_APPROVAL_SCRIPT = `
 local key = KEYS[1]
 local gameId = ARGV[1]
 local now = ARGV[2]
+local maxGameIds = tonumber(ARGV[3]) or 50
 
 local data = redis.call('GET', key)
 local approvalData
@@ -41,6 +43,12 @@ if data then
     end
   end
   table.insert(approvalData.gameIds, gameId)
+
+  -- Cap the array to prevent unbounded growth (keep most recent entries)
+  while #approvalData.gameIds > maxGameIds do
+    table.remove(approvalData.gameIds, 1)
+  end
+
   approvalData.approvalCount = #approvalData.gameIds
   approvalData.lastApproved = now
 else
