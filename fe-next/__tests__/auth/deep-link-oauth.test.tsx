@@ -273,7 +273,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: Deep link event is fired with OAuth callback URL
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: deepLinkUrl });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: deepLinkUrl });
       }
 
       // THEN: Should call Browser.close to dismiss the in-app browser
@@ -299,7 +299,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: Deep link event is fired with non-auth URL
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: deepLinkUrl });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: deepLinkUrl });
       }
 
       // THEN: Should NOT call Browser.close
@@ -323,7 +323,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: Deep link event is fired
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: deepLinkUrl });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: deepLinkUrl });
       }
 
       // THEN: Should NOT call Browser.close (not native)
@@ -348,7 +348,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: Deep link event is fired
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: deepLinkUrl });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: deepLinkUrl });
       }
 
       // THEN: Should still redirect despite Browser.close error
@@ -378,7 +378,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: HTTPS App Link is received
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: httpsAppLink });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: httpsAppLink });
       }
 
       // THEN: Should extract path correctly and redirect (stripping from_app param)
@@ -406,7 +406,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: HTTPS App Link is received
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: httpsAppLink });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: httpsAppLink });
       }
 
       // THEN: Should close the browser
@@ -432,7 +432,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // WHEN: HTTPS App Link is received
       if (appUrlOpenCallback) {
-        await appUrlOpenCallback({ url: httpsAppLink });
+        await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: httpsAppLink });
       }
 
       // THEN: Should default to Hebrew locale
