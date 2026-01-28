@@ -270,6 +270,13 @@ export async function buildAIPromptAsync(
     getSectionWithTracking('FINAL_CHECKLIST', templateValues),
   ]);
 
+  // Log OUTPUT_FORMAT section for debugging
+  console.log(`[BUZZ] OUTPUT_FORMAT section length: ${outputFormatSection.length} chars`);
+  if (!outputFormatSection.includes('"challenges"') || !outputFormatSection.includes('"trending_context"')) {
+    console.error('[BUZZ] WARNING: OUTPUT_FORMAT may be missing required fields!');
+    console.error('[BUZZ] OUTPUT_FORMAT preview:', outputFormatSection.substring(0, 500));
+  }
+
   // Handle priority keywords section (conditional)
   let priorityKeywordsSection = '';
   if (extractedKeywords.length > 0) {

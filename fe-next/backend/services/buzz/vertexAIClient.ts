@@ -113,6 +113,10 @@ export async function generateWithGemini(prompt: string): Promise<string> {
     throw new Error('No response text from Gemini');
   }
 
+  // Log response preview for debugging
+  console.log(`[BUZZ] Gemini response length: ${responseText.length} chars`);
+  console.log(`[BUZZ] Response preview (first 500 chars):`, responseText.substring(0, 500));
+
   return responseText;
 }
 

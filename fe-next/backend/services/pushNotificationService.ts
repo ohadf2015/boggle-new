@@ -395,7 +395,7 @@ export async function sendGiftNotifications(
       title: "You've received a gift! 🎁",
       body,
       notificationType: 'gift',
-      actionUrl: '/gifts',
+      actionUrl: '/',  // Navigate to home - gift modal auto-shows in Header
       relatedEntityType: 'gift',
       relatedEntityId: gift.giftId,
     };

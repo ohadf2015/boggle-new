@@ -4,14 +4,13 @@
  */
 
 import {
-  BANNED_BRAND_WORDS,
   MAX_ANSWER_LENGTH,
   MIN_ANSWER_LENGTH,
   WORDLE_WORD_LENGTH,
 } from './constants';
 import type { BuzzChallenge, ParsedAIResponse, SocialContent } from './types';
 import { isSportsRelatedChallenge } from './trendsService';
-import { isBrandOrProperNoun, repairTruncatedJson } from './utils';
+import { repairTruncatedJson } from './utils';
 
 /**
  * Validate challenges for basic sanity checks
@@ -24,26 +23,14 @@ export function validateChallenges(
 ): BuzzChallenge[] {
   const minLength = MIN_ANSWER_LENGTH[language] || 3;
   const rejectionReasons: Record<string, string[]> = {
-    'brand_names': [],
     'invalid_length': [],
-    'invalid_options': [],
   };
+
+  // NOTE: Brand name filtering disabled - we now allow brand/company names as answers
+  // since trending topics often include brands that make engaging challenges
 
   const validatedChallenges = challenges.filter((challenge) => {
     const answer = challenge.answer;
-
-    // Filter out brand names and proper nouns
-    // For non-English languages, be more permissive as brand names are often trending topics
-    // Only reject if answer is ALL UPPERCASE (clear brand acronym) or in explicit banned list
-    const shouldRejectBrand = language === 'en'
-      ? isBrandOrProperNoun(answer, BANNED_BRAND_WORDS)
-      : answer === answer.toUpperCase() && isBrandOrProperNoun(answer, BANNED_BRAND_WORDS);
-
-    if (shouldRejectBrand) {
-      rejectionReasons['brand_names'].push(`${answer} (${challenge.type})`);
-      console.warn(`[BUZZ] Rejected brand/proper noun: ${answer}`);
-      return false;
-    }
 
     // Special validation for wordle_guess: must be exactly 5 letters
     if (challenge.type === 'wordle_guess') {
@@ -60,22 +47,6 @@ export function validateChallenges(
       }
     }
 
-    // Validate options for multiple choice
-    if (challenge.options) {
-      const allValid = challenge.options.every((option) => {
-        // Apply same permissive logic for non-English languages
-        const shouldReject = language === 'en'
-          ? isBrandOrProperNoun(option, BANNED_BRAND_WORDS)
-          : option === option.toUpperCase() && isBrandOrProperNoun(option, BANNED_BRAND_WORDS);
-        return !shouldReject;
-      });
-      if (!allValid) {
-        rejectionReasons['invalid_options'].push(`${challenge.prompt.substring(0, 50)}...`);
-        console.warn(`[BUZZ] Invalid options contain brand names for: ${challenge.prompt}`);
-        return false;
-      }
-    }
-
     return true;
   });
 
@@ -86,14 +57,8 @@ export function validateChallenges(
     console.error(`  Passed: ${validatedChallenges.length}`);
     console.error(`  Rejected: ${challenges.length - validatedChallenges.length}`);
 
-    if (rejectionReasons['brand_names'].length > 0) {
-      console.error(`  Brand names (${rejectionReasons['brand_names'].length}):`, rejectionReasons['brand_names']);
-    }
     if (rejectionReasons['invalid_length'].length > 0) {
       console.error(`  Invalid length (${rejectionReasons['invalid_length'].length}):`, rejectionReasons['invalid_length']);
-    }
-    if (rejectionReasons['invalid_options'].length > 0) {
-      console.error(`  Invalid options (${rejectionReasons['invalid_options'].length}):`, rejectionReasons['invalid_options']);
     }
 
     throw new Error(`Insufficient validated challenges: got ${validatedChallenges.length}, need 5`);
@@ -120,6 +85,7 @@ export function validateChallenges(
 
 /**
  * Validate a single challenge without minimum count requirement
+ * NOTE: Brand name filtering disabled - we now allow brand/company names as answers
  */
 export function validateSingleChallenge(
   challenge: BuzzChallenge,
@@ -127,16 +93,6 @@ export function validateSingleChallenge(
 ): boolean {
   const answer = challenge.answer;
   const minLength = MIN_ANSWER_LENGTH[language] || 3;
-
-  // For non-English languages, be more permissive with brand names
-  const shouldRejectBrand = language === 'en'
-    ? isBrandOrProperNoun(answer, BANNED_BRAND_WORDS)
-    : answer === answer.toUpperCase() && isBrandOrProperNoun(answer, BANNED_BRAND_WORDS);
-
-  if (shouldRejectBrand) {
-    console.warn(`[BUZZ] Rejected brand/proper noun: ${answer}`);
-    return false;
-  }
 
   if (challenge.type === 'wordle_guess') {
     if (answer.length !== WORDLE_WORD_LENGTH) {
@@ -146,20 +102,6 @@ export function validateSingleChallenge(
   } else {
     if (answer.length < minLength || answer.length > MAX_ANSWER_LENGTH) {
       console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters, min ${minLength} for ${language})`);
-      return false;
-    }
-  }
-
-  if (challenge.options) {
-    const allValid = challenge.options.every((option) => {
-      // Apply same permissive logic for non-English languages
-      const shouldReject = language === 'en'
-        ? isBrandOrProperNoun(option, BANNED_BRAND_WORDS)
-        : option === option.toUpperCase() && isBrandOrProperNoun(option, BANNED_BRAND_WORDS);
-      return !shouldReject;
-    });
-    if (!allValid) {
-      console.warn(`[BUZZ] Invalid options contain brand names for: ${challenge.prompt}`);
       return false;
     }
   }
@@ -215,9 +157,10 @@ export function parseAIResponse(responseText: string): ParsedAIResponse {
     jsonText = jsonText.replace(/```json?\n?/g, '').replace(/```\n?$/g, '');
   }
 
-  let parsed: { challenges?: BuzzChallenge[]; social_content?: SocialContent };
+  let parsed: { challenges?: BuzzChallenge[]; social_content?: SocialContent; date?: string; language?: string; trending_summary?: string };
   try {
     parsed = JSON.parse(jsonText);
+    console.log('[BUZZ] Parsed JSON keys:', Object.keys(parsed));
   } catch (firstError: unknown) {
     const firstErrorMsg = firstError instanceof Error ? firstError.message : 'Unknown error';
     console.warn('[BUZZ] Initial JSON parse failed:', firstErrorMsg);
@@ -243,21 +186,36 @@ export function parseAIResponse(responseText: string): ParsedAIResponse {
   }
 
   if (!parsed.challenges || !Array.isArray(parsed.challenges)) {
+    console.error('[BUZZ] Invalid response format: missing challenges array');
+    console.error('[BUZZ] Parsed object keys:', Object.keys(parsed));
+    console.error('[BUZZ] Raw parsed content (first 1000 chars):', JSON.stringify(parsed).substring(0, 1000));
     throw new Error('Invalid response format: missing challenges array');
   }
 
-  const validChallenges = parsed.challenges.filter((challenge: Partial<BuzzChallenge>) => {
-    return (
-      challenge.type &&
-      challenge.trend_topic &&
-      challenge.prompt &&
-      challenge.answer &&
-      challenge.difficulty &&
-      challenge.trending_context
-    );
+  console.log(`[BUZZ] AI returned ${parsed.challenges.length} challenges, validating structure...`);
+  if (parsed.challenges.length > 0) {
+    console.log('[BUZZ] First challenge example:', JSON.stringify(parsed.challenges[0], null, 2));
+  }
+
+  const validChallenges = parsed.challenges.filter((challenge: Partial<BuzzChallenge>, index: number) => {
+    const missingFields: string[] = [];
+    if (!challenge.type) missingFields.push('type');
+    if (!challenge.trend_topic) missingFields.push('trend_topic');
+    if (!challenge.prompt) missingFields.push('prompt');
+    if (!challenge.answer) missingFields.push('answer');
+    if (!challenge.difficulty) missingFields.push('difficulty');
+    if (!challenge.trending_context) missingFields.push('trending_context');
+
+    if (missingFields.length > 0) {
+      console.warn(`[BUZZ] Challenge ${index} missing required fields: ${missingFields.join(', ')}`);
+      console.warn(`[BUZZ] Challenge ${index} has fields:`, Object.keys(challenge));
+      return false;
+    }
+    return true;
   }) as BuzzChallenge[];
 
   if (validChallenges.length < 5) {
+    console.error(`[BUZZ] Structure validation: ${validChallenges.length}/${parsed.challenges.length} passed`);
     throw new Error(`Insufficient valid challenges: got ${validChallenges.length}, need 5`);
   }
 

@@ -404,9 +404,22 @@ export function MusicProvider({ children }: MusicProviderProps) {
         }
     }, [volume, isMuted]);
 
-    // Explicitly unlock audio - called when user clicks the speaker button (fallback)
+    // Queue for track requests made before audio is unlocked
+    // MUST be declared before unlockAudio since it references this ref
+    const pendingUnlockTrackRef = useRef<PendingTrack | null>(null);
+
+    // Ref to track the pending unlock timeout so we can cancel it if needed
+    const pendingUnlockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Ref to hold fadeToTrack for recursive calls
+    const fadeToTrackRef = useRef<((trackKey: TrackKey, fadeOutMs?: number, fadeInMs?: number) => void) | null>(null);
+
+    // Explicitly unlock audio - called when user clicks play buttons or the speaker icon
+    // Also processes any pending track requests that were queued before audio was unlocked
     const unlockAudio = useCallback(() => {
         if (audioUnlockedRef.current) return;
+
+        logger.log('[Music] unlockAudio called, unlocking audio...');
 
         // Resume AudioContext for iOS Safari - wrap in try-catch for device errors
         if (Howler.ctx && Howler.ctx.state === 'suspended') {
@@ -426,20 +439,24 @@ export function MusicProvider({ children }: MusicProviderProps) {
 
         audioUnlockedRef.current = true;
         setAudioUnlocked(true);
+
+        // Process any pending track request immediately (same as handleFirstInteraction)
+        // This ensures music plays when unlockAudio is called explicitly (e.g., in DailyChallenge)
+        if (pendingUnlockTrackRef.current) {
+            const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
+            pendingUnlockTrackRef.current = null;
+            logger.log('[Music] unlockAudio - Playing pending track:', trackKey);
+            // Small delay to ensure AudioContext is fully ready
+            pendingUnlockTimeoutRef.current = setTimeout(() => {
+                pendingUnlockTimeoutRef.current = null;
+                fadeToTrackRef.current?.(trackKey, fadeOutMs, fadeInMs);
+            }, 100);
+        }
     }, []);
 
     // Queue for pending track requests during transitions
     const pendingTrackRef = useRef<PendingTrack | null>(null);
     const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    // Queue for track requests made before audio is unlocked
-    const pendingUnlockTrackRef = useRef<PendingTrack | null>(null);
-
-    // Ref to track the pending unlock timeout so we can cancel it if needed
-    const pendingUnlockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    // Ref to hold fadeToTrack for recursive calls
-    const fadeToTrackRef = useRef<((trackKey: TrackKey, fadeOutMs?: number, fadeInMs?: number) => void) | null>(null);
 
     // Crossfade to a new track - MUST be defined before useEffects that reference it
     const fadeToTrack = useCallback(async (trackKey: TrackKey, fadeOutMs = 1000, fadeInMs = 1000) => {
@@ -632,17 +649,10 @@ export function MusicProvider({ children }: MusicProviderProps) {
         fadeToTrack(trackKey, 500, 500);
     }, [fadeToTrack]);
 
-    // Process pending track requests when audio gets unlocked
-    useEffect(() => {
-        if (audioUnlocked && pendingUnlockTrackRef.current) {
-            const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
-            pendingUnlockTrackRef.current = null;
-            // Small delay to ensure AudioContext is fully resumed
-            setTimeout(() => {
-                fadeToTrack(trackKey, fadeOutMs, fadeInMs);
-            }, 50);
-        }
-    }, [audioUnlocked, fadeToTrack]);
+    // NOTE: Pending track processing is now handled in two places:
+    // 1. unlockAudio() - for explicit unlock via play buttons
+    // 2. handleFirstInteraction() - for auto-unlock via any user interaction
+    // Both use the same 100ms delay pattern to ensure AudioContext is ready.
 
     // Stop music with fade out
     const stopMusic = useCallback((fadeOutMs = 1000) => {
