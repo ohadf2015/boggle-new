@@ -120,14 +120,17 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       setUnclaimedCount(data.count || 0);
       setCachedCount(data.count || 0);
     } catch (err) {
+      // Serialize error message properly for logging (Error objects don't stringify well)
+      const errorMessage = err instanceof Error ? err.message : String(err);
+
       // Network errors are common on mobile - use warn instead of error to reduce noise
-      const isNetworkError = err instanceof TypeError && err.message.includes('fetch');
+      const isNetworkError = err instanceof TypeError && errorMessage.includes('fetch');
       if (isNetworkError) {
         console.warn('[Gifts] Network error fetching unclaimed count - will retry on next poll');
       } else {
-        console.error('[Gifts] Error fetching unclaimed gifts:', err);
+        console.error('[Gifts] Error fetching unclaimed gifts:', errorMessage);
       }
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -179,14 +182,17 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       setUnclaimedCount(unclaimed);
       setCachedCount(unclaimed);
     } catch (err) {
+      // Serialize error message properly for logging (Error objects don't stringify well)
+      const errorMessage = err instanceof Error ? err.message : String(err);
+
       // Network errors are common on mobile - use warn instead of error to reduce noise
-      const isNetworkError = err instanceof TypeError && err.message.includes('fetch');
+      const isNetworkError = err instanceof TypeError && errorMessage.includes('fetch');
       if (isNetworkError) {
         console.warn('[Gifts] Network error fetching gifts - will retry on refresh');
       } else {
-        console.error('[Gifts] Error fetching gifts:', err);
+        console.error('[Gifts] Error fetching gifts:', errorMessage);
       }
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

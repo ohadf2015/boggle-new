@@ -29,7 +29,6 @@ import {
   clearWordHuntResultForRetry,
   getGuestFingerprint,
   mapServerResultToStoredResult,
-  GAME_LANGUAGE_KEY,
   getWordHuntTutorialKey,
   getWordHuntResultKey,
   type WordHuntResult,
@@ -63,32 +62,15 @@ const DailyChallenge: React.FC = () => {
   const { unlockAudio } = useMusic();
   const searchParams = useSearchParams();
 
-  // Game language state - separate from UI language
+  // Game language state - defaults to UI language
   // This controls only the puzzle/dictionary language, not the UI
   // User can switch languages via the dropdown during the session
-  // Initialize with URL locale to avoid hydration mismatch (localStorage is read in useEffect)
+  // Always defaults to UI language - player can change it but it won't persist across sessions
   const urlLocale = language as Language;
   const defaultLanguage = urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
     ? urlLocale
     : 'en';
   const [gameLanguage, setGameLanguage] = useState<Language>(defaultLanguage);
-  const [isLanguageInitialized, setIsLanguageInitialized] = useState(false);
-
-  // Load saved game language from localStorage after mount (avoids hydration mismatch)
-  useEffect(() => {
-    const saved = localStorage.getItem(GAME_LANGUAGE_KEY);
-    if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
-      setGameLanguage(saved as Language);
-    }
-    setIsLanguageInitialized(true);
-  }, []);
-
-  // Persist game language to localStorage (only after initial load to avoid overwriting saved value)
-  useEffect(() => {
-    if (isLanguageInitialized) {
-      localStorage.setItem(GAME_LANGUAGE_KEY, gameLanguage);
-    }
-  }, [gameLanguage, isLanguageInitialized]);
 
   // Get current language flag
   const getCurrentFlag = (lang: Language) => {

@@ -235,10 +235,9 @@ export function useAdventureMusic({
         }
       },
       onend: () => {
-        // Manual loop with crossfade
-        if (!windowFocusedRef.current || document.visibilityState === 'hidden') {
-          return;
-        }
+        // Manual loop with crossfade - always loop in adventure mode
+        // Focus/visibility checks removed to ensure continuous background music
+        // The isPaused and enabled checks below handle appropriate pausing
 
         // Check if this track is still the current track
         const isTrack1 = track1Ref.current === howl;

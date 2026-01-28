@@ -73,21 +73,39 @@ export async function initializeNativeOAuth(): Promise<boolean> {
     const socialLoginModule = await import('@capgo/capacitor-social-login');
     SocialLogin = socialLoginModule.SocialLogin;
 
-    // Initialize with providers
+    // Build provider config based on platform
     // Note: Use 'online' mode to get idToken directly, which is needed for signInWithIdToken
     // 'offline' mode returns serverAuthCode instead, which requires server-side token exchange
-    await SocialLogin.initialize({
+    // Apple Sign-In is only supported on iOS - Android requires a redirectUrl that we don't have
+    const providerConfig: { google: { webClientId: string; mode: 'online' }; apple?: Record<string, never> } = {
       google: {
         webClientId: config.google.webClientId,
         mode: 'online'  // Returns idToken and accessToken directly
       },
-      apple: {}  // No config needed for iOS
-    });
+    };
+
+    // Only add Apple config on iOS - on Android it throws "redirectUrl is null or empty" error
+    if (isIOS()) {
+      providerConfig.apple = {};  // No config needed for iOS
+    }
+
+    await SocialLogin.initialize(providerConfig);
 
     socialLoginInitialized = true;
     logger.log('[NativeOAuth] Successfully initialized');
     return true;
   } catch (error) {
+    // Handle expected errors gracefully without reporting to Sentry
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Android Apple redirect URL error is expected - Apple Sign-In isn't configured for Android
+    if (errorMessage.includes('redirectUrl is null or empty') || errorMessage.includes('apple.android')) {
+      logger.warn('[NativeOAuth] Apple Sign-In not configured for Android (expected) - Google Sign-In still available');
+      // Still mark as initialized - Google Sign-In should work
+      socialLoginInitialized = true;
+      return true;
+    }
+
     logger.error('[NativeOAuth] Failed to initialize:', error);
     return false;
   }

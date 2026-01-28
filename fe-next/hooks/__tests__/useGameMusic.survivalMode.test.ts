@@ -14,14 +14,21 @@ describe('useGameMusic - Survival Mode (fire-round)', () => {
   const mockFadeToTrack = jest.fn();
   const mockPlayTrack = jest.fn();
 
-  const mockTracks = {
+  const mockTracks: {
+    LOBBY: 'lobby';
+    BEFORE_GAME: 'beforeGame';
+    IN_GAME: 'inGame';
+    ALMOST_OUT_OF_TIME: 'almostOutOfTime';
+    BOSSA_ARCADE: 'bossaArcade';
+    BOSSA: 'bossa';
+  } = {
     LOBBY: 'lobby',
     BEFORE_GAME: 'beforeGame',
     IN_GAME: 'inGame',
     ALMOST_OUT_OF_TIME: 'almostOutOfTime',
     BOSSA_ARCADE: 'bossaArcade',
     BOSSA: 'bossa',
-  } as const;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();

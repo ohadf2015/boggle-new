@@ -310,4 +310,161 @@ describe('useAdventureMusic', () => {
       expect(mockPlay).not.toHaveBeenCalled();
     });
   });
+
+  describe('continuous looping', () => {
+    it('loops music when track ends in adventure mode', () => {
+      // GIVEN - capture onend callback from Howl
+      const { Howl } = require('howler');
+      let capturedOnEnd: (() => void) | undefined;
+
+      Howl.mockImplementation((config: { onend?: () => void }) => {
+        if (config.onend) {
+          capturedOnEnd = config.onend;
+        }
+        return mockHowlInstance;
+      });
+
+      renderHook(() =>
+        useAdventureMusic({
+          ...defaultProps,
+          isPlaying: true,
+          enabled: true,
+        })
+      );
+
+      // Track starts playing
+      expect(mockPlay).toHaveBeenCalled();
+      mockPlay.mockClear();
+      mockSeek.mockClear();
+      mockFade.mockClear();
+
+      // WHEN - track ends (simulate onend callback)
+      expect(capturedOnEnd).toBeDefined();
+      act(() => {
+        capturedOnEnd!();
+      });
+
+      // THEN - should loop: seek to 0, play again, fade in
+      expect(mockSeek).toHaveBeenCalledWith(0);
+      expect(mockPlay).toHaveBeenCalled();
+      expect(mockFade).toHaveBeenCalled();
+    });
+
+    it('continues looping even when window was briefly unfocused', () => {
+      // GIVEN - capture onend callback
+      const { Howl } = require('howler');
+      let capturedOnEnd: (() => void) | undefined;
+
+      Howl.mockImplementation((config: { onend?: () => void }) => {
+        if (config.onend) {
+          capturedOnEnd = config.onend;
+        }
+        return mockHowlInstance;
+      });
+
+      renderHook(() =>
+        useAdventureMusic({
+          worldNumber: 1,
+          isPlaying: true,
+          isPaused: false,
+          timeRemaining: 0,
+          totalTime: 0,
+          enabled: true,
+        })
+      );
+
+      mockPlay.mockClear();
+      mockSeek.mockClear();
+      mockFade.mockClear();
+
+      // WHEN - track ends (even if window focus state varies)
+      expect(capturedOnEnd).toBeDefined();
+      act(() => {
+        capturedOnEnd!();
+      });
+
+      // THEN - should ALWAYS loop in adventure mode
+      // Music should restart regardless of window focus state
+      expect(mockSeek).toHaveBeenCalledWith(0);
+      expect(mockPlay).toHaveBeenCalled();
+    });
+
+    it('does NOT loop when music is disabled', () => {
+      // GIVEN
+      const { Howl } = require('howler');
+      let capturedOnEnd: (() => void) | undefined;
+
+      Howl.mockImplementation((config: { onend?: () => void }) => {
+        if (config.onend) {
+          capturedOnEnd = config.onend;
+        }
+        return mockHowlInstance;
+      });
+
+      const { rerender } = renderHook(
+        ({ enabled }) =>
+          useAdventureMusic({
+            ...defaultProps,
+            isPlaying: true,
+            enabled,
+          }),
+        { initialProps: { enabled: true } }
+      );
+
+      // Disable music
+      rerender({ enabled: false });
+
+      mockPlay.mockClear();
+      mockSeek.mockClear();
+
+      // WHEN - track ends while disabled
+      expect(capturedOnEnd).toBeDefined();
+      act(() => {
+        capturedOnEnd!();
+      });
+
+      // THEN - should NOT loop
+      expect(mockSeek).not.toHaveBeenCalled();
+      expect(mockPlay).not.toHaveBeenCalled();
+    });
+
+    it('does NOT loop when game is paused', () => {
+      // GIVEN
+      const { Howl } = require('howler');
+      let capturedOnEnd: (() => void) | undefined;
+
+      Howl.mockImplementation((config: { onend?: () => void }) => {
+        if (config.onend) {
+          capturedOnEnd = config.onend;
+        }
+        return mockHowlInstance;
+      });
+
+      const { rerender } = renderHook(
+        ({ isPaused }) =>
+          useAdventureMusic({
+            ...defaultProps,
+            isPlaying: true,
+            isPaused,
+          }),
+        { initialProps: { isPaused: false } }
+      );
+
+      // Pause game
+      rerender({ isPaused: true });
+
+      mockPlay.mockClear();
+      mockSeek.mockClear();
+
+      // WHEN - track ends while paused
+      expect(capturedOnEnd).toBeDefined();
+      act(() => {
+        capturedOnEnd!();
+      });
+
+      // THEN - should NOT loop when paused
+      expect(mockSeek).not.toHaveBeenCalled();
+      expect(mockPlay).not.toHaveBeenCalled();
+    });
+  });
 });

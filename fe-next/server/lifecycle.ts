@@ -42,14 +42,14 @@ export async function initializeServer(io: Server): Promise<void> {
     console.error('Failed to restore tournaments:', error);
   }
 
-  // Load English dictionary on startup (most common language)
-  // Other languages will be lazy-loaded on first use for ~60% memory savings
+  // Load ALL dictionaries on startup to prevent race conditions and delays during gameplay
+  // Memory cost is ~10-15MB for all 5 languages, but eliminates latency issues
   try {
-    console.log('[STARTUP] Loading English dictionary (lazy loading enabled for other languages)...');
-    await dictionary.loadEnglishOnly();
-    console.log('[STARTUP] English dictionary loaded - other languages will be lazy-loaded on demand');
+    console.log('[STARTUP] Loading all dictionaries (en, he, sv, ja, es)...');
+    await dictionary.load();
+    console.log('[STARTUP] All dictionaries loaded successfully');
   } catch (error) {
-    console.error('Failed to load dictionary:', error);
+    console.error('Failed to load dictionaries:', error);
   }
 
   // Warm up worker pool

@@ -737,7 +737,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
-                        <main id="main-content" className="screen-fit-content relative z-10 overflow-visible pb-16 sm:pb-0" tabIndex={-1}>
+                        <main id="main-content" className="relative z-10 overflow-visible pb-16 sm:pb-0" tabIndex={-1}>
                             {children}
                         </main>
                         <AutoHideFooter className="hidden sm:block relative z-10 flex-shrink-0" />
