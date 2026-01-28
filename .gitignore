@@ -36,3 +36,4 @@ coverage/
 **/*.mov
 /test-screenshots
 /screenshots
+fe-next/app-debug.apk
