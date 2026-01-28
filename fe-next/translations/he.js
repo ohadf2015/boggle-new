@@ -4634,6 +4634,55 @@ const he = {
       "conflictResolved": "Progress updated from cloud"
     }
   },
+  "notifications": {
+    "title": "התראות",
+    "empty": "אין התראות עדיין",
+    "emptyDesc": "כשתקבלו התראות, הן יופיעו כאן",
+    "markAllRead": "סמן הכל כנקרא",
+    "markAsRead": "סמן כנקרא",
+    "viewAll": "הצג הכל",
+    "newNotification": "התראה חדשה",
+    "justNow": "עכשיו",
+    "minutesAgo": "לפני דקה",
+    "minutesAgoPlural": "לפני {count} דקות",
+    "hoursAgo": "לפני שעה",
+    "hoursAgoPlural": "לפני {count} שעות",
+    "daysAgo": "לפני יום",
+    "daysAgoPlural": "לפני {count} ימים",
+    "view": "צפה",
+    "dismiss": "סגור",
+    "types": {
+      "gift": "מתנה",
+      "system": "מערכת",
+      "achievement": "הישג",
+      "social": "חברתי",
+      "marketing": "חדשות"
+    },
+    "gift": {
+      "title": "קיבלת מתנה!",
+      "body": "{sender} שלח לך {xp} XP ו-{coins} מטבעות!"
+    },
+    "admin": {
+      "sendTitle": "שלח התראה",
+      "selectPlayers": "בחר נמענים",
+      "chooseType": "בחר סוג",
+      "writeMessage": "כתוב הודעה",
+      "preview": "תצוגה מקדימה",
+      "send": "שלח",
+      "sending": "שולח...",
+      "sent": "ההתראה נשלחה!",
+      "recipients": "נמענים",
+      "type": "סוג",
+      "sendingTo": "שולח אל",
+      "titleLabel": "כותרת",
+      "titlePlaceholder": "כותרת ההתראה...",
+      "bodyLabel": "הודעה",
+      "bodyPlaceholder": "תוכן ההתראה...",
+      "actionUrlLabel": "קישור פעולה",
+      "sendSuccess": "ההתראה נשלחה בהצלחה!",
+      "sendError": "שליחת ההתראה נכשלה. נסה שוב."
+    }
+  },
   "native": {
     "offline": {
       "title": "אין חיבור",

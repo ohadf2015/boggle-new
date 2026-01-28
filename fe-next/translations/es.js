@@ -4648,6 +4648,55 @@ const es = {
       "conflictResolved": "Progress updated from cloud"
     }
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "Sin notificaciones aún",
+    "emptyDesc": "Cuando recibas notificaciones, aparecerán aquí",
+    "markAllRead": "Marcar todo como leído",
+    "markAsRead": "Marcar como leído",
+    "viewAll": "Ver todo",
+    "newNotification": "Nueva notificación",
+    "justNow": "Ahora mismo",
+    "minutesAgo": "Hace {count} minuto",
+    "minutesAgoPlural": "Hace {count} minutos",
+    "hoursAgo": "Hace {count} hora",
+    "hoursAgoPlural": "Hace {count} horas",
+    "daysAgo": "Hace {count} día",
+    "daysAgoPlural": "Hace {count} días",
+    "view": "Ver",
+    "dismiss": "Descartar",
+    "types": {
+      "gift": "Regalo",
+      "system": "Sistema",
+      "achievement": "Logro",
+      "social": "Social",
+      "marketing": "Noticias"
+    },
+    "gift": {
+      "title": "¡Recibiste un regalo!",
+      "body": "{sender} te envió {xp} XP y {coins} monedas!"
+    },
+    "admin": {
+      "sendTitle": "Enviar Notificación",
+      "selectPlayers": "Seleccionar Destinatarios",
+      "chooseType": "Elegir Tipo",
+      "writeMessage": "Escribir Mensaje",
+      "preview": "Vista Previa",
+      "send": "Enviar",
+      "sending": "Enviando...",
+      "sent": "¡Notificación Enviada!",
+      "recipients": "Destinatarios",
+      "type": "Tipo",
+      "sendingTo": "Enviando a",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Título de la notificación...",
+      "bodyLabel": "Mensaje",
+      "bodyPlaceholder": "Mensaje de la notificación...",
+      "actionUrlLabel": "URL de Acción",
+      "sendSuccess": "¡Notificación enviada con éxito!",
+      "sendError": "Error al enviar notificación. Intenta de nuevo."
+    }
+  },
   "native": {
     "offline": {
       "title": "Sin Conexión",

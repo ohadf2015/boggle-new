@@ -4659,6 +4659,55 @@ const sv = {
       "conflictResolved": "Progress updated from cloud"
     }
   },
+  "notifications": {
+    "title": "Aviseringar",
+    "empty": "Inga aviseringar än",
+    "emptyDesc": "När du får aviseringar visas de här",
+    "markAllRead": "Markera alla som lästa",
+    "markAsRead": "Markera som läst",
+    "viewAll": "Visa alla",
+    "newNotification": "Ny avisering",
+    "justNow": "Just nu",
+    "minutesAgo": "{count} minut sedan",
+    "minutesAgoPlural": "{count} minuter sedan",
+    "hoursAgo": "{count} timme sedan",
+    "hoursAgoPlural": "{count} timmar sedan",
+    "daysAgo": "{count} dag sedan",
+    "daysAgoPlural": "{count} dagar sedan",
+    "view": "Visa",
+    "dismiss": "Avfärda",
+    "types": {
+      "gift": "Gåva",
+      "system": "System",
+      "achievement": "Prestation",
+      "social": "Socialt",
+      "marketing": "Nyheter"
+    },
+    "gift": {
+      "title": "Du fick en gåva!",
+      "body": "{sender} skickade dig {xp} XP och {coins} mynt!"
+    },
+    "admin": {
+      "sendTitle": "Skicka avisering",
+      "selectPlayers": "Välj mottagare",
+      "chooseType": "Välj typ",
+      "writeMessage": "Skriv meddelande",
+      "preview": "Förhandsgranska",
+      "send": "Skicka",
+      "sending": "Skickar...",
+      "sent": "Avisering skickad!",
+      "recipients": "Mottagare",
+      "type": "Typ",
+      "sendingTo": "Skickar till",
+      "titleLabel": "Titel",
+      "titlePlaceholder": "Aviseringstitel...",
+      "bodyLabel": "Meddelande",
+      "bodyPlaceholder": "Aviseringsmeddelande...",
+      "actionUrlLabel": "Åtgärds-URL",
+      "sendSuccess": "Avisering skickad!",
+      "sendError": "Misslyckades med att skicka avisering. Försök igen."
+    }
+  },
   "native": {
     "offline": {
       "title": "Ingen anslutning",

@@ -4659,6 +4659,55 @@ const ja = {
       "conflictResolved": "Progress updated from cloud"
     }
   },
+  "notifications": {
+    "title": "通知",
+    "empty": "通知はまだありません",
+    "emptyDesc": "通知を受け取ると、ここに表示されます",
+    "markAllRead": "すべて既読にする",
+    "markAsRead": "既読にする",
+    "viewAll": "すべて表示",
+    "newNotification": "新しい通知",
+    "justNow": "たった今",
+    "minutesAgo": "{count}分前",
+    "minutesAgoPlural": "{count}分前",
+    "hoursAgo": "{count}時間前",
+    "hoursAgoPlural": "{count}時間前",
+    "daysAgo": "{count}日前",
+    "daysAgoPlural": "{count}日前",
+    "view": "表示",
+    "dismiss": "閉じる",
+    "types": {
+      "gift": "ギフト",
+      "system": "システム",
+      "achievement": "実績",
+      "social": "ソーシャル",
+      "marketing": "ニュース"
+    },
+    "gift": {
+      "title": "ギフトを受け取りました！",
+      "body": "{sender}から{xp} XPと{coins}コインが届きました！"
+    },
+    "admin": {
+      "sendTitle": "通知を送信",
+      "selectPlayers": "受信者を選択",
+      "chooseType": "タイプを選択",
+      "writeMessage": "メッセージを書く",
+      "preview": "プレビュー",
+      "send": "送信",
+      "sending": "送信中...",
+      "sent": "通知が送信されました！",
+      "recipients": "受信者",
+      "type": "タイプ",
+      "sendingTo": "送信先",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "通知タイトル...",
+      "bodyLabel": "メッセージ",
+      "bodyPlaceholder": "通知メッセージ...",
+      "actionUrlLabel": "アクションURL",
+      "sendSuccess": "通知が正常に送信されました！",
+      "sendError": "通知の送信に失敗しました。もう一度お試しください。"
+    }
+  },
   "native": {
     "offline": {
       "title": "接続なし",

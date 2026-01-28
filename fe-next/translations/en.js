@@ -4644,6 +4644,55 @@ const en = {
       "conflictResolved": "Progress updated from cloud"
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "emptyDesc": "When you receive notifications, they'll appear here",
+    "markAllRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "viewAll": "View All",
+    "newNotification": "New notification",
+    "justNow": "Just now",
+    "minutesAgo": "{count} minute ago",
+    "minutesAgoPlural": "{count} minutes ago",
+    "hoursAgo": "{count} hour ago",
+    "hoursAgoPlural": "{count} hours ago",
+    "daysAgo": "{count} day ago",
+    "daysAgoPlural": "{count} days ago",
+    "view": "View",
+    "dismiss": "Dismiss",
+    "types": {
+      "gift": "Gift",
+      "system": "System",
+      "achievement": "Achievement",
+      "social": "Social",
+      "marketing": "News"
+    },
+    "gift": {
+      "title": "You received a gift!",
+      "body": "{sender} sent you {xp} XP and {coins} coins!"
+    },
+    "admin": {
+      "sendTitle": "Send Notification",
+      "selectPlayers": "Select Recipients",
+      "chooseType": "Choose Type",
+      "writeMessage": "Write Message",
+      "preview": "Preview",
+      "send": "Send",
+      "sending": "Sending...",
+      "sent": "Notification Sent!",
+      "recipients": "Recipients",
+      "type": "Type",
+      "sendingTo": "Sending to",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Notification title...",
+      "bodyLabel": "Message",
+      "bodyPlaceholder": "Notification message...",
+      "actionUrlLabel": "Action URL",
+      "sendSuccess": "Notification sent successfully!",
+      "sendError": "Failed to send notification. Please try again."
+    }
+  },
   "native": {
     "offline": {
       "title": "No Connection",
