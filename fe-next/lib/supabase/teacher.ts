@@ -336,6 +336,60 @@ export async function joinClassroom(
 }
 
 /**
+ * Get student's classroom from their membership
+ *
+ * Returns the classroom the student is a member of, or null if not a member of any.
+ * If a student is a member of multiple classrooms, returns the most recently joined.
+ */
+export async function getStudentClassroom(
+  studentId: string
+): Promise<{ data: Classroom | null; error: { message: string } | null }> {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    // Query membership with joined classroom info, ordered by join date (most recent first)
+    const { data: membership, error: membershipError } = await supabase
+      .from('classroom_memberships')
+      .select(`
+        id,
+        classroom_id,
+        joined_at,
+        classrooms (
+          id,
+          teacher_id,
+          name,
+          join_code,
+          language,
+          created_at,
+          updated_at
+        )
+      `)
+      .eq('student_id', studentId)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (membershipError) {
+      logger.error('Error fetching student classroom:', membershipError);
+      return { data: null, error: { message: membershipError.message } };
+    }
+
+    if (!membership || !membership.classrooms) {
+      return { data: null, error: null };
+    }
+
+    // Extract classroom from the nested structure
+    const classroom = membership.classrooms as unknown as Classroom;
+
+    return { data: classroom, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getStudentClassroom:', error);
+    return { data: null, error: { message: error } };
+  }
+}
+
+/**
  * Get all students in a classroom with their profile information
  */
 export async function getClassroomStudents(

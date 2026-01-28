@@ -32,11 +32,29 @@ const FIELD_NAME_MAPPINGS: Record<string, string> = {
 /**
  * Normalize challenge field names from common AI variations
  * Maps fields like 'trending_topic' -> 'trend_topic', 'clue' -> 'prompt'
+ * Also flattens nested 'data' objects that some AI models produce
  */
 function normalizeChallengeFields(challenge: Record<string, unknown>): Record<string, unknown> {
   const normalized: Record<string, unknown> = {};
 
-  for (const [key, value] of Object.entries(challenge)) {
+  // First, flatten nested 'data' object if present
+  // Some AI models return: { type, prompt, data: { trend_topic, answer, ... } }
+  // We need to flatten this to: { type, prompt, trend_topic, answer, ... }
+  const flattenedChallenge: Record<string, unknown> = { ...challenge };
+  if (challenge.data && typeof challenge.data === 'object' && !Array.isArray(challenge.data)) {
+    const dataObj = challenge.data as Record<string, unknown>;
+    for (const [key, value] of Object.entries(dataObj)) {
+      // Only copy if the key doesn't already exist at the top level
+      if (!(key in flattenedChallenge)) {
+        flattenedChallenge[key] = value;
+      }
+    }
+    // Remove the data key after flattening
+    delete flattenedChallenge.data;
+  }
+
+  // Then apply field name normalization
+  for (const [key, value] of Object.entries(flattenedChallenge)) {
     const normalizedKey = FIELD_NAME_MAPPINGS[key] || key;
     // Don't overwrite if the correct field already exists
     if (!(normalizedKey in normalized)) {

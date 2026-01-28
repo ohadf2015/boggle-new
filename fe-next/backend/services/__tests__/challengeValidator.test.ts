@@ -296,7 +296,80 @@ describe('parseAIResponse - AI field name normalization', () => {
     });
   });
 
-  // Test case 6: Original correct field names still work
+  // Test case 6: AI returns nested data object structure
+  // This bug was discovered in production: AI returned { type, prompt, data: { trend_topic, answer, ... } }
+  it('should extract fields from nested data object', () => {
+    const aiResponse = JSON.stringify({
+      date: '2026-01-28',
+      language: 'he',
+      challenges: [
+        {
+          type: 'anagram',
+          prompt: 'פתרו: לארשי',
+          data: {
+            trend_topic: 'ישראל',
+            answer: 'ישראל',
+            difficulty: 'easy',
+            trending_context: 'ישראל בחדשות',
+          },
+        },
+        {
+          type: 'fill_blank',
+          prompt: 'השלימו: טכ_ _ _ _ _ _',
+          data: {
+            trend_topic: 'טכנולוגיה',
+            answer: 'טכנולוגיה',
+            difficulty: 'medium',
+            trending_context: 'חדשות טכנולוגיה',
+          },
+        },
+        {
+          type: 'riddle',
+          prompt: 'מה זה?',
+          data: {
+            trend_topic: 'ספורט',
+            answer: 'כדור',
+            difficulty: 'easy',
+            trending_context: 'ספורט',
+          },
+        },
+        {
+          type: 'anagram',
+          prompt: 'פתרו: הקיסומ',
+          data: {
+            trend_topic: 'מוסיקה',
+            answer: 'מוסיקה',
+            difficulty: 'easy',
+            trending_context: 'מוסיקה',
+          },
+        },
+        {
+          type: 'fill_blank',
+          prompt: 'השלימו: אומ_ _ _',
+          data: {
+            trend_topic: 'אומנות',
+            answer: 'אומנות',
+            difficulty: 'easy',
+            trending_context: 'אומנות',
+          },
+        },
+      ],
+    });
+
+    const result = parseAIResponse(aiResponse);
+
+    expect(result.challenges.length).toBe(5);
+    result.challenges.forEach((challenge) => {
+      expect(challenge.type).toBeDefined();
+      expect(challenge.trend_topic).toBeDefined();
+      expect(challenge.prompt).toBeDefined();
+      expect(challenge.answer).toBeDefined();
+      expect(challenge.difficulty).toBeDefined();
+      expect(challenge.trending_context).toBeDefined();
+    });
+  });
+
+  // Test case 7: Original correct field names still work
   it('should still work with correct field names', () => {
     const aiResponse = JSON.stringify({
       date: '2026-01-28',

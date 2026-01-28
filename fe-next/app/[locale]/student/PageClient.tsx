@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useStudentProgress } from '@/hooks/useStudentProgress';
+import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import Header from '@/components/Header';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
@@ -42,7 +42,7 @@ export default function StudentPageClient() {
   const router = useRouter();
   const isRTL = language === 'he';
   const [isChecking, setIsChecking] = useState(true);
-  const { lessons } = useStudentProgress();
+  const { classroomId } = useStudentClassroom();
 
   useEffect(() => {
     // Wait for auth to finish loading before checking authentication
@@ -71,9 +71,6 @@ export default function StudentPageClient() {
   if (!user) {
     return null;
   }
-
-  // Get classroom ID from first lesson (all lessons should have same classroom_id)
-  const classroomId = lessons.length > 0 ? lessons[0].classroomId : null;
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
