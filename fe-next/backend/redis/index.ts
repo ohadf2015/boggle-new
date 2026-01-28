@@ -84,3 +84,21 @@ export {
   releaseGameLock,
   withGameLock,
 } from './locking';
+
+// User profile caching
+export {
+  cacheUserProfile,
+  cacheUserProfiles,
+  getCachedUserProfile,
+  getCachedUserProfiles,
+  invalidateUserProfile,
+  invalidateUserProfiles,
+} from './userProfile';
+export type { CachedUserProfile } from './userProfile';
+
+// Friendship status caching
+export {
+  cacheFriendshipStatus,
+  getCachedFriendshipStatus,
+  invalidateFriendshipStatus,
+} from './friendship';

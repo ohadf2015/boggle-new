@@ -10,14 +10,26 @@ import type {
   Message,
   Challenge,
 } from '@/shared/types/friends';
+import {
+  getCachedFriendshipStatus,
+  cacheFriendshipStatus,
+  invalidateFriendshipStatus,
+} from '../redis';
 
 // ==================== Friend Management ====================
 
 /**
- * Check if two users are friends
+ * Check if two users are friends (with Redis caching)
  */
 export async function areFriends(userAId: string, userBId: string): Promise<boolean> {
   try {
+    // Check Redis cache first
+    const cached = await getCachedFriendshipStatus(userAId, userBId);
+    if (cached !== null) {
+      return cached;
+    }
+
+    // Cache miss - query database
     const supabase = getSupabase();
     if (!supabase) {
       logger.error('FRIENDS_MANAGER', 'Supabase client not available');
@@ -37,7 +49,12 @@ export async function areFriends(userAId: string, userBId: string): Promise<bool
       return false;
     }
 
-    return !!data;
+    const isFriends = !!data;
+
+    // Cache the result
+    await cacheFriendshipStatus(userAId, userBId, isFriends);
+
+    return isFriends;
   } catch (error) {
     logger.error('FRIENDS_MANAGER', `Exception checking friendship: ${(error as Error).message}`);
     return false;
@@ -169,6 +186,9 @@ export async function acceptFriendRequest(
       };
     }
 
+    // Invalidate friendship cache - they are now friends
+    await invalidateFriendshipStatus(request.user_id, acceptingUserId);
+
     return { success: true };
   } catch (error) {
     logger.error('FRIENDS_MANAGER', `Exception accepting friend request: ${(error as Error).message}`);
@@ -230,6 +250,9 @@ export async function unfriend(userId: string, friendUserId: string): Promise<{ 
       logger.error('FRIENDS_MANAGER', `Error unfriending user: ${error.message}`);
       return { success: false };
     }
+
+    // Invalidate friendship cache - they are no longer friends
+    await invalidateFriendshipStatus(userId, friendUserId);
 
     return { success: true };
   } catch (error) {

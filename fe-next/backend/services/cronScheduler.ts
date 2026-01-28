@@ -4,14 +4,19 @@ import { populateWikipediaWords } from './wikipediaWordPopulator';
 import type { Language } from '@/shared/types/game';
 
 /**
- * Daily Buzz Cron Scheduler
+ * Cron Scheduler
  *
- * Runs daily at 00:00 UTC to generate challenges for all supported languages
- * Wikipedia word population runs at 23:55 UTC (5 minutes before)
+ * Schedules:
+ * - Daily Buzz: 00:00 UTC daily - generates challenges for all languages
+ * - Wikipedia words: 23:55 UTC daily - populates word bank from Wikipedia
+ * - Daily word selector: 01:00 UTC daily - pre-selects target words for daily challenges
+ * - Bot difficulty calculator: 03:00 UTC weekly (Sunday) - adjusts bot behavior from player stats
+ *
  * Works with Railway, Heroku, or any Node.js hosting
  */
 
 const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
+const EDGE_FUNCTION_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 
 export function startDailyBuzzCron() {
   // Validate Google credentials on startup
@@ -205,4 +210,177 @@ export async function triggerWikipediaWordPopulation(
     success: allSuccess,
     results,
   };
+}
+
+/**
+ * Call Supabase Edge Function
+ * Helper to invoke Edge Functions from the backend
+ */
+async function callEdgeFunction(
+  functionName: string,
+  logPrefix: string
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error(`${logPrefix} Missing Supabase configuration`);
+    return { success: false, error: 'Missing Supabase configuration' };
+  }
+
+  try {
+    const edgeFunctionUrl = `${supabaseUrl}/functions/v1/${functionName}`;
+
+    const response = await fetch(edgeFunctionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseServiceKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`${logPrefix} Edge Function error:`, errorText);
+      return { success: false, error: errorText };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`${logPrefix} Failed to call Edge Function:`, errorMsg);
+    return { success: false, error: errorMsg };
+  }
+}
+
+/**
+ * Start Daily Word Selector cron
+ * Runs at 01:00 UTC daily to pre-generate target words for the next 7 days
+ */
+export function startDailyWordSelectorCron() {
+  const task = cron.schedule('0 1 * * *', async () => {
+    console.log('🎯 [CRON] Starting daily word selection...');
+    const startTime = Date.now();
+
+    const result = await callEdgeFunction('daily-word-selector', '🎯 [CRON]');
+
+    const duration = Date.now() - startTime;
+    if (result.success) {
+      const data = result.data as { summary?: { created: number; skipped: number } };
+      console.log(`✅ [CRON] Daily word selection complete in ${duration}ms`);
+      console.log(`📊 [CRON] Summary:`, data.summary);
+    } else {
+      console.error(`❌ [CRON] Daily word selection failed:`, result.error);
+    }
+  }, {
+    timezone: 'UTC',
+  });
+
+  console.log('✅ Daily word selector cron started (runs daily at 01:00 UTC)');
+  return task;
+}
+
+/**
+ * Start Bot Difficulty Calculator cron
+ * Runs at 03:00 UTC every Sunday to analyze player stats and adjust bot behavior
+ */
+export function startBotDifficultyCalculatorCron() {
+  // Run every Sunday at 03:00 UTC
+  // Cron pattern: '0 3 * * 0' = At 03:00 on Sunday
+  const task = cron.schedule('0 3 * * 0', async () => {
+    console.log('🤖 [CRON] Starting bot difficulty calculation...');
+    const startTime = Date.now();
+
+    const result = await callEdgeFunction('bot-difficulty-calculator', '🤖 [CRON]');
+
+    const duration = Date.now() - startTime;
+    if (result.success) {
+      const data = result.data as { summary?: { updated: number; fallback: number } };
+      console.log(`✅ [CRON] Bot difficulty calculation complete in ${duration}ms`);
+      console.log(`📊 [CRON] Summary:`, data.summary);
+    } else {
+      console.error(`❌ [CRON] Bot difficulty calculation failed:`, result.error);
+    }
+  }, {
+    timezone: 'UTC',
+  });
+
+  console.log('✅ Bot difficulty calculator cron started (runs weekly on Sunday at 03:00 UTC)');
+  return task;
+}
+
+/**
+ * Manual trigger for Daily Word Selector
+ * Used by admin dashboard
+ */
+export async function triggerDailyWordSelection(): Promise<{
+  success: boolean;
+  data?: unknown;
+  error?: string;
+  duration: number;
+}> {
+  console.log('🎯 [MANUAL] Starting manual daily word selection...');
+  const startTime = Date.now();
+
+  const result = await callEdgeFunction('daily-word-selector', '🎯 [MANUAL]');
+
+  const duration = Date.now() - startTime;
+  console.log(`✨ [MANUAL] Daily word selection complete in ${duration}ms`);
+
+  return { ...result, duration };
+}
+
+/**
+ * Manual trigger for Bot Difficulty Calculator
+ * Used by admin dashboard
+ */
+export async function triggerBotDifficultyCalculation(): Promise<{
+  success: boolean;
+  data?: unknown;
+  error?: string;
+  duration: number;
+}> {
+  console.log('🤖 [MANUAL] Starting manual bot difficulty calculation...');
+  const startTime = Date.now();
+
+  const result = await callEdgeFunction('bot-difficulty-calculator', '🤖 [MANUAL]');
+
+  const duration = Date.now() - startTime;
+  console.log(`✨ [MANUAL] Bot difficulty calculation complete in ${duration}ms`);
+
+  return { ...result, duration };
+}
+
+/**
+ * Start all cron jobs
+ * Called from server startup
+ */
+export function startAllCronJobs(): ScheduledTask[] {
+  const tasks: ScheduledTask[] = [];
+
+  // Daily Buzz generation (00:00 UTC)
+  tasks.push(startDailyBuzzCron());
+
+  // Wikipedia word population (23:55 UTC)
+  tasks.push(startWikipediaWordCron());
+
+  // Daily word selector (01:00 UTC)
+  tasks.push(startDailyWordSelectorCron());
+
+  // Bot difficulty calculator (03:00 UTC on Sundays)
+  tasks.push(startBotDifficultyCalculatorCron());
+
+  console.log(`✅ All ${tasks.length} cron jobs started`);
+  return tasks;
+}
+
+/**
+ * Stop all cron jobs (for graceful shutdown)
+ */
+export function stopAllCronJobs(tasks: ScheduledTask[]): void {
+  for (const task of tasks) {
+    task.stop();
+  }
+  console.log(`🛑 Stopped ${tasks.length} cron jobs`);
 }

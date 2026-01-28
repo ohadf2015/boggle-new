@@ -56,8 +56,8 @@ export function NotificationDropdown({
     <div
       ref={dropdownRef}
       className="
-        absolute top-full right-0 mt-2
-        w-80 max-h-96
+        absolute top-full end-0 mt-2
+        w-80 max-w-[calc(100vw-1rem)] max-h-96
         bg-neo-navy border-3 border-black rounded-lg
         shadow-hard-lg overflow-hidden
         z-50

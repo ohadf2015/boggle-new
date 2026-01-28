@@ -14,7 +14,7 @@ import { setEventLoopLag } from '../backend/utils/metrics';
 import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } from './redisAdapter';
 import { clearCleanupTimers } from './socketSetup';
 import * as gameStateManager from '../backend/modules/gameStateManager';
-import { startDailyBuzzCron, stopDailyBuzzCron } from '../backend/services/cronScheduler';
+import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronScheduler';
 import type { ScheduledTask } from 'node-cron';
 
 /**
@@ -23,9 +23,9 @@ import type { ScheduledTask } from 'node-cron';
 export type ShutdownHandler = () => Promise<void>;
 
 /**
- * Daily Buzz cron task (stored for cleanup)
+ * Cron tasks (stored for cleanup)
  */
-let dailyBuzzCronTask: ScheduledTask | null = null;
+let cronTasks: ScheduledTask[] = [];
 
 /**
  * Initialize all server components
@@ -61,13 +61,13 @@ export async function initializeServer(io: Server): Promise<void> {
     console.warn('[WORKER POOL] Failed to warm up:', errorMessage);
   }
 
-  // Start Daily Buzz cron scheduler
+  // Start all cron schedulers (Daily Buzz, Wikipedia, Daily Words, Bot Difficulty)
   try {
-    dailyBuzzCronTask = startDailyBuzzCron();
-    console.log('[STARTUP] Daily Buzz cron scheduler started');
+    cronTasks = startAllCronJobs();
+    console.log(`[STARTUP] Started ${cronTasks.length} cron schedulers`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[STARTUP] Failed to start Daily Buzz cron:', errorMessage);
+    console.error('[STARTUP] Failed to start cron schedulers:', errorMessage);
   }
 }
 
@@ -152,15 +152,15 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
       console.error('[SHUTDOWN] Error closing worker pool:', errorMessage);
     }
 
-    // Stop Daily Buzz cron scheduler
+    // Stop all cron schedulers
     try {
-      if (dailyBuzzCronTask) {
-        stopDailyBuzzCron(dailyBuzzCronTask);
-        console.log('[SHUTDOWN] Daily Buzz cron scheduler stopped');
+      if (cronTasks.length > 0) {
+        stopAllCronJobs(cronTasks);
+        console.log(`[SHUTDOWN] Stopped ${cronTasks.length} cron schedulers`);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('[SHUTDOWN] Error stopping Daily Buzz cron:', errorMessage);
+      console.error('[SHUTDOWN] Error stopping cron schedulers:', errorMessage);
     }
 
     // Close socket connections

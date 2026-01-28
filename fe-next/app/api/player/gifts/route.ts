@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
@@ -31,7 +31,12 @@ interface GiftMessage {
 
 /**
  * GET /api/player/gifts
- * Get player's gift messages (unclaimed first)
+ * Get player's gift messages (unclaimed and not dismissed)
+ *
+ * Only returns gifts that:
+ * 1. Are not claimed (claimed = false)
+ * 2. Were created AFTER the user's gift_modal_dismissed_at timestamp (if set)
+ *    This ensures dismissed gifts don't appear in the gift list/badge
  */
 export async function GET() {
   try {
@@ -46,7 +51,15 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: gifts, error: giftsError } = await supabase
+    // Get user's profile to check gift_modal_dismissed_at
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('gift_modal_dismissed_at')
+      .eq('id', user.id)
+      .single();
+
+    // Build the query - filter by claimed status and dismissal timestamp
+    let query = supabase
       .from('admin_gift_messages')
       .select(`
         id,
@@ -64,7 +77,14 @@ export async function GET() {
         sender:profiles!admin_gift_messages_sender_id_fkey(username, display_name)
       `)
       .eq('recipient_id', user.id)
-      .eq('claimed', false) // FIX: Only fetch unclaimed gifts
+      .eq('claimed', false);
+
+    // If user has dismissed the modal, only return gifts created AFTER that time
+    if (profile?.gift_modal_dismissed_at) {
+      query = query.gt('created_at', profile.gift_modal_dismissed_at);
+    }
+
+    const { data: gifts, error: giftsError } = await query
       .order('created_at', { ascending: false });
 
     if (giftsError) {

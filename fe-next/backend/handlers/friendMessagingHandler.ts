@@ -10,6 +10,11 @@ import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
 import { cleanProfanity } from '../utils/profanityFilter';
+import {
+  getCachedUserProfile,
+  cacheUserProfile,
+  type CachedUserProfile,
+} from '../redis';
 
 // Rate limit weights
 const RATE_WEIGHTS = {
@@ -52,10 +57,25 @@ function broadcastToUser(io: Server, authUserId: string, event: string, data: an
 }
 
 /**
- * Get user profile by ID
+ * Get user profile by ID (with Redis caching)
  */
 async function getUserProfile(userId: string) {
   try {
+    // Check Redis cache first
+    const cached = await getCachedUserProfile(userId);
+    if (cached) {
+      return {
+        username: cached.username,
+        displayName: cached.displayName,
+        avatar: {
+          emoji: cached.avatarEmoji,
+          color: cached.avatarColor,
+          image: cached.avatarImage,
+        },
+      };
+    }
+
+    // Cache miss - fetch from database
     const supabase = getSupabase();
     if (!supabase) {
       logger.error('MESSAGING_HANDLER', 'Supabase client not available');
@@ -69,6 +89,17 @@ async function getUserProfile(userId: string) {
       .single();
 
     if (!data) return null;
+
+    // Cache the profile for future requests
+    const profileToCache: CachedUserProfile = {
+      userId,
+      username: data.username,
+      displayName: data.display_name,
+      avatarEmoji: data.avatar_emoji || '👤',
+      avatarColor: data.avatar_color || '#808080',
+      avatarImage: data.avatar_image,
+    };
+    await cacheUserProfile(profileToCache);
 
     return {
       username: data.username,

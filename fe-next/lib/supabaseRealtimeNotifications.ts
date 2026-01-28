@@ -62,11 +62,15 @@ export function subscribeToNotifications(
         onNewNotification(notification);
       }
     )
-    .subscribe((status) => {
+    .subscribe((status, err) => {
       if (status === 'SUBSCRIBED') {
         console.log('Subscribed to notifications channel');
       } else if (status === 'CHANNEL_ERROR') {
-        console.error('Error subscribing to notifications channel');
+        // Log the actual error for debugging - Supabase passes error as second param
+        const errorMessage = err instanceof Error ? err.message : (err ? String(err) : 'Unknown channel error');
+        console.error('Error subscribing to notifications channel:', errorMessage);
+      } else if (status === 'TIMED_OUT') {
+        console.warn('Notifications channel subscription timed out - will retry');
       }
     });
 
@@ -145,7 +149,9 @@ export async function fetchNotifications(options: {
       total: data.pagination?.total || 0,
     };
   } catch (error) {
-    console.error('Error fetching notifications:', error);
+    // Serialize error properly for Sentry - Error objects don't stringify well
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error fetching notifications:', errorMessage);
     return { notifications: [], unreadCount: 0, total: 0 };
   }
 }

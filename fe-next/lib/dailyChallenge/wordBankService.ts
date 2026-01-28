@@ -729,6 +729,47 @@ async function addToCommunityWords(
 }
 
 /**
+ * Batch add words to community_words table for game validation
+ * Uses upsert for efficient bulk operations
+ */
+async function batchAddToCommunityWords(
+  supabase: SupabaseClient,
+  words: Array<{ word: string; language: string }>
+): Promise<{ added: number; errors: number }> {
+  if (words.length === 0) {
+    return { added: 0, errors: 0 };
+  }
+
+  const now = new Date().toISOString();
+
+  // Prepare batch data with normalized words
+  const batchData = words.map(({ word, language }) => ({
+    word: word.toLowerCase().trim(),
+    language,
+    approval_count: 1,
+    first_approved_at: now,
+    last_approved_at: now,
+  }));
+
+  // Use upsert to handle both inserts and updates in one operation
+  // On conflict: update last_approved_at (approval_count handled by DB trigger)
+  const { error } = await supabase
+    .from('community_words')
+    .upsert(batchData, {
+      onConflict: 'word,language',
+      ignoreDuplicates: false, // Update existing records
+    });
+
+  if (error) {
+    console.error('Error batch inserting into community_words:', error.message);
+    return { added: 0, errors: words.length };
+  }
+
+  console.log(`[WordBank] Batch added ${words.length} words to community_words`);
+  return { added: words.length, errors: 0 };
+}
+
+/**
  * Bulk update validation status for multiple words
  * When approving, also adds all words to community_words for game validation
  */
@@ -778,12 +819,10 @@ export async function bulkUpdateValidationStatus(
   } else {
     affected = data || wordIds.length;
 
-    // RPC succeeded - now add approved words to community_words
+    // RPC succeeded - now add approved words to community_words using batch insert
     if (validationStatus === 'approved' && wordsToAddToCommunity.length > 0) {
-      console.log(`[WordBank] Adding ${wordsToAddToCommunity.length} bulk-approved words to community_words`);
-      for (const { word, language } of wordsToAddToCommunity) {
-        await addToCommunityWords(supabase, word, language);
-      }
+      console.log(`[WordBank] Batch adding ${wordsToAddToCommunity.length} bulk-approved words to community_words`);
+      await batchAddToCommunityWords(supabase, wordsToAddToCommunity);
     }
   }
 

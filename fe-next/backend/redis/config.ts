@@ -12,6 +12,8 @@ export const TTL_CONFIG = {
   LEADERBOARD_USER: 120,                                                // 2 minutes (was 1 minute)
   DAILY_PUZZLE: parseInt(process.env.REDIS_DAILY_PUZZLE_TTL || '86400'),
   DAILY_LEADERBOARD: parseInt(process.env.REDIS_DAILY_LEADERBOARD_TTL || '60'),
+  USER_PROFILE: 300,                                                    // 5 minutes - balances freshness with DB load
+  FRIENDSHIP_STATUS: 120,                                               // 2 minutes - changes via accept/decline
 };
 
 // Performance Configuration

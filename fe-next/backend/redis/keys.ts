@@ -26,6 +26,15 @@ export const KEYS = {
 
   dailyLeaderboard: (date: string, language: string, limit: number): string =>
     `${REDIS_PREFIX}:${REDIS_VERSION}:daily:lb:${language}:${date}:${limit}`,
+
+  userProfile: (userId: string): string =>
+    `${REDIS_PREFIX}:${REDIS_VERSION}:profile:${userId}`,
+
+  friendshipStatus: (userA: string, userB: string): string => {
+    // Sort user IDs to ensure consistent key regardless of query order
+    const [id1, id2] = [userA, userB].sort();
+    return `${REDIS_PREFIX}:${REDIS_VERSION}:friends:${id1}:${id2}`;
+  },
 };
 
 /**
