@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { User, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useRouter } from 'next/navigation';
@@ -95,14 +95,23 @@ export default function ProfilePageClient(): React.JSX.Element {
 
   const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50; // Minimum drag distance to trigger navigation
+    const isRtl = language === 'he'; // Hebrew is RTL
 
     if (Math.abs(info.offset.x) > threshold) {
       if (info.offset.x > 0) {
-        // Dragged right (go to previous section)
-        goToPrevSection();
+        // Dragged right: In LTR = previous, In RTL = next
+        if (isRtl) {
+          goToNextSection();
+        } else {
+          goToPrevSection();
+        }
       } else {
-        // Dragged left (go to next section)
-        goToNextSection();
+        // Dragged left: In LTR = next, In RTL = previous
+        if (isRtl) {
+          goToPrevSection();
+        } else {
+          goToNextSection();
+        }
       }
     }
   };
@@ -241,23 +250,23 @@ export default function ProfilePageClient(): React.JSX.Element {
 
         {/* NOTE: Do NOT use overflow-y-auto here - scroll propagates to body's screen-fit */}
         <div className="flex-1 min-h-0 relative">
-          {/* Swipe indicator - left side */}
+          {/* Swipe indicator - left side (use logical start for RTL support) */}
           {currentIndex > 0 && (
             <div
-              className="absolute left-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-r from-neo-navy/60 to-transparent flex items-center justify-start ps-1"
+              className="absolute start-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-r rtl:bg-gradient-to-l from-neo-navy/60 to-transparent flex items-center justify-start ps-1"
               aria-hidden="true"
             >
-              <ChevronLeft className="w-4 h-4 text-neo-yellow/60" />
+              <ChevronLeft className="w-4 h-4 text-neo-yellow/60 rtl:rotate-180" />
             </div>
           )}
 
-          {/* Swipe indicator - right side */}
+          {/* Swipe indicator - right side (use logical end for RTL support) */}
           {currentIndex < sections.length - 1 && (
             <div
-              className="absolute right-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-l from-neo-navy/60 to-transparent flex items-center justify-end pe-1"
+              className="absolute end-0 top-0 bottom-0 w-6 z-10 pointer-events-none bg-gradient-to-l rtl:bg-gradient-to-r from-neo-navy/60 to-transparent flex items-center justify-end pe-1"
               aria-hidden="true"
             >
-              <ChevronRight className="w-4 h-4 text-neo-yellow/60" />
+              <ChevronRight className="w-4 h-4 text-neo-yellow/60 rtl:rotate-180" />
             </div>
           )}
 
@@ -328,44 +337,6 @@ export default function ProfilePageClient(): React.JSX.Element {
             )}
           </AnimatePresence>
 
-            {/* Navigation arrows at bottom - fully visible (no opacity) */}
-            {currentIndex > 0 && (
-              <button
-                onClick={goToPrevSection}
-                className={cn(
-                  'fixed start-2 bottom-20 z-10',
-                  'w-10 h-10 rounded-full',
-                  'bg-neo-navy border-2 border-neo-yellow',
-                  'flex items-center justify-center',
-                  'text-neo-yellow',
-                  'shadow-hard-sm',
-                  'active:translate-y-0.5 active:shadow-hard-pressed',
-                  'transition-all'
-                )}
-                aria-label="Previous section"
-              >
-                <ChevronLeft className="w-6 h-6 rtl:rotate-180" />
-              </button>
-            )}
-
-            {currentIndex < sections.length - 1 && (
-              <button
-                onClick={goToNextSection}
-                className={cn(
-                  'fixed end-2 bottom-20 z-10',
-                  'w-10 h-10 rounded-full',
-                  'bg-neo-navy border-2 border-neo-yellow',
-                  'flex items-center justify-center',
-                  'text-neo-yellow',
-                  'shadow-hard-sm',
-                  'active:translate-y-0.5 active:shadow-hard-pressed',
-                  'transition-all'
-                )}
-                aria-label="Next section"
-              >
-                <ChevronRight className="w-6 h-6 rtl:rotate-180" />
-              </button>
-            )}
           </motion.div>
         </div>
 

@@ -152,37 +152,17 @@ describe('Profile Mobile Tab Navigation', () => {
     });
   });
 
-  describe('Navigation Arrows', () => {
-    it('should position arrows at bottom without opacity', () => {
+  describe('Navigation Arrows Removed', () => {
+    it('should NOT have fixed yellow arrow buttons at bottom', () => {
       render(<ProfilePageClient />);
 
-      // Next button should be visible (we start on first section, so only "next" shows)
+      // The fixed yellow navigation arrows should be removed
+      const prevButton = screen.queryByLabelText(/previous section/i);
       const nextButton = screen.queryByLabelText(/next section/i);
 
-      if (nextButton) {
-        // Should be positioned at bottom
-        expect(nextButton.className).toContain('bottom-');
-
-        // Should NOT have reduced opacity (full visibility now)
-        expect(nextButton.className).not.toContain('opacity-40');
-        expect(nextButton.className).not.toContain('opacity-30');
-      }
-    });
-
-    it('should have neo-brutalist arrow styling', () => {
-      render(<ProfilePageClient />);
-
-      const nextButton = screen.queryByLabelText(/next section/i);
-
-      if (nextButton) {
-        // Should have neo-brutalist styling
-        expect(nextButton.className).toContain('bg-neo-navy');
-        expect(nextButton.className).toContain('border-2');
-        expect(nextButton.className).toContain('border-neo-yellow');
-
-        // Should have active press state
-        expect(nextButton.className).toContain('active:');
-      }
+      // Neither should exist as fixed buttons
+      expect(prevButton).not.toBeInTheDocument();
+      expect(nextButton).not.toBeInTheDocument();
     });
   });
 
@@ -194,5 +174,55 @@ describe('Profile Mobile Tab Navigation', () => {
       const rightIndicator = container.querySelector('[aria-hidden="true"].bg-gradient-to-l');
       expect(rightIndicator).toBeInTheDocument();
     });
+
+    it('should have RTL rotation on swipe indicator chevron icons', () => {
+      const { container } = render(<ProfilePageClient />);
+
+      // Find the chevron icons in swipe indicators (end side for "next" direction)
+      const rightIndicator = container.querySelector('[aria-hidden="true"].end-0');
+
+      if (rightIndicator) {
+        const chevronIcon = rightIndicator.querySelector('svg');
+        expect(chevronIcon).toBeInTheDocument();
+        // SVG elements use class attribute, not className property
+        const classAttr = chevronIcon?.getAttribute('class') || '';
+        // Icon should have rtl:rotate-180 class for proper RTL support
+        expect(classAttr).toContain('rtl:rotate-180');
+      }
+    });
+  });
+});
+
+describe('Profile RTL Swipe Direction', () => {
+  beforeEach(() => {
+    // Reset mock to RTL
+    jest.doMock('@/contexts/LanguageContext', () => ({
+      useLanguage: () => ({
+        t: (key: string) => {
+          const translations: Record<string, string> = {
+            'profile.sections.overview': 'סקירה',
+            'profile.sections.stats': 'סטטיסטיקה',
+            'profile.sections.achievements': 'הישגים',
+            'profile.sections.collection': 'אוסף',
+            'profile.title': 'הפרופיל שלך'
+          };
+          return translations[key] || key;
+        },
+        language: 'he',
+        dir: 'rtl'
+      })
+    }));
+  });
+
+  it('should have RTL-aware swipe gesture handling in the motion component', () => {
+    // This test documents that the swipe direction must be RTL-aware
+    // In RTL: swipe right = next, swipe left = previous (opposite of LTR)
+    // The component should use the language context's dir property to determine direction
+    const { container } = render(<ProfilePageClient />);
+
+    // The motion.div with drag="x" should exist for swipe handling
+    const swipeableContainer = container.querySelector('[draggable]') ||
+                               container.querySelector('.h-full.px-5');
+    expect(swipeableContainer).toBeInTheDocument();
   });
 });

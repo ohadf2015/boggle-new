@@ -72,11 +72,18 @@ function needsAuthProviders(pathname: string | null): boolean {
  * - Landing page: EssentialProviders only (~50KB)
  * - Game pages: Full Providers stack (~500KB+)
  * - Auth pages: Essential + Auth providers (~150KB)
+ *
+ * During SSR, always use EssentialProviders to avoid context errors
  */
 export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
   const pathname = usePathname();
 
   const providerType = useMemo(() => {
+    // During SSR (pathname is null), default to essential providers
+    if (!pathname) {
+      return 'essential';
+    }
+
     if (needsGameProviders(pathname)) {
       return 'full';
     }

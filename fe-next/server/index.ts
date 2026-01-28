@@ -49,6 +49,7 @@ import dailyChallengeRoutes from '../backend/routes/dailyChallenge';
 import buzzChallengeRoutes from '../backend/routes/buzzChallenge';
 import aiHintsRoutes from '../backend/routes/aiHints';
 import adminGiftRoutes from '../backend/routes/adminGift';
+import adminNotificationRoutes from '../backend/routes/adminNotification';
 
 // Configuration
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -95,6 +96,7 @@ async function start(): Promise<void> {
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/admin/gift', adminGiftRoutes);
+  app.use('/api/admin/notification', adminNotificationRoutes);
   app.use('/api/dictionary', dictionaryRoutes);
   app.use('/api/solve-grid', solveGridRoutes);
   app.use('/api/single-player', singlePlayerRoutes);

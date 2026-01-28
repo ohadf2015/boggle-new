@@ -4,6 +4,7 @@ import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
 import { broadcastSignedOut } from '@/utils/crossTabAuthSync';
 import { locales } from './i18n';
+import { isNative } from '@/utils/platform';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -37,6 +38,8 @@ function getCurrentLocale(): string | null {
 }
 
 // Auth helper functions
+// NOTE: For mobile (Capacitor), use performMobileOAuth() from utils/mobileOAuth.ts
+// instead of these functions directly. The useOAuthSignIn hook handles this automatically.
 export async function signInWithGoogle() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 
@@ -44,10 +47,8 @@ export async function signInWithGoogle() {
   const currentLocale = getCurrentLocale();
 
   // Use deep link scheme for native apps, web URL for browser
-  const isNativeApp = typeof window !== 'undefined' &&
-    (window.location.protocol === 'capacitor:' || window.location.protocol === 'ionic:');
-
-  const redirectUrl = isNativeApp
+  // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
+  const redirectUrl = isNative()
     ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
     : new URL('/auth/callback' + (currentLocale ? `?locale=${currentLocale}` : ''), window.location.origin).toString();
 
@@ -64,10 +65,8 @@ export async function signInWithDiscord() {
   const currentLocale = getCurrentLocale();
 
   // Use deep link scheme for native apps, web URL for browser
-  const isNativeApp = typeof window !== 'undefined' &&
-    (window.location.protocol === 'capacitor:' || window.location.protocol === 'ionic:');
-
-  const redirectUrl = isNativeApp
+  // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
+  const redirectUrl = isNative()
     ? 'lexiclash://auth/callback' + (currentLocale ? `?locale=${currentLocale}` : '')
     : new URL('/auth/callback' + (currentLocale ? `?locale=${currentLocale}` : ''), window.location.origin).toString();
 

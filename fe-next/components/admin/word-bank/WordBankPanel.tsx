@@ -10,7 +10,6 @@ import { useWordBank } from './hooks/useWordBank';
 import { WordBankStatsCard } from './components/WordBankStatsCard';
 import { WordBankFilters } from './components/WordBankFilters';
 import { WordBankTable } from './components/WordBankTable';
-import { WikipediaSyncSection } from './components/WikipediaSyncSection';
 import { BulkImportModal } from './components/BulkImportModal';
 import { BulkActionsBar } from './components/BulkActionsBar';
 
@@ -118,10 +117,6 @@ export function WordBankPanel(): React.ReactElement {
     refresh();
   }, [refresh]);
 
-  const handleSyncComplete = useCallback((): void => {
-    refresh();
-  }, [refresh]);
-
   return (
     <div className="space-y-6 relative pb-20">
       {/* Error Banner */}
@@ -142,9 +137,6 @@ export function WordBankPanel(): React.ReactElement {
 
       {/* Stats Card */}
       <WordBankStatsCard stats={stats} loading={loading} onRefresh={refresh} />
-
-      {/* Wikipedia Sync Section */}
-      <WikipediaSyncSection language={selectedLanguage} onSyncComplete={handleSyncComplete} />
 
       {/* Actions Bar */}
       <div className="flex items-center justify-between">

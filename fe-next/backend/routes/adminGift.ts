@@ -6,6 +6,7 @@
 import express, { Request, Response, Router, NextFunction } from 'express';
 import { z } from 'zod';
 import logger from '../utils/logger';
+import { pushNotificationService, GiftNotificationData } from '../services/pushNotificationService';
 
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 
@@ -196,6 +197,22 @@ router.post('/send', async (req: AdminRequest, res: Response): Promise<void> => 
       res.status(500).json({ error: 'Failed to send gifts', requestId });
       return;
     }
+
+    // Send push notifications to recipients (async, non-blocking)
+    const giftNotifications: GiftNotificationData[] = (insertedGifts || []).map((gift: { id: string; recipient_id: string }) => ({
+      recipientId: gift.recipient_id,
+      giftId: gift.id,
+      senderName: adminUser.username || 'Admin',
+      title,
+      xpAmount,
+      coinAmount,
+      badgeId: badgeId || undefined,
+    }));
+
+    // Fire and forget - don't wait for push delivery
+    pushNotificationService.sendGiftNotifications(giftNotifications).catch((err: Error) => {
+      logger.error('ADMIN_GIFT', `Push notification error: ${err.message} [${requestId}]`);
+    });
 
     logger.info('ADMIN_GIFT', JSON.stringify({
       action: 'gifts_sent',

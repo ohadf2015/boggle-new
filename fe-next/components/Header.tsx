@@ -15,6 +15,7 @@ import { GiftNotificationBadge } from './gift/GiftNotificationBadge';
 import { AdminGiftModal } from './gift/AdminGiftModal';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
+import { NotificationBell } from './notifications/NotificationBell';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import HeaderMenuDropdown from './HeaderMenuDropdown';
 
@@ -390,6 +391,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </button>
                     )}
 
+                    {/* Notification Bell - only show for authenticated users */}
+                    {isAuthenticated && <NotificationBell />}
+
                     {/* Quick Language Switcher - visible for ALL users */}
                     <QuickLanguageSwitcher compact />
 
@@ -400,10 +404,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     <HeaderMenuDropdown />
                 </div>
 
-                {/* Mobile: Volume + Hamburger - simplified grouping */}
+                {/* Mobile: Volume + Notifications + Hamburger - simplified grouping */}
                 <div className="sm:hidden flex items-center gap-2 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
                     {/* Sound controls */}
                     <MusicControls />
+
+                    {/* Notification Bell - only show for authenticated users */}
+                    {isAuthenticated && <NotificationBell />}
 
                     {/* Hamburger menu button - always shows Menu/X icon */}
                     <button

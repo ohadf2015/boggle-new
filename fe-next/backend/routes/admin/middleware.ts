@@ -17,7 +17,7 @@ const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseSer
  */
 export const adminRateLimiter = {
   requests: new Map<string, RateLimitRecord>(),
-  maxRequests: 100,       // Max requests per window
+  maxRequests: 300,       // Max requests per window (increased for LiveMonitor auto-refresh)
   windowMs: 60 * 1000,    // 1 minute window
 
   isAllowed(ip: string): boolean {

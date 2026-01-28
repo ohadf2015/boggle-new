@@ -72,7 +72,8 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         const response = await fetch(`/api/admin/daily-word/word-bank?${params.toString()}`);
 
         if (!response.ok) {
-          throw new Error('Failed to fetch word bank');
+          const errorBody = await response.text().catch(() => 'No error details');
+          throw new Error(`Failed to fetch word bank (${response.status}): ${errorBody}`);
         }
 
         const data = await response.json();
@@ -93,7 +94,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch words';
         setError(errorMessage);
-        console.error('Word bank fetch error:', errorMessage, err);
+        // Don't log generic "Failed to fetch" errors - they're likely network issues
+        if (!errorMessage.includes('Failed to fetch')) {
+          console.error('Word bank fetch error:', errorMessage);
+        }
       } finally {
         setLoading(false);
       }
@@ -111,7 +115,8 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
       const response = await fetch(`/api/admin/daily-word/word-bank?${params.toString()}`);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch stats');
+        const errorBody = await response.text().catch(() => 'No error details');
+        throw new Error(`Failed to fetch stats (${response.status}): ${errorBody}`);
       }
 
       const data = await response.json();
@@ -121,7 +126,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch stats';
-      console.error('Stats fetch error:', errorMessage, err);
+      // Don't log generic "Failed to fetch" errors - they're likely network issues
+      if (!errorMessage.includes('Failed to fetch')) {
+        console.error('Stats fetch error:', errorMessage);
+      }
     }
   }, [filters.language]);
 
@@ -335,10 +343,12 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
     setError(null);
   }, []);
 
-  // Initial load
+  // Initial load and filter changes
+  // Don't include refresh in deps - it would cause infinite loop since refresh depends on fetchWords/fetchStats
   useEffect(() => {
     refresh();
-  }, [filters.language, filters.status, filters.validation_status, filters.source, filters.search, refresh]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.language, filters.status, filters.validation_status, filters.source, filters.search]);
 
   return {
     words,

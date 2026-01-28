@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
+import { isNative } from '@/utils/platform';
+import { performMobileOAuth } from '@/utils/mobileOAuth';
 
 interface UseOAuthSignInOptions {
   /** Callback before redirect (e.g., to store pending data) */
@@ -20,6 +22,9 @@ interface UseOAuthSignInReturn {
 /**
  * Hook for handling OAuth sign-in with Google and Discord
  * Extracts common sign-in logic from auth modals
+ *
+ * On mobile (Capacitor), uses in-app browser via performMobileOAuth
+ * On web, uses standard Supabase OAuth redirect flow
  */
 export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSignInReturn {
   const { onBeforeRedirect, onError } = options;
@@ -39,6 +44,21 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
       // Call before redirect callback (e.g., to store pending game data)
       onBeforeRedirect?.();
 
+      // Use in-app browser OAuth on mobile (Capacitor)
+      // This opens OAuth in SFSafariViewController (iOS) or Custom Tabs (Android)
+      // and returns to the app via deep link instead of staying in external browser
+      if (isNative()) {
+        const mobileResult = await performMobileOAuth(provider);
+        if (!mobileResult.success) {
+          const errorMessage = mobileResult.error || 'Mobile sign in failed';
+          setError(errorMessage);
+          onError?.(errorMessage);
+        }
+        // On success, deep link handler will catch the callback and navigate to auth/callback
+        return;
+      }
+
+      // Web flow: standard Supabase OAuth redirect
       let result;
       switch (provider) {
         case 'google':

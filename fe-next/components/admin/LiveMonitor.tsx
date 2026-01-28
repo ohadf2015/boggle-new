@@ -140,11 +140,18 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
   }, [onTokenExpired]);
 
   // Initial fetch and auto-refresh every 5 seconds
+  // Use ref-based callback to prevent interval recreation
+  const fetchRef = useRef(fetchLiveGames);
+
   useEffect(() => {
-    fetchLiveGames();
-    const interval = setInterval(fetchLiveGames, 5000);
-    return () => clearInterval(interval);
+    fetchRef.current = fetchLiveGames;
   }, [fetchLiveGames]);
+
+  useEffect(() => {
+    fetchRef.current();
+    const interval = setInterval(() => fetchRef.current(), 5000);
+    return () => clearInterval(interval);
+  }, []); // Empty deps - stable interval
 
   const handleManualRefresh = () => {
     setLoading(true);
