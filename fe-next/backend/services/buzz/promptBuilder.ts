@@ -161,21 +161,28 @@ export function buildAIPrompt(
 
 /**
  * Format trends into display context
+ * Enhanced to showcase breakdown words as potential answer candidates
  */
 function formatTrendsContext(trends: TrendingTopic[]): string {
   return trends
     .map((trend, idx) => {
       const breakdownItems = trend.trend_breakdown ?? [];
-      const contextParts = breakdownItems.length > 0
-        ? breakdownItems.join(', ')
-        : trend.categories?.map(c => c.name).join(', ') || 'Currently trending';
+      const categoryInfo = trend.categories?.map(c => c.name).join(', ') || 'General';
       const volumeDisplay = trend.search_volume
         ? `${(trend.search_volume / 1000).toFixed(0)}K+`
         : 'prominent';
       const riseIndicator = trend.increase_percentage
         ? ` 🔥 RISING +${trend.increase_percentage}%`
         : '';
-      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches${riseIndicator}\n   Breakdown context: ${contextParts}`;
+
+      // Build breakdown section with emphasis on usable words
+      let breakdownSection = '';
+      if (breakdownItems.length > 0) {
+        breakdownSection = `\n   **Related words (USE as answers!)**: ${breakdownItems.slice(0, 8).join(', ')}`;
+      }
+
+      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches${riseIndicator}
+   Category: ${categoryInfo}${breakdownSection}`;
     })
     .join('\n\n');
 }

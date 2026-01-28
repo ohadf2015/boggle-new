@@ -4,8 +4,10 @@
  * Tests world-specific music loading, track switching, and pause/resume behavior.
  */
 
+import React, { ReactNode } from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureMusic } from '../useAdventureMusic';
+import { MusicProvider } from '@/contexts/MusicContext';
 
 // Mock Howler.js
 const mockPlay = jest.fn();
@@ -57,6 +59,13 @@ jest.mock('@/utils/logger', () => {
   };
 });
 
+// Test wrapper with MusicProvider
+const createWrapper = () => {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return React.createElement(MusicProvider, null, children);
+  };
+};
+
 describe('useAdventureMusic', () => {
   const defaultProps = {
     worldNumber: 1,
@@ -82,10 +91,21 @@ describe('useAdventureMusic', () => {
     it('initializes tracks for world with music (1-3)', () => {
       const { Howl } = require('howler');
 
-      renderHook(() => useAdventureMusic(defaultProps));
+      // Clear mocks to ignore MusicProvider's Howl calls
+      jest.clearAllMocks();
+
+      renderHook(() => useAdventureMusic(defaultProps), { wrapper: createWrapper() });
+
+      // Filter for adventure music Howl instances only
+      const adventureMusicCalls = Howl.mock.calls.filter(
+        (call: unknown[]) => {
+          const src = (call[0] as { src?: string[] })?.src?.[0];
+          return src?.includes('/music/adventure/');
+        }
+      );
 
       // Should create 2 Howl instances for track 1 and track 2
-      expect(Howl).toHaveBeenCalledTimes(2);
+      expect(adventureMusicCalls).toHaveLength(2);
       expect(Howl).toHaveBeenCalledWith(
         expect.objectContaining({
           src: ['/music/adventure/1_level_1.mp3'],
@@ -101,19 +121,30 @@ describe('useAdventureMusic', () => {
     it('does NOT initialize tracks for worlds without music (4+)', () => {
       const { Howl } = require('howler');
 
+      // Clear mocks to ignore MusicProvider's Howl calls
+      jest.clearAllMocks();
+
       renderHook(() =>
         useAdventureMusic({
           ...defaultProps,
           worldNumber: 4,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
 
-      // Should not create any Howl instances
-      expect(Howl).not.toHaveBeenCalled();
+      // Should not create any adventure music Howl instances (world 4 has no music)
+      // MusicProvider creates its own Howls for global music, but adventure hook should not
+      const adventureMusicCalls = Howl.mock.calls.filter(
+        (call: unknown[]) => {
+          const src = (call[0] as { src?: string[] })?.src?.[0];
+          return src?.includes('/music/adventure/');
+        }
+      );
+      expect(adventureMusicCalls).toHaveLength(0);
     });
 
     it('returns hasMusic=true for worlds 1-3', () => {
-      const { result } = renderHook(() => useAdventureMusic(defaultProps));
+      const { result } = renderHook(() => useAdventureMusic(defaultProps), { wrapper: createWrapper() });
       expect(result.current.hasMusic).toBe(true);
     });
 
@@ -122,7 +153,8 @@ describe('useAdventureMusic', () => {
         useAdventureMusic({
           ...defaultProps,
           worldNumber: 5,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
       expect(result.current.hasMusic).toBe(false);
     });
@@ -132,7 +164,7 @@ describe('useAdventureMusic', () => {
     it('starts track 1 when gameplay begins', () => {
       const { rerender } = renderHook(
         ({ isPlaying }) => useAdventureMusic({ ...defaultProps, isPlaying }),
-        { initialProps: { isPlaying: false } }
+        { initialProps: { isPlaying: false }, wrapper: createWrapper() }
       );
 
       // Start playing
@@ -149,7 +181,7 @@ describe('useAdventureMusic', () => {
       const { rerender } = renderHook(
         ({ isPlaying, isPaused }) =>
           useAdventureMusic({ ...defaultProps, isPlaying, isPaused }),
-        { initialProps: { isPlaying: true, isPaused: false } }
+        { initialProps: { isPlaying: true, isPaused: false }, wrapper: createWrapper() }
       );
 
       // Pause the game
@@ -164,7 +196,7 @@ describe('useAdventureMusic', () => {
 
       const { rerender } = renderHook(
         ({ isPlaying }) => useAdventureMusic({ ...defaultProps, isPlaying }),
-        { initialProps: { isPlaying: true } }
+        { initialProps: { isPlaying: true }, wrapper: createWrapper() }
       );
 
       // Stop playing
@@ -188,7 +220,7 @@ describe('useAdventureMusic', () => {
             timeRemaining,
             totalTime,
           }),
-        { initialProps: { timeRemaining: totalTime } }
+        { initialProps: { timeRemaining: totalTime }, wrapper: createWrapper() }
       );
 
       // Clear mocks from initialization
@@ -213,7 +245,7 @@ describe('useAdventureMusic', () => {
             timeRemaining,
             totalTime,
           }),
-        { initialProps: { timeRemaining: totalTime } }
+        { initialProps: { timeRemaining: totalTime }, wrapper: createWrapper() }
       );
 
       // Clear mocks from initialization
@@ -238,7 +270,8 @@ describe('useAdventureMusic', () => {
       mockPlaying.mockReturnValue(true);
 
       const { result } = renderHook(() =>
-        useAdventureMusic({ ...defaultProps, isPlaying: true })
+        useAdventureMusic({ ...defaultProps, isPlaying: true }),
+        { wrapper: createWrapper() }
       );
 
       // Clear previous fade calls from initialization
@@ -259,7 +292,7 @@ describe('useAdventureMusic', () => {
 
   describe('cleanup', () => {
     it('unloads tracks on unmount', () => {
-      const { unmount } = renderHook(() => useAdventureMusic(defaultProps));
+      const { unmount } = renderHook(() => useAdventureMusic(defaultProps), { wrapper: createWrapper() });
 
       unmount();
 
@@ -274,7 +307,7 @@ describe('useAdventureMusic', () => {
 
       const { rerender } = renderHook(
         ({ worldNumber }) => useAdventureMusic({ ...defaultProps, worldNumber }),
-        { initialProps: { worldNumber: 1 } }
+        { initialProps: { worldNumber: 1 }, wrapper: createWrapper() }
       );
 
       jest.clearAllMocks();
@@ -303,7 +336,8 @@ describe('useAdventureMusic', () => {
           ...defaultProps,
           isPlaying: true,
           enabled: false,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
 
       // Should not start playback
@@ -313,13 +347,14 @@ describe('useAdventureMusic', () => {
 
   describe('continuous looping', () => {
     it('loops music when track ends in adventure mode', () => {
-      // GIVEN - capture onend callback from Howl
+      // GIVEN - capture onend callback from adventure music Howl (not MusicProvider)
       const { Howl } = require('howler');
-      let capturedOnEnd: (() => void) | undefined;
+      const capturedOnEndCallbacks: (() => void)[] = [];
 
-      Howl.mockImplementation((config: { onend?: () => void }) => {
-        if (config.onend) {
-          capturedOnEnd = config.onend;
+      Howl.mockImplementation((config: { onend?: () => void; src?: string[] }) => {
+        // Only capture onend from adventure music tracks, not MusicProvider
+        if (config.onend && config.src?.[0]?.includes('/music/adventure/')) {
+          capturedOnEndCallbacks.push(config.onend);
         }
         return mockHowlInstance;
       });
@@ -329,7 +364,8 @@ describe('useAdventureMusic', () => {
           ...defaultProps,
           isPlaying: true,
           enabled: true,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
 
       // Track starts playing
@@ -338,10 +374,10 @@ describe('useAdventureMusic', () => {
       mockSeek.mockClear();
       mockFade.mockClear();
 
-      // WHEN - track ends (simulate onend callback)
-      expect(capturedOnEnd).toBeDefined();
+      // WHEN - track ends (simulate onend callback from track 1)
+      expect(capturedOnEndCallbacks.length).toBeGreaterThan(0);
       act(() => {
-        capturedOnEnd!();
+        capturedOnEndCallbacks[0](); // First adventure track's onend
       });
 
       // THEN - should loop: seek to 0, play again, fade in
@@ -351,13 +387,14 @@ describe('useAdventureMusic', () => {
     });
 
     it('continues looping even when window was briefly unfocused', () => {
-      // GIVEN - capture onend callback
+      // GIVEN - capture onend callback from adventure music Howl (not MusicProvider)
       const { Howl } = require('howler');
-      let capturedOnEnd: (() => void) | undefined;
+      const capturedOnEndCallbacks: (() => void)[] = [];
 
-      Howl.mockImplementation((config: { onend?: () => void }) => {
-        if (config.onend) {
-          capturedOnEnd = config.onend;
+      Howl.mockImplementation((config: { onend?: () => void; src?: string[] }) => {
+        // Only capture onend from adventure music tracks, not MusicProvider
+        if (config.onend && config.src?.[0]?.includes('/music/adventure/')) {
+          capturedOnEndCallbacks.push(config.onend);
         }
         return mockHowlInstance;
       });
@@ -370,7 +407,8 @@ describe('useAdventureMusic', () => {
           timeRemaining: 0,
           totalTime: 0,
           enabled: true,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
 
       mockPlay.mockClear();
@@ -378,9 +416,9 @@ describe('useAdventureMusic', () => {
       mockFade.mockClear();
 
       // WHEN - track ends (even if window focus state varies)
-      expect(capturedOnEnd).toBeDefined();
+      expect(capturedOnEndCallbacks.length).toBeGreaterThan(0);
       act(() => {
-        capturedOnEnd!();
+        capturedOnEndCallbacks[0](); // First adventure track's onend
       });
 
       // THEN - should ALWAYS loop in adventure mode
@@ -408,7 +446,7 @@ describe('useAdventureMusic', () => {
             isPlaying: true,
             enabled,
           }),
-        { initialProps: { enabled: true } }
+        { initialProps: { enabled: true }, wrapper: createWrapper() }
       );
 
       // Disable music
@@ -447,7 +485,7 @@ describe('useAdventureMusic', () => {
             isPlaying: true,
             isPaused,
           }),
-        { initialProps: { isPaused: false } }
+        { initialProps: { isPaused: false }, wrapper: createWrapper() }
       );
 
       // Pause game

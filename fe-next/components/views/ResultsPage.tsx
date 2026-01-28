@@ -144,16 +144,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
   }, [finalScores]);
 
+  // Normalize username for comparison (trim whitespace, case-insensitive)
+  // This prevents rank mismatch bugs when frontend username differs slightly from server
+  const normalizeUsername = useCallback((name: string | undefined | null): string => {
+    return (name || '').trim().toLowerCase();
+  }, []);
+
   // Detect if all opponents are bots (for NextStepPrompt - suggest brain training)
   const isBotsOnlyGame = useMemo(() => {
     if (!sortedScores || sortedScores.length === 0) return false;
-    const opponents = sortedScores.filter(p => p.username !== username);
+    const normalizedUsername = normalizeUsername(username);
+    const opponents = sortedScores.filter(p => normalizeUsername(p.username) !== normalizedUsername);
     // Game is bots-only if there are opponents and ALL of them are bots
     return opponents.length > 0 && opponents.every(p => p.isBot === true);
-  }, [sortedScores, username]);
+  }, [sortedScores, username, normalizeUsername]);
 
   const winner = sortedScores[0];
-  const isCurrentUserWinner = winner?.username === username;
+  const isCurrentUserWinner = normalizeUsername(winner?.username) === normalizeUsername(username);
 
   // CrazyGames lifecycle - stop gameplay when results page loads
   // Call happytime if winner (throttled to once per 30s)
@@ -176,9 +183,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Calculate current player's rank (1-based: 1st, 2nd, 3rd, etc.)
   const currentPlayerRank = useMemo(() => {
     if (!username || sortedScores.length === 0) return -1;
-    const index = sortedScores.findIndex(p => p.username === username);
+    const normalizedUsername = normalizeUsername(username);
+    const index = sortedScores.findIndex(p => normalizeUsername(p.username) === normalizedUsername);
     return index >= 0 ? index + 1 : -1;
-  }, [sortedScores, username]);
+  }, [sortedScores, username, normalizeUsername]);
 
   // Always show the current player in the celebration banner
   // This ensures personalized feedback regardless of rank
@@ -192,8 +200,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Get current player data for share prompt
   const currentPlayerData = useMemo(() => {
     if (!finalScores || !username) return null;
-    return finalScores.find(p => p.username === username);
-  }, [finalScores, username]);
+    const normalizedUsername = normalizeUsername(username);
+    return finalScores.find(p => normalizeUsername(p.username) === normalizedUsername);
+  }, [finalScores, username, normalizeUsername]);
 
   // Memoize current player's valid words - used in multiple places
   const currentPlayerValidWords = useMemo(() => {
@@ -202,8 +211,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Memoize other players list (excluding current user)
   const otherPlayers = useMemo(() => {
-    return sortedScores.filter(p => p.username !== username);
-  }, [sortedScores, username]);
+    const normalizedUsername = normalizeUsername(username);
+    return sortedScores.filter(p => normalizeUsername(p.username) !== normalizedUsername);
+  }, [sortedScores, username, normalizeUsername]);
 
   // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
   // BUT if player has 0 score AND there are other players, treat them as non-winner (rank 4+)
@@ -211,12 +221,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
   const totalPlayers = sortedScores.length;
   const bannerRank = hasZeroScore && totalPlayers > 1 ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
-  const isCurrentUserInBanner = bannerPlayer?.username === username;
+  const isCurrentUserInBanner = normalizeUsername(bannerPlayer?.username) === normalizeUsername(username);
 
   // Update guest stats when results load (only once)
   useEffect(() => {
     if (!isAuthenticated && !hasUpdatedStatsRef.current && finalScores && username) {
-      const currentPlayerData = finalScores.find(p => p.username === username);
+      const normalizedUsername = normalizeUsername(username);
+      const currentPlayerData = finalScores.find(p => normalizeUsername(p.username) === normalizedUsername);
 
       if (currentPlayerData) {
         const longestValidWord = currentPlayerValidWords.reduce<string | undefined>((longest, w) =>
@@ -235,7 +246,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         hasUpdatedStatsRef.current = true;
       }
     }
-  }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements, currentPlayerValidWords]);
+  }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements, currentPlayerValidWords, normalizeUsername]);
 
   // Use unified coin context
   const { refreshCoins } = useCoinContext();
@@ -697,7 +708,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           {/* Winner Banner - prominent */}
           {winner && (
             <div className="w-full max-w-sm">
-              <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />
+              <ResultsWinnerBanner winner={winner} isCurrentUserWinner={normalizeUsername(winner.username) === normalizeUsername(username)} />
             </div>
           )}
 
@@ -816,8 +827,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 allPlayerWords={allPlayerWords}
                 currentUsername={username}
                 isWinner={index === 0}
-                xpGainedData={player.username === username ? xpGainedData : null}
-                levelUpData={player.username === username ? levelUpData : null}
+                xpGainedData={normalizeUsername(player.username) === normalizeUsername(username) ? xpGainedData : null}
+                levelUpData={normalizeUsername(player.username) === normalizeUsername(username) ? levelUpData : null}
                 duplicateRuleDisabled={duplicateRuleDisabled}
                 archetype={playerArchetypes.get(player.username) || null}
               />
@@ -917,7 +928,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               username: p.username,
               finalScore: p.score,
               avatar: p.avatar,
-              isCurrentPlayer: p.username === username,
+              isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
             }))}
             currentUsername={username}
             duration={2500}
@@ -1229,7 +1240,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                     username: p.username,
                     finalScore: p.score,
                     avatar: p.avatar,
-                    isCurrentPlayer: p.username === username,
+                    isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
                   }))}
                   currentUsername={username}
                   duration={2500}

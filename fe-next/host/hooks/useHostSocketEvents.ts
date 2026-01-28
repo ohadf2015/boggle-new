@@ -198,10 +198,12 @@ const useHostSocketEvents = ({
   });
 
   // Player management events
+  // Pass hostUsername to filter self-notifications when host is also playing
   useHostPlayerEvents({
     socket,
     t,
     hostPlaying,
+    hostUsername: hostPlaying ? username : undefined,
     queueAchievement,
     setPlayersReady,
     setPlayerWordCounts,

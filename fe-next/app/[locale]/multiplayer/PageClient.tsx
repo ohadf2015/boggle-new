@@ -478,6 +478,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         if (savedSession?.gameCode) {
           logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
           toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
+            id: 'socket-reconnecting-to-game', // Deduplicate with toast ID
             duration: 2000,
           });
 
@@ -566,10 +567,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     socketInstance.on('reconnect', (attemptNumber) => {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
-      toast.success(t('common.reconnected') || 'Reconnected!', {
-        duration: 2000,
-        icon: '✓',
-      });
+      // Note: useConnectionToasts already handles showing reconnect toast with deduplication
+      // Don't show duplicate toast here - the hook will handle it
     });
 
     socketInstance.on('reconnect_failed', () => {

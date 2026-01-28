@@ -197,9 +197,14 @@ export function filterTrends(
 /**
  * Select trends for challenge generation
  * Prioritizes rising trends while maintaining diversity across categories
+ *
+ * NOTE: We select 7 trends instead of 5 to give the AI more material
+ * for generating challenges. This provides a buffer when some trends
+ * don't produce valid challenges during validation.
  */
 export function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic[] {
-  if (trends.length <= 5) return trends;
+  const MIN_TRENDS = 7; // Increased from 5 for better AI generation reliability
+  if (trends.length <= MIN_TRENDS) return trends;
 
   const selected: TrendingTopic[] = [];
   const categoryCount = new Map<string, number>();
@@ -236,7 +241,7 @@ export function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic
   // First pass: prioritize fastest-rising NON-SPORTS trends
   const risingFastNonSports = nonSportsTrends.filter(t => (t.increase_percentage ?? 0) > 100);
   for (const trend of risingFastNonSports) {
-    if (selected.length >= 5) break;
+    if (selected.length >= MIN_TRENDS) break;
     if (canAddTrend(trend)) {
       addTrend(trend);
     }
@@ -247,7 +252,7 @@ export function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic
     (t.increase_percentage ?? 0) > 0 && !selected.includes(t)
   );
   for (const trend of risingNonSports) {
-    if (selected.length >= 5) break;
+    if (selected.length >= MIN_TRENDS) break;
     if (canAddTrend(trend)) {
       addTrend(trend);
     }
@@ -256,7 +261,7 @@ export function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic
   // Third pass: add up to 1 sports trend if we have room
   const risingSports = sportsTrends.filter(t => (t.increase_percentage ?? 0) > 50);
   for (const trend of risingSports) {
-    if (selected.length >= 5) break;
+    if (selected.length >= MIN_TRENDS) break;
     if (canAddTrend(trend)) {
       addTrend(trend);
       break;
@@ -265,7 +270,7 @@ export function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic
 
   // Fourth pass: fill remaining slots with any non-sports trends
   for (const trend of nonSportsTrends) {
-    if (selected.length >= 5) break;
+    if (selected.length >= MIN_TRENDS) break;
     if (!selected.includes(trend) && canAddTrend(trend)) {
       addTrend(trend);
     }
@@ -273,16 +278,16 @@ export function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic
 
   // Final pass: fill with remaining trends while still respecting category limits
   for (const trend of trends) {
-    if (selected.length >= 5) break;
+    if (selected.length >= MIN_TRENDS) break;
     if (!selected.includes(trend) && canAddTrend(trend)) {
       addTrend(trend);
     }
   }
 
   // Ultra-fallback: if still not enough trends, add ANY remaining
-  if (selected.length < 5) {
+  if (selected.length < MIN_TRENDS) {
     for (const trend of trends) {
-      if (selected.length >= 5) break;
+      if (selected.length >= MIN_TRENDS) break;
       if (!selected.includes(trend)) {
         addTrend(trend);
       }
@@ -303,6 +308,7 @@ export function getStopWords(language: string): Set<string> {
 
 /**
  * Extract common keywords from trend breakdowns
+ * Includes both individual words and short phrases that are usable as challenge answers
  */
 export function extractKeywordsFromBreakdowns(trends: TrendingTopic[], language: string): string[] {
   const stopWords = getStopWords(language);
@@ -312,6 +318,14 @@ export function extractKeywordsFromBreakdowns(trends: TrendingTopic[], language:
     if (!trend.trend_breakdown) continue;
 
     for (const phrase of trend.trend_breakdown) {
+      // Also consider the full breakdown phrase if it's short enough for a word game
+      const cleanPhrase = phrase.trim().toLowerCase();
+      if (cleanPhrase.length >= 3 && cleanPhrase.length <= 12 && !cleanPhrase.includes(' ')) {
+        // Single word breakdown - add with higher weight
+        keywords.set(cleanPhrase, (keywords.get(cleanPhrase) ?? 0) + 2);
+      }
+
+      // Extract individual words from multi-word phrases
       const words = phrase
         .toLowerCase()
         .split(/[\s,.\-:;!?"'()]+/)
@@ -331,7 +345,7 @@ export function extractKeywordsFromBreakdowns(trends: TrendingTopic[], language:
 
   return Array.from(keywords.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 20)
+    .slice(0, 25) // Increased from 20 to provide more options
     .map(([word]) => word);
 }
 

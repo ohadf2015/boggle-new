@@ -1270,20 +1270,25 @@ body.crazygames-embed {
  * isolated scroll context that works independently of body scroll.
  *
  * Use when:
- * - Page has fixed bottom tab bar
+ * - Page has fixed bottom tab bar (position: fixed)
  * - Content needs to scroll independently
  * - Parent uses screen-fit-content pattern
  *
- * The calc accounts for:
+ * The calc accounts for (daily/singleplayer results pages):
  * - 100dvh: Full viewport (dynamic - adjusts when browser UI changes)
- * - Header: ~48px compact header
- * - Tab bar: var(--mobile-tab-bar-height) = 64px
+ * - AutoHideHeader: 60px (global header with logo/menu)
+ * - main.pb-16: 64px (layout padding for GlobalBottomNav, present even when hidden)
+ * - Compact Header: 48px (page-specific header with back button)
  * - Safe area: env(safe-area-inset-bottom) for notched devices
+ *
+ * NOTE: MobileTabBar (position: fixed) is NOT subtracted because it overlays
+ * content rather than taking document flow space. The content uses
+ * pb-[--mobile-bottom-safe] padding to scroll past the fixed bar.
  */
 .isolate-scroll {
-  /* Fixed height based on viewport minus header and tab bar */
-  height: calc(100dvh - 48px - var(--mobile-tab-bar-height) - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - 48px - var(--mobile-tab-bar-height) - env(safe-area-inset-bottom, 0px));
+  /* Fixed height = viewport - AutoHideHeader(60) - main.pb-16(64) - CompactHeader(48) - safe-area */
+  height: calc(100dvh - 60px - 64px - 48px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 60px - 64px - 48px - env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { Howl, Howler } from 'howler';
 import logger from '@/utils/logger';
+import { useMusic } from '@/contexts/MusicContext';
 
 // ==============================================
 // TYPES
@@ -43,9 +44,6 @@ const TRACK_SWITCH_THRESHOLD = 0.5;
 
 /** Crossfade duration in milliseconds */
 const CROSSFADE_MS = 2000;
-
-/** Default volume for adventure music */
-const DEFAULT_VOLUME = 0.5;
 
 // ==============================================
 // HELPERS
@@ -90,6 +88,10 @@ export function useAdventureMusic({
   totalTime,
   enabled = true,
 }: UseAdventureMusicOptions) {
+  // Get volume and mute settings from MusicContext
+  // This ensures MusicControls works correctly in adventure mode
+  const { volume: contextVolume, isMuted: contextMuted } = useMusic();
+
   // Track refs for Howl instances
   const track1Ref = useRef<Howl | null>(null);
   const track2Ref = useRef<Howl | null>(null);
@@ -103,6 +105,10 @@ export function useAdventureMusic({
   const enabledRef = useRef(enabled);
   const prevTotalTimeRef = useRef(totalTime);
 
+  // MusicContext refs (for callbacks that can't have dependencies)
+  const contextVolumeRef = useRef(contextVolume);
+  const contextMutedRef = useRef(contextMuted);
+
   // Window focus tracking
   const windowFocusedRef = useRef(typeof document !== 'undefined' ? document.hasFocus() : true);
   const pausedByBlurRef = useRef(false);
@@ -115,6 +121,16 @@ export function useAdventureMusic({
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
   useEffect(() => { enabledRef.current = enabled; }, [enabled]);
+  useEffect(() => { contextVolumeRef.current = contextVolume; }, [contextVolume]);
+  useEffect(() => { contextMutedRef.current = contextMuted; }, [contextMuted]);
+
+  /**
+   * Get the effective volume based on MusicContext settings
+   * Returns 0 if muted, otherwise returns the context volume
+   */
+  const getEffectiveVolume = useCallback(() => {
+    return contextMutedRef.current ? 0 : contextVolumeRef.current;
+  }, []);
 
   // ==============================================
   // AUDIO CONTROL HELPERS
@@ -152,9 +168,9 @@ export function useAdventureMusic({
 
     if (howl && !howl.playing()) {
       howl.play();
-      howl.volume(DEFAULT_VOLUME);
+      howl.volume(getEffectiveVolume());
     }
-  }, []);
+  }, [getEffectiveVolume]);
 
   // ==============================================
   // WINDOW FOCUS & VISIBILITY HANDLERS
@@ -246,16 +262,17 @@ export function useAdventureMusic({
                           (isTrack2 && currentTrackRef.current === 2);
 
         if (shouldLoop && enabledRef.current && isPlayingRef.current && !isPausedRef.current) {
-          logger.log(`[AdventureMusic] ${trackName} ended, looping with crossfade`);
+          const targetVolume = getEffectiveVolume();
+          logger.log(`[AdventureMusic] ${trackName} ended, looping with crossfade to volume ${targetVolume}`);
           howl.seek(0);
           howl.volume(0);
           howl.play();
-          howl.fade(0, DEFAULT_VOLUME, CROSSFADE_MS);
+          howl.fade(0, targetVolume, CROSSFADE_MS);
         }
       },
     });
     return howl;
-  }, []);
+  }, [getEffectiveVolume]);
 
   /**
    * Initialize tracks for the current world
@@ -295,7 +312,8 @@ export function useAdventureMusic({
   const startTrack1 = useCallback(() => {
     if (!track1Ref.current || currentTrackRef.current === 1) return;
 
-    logger.log(`[AdventureMusic] Starting track 1`);
+    const targetVolume = getEffectiveVolume();
+    logger.log(`[AdventureMusic] Starting track 1 at volume ${targetVolume}`);
 
     // Load if not loaded
     if (track1Ref.current.state() === 'unloaded') {
@@ -312,9 +330,9 @@ export function useAdventureMusic({
     // Start track 1
     track1Ref.current.volume(0);
     track1Ref.current.play();
-    track1Ref.current.fade(0, DEFAULT_VOLUME, CROSSFADE_MS);
+    track1Ref.current.fade(0, targetVolume, CROSSFADE_MS);
     currentTrackRef.current = 1;
-  }, []);
+  }, [getEffectiveVolume]);
 
   /**
    * Switch to track 2
@@ -322,7 +340,8 @@ export function useAdventureMusic({
   const switchToTrack2 = useCallback(() => {
     if (!track2Ref.current || currentTrackRef.current === 2 || hasSwitchedToTrack2Ref.current) return;
 
-    logger.log(`[AdventureMusic] Switching to track 2`);
+    const targetVolume = getEffectiveVolume();
+    logger.log(`[AdventureMusic] Switching to track 2 at volume ${targetVolume}`);
     hasSwitchedToTrack2Ref.current = true;
 
     // Load if not loaded
@@ -340,9 +359,9 @@ export function useAdventureMusic({
     // Start track 2
     track2Ref.current.volume(0);
     track2Ref.current.play();
-    track2Ref.current.fade(0, DEFAULT_VOLUME, CROSSFADE_MS);
+    track2Ref.current.fade(0, targetVolume, CROSSFADE_MS);
     currentTrackRef.current = 2;
-  }, []);
+  }, [getEffectiveVolume]);
 
   /**
    * Stop all music
@@ -411,14 +430,14 @@ export function useAdventureMusic({
         const howl = currentTrackRef.current === 1 ? track1Ref.current : track2Ref.current;
         if (howl) {
           howl.play();
-          howl.volume(DEFAULT_VOLUME);
+          howl.volume(getEffectiveVolume());
         }
       }
     } else {
       // Pause music when game is paused or not playing
       suspendAudio('Game paused/stopped');
     }
-  }, [isPlaying, isPaused, enabled, worldNumber, startTrack1, suspendAudio]);
+  }, [isPlaying, isPaused, enabled, worldNumber, startTrack1, suspendAudio, getEffectiveVolume]);
 
   // Handle track switching based on time
   useEffect(() => {
@@ -457,6 +476,20 @@ export function useAdventureMusic({
       }
     }
   }, [totalTime, enabled, isPlaying, isPaused, startTrack1]);
+
+  // Handle MusicContext volume and mute changes in real-time
+  // This ensures MusicControls works correctly during adventure mode playback
+  useEffect(() => {
+    const currentTrack = currentTrackRef.current;
+    if (!currentTrack) return;
+
+    const howl = currentTrack === 1 ? track1Ref.current : track2Ref.current;
+    if (!howl) return;
+
+    const effectiveVolume = contextMuted ? 0 : contextVolume;
+    logger.log(`[AdventureMusic] MusicContext changed - setting volume to ${effectiveVolume}`);
+    howl.volume(effectiveVolume);
+  }, [contextVolume, contextMuted]);
 
   // ==============================================
   // RETURN

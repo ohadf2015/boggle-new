@@ -98,7 +98,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[80]",
-                "bg-neo-navy/95 backdrop-blur-sm",
+                "bg-neo-navy", // Solid background, no transparency
                 "border-t-3 border-neo-black",
                 "shadow-[0_-4px_0_0_rgba(0,0,0,1)]", // Hard shadow upward
                 "sm:hidden", // Only visible on mobile (<sm breakpoint)

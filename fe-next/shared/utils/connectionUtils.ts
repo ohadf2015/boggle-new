@@ -105,19 +105,47 @@ export function handlePlayerLeft(
 
 /**
  * Create all connection-related handlers
+ * @param t - Translation function
+ * @param context - 'HOST' or 'PLAYER'
+ * @param currentUsername - Optional current user's username to filter self-notifications
  */
 export function createConnectionHandlers(
   t: (key: string) => string,
-  context: 'HOST' | 'PLAYER'
+  context: 'HOST' | 'PLAYER',
+  currentUsername?: string
 ) {
   return {
-    handlePlayerDisconnected: (data: PlayerEventData) =>
-      handlePlayerDisconnected(data, t, context),
-    handlePlayerReconnected: (data: PlayerEventData) =>
-      handlePlayerReconnected(data, t, context),
-    handlePlayerConnectionStatusChanged: (data: ConnectionStatusData) =>
-      handlePlayerConnectionStatusChanged(data, t, context),
-    handlePlayerLeft: (data: PlayerEventData) =>
-      handlePlayerLeft(data, t, context),
+    handlePlayerDisconnected: (data: PlayerEventData) => {
+      // Don't show notification about yourself disconnecting
+      if (currentUsername && data.username === currentUsername) {
+        logger.log(`[${context}] Skipping self-disconnect notification`);
+        return;
+      }
+      handlePlayerDisconnected(data, t, context);
+    },
+    handlePlayerReconnected: (data: PlayerEventData) => {
+      // Don't show notification about yourself reconnecting
+      if (currentUsername && data.username === currentUsername) {
+        logger.log(`[${context}] Skipping self-reconnect notification`);
+        return;
+      }
+      handlePlayerReconnected(data, t, context);
+    },
+    handlePlayerConnectionStatusChanged: (data: ConnectionStatusData) => {
+      // Don't show notification about your own connection status
+      if (currentUsername && data.username === currentUsername) {
+        logger.log(`[${context}] Skipping self-connection-status notification`);
+        return;
+      }
+      handlePlayerConnectionStatusChanged(data, t, context);
+    },
+    handlePlayerLeft: (data: PlayerEventData) => {
+      // Don't show notification about yourself leaving
+      if (currentUsername && data.username === currentUsername) {
+        logger.log(`[${context}] Skipping self-left notification`);
+        return;
+      }
+      handlePlayerLeft(data, t, context);
+    },
   };
 }

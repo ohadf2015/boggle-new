@@ -45,9 +45,10 @@ export function usePlayerSessionEvents({
     setLevelUpData,
   } = useGameActions();
   // Create memoized handlers using shared utilities
+  // Pass username to filter out self-notifications (e.g., player doesn't see "you reconnected" toast)
   const connectionHandlers = useMemo(
-    () => createConnectionHandlers(t, 'PLAYER'),
-    [t]
+    () => createConnectionHandlers(t, 'PLAYER', username),
+    [t, username]
   );
   const {
     handlePlayerDisconnected,

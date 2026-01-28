@@ -18,6 +18,7 @@ interface UseHostPlayerEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   hostPlaying: boolean;
+  hostUsername?: string;
   queueAchievement: (achievement: AchievementPayload) => void;
 
   // State setters
@@ -39,6 +40,7 @@ export function useHostPlayerEvents({
   socket,
   t,
   hostPlaying,
+  hostUsername,
   queueAchievement,
   setPlayersReady,
   setPlayerWordCounts,
@@ -49,9 +51,10 @@ export function useHostPlayerEvents({
   setLevelUpData,
 }: UseHostPlayerEventsProps): void {
   // Create memoized handlers using shared utilities
+  // Pass hostUsername to filter out self-notifications when host is also playing
   const connectionHandlers = useMemo(
-    () => createConnectionHandlers(t, 'HOST'),
-    [t]
+    () => createConnectionHandlers(t, 'HOST', hostUsername),
+    [t, hostUsername]
   );
   const {
     handlePlayerDisconnected,

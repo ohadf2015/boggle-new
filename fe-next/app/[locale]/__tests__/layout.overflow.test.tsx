@@ -10,14 +10,14 @@ import { resolve } from 'path';
  * The correct scroll containment pattern requires:
  * 1. Body with screen-fit (provides min-height: 100dvh, overflow-y: auto, -webkit-overflow-scrolling: touch)
  * 2. Wrapper div with overflow-x-hidden (contains horizontal overflow only)
- * 3. Main with screen-fit-content (provides flex: 1, min-height: 0 for flex sizing)
+ * 3. Main with overflow-visible and proper z-index (allows content to flow naturally)
  *
  * IMPORTANT: Scroll is handled at the BODY level (screen-fit), NOT at the main level.
  * Having overflow-y: auto on BOTH body AND main creates a "scroll trap" on iOS where
  * overscroll-behavior-y: contain blocks momentum scrolling.
  *
- * The fix: screen-fit-content no longer has overflow-y: auto or overscroll-behavior.
- * This creates a single scroll point at the body, which iOS can reliably track.
+ * The main element uses overflow-visible to allow child content to scroll naturally
+ * and includes bottom padding (pb-16) for mobile bottom nav on small screens.
  */
 describe('Layout Mobile Scroll Architecture', () => {
   let layoutSource: string;
@@ -70,9 +70,10 @@ describe('Layout Mobile Scroll Architecture', () => {
     expect(layoutSource).toContain('body className="antialiased screen-fit"');
   });
 
-  it('main should use screen-fit-content for flex sizing', () => {
-    // Main content should use screen-fit-content class which provides:
-    // flex: 1, min-height: 0 (for proper flex sizing)
+  it('main should use overflow-visible to allow content to flow naturally', () => {
+    // Main content should use overflow-visible to:
+    // 1. Allow child content to scroll naturally (scroll handled at body level)
+    // 2. Support bottom padding for mobile nav (pb-16 sm:pb-0)
     // NOTE: Scroll is handled at body level, NOT at main level
     const mainMatch = layoutSource.match(/<main[^>]*className="([^"]*)"/);
 
@@ -80,8 +81,11 @@ describe('Layout Mobile Scroll Architecture', () => {
 
     if (mainMatch) {
       const mainClasses = mainMatch[1];
-      // Main uses screen-fit-content for flex sizing (not for scrolling)
-      expect(mainClasses).toContain('screen-fit-content');
+      // Main uses overflow-visible so child content can scroll at body level
+      expect(mainClasses).toContain('overflow-visible');
+      // Main has bottom padding for mobile nav (removed on sm+ screens)
+      expect(mainClasses).toContain('pb-16');
+      expect(mainClasses).toContain('sm:pb-0');
     }
   });
 });

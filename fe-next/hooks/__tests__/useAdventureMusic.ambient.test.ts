@@ -5,8 +5,10 @@
  * World music should play on ALL adventure screens, not just during gameplay.
  */
 
+import React, { ReactNode } from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureMusic } from '../useAdventureMusic';
+import { MusicProvider } from '@/contexts/MusicContext';
 
 // ==============================================
 // MOCKS
@@ -60,6 +62,13 @@ jest.mock('@/utils/logger', () => {
   };
 });
 
+// Test wrapper with MusicProvider
+const createWrapper = () => {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return React.createElement(MusicProvider, null, children);
+  };
+};
+
 // ==============================================
 // TESTS
 // ==============================================
@@ -93,7 +102,8 @@ describe('useAdventureMusic - Ambient Mode', () => {
           ...ambientProps,
           timeRemaining: 0,
           totalTime: 0,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
 
       // THEN - should play track 1 immediately
@@ -112,7 +122,8 @@ describe('useAdventureMusic - Ambient Mode', () => {
             timeRemaining: 0,
             totalTime: 0,
             enabled: true,
-          })
+          }),
+        { wrapper: createWrapper() }
       );
 
       jest.clearAllMocks();
@@ -138,7 +149,8 @@ describe('useAdventureMusic - Ambient Mode', () => {
           timeRemaining: 0,
           totalTime: 0,
           enabled: true,
-        })
+        }),
+        { wrapper: createWrapper() }
       );
 
       // THEN - Howl should be created with manual loop handling
@@ -164,7 +176,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
             totalTime: 0,
             enabled: true,
           }),
-        { initialProps: { isPaused: false } }
+        { initialProps: { isPaused: false }, wrapper: createWrapper() }
       );
 
       // WHEN
@@ -188,7 +200,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
             totalTime: 0,
             enabled: true,
           }),
-        { initialProps: { worldNumber: 1 } }
+        { initialProps: { worldNumber: 1 }, wrapper: createWrapper() }
       );
 
       jest.clearAllMocks();
@@ -218,7 +230,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
             totalTime,
             enabled: true,
           }),
-        { initialProps: { timeRemaining: 0, totalTime: 0 } }
+        { initialProps: { timeRemaining: 0, totalTime: 0 }, wrapper: createWrapper() }
       );
 
       // Music should be playing
@@ -246,7 +258,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
             totalTime,
             enabled: true,
           }),
-        { initialProps: { timeRemaining: 0, totalTime: 0 } }
+        { initialProps: { timeRemaining: 0, totalTime: 0 }, wrapper: createWrapper() }
       );
 
       // Transition to gameplay
@@ -275,7 +287,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
             totalTime,
             enabled: true,
           }),
-        { initialProps: { timeRemaining: 60, totalTime: 120 } }
+        { initialProps: { timeRemaining: 60, totalTime: 120 }, wrapper: createWrapper() }
       );
 
       jest.clearAllMocks();
