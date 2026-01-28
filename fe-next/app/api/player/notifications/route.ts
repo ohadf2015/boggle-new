@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         read,
         read_at,
         created_at,
-        sender:profiles!user_notifications_sender_id_fkey(
+        sender:profiles!user_notifications_sender_profile_fkey(
           username,
           display_name,
           avatar_emoji,

@@ -62,7 +62,36 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
+// Bounded cache configuration - prevents unbounded memory growth
+const CACHE_LIMITS = {
+  PLAYER_WORDS_MAX_ENTRIES: 10,      // Max 10 languages cached
+  BLACKLIST_MAX_ENTRIES: 10,         // Max 10 languages cached
+  DIFFICULTY_PARAMS_MAX_ENTRIES: 15, // Max 15 language/difficulty combos
+  WRONG_WORDS_MAX_ENTRIES: 10,       // Max 10 languages cached
+};
+
+// Helper to evict oldest entry when cache is full
+function evictOldestEntry<T>(cache: Map<string, CacheEntry<T>>, maxSize: number): void {
+  if (cache.size < maxSize) return;
+
+  let oldestKey: string | null = null;
+  let oldestTime = Infinity;
+
+  for (const [key, entry] of cache.entries()) {
+    if (entry.timestamp < oldestTime) {
+      oldestTime = entry.timestamp;
+      oldestKey = key;
+    }
+  }
+
+  if (oldestKey) {
+    cache.delete(oldestKey);
+    logger.debug('BOT', `Evicted oldest cache entry: ${oldestKey}`);
+  }
+}
+
 // Cache for player words per language (refreshed periodically)
+// Limited to prevent unbounded memory growth
 const playerWordsCache = new Map<string, CacheEntry<string[]>>();
 
 // Cache for blacklisted words (words bots should not use)
@@ -145,6 +174,8 @@ export async function getCachedPlayerWords(language: string): Promise<string[]> 
   // Fetch fresh data
   try {
     const { data: words } = await getPopularPlayerWords(language, 500);
+    // Enforce cache size limit before adding
+    evictOldestEntry(playerWordsCache, CACHE_LIMITS.PLAYER_WORDS_MAX_ENTRIES);
     playerWordsCache.set(language, { words, timestamp: now });
     logger.debug('BOT', `Refreshed player words cache for ${language}: ${words.length} words`);
     return words;
@@ -189,6 +220,8 @@ export async function getCachedBlacklist(language: string): Promise<Set<string>>
     }
 
     const words = new Set<string>((data || []).map((row: { word: string }) => row.word.toLowerCase()));
+    // Enforce cache size limit before adding
+    evictOldestEntry(blacklistCache, CACHE_LIMITS.BLACKLIST_MAX_ENTRIES);
     blacklistCache.set(language, { words, timestamp: now });
     logger.debug('BOT', `Refreshed blacklist cache for ${language}: ${words.size} words`);
     return words;
@@ -205,29 +238,66 @@ export async function getCachedBlacklist(language: string): Promise<Set<string>>
 export function clearBehaviorCaches(): void {
   const playerWordsCount = playerWordsCache.size;
   const blacklistCount = blacklistCache.size;
+  const difficultyCount = difficultyParamsCache.size;
+  const wrongWordsCount = wrongWordsCache.size;
+
   playerWordsCache.clear();
   blacklistCache.clear();
-  logger.info('BOT', `Cleared behavior caches: ${playerWordsCount} player words, ${blacklistCount} blacklist entries`);
+  difficultyParamsCache.clear();
+  wrongWordsCache.clear();
+
+  logger.info('BOT', `Cleared all behavior caches: ${playerWordsCount} player words, ${blacklistCount} blacklist, ${difficultyCount} difficulty params, ${wrongWordsCount} wrong words entries`);
 }
 
 /**
- * Get cache statistics
+ * Get cache statistics with memory estimates
  */
 export function getCacheStats(): {
   playerWordsCacheSize: number;
   playerWordsCacheLanguages: string[];
+  playerWordsCacheLimit: number;
   blacklistCacheSize: number;
   blacklistCacheLanguages: string[];
+  blacklistCacheLimit: number;
   difficultyParamsCacheSize: number;
+  difficultyParamsCacheLimit: number;
   wrongWordsCacheSize: number;
+  wrongWordsCacheLimit: number;
+  estimatedMemoryBytes: number;
 } {
+  // Estimate memory usage (rough approximation)
+  let estimatedBytes = 0;
+
+  // Player words: ~500 words per language × ~8 bytes per word = ~4KB per language
+  for (const entry of playerWordsCache.values()) {
+    estimatedBytes += entry.words.length * 8;
+  }
+
+  // Blacklist: ~100 words per language × ~8 bytes = ~800 bytes per language
+  for (const entry of blacklistCache.values()) {
+    estimatedBytes += entry.words.size * 8;
+  }
+
+  // Difficulty params: ~200 bytes per entry
+  estimatedBytes += difficultyParamsCache.size * 200;
+
+  // Wrong words: ~100 words per language × ~8 bytes = ~800 bytes per language
+  for (const entry of wrongWordsCache.values()) {
+    estimatedBytes += entry.words.length * 8;
+  }
+
   return {
     playerWordsCacheSize: playerWordsCache.size,
     playerWordsCacheLanguages: Array.from(playerWordsCache.keys()),
+    playerWordsCacheLimit: CACHE_LIMITS.PLAYER_WORDS_MAX_ENTRIES,
     blacklistCacheSize: blacklistCache.size,
     blacklistCacheLanguages: Array.from(blacklistCache.keys()),
+    blacklistCacheLimit: CACHE_LIMITS.BLACKLIST_MAX_ENTRIES,
     difficultyParamsCacheSize: difficultyParamsCache.size,
+    difficultyParamsCacheLimit: CACHE_LIMITS.DIFFICULTY_PARAMS_MAX_ENTRIES,
     wrongWordsCacheSize: wrongWordsCache.size,
+    wrongWordsCacheLimit: CACHE_LIMITS.WRONG_WORDS_MAX_ENTRIES,
+    estimatedMemoryBytes: estimatedBytes,
   };
 }
 
@@ -286,6 +356,8 @@ export async function getCachedDifficultyParams(
       calculatedAt: new Date(data.calculated_at),
     };
 
+    // Enforce cache size limit before adding
+    evictOldestEntry(difficultyParamsCache, CACHE_LIMITS.DIFFICULTY_PARAMS_MAX_ENTRIES);
     difficultyParamsCache.set(cacheKey, { words: params, timestamp: now });
     logger.debug('BOT', `Loaded dynamic params for ${language}/${difficulty}: ${params.adjustedWordsPerMinute} wpm, ${params.sampleSize} samples`);
     return params;
@@ -337,6 +409,8 @@ export async function getCachedWrongWords(
     }
 
     const words = (data || []).map((row: { word: string }) => row.word);
+    // Enforce cache size limit before adding
+    evictOldestEntry(wrongWordsCache, CACHE_LIMITS.WRONG_WORDS_MAX_ENTRIES);
     wrongWordsCache.set(language, { words, timestamp: now });
     logger.debug('BOT', `Loaded ${words.length} wrong words for ${language}`);
     return words;

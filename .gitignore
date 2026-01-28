@@ -4,6 +4,7 @@ build
 .DS_Store
 .claude-memory/
 .memdb/
+.trae/
 *.log
 npm-debug.log*
 yarn-debug.log*

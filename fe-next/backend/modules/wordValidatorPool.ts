@@ -221,11 +221,16 @@ export class WordValidatorPool {
     // Dynamic import for ES module compatibility
     const validator = await import('./wordValidator');
 
+    // Reconstruct Map from serialized array entries if needed
+    const positions = data.positions
+      ? new Map(data.positions as [string, [number, number][]][])
+      : undefined;
+
     switch (action) {
       case 'isWordOnBoard':
-        return validator.isWordOnBoard(data.word as string, data.board as string[][], data.positions as PositionsMap);
+        return validator.isWordOnBoard(data.word as string, data.board as string[][], positions);
       case 'getWordPath':
-        return validator.getWordPath(data.word as string, data.board as string[][], data.positions as PositionsMap);
+        return validator.getWordPath(data.word as string, data.board as string[][], positions);
       case 'makePositionsMap':
         return Array.from(validator.makePositionsMap(data.board as string[][]).entries());
       default:

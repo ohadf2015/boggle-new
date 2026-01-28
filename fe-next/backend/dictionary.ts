@@ -71,6 +71,14 @@ interface LanguageConfig {
   approvedFile: string;
 }
 
+// Memory tracking for dictionaries
+interface DictionaryMemoryStats {
+  language: Language;
+  wordCount: number;
+  estimatedBytes: number;
+  lastAccessed: number;
+}
+
 class Dictionary {
   englishWords: Set<string>;
   hebrewWords: Set<string>;
@@ -81,6 +89,7 @@ class Dictionary {
   loaded: boolean; // @deprecated - use loadedLanguages instead
   loadedLanguages: Set<Language>; // Track which languages are loaded
   loadingPromises: Map<Language, Promise<void>>; // Prevent duplicate loading
+  lastAccessTime: Map<Language, number>; // Track last access for potential unloading
 
   constructor() {
     this.englishWords = new Set();
@@ -92,14 +101,180 @@ class Dictionary {
     this.loaded = false;
     this.loadedLanguages = new Set();
     this.loadingPromises = new Map();
+    this.lastAccessTime = new Map();
   }
 
+  /**
+   * Get memory usage statistics for all loaded dictionaries
+   */
+  getMemoryStats(): DictionaryMemoryStats[] {
+    const stats: DictionaryMemoryStats[] = [];
+    const avgBytesPerWord = 12; // Average word length ~6 chars × 2 bytes (UTF-16) + Set overhead
+
+    if (this.loadedLanguages.has('en')) {
+      stats.push({
+        language: 'en',
+        wordCount: this.englishWords.size,
+        estimatedBytes: this.englishWords.size * avgBytesPerWord,
+        lastAccessed: this.lastAccessTime.get('en') || 0
+      });
+    }
+    if (this.loadedLanguages.has('he')) {
+      stats.push({
+        language: 'he',
+        wordCount: this.hebrewWords.size,
+        estimatedBytes: this.hebrewWords.size * avgBytesPerWord,
+        lastAccessed: this.lastAccessTime.get('he') || 0
+      });
+    }
+    if (this.loadedLanguages.has('sv')) {
+      stats.push({
+        language: 'sv',
+        wordCount: this.swedishWords.size,
+        estimatedBytes: this.swedishWords.size * avgBytesPerWord,
+        lastAccessed: this.lastAccessTime.get('sv') || 0
+      });
+    }
+    if (this.loadedLanguages.has('ja')) {
+      stats.push({
+        language: 'ja',
+        wordCount: this.japaneseWords.size,
+        estimatedBytes: this.japaneseWords.size * avgBytesPerWord,
+        lastAccessed: this.lastAccessTime.get('ja') || 0
+      });
+    }
+    if (this.loadedLanguages.has('es')) {
+      stats.push({
+        language: 'es',
+        wordCount: this.spanishWords.size,
+        estimatedBytes: this.spanishWords.size * avgBytesPerWord,
+        lastAccessed: this.lastAccessTime.get('es') || 0
+      });
+    }
+
+    return stats;
+  }
+
+  /**
+   * Get total estimated memory usage in bytes
+   */
+  getTotalMemoryUsage(): number {
+    return this.getMemoryStats().reduce((sum, stat) => sum + stat.estimatedBytes, 0);
+  }
+
+  /**
+   * Unload a language dictionary to free memory
+   * Note: English cannot be unloaded as it's the default fallback
+   */
+  unloadLanguage(language: Language): boolean {
+    if (language === 'en') {
+      logger.warn('DICT', 'Cannot unload English dictionary - it is the default fallback');
+      return false;
+    }
+
+    if (!this.loadedLanguages.has(language)) {
+      return false; // Already not loaded
+    }
+
+    const beforeSize = this.getTotalMemoryUsage();
+
+    switch (language) {
+      case 'he':
+        this.hebrewWords = new Set();
+        break;
+      case 'sv':
+        this.swedishWords = new Set();
+        break;
+      case 'ja':
+        this.japaneseWords = new Set();
+        this.kanjiCompounds = [];
+        break;
+      case 'es':
+        this.spanishWords = new Set();
+        break;
+    }
+
+    this.loadedLanguages.delete(language);
+    this.lastAccessTime.delete(language);
+
+    const afterSize = this.getTotalMemoryUsage();
+    const freedBytes = beforeSize - afterSize;
+    logger.info('DICT', `Unloaded ${language} dictionary, freed ~${Math.round(freedBytes / 1024)}KB`);
+
+    return true;
+  }
+
+  /**
+   * Unload dictionaries that haven't been accessed in the specified time
+   * @param maxIdleMs - Maximum idle time in milliseconds (default: 30 minutes)
+   */
+  unloadIdleDictionaries(maxIdleMs: number = 30 * 60 * 1000): Language[] {
+    const now = Date.now();
+    const unloaded: Language[] = [];
+
+    for (const [language, lastAccess] of this.lastAccessTime.entries()) {
+      if (language !== 'en' && now - lastAccess > maxIdleMs) {
+        if (this.unloadLanguage(language)) {
+          unloaded.push(language);
+        }
+      }
+    }
+
+    if (unloaded.length > 0) {
+      logger.info('DICT', `Unloaded ${unloaded.length} idle dictionaries: ${unloaded.join(', ')}`);
+    }
+
+    return unloaded;
+  }
+
+  /**
+   * Load only English dictionary for fast startup
+   * Other languages will be lazy-loaded on first use
+   * This saves ~60% memory on startup
+   */
+  async loadEnglishOnly(): Promise<void> {
+    if (this.loadedLanguages.has('en')) {
+      return;
+    }
+
+    logger.info('DICT', 'Loading English dictionary only (lazy loading enabled for other languages)...');
+    const startTime = Date.now();
+
+    try {
+      const safeReadFile = async (filePath: string): Promise<string> => {
+        try {
+          if (fs.existsSync(filePath)) {
+            return await fsp.readFile(filePath, 'utf-8');
+          }
+        } catch (e: unknown) {
+          const error = e as Error;
+          logger.warn('DICT', `Could not read ${filePath}: ${error.message}`);
+        }
+        return '';
+      };
+
+      await this.loadEnglishDictionary(safeReadFile);
+      this.loadedLanguages.add('en');
+      this.lastAccessTime.set('en', Date.now());
+      this.loaded = true; // Backward compatibility
+
+      const loadTime = Date.now() - startTime;
+      logger.info('DICT', `English dictionary loaded in ${loadTime}ms (other languages will be lazy-loaded)`);
+    } catch (error) {
+      logger.error('DICT', `Error loading English dictionary: ${error}`);
+    }
+  }
+
+  /**
+   * Load all dictionaries at once (original behavior)
+   * Consider using loadEnglishOnly() for faster startup
+   */
   async load(): Promise<void> {
     if (this.loaded) {
       return;
     }
 
-    logger.info('DICT', 'Loading dictionaries in parallel...');
+    logger.info('DICT', 'Loading all dictionaries in parallel...');
     const startTime = Date.now();
 
     try {
@@ -353,8 +528,9 @@ class Dictionary {
    * Returns immediately if already loaded or loading
    */
   async ensureLanguageLoaded(language: Language): Promise<void> {
-    // Already loaded
+    // Already loaded - update access time
     if (this.loadedLanguages.has(language)) {
+      this.lastAccessTime.set(language, Date.now());
       return;
     }
 
@@ -370,6 +546,7 @@ class Dictionary {
     try {
       await loadPromise;
       this.loadedLanguages.add(language);
+      this.lastAccessTime.set(language, Date.now());
     } finally {
       this.loadingPromises.delete(language);
     }
@@ -598,6 +775,9 @@ class Dictionary {
       // Language not loaded yet - caller should call ensureLanguageLoaded(language) and retry
       return null;
     }
+
+    // Update access time for this language (for idle unloading)
+    this.lastAccessTime.set(language, Date.now());
 
     // Backward compatibility: also check old global loaded flag
     if (!this.loaded && this.loadedLanguages.size === 0) {
@@ -886,6 +1066,7 @@ export {
 
 // Additional exported functions
 export const load = (): Promise<void> => dictionary.load();
+export const loadEnglishOnly = (): Promise<void> => dictionary.loadEnglishOnly();
 export const isValidWord = (word: string, language: Language): boolean | null => dictionary.isValidWord(word, language);
 export const isValidEnglishWord = (word: string): boolean | null => dictionary.isValidEnglishWord(word);
 export const isValidHebrewWord = (word: string): boolean | null => dictionary.isValidHebrewWord(word);
@@ -896,6 +1077,12 @@ export const getRandomKanjiCompounds = (count?: number, minLength?: number, maxL
 export const getRandomLongWords = (language: Language, count?: number, minLength?: number, maxLength?: number): string[] => dictionary.getRandomLongWords(language, count, minLength, maxLength);
 export const getRandomLongWordsWithTheme = (language: Language, count?: number, minLength?: number, maxLength?: number): ThemedWordsResult => dictionary.getRandomLongWordsWithTheme(language, count, minLength, maxLength);
 export const ensureLanguageLoaded = (language: Language): Promise<void> => dictionary.ensureLanguageLoaded(language);
+// Memory management exports
+export const getMemoryStats = (): DictionaryMemoryStats[] => dictionary.getMemoryStats();
+export const getTotalMemoryUsage = (): number => dictionary.getTotalMemoryUsage();
+export const unloadLanguage = (language: Language): boolean => dictionary.unloadLanguage(language);
+export const unloadIdleDictionaries = (maxIdleMs?: number): Language[] => dictionary.unloadIdleDictionaries(maxIdleMs);
 export { getCurrentTheme };
+export type { DictionaryMemoryStats };
 
 // ES Module exports

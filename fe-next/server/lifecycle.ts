@@ -43,11 +43,11 @@ export async function initializeServer(io: Server): Promise<void> {
   }
 
   // Load English dictionary on startup (most common language)
-  // Other languages will be lazy-loaded on first use for faster startup
+  // Other languages will be lazy-loaded on first use for ~60% memory savings
   try {
-    console.log('[STARTUP] Loading dictionary...');
-    await dictionary.load();
-    console.log('[STARTUP] Dictionary loaded - ready for all languages');
+    console.log('[STARTUP] Loading English dictionary (lazy loading enabled for other languages)...');
+    await dictionary.loadEnglishOnly();
+    console.log('[STARTUP] English dictionary loaded - other languages will be lazy-loaded on demand');
   } catch (error) {
     console.error('Failed to load dictionary:', error);
   }

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
 import type { WordBankWord, WordBankStats, WordBankFilters, ValidationStatus, BulkActionResult } from '../types';
 
@@ -35,8 +36,24 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
   const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const supabaseRef = useRef(createClient());
 
   const limit = filters.limit || 50;
+
+  /**
+   * Get authorization headers with Bearer token
+   * Required for admin API authentication
+   */
+  const getAuthHeaders = useCallback(async (): Promise<Record<string, string>> => {
+    const { data: { session } } = await supabaseRef.current.auth.getSession();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+    return headers;
+  }, []);
 
   const fetchWords = useCallback(
     async (resetOffset = false): Promise<void> => {
@@ -69,7 +86,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
           params.append('search', filters.search);
         }
 
-        const response = await fetch(`/api/admin/daily-word/word-bank?${params.toString()}`);
+        const headers = await getAuthHeaders();
+        const response = await fetch(`/api/admin/daily-word/word-bank?${params.toString()}`, {
+          headers,
+        });
 
         if (!response.ok) {
           const errorBody = await response.text().catch(() => 'No error details');
@@ -102,7 +122,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         setLoading(false);
       }
     },
-    [filters, offset, limit]
+    [filters, offset, limit, getAuthHeaders]
   );
 
   const fetchStats = useCallback(async (): Promise<void> => {
@@ -112,7 +132,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         action: 'stats',
       });
 
-      const response = await fetch(`/api/admin/daily-word/word-bank?${params.toString()}`);
+      const headers = await getAuthHeaders();
+      const response = await fetch(`/api/admin/daily-word/word-bank?${params.toString()}`, {
+        headers,
+      });
 
       if (!response.ok) {
         const errorBody = await response.text().catch(() => 'No error details');
@@ -131,7 +154,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         console.error('Stats fetch error:', errorMessage);
       }
     }
-  }, [filters.language]);
+  }, [filters.language, getAuthHeaders]);
 
   const refresh = useCallback(async (): Promise<void> => {
     setOffset(0);
@@ -141,9 +164,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
   const deleteWord = useCallback(
     async (word: string): Promise<boolean> => {
       try {
+        const headers = await getAuthHeaders();
         const response = await fetch('/api/admin/daily-word/word-bank', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             action: 'delete',
             word,
@@ -172,7 +196,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         return false;
       }
     },
-    [filters.language, fetchStats]
+    [filters.language, fetchStats, getAuthHeaders]
   );
 
   const loadMore = useCallback(async (): Promise<void> => {
@@ -184,9 +208,10 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
   const approveWord = useCallback(
     async (wordId: string): Promise<boolean> => {
       try {
+        const headers = await getAuthHeaders();
         const response = await fetch('/api/admin/daily-word/word-bank', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             action: 'approve',
             wordId,
@@ -217,15 +242,16 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         return false;
       }
     },
-    [filters.language, fetchStats]
+    [filters.language, fetchStats, getAuthHeaders]
   );
 
   const rejectWord = useCallback(
     async (wordId: string): Promise<boolean> => {
       try {
+        const headers = await getAuthHeaders();
         const response = await fetch('/api/admin/daily-word/word-bank', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             action: 'reject',
             wordId,
@@ -256,15 +282,16 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         return false;
       }
     },
-    [filters.language, fetchStats]
+    [filters.language, fetchStats, getAuthHeaders]
   );
 
   const bulkApprove = useCallback(
     async (wordIds: string[]): Promise<BulkActionResult> => {
       try {
+        const headers = await getAuthHeaders();
         const response = await fetch('/api/admin/daily-word/word-bank', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             action: 'bulk-approve',
             wordIds,
@@ -296,15 +323,16 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         return { success: false, affected: 0, errors: [] };
       }
     },
-    [filters.language, fetchStats]
+    [filters.language, fetchStats, getAuthHeaders]
   );
 
   const bulkReject = useCallback(
     async (wordIds: string[]): Promise<BulkActionResult> => {
       try {
+        const headers = await getAuthHeaders();
         const response = await fetch('/api/admin/daily-word/word-bank', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             action: 'bulk-reject',
             wordIds,
@@ -336,7 +364,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         return { success: false, affected: 0, errors: [] };
       }
     },
-    [filters.language, fetchStats]
+    [filters.language, fetchStats, getAuthHeaders]
   );
 
   const clearError = useCallback((): void => {

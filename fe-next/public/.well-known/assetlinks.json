@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "live.lexiclash.app",
+      "sha256_cert_fingerprints": [
+        "54:61:18:A2:39:B5:B7:55:A9:6A:A8:83:01:21:A1:57:EE:ED:2D:22:F2:35:10:5A:C0:E7:6A:1C:0C:97:90:19"
+      ]
+    }
+  }
+]
