@@ -649,10 +649,21 @@ export function MusicProvider({ children }: MusicProviderProps) {
         fadeToTrack(trackKey, 500, 500);
     }, [fadeToTrack]);
 
-    // NOTE: Pending track processing is now handled in two places:
-    // 1. unlockAudio() - for explicit unlock via play buttons
-    // 2. handleFirstInteraction() - for auto-unlock via any user interaction
-    // Both use the same 100ms delay pattern to ensure AudioContext is ready.
+    // BACKUP: Process pending track requests when audio gets unlocked via React state change
+    // This is a safety net in case the inline processing in handleFirstInteraction or unlockAudio
+    // fails to play the pending track (e.g., due to timing issues or race conditions).
+    // The inline processing should handle most cases, but this useEffect catches edge cases.
+    useEffect(() => {
+        if (audioUnlocked && pendingUnlockTrackRef.current) {
+            const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
+            pendingUnlockTrackRef.current = null;
+            logger.log('[Music] useEffect backup - Playing pending track:', trackKey);
+            // Small delay to ensure AudioContext is fully resumed
+            setTimeout(() => {
+                fadeToTrack(trackKey, fadeOutMs, fadeInMs);
+            }, 50);
+        }
+    }, [audioUnlocked, fadeToTrack]);
 
     // Stop music with fade out
     const stopMusic = useCallback((fadeOutMs = 1000) => {
