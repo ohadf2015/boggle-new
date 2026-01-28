@@ -13,6 +13,41 @@ import { isSportsRelatedChallenge } from './trendsService';
 import { repairTruncatedJson } from './utils';
 
 /**
+ * Field name mappings for normalizing AI output variations
+ * AI models sometimes use slightly different field names than expected
+ */
+const FIELD_NAME_MAPPINGS: Record<string, string> = {
+  // trend_topic variants
+  trending_topic: 'trend_topic',
+  trend: 'trend_topic',
+  topic: 'trend_topic',
+  // prompt variants
+  clue: 'prompt',
+  question: 'prompt',
+  // trending_context variants
+  context: 'trending_context',
+  trend_context: 'trending_context',
+};
+
+/**
+ * Normalize challenge field names from common AI variations
+ * Maps fields like 'trending_topic' -> 'trend_topic', 'clue' -> 'prompt'
+ */
+function normalizeChallengeFields(challenge: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(challenge)) {
+    const normalizedKey = FIELD_NAME_MAPPINGS[key] || key;
+    // Don't overwrite if the correct field already exists
+    if (!(normalizedKey in normalized)) {
+      normalized[normalizedKey] = value;
+    }
+  }
+
+  return normalized;
+}
+
+/**
  * Validate challenges for basic sanity checks
  * NOTE: Dictionary validation removed - Buzz challenges use trending topic words
  * that may not exist in the game dictionary
@@ -197,7 +232,12 @@ export function parseAIResponse(responseText: string): ParsedAIResponse {
     console.log('[BUZZ] First challenge example:', JSON.stringify(parsed.challenges[0], null, 2));
   }
 
-  const validChallenges = parsed.challenges.filter((challenge: Partial<BuzzChallenge>, index: number) => {
+  // Normalize field names before validation (handles AI variations like 'trending_topic' -> 'trend_topic')
+  const normalizedRawChallenges = parsed.challenges.map((challenge) =>
+    normalizeChallengeFields(challenge as unknown as Record<string, unknown>)
+  ) as unknown as Partial<BuzzChallenge>[];
+
+  const validChallenges = normalizedRawChallenges.filter((challenge: Partial<BuzzChallenge>, index: number) => {
     const missingFields: string[] = [];
     if (!challenge.type) missingFields.push('type');
     if (!challenge.trend_topic) missingFields.push('trend_topic');
