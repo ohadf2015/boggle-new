@@ -21,7 +21,7 @@ describe('useGameMusic - Survival Mode (fire-round)', () => {
     ALMOST_OUT_OF_TIME: 'almostOutOfTime',
     BOSSA_ARCADE: 'bossaArcade',
     BOSSA: 'bossa',
-  };
+  } as const;
 
   beforeEach(() => {
     jest.clearAllMocks();
