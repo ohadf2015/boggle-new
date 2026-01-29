@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 18 - Education XP System (COMPLETE)
+**Current focus:** Phase 19 - Achievement System (IN PROGRESS)
 
 ## Current Position
 
-Phase: 25 of 25 (Capacitor Native Apps Integration) — COMPLETE
-Plan: 6/6 complete
-Status: Complete
-Last activity: 2026-01-26 — Completed 25-06-PLAN.md (Generic Haptics Abstraction Layer)
+Phase: 19 of 25 (Achievement System)
+Plan: 1/5 complete
+Status: In progress
+Last activity: 2026-01-29 — Completed 19-01-PLAN.md (Achievement System Foundation)
 
-Progress: [████████████] 19/25 phases (76% milestone, v1.2 complete - Phase 24-25)
+Progress: [████████████░] 19/25 phases (76% milestone, v1.2 complete - Phase 24-25)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [████████████] 19/25 phases (76% milestone, v1
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 19 (Phase 15-18 complete)
-- Current phase: 18 (Education XP System) — COMPLETE
-- Next phase: 19 (Education Teacher Dashboard)
+- Plans completed: 20 (Phase 15-18 complete, Phase 19 plan 01 complete)
+- Current phase: 19 (Achievement System) — IN PROGRESS
+- Next phase: 20 (Education Teacher Dashboard)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -76,6 +76,13 @@ Progress: [████████████] 19/25 phases (76% milestone, v1
 | 18-05 | Practice XP Integration | 7min | Complete |
 
 **Phase 18 Total:** 35 minutes, 114 tests added (15 new in 18-05)
+
+**Phase 19 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 19-01 | Achievement System Foundation | Previously completed | Complete |
+
+**Phase 19 Total:** 1/5 plans complete, 23 tests added
 
 **Phase 24 Plans:**
 | Plan | Name | Duration | Status |
@@ -147,6 +154,12 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **18-05**: PracticeSessionProvider context → Wraps practice activities with XP state and persistence (2026-01-25)
 - **18-05**: Fixed XP header during practice → Progress bar and streak visible without disrupting UI (2026-01-25)
 - **18-05**: Optional xpSessionData prop → Practice components work with or without XP integration (2026-01-25)
+- **19-01**: 18 achievements total → Balanced across 4 categories (5 progress, 4 skill, 5 consistency, 4 exploration) (2026-01-25)
+- **19-01**: 2 secret achievements → streak_champion and word_variety hide progress until bronze unlock (2026-01-25)
+- **19-01**: 4-tier progression → Bronze/Silver/Gold/Platinum with specific thresholds per achievement (2026-01-25)
+- **19-01**: >= comparison for tiers → Includes exact threshold match using Math.min pattern (2026-01-25)
+- **19-01**: RLS classmate access → Students can view achievements of classmates in same classroom for leaderboard (2026-01-25)
+- **19-01**: getProgressValue mapping → Maps achievement key to student metric (e.g., first_lesson → lessonsCompleted) (2026-01-25)
 - **24-02**: CSS isolation with 'all: initial' → Prevents parent frame styles from bleeding through iframe (2026-01-26)
 - **24-02**: 100vh/100dvh fallback pattern → 100vh = parent height, 100dvh = iframe height (2026-01-26)
 - **24-02**: Viewport hook delegation → Separate concerns, reusable outside provider (2026-01-26)
@@ -263,14 +276,19 @@ None.
 - Total duration: 52 minutes across 5 plans
 - Ready for App Store/Play Store submission
 
+**Phase 19 (Achievement System) — IN PROGRESS:**
+- Achievement database schema complete — 3 tables, 18 badges, 72 tier thresholds (19-01 complete)
+- TDD achievement manager complete — 23 tests passing, progress calculation and unlock detection (19-01 complete)
+- Ready for classroom leaderboard (19-02), unlock detection (19-03), profile display (19-04)
+
 ## Session Continuity
 
-Last session: 2026-01-26
-Stopped at: Completed 24-07-PLAN.md (OAuth Hiding Gap Closure) — Phase 24 COMPLETE
+Last session: 2026-01-29
+Stopped at: Completed 19-01-PLAN.md (Achievement System Foundation) — Plan 1/5 complete
 Resume file: None
 
-**Next action:** Phase 24 complete. CrazyGames portal integration ready for deployment testing.
+**Next action:** Phase 19 plan 02 (Classroom Leaderboard) - Build achievement leaderboard UI for classroom context.
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-26 (Phase 24 plan 07 complete - PHASE COMPLETE)*
+*Last updated: 2026-01-29 (Phase 19 plan 01 complete - Achievement System Foundation)*
