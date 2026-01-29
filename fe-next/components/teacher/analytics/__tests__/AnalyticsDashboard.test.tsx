@@ -25,8 +25,8 @@ const mockMetrics = {
   totalStudents: 20,
   weeklyEngagement: 85,
   commonMistakes: [
-    { word: 'receive', errorRate: 0.75, attempts: 8 },
-    { word: 'separate', errorRate: 0.67, attempts: 6 },
+    { word: 'receive', errorRate: 0.75, studentCount: 8 },
+    { word: 'separate', errorRate: 0.67, studentCount: 6 },
   ],
 };
 

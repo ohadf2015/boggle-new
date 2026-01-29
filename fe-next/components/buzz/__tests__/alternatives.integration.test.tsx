@@ -49,8 +49,28 @@ jest.mock('framer-motion', () => ({
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     h2: ({ children, ...props }: any) => <h2 {...props}>{children}</h2>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
+  useMotionValue: (initial: number) => ({
+    get: () => initial,
+    set: jest.fn(),
+    on: jest.fn(),
+    onChange: jest.fn(() => jest.fn()), // Returns an unsubscribe function
+    destroy: jest.fn(),
+  }),
+  useTransform: () => ({
+    get: () => 0,
+    set: jest.fn(),
+    on: jest.fn(),
+    onChange: jest.fn(() => jest.fn()),
+    destroy: jest.fn(),
+  }),
+  useAnimation: () => ({
+    start: jest.fn().mockResolvedValue(undefined),
+    stop: jest.fn(),
+    set: jest.fn(),
+  }),
 }));
 
 // Mock AnswerFeedbackModal to immediately call onClose (bypasses setTimeout timing issues in tests)

@@ -79,10 +79,10 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
 
   // Swipe gesture handlers
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: nextStep,
-    onSwipeRight: prevStep,
-    isRtl: isRTL,
-    enableHaptic: false,
+    onSwipe: (direction) => {
+      if (direction === 'left') nextStep();
+      else if (direction === 'right') prevStep();
+    },
     threshold: 50,
   });
 

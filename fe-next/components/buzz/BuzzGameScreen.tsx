@@ -246,14 +246,13 @@ export default function BuzzGameScreen({
   }, [challengeData.challenges.length]);
 
   // Bidirectional swipe gesture for mobile navigation
-  // NOTE: useSwipeGesture already handles RTL reversal internally when isRtl=true,
-  // so we map left->next and right->prev as if in LTR mode. The hook will reverse them for RTL.
+  // Left swipe = go forward/next, Right swipe = go backward/previous
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: handleNextChallenge,  // Swipe left = go forward/next
-    onSwipeRight: handlePrevChallenge,  // Swipe right = go backward/previous
-    isRtl: dir === 'rtl',
+    onSwipe: (direction) => {
+      if (direction === 'left') handleNextChallenge();
+      else if (direction === 'right') handlePrevChallenge();
+    },
     threshold: 75,
-    enableHaptic: true,
   });
 
   // Handle hint click

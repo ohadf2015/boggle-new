@@ -319,7 +319,7 @@ describe('enrichVocabularyWithContext', () => {
 
     expect(result).toHaveProperty('contextualExamples');
     expect(result.contextualExamples).toHaveLength(1);
-    expect(result.contextualExamples[0]).toBe('Technology is advancing rapidly.');
+    expect(result.contextualExamples?.[0]).toBe('Technology is advancing rapidly.');
   });
 
   it('should preserve original word properties', async () => {

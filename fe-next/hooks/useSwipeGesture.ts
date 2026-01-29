@@ -17,7 +17,7 @@
  * ```
  */
 
-import { useMotionValue, useTransform } from 'framer-motion';
+import { useMotionValue, useTransform, MotionValue } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 export type SwipeDirection = 'left' | 'right';
@@ -38,11 +38,11 @@ interface DragEndInfo {
 
 export interface UseSwipeGestureReturn {
   /** Motion value for horizontal position */
-  x: ReturnType<typeof useMotionValue<number>>;
+  x: MotionValue<number>;
   /** Motion value for card rotation (-50deg to +50deg) */
-  rotate: ReturnType<typeof useTransform>;
+  rotate: MotionValue<number>;
   /** Motion value for card opacity (fades at edges) */
-  opacity: ReturnType<typeof useTransform>;
+  opacity: MotionValue<number>;
   /** Handler for drag end event from Framer Motion */
   handleDragEnd: (event: any, info: DragEndInfo) => void;
   /** Handler for keyboard shortcuts (ArrowLeft/ArrowRight) */

@@ -52,7 +52,7 @@ export function useSpeechSynthesis(defaultLang: string = 'en-US') {
    * @param lang - Language code (optional, uses defaultLang if not provided)
    */
   const speak = useCallback(
-    async (word: string, lang?: string) => {
+    async (word: string, lang?: string): Promise<boolean> => {
       const targetLang = lang || defaultLang;
 
       // Cancel any ongoing speech
@@ -63,8 +63,10 @@ export function useSpeechSynthesis(defaultLang: string = 'en-US') {
 
       try {
         await speakWord(word, targetLang);
+        return true;
       } catch (error) {
         console.error('Speech synthesis error:', error);
+        return false;
       } finally {
         // Only update state if component still mounted
         if (isMountedRef.current) {

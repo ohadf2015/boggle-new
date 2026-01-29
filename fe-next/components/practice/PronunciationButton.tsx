@@ -30,7 +30,7 @@ export function PronunciationButton({
   const [showFallback, setShowFallback] = useState(false);
 
   const handleClick = async () => {
-    const success = await speak(word, lang);
+    const success: boolean = await speak(word, lang);
 
     // Show IPA fallback if voice unavailable
     if (!success && ipaPronunciation) {

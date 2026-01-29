@@ -164,22 +164,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     }
   };
 
-  // Swipe gesture handlers
+  // Swipe gesture handlers - left=next, right=back
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      // Swipe left = next (in LTR), prev (in RTL) - handled by hook
-      if (canAdvance()) {
+    onSwipe: (direction) => {
+      if (direction === 'left' && canAdvance()) {
         handleNext();
-      }
-    },
-    onSwipeRight: () => {
-      // Swipe right = prev (in LTR), next (in RTL) - handled by hook
-      if (currentStep > 0) {
+      } else if (direction === 'right' && currentStep > 0) {
         handleBack();
       }
     },
-    isRtl: dir === 'rtl',
-    enableHaptic: false, // We handle haptic manually for better control
     threshold: 50,
   });
 

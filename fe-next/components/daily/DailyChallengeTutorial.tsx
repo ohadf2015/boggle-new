@@ -42,10 +42,10 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
 
   // Swipe gesture handlers
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: nextStep,
-    onSwipeRight: prevStep,
-    isRtl: dir === 'rtl',
-    enableHaptic: false, // We handle haptic manually
+    onSwipe: (direction) => {
+      if (direction === 'left') nextStep();
+      else if (direction === 'right') prevStep();
+    },
     threshold: 50,
   });
 

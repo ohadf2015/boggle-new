@@ -29,7 +29,7 @@ export function VocabularyCardEnriched({
   compact = false,
   className = '',
 }: VocabularyCardEnrichedProps) {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div

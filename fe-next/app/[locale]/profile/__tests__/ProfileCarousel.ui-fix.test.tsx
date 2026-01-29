@@ -75,6 +75,9 @@ jest.mock('@/hooks/useMobileLandscape', () => ({
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn()
+  }),
+  useSearchParams: () => ({
+    get: jest.fn(() => null)
   })
 }));
 

@@ -35,17 +35,14 @@ export const MobileEnhancementsDemo: React.FC = () => {
 
   // Swipe navigation
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      if (currentPage < totalPages) {
+    onSwipe: (direction) => {
+      if (direction === 'left' && currentPage < totalPages) {
         setCurrentPage((p) => p + 1);
-      }
-    },
-    onSwipeRight: () => {
-      if (currentPage > 1) {
+      } else if (direction === 'right' && currentPage > 1) {
         setCurrentPage((p) => p - 1);
       }
     },
-    enableHaptic: true,
+    threshold: 150,
   });
 
   // Pull to refresh

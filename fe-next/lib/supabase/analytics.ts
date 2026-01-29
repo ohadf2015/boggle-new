@@ -6,6 +6,12 @@ import type { StudentLessonProgress } from './teacher';
 // TYPE DEFINITIONS
 // =============================================
 
+/** Word attempt data structure from student_lesson_progress.words_attempted JSON */
+type WordAttemptData = { correct?: number; attempts?: number };
+
+/** Record of words to their attempt data */
+type WordsAttemptedRecord = Record<string, WordAttemptData>;
+
 export interface ClassroomMetrics {
   /** Count of students with overall accuracy <60% in last 7 days */
   studentsNeedingHelp: number;
@@ -149,14 +155,15 @@ export async function getClassroomMetrics(
     }>();
 
     if (progressData) {
-      progressData.forEach((progress: StudentLessonProgress) => {
+      progressData.forEach((progress) => {
         const existing = studentMetrics.get(progress.student_id);
 
         // Calculate accuracy from words_attempted
         let correct = 0;
         let attempts = 0;
         if (progress.words_attempted) {
-          Object.values(progress.words_attempted).forEach(word => {
+          const wordsData = progress.words_attempted as WordsAttemptedRecord;
+          Object.values(wordsData).forEach((word) => {
             correct += word.correct || 0;
             attempts += word.attempts || 0;
           });
@@ -276,10 +283,12 @@ export async function getCommonMistakes(
     }>();
 
     if (progressData) {
-      progressData.forEach((progress: StudentLessonProgress) => {
+      progressData.forEach((progress) => {
         if (!progress.words_attempted) return;
 
-        Object.entries(progress.words_attempted).forEach(([word, wordAttempt]) => {
+        type WordAttemptData = { correct?: number; attempts?: number };
+        const wordsData = progress.words_attempted as Record<string, WordAttemptData>;
+        (Object.entries(wordsData) as [string, WordAttemptData][]).forEach(([word, wordAttempt]) => {
           const existing = wordStats.get(word);
           if (existing) {
             existing.attempts += wordAttempt.attempts || 0;
@@ -508,7 +517,8 @@ export async function getStudentsProgressSummary(
 
         // Calculate accuracy from words_attempted
         if (progress.words_attempted) {
-          Object.values(progress.words_attempted).forEach(word => {
+          const wordsData = progress.words_attempted as Record<string, { correct?: number; attempts?: number }>;
+          Object.values(wordsData).forEach(word => {
             const correct = word.correct || 0;
             const attempts = word.attempts || 0;
             totalCorrect += correct;
@@ -653,7 +663,7 @@ export async function getLessonEffectiveness(
     });
 
     if (progressData) {
-      progressData.forEach((progress: StudentLessonProgress) => {
+      progressData.forEach((progress) => {
         const metrics = lessonMetrics.get(progress.lesson_id);
         if (!metrics) return;
 
@@ -665,7 +675,8 @@ export async function getLessonEffectiveness(
 
         // Calculate accuracy from words_attempted
         if (progress.words_attempted) {
-          Object.values(progress.words_attempted).forEach(word => {
+          const wordsData = progress.words_attempted as Record<string, { correct?: number; attempts?: number }>;
+          Object.values(wordsData).forEach(word => {
             metrics.totalCorrect += word.correct || 0;
             metrics.totalAttempts += word.attempts || 0;
           });
@@ -798,7 +809,7 @@ export async function getVocabularyHeatmapData(
     // Extract unique words across all students
     const wordsSet = new Set<string>();
     if (progressData) {
-      progressData.forEach((progress: StudentLessonProgress) => {
+      progressData.forEach((progress) => {
         if (progress.words_attempted) {
           Object.keys(progress.words_attempted).forEach(word => {
             wordsSet.add(word);
@@ -819,9 +830,10 @@ export async function getVocabularyHeatmapData(
         let totalCorrect = 0;
 
         if (progressData) {
-          progressData.forEach((progress: StudentLessonProgress) => {
-            if (progress.student_id === student.id && progress.words_attempted?.[word]) {
-              const wordData = progress.words_attempted[word];
+          progressData.forEach((progress) => {
+            const wordsData = progress.words_attempted as Record<string, { correct?: number; attempts?: number }> | null;
+            if (progress.student_id === student.id && wordsData?.[word]) {
+              const wordData = wordsData[word];
               totalAttempts += wordData.attempts || 0;
               totalCorrect += wordData.correct || 0;
             }

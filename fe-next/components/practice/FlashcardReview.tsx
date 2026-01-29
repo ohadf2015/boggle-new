@@ -21,7 +21,7 @@ import {
 import type { VocabularyWord } from '@/lib/supabase/teacher';
 import { FlashcardSwipeStack } from './FlashcardSwipeStack';
 import type { EnrichedVocabularyWord, VocabularyExample } from '@/types/vocabulary';
-import { socket } from '@/lib/socket';
+import { useSocketOptional } from '@/utils/SocketContext';
 import { PronunciationButton } from './PronunciationButton';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 
@@ -48,6 +48,8 @@ export default function FlashcardReview({
 }: FlashcardReviewProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
+  const socketContext = useSocketOptional();
+  const socket = socketContext?.socket;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -66,6 +68,20 @@ export default function FlashcardReview({
   // Enrich vocabulary words with Daily Buzz context on mount
   useEffect(() => {
     if (words.length === 0) return;
+
+    // If socket not available, use words as-is without enrichment
+    if (!socket) {
+      const basicEnriched: EnrichedVocabularyWord[] = words.map((word) => ({
+        word: word.word,
+        definition: word.definition || 'No definition provided',
+        pronunciation: undefined,
+        partOfSpeech: undefined,
+        examples: [],
+        contextualExamples: [],
+      }));
+      setEnrichedWords(basicEnriched);
+      return;
+    }
 
     setIsEnriching(true);
 
@@ -103,7 +119,7 @@ export default function FlashcardReview({
     return () => {
       socket.off('vocabularyEnriched', handleEnriched);
     };
-  }, [words, language]);
+  }, [words, language, socket]);
 
   const handleFlip = useCallback(() => {
     setIsFlipped((prev) => {

@@ -32,6 +32,9 @@ const logger = require('../utils/logger');
 // Re-export Bot type
 export type { Bot, WordSubmissionData };
 
+// ESM re-export for addWordToBlacklist
+export { addWordToBlacklist };
+
 // Avatar interface
 export interface BotAvatar {
   avatarImage: string;

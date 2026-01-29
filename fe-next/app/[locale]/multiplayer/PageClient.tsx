@@ -1173,10 +1173,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     // Determine avatar to use: prioritize modal selection > profile > guest state > just-generated > derive from name
     // Sanitize profile color to ensure it matches backend validation pattern
     const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
+    const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
     const effectiveAvatar = profile
       ? { emoji: profile.avatar_emoji, color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage), avatarImage: effectiveAvatarImage }
       : {
-        ...(generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername)),
+        ...fallbackAvatar,
+        color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
         avatarImage: avatarImageId || undefined
       };
 
@@ -1238,10 +1240,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       // For hosts: prioritize modal selection, then profile, then generated/guest avatar
       // Sanitize profile color to ensure it matches backend validation pattern
       const hostAvatarImage = avatarImageId || profile?.avatar_image;
+      const hostFallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
       const hostAvatar = profile
         ? { emoji: profile.avatar_emoji, color: sanitizeAvatarColor(profile.avatar_color, hostAvatarImage), avatarImage: hostAvatarImage }
         : {
-          ...(generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername)),
+          ...hostFallbackAvatar,
+          color: sanitizeAvatarColor(hostFallbackAvatar.color, avatarImageId),
           avatarImage: avatarImageId || undefined
         };
 

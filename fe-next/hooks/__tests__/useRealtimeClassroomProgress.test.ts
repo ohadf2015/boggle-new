@@ -173,7 +173,7 @@ describe('useRealtimeClassroomProgress', () => {
 
   it('should update connection status', async () => {
     // GIVEN: Hook is mounted
-    const { result, waitForNextUpdate } = renderHook(() => useRealtimeClassroomProgress({
+    const { result } = renderHook(() => useRealtimeClassroomProgress({
       classroomId: 'classroom-123',
       enabled: true,
     }));

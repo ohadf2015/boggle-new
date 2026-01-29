@@ -74,19 +74,35 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
   });
 
   describe('when regenerating image', () => {
+    // Mock response for sections API (auto-fetched when authToken is set)
+    const mockSectionsResponse = {
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          sections: [],
+          summary: { total: 0, customized: 0, default: 0 },
+          language: null,
+        },
+      }),
+    };
+
     it('should update the displayed image URL after successful regeneration', async () => {
       const newImageUrl = 'https://storage.example.com/new-image-67890.webp';
       const newPrompt = 'New regenerated prompt';
 
-      // Mock fetch for challenges API
+      // Mock fetch calls in order:
+      // 1. Sections API (auto-fetched by useSectionManagement)
+      // 2. Challenges API
+      // 3. Regenerate-image API
       (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(mockSectionsResponse)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             data: mockChallengeData,
           }),
         })
-        // Mock fetch for regenerate-image API
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -100,7 +116,14 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
           }),
         });
 
-      render(<DailyBuzzAdminPanel />);
+      await act(async () => {
+        render(<DailyBuzzAdminPanel />);
+      });
+
+      // Wait for initial async effects to settle (auth token fetch, sections fetch)
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
 
       // Open the challenges section
       const viewEditButton = screen.getByText(/View & Edit Challenges/i);
@@ -138,15 +161,18 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
     it('should display error message when regeneration fails', async () => {
       const errorMessage = 'Imagen API rate limit exceeded';
 
-      // Mock fetch for challenges API
+      // Mock fetch calls in order:
+      // 1. Sections API (auto-fetched by useSectionManagement)
+      // 2. Challenges API
+      // 3. Regenerate-image API (failure)
       (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(mockSectionsResponse)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             data: mockChallengeData,
           }),
         })
-        // Mock fetch for regenerate-image API (failure)
         .mockResolvedValueOnce({
           ok: false,
           json: async () => ({
@@ -154,7 +180,14 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
           }),
         });
 
-      render(<DailyBuzzAdminPanel />);
+      await act(async () => {
+        render(<DailyBuzzAdminPanel />);
+      });
+
+      // Wait for initial async effects to settle (auth token fetch, sections fetch)
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
 
       // Open the challenges section
       const viewEditButton = screen.getByText(/View & Edit Challenges/i);
@@ -186,15 +219,18 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
     it('should force image refresh by using URL as key (cache busting)', async () => {
       const newImageUrl = 'https://storage.example.com/new-image-99999.webp';
 
-      // Mock fetch for challenges API
+      // Mock fetch calls in order:
+      // 1. Sections API (auto-fetched by useSectionManagement)
+      // 2. Challenges API
+      // 3. Regenerate-image API
       (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(mockSectionsResponse)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             data: mockChallengeData,
           }),
         })
-        // Mock fetch for regenerate-image API
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -207,7 +243,14 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
           }),
         });
 
-      render(<DailyBuzzAdminPanel />);
+      await act(async () => {
+        render(<DailyBuzzAdminPanel />);
+      });
+
+      // Wait for initial async effects to settle (auth token fetch, sections fetch)
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
 
       // Open the challenges section
       const viewEditButton = screen.getByText(/View & Edit Challenges/i);

@@ -194,8 +194,8 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
     it('should have bottom tabs hidden on desktop (lg screens)', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      // Find the bottom navigation (tab bar)
-      const bottomNav = screen.getByRole('navigation');
+      // Find the bottom tab bar (uses role="tablist" which overrides nav's implicit navigation role)
+      const bottomNav = screen.getByRole('tablist');
 
       // Check that the nav has lg:hidden class to hide on desktop
       expect(bottomNav.className).toContain('lg:hidden');
@@ -204,7 +204,8 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
     it('should have bottom tabs sticky at the bottom', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      const nav = screen.getByRole('navigation');
+      // Find the bottom tab bar by role="tablist"
+      const nav = screen.getByRole('tablist');
 
       // Check that nav has flex-shrink-0 to prevent compression
       expect(nav).toHaveClass('flex-shrink-0');

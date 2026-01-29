@@ -199,11 +199,11 @@ function generateScoreCardData(game: GameState, username: string): ScoreCardData
   // Get top words
   const topWords = getTopWords(wordDetails);
 
-  // Get achievements
-  const achievementKeys: string[] = game.playerAchievements?.[username] || [];
-  const achievements: AchievementPayload[] = achievementKeys.map(key => ({
-    key,
-    icon: ACHIEVEMENT_ICONS[key] || '🏅'
+  // Get achievements (extract id from PlayerAchievement objects)
+  const playerAchievements = game.playerAchievements?.[username] || [];
+  const achievements: AchievementPayload[] = playerAchievements.map(a => ({
+    key: a.id,
+    icon: ACHIEVEMENT_ICONS[a.id] || '🏅'
   }));
 
   // Build metadata
@@ -222,7 +222,7 @@ function generateScoreCardData(game: GameState, username: string): ScoreCardData
 
   return {
     username,
-    avatar: user.avatar,
+    avatar: user.avatar ?? {},
     score,
     rank,
     stats,
