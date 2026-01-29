@@ -1,1092 +1,637 @@
-# Domain Pitfalls: Boss Battles, Combo Systems, and Education Gamification
+# Domain Pitfalls: v2.0 Adventure Overhaul
 
-**Domain:** Word Puzzle Game Feature Additions (v1.1)
-**Researched:** 2026-01-25
-**Confidence:** HIGH (verified with 2025-2026 sources + existing codebase constraints)
-
----
-
-## Executive Summary
-
-Adding boss battles, combo systems, and education gamification to an existing word puzzle game carries specific integration risks that can undermine user experience, performance, and learning outcomes. Research reveals three critical failure patterns:
-
-1. **Difficulty Disconnect** - Boss battles alienate casual puzzle players when difficulty curves are designed for action gamers (59% of puzzle gamers report frustration with action-oriented bosses)
-2. **Animation Cascade** - Combo/chain systems create performance bottlenecks through unoptimized state management and excessive DOM manipulation (4x performance degradation on low-powered devices without GPU optimization)
-3. **Motivation Undermining** - Education gamification can decrease long-term intrinsic motivation through overjustification effects (shown in 2024-2025 meta-analyses)
-
-**For LexiClash specifically:** The existing 500KB bundle budget, 3,481-test suite, and 4-language RTL support create integration constraints where "just add feature" approaches WILL fail. Each pitfall includes prevention strategies and phase assignment for roadmapping.
+**Domain:** Feature-rich game mode with dynamic mechanics, power systems, and visual content
+**Researched:** 2026-01-30
 
 ---
 
-## Boss Battle Pitfalls
+## CRITICAL PITFALLS
 
-### Pitfall 1: Genre Mismatch & Difficulty Alienation
+Mistakes that cause rewrites, major performance issues, or player abandonment.
 
-**What goes wrong:**
-Boss battles designed with action-game difficulty curves alienate puzzle game players. Research shows puzzle gamers explicitly reject boss fights as "painful roadblocks" when they require reflexes/timing rather than puzzle-solving skills.
+### Pitfall 1: React Context Re-render Cascade (Performance Killer)
 
-**Real-world evidence:**
-- Players of puzzle game COCOON report bosses are "not fun" and question "why does a puzzle game need boss fights?"
-- Community discussions reveal players "can solve puzzles correctly but fail due to operational mistakes"
-- Balancing mistake: If boss is too hard or feels "unfair," players quit rather than retry
+**What goes wrong:** When you have 15+ Context providers (this codebase already has them), and they're all passing large value objects, every context value change triggers re-renders in EVERY component that consumes that context - even if the component only uses one small piece of the value.
 
-**Why it happens:**
-- Puzzle games attract players seeking logical challenges, not reflex challenges
-- Developers assume "challenging = harder mechanics" instead of "harder puzzles"
-- Boss difficulty tuned for core gamers, not casual word-game audience
+**Why it happens:** `useContext` subscribes to the entire context value and doesn't care that you only use a small part. A single state change in InGameContext (57 properties) or ProgressionContext (16 properties) causes every child component to re-render.
+
+**Current codebase evidence:**
+- 17 context providers already exist
+- InGameContext has 57 properties (username, gameCode, letterGrid, comboLevel, etc.)
+- ProgressionContext manages complex state with progression data
+- Adding power-ups, boss mechanics, and difficulty state will balloon these contexts further
 
 **Consequences:**
-- Player churn at boss encounters
-- Negative reviews citing frustration
-- Accessibility complaints
-- Educational value lost (students quit before learning)
-
-**Warning signs:**
-- Playtests show >30% abandon rate at first boss
-- Boss mechanics require timing/reflexes instead of word skills
-- No adaptive difficulty or skip option
-- Boss feedback focuses on "git gud" not "try different strategy"
+- 60fps drops to <30fps during animations
+- Janky UI interactions, especially on mobile
+- Battery drain from unnecessary renders
+- Players perceive the game as "laggy"
 
 **Prevention:**
-1. **Design boss as "puzzle under pressure," not "action challenge"**
-   - Boss mechanics MUST use word-finding skills (longer words = more damage, rare letters = critical hits)
-   - Timer/pressure element tests speed, not reflexes
-   - Clear visual feedback shows which strategies work (like traditional puzzle games)
+1. **Split contexts by concern**: Don't add boss state to InGameContext - create BossContext
+2. **Separate data from API**: Split read-only data (current level) from callbacks (onPowerUpUse)
+3. **Memoize provider values**: Already documented in InGameContext.tsx line 74 - "parent component should memoize the value object" - ENFORCE THIS for new contexts
+4. **Use React.memo on consumer components**: Prevent re-renders when props haven't changed
+5. **Consider Zustand or Jotai**: For frequently-updating state like boss health or combo multipliers
 
-2. **Implement adaptive difficulty from Day 1**
-   - Track player performance on regular puzzles
-   - Scale boss health/timer based on player's average score
-   - Provide "strategy hints" after 2 failures (not just "try again")
+**Detection:**
+- Use React DevTools Profiler to measure re-render frequency
+- If a component re-renders >5 times during a single animation, context is too large
+- Test on low-end devices (not just your MacBook)
 
-3. **Offer accessibility options**
-   - Extended timer mode
-   - Reduced boss health setting
-   - "Story mode" that auto-completes after 5 attempts
-   - Never lock progression behind boss (alternative path for casual players)
-
-4. **Playtest with target audience (puzzle players, not action gamers)**
-   - Test with users who play Wordle/Spelling Bee, not Elden Ring
-   - Target: 80% of players beat boss within 3 attempts
-   - If >20% abandon, boss is too hard
-
-**Phase assignment:** Phase 1 (Boss Battle Foundation)
-- Must establish difficulty philosophy and testing protocol BEFORE implementing first boss
-- Failing to address this early requires redesigning all bosses later
+**Sources:**
+- [React Context Performance Dangers](https://thoughtspile.github.io/2021/10/04/react-context-dangers/)
+- [Pitfalls of Overusing React Context - LogRocket](https://blog.logrocket.com/pitfalls-of-overusing-react-context/)
+- [How to Write Performant React Apps with Context](https://www.developerway.com/posts/how-to-write-performant-react-apps-with-context)
 
 ---
 
-### Pitfall 2: Unclear Boss Mechanics
+### Pitfall 2: Framer Motion Layout Thrashing (Animation Nightmare)
 
-**What goes wrong:**
-Players don't understand how to damage the boss or why their actions succeed/fail, leading to trial-and-error frustration instead of strategic thinking.
+**What goes wrong:** Animating the wrong CSS properties causes layout thrashing - the browser has to recalculate the entire page layout on every frame, dropping you from 60fps to 15fps.
 
-**Why it happens:**
-- Mechanics explained via tutorial text (players skip)
-- Visual feedback too subtle (especially on mobile)
-- Boss behavior inconsistent or random-seeming
+**Why it happens:** Animating `width`, `height`, `top`, `left`, `margin`, or `padding` triggers layout recalculation. The browser must:
+1. Read current layout (forced synchronous layout)
+2. Write new styles
+3. Recalculate entire page layout
+4. Repaint
+This happens 60 times per second during animation.
+
+**Current codebase context:**
+- Framer Motion is already in use (AdaptiveMotion.tsx)
+- Project has 20+ components using framer-motion
+- Adding cascading tiles, score explosions, boss attack animations will multiply this risk
 
 **Consequences:**
-- Players resort to random actions hoping something works
-- Educational value lost (students don't learn strategy)
-- Accessibility issues (players with cognitive disabilities can't parse rules)
-
-**Warning signs:**
-- Playtesters ask "What am I supposed to do?" during boss fights
-- Players repeat failed strategies without trying new approaches
-- No visible damage indicators or progress feedback
-- Tutorial completion rate <50%
+- Animations stutter and lag
+- Mobile devices overheat
+- iOS Safari performs especially poorly
+- Players perceive the game as "broken"
 
 **Prevention:**
-1. **Show, don't tell**
-   - First boss encounter is tutorial fight with forced mechanics demonstration
-   - Visual indicators show damage sources (word length → damage number animation)
-   - Boss "telegraphs" attacks with clear animations (3s warning before special move)
+1. **Animate transforms only**: Use `transform: translate()` instead of `left/top`
+2. **Use opacity**: It's the only non-transform property that's cheap to animate
+3. **Batch DOM reads/writes**: Separate all DOM reads from writes, use `requestAnimationFrame`
+4. **Use layoutId sparingly**: Framer Motion's `layoutId` triggers measurements on every component in the tree
+5. **Leverage existing AdaptiveMotion**: The codebase already has performance-aware motion components - USE THEM
+6. **Enable hardware acceleration**: Ensure `will-change: transform` or `transform: translateZ(0)` for animated elements
 
-2. **Progressive complexity**
-   - First boss: Simple mechanic (longer words = more damage)
-   - Second boss: Adds twist (bonus damage for rare letters)
-   - Third boss: Combines mechanics (chains + rare letters)
+**Good example:**
+```tsx
+// ✅ GOOD - Animates transform (GPU-accelerated)
+<motion.div
+  initial={{ opacity: 0, x: -100 }}
+  animate={{ opacity: 1, x: 0 }}
+/>
 
-3. **LexiClash-specific: Leverage existing visual language**
-   - Use Neo-Brutalist hard shadows for damage indicators (pop effect)
-   - Reuse animation vocabulary from existing game modes
-   - Ensure RTL compatibility (Hebrew damage numbers, timers)
+// ❌ BAD - Animates layout properties
+<motion.div
+  initial={{ opacity: 0, marginLeft: -100 }}
+  animate={{ opacity: 1, marginLeft: 0 }}
+/>
+```
 
-**Phase assignment:** Phase 1 (Boss Battle Foundation)
-- Tutorial UX design is foundational architecture
-- Cannot bolt on clarity later without full redesign
+**Detection:**
+- Use Chrome DevTools Performance tab, look for "Recalculate Style" taking >5ms
+- Enable "Paint flashing" in DevTools to see repaints
+- If entire screen flashes green during animation, you're animating the wrong properties
+- Test on actual mobile devices (iPhone 12/13, not just simulator)
+
+**Sources:**
+- [React Animation Performance - Steve Kinney](https://stevekinney.com/courses/react-performance/animation-performance)
+- [Frameworks and Layout Thrashing - Frontend Masters](https://frontendmasters.com/courses/web-performance/frameworks-and-layout-thrashing/)
+- [Framer Motion Performance Tips](https://www.framer.com/motion/guide-upgrade/)
+- [Motion Performance Guide](https://motion.dev/docs/react-layout-animations)
 
 ---
 
-### Pitfall 3: Boss Breaks Existing Features
+### Pitfall 3: Power Creep (Game Balance Collapse)
 
-**What goes wrong:**
-Boss battle code interferes with existing game systems (timers, scoring, animations, multiplayer state) causing regressions in previously working features.
+**What goes wrong:** Power-ups start feeling "essential" instead of "helpful." Players can trivialize content with power-up stacking. Later bosses become impossible without power-ups, creating a pay-to-win perception (even if power-ups are free).
 
-**Why it happens:**
-- Boss logic added without understanding existing state management
-- Shared state mutated by boss without coordination
-- Animation conflicts (boss animations + existing game animations)
-- RTL layout assumptions broken
+**Why it happens:** Developers design new power-ups to feel impactful, so they make them stronger than existing ones. Older content wasn't designed for these power-ups, so it becomes too easy. Newer content is balanced around power-ups, becoming impossible without them.
 
 **Consequences:**
-- Tests fail (breaking 3,481-test suite)
-- Multiplayer desync (if boss added to multiplayer modes)
-- Layout breaks in Hebrew (RTL issues)
-- Performance regression (animations stack inefficiently)
-
-**Warning signs:**
-- Test suite shows failures in unrelated components
-- Boss mode works but regular mode suddenly buggy
-- Hebrew layout overlaps or shadows flip incorrectly
-- Bundle size jumps >50KB for boss feature alone
+- Early levels become boring (too easy with power-ups)
+- Later levels feel mandatory to use power-ups (not a choice)
+- Players perceive the game as "pay-to-win" even if power-ups are earned
+- Skill becomes less important than power-up inventory
+- Difficult to add new content without making it trivial or impossible
 
 **Prevention:**
-1. **Isolation architecture**
-   - Boss battles in separate route (`/game/boss`)
-   - Dedicated state container (avoid polluting global game state)
-   - Own animation context (prevent conflicts with existing Framer Motion)
+1. **Horizontal progression over vertical**: Add power-ups that enable different strategies, not just "better numbers"
+   - ✅ "Freeze Timer" enables careful word hunting (different playstyle)
+   - ❌ "2x Score" just makes everything easier (vertical power)
+2. **Soft caps on stacking**: Diminishing returns if players stack multiple score multipliers
+3. **Boss mechanics that ignore power-ups**: Some boss attacks can't be avoided with power-ups (forces skill)
+4. **Design content WITHOUT power-ups first**: Balance the level, then add power-ups as optional help
+5. **Separate progression systems**: Stars unlock worlds (skill-based), coins unlock power-ups (optional)
+6. **Test with and without**: Every level must be beatable without power-ups, faster with them
 
-2. **Integration testing protocol**
-   - Run full test suite after each boss feature
-   - Manual test in all 4 languages (Hebrew, English, Swedish, Japanese)
-   - Performance budget check (bundle <500KB, Lighthouse 90+)
-   - Verify existing game modes still work
+**Warning signs:**
+- Playtesters say "I can't beat this without power-ups"
+- Players feel forced to grind coins for power-ups to progress
+- Boss difficulty jumps drastically if you don't use power-ups
+- Reddit posts complaining about "pay-to-win" mechanics
 
-3. **LexiClash-specific constraints**
-   - Boss shadows must use `shadow-hard-*` utilities (hard shadows, no blur)
-   - Animations must use GPU-accelerated properties only (transform, opacity)
-   - RTL testing mandatory (boss UI, timers, damage indicators in Hebrew)
-
-**Phase assignment:** Phase 1 (Boss Battle Foundation) + Phase 4 (System Integration)
-- Phase 1: Establish isolation architecture
-- Phase 4: Integration testing and regression prevention
+**Sources:**
+- [Power Creep - TV Tropes](https://tvtropes.org/pmwiki/pmwiki.php/Main/PowerCreep)
+- [How to Avoid Power Creep in Multiplayer Games - LinkedIn](https://www.linkedin.com/advice/0/how-do-you-avoid-mitigate-effects-power-creep-multiplayer)
+- [Scaling Power the Right Way](https://www.fateless.gg/news/scaling-power-the-right-way/)
+- [On Power Creep - Bruno Dias](https://brunodias.dev/2021/11/27/power-creep.html)
 
 ---
 
-## Chain/Combo Pitfalls
+### Pitfall 4: Rubber-Banding Perception (Adaptive Difficulty Failure)
 
-### Pitfall 4: Combo State Management Performance Collapse
+**What goes wrong:** Players notice the adaptive difficulty system and feel like the game is "cheating" or "patronizing" them. They feel victories are hollow because the game "let them win."
 
-**What goes wrong:**
-Chain/combo systems create performance bottlenecks when state updates trigger excessive re-renders, DOM manipulation, and animation calculations. Research shows "arrays of timers and different states for each combo" makes code "ugly and unmanageable very quickly."
+**Why it happens:** DDA (Dynamic Difficulty Adjustment) is meant to keep players in the "flow state," but if it's too obvious, players feel the challenge is artificial. Classic example: racing games where AI opponents suddenly speed up when you're winning.
 
-**Real-world evidence:**
-- Developers report combo state management becoming unmanageable without proper patterns
-- High-frequency state updates (like animation timelines) cause performance issues if not handled correctly
-- Mobile devices show 4x performance degradation without GPU optimization
-
-**Why it happens:**
-- Each combo step triggers React re-render
-- Animation calculations happen in main thread
-- State updates not batched (causes layout thrashing)
-- No memoization of expensive combo calculations
+**Current risk for this project:**
+- You're planning "Dynamic difficulty system adapting to player performance"
+- Word puzzles make DDA especially obvious (if the board suddenly has easier words, players notice)
 
 **Consequences:**
-- Frame drops on mobile (especially iOS Safari, which drains battery 6% faster than optimized browsers)
-- Combo animations lag or stutter
-- Battery drain (users report Safari consuming 30% battery in 74 minutes)
-- User frustration ("game feels slow")
-
-**Warning signs:**
-- Combo animations dropping below 60fps on mid-range devices
-- React DevTools shows >10 renders per combo step
-- Lighthouse performance score drops below 90
-- Battery usage increases >20% during combo-heavy gameplay
+- Players feel cheated when they lose ("the game made the board harder")
+- Players feel patronized when they win ("the game gave me easy words")
+- Undermines sense of skill and accomplishment
+- Players may quit even when they're winning
 
 **Prevention:**
-1. **Use state machine pattern for combos**
-   - Finite State Machine (FSM) with hierarchical states
-   - Example: `IDLE → COMBO_1 → COMBO_2 → COMBO_3 → COOLDOWN → IDLE`
-   - Each state pushed onto stack, popped when animation completes
-   - Prevents "array of timers" anti-pattern
+1. **Make it invisible**: DDA adjustments should be subtle and unnoticeable
+   - ✅ Adjust word length targets slightly (7-letter vs 8-letter minimum)
+   - ❌ Change board difficulty mid-game (players notice immediately)
+2. **Pre-game adjustments only**: Select difficulty BEFORE the level starts based on past performance
+3. **Transparent difficulty options**: Let players choose Easy/Medium/Hard explicitly
+4. **Gradual, not sudden**: If adjusting mid-game, change over 3-4 rounds, not instantly
+5. **Performance-based unlocks**: Instead of making content easier, unlock power-ups/hints after failures
+6. **Never adjust during boss fights**: Boss difficulty should be fixed - adjusting feels like cheating
 
-2. **Optimize animation performance**
-   - Use Framer Motion's motion values (animate without triggering React renders)
-   - Batch updates using `requestAnimationFrame`
-   - GPU-accelerated properties ONLY: `transform`, `opacity` (never `width`, `height`, `top`, `left`)
-   - Simplify animations on mobile (LexiClash already has device detection)
+**Academic research findings:**
+- "Rubber-banding can feel unfair that the computer doesn't follow the same rules"
+- "For DDA to be successful, it should be invisible – the player should never feel it happening"
+- Recent research (2022-2026) focuses on improving rubber-banding adaptability while remaining undetectable
 
-3. **Computed stores for combo calculations**
-   - Derive combo multiplier from atomic stores (word length, letter rarity, chain count)
-   - Memoize expensive calculations
-   - Subscribe components to specific slices (not entire state)
+**Detection:**
+- Playtest with think-aloud protocol: If players say "that felt too easy" or "the game helped me," DDA is too obvious
+- Watch for pattern recognition: Players saying "the board always gets easier after I fail"
 
-4. **LexiClash-specific optimizations**
-   - Leverage existing animation system (Framer Motion already configured)
-   - Use container queries for responsive combo UI (prefer `cqw`/`cqh` over `vw`/`vh`)
-   - Test on iOS Safari specifically (known battery drain issues)
-
-**Phase assignment:** Phase 2 (Chain/Combo System)
-- State machine architecture is foundational (cannot retrofit later)
-- Performance budget enforcement from Day 1
+**Sources:**
+- [Adaptive Rubber-Banding System of DDA in Racing Games](https://journals.sagepub.com/doi/abs/10.3233/ICG-220207)
+- [More Than Meets the Eye: The Secrets of DDA - Game Developer](https://www.gamedeveloper.com/design/more-than-meets-the-eye-the-secrets-of-dynamic-difficulty-adjustment)
+- [What Is Rubber Banding in Video Games - How-To Geek](https://www.howtogeek.com/what-is-rubber-banding-in-video-games-and-why-does-everyone-hate-it/)
 
 ---
 
-### Pitfall 5: Combo Visual Feedback Overload
+### Pitfall 5: Meta-Progression Grind Wall
 
-**What goes wrong:**
-Excessive visual effects for combo chains (particles, screen shakes, sound effects, popup numbers) create sensory overload and accessibility issues, especially on mobile screens.
+**What goes wrong:** Players feel like they're playing a "free-to-play mobile gacha game" with a grinding paywall. Permanent upgrades make skill less important than time spent grinding.
 
-**Why it happens:**
-- "More effects = more exciting" fallacy
-- Developers focus on peak moments without considering sustained combo sequences
-- No accessibility settings for reduced motion
+**Why it happens:** Designers want to give players a sense of persistent progress, but if the meta-progression becomes gating (you NEED upgrades to progress), it feels like grinding instead of playing.
+
+**Current risk for this project:**
+- You're planning "Meta-progression with permanent upgrades and skill trees"
+- This is a premium word puzzle game, not a F2P mobile game - grind perception is especially damaging
 
 **Consequences:**
-- Motion sickness (especially with screen shake)
-- Readability issues (can't see board through effects)
-- Accessibility violations (WCAG 2.1 AA requires reduced motion support)
-- Battery drain (excessive particle effects)
-
-**Warning signs:**
-- Playtesters report "too much happening on screen"
-- Can't read word tiles during combo sequences
-- No reduced motion option
-- Particle count >100 simultaneously
+- Players complain about "hitting a paywall" even though the game isn't F2P
+- Skill becomes less important than grinding for upgrades
+- Players who don't grind feel left behind
+- Reddit reviews saying "grindy" or "mobile game mechanics"
 
 **Prevention:**
-1. **Progressive feedback intensity**
-   - Combo 2-3: Subtle pulse animation
-   - Combo 4-5: Color change + number popup
-   - Combo 6+: Particle effect (limited to 20 particles max)
+1. **Skill > upgrades**: Upgrades should provide ~20% advantage, not 200%
+   - A skilled player without upgrades should beat an unskilled player with max upgrades
+2. **Horizontal upgrades**: Unlock new strategies, not just bigger numbers
+   - ✅ "Unlock hint system" (new capability)
+   - ❌ "+50% base score" (just inflation)
+3. **Fast unlock cadence**: Players should unlock something every 1-2 play sessions
+4. **No grinding for basics**: Core mechanics shouldn't require upgrades
+5. **Cosmetic vs functional**: Consider making skill tree mostly cosmetic (different word highlight colors, board themes)
+6. **Transparent costs**: Players should know exactly how much grinding is needed for next unlock
 
-2. **Respect user preferences**
-   - Check `prefers-reduced-motion` media query
-   - Offer settings toggle for effects intensity
-   - Never use screen shake (known accessibility issue)
+**Warning signs:**
+- Playtesters say "I feel like I'm just grinding for upgrades"
+- Progression feels like "playing until character is powerful enough" instead of "learning and strategizing"
+- Players can't complete world 3 without skill tree upgrades (means upgrades are gating content)
 
-3. **LexiClash-specific design**
-   - Use Neo-Brutalist style (bold colors, hard shadows) for clarity
-   - Halftone texture already provides visual interest (don't over-animate)
-   - Test on mobile screens (combo effects must work at 375px width)
-
-**Phase assignment:** Phase 2 (Chain/Combo System)
-- Accessibility requirements are non-negotiable (WCAG compliance)
+**Sources:**
+- [Transitioning to Free-to-Play - Meta Horizon OS](https://developers.meta.com/horizon/resources/monetization-f2p-transition)
+- [Meta Progression Discussion - ResetEra](https://www.resetera.com/threads/do-you-like-meta-progression-in-your-roguelikes-roguelites.1341955/)
+- [Meta Progression in Roguelikes](https://notes.hamatti.org/gaming/video-games/meta-progression-with-gradual-tutorial-in-roguelike-games)
 
 ---
 
-### Pitfall 6: Combo Balance Breaking Core Gameplay
+## MODERATE PITFALLS
 
-**What goes wrong:**
-Combo mechanics make regular word-finding trivial or create "optimal strategy" that's boring to execute. Players either abuse combos (game too easy) or ignore combos (feature wasted).
+Mistakes that cause delays, technical debt, or significant rework.
 
-**Why it happens:**
-- Combo bonuses tuned too high (3x multiplier makes combos only viable strategy)
-- Or combo bonuses too low (players ignore and just find long words)
-- Combo mechanics don't align with word puzzle skills
+### Pitfall 6: Boss Fight Clarity Failure
+
+**What goes wrong:** Players don't understand boss attack patterns. One-shot mechanics that aren't telegraphed. Unclear win conditions. Bosses that are either trivially easy or impossibly hard with no middle ground.
+
+**Why it happens:** Designers know the mechanics intimately, so they underestimate how confusing they are to new players. Boss playtesting is expensive (requires completing earlier content), so it gets less iteration.
 
 **Consequences:**
-- Degenerate strategies (players spam short words for combos instead of finding long words)
-- Feature ignored (players never engage with combo system)
-- Educational value lost (students learn "gaming system" not "vocabulary")
-
-**Warning signs:**
-- Playtests show >80% of points from combos (combos too strong)
-- Or <10% of points from combos (combos too weak)
-- Players using same repetitive pattern every game
-- Top scores all use identical strategy
+- Players quit in frustration saying "that was unfair"
+- Bosses are forgotten if too easy
+- Negative reviews complaining about difficulty spikes
+- Expensive iteration cycles (requires replaying entire world to test)
 
 **Prevention:**
-1. **Balance combo with word quality**
-   - Example: `Score = WordLength × LetterRarity × ComboMultiplier`
-   - Combo multiplier: 1.0x → 1.5x → 2.0x → 2.5x (max)
-   - Long rare word = better than spam short words
-   - Combo bonus rewards consistency, not spam
+1. **Telegraph everything**: Visual/audio cues 1-2 seconds before boss attacks
+2. **Tutorial boss**: First boss should teach mechanics, not punish players
+3. **Escalating mechanics**: Boss should use basic attacks first, complex patterns later
+4. **Clear visual language**: Each boss attack type has distinct visual/sound
+5. **Forgiving first encounter**: Boss should be slightly too easy on first try
+6. **Iteration budget**: Plan for 5-6 playtesting cycles per boss (they always need more tuning)
+7. **Avoid "unfair" mechanics**: Nothing that kills players for playing well (e.g., Odin getting "bored" in FF7 Rebirth)
 
-2. **Combo decay mechanics**
-   - Combo timer shortens with each chain (2s → 1.5s → 1s)
-   - Forces players to find words quickly, not just any words
-   - Natural ceiling prevents infinite combos
+**Testing requirements:**
+- Fresh playtesters (not developers who know the mechanics)
+- Watch them play WITHOUT explaining anything
+- If >50% die to mechanic without understanding why, it needs better telegraphing
 
-3. **Playtesting metrics**
-   - Track score distribution: 40-60% from words, 40-60% from combos
-   - Monitor strategy diversity (no single dominant pattern)
-   - Educational context: Students should learn vocabulary, not exploit combos
-
-**Phase assignment:** Phase 3 (Balance & Polish)
-- Balance requires data from real players (cannot predict perfectly)
-- Budget time for iteration based on telemetry
+**Sources:**
+- [Boss Design: How to Make an Unforgettable Boss Battle](https://gamedesignskills.com/game-design/game-boss-design/)
+- [24 Hardest Video Game Bosses in 2026 - Eneba](https://www.eneba.com/hub/games/hardest-video-game-bosses/)
+- Community discussions on boss design mistakes (Steam forums, Reddit)
 
 ---
 
-### Pitfall 7: Combo RTL Layout Breakage
+### Pitfall 7: Visual Overload & Accessibility
 
-**What goes wrong:**
-Combo animations and UI elements designed for LTR (left-to-right) break in RTL languages (Hebrew). Combo chains flow wrong direction, damage numbers positioned incorrectly, timers overlap.
+**What goes wrong:** Too many particle effects, animations, and visual feedback create sensory overload. Players with photosensitivity, ADHD, or motion sensitivity can't play. The screen becomes "an illegible mess, obscuring crucial details."
 
-**Real-world evidence:**
-- RTL animations need reversed `translateX()` with separate `@keyframes`
-- Transform origin must be specified differently for RTL
-- Icons implying directionality need `scaleX(-1)` flip
+**Why it happens:** Designers add visual effects to make the game feel "juicy" and satisfying, but they don't test cumulative impact. Each individual effect seems fine, but 50 effects simultaneously = chaos.
 
-**Why it happens:**
-- Developers test only in English
-- Animation code hardcodes left-to-right assumptions
-- Tailwind RTL utilities not used consistently
+**Current risk for this project:**
+- "Candy Crush-style explosions" - Candy Crush is infamous for visual chaos
+- "Animated feedback" - Every action triggering animation compounds
+- "Cinematic boss battles" - More effects = more overload
+- Neo-brutalist design with bold colors and high contrast already visually intense
 
 **Consequences:**
-- Hebrew players see broken combo UI
-- Combo chains flow right-to-left (confusing visual)
-- Educational market in Israel/Middle East unavailable
-
-**Warning signs:**
-- Combo animations only tested in English
-- Hardcoded `translateX(100px)` instead of logical properties
-- Shadows don't flip in Hebrew (`4px 4px` should become `-4px 4px`)
+- Players report headaches, eye strain, nausea
+- Can't track important information (where's my score? which words did I find?)
+- Accessibility complaints, potential app store rating drop
+- Legal risk in some jurisdictions (accessibility laws)
 
 **Prevention:**
-1. **Use logical properties from Day 1**
-   - `margin-inline-start` instead of `margin-left`
-   - Tailwind `start-*` instead of `left-*`
-   - Never hardcode directional transforms
+1. **Accessibility setting for reduced effects**: Already implemented in AdaptiveMotion.tsx - extend it to particles
+2. **2026 trend: Minimalist UI**: Industry is moving toward "less clutter, more clarity"
+   - Games like Alto's Odyssey use environmental cues instead of HUD
+   - Sans-serif typography, radial menus, contextual displays
+3. **Particle budget**: Max 20 particles on screen simultaneously
+4. **Layered effects**: Background particles (subtle), mid-ground (moderate), foreground (bold) - don't overlap
+5. **Color-blind modes**: Test with color-blind simulators
+6. **Motion settings**: Respect `prefers-reduced-motion` (already in useShouldReduceMotion)
+7. **Flash warning**: Avoid rapid flashing (>3 flashes per second = seizure risk)
 
-2. **Test in Hebrew continuously**
-   - Every combo feature tested in all 4 languages
-   - Visual regression testing for RTL
-   - Automated tests for shadow direction
+**2026 industry direction:**
+- "Minimalist UI design leads 2026 trends, stripping away clutter for deeper immersion"
+- "Prioritizes minimalist UIs, ray-traced photorealism, stylized cozy art"
+- "Solution prioritizes gameplay and player comfort, using particle effects sparingly and purposefully"
 
-3. **LexiClash-specific RTL compliance**
-   - `shadow-hard-*` utilities already handle RTL (auto-flip)
-   - Use existing RTL testing infrastructure
-   - Combo animations must use `animate-neo-*` classes (RTL-aware)
+**Testing checklist:**
+- [ ] Test with `prefers-reduced-motion: reduce` enabled
+- [ ] Use color-blind simulator (Stark plugin or similar)
+- [ ] Ask someone with ADHD/photosensitivity to playtest
+- [ ] Record gameplay and watch at 0.5x speed - can you track all information?
 
-**Phase assignment:** Phase 2 (Chain/Combo System)
-- RTL support is architectural (cannot retrofit later)
+**Sources:**
+- [The Particle Effect Apocalypse - Wayline](https://www.wayline.io/blog/particle-effect-apocalypse-avoiding-visual-excess)
+- [Pixels to Immersion: Graphics in 2026 Games](https://www.webpronews.com/pixels-to-immersion-graphics-revolutionizing-player-eyes-in-2026-games/)
+- [VFX in Game Development Guide](https://www.juegostudio.com/blog/all-about-vfx-in-game-development-in-2024)
 
 ---
 
-## Education Gamification Pitfalls
+### Pitfall 8: WebSocket State Race Conditions
 
-### Pitfall 8: Extrinsic Motivation Undermining Intrinsic Learning
+**What goes wrong:** Real-time multiplayer has race conditions where clients get out of sync. Player sees different boss health than server. Power-up usage doesn't register. Animation state desyncs.
 
-**What goes wrong:**
-Over-reliance on extrinsic rewards (points, badges, leaderboards) undermines students' intrinsic motivation to learn, creating dependency on external validation. Research shows long-term exposure to gamified learning decreases intrinsic motivation.
+**Why it happens:** WebSockets are asynchronous. Events can arrive out of order. Client-side state updates happen before server confirmation. Network latency causes timing mismatches.
 
-**Real-world evidence (2024-2025 research):**
-- "Overjustification effect"—excessive rewards hamper intrinsic motivation, key determinant of gamification failure
-- "Once novelty effect disappears, extrinsic reward system may be unable to stimulate intrinsic motivation and even undermine grades"
-- "When students rely solely on extrinsic validation, motivation fades once rewards diminish"
-- Meta-analysis shows "students' intrinsic motivation may decrease due to long exposure to gamified learning strategies"
-
-**Why it happens:**
-- "Shallow gamification"—superficial application of game elements without transforming core experience
-- Every action triggers point/badge popup (constant extrinsic focus)
-- No emphasis on mastery, curiosity, or autonomy
+**Current codebase evidence:**
+- Socket.IO already in use (SocketContext.tsx, SocketEventBusContext.tsx)
+- Real-time game state in InGameContext
+- Adding boss battles and power-ups will multiply state synchronization complexity
 
 **Consequences:**
-- Students stop learning when rewards removed
-- Learning becomes transactional ("What do I get for this?")
-- Cheating increases (students optimize for points, not knowledge)
-- Long-term educational outcomes worsen
-
-**Warning signs:**
-- Students ask "How many points?" before "What will I learn?"
-- Engagement drops when rewards reduced
-- Students game system (repeat easy lessons for points)
-- Teachers report students focused on leaderboard, not content
+- Players see boss health at 0% but boss is still attacking (desync)
+- Power-up activated but didn't work (dropped message)
+- Leaderboard shows wrong scores during live game
+- Negative reviews: "multiplayer is broken"
 
 **Prevention:**
-1. **Design for intrinsic motivation first**
-   - Emphasize mastery: "You learned 50 new words!" not "You earned 500 points!"
-   - Autonomy: Students choose lesson topics
-   - Competence: Show skill progression, not just numbers
-   - Progress visualization (skill trees) over point accumulation
+1. **Server authoritative**: Server is source of truth, always
+2. **Event cache during connection**: Recent 2026 solution - queue messages until UI ready
+   ```
+   1. Fetch initial state
+   2. Establish WebSocket connection
+   3. Cache incoming messages
+   4. Fetch state again (catch missed events)
+   5. Replay queued messages in order
+   ```
+3. **Sequence numbers**: Number all messages, detect gaps, request retransmission
+4. **Optimistic UI with rollback**: Show power-up effect immediately, rollback if server rejects
+5. **Heartbeat/health checks**: Detect stale connections, force reconnect
+6. **Idempotent handlers**: Duplicate messages should be safe to process twice
+7. **Rate limiting**: Already implemented at 50 msg/10s - keep it
 
-2. **Use extrinsic rewards sparingly**
-   - Badges for genuine achievements (not "played 10 games")
-   - Leaderboards optional (never forced)
-   - Points tied to learning outcomes, not time spent
+**Current protection:**
+- Backend has rate limiting in `backend/middleware/rateLimit.ts`
+- WebSocket handlers use `createHandler` with validation
 
-3. **Encourage process over outcomes**
-   - Celebrate effort, strategy, improvement
-   - "You improved 20% this week" > "You're rank #5"
-   - Show word mastery curves, not just scores
+**New risks from v2.0:**
+- Boss attack synchronization (all players see same attack at same time)
+- Power-up inventory state (client thinks they have 3 hints, server says 2)
+- Combo multiplier timing (combo expires on client but server disagrees)
 
-4. **Educational research-backed approach**
-   - Self-Determination Theory (SDT): Support autonomy, competence, relatedness
-   - Avoid constant rewards (intermittent reinforcement better)
-   - Focus on meaningful progress
-
-**Phase assignment:** Phase 5 (Gamification Design)
-- Motivation philosophy must be established before implementing XP/achievements
-- Retrofitting intrinsic focus after extrinsic system is extremely hard
+**Sources:**
+- [Handling Race Conditions in Real-Time Apps - DEV](https://dev.to/mattlewandowski93/handling-race-conditions-in-real-time-apps-49c8)
+- [Building Multiplayer Tic Tac Toe with Next.js + Socket.IO](https://medium.com/@vaibhavkhushalani/building-a-real-time-multiplayer-tic-tac-toe-with-next-js-socket-io-open-source-fc0804a940a5)
+- [Server-Sent Events vs WebSockets in 2026](https://www.nimbleway.com/blog/server-sent-events-vs-websockets-what-is-the-difference-2026-guide)
 
 ---
 
-### Pitfall 9: Gamification Enables Cheating & Gaming the System
+### Pitfall 9: Next.js + Socket.IO Deployment Trap
 
-**What goes wrong:**
-Students find ways to exploit gamification mechanics for points without learning—repeating easy content, collaborating inappropriately, or using external tools to "beat the game" instead of learning.
+**What goes wrong:** Socket.IO works perfectly in local development but breaks on Vercel deployment because "serverless functions do not support WebSockets."
 
-**Real-world evidence:**
-- Research identifies "cheating, gaming the system, or competing unfairly" as key gamification risk
-- "Manipulation, coercion, exploitation" ethical concerns when gamification influences behavior without full awareness
+**Why it happens:** Next.js with Socket.IO requires a custom server (Express). Custom servers disable Vercel's optimizations (serverless functions, Automatic Static Optimization, edge network).
 
-**Why it happens:**
-- Points rewarded for completion, not comprehension
-- No validation of learning (just "played level")
-- Leaderboards create competitive pressure
-- Easy content gives same rewards as hard content
+**Current codebase:**
+- Uses custom Express server (`server.ts`)
+- Socket.IO integration via custom server
+- NOT using Vercel serverless
 
 **Consequences:**
-- Students optimize for points, not knowledge
-- False progress indicators (teachers think student learned, but they exploited system)
-- Unfair advantage for students who discover exploits
-- Trust erosion (students see learning as "game to beat")
-
-**Warning signs:**
-- Students replay same easy lesson repeatedly
-- Suspiciously fast completion times
-- Perfect scores without demonstrated understanding
-- Teacher reports: "Student has high XP but fails comprehension tests"
+- Can't deploy to Vercel (current architecture is fine with this)
+- Lose Next.js optimizations (serverless, auto-scaling, edge caching)
+- Must manage server scaling manually
+- Higher hosting costs (always-on server vs serverless)
 
 **Prevention:**
-1. **Validate learning, not just participation**
-   - Boss battles require demonstrating knowledge (can't brute-force)
-   - Diminishing returns on repeated content (first attempt: 100 XP, second: 10 XP)
-   - Randomized challenges (can't memorize answers)
+1. **Acknowledge the trade-off**: Custom server is intentional, not a mistake
+2. **Deploy to VM or container**: Use Railway, Render, DigitalOcean, AWS EC2, not Vercel
+3. **Load balancing**: For scaling, use load balancer + clustering
+4. **Sticky sessions**: Ensure WebSocket connections stick to same server instance
+5. **Alternative architecture**: Consider separating Socket.IO server from Next.js app
+   - Next.js on Vercel (SSR, static pages)
+   - Socket.IO on separate server (Railway, Render)
+   - More complex but leverages each platform's strengths
 
-2. **Balance competition with collaboration**
-   - Class goals (everyone learns together) alongside individual goals
-   - Leaderboard shows improvement rate, not just absolute scores
-   - Encourage helping classmates (social learning)
+**Don't change unless:**
+- You're hitting scale issues (>10K concurrent connections)
+- Hosting costs become prohibitive
+- You need edge network CDN benefits
 
-3. **Teacher oversight tools**
-   - Analytics show time-to-completion vs. accuracy (flag outliers)
-   - Content mastery indicators separate from XP
-   - Alerts for suspicious patterns
-
-4. **Ethical gamification design**
-   - Transparent mechanics (students understand reward logic)
-   - No hidden manipulations
-   - Privacy-respecting (no public shaming via leaderboards)
-
-**Phase assignment:** Phase 5 (Gamification Design) + Phase 7 (Teacher Tools)
-- Anti-cheat architecture must be built into XP system
-- Teacher analytics needed to detect exploitation
+**Sources:**
+- [How to Use with Next.js - Socket.IO](https://socket.io/how-to/use-with-nextjs)
+- [Integrating Socket.IO with App Router - GitHub Discussion](https://github.com/vercel/next.js/discussions/50097)
+- [Implementing WebSocket Communication in Next.js - LogRocket](https://blog.logrocket.com/implementing-websocket-communication-next-js/)
 
 ---
 
-### Pitfall 10: Achievement Fatigue & Meaningless Badges
+### Pitfall 10: Asset Performance & Memory Leaks
 
-**What goes wrong:**
-Too many achievements/badges create notification fatigue. Achievements for trivial actions ("You logged in!") devalue meaningful accomplishments. Students ignore or get annoyed by constant popups.
+**What goes wrong:** Remotion videos, boss graphics, particle images accumulate in memory and never get garbage collected. Page uses 500MB+ RAM, crashes on mobile devices.
 
-**Why it happens:**
-- Trying to "engage" students with frequent rewards
-- Achievement inflation (everyone gets badges for everything)
-- No distinction between significant vs. trivial achievements
+**Why it happens:** JavaScript can't "leak" memory technically, but objects can be referenced longer than necessary. `AudioBuffer` and `WebGLTexture` retain large unmanaged memory outside JS heap.
+
+**Current risk for this project:**
+- "Enhanced visual content pipeline (Remotion videos, Image MCP graphics)"
+- Boss battles with unique graphics per boss
+- Particle systems with sprite sheets
+- Remotion video generation is "computationally intensive" and "heavy workload"
 
 **Consequences:**
-- Students dismiss all achievement notifications
-- Meaningful milestones lost in noise
-- Accessibility issues (constant popups disrupt screen readers)
-- Cynicism ("participation trophy" effect)
-
-**Warning signs:**
-- >20 achievements available in first hour of play
-- Achievements for basic actions ("Played first game")
-- Players disable achievement notifications
-- Teachers report students "don't care about badges anymore"
+- Mobile browsers crash after 10-15 minutes of gameplay
+- iOS Safari especially bad (aggressive memory limits)
+- Players report app "slowing down over time"
+- Negative reviews: "crashes constantly"
 
 **Prevention:**
-1. **Fewer, meaningful achievements**
-   - Cap at 30-50 total achievements (not 200+)
-   - Each achievement represents genuine milestone
-   - Examples: "First Boss Defeated," "100-Word Vocabulary Mastery," "10-Chain Combo Expert"
+1. **Asset streaming**: Load assets on-demand, unload when not needed
+   - Load boss graphics when entering boss fight, unload after
+   - Load world 2 textures when entering world 2, unload world 1 textures
+2. **Voiceover one-line-at-time**: Load audio line, play it, unload it (don't preload all audio)
+3. **WebP optimization**: Images MUST be WebP quality 80 (not 90), <200KB target
+   - Already documented in CLAUDE.md - enforce in asset pipeline
+4. **Remotion Lambda for server-side**: Don't generate videos on client, use Remotion Lambda for distributed rendering
+5. **Texture atlases**: Combine multiple small images into one sprite sheet (fewer texture objects)
+6. **Dispose WebGL textures**: Explicitly call `.dispose()` on THREE.js textures
+7. **Memory profiling**: Use Chrome DevTools Memory tab, take heap snapshots before/after boss fights
 
-2. **Tiered achievement system**
-   - Bronze: Common (first word, first game)
-   - Silver: Skill-based (defeat boss, 5-chain combo)
-   - Gold: Mastery (vocabulary expert, teaching others)
-   - Platinum: Rare (class champion, year-long progress)
+**Current protections:**
+- Image optimization guidelines in CLAUDE.md (WebP, quality 80, <200KB)
+- Scripts for optimization: `npm run optimize:image`, `npm run asset:pipeline`
 
-3. **Non-intrusive notifications**
-   - Achievement popup after game ends (not mid-game)
-   - Summary screen shows multiple achievements at once
-   - Respect reduced-motion preferences
+**New risks from v2.0:**
+- Multiple boss graphics loaded simultaneously
+- Remotion video generation on client (should be server-side)
+- Particle sprite sheets accumulating
 
-4. **LexiClash-specific design**
-   - Neo-Brutalist badge design (bold, clear visual hierarchy)
-   - Achievement gallery (students can review anytime)
-   - RTL-compatible badge layouts
+**Testing checklist:**
+- [ ] Heap snapshot before boss fight, after boss fight - memory should return to baseline
+- [ ] Play for 30 minutes on iPhone 12 - should not crash
+- [ ] Check Network tab - total assets downloaded should be <10MB
+- [ ] Use Lighthouse "Avoid enormous network payloads" audit
 
-**Phase assignment:** Phase 5 (Gamification Design)
-- Achievement philosophy prevents over-engineering later
+**Sources:**
+- [Optimizing Your HTML5 Video Game - Filament Games](https://www.filamentgames.com/blog/optimizing-your-html5-video-game-a-case-study/)
+- [How to Fix Memory Leaks in 3D Game Development - LinkedIn](https://www.linkedin.com/advice/0/how-can-you-identify-fix-memory-leaks-3d-game-development-ixmse)
+- [Game Asset Optimization - Samsung Developer](https://developer.samsung.com/galaxy-gamedev/resources/articles/asset.html)
+- [Remotion Performance Tips](https://www.remotion.dev/docs/performance)
 
 ---
 
-## Analytics Pitfalls
+## MINOR PITFALLS
 
-### Pitfall 11: Student Privacy Violations (COPPA/GDPR Non-Compliance)
+Mistakes that cause annoyance but are fixable.
 
-**What goes wrong:**
-Student analytics dashboards collect/store/share personally identifiable information (PII) without proper consent, encryption, or compliance with education privacy laws. Major updates to COPPA (effective June 23, 2025, full compliance by April 22, 2026) significantly broaden protected information.
+### Pitfall 11: Scope Creep (Feature Explosion)
 
-**Real-world evidence (2025-2026 regulations):**
-- COPPA amendments now include biometric identifiers and government-issued IDs in protected data
-- Updated consent requirements: Parents must explicitly identify third parties receiving data and purposes
-- Granular consent: Parents can consent to collection without approving third-party disclosure
-- Penalties: Up to $51,744 per affected child for violations
-- GDPR digital consent age: 13-16 (varies by EU member state)
+**What goes wrong:** "Let's add one more boss mechanic... and one more power-up... and a pet system... and seasonal events..." The v2.0 milestone balloons from 3 months to 9 months.
 
-**Why it happens:**
-- Developers unfamiliar with education privacy law
-- Analytics library defaults collect more data than needed
-- Third-party integrations share data without disclosure
-- Minimal viable product (MVP) skips compliance "to ship faster"
+**Why it happens:** Feature creep is "the excessive ongoing expansion of new features" that goes beyond basic function. Game development is especially prone because every feature sounds cool in isolation.
+
+**Current risk:**
+- v2.0 scope is already MASSIVE:
+  - Dynamic board mechanics (moving tiles, cascades, explosions)
+  - Power-up system with mid-game boosters
+  - Meta-progression with skill trees
+  - Boss battle overhaul
+  - Enhanced visual pipeline (Remotion, Image MCP, Python)
+  - Polished UI
+  - Dynamic difficulty
+  - Complete v1.1 carryover
+- That's 8 major feature categories - each could be a milestone
 
 **Consequences:**
-- Legal penalties ($51,744 per child under COPPA)
-- School district bans product
-- Loss of trust (parents, teachers, administrators)
-- Data breach liabilities
-- Cannot operate in EU/international markets
-
-**Warning signs:**
-- Analytics collect student names, emails, photos without consent workflow
-- No parental consent system for students <13
-- Third-party analytics (Google Analytics, Mixpanel) without disclosures
-- Data stored unencrypted
-- No data retention/deletion policy
+- Missed deadlines, indefinite "almost done" state
+- Budget overruns (if commercial project)
+- Team burnout
+- Quality suffers (rushing to finish ballooned scope)
+- "Development hell" - project never ships
 
 **Prevention:**
-1. **COPPA compliance checklist (2026 rules):**
-   - Implement verifiable parental consent before collecting data from <13
-   - Detailed consent disclosures identifying third parties and purposes
-   - Granular consent options (collection vs. sharing)
-   - Data minimization (collect only what's educationally necessary)
-   - Encryption at rest and in transit
-   - Data deletion within 30 days of request
-   - No third-party sharing without explicit consent
+1. **MoSCoW method**:
+   - **Must have**: Dynamic mechanics, boss battles, basic power-ups
+   - **Should have**: Meta-progression, skill trees
+   - **Could have**: Advanced particle effects, cinematic cutscenes
+   - **Won't have** (this release): Seasonal events, pet system, PvP arena
+2. **Feature freeze date**: 2 weeks before target completion, NO new features
+3. **Vertical slice first**: Build ONE complete world with all features before adding more worlds
+4. **Ruthless prioritization**: Ask "does this directly serve the core goal?" for every feature
+5. **Cut confidently**: If a feature slips schedule by >20%, CUT IT and save for v2.1
+6. **Beware "while I'm here"**: Don't refactor unrelated code during feature work
 
-2. **GDPR compliance (if serving EU students):**
-   - Age verification (13-16 depending on country)
-   - Right to access, rectification, erasure, portability
-   - Data processing agreements with vendors
-   - Privacy by design and default
+**2026 context:**
+- "Production quality is measured by intent, authenticity, and alignment with player motivation"
+- "Studios that understand their audience, apply discipline to scale, and use technology purposefully will shape gaming's next era"
 
-3. **Technical implementations:**
-   - Anonymous student IDs (no PII in analytics database)
-   - Teachers see aggregated data, not individual student PII
-   - Role-based access control (teachers see their classes only)
-   - Audit logs for all data access
-   - Automated data retention enforcement
+**Warning signs:**
+- Milestone is >50% over original time estimate
+- You're saying "just one more small feature"
+- Backlog has 30+ unimplemented ideas
+- You can't explain the feature in one sentence
 
-4. **LexiClash-specific approach:**
-   - Supabase Row-Level Security (RLS) for student data
-   - Student profiles separate from analytics events
-   - Redis for transient session data (auto-expire)
-   - No student names/emails sent to client-side analytics
-
-**Phase assignment:** Phase 6 (Privacy & Compliance)
-- MUST happen before launch (cannot retrofit compliance)
-- Legal review required (not just developer implementation)
+**Sources:**
+- [Scope Creep in Indie Games - Wayline](https://www.wayline.io/blog/scope-creep-indie-games-avoiding-development-hell)
+- [Scope Creep vs Future Creep in Game Development](https://www.manuelsanchezdev.com/blog/scope-vs-future-creep-game-development)
+- [How to Avoid Scope Creep in Game Development - Codecks](https://www.codecks.io/blog/2025/how-to-avoid-scope-creep-in-game-development/)
 
 ---
 
-### Pitfall 12: Analytics Dashboard Data Overload
+### Pitfall 12: Technical Debt During Feature Rush
 
-**What goes wrong:**
-Teacher dashboards show too many metrics, graphs, and indicators, overwhelming educators with limited data literacy. Research shows 59% of learning analytics dashboards use 6+ colors, contributing to information overload.
+**What goes wrong:** You add boss battles, power-ups, and meta-progression without cleaning up existing code. Test coverage drops. 500+ line files proliferate. Six months later, you can't add new features without breaking three old features.
 
-**Real-world evidence (2025 research):**
-- "Simplified graphs and reduced numbers of displayed indicators needed to avoid information overload"
-- "Contrasting colors compete for users' attention and distract decision-making processes"
-- "Cognitive overload from color misuse leads to longer fixation periods on irrelevant dashboard aspects"
-- "Many dashboards assume high data literacy, creating gap between potential and practice"
+**Why it happens:** "I'll refactor later" is the developer's lie. Pressure to ship features means cutting corners. Technical debt compounds exponentially.
 
-**Why it happens:**
-- Developers show all available data ("more data = more useful")
-- No user research with actual teachers
-- Analytics designed for data scientists, not educators
-- Fear of "missing something important"
+**Current codebase status:**
+- Good: CLAUDE.md enforces <500 lines per file
+- Good: TDD is mandatory (22-tdd-strict.md)
+- Risk: Adding 8 major feature categories will test this discipline
 
 **Consequences:**
-- Teachers don't use dashboard (too confusing)
-- Important insights buried in noise
-- Decision paralysis (too much conflicting data)
-- Teachers revert to manual tracking (dashboard wasted)
-
-**Warning signs:**
-- Dashboard shows >10 metrics on main screen
-- Uses >6 different colors
-- No clear hierarchy (everything looks equally important)
-- Teachers ask "What should I look at first?"
-- Teachers say "I don't have time to analyze all this"
+- v2.1 takes 3x longer because of v2.0 tech debt
+- Bugs in old features when adding new features
+- New developers can't onboard (code is incomprehensible)
+- Refactoring becomes so expensive you avoid it (debt spiral)
 
 **Prevention:**
-1. **Prioritize actionable insights**
-   - Main dashboard: 3-5 key metrics only
-   - Example: "Students needing help," "Class average progress," "Common mistakes"
-   - Drill-down for details (progressive disclosure)
-   - Clear next actions ("Review vocabulary with these 5 students")
+1. **Refactor continuously, not in "tech debt sprints"**:
+   - Allocate 10-15% of each sprint to tech debt
+   - Refactor WHILE adding features, not after
+2. **Boy Scout Rule**: Leave code better than you found it
+3. **Test coverage must not decrease**:
+   - v2.0 should maintain or increase test coverage
+   - If coverage drops >5%, stop and write tests
+4. **File size enforcement**:
+   - Already in CLAUDE.md: <500 lines per file, <300 for components
+   - Use linter to enforce (fail build if exceeded)
+5. **Code review for debt**: Reject PRs that add tech debt without plan to address it
+6. **DevOps integration** (2026 approach):
+   - Small updates to architecture during development cycle
+   - Prevents need for "major overhauls" later
 
-2. **Design with teachers (co-design research approach)**
-   - User research with actual teachers (not data scientists)
-   - Understand: "What decisions do teachers make?" not "What data exists?"
-   - Test with users with low data literacy
-   - Iterative refinement based on teacher feedback
-
-3. **Visual design principles**
-   - Use 2-3 colors max (LexiClash Neo-Brutalist palette: yellow, orange, pink accents)
-   - Clear visual hierarchy (most important = largest/boldest)
-   - Labels in plain language ("Students struggling" not "Performance below 2σ")
-   - Reduce chart junk (no 3D effects, gradients, unnecessary grid lines)
-
-4. **Progressive disclosure**
-   - Level 1: At-a-glance status (green/yellow/red indicators)
-   - Level 2: Summary metrics (class average, top/bottom performers)
-   - Level 3: Detailed analytics (individual student drill-down)
-   - Teachers choose depth based on time available
-
-5. **LexiClash-specific design:**
-   - Neo-Brutalist clarity (bold, high-contrast, simple shapes)
-   - Hard shadows for card hierarchy (no subtle gradients)
-   - Container queries for responsive dashboard (works on tablet/phone)
-   - RTL-compatible layouts (Hebrew-speaking teachers)
-
-**Phase assignment:** Phase 7 (Teacher Tools)
-- User research must happen before dashboard design
-- Co-design prevents rebuilding dashboard after launch
-
----
-
-### Pitfall 13: Misleading Metrics & Vanity Statistics
-
-**What goes wrong:**
-Analytics track metrics that look impressive but don't indicate learning outcomes—"time played," "games completed," "points earned." Teachers make decisions based on misleading data.
-
-**Why it happens:**
-- Easy to measure activity, hard to measure learning
-- Confusing correlation with causation
-- Metrics optimize for engagement, not education
-- No validation against learning outcomes
-
-**Consequences:**
-- Teachers think students are learning when they're just playing
-- Students rewarded for time spent, not knowledge gained
-- Misallocation of teaching resources
-- Educational research shows gamification failure when metrics don't align with learning
+**2026 best practice:**
+- "DevOps teams integrate refactoring into development cycle, with small updates keeping systems maintainable without major future overhauls"
+- "Prevent new debt: for every story you develop, make sure technical debt isn't getting worse"
 
 **Warning signs:**
-- Dashboard emphasizes "hours played" over "concepts mastered"
-- High scores without comprehension validation
-- Metrics don't correlate with standardized test results
-- Teachers say "Dashboard shows progress but student still struggles"
+- Test coverage trending downward
+- PRs touching >10 files for "simple" features
+- Developers saying "I don't understand this code"
+- Bug fix introduces 2 new bugs
 
-**Prevention:**
-1. **Measure learning outcomes, not activity:**
-   - Vocabulary mastery (words learned, retention rate)
-   - Skill progression (word-finding speed, accuracy over time)
-   - Concept transfer (applying words in new contexts)
-   - Avoid: "Games played," "Time online," "Points earned"
-
-2. **Validate metrics against ground truth:**
-   - Correlate dashboard metrics with teacher assessments
-   - Compare with standardized test results
-   - Track long-term retention (not just immediate recall)
-   - A/B test: Do students with high dashboard scores actually learn more?
-
-3. **Transparent methodology:**
-   - Explain how metrics are calculated
-   - Show confidence intervals (acknowledge uncertainty)
-   - Label predictive vs. descriptive metrics
-   - Avoid false precision ("Student is 87.3% proficient")
-
-4. **Educational research alignment:**
-   - Use established frameworks (Bloom's Taxonomy, Webb's DOK)
-   - Collaborate with education researchers
-   - Pilot with teachers, gather feedback
-
-**Phase assignment:** Phase 7 (Teacher Tools)
-- Metric selection is strategic (foundational decision)
+**Sources:**
+- [Refactor All The Time Instead of Tech Debt Day - DEV](https://dev.to/jesterxl/refactor-all-the-time-instead-of-tech-debt-day-1cj3)
+- [How DevOps Reduces Technical Debt in 2026](https://c4techservices.com/how-devops-reduces-technical-debt-in-2026/)
+- [Technical Debt and Refactoring - Aviator](https://www.aviator.co/blog/technical-debt-and-the-role-of-refactoring/)
 
 ---
 
-## Integration Pitfalls
+## PHASE-SPECIFIC WARNINGS
 
-### Pitfall 14: Breaking Existing Test Suite (3,481 Tests)
+Recommendations for which phases need deeper research or extra caution.
 
-**What goes wrong:**
-New features (boss battles, combos, gamification) introduce regressions in existing functionality, breaking tests and undermining confidence in codebase stability.
-
-**Why it happens:**
-- Shared state modified without updating all consumers
-- Global styles conflict with new components
-- Animation contexts overlap
-- Test mocks outdated
-
-**Consequences:**
-- Test suite becomes unreliable ("tests always fail now")
-- Developers skip tests ("too many false failures")
-- Real bugs hidden in noise
-- Development velocity crashes (debugging regressions)
-
-**Warning signs:**
-- >10 test failures after feature branch merge
-- Tests fail in unrelated components
-- Flaky tests (sometimes pass, sometimes fail)
-- "Works on my machine" (tests fail in CI)
-
-**Prevention:**
-1. **Isolation architecture (repeated from Pitfall 3):**
-   - Boss battles: Separate route, state container
-   - Combos: Own animation context
-   - Gamification: Dedicated XP/achievement store
-   - Minimize shared global state
-
-2. **Test discipline:**
-   - Run full suite after every change (`npm run test`)
-   - Fix ALL test failures before merging (zero tolerance)
-   - Add tests for new features (maintain coverage ≥80%)
-   - Update mocks when APIs change
-
-3. **CI/CD integration:**
-   - GitHub Actions runs tests on every PR
-   - Block merge if tests fail
-   - Coverage reports (flag regressions)
-   - Visual regression testing (Percy, Chromatic)
-
-4. **LexiClash-specific testing:**
-   - Test in all 4 languages (Hebrew RTL critical)
-   - Snapshot tests for Neo-Brutalist components
-   - Animation testing (Framer Motion behavior)
-
-**Phase assignment:** Phase 4 (System Integration)
-- Continuous testing prevents accumulated technical debt
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| **Dynamic Board Mechanics** | Layout thrashing from animating tiles | Research: CSS transform animations, `will-change`, GPU acceleration. Use Framer Motion's `layoutId` sparingly |
+| **Power-Up System** | Power creep making content too easy | Research: Horizontal progression, soft caps, test every level without power-ups first |
+| **Meta-Progression** | Grind wall perception | Research: F2P progression curves (to avoid them), unlock cadence benchmarks |
+| **Boss Battles** | Unfair/unclear mechanics | Research: Boss design patterns, telegraphing best practices. Budget 5-6 iteration cycles per boss |
+| **Visual Content Pipeline** | Memory leaks from Remotion/images | Research: Asset streaming, WebGL texture disposal, Remotion Lambda for server-side rendering |
+| **Polished UI** | Context re-render cascades | Research: Context splitting patterns, Zustand/Jotai for high-frequency state |
+| **Dynamic Difficulty** | Rubber-banding perception | Research: Invisible DDA techniques, pre-game vs mid-game adjustment tradeoffs |
+| **v1.1 Carryover** | Technical debt from rushed features | Research: Refactoring while adding features, Boy Scout Rule enforcement |
 
 ---
 
-### Pitfall 15: Bundle Size Explosion (Breaking 500KB Budget)
+## MITIGATION STRATEGY SUMMARY
 
-**What goes wrong:**
-Adding boss battles, combo animations, gamification UI, and analytics dashboards bloats JavaScript bundle beyond performance budget, degrading load times and Core Web Vitals.
+**Before starting v2.0:**
+1. [ ] Split existing large contexts (InGameContext, ProgressionContext) by concern
+2. [ ] Audit current animation usage - are we animating transforms or layout properties?
+3. [ ] Establish memory budget: Max MB per world, max particles on screen
+4. [ ] Define power-up design principles: Horizontal > vertical, skill > upgrades
+5. [ ] Set up continuous profiling: React DevTools Profiler, Chrome Performance tab
 
-**Real-world evidence:**
-- Research shows optimal budget: 130-170KB minified+gzipped
-- Teams typically set 150KB limit for total bundle
-- Bundle bloat blocks rendering, degrades performance
-- Improves Core Web Vitals metrics (Interaction to Next Paint)
+**During development:**
+1. [ ] Test every feature on low-end device (iPhone 12, not MacBook)
+2. [ ] Playtest bosses with fresh testers (not developers)
+3. [ ] Monitor test coverage weekly - must not decrease
+4. [ ] Code review for context patterns, animation properties, asset loading
+5. [ ] Refactor continuously (10-15% sprint capacity)
 
-**Why it happens:**
-- Heavy libraries added without considering bundle impact
-- No code splitting (all features loaded upfront)
-- Unused dependencies included
-- Animation libraries duplicated
-
-**Consequences:**
-- Lighthouse score drops <90 (violates LexiClash budget)
-- Slow load on 3G networks (educational context: many students on low bandwidth)
-- Poor Core Web Vitals (SEO penalty)
-- Mobile data costs (students with limited data plans)
-
-**Warning signs:**
-- Bundle size increases >50KB per feature
-- Lighthouse Performance score <90
-- Load time >3s on 3G
-- Multiple animation libraries imported
-
-**Prevention:**
-1. **Aggressive code splitting:**
-   - Boss battles: Lazy-load route (`next/dynamic`)
-   - Combo effects: Load on-demand
-   - Admin analytics: Separate bundle (teachers only)
-   - Use React lazy loading for heavy components
-
-2. **Bundle analysis:**
-   - Run `next build` and check bundle report
-   - Use `webpack-bundle-analyzer`
-   - Identify large dependencies
-   - Replace heavy libraries with lighter alternatives
-
-3. **Dependency audit:**
-   - Avoid: Moment.js (use date-fns or native Intl)
-   - Avoid: Lodash (use native methods or import specific functions)
-   - Avoid: Multiple animation libraries (stick with Framer Motion)
-   - Tree-shaking enabled
-
-4. **CI performance budget:**
-   - Use `size-limit` package
-   - Fail build if bundle exceeds 500KB
-   - Track bundle size over time (prevent gradual bloat)
-
-5. **LexiClash-specific constraints:**
-   - Current bundle already optimized (Lighthouse 90+)
-   - Features must stay within budget (or split into separate routes)
-   - Mobile-first: Optimize for slow networks
-
-**Phase assignment:** Phase 4 (System Integration)
-- Performance regression prevention (continuous monitoring)
+**Before release:**
+1. [ ] Accessibility audit: Reduced motion, color-blind modes, particle budget
+2. [ ] Memory profiling: 30-minute play session should not leak
+3. [ ] Power-up balance: Can every level be beaten without power-ups?
+4. [ ] DDA testing: Is adaptive difficulty noticeable? (It shouldn't be)
+5. [ ] Performance testing: 60fps on iPhone 12 during boss battles?
 
 ---
 
-### Pitfall 16: Animation Performance Cascade Failure
+## RESEARCH CONFIDENCE
 
-**What goes wrong:**
-Boss battle effects + combo chain animations + gamification popups + existing game animations create performance cascade, dropping frame rates and draining battery on mobile.
-
-**Real-world evidence:**
-- iOS Safari drains battery 6% faster than optimized browsers
-- Users report Safari consuming 30% battery in 74 minutes
-- Motion effects/parallax contribute to battery consumption
-- Framer Motion requires GPU-accelerated properties for mobile performance
-
-**Why it happens:**
-- Animations use non-GPU-accelerated properties (width, height, top, left)
-- Too many simultaneous animations (particles + UI + gameplay)
-- No animation simplification on low-powered devices
-- Excessive DOM manipulation during animations
-
-**Consequences:**
-- Frame drops (below 60fps)
-- Battery drain (students complain "game kills my battery")
-- Jank/stuttering (poor user experience)
-- Thermal throttling (device overheats, slows down)
-
-**Warning signs:**
-- Frame rate <60fps during combo sequences
-- Battery drain >10% per 30 minutes of gameplay
-- Device gets hot during boss battles
-- Animations lag on iPhone 12 or older
-
-**Prevention:**
-1. **GPU-accelerated animations only:**
-   - Use: `transform` (translateX, translateY, scale, rotate), `opacity`
-   - Never: `width`, `height`, `top`, `left`, `margin`, `padding`
-   - Framer Motion: Use motion values (skip React re-renders)
-
-2. **Animation budget:**
-   - Max 3 simultaneous animations (boss + combo + UI)
-   - Pause background animations during intense sequences
-   - Reduce particle count on mobile (<20 particles)
-
-3. **Device-adaptive complexity:**
-   - Detect device capabilities (LexiClash already has this)
-   - Simplify animations on low-end devices
-   - Offer "Reduce Motion" setting (accessibility + performance)
-
-4. **Framer Motion optimizations (verified 2026 sources):**
-   - 4x framerates on low-powered devices (recent improvements)
-   - Energy efficient animations
-   - Use `whileTap`/`whileHover` props (optimized internally)
-   - Lazy load animation components (`useInView` + React.lazy)
-
-5. **LexiClash-specific:**
-   - Leverage existing `animate-neo-*` classes (optimized)
-   - Test on iOS Safari specifically (known battery issues)
-   - Container queries for responsive animations
-
-**Phase assignment:** Phase 4 (System Integration)
-- Performance testing across features (holistic view)
+| Area | Confidence | Notes |
+|------|------------|-------|
+| Animation Performance | HIGH | WebSearch verified with current 2026 sources, specific to React/Framer Motion |
+| Game Balance (Power Creep) | MEDIUM | Industry patterns well-documented, but specific to word puzzles (not typical) |
+| Adaptive Difficulty | MEDIUM | Academic research + industry practice, but implementation details matter |
+| Meta-Progression | MEDIUM | F2P patterns documented, but applying to premium game requires care |
+| Boss Design | LOW | General principles found, but word-puzzle bosses are unusual (may need innovation) |
+| Visual Overload | HIGH | 2026 accessibility trends clearly documented, industry moving toward minimalism |
+| WebSocket Race Conditions | HIGH | Recent 2026 solutions found, specific to Socket.IO + Next.js |
+| Asset Performance | HIGH | Specific to Remotion, WebGL, mobile browsers - well-researched |
+| Scope Creep | HIGH | Universal problem, 2026 solutions documented |
+| Technical Debt | HIGH | 2026 DevOps approach clearly documented |
 
 ---
 
-## Mobile/Browser Pitfalls
+## CONCLUSION
 
-### Pitfall 17: iOS Safari Specific Issues
+The v2.0 Adventure Overhaul is ambitious and exciting, but the research surfaced 12 critical pitfalls that could derail the project:
 
-**What goes wrong:**
-Features work in Chrome but break in iOS Safari—audio doesn't play, animations stutter, localStorage quota exceeded, viewport height jumps.
+**Top 3 Risks:**
+1. **React Context re-render cascade** - Already have 17 contexts, adding more state will cause performance collapse
+2. **Animation layout thrashing** - Animating wrong CSS properties will drop mobile to <30fps
+3. **Power creep** - Power-ups will trivialize content or gate progression if not carefully balanced
 
-**Real-world evidence (2026):**
-- iOS 26 battery drain issues reported
-- Safari not optimized for animations/motion graphics
-- Game testing: Safari drained 89% → 72% in 10 minutes (6% worse than Brave)
+**Key Insight:** The 2026 gaming industry is trending toward **minimalism, performance, and player comfort** over visual excess. This aligns well with the project's existing performance-aware architecture (AdaptiveMotion, ProgressionContext optimization notes).
 
-**Why it happens:**
-- iOS Safari has unique constraints (audio policy, storage limits)
-- Webkit bugs differ from Chrome
-- Aggressive power saving
-- Viewport height changes when address bar appears/disappears
+**Recommended Phase Order (based on risk):**
+1. Start with **Dynamic Board Mechanics** - Highest technical risk, needs animation research
+2. Add **Power-Up System** - Medium risk, needs balance research, no dependencies
+3. Implement **Boss Battles** - High iteration cost, needs mechanics tested with real players
+4. Add **Meta-Progression** - Lower risk if power-ups are balanced first
+5. Polish **Visual Pipeline** - Last, to avoid visual overload accumulation
+6. Tune **Dynamic Difficulty** - Very last, requires all other systems working
 
-**Consequences:**
-- Broken user experience for 30% of mobile users (iOS)
-- Audio cues don't work (boss battles, combo feedback)
-- Layout shifts (viewport height issue)
-- Students on iPads can't use app
-
-**Warning signs:**
-- Features only tested in Chrome
-- No iOS device testing
-- Audio autoplays (blocked in iOS Safari)
-- Fixed viewport height (vh units)
-
-**Prevention:**
-1. **iOS Safari testing mandatory:**
-   - Test on real iPhone/iPad (not just simulator)
-   - Test across iOS versions (latest + N-1)
-   - Check: Audio, animations, storage, viewport
-
-2. **Audio handling:**
-   - Require user gesture before playing audio
-   - Preload audio on user interaction
-   - Fallback for when audio blocked
-
-3. **Viewport height fix:**
-   - Use `dvh` (dynamic viewport height) instead of `vh`
-   - Or JavaScript: `window.innerHeight` for mobile
-   - Test with address bar visible/hidden
-
-4. **Storage limits:**
-   - iOS Safari: 50MB localStorage limit
-   - Monitor usage, clear old data
-   - Graceful degradation when quota exceeded
-
-5. **LexiClash-specific:**
-   - Already supports mobile, but new features must be tested
-   - Neo-Brutalist design should simplify animations (less Safari struggle)
-
-**Phase assignment:** Phase 8 (Mobile Optimization)
-- Cross-browser testing before launch
-
----
-
-### Pitfall 18: Touch Interaction Conflicts
-
-**What goes wrong:**
-Boss battles and combo systems designed for mouse/keyboard fail on touch devices—gesture conflicts, small tap targets, no visual feedback.
-
-**Why it happens:**
-- Developers test on desktop
-- Hover states don't exist on touch
-- Tap targets too small (<44px)
-
-**Consequences:**
-- Frustration on mobile (majority of users)
-- Accessibility violations (WCAG 2.1 AA: 44px minimum)
-- Combo chains hard to execute on touchscreen
-
-**Warning signs:**
-- No mobile testing
-- Hover-dependent interactions
-- Tap targets <44px
-- Multi-touch gestures conflict with browser (pinch-zoom)
-
-**Prevention:**
-1. **Touch-first design:**
-   - Tap targets ≥48px (LexiClash design system should enforce)
-   - No hover-only interactions
-   - Visual feedback on tap (button press animation)
-   - Test on phones (375px width minimum)
-
-2. **Gesture clarity:**
-   - Tap (not swipe) for primary actions
-   - Long-press for secondary actions
-   - No custom gestures that conflict with browser
-
-3. **LexiClash-specific:**
-   - Neo-Brutalist design (bold, chunky buttons = easy to tap)
-   - `animate-neo-press` animation (clear tap feedback)
-   - Already mobile-optimized (extend to new features)
-
-**Phase assignment:** Phase 8 (Mobile Optimization)
-
----
-
-## Prevention Summary (Checklist)
-
-### Boss Battles (Phase 1)
-- [ ] Difficulty curve designed for puzzle players (not action gamers)
-- [ ] Boss mechanics use word-finding skills (not reflexes)
-- [ ] Adaptive difficulty based on player performance
-- [ ] Accessibility options (extended timer, reduced health, skip)
-- [ ] Tutorial shows mechanics (visual demonstration, not text)
-- [ ] Isolated state management (no global state pollution)
-- [ ] RTL testing in Hebrew
-
-### Chain/Combo System (Phase 2)
-- [ ] State machine pattern (FSM with hierarchical states)
-- [ ] GPU-accelerated animations only (transform, opacity)
-- [ ] Animation budget enforced (<3 simultaneous)
-- [ ] Reduced motion support (accessibility)
-- [ ] Combo balance testing (40-60% score from combos)
-- [ ] Combo decay mechanics (prevents infinite chains)
-- [ ] RTL layout compatibility (logical properties)
-
-### Gamification (Phase 5)
-- [ ] Intrinsic motivation emphasized (mastery, autonomy, competence)
-- [ ] Extrinsic rewards minimal (badges for genuine achievements)
-- [ ] Anti-cheat validation (learning verified, not just completion)
-- [ ] Achievement quality over quantity (30-50 total, not 200+)
-- [ ] Ethical design (transparent mechanics, no manipulation)
-- [ ] Diminishing returns on repeated content
-
-### Analytics & Privacy (Phases 6-7)
-- [ ] COPPA compliance (parental consent, data minimization, encryption)
-- [ ] GDPR compliance if serving EU (age verification, data rights)
-- [ ] Anonymous student IDs (no PII in analytics)
-- [ ] Teacher dashboard: 3-5 key metrics (avoid overload)
-- [ ] Metrics measure learning outcomes (not activity)
-- [ ] Co-design with teachers (user research)
-- [ ] RTL-compatible dashboard (Hebrew teachers)
-
-### Integration & Performance (Phases 4, 8)
-- [ ] Full test suite passing (3,481 tests, zero failures)
-- [ ] Bundle size <500KB (code splitting, lazy loading)
-- [ ] Lighthouse Performance ≥90 (Core Web Vitals)
-- [ ] iOS Safari testing (audio, animations, viewport, storage)
-- [ ] Touch interaction compliance (≥48px tap targets)
-- [ ] Animation performance (60fps on mid-range devices)
-- [ ] Battery usage acceptable (<10% per 30min)
-- [ ] All 4 languages tested (Hebrew RTL critical)
-
----
-
-## Sources
-
-### Boss Battle Design
-- [Boss Battles in Puzzle Games - Medium](https://adityava.medium.com/puzzles-patterns-and-preparation-boss-battles-2066bc97113b)
-- [COCOON Boss Battle Discussion - Steam Community](https://steamcommunity.com/app/1497440/discussions/0/3944650879129135995/)
-- [Boss Design Guide - Game Design Skills](https://gamedesignskills.com/game-design/game-boss-design/)
-- [Stolen Realm Difficulty Discussion - Steam Community](https://steamcommunity.com/app/1330000/discussions/0/3374907062175635973/)
-- [Pantheon MMO Combat Update 2026](https://www.pantheonmmo.com/news/spring-2026-combat-and-progression-update-overview/)
-
-### Combo/Chain Systems
-- [State Management in 2026 - Nucamp](https://www.nucamp.co/blog/state-management-in-2026-redux-context-api-and-modern-patterns)
-- [Animation State Control Patterns - StudyRaid](https://app.studyraid.com/en/read/15041/520325/animation-state-control-patterns)
-- [State Pattern - Game Programming Patterns](https://gameprogrammingpatterns.com/state.html)
-- [Quora: Combo System Development](https://www.quora.com/How-are-combo-systems-chain-attacks-as-in-AC-made-in-games-What-are-the-thought-process-and-workflow-I-briefly-experimented-with-keeping-arrays-of-timers-and-different-states-for-each-combo-but-the-code-gets-ugly-and-unmanageable-very-quickly)
-
-### RTL Layout Issues
-- [Right to Left Styling 101](https://rtlstyling.com/posts/rtl-styling/)
-- [RTL in React Developer's Guide - LeanCode](https://leancode.co/blog/right-to-left-in-react)
-- [Supporting RTL Layout - DEV Community](https://dev.to/logto/supporting-rtl-language-layout-in-your-web-application-22am)
-
-### Gamification Research (2024-2025)
-- [Gamified Learning Strategies - PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC10448467/)
-- [Gamification Challenges - LinkedIn](https://www.linkedin.com/advice/1/what-challenges-risks-gamification-education)
-- [Gamification Enhances Intrinsic Motivation - Springer](https://link.springer.com/article/10.1007/s11423-023-10337-7)
-- [Why Gamification is Not Working - SAGE Journals](https://journals.sagepub.com/doi/abs/10.1177/15554120241228125)
-- [Gamification in Education and Training - Springer](https://link.springer.com/article/10.1007/s11159-024-10111-8)
-
-### Student Privacy & Compliance
-- [COPPA Compliance 2025 - Promise Legal](https://blog.promise.legal/startup-central/coppa-compliance-in-2025-a-practical-guide-for-tech-edtech-and-kids-apps/)
-- [EdTech SaaS Compliance - ComplyDog](https://complydog.com/blog/edtech-saas-compliance-student-privacy-gdpr-implementation)
-- [School Data Governance - SecurePrivacy](https://secureprivacy.ai/blog/school-data-governance-software-ferpa-coppa-k-12)
-- [Student Data Privacy Guide - DeLedao](https://www.deledao.com/post/student-data-privacy-compliance-guide)
-
-### Teacher Dashboard UX
-- [Teacher Game Learning Analytics - ResearchGate](https://www.researchgate.net/publication/338533605_Improving_Teacher_Game_Learning_Analytics_Dashboards_through_ad-hoc_Development)
-- [Co-designing Learning Analytics Dashboards - Springer](https://link.springer.com/article/10.1007/s11423-025-10577-9)
-- [Human-Centered Dashboard Design - MDPI](https://www.mdpi.com/2227-7102/13/12/1190)
-- [Learning Analytics Dashboard Tool - Springer](https://educationaltechnologyjournal.springeropen.com/articles/10.1186/s41239-021-00313-7)
-
-### Mobile Performance & Battery
-- [Energy Efficiency Guide - Apple Developer](https://developer.apple.com/library/archive/documentation/Performance/Conceptual/EnergyGuide-iOS/AvoidExtraneousGraphicsAndAnimations.html)
-- [iOS 18 Battery Drain Solutions - MoniMaster](https://www.monimaster.com/ios/ios-18-battery-drain/)
-- [Safari Battery Life Issues - Medium](https://medium.com/macoclock/safari-is-slow-and-worse-for-battery-life-2ec88b162a08)
-
-### Framer Motion Performance
-- [Framer Motion Animation Performance](https://www.framer.com/updates/animation-performance)
-- [Optimizing for Mobile Devices - StudyRaid](https://app.studyraid.com/en/read/7850/206068/optimizing-animations-for-mobile-devices)
-- [Framer Motion Performance Tips - TillItsDone](https://tillitsdone.com/blogs/framer-motion-performance-tips/)
-- [Best Practices for Performant Animations - StudyRaid](https://app.studyraid.com/en/read/7850/206073/best-practices-for-performant-animations)
-
-### Bundle Size & Performance Budgets
-- [Size Limit Tool - GitHub](https://github.com/ai/size-limit)
-- [Performance Budgeting with JavaScript - DEV](https://dev.to/omriluz1/performance-budgeting-with-javascript-2ppa)
-- [Small Bundles, Fast Pages - Calibre](https://calibreapp.com/blog/bundle-size-optimization)
-- [Optimizing Next.js Performance - Catch Metrics](https://www.catchmetrics.io/blog/optimizing-nextjs-performance-bundles-lazy-loading-and-images)
-- [Reducing JavaScript Bundle Size - DebugBear](https://www.debugbear.com/blog/reducing-javascript-bundle-size)
+This ordering front-loads technical risk and allows course correction before visual polish.
