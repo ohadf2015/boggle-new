@@ -32,6 +32,7 @@ export interface AddWordOptions {
   autoValidated?: boolean;
   validated?: boolean | null;
   score?: number;
+  potentialScore?: number;
   comboBonus?: number;
   comboLevel?: number;
   fireRoundMultiplier?: number;
@@ -307,7 +308,7 @@ export function recordFirstFinder(
   game: ScoreGameBase | null,
   word: string,
   username: string,
-  avatar?: Partial<Avatar> | null
+  avatar?: Partial<Avatar> | null | undefined
 ): boolean {
   if (!game || !word) return false;
 
