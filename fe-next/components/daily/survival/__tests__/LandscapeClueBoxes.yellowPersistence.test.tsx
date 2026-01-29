@@ -20,7 +20,6 @@ interface LandscapeClueBoxesTestProps {
   targetWord: string;
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
-  isProtected: boolean;
   gameDir: 'ltr' | 'rtl';
   attempts: { word: string; feedback: LetterFeedback[]; timestamp: number }[];
 }
@@ -32,7 +31,6 @@ const TestLandscapeClueBoxes: React.FC<LandscapeClueBoxesTestProps> = ({
   targetWord,
   accumulatedClues,
   revealedLetters,
-  isProtected,
   gameDir,
   attempts,
 }) => {
@@ -111,7 +109,6 @@ describe('LandscapeClueBoxes - Yellow Letter Persistence', () => {
     targetWord: 'APPLE',
     accumulatedClues: new Map<number, AccumulatedClue>(),
     revealedLetters: new Set<number>(),
-    isProtected: false,
     gameDir: 'ltr' as const,
     attempts: [],
   };

@@ -51,7 +51,6 @@ describe('LandscapeClueBoxes - Feedback Box Count', () => {
   const createProps = (targetWord: string, feedback: LetterFeedback[] | null, showOverlay: boolean) => ({
     grid: [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']] as [string[], string[], string[]],
     isGameOver: false,
-    isProtected: false,
     eliminatedLetters: new Set<string>(),
     onWordSubmit: jest.fn(),
     onWordChange: jest.fn(),

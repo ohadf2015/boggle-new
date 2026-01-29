@@ -6,7 +6,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
-import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -64,9 +63,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     () => isLowEnd || !enableComplexAnimations,
     [isLowEnd, enableComplexAnimations]
   );
-
-  // Screenshot protection
-  const { isProtected } = useScreenshotProtection();
 
   // Game logic hook
   const [state, actions] = useSurvivalGameLogic({
@@ -127,7 +123,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <SurvivalLandscapeLayout
         grid={grid}
         isGameOver={state.isGameOver}
-        isProtected={isProtected}
         eliminatedLetters={state.eliminatedLetters}
         onWordSubmit={actions.handleWordSubmit}
         onWordChange={actions.handleWordChange}
@@ -194,7 +189,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         latestAttemptFeedback={state.latestAttemptFeedback}
         showFeedbackOverlay={state.showFeedbackOverlay}
         isClueGaining={state.isClueGaining}
-        isProtected={isProtected}
         skipAnimations={skipAnimations}
         gameDir={actions.gameDir}
         t={t}
@@ -230,7 +224,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <SurvivalGridSection
         grid={grid}
         isGameOver={state.isGameOver}
-        isProtected={isProtected}
         eliminatedLetters={state.eliminatedLetters}
         onWordSubmit={actions.handleWordSubmit}
         onWordChange={actions.handleWordChange}

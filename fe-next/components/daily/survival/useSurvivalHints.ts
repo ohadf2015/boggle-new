@@ -1,16 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { Language } from '@/types';
 import { generateProgressiveHints, generateFallbackHints, CLUE_SHOP_ITEMS, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
-import { getWordRarity } from '@/utils/dailyChallenge/wordRarity';
 import type { FeedbackType } from '../WordFeedbackToast';
 
-/**
- * Rarity threshold for auto-revealing first letter
- * Words with rarity >= 4 (RARE or LEGENDARY) get a free hint
- */
-const RARE_WORD_THRESHOLD = 4;
 
 export interface UseSurvivalHintsProps {
   targetWord: string;
@@ -72,14 +66,6 @@ export function useSurvivalHints({
     return generateFallbackHints(targetWord, language);
   }, [targetWord, language]);
 
-  // Check if target word is rare/legendary (rarity >= 4)
-  const targetWordRarity = useMemo(() => {
-    if (!targetWord || targetWord.length < 2) return 3;
-    return getWordRarity(targetWord, language);
-  }, [targetWord, language]);
-
-  const isRareWord = targetWordRarity >= RARE_WORD_THRESHOLD;
-
   // Set initial hints on mount
   useEffect(() => {
     if (initialHints && initialHints.hints.length > 0 && !currentHint) {
@@ -88,19 +74,6 @@ export function useSurvivalHints({
       setExampleSentence(initialHints.exampleSentence);
     }
   }, [initialHints, currentHint]);
-
-  // Track if we've already shown the rare word hint
-  const hasShownRareWordHint = useRef(false);
-
-  // Auto-reveal first letter for rare/legendary words
-  useEffect(() => {
-    if (isRareWord && targetWord.length > 0 && !hasShownRareWordHint.current) {
-      hasShownRareWordHint.current = true;
-      // Reveal first letter as a free hint for tricky words
-      setRevealedLetters(new Set([0]));
-      // Note: hintStage update is handled by effect below
-    }
-  }, [isRareWord, targetWord]);
 
   // Determine hint availability based on state
   const unrevealedCount = useMemo(() => {

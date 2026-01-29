@@ -15,7 +15,6 @@ import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import {
   getGuestFingerprint,
   getGuestDailyPlayer,
@@ -72,7 +71,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 }) => {
   const { t } = useLanguage();
   const { user, profile, isAuthenticated } = useAuth();
-  const { isProtected } = useScreenshotProtection();
 
   // Local state
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
@@ -406,25 +404,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </div>
 
       {/* Main Content - uses isolate-scroll on mobile for fixed tab bar compatibility */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll px-3 pb-[--mobile-bottom-safe] md:pb-6 relative">
-        {/* Screenshot protection overlay */}
-        {isProtected && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">
-            <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-lime shadow-hard text-center">
-              <div className="text-2xl mb-2">👀</div>
-              <div className="font-bold text-sm">{t('daily.screenshotProtection') || 'Click here to continue'}</div>
-            </div>
-          </div>
-        )}
-
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll px-3 pb-[--mobile-bottom-safe] md:pb-6">
         {/* Mobile: Tab-based content */}
-        <div className={cn("max-w-md mx-auto pt-4 md:hidden", isProtected && "blur-xl pointer-events-none select-none")}>
+        <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && renderResultsContent()}
           {activeTab === 'stats' && renderStatsContent()}
         </div>
 
         {/* Desktop: Single column layout */}
-        <div className={cn("hidden md:block max-w-md mx-auto pt-4", isProtected && "blur-xl pointer-events-none select-none")}>
+        <div className="hidden md:block max-w-md mx-auto pt-4">
           {renderResultsContent()}
         </div>
       </div>

@@ -46,7 +46,6 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
     latestAttemptFeedback: feedback,
     showFeedbackOverlay: showOverlay,
     isClueGaining: false,
-    isProtected: false,
     skipAnimations: true,
     gameDir: 'ltr' as const,
     t: (key: string) => key,

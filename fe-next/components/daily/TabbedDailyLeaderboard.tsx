@@ -101,12 +101,12 @@ const TodayParticipantRow = memo<{
     return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
   };
 
-  // Rank badge colors
+  // Rank badge colors - high contrast for WCAG AA compliance
   const getRankBadgeColors = () => {
     if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-400 text-amber-900 border-amber-500';
-    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+    if (rank === 2) return 'bg-gradient-to-br from-slate-400 to-slate-500 text-white border-slate-600';
     if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
-    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
+    return 'bg-slate-600 dark:bg-slate-600 text-white dark:text-slate-100 border-slate-500 dark:border-slate-500';
   };
 
   return (
@@ -225,12 +225,12 @@ const AllTimeParticipantRow = memo<{
     return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
   };
 
-  // Rank badge colors
+  // Rank badge colors - high contrast for WCAG AA compliance
   const getRankBadgeColors = () => {
     if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-400 text-amber-900 border-amber-500';
-    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+    if (rank === 2) return 'bg-gradient-to-br from-slate-400 to-slate-500 text-white border-slate-600';
     if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
-    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
+    return 'bg-slate-600 dark:bg-slate-600 text-white dark:text-slate-100 border-slate-500 dark:border-slate-500';
   };
 
   return (

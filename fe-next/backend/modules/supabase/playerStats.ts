@@ -4,9 +4,8 @@
  */
 
 import { getSupabase, GameStats, XpInfo, UpdatedUserStats } from './client';
-
-const { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } = require('../xpManager');
-const logger = require('../../utils/logger');
+import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '../xpManager';
+import logger from '../../utils/logger';
 
 // Lazy import to avoid circular dependency with botManager
 let _generateRandomPlayerName: ((existingUsernames: string[], language: string) => { name: string; avatar: { emoji: string; color: string } }) | null = null;

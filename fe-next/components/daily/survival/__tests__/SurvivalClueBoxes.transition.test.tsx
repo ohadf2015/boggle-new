@@ -33,7 +33,6 @@ describe('SurvivalClueBoxes - Transition Tests', () => {
     latestAttemptFeedback: null as LetterFeedback[] | null,
     showFeedbackOverlay: false,
     isClueGaining: false,
-    isProtected: false,
     skipAnimations: true,
     gameDir: 'ltr' as const,
     t: (key: string) => key,

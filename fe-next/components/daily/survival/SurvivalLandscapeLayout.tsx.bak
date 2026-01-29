@@ -22,6 +22,7 @@ export interface LandscapeClueBoxesProps {
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
   attempts: TargetAttempt[];
+  isProtected: boolean;
   gameDir: 'ltr' | 'rtl';
   // Feedback overlay props
   latestAttemptFeedback: LetterFeedback[] | null;
@@ -35,6 +36,7 @@ export interface SurvivalLandscapeLayoutProps {
   // Grid props
   grid: LetterGrid;
   isGameOver: boolean;
+  isProtected: boolean;
   eliminatedLetters: Set<string>;
   onWordSubmit: (word: string) => void;
   onWordChange: (word: string, count: number) => void;
@@ -91,6 +93,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   // Grid props
   grid,
   isGameOver,
+  isProtected,
   eliminatedLetters,
   onWordSubmit,
   onWordChange,
@@ -194,6 +197,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
             accumulatedClues={accumulatedClues}
             revealedLetters={revealedLetters}
             attempts={attempts}
+            isProtected={isProtected}
             gameDir={gameDir}
             latestAttemptFeedback={latestAttemptFeedback}
             showFeedbackOverlay={showFeedbackOverlay}
@@ -207,11 +211,11 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
         <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
           <div className={cn(
             "transition-all duration-200",
-            
+            isProtected && "blur-xl pointer-events-none select-none"
           )}>
             <GridComponent
               grid={grid}
-              interactive={!isGameOver}
+              interactive={!isGameOver && !isProtected}
               onWordSubmit={onWordSubmit}
               onWordChange={onWordChange}
               hideWordPreview
@@ -418,6 +422,7 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   accumulatedClues,
   revealedLetters,
   attempts,
+  isProtected,
   gameDir,
   latestAttemptFeedback,
   showFeedbackOverlay,
@@ -464,7 +469,7 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
         dir={gameDir}
         className={cn(
           "flex justify-center flex-wrap gap-1.5 mb-2 p-2 rounded-neo bg-neo-navy/30 border-2 border-neo-black/20",
-          
+          isProtected && "blur-xl select-none"
         )}
       >
         <AnimatePresence mode="sync">

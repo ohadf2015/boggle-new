@@ -127,12 +127,6 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useScreenshotProtection', () => ({
-  useScreenshotProtection: () => ({
-    isProtected: false,
-  }),
-}));
-
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: () => ({

@@ -65,12 +65,6 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useScreenshotProtection', () => ({
-  useScreenshotProtection: () => ({
-    isProtected: false,
-  }),
-}));
-
 const mockGrid: LetterGrid = [
   ['H', 'O', 'U'],
   ['S', 'E', 'L'],

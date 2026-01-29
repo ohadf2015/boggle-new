@@ -75,12 +75,6 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useScreenshotProtection', () => ({
-  useScreenshotProtection: () => ({
-    isProtected: false,
-  }),
-}));
-
 // Mock useMediaQuery to simulate desktop
 jest.mock('@/hooks/useMediaQuery', () => ({
   useMediaQuery: jest.fn(() => true), // Desktop mode

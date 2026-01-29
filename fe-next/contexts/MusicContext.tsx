@@ -416,6 +416,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
 
     // Explicitly unlock audio - called when user clicks play buttons or the speaker icon
     // Also processes any pending track requests that were queued before audio was unlocked
+    // Auto-unmutes if previously muted, since explicit user action implies they want to hear audio
     const unlockAudio = useCallback(() => {
         if (audioUnlockedRef.current) return;
 
@@ -436,6 +437,10 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 logger.log('[Music] unlockAudio - AudioContext error:', err);
             }
         }
+
+        // NOTE: Auto-unmute is handled in fadeToTrack() when music actually starts,
+        // not here. unlockAudio() can be called from various places (mute button clicks,
+        // any user interaction), and we only want to auto-unmute when starting game music.
 
         audioUnlockedRef.current = true;
         setAudioUnlocked(true);
@@ -522,6 +527,16 @@ export function MusicProvider({ children }: MusicProviderProps) {
         }
 
         const oldHowl = currentHowlRef.current;
+
+        // Auto-unmute when starting music (user initiated fadeToTrack implies they want audio)
+        // This fixes the bug where music plays silently because isMuted was persisted
+        // from a previous session. When game music starts, user expects to hear it.
+        if (isMutedRef.current) {
+            logger.log('[Music] fadeToTrack - Auto-unmuting (music start implies audio expected)');
+            isMutedRef.current = false;
+            setIsMuted(false);
+        }
+
         const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
 
         // CRITICAL: Stop ALL other tracks to ensure only one music track plays at a time
@@ -605,6 +620,11 @@ export function MusicProvider({ children }: MusicProviderProps) {
                     logger.error('[Music] Failed to resume AudioContext:', err);
                 }
             }
+
+            // NOTE: We do NOT auto-unmute here. Auto-unmute only happens in unlockAudio()
+            // which is called explicitly when starting a game. handleFirstInteraction can
+            // trigger on any click (including mute button clicks), so we don't want to
+            // interfere with the user's mute preference here.
 
             // Update ref immediately so fadeToTrack works in the same event cycle
             audioUnlockedRef.current = true;
@@ -706,18 +726,24 @@ export function MusicProvider({ children }: MusicProviderProps) {
     }, [isMuted]);
 
     // Toggle mute - uses volumeRef to avoid dependency on volume state
+    // Synchronously updates isMutedRef BEFORE state so other event handlers see the new value immediately
     const toggleMute = useCallback(() => {
-        setIsMuted(prev => {
-            const newMuted = !prev;
-            if (currentHowlRef.current) {
-                if (newMuted) {
-                    currentHowlRef.current.volume(0);
-                } else {
-                    currentHowlRef.current.volume(volumeRef.current);
-                }
+        // Calculate new muted value from ref (which is always in sync with state via useEffect)
+        const newMuted = !isMutedRef.current;
+        // Update ref FIRST, synchronously, so handleFirstInteraction sees it
+        isMutedRef.current = newMuted;
+
+        // Then update state (async)
+        setIsMuted(newMuted);
+
+        // Update Howl volume immediately
+        if (currentHowlRef.current) {
+            if (newMuted) {
+                currentHowlRef.current.volume(0);
+            } else {
+                currentHowlRef.current.volume(volumeRef.current);
             }
-            return newMuted;
-        });
+        }
     }, []);
 
     // Update volume when mute state changes and we have an active track

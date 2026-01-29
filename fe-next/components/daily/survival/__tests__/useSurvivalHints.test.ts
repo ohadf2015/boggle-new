@@ -319,6 +319,27 @@ describe('useSurvivalHints', () => {
     });
   });
 
+  describe('no automatic first letter reveal', () => {
+    it('should NOT auto-reveal first letter for any word regardless of rarity', () => {
+      // Mock rare word (rarity >= 4)
+      const { getWordRarity } = jest.requireMock('@/utils/dailyChallenge/wordRarity');
+      (getWordRarity as jest.Mock).mockReturnValue(5); // LEGENDARY rarity
+
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // No letters should be revealed automatically at initialization
+      expect(result.current[0].revealedLetters.size).toBe(0);
+    });
+
+    it('should start with empty revealed letters set for common words', () => {
+      // Rarity 2 is common (already mocked in beforeEach)
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // No letters should be revealed automatically
+      expect(result.current[0].revealedLetters.size).toBe(0);
+    });
+  });
+
   describe('integration: multiple token spending', () => {
     it('should allow buying multiple reveals before moving to next tier', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));

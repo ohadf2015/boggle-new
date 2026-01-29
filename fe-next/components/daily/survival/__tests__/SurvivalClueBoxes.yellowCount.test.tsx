@@ -24,7 +24,6 @@ describe('SurvivalClueBoxes - Yellow Letter Count Limiting', () => {
     latestAttemptFeedback: null,
     showFeedbackOverlay: false,
     isClueGaining: false,
-    isProtected: false,
     skipAnimations: true,
     gameDir: 'ltr' as const,
     t: (key: string) => key,

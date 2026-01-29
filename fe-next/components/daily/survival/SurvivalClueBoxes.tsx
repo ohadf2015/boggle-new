@@ -18,7 +18,6 @@ export interface SurvivalClueBoxesProps {
   latestAttemptFeedback: LetterFeedback[] | null;
   showFeedbackOverlay: boolean;
   isClueGaining: boolean;
-  isProtected: boolean;
   skipAnimations: boolean;
   gameDir: 'ltr' | 'rtl';
   t: (key: string) => string;
@@ -37,7 +36,6 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   latestAttemptFeedback,
   showFeedbackOverlay,
   isClueGaining,
-  isProtected,
   skipAnimations,
   gameDir,
   t,
@@ -56,8 +54,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
           ? "clue-feedback-active clue-container-attention"
           : isClueGaining
             ? "clue-container-green-glow"
-            : "clue-container-glow",
-        isProtected && "blur-xl select-none"
+            : "clue-container-glow"
       )}
     >
       {/* Tries counter - only count non-discovery attempts */}

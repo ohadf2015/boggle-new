@@ -183,7 +183,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
                     <Button
                       onClick={onCopy}
-                      className="py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white border-3 border-neo-black dark:border-slate-500 rounded-neo"
+                      className="py-3 bg-slate-700 dark:bg-slate-600 text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-slate-800 dark:hover:bg-slate-500"
                     >
                       {copied ? (
                         <>
