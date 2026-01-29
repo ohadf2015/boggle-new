@@ -496,11 +496,9 @@ export async function getStudentsProgressSummary(
             const attempts = word.attempts || 0;
             totalCorrect += correct;
             totalAttempts += attempts;
+            wordsAttempted += attempts; // Count total attempts
           });
         }
-
-        // Count unique words attempted (not total attempts)
-        wordsAttempted += Object.keys(progress.words_attempted || {}).length;
 
         // Track most recent practice date
         if (progress.last_practice_date) {

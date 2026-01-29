@@ -489,3 +489,198 @@ describe('analytics - getLessonEffectiveness', () => {
     expect(result.data?.[0].lessonName).toBe('Advanced Verbs');
   });
 });
+
+describe('analytics - getStudentsProgressSummary', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return empty array for classroom with no students', async () => {
+    // GIVEN: Empty classroom
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    });
+
+    // WHEN
+    const result = await getStudentsProgressSummary('classroom-empty');
+
+    // THEN
+    expect(result.data).toEqual([]);
+    expect(result.error).toBeNull();
+  });
+
+  it('should return student progress with calculated mastery', async () => {
+    // GIVEN: 2 students with progress data
+    const mockMemberships = [
+      { student_id: 'student-1' },
+      { student_id: 'student-2' },
+    ];
+
+    const mockProfiles = [
+      { id: 'student-1', display_name: 'Alice', avatar_url: 'avatar1.png' },
+      { id: 'student-2', display_name: 'Bob', avatar_url: null },
+    ];
+
+    const mockLessons = [
+      { id: 'lesson-1', words: [{ word: 'word1' }, { word: 'word2' }, { word: 'word3' }, { word: 'word4' }, { word: 'word5' }] },
+    ];
+
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        total_xp: 250,
+        current_level: 3,
+        current_streak: 5,
+        words_mastered: ['word1', 'word2', 'word3'], // 3/5 = 60%
+        words_attempted: {
+          word1: { attempts: 2, correct: 2 },
+          word2: { attempts: 2, correct: 1 },
+          word3: { attempts: 2, correct: 2 },
+        },
+        last_practice_date: '2026-01-29',
+      },
+      {
+        student_id: 'student-2',
+        lesson_id: 'lesson-1',
+        total_xp: 150,
+        current_level: 2,
+        current_streak: 2,
+        words_mastered: ['word1'], // 1/5 = 20%
+        words_attempted: {
+          word1: { attempts: 3, correct: 3 },
+          word2: { attempts: 3, correct: 1 },
+        },
+        last_practice_date: '2026-01-28',
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockLessons, error: null }),
+      });
+
+    // WHEN
+    const result = await getStudentsProgressSummary('classroom-1');
+
+    // THEN
+    expect(result.data).toHaveLength(2);
+    expect(result.data?.[0]).toMatchObject({
+      studentId: 'student-1',
+      displayName: 'Alice',
+      avatarUrl: 'avatar1.png',
+      totalXp: 250,
+      currentLevel: 3,
+      vocabularyMastery: 60, // 3/5 * 100
+      currentStreak: 5,
+    });
+    expect(result.error).toBeNull();
+  });
+
+  it('should calculate accuracy from words_attempted correctly', async () => {
+    // GIVEN: Student with accuracy calculation needed
+    const mockMemberships = [{ student_id: 'student-1' }];
+    const mockProfiles = [{ id: 'student-1', display_name: 'Charlie', avatar_url: null }];
+    const mockLessons = [{ id: 'lesson-1', words: [{ word: 'word1' }, { word: 'word2' }] }];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        total_xp: 100,
+        current_level: 1,
+        current_streak: 1,
+        words_mastered: [],
+        words_attempted: {
+          word1: { attempts: 5, correct: 4 }, // 4/5
+          word2: { attempts: 5, correct: 3 }, // 3/5
+        }, // Total: 7/10 = 70% accuracy
+        last_practice_date: '2026-01-29',
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockLessons, error: null }),
+      });
+
+    // WHEN
+    const result = await getStudentsProgressSummary('classroom-1');
+
+    // THEN
+    expect(result.data?.[0].overallAccuracy).toBe(70); // 7/10 * 100
+    expect(result.data?.[0].wordsAttempted).toBe(10);
+  });
+
+  it('should mark student as struggling when accuracy < 60%', async () => {
+    // GIVEN: Student with low accuracy
+    const mockMemberships = [{ student_id: 'student-1' }];
+    const mockProfiles = [{ id: 'student-1', display_name: 'Diana', avatar_url: null }];
+    const mockLessons = [{ id: 'lesson-1', words: [{ word: 'word1' }] }];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        total_xp: 50,
+        current_level: 1,
+        current_streak: 0,
+        words_mastered: [],
+        words_attempted: {
+          word1: { attempts: 10, correct: 5 }, // 50% accuracy
+        },
+        last_practice_date: '2026-01-29',
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockLessons, error: null }),
+      });
+
+    // WHEN
+    const result = await getStudentsProgressSummary('classroom-1');
+
+    // THEN
+    expect(result.data?.[0].isStruggling).toBe(true);
+    expect(result.data?.[0].overallAccuracy).toBe(50);
+  });
+});
