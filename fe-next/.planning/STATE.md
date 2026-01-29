@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 21 of 25 (Rich Lesson Delivery) — IN PROGRESS
-Plan: 1/6 complete (21-01)
-Status: Phase 21 in progress - TTS service complete
-Last activity: 2026-01-29 — Completed 21-01 (Text-to-Speech Service)
+Plan: 2/6 complete (21-01, 21-02)
+Status: Phase 21 in progress - Enriched vocabulary card complete
+Last activity: 2026-01-29 — Completed 21-02 (Enriched Vocabulary Card)
 
 Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-21 in progress, v1.2 Phase 24-25 complete)
 
@@ -30,9 +30,9 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 31 (Phase 15-20 complete, Phase 21 1/6)
+- Plans completed: 32 (Phase 15-20 complete, Phase 21 2/6)
 - Current phase: 21 (Rich Lesson Delivery) — IN PROGRESS
-- Next: Phase 21 plans 02-06
+- Next: Phase 21 plans 03-06
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -128,8 +128,8 @@ Progress: [██████████████] 21/25 phases (84% milesto
 **Phase 21 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 21-01 | Text-to-Speech Service | 10min | Complete |
-| 21-02 | Vocabulary Card UI | - | Pending |
+| 21-01 | Text-to-Speech Service | 6min | Complete |
+| 21-02 | Enriched Vocabulary Card | 15min | Complete |
 | 21-03 | Lesson Practice Flow | - | Pending |
 | 21-04 | Progress Tracking | - | Pending |
 | 21-05 | Lesson Assignment UI | - | Pending |
@@ -246,6 +246,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **20-05**: Mastery level thresholds (mastered >=80%, practicing 50-79%, struggling <50%) → Aligns with educational research on comprehension (2026-01-29)
 - **20-05**: Grid layout with sticky column → First column (words) stays visible during horizontal scroll for mobile UX (2026-01-29)
 - **20-05**: Color-coded cells (cyan/yellow/orange/navy) → Matches design system and provides clear visual distinction (2026-01-29)
+- **21-02**: education.lesson namespace → Practice components use education.lesson.* not teacher.lesson.* for translations (2026-01-29)
+- **21-02**: IPA fallback tooltip → Shows pronunciation guide when TTS voice unavailable (3s auto-dismiss) (2026-01-29)
+- **21-02**: Neo-yellow for contextual examples → Background differentiates themed examples from regular usage examples (2026-01-29)
+- **21-02**: Compact mode toggle → VocabularyCard supports both full detail and summary views for flexible layouts (2026-01-29)
 - **21-01**: Web Speech API over external TTS service → Browser native, zero latency, no API costs, works offline (2026-01-29)
 - **21-01**: Language-based voice selection (exact match → prefix match → fallback) → en-GB → en-US (prefix), supports language variants (2026-01-29)
 - **21-01**: Rate 0.9 for pronunciation speed → Slightly slower than default for clearer pronunciation learning (2026-01-29)
@@ -379,14 +383,14 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 21-01 (Text-to-Speech Service)
+Stopped at: Completed 21-02 (Enriched Vocabulary Card)
 Resume file: None
 
-**Next action:** Execute Phase 21 plans 02-06 (Vocabulary Card UI, Lesson Practice, Progress, Assignment, Integration)
+**Next action:** Execute Phase 21 plans 03-06
 
 **Phase 21 Summary (so far):**
-- 1/6 plans complete (10 minutes total)
-- 30 tests added
+- 2/6 plans complete (21 minutes total)
+- TTS service and enriched vocabulary card components ready for integration
 - TTS service with Web Speech API complete
 - Hebrew TTS fallback to IPA needed in 21-02
 
