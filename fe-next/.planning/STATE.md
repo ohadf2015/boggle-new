@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 Phase: 21 of 25 (Rich Lesson Delivery) — IN PROGRESS
 Plan: 5/6 complete (21-01, 21-02, 21-03, 21-04, 21-05)
-Status: Phase 21 in progress - Daily Buzz context service complete
-Last activity: 2026-01-29 — Completed 21-05 (Daily Buzz Context Service)
+Status: Phase 21 in progress - Swipeable flashcard stack complete
+Last activity: 2026-01-29 — Completed 21-04 (Swipeable Flashcard Stack)
 
 Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-21 in progress, v1.2 Phase 24-25 complete)
 
@@ -30,7 +30,7 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 35 (Phase 15-20 complete, Phase 21 5/6)
+- Plans completed: 36 (Phase 15-20 complete, Phase 21 5/6)
 - Current phase: 21 (Rich Lesson Delivery) — IN PROGRESS
 - Next: Phase 21 plan 06
 
@@ -131,11 +131,11 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 21-01 | Text-to-Speech Service | 6min | Complete |
 | 21-02 | Enriched Vocabulary Card | 15min | Complete |
 | 21-03 | Swipe Gesture Hook | TBD | Complete |
-| 21-04 | Lesson Builder Components | - | Pending |
+| 21-04 | Swipeable Flashcard Stack | 10min | Complete |
 | 21-05 | Daily Buzz Context Service | 15min | Complete |
 | 21-06 | Lesson Assignment UI | - | Pending |
 
-**Phase 21 Total (so far):** 36 minutes, 78 tests added (5/6 plans complete)
+**Phase 21 Total (so far):** 46 minutes, 78 tests added (5/6 plans complete)
 
 ## Accumulated Context
 
@@ -266,6 +266,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **21-03**: ArrowLeft/ArrowRight keyboard shortcuts → Accessibility requirement, all interactions (drag + keyboard) tested (2026-01-29)
 - **21-03**: 150px default threshold → Research context specification for minimum swipe distance (2026-01-29)
 - **21-03**: Disabled state preserves snap-back → Visual feedback even when swipe disabled, card returns to center (2026-01-29)
+- **21-04**: Opacity-based swipe feedback → Progressive visual reveal as user drags, green (right) / red (left) color coding (2026-01-29)
+- **21-04**: Show 2 background cards → Provides visual stack effect without cluttering UI, scale/opacity transforms for depth (2026-01-29)
+- **21-04**: Tap to reveal then swipe → Two-step interaction prevents accidental swipes, gives user time to think (2026-01-29)
+- **21-04**: Space to flip, arrows to swipe → Accessibility requirement, keyboard navigation for power users (2026-01-29)
 
 ### Pending Todos
 
@@ -338,6 +342,10 @@ None.
 
 **Phase 21 (Rich Lesson Delivery) — IN PROGRESS:**
 - Text-to-speech service complete — Web Speech API integration, 30 tests passing (21-01)
+- Enriched vocabulary card complete — TTS integration, contextual examples, Neo-Brutalist design (21-02)
+- Swipe gesture hook complete — Framer Motion motion values, 150px threshold, keyboard shortcuts (21-03)
+- Swipeable flashcard stack complete — Stack visual, green/red feedback, tap-to-reveal flow (21-04)
+- Daily Buzz context service complete — Fuzzy matching, stem algorithm, WebSocket handler (21-05)
 - Hebrew TTS limitation — Most browsers lack Hebrew voices, will use IPA fallback
 - Browser compatibility — Safari iOS requires user gesture for first speech
 - Voice quality variance — Android voices robotic, iOS natural (rate 0.9 helps consistency)
@@ -387,16 +395,16 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 21-02 (Enriched Vocabulary Card)
+Stopped at: Completed 21-04 (Swipeable Flashcard Stack)
 Resume file: None
 
-**Next action:** Execute Phase 21 plans 03-06
+**Next action:** Execute Phase 21 plan 06
 
 **Phase 21 Summary (so far):**
-- 2/6 plans complete (21 minutes total)
-- TTS service and enriched vocabulary card components ready for integration
-- TTS service with Web Speech API complete
-- Hebrew TTS fallback to IPA needed in 21-02
+- 5/6 plans complete (46 minutes total)
+- Wave 1 complete: TTS, enriched card, swipe hook, Daily Buzz context
+- Wave 2 in progress: Flashcard stack component ready for integration
+- All lesson delivery UI components functional
 
 **Phase 20 Summary:**
 - 6/6 plans complete (127 minutes total)
@@ -406,4 +414,4 @@ Resume file: None
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-29 (Phase 21 plan 03 complete - swipe gesture hook)*
+*Last updated: 2026-01-29 (Phase 21 plan 04 complete - swipeable flashcard stack)*
