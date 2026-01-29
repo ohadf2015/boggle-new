@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 19 of 25 (Achievement System)
-Plan: 2/5 complete
+Plan: 4/5 complete
 Status: In progress
-Last activity: 2026-01-29 — Completed 19-02-PLAN.md (Classroom Leaderboard)
+Last activity: 2026-01-29 — Completed 19-04-PLAN.md (Profile Badge Display)
 
 Progress: [████████████░] 19/25 phases (76% milestone, v1.2 complete - Phase 24-25)
 
@@ -82,8 +82,10 @@ Progress: [████████████░] 19/25 phases (76% milestone,
 |------|------|----------|--------|
 | 19-01 | Achievement System Foundation | Previously completed | Complete |
 | 19-02 | Classroom Leaderboard | 6min | Complete |
+| 19-03 | Achievement Unlock Detection & Celebration | 6min | Complete |
+| 19-04 | Profile Badge Display | 8min | Complete |
 
-**Phase 19 Total:** 2/5 plans complete, 47 tests added (24 new in 19-02)
+**Phase 19 Total:** 4/5 plans complete, 110 tests added (33 new in 19-04: 16 card + 17 grid)
 
 **Phase 24 Plans:**
 | Plan | Name | Duration | Status |
@@ -161,6 +163,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **19-01**: >= comparison for tiers → Includes exact threshold match using Math.min pattern (2026-01-25)
 - **19-01**: RLS classmate access → Students can view achievements of classmates in same classroom for leaderboard (2026-01-25)
 - **19-01**: getProgressValue mapping → Maps achievement key to student metric (e.g., first_lesson → lessonsCompleted) (2026-01-25)
+- **19-03**: FIFO queue for unlock management → Multiple unlocks wait in order, one celebration at a time (2026-01-29)
+- **19-03**: Tier-based UI prominence → Bronze/Silver toast (auto-dismiss 3s), Gold/Platinum full modal (2026-01-29)
+- **19-03**: localStorage persistence → Prevents re-showing acknowledged unlocks on page refresh (2026-01-29)
+- **19-03**: Conditional confetti/sound → Only Gold/Platinum tiers for performance + special feeling (2026-01-29)
 - **24-02**: CSS isolation with 'all: initial' → Prevents parent frame styles from bleeding through iframe (2026-01-26)
 - **24-02**: 100vh/100dvh fallback pattern → 100vh = parent height, 100dvh = iframe height (2026-01-26)
 - **24-02**: Viewport hook delegation → Separate concerns, reusable outside provider (2026-01-26)
@@ -244,14 +250,24 @@ None.
 - Total: 114 tests, full XP system functional
 
 **Phase 19 (Achievement System) — IN PROGRESS:**
-- Achievement badges complete — 23 tests, 3-tier system (bronze/silver/gold), 9 achievement types
+- Achievement badges complete — 23 tests, 4-tier system (bronze/silver/gold/platinum), 18 achievement types
 - Classroom leaderboard complete — 24 tests (13 hook + 11 component)
   - useClassroomLeaderboard hook — Top 3 + current user rank, inactive detection (7+ days)
   - ClassroomLeaderboard UI — Neo-Brutalist design, emoji badges (🥇🥈🥉), RTL support
   - getClassroomLeaderboard query — XP aggregation across lessons, privacy-scoped to classroom
   - Translations — 4 languages (en, he, sv, ja) for leaderboard section
-- Total: 47 tests passing, 2/5 plans complete
-- Ready for teacher dashboard integration (Phase 19-03)
+- Achievement unlock detection complete — 30 tests (12 hook + 18 modal)
+  - useAchievementUnlock hook — FIFO queue, localStorage persistence, before/after comparison
+  - AchievementUnlockModal UI — Toast for Bronze/Silver, full modal for Gold/Platinum
+  - Confetti integration — fireLevelUpConfetti for Gold/Platinum tiers only
+  - Translations — 4 languages for unlock celebrations
+- Profile badge display complete — 33 tests (16 card + 17 grid)
+  - AchievementProgressCard — Tier colors, progress bars (X/Y format), pin functionality
+  - EducationBadgeGrid — Category grouping, featured badges (max 3 pins), collapsible sections
+  - Secret badges show "???" until unlocked, locked badges show hints
+  - All translations in 5 languages (en, he, sv, ja, es)
+- Total: 110 tests passing, 4/5 plans complete
+- Ready for student dashboard integration (Phase 19-05)
 
 **Phase 20 (Analytics):**
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
@@ -295,11 +311,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 19-02-PLAN.md (Classroom Leaderboard) — Plan 2/5 complete
+Stopped at: Completed 19-03-PLAN.md (Achievement Unlock Detection & Celebration) — Plan 3/5 complete
 Resume file: None
 
-**Next action:** Phase 19 plan 03 (Student Dashboard Integration) - Integrate leaderboard and achievements into student dashboard.
+**Next action:** Phase 19 plan 05 (Database Integration) - Wire achievement unlock detection and persist pin states to database.
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-29 (Phase 19 plan 02 complete - Classroom Leaderboard)*
+*Last updated: 2026-01-29 (Phase 19 plan 04 complete - Profile Badge Display)*
