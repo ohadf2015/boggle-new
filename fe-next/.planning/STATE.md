@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 20 of 25 (Student Analytics Dashboard) — IN PROGRESS
-Plan: 1/6 complete
-Status: Analytics foundation implemented
-Last activity: 2026-01-29 — Completed 20-01-PLAN.md (analytics queries + hook with TDD)
+Plan: 2/6 complete
+Status: Analytics foundation + Lesson Effectiveness Chart complete
+Last activity: 2026-01-29 — Completed 20-04-PLAN.md (lesson effectiveness chart with TDD)
 
 Progress: [█████████████░] 20/25 phases (80% milestone, v1.1 Phase 15-19 complete, v1.2 Phase 24-25 complete)
 
@@ -30,9 +30,9 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 22 (Phase 15-19 complete, Phase 20 plan 01 complete)
+- Plans completed: 23 (Phase 15-19 complete, Phase 20 plans 01 + 04 complete)
 - Current phase: 20 (Student Analytics Dashboard) — IN PROGRESS
-- Next: Phase 20 plans 02-06 (UI components + integration)
+- Next: Phase 20 plans 02-03, 05-06 (UI components + integration)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -119,11 +119,11 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 20-01 | Analytics Foundation TDD | 7min | Complete |
 | 20-02 | Classroom Overview Card | TBD | Pending |
 | 20-03 | Struggling Students List | TBD | Pending |
-| 20-04 | Common Mistakes Widget | TBD | Pending |
+| 20-04 | Lesson Effectiveness Chart | 6min | Complete |
 | 20-05 | Weekly Activity Heatmap | TBD | Pending |
 | 20-06 | Dashboard Integration | TBD | Pending |
 
-**Phase 20 Progress:** 7 minutes, 14 tests added (8 query + 6 hook), 1/6 plans complete
+**Phase 20 Progress:** 13 minutes, 28 tests added (12 query + 11 hook + 5 component), 2/6 plans complete
 
 ## Accumulated Context
 
@@ -228,6 +228,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **20-01**: >50% error rate for common mistakes → Filters borderline words (50% exactly), surfaces clear problem areas (2026-01-29)
 - **20-01**: Parallel Promise.all for metrics fetch → Reduces load time ~50% (sequential 400ms → parallel 200ms) (2026-01-29)
 - **20-01**: 7-day window for metrics → Balances recency with statistical significance, matches weekly teacher planning (2026-01-29)
+- **20-04**: Dual Y-axes (XP left, % right) → Different value scales (0-300 XP vs 0-100%) require separate axes (2026-01-29)
+- **20-04**: Bar chart (not line chart) → Discrete lessons better represented as bars than continuous lines (2026-01-29)
+- **20-04**: Neo-cyan for XP, neo-pink for completion rate → Matches ClassProgressChart color scheme for visual consistency (2026-01-29)
 
 ### Pending Todos
 
