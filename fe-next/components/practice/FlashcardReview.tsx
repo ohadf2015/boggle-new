@@ -190,16 +190,13 @@ export default function FlashcardReview({
                 {currentIndex + 1} / {words.length}
               </p>
             </div>
-            {/* Mode toggle buttons */}
+            {/* Mode toggle buttons - in swipe mode, swipe button is active */}
             <div className="flex gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('classic')}
-                className={cn(
-                  'text-neo-cyan hover:bg-neo-cyan/20',
-                  reviewMode === 'classic' && 'bg-neo-cyan/20'
-                )}
+                className="text-neo-cyan hover:bg-neo-cyan/20"
                 title={t('education.lesson.classicMode') || 'Classic Mode'}
               >
                 <MousePointer2 className="w-4 h-4" />
@@ -208,10 +205,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('swipe')}
-                className={cn(
-                  'text-neo-pink hover:bg-neo-pink/20',
-                  reviewMode === 'swipe' && 'bg-neo-pink/20'
-                )}
+                className="text-neo-pink hover:bg-neo-pink/20 bg-neo-pink/20"
                 title={t('education.lesson.swipeMode') || 'Swipe Mode'}
               >
                 <Layers className="w-4 h-4" />
@@ -264,10 +258,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('classic')}
-                className={cn(
-                  'text-neo-cyan hover:bg-neo-cyan/20',
-                  reviewMode === 'classic' && 'bg-neo-cyan/20'
-                )}
+                className="text-neo-cyan hover:bg-neo-cyan/20 bg-neo-cyan/20"
                 title={t('education.lesson.classicMode') || 'Classic Mode'}
               >
                 <MousePointer2 className="w-4 h-4" />
@@ -276,10 +267,7 @@ export default function FlashcardReview({
                 variant="ghost"
                 size="sm"
                 onClick={() => setReviewMode('swipe')}
-                className={cn(
-                  'text-neo-pink hover:bg-neo-pink/20',
-                  reviewMode === 'swipe' && 'bg-neo-pink/20'
-                )}
+                className="text-neo-pink hover:bg-neo-pink/20"
                 title={t('education.lesson.swipeMode') || 'Swipe Mode'}
               >
                 <Layers className="w-4 h-4" />
