@@ -4520,7 +4520,10 @@ const he = {
       "contextualExamples": "בהקשר",
       "pronounce": "הקשב להגייה",
       "speaking": "מדבר...",
-      "pronunciationFallback": "הגייה"
+      "pronunciationFallback": "הגייה",
+      "gotIt": "ידעתי",
+      "dontKnow": "לא ידעתי",
+      "tapToReveal": "הקש לחשיפה"
     },
     "leaderboard": {
       "title": "לוח מובילים כיתתי",

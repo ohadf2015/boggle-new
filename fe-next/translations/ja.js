@@ -4545,7 +4545,10 @@ const ja = {
       "contextualExamples": "文脈での使用",
       "pronounce": "発音を聞く",
       "speaking": "再生中...",
-      "pronunciationFallback": "発音"
+      "pronunciationFallback": "発音",
+      "gotIt": "分かった",
+      "dontKnow": "分からない",
+      "tapToReveal": "タップして表示"
     },
     "leaderboard": {
       "title": "クラスリーダーボード",

@@ -4545,7 +4545,10 @@ const sv = {
       "contextualExamples": "I sammanhang",
       "pronounce": "Lyssna på uttal",
       "speaking": "Talar...",
-      "pronunciationFallback": "Uttal"
+      "pronunciationFallback": "Uttal",
+      "gotIt": "Kan det",
+      "dontKnow": "Vet inte",
+      "tapToReveal": "Tryck för att visa"
     },
     "leaderboard": {
       "title": "Klassrumets Topplista",

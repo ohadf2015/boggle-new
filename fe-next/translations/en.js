@@ -4530,7 +4530,10 @@ const en = {
       "contextualExamples": "In Context",
       "pronounce": "Listen to pronunciation",
       "speaking": "Speaking...",
-      "pronunciationFallback": "Pronunciation"
+      "pronunciationFallback": "Pronunciation",
+      "gotIt": "Got It",
+      "dontKnow": "Don't Know",
+      "tapToReveal": "Tap to reveal"
     },
     "leaderboard": {
       "title": "Classroom Leaderboard",
