@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 19 of 25 (Achievement System)
-Plan: 4/5 complete
-Status: In progress
-Last activity: 2026-01-29 — Completed 19-04-PLAN.md (Profile Badge Display)
+Plan: 5/5 complete
+Status: Phase complete
+Last activity: 2026-01-29 — Completed 19-05-PLAN.md (Student Dashboard Integration)
 
 Progress: [████████████░] 19/25 phases (76% milestone, v1.2 complete - Phase 24-25)
 
@@ -84,8 +84,9 @@ Progress: [████████████░] 19/25 phases (76% milestone,
 | 19-02 | Classroom Leaderboard | 6min | Complete |
 | 19-03 | Achievement Unlock Detection & Celebration | 6min | Complete |
 | 19-04 | Profile Badge Display | 8min | Complete |
+| 19-05 | Student Dashboard Integration | 12min | Complete |
 
-**Phase 19 Total:** 4/5 plans complete, 110 tests added (33 new in 19-04: 16 card + 17 grid)
+**Phase 19 Total:** 32 minutes (20min active work), 110 tests added, all tasks found complete
 
 **Phase 24 Plans:**
 | Plan | Name | Duration | Status |
@@ -167,6 +168,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **19-03**: Tier-based UI prominence → Bronze/Silver toast (auto-dismiss 3s), Gold/Platinum full modal (2026-01-29)
 - **19-03**: localStorage persistence → Prevents re-showing acknowledged unlocks on page refresh (2026-01-29)
 - **19-03**: Conditional confetti/sound → Only Gold/Platinum tiers for performance + special feeling (2026-01-29)
+- **19-05**: Dynamic import ClassroomLeaderboard → Prevents SSR issues with framer-motion on older mobile browsers (2026-01-29)
+- **19-05**: Achievement check after XP persistence → Ensures database updated before checking for unlocks (2026-01-29)
+- **19-05**: XP manager for level calculation → Profile page uses getXpProgress directly for accuracy (2026-01-29)
 - **24-02**: CSS isolation with 'all: initial' → Prevents parent frame styles from bleeding through iframe (2026-01-26)
 - **24-02**: 100vh/100dvh fallback pattern → 100vh = parent height, 100dvh = iframe height (2026-01-26)
 - **24-02**: Viewport hook delegation → Separate concerns, reusable outside provider (2026-01-26)
@@ -249,7 +253,7 @@ None.
 - Supabase persistence — XP saved on session completion
 - Total: 114 tests, full XP system functional
 
-**Phase 19 (Achievement System) — IN PROGRESS:**
+**Phase 19 (Achievement System) — COMPLETE:**
 - Achievement badges complete — 23 tests, 4-tier system (bronze/silver/gold/platinum), 18 achievement types
 - Classroom leaderboard complete — 24 tests (13 hook + 11 component)
   - useClassroomLeaderboard hook — Top 3 + current user rank, inactive detection (7+ days)
@@ -266,8 +270,11 @@ None.
   - EducationBadgeGrid — Category grouping, featured badges (max 3 pins), collapsible sections
   - Secret badges show "???" until unlocked, locked badges show hints
   - All translations in 5 languages (en, he, sv, ja, es)
-- Total: 110 tests passing, 4/5 plans complete
-- Ready for student dashboard integration (Phase 19-05)
+- Student dashboard integration complete — All integration points verified (19-05)
+  - ClassroomLeaderboard integrated on student dashboard with conditional rendering
+  - PracticeSessionProvider calls checkForUnlocks after XP award (22 tests passing)
+  - Profile page with EducationBadgeGrid, achievement fetching, pin management
+- Total: 110 tests passing, 5/5 plans complete, full achievement system operational
 
 **Phase 20 (Analytics):**
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
@@ -303,18 +310,14 @@ None.
 - Total duration: 52 minutes across 5 plans
 - Ready for App Store/Play Store submission
 
-**Phase 19 (Achievement System) — IN PROGRESS:**
-- Achievement database schema complete — 3 tables, 18 badges, 72 tier thresholds (19-01 complete)
-- TDD achievement manager complete — 23 tests passing, progress calculation and unlock detection (19-01 complete)
-- Ready for classroom leaderboard (19-02), unlock detection (19-03), profile display (19-04)
 
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 19-03-PLAN.md (Achievement Unlock Detection & Celebration) — Plan 3/5 complete
+Stopped at: Completed 19-05-PLAN.md (Student Dashboard Integration) — Phase 19 complete
 Resume file: None
 
-**Next action:** Phase 19 plan 05 (Database Integration) - Wire achievement unlock detection and persist pin states to database.
+**Next action:** Phase 20 (Education Teacher Dashboard) - Begin teacher-facing features for classroom management.
 
 ---
 *State initialized: 2026-01-22*
