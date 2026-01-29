@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 20 - Student Analytics Dashboard (IN PROGRESS)
+**Current focus:** Phase 21 - Rich Lesson Delivery (next up)
 
 ## Current Position
 
-Phase: 20 of 25 (Student Analytics Dashboard) — IN PROGRESS
-Plan: 3/6 complete
-Status: Analytics foundation + Lesson Effectiveness Chart + Vocabulary Heatmap complete
-Last activity: 2026-01-29 — Completed 20-05-PLAN.md (vocabulary mastery heatmap with TDD)
+Phase: 21 of 25 (Rich Lesson Delivery) — PLANNING NEEDED
+Plan: 0/TBD complete
+Status: Phase 20 (Analytics Dashboard) complete, Phase 21 not yet planned
+Last activity: 2026-01-29 — Completed Phase 20 (Student Analytics Dashboard) with verification
 
-Progress: [█████████████░] 20/25 phases (80% milestone, v1.1 Phase 15-19 complete, v1.2 Phase 24-25 complete)
+Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-20 complete, v1.2 Phase 24-25 complete)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 24 (Phase 15-19 complete, Phase 20 plans 01, 04, 05 complete)
-- Current phase: 20 (Student Analytics Dashboard) — IN PROGRESS
-- Next: Phase 20 plans 02-03, 06 (UI components + integration)
+- Plans completed: 30 (Phase 15-20 complete)
+- Current phase: 21 (Rich Lesson Delivery) — NOT STARTED
+- Next: Phase 21 planning and execution
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -117,13 +117,13 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
 | 20-01 | Analytics Foundation TDD | 7min | Complete |
-| 20-02 | Classroom Overview Card | TBD | Pending |
-| 20-03 | Struggling Students List | TBD | Pending |
+| 20-02 | MetricCard + AnalyticsDashboard | 20min | Complete |
+| 20-03 | StudentProgressTable | 13min | Complete |
 | 20-04 | Lesson Effectiveness Chart | 6min | Complete |
 | 20-05 | Vocabulary Mastery Heatmap | 11min | Complete |
-| 20-06 | Dashboard Integration | TBD | Pending |
+| 20-06 | Realtime + Integration | 70min | Complete |
 
-**Phase 20 Progress:** 24 minutes, 48 tests added (19 query + 16 hook + 13 component), 3/6 plans complete
+**Phase 20 Total:** 127 minutes, 144 tests added, verification passed 5/5
 
 ## Accumulated Context
 
@@ -332,25 +332,32 @@ None.
 - Total duration: 52 minutes across 5 plans
 - Ready for App Store/Play Store submission
 
-**Phase 20 (Analytics Dashboard) — IN PROGRESS:**
-- Analytics foundation complete — getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics (20-01 complete)
-- useClassroomAnalytics hook — Parallel fetch, loading/error states, 80.55% coverage (20-01 complete)
-- 14 tests passing — 8 query tests + 6 hook tests, TDD RED-GREEN-REFACTOR cycle
-- Next: UI components (ClassroomOverviewCard, StrugglingStudentsList, CommonMistakesWidget)
+**Phase 20 (Analytics Dashboard) — COMPLETE:**
+- Analytics foundation complete — getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics (20-01)
+- useClassroomAnalytics hook — Parallel fetch, loading/error states (20-01)
+- MetricCard + AnalyticsDashboard — 4 key metrics with actionable buttons (20-02)
+- StudentProgressTable — Sortable columns, "needs help" indicator (20-03)
+- LessonEffectivenessChart — Recharts bar chart, dual Y-axes (20-04)
+- VocabularyHeatmap — Student × word grid, mastery-level coloring (20-05)
+- LiveActivityIndicator — Supabase Realtime, connection status (20-06)
+- Analytics page — Radix UI Tabs, all components integrated (20-06)
+- Gap closure: Schema mismatch fixed (32bf6b3a)
+- Total: 144 tests passing, verification 5/5
 
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed Phase 20 Plan 01 (Analytics Foundation TDD)
+Stopped at: Completed Phase 20 execution with verification
 Resume file: None
 
-**Next action:** Continue Phase 20 with `/gsd:execute-plan 20 02` or `/gsd:execute-phase 20` for remaining plans
+**Next action:** Plan and execute Phase 21 (Rich Lesson Delivery) with `/gsd:discuss-phase 21` or `/gsd:plan-phase 21`
 
-**Phase 20 Status:**
-- 1/6 plans complete (20-01: Analytics Foundation TDD)
-- Remaining: 20-02 through 20-06 (UI components + integration)
-- Current: Analytics queries and hook ready for dashboard consumption
+**Phase 20 Summary:**
+- 6/6 plans complete (127 minutes total)
+- 144 tests added
+- Verification passed 5/5 after gap closure (schema mismatch fixed)
+- All 5 ANALYTICS requirements satisfied
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-29 (Phase 20 plan 01 complete - analytics foundation implemented)*
+*Last updated: 2026-01-29 (Phase 20 complete - analytics dashboard verified)*

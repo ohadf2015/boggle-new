@@ -21,7 +21,13 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { generateRandomTable } from '../utils/gameUtils.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
-import tournamentManager from '../modules/tournamentManager.js';
+import {
+  createTournament as createTournamentFn,
+  getTournamentStandings,
+  getTournament,
+  startTournamentRound,
+  deleteTournament
+} from '../modules/tournamentManager.js';
 import logger from '../utils/logger.js';
 import { startGameTimer } from './';
 
@@ -79,16 +85,18 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    // Get players with their avatars
-    const users: GameUser[] = getGameUsers(gameCode);
-    const players: TournamentPlayer[] = users.map(u => ({
-      socketId: u.socketId,
-      username: u.username,
-      avatar: u.avatar
-    }));
+    // Get host info
+    const hostPlayerId = game.hostPlayerId || socket.id;
+    const hostUsername = game.hostUsername || 'Host';
+
+    // Create tournament settings
+    const settings = {
+      name: name || 'Tournament',
+      totalRounds: totalRounds || 3
+    };
 
     // Create tournament
-    const tournament: Tournament = tournamentManager.createTournament(name || 'Tournament', totalRounds || 3, players);
+    const tournament = createTournamentFn(hostPlayerId, hostUsername, settings);
     setTournamentIdForGame(gameCode, tournament.id);
 
     // Broadcast tournament created
@@ -100,7 +108,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
         currentRound: 0,
         status: 'created'
       },
-      standings: tournamentManager.getTournamentStandings(tournament.id) as TournamentStanding[]
+      standings: getTournamentStandings(tournament.id) || []
     });
 
     logger.info('TOURNAMENT', `Tournament "${tournament.name}" created for game ${gameCode}`);
@@ -138,14 +146,14 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const tournament: Tournament = tournamentManager.getTournament(tournamentId);
+    const tournament = getTournament(tournamentId);
     if (!tournament) {
       emitError(socket, 'Tournament not found');
       return;
     }
 
     // Start new round
-    tournamentManager.startTournamentRound(tournamentId);
+    startTournamentRound(tournamentId, gameCode);
 
     // Generate new board for the round
     const letterGrid: LetterGrid = generateRandomTable(game.language || 'en');
@@ -199,7 +207,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
         totalRounds: tournament.totalRounds,
         currentRound: tournament.currentRound
       },
-      standings: tournamentManager.getTournamentStandings(tournamentId) as TournamentStanding[]
+      standings: getTournamentStandings(tournamentId) as TournamentStanding[]
     });
 
     // Broadcast game start
@@ -235,8 +243,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const standings: TournamentStanding[] = tournamentManager.getTournamentStandings(game.tournamentId);
-    const tournament: Tournament | null = tournamentManager.getTournament(game.tournamentId);
+    const standings: TournamentStanding[] = getTournamentStandings(game.tournamentId);
+    const tournament: Tournament | null = getTournament(game.tournamentId);
 
     socket.emit('tournamentStandings', {
       tournament: tournament ? {
@@ -283,7 +291,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     }
 
     // Cancel tournament
-    tournamentManager.cancelTournament(tournamentId);
+    deleteTournament(tournamentId);
     setTournamentIdForGame(gameCode, null);
 
     // Broadcast cancellation

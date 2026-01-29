@@ -321,7 +321,7 @@ function registerScorecardHandlers(io: Server, socket: Socket): void {
 
     // Generate score card data
     try {
-      const scoreCardData = generateScoreCardData(game, username);
+      const scoreCardData = generateScoreCardData(game as unknown as Game, username);
 
       // Emit success response
       safeEmit(socket, 'scorecard:data', {

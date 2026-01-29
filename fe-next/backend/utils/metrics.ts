@@ -8,6 +8,8 @@ interface GlobalCounters {
   wordNeedsValidation: number;
   rateLimited: number;
   eventLoopLagMs: number;
+  'scorecard.generated': number;
+  'scorecard.error': number;
 }
 
 interface RoomMetrics {
@@ -38,7 +40,9 @@ const counters: GlobalCounters = {
   wordNotOnBoard: 0,
   wordNeedsValidation: 0,
   rateLimited: 0,
-  eventLoopLagMs: 0
+  eventLoopLagMs: 0,
+  'scorecard.generated': 0,
+  'scorecard.error': 0
 };
 
 const perRoom = new Map<string, RoomMetrics>();
