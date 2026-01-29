@@ -72,6 +72,7 @@ const sv = {
     "creating": "Skapar...",
     "guest": "Gäst",
     "back": "Tillbaka",
+    "backHome": "Tillbaka hem",
     "backToHome": "Tillbaka till startsidan",
     "backToMenu": "Tillbaka till menyn",
     "next": "Nästa",
@@ -697,6 +698,7 @@ const sv = {
     "difficultyTooltipTimer": "Längre tid = fler ord hittade"
   },
   "tvBroadcast": {
+    "liveGameInProgress": "Livespel pågår",
     "joinAt": "Gå med på",
     "gameCode": "Spelkod",
     "players": "Spelare",
@@ -849,7 +851,8 @@ const sv = {
       "verifying": "Verifierar med AI...",
       "scoring": "Räknar poäng...",
       "finalizing": "Slutför resultat..."
-    }
+    },
+    "mobileNavigation": "Mobilnavigering"
   },
   "waiting": {
     "milestoneFirst": "Första spelaren!",
@@ -4276,7 +4279,8 @@ const sv = {
       "sort": {
         "recent": "Senaste",
         "progress": "Framsteg"
-      }
+      },
+      "completed": "Slutförd"
     },
     "practice": {
       "title": "Övningsläge",
@@ -4492,7 +4496,10 @@ const sv = {
         "pasteButton": "Klistra in kod",
         "success": "Har gått med i klassrummet!",
         "invalidCode": "Ogiltig klassrumskod",
-        "alreadyMember": "Du är redan medlem i detta klassrum"
+        "alreadyMember": "Du är redan medlem i detta klassrum",
+        "codePasted": "Kod klistrad!",
+        "emptyClipboard": "Urklipp är tomt",
+        "clipboardError": "Kunde inte läsa urklipp"
       }
     },
     "xp": {

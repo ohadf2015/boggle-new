@@ -72,6 +72,7 @@ const ja = {
     "creating": "作成中...",
     "guest": "ゲスト",
     "back": "戻る",
+    "backHome": "ホームへ",
     "backToHome": "ホームに戻る",
     "backToMenu": "メニューに戻る",
     "next": "次へ",
@@ -697,6 +698,7 @@ const ja = {
     "difficultyTooltipTimer": "長い時間＝たくさん見つかる"
   },
   "tvBroadcast": {
+    "liveGameInProgress": "ライブゲーム進行中",
     "joinAt": "参加URL",
     "gameCode": "ゲームコード",
     "players": "プレイヤー",
@@ -849,7 +851,8 @@ const ja = {
       "verifying": "AIで検証中...",
       "scoring": "スコア計算中...",
       "finalizing": "結果をまとめ中..."
-    }
+    },
+    "mobileNavigation": "モバイルナビゲーション"
   },
   "waiting": {
     "milestoneFirst": "最初のプレイヤー！",
@@ -4276,7 +4279,8 @@ const ja = {
       "sort": {
         "recent": "新しい順",
         "progress": "進捗順"
-      }
+      },
+      "completed": "完了"
     },
     "practice": {
       "title": "練習モード",
@@ -4492,7 +4496,10 @@ const ja = {
         "pasteButton": "コードを貼り付け",
         "success": "クラスに参加しました！",
         "invalidCode": "無効なクラスコードです",
-        "alreadyMember": "すでにこのクラスのメンバーです"
+        "alreadyMember": "すでにこのクラスのメンバーです",
+        "codePasted": "コードが貼り付けられました！",
+        "emptyClipboard": "クリップボードは空です",
+        "clipboardError": "クリップボードを読み取れませんでした"
       }
     },
     "xp": {

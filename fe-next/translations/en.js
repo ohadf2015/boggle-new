@@ -73,6 +73,7 @@ const en = {
     "creating": "Creating...",
     "guest": "Guest",
     "back": "Back",
+    "backHome": "Back Home",
     "backToHome": "Back to Home",
     "backToMenu": "Back to Menu",
     "next": "Next",
@@ -700,6 +701,7 @@ const en = {
     "difficultyTooltipTimer": "Longer time = more words found"
   },
   "tvBroadcast": {
+    "liveGameInProgress": "Live Game in Progress",
     "joinAt": "Join at",
     "gameCode": "Game Code",
     "players": "Players",
@@ -852,7 +854,8 @@ const en = {
       "verifying": "Verifying with AI...",
       "scoring": "Calculating scores...",
       "finalizing": "Finalizing results..."
-    }
+    },
+    "mobileNavigation": "Mobile Navigation"
   },
   "waiting": {
     "milestoneFirst": "First one in!",
@@ -4245,7 +4248,8 @@ const en = {
       "sort": {
         "recent": "Recent",
         "progress": "Progress"
-      }
+      },
+      "completed": "Completed"
     },
     "practice": {
       "title": "Practice Mode",
@@ -4477,7 +4481,10 @@ const en = {
         "pasteButton": "Paste code",
         "success": "Successfully joined classroom!",
         "invalidCode": "Invalid classroom code",
-        "alreadyMember": "You are already a member of this classroom"
+        "alreadyMember": "You are already a member of this classroom",
+        "codePasted": "Code pasted!",
+        "emptyClipboard": "Clipboard is empty",
+        "clipboardError": "Couldn't read clipboard"
       }
     },
     "xp": {

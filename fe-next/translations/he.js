@@ -72,6 +72,7 @@ const he = {
     "creating": "יוצר...",
     "guest": "אורח",
     "back": "חזור",
+    "backHome": "חזרה הביתה",
     "backToHome": "חזרה לדף הבית",
     "backToMenu": "חזרה לתפריט",
     "next": "הבא",
@@ -707,6 +708,7 @@ const he = {
     "difficultyTooltipTimer": "יותר זמן = יותר מילים"
   },
   "tvBroadcast": {
+    "liveGameInProgress": "משחק חי מתנהל",
     "joinAt": "הצטרפו ב",
     "gameCode": "קוד משחק",
     "players": "שחקנים",
@@ -859,7 +861,8 @@ const he = {
       "verifying": "מאמת עם AI...",
       "scoring": "מחשב ניקוד...",
       "finalizing": "מסיים את התוצאות..."
-    }
+    },
+    "mobileNavigation": "ניווט במובייל"
   },
   "waiting": {
     "milestoneFirst": "ראשון בפנים!",
@@ -4251,7 +4254,8 @@ const he = {
       "sort": {
         "recent": "אחרונים",
         "progress": "התקדמות"
-      }
+      },
+      "completed": "הושלם"
     },
     "practice": {
       "title": "מצב תרגול",
@@ -4467,7 +4471,10 @@ const he = {
         "pasteButton": "הדבק קוד",
         "success": "הצטרפת בהצלחה לכיתה!",
         "invalidCode": "קוד כיתה לא תקין",
-        "alreadyMember": "אתה כבר חבר בכיתה זו"
+        "alreadyMember": "אתה כבר חבר בכיתה זו",
+        "codePasted": "הקוד הודבק!",
+        "emptyClipboard": "הלוח ריק",
+        "clipboardError": "לא ניתן לקרוא מהלוח"
       }
     },
     "xp": {

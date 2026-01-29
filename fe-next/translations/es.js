@@ -72,6 +72,7 @@ const es = {
     "creating": "Creando...",
     "guest": "Invitado",
     "back": "Atrás",
+    "backHome": "Volver a Inicio",
     "backToHome": "Volver al Inicio",
     "backToMenu": "Volver al Menú",
     "next": "Siguiente",
@@ -694,6 +695,7 @@ const es = {
     "difficultyTooltipTimer": "Más tiempo = más palabras"
   },
   "tvBroadcast": {
+    "liveGameInProgress": "Juego en Vivo en Progreso",
     "joinAt": "Únete en",
     "gameCode": "Código de Juego",
     "players": "Jugadores",
@@ -846,7 +848,8 @@ const es = {
       "verifying": "Verificando con IA...",
       "scoring": "Calculando puntajes...",
       "finalizing": "Finalizando resultados..."
-    }
+    },
+    "mobileNavigation": "Navegación Móvil"
   },
   "waiting": {
     "milestoneFirst": "¡Primer jugador!",
@@ -4265,7 +4268,8 @@ const es = {
       "sort": {
         "recent": "Recientes",
         "progress": "Progreso"
-      }
+      },
+      "completed": "Completado"
     },
     "practice": {
       "title": "Modo Práctica",
@@ -4481,7 +4485,10 @@ const es = {
         "pasteButton": "Pegar código",
         "success": "¡Te uniste al aula!",
         "invalidCode": "Código inválido",
-        "alreadyMember": "Ya eres miembro de esta aula"
+        "alreadyMember": "Ya eres miembro de esta aula",
+        "codePasted": "¡Código pegado!",
+        "emptyClipboard": "El portapapeles está vacío",
+        "clipboardError": "No se pudo leer el portapapeles"
       }
     },
     "xp": {
