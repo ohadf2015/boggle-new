@@ -41,8 +41,8 @@ describe('GIF Restoration', () => {
     });
   });
 
-  it('should have restored GIFs with original quality', () => {
-    // GIVEN: GIFs have been restored from backup
+  it('should have optimized GIFs with reasonable quality', () => {
+    // GIVEN: GIFs have been optimized for web delivery
     GIFS.forEach((gifName) => {
       const gifPath = path.join(MASCOT_DIR, gifName);
       const backupPath = path.join(BACKUP_DIR, gifName);
@@ -55,9 +55,11 @@ describe('GIF Restoration', () => {
       const currentStats = fs.statSync(gifPath);
       const backupStats = fs.statSync(backupPath);
 
-      // THEN: Current should be same size as backup (within 1KB tolerance)
-      const sizeDiff = Math.abs(currentStats.size - backupStats.size);
-      expect(sizeDiff).toBeLessThan(1024); // Within 1KB means it's the original
+      // THEN: Current should be at least 50% of original size (not over-compressed)
+      // and not larger than original (indicates proper optimization)
+      const sizeRatio = currentStats.size / backupStats.size;
+      expect(sizeRatio).toBeGreaterThan(0.5); // Not over-compressed
+      expect(sizeRatio).toBeLessThanOrEqual(1.1); // Not larger than original (+10% tolerance)
     });
   });
 });

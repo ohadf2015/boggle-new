@@ -818,72 +818,84 @@
   /* Keep static visual feedback for selection even with reduced motion */
   .tile-selected-enhanced {
     box-shadow:
-      0 0 24px rgba(191, 255, 0, 0.9),
-      0 0 48px rgba(191, 255, 0, 0.5);
+      0 0 12px rgba(255, 255, 255, 0.4),
+      0 0 24px rgba(0, 200, 255, 0.25);
     filter: brightness(1.1);
+    background: linear-gradient(
+      135deg,
+      rgba(0, 220, 255, 0.35) 0%,
+      rgba(100, 255, 255, 0.25) 50%,
+      rgba(0, 180, 220, 0.3) 100%
+    ) !important;
   }
 }
 
 /* ========== SELECTED STATE ENHANCEMENT ========== */
 
-/* Pulsing glow animation for selected tiles */
-@keyframes selection-pulse {
+/* Refined selection glow - subtle, elegant breathing effect */
+@keyframes selection-glow {
   0%, 100% {
     box-shadow:
-      0 0 24px rgba(191, 255, 0, 0.9),
-      0 0 48px rgba(191, 255, 0, 0.5);
-    filter: brightness(1.05);
+      0 0 12px rgba(255, 255, 255, 0.4),
+      0 0 24px rgba(0, 200, 255, 0.25);
+    filter: brightness(1.08);
   }
   50% {
     box-shadow:
-      0 0 32px rgba(191, 255, 0, 1),
-      0 0 64px rgba(191, 255, 0, 0.7),
-      0 0 80px rgba(191, 255, 0, 0.3);
-    filter: brightness(1.15);
+      0 0 16px rgba(255, 255, 255, 0.5),
+      0 0 32px rgba(0, 200, 255, 0.35);
+    filter: brightness(1.12);
   }
 }
 
-/* Outer ring pulse animation */
-@keyframes selection-ring-pulse {
+/* Subtle scale breathing for satisfying feedback */
+@keyframes selection-breathe {
   0%, 100% {
     transform: scale(1);
-    opacity: 1;
   }
   50% {
-    transform: scale(1.05);
-    opacity: 0.9;
+    transform: scale(1.02);
   }
 }
 
 .tile-selected-enhanced {
   z-index: 20 !important;
-  animation: selection-pulse 0.8s ease-in-out infinite;
+  animation:
+    selection-glow 1.5s ease-in-out infinite,
+    selection-breathe 1.5s ease-in-out infinite;
+  /* Clean cyan-white highlight bg - premium feel */
+  background: linear-gradient(
+    135deg,
+    rgba(0, 220, 255, 0.35) 0%,
+    rgba(100, 255, 255, 0.25) 50%,
+    rgba(0, 180, 220, 0.3) 100%
+  ) !important;
 }
 
+/* Clean border ring - no glow, just solid neo-brutalist border */
 .tile-selected-enhanced::after {
   content: '';
   position: absolute;
-  inset: -6px;
-  border: 4px solid var(--neo-lime, #BFFF00);
+  inset: -3px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
   border-radius: inherit;
-  box-shadow:
-    0 0 24px rgba(191, 255, 0, 0.8),
-    0 0 48px rgba(191, 255, 0, 0.4),
-    inset 0 0 12px rgba(191, 255, 0, 0.3);
   pointer-events: none;
   z-index: 30;
-  animation: selection-ring-pulse 0.8s ease-in-out infinite;
 }
 
-/* Dark backdrop behind selected tile for contrast */
+/* Subtle inner highlight for depth */
 .tile-selected-enhanced::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  background: rgba(0, 0, 0, 0.3);
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 40%
+  );
   border-radius: inherit;
   pointer-events: none;
-  z-index: -1;
+  z-index: 2;
 }
 
 /* ==============================================

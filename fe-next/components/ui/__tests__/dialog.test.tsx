@@ -176,9 +176,10 @@ describe('Dialog Component', () => {
       );
 
       const header = screen.getByTestId('dialog-title').parentElement;
-      expect(header).toHaveClass('p-4');
-      expect(header).toHaveClass('sm:p-6');
-      expect(header).toHaveClass('lg:p-8');
+      // Reduced padding: mobile 12px (p-3), sm 16px (p-4), lg 20px (p-5)
+      expect(header).toHaveClass('p-3');
+      expect(header).toHaveClass('sm:p-4');
+      expect(header).toHaveClass('lg:p-5');
     });
 
     it('applies custom className alongside variant styles', () => {

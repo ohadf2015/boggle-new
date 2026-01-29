@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, type ReactNode } from 'react';
+import React, { memo, useState, useEffect, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CircularTimer from '@/components/CircularTimer';
@@ -13,6 +13,7 @@ import { shouldShowKeyboardTrails } from '../../keyboardTrailsUtils';
 import { GameOverlays } from './GameOverlays';
 import { GameHeader } from './GameHeader';
 import { ScoreDisplay } from './ScoreDisplay';
+import FloatingScoreAnimation from '../../FloatingScoreAnimation';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer } from '@/shared/types/view';
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
@@ -138,8 +139,35 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   children,
   minWordLength,
 }) {
+  // Track floating score animation
+  const [floatingScore, setFloatingScore] = useState<number | null>(null);
+  const [isFireRoundScore, setIsFireRoundScore] = useState(false);
+
+  // Trigger floating score animation when word is accepted
+  useEffect(() => {
+    if (currentFeedback?.type === 'accepted' && currentFeedback.score) {
+      setFloatingScore(currentFeedback.score);
+      setIsFireRoundScore(currentFeedback.fireRoundActive ?? false);
+    }
+  }, [currentFeedback]);
+
+  // Clear floating score after animation completes
+  const handleScoreAnimationComplete = () => {
+    setFloatingScore(null);
+    setIsFireRoundScore(false);
+  };
+
   return (
     <>
+      {/* Floating Score Animation - renders above everything */}
+      {isPlaying && (
+        <FloatingScoreAnimation
+          score={floatingScore}
+          isFireRound={isFireRoundScore}
+          onAnimationComplete={handleScoreAnimationComplete}
+        />
+      )}
+
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}

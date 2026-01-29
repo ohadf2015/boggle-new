@@ -180,6 +180,8 @@ export interface InteractiveMascotProps {
   className?: string;
   /** Priority loading for above-the-fold mascots */
   priority?: boolean;
+  /** Fetch priority hint for the browser (high = LCP optimization) */
+  fetchPriority?: 'high' | 'low' | 'auto';
   /** Alt text override */
   alt?: string;
   /** Enable hover interaction */
@@ -325,6 +327,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   animated = true,
   className = '',
   priority = false,
+  fetchPriority,
   alt,
   enableHover = true,
   enableClick = true,
@@ -460,6 +463,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
                 height={SIZE_PIXELS[size]}
                 className="object-contain drop-shadow-lg"
                 priority={priority}
+                fetchPriority={fetchPriority}
                 unoptimized={isGif}
               />
             </motion.div>

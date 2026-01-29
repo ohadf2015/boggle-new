@@ -318,6 +318,7 @@ const es = {
     "moreSettings": "Más ajustes"
   },
   "share": {
+    "button": "Compartir",
     "linkCopied": "¡Link copiado! 🔗",
     "copyError": "No se pudo - toca otra vez",
     "inviteMessage": "¡Batalla de palabras AHORA! Entra 🔥",
@@ -1875,7 +1876,11 @@ const es = {
   },
   "referral": {
     "milestoneTitle": "¡Hito de amigo!",
-    "milestoneMessage": "¡Sigue invitando amigos para ganar más recompensas!"
+    "milestoneMessage": "¡Sigue invitando amigos para ganar más recompensas!",
+    "teaser": {
+      "title": "Invita amigos, gana XP",
+      "subtitle": "¡Obtén 100 XP por cada amigo que se una!"
+    }
   },
   "coins": {
     "title": "Monedas y Recompensas",
@@ -2449,7 +2454,8 @@ const es = {
     "behindRecord": "{diff} para superar tu récord",
     "tiedWithRecord": "¡Empatado con tu récord!",
     "challengeFriend": "Desafía a un amigo",
-    "shareHint": "Comparte el mismo tablero con amigos"
+    "shareHint": "Comparte el mismo tablero con amigos",
+    "winnerPrompt": "¡Los aplastaste! Desafía a tus amigos 😈"
   },
   "rules": {
     "pageTitle": "LexiClash: Batalla de Palabras en Tiempo Real",
@@ -2829,6 +2835,7 @@ const es = {
       "scoreBreakdownTooltip": "Toca para detalles"
     },
     "results": {
+      "tapToCelebrate": "¡Toca para celebrar!",
       "targetWord": "Palabra Objetivo",
       "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
       "nextChallengeIn": "Próximo desafío en",
@@ -2972,6 +2979,10 @@ const es = {
   "keyboardDesktopBadge": {
     "typeWords": "Escribe palabras",
     "pressQuestion": "Presiona ? para atajos"
+  },
+  "keyboardInlineHint": {
+    "message": "Escribe + Enter",
+    "fullMessage": "Escribe palabras en tu teclado y presiona Enter para enviar"
   },
   "enterKeyHint": {
     "pressEnter": "Presiona Enter para enviar"
@@ -3961,6 +3972,10 @@ const es = {
       "hintAvailable": "¿Necesitas una pista?",
       "hintUsed": "¡Prueba esta palabra!",
       "noHints": "No hay más pistas disponibles"
+    },
+    "hints": {
+      "minLetters2": "2+ letras",
+      "minLetters3": "3+ letras"
     },
     "retry": {
       "title": "¡Casi lo tienes!",

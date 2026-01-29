@@ -19,6 +19,8 @@ export interface InviteCardProps {
   className?: string;
   /** Compact horizontal layout with smaller QR */
   compact?: boolean;
+  /** Desktop-optimized layout with better horizontal space usage */
+  desktop?: boolean;
 }
 
 // ==================== Component ====================
@@ -38,6 +40,7 @@ export function InviteCard({
   t,
   className,
   compact = false,
+  desktop = false,
 }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
   const joinUrl = getJoinUrl(gameCode);
@@ -74,6 +77,109 @@ export function InviteCard({
     }
   }, [gameCode, joinUrl, t, handleCopyLink]);
 
+  // Desktop-optimized two-column layout with larger QR and better horizontal space usage
+  if (desktop) {
+    return (
+      <div
+        data-testid="invite-card"
+        className={cn(
+          'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full',
+          'bg-slate-800',
+          'shadow-hard-lg',
+          className
+        )}
+      >
+        {/* Decorative accent */}
+        <div className="absolute top-0 left-0 right-0 h-2 bg-neo-lime" />
+
+        <div className="p-6 pt-8">
+          {/* Two-column layout: QR + Content side by side */}
+          <div className="grid grid-cols-[auto_1fr] gap-6 items-start">
+            {/* Left: QR Code - larger for desktop visibility */}
+            <div className="flex flex-col items-center gap-3">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="p-4 bg-white rounded-neo border-4 border-neo-black shadow-hard"
+              >
+                <QRCodeSVG
+                  value={joinUrl}
+                  size={180}
+                  level="H"
+                  includeMargin={false}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                />
+              </motion.div>
+              {/* Room Code below QR */}
+              <div className="text-center">
+                <p className="text-xs font-bold uppercase text-neo-cream/60 mb-0.5">
+                  {t('roomCode.title') || 'Room Code'}
+                </p>
+                <p className="text-3xl font-black tracking-wider text-neo-lime">{gameCode}</p>
+              </div>
+            </div>
+
+            {/* Right: Header + Share Options */}
+            <div className="flex flex-col justify-between h-full min-h-[220px] py-1">
+              {/* Header */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Share2 className="w-6 h-6 text-neo-cyan" />
+                  <h2 className="text-xl font-black uppercase text-neo-cream">
+                    {t('hostView.inviteFriends') || 'Invite Friends'}
+                  </h2>
+                </div>
+                <p className="text-sm text-neo-cream/70 leading-relaxed">
+                  {t('hostView.scanOrShare') || 'Scan the QR code with your phone or share the link with friends to join the game.'}
+                </p>
+              </div>
+
+              {/* Share Buttons - stacked vertically for desktop */}
+              <div className="flex flex-col gap-3 mt-4">
+                <motion.button
+                  data-testid="copy-link-button"
+                  onClick={handleCopyLink}
+                  whileTap={{ scale: 0.98 }}
+                  className={cn(
+                    'flex items-center justify-center gap-2 px-5 py-3.5 rounded-neo border-3 border-neo-black font-bold text-base transition-all',
+                    linkCopied
+                      ? 'bg-neo-lime text-neo-black shadow-none'
+                      : 'bg-neo-navy hover:bg-neo-navy-light text-neo-cream shadow-hard-sm hover:shadow-none'
+                  )}
+                >
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-5 h-5" />
+                      <span>{t('common.copied') || 'Copied!'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-5 h-5" />
+                      <span>{t('roomCode.copyLink') || 'Copy Invite Link'}</span>
+                    </>
+                  )}
+                </motion.button>
+
+                {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                  <motion.button
+                    data-testid="native-share-button"
+                    onClick={handleNativeShare}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold text-base shadow-hard-sm hover:shadow-none transition-all"
+                  >
+                    <Share2 className="w-5 h-5" />
+                    <span>{t('share.button') || 'Share'}</span>
+                  </motion.button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Compact horizontal layout
   if (compact) {
     return (
@@ -81,13 +187,13 @@ export function InviteCard({
         data-testid="invite-card"
         className={cn(
           'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full max-w-md',
-          'bg-gradient-to-br from-neo-pink/20 via-slate-800 to-neo-cyan/20',
+          'bg-slate-800',
           'shadow-hard',
           className
         )}
       >
         {/* Decorative accent */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-pink" />
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-neo-lime" />
 
         <div className="p-4 pt-5">
           {/* Horizontal layout: QR + Content */}
@@ -168,13 +274,13 @@ export function InviteCard({
       data-testid="invite-card"
       className={cn(
         'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full max-w-md',
-        'bg-gradient-to-br from-neo-pink/20 via-slate-800 to-neo-cyan/20',
+        'bg-slate-800',
         'shadow-hard-lg',
         className
       )}
     >
       {/* Decorative accent */}
-      <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-pink" />
+      <div className="absolute top-0 left-0 right-0 h-2 bg-neo-lime" />
 
       <div className="p-6 pt-8">
         {/* Header */}

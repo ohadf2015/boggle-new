@@ -304,12 +304,12 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className={cn(
+              <h2 className={cn(
                 "font-black uppercase text-neo-black leading-tight drop-shadow-sm",
                 compact ? "text-base" : "text-lg sm:text-xl"
               )}>
                 {t('daily.badge') || 'Daily Challenge'}
-              </h3>
+              </h2>
               <span className={cn(
                 "font-black text-neo-white bg-neo-navy/90 px-2 py-0.5 rounded-neo border-2 border-neo-black shadow-hard-xs",
                 compact ? "text-xs" : "text-sm"

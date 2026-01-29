@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, type ReactNode, type RefObject } from 'react';
+import React, { memo, useState, useEffect, type ReactNode, type RefObject } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -12,12 +12,14 @@ import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
 import ComboDisplay from '../../ComboDisplay';
 import CompactLeaderboard from '../../CompactLeaderboard';
 import { shouldShowKeyboardTrails } from '../../keyboardTrailsUtils';
+import { KeyboardInlineHint } from '@/components/keyboard';
 import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
 import { GameOverlays } from './GameOverlays';
 import { GameHeader } from './GameHeader';
 import { GameLeaderboard } from './GameLeaderboard';
 import { GameWordList } from './GameWordList';
 import { ScoreDisplay } from './ScoreDisplay';
+import FloatingScoreAnimation from '../../FloatingScoreAnimation';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer, FoundWord } from '@/shared/types/view';
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
@@ -167,8 +169,35 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   gameStatsRef,
   children,
 }) {
+  // Track floating score animation
+  const [floatingScore, setFloatingScore] = useState<number | null>(null);
+  const [isFireRoundScore, setIsFireRoundScore] = useState(false);
+
+  // Trigger floating score animation when word is accepted
+  useEffect(() => {
+    if (currentFeedback?.type === 'accepted' && currentFeedback.score) {
+      setFloatingScore(currentFeedback.score);
+      setIsFireRoundScore(currentFeedback.fireRoundActive ?? false);
+    }
+  }, [currentFeedback]);
+
+  // Clear floating score after animation completes
+  const handleScoreAnimationComplete = () => {
+    setFloatingScore(null);
+    setIsFireRoundScore(false);
+  };
+
   return (
     <>
+      {/* Floating Score Animation - renders above everything */}
+      {isPlaying && (
+        <FloatingScoreAnimation
+          score={floatingScore}
+          isFireRound={isFireRoundScore}
+          onAnimationComplete={handleScoreAnimationComplete}
+        />
+      )}
+
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
@@ -364,7 +393,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           )}
 
           {/* Grid - no expansion on mobile to stay close to word forming area, centers on desktop */}
-          <div className="flex-grow-0 md:flex-1 flex items-start md:items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0">
+          <div className="flex-grow-0 md:flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0 gap-2">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
@@ -385,6 +414,14 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               onSingleTapDetected={onSingleTapDetected}
               language={gameLanguage}
             />
+
+            {/* Desktop keyboard input hint - appears below grid */}
+            {isPlaying && isDesktop && (
+              <KeyboardInlineHint
+                t={t}
+                isActive={gameActive && !showStartAnimation}
+              />
+            )}
           </div>
 
           {/* Words Remaining (single-player) */}

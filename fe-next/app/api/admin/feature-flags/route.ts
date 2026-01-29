@@ -5,6 +5,7 @@ import {
   setFeatureFlag,
   deleteFeatureFlag,
 } from '@/backend/utils/featureFlags';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 /**
  * GET /api/admin/feature-flags
@@ -15,13 +16,10 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin authorization
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Verify admin authorization using JWT-based auth (consistent with other admin endpoints)
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     const { searchParams } = new URL(request.url);
@@ -76,13 +74,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authorization
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Verify admin authorization using JWT-based auth (consistent with other admin endpoints)
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     const body = await request.json();
@@ -148,13 +143,10 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    // Verify admin authorization
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Verify admin authorization using JWT-based auth (consistent with other admin endpoints)
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     const { searchParams } = new URL(request.url);

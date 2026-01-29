@@ -3,8 +3,51 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home, HelpCircle, Wifi } from 'lucide-react';
 import logger from '@/utils/logger';
+import { translations } from '@/translations';
+import type { Language } from '@/shared/types/game';
+
+// ==========================================
+// Translation Helper
+// ==========================================
+
+type TranslationFunction = (path: string, fallback?: string) => string;
+
+/**
+ * Get translation function for error boundaries
+ * Tries to detect language from localStorage, falls back to 'en'
+ */
+function getTranslationFn(): TranslationFunction {
+  let language: Language = 'en';
+
+  // Try to get language from localStorage (safe for SSR)
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('language');
+      if (stored && ['en', 'he', 'sv', 'ja', 'es'].includes(stored)) {
+        language = stored as Language;
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+
+  return (path: string, fallback?: string): string => {
+    try {
+      const keys = path.split('.');
+      let current: unknown = translations[language as keyof typeof translations];
+      for (const key of keys) {
+        if (current === null || typeof current !== 'object') return fallback || path;
+        current = (current as Record<string, unknown>)[key];
+        if (current === undefined) return fallback || path;
+      }
+      return typeof current === 'string' ? current : (fallback || path);
+    } catch {
+      return fallback || path;
+    }
+  };
+}
 
 // ==========================================
 // Chunk Load Error Detection
@@ -165,27 +208,39 @@ interface ErrorFallbackProps {
   onReset: () => void;
 }
 
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onReset }) => (
-  <Card className="m-4 border-red-500/50 bg-red-50 dark:bg-red-900/20">
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-        <AlertTriangle className="w-5 h-5" />
-        Something went wrong
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      {process.env.NODE_ENV === 'development' && error && (
-        <pre className="p-2 bg-red-100 dark:bg-red-900/40 rounded text-xs overflow-auto max-h-32">
-          {error.message}
-        </pre>
-      )}
-      <Button onClick={onReset} variant="outline" className="gap-2">
-        <RefreshCw className="w-4 h-4" />
-        Try again
-      </Button>
-    </CardContent>
-  </Card>
-);
+const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onReset }) => {
+  const t = getTranslationFn();
+
+  return (
+    <Card className="m-4 border-neo-red/50 bg-neo-red/10">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-neo-red">
+          <AlertTriangle className="w-5 h-5" />
+          {t('errors.somethingWentWrong', 'Quick Timeout!')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-neo-cream/80">
+          {t('errors.unexpectedError', "Tiny hiccup - but your game's totally safe!")}
+        </p>
+        {process.env.NODE_ENV === 'development' && error && (
+          <details className="p-2 bg-neo-black/20 rounded-neo text-xs">
+            <summary className="cursor-pointer font-semibold">{t('errors.errorDetails', 'Details')}</summary>
+            <pre className="mt-2 overflow-auto max-h-32 text-neo-red">
+              {error.message}
+            </pre>
+          </details>
+        )}
+        <div className="flex gap-2">
+          <Button onClick={onReset} variant="outline" className="gap-2">
+            <RefreshCw className="w-4 h-4" />
+            {t('common.retry', 'Try Again')}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 // ==========================================
 // Feature-Specific Error Boundary
@@ -242,62 +297,91 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
     if (this.state.hasError) {
       const { featureName, icon, showRetry = true, showHomeButton = false } = this.props;
       const isChunkError = isChunkLoadError(this.state.error);
+      const t = getTranslationFn();
 
       // Special UI for chunk load errors (stale deployment)
       if (isChunkError) {
         return (
-          <Card className="m-4 border-blue-500/50 bg-blue-50 dark:bg-blue-900/20">
+          <Card className="m-4 border-neo-cyan/50 bg-neo-cyan/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+              <CardTitle className="flex items-center gap-2 text-neo-cyan">
                 <RefreshCw className="w-5 h-5" />
-                Update Available
+                {t('errors.updateHeading', 'Fresh Update Ready!')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                A new version of LexiClash is available. Please refresh to continue playing.
+              <p className="text-sm text-neo-cream/80">
+                {t('errors.updateMessage', "Cool new stuff just dropped! Quick refresh and you're back in.")}
               </p>
-              <Button onClick={this.handleHardRefresh} className="gap-2">
+              <p className="text-xs text-neo-lime/80 flex items-center gap-1">
+                <span>✓</span>
+                {t('errors.updateProgress', 'Takes 2 seconds!')}
+              </p>
+              <Button onClick={this.handleHardRefresh} className="gap-2 bg-neo-cyan text-neo-black hover:bg-neo-cyan/80">
                 <RefreshCw className="w-4 h-4" />
-                Refresh Page
+                {t('errors.refreshPage', 'Refresh')}
               </Button>
             </CardContent>
           </Card>
         );
       }
 
+      // Check if this might be a connection issue
+      const errorMsg = this.state.error?.message?.toLowerCase() || '';
+      const isConnectionError = errorMsg.includes('network') ||
+                                errorMsg.includes('fetch') ||
+                                errorMsg.includes('connection') ||
+                                errorMsg.includes('offline');
+
       return (
-        <Card className="m-4 border-amber-500/50 bg-amber-50 dark:bg-amber-900/20">
+        <Card className="m-4 border-neo-yellow/50 bg-neo-yellow/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-              {icon || <AlertTriangle className="w-5 h-5" />}
-              {featureName} Error
+            <CardTitle className="flex items-center gap-2 text-neo-yellow">
+              {icon || (isConnectionError ? <Wifi className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />)}
+              {t('errors.errorHeading', "Let's Get You Back!")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              We encountered an issue with {featureName.toLowerCase()}. This has been logged for review.
+            <p className="text-sm text-neo-cream/80">
+              {isConnectionError
+                ? t('errors.connectionLost', 'Lost connection - reconnecting')
+                : t('errors.errorMessage', "Quick glitch, but don't worry - your words are safe!")}
             </p>
+
+            {/* Recovery guidance */}
+            <div className="text-xs text-neo-lime/80 space-y-1">
+              <p className="flex items-center gap-1">
+                <span>✓</span>
+                {t('errors.errorProgress', "Everything's saved!")}
+              </p>
+              {isConnectionError && (
+                <p className="flex items-center gap-1">
+                  <HelpCircle className="w-3 h-3" />
+                  {t('errors.notConnected', "Can't reach the server")}
+                </p>
+              )}
+            </div>
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded text-xs">
-                <summary className="cursor-pointer font-semibold">Error Details</summary>
-                <pre className="mt-2 overflow-auto max-h-32">
+              <details className="p-2 bg-neo-black/20 rounded-neo text-xs">
+                <summary className="cursor-pointer font-semibold">{t('errors.errorDetails', 'Details')}</summary>
+                <pre className="mt-2 overflow-auto max-h-32 text-neo-red">
                   {this.state.error.message}
                   {this.state.errorInfo?.componentStack}
                 </pre>
               </details>
             )}
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {showRetry && (
-                <Button onClick={this.handleReset} variant="outline" className="gap-2">
+                <Button onClick={this.handleReset} variant="outline" className="gap-2 border-neo-yellow text-neo-yellow hover:bg-neo-yellow/20">
                   <RefreshCw className="w-4 h-4" />
-                  Try again
+                  {t('common.retry', 'Try Again')}
                 </Button>
               )}
               {showHomeButton && (
                 <Button onClick={this.handleGoHome} variant="outline" className="gap-2">
                   <Home className="w-4 h-4" />
-                  Go Home
+                  {t('common.backToHome', 'Back to Home')}
                 </Button>
               )}
             </div>

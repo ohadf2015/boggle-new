@@ -625,9 +625,11 @@ const GridComponent = memo<GridComponentProps>(({
                     isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
                     // Desktop hover on adjacent hint - stronger glow when hovering over valid next cell
                     isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
-                    // Hover on last selected cell - hint to click again to submit
-                    // NOTE: Removed animate-pulse - caused excessive blinking on desktop when mouse hovers over last selected letter
-                    isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green/80 ring-offset-2",
+                    // Hover on last selected cell - strong visual hint to click again to submit word
+                    // Green ring + scale indicates "click to submit"
+                    isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
+                    // All selected cells get slight lift on desktop to feel "sticky" and persistent
+                    isSelected && !isHovered && "shadow-hard-sm",
                     // Keyboard focus indicator - enhanced with glow animation
                     isFocused && !isSelected && "z-20 animate-keyboard-focus",
                     // Transition controls

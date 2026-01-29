@@ -486,15 +486,16 @@ export function MusicProvider({ children }: MusicProviderProps) {
         }
 
         // Preload the track on-demand if not loaded yet
+        // CRITICAL for iOS Safari: Don't await preload - call play() synchronously
+        // Howler.js with html5: true queues play() calls and plays when loaded
+        // Awaiting would break the user gesture chain on iOS Safari
         if (newHowl.state() === 'unloaded') {
-            logger.log('[Music] Preloading track on demand:', trackKey);
-            try {
-                await preloadAudioOnDemand(newHowl);
-                logger.log('[Music] Track loaded successfully:', trackKey);
-            } catch (err) {
-                logger.error('[Music] Failed to load track:', trackKey, err);
-                return; // Don't try to play if loading failed
-            }
+            logger.log('[Music] Track not loaded, starting load:', trackKey);
+            newHowl.load();
+            // Don't await - continue to play() call which Howler queues
+        } else if (newHowl.state() === 'loading') {
+            logger.log('[Music] Track currently loading:', trackKey);
+            // Don't await - continue to play() call which Howler queues
         }
 
         // If same track, just ensure it's playing (use ref to avoid dependency)
@@ -610,16 +611,26 @@ export function MusicProvider({ children }: MusicProviderProps) {
             setAudioUnlocked(true);
 
             // Process any pending track request immediately (don't wait for React re-render)
+            // CRITICAL: Must call play() synchronously within user gesture for iOS Safari
+            // Any setTimeout or await will break the user gesture chain and prevent autoplay
             if (pendingUnlockTrackRef.current) {
                 const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
                 pendingUnlockTrackRef.current = null;
                 logger.log('[Music] Playing pending track:', trackKey);
-                // Small delay to ensure AudioContext is fully ready
-                // Store the timeout so it can be cancelled if a new track is requested
-                pendingUnlockTimeoutRef.current = setTimeout(() => {
-                    pendingUnlockTimeoutRef.current = null;
-                    fadeToTrack(trackKey, fadeOutMs, fadeInMs);
-                }, 100);
+
+                // Pre-load the track synchronously if needed, then play immediately
+                const pendingHowl = howlsRef.current[trackKey];
+                if (pendingHowl && pendingHowl.state() === 'unloaded') {
+                    // Load the track - this starts loading but doesn't block
+                    pendingHowl.load();
+                    // Play once loaded - Howler queues play() calls made before load completes
+                    // This maintains the user gesture chain because play() is called synchronously
+                    logger.log('[Music] Track not loaded, loading and playing:', trackKey);
+                }
+
+                // Call fadeToTrack immediately - no setTimeout
+                // The AudioContext.resume() above has already completed
+                fadeToTrack(trackKey, fadeOutMs, fadeInMs);
             }
 
             // Remove all listeners after first interaction

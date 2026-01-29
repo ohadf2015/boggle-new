@@ -515,88 +515,57 @@ export default function LevelGrid({
 
   return (
     <div data-testid="level-grid" className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent">
-      {/* Multi-layer parallax container - stays fixed while content scrolls */}
+      {/* Simplified parallax container - cleaner, less distracting */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Layer 1: Deep space/base gradient (depth: 0.05) */}
+        {/* Layer 1: Base gradient with world accent */}
         <div
           className="absolute inset-0"
           style={{
             transform: `translate(${parallaxX * 0.05}px, ${parallaxY * 0.05}px)`,
-            background: `radial-gradient(ellipse at 50% 30%, ${glowColor}15 0%, transparent 60%),
-                         linear-gradient(180deg, rgba(10,10,30,0.9) 0%, rgba(15,15,40,0.95) 100%)`,
+            background: `radial-gradient(ellipse at 50% 30%, ${glowColor}10 0%, transparent 50%),
+                         linear-gradient(180deg, rgba(10,10,30,0.95) 0%, rgba(15,15,40,1) 100%)`,
           }}
         />
 
-        {/* Layer 2: World image as blurred background (depth: 0.1) */}
+        {/* Layer 2: Main world image - the hero background */}
         <div
           className="absolute inset-0 level-grid-parallax-layer"
           style={{
-            transform: `translate(${parallaxX * 0.1}px, ${parallaxY * 0.1}px) scale(1.4)`,
+            transform: `translate(${parallaxX * 0.12}px, ${parallaxY * 0.12}px) scale(1.15)`,
           }}
         >
           <Image
             src={worldImage}
             alt=""
             fill
-            className="object-cover blur-xl opacity-35"
+            className="object-cover opacity-50"
             priority
           />
+          {/* Overlay to darken and add world color tint */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, rgba(10,10,30,0.4) 0%, ${glowColor}15 50%, rgba(10,10,30,0.6) 100%)`,
+            }}
+          />
         </div>
 
-        {/* Layer 3: Far parallax image layer (depth: 0.12-0.15) */}
-        {parallaxLayers.far && (
-          <ParallaxImageLayer
-            {...parallaxLayers.far}
-            parallaxX={parallaxX}
-            parallaxY={parallaxY}
-          />
-        )}
-
-        {/* Layer 4: World-colored gradient overlay (depth: 0.18) */}
+        {/* Layer 3: Subtle accent glow */}
         <div
           className="absolute inset-0"
           style={{
-            transform: `translate(${parallaxX * 0.18}px, ${parallaxY * 0.18}px)`,
-            background: `linear-gradient(180deg, transparent 0%, ${glowColor}15 40%, ${glowColor}35 100%)`,
-          }}
-        />
-
-        {/* Layer 5: Mid parallax image layer (depth: 0.25-0.3) */}
-        {parallaxLayers.mid && (
-          <ParallaxImageLayer
-            {...parallaxLayers.mid}
-            parallaxX={parallaxX}
-            parallaxY={parallaxY}
-          />
-        )}
-
-        {/* Layer 6: Atmospheric glow orbs (depth: 0.25) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            transform: `translate(${parallaxX * 0.25}px, ${parallaxY * 0.25}px)`,
+            transform: `translate(${parallaxX * 0.2}px, ${parallaxY * 0.2}px)`,
           }}
         >
-          {/* Primary glow - top center */}
           <div
-            className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] rounded-full level-grid-glow-orb"
+            className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[400px] h-[300px] rounded-full"
             style={{
-              background: `radial-gradient(ellipse, ${glowColor}40 0%, transparent 65%)`,
-              '--glow-color': glowColor,
-            } as React.CSSProperties}
-          />
-          {/* Secondary glow - bottom offset */}
-          <div
-            className="absolute bottom-[20%] left-[30%] w-[300px] h-[300px] rounded-full level-grid-glow-orb"
-            style={{
-              background: `radial-gradient(circle, ${glowColor}25 0%, transparent 70%)`,
-              '--glow-color': glowColor,
-              animationDelay: '2s',
-            } as React.CSSProperties}
+              background: `radial-gradient(ellipse, ${glowColor}25 0%, transparent 60%)`,
+            }}
           />
         </div>
 
-        {/* Layer 7: Floating particles (depth: 0.35 via CSS) */}
+        {/* Layer 4: Floating particles for life */}
         <div className="absolute inset-0">
           {particles.map((particle) => (
             <FloatingParticle
@@ -611,20 +580,12 @@ export default function LevelGrid({
           ))}
         </div>
 
-        {/* Layer 8: Near parallax image layer (depth: 0.5-0.55) */}
-        {parallaxLayers.near && (
-          <ParallaxImageLayer
-            {...parallaxLayers.near}
-            parallaxX={parallaxX}
-            parallaxY={parallaxY}
-          />
-        )}
-
-        {/* Layer 9: Foreground depth frame (depth: 0.6) */}
-        <ForegroundFrame
-          glowColor={glowColor}
-          parallaxX={parallaxX}
-          parallaxY={parallaxY}
+        {/* Layer 5: Subtle vignette for depth */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            boxShadow: 'inset 0 0 100px rgba(0,0,0,0.5)',
+          }}
         />
       </div>
 

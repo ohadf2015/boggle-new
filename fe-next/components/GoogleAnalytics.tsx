@@ -1,12 +1,13 @@
 'use client';
 
-import Script from 'next/script';
+import { GoogleAnalytics as NextGoogleAnalytics } from '@next/third-parties/google';
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 
 /**
  * Google Analytics 4 component
  *
+ * Uses @next/third-parties for optimized loading (reduces main thread blocking)
  * Add NEXT_PUBLIC_GA4_MEASUREMENT_ID to your environment variables
  * to enable tracking. Without it, analytics is disabled.
  */
@@ -21,25 +22,11 @@ export function GoogleAnalytics() {
     return null;
   }
 
-  return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="lazyOnload"
-      />
-      <Script id="google-analytics" strategy="lazyOnload">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}', {
-            page_path: window.location.pathname,
-            cookie_flags: 'SameSite=None;Secure',
-          });
-        `}
-      </Script>
-    </>
-  );
+  // @next/third-parties automatically handles:
+  // - Deferred loading to reduce main thread blocking
+  // - Proper gtag initialization
+  // - Cookie configuration
+  return <NextGoogleAnalytics gaId={GA_MEASUREMENT_ID} />;
 }
 
 /**

@@ -42,8 +42,14 @@ export function DesktopLobbyLayout({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        'grid grid-cols-[300px_1fr_320px] gap-6 h-full p-6',
-        'bg-gradient-to-br from-neo-navy via-neo-navy to-slate-900',
+        // Base grid layout with responsive columns
+        'grid h-full p-6 bg-neo-navy',
+        // Responsive grid columns: slightly wider sidebars on larger screens
+        'grid-cols-[300px_1fr_320px]',
+        'xl:grid-cols-[320px_1fr_360px]',
+        '2xl:grid-cols-[360px_1fr_400px]',
+        // Responsive gap: scales with viewport
+        'gap-4 lg:gap-5 xl:gap-6',
         className
       )}
     >
@@ -60,7 +66,10 @@ export function DesktopLobbyLayout({
         data-testid="desktop-center-column"
         className="flex flex-col items-center justify-start gap-6 overflow-y-auto overscroll-contain scrollable-area min-h-0"
       >
-        {centerContent}
+        {/* Constrained content wrapper - prevents stretching on ultra-wide screens */}
+        <div className="w-full max-w-3xl mx-auto px-2">
+          {centerContent}
+        </div>
       </main>
 
       {/* Right Column - Players & Chat */}

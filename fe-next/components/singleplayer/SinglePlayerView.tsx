@@ -406,6 +406,9 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
+    // Reset hasAutoStartedRef so user can navigate to a new preset from results page
+    // This allows "Play Against Bots" button in NextStepPrompt to work after practice mode
+    hasAutoStartedRef.current = false;
   }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
 
   const handlePlayAgain = () => {

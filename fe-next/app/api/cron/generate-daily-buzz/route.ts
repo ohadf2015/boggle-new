@@ -58,11 +58,20 @@ function getBuzzEnabledLanguages(): readonly string[] {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret (Vercel adds this automatically)
+    // Verify cron secret - REQUIRED for security
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // Security: CRON_SECRET must be configured in production
+    if (!cronSecret) {
+      console.error('[Cron] CRON_SECRET environment variable is not configured');
+      return NextResponse.json(
+        { error: 'Server configuration error: CRON_SECRET not configured' },
+        { status: 500 }
+      );
+    }
+
+    if (authHeader !== `Bearer ${cronSecret}`) {
       console.error('[Cron] Unauthorized: Invalid cron secret');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

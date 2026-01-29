@@ -284,17 +284,18 @@ export async function joinClassroom(
       return { data: null, error: { message: 'Invalid join code format (letters and numbers only)' } };
     }
 
-    // Find classroom by join code
-    const { data: classroom, error: classroomError } = await supabase
-      .from('classrooms')
-      .select('id')
-      .eq('join_code', normalizedCode)
-      .maybeSingle();
+    // Find classroom by join code using secure RPC function
+    // This prevents enumeration of all classrooms (security fix)
+    const { data: classroomResult, error: classroomError } = await supabase
+      .rpc('lookup_classroom_by_join_code', { p_join_code: normalizedCode });
 
     if (classroomError) {
       logger.error('Error querying classroom:', classroomError);
       return { data: null, error: { message: classroomError.message } };
     }
+
+    // RPC returns an array, get the first result
+    const classroom = Array.isArray(classroomResult) ? classroomResult[0] : classroomResult;
 
     if (!classroom) {
       // Classroom not found - clearer error message

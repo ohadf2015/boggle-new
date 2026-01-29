@@ -139,6 +139,8 @@ export interface LevelConfig {
   gridSize: 4 | 5 | 6 | 7;
   /** Time limit in seconds */
   timerSeconds: number;
+  /** Minimum word length required (default: 3, World 1 uses 2 for tutorials) */
+  minWordLength?: 2 | 3;
   /** Objectives to complete */
   objectives: LevelObjective[];
   /** Special tiles to place on the grid */

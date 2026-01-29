@@ -76,10 +76,12 @@ export default function StudentPageClient() {
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
       <Header />
 
-      <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
+      {/* Reduced padding: mobile 12px, sm 16px (was 24px) */}
+      <div className="w-full max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8 flex-1">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-neo-display text-neo-white mb-2">
+        {/* Reduced margin: mobile 12px, sm 16px (was 32px) */}
+        <div className="mb-3 sm:mb-4">
+          <h1 className="text-3xl font-neo-display text-neo-white mb-1">
             {t('student.dashboard.title')}
           </h1>
           <p className="text-neo-white/70 font-neo-body">
@@ -88,7 +90,8 @@ export default function StudentPageClient() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Reduced gap: mobile 16px, lg 24px (was 32px) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Lesson List - Takes up 2 columns on desktop */}
           <div className="lg:col-span-2">
             <StudentLessonView />

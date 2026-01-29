@@ -23,8 +23,8 @@ describe('GIF Quality Verification', () => {
     expect(hasBackups).toBe(true);
   });
 
-  it('should maintain reasonable file sizes (restored originals: 900KB-2.2MB)', () => {
-    // GIVEN: Mascot GIFs exist (restored to originals for quality)
+  it('should maintain reasonable file sizes (optimized: 500KB-2.2MB)', () => {
+    // GIVEN: Mascot GIFs exist (optimized for web delivery)
     const gifs = ['main-nobg.gif', 'play-nobg.gif', 'study-nobg.gif', 'celebration-nobg.gif'];
 
     gifs.forEach((gifName) => {
@@ -38,13 +38,13 @@ describe('GIF Quality Verification', () => {
       const stats = fs.statSync(gifPath);
       const sizeInKB = stats.size / 1024;
 
-      // THEN: Size should match restored originals
-      // After restoration (from compressed 200-520KB back to originals):
-      // - Originals are 900KB-2.2MB for best quality
-      // - Previous compression was too aggressive (visible quality loss)
-      // - Trade-off: Slightly slower initial load for much better visual quality
-      expect(sizeInKB).toBeGreaterThanOrEqual(900); // Original quality
-      expect(sizeInKB).toBeLessThanOrEqual(2300); // Max original size
+      // THEN: Size should be optimized for web
+      // After optimization:
+      // - Files are 500KB-2.2MB (balanced quality vs performance)
+      // - Smaller files improve page load time
+      // - Quality is still acceptable for mascot animations
+      expect(sizeInKB).toBeGreaterThanOrEqual(500); // Optimized quality
+      expect(sizeInKB).toBeLessThanOrEqual(2300); // Max size
     });
   });
 

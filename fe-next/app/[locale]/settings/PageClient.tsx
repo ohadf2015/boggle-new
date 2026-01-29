@@ -161,13 +161,15 @@ export default function SettingsPageClient(): React.JSX.Element {
 
       <div className={cn(
         "max-w-2xl mx-auto px-4 page-content-safe",
-        isLandscape ? "py-2" : "py-6"
+        // Reduced padding: mobile 12px, desktop 16px (was 24px)
+        isLandscape ? "py-2" : "py-3 sm:py-4"
       )}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-6"
+          // Reduced margin: mobile 12px, sm 16px (was 24px)
+          className="flex items-center gap-4 mb-3 sm:mb-4"
         >
           <Button
             variant="outline"
@@ -190,7 +192,8 @@ export default function SettingsPageClient(): React.JSX.Element {
         </motion.div>
 
         {/* Settings Sections */}
-        <div className="space-y-6">
+        {/* Reduced spacing: mobile 12px, sm 16px (was 24px) */}
+        <div className="space-y-3 sm:space-y-4">
           {/* Appearance */}
           <motion.section
             initial={{ opacity: 0, y: 10 }}
@@ -395,7 +398,8 @@ export default function SettingsPageClient(): React.JSX.Element {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           className={cn(
-            'mt-8 pt-4 border-t text-center',
+            // Reduced margin: 16px top, 8px padding (was 32px/16px)
+            'mt-4 pt-2 border-t text-center',
             isDarkMode ? 'border-slate-700' : 'border-gray-200'
           )}
         >

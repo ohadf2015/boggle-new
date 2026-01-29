@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Target, Check, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Target, Check, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,6 +25,8 @@ interface ChallengeButtonProps {
   gameDuration: number;
   /** Button variant */
   variant?: 'default' | 'compact';
+  /** Whether player won (shows enhanced prompt) */
+  isWinner?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
@@ -42,6 +44,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
   gameLanguage,
   gameDuration,
   variant = 'default',
+  isWinner = false,
   className,
 }) => {
   const { t } = useLanguage();
@@ -126,8 +129,34 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className={className}
+      className={cn('flex flex-col gap-2', className)}
     >
+      {/* Winner callout - draws attention to share action */}
+      <AnimatePresence>
+        {isWinner && !challengeUrl && !isCreating && (
+          <motion.div
+            initial={{ opacity: 0, y: -5, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={cn(
+              'flex items-center justify-center gap-2 px-3 py-2',
+              'bg-gradient-to-r from-neo-yellow/20 to-neo-orange/20',
+              'border-2 border-neo-yellow/40 rounded-neo'
+            )}
+          >
+            <motion.div
+              animate={{ rotate: [0, 15, -15, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <Sparkles className="w-4 h-4 text-neo-yellow" />
+            </motion.div>
+            <span className="text-sm font-bold text-neo-yellow">
+              {t('challenge.winnerPrompt') || 'You crushed it! Challenge your friends 😈'}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Button
         onClick={handleCreateChallenge}
         disabled={isCreating}
@@ -141,6 +170,8 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
           'disabled:opacity-70 disabled:cursor-not-allowed',
           challengeUrl
             ? 'bg-neo-lime text-neo-black'
+            : isWinner
+            ? 'bg-neo-yellow text-neo-black'
             : 'bg-neo-cyan text-neo-black',
           isCompact ? 'p-3 text-sm' : 'p-4 text-base'
         )}
@@ -165,7 +196,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
 
       {/* Subtitle hint */}
       {!isCompact && !challengeUrl && !isCreating && (
-        <p className="text-center text-xs text-white/60 mt-2 font-medium">
+        <p className="text-center text-xs text-white/60 font-medium">
           {t('challenge.shareHint') || 'Share the same board with friends'}
         </p>
       )}

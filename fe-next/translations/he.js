@@ -318,6 +318,7 @@ const he = {
     "moreSettings": "הגדרות נוספות"
   },
   "share": {
+    "button": "שתף",
     "linkCopied": "הקישור הועתק! 🔗",
     "copyError": "לא הצליח - נסו שוב",
     "inviteMessage": "קרב מילים עכשיו! בואו 🔥",
@@ -2073,7 +2074,11 @@ const he = {
   },
   "referral": {
     "milestoneTitle": "אבן דרך של חבר!",
-    "milestoneMessage": "המשך להזמין חברים כדי להרוויח עוד פרסים!"
+    "milestoneMessage": "המשך להזמין חברים כדי להרוויח עוד פרסים!",
+    "teaser": {
+      "title": "הזמן חברים, צבור XP",
+      "subtitle": "קבל 100 XP על כל חבר שמצטרף!"
+    }
   },
   "coins": {
     "title": "מטבעות ופרסים",
@@ -2462,7 +2467,8 @@ const he = {
     "behindRecord": "{diff} להכות את השיא שלך",
     "tiedWithRecord": "שוויון עם השיא שלך!",
     "challengeFriend": "אתגר חבר",
-    "shareHint": "שתפו את אותו הלוח עם חברים"
+    "shareHint": "שתפו את אותו הלוח עם חברים",
+    "winnerPrompt": "שברת אותם! אתגר את החברים 😈"
   },
   "rules": {
     "pageTitle": "לקסיקלאש: קרב מילים בזמן אמת",
@@ -2842,6 +2848,7 @@ const he = {
       "scoreBreakdownTooltip": "לחץ לפרטים"
     },
     "results": {
+      "tapToCelebrate": "לחץ לחגוג!",
       "targetWord": "מילת היעד",
       "betterLuckNextTime": "בהצלחה בפעם הבאה!",
       "nextChallengeIn": "האתגר הבא בעוד",
@@ -3149,6 +3156,10 @@ const he = {
   "keyboardDesktopBadge": {
     "typeWords": "הקלד מילים",
     "pressQuestion": "לחץ ? לקיצורים"
+  },
+  "keyboardInlineHint": {
+    "message": "הקלד + Enter",
+    "fullMessage": "הקלד מילים במקלדת ולחץ Enter לשליחה"
   },
   "enterKeyHint": {
     "pressEnter": "לחץ Enter לשליחה"
@@ -3947,6 +3958,10 @@ const he = {
       "hintAvailable": "צריכים רמז?",
       "hintUsed": "נסו את המילה הזו!",
       "noHints": "אין עוד רמזים זמינים"
+    },
+    "hints": {
+      "minLetters2": "2+ אותיות",
+      "minLetters3": "3+ אותיות"
     },
     "retry": {
       "title": "כמעט שם!",

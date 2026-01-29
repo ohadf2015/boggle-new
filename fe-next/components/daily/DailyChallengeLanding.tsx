@@ -264,7 +264,7 @@ export function DailyChallengeLanding({
         transition={{ delay: 0.1 }}
         className="text-center mb-3 sm:mb-6"
       >
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-neo-display font-black bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient-flow_4s_ease_infinite]">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-neo-display font-black text-neo-lime">
           {t('daily.chooseQuest')}
         </h1>
       </motion.div>
@@ -348,29 +348,14 @@ export function DailyChallengeLanding({
       {/* Daily Double Achievement - Premium Badge */}
       {bothWon && (
         <motion.div
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.4 }}
-          className="mt-5 relative"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut', delay: 0.4 }}
+          className="mt-5"
         >
-          {/* Glow effect */}
-          <motion.div
-            className="absolute -inset-2 rounded-2xl blur-lg -z-10"
-            animate={{
-              opacity: [0.4, 0.7, 0.4],
-              scale: [1, 1.05, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.4) 0%, transparent 70%)' }}
-          />
-          <div className="px-5 py-3 bg-neo-navy-light/90 backdrop-blur-sm border-3 border-neo-lime rounded-xl shadow-hard">
+          <div className="px-5 py-3 bg-neo-navy-light border-3 border-neo-lime rounded-xl shadow-hard">
             <div className="flex items-center gap-3">
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <Trophy className="w-6 h-6 text-neo-lime drop-shadow-[0_0_8px_rgba(191,255,0,0.6)]" />
-              </motion.div>
+              <Trophy className="w-6 h-6 text-neo-lime" />
               <span className="font-black text-neo-lime text-base tracking-wide uppercase">
                 {t('achievement.dailyDouble.name')}
               </span>
@@ -607,19 +592,13 @@ function CompactChallengeCard({
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
       className="relative"
     >
-      {/* Animated glow effect for new challenges */}
-      {status === 'new' && showEffects && (
-        <motion.div
-          className="absolute -inset-1 rounded-2xl opacity-60 blur-md -z-10"
-          animate={{
-            boxShadow: [
-              `0 0 20px ${styles.glowColor}`,
-              `0 0 40px ${styles.glowColor}`,
-              `0 0 20px ${styles.glowColor}`,
-            ],
-          }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ background: `linear-gradient(135deg, ${styles.glowColor}, transparent)` }}
+      {/* Subtle border highlight for new challenges */}
+      {status === 'new' && (
+        <div
+          className={cn(
+            'absolute -inset-0.5 rounded-2xl -z-10',
+            color === 'orange' ? 'bg-neo-orange/30' : 'bg-neo-cyan/30'
+          )}
         />
       )}
 
@@ -645,32 +624,15 @@ function CompactChallengeCard({
           (status === 'won' || status === 'lost') && 'opacity-85',
           isUnavailable && 'opacity-60'
         )}
-        style={{
-          ...tiltStyle,
-          boxShadow: isHovered && !isUnavailable
-            ? `0 0 30px ${styles.glowColor}, 6px 6px 0px black`
-            : undefined,
-        }}
+        style={tiltStyle}
       >
-        {/* Decorative corner accents */}
-        {showEffects && (
-          <>
-            <motion.div
-              className="absolute top-0 end-0 w-12 h-12 pointer-events-none overflow-hidden rounded-tr-xl"
-              animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="absolute -top-6 -end-6 w-12 h-12 bg-white/20 rotate-45" />
-            </motion.div>
-            <motion.div
-              className="absolute bottom-0 start-0 w-8 h-8 pointer-events-none overflow-hidden rounded-bl-xl"
-              animate={isHovered ? { scale: 1.3, opacity: 0.12 } : { scale: 1, opacity: 0.06 }}
-              transition={{ duration: 0.3, delay: 0.05 }}
-            >
-              <div className="absolute -bottom-4 -start-4 w-8 h-8 bg-white/20 rotate-45" />
-            </motion.div>
-          </>
-        )}
+        {/* Decorative corner accents - static for performance */}
+        <div className="absolute top-0 end-0 w-10 h-10 pointer-events-none overflow-hidden rounded-tr-xl opacity-10">
+          <div className="absolute -top-5 -end-5 w-10 h-10 bg-white rotate-45" />
+        </div>
+        <div className="absolute bottom-0 start-0 w-8 h-8 pointer-events-none overflow-hidden rounded-bl-xl opacity-5">
+          <div className="absolute -bottom-4 -start-4 w-8 h-8 bg-white rotate-45" />
+        </div>
 
         {/* Status Badge - Top Right */}
         <div className="absolute top-2 end-2 z-10">
@@ -681,31 +643,16 @@ function CompactChallengeCard({
             </span>
           ) : (status === 'won' || status === 'lost') ? (
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
             >
-              {/* Glow effect behind badge - green for won, pink for lost */}
-              <motion.div
-                className="absolute -inset-1 rounded-full blur-sm -z-10"
-                animate={{
-                  opacity: [0.4, 0.7, 0.4],
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                style={{
-                  background: status === 'won'
-                    ? 'rgba(191, 255, 0, 0.5)'  // Green glow for win
-                    : 'rgba(255, 20, 147, 0.5)' // Pink glow for loss
-                }}
-              />
               <span
                 className={cn(
                   "flex items-center gap-1 text-xs sm:text-sm font-bold px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border-2 border-neo-black shadow-hard-sm",
                   status === 'won'
-                    ? "bg-neo-lime text-neo-black"  // Green for win
-                    : "bg-neo-pink text-neo-black"   // Pink for loss
+                    ? "bg-neo-lime text-neo-black"
+                    : "bg-neo-pink text-neo-black"
                 )}
                 data-testid={status === 'won' ? "won-badge" : "lost-badge"}
               >
@@ -724,19 +671,14 @@ function CompactChallengeCard({
               {t('buzz.notAvailable')}
             </span>
           ) : badge ? (
-            <motion.span
-              animate={showEffects ? { scale: [1, 1.05, 1] } : {}}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-xs font-bold bg-neo-pink/20 text-neo-pink px-2 py-0.5 rounded-full border border-neo-pink/30"
-            >
+            <span className="text-xs font-bold bg-neo-pink/20 text-neo-pink px-2 py-0.5 rounded-full border border-neo-pink/30">
               {badge}
-            </motion.span>
+            </span>
           ) : null}
         </div>
 
         {/* Time Mode Badge - Prominent at top, compact on mobile */}
-        <motion.div
-          whileHover={showEffects ? { scale: 1.05 } : {}}
+        <div
           className={cn(
             'flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full mb-2 sm:mb-3',
             'border-2 font-bold text-xs sm:text-sm uppercase tracking-wide',
@@ -751,7 +693,7 @@ function CompactChallengeCard({
             <Hourglass className="w-3 h-3 sm:w-4 sm:h-4" />
           )}
           <span>{timeModeLabel}</span>
-        </motion.div>
+        </div>
 
         {/* Preview: Custom Grid, Image, or Icon - responsive height that fits content */}
         <div className="relative w-full h-28 sm:h-40 flex items-center justify-center mb-2 sm:mb-3">
@@ -778,40 +720,25 @@ function CompactChallengeCard({
           {(status === 'won' || status === 'lost') && !isLoadingStatus && (
             <motion.div
               data-testid={`completion-overlay-${challengeId}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className={cn(
                 'absolute inset-0 z-30 flex flex-col items-center justify-center',
-                'rounded-xl border-3 border-neo-black backdrop-blur-sm',
+                'rounded-xl border-3 border-neo-black',
                 status === 'won'
-                  ? 'bg-neo-lime/90'
-                  : 'bg-neo-pink/90'
+                  ? 'bg-neo-lime'
+                  : 'bg-neo-pink'
               )}
             >
-              {/* Glow effect behind */}
-              <motion.div
-                className="absolute inset-0 rounded-xl -z-10"
-                animate={{
-                  boxShadow: status === 'won'
-                    ? ['0 0 20px rgba(191, 255, 0, 0.5)', '0 0 40px rgba(191, 255, 0, 0.7)', '0 0 20px rgba(191, 255, 0, 0.5)']
-                    : ['0 0 20px rgba(255, 20, 147, 0.5)', '0 0 40px rgba(255, 20, 147, 0.7)', '0 0 20px rgba(255, 20, 147, 0.5)'],
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              />
-
               {/* Icon */}
-              <motion.div
-                animate={{ rotate: status === 'won' ? [0, 10, -10, 0] : [0, -5, 5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="mb-1 sm:mb-2"
-              >
+              <div className="mb-1 sm:mb-2">
                 {status === 'won' ? (
-                  <Trophy className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black drop-shadow-lg" strokeWidth={2.5} />
+                  <Trophy className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black" strokeWidth={2.5} />
                 ) : (
-                  <Frown className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black drop-shadow-lg" strokeWidth={2.5} />
+                  <Frown className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black" strokeWidth={2.5} />
                 )}
-              </motion.div>
+              </div>
 
               {/* Completion Text */}
               <span className="font-neo-display font-black text-lg sm:text-2xl text-neo-black uppercase tracking-wide">
@@ -873,28 +800,12 @@ function CompactChallengeCard({
         ) : (
           <div
             className={cn(
-              'relative w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg overflow-hidden',
+              'w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg',
               styles.bg,
-              'text-neo-black border-2 border-neo-black shadow-hard-sm',
-              'transition-all'
+              'text-neo-black border-2 border-neo-black shadow-hard-sm'
             )}
           >
             {buttonText}
-            {/* Shine sweep effect */}
-            {showEffects && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                  initial={{ x: '-100%' }}
-                  animate={isHovered ? { x: '200%' } : { x: '-100%' }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                />
-              </motion.div>
-            )}
           </div>
         )}
       </div>

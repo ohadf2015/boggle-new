@@ -4,8 +4,8 @@ import React, { useEffect, useState, lazy, Suspense, memo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Map } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Map, Sparkles, Gift, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,11 +18,14 @@ import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
-import { ModeCardSkeleton } from './ModeCardSkeleton';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
-import AuthModal from '@/components/auth/AuthModal';
+
+// Lazy load AuthModal - only opened when user clicks locked feature
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), {
+  ssr: false,
+});
 
 interface HeroMascotProps {
   /** Whether in mobile portrait mode - uses smaller size */
@@ -47,6 +50,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
           clickVariant="celebrating"
           clickAnimation="bounce"
           priority
+          fetchPriority="high"
           delay={0.1}
         />
       </div>
@@ -67,6 +71,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
           clickVariant="celebrating"
           clickAnimation="bounce"
           priority
+          fetchPriority="high"
           delay={0.1}
         />
       </div>
@@ -81,6 +86,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
           clickVariant="celebrating"
           clickAnimation="bounce"
           priority
+          fetchPriority="high"
           delay={0.1}
         />
       </div>
@@ -95,6 +101,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
           clickVariant="celebrating"
           clickAnimation="bounce"
           priority
+          fetchPriority="high"
           delay={0.1}
         />
       </div>
@@ -150,11 +157,17 @@ const LandingView: React.FC = () => {
   // Onboarding modal state (opened when user clicks tutorial button)
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Track if user is first-time visitor for enhanced tutorial button animation
+  // Track if user is first-time visitor for tutorial callout
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
+
+  // Tutorial callout visibility (shown above FAB for first-time users)
+  const [showTutorialCallout, setShowTutorialCallout] = useState(false);
 
   // Auth modal state (opened when user clicks locked feature)
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Referral callout visibility (shown when tutorial callout is hidden)
+  const [showReferralCallout, setShowReferralCallout] = useState(false);
 
   // Note: Profile customization is now handled globally in ProfileCustomizationWrapper
 
@@ -170,18 +183,42 @@ const LandingView: React.FC = () => {
     }
   }, [language, router]);
 
-  // Check if user is first-time visitor for enhanced tutorial button animation
+  // Check if user is first-time visitor for tutorial callout
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     // Only consider first-time if not authenticated and hasn't completed onboarding
     const isFirstTime = !isAuthenticated && !hasCompletedOnboarding();
     setIsFirstTimeUser(isFirstTime);
+    // Show tutorial callout above FAB for first-time users
+    setShowTutorialCallout(isFirstTime);
   }, [isAuthenticated]);
 
-  // Open tutorial modal
+  // Show referral callout for returning users who haven't dismissed it
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Only show referral callout to returning users (not first-time)
+    const hasDismissedReferral = localStorage.getItem('referral_callout_dismissed') === 'true';
+    const hasCompletedOnboardingCheck = hasCompletedOnboarding();
+
+    // Show if: not first-time user, hasn't dismissed, and isn't currently seeing tutorial callout
+    if (hasCompletedOnboardingCheck && !hasDismissedReferral && !showTutorialCallout) {
+      setShowReferralCallout(true);
+    }
+  }, [showTutorialCallout]);
+
+  // Dismiss referral callout and persist to localStorage
+  const handleDismissReferral = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    localStorage.setItem('referral_callout_dismissed', 'true');
+    setShowReferralCallout(false);
+  };
+
+  // Open tutorial modal (from FAB button)
   const handleOpenTutorial = () => {
     setShowOnboarding(true);
+    setShowTutorialCallout(false);
     // Mark onboarding as started when user clicks tutorial button
     if (isFirstTimeUser) {
       markOnboardingSkipped();
@@ -244,6 +281,8 @@ const LandingView: React.FC = () => {
           <motion.div
             className={cn(
               "text-center animate-fade-in-fast relative z-10",
+              // Max-width for desktop to prevent text stretching
+              "max-w-3xl mx-auto",
               isMobilePortrait ? "mb-2" : "mb-4 sm:mb-6 lg:mb-8"
             )}
             style={!isMobilePortrait ? {
@@ -269,6 +308,8 @@ const LandingView: React.FC = () => {
             <motion.p
               className={cn(
                 "font-medium text-neo-black/80 dark:text-neo-white/85",
+                // Max-width for subtitle readability
+                "max-w-xl mx-auto",
                 isMobilePortrait ? "text-xs" : "text-sm sm:text-base lg:text-lg xl:text-xl"
               )}
               initial={{ y: 20, opacity: 0 }}
@@ -336,7 +377,8 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-pink to-pink-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all duration-200 min-h-[100px] sm:min-h-[120px]',
+                  // Reduced min-height: 80px on xs, 100px on sm (was 100/120px)
+                  'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(255,20,147,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
@@ -376,7 +418,8 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-cyan to-cyan-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all duration-200 min-h-[100px] sm:min-h-[120px]',
+                  // Reduced min-height: 80px on xs, 100px on sm (was 100/120px)
+                  'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(0,255,255,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
@@ -406,7 +449,8 @@ const LandingView: React.FC = () => {
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
                   'bg-gradient-to-br from-neo-lime to-lime-500',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
+                  // Reduced min-height: 64px on xs, 80px on sm (was 80/100px)
+                  'transition-all duration-200 min-h-[64px] sm:min-h-[80px]',
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.4))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
@@ -426,9 +470,10 @@ const LandingView: React.FC = () => {
           /* Desktop: Centered grid layout with visual hierarchy */
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
             {/* Cards container - Daily Challenge Banner + Mode Cards in single grid */}
-            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-5 justify-items-center">
-              {/* Daily Challenge Banner - spans full width */}
-              <div className="col-span-1 sm:col-span-2 w-full">
+            {/* max-w-5xl (1024px) constrains overall width, individual cards have max-w-md (448px) */}
+            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 justify-items-center px-4 lg:px-6">
+              {/* Daily Challenge Banner - spans full width with its own max-width */}
+              <div className="col-span-1 sm:col-span-2 w-full max-w-4xl mx-auto">
                 <Suspense fallback={
                   <div
                     className="w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
@@ -448,12 +493,14 @@ const LandingView: React.FC = () => {
               </div>
 
               {/* Primary cards - Multiplayer and Single Player */}
+              {/* max-w-md (448px) prevents cards from stretching too wide */}
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
                 href={`/${language}/multiplayer`}
                 icon={<Users className="w-6 h-6" />}
                 variant="pink"
+                className="w-full max-w-md"
                 liveBadge={{
                   openRooms: liveRoomStats.openRooms,
                   totalPlayers: liveRoomStats.totalPlayers,
@@ -471,9 +518,10 @@ const LandingView: React.FC = () => {
                 href={`/${language}/singleplayer`}
                 icon={<User className="w-6 h-6" />}
                 variant="cyan"
+                className="w-full max-w-md"
               />
 
-              {/* Secondary card - Adventure Mode (spans full width) */}
+              {/* Secondary card - Adventure Mode (spans full width with larger max-width) */}
               <ModeCard
                 title={t('landing.adventureMode') || 'Adventure'}
                 description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
@@ -482,7 +530,7 @@ const LandingView: React.FC = () => {
                 variant="lime"
                 secondary
                 badge="BETA"
-                className="sm:col-span-2"
+                className="sm:col-span-2 w-full max-w-2xl"
               />
             </div>
           </div>
@@ -491,35 +539,125 @@ const LandingView: React.FC = () => {
         </>
       </main>
 
-      {/* Tutorial FAB - Fixed bottom corner button with enhanced animation for first-time users */}
+      {/* Tutorial FAB with Callout - Fixed bottom corner */}
       {/* Position accounts for GlobalBottomNav (64px h-16 + safe area) on mobile */}
       {/* sm:bottom-24 clears the footer (visible at sm:) which is ~72px tall */}
-      <motion.button
-        onClick={handleOpenTutorial}
-        className={cn(
-          "fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8",
-          "flex items-center justify-center gap-2",
-          "min-w-[48px] min-h-[48px]",
-          "px-4 py-3",
-          "bg-neo-purple text-neo-white",
-          "font-bold text-sm",
-          "border-3 border-neo-black",
-          "rounded-neo shadow-hard-lg",
-          "hover:shadow-hard-xl active:shadow-hard",
-          "transition-shadow duration-150",
-          "rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8",
-          isFirstTimeUser && "animate-pulse-subtle"
-        )}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label={t('landing.tutorial') || 'Tutorial'}
-      >
-        <GraduationCap className="w-5 h-5" />
-        <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
-      </motion.button>
+      <div className={cn(
+        "fixed bottom-20 right-[max(env(safe-area-inset-right,0px),1rem)] z-[55] sm:bottom-24 sm:right-6 lg:right-8",
+        "flex flex-col items-end gap-2",
+        "rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8 rtl:items-start"
+      )}>
+        {/* Callout bubble for first-time users */}
+        <AnimatePresence>
+          {showTutorialCallout && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 5, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="relative"
+            >
+              {/* Callout content */}
+              <motion.div
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2",
+                  "bg-gradient-to-r from-neo-pink to-neo-purple",
+                  "border-2 border-neo-black rounded-neo shadow-hard",
+                  "cursor-pointer"
+                )}
+                onClick={handleOpenTutorial}
+                role="status"
+                aria-live="polite"
+              >
+                <Sparkles className="w-4 h-4 text-neo-lime animate-pulse" />
+                <span className="text-sm font-bold text-white whitespace-nowrap">
+                  {t('tutorialPrompt.title') || 'First time here?'}
+                </span>
+              </motion.div>
+              {/* Arrow pointing down to button */}
+              <motion.div
+                animate={{ y: [0, 3, 0] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+                className="absolute -bottom-2 right-4 rtl:right-auto rtl:left-4"
+              >
+                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Referral callout for returning users */}
+        <AnimatePresence>
+          {showReferralCallout && !showTutorialCallout && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 5, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="relative"
+            >
+              <Link
+                href={`/${language}/profile`}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2",
+                  "bg-gradient-to-r from-neo-pink/90 to-purple-600/90",
+                  "border-2 border-neo-black rounded-neo shadow-hard",
+                  "hover:from-neo-pink hover:to-purple-500",
+                  "transition-colors"
+                )}
+              >
+                <Gift className="w-4 h-4 text-neo-lime" />
+                <span className="text-sm font-bold text-white whitespace-nowrap">
+                  {t('referral.teaser.title') || 'Invite Friends, Earn XP'}
+                </span>
+                <button
+                  onClick={handleDismissReferral}
+                  className="p-0.5 rounded-full hover:bg-white/20 transition-colors"
+                  aria-label={t('common.dismiss') || 'Dismiss'}
+                >
+                  <X className="w-3.5 h-3.5 text-white/70" />
+                </button>
+              </Link>
+              {/* Arrow pointing down to button */}
+              <motion.div
+                animate={{ y: [0, 3, 0] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
+                className="absolute -bottom-2 right-4 rtl:right-auto rtl:left-4"
+              >
+                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Tutorial FAB button */}
+        <motion.button
+          onClick={handleOpenTutorial}
+          className={cn(
+            "flex items-center justify-center gap-2",
+            "min-w-[48px] min-h-[48px]",
+            "px-4 py-3",
+            "bg-neo-purple text-neo-white",
+            "font-bold text-sm",
+            "border-3 border-neo-black",
+            "rounded-neo shadow-hard-lg",
+            "hover:shadow-hard-xl active:shadow-hard",
+            "transition-shadow duration-150",
+            isFirstTimeUser && "animate-pulse-subtle"
+          )}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label={t('landing.tutorial') || 'Tutorial'}
+        >
+          <GraduationCap className="w-5 h-5" />
+          <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
+        </motion.button>
+      </div>
     </div>
   );
 };

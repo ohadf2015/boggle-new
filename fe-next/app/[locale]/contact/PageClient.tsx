@@ -75,13 +75,15 @@ export default function ContactPageClient(): React.JSX.Element {
 
       <div className={cn(
         "max-w-2xl mx-auto px-4 page-content-safe",
-        isLandscape ? "py-2" : "py-6"
+        // Reduced padding: mobile 12px, desktop 16px (was 24px)
+        isLandscape ? "py-2" : "py-3 sm:py-4"
       )}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-6"
+          // Reduced margin: mobile 12px, sm 16px (was 24px)
+          className="flex items-center gap-4 mb-3 sm:mb-4"
         >
           <Button
             variant="outline"
@@ -108,7 +110,8 @@ export default function ContactPageClient(): React.JSX.Element {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          // Reduced margin: mobile 16px, sm 20px (was 32px)
+          className="mb-4 sm:mb-5"
         >
           <h2 className={cn(
             'text-sm font-black uppercase mb-3 flex items-center gap-2',
@@ -335,7 +338,8 @@ export default function ContactPageClient(): React.JSX.Element {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           className={cn(
-            'mt-8 pt-4 border-t text-center',
+            // Reduced margin: 16px top, 8px padding (was 32px/16px)
+            'mt-4 pt-2 border-t text-center',
             isDarkMode ? 'border-slate-700' : 'border-gray-200'
           )}
         >

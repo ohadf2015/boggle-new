@@ -29,12 +29,12 @@ export interface ResultDisplayProps {
   t: (key: string) => string;
 }
 
-/** Score tier colors with glow effect and border for ring animation */
+/** Score tier colors */
 function getScoreStyles(score: number) {
-  if (score >= 800) return { color: 'text-neo-lime', glow: '0 0 40px rgba(191, 255, 0, 0.4)', border: 'border-neo-lime/20' };
-  if (score >= 600) return { color: 'text-neo-yellow', glow: '0 0 40px rgba(255, 225, 53, 0.4)', border: 'border-neo-yellow/20' };
-  if (score >= 400) return { color: 'text-neo-orange', glow: '0 0 40px rgba(255, 107, 53, 0.4)', border: 'border-neo-orange/20' };
-  return { color: 'text-neo-pink', glow: '0 0 40px rgba(255, 20, 147, 0.4)', border: 'border-neo-pink/20' };
+  if (score >= 800) return { color: 'text-neo-lime' };
+  if (score >= 600) return { color: 'text-neo-yellow' };
+  if (score >= 400) return { color: 'text-neo-orange' };
+  return { color: 'text-neo-pink' };
 }
 
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({
@@ -75,6 +75,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
+      className="w-full max-w-3xl mx-auto" // Constrain max width for desktop
     >
       <div className="bg-neo-navy/90 rounded-neo-lg border-3 border-neo-black shadow-hard-lg overflow-hidden">
         {/* Compact Header with Puzzle # and Streak */}
@@ -90,88 +91,137 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
           )}
         </div>
 
-        {/* Main Content */}
-        <div className="px-5 py-6 text-center">
+        {/* Main Content - Responsive padding for desktop */}
+        <div className="px-5 py-6 md:px-8 md:py-8 text-center md:text-left">
           {solved ? (
-            /* WIN STATE - Clean score display with animated ring */
+            /* WIN STATE - Two-column layout on desktop */
             <motion.div
               onClick={handleTapCelebrate}
-              className="cursor-pointer select-none relative"
-              whileHover={{ scale: 1.01 }}
+              className="cursor-pointer select-none"
               whileTap={{ scale: 0.98 }}
             >
-              {/* Decorative animated ring */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none -top-2">
-                <div
-                  className={`w-36 h-36 sm:w-44 sm:h-44 rounded-full border-4 ${styles.border} animate-ping`}
-                  style={{ animationDuration: '2s' }}
-                />
+              {/* Desktop: Two-column grid | Mobile: Stacked */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+                {/* Left Column: Score */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.2, ease: 'easeOut' }}
+                  className="relative flex flex-col items-center md:items-start"
+                >
+                  <div
+                    className={`text-[5rem] sm:text-[6rem] lg:text-[7rem] font-black ${styles.color} leading-none tracking-tight`}
+                  >
+                    {scoreBreakdown.total}
+                  </div>
+                  <div className="text-slate-500 text-sm md:text-base font-bold -mt-1">
+                    / 1000
+                  </div>
+
+                  {/* Score breakdown chips - visible on desktop */}
+                  <div className="hidden md:flex flex-wrap gap-2 mt-4">
+                    <span className="px-3 py-1.5 bg-slate-800 rounded-neo border-2 border-slate-600 text-xs font-bold text-slate-300">
+                      ⚡ +{scoreBreakdown.speed}
+                    </span>
+                    <span className="px-3 py-1.5 bg-slate-800 rounded-neo border-2 border-slate-600 text-xs font-bold text-slate-300">
+                      📝 +{scoreBreakdown.exploration}
+                    </span>
+                    <span className="px-3 py-1.5 bg-slate-800 rounded-neo border-2 border-slate-600 text-xs font-bold text-slate-300">
+                      🎯 +{scoreBreakdown.accuracy}
+                    </span>
+                  </div>
+                </motion.div>
+
+                {/* Right Column: Target Word + Stats */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex flex-col items-center md:items-start justify-center gap-4 pt-4 md:pt-0 md:border-l md:border-t-0 border-t border-slate-700/40 md:pl-8"
+                >
+                  {/* Target word */}
+                  <div className="text-center md:text-left">
+                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">
+                      {t('wordHunt.results.targetWord')}
+                    </div>
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-black text-neo-lime tracking-wider">
+                      {displayedTargetWord}
+                    </div>
+                  </div>
+
+                  {/* Tap to celebrate hint - mobile only */}
+                  <div className="md:hidden text-[10px] text-slate-500 mt-2">
+                    {t('wordHunt.results.tapToCelebrate') || 'Tap to celebrate!'}
+                  </div>
+
+                  {/* Next challenge countdown - desktop placement */}
+                  <div className="hidden md:inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 rounded-neo border-2 border-slate-600/50 mt-2">
+                    <Clock className="w-4 h-4 text-neo-cyan" />
+                    <div>
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">
+                        {t('wordHunt.results.nextChallengeIn')}
+                      </div>
+                      <div className="text-xl font-black text-neo-cyan -mt-0.5">
+                        {countdown}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
 
-              {/* Score */}
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 20 }}
-                className="relative"
-              >
-                <div
-                  className={`text-[5rem] sm:text-[6rem] font-black ${styles.color} leading-none tracking-tight`}
-                  style={{ textShadow: styles.glow }}
-                >
-                  {scoreBreakdown.total}
+              {/* Mobile: Countdown below */}
+              <div className="md:hidden mt-5 pt-4 border-t border-slate-700/40">
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 rounded-neo border-2 border-slate-600/50">
+                  <Clock className="w-4 h-4 text-neo-cyan" />
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-bold">
+                      {t('wordHunt.results.nextChallengeIn')}
+                    </div>
+                    <div className="text-xl font-black text-neo-cyan -mt-0.5">
+                      {countdown}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-slate-500 text-sm font-bold -mt-1">
-                  / 1000
-                </div>
-              </motion.div>
-
-              {/* Target Word - Revealed */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="mt-5 pt-4 border-t border-slate-700/40"
-              >
-                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">
-                  {t('wordHunt.results.targetWord')}
-                </div>
-                <div className="text-2xl sm:text-3xl font-black text-neo-lime tracking-wider">
-                  {displayedTargetWord}
-                </div>
-              </motion.div>
+              </div>
             </motion.div>
           ) : (
-            /* FAIL STATE - Encourage next attempt */
+            /* FAIL STATE - Two-column on desktop */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="space-y-5"
             >
-              <div className="text-slate-300 font-medium">
-                {t('wordHunt.results.betterLuckNextTime')}
-              </div>
-
-              {/* Attempts display */}
-              <div>
-                <div className="text-5xl font-black text-slate-400 tracking-tight">
-                  {attemptsUsed}<span className="text-slate-600">/10</span>
-                </div>
-                <div className="text-xs text-slate-500 uppercase font-medium mt-1">
-                  {t('wordHunt.results.attemptsUsed') || 'attempts used'}
-                </div>
-              </div>
-
-              {/* Next challenge countdown */}
-              <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 rounded-neo border-2 border-slate-600/50">
-                <Clock className="w-4 h-4 text-neo-cyan" />
-                <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">
-                    {t('wordHunt.results.nextChallengeIn')}
+              {/* Desktop: Side by side | Mobile: Stacked */}
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 md:gap-8 items-center">
+                {/* Left: Message & Attempts */}
+                <div className="space-y-5 flex flex-col items-center md:items-start">
+                  <div className="text-slate-300 font-medium text-base md:text-lg">
+                    {t('wordHunt.results.betterLuckNextTime')}
                   </div>
-                  <div className="text-xl font-black text-neo-cyan -mt-0.5">
-                    {countdown}
+
+                  {/* Attempts display */}
+                  <div className="text-center md:text-left">
+                    <div className="text-5xl md:text-6xl font-black text-slate-400 tracking-tight">
+                      {attemptsUsed}<span className="text-slate-600">/10</span>
+                    </div>
+                    <div className="text-xs text-slate-500 uppercase font-medium mt-1">
+                      {t('wordHunt.results.attemptsUsed') || 'attempts used'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Countdown (more prominent on desktop) */}
+                <div className="flex items-center justify-center md:justify-end">
+                  <div className="inline-flex flex-col items-center gap-2 px-6 py-4 bg-slate-800/80 rounded-neo border-3 border-slate-600/50">
+                    <Clock className="w-6 h-6 text-neo-cyan" />
+                    <div className="text-center">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">
+                        {t('wordHunt.results.nextChallengeIn')}
+                      </div>
+                      <div className="text-2xl md:text-3xl font-black text-neo-cyan">
+                        {countdown}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

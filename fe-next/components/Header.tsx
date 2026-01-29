@@ -1,5 +1,6 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility, Brain, Lock } from 'lucide-react';
 import Link from 'next/link';
@@ -10,9 +11,11 @@ import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import { CoinBalance } from './CoinBalance';
-import AuthModal from './auth/AuthModal';
 import { GiftNotificationBadge } from './gift/GiftNotificationBadge';
-import { AdminGiftModal } from './gift/AdminGiftModal';
+
+// Lazy load modals - only opened on user interaction
+const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
+const AdminGiftModal = dynamic(() => import('./gift/AdminGiftModal').then(m => m.AdminGiftModal), { ssr: false });
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
 import { NotificationBell } from './notifications/NotificationBell';

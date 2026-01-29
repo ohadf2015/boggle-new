@@ -66,7 +66,8 @@ function useStatusConfig(t: (key: string) => string) {
 
 /**
  * Minimal connection dot (just the indicator, no tooltip)
- * Only shows when there's a connection issue (not when connected)
+ * Shows prominently during initial connection, then hides when connected.
+ * Shows again if connection issues occur.
  */
 export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) => {
   const { isConnected, isReconnecting, connectionError } = useSocket();
@@ -88,13 +89,59 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
   }
 
   const config = statusConfig[status];
+  const showExpandedState = status === 'connecting' || status === 'reconnecting';
 
   return (
-    <div
-      className={cn('connection-indicator', config.className, className)}
-      role="status"
-      aria-label={`${config.label}`}
-    />
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className={cn(
+          'fixed top-2 left-1/2 -translate-x-1/2 z-[9998]',
+          'flex items-center gap-2',
+          'px-3 py-1.5 rounded-full',
+          'border-2 border-neo-black shadow-hard-sm',
+          status === 'connecting' && 'bg-neo-yellow',
+          status === 'reconnecting' && 'bg-neo-yellow',
+          status === 'disconnected' && 'bg-neo-red',
+          className
+        )}
+        role="status"
+        aria-live="polite"
+        aria-label={config.label}
+      >
+        {/* Pulsing dot */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+          className={cn(
+            'w-2.5 h-2.5 rounded-full',
+            status === 'disconnected' ? 'bg-neo-cream' : 'bg-neo-black'
+          )}
+        />
+
+        {/* Status text */}
+        <span className={cn(
+          'text-xs font-bold uppercase tracking-wide',
+          status === 'disconnected' ? 'text-neo-cream' : 'text-neo-black'
+        )}>
+          {showExpandedState ? (
+            <>
+              {status === 'reconnecting' ? t('common.reconnecting') : t('common.connecting')}
+              <motion.span
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                ...
+              </motion.span>
+            </>
+          ) : (
+            config.label
+          )}
+        </span>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

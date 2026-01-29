@@ -73,19 +73,19 @@ export function EnhancedPlayerList({
         className
       )}
     >
-      {/* Decorative top accent */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-neo-yellow via-neo-pink to-neo-purple" />
+      {/* Decorative top accent - slightly taller on desktop */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 xl:h-2 bg-gradient-to-r from-neo-yellow via-neo-pink to-neo-purple" />
 
-      {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-neo-black/30 flex-shrink-0">
-        <Users className="w-5 h-5 text-neo-pink" />
-        <span className="text-sm font-black uppercase text-neo-cream">
+      {/* Header - larger on desktop */}
+      <div className="flex items-center gap-2 xl:gap-3 px-4 py-3 xl:px-5 xl:py-4 border-b border-neo-black/30 flex-shrink-0">
+        <Users className="w-5 h-5 xl:w-6 xl:h-6 text-neo-pink" />
+        <span className="text-sm xl:text-base font-black uppercase text-neo-cream">
           {t('hostView.playersJoined')} ({filteredPlayers.length})
         </span>
       </div>
 
-      {/* Player List */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-3 space-y-2">
+      {/* Player List - responsive spacing */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-3 xl:p-4 space-y-2 xl:space-y-3">
         <AnimatePresence mode="popLayout">
           {filteredPlayers.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -105,7 +105,8 @@ export function EnhancedPlayerList({
                 exit={{ opacity: 0, x: 20, scale: 0.9 }}
                 transition={{ delay: index * 0.05, type: 'spring', stiffness: 200 }}
                 className={cn(
-                  'flex items-center gap-3 p-3 rounded-neo border-2 transition-all',
+                  // Responsive padding and gap for desktop
+                  'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-all',
                   isMe
                     ? 'bg-neo-lime/10 border-neo-lime/50'
                     : isBot
@@ -113,19 +114,19 @@ export function EnhancedPlayerList({
                       : 'bg-white/5 border-neo-black/30 hover:bg-white/10'
                 )}
               >
-                {/* Avatar */}
+                {/* Avatar - larger on desktop */}
                 <div className="relative flex-shrink-0">
                   <Avatar
                     profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
                     avatarImage={avatar?.avatarImage}
                     size="md"
-                    className="w-12 h-12"
+                    className="w-12 h-12 xl:w-14 xl:h-14"
                   />
-                  {/* Online indicator dot */}
+                  {/* Online indicator dot - slightly larger on desktop */}
                   {!isBot && (
                     <div
                       className={cn(
-                        'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-slate-800',
+                        'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 xl:w-4 xl:h-4 rounded-full border-2 border-slate-800',
                         presence === 'active'
                           ? 'bg-neo-lime'
                           : presence === 'idle'
@@ -136,33 +137,33 @@ export function EnhancedPlayerList({
                   )}
                 </div>
 
-                {/* Player Info */}
+                {/* Player Info - larger text on desktop */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span
                       className={cn(
-                        'font-bold truncate',
+                        'font-bold truncate xl:text-lg',
                         isMe ? 'text-neo-lime' : 'text-neo-cream'
                       )}
                     >
                       {name}
                     </span>
                     {isMe && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-neo-lime/20 text-neo-lime font-bold">
+                      <span className="text-[10px] xl:text-xs px-1.5 xl:px-2 py-0.5 xl:py-1 rounded bg-neo-lime/20 text-neo-lime font-bold">
                         {t('playerView.me') || 'YOU'}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-0.5 xl:mt-1">
                     {isHostPlayer && (
-                      <div className="flex items-center gap-1 text-xs text-neo-yellow">
-                        <Crown className="w-3 h-3" />
+                      <div className="flex items-center gap-1 text-xs xl:text-sm text-neo-yellow">
+                        <Crown className="w-3 h-3 xl:w-4 xl:h-4" />
                         <span className="font-bold uppercase">{t('hostView.host') || 'Host'}</span>
                       </div>
                     )}
                     {isBot && (
-                      <div className="flex items-center gap-1 text-xs text-neo-cyan">
-                        <Bot className="w-3 h-3" />
+                      <div className="flex items-center gap-1 text-xs xl:text-sm text-neo-cyan">
+                        <Bot className="w-3 h-3 xl:w-4 xl:h-4" />
                         <span className="font-bold uppercase">{t('common.bot') || 'Bot'}</span>
                       </div>
                     )}
@@ -178,15 +179,15 @@ export function EnhancedPlayerList({
           })}
         </AnimatePresence>
 
-        {/* Empty State */}
+        {/* Empty State - larger on desktop */}
         {filteredPlayers.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-8 text-center"
+            className="flex flex-col items-center justify-center py-8 xl:py-12 text-center"
           >
-            <Users className="w-12 h-12 text-neo-cream/20 mb-3" />
-            <p className="text-sm text-neo-cream/50">
+            <Users className="w-12 h-12 xl:w-16 xl:h-16 text-neo-cream/20 mb-3 xl:mb-4" />
+            <p className="text-sm xl:text-base text-neo-cream/50">
               {t('hostView.waitingForPlayers') || 'Waiting for players...'}
             </p>
           </motion.div>

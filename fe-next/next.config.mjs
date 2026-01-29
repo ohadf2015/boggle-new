@@ -2,6 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { withSentryConfig } from '@sentry/nextjs';
 import bundleAnalyzer from '@next/bundle-analyzer';
+import million from 'million/compiler';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -259,17 +260,32 @@ const nextConfig = {
 // Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
 // Source map upload options are optional (for better stack traces in Sentry dashboard)
 // Wrap with bundle analyzer (only active when ANALYZE=true)
-export default withBundleAnalyzer(
-  withSentryConfig(nextConfig, {
-    org: process.env.SENTRY_ORG,
-    project: process.env.SENTRY_PROJECT,
-    authToken: process.env.SENTRY_AUTH_TOKEN,
-    silent: true,
-    hideSourceMaps: true,
-    webpack: {
-      treeshake: {
-        removeDebugLogging: true,
-      },
+const sentryConfig = withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  hideSourceMaps: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
     },
-  })
+  },
+});
+
+// Million.js - React compiler for faster rendering (70% faster virtual DOM)
+// auto: true enables automatic optimization of all components
+// Disabled in development for faster HMR
+const millionConfig = million.next(
+  withBundleAnalyzer(sentryConfig),
+  {
+    auto: {
+      // Skip components that use unsupported patterns
+      skip: ['Header', 'ModeCard', 'IdleMascotWithEntrance'],
+      rsc: true, // Enable React Server Components support
+    },
+    mute: true, // Suppress console warnings in production
+  }
 );
+
+export default process.env.NODE_ENV === 'production' ? millionConfig : withBundleAnalyzer(sentryConfig);

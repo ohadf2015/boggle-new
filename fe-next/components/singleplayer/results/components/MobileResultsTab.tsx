@@ -151,8 +151,10 @@ export function MobileResultsTab({
           gameLanguage={results.language || 'en'}
           gameDuration={results.gameDuration}
           variant="compact"
+          isWinner={isWinner}
         />
       )}
+
     </div>
   );
 }

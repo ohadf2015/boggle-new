@@ -7,6 +7,19 @@ import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib
 const SENDGRID_TIMEOUT_MS = 10_000; // 10 seconds
 
 /**
+ * HTML entity encoding to prevent XSS in email HTML content
+ * This is critical for security when user input is rendered in HTML emails
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Fetch with timeout using AbortController
  */
 async function fetchWithTimeout(
@@ -108,16 +121,17 @@ async function sendEmailNotification(name: string, email: string, message: strin
           },
           {
             type: 'text/html',
+            // Security: Escape user input to prevent XSS in HTML emails
             value: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1a1a2e; border-bottom: 3px solid #FFE135; padding-bottom: 10px;">
                   New Contact Form Submission
                 </h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+                <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+                <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
                 <div style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border-radius: 8px;">
                   <strong>Message:</strong>
-                  <p style="white-space: pre-wrap;">${message}</p>
+                  <p style="white-space: pre-wrap;">${escapeHtml(message)}</p>
                 </div>
                 <p style="margin-top: 20px; color: #666; font-size: 12px;">
                   Sent via LexiClash Contact Form

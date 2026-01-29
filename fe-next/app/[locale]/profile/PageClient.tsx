@@ -146,8 +146,9 @@ export default function ProfilePageClient(): React.JSX.Element {
         isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="text-center py-12">
+        {/* Reduced padding for unauthenticated view */}
+        <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
+          <div className="text-center py-6 sm:py-8">
             <User className="mx-auto text-6xl text-gray-600 mb-4" />
             <h2 className={cn('text-2xl font-bold mb-2', isDarkMode ? 'text-white' : 'text-gray-900')}>
               {t('profile.title')}
@@ -364,11 +365,13 @@ export default function ProfilePageClient(): React.JSX.Element {
         <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
         <AutoHideHeader />
 
-        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full', isLandscape ? 'py-2' : 'py-4 lg:py-6')}>
+        {/* Reduced padding for desktop view */}
+        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full', isLandscape ? 'py-2' : 'py-3 lg:py-4')}>
           {/* Two-column layout on larger screens */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+          {/* Reduced gap: mobile 12px, lg 16px (was 16/24px) */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 lg:gap-4">
             {/* Left Column: Identity & Progress */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <ProfileHeader {...profileHeaderProps} />
               <ProfileXpSection profile={profile} isDarkMode={isDarkMode} />
               <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} />
@@ -380,7 +383,7 @@ export default function ProfilePageClient(): React.JSX.Element {
             </div>
 
             {/* Right Column: Stats & Achievements */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} delay={0.15} />
               <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />
               <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
@@ -388,7 +391,8 @@ export default function ProfilePageClient(): React.JSX.Element {
           </div>
 
           {/* Full-width sections below */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-4">
+          {/* Reduced margin: 12px (was 16px) */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-3">
             <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
           </motion.div>
 

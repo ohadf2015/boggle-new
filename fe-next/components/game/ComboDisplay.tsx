@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
@@ -143,6 +143,22 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
   const showMascot = isHighCombo && !compact;
+
+  // Track combo level changes for level-up effects
+  const prevComboLevelRef = useRef(comboLevel);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+
+  // Detect combo level increase and show level-up flash
+  useEffect(() => {
+    if (comboLevel > prevComboLevelRef.current && comboLevel >= 2) {
+      setShowLevelUp(true);
+      const timer = setTimeout(() => setShowLevelUp(false), 800);
+      prevComboLevelRef.current = comboLevel;
+      return () => clearTimeout(timer);
+    }
+    prevComboLevelRef.current = comboLevel;
+    return undefined;
+  }, [comboLevel]);
 
   // Get rarity-based colors
   const rarity = getComboRarity(comboLevel);
@@ -415,17 +431,58 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             </motion.div>
           )}
 
-          {/* Burst effect on combo increase */}
+          {/* Burst effect on combo increase - enhanced with double ring */}
           <motion.div
             key={`burst-${comboLevel}`}
             className="absolute inset-0 rounded-full pointer-events-none"
             initial={{ scale: 0.8, opacity: 0.8 }}
+            animate={{ scale: 2.5, opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            style={{
+              border: `3px solid ${rarityColors.burst}`,
+              boxShadow: `0 0 20px ${rarityColors.shadow}`,
+            }}
+          />
+          {/* Second burst ring - delayed for staggered effect */}
+          <motion.div
+            key={`burst2-${comboLevel}`}
+            className="absolute inset-0 rounded-full pointer-events-none"
+            initial={{ scale: 0.6, opacity: 0.6 }}
             animate={{ scale: 2, opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
             style={{
               border: `2px solid ${rarityColors.burst}`,
             }}
           />
+
+          {/* Level Up flash - appears above combo when leveling up */}
+          <AnimatePresence>
+            {showLevelUp && !skipSparkles && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                animate={{ opacity: 1, y: compact ? -28 : -35, scale: 1 }}
+                exit={{ opacity: 0, y: compact ? -40 : -50, scale: 0.8 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 500,
+                  damping: 25,
+                }}
+                className={cn(
+                  'absolute left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none z-20',
+                  compact ? 'text-[10px]' : 'text-xs',
+                  'font-black uppercase tracking-wider px-2 py-0.5 rounded-full',
+                  'border-2 border-neo-black shadow-hard-sm'
+                )}
+                style={{
+                  background: rarityColors.glow,
+                  color: rarity === 'common' || rarity === 'legendary' ? '#1a1a2e' : '#fff',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                }}
+              >
+                ⚡ +1
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Mascot celebration for high combos (5+) - positioned to the left, doesn't affect layout */}
           {showMascot && (

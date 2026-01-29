@@ -318,6 +318,7 @@ const sv = {
     "moreSettings": "Fler inställningar"
   },
   "share": {
+    "button": "Dela",
     "linkCopied": "Länk kopierad! 🔗",
     "copyError": "Gick inte - tryck igen",
     "inviteMessage": "Ordstrid pågår NU! Hoppa in 🔥",
@@ -1892,7 +1893,11 @@ const sv = {
   },
   "referral": {
     "milestoneTitle": "Vänmilstolpe!",
-    "milestoneMessage": "Fortsätt bjuda in vänner för fler belöningar!"
+    "milestoneMessage": "Fortsätt bjuda in vänner för fler belöningar!",
+    "teaser": {
+      "title": "Bjud in vänner, få XP",
+      "subtitle": "Få 100 XP för varje vän som går med!"
+    }
   },
   "coins": {
     "title": "Mynt & Belöningar",
@@ -2452,7 +2457,8 @@ const sv = {
     "behindRecord": "{diff} för att slå ditt rekord",
     "tiedWithRecord": "Lika med ditt rekord!",
     "challengeFriend": "Utmana en vän",
-    "shareHint": "Dela samma bräde med vänner"
+    "shareHint": "Dela samma bräde med vänner",
+    "winnerPrompt": "Du krossade det! Utmana dina vänner 😈"
   },
   "rules": {
     "pageTitle": "LexiClash: Ordstrid i Realtid",
@@ -2840,6 +2846,7 @@ const sv = {
       "scoreBreakdownTooltip": "Tryck för detaljer"
     },
     "results": {
+      "tapToCelebrate": "Tryck för att fira!",
       "targetWord": "Målordet",
       "betterLuckNextTime": "Bättre lycka nästa gång!",
       "nextChallengeIn": "Nästa utmaning om",
@@ -3156,6 +3163,10 @@ const sv = {
   "keyboardDesktopBadge": {
     "typeWords": "Skriv ord",
     "pressQuestion": "Tryck ? för genvägar"
+  },
+  "keyboardInlineHint": {
+    "message": "Skriv + Enter",
+    "fullMessage": "Skriv ord på tangentbordet och tryck Enter för att skicka"
   },
   "enterKeyHint": {
     "pressEnter": "Tryck Enter för att skicka"
@@ -3972,6 +3983,10 @@ const sv = {
       "hintAvailable": "Behöver du ett tips?",
       "hintUsed": "Prova det här ordet!",
       "noHints": "Inga fler tips tillgängliga"
+    },
+    "hints": {
+      "minLetters2": "2+ bokstäver",
+      "minLetters3": "3+ bokstäver"
     },
     "retry": {
       "title": "Nästan där!",

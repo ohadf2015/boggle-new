@@ -19,6 +19,20 @@ interface UseStudentClassroomActions {
 
 export type UseStudentClassroomReturn = UseStudentClassroomState & UseStudentClassroomActions;
 
+const INITIAL_STATE: UseStudentClassroomState = {
+  classroom: null,
+  classroomId: null,
+  isLoading: true,
+  error: null,
+};
+
+const EMPTY_STATE: UseStudentClassroomState = {
+  classroom: null,
+  classroomId: null,
+  isLoading: false,
+  error: null,
+};
+
 /**
  * Hook for getting the student's classroom from their membership
  *
@@ -32,22 +46,11 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
   const { isAuthenticated, user } = useAuth();
   const isMounted = useMounted();
 
-  const [state, setState] = useState<UseStudentClassroomState>({
-    classroom: null,
-    classroomId: null,
-    isLoading: true,
-    error: null,
-  });
+  const [state, setState] = useState<UseStudentClassroomState>(INITIAL_STATE);
 
-  // Fetch student's classroom
   const fetchClassroom = useCallback(async () => {
     if (!isAuthenticated || !user) {
-      setState({
-        classroom: null,
-        classroomId: null,
-        isLoading: false,
-        error: null,
-      });
+      setState(EMPTY_STATE);
       return;
     }
 
@@ -56,12 +59,7 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
 
       if (isMounted.current) {
         if (error) {
-          setState({
-            classroom: null,
-            classroomId: null,
-            isLoading: false,
-            error: error.message,
-          });
+          setState({ ...EMPTY_STATE, error: error.message });
         } else {
           setState({
             classroom: data,
@@ -74,32 +72,21 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
     } catch (err) {
       logger.error('Error in useStudentClassroom:', err);
       if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: 'Failed to load classroom',
-        }));
+        setState(prev => ({ ...prev, isLoading: false, error: 'Failed to load classroom' }));
       }
     }
   }, [isAuthenticated, user, isMounted]);
 
-  // Refresh function
   const refresh = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true }));
     await fetchClassroom();
   }, [fetchClassroom]);
 
-  // Initial fetch on mount and when auth changes
   useEffect(() => {
     if (isAuthenticated) {
       fetchClassroom();
     } else {
-      setState({
-        classroom: null,
-        classroomId: null,
-        isLoading: false,
-        error: null,
-      });
+      setState(EMPTY_STATE);
     }
   }, [isAuthenticated, fetchClassroom]);
 

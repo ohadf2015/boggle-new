@@ -436,11 +436,11 @@ function HostPreGameView({
                   t={t}
                   className="max-w-md"
                 />
-                {/* Invite Card - Sharing is secondary action */}
+                {/* Invite Card - Desktop-optimized layout with larger QR */}
                 <InviteCard
                   gameCode={gameCode}
                   t={t}
-                  compact
+                  desktop
                 />
               </>
             }

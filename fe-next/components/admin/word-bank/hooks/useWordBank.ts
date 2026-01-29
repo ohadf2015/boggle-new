@@ -285,22 +285,25 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
     [filters.language, fetchStats, getAuthHeaders]
   );
 
-  const bulkApprove = useCallback(
-    async (wordIds: string[]): Promise<BulkActionResult> => {
-      // Use AbortController with 60s timeout for bulk operations
+  /**
+   * Execute a bulk validation action (approve or reject) with timeout handling
+   */
+  const executeBulkAction = useCallback(
+    async (
+      wordIds: string[],
+      action: 'bulk-approve' | 'bulk-reject',
+      newStatus: ValidationStatus
+    ): Promise<BulkActionResult> => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000);
+      const actionName = action === 'bulk-approve' ? 'approve' : 'reject';
 
       try {
         const headers = await getAuthHeaders();
         const response = await fetch('/api/admin/daily-word/word-bank', {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            action: 'bulk-approve',
-            wordIds,
-            language: filters.language,
-          }),
+          body: JSON.stringify({ action, wordIds, language: filters.language }),
           signal: controller.signal,
         });
 
@@ -308,17 +311,14 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
 
         if (!response.ok) {
           const errorBody = await response.text().catch(() => 'No details');
-          throw new Error(`Failed to bulk approve (${response.status}): ${errorBody}`);
+          throw new Error(`Failed to bulk ${actionName} (${response.status}): ${errorBody}`);
         }
 
         const data = await response.json();
 
         if (data.success) {
-          // Update words in local state
           setWords(prev =>
-            prev.map(w =>
-              wordIds.includes(w.id) ? { ...w, validation_status: 'approved' as ValidationStatus } : w
-            )
+            prev.map(w => (wordIds.includes(w.id) ? { ...w, validation_status: newStatus } : w))
           );
           await fetchStats();
         }
@@ -326,7 +326,7 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
         return data.result || { success: data.success, affected: wordIds.length, errors: [] };
       } catch (err) {
         clearTimeout(timeoutId);
-        let errorMessage = 'Failed to bulk approve';
+        let errorMessage = `Failed to bulk ${actionName}`;
         if (err instanceof Error) {
           if (err.name === 'AbortError') {
             errorMessage = 'Request timed out after 60 seconds. Please try with fewer words.';
@@ -335,68 +335,26 @@ export function useWordBank(filters: WordBankFilters): UseWordBankResult {
           }
         }
         setError(errorMessage);
-        console.error('Bulk approve error:', errorMessage, err);
+        const errorDetails = err instanceof Error
+          ? { name: err.name, message: err.message, stack: err.stack }
+          : String(err);
+        console.error(`Bulk ${actionName} error:`, errorMessage, errorDetails);
         return { success: false, affected: 0, errors: [] };
       }
     },
     [filters.language, fetchStats, getAuthHeaders]
   );
 
+  const bulkApprove = useCallback(
+    (wordIds: string[]): Promise<BulkActionResult> =>
+      executeBulkAction(wordIds, 'bulk-approve', 'approved'),
+    [executeBulkAction]
+  );
+
   const bulkReject = useCallback(
-    async (wordIds: string[]): Promise<BulkActionResult> => {
-      // Use AbortController with 60s timeout for bulk operations
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000);
-
-      try {
-        const headers = await getAuthHeaders();
-        const response = await fetch('/api/admin/daily-word/word-bank', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            action: 'bulk-reject',
-            wordIds,
-            language: filters.language,
-          }),
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          const errorBody = await response.text().catch(() => 'No details');
-          throw new Error(`Failed to bulk reject (${response.status}): ${errorBody}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-          // Update words in local state
-          setWords(prev =>
-            prev.map(w =>
-              wordIds.includes(w.id) ? { ...w, validation_status: 'rejected' as ValidationStatus } : w
-            )
-          );
-          await fetchStats();
-        }
-
-        return data.result || { success: data.success, affected: wordIds.length, errors: [] };
-      } catch (err) {
-        clearTimeout(timeoutId);
-        let errorMessage = 'Failed to bulk reject';
-        if (err instanceof Error) {
-          if (err.name === 'AbortError') {
-            errorMessage = 'Request timed out after 60 seconds. Please try with fewer words.';
-          } else {
-            errorMessage = err.message;
-          }
-        }
-        setError(errorMessage);
-        console.error('Bulk reject error:', errorMessage, err);
-        return { success: false, affected: 0, errors: [] };
-      }
-    },
-    [filters.language, fetchStats, getAuthHeaders]
+    (wordIds: string[]): Promise<BulkActionResult> =>
+      executeBulkAction(wordIds, 'bulk-reject', 'rejected'),
+    [executeBulkAction]
   );
 
   const clearError = useCallback((): void => {

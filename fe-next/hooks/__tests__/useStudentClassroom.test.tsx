@@ -12,7 +12,14 @@ import { useStudentClassroom } from '../useStudentClassroom';
 
 // Mock the auth context
 const mockUser = { id: 'student-123' };
-const mockUseAuth = jest.fn(() => ({
+const mockUseAuth = jest.fn<
+  {
+    user: { id: string } | null;
+    isAuthenticated: boolean;
+    loading: boolean;
+  },
+  []
+>(() => ({
   user: mockUser,
   isAuthenticated: true,
   loading: false,

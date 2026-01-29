@@ -38,15 +38,12 @@ export async function diagnosticCheckClassroomCode(joinCode: string): Promise<{
   const suggestions: string[] = [];
 
   try {
-    // Try exact match first
-    const { data: classroom, error } = await supabase
-      .from('classrooms')
-      .select('id, name, teacher_id, created_at')
-      .eq('join_code', normalizedCode)
-      .maybeSingle();
+    // Try exact match using secure RPC function
+    // Note: This uses the secure lookup function that only returns matching classroom
+    const { data: classroomResult, error } = await supabase
+      .rpc('lookup_classroom_by_join_code', { p_join_code: normalizedCode });
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 is "no rows returned" which is not an error
+    if (error) {
       logger.error('Error checking classroom code:', error);
       return {
         exists: false,
@@ -57,12 +54,20 @@ export async function diagnosticCheckClassroomCode(joinCode: string): Promise<{
       };
     }
 
+    // RPC returns an array, get the first result
+    const classroom = Array.isArray(classroomResult) ? classroomResult[0] : classroomResult;
+
     if (classroom) {
       return {
         exists: true,
         rawCode: joinCode,
         normalizedCode,
-        classroom,
+        classroom: {
+          id: classroom.id,
+          name: classroom.name,
+          teacher_id: '', // Not exposed by RPC for security
+          created_at: '', // Not exposed by RPC for security
+        },
       };
     }
 
@@ -75,22 +80,8 @@ export async function diagnosticCheckClassroomCode(joinCode: string): Promise<{
       suggestions.push('Code can only contain letters (A-Z) and numbers (2-9)');
     }
 
-    // Check for similar codes (Levenshtein distance = 1)
-    const { data: similarCodes } = await supabase
-      .from('classrooms')
-      .select('join_code')
-      .limit(100);
-
-    if (similarCodes && similarCodes.length > 0) {
-      const similar = similarCodes
-        .map(c => c.join_code)
-        .filter(code => levenshteinDistance(normalizedCode, code) === 1)
-        .slice(0, 3);
-
-      if (similar.length > 0) {
-        suggestions.push(`Did you mean: ${similar.join(', ')}?`);
-      }
-    }
+    // Note: Similar code suggestions disabled for security
+    // (would require access to all classroom codes which is now restricted)
 
     if (suggestions.length === 0) {
       suggestions.push('Double-check the code with your teacher');

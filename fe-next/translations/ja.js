@@ -318,6 +318,7 @@ const ja = {
     "moreSettings": "その他の設定"
   },
   "share": {
+    "button": "シェア",
     "linkCopied": "リンクコピー完了！🔗",
     "copyError": "失敗 - もう一度タップ",
     "inviteMessage": "ワードバトル開催中！参加して 🔥",
@@ -1892,7 +1893,11 @@ const ja = {
   },
   "referral": {
     "milestoneTitle": "友達のマイルストーン！",
-    "milestoneMessage": "友達を招待してもっと報酬を獲得しよう！"
+    "milestoneMessage": "友達を招待してもっと報酬を獲得しよう！",
+    "teaser": {
+      "title": "友達を招待してXPを獲得",
+      "subtitle": "参加した友達ごとに100 XPをゲット！"
+    }
   },
   "coins": {
     "title": "コイン＆報酬",
@@ -2452,7 +2457,8 @@ const ja = {
     "behindRecord": "記録を破るまであと{diff}",
     "tiedWithRecord": "記録と同点！",
     "challengeFriend": "友だちに挑戦",
-    "shareHint": "同じボードを友達とシェア"
+    "shareHint": "同じボードを友達とシェア",
+    "winnerPrompt": "圧勝！友達に挑戦しよう 😈"
   },
   "rules": {
     "pageTitle": "LexiClash: リアルタイム単語バトル",
@@ -2840,6 +2846,7 @@ const ja = {
       "scoreBreakdownTooltip": "詳細はタップ"
     },
     "results": {
+      "tapToCelebrate": "タップしてお祝い！",
       "targetWord": "目標単語",
       "betterLuckNextTime": "次回は頑張って！",
       "nextChallengeIn": "次のチャレンジまで",
@@ -3156,6 +3163,10 @@ const ja = {
   "keyboardDesktopBadge": {
     "typeWords": "単語を入力",
     "pressQuestion": "? でショートカット"
+  },
+  "keyboardInlineHint": {
+    "message": "入力 + Enter",
+    "fullMessage": "キーボードで単語を入力し、Enterで送信"
   },
   "enterKeyHint": {
     "pressEnter": "Enterで送信"
@@ -3972,6 +3983,10 @@ const ja = {
       "hintAvailable": "ヒントが必要？",
       "hintUsed": "この言葉を試してみて！",
       "noHints": "ヒントはもうありません"
+    },
+    "hints": {
+      "minLetters2": "2文字以上",
+      "minLetters3": "3文字以上"
     },
     "retry": {
       "title": "もう少し！",

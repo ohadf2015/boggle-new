@@ -145,7 +145,9 @@ describe('LandingView - Tutorial Button Z-Index', () => {
 
     // Find tutorial button by aria-label
     const tutorialButton = screen.getByLabelText('landing.tutorial');
-    const tutorialClasses = tutorialButton.className;
+    // The z-index and fixed positioning are on the wrapper div, not the button itself
+    const tutorialWrapper = tutorialButton.parentElement;
+    const tutorialClasses = tutorialWrapper?.className || '';
 
     // Find GlobalBottomNav
     const bottomNav = screen.getByLabelText('nav.bottomNavigation');
@@ -177,19 +179,19 @@ describe('LandingView - Tutorial Button Z-Index', () => {
 
     // Find tutorial button
     const tutorialButton = screen.getByLabelText('landing.tutorial');
-    const tutorialClasses = tutorialButton.className;
+    // The fixed positioning and bottom classes are on the wrapper div, not the button itself
+    const tutorialWrapper = tutorialButton.parentElement;
+    const tutorialClasses = tutorialWrapper?.className || '';
 
     // On mobile (without sm: breakpoint), tutorial button should account for GlobalBottomNav
     // GlobalBottomNav is 64px tall (h-16) so tutorial button should be positioned higher
     // Expected: bottom should be at least 64px + 1rem (16px) = 80px minimum
-    // Currently failing because button uses bottom-[max(env(safe-area-inset-bottom,0px),1rem)]
-    // which is only 1rem (16px), causing it to overlap with the 64px nav bar
 
     expect(tutorialClasses).toContain('fixed');
     expect(tutorialClasses).toContain('bottom-');
 
     // Check if position accounts for nav height on mobile
-    // Should be sm:bottom-24 (for footer) OR mobile should be higher than just 1rem
+    // Should be bottom-20 (80px) for mobile with nav, sm:bottom-24 for footer
     const hasProperMobileBottom =
       tutorialClasses.includes('bottom-20') || // 80px (64px nav + 16px margin)
       tutorialClasses.includes('bottom-24'); // 96px (safe margin)
@@ -201,7 +203,9 @@ describe('LandingView - Tutorial Button Z-Index', () => {
     render(<LandingView />);
 
     const tutorialButton = screen.getByLabelText('landing.tutorial');
-    const tutorialClasses = tutorialButton.className;
+    // The z-index is on the wrapper div, not the button itself
+    const tutorialWrapper = tutorialButton.parentElement;
+    const tutorialClasses = tutorialWrapper?.className || '';
 
     // Tutorial button needs z-index > 50 (GlobalBottomNav's z-index)
     // Extract z-index from className

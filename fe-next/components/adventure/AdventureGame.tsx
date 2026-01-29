@@ -239,10 +239,12 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Word validation hook (must come before selection hook which depends on isValidating)
     // Pass tiles for score calculation with special tile multipliers (gold 3x, rainbow 1.25x)
+    // minWordLength comes from levelConfig (World 1 uses 2, others default to 3)
+    const minWordLength = levelConfig.minWordLength ?? 3;
     const { validateWord, isValidating } = useAdventureWordValidation({
       grid: initialGrid,
       language: language || 'en',
-      minWordLength: 3,
+      minWordLength,
       foundWords: gameState.wordsFound,
       tiles: tiles2D,
     });
@@ -600,7 +602,8 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleWordSubmit = useCallback(
       async (_word: string, _indices: number[]) => {
         // Use currentWord and getPath() from selection hook for validated path
-        if (!isPlaying || isPaused || currentWord.length < 3 || isValidating) return;
+        // minWordLength from levelConfig (World 1 = 2, others = 3)
+        if (!isPlaying || isPaused || currentWord.length < minWordLength || isValidating) return;
 
         // Clear previous timeouts to prevent stale state updates
         if (validationErrorTimeoutRef.current) {
@@ -691,7 +694,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength]
     );
 
     // Handle level complete continue
@@ -839,6 +842,28 @@ const AdventureGame = memo<AdventureGameProps>(
               comboCount={gameState.comboCount}
               className="absolute top-[10%] left-1/2 -translate-x-1/2 z-50"
             />
+
+            {/* Minimum Word Length Hint - Shows when selecting but not yet meeting minimum */}
+            {selectedIndices.length > 0 && selectedIndices.length < minWordLength && (
+              <div
+                data-testid="min-word-hint"
+                className={cn(
+                  'px-3 py-1 rounded-full',
+                  'bg-neo-white/10 border border-neo-white/20',
+                  'text-neo-white/70 text-xs font-medium',
+                  'flex items-center gap-1.5'
+                )}
+              >
+                <span>
+                  {minWordLength === 2
+                    ? t('adventure.hints.minLetters2') || '2+ letters'
+                    : t('adventure.hints.minLetters3') || '3+ letters'}
+                </span>
+                <span className="font-bold text-neo-lime">
+                  {selectedIndices.length}/{minWordLength}
+                </span>
+              </div>
+            )}
 
             {/* Feedback Container - Minimal height, absolute positioning prevents layout shift */}
             <div

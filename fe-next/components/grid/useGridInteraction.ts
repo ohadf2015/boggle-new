@@ -413,13 +413,15 @@ export function useGridInteraction({
   }, [interactive, selectedCells, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells, onSingleTapDetected]);
 
   // Click-to-select handler for desktop
+  // Desktop UX improvement: Longer double-click window (500ms) makes it easier
+  // to select multiple cells without accidentally submitting
   const handleCellClick = useCallback((rowIndex: number, colIndex: number, letter: string) => {
     const now = Date.now();
     const timeSinceLastClick = now - lastClickTimeRef.current;
     const sameCell = lastClickCellRef.current?.row === rowIndex && lastClickCellRef.current?.col === colIndex;
 
-    // Double-click = submit
-    if (sameCell && timeSinceLastClick < 300 && selectedCells.length > 0) {
+    // Double-click on same cell = submit (500ms window for easier multi-cell selection)
+    if (sameCell && timeSinceLastClick < 500 && selectedCells.length >= 2) {
       submitWord();
       lastClickTimeRef.current = 0;
       lastClickCellRef.current = null;
@@ -439,10 +441,12 @@ export function useGridInteraction({
     const existingIndex = selectedCells.findIndex(c => c.row === rowIndex && c.col === colIndex);
 
     if (existingIndex !== -1) {
+      // Clicking last selected cell with 2+ letters = submit
       if (existingIndex === selectedCells.length - 1 && selectedCells.length >= 2) {
         submitWord();
         return;
       }
+      // Clicking earlier cell = backtrack to that position
       setSelectedCells(selectedCells.slice(0, existingIndex + 1));
       vibrateBacktrack(fireRoundActive);
       return;

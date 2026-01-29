@@ -250,6 +250,41 @@ describe('SinglePlayerView - preset=bots navigation bug', () => {
     }, { timeout: 3000 });
   });
 
+  it('FIXED: should start bots game after autoStart=practice finished and user navigates to preset=bots', async () => {
+    // This is the EXACT bug that was fixed:
+    // 1. User starts with autoStart=practice
+    // 2. User finishes practice, now at 'results' phase
+    // 3. User clicks "Play Against Bots" which navigates to ?preset=bots
+    // 4. FIX: hasAutoStartedRef.current is reset to false when entering results phase
+    //    so the preset=bots param is processed correctly!
+
+    // Start with autoStart=practice
+    mockSearchParams.set('autoStart', 'practice');
+
+    const { rerender } = render(<SinglePlayerView />);
+
+    // Should immediately start playing (practice mode started)
+    await waitFor(() => {
+      expect(screen.getByTestId('game')).toBeInTheDocument();
+    });
+
+    // Now simulate: user finished game, and clicks "Play Against Bots"
+    // This changes the URL to ?preset=bots (removing autoStart)
+    mockSearchParams = new Map();
+    mockSearchParams.set('preset', 'bots');
+
+    // Rerender simulating client-side navigation
+    await act(async () => {
+      rerender(<SinglePlayerView />);
+    });
+
+    // FIX: hasAutoStartedRef.current is now reset to false when game ends and enters results phase
+    // So the preset=bots param is processed and the game restarts with bots
+    await waitFor(() => {
+      expect(screen.getByTestId('game')).toBeInTheDocument();
+    }, { timeout: 3000 });
+  });
+
   it('should NOT interrupt an ongoing game when preset param appears', async () => {
     // If somehow a preset param appears while playing, don't restart the game
     mockSearchParams.set('preset', 'bots');

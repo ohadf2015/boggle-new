@@ -259,12 +259,17 @@ export function getLevelConfig(
         : ((level - 4) as 1 | 2 | 3);
   const isBossLevel = level === LEVELS_PER_WORLD; // Level 7
 
+  // World 1 is tutorial - allow 2-letter words for easier introduction
+  // All other worlds require standard 3-letter minimum
+  const minWordLength: 2 | 3 = world === 1 ? 2 : 3;
+
   // Build config
   const config: LevelConfig = {
     world,
     level,
     gridSize,
     timerSeconds,
+    minWordLength,
     objectives,
     specialTiles,
     difficulty,

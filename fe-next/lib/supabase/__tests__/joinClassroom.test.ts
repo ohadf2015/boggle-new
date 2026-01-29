@@ -1,8 +1,8 @@
 /**
  * Test suite for classroom join functionality
  *
- * Bug fix: RLS policy was blocking students from looking up classrooms by join_code
- * before they were members. Added policy: "Anyone can lookup classroom by join code"
+ * Security fix: Uses RPC function lookup_classroom_by_join_code instead of
+ * direct SELECT to prevent classroom enumeration attacks.
  */
 
 import { joinClassroom } from '../teacher';
@@ -13,11 +13,13 @@ import { supabase } from '@/lib/supabase';
 jest.mock('@/lib/supabase', () => ({
   supabase: {
     from: jest.fn(),
+    rpc: jest.fn(),
   },
 }));
 
-// Access the mocked function after the mock is set up
+// Access the mocked functions after the mock is set up
 const mockFrom = (supabase?.from || jest.fn()) as jest.MockedFunction<any>;
+const mockRpc = ((supabase as any)?.rpc || jest.fn()) as jest.MockedFunction<any>;
 
 describe('joinClassroom', () => {
   const mockStudentId = 'student-123';
@@ -29,29 +31,24 @@ describe('joinClassroom', () => {
   describe('Bug: Code "4HCDMS" validation', () => {
     it('should accept valid join code "4HCDMS" that exists in database', async () => {
       // GIVEN: A valid classroom with code "4HCDMS" exists
-      const mockClassroom = { id: 'classroom-456' };
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockSingle = jest.fn().mockResolvedValue({
-        data: mockClassroom,
-        error: null
+      // The RPC function returns an array of matching classrooms
+      const mockClassroom = { id: 'classroom-456', name: 'Test Class', language: 'en' };
+
+      mockRpc.mockResolvedValue({
+        data: [mockClassroom],
+        error: null,
       });
+
       const mockMaybeSingle = jest.fn().mockResolvedValue({
         data: null,
-        error: null
+        error: null,
       });
       const mockInsert = jest.fn().mockResolvedValue({
-        error: null
+        error: null,
       });
 
       mockFrom.mockImplementation((table: string) => {
-        if (table === 'classrooms') {
-          return {
-            select: mockSelect.mockReturnThis(),
-            eq: mockEq.mockReturnThis(),
-            maybeSingle: mockSingle,
-          } as any;
-        } else if (table === 'classroom_memberships') {
+        if (table === 'classroom_memberships') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
@@ -69,24 +66,18 @@ describe('joinClassroom', () => {
       expect(result.error).toBeNull();
       expect(result.data?.classroom_id).toBe('classroom-456');
 
-      // Verify code was uppercased in query
-      expect(mockEq).toHaveBeenCalledWith('join_code', '4HCDMS');
+      // Verify RPC was called with correct parameters
+      expect(mockRpc).toHaveBeenCalledWith('lookup_classroom_by_join_code', {
+        p_join_code: '4HCDMS',
+      });
     });
 
     it('should return error when code "4HCDMS" does not exist in database', async () => {
       // GIVEN: No classroom with code "4HCDMS" exists
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockSingle = jest.fn().mockResolvedValue({
-        data: null,
-        error: null  // maybeSingle returns null error when no rows found
+      mockRpc.mockResolvedValue({
+        data: [], // Empty array means no classroom found
+        error: null,
       });
-
-      mockFrom.mockImplementation(() => ({
-        select: mockSelect,
-        eq: mockEq,
-        maybeSingle: mockSingle,
-      } as any));
 
       // WHEN: Student tries to join with non-existent code
       const result = await joinClassroom('4HCDMS', mockStudentId);
@@ -99,29 +90,23 @@ describe('joinClassroom', () => {
 
     it('should handle lowercase code input by converting to uppercase', async () => {
       // GIVEN: Classroom exists with code "4HCDMS" (uppercase)
-      const mockClassroom = { id: 'classroom-789' };
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockSingle = jest.fn().mockResolvedValue({
-        data: mockClassroom,
-        error: null
+      const mockClassroom = { id: 'classroom-789', name: 'Test Class', language: 'en' };
+
+      mockRpc.mockResolvedValue({
+        data: [mockClassroom],
+        error: null,
       });
+
       const mockMaybeSingle = jest.fn().mockResolvedValue({
         data: null,
-        error: null
+        error: null,
       });
       const mockInsert = jest.fn().mockResolvedValue({
-        error: null
+        error: null,
       });
 
       mockFrom.mockImplementation((table: string) => {
-        if (table === 'classrooms') {
-          return {
-            select: mockSelect.mockReturnThis(),
-            eq: mockEq.mockReturnThis(),
-            maybeSingle: mockSingle,
-          } as any;
-        } else if (table === 'classroom_memberships') {
+        if (table === 'classroom_memberships') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
@@ -137,42 +122,33 @@ describe('joinClassroom', () => {
 
       // THEN: Should convert to uppercase and find the classroom
       expect(result.error).toBeNull();
-      expect(mockEq).toHaveBeenCalledWith('join_code', '4HCDMS');
+      expect(mockRpc).toHaveBeenCalledWith('lookup_classroom_by_join_code', {
+        p_join_code: '4HCDMS',
+      });
     });
 
     it('should validate code format (6 alphanumeric characters)', async () => {
       // GIVEN: Various invalid code formats
       const invalidCodes = [
-        '4HCD',      // Too short
-        '4HCDMSS',   // Too long
-        '4HCD MS',   // Contains space
-        '4HCD-S',    // Contains dash
-        '',          // Empty
+        { code: '4HCD', expectedError: '6 characters' }, // Too short
+        { code: '4HCDMSS', expectedError: '6 characters' }, // Too long
+        { code: '4HCD MS', expectedError: '6 characters' }, // Contains space (after trim)
+        { code: '4HCD-S', expectedError: 'letters and numbers only' }, // Contains dash
+        { code: '', expectedError: '6 characters' }, // Empty
       ];
 
-      for (const invalidCode of invalidCodes) {
+      for (const { code, expectedError } of invalidCodes) {
         // WHEN: Student enters invalid code format
-        // NOTE: Current implementation doesn't validate format before DB query
-        // This test documents expected behavior (should add validation)
+        const result = await joinClassroom(code, mockStudentId);
 
-        const mockSelect = jest.fn().mockReturnThis();
-        const mockEq = jest.fn().mockReturnThis();
-        const mockSingle = jest.fn().mockResolvedValue({
-          data: null,
-          error: { message: 'No rows returned' }
-        });
-
-        mockFrom.mockImplementation(() => ({
-          select: mockSelect,
-          eq: mockEq,
-          maybeSingle: mockSingle,
-        }));
-
-        const result = await joinClassroom(invalidCode, mockStudentId);
-
-        // THEN: Should return error
+        // THEN: Should return validation error without hitting the database
         expect(result.error).not.toBeNull();
-        expect(result.error?.message).toBeTruthy();
+        expect(result.error?.message.toLowerCase()).toContain(expectedError.toLowerCase());
+
+        // RPC should not be called for invalid formats
+        expect(mockRpc).not.toHaveBeenCalled();
+
+        jest.clearAllMocks();
       }
     });
   });
@@ -180,28 +156,21 @@ describe('joinClassroom', () => {
   describe('Existing member scenarios', () => {
     it('should handle student already being a member gracefully', async () => {
       // GIVEN: Student is already a member of the classroom
-      const mockClassroom = { id: 'classroom-999' };
+      const mockClassroom = { id: 'classroom-999', name: 'Test Class', language: 'en' };
       const mockExisting = { id: 'membership-123' };
 
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockSingle = jest.fn().mockResolvedValue({
-        data: mockClassroom,
-        error: null
+      mockRpc.mockResolvedValue({
+        data: [mockClassroom],
+        error: null,
       });
+
       const mockMaybeSingle = jest.fn().mockResolvedValue({
         data: mockExisting,
-        error: null
+        error: null,
       });
 
       mockFrom.mockImplementation((table: string) => {
-        if (table === 'classrooms') {
-          return {
-            select: mockSelect.mockReturnThis(),
-            eq: mockEq.mockReturnThis(),
-            maybeSingle: mockSingle,
-          } as any;
-        } else if (table === 'classroom_memberships') {
+        if (table === 'classroom_memberships') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
@@ -217,6 +186,23 @@ describe('joinClassroom', () => {
       // THEN: Should return success without creating duplicate membership
       expect(result.error).toBeNull();
       expect(result.data?.classroom_id).toBe('classroom-999');
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle RPC errors gracefully', async () => {
+      // GIVEN: RPC call fails
+      mockRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'Database connection failed' },
+      });
+
+      // WHEN: Student tries to join
+      const result = await joinClassroom('4HCDMS', mockStudentId);
+
+      // THEN: Should return error
+      expect(result.error).not.toBeNull();
+      expect(result.error?.message).toBe('Database connection failed');
     });
   });
 });

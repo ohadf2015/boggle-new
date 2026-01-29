@@ -318,6 +318,7 @@ const en = {
     "moreSettings": "More Settings"
   },
   "share": {
+    "button": "Share",
     "linkCopied": "Link copied! 🔗",
     "copyError": "Couldn't copy - tap again",
     "inviteMessage": "Word battle happening NOW! Jump in 🔥",
@@ -2066,7 +2067,11 @@ const en = {
   },
   "referral": {
     "milestoneTitle": "Friend Milestone!",
-    "milestoneMessage": "Keep inviting friends to earn more rewards!"
+    "milestoneMessage": "Keep inviting friends to earn more rewards!",
+    "teaser": {
+      "title": "Invite Friends, Earn XP",
+      "subtitle": "Get 100 XP for each friend who joins!"
+    }
   },
   "coins": {
     "title": "Coins & Rewards",
@@ -2455,7 +2460,8 @@ const en = {
     "behindRecord": "{diff} to beat record",
     "tiedWithRecord": "Tied!",
     "challengeFriend": "Challenge a Friend",
-    "shareHint": "Share the same board with friends"
+    "shareHint": "Share the same board with friends",
+    "winnerPrompt": "You crushed it! Challenge your friends 😈"
   },
   "rules": {
     "pageTitle": "LexiClash: Real-Time Word Battle",
@@ -2835,6 +2841,7 @@ const en = {
       "scoreBreakdownTooltip": "Tap for details"
     },
     "results": {
+      "tapToCelebrate": "Tap to celebrate!",
       "targetWord": "Target Word",
       "betterLuckNextTime": "Better luck next time!",
       "nextChallengeIn": "Next challenge in",
@@ -3015,6 +3022,10 @@ const en = {
   "keyboardDesktopBadge": {
     "typeWords": "Type words",
     "pressQuestion": "Press ? for shortcuts"
+  },
+  "keyboardInlineHint": {
+    "message": "Type + Enter",
+    "fullMessage": "Type words on your keyboard and press Enter to submit"
   },
   "enterKeyHint": {
     "pressEnter": "Press Enter to submit"
@@ -3949,6 +3960,10 @@ const en = {
       "hintAvailable": "Need a hint?",
       "hintUsed": "Try this word!",
       "noHints": "No more hints available"
+    },
+    "hints": {
+      "minLetters2": "2+ letters",
+      "minLetters3": "3+ letters"
     },
     "retry": {
       "title": "Almost There!",

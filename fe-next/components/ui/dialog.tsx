@@ -142,7 +142,8 @@ const DialogHeader = ({
   return (
     <div
       className={cn(
-        "flex flex-col space-y-1.5 p-4 sm:p-6 lg:p-8",
+        // Reduced padding: mobile 12px, sm 16px, lg 20px (was 16/24/32)
+        "flex flex-col space-y-1 p-3 sm:p-4 lg:p-5",
         bgClass,
         "border-b-3 border-neo-black",
         "text-neo-black",
@@ -163,7 +164,8 @@ const DialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 lg:gap-3",
-      "p-4 sm:p-6 lg:p-8 pt-0 sm:pt-0 lg:pt-0",
+      // Reduced padding: mobile 12px, sm 16px, lg 20px (was 16/24/32)
+      "p-3 sm:p-4 lg:p-5 pt-0 sm:pt-0 lg:pt-0",
       className
     )}
     {...props}
@@ -214,7 +216,8 @@ const DialogBody = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "p-4 sm:p-6 lg:p-8",
+      // Reduced padding: mobile 12px, sm 16px, lg 20px (was 16/24/32)
+      "p-3 sm:p-4 lg:p-5",
       className
     )}
     {...props}

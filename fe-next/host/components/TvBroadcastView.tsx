@@ -191,9 +191,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
       {/* Join Bar (Kahoot-style) - Always visible, even in fullscreen */}
       <motion.div
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
       >
         <TvJoinBar
           gameCode={gameCode}
