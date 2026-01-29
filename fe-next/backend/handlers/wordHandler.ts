@@ -4,7 +4,9 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, LeaderboardEntry, WordDetail, Language, Avatar } from '@/shared/types';
+import type { WordDetail, Language, Avatar } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
+import type { LeaderboardPlayer } from '../modules/scoreManager.js';
 
 import {
   getGame,
@@ -34,11 +36,11 @@ import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForSco
 import { emitError, ErrorMessages, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { inc, incPerGame } from '../utils/metrics.js';
-import botManager from '../modules/botManager.js';
+import { addWordToBlacklist } from '../modules/botManager.js';
 import logger from '../utils/logger.js';
 import { isSocketMigrating, processLongWordEngagement } from './';
 import { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } from '../utils/socketValidation.js';
-import { spamDetector, PenaltyTier, InvalidReason } from '../modules/spamDetector.js';
+import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 
 // Rate limit weights
@@ -113,8 +115,8 @@ interface GameUserData {
  * @param reason - Reason for invalidity
  * @param game - Game object (for score updates)
  */
-function handleSpamDetection(socket: Socket, gameCode: string, username: string, word: string, reason: string, game: Game): void {
-  const result: SpamResult = spamDetector.recordInvalidWord(gameCode, username, word, reason);
+function handleSpamDetection(socket: Socket, gameCode: string, username: string, word: string, reason: InvalidReasonValue, game: GameState): void {
+  const result = spamDetector.recordInvalidWord(gameCode, username, word, reason);
 
   // Only emit events when tier changes or penalties apply
   switch (result.tier) {
@@ -257,7 +259,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           gameCode,
           username,
           word,
-          timeSinceEnd: Date.now() - game.gameEndedAt
+          timeSinceEnd: game.gameEndedAt ? Date.now() - game.gameEndedAt : 0
         });
       }
 
@@ -303,7 +305,12 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Validate word on board
+      // Validate word on board (skip if no grid - shouldn't happen in normal gameplay)
+      if (!game.letterGrid) {
+        logger.warn('WORD', 'No letter grid available for word validation', { gameCode });
+        await releaseGraceLockIfNeeded();
+        return;
+      }
       const isOnBoard = await isWordOnBoardAsync(normalizedWord, game.letterGrid, game.letterPositions);
       if (!isOnBoard) {
         inc('wordNotOnBoard');
@@ -340,15 +347,15 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary, fireRoundActive);
+        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary === true, fireRoundActive === true);
       } else {
-        handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive);
+        handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive === true);
       }
 
       // Update leaderboard - reduced throttle for more responsive score updates
       // Using 200ms as a balance between responsiveness and network efficiency
       const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '200');
-      getLeaderboardThrottled(gameCode, (leaderboard: LeaderboardEntry[]) => {
+      getLeaderboardThrottled(gameCode, (leaderboard: LeaderboardPlayer[]) => {
         broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
       }, lbThrottleMs);
 
@@ -391,35 +398,40 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
     const { word, voteType, gameCode: providedGameCode } = validation.data as SubmitWordVotePayload;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const username = getUsernameBySocketId(socket.id);
+    const rawUsername = getUsernameBySocketId(socket.id);
 
     if (!gameCode) return;
 
     const game = getGame(gameCode);
     if (!game) return;
+    if (!rawUsername) return;
 
-    const userData: GameUserData | undefined = game.users?.[username];
+    const username: string = rawUsername;
+    const userData = game.users?.[username];
     const userId = userData?.authUserId || null;
-    const guestId = (game.users?.[username] as GameUserData & { guestTokenHash?: string })?.guestTokenHash || null;
+    const guestId = userData?.guestTokenHash || null;
 
     if (!userId && !guestId) {
       logger.debug('VOTE', `No voter identifier for ${username}`);
       return;
     }
 
-    const result: VoteResult = await recordVote({
+    // Map 'valid'/'invalid' to 'like'/'dislike' for the community word system
+    const mappedVoteType: 'like' | 'dislike' = voteType === 'valid' ? 'like' : 'dislike';
+
+    const result = await recordVote({
       word,
       language: game.language || 'en',
       userId,
       guestId,
       gameCode,
-      voteType,
+      voteType: mappedVoteType,
       submitter: data.submittedBy || 'unknown',
       isBotWord: data.isBot === true
     });
 
     if (result.success) {
-      updatePendingCache(word, game.language || 'en', voteType);
+      updatePendingCache(word, game.language || 'en', mappedVoteType);
       socket.emit('voteRecorded', { word, success: true });
       logger.info('VOTE', `${username} voted ${voteType} on "${word}"`);
 
@@ -450,6 +462,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
     const username = getUsernameBySocketId(socket.id);
 
     if (!gameCode) return;
+    if (!username) return; // Username is required for peer validation
 
     const game = getGame(gameCode);
     if (!game) return;
@@ -487,7 +500,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
 // Helper functions
 
-function handleValidatedWord(io: Server, socket: Socket, game: Game, gameCode: string, username: string, normalizedWord: string, comboLevel: number, isInDictionary: boolean, fireRoundActive: boolean = false): void {
+function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, comboLevel: number, isInDictionary: boolean, fireRoundActive: boolean = false): void {
   const safeComboLevel = Math.max(0, Math.min(10, parseInt(String(comboLevel), 10) || 0));
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
@@ -516,7 +529,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: Game, gameCode: s
 
   // Save to database if dictionary word
   if (isInDictionary && isSupabaseConfigured()) {
-    const userData: GameUserData | undefined = game.users?.[username];
+    const userData = game.users?.[username];
     savePlayerWord({
       word: normalizedWord,
       language: game.language || 'en',
@@ -565,7 +578,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: Game, gameCode: s
 
   // Process long word engagement (8+ letters triggers mystery reward chance)
   if (normalizedWord.length >= 8) {
-    const userData: GameUserData | undefined = game.users?.[username];
+    const userData = game.users?.[username];
     if (userData?.authUserId) {
       processLongWordEngagement(socket, userData.authUserId, normalizedWord, gameCode)
         .catch((err: Error) => logger.debug('ENGAGEMENT', `Long word engagement error: ${err.message}`));
@@ -573,7 +586,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: Game, gameCode: s
   }
 }
 
-function handlePendingWord(socket: Socket, game: Game, gameCode: string, username: string, normalizedWord: string, comboLevel: number, fireRoundActive: boolean = false): void {
+function handlePendingWord(socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, comboLevel: number, fireRoundActive: boolean = false): void {
   const safeComboLevel = Math.max(0, Math.min(10, parseInt(String(comboLevel), 10) || 0));
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
@@ -609,9 +622,10 @@ function handlePendingWord(socket: Socket, game: Game, gameCode: string, usernam
   });
 }
 
-function handleWordBecameValid(io: Server, socket: Socket, game: Game, gameCode: string, word: string, submitter?: string): void {
+function handleWordBecameValid(io: Server, socket: Socket, game: GameState, gameCode: string, word: string, submitter?: string): void {
   if (submitter && game.playerWordDetails?.[submitter]) {
-    const wordDetail = game.playerWordDetails[submitter].find((wd: WordDetail) => wd.word === word);
+    const wordDetails = game.playerWordDetails[submitter] as WordDetail[];
+    const wordDetail = wordDetails.find((wd: WordDetail) => wd.word === word);
     if (wordDetail && wordDetail.validated !== true) {
       const potentialScore = wordDetail.score || calculateWordScore(word, wordDetail.comboLevel || 0);
 
@@ -624,7 +638,7 @@ function handleWordBecameValid(io: Server, socket: Socket, game: Game, gameCode:
 
       logger.info('VOTE', `Word "${word}" validated! Awarding ${potentialScore} to ${submitter}`);
 
-      const submitterData: GameUserData | undefined = game.users?.[submitter];
+      const submitterData = game.users?.[submitter];
       if (submitterData?.socketId) {
         const submitterSocket = getSocketById(io, submitterData.socketId);
         if (submitterSocket) {
@@ -644,7 +658,7 @@ function handleWordBecameValid(io: Server, socket: Socket, game: Game, gameCode:
   });
 }
 
-function handlePeerRejection(io: Server, gameCode: string, game: Game, result: PeerValidationResult): void {
+function handlePeerRejection(io: Server, gameCode: string, game: GameState, result: PeerValidationResult): void {
   const scoreRemoved = removePeerRejectedWordScore(gameCode, result.word, result.submitter);
 
   logger.info('PEER_VALIDATION', `Word "${result.word}" rejected. Removed ${scoreRemoved} from ${result.submitter}`);
@@ -656,7 +670,7 @@ function handlePeerRejection(io: Server, gameCode: string, game: Game, result: P
 
   // Blacklist bot words
   if (result.isBot && game.language) {
-    botManager.addWordToBlacklist(result.word, game.language)
+    addWordToBlacklist(result.word, game.language)
       .then((success: boolean) => {
         if (success) {
           logger.info('BOT', `Bot word "${result.word}" blacklisted for ${game.language}`);
@@ -674,7 +688,7 @@ function handlePeerRejection(io: Server, gameCode: string, game: Game, result: P
     scoreRemoved
   });
 
-  const leaderboard: LeaderboardEntry[] = getLeaderboard(gameCode);
+  const leaderboard: LeaderboardPlayer[] = getLeaderboard(gameCode);
   broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
 }
 
