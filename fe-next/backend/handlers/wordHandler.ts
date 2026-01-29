@@ -459,10 +459,11 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
     const { word, isValid, gameCode: providedGameCode } = validation.data as SubmitPeerValidationVotePayload;
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const username = getUsernameBySocketId(socket.id);
+    const rawUsername = getUsernameBySocketId(socket.id);
 
     if (!gameCode) return;
-    if (!username) return; // Username is required for peer validation
+    if (!rawUsername) return; // Username is required for peer validation
+    const username: string = rawUsername;
 
     const game = getGame(gameCode);
     if (!game) return;
@@ -516,7 +517,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   // Record this player as the first finder of this word
   const userData = game.users?.[username];
-  recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar);
+  recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
 
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: true,
@@ -601,7 +602,7 @@ function handlePendingWord(socket: Socket, game: GameState, gameCode: string, us
 
   // Record this player as the first finder of this word (even for pending words)
   const userData = game.users?.[username];
-  recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar);
+  recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
 
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: false,
@@ -659,29 +660,39 @@ function handleWordBecameValid(io: Server, socket: Socket, game: GameState, game
 }
 
 function handlePeerRejection(io: Server, gameCode: string, game: GameState, result: PeerValidationResult): void {
-  const scoreRemoved = removePeerRejectedWordScore(gameCode, result.word, result.submitter);
+  // Guard against missing word or submitter
+  if (!result.word || !result.submitter) {
+    logger.warn('PEER_VALIDATION', 'Missing word or submitter in peer rejection result');
+    return;
+  }
 
-  logger.info('PEER_VALIDATION', `Word "${result.word}" rejected. Removed ${scoreRemoved} from ${result.submitter}`);
+  // Type assertion after null checks
+  const word: string = result.word;
+  const submitter: string = result.submitter;
+
+  const scoreRemoved = removePeerRejectedWordScore(gameCode, word, submitter);
+
+  logger.info('PEER_VALIDATION', `Word "${word}" rejected. Removed ${scoreRemoved} from ${submitter}`);
 
   // Record rejected word for admin review (if not a bot word)
-  if (!result.isBot && result.word && isSupabaseConfigured()) {
-    recordPlayerWrongWord(result.word, game.language || 'en', 'peer_rejected').catch(() => {});
+  if (!result.isBot && isSupabaseConfigured()) {
+    recordPlayerWrongWord(word, game.language || 'en', 'peer_rejected').catch(() => {});
   }
 
   // Blacklist bot words
   if (result.isBot && game.language) {
-    addWordToBlacklist(result.word, game.language)
+    addWordToBlacklist(word, game.language)
       .then((success: boolean) => {
         if (success) {
-          logger.info('BOT', `Bot word "${result.word}" blacklisted for ${game.language}`);
+          logger.info('BOT', `Bot word "${word}" blacklisted for ${game.language}`);
         }
       })
       .catch((err: Error) => logger.warn('BOT', `Failed to blacklist: ${err.message}`));
   }
 
   broadcastToRoom(io, getGameRoom(gameCode), 'peerValidationResult', {
-    word: result.word,
-    submitter: result.submitter,
+    word,
+    submitter,
     rejected: true,
     invalidVotes: result.invalidVotes,
     validVotes: result.validVotes,
