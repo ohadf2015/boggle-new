@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 20 of 25 (Student Analytics Dashboard) — IN PROGRESS
-Plan: 2/6 complete
-Status: Analytics foundation + Lesson Effectiveness Chart complete
-Last activity: 2026-01-29 — Completed 20-04-PLAN.md (lesson effectiveness chart with TDD)
+Plan: 3/6 complete
+Status: Analytics foundation + Lesson Effectiveness Chart + Vocabulary Heatmap complete
+Last activity: 2026-01-29 — Completed 20-05-PLAN.md (vocabulary mastery heatmap with TDD)
 
 Progress: [█████████████░] 20/25 phases (80% milestone, v1.1 Phase 15-19 complete, v1.2 Phase 24-25 complete)
 
@@ -30,9 +30,9 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 23 (Phase 15-19 complete, Phase 20 plans 01 + 04 complete)
+- Plans completed: 24 (Phase 15-19 complete, Phase 20 plans 01, 04, 05 complete)
 - Current phase: 20 (Student Analytics Dashboard) — IN PROGRESS
-- Next: Phase 20 plans 02-03, 05-06 (UI components + integration)
+- Next: Phase 20 plans 02-03, 06 (UI components + integration)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -120,10 +120,10 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 20-02 | Classroom Overview Card | TBD | Pending |
 | 20-03 | Struggling Students List | TBD | Pending |
 | 20-04 | Lesson Effectiveness Chart | 6min | Complete |
-| 20-05 | Weekly Activity Heatmap | TBD | Pending |
+| 20-05 | Vocabulary Mastery Heatmap | 11min | Complete |
 | 20-06 | Dashboard Integration | TBD | Pending |
 
-**Phase 20 Progress:** 13 minutes, 28 tests added (12 query + 11 hook + 5 component), 2/6 plans complete
+**Phase 20 Progress:** 24 minutes, 48 tests added (19 query + 16 hook + 13 component), 3/6 plans complete
 
 ## Accumulated Context
 
@@ -231,6 +231,9 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **20-04**: Dual Y-axes (XP left, % right) → Different value scales (0-300 XP vs 0-100%) require separate axes (2026-01-29)
 - **20-04**: Bar chart (not line chart) → Discrete lessons better represented as bars than continuous lines (2026-01-29)
 - **20-04**: Neo-cyan for XP, neo-pink for completion rate → Matches ClassProgressChart color scheme for visual consistency (2026-01-29)
+- **20-05**: Mastery level thresholds (mastered >=80%, practicing 50-79%, struggling <50%) → Aligns with educational research on comprehension (2026-01-29)
+- **20-05**: Grid layout with sticky column → First column (words) stays visible during horizontal scroll for mobile UX (2026-01-29)
+- **20-05**: Color-coded cells (cyan/yellow/orange/navy) → Matches design system and provides clear visual distinction (2026-01-29)
 
 ### Pending Todos
 
