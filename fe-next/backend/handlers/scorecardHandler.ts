@@ -5,7 +5,6 @@
 
 import type { Server, Socket } from 'socket.io';
 import type {
-  Game,
   Avatar,
   WordDetail,
   ScoreCardData,
@@ -16,6 +15,7 @@ import type {
   GenerateScoreCardRequest,
   AchievementPayload
 } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager.js';
 import { safeEmit } from '../utils/socketHelpers.js';
@@ -174,7 +174,7 @@ function getTopWords(wordDetails: WordDetail[]): ScoreCardWord[] {
  * @param username - Player username
  * @returns Score card data
  */
-function generateScoreCardData(game: Game, username: string): ScoreCardData {
+function generateScoreCardData(game: GameState, username: string): ScoreCardData {
   // Get player data
   const user = game.users[username];
   if (!user) {
@@ -210,7 +210,7 @@ function generateScoreCardData(game: Game, username: string): ScoreCardData {
   const metadata: ScoreCardMetadata = {
     gameCode: game.gameCode,
     language: game.language || 'en',
-    timestamp: (game as Game & { gameEndedAt?: number }).gameEndedAt || Date.now(),
+    timestamp: (game as GameState & { gameEndedAt?: number }).gameEndedAt || Date.now(),
     gameDuration: game.gameDuration || game.timerSeconds || 180,
     isRanked: game.isRanked || false,
     difficulty: game.difficulty,
@@ -218,7 +218,7 @@ function generateScoreCardData(game: Game, username: string): ScoreCardData {
   };
 
   // Get titles (may be stored in game state after calculation)
-  const titles: string[] = (game as Game & { playerTitles?: Record<string, string[]> }).playerTitles?.[username] || [];
+  const titles: string[] = (game as GameState & { playerTitles?: Record<string, string[]> }).playerTitles?.[username] || [];
 
   return {
     username,
@@ -321,7 +321,7 @@ function registerScorecardHandlers(io: Server, socket: Socket): void {
 
     // Generate score card data
     try {
-      const scoreCardData = generateScoreCardData(game as unknown as Game, username);
+      const scoreCardData = generateScoreCardData(game, username);
 
       // Emit success response
       safeEmit(socket, 'scorecard:data', {
