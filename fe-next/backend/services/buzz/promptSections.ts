@@ -126,56 +126,54 @@ export const CHALLENGE_REQUIREMENTS_TEMPLATE = `## 📋 CHALLENGE REQUIREMENTS
 
 // ============================================================================
 // SECTION 7: CHALLENGE_TYPES - Detailed instructions for each type
+// PRIORITY ORDER: chain, wordle, trending_trio FIRST, then others
 // ============================================================================
-export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (with lateral thinking examples)
+export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER - create these types first!)
 
-1. **anagram**: Trend-connected clue + scrambled letters
-   - Format: "[Unexpected angle on trend] | Letters: XXXXX"
-   - Trend "Olympics" → "Where fans crush together | Letters: DOWCR" → CROWD
-   - Trend "AI Summit" → "What nervous speakers do | Letters: TSAEW" → SWEAT
+**TONE**: Be witty and clever where it flows naturally. Don't force humor - a smart connection is better than a forced joke.
 
-2. **fill_blank**: Phrase with unexpected angle on trend
-   - Format: "Phrase with _ _ _ _ _ (N letters)" - USE SPACED UNDERSCORES matching exact word length!
-   - CRITICAL: Count of underscores MUST EQUAL the answer length. Each underscore = one letter.
-   - **ALTERNATIVES** (NEW): If the blank could have 1-2 other equally valid words of the SAME LENGTH, include them in "alternatives" array
-   - Example: "You need to _ _ _ _ _ a tent (5 letters)" → answer: "PITCH", alternatives: ["RAISE", "ERECT"]
-   - Example: "Where to _ _ _ _ your car (4 letters)" → answer: "PARK", alternatives: ["STOP"]
-   - Only include alternatives if they are EQUALLY common and valid. Don't force it.
-   - If no valid alternatives exist (most cases), omit the "alternatives" field entirely.
-   - Trend "Election" → "Voters stood in _ _ _ _ for hours (4 letters)" → LINE (4 letters = 4 underscores)
-   - Trend "Heat Wave" → "People escaped to the _ _ _ _ _ (5 letters)" → SHADE (5 letters = 5 underscores)
+**⭐ PRIORITY TYPES (MUST include at least 2 of these 3):**
 
-3. **word_chain**: COMPOUND WORD CHAIN - Answer forms compound words with BOTH neighbors
+1. **word_chain**: COMPOUND WORD CHAIN - Answer forms compound words with BOTH neighbors
    - Format: "WORD1 → ??? → WORD2" - Player must guess the middle word
    - CRITICAL: The answer MUST create valid compound words on BOTH sides
+   - **VERIFIED COMPOUND CHAINS (use these patterns)**:
+     - SUN → FLOWER → POT (SUNflower + FLOWERpot) ✅
+     - FIRE → WORK → SHOP (FIREwork + WORKshop) ✅
+     - BACK → PACK → AGE (BACKpack + PACKage) ✅
+     - DOOR → STEP → CHILD (DOORstep + STEPchild) ✅
 
-   **VERIFIED COMPOUND CHAINS (use these patterns)**:
-   - SUN → FLOWER → POT (SUNflower + FLOWERpot) ✅
-   - FIRE → WORK → SHOP (FIREwork + WORKshop) ✅
-   - BACK → PACK → AGE (BACKpack + PACKage) ✅
-   - DOOR → STEP → CHILD (DOORstep + STEPchild) ✅
-   - TOOTH → PICK → UP (TOOTHpick + PICKup) ✅
-   - DATA → BASE → LINE (DATAbase + BASEline) ✅
-   - GRAND → STAND → STILL (GRANDstand + STANDstill) ✅
+2. **wordle_guess**: 5-letter word with clever connection to trend
+   - Format: "[Clue from an interesting angle]"
+   - MUST be EXACTLY 5 letters
+   - Trend "Marathon" → "What winners break at the end (5 letters)" → SWEAT
+   - Trend "Concert" → "What you lose after the show (5 letters)" → VOICE
 
-4. **definition_match**: Word from unexpected angle, 4 options
-   - Trend "Wildfire" → Word for "people who leave their homes": EVACUEE, REFUGEE, MIGRANT, NOMAD
+3. **trending_trio**: Three related words connected to a trend
+   - Format: "Find the 3 words that connect: [CLUE about the trend]"
+   - Trend "Olympics" → "Events where you need balance" → BEAM, RINGS, VAULT
+   - Trend "Coffee" → "Morning ritual essentials" → BREW, GRIND, ROAST
 
-5. **riddle**: THE PREMIUM CHALLENGE - Deeply metaphorical, 2-3 steps removed from literal
+**📝 ADDITIONAL TYPES (fill remaining slots with these):**
 
-   **Riddle Philosophy**: The best riddles work on MULTIPLE LEVELS simultaneously.
+4. **anagram**: Trend-connected clue + scrambled letters
+   - Format: "[Clever angle on trend] | Letters: XXXXX"
+   - Trend "Olympics" → "Where fans crush together | Letters: DOWCR" → CROWD
 
-   **Advanced Riddle Techniques**:
+5. **fill_blank**: Phrase with clever angle on trend
+   - Format: "Phrase with _ _ _ _ _ (N letters)" - USE SPACED UNDERSCORES matching exact word length!
+   - CRITICAL: Count of underscores MUST EQUAL the answer length.
+   - Trend "Heat Wave" → "Everyone searching for _ _ _ _ _ (5 letters)" → SHADE
+
+6. **definition_match**: Word from unexpected angle, 4 options
+   - Trend "Wildfire" → "People who leave their homes": EVACUEE, REFUGEE, MIGRANT, NOMAD
+
+7. **riddle**: Clever wordplay with wit where it flows naturally
+   - Use puns, double meanings, and playful misdirection when it works
    - **Paradox**: "I grow shorter as I grow older" (CANDLE)
-   - **Inversion**: "I have cities without houses, forests without trees" (MAP)
-   - **Personification**: "I have teeth but cannot bite" (COMB, ZIPPER)
-   - **Sensory confusion**: "I can be cracked, told, and made, but never touched" (JOKE)
-   - **Time paradox**: "The more you take, the more you leave behind" (STEPS)
-
-6. **wordle_guess**: 5-letter word with unexpected connection
-   - Format: "[Clue from unusual angle]"
-   - Trend "Marathon" → "What winners break at the end (5 letters)" → SWEAT (not TAPE)
-   - Trend "Concert" → "What you lose after the show (5 letters)" → VOICE`;
+   - **Inversion**: "I have a bed but never sleep, a mouth but never speak" (RIVER)
+   - **Personification**: "I have hands but can't wave" (CLOCK)
+   - Let the cleverness speak for itself - don't force the humor`;
 
 // ============================================================================
 // SECTION 8: OUTPUT_FORMAT - JSON structure for the response

@@ -122,13 +122,12 @@ async function getSupabaseClient() {
 }
 
 /**
- * Build editorial-style image prompt that shows trending topics
- * Uses Google Trends visual language with modern illustration style
- * Combines trending indicators with topic-relevant imagery
+ * Build simplified image prompt for Daily Buzz
+ * Creates modern, funny caricature-style illustrations related to trending topics
  *
  * @param topic - The trending topic to visualize
  * @param category - Category for mood selection (sports, finance, etc.)
- * @param language - Target language code (used for future localization)
+ * @param language - Target language code for any text in image
  */
 function buildImagePrompt(
   topic: string,
@@ -137,268 +136,44 @@ function buildImagePrompt(
 ): string {
   const mood = MOOD_MAP[category] || MOOD_MAP.general;
 
-  // Build a concrete visual scene from the trend
-  const visualScene = buildVisualScene(topic, category);
+  // Get language name for prompt
+  const languageNames: Record<string, string> = {
+    en: 'English',
+    he: 'Hebrew',
+    sv: 'Swedish',
+    ja: 'Japanese',
+    es: 'Spanish',
+  };
+  const languageName = languageNames[language] || 'English';
 
-  // Log language for debugging (will be used for future localization)
   console.log(`[IMAGEN] Building prompt for language: ${language}, topic: ${topic}`);
 
-  return `Create a MODERN STYLIZED illustration for a Google Trends-powered word game.
+  return `Modern funny caricature illustration about "${topic}".
 
-SUBJECT: ${visualScene}
+STYLE:
+- Funny, exaggerated caricature style (editorial cartoon meets modern app design)
+- Bright, bold colors with playful energy
+- Characters or objects with personality and humor
+- Include an upward trending arrow somewhere in the scene
+- Modern 2.5D illustration with soft gradients
 
-=== CRITICAL: ABSOLUTELY NO TEXT ===
+TOPIC:
+- Show a witty, humorous take on "${topic}"
+- Can be literal or a clever metaphorical interpretation
+- Make it shareable and fun
 
-**ZERO TEXT POLICY - THIS IS THE MOST IMPORTANT RULE:**
-- ABSOLUTELY NO text, words, letters, numbers, or characters in any language
-- NO signs, labels, banners, headlines, captions, watermarks, or UI elements with text
-- NO partial words, abbreviations, or letter-like shapes that could be mistaken for text
-- The image must be 100% PURELY VISUAL with zero readable content
-- If you're unsure whether something looks like text, DO NOT include it
+LANGUAGE: Any text MUST be in ${languageName}
 
-=== MODERN STYLIZED ILLUSTRATION STYLE ===
+CONSTRAINTS:
+- NO realistic photography
+- NO chibi/anime style
+- NO hex codes or technical notation visible
+- Family-friendly content only
+- Prefer NO text, but if unavoidable use ${languageName}
 
-ART STYLE - "CONTEMPORARY ILLUSTRATION WITH CHARACTER":
-- **Modern 2.5D style** with depth but not full 3D rendering (think modern app illustrations, editorial graphics)
-- Friendly, appealing designs with personality and charm - **subtle kawaii elements allowed**
-- Soft gradients, gentle shading, and dimensional feel (NOT completely flat)
-- Rounded, friendly shapes with some depth and character
-- Think: Modern app illustrations (Headspace, Duolingo), contemporary editorial art, stylized character design
-- Professional illustration quality - polished, warm, and approachable
+MOOD: ${mood}, funny, modern, trending
 
-GOOGLE TRENDS VISUAL ELEMENTS (MUST INCLUDE):
-- Prominent UPWARD TRENDING ARROW somewhere in composition (the iconic Google Trends rising line)
-- Google Trends gradient: Blue transitioning to Green (use the colors, do NOT show hex codes)
-- Search-inspired elements: magnifying glass motif, data visualization hints
-- Sense of "what's hot right now" - dynamic, current, buzzing energy
-
-COLOR PALETTE (Modern Illustration + Google Trends):
-- PRIMARY: Google Blue - trust and clarity
-- SECONDARY: Google Green - growth and freshness
-- ACCENT 1: Warm Yellow - energy and positivity
-- ACCENT 2: Soft Coral - warmth and friendliness
-- BACKGROUND: Gentle gradients with subtle depth (pastels allowed for approachability)
-- Soft shading with 2.5D depth - some dimensional lighting without full 3D rendering
-
-VISUAL REQUIREMENTS:
-- Central subject representing the trending topic (60-70% of frame)
-- MANDATORY: Rising trend line or arrow integrated into design
-- 2.5D style with gentle depth and layering (NOT fully flat, NOT heavy 3D)
-- Soft focus on background elements for depth
-- Dynamic composition suggesting upward momentum and energy
-
-ILLUSTRATION GUIDELINES:
-- If showing people/characters: Modern stylized proportions - friendly and approachable (subtle kawaii OK, but NOT chibi/super-deformed)
-- If showing objects: Stylized with soft shading and gentle dimensionality
-- If showing concepts: Creative visual metaphors with contemporary illustration style
-- Warm, optimistic mood with charm and personality
-
-MOOD: ${mood}, DYNAMIC, CURRENT, NEWSWORTHY
-
-ABSOLUTE CONSTRAINTS (CRITICAL - DO NOT VIOLATE):
-- **ZERO TEXT** - No text, words, letters, numbers, or characters in ANY language (English, Hebrew, Japanese, Swedish, Spanish, or any other)
-- **NO HEX COLOR CODES** visible in the image - NO color values like #FFD700 or #4285F4
-- **NO RGB/HSL values** visible - NO technical notation like rgb(255,215,0)
-- **NO alphanumeric strings or codes** - NO visible UI elements with text
-- **NO signs, labels, or banners** - Even decorative text is forbidden
-- **ABSOLUTELY NO chibi style** - NO super-deformed characters, NO bobblehead proportions
-- **ABSOLUTELY NO heavy anime aesthetic** - NO manga-style linework, NO anime cel-shading, NO moe (萌え) exaggeration
-- **Subtle kawaii elements are ALLOWED** - Friendly, approachable character design is fine
-- **NO overly exaggerated anime proportions** - Avoid huge eyes (50%+ of face), tiny mouths, extreme stylization
-- NO realistic photography style - MUST be stylized illustration
-- **Modern 2.5D illustration style** - Think contemporary app design, NOT full 3D rendering
-- Characters should have balanced, friendly proportions (neither Western realistic NOR Japanese chibi)
-- Keep it family-friendly and universally appealing
-
-STYLE ENFORCEMENT - MODERN ILLUSTRATION:
-This is a contemporary stylized illustration with personality and charm.
-✅ CORRECT REFERENCE: Headspace app illustrations, Duolingo characters, modern editorial graphics, stylized infographics
-✅ SUBTLE KAWAII OK: Friendly round shapes, gentle expressions, soft pastel accents
-❌ FORBIDDEN: Chibi/super-deformed style, heavy anime linework, extreme anime proportions
-❌ FORBIDDEN: Any text, letters, words, or numbers in any language
-
-SPECIFIC STYLE RULES:
-- Eyes: Friendly and expressive but proportional (NOT taking up half the face)
-- Face: Balanced stylized proportions - neither hyper-realistic nor chibi
-- Colors: Soft gradients with gentle depth, pastels allowed for warmth
-- Style: 2.5D modern illustration with layering, NOT flat cel-shading OR heavy 3D
-- Expression: Warm and charming with personality, subtle emotion
-
-OUTPUT: Square 1024×1024px modern stylized illustration with ZERO TEXT
-The final image should look like premium app illustration or contemporary editorial graphic - friendly, approachable, with gentle depth and charm. Contains absolutely no readable text in any language.`;
-}
-
-/**
- * Build an editorial visual scene description from the trending topic
- * Creates bold, modern imagery with Google Trends visual language
- */
-function buildVisualScene(topic: string, category: string): string {
-  const lowercaseTopic = topic.toLowerCase();
-
-  // Sports - dynamic athletic imagery with trending elements
-  if (category === 'sports') {
-    if (lowercaseTopic.includes('super bowl') || lowercaseTopic.includes('nfl') || lowercaseTopic.includes('football')) {
-      return 'Bold silhouette of football helmet and ball with dramatic upward trending arrow, stadium lights as data points in background, Google blue-green gradient sweep';
-    }
-    if (lowercaseTopic.includes('basketball') || lowercaseTopic.includes('nba')) {
-      return 'Dynamic basketball in motion with trailing trend line arc, hoop as circular graph element, bold geometric court lines, rising arrow trajectory';
-    }
-    if (lowercaseTopic.includes('soccer') || lowercaseTopic.includes('world cup') || lowercaseTopic.includes('fifa')) {
-      return 'Stylized soccer ball with hexagon pattern forming data visualization, goal net as grid graph, upward trending arrow integrated into kick motion';
-    }
-    if (lowercaseTopic.includes('tennis') || lowercaseTopic.includes('wimbledon')) {
-      return 'Tennis racket and ball creating upward arc trajectory like a trending graph, court lines as data grid, bold geometric composition';
-    }
-    if (lowercaseTopic.includes('olympics')) {
-      return 'Olympic rings reimagined with Google Trends colors (blue to green gradient), medal podium as rising bar chart, torch flame as trending arrow';
-    }
-    if (lowercaseTopic.includes('golf')) {
-      return 'Golf ball trajectory forming rising trend line toward flag, course contours as topographic data visualization, clean geometric style';
-    }
-    if (lowercaseTopic.includes('boxing') || lowercaseTopic.includes('ufc') || lowercaseTopic.includes('fight')) {
-      return 'Bold boxing gloves silhouette with impact burst forming trend spike, ring ropes as graph lines, dynamic upward momentum';
-    }
-    return 'Dynamic athletic figure silhouette with motion lines forming upward trend graph, sports equipment as bold icons, Google blue-green accent colors';
-  }
-
-  // Finance - data-driven financial imagery
-  if (category === 'finance') {
-    if (lowercaseTopic.includes('bitcoin') || lowercaseTopic.includes('crypto') || lowercaseTopic.includes('ethereum')) {
-      return 'Stylized crypto coin with blockchain pattern, dramatic rising candlestick chart integrated into design, Google blue-green gradient on trend line';
-    }
-    if (lowercaseTopic.includes('stock') || lowercaseTopic.includes('market') || lowercaseTopic.includes('dow') || lowercaseTopic.includes('nasdaq')) {
-      return 'Bold upward trending line chart as hero element, building silhouettes forming bar graph, bull market arrow in Google Trends colors';
-    }
-    if (lowercaseTopic.includes('fed') || lowercaseTopic.includes('rate') || lowercaseTopic.includes('inflation')) {
-      return 'Stylized percentage symbol with data flow lines, economic indicators as geometric shapes, prominent trend direction arrow';
-    }
-    return 'Bold currency symbols with integrated trend line showing upward momentum, data grid background, modern financial infographic style';
-  }
-
-  // Entertainment - bold showbiz imagery
-  if (category === 'entertainment') {
-    if (lowercaseTopic.includes('oscar') || lowercaseTopic.includes('academy award')) {
-      return 'Geometric Oscar statuette silhouette with spotlight beams forming rising trend lines, film strip as data timeline, red carpet as color accent';
-    }
-    if (lowercaseTopic.includes('grammy') || lowercaseTopic.includes('music award')) {
-      return 'Stylized gramophone with sound waves forming trending graph, musical notes as data points rising upward, bold geometric composition';
-    }
-    if (lowercaseTopic.includes('movie') || lowercaseTopic.includes('film') || lowercaseTopic.includes('box office')) {
-      return 'Film reel and clapperboard as bold icons, box office numbers visualized as rising bar chart, spotlight creating upward beam';
-    }
-    if (lowercaseTopic.includes('concert') || lowercaseTopic.includes('tour') || lowercaseTopic.includes('album')) {
-      return 'Microphone silhouette with sound waves forming upward trend, crowd as data visualization dots, stage lights as accent colors';
-    }
-    if (lowercaseTopic.includes('streaming') || lowercaseTopic.includes('netflix') || lowercaseTopic.includes('show')) {
-      return 'Play button icon with viewer count rising as trend graph, streaming waves as data flow, bold geometric screen shapes';
-    }
-    if (lowercaseTopic.includes('game') || lowercaseTopic.includes('video game') || lowercaseTopic.includes('gaming')) {
-      return 'Game controller with player stats rising as trend line, pixel-inspired data visualization, achievement unlock as upward arrow';
-    }
-    return 'Spotlight and stage silhouette with audience engagement shown as rising trend graph, entertainment icons in bold geometric style';
-  }
-
-  // Technology - modern tech infographic style
-  if (category === 'technology') {
-    if (lowercaseTopic.includes('ai') || lowercaseTopic.includes('chatgpt') || lowercaseTopic.includes('artificial intelligence')) {
-      return 'Neural network nodes forming upward trend pattern, stylized robot/AI brain icon, data flow lines in Google blue-green gradient';
-    }
-    if (lowercaseTopic.includes('apple') || lowercaseTopic.includes('iphone') || lowercaseTopic.includes('ios')) {
-      return 'Sleek device silhouette with app grid forming data visualization, usage trend line rising from screen, bold minimalist tech aesthetic';
-    }
-    if (lowercaseTopic.includes('space') || lowercaseTopic.includes('spacex') || lowercaseTopic.includes('nasa') || lowercaseTopic.includes('rocket')) {
-      return 'Rocket trajectory forming dramatic upward trend line, orbit paths as data circles, stars as data points, bold space infographic';
-    }
-    if (lowercaseTopic.includes('tesla') || lowercaseTopic.includes('ev') || lowercaseTopic.includes('electric car')) {
-      return 'Sleek EV silhouette with charging bolt forming trend arrow, battery level as rising bar chart, clean automotive data viz';
-    }
-    if (lowercaseTopic.includes('social media') || lowercaseTopic.includes('twitter') || lowercaseTopic.includes('meta') || lowercaseTopic.includes('instagram')) {
-      return 'Social icons with engagement metrics visualized as rising trend, notification bubbles as data points, viral spread pattern';
-    }
-    return 'Circuit board pattern with data flow forming upward trend, tech device silhouettes as bold icons, Google Trends color gradient';
-  }
-
-  // Weather - dramatic atmospheric visualization
-  if (category === 'weather') {
-    if (lowercaseTopic.includes('hurricane') || lowercaseTopic.includes('tropical storm')) {
-      return 'Stylized hurricane spiral as data visualization, storm tracking path as trend line, weather radar aesthetic with bold colors';
-    }
-    if (lowercaseTopic.includes('tornado') || lowercaseTopic.includes('severe storm')) {
-      return 'Dramatic tornado funnel with wind speed data visualization, storm intensity shown as rising trend, bold weather warning colors';
-    }
-    if (lowercaseTopic.includes('flood') || lowercaseTopic.includes('rain')) {
-      return 'Rain drops forming data points in rising pattern, water level as bar chart rising, cloud and precipitation infographic style';
-    }
-    if (lowercaseTopic.includes('heat') || lowercaseTopic.includes('hot') || lowercaseTopic.includes('temperature')) {
-      return 'Thermometer as vertical trend graph reaching upward, heat waves as data visualization lines, sun icon with temperature spike';
-    }
-    if (lowercaseTopic.includes('snow') || lowercaseTopic.includes('blizzard') || lowercaseTopic.includes('winter')) {
-      return 'Snowflake patterns as data points, accumulation shown as rising bar chart, cold temperature trend visualization';
-    }
-    return 'Weather icons (sun, cloud, rain) as bold geometric shapes, atmospheric data as trend lines, meteorological infographic style';
-  }
-
-  // Politics - civic infographic style
-  if (category === 'politics') {
-    if (lowercaseTopic.includes('election') || lowercaseTopic.includes('vote') || lowercaseTopic.includes('ballot')) {
-      return 'Ballot box with votes rising as trend graph, checkmark as upward arrow, poll numbers visualization, civic engagement rising';
-    }
-    if (lowercaseTopic.includes('white house') || lowercaseTopic.includes('president')) {
-      return 'White House silhouette with approval/interest trend line, flag as accent element, bold governmental iconography';
-    }
-    if (lowercaseTopic.includes('congress') || lowercaseTopic.includes('senate') || lowercaseTopic.includes('house')) {
-      return 'Capitol dome silhouette with legislative activity as rising trend, columns forming bar chart, civic institution infographic';
-    }
-    if (lowercaseTopic.includes('supreme court') || lowercaseTopic.includes('ruling')) {
-      return 'Scales of justice with public interest rising on one side, gavel creating impact spike on trend line, legal iconography';
-    }
-    return 'Civic symbols (flag, capitol, eagle) as bold geometric icons, public interest shown as rising trend graph';
-  }
-
-  // General/News - editorial news style
-  if (lowercaseTopic.includes('breaking') || lowercaseTopic.includes('news')) {
-    return 'Breaking news burst with interest spike visualization, media icons as bold silhouettes, attention trend rising dramatically, editorial infographic style';
-  }
-  if (lowercaseTopic.includes('celebrity') || lowercaseTopic.includes('star')) {
-    return 'Star silhouette with fame/interest trend rising, spotlight beams as data rays, red carpet leading upward, sophisticated editorial style';
-  }
-  if (lowercaseTopic.includes('viral') || lowercaseTopic.includes('trending')) {
-    return 'Share/repost pattern forming exponential trend curve, viral spread visualization, Google Trends upward arrow prominent, modern infographic aesthetic';
-  }
-
-  // Anime/Manga/Gaming - Modern stylized, NOT chibi
-  if (lowercaseTopic.includes('anime') || lowercaseTopic.includes('manga') || lowercaseTopic.includes('kawaii')) {
-    return 'Modern stylized representation of Japanese pop culture using contemporary illustration style - use books, screens, or abstract symbols (NOT chibi anime characters). Friendly, approachable design with subtle kawaii charm is fine. Rising popularity trend line integrated into scene, Google Trends gradient, 2.5D layered composition with soft depth';
-  }
-
-  // Music/Artists - Modern illustration concert style
-  if (lowercaseTopic.includes('music') || lowercaseTopic.includes('artist') || lowercaseTopic.includes('singer') || lowercaseTopic.includes('band')) {
-    return 'Modern stylized concert scene with friendly illustrated musical instruments, soft layered sound waves forming upward trend, warm stage lighting with gentle gradients, contemporary app illustration aesthetic (think Headspace or Spotify graphics)';
-  }
-
-  // Fashion/Style - Contemporary fashion illustration
-  if (lowercaseTopic.includes('fashion') || lowercaseTopic.includes('style') || lowercaseTopic.includes('designer')) {
-    return 'Contemporary fashion illustration with stylized fabric elements and soft shading, trending style indicators integrated into scene, runway as rising trend line with 2.5D perspective, modern editorial illustration quality with approachable charm';
-  }
-
-  // Food/Restaurant - Modern culinary illustration
-  if (lowercaseTopic.includes('food') || lowercaseTopic.includes('restaurant') || lowercaseTopic.includes('recipe') || lowercaseTopic.includes('chef')) {
-    return 'Modern culinary illustration with appetizing food styling and soft gradients, ingredient elements forming data visualization, rising popularity shown as ascending steam with gentle layering, contemporary food app aesthetic (think food delivery apps)';
-  }
-
-  // Travel/Tourism - Modern travel illustration
-  if (lowercaseTopic.includes('travel') || lowercaseTopic.includes('tourism') || lowercaseTopic.includes('destination') || lowercaseTopic.includes('vacation')) {
-    return 'Modern travel illustration with stylized landmark silhouettes, journey path forming upward trend line through layered scene, atmospheric depth with soft gradients, contemporary wanderlust aesthetic (think modern travel apps or Airbnb graphics)';
-  }
-
-  // Science/Research - Modern science illustration
-  if (lowercaseTopic.includes('science') || lowercaseTopic.includes('research') || lowercaseTopic.includes('study') || lowercaseTopic.includes('discovery')) {
-    return 'Modern scientific illustration with stylized molecular/atomic patterns, research data as rising trend visualization with gentle depth, laboratory equipment as friendly illustrated icons, contemporary science communication aesthetic (think Kurzgesagt style)';
-  }
-
-  // Default: Topic-specific with modern 2.5D illustration style
-  // This fallback must be specific to prevent chibi but allow subtle kawaii charm
-  return `MODERN 2.5D ILLUSTRATION STYLE (absolutely NO chibi/super-deformed aesthetic - subtle kawaii OK): Contemporary stylized representation of "${topic}" with gentle depth, soft shading, and layered composition. Central subject (70% of frame) with prominent upward trending arrow integrated into design. Google Trends gradient using Google Blue transitioning to Google Green in accents or background. Soft atmospheric depth with gentle gradients. Style references: Headspace app illustrations, Duolingo characters, modern editorial graphics, contemporary infographics. Professional illustration quality with friendly, approachable mood - think premium app design or modern editorial, NOT chibi characters or heavy anime style. Balanced proportions with charm and personality.`;
+OUTPUT: Square 1024×1024px illustration`;
 }
 
 /**
