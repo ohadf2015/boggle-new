@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 21 of 25 (Rich Lesson Delivery) — PLANNING NEEDED
-Plan: 0/TBD complete
-Status: Phase 20 (Analytics Dashboard) complete, Phase 21 not yet planned
-Last activity: 2026-01-29 — Completed Phase 20 (Student Analytics Dashboard) with verification
+Phase: 21 of 25 (Rich Lesson Delivery) — IN PROGRESS
+Plan: 3/6 complete (21-01, 21-02, 21-03)
+Status: Phase 21 in progress - Swipe gesture hook complete
+Last activity: 2026-01-29 — Completed 21-03 (useSwipeGesture hook)
 
-Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-20 complete, v1.2 Phase 24-25 complete)
+Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-21 in progress, v1.2 Phase 24-25 complete)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 30 (Phase 15-20 complete)
-- Current phase: 21 (Rich Lesson Delivery) — NOT STARTED
-- Next: Phase 21 planning and execution
+- Plans completed: 33 (Phase 15-20 complete, Phase 21 3/6)
+- Current phase: 21 (Rich Lesson Delivery) — IN PROGRESS
+- Next: Phase 21 plans 04-06
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -124,6 +124,18 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 20-06 | Realtime + Integration | 70min | Complete |
 
 **Phase 20 Total:** 127 minutes, 144 tests added, verification passed 5/5
+
+**Phase 21 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 21-01 | Lesson Content Schema | TBD | Complete |
+| 21-02 | FlashcardData Hook | TBD | Complete |
+| 21-03 | Swipe Gesture Hook | 7min | Complete |
+| 21-04 | Flashcard Component | - | Pending |
+| 21-05 | Lesson Practice Integration | - | Pending |
+| 21-06 | Audio & Mastery Indicators | - | Pending |
+
+**Phase 21 Total (so far):** 7 minutes, 32 tests added (3/6 plans complete)
 
 ## Accumulated Context
 
@@ -234,6 +246,12 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **20-05**: Mastery level thresholds (mastered >=80%, practicing 50-79%, struggling <50%) → Aligns with educational research on comprehension (2026-01-29)
 - **20-05**: Grid layout with sticky column → First column (words) stays visible during horizontal scroll for mobile UX (2026-01-29)
 - **20-05**: Color-coded cells (cyan/yellow/orange/navy) → Matches design system and provides clear visual distinction (2026-01-29)
+- **21-03**: useMotionValue for x position (not useState) → Framer Motion provides performant animations without re-renders, 60fps on mobile (2026-01-29)
+- **21-03**: State subscription via x.onChange() → useMemo doesn't react to motion values, useEffect pattern for reactive derived state (2026-01-29)
+- **21-03**: Threshold detection on drag end → Performance optimization, avoids continuous checks during drag (2026-01-29)
+- **21-03**: ArrowLeft/ArrowRight keyboard shortcuts → Accessibility requirement, all interactions (drag + keyboard) tested (2026-01-29)
+- **21-03**: 150px default threshold → Research context specification for minimum swipe distance (2026-01-29)
+- **21-03**: Disabled state preserves snap-back → Visual feedback even when swipe disabled, card returns to center (2026-01-29)
 
 ### Pending Todos
 
@@ -347,10 +365,16 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed Phase 20 execution with verification
+Stopped at: Completed 21-03 (useSwipeGesture hook)
 Resume file: None
 
-**Next action:** Plan and execute Phase 21 (Rich Lesson Delivery) with `/gsd:discuss-phase 21` or `/gsd:plan-phase 21`
+**Next action:** Execute Phase 21 plans 04-06 (Flashcard Component, Lesson Integration, Audio/Mastery)
+
+**Phase 21 Summary (so far):**
+- 3/6 plans complete (7 minutes total)
+- 32 tests added
+- Swipe gesture hook with Framer Motion complete
+- Plans 21-01 and 21-02 completed previously (durations TBD)
 
 **Phase 20 Summary:**
 - 6/6 plans complete (127 minutes total)
@@ -360,4 +384,4 @@ Resume file: None
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-29 (Phase 20 complete - analytics dashboard verified)*
+*Last updated: 2026-01-29 (Phase 21 plan 03 complete - swipe gesture hook)*
