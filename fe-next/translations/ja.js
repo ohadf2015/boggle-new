@@ -2087,7 +2087,7 @@ const ja = {
     "backToGame": "ゲームに戻る",
     "lastUpdated": "最終更新日",
     "lastUpdatedDate": "2026年1月26日",
-    "copyright": "© 2025 LexiClash Ltd. All rights reserved.",
+    "copyright": "© {{year}} LexiClash Ltd. All rights reserved.",
     "index": {
       "title": "法的情報",
       "intro": "LexiClashをご利用いただく際の権利と、私たちがどのようにお客様のデータを保護するかを理解するため、法的文書をご確認ください。",
@@ -3057,32 +3057,32 @@ const ja = {
     "revealCost": "見る（{cost}コイン）"
   },
   "accessibility": {
-    "title": "アクセシビリティ",
-    "subtitle": "あなたのニーズに合わせて体験をカスタマイズしましょう。これらの設定はローカルに保存されます。",
-    "footer": "これらの設定はデバイスにローカル保存されます。追加のシステムレベルのアクセシビリティ機能については、デバイスの設定を確認してください。",
+    "title": "自分好みに",
+    "subtitle": "快適に設定しよう。自動保存されるよ。",
+    "footer": "この端末に保存されます。他の設定は端末の設定から。",
     "fireRoundLights": {
-      "title": "ファイアラウンドライトを無効化",
-      "description": "ファイアラウンド中の虹色のセルをオフにして、落ち着いた視覚体験に。"
+      "title": "ファイアラウンドを控えめに",
+      "description": "虹色の光をオフにして、落ち着いた雰囲気に"
     },
     "reduceMotion": {
-      "title": "アニメーションを軽減",
-      "description": "アニメーションと動きを最小限にして穏やかな体験に。動きの敏感さに役立ちます。"
+      "title": "動きを控えめに",
+      "description": "アニメーションを減らして、目に優しく"
     },
     "disableSounds": {
-      "title": "効果音を無効化",
-      "description": "すべての効果音をオフにします。音楽コントロールはヘッダーから引き続き利用可能です。"
+      "title": "サイレントモード",
+      "description": "効果音をオフに。音楽コントロールは上にあるよ"
     },
     "highContrast": {
-      "title": "ハイコントラストモード",
-      "description": "視認性を向上させるために、ボーダー幅と色のコントラストを増加させます。"
+      "title": "くっきりモード",
+      "description": "線を太く、色をはっきりさせて見やすく"
     },
     "largerText": {
-      "title": "大きなテキスト",
-      "description": "読みやすさのためにベースフォントサイズを125%増加させます。"
+      "title": "大きな文字",
+      "description": "文字を125%大きくして読みやすく"
     },
     "earthquakeEffects": {
-      "title": "地震エフェクトを無効化",
-      "description": "激しい地震アニメーション（揺れ、3D効果、モーションブラー、破片）をオフにして優しい体験に。"
+      "title": "揺れをオフ",
+      "description": "画面の揺れや激しいエフェクトをオフにして穏やかに"
     }
   },
   "peerValidation": {
@@ -3260,52 +3260,52 @@ const ja = {
     "sessionRecorded": "セッション録画添付済み"
   },
   "brain": {
-    "title": "脳トレ",
+    "title": "ブレインジム",
     "score": "ブレインスコア",
     "points": "ブレインポイント",
-    "loading": "脳トレを読み込み中...",
+    "loading": "脳をウォームアップ中...",
     "nav": {
       "profile": "プロフィール",
       "home": "ホーム",
-      "brain": "脳トレ",
-      "dashboard": "認知ダッシュボード"
+      "brain": "ブレインジム",
+      "dashboard": "あなたの記録"
     },
     "domains": {
-      "processingSpeed": "処理速度",
-      "processingSpeedDesc": "情報を処理して反応するスピード",
-      "workingMemory": "ワーキングメモリ",
-      "workingMemoryDesc": "短時間で情報を保持し、処理する力",
-      "attention": "注意力",
-      "attentionDesc": "集中して取り組み続ける力",
-      "flexibility": "柔軟性",
-      "flexibilityDesc": "状況に応じて切り替え、適応する力",
+      "processingSpeed": "ひらめき力",
+      "processingSpeedDesc": "ピンとくるスピード",
+      "workingMemory": "記憶力",
+      "workingMemoryDesc": "考えながら覚えておく力",
+      "attention": "集中力",
+      "attentionDesc": "ここぞという時の集中",
+      "flexibility": "切り替え力",
+      "flexibilityDesc": "サッと頭を切り替える",
       "vocabulary": "語彙力",
-      "vocabularyDesc": "言葉の引き出しの多さと単語の取り出しやすさ"
+      "vocabularyDesc": "あなたの言葉の引き出し"
     },
     "progress": {
-      "improving": "上昇中",
-      "declining": "下降中",
-      "stable": "安定"
+      "improving": "上昇中！",
+      "declining": "下がり気味",
+      "stable": "キープ中"
     },
     "recommendation": {
-      "title": "パーソナルアドバイス",
-      "startDrill": "ドリル開始",
-      "scienceHint": "ターゲット練習は特定の認知能力を向上させます",
-      "declining": "{domain}が下がっています。このドリルで回復しよう！",
-      "low": "{domain}に改善の余地あり。練習あるのみ！",
-      "improve": "{domain}スキルを伸ばし続けよう！",
+      "title": "おすすめ",
+      "startDrill": "やってみる",
+      "scienceHint": "集中トレーニング = 早く上達",
+      "declining": "{domain}がちょっと下がってきた。これで回復しよう！",
+      "low": "{domain}を鍛えよう！",
+      "improve": "{domain}をどんどん伸ばそう！",
       "unlock": "あと{games}ゲームで解放"
     },
     "welcomeBack": {
-      "title": "おかえりなさい！",
-      "longTime": "久しぶり！脳がまたトレーニングする準備ができているよ。",
-      "twoWeeks": "また会えてうれしい！続きから始めよう。",
-      "fewDays": "おかえり！進歩を続ける準備はできた？",
-      "currentScore": "現在",
+      "title": "おかえり！",
+      "longTime": "久しぶり！脳が待ってたよ。",
+      "twoWeeks": "会えてうれしい！続きからいこう。",
+      "fewDays": "また来てくれた！上を目指そう？",
+      "currentScore": "今",
       "personalBest": "ベスト",
       "bestStreak": "最高連続",
-      "rebuildStreak": "連続記録を再構築する時！",
-      "keepGrowing": "脳力を高め続けよう！",
+      "rebuildStreak": "連続記録を取り戻そう！ 🔥",
+      "keepGrowing": "脳を鍛え続けよう！ 💪",
       "reachTier": "また{tier}ティアに到達できる？",
       "beatBest": "ベストは{score}。超えられる？",
       "daysAway": "最後のゲームから{days}日"
@@ -4497,6 +4497,7 @@ const ja = {
     },
     "xp": {
       "level": "レベル",
+      "maxLevel": "最大レベル",
       "nextLevel": "次のレベル",
       "xpGained": "獲得XP",
       "totalXp": "合計XP",

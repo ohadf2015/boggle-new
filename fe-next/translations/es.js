@@ -1634,7 +1634,7 @@ const es = {
     "backToGame": "Volver al Juego",
     "lastUpdated": "Última actualización",
     "lastUpdatedDate": "26 de enero de 2026",
-    "copyright": "© 2025 LexiClash Ltd. Todos los derechos reservados.",
+    "copyright": "© {{year}} LexiClash Ltd. Todos los derechos reservados.",
     "index": {
       "title": "Información Legal",
       "intro": "Revisa nuestros documentos legales para entender tus derechos y cómo protegemos tus datos cuando usas LexiClash.",
@@ -3057,32 +3057,32 @@ const es = {
     "revealCost": "Revelar ({cost} monedas)"
   },
   "accessibility": {
-    "title": "Accesibilidad",
-    "subtitle": "Personaliza tu experiencia según tus necesidades. Estas configuraciones se guardan localmente.",
-    "footer": "Estas configuraciones se almacenan localmente en tu dispositivo. Para funciones de accesibilidad adicionales a nivel de sistema, revisa la configuración de tu dispositivo.",
+    "title": "A tu manera",
+    "subtitle": "Hazlo cómodo. Se guarda solo.",
+    "footer": "Guardado en tu dispositivo. Más opciones en ajustes del sistema.",
     "fireRoundLights": {
-      "title": "Desactivar luces de ronda de fuego",
-      "description": "Apaga las celdas brillantes del arcoíris durante rondas de fuego para una experiencia visual más tranquila."
+      "title": "Rondas de fuego tranquilas",
+      "description": "Sin arcoíris brillantes - mantén la calma en rondas de fuego"
     },
     "reduceMotion": {
-      "title": "Reducir animaciones",
-      "description": "Minimiza animaciones y transiciones para una experiencia más tranquila. Ayuda con la sensibilidad al movimiento."
+      "title": "Menos movimiento",
+      "description": "Menos rebotes, menos giros - más suave para los ojos"
     },
     "disableSounds": {
-      "title": "Desactivar efectos de sonido",
-      "description": "Apaga todos los efectos de sonido. Los controles de música siguen disponibles en el encabezado."
+      "title": "Modo silencioso",
+      "description": "Apaga todos los sonidos. El control de música sigue arriba"
     },
     "highContrast": {
-      "title": "Modo de alto contraste",
-      "description": "Aumenta el ancho de los bordes y el contraste de color para mejor visibilidad."
+      "title": "Colores nítidos",
+      "description": "Bordes más gruesos y colores más claros - fácil de ver"
     },
     "largerText": {
-      "title": "Texto más grande",
-      "description": "Aumenta el tamaño de fuente base un 125% para mejor legibilidad."
+      "title": "Texto grande",
+      "description": "Texto 125% más grande - más fácil de leer"
     },
     "earthquakeEffects": {
-      "title": "Desactivar Efectos de Terremoto",
-      "description": "Desactiva animaciones intensas de terremotos (movimientos, efectos 3D, desenfoque y escombros) para una experiencia más suave."
+      "title": "Sin temblores",
+      "description": "Desactiva las sacudidas y efectos intensos - experiencia suave"
     }
   },
   "peerValidation": {
@@ -3249,52 +3249,52 @@ const es = {
     "sessionRecorded": "Grabación de sesión adjunta"
   },
   "brain": {
-    "title": "Entrenamiento Mental",
-    "score": "Puntuación Cerebral",
-    "points": "Puntos Cerebrales",
-    "loading": "Cargando entrenamiento mental...",
+    "title": "Gimnasio Mental",
+    "score": "Puntos de Cerebro",
+    "points": "Puntos de Cerebro",
+    "loading": "Calentando el cerebro...",
     "nav": {
       "profile": "Perfil",
       "home": "Inicio",
-      "brain": "Entrenamiento Mental",
-      "dashboard": "Panel Cognitivo"
+      "brain": "Gimnasio",
+      "dashboard": "Tus estadísticas"
     },
     "domains": {
-      "processingSpeed": "Velocidad de Procesamiento",
-      "processingSpeedDesc": "Qué tan rápido tu cerebro procesa información y reacciona",
-      "workingMemory": "Memoria de Trabajo",
-      "workingMemoryDesc": "Capacidad de mantener y procesar información a corto plazo",
-      "attention": "Atención",
-      "attentionDesc": "Capacidad de enfocarte y mantenerte alerta durante tareas",
-      "flexibility": "Flexibilidad",
-      "flexibilityDesc": "Capacidad de adaptarte y cambiar entre tareas",
+      "processingSpeed": "Velocidad mental",
+      "processingSpeedDesc": "Qué tan rápido captas y reaccionas",
+      "workingMemory": "Memoria activa",
+      "workingMemoryDesc": "Retener info mientras piensas",
+      "attention": "Concentración",
+      "attentionDesc": "Mantener el enfoque cuando importa",
+      "flexibility": "Agilidad mental",
+      "flexibilityDesc": "Saltar entre tareas fácilmente",
       "vocabulary": "Vocabulario",
-      "vocabularyDesc": "Riqueza del vocabulario y facilidad para encontrar palabras"
+      "vocabularyDesc": "Tu banco de palabras"
     },
     "progress": {
-      "improving": "Mejorando",
+      "improving": "¡Subiendo!",
       "declining": "Bajando",
       "stable": "Estable"
     },
     "recommendation": {
-      "title": "Consejo Personalizado",
-      "startDrill": "Iniciar Ejercicio",
-      "scienceHint": "La práctica enfocada mejora habilidades cognitivas específicas",
-      "declining": "Tu {domain} ha bajado. ¡Este ejercicio ayudará!",
-      "low": "Tu {domain} necesita trabajo. ¡La práctica hace al maestro!",
-      "improve": "¡Sigue mejorando tus habilidades de {domain}!",
-      "unlock": "Juega {games} partidas más para desbloquear"
+      "title": "Prueba esto",
+      "startDrill": "¡Vamos!",
+      "scienceHint": "Práctica enfocada = progreso más rápido",
+      "declining": "Tu {domain} necesita un boost. ¡Esto ayudará!",
+      "low": "¡Vamos a afilar tu {domain}!",
+      "improve": "¡Sigue mejorando tu {domain}!",
+      "unlock": "{games} partidas más para desbloquear"
     },
     "welcomeBack": {
-      "title": "¡Bienvenido de Nuevo!",
-      "longTime": "¡Ha pasado tiempo! Tu cerebro está listo para entrenar otra vez.",
-      "twoWeeks": "¡Qué bueno verte! Continuemos donde lo dejamos.",
-      "fewDays": "¡Bienvenido de vuelta! ¿Listo para seguir progresando?",
-      "currentScore": "Actual",
+      "title": "¡Volviste!",
+      "longTime": "¡Cuánto tiempo! Tu cerebro te extrañaba.",
+      "twoWeeks": "¡Qué bueno verte! Sigamos donde quedamos.",
+      "fewDays": "¿Listo para seguir subiendo?",
+      "currentScore": "Ahora",
       "personalBest": "Mejor",
-      "bestStreak": "Mejor Racha",
-      "rebuildStreak": "¡Hora de reconstruir tu racha!",
-      "keepGrowing": "¡Sigamos fortaleciendo tu cerebro!",
+      "bestStreak": "Mejor racha",
+      "rebuildStreak": "¡Hora de reconstruir la racha! 🔥",
+      "keepGrowing": "¡Sigamos fortaleciendo el cerebro! 💪",
       "reachTier": "¿Puedes alcanzar el nivel {tier} otra vez?",
       "beatBest": "Tu mejor es {score}. ¿Puedes superarlo?",
       "daysAway": "{days} días desde tu última partida"
@@ -4486,6 +4486,7 @@ const es = {
     },
     "xp": {
       "level": "Nivel",
+      "maxLevel": "Nivel Máximo",
       "nextLevel": "Siguiente Nivel",
       "xpGained": "XP Ganado",
       "totalXp": "XP Total",

@@ -235,7 +235,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             'font-neo-display font-black text-neo-pink',
             sizeConfig.levelText
           )}>
-            MAX LEVEL
+            {t('education.xp.maxLevel')}
           </span>
         </div>
       )}

@@ -12,6 +12,7 @@
  */
 
 import React, { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import AchievementProgressCard from './AchievementProgressCard';
 
@@ -207,22 +208,24 @@ export default function EducationBadgeGrid({
             {/* Category Header */}
             <button
               onClick={() => toggleCategory(category)}
-              className="w-full flex items-center justify-between text-left group"
+              className="w-full flex items-center justify-between text-left group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors"
             >
-              <h3 className="font-neo-display text-xl font-bold text-neo-white">
+              <h3 className="font-neo-display text-xl font-bold text-neo-white group-hover:text-neo-cyan transition-colors">
                 {t(`education.achievements.categories.${category}`)}
               </h3>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm text-neo-white/60">
+                <span className="text-sm text-neo-white/60 group-hover:text-neo-white/80 transition-colors">
                   {t('education.achievements.earned', {
                     count: categoryEarnedCount,
                     total: categoryAchievements.length,
                   })}
                 </span>
-                <span className="text-neo-white/60 text-xl transition-transform duration-200" style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}>
-                  ▼
-                </span>
+                <ChevronDown
+                  className={`w-5 h-5 text-neo-white/60 group-hover:text-neo-cyan transition-all duration-200 ${
+                    isCollapsed ? '-rotate-90' : 'rotate-0'
+                  }`}
+                />
               </div>
             </button>
 

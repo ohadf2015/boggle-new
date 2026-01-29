@@ -2087,7 +2087,7 @@ const sv = {
     "backToGame": "Tillbaka till spelet",
     "lastUpdated": "Senast uppdaterad",
     "lastUpdatedDate": "26 januari, 2026",
-    "copyright": "© 2025 LexiClash Ltd. Alla rättigheter förbehållna.",
+    "copyright": "© {{year}} LexiClash Ltd. Alla rättigheter förbehållna.",
     "index": {
       "title": "Juridisk information",
       "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
@@ -3057,32 +3057,32 @@ const sv = {
     "revealCost": "Avslöja ({cost} mynt)"
   },
   "accessibility": {
-    "title": "Tillgänglighet",
-    "subtitle": "Anpassa din upplevelse efter dina behov. Dessa inställningar sparas lokalt.",
-    "footer": "Dessa inställningar lagras lokalt på din enhet. För ytterligare systemnivå tillgänglighetsfunktioner, kontrollera enhetsinställningarna.",
+    "title": "På ditt sätt",
+    "subtitle": "Gör det bekvämt. Sparas automatiskt.",
+    "footer": "Sparas på din enhet. Kolla systeminställningarna för fler alternativ.",
     "fireRoundLights": {
-      "title": "Inaktivera eldrundebelysning",
-      "description": "Stänger av regnbågslysande celler under eldrundar för en lugnare visuell upplevelse."
+      "title": "Lugna eldrundor",
+      "description": "Skippa regnbågsglödet - håll det lugnt under eldrundor"
     },
     "reduceMotion": {
-      "title": "Minska animationer",
-      "description": "Minimerar animationer och övergångar för en lugnare upplevelse. Hjälper vid rörelsekänslighet."
+      "title": "Mindre rörelse",
+      "description": "Mindre studs, mindre snurrande - snällare mot ögonen"
     },
     "disableSounds": {
-      "title": "Inaktivera ljudeffekter",
-      "description": "Stäng av alla ljudeffekter. Musikkontroller är fortfarande tillgängliga i sidhuvudet."
+      "title": "Tyst läge",
+      "description": "Stänger av alla ljud. Musikkontrollen finns kvar uppe"
     },
     "highContrast": {
-      "title": "Högkontrastläge",
-      "description": "Öka kantbredder och färgkontrast för bättre synlighet."
+      "title": "Tydliga färger",
+      "description": "Tjockare kanter och starkare kontraster - lättare att se"
     },
     "largerText": {
       "title": "Större text",
-      "description": "Öka bastextstorlek med 125% för bättre läsbarhet."
+      "description": "Gör texten 125% större - lättare att läsa"
     },
     "earthquakeEffects": {
-      "title": "Inaktivera jordbävningseffekter",
-      "description": "Stänger av intensiva jordbävningsanimationer (skakning, 3D-effekter, rörelsoskärpa och skrot) för en mjukare upplevelse."
+      "title": "Inga skakningar",
+      "description": "Stänger av skakningar och intensiva effekter - mjukare upplevelse"
     }
   },
   "peerValidation": {
@@ -3260,52 +3260,52 @@ const sv = {
     "sessionRecorded": "Sessionsinspelning bifogad"
   },
   "brain": {
-    "title": "Hjärnträning",
+    "title": "Hjärngym",
     "score": "Hjärnpoäng",
     "points": "Hjärnpoäng",
-    "loading": "Laddar hjärnträning...",
+    "loading": "Värmer upp hjärnan...",
     "nav": {
       "profile": "Profil",
       "home": "Hem",
-      "brain": "Hjärnträning",
-      "dashboard": "Kognitiv instrumentpanel"
+      "brain": "Hjärngym",
+      "dashboard": "Din statistik"
     },
     "domains": {
-      "processingSpeed": "Bearbetningshastighet",
-      "processingSpeedDesc": "Hur snabbt din hjärna bearbetar information och reagerar",
-      "workingMemory": "Arbetsminne",
-      "workingMemoryDesc": "Förmågan att hålla och bearbeta information på kort sikt",
-      "attention": "Uppmärksamhet",
-      "attentionDesc": "Förmågan att fokusera och vara alert under uppgifter",
-      "flexibility": "Flexibilitet",
-      "flexibilityDesc": "Förmågan att anpassa sig och växla mellan olika uppgifter",
+      "processingSpeed": "Snabbtänkt",
+      "processingSpeedDesc": "Hur snabbt du snappar och reagerar",
+      "workingMemory": "Minneskraft",
+      "workingMemoryDesc": "Hålla info medan du tänker",
+      "attention": "Fokus",
+      "attentionDesc": "Hålla skärpan när det gäller",
+      "flexibility": "Smidighet",
+      "flexibilityDesc": "Hoppa mellan uppgifter med lätthet",
       "vocabulary": "Ordförråd",
-      "vocabularyDesc": "Bredden i ditt ordförråd och hur lätt du hittar ord"
+      "vocabularyDesc": "Din ordbank"
     },
     "progress": {
-      "improving": "Förbättras",
-      "declining": "Sjunker",
-      "stable": "Stabil"
+      "improving": "På väg upp!",
+      "declining": "Dippar",
+      "stable": "Håller sig"
     },
     "recommendation": {
-      "title": "Personligt tips",
-      "startDrill": "Starta övning",
-      "scienceHint": "Riktad träning förbättrar specifika kognitiva förmågor",
-      "declining": "Din {domain} har sjunkit. Denna övning kan hjälpa!",
-      "low": "Din {domain} behöver träning. Övning ger färdighet!",
-      "improve": "Fortsätt bygga dina {domain}-färdigheter!",
-      "unlock": "Spela {games} spel till för att låsa upp"
+      "title": "Prova detta",
+      "startDrill": "Kör!",
+      "scienceHint": "Fokuserad träning = snabbare framsteg",
+      "declining": "Din {domain} behöver en boost. Detta hjälper!",
+      "low": "Låt oss vässa din {domain}!",
+      "improve": "Fortsätt bygga {domain}!",
+      "unlock": "{games} spel kvar att låsa upp"
     },
     "welcomeBack": {
-      "title": "Välkommen tillbaka!",
-      "longTime": "Det har gått ett tag! Din hjärna är redo att träna igen.",
-      "twoWeeks": "Kul att se dig! Låt oss fortsätta där vi slutade.",
-      "fewDays": "Välkommen tillbaka! Redo att fortsätta din utveckling?",
-      "currentScore": "Nuvarande",
+      "title": "Du är tillbaka!",
+      "longTime": "Längesedan! Hjärnan har saknat dig.",
+      "twoWeeks": "Kul! Vi fortsätter där vi slutade.",
+      "fewDays": "Redo att fortsätta klättra?",
+      "currentScore": "Nu",
       "personalBest": "Bäst",
-      "bestStreak": "Bästa Streak",
-      "rebuildStreak": "Dags att bygga upp din streak igen!",
-      "keepGrowing": "Låt oss fortsätta stärka din hjärna!",
+      "bestStreak": "Bästa streak",
+      "rebuildStreak": "Dags att bygga streaken igen! 🔥",
+      "keepGrowing": "Vi stärker hjärnan! 💪",
       "reachTier": "Kan du nå {tier}-nivå igen?",
       "beatBest": "Ditt bästa är {score}. Kan du slå det?",
       "daysAway": "{days} dagar sedan senaste spelet"
@@ -4497,6 +4497,7 @@ const sv = {
     },
     "xp": {
       "level": "Nivå",
+      "maxLevel": "Max nivå",
       "nextLevel": "Nästa nivå",
       "xpGained": "XP intjänat",
       "totalXp": "Totalt XP",

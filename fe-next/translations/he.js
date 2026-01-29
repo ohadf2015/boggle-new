@@ -1832,7 +1832,7 @@ const he = {
     "backToGame": "חזרה למשחק",
     "lastUpdated": "עודכן לאחרונה",
     "lastUpdatedDate": "26 בינואר, 2026",
-    "copyright": "© 2025 LexiClash Ltd. כל הזכויות שמורות.",
+    "copyright": "© {{year}} LexiClash Ltd. כל הזכויות שמורות.",
     "index": {
       "title": "מידע משפטי",
       "intro": "עיינו במסמכים המשפטיים שלנו כדי להבין את הזכויות שלכם וכיצד אנו מגנים על הנתונים שלכם בעת השימוש בלקסיקלאש.",
@@ -3050,58 +3050,58 @@ const he = {
     "usedForReveals": "השתמשו במטבעות כדי לחשוף מילים במשחקי יחיד!"
   },
   "accessibility": {
-    "title": "נגישות",
-    "subtitle": "התאם את החוויה שלך לצרכים שלך. הגדרות אלה נשמרות באופן מקומי.",
-    "footer": "הגדרות אלה נשמרות באופן מקומי במכשיר שלך. לתכונות נגישות נוספות ברמת המערכת, בדוק את הגדרות המכשיר.",
+    "title": "בדרך שלך",
+    "subtitle": "תעשו נוח לעצמכם. נשמר אוטומטית.",
+    "footer": "נשמר במכשיר שלך. יש עוד אפשרויות נגישות בהגדרות המכשיר.",
     "fireRoundLights": {
-      "title": "השבת אורות סיבוב אש",
-      "description": "מכבה תאים זוהרים בצבעי הקשת במהלך סיבובי אש לחוויה ויזואלית רגועה יותר."
+      "title": "סיבוב אש רגוע",
+      "description": "בלי הקשתות הזוהרות - שומר על הרוגע בסיבובי האש"
     },
     "reduceMotion": {
-      "title": "צמצם אנימציות",
-      "description": "מצמצם אנימציות ומעברים לחוויה רגועה יותר. עוזר לרגישות לתנועה."
+      "title": "פחות תנועה",
+      "description": "פחות קפיצות, פחות סחרחורות - עדין יותר לעיניים"
     },
     "disableSounds": {
-      "title": "השבת אפקטים קוליים",
-      "description": "כבה את כל אפקטי הקול. בקרות המוזיקה עדיין זמינות בכותרת העליונה."
+      "title": "שקט",
+      "description": "משתיק הכל. המוזיקה עדיין בשליטה למעלה"
     },
     "highContrast": {
-      "title": "מצב ניגודיות גבוהה",
-      "description": "הגדל רוחב גבולות וניגודיות צבעים לנראות טובה יותר."
+      "title": "ניגודיות חזקה",
+      "description": "גבולות עבים יותר וצבעים ברורים - קל לראות"
     },
     "largerText": {
-      "title": "טקסט גדול יותר",
-      "description": "הגדל גודל גופן בסיסי ב-125% לקריאות טובה יותר."
+      "title": "אותיות גדולות",
+      "description": "מגדיל את הטקסט ב-125% - נוח יותר לקרוא"
     },
     "earthquakeEffects": {
-      "title": "ביטול אפקטי רעידת אדמה",
-      "description": "מכבה אנימציות רעידת אדמה אינטנסיביות (רעידות, אפקטים תלת-ממדיים, טשטוש תנועה ופסולת) לחוויה עדינה יותר."
+      "title": "בלי רעידות",
+      "description": "מכבה רעידות מסך ואפקטים אינטנסיביים - חוויה נעימה יותר"
     }
   },
   "peerValidation": {
-    "title": "זו מילה אמיתית?",
-    "submittedBy": "נשלח על ידי",
-    "valid": "תקין",
-    "invalid": "לא תקין",
-    "voteRecorded": "ההצבעה נרשמה!",
-    "yourWordRejected": "המילה שלך נדחתה!",
-    "wordRejected": "מילה נדחתה",
-    "communityRejected": "הקהילה הצביעה שמילה זו לא תקינה.",
-    "pointsLost": "נקודות שאבדו",
-    "wasRejected": "נדחתה",
-    "invalidVotes": "לא תקין",
-    "validVotes": "תקין"
+    "title": "באמת מילה?",
+    "submittedBy": "מאת",
+    "valid": "כן!",
+    "invalid": "לא...",
+    "voteRecorded": "הצבעת! 🗳️",
+    "yourWordRejected": "המילה שלך לא עברה!",
+    "wordRejected": "נפסלה",
+    "communityRejected": "השחקנים החליטו שזו לא מילה.",
+    "pointsLost": "נקודות שהלכו",
+    "wasRejected": "נפסלה",
+    "invalidVotes": "לא",
+    "validVotes": "כן"
   },
   "email": {
-    "title": "קבל אתגרים יומיים!",
+    "title": "פאזלים ישר לאינבוקס! 🧩",
     "placeholder": "האימייל@שלך.com",
-    "submit": "הירשם",
-    "submitting": "נרשם...",
-    "successTitle": "הכל מוכן!",
-    "successMessage": "נשלח לך אתגרים יומיים ותזכורות רצף. בדוק את תיבת הדואר!",
-    "privacy": "אנחנו מכבדים את הפרטיות שלך. ביטול מנוי בכל עת. ללא ספאם, מבטיחים.",
-    "benefitShort1": "תזכורות רצף",
-    "benefitShort2": "אתגרים יומיים"
+    "submit": "אני בפנים!",
+    "submitting": "רושם...",
+    "successTitle": "מושלם! 🎉",
+    "successMessage": "תזכורות יומיות בדרך אליך. גם רצפים לא ישכחו! 🔥",
+    "privacy": "בלי ספאם, מבטיחים. לבטל? קליק אחד בכל מייל.",
+    "benefitShort1": "שומרים על הרצף",
+    "benefitShort2": "פאזלים טריים"
   },
   "pwa": {
     "installTitle": "התקן את לקסיקלאש",
@@ -3179,18 +3179,18 @@ const he = {
   },
   "pushNotifications": {
     "settings": {
-      "title": "התראות פוש",
-      "description": "קבל תזכורות על הפאזלים היומיים שלך",
-      "enabled": "תזכורת יומית",
-      "enabledDesc": "נדנדה בוקרית לשחק את האתגרים היומיים שלך",
-      "time": "שעת התזכורת",
-      "timeDesc": "מתי להעיר אותך עם פאזל טרי",
-      "permissionRequired": "דרושה הרשאה",
-      "permissionDenied": "התראות חסומות",
-      "permissionDeniedDesc": "הפעל התראות בהגדרות המכשיר כדי לקבל תזכורות",
-      "openSettings": "פתח הגדרות",
-      "enableButton": "הפעל תזכורות",
-      "saved": "התזכורת נקבעה!"
+      "title": "התראה יומית",
+      "description": "לא תפספסו אף פאזל",
+      "enabled": "נדנוד בוקר",
+      "enabledDesc": "השכמה קטנה לפאזלים היומיים",
+      "time": "מתי?",
+      "timeDesc": "בחרו את הזמן המושלם שלכם",
+      "permissionRequired": "צריך אישור",
+      "permissionDenied": "תפעילו בהגדרות הטלפון",
+      "permissionDeniedDesc": "לכו להגדרות ותפעילו התראות",
+      "openSettings": "להגדרות",
+      "enableButton": "תזכירו לי",
+      "saved": "סגור!"
     },
     "daily": {
       "title1": "האתגר היומי מחכה לך!",
@@ -3253,48 +3253,48 @@ const he = {
     "sessionRecorded": "הקלטת הפעלה מצורפת"
   },
   "brain": {
-    "title": "אימון קוגניטיבי",
-    "score": "ציון קוגניטיבי",
-    "points": "נקודות קוגניטיביות",
-    "loading": "טוען אימון קוגניטיבי...",
+    "title": "חדר כושר למוח",
+    "score": "ציון מוח",
+    "points": "נקודות מוח",
+    "loading": "מחמם את המוח...",
     "nav": {
       "profile": "פרופיל",
       "home": "בית",
-      "brain": "אימון קוגניטיבי",
-      "dashboard": "לוח מחוונים קוגניטיבי"
+      "brain": "חדר כושר",
+      "dashboard": "הסטטיסטיקות שלך"
     },
     "domains": {
-      "processingSpeed": "מהירות עיבוד",
-      "processingSpeedDesc": "המהירות שבה המוח שלך מעבד מידע ומגיב",
-      "workingMemory": "זיכרון עבודה",
-      "workingMemoryDesc": "היכולת לשמור ולעבד מידע בטווח הקצר",
-      "attention": "קשב",
-      "attentionDesc": "היכולת להתמקד ולהישאר ערני במהלך משימות",
-      "flexibility": "גמישות",
-      "flexibilityDesc": "היכולת להתאים ולעבור בין משימות שונות",
+      "processingSpeed": "מהירות חשיבה",
+      "processingSpeedDesc": "כמה מהר אתה קולט ומגיב",
+      "workingMemory": "זיכרון פעיל",
+      "workingMemoryDesc": "להחזיק מידע תוך כדי חשיבה",
+      "attention": "ריכוז",
+      "attentionDesc": "להישאר חד כשזה חשוב",
+      "flexibility": "גמישות מחשבתית",
+      "flexibilityDesc": "לקפוץ בין משימות בקלות",
       "vocabulary": "אוצר מילים",
-      "vocabularyDesc": "עושר אוצר המילים והיכולת לשלוף מילים"
+      "vocabularyDesc": "הבנק שלך למילים"
     },
     "progress": {
-      "improving": "משתפר",
+      "improving": "עולה!",
       "declining": "יורד",
       "stable": "יציב"
     },
     "recommendation": {
-      "title": "טיפ אישי",
-      "startDrill": "התחל תרגיל",
-      "scienceHint": "תרגול ממוקד משפר יכולות קוגניטיביות ספציפיות 🧠",
-      "declining": "ה{domain} שלך ירד לאחרונה. התרגיל הזה יעזור!",
-      "low": "ה{domain} שלך צריך עבודה. תרגול עושה מושלם!",
-      "improve": "המשיכו לבנות את כישורי ה{domain}!",
-      "unlock": "שחקו עוד {games} משחקים לפתיחה"
+      "title": "נסה את זה",
+      "startDrill": "יאללה",
+      "scienceHint": "תרגול ממוקד = התקדמות מהירה יותר",
+      "declining": "ה{domain} שלך צריך בוסט. זה יעזור!",
+      "low": "בוא נחדד את ה{domain}!",
+      "improve": "תמשיך לפתח את ה{domain}!",
+      "unlock": "עוד {games} משחקים לפתיחה"
     },
     "welcomeBack": {
-      "title": "ברוך הבא חזרה!",
-      "longTime": "עבר הרבה זמן! המוח שלך מוכן להתאמן שוב 🧠",
-      "twoWeeks": "טוב לראות אותך! בוא נמשיך מאיפה שהפסקנו.",
-      "fewDays": "ברוך הבא! מוכן להמשיך להתקדם? 🚀",
-      "currentScore": "נוכחי",
+      "title": "חזרת!",
+      "longTime": "לא נראינו הרבה זמן! המוח התגעגע.",
+      "twoWeeks": "כיף שחזרת! נמשיך מאיפה שהפסקנו.",
+      "fewDays": "מוכן להמשיך לטפס?",
+      "currentScore": "עכשיו",
       "personalBest": "שיא",
       "bestStreak": "רצף שיא",
       "rebuildStreak": "זמן לבנות מחדש את הרצף! 🔥",
@@ -4472,6 +4472,7 @@ const he = {
     },
     "xp": {
       "level": "רמה",
+      "maxLevel": "רמה מקסימלית",
       "nextLevel": "רמה הבאה",
       "xpGained": "נקודות ניסיון",
       "totalXp": "סה\"כ נקודות",
