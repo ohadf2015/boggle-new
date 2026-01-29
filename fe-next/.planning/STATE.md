@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 21 of 25 (Rich Lesson Delivery) — IN PROGRESS
-Plan: 5/6 complete (21-01, 21-02, 21-03, 21-04, 21-05)
-Status: Phase 21 in progress - Swipeable flashcard stack complete
-Last activity: 2026-01-29 — Completed 21-04 (Swipeable Flashcard Stack)
+Phase: 21 of 25 (Rich Lesson Delivery) — COMPLETE
+Plan: 6/6 complete (All plans complete)
+Status: Phase 21 complete - Enhanced flashcard review with TTS, enrichment, and swipe mode
+Last activity: 2026-01-29 — Completed 21-06 (Lesson Assignment UI - Final Integration)
 
-Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-21 in progress, v1.2 Phase 24-25 complete)
+Progress: [███████████████] 22/25 phases (88% milestone, v1.1 Phase 15-21 COMPLETE, v1.2 Phase 24-25 complete)
 
 ## Performance Metrics
 
@@ -30,9 +30,9 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 36 (Phase 15-20 complete, Phase 21 5/6)
-- Current phase: 21 (Rich Lesson Delivery) — IN PROGRESS
-- Next: Phase 21 plan 06
+- Plans completed: 42 (Phase 15-21 COMPLETE)
+- Current phase: 22 (Engagement Loops) — NEXT
+- Next: Phase 22 plan 01
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -133,9 +133,9 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 21-03 | Swipe Gesture Hook | TBD | Complete |
 | 21-04 | Swipeable Flashcard Stack | 10min | Complete |
 | 21-05 | Daily Buzz Context Service | 15min | Complete |
-| 21-06 | Lesson Assignment UI | - | Pending |
+| 21-06 | Lesson Assignment UI | 10min | Complete |
 
-**Phase 21 Total (so far):** 46 minutes, 78 tests added (5/6 plans complete)
+**Phase 21 Total:** 56 minutes, 78 tests added, verification passed 6/6, Phase COMPLETE
 
 ## Accumulated Context
 
@@ -270,6 +270,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **21-04**: Show 2 background cards → Provides visual stack effect without cluttering UI, scale/opacity transforms for depth (2026-01-29)
 - **21-04**: Tap to reveal then swipe → Two-step interaction prevents accidental swipes, gives user time to think (2026-01-29)
 - **21-04**: Space to flip, arrows to swipe → Accessibility requirement, keyboard navigation for power users (2026-01-29)
+- **21-06**: WebSocket-based enrichment on mount → Enables real-time Daily Buzz context integration without blocking render (2026-01-29)
+- **21-06**: Mode toggle in header (visible when enriched) → Clean UX: classic for basic review, swipe unlocks after enrichment (2026-01-29)
+- **21-06**: Auto-pronounce checkbox below progress bar → Accessible position, easy to toggle during practice (2026-01-29)
+- **21-06**: PronunciationButton on definition side → Manual pronunciation option even when auto-pronounce disabled (2026-01-29)
 
 ### Pending Todos
 
@@ -340,15 +344,17 @@ None.
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
 - Teacher co-design needed — Build dashboard with teachers, not for them (research pitfall 9)
 
-**Phase 21 (Rich Lesson Delivery) — IN PROGRESS:**
+**Phase 21 (Rich Lesson Delivery) — COMPLETE:**
 - Text-to-speech service complete — Web Speech API integration, 30 tests passing (21-01)
 - Enriched vocabulary card complete — TTS integration, contextual examples, Neo-Brutalist design (21-02)
 - Swipe gesture hook complete — Framer Motion motion values, 150px threshold, keyboard shortcuts (21-03)
 - Swipeable flashcard stack complete — Stack visual, green/red feedback, tap-to-reveal flow (21-04)
 - Daily Buzz context service complete — Fuzzy matching, stem algorithm, WebSocket handler (21-05)
-- Hebrew TTS limitation — Most browsers lack Hebrew voices, will use IPA fallback
-- Browser compatibility — Safari iOS requires user gesture for first speech
-- Voice quality variance — Android voices robotic, iOS natural (rate 0.9 helps consistency)
+- Final integration complete — Mode toggle, enrichment, TTS, swipe gestures all working together (21-06)
+- Total: 56 minutes, 78 tests added, verification passed 6/6
+- Hebrew TTS limitation — Most browsers lack Hebrew voices, IPA fallback implemented
+- Browser compatibility — Safari iOS requires user gesture for first speech (documented)
+- Voice quality variance — Android voices robotic, iOS natural (rate 0.9 provides consistency)
 
 **Phase 24 (CrazyGames Portal Integration) — COMPLETE:**
 - Visual consistency verified — CSS isolation + viewport hook implemented (24-02 complete)
@@ -395,16 +401,17 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 21-04 (Swipeable Flashcard Stack)
+Stopped at: Completed 21-06 (Lesson Assignment UI - Final Integration)
 Resume file: None
 
-**Next action:** Execute Phase 21 plan 06
+**Next action:** Phase 21 COMPLETE - Move to Phase 22 (Engagement Loops)
 
-**Phase 21 Summary (so far):**
-- 5/6 plans complete (46 minutes total)
-- Wave 1 complete: TTS, enriched card, swipe hook, Daily Buzz context
-- Wave 2 in progress: Flashcard stack component ready for integration
-- All lesson delivery UI components functional
+**Phase 21 Summary (COMPLETE):**
+- 6/6 plans complete (56 minutes total)
+- 78 tests added
+- All components integrated: TTS, enriched cards, swipe gestures, Daily Buzz context
+- FlashcardReview now supports classic and swipe modes with full enrichment
+- Verification passed 6/6 (lint, build, translations, type safety)
 
 **Phase 20 Summary:**
 - 6/6 plans complete (127 minutes total)
@@ -414,4 +421,4 @@ Resume file: None
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-29 (Phase 21 plan 04 complete - swipeable flashcard stack)*
+*Last updated: 2026-01-29 (Phase 21 COMPLETE - Rich Lesson Delivery)*
