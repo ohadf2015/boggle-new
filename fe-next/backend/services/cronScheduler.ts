@@ -15,8 +15,8 @@ import type { Language } from '@/shared/types/game';
  * Works with Railway, Heroku, or any Node.js hosting
  */
 
-const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
-const EDGE_FUNCTION_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja'] as const;
+const EDGE_FUNCTION_LANGUAGES = ['en', 'he', 'sv', 'ja'] as const;
 
 export function startDailyBuzzCron() {
   // Validate Google credentials on startup
