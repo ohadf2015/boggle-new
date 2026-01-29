@@ -4365,7 +4365,13 @@ const ja = {
       "saving": "保存中...",
       "saved": "保存しました！",
       "noLessons": "まだレッスンがありません",
-      "createFirst": "最初の語彙レッスンを作成しましょう"
+      "createFirst": "最初の語彙レッスンを作成しましょう",
+      "definition": "定義",
+      "examples": "使用例",
+      "contextualExamples": "文脈での使用",
+      "pronounce": "発音を聞く",
+      "speaking": "再生中...",
+      "pronunciationFallback": "発音"
     },
     "lessons": {
       "assign": {

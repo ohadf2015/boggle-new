@@ -4340,7 +4340,13 @@ const he = {
       "saving": "שומר...",
       "saved": "השיעור נשמר!",
       "noLessons": "אין שיעורים עדיין",
-      "createFirst": "צרו את שיעור אוצר המילים הראשון"
+      "createFirst": "צרו את שיעור אוצר המילים הראשון",
+      "definition": "הגדרה",
+      "examples": "דוגמאות שימוש",
+      "contextualExamples": "בהקשר",
+      "pronounce": "הקשב להגייה",
+      "speaking": "מדבר...",
+      "pronunciationFallback": "הגייה"
     },
     "lessons": {
       "assign": {

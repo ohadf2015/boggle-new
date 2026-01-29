@@ -4334,7 +4334,13 @@ const en = {
       "saving": "Saving...",
       "saved": "Lesson saved!",
       "noLessons": "No lessons yet",
-      "createFirst": "Create your first vocabulary lesson"
+      "createFirst": "Create your first vocabulary lesson",
+      "definition": "Definition",
+      "examples": "Usage Examples",
+      "contextualExamples": "In Context",
+      "pronounce": "Listen to pronunciation",
+      "speaking": "Speaking...",
+      "pronunciationFallback": "Pronunciation"
     },
     "lessons": {
       "assign": {

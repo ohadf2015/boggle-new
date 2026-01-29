@@ -4365,7 +4365,13 @@ const sv = {
       "saving": "Sparar...",
       "saved": "Lektion sparad!",
       "noLessons": "Inga lektioner än",
-      "createFirst": "Skapa din första gloslektion"
+      "createFirst": "Skapa din första gloslektion",
+      "definition": "Definition",
+      "examples": "Användningsexempel",
+      "contextualExamples": "I sammanhang",
+      "pronounce": "Lyssna på uttal",
+      "speaking": "Talar...",
+      "pronunciationFallback": "Uttal"
     },
     "lessons": {
       "assign": {
