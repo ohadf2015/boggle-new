@@ -73,7 +73,7 @@ export default function FlashcardReview({
     if (!socket) {
       const basicEnriched: EnrichedVocabularyWord[] = words.map((word) => ({
         word: word.word,
-        definition: word.definition || 'No definition provided',
+        definition: word.definition || '',
         pronunciation: undefined,
         partOfSpeech: undefined,
         examples: [],
@@ -88,7 +88,7 @@ export default function FlashcardReview({
     // Convert VocabularyWord to enrichment format
     const wordsToEnrich = words.map((word) => ({
       word: word.word,
-      definition: word.definition || 'No definition provided',
+      definition: word.definition || '',
     }));
 
     // Request enrichment via WebSocket
@@ -430,7 +430,7 @@ export default function FlashcardReview({
                         />
                       </div>
                       <p className="text-xl sm:text-2xl font-neo-body text-neo-white">
-                        {currentWord.definition || 'No definition provided'}
+                        {currentWord.definition || t('education.practice.noDefinition')}
                       </p>
                     </div>
                   ) : (

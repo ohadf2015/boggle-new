@@ -286,9 +286,8 @@ export async function getCommonMistakes(
       progressData.forEach((progress) => {
         if (!progress.words_attempted) return;
 
-        type WordAttemptData = { correct?: number; attempts?: number };
-        const wordsData = progress.words_attempted as Record<string, WordAttemptData>;
-        (Object.entries(wordsData) as [string, WordAttemptData][]).forEach(([word, wordAttempt]) => {
+        const wordsData = progress.words_attempted as WordsAttemptedRecord;
+        Object.entries(wordsData).forEach(([word, wordAttempt]) => {
           const existing = wordStats.get(word);
           if (existing) {
             existing.attempts += wordAttempt.attempts || 0;
@@ -517,13 +516,11 @@ export async function getStudentsProgressSummary(
 
         // Calculate accuracy from words_attempted
         if (progress.words_attempted) {
-          const wordsData = progress.words_attempted as Record<string, { correct?: number; attempts?: number }>;
+          const wordsData = progress.words_attempted as WordsAttemptedRecord;
           Object.values(wordsData).forEach(word => {
-            const correct = word.correct || 0;
-            const attempts = word.attempts || 0;
-            totalCorrect += correct;
-            totalAttempts += attempts;
-            wordsAttempted += attempts; // Count total attempts
+            totalCorrect += word.correct || 0;
+            totalAttempts += word.attempts || 0;
+            wordsAttempted += word.attempts || 0; // Count total attempts
           });
         }
 
@@ -675,7 +672,7 @@ export async function getLessonEffectiveness(
 
         // Calculate accuracy from words_attempted
         if (progress.words_attempted) {
-          const wordsData = progress.words_attempted as Record<string, { correct?: number; attempts?: number }>;
+          const wordsData = progress.words_attempted as WordsAttemptedRecord;
           Object.values(wordsData).forEach(word => {
             metrics.totalCorrect += word.correct || 0;
             metrics.totalAttempts += word.attempts || 0;
@@ -831,7 +828,7 @@ export async function getVocabularyHeatmapData(
 
         if (progressData) {
           progressData.forEach((progress) => {
-            const wordsData = progress.words_attempted as Record<string, { correct?: number; attempts?: number }> | null;
+            const wordsData = progress.words_attempted as WordsAttemptedRecord | null;
             if (progress.student_id === student.id && wordsData?.[word]) {
               const wordData = wordsData[word];
               totalAttempts += wordData.attempts || 0;

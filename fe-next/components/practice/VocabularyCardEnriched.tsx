@@ -68,7 +68,7 @@ export function VocabularyCardEnriched({
           {t('education.lesson.definition')}
         </h4>
         <p className="text-base font-neo-body text-neo-navy leading-relaxed">
-          {word.definition}
+          {word.definition || t('education.practice.noDefinition')}
         </p>
       </div>
 

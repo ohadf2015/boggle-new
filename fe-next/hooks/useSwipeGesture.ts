@@ -15,6 +15,34 @@
  *   threshold: 150,
  * });
  * ```
+ *
+ * ## Migration from v1 API (Phase 21)
+ *
+ * The API was simplified from separate callbacks to a unified callback:
+ *
+ * ```tsx
+ * // OLD API (deprecated)
+ * useSwipeGesture({
+ *   onSwipeLeft: () => handleNext(),
+ *   onSwipeRight: () => handleBack(),
+ *   isRtl: dir === 'rtl',
+ *   enableHaptic: true,
+ * });
+ *
+ * // NEW API (current)
+ * useSwipeGesture({
+ *   onSwipe: (direction) => {
+ *     if (direction === 'left') handleNext();
+ *     else if (direction === 'right') handleBack();
+ *   },
+ *   threshold: 150,
+ * });
+ * ```
+ *
+ * **Breaking changes:**
+ * - `onSwipeLeft`/`onSwipeRight` replaced with `onSwipe(direction)`
+ * - `isRtl` removed (handle RTL in your callback if needed)
+ * - `enableHaptic` removed (trigger haptics in your callback if needed)
  */
 
 import { useMotionValue, useTransform, MotionValue } from 'framer-motion';
