@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 21 of 25 (Rich Lesson Delivery) — IN PROGRESS
-Plan: 2/6 complete (21-01, 21-02)
-Status: Phase 21 in progress - Enriched vocabulary card complete
-Last activity: 2026-01-29 — Completed 21-02 (Enriched Vocabulary Card)
+Plan: 5/6 complete (21-01, 21-02, 21-03, 21-04, 21-05)
+Status: Phase 21 in progress - Daily Buzz context service complete
+Last activity: 2026-01-29 — Completed 21-05 (Daily Buzz Context Service)
 
 Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-21 in progress, v1.2 Phase 24-25 complete)
 
@@ -30,9 +30,9 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 32 (Phase 15-20 complete, Phase 21 2/6)
+- Plans completed: 35 (Phase 15-20 complete, Phase 21 5/6)
 - Current phase: 21 (Rich Lesson Delivery) — IN PROGRESS
-- Next: Phase 21 plans 03-06
+- Next: Phase 21 plan 06
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -130,12 +130,12 @@ Progress: [██████████████] 21/25 phases (84% milesto
 |------|------|----------|--------|
 | 21-01 | Text-to-Speech Service | 6min | Complete |
 | 21-02 | Enriched Vocabulary Card | 15min | Complete |
-| 21-03 | Lesson Practice Flow | - | Pending |
-| 21-04 | Progress Tracking | - | Pending |
-| 21-05 | Lesson Assignment UI | - | Pending |
-| 21-06 | Integration & Testing | - | Pending |
+| 21-03 | Swipe Gesture Hook | TBD | Complete |
+| 21-04 | Lesson Builder Components | - | Pending |
+| 21-05 | Daily Buzz Context Service | 15min | Complete |
+| 21-06 | Lesson Assignment UI | - | Pending |
 
-**Phase 21 Total (so far):** 10 minutes, 30 tests added (1/6 plans complete)
+**Phase 21 Total (so far):** 36 minutes, 78 tests added (5/6 plans complete)
 
 ## Accumulated Context
 
@@ -257,6 +257,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **21-01**: Promise-based API with onend/onerror handlers → Async speech completion tracking, proper error handling (2026-01-29)
 - **21-01**: useRef for isMounted tracking → Prevents state updates after unmount, avoids React warnings (2026-01-29)
 - **21-03**: useMotionValue for x position (not useState) → Framer Motion provides performant animations without re-renders, 60fps on mobile (2026-01-29)
+- **21-05**: Stem matching algorithm (-ing/-ed/-s/-es/-ies/-y) → Handles word variations (technology/technologies/technological) for fuzzy matching (2026-01-29)
+- **21-05**: Bidirectional fuzzy matching → Checks both target in word AND word in target, maximizes contextual example discovery (2026-01-29)
+- **21-05**: Zod validation for WebSocket payloads → Type safety at runtime, better error messages for vocabulary enrichment (2026-01-29)
+- **21-05**: Graceful degradation (empty arrays on error) → Missing Daily Buzz context doesn't break lesson flow (2026-01-29)
 - **21-03**: State subscription via x.onChange() → useMemo doesn't react to motion values, useEffect pattern for reactive derived state (2026-01-29)
 - **21-03**: Threshold detection on drag end → Performance optimization, avoids continuous checks during drag (2026-01-29)
 - **21-03**: ArrowLeft/ArrowRight keyboard shortcuts → Accessibility requirement, all interactions (drag + keyboard) tested (2026-01-29)
