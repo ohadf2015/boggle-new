@@ -20,6 +20,10 @@ const activeSubscriptions = new Map<string, RealtimeChannel>();
 const leaderboardCallbacks = new Set<(payload: any) => void>();
 const leaderboardStatusCallbacks = new Set<(status: string) => void>();
 
+// Subscriber callbacks for classroom progress
+const classroomProgressCallbacks = new Map<string, Set<(payload: any) => void>>();
+const classroomProgressStatusCallbacks = new Map<string, Set<(status: string) => void>>();
+
 // Debounce timers
 const debounceTimers = new Map<string, NodeJS.Timeout>();
 
@@ -66,6 +70,88 @@ interface GameRoomChannel {
   track: (userData: any) => any;
   untrack: () => any;
   unsubscribe: () => void;
+}
+
+/**
+ * Get or create the shared classroom progress channel (singleton pattern per classroom)
+ * This ensures only one WebSocket subscription per classroom across all consumers
+ */
+function getOrCreateClassroomProgressChannel(classroomId: string): RealtimeChannel | null {
+  if (!supabase) {
+    logger.warn('[Realtime] Supabase not configured');
+    return null;
+  }
+
+  const channelName = `classroom-progress-${classroomId}`;
+
+  // Return existing channel if already created
+  if (activeSubscriptions.has(channelName)) {
+    return activeSubscriptions.get(channelName)!;
+  }
+
+  logger.log('[Realtime] Creating classroom progress channel:', classroomId);
+
+  const channel = supabase
+    .channel(channelName)
+    .on(
+      'postgres_changes',
+      {
+        event: '*', // Listen to all events: INSERT (new progress), UPDATE (progress updates), DELETE
+        schema: 'public',
+        table: 'student_lesson_progress'
+      },
+      (payload) => {
+        logger.log('[Realtime] Classroom progress change:', payload.eventType, payload.new);
+
+        // Get callbacks for this classroom
+        const callbacks = classroomProgressCallbacks.get(classroomId);
+        if (!callbacks) return;
+
+        // Extract student ID from payload
+        const studentId = (payload.new as any)?.student_id || (payload.old as any)?.student_id;
+
+        // Notify all subscribers with debouncing per callback
+        callbacks.forEach(callback => {
+          const debounceKey = `classroom-${classroomId}-callback-${callback.toString().slice(0, 50)}`;
+          debounce(debounceKey, () => {
+            callback({
+              studentId,
+              eventType: payload.eventType,
+              data: payload.new || payload.old,
+            });
+          }, 500);
+        });
+      }
+    )
+    .subscribe((status) => {
+      logger.log('[Realtime] Classroom progress subscription status:', classroomId, status);
+
+      // Handle connection recovery
+      if (status === REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR || status === REALTIME_SUBSCRIBE_STATES.TIMED_OUT) {
+        if (connectionRetryCount < MAX_RETRY_COUNT) {
+          const delay = getRetryDelay(connectionRetryCount);
+          logger.warn(`[Realtime] Classroom progress connection failed, retrying in ${delay}ms (attempt ${connectionRetryCount + 1}/${MAX_RETRY_COUNT})`);
+          connectionRetryCount++;
+          setTimeout(() => {
+            // Remove and recreate channel
+            activeSubscriptions.delete(channelName);
+            supabase?.removeChannel(channel);
+            getOrCreateClassroomProgressChannel(classroomId);
+          }, delay);
+        } else {
+          logger.error('[Realtime] Classroom progress connection failed after max retries');
+        }
+      } else if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
+        connectionRetryCount = 0; // Reset on successful connection
+      }
+
+      // Notify all status subscribers for this classroom
+      const statusCallbacks = classroomProgressStatusCallbacks.get(classroomId);
+      statusCallbacks?.forEach(callback => callback(status));
+    });
+
+  activeSubscriptions.set(channelName, channel);
+  return channel;
 }
 
 /**
@@ -132,6 +218,66 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
 
   activeSubscriptions.set(channelName, channel);
   return channel;
+}
+
+/**
+ * Subscribe to classroom student progress changes (uses shared singleton channel per classroom)
+ * Multiple consumers for the same classroom share the same WebSocket subscription
+ *
+ * @param classroomId - Classroom ID to watch
+ * @param onUpdate - Callback when any student's progress changes (debounced by default)
+ * @param options - Subscription options
+ * @returns Unsubscribe function
+ */
+export function subscribeToClassroomProgress(
+  classroomId: string,
+  onUpdate: (payload: { studentId: string; eventType: string; data: any }) => void,
+  options: SubscriptionOptions = {}
+): () => void {
+  const channel = getOrCreateClassroomProgressChannel(classroomId);
+
+  if (!channel) {
+    return () => {};
+  }
+
+  // Get or create callback set for this classroom
+  if (!classroomProgressCallbacks.has(classroomId)) {
+    classroomProgressCallbacks.set(classroomId, new Set());
+  }
+  const callbacks = classroomProgressCallbacks.get(classroomId)!;
+
+  // Add callback to the set
+  callbacks.add(onUpdate);
+
+  // Add status callback if provided
+  if (options.onStatusChange) {
+    if (!classroomProgressStatusCallbacks.has(classroomId)) {
+      classroomProgressStatusCallbacks.set(classroomId, new Set());
+    }
+    classroomProgressStatusCallbacks.get(classroomId)!.add(options.onStatusChange);
+  }
+
+  return () => {
+    logger.log('[Realtime] Removing classroom progress subscriber:', classroomId);
+    callbacks.delete(onUpdate);
+
+    if (options.onStatusChange) {
+      classroomProgressStatusCallbacks.get(classroomId)?.delete(options.onStatusChange);
+    }
+
+    // Only remove the channel if no more subscribers for this classroom
+    if (callbacks.size === 0) {
+      logger.log('[Realtime] No more classroom progress subscribers, cleaning up channel:', classroomId);
+      const channelName = `classroom-progress-${classroomId}`;
+      const existingChannel = activeSubscriptions.get(channelName);
+      if (existingChannel && supabase) {
+        supabase?.removeChannel(existingChannel);
+        activeSubscriptions.delete(channelName);
+        classroomProgressCallbacks.delete(classroomId);
+        classroomProgressStatusCallbacks.delete(classroomId);
+      }
+    }
+  };
 }
 
 /**
@@ -377,6 +523,8 @@ export function cleanupAllSubscriptions(): void {
   // Clear callback sets
   leaderboardCallbacks.clear();
   leaderboardStatusCallbacks.clear();
+  classroomProgressCallbacks.clear();
+  classroomProgressStatusCallbacks.clear();
 
   // Remove all channels
   activeSubscriptions.forEach((channel) => {
@@ -394,11 +542,18 @@ export function cleanupAllSubscriptions(): void {
 export function getSubscriptionStats(): {
   activeChannels: number;
   leaderboardSubscribers: number;
+  classroomProgressSubscribers: number;
   pendingDebounces: number;
 } {
+  let classroomProgressTotal = 0;
+  classroomProgressCallbacks.forEach(callbacks => {
+    classroomProgressTotal += callbacks.size;
+  });
+
   return {
     activeChannels: activeSubscriptions.size,
     leaderboardSubscribers: leaderboardCallbacks.size,
+    classroomProgressSubscribers: classroomProgressTotal,
     pendingDebounces: debounceTimers.size
   };
 }

@@ -1,4 +1,4 @@
-import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics, getStudentsProgressSummary, getLessonEffectiveness } from '../analytics';
+import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics, getStudentsProgressSummary, getLessonEffectiveness, getVocabularyHeatmapData } from '../analytics';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
@@ -487,6 +487,297 @@ describe('analytics - getLessonEffectiveness', () => {
 
     // THEN
     expect(result.data?.[0].lessonName).toBe('Advanced Verbs');
+  });
+});
+
+describe('analytics - getVocabularyHeatmapData', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return empty data for classroom with no students', async () => {
+    // GIVEN: Empty classroom
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    });
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-empty');
+
+    // THEN
+    expect(result.data?.students).toEqual([]);
+    expect(result.data?.words).toEqual([]);
+    expect(result.data?.cells).toEqual([]);
+    expect(result.error).toBeNull();
+  });
+
+  it('should calculate mastery level correctly - mastered (>=80% accuracy, >=3 attempts)', async () => {
+    // GIVEN: Student with mastered word
+    const mockMemberships = [{ student_id: 'student-1' }];
+    const mockProfiles = [{ id: 'student-1', display_name: 'Alice' }];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          excellence: { attempts: 5, correct: 4 }, // 80% accuracy, 5 attempts -> mastered
+        },
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-1');
+
+    // THEN
+    expect(result.data?.cells).toHaveLength(1);
+    expect(result.data?.cells[0]).toMatchObject({
+      studentId: 'student-1',
+      studentName: 'Alice',
+      word: 'excellence',
+      masteryLevel: 'mastered',
+      accuracy: 80,
+      attempts: 5,
+    });
+  });
+
+  it('should calculate mastery level correctly - practicing (50-79% accuracy)', async () => {
+    // GIVEN: Student practicing a word
+    const mockMemberships = [{ student_id: 'student-1' }];
+    const mockProfiles = [{ id: 'student-1', display_name: 'Bob' }];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          challenge: { attempts: 10, correct: 6 }, // 60% accuracy -> practicing
+        },
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-1');
+
+    // THEN
+    expect(result.data?.cells[0].masteryLevel).toBe('practicing');
+    expect(result.data?.cells[0].accuracy).toBe(60);
+  });
+
+  it('should calculate mastery level correctly - struggling (<50% accuracy)', async () => {
+    // GIVEN: Student struggling with a word
+    const mockMemberships = [{ student_id: 'student-1' }];
+    const mockProfiles = [{ id: 'student-1', display_name: 'Charlie' }];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          difficult: { attempts: 10, correct: 3 }, // 30% accuracy -> struggling
+        },
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-1');
+
+    // THEN
+    expect(result.data?.cells[0].masteryLevel).toBe('struggling');
+    expect(result.data?.cells[0].accuracy).toBe(30);
+  });
+
+  it('should calculate mastery level correctly - not-started (0 attempts)', async () => {
+    // GIVEN: Two students, one has attempted word, one has not
+    const mockMemberships = [
+      { student_id: 'student-1' },
+      { student_id: 'student-2' },
+    ];
+    const mockProfiles = [
+      { id: 'student-1', display_name: 'Alice' },
+      { id: 'student-2', display_name: 'Diana' },
+    ];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          word1: { attempts: 5, correct: 4 },
+        },
+      },
+      {
+        student_id: 'student-2',
+        lesson_id: 'lesson-1',
+        words_attempted: {}, // No attempts yet
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-1');
+
+    // THEN
+    // Alice has attempted word1
+    const aliceCell = result.data?.cells.find(c => c.studentId === 'student-1' && c.word === 'word1');
+    expect(aliceCell?.masteryLevel).toBe('mastered');
+
+    // Diana has not attempted word1 yet
+    const dianaCell = result.data?.cells.find(c => c.studentId === 'student-2' && c.word === 'word1');
+    expect(dianaCell?.masteryLevel).toBe('not-started');
+    expect(dianaCell?.attempts).toBe(0);
+    expect(dianaCell?.accuracy).toBe(0);
+  });
+
+  it('should return all unique words across students', async () => {
+    // GIVEN: Multiple students with different words attempted
+    const mockMemberships = [
+      { student_id: 'student-1' },
+      { student_id: 'student-2' },
+    ];
+    const mockProfiles = [
+      { id: 'student-1', display_name: 'Alice' },
+      { id: 'student-2', display_name: 'Bob' },
+    ];
+    const mockProgress = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          apple: { attempts: 3, correct: 3 },
+          banana: { attempts: 2, correct: 1 },
+        },
+      },
+      {
+        student_id: 'student-2',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          banana: { attempts: 4, correct: 2 },
+          cherry: { attempts: 5, correct: 4 },
+        },
+      },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-1');
+
+    // THEN
+    expect(result.data?.words).toEqual(expect.arrayContaining(['apple', 'banana', 'cherry']));
+    expect(result.data?.words).toHaveLength(3);
+  });
+
+  it('should filter by lessonId when provided', async () => {
+    // GIVEN: Multiple lessons, filter by one
+    const mockMemberships = [{ student_id: 'student-1' }];
+    const mockProfiles = [{ id: 'student-1', display_name: 'Alice' }];
+    const mockProgressLesson1 = [
+      {
+        student_id: 'student-1',
+        lesson_id: 'lesson-1',
+        words_attempted: {
+          word1: { attempts: 3, correct: 3 },
+        },
+      },
+    ];
+
+    const mockProgressQuery = {
+      select: jest.fn().mockReturnThis(),
+      in: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+    };
+    // Last eq returns the data
+    mockProgressQuery.eq.mockResolvedValue({ data: mockProgressLesson1, error: null });
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+      })
+      .mockReturnValueOnce(mockProgressQuery);
+
+    // WHEN
+    const { getVocabularyHeatmapData } = await import('../analytics');
+    const result = await getVocabularyHeatmapData('classroom-1', 'lesson-1');
+
+    // THEN
+    expect(result.data?.words).toEqual(['word1']);
+    expect(result.error).toBeNull();
   });
 });
 

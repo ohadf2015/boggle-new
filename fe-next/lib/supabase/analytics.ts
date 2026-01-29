@@ -56,6 +56,23 @@ export interface StudentProgressSummary {
   currentStreak: number;
 }
 
+export type MasteryLevel = 'mastered' | 'practicing' | 'struggling' | 'not-started';
+
+export interface HeatmapCell {
+  studentId: string;
+  studentName: string;
+  word: string;
+  masteryLevel: MasteryLevel;
+  accuracy: number;           // 0-100
+  attempts: number;
+}
+
+export interface VocabularyHeatmapData {
+  students: Array<{ id: string; name: string }>;
+  words: string[];
+  cells: HeatmapCell[];
+}
+
 // =============================================
 // ANALYTICS QUERIES
 // =============================================
@@ -693,5 +710,161 @@ export async function getLessonEffectiveness(
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getLessonEffectiveness:', error);
     return { data: [], error: { message: error } };
+  }
+}
+
+/**
+ * Get vocabulary mastery heatmap data (student × word grid)
+ *
+ * @param classroomId - Classroom ID
+ * @param lessonId - Optional lesson filter
+ * @returns Heatmap data with students, words, and cells
+ */
+export async function getVocabularyHeatmapData(
+  classroomId: string,
+  lessonId?: string
+): Promise<{ data: VocabularyHeatmapData; error: { message: string } | null }> {
+  if (!supabase) {
+    return {
+      data: { students: [], words: [], cells: [] },
+      error: { message: 'Supabase not configured' },
+    };
+  }
+
+  try {
+    // Get all students in classroom
+    const { data: memberships, error: memberError } = await supabase
+      .from('classroom_memberships')
+      .select('student_id')
+      .eq('classroom_id', classroomId);
+
+    if (memberError) {
+      logger.error('Error fetching classroom memberships:', memberError);
+      return {
+        data: { students: [], words: [], cells: [] },
+        error: { message: memberError.message },
+      };
+    }
+
+    if (!memberships || memberships.length === 0) {
+      return {
+        data: { students: [], words: [], cells: [] },
+        error: null,
+      };
+    }
+
+    const studentIds = memberships.map(m => m.student_id);
+
+    // Get profiles for display names
+    const { data: profiles, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', studentIds);
+
+    if (profileError) {
+      logger.error('Error fetching profiles:', profileError);
+      return {
+        data: { students: [], words: [], cells: [] },
+        error: { message: profileError.message },
+      };
+    }
+
+    // Build student list
+    const students = (profiles || []).map(p => ({
+      id: p.id,
+      name: p.display_name || 'Unknown',
+    }));
+
+    // Get progress data
+    let query = supabase
+      .from('student_lesson_progress')
+      .select('student_id, lesson_id, words_attempted')
+      .in('student_id', studentIds);
+
+    if (lessonId) {
+      query = query.eq('lesson_id', lessonId);
+    }
+
+    const { data: progressData, error: progressError } = await query;
+
+    if (progressError) {
+      logger.error('Error fetching progress:', progressError);
+      return {
+        data: { students: [], words: [], cells: [] },
+        error: { message: progressError.message },
+      };
+    }
+
+    // Extract unique words across all students
+    const wordsSet = new Set<string>();
+    if (progressData) {
+      progressData.forEach((progress: StudentLessonProgress) => {
+        if (progress.words_attempted) {
+          Object.keys(progress.words_attempted).forEach(word => {
+            wordsSet.add(word);
+          });
+        }
+      });
+    }
+
+    const words = Array.from(wordsSet);
+
+    // Build cells
+    const cells: HeatmapCell[] = [];
+
+    students.forEach(student => {
+      words.forEach(word => {
+        // Find student's attempt for this word across all lessons
+        let totalAttempts = 0;
+        let totalCorrect = 0;
+
+        if (progressData) {
+          progressData.forEach((progress: StudentLessonProgress) => {
+            if (progress.student_id === student.id && progress.words_attempted?.[word]) {
+              const wordData = progress.words_attempted[word];
+              totalAttempts += wordData.attempts || 0;
+              totalCorrect += wordData.correct || 0;
+            }
+          });
+        }
+
+        // Calculate mastery level
+        let masteryLevel: MasteryLevel = 'not-started';
+        let accuracy = 0;
+
+        if (totalAttempts > 0) {
+          accuracy = Math.round((totalCorrect / totalAttempts) * 100);
+
+          if (accuracy >= 80 && totalAttempts >= 3) {
+            masteryLevel = 'mastered';
+          } else if (accuracy >= 50) {
+            masteryLevel = 'practicing';
+          } else {
+            masteryLevel = 'struggling';
+          }
+        }
+
+        cells.push({
+          studentId: student.id,
+          studentName: student.name,
+          word,
+          masteryLevel,
+          accuracy,
+          attempts: totalAttempts,
+        });
+      });
+    });
+
+    return {
+      data: { students, words, cells },
+      error: null,
+    };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getVocabularyHeatmapData:', error);
+    return {
+      data: { students: [], words: [], cells: [] },
+      error: { message: error },
+    };
   }
 }
