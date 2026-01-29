@@ -68,6 +68,25 @@ LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, imm
 - ✓ Student classroom join flow — v1.0
 - ✓ Lesson assignment system — v1.0
 - ✓ Student practice mode — v1.0
+- ✓ Student analytics dashboard — v1.1
+- ✓ Education XP and leveling system — v1.1
+- ✓ Achievement badges (18 types, 4 tiers) — v1.1
+- ✓ Classroom leaderboards — v1.1
+- ✓ Rich lesson delivery with TTS — v1.1
+- ✓ Swipeable flashcard review — v1.1
+- ✓ Daily Buzz contextual examples — v1.1
+
+**v1.1 Adventure:**
+- ✓ Chain combo system with 1.5x multiplier — v1.1
+- ✓ Combo tier feedback (Nice/Great/Amazing/Legendary) — v1.1
+- ✓ Chain particle effects — v1.1
+- ✓ Boss battle foundation (10 bosses with mechanics) — v1.1
+- ✓ Boss HP tracking with 5-phase state machine — v1.1
+- ✓ Boss HP bar with animations — v1.1
+
+**Platform Integration:**
+- ✓ CrazyGames SDK integration — v1.1
+- ✓ Native iOS/Android apps (Capacitor) — v1.1
 
 **Existing (pre-v1):**
 - ✓ Multiplayer real-time gameplay — existing
@@ -80,21 +99,59 @@ LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, imm
 
 ### Active
 
-<!-- v1.1 milestone scope -->
+<!-- v2.0 milestone scope -->
 
-**Adventure Expansion:**
-- [ ] World 4: Idiom Archipelago full theming (parallax, particles, board decorations, AI backgrounds)
-- [ ] World 5: Compound Canyon full theming (parallax, particles, board decorations, AI backgrounds)
-- [ ] Boss battle system (end-of-world challenges with special mechanics)
-- [ ] Chain/combo auto-cascade system (satisfying chain reactions)
+**Dynamic Board Mechanics:**
+- [ ] Moving/shifting tiles system
+- [ ] Collapsing tiles with cascade effects
+- [ ] Candy Crush-style explosions and animations
+- [ ] Special tile types (frozen, locked, multiplier)
+- [ ] Board transformation effects
 
-**Education Enhancements:**
-- [ ] Student analytics dashboard (progress tracking, mastery metrics, performance reports)
-- [ ] Gamification system (XP, achievements, streaks, classroom leaderboards)
-- [ ] Rich lesson delivery (vocabulary explanations, examples, contextual content)
+**Power-Up System:**
+- [ ] Mid-game power-ups (freeze time, hints, score boost)
+- [ ] Power-up cooldown and availability system
+- [ ] Visual feedback and activation animations
+- [ ] Power-up unlock progression
 
-**Tech Debt & Polish:**
-- [ ] Entry sequence timing optimization (2.38s → 2s target)
+**Meta-Progression:**
+- [ ] Permanent upgrades across levels
+- [ ] Player skill tree or talent system
+- [ ] Unlock new abilities and mechanics
+- [ ] Progression rewards and milestones
+
+**Boss Battle Overhaul:**
+- [ ] Bosses feel like real fights with cinematic presence
+- [ ] Unique graphics and animations per boss
+- [ ] Special boss abilities that change board state
+- [ ] Enhanced boss mechanics (visual + gameplay)
+- [ ] Boss entrance and defeat cinematics
+
+**Dynamic Difficulty:**
+- [ ] Adaptive difficulty based on player performance
+- [ ] Difficulty indicators and player feedback
+- [ ] Balanced challenge curve
+
+**Visual Content Pipeline:**
+- [ ] Enhanced Remotion video compositions
+- [ ] New graphics generation using Image MCP
+- [ ] Improved background removal with Python
+- [ ] Epic victory and defeat sequences
+- [ ] Level intro cinematics
+
+**UI Polish & Focus:**
+- [ ] Improved visual hierarchy during gameplay
+- [ ] Enhanced animated feedback for all actions
+- [ ] Clear progress indicators (objectives, cooldowns, phases)
+- [ ] Streamlined in-game interface
+- [ ] Better focus on board during gameplay
+
+**World Expansion (from v1.1):**
+- [ ] World 4: Idiom Archipelago full theming
+- [ ] World 5: Compound Canyon full theming
+
+**Tech Debt Cleanup (from v1.1):**
+- [ ] Entry sequence timing optimization (2.38s → 2s)
 - [ ] Video MP4 rendering pipeline
 - [ ] Bug fixes (BUG-004 through BUG-008)
 - [ ] Lexi stuck detection
@@ -153,18 +210,19 @@ LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, imm
 - **Performance**: Animations must support reduced-motion preference
 - **File Size**: Max 500 lines per file, split larger
 
-## Current Milestone: v1.1 Adventure & Education Expansion
+## Current Milestone: v2.0 Adventure Overhaul
 
-**Goal:** Expand adventure mode with Worlds 4-5, boss battles, and chain combos while enhancing education mode with analytics and gamification.
+**Goal:** Transform Adventure Mode into a feature-rich, visually spectacular experience with dynamic board mechanics, power systems, meta-progression, and cinematic boss battles.
 
 **Target features:**
-- World 4 (Idiom Archipelago) and World 5 (Compound Canyon) with full theming
-- Boss battle system for end-of-world challenges
-- Chain/combo auto-cascade for satisfying gameplay
-- Student analytics and progress tracking
-- Education gamification (XP, achievements, streaks)
-- Rich lesson content delivery
-- Tech debt cleanup (timing, video rendering, bugs)
+- Dynamic board mechanics (moving tiles, collapsing cascades, Candy Crush-style explosions)
+- Power-up system with mid-game boosters (freeze time, hints, score multipliers)
+- Meta-progression with permanent upgrades and skill trees
+- Boss battle overhaul with unique graphics, special abilities, and cinematic presence
+- Enhanced visual content pipeline (Remotion videos, Image MCP graphics, Python background removal)
+- Polished in-game UI with improved hierarchy, animated feedback, and progress indicators
+- Dynamic difficulty system adapting to player performance
+- Complete v1.1 carryover work (Worlds 4-5, tech debt cleanup)
 
 ---
-*Last updated: 2026-01-25 after v1.1 milestone start*
+*Last updated: 2026-01-30 after v2.0 milestone start*
