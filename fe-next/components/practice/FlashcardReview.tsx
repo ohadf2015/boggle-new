@@ -22,6 +22,8 @@ import type { VocabularyWord } from '@/lib/supabase/teacher';
 import { FlashcardSwipeStack } from './FlashcardSwipeStack';
 import type { EnrichedVocabularyWord, VocabularyExample } from '@/types/vocabulary';
 import { socket } from '@/lib/socket';
+import { PronunciationButton } from './PronunciationButton';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -54,6 +56,9 @@ export default function FlashcardReview({
   const [reviewMode, setReviewMode] = useState<ReviewMode>('classic');
   const [enrichedWords, setEnrichedWords] = useState<EnrichedVocabularyWord[]>([]);
   const [isEnriching, setIsEnriching] = useState(false);
+  const [autoPronounce, setAutoPronounce] = useState(false);
+
+  const { speak } = useSpeechSynthesis(language);
 
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
@@ -101,8 +106,15 @@ export default function FlashcardReview({
   }, [words, language]);
 
   const handleFlip = useCallback(() => {
-    setIsFlipped((prev) => !prev);
-  }, []);
+    setIsFlipped((prev) => {
+      const nextFlipped = !prev;
+      // Auto-pronounce when flipping to answer (definition) side
+      if (nextFlipped && autoPronounce && currentWord) {
+        speak(currentWord.word);
+      }
+      return nextFlipped;
+    });
+  }, [autoPronounce, currentWord, speak]);
 
   const handleAnswer = useCallback((correct: boolean) => {
     setResults((prev) => [...prev, correct]);
@@ -337,14 +349,33 @@ export default function FlashcardReview({
           )}
         </div>
 
-        {/* Progress bar */}
-        <div className="h-2 bg-neo-black/30 rounded-full mb-8 overflow-hidden">
-          <motion.div
-            className="h-full bg-neo-cyan"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
-          />
+        {/* Progress bar and auto-pronounce option */}
+        <div className="mb-8">
+          <div className="h-2 bg-neo-black/30 rounded-full mb-3 overflow-hidden">
+            <motion.div
+              className="h-full bg-neo-cyan"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+
+          {/* Auto-pronounce checkbox */}
+          <div className="flex items-center justify-center gap-2">
+            <input
+              type="checkbox"
+              id="auto-pronounce"
+              checked={autoPronounce}
+              onChange={(e) => setAutoPronounce(e.target.checked)}
+              className="w-4 h-4 accent-neo-cyan cursor-pointer"
+            />
+            <label
+              htmlFor="auto-pronounce"
+              className="text-sm text-slate-400 font-neo-body cursor-pointer select-none"
+            >
+              {t('education.lesson.autoPronounce') || 'Auto-pronounce'}
+            </label>
+          </div>
         </div>
 
         {/* Flashcard */}
@@ -370,11 +401,18 @@ export default function FlashcardReview({
               >
                 <CardContent className="p-6 text-center">
                   {isFlipped ? (
-                    // Definition side
+                    // Definition side with pronunciation
                     <div>
-                      <p className="text-sm text-neo-cyan mb-2 font-neo-body">
-                        {t('education.practice.definition') || 'Definition'}
-                      </p>
+                      <div className="flex items-center justify-center gap-3 mb-2">
+                        <p className="text-sm text-neo-cyan font-neo-body">
+                          {t('education.practice.definition') || 'Definition'}
+                        </p>
+                        <PronunciationButton
+                          word={currentWord.word}
+                          lang={language}
+                          size="sm"
+                        />
+                      </div>
                       <p className="text-xl sm:text-2xl font-neo-body text-neo-white">
                         {currentWord.definition || 'No definition provided'}
                       </p>
