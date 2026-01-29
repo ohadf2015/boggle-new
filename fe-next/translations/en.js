@@ -4524,6 +4524,14 @@ const en = {
         "monthDesc": "30 days of excellence!"
       }
     },
+    "lesson": {
+      "definition": "Definition",
+      "examples": "Usage Examples",
+      "contextualExamples": "In Context",
+      "pronounce": "Listen to pronunciation",
+      "speaking": "Speaking...",
+      "pronunciationFallback": "Pronunciation"
+    },
     "leaderboard": {
       "title": "Classroom Leaderboard",
       "yourPosition": "Your Position",

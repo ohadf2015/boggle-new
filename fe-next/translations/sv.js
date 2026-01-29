@@ -4539,6 +4539,14 @@ const sv = {
         "monthDesc": "30 dagar av excellens!"
       }
     },
+    "lesson": {
+      "definition": "Definition",
+      "examples": "Användningsexempel",
+      "contextualExamples": "I sammanhang",
+      "pronounce": "Lyssna på uttal",
+      "speaking": "Talar...",
+      "pronunciationFallback": "Uttal"
+    },
     "leaderboard": {
       "title": "Klassrumets Topplista",
       "yourPosition": "Din Position",

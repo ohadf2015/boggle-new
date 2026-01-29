@@ -4514,6 +4514,14 @@ const he = {
         "monthDesc": "30 יום של מצוינות!"
       }
     },
+    "lesson": {
+      "definition": "הגדרה",
+      "examples": "דוגמאות שימוש",
+      "contextualExamples": "בהקשר",
+      "pronounce": "הקשב להגייה",
+      "speaking": "מדבר...",
+      "pronunciationFallback": "הגייה"
+    },
     "leaderboard": {
       "title": "לוח מובילים כיתתי",
       "yourPosition": "המיקום שלך",

@@ -4539,6 +4539,14 @@ const ja = {
         "monthDesc": "30日間の素晴らしい成果！"
       }
     },
+    "lesson": {
+      "definition": "定義",
+      "examples": "使用例",
+      "contextualExamples": "文脈での使用",
+      "pronounce": "発音を聞く",
+      "speaking": "再生中...",
+      "pronunciationFallback": "発音"
+    },
     "leaderboard": {
       "title": "クラスリーダーボード",
       "yourPosition": "あなたの順位",

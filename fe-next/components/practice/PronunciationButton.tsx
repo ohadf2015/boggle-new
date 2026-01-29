@@ -63,7 +63,7 @@ export function PronunciationButton({
           disabled:opacity-50 disabled:cursor-not-allowed
           ${className}
         `}
-        aria-label={isSpeaking ? t('lesson.speaking') : t('lesson.pronounce')}
+        aria-label={isSpeaking ? t('education.lesson.speaking') : t('education.lesson.pronounce')}
       >
         {isSpeaking ? (
           <Loader2 className="w-5 h-5 animate-spin" />
@@ -90,7 +90,7 @@ export function PronunciationButton({
           role="tooltip"
         >
           <div className="text-xs text-neo-yellow mb-1">
-            {t('lesson.pronunciationFallback')}
+            {t('education.lesson.pronunciationFallback')}
           </div>
           <div className="font-mono">{ipaPronunciation}</div>
         </div>
