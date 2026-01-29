@@ -4582,15 +4582,16 @@ const sv = {
       "accuracyTooltip": "{{student}}: {{accuracy}}% på \"{{word}}\"",
       "noVocabularyData": "Ingen ordförrådsdata ännu",
       "practiceToSee": "Elever behöver öva för att se behärskning"
-    },
-    "achievements": {
+,
       "live": "Live",
       "offline": "Offline",
       "connecting": "Ansluter...",
       "connectionError": "Anslutningsproblem",
       "activeNow": "{{count}} aktiva nu",
       "noActivity": "Ingen aktivitet",
-      "updatedAgo": "Uppdaterad {{time}} sedan",
+      "updatedAgo": "Uppdaterad {{time}} sedan"
+    },
+    "achievements": {
       "title": "Prestationer",
       "completion": "{percent}% Slutfört - {earned}/{total} märken",
       "featured": "Utvalda Märken",

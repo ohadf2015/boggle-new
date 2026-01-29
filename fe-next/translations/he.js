@@ -4557,15 +4557,16 @@ const he = {
       "accuracyTooltip": "{{student}}: {{accuracy}}% ב-\"{{word}}\"",
       "noVocabularyData": "אין עדיין נתוני אוצר מילים",
       "practiceToSee": "תלמידים צריכים לתרגל כדי לראות שליטה"
-    },
-    "achievements": {
+,
       "live": "שידור חי",
       "offline": "לא מקוון",
       "connecting": "מתחבר...",
       "connectionError": "בעיית חיבור",
       "activeNow": "{{count}} פעילים כעת",
       "noActivity": "אין פעילות",
-      "updatedAgo": "עודכן לפני {{time}}",
+      "updatedAgo": "עודכן לפני {{time}}"
+    },
+    "achievements": {
       "title": "הישגים",
       "completion": "{percent}% הושלמו - {earned}/{total} תגים",
       "featured": "תגים מומלצים",

@@ -4582,15 +4582,16 @@ const ja = {
       "accuracyTooltip": "{{student}}: \"{{word}}\"で{{accuracy}}%",
       "noVocabularyData": "まだ語彙データがありません",
       "practiceToSee": "習熟度を見るには生徒が練習する必要があります"
-    },
-    "achievements": {
+,
       "live": "ライブ",
       "offline": "オフライン",
       "connecting": "接続中...",
       "connectionError": "接続エラー",
       "activeNow": "{{count}}人がアクティブ",
       "noActivity": "アクティビティなし",
-      "updatedAgo": "{{time}}前に更新",
+      "updatedAgo": "{{time}}前に更新"
+    },
+    "achievements": {
       "title": "実績",
       "completion": "{percent}%完了 - {earned}/{total}バッジ",
       "featured": "注目のバッジ",
