@@ -4526,6 +4526,22 @@ const es = {
       "level": "Nv. {level}",
       "xp": "{xp} XP"
     },
+    "analytics": {
+      "title": "Análisis de Clase",
+      "subtitle": "Seguimiento del progreso de los estudiantes e identificación de oportunidades de aprendizaje",
+      "studentsNeedingHelp": "Estudiantes que Necesitan Ayuda",
+      "classAverageXp": "XP Promedio de la Clase",
+      "activeStudentsToday": "Activos Hoy",
+      "commonMistakes": "Errores Comunes",
+      "weeklyEngagement": "Participación Semanal",
+      "viewStudents": "Ver Estudiantes",
+      "createReviewLesson": "Crear Revisión",
+      "noData": "Aún no hay datos de análisis",
+      "assignLessons": "Asigna lecciones a los estudiantes para ver análisis",
+      "loading": "Cargando análisis...",
+      "error": "Error al cargar análisis",
+      "retry": "Reintentar"
+    },
     "achievements": {
       "title": "Logros",
       "completion": "{percent}% Completado - {earned}/{total} insignias",
