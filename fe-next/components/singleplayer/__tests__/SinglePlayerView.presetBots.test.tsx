@@ -32,6 +32,16 @@ jest.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => mockSetIsInGame,
 }));
 
+// Mock MusicContext
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    unlockAudio: jest.fn(),
+    playBackgroundMusic: jest.fn(),
+    stopBackgroundMusic: jest.fn(),
+    isPlaying: false,
+  }),
+}));
+
 // Mock hooks
 jest.mock('@/hooks/useGameMusic', () => ({
   useGameMusic: jest.fn(),
