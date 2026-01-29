@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -16,10 +16,12 @@ import {
   ChevronRight,
   Layers,
   MousePointer2,
+  Loader2,
 } from 'lucide-react';
 import type { VocabularyWord } from '@/lib/supabase/teacher';
 import { FlashcardSwipeStack } from './FlashcardSwipeStack';
-import type { EnrichedVocabularyWord } from '@/types/vocabulary';
+import type { EnrichedVocabularyWord, VocabularyExample } from '@/types/vocabulary';
+import { socket } from '@/lib/socket';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -51,9 +53,52 @@ export default function FlashcardReview({
   const [showResults, setShowResults] = useState(false);
   const [reviewMode, setReviewMode] = useState<ReviewMode>('classic');
   const [enrichedWords, setEnrichedWords] = useState<EnrichedVocabularyWord[]>([]);
+  const [isEnriching, setIsEnriching] = useState(false);
 
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
+
+  // Enrich vocabulary words with Daily Buzz context on mount
+  useEffect(() => {
+    if (words.length === 0) return;
+
+    setIsEnriching(true);
+
+    // Convert VocabularyWord to enrichment format
+    const wordsToEnrich = words.map((word) => ({
+      word: word.word,
+      definition: word.definition || 'No definition provided',
+    }));
+
+    // Request enrichment via WebSocket
+    socket.emit('enrichVocabulary', {
+      words: wordsToEnrich,
+      language: language,
+    });
+
+    // Listen for enriched response
+    const handleEnriched = (data: { enrichedWords: any[] }) => {
+      const enriched: EnrichedVocabularyWord[] = data.enrichedWords.map((word: any) => ({
+        word: word.word,
+        definition: word.definition,
+        pronunciation: word.pronunciation,
+        partOfSpeech: word.partOfSpeech,
+        examples: word.examples || [],
+        contextualExamples: (word.contextualExamples || []).map((text: string) => ({
+          text,
+        })) as VocabularyExample[],
+      }));
+      setEnrichedWords(enriched);
+      setIsEnriching(false);
+    };
+
+    socket.on('vocabularyEnriched', handleEnriched);
+
+    // Cleanup
+    return () => {
+      socket.off('vocabularyEnriched', handleEnriched);
+    };
+  }, [words, language]);
 
   const handleFlip = useCallback(() => {
     setIsFlipped((prev) => !prev);
@@ -82,6 +127,22 @@ export default function FlashcardReview({
     setResults([]);
     setShowResults(false);
   }, []);
+
+  // Loading state while enriching
+  if (isEnriching) {
+    return (
+      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
+        <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
+          <CardContent className="p-8 text-center">
+            <Loader2 className="w-12 h-12 mx-auto text-neo-cyan animate-spin mb-4" />
+            <p className="text-neo-white font-neo-body">
+              {t('education.lesson.enrichingContent') || 'Loading enriched content...'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Results screen
   if (showResults) {
