@@ -21,8 +21,9 @@ const mockRefresh = jest.fn();
 const mockMetrics = {
   studentsNeedingHelp: 5,
   classAverageXp: 1250,
-  activeStudentsCount: 18,
-  totalStudentsCount: 20,
+  activeStudentsToday: 18,
+  totalStudents: 20,
+  weeklyEngagement: 85,
   commonMistakes: [
     { word: 'receive', errorRate: 0.75, attempts: 8 },
     { word: 'separate', errorRate: 0.67, attempts: 6 },

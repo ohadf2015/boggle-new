@@ -121,12 +121,12 @@ export function AnalyticsDashboard({
   const formattedAverageXp = metrics.classAverageXp.toLocaleString('en-US');
 
   // Active students ratio
-  const activeStudentsRatio = `${metrics.activeStudentsCount}/${metrics.totalStudentsCount}`;
+  const activeStudentsRatio = `${metrics.activeStudentsToday}/${metrics.totalStudents}`;
 
   // Engagement percentage
   const engagementPercent =
-    metrics.totalStudentsCount > 0
-      ? Math.round((metrics.activeStudentsCount / metrics.totalStudentsCount) * 100)
+    metrics.totalStudents > 0
+      ? Math.round((metrics.activeStudentsToday / metrics.totalStudents) * 100)
       : 0;
 
   // Common mistakes count
