@@ -194,10 +194,15 @@ Plans:
   3. Teacher can view lesson effectiveness charts showing which lessons drive learning outcomes
   4. Teacher can see vocabulary mastery heatmap by student identifying knowledge gaps
   5. Teacher sees real-time progress updates during active class sessions
-**Plans**: TBD
+**Plans**: 6 plans in 3 waves (85+ tests estimated)
 
 Plans:
-- [ ] 20-01: TBD during plan-phase
+- [ ] 20-01-PLAN.md — Analytics foundation TDD (queries + hook) (Wave 1, 16+ tests)
+- [ ] 20-02-PLAN.md — MetricCard + AnalyticsDashboard components (Wave 2, 15+ tests)
+- [ ] 20-03-PLAN.md — StudentProgressTable with sorting (Wave 2, 13+ tests)
+- [ ] 20-04-PLAN.md — LessonEffectivenessChart (Recharts bar chart) (Wave 2, 13+ tests)
+- [ ] 20-05-PLAN.md — VocabularyHeatmap (student × word grid) (Wave 3, 16+ tests)
+- [ ] 20-06-PLAN.md — Real-Time Progress + Analytics Page Integration (Wave 3, 24+ tests)
 
 #### Phase 21: Rich Lesson Delivery
 **Goal**: Enhance student learning with rich vocabulary content
@@ -313,7 +318,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 17. Boss Mechanic Expansion | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
 | 18. Education XP System | v1.1 | 5/5 | ✅ Complete | 2026-01-25 |
 | 19. Achievement System | v1.1 | 5/5 | ✅ Complete | 2026-01-29 |
-| 20. Student Analytics Dashboard | v1.1 | 0/TBD | Not started | - |
+| 20. Student Analytics Dashboard | v1.1 | 0/6 | Planned | - |
 | 21. Rich Lesson Delivery | v1.1 | 0/TBD | Not started | - |
 | 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |
 | 23. Tech Debt Cleanup | v1.1 | 0/TBD | Not started | - |
@@ -323,4 +328,4 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-29 after Phase 19 execution complete*
+*Last updated: 2026-01-29 after Phase 20 planning complete*
