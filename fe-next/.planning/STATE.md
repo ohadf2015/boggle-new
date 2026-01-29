@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** Phase 20 - Student Analytics Dashboard (NEXT)
+**Current focus:** Phase 20 - Student Analytics Dashboard (IN PROGRESS)
 
 ## Current Position
 
-Phase: 19 of 25 (Achievement System) — COMPLETE
-Plan: 5/5 complete
-Status: Verified and committed
-Last activity: 2026-01-29 — Phase 19 verified (5/5 success criteria passed)
+Phase: 20 of 25 (Student Analytics Dashboard) — IN PROGRESS
+Plan: 1/6 complete
+Status: Analytics foundation implemented
+Last activity: 2026-01-29 — Completed 20-01-PLAN.md (analytics queries + hook with TDD)
 
 Progress: [█████████████░] 20/25 phases (80% milestone, v1.1 Phase 15-19 complete, v1.2 Phase 24-25 complete)
 
@@ -30,9 +30,9 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 21 (Phase 15-18 complete, Phase 19 plans 01-02 complete)
-- Current phase: 19 (Achievement System) — COMPLETE
-- Next phase: 20 (Student Analytics Dashboard)
+- Plans completed: 22 (Phase 15-19 complete, Phase 20 plan 01 complete)
+- Current phase: 20 (Student Analytics Dashboard) — IN PROGRESS
+- Next: Phase 20 plans 02-06 (UI components + integration)
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -112,6 +112,18 @@ Progress: [█████████████░] 20/25 phases (80% milesto
 | 25-06 | Generic Haptics Abstraction Layer | 18min | Complete |
 
 **Phase 25 Total:** 70 minutes, 118 tests added (25 new in 25-06), native app infrastructure COMPLETE
+
+**Phase 20 Plans:**
+| Plan | Name | Duration | Status |
+|------|------|----------|--------|
+| 20-01 | Analytics Foundation TDD | 7min | Complete |
+| 20-02 | Classroom Overview Card | TBD | Pending |
+| 20-03 | Struggling Students List | TBD | Pending |
+| 20-04 | Common Mistakes Widget | TBD | Pending |
+| 20-05 | Weekly Activity Heatmap | TBD | Pending |
+| 20-06 | Dashboard Integration | TBD | Pending |
+
+**Phase 20 Progress:** 7 minutes, 14 tests added (8 query + 6 hook), 1/6 plans complete
 
 ## Accumulated Context
 
@@ -212,6 +224,10 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **25-06**: Facade Pattern with convenience methods → Simple tap/success/error while supporting custom patterns (2026-01-26)
 - **25-06**: Backwards compatibility exports → Gradual migration path without breaking changes (2026-01-26)
 - **25-06**: HapticsContext for configuration → Infrastructure ready for future settings UI (2026-01-26)
+- **20-01**: 60% accuracy threshold for struggling students → Aligns with educational research on comprehension (2026-01-29)
+- **20-01**: >50% error rate for common mistakes → Filters borderline words (50% exactly), surfaces clear problem areas (2026-01-29)
+- **20-01**: Parallel Promise.all for metrics fetch → Reduces load time ~50% (sequential 400ms → parallel 200ms) (2026-01-29)
+- **20-01**: 7-day window for metrics → Balances recency with statistical significance, matches weekly teacher planning (2026-01-29)
 
 ### Pending Todos
 
@@ -310,22 +326,25 @@ None.
 - Total duration: 52 minutes across 5 plans
 - Ready for App Store/Play Store submission
 
+**Phase 20 (Analytics Dashboard) — IN PROGRESS:**
+- Analytics foundation complete — getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics (20-01 complete)
+- useClassroomAnalytics hook — Parallel fetch, loading/error states, 80.55% coverage (20-01 complete)
+- 14 tests passing — 8 query tests + 6 hook tests, TDD RED-GREEN-REFACTOR cycle
+- Next: UI components (ClassroomOverviewCard, StrugglingStudentsList, CommonMistakesWidget)
 
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Phase 19 verified and committed (5/5 success criteria passed)
+Stopped at: Completed Phase 20 Plan 01 (Analytics Foundation TDD)
 Resume file: None
 
-**Next action:** Execute Phase 20 with `/gsd:execute-phase 20`
+**Next action:** Continue Phase 20 with `/gsd:execute-plan 20 02` or `/gsd:execute-phase 20` for remaining plans
 
-**Phase 20 Planning Complete:**
-- 6 plans created in `.planning/phases/20-student-analytics-dashboard/`
-- Wave 1: 20-01 (Foundation TDD)
-- Wave 2: 20-02, 20-03, 20-04 (Parallel components)
-- Wave 3: 20-05, 20-06 (Heatmap + Integration)
-- Estimated: 85+ tests
+**Phase 20 Status:**
+- 1/6 plans complete (20-01: Analytics Foundation TDD)
+- Remaining: 20-02 through 20-06 (UI components + integration)
+- Current: Analytics queries and hook ready for dashboard consumption
 
 ---
 *State initialized: 2026-01-22*
-*Last updated: 2026-01-29 (Phase 20 planning complete - 6 plans ready for execution)*
+*Last updated: 2026-01-29 (Phase 20 plan 01 complete - analytics foundation implemented)*
