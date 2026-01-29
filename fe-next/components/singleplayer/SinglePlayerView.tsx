@@ -10,6 +10,7 @@ import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
 import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManager';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
+import { useMusic } from '@/contexts/MusicContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
@@ -112,6 +113,7 @@ function generateBotsForPreset(count: number, difficulty: 'easy' | 'medium' | 'h
 
 const SinglePlayerView: React.FC = () => {
   const { language: uiLanguage, t } = useLanguage();
+  const { unlockAudio } = useMusic();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -320,6 +322,10 @@ const SinglePlayerView: React.FC = () => {
 
   // Handle preset selection - quick start with preset settings
   const handleSelectPreset = useCallback((preset: PresetConfig) => {
+    // CRITICAL: Unlock audio immediately on user click
+    // This ensures browser autoplay policy is satisfied within the user gesture
+    unlockAudio();
+
     // Determine mode based on preset
     let mode: SinglePlayerMode = 'solo-bots';
     if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
@@ -349,17 +355,19 @@ const SinglePlayerView: React.FC = () => {
       minWordLength,
     }));
     setPhase('playing');
-  }, [uiLanguage, generateBots]);
+  }, [uiLanguage, generateBots, unlockAudio]);
 
   // Handle custom game - go to detailed lobby
   const handleCustomGame = useCallback(() => {
     setPhase('lobby');
   }, []);
 
-  const handleStartGame = (settings: Partial<SinglePlayerGameState>) => {
+  const handleStartGame = useCallback((settings: Partial<SinglePlayerGameState>) => {
+    // Unlock audio on user gesture (required for browser autoplay policy)
+    unlockAudio();
     setGameState(prev => ({ ...prev, ...settings }));
     setPhase('playing');
-  };
+  }, [unlockAudio]);
 
   const handleGameEnd = useCallback((results: SinglePlayerResultsData) => {
     // Track training game completion for progressive mode discovery
@@ -417,13 +425,15 @@ const SinglePlayerView: React.FC = () => {
   };
 
   // Quick rematch - immediately start a new game with same settings
-  const handleQuickRematch = () => {
+  const handleQuickRematch = useCallback(() => {
+    // Unlock audio on user gesture (required for browser autoplay policy)
+    unlockAudio();
     setResultsData(null);
     // Reset grid to null so a new grid is generated
     setGameState(prev => ({ ...prev, grid: null }));
     // Immediately go to playing phase
     setPhase('playing');
-  };
+  }, [unlockAudio]);
 
   const handleBackToLobby = () => {
     setResultsData(null);
