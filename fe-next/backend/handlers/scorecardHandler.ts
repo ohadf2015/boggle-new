@@ -181,8 +181,8 @@ function generateScoreCardData(game: GameState, username: string): ScoreCardData
     throw new Error('Player not found in game');
   }
 
-  // Get word details for this player
-  const wordDetails: WordDetail[] = game.playerWordDetails?.[username] || [];
+  // Get word details for this player (cast from unknown[] as stored in GameState)
+  const wordDetails = (game.playerWordDetails?.[username] || []) as WordDetail[];
   const totalWordsFound = game.playerWords?.[username]?.length || 0;
   const score = game.playerScores?.[username] || 0;
 
