@@ -156,7 +156,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     startTournamentRound(tournamentId, gameCode);
 
     // Generate new board for the round
-    const letterGrid: LetterGrid = generateRandomTable(game.language || 'en');
+    const letterGrid: LetterGrid = generateRandomTable(null, null, game.language || 'en');
     const timerSeconds = game.timerSeconds || 180;
 
     // Update game state
@@ -170,14 +170,14 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     });
 
     // Precompute positions
-    const positions: Map<string, GridPosition[]> = makePositionsMap(letterGrid);
+    const positions = makePositionsMap(letterGrid);
     const current = getGame(gameCode);
     if (current) {
       current.letterPositions = positions;
     }
 
     // Initialize player data for new round
-    const users: GameUser[] = getGameUsers(gameCode);
+    const users = getGameUsers(gameCode);
     const playerUsernames = users.map(u => u.username);
     const gameForInit = getGame(gameCode);
     if (gameForInit) {
@@ -187,10 +187,10 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       if (!gameForInit.playerWords) gameForInit.playerWords = {};
 
       playerUsernames.forEach((username: string) => {
-        gameForInit.playerWordDetails[username] = [];
+        gameForInit.playerWordDetails![username] = [];
         gameForInit.playerWords[username] = [];
         gameForInit.playerScores[username] = 0;
-        gameForInit.playerAchievements[username] = [];
+        gameForInit.playerAchievements![username] = [];
       });
       gameForInit.firstWordFound = false;
       gameForInit.startTime = Date.now();
@@ -207,7 +207,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
         totalRounds: tournament.totalRounds,
         currentRound: tournament.currentRound
       },
-      standings: getTournamentStandings(tournamentId) as TournamentStanding[]
+      standings: getTournamentStandings(tournamentId) || []
     });
 
     // Broadcast game start
@@ -217,7 +217,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       language: game.language,
       minWordLength: game.minWordLength || 2,
       messageId,
-      boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null // Preserve theme from first round if any
+      boardTheme: (game as unknown as { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null // Preserve theme from first round if any
     });
 
     // Set acknowledgment timeout
@@ -243,8 +243,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const standings: TournamentStanding[] = getTournamentStandings(game.tournamentId);
-    const tournament: Tournament | null = getTournament(game.tournamentId);
+    const standings = getTournamentStandings(game.tournamentId) || [];
+    const tournament = getTournament(game.tournamentId) ?? null;
 
     socket.emit('tournamentStandings', {
       tournament: tournament ? {
