@@ -4533,7 +4533,11 @@ const en = {
       "pronunciationFallback": "Pronunciation",
       "gotIt": "Got It",
       "dontKnow": "Don't Know",
-      "tapToReveal": "Tap to reveal"
+      "tapToReveal": "Tap to reveal",
+      "classicMode": "Classic Mode",
+      "swipeMode": "Swipe Mode",
+      "autoPronounce": "Auto-pronounce",
+      "enrichingContent": "Loading enriched content..."
     },
     "leaderboard": {
       "title": "Classroom Leaderboard",

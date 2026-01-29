@@ -4548,7 +4548,11 @@ const ja = {
       "pronunciationFallback": "発音",
       "gotIt": "分かった",
       "dontKnow": "分からない",
-      "tapToReveal": "タップして表示"
+      "tapToReveal": "タップして表示",
+      "classicMode": "クラシックモード",
+      "swipeMode": "スワイプモード",
+      "autoPronounce": "自動発音",
+      "enrichingContent": "拡張コンテンツを読み込み中..."
     },
     "leaderboard": {
       "title": "クラスリーダーボード",

@@ -4523,7 +4523,11 @@ const he = {
       "pronunciationFallback": "הגייה",
       "gotIt": "ידעתי",
       "dontKnow": "לא ידעתי",
-      "tapToReveal": "הקש לחשיפה"
+      "tapToReveal": "הקש לחשיפה",
+      "classicMode": "מצב קלאסי",
+      "swipeMode": "מצב החלקה",
+      "autoPronounce": "הגייה אוטומטית",
+      "enrichingContent": "טוען תוכן מועשר..."
     },
     "leaderboard": {
       "title": "לוח מובילים כיתתי",

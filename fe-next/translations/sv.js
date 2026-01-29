@@ -4548,7 +4548,11 @@ const sv = {
       "pronunciationFallback": "Uttal",
       "gotIt": "Kan det",
       "dontKnow": "Vet inte",
-      "tapToReveal": "Tryck för att visa"
+      "tapToReveal": "Tryck för att visa",
+      "classicMode": "Klassiskt läge",
+      "swipeMode": "Svep-läge",
+      "autoPronounce": "Auto-uttala",
+      "enrichingContent": "Laddar berikat innehåll..."
     },
     "leaderboard": {
       "title": "Klassrumets Topplista",

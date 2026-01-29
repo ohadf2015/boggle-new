@@ -13,9 +13,13 @@ import {
   RotateCcw,
   Trophy,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Layers,
+  MousePointer2,
 } from 'lucide-react';
 import type { VocabularyWord } from '@/lib/supabase/teacher';
+import { FlashcardSwipeStack } from './FlashcardSwipeStack';
+import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -28,6 +32,8 @@ interface FlashcardReviewProps {
     sessionMasteryMessage: string | null;
   };
 }
+
+type ReviewMode = 'classic' | 'swipe';
 
 export default function FlashcardReview({
   words,
@@ -43,6 +49,8 @@ export default function FlashcardReview({
   const [isFlipped, setIsFlipped] = useState(false);
   const [results, setResults] = useState<boolean[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [reviewMode, setReviewMode] = useState<ReviewMode>('classic');
+  const [enrichedWords, setEnrichedWords] = useState<EnrichedVocabularyWord[]>([]);
 
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
@@ -159,10 +167,79 @@ export default function FlashcardReview({
     );
   }
 
+  // Render swipe mode
+  if (reviewMode === 'swipe' && enrichedWords.length > 0) {
+    return (
+      <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
+        <div className="max-w-lg mx-auto">
+          {/* Header with mode toggle */}
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="text-slate-400 hover:text-neo-white"
+            >
+              <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-xl font-neo-display text-neo-white">
+                {t('education.practice.flashcards') || 'Flashcard Review'}
+              </h1>
+              <p className="text-sm text-slate-400">
+                {currentIndex + 1} / {words.length}
+              </p>
+            </div>
+            {/* Mode toggle buttons */}
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setReviewMode('classic')}
+                className={cn(
+                  'text-neo-cyan hover:bg-neo-cyan/20',
+                  reviewMode === 'classic' && 'bg-neo-cyan/20'
+                )}
+                title={t('education.lesson.classicMode') || 'Classic Mode'}
+              >
+                <MousePointer2 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setReviewMode('swipe')}
+                className={cn(
+                  'text-neo-pink hover:bg-neo-pink/20',
+                  reviewMode === 'swipe' && 'bg-neo-pink/20'
+                )}
+                title={t('education.lesson.swipeMode') || 'Swipe Mode'}
+              >
+                <Layers className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Swipe stack */}
+          <FlashcardSwipeStack
+            words={enrichedWords}
+            onGotIt={(word) => handleAnswer(true)}
+            onDontKnow={(word) => handleAnswer(false)}
+            onComplete={() => {
+              const correctCount = results.filter(Boolean).length;
+              setShowResults(true);
+              onComplete({ correct: correctCount, total: words.length });
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Classic mode (existing tap-to-flip)
   return (
     <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
       <div className="max-w-lg mx-auto">
-        {/* Header */}
+        {/* Header with mode toggle */}
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
@@ -180,6 +257,35 @@ export default function FlashcardReview({
               {currentIndex + 1} / {words.length}
             </p>
           </div>
+          {/* Mode toggle buttons (only show if enriched) */}
+          {enrichedWords.length > 0 && (
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setReviewMode('classic')}
+                className={cn(
+                  'text-neo-cyan hover:bg-neo-cyan/20',
+                  reviewMode === 'classic' && 'bg-neo-cyan/20'
+                )}
+                title={t('education.lesson.classicMode') || 'Classic Mode'}
+              >
+                <MousePointer2 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setReviewMode('swipe')}
+                className={cn(
+                  'text-neo-pink hover:bg-neo-pink/20',
+                  reviewMode === 'swipe' && 'bg-neo-pink/20'
+                )}
+                title={t('education.lesson.swipeMode') || 'Swipe Mode'}
+              >
+                <Layers className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Progress bar */}
