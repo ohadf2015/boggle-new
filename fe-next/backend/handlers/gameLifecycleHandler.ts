@@ -6,7 +6,7 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, LetterGrid, Language, DifficultyLevel, Avatar } from '@/shared/types';
 
-const {
+import {
   createGame,
   getGame,
   updateGame,
@@ -23,10 +23,11 @@ const {
   canTransitionGameState,
   isRoomEmpty,
   markPlayerReadyForNextGame,
-  getPlayersReadyCount
-} = require('../modules/gameStateManager');
+  getPlayersReadyCount,
+  removeUserFromGame
+} from '../modules/gameStateManager.js';
 
-const {
+import {
   broadcastToRoom,
   getGameRoom,
   joinRoom,
@@ -34,24 +35,24 @@ const {
   safeEmit,
   getSocketById,
   disconnectSocket
-} = require('../utils/socketHelpers');
+} from '../utils/socketHelpers.js';
 
-const { makePositionsMap } = require('../modules/wordValidator');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const gameStartCoordinator = require('../utils/gameStartCoordinator');
-const timerManager = require('../utils/timerManager');
-const redisClient = require('../redisClient');
-const { inc, ensureGame } = require('../utils/metrics');
-const { generateRandomAvatar } = require('../utils/gameUtils');
-const { getRandomLongWordsWithTheme, ensureLanguageLoaded } = require('../dictionary');
-const logger = require('../utils/logger');
-const { startGameTimer, endGame } = require('./shared');
-const { findAllWords, getCachedTrie } = require('../modules/boggleSolver');
-const { validatePayload, createGameSchema, startGameSchema } = require('../utils/socketValidation');
-const botManager = require('../modules/botManager');
-const { spamDetector } = require('../modules/spamDetector');
-const { notifyRoomCreated, notifyGameStarted } = require('../modules/notificationService');
+import { makePositionsMap } from '../modules/wordValidator.js';
+import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import { clearGameTimer } from '../utils/timerManager.js';
+import { saveGameState } from '../redisClient.js';
+import { inc, ensureGame } from '../utils/metrics.js';
+import { generateRandomAvatar } from '../utils/gameUtils.js';
+import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
+import logger from '../utils/logger.js';
+import { startGameTimer, endGame } from './shared.js';
+import { findAllWords, getCachedTrie } from '../modules/boggleSolver.js';
+import { validatePayload, createGameSchema, startGameSchema } from '../utils/socketValidation.js';
+import { stopAllBots } from '../modules/botManager.js';
+import { spamDetector } from '../modules/spamDetector.js';
+import { notifyRoomCreated, notifyGameStarted } from '../modules/notificationService.js';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -130,7 +131,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       });
 
       // playerId is already validated by schema (UUID v4 format) - use as is
-      const sanitizedPlayerId = playerId || null;
+      const sanitizedPlayerId = playerId || undefined;
 
       // Check if game already exists
       if (gameExists(gameCode)) {
@@ -204,7 +205,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       // Save to Redis
       try {
-        await redisClient.saveGameState(gameCode, game);
+        await saveGameState(gameCode, game as unknown as Parameters<typeof saveGameState>[1]);
       } catch (err: unknown) {
         const error = err as Error;
         logger.error('REDIS', 'Failed to save game state', error);
@@ -288,9 +289,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       logger.warn('SOCKET', `Game ${gameCode} in unexpected state ${currentGameState}, auto-resetting before start`);
 
       // Clear any lingering timers/state from previous game
-      timerManager.clearGameTimer(gameCode);
+      clearGameTimer(gameCode);
       gameStartCoordinator.cleanupSequence(gameCode);
-      botManager.stopAllBots(gameCode);
+      stopAllBots(gameCode);
 
       // Force reset to 'waiting' state - try proper reset first, fallback to direct state change
       const resetSuccess = resetGameForNewRound(gameCode);
@@ -345,10 +346,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     ensureGame(gameCode);
 
     // Initialize player data
-    initializePlayerData(game, gameCode);
+    initializePlayerData(game as unknown as Game, gameCode);
 
     // Initialize game start coordination
-    const users: GameUser[] = getGameUsers(gameCode);
+    const users = getGameUsers(gameCode);
     const playerUsernames = users.map(u => u.username);
     const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
 
@@ -500,14 +501,14 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     }
 
     const stateBeforeReset = game.gameState;
-    timerManager.clearGameTimer(gameCode);
+    clearGameTimer(gameCode);
 
     // Clean up game start coordinator to prevent stale acknowledgment state
     gameStartCoordinator.cleanupSequence(gameCode);
 
     // Stop bots but keep them in the game - they will be restarted when new game begins
     // Note: cleanupGameBots would delete all bots, causing them to not play in subsequent games
-    botManager.stopAllBots(gameCode);
+    stopAllBots(gameCode);
 
     const resetSuccess = resetGameForNewRound(gameCode);
     const gameAfterReset = getGame(gameCode);
@@ -619,19 +620,18 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
       broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
         message: 'Host started a new game. Room is closing.'
       });
-      timerManager.clearGameTimer(existingConnection.gameCode);
+      clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() });
     }
   } else {
-    const { removeUserFromGame } = require('../modules/gameStateManager');
     removeUserFromGame(existingConnection.gameCode, existingConnection.username);
 
     // Check if old room is now empty and close it immediately
     if (isRoomEmpty(existingConnection.gameCode)) {
       logger.info('SOCKET', `Old room ${existingConnection.gameCode} is empty after player switch - closing immediately`);
-      timerManager.clearGameTimer(existingConnection.gameCode);
-      botManager.stopAllBots(existingConnection.gameCode);
+      clearGameTimer(existingConnection.gameCode);
+      stopAllBots(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() });
     } else {
@@ -653,7 +653,7 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
  * Initialize player data structures for a new game
  */
 function initializePlayerData(game: Game, gameCode: string): void {
-  const users: GameUser[] = getGameUsers(gameCode);
+  const users = getGameUsers(gameCode);
   const playerUsernames = users.map(u => u.username);
   const gameForInit = getGame(gameCode);
 
@@ -667,7 +667,7 @@ function initializePlayerData(game: Game, gameCode: string): void {
     if (!gameForInit.playerWords) gameForInit.playerWords = {};
 
     playerUsernames.forEach((username: string) => {
-      gameForInit.playerWordDetails[username] = [];
+      gameForInit.playerWordDetails![username] = [];
       gameForInit.playerWords[username] = [];
       gameForInit.playerScores[username] = 0;
       gameForInit.playerAchievements[username] = [];
@@ -677,12 +677,6 @@ function initializePlayerData(game: Game, gameCode: string): void {
     gameForInit.startTime = Date.now();
   }
 }
-
-module.exports = {
-  registerGameLifecycleHandlers,
-  handleExistingAuthConnection,
-  initializePlayerData
-};
 
 export {
   registerGameLifecycleHandlers,

@@ -11,6 +11,12 @@
 import type { Socket } from 'socket.io';
 import type { Request, Response, NextFunction } from 'express';
 import logger from './logger';
+import {
+  isIpBlockedRedis,
+  blockIpRedis,
+  checkRateLimitRedis,
+  RATE_LIMIT_KEYS,
+} from '../redis/rateLimit';
 
 // ==========================================
 // Type Definitions
@@ -804,6 +810,78 @@ export function isIpBlocked(ip: string): boolean {
  */
 export function getRateLimitStats(): SocketRateLimiterStats {
   return rateLimiterInstance.getStats();
+}
+
+// ==========================================
+// Redis-Backed Rate Limiting (Distributed)
+// ==========================================
+
+/**
+ * Check if IP is blocked (async, checks Redis first)
+ * Use this at connection time for distributed IP blocking
+ */
+export async function isIpBlockedAsync(ip: string): Promise<boolean> {
+  // Check in-memory first (instant response)
+  if (rateLimiterInstance.isIpBlocked(ip)) {
+    return true;
+  }
+
+  // Check Redis for distributed blocking
+  const redisBlocked = await isIpBlockedRedis(ip);
+  if (redisBlocked) {
+    // Sync to in-memory cache
+    rateLimiterInstance.blockIp(ip);
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Block IP (async, stores in both Redis and in-memory)
+ * Use this for distributed IP blocking across all server instances
+ */
+export async function blockIpAsync(ip: string, durationMs?: number): Promise<void> {
+  const duration = durationMs ?? rateLimiterInstance.blockDurationMs;
+
+  // Block in-memory (immediate effect for this instance)
+  rateLimiterInstance.blockIp(ip, duration);
+
+  // Block in Redis (distributed effect across all instances)
+  await blockIpRedis(ip, duration);
+}
+
+/**
+ * Check rate limit with optional Redis backend (async)
+ * Use this for critical rate limiting that needs distributed state
+ *
+ * @param key - Unique key (e.g., socket ID, IP:path)
+ * @param ip - Client IP address
+ * @param options - Rate limit options
+ */
+export async function checkRateLimitAsync(
+  key: string,
+  ip: string,
+  options: { maxRequests: number; windowMs: number; weight?: number }
+): Promise<{ allowed: boolean; reason?: string; remaining: number }> {
+  // Check IP block first
+  if (await isIpBlockedAsync(ip)) {
+    return { allowed: false, reason: 'ip_blocked', remaining: 0 };
+  }
+
+  // Use Redis for distributed rate limiting
+  const redisKey = RATE_LIMIT_KEYS.socket(key);
+  const result = await checkRateLimitRedis(redisKey, {
+    maxRequests: options.maxRequests,
+    windowMs: options.windowMs,
+    weight: options.weight ?? 1,
+  });
+
+  return {
+    allowed: !result.limited,
+    reason: result.reason,
+    remaining: result.remaining,
+  };
 }
 
 export default rateLimiterInstance;

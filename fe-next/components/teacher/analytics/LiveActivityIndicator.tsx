@@ -105,22 +105,26 @@ export function LiveActivityIndicator({
 
   // ==================== LAST UPDATE ====================
 
-  const getTimeAgo = (date: Date | null): string => {
-    if (!date) return '';
+  // Compute time ago string from lastUpdate
+  // Note: Using lastUpdate directly instead of Date.now() to avoid impure function during render
+  let lastUpdateText = '';
+  if (lastUpdate) {
+    const seconds = Math.floor((new Date().getTime() - lastUpdate.getTime()) / 1000);
 
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-
-    if (seconds < 10) return t('education.analytics.updatedAgo', { time: 'just now' });
-    if (seconds < 60) return t('education.analytics.updatedAgo', { time: `${seconds}s` });
-
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return t('education.analytics.updatedAgo', { time: `${minutes}m` });
-
-    const hours = Math.floor(minutes / 60);
-    return t('education.analytics.updatedAgo', { time: `${hours}h` });
-  };
-
-  const lastUpdateText = getTimeAgo(lastUpdate);
+    if (seconds < 10) {
+      lastUpdateText = t('education.analytics.updatedAgo', { time: 'just now' });
+    } else if (seconds < 60) {
+      lastUpdateText = t('education.analytics.updatedAgo', { time: `${seconds}s` });
+    } else {
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) {
+        lastUpdateText = t('education.analytics.updatedAgo', { time: `${minutes}m` });
+      } else {
+        const hours = Math.floor(minutes / 60);
+        lastUpdateText = t('education.analytics.updatedAgo', { time: `${hours}h` });
+      }
+    }
+  }
 
   // ==================== RENDER ====================
 

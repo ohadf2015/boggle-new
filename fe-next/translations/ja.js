@@ -4581,8 +4581,10 @@ const ja = {
       "notStarted": "未開始",
       "accuracyTooltip": "{{student}}: \"{{word}}\"で{{accuracy}}%",
       "noVocabularyData": "まだ語彙データがありません",
-      "practiceToSee": "習熟度を見るには生徒が練習する必要があります"
-,
+      "practiceToSee": "習熟度を見るには生徒が練習する必要があります",
+      "viewLessons": "レッスン",
+      "viewVocabulary": "語彙",
+      "backToClassroom": "クラスルームに戻る",
       "live": "ライブ",
       "offline": "オフライン",
       "connecting": "接続中...",

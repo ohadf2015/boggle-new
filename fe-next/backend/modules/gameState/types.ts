@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language } from '@/shared/types/game';
+import type { LetterGrid, Language, GridPosition } from '@/shared/types/game';
 
 // Redis client interface
 export interface RedisClient {
@@ -16,14 +16,19 @@ export interface RedisClient {
 // Game user interface
 export interface GameUser {
   socketId: string;
+  username?: string; // Optional - typically the key in Record<string, GameUser>
   avatar: { avatarImage?: string; emoji?: string; color?: string } | null;
   isHost: boolean;
   authUserId: string | null;
   guestTokenHash: string | null;
   guestSessionId?: string | null;
   isBot?: boolean;
+  botDifficulty?: string;
   disconnected?: boolean;
-  presence?: { status: string; lastHeartbeat: number; lastActivity: number };
+  disconnectedAt?: number;
+  presence?: 'active' | 'idle' | 'afk';
+  lastActivity?: number;
+  lastHeartbeat?: number;
 }
 
 // Spectator interface
@@ -66,7 +71,14 @@ export interface GameState {
   playerCombos: Record<string, number>;
   gameState: 'waiting' | 'in-progress' | 'validating' | 'finished';
   letterGrid: LetterGrid | null;
+  letterPositions?: Map<string, [number, number][]>;
   timerSeconds: number;
+  remainingTime?: number;
+  gameDuration?: number;
+  minWordLength?: number;
+  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  gameStartedAt?: number;
+  boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null;
   tournamentId: string | null;
   reconnectionTimeout: ReturnType<typeof setTimeout> | null;
   validationTimeout?: ReturnType<typeof setTimeout> | null;
@@ -84,6 +96,10 @@ export interface GameState {
   playerWordDetails?: Record<string, unknown[]>;
   playersReadyForNextGame: Record<string, boolean>;
   selectedVocabulary?: Set<string>;
+  chatHistory?: { username: string; message: string; timestamp: number; isHost?: boolean }[];
+  totalBoardWords?: number;
+  firstWordFound?: boolean;
+  startTime?: number;
 }
 
 // Game creation data interface

@@ -2,11 +2,17 @@
 
 import { Edit2 } from 'lucide-react';
 import { CHALLENGE_TYPE_ICONS, type BuzzChallengeAdmin } from '../types';
+import { MarkAsBadButton } from './MarkAsBadButton';
 
 export interface ChallengeCardProps {
   challenge: BuzzChallengeAdmin;
   index: number;
   onEdit: (index: number) => void;
+  // Mark as bad props (optional - only shown when authToken provided)
+  authToken?: string;
+  date?: string;
+  language?: string;
+  onMarkAsBadSuccess?: () => void;
 }
 
 function getChallengeTypeIcon(type: string): string {
@@ -27,12 +33,16 @@ function getDifficultyColor(difficulty: string): string {
 }
 
 /**
- * Individual challenge display card with edit action.
+ * Individual challenge display card with edit action and mark-as-bad button.
  */
 export function ChallengeCard({
   challenge,
   index,
   onEdit,
+  authToken,
+  date,
+  language,
+  onMarkAsBadSuccess,
 }: ChallengeCardProps): React.ReactElement {
   return (
     <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4 space-y-2">
@@ -48,13 +58,26 @@ export function ChallengeCard({
             {challenge.difficulty}
           </span>
         </div>
-        <button
-          onClick={() => onEdit(index)}
-          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-neo-yellow transition-colors shrink-0"
-          title="Edit / Regenerate"
-        >
-          <Edit2 className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          {authToken && date && language && (
+            <MarkAsBadButton
+              authToken={authToken}
+              date={date}
+              language={language}
+              challengeIndex={index}
+              challengeType={challenge.type}
+              trendTopic={challenge.trend_topic}
+              onSuccess={onMarkAsBadSuccess}
+            />
+          )}
+          <button
+            onClick={() => onEdit(index)}
+            className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-neo-yellow transition-colors"
+            title="Edit / Regenerate"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       <div className="text-white">

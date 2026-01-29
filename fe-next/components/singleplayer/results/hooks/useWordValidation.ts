@@ -53,7 +53,9 @@ export function useWordValidation({
         })
       });
     } catch (error) {
-      console.error('Failed to record vote:', error);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Failed to record vote:', errorMessage);
     }
   }, [gameSessionId, language]);
 

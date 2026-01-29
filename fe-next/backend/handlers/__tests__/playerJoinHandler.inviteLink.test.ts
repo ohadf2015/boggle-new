@@ -56,6 +56,7 @@ jest.mock('../../utils/socketHelpers', () => ({
   safeEmit: jest.fn(),
   getSocketById: jest.fn(),
   disconnectSocket: jest.fn(),
+  isSocketMigrating: jest.fn().mockReturnValue(false),
 }));
 
 jest.mock('../../utils/errorHandler', () => ({

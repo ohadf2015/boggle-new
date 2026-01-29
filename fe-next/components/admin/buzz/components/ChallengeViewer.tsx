@@ -35,10 +35,10 @@ export interface ChallengeViewerProps {
   // Image operations
   isRegeneratingImage: boolean;
   regenerateImageError: string | null;
-  onRegenerateImage: () => Promise<void>;
+  onRegenerateImage: () => Promise<boolean>;
   isRemovingImage: boolean;
   removeImageError: string | null;
-  onRemoveImage: () => Promise<void>;
+  onRemoveImage: () => Promise<boolean>;
   onClearImageErrors: () => void;
   // Type regeneration
   isRegeneratingType: boolean;
@@ -47,6 +47,8 @@ export interface ChallengeViewerProps {
   onClearTypeError: () => void;
   // Success callback
   onSuccess: (message: string) => void;
+  // Auth for mark-as-bad feature
+  authToken?: string;
 }
 
 /**
@@ -70,6 +72,7 @@ export function ChallengeViewer({
   onRegenerateByType,
   onClearTypeError,
   onSuccess,
+  authToken,
 }: ChallengeViewerProps): React.ReactElement {
   const [showChallenges, setShowChallenges] = useState(false);
   const [viewLanguage, setViewLanguage] = useState<string>('en');
@@ -136,16 +139,16 @@ export function ChallengeViewer({
 
   // Handle image regeneration with success message
   async function handleRegenerateImage(): Promise<void> {
-    await onRegenerateImage();
-    if (challengeData && !regenerateImageError) {
+    const success = await onRegenerateImage();
+    if (success && challengeData) {
       onSuccess(`Image regenerated for ${challengeData.language.toUpperCase()} on ${challengeData.puzzle_date}`);
     }
   }
 
   // Handle image removal with success message
   async function handleRemoveImage(): Promise<void> {
-    await onRemoveImage();
-    if (challengeData && !removeImageError) {
+    const success = await onRemoveImage();
+    if (success && challengeData) {
       setRemoveImageDialogOpen(false);
       onSuccess(`Image removed for ${challengeData.language.toUpperCase()} on ${challengeData.puzzle_date}`);
     }
@@ -271,6 +274,10 @@ export function ChallengeViewer({
                     challenge={challenge}
                     index={index}
                     onEdit={handleEditChallenge}
+                    authToken={authToken}
+                    date={challengeData.puzzle_date}
+                    language={viewLanguage}
+                    onMarkAsBadSuccess={() => onSuccess('Challenge marked as bad - feedback stored for AI improvement')}
                   />
                 ))}
               </div>

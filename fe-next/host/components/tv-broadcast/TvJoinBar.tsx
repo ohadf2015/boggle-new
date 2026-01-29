@@ -51,7 +51,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
 
           {/* Center: Game Code (HUGE) */}
           <div className="flex-shrink-0 text-center px-6">
-            <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
+            <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1" id="game-code-label">
               {t('tvBroadcast.gameCode')}
             </p>
             <motion.div
@@ -59,8 +59,10 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               className="bg-neo-cream text-neo-purple px-6 py-2 rounded-neo border-4 border-neo-black shadow-hard"
+              role="status"
+              aria-labelledby="game-code-label"
             >
-              <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase">
+              <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase" aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
                 {gameCode}
               </span>
             </motion.div>

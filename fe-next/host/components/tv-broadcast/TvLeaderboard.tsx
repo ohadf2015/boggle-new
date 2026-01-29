@@ -3,6 +3,7 @@
 import React, { memo, useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -70,9 +71,14 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
 
   if (sortedPlayers.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full w-full p-4">
-        <p className="text-neo-black/50 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
-        <p className="text-neo-black/30 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers') || 'Waiting for players to join...'}</p>
+      <div
+        className="flex flex-col items-center justify-center h-full w-full p-4"
+        role="status"
+        aria-live="polite"
+      >
+        <Users className="w-12 h-12 text-neo-black/30 mb-3" />
+        <p className="text-neo-black/60 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
+        <p className="text-neo-black/40 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers') || 'Waiting for players to join...'}</p>
       </div>
     );
   }

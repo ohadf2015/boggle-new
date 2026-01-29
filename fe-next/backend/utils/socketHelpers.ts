@@ -152,3 +152,11 @@ export function disconnectSocket(socket: Socket, close: boolean = false): void {
     console.error('[SOCKET] Error disconnecting socket:', (error as Error).message);
   }
 }
+
+/**
+ * Check if socket is migrating to another tab
+ * Used to prevent treating tab migrations as disconnects
+ */
+export function isSocketMigrating(socket: Socket): boolean {
+  return socket.data && socket.data.migrating === true;
+}

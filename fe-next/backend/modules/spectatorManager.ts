@@ -17,6 +17,7 @@ export interface SpectatorOptions {
   avatar?: Avatar | null;
   authUserId?: string | null;
   guestTokenHash?: string | null;
+  guestSessionId?: string | null;
 }
 
 export interface SpectatorInfo extends Spectator {

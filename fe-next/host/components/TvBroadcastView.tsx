@@ -32,6 +32,7 @@ interface TvBroadcastViewProps {
   username: string; // Host username
   roomLanguage: Language;
   roomName?: string;
+  /** Translation function for i18n */
   t: (path: string, params?: Record<string, string | number>) => string;
 
   // Game state
@@ -214,9 +215,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       />
 
       {/* Main Content: Grid + Leaderboard (50/50) - Using CSS Grid for reliable height distribution */}
-      <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
+      {/* On mobile portrait, stack vertically with more space for the grid */}
+      <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[minmax(45%,1fr)_minmax(35%,auto)] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
         {/* Left: Grid - fills grid cell and centers the square grid inside */}
-        <div className="min-h-[200px] md:min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+        <div className="min-h-[180px] md:min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-hidden">
           {tableData && Array.isArray(tableData) && tableData.length > 0 && tableData[0] && tableData[0].length > 0 ? (
             <TvGrid
               grid={tableData}
@@ -224,14 +226,14 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
               earthquakeShaking={isEarthquakeShaking}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center p-4">
-              <p className="text-neo-black/50 font-bold text-xl text-center">{t('tvBroadcast.waitingForGame')}</p>
+            <div className="w-full h-full flex items-center justify-center p-4" role="status" aria-live="polite">
+              <p className="text-neo-black/50 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.waitingForGame')}</p>
             </div>
           )}
         </div>
 
         {/* Right: Leaderboard - fills grid cell, needs overflow-auto for scrolling */}
-        <div className="min-h-[150px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-auto">
+        <div className="min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-auto">
           <TvLeaderboard
             players={leaderboardData}
             playerCombos={playerCombos}

@@ -200,6 +200,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             {mobileTab === 'players' ? (
               <motion.div
                 key="players"
+                id="players-panel"
+                role="tabpanel"
+                aria-labelledby="players-tab"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -210,6 +213,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             ) : (
               <motion.div
                 key="chat"
+                id="chat-panel"
+                role="tabpanel"
+                aria-labelledby="chat-tab"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -231,20 +237,27 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       </main>
 
       {/* Bottom Tab Bar - 2 Tabs, mobile only */}
-      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden relative z-50">
+      <nav
+        className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden relative z-50"
+        role="tablist"
+        aria-label={t('playerView.mobileNavigation') || 'Mobile navigation'}
+      >
         <div className="flex items-center h-12">
           {/* Players Tab */}
           <button
             onClick={() => setMobileTab('players')}
+            role="tab"
+            aria-selected={mobileTab === 'players'}
+            aria-controls="players-panel"
             className={cn(
               'flex-1 flex flex-col items-center justify-center h-full transition-all',
               mobileTab === 'players' ? 'text-neo-yellow bg-neo-navy-light/50' : 'text-neo-white/60'
             )}
           >
             <div className="relative">
-              <Users className="w-5 h-5" />
+              <Users className="w-5 h-5" aria-hidden="true" />
               {playersReady.length > 0 && (
-                <span className="absolute -top-1 -right-2 bg-neo-pink text-neo-white text-[8px] font-bold rounded-full min-w-[12px] h-[12px] flex items-center justify-center border border-neo-black">
+                <span className="absolute -top-1 -right-2 bg-neo-pink text-neo-white text-[8px] font-bold rounded-full min-w-[12px] h-[12px] flex items-center justify-center border border-neo-black" aria-label={`${playersReady.length} players`}>
                   {playersReady.length > 9 ? '9+' : playersReady.length}
                 </span>
               )}
@@ -255,15 +268,18 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           {/* Chat Tab */}
           <button
             onClick={handleChatTab}
+            role="tab"
+            aria-selected={mobileTab === 'chat'}
+            aria-controls="chat-panel"
             className={cn(
               'flex-1 flex flex-col items-center justify-center h-full transition-all',
               mobileTab === 'chat' ? 'text-neo-yellow bg-neo-navy-light/50' : 'text-neo-white/60'
             )}
           >
             <div className="relative">
-              <MessageCircle className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5" aria-hidden="true" />
               {unreadChat > 0 && mobileTab !== 'chat' && (
-                <span className="absolute -top-1 -right-2 bg-neo-red text-neo-white text-[8px] font-bold rounded-full min-w-[12px] h-[12px] flex items-center justify-center border border-neo-black">
+                <span className="absolute -top-1 -right-2 bg-neo-red text-neo-white text-[8px] font-bold rounded-full min-w-[12px] h-[12px] flex items-center justify-center border border-neo-black" aria-label={`${unreadChat} unread messages`}>
                   {unreadChat > 9 ? '9+' : unreadChat}
                 </span>
               )}

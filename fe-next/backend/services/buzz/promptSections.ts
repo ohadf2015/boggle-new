@@ -132,20 +132,27 @@ export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER
 
 **TONE**: Be witty and clever where it flows naturally. Don't force humor - a smart connection is better than a forced joke.
 
-**⭐ PRIORITY TYPES (MUST include at least 2 of these 3):**
+**⭐ REQUIRED TYPES (MUST include):**
+- **wordle_guess**: MANDATORY - Every Daily Buzz MUST include exactly ONE wordle_guess challenge
+- Plus at least 1 of the other priority types below
+
+**⭐ PRIORITY TYPES:**
 
 1. **word_chain**: COMPOUND WORD CHAIN - Answer forms compound words with BOTH neighbors
-   - Format: "WORD1 → ??? → WORD2" - Player must guess the middle word
+   - **EXACT FORMAT REQUIRED**: "WORD1 → ??? → WORD2" (use arrow symbols: →)
+   - The prompt field MUST contain EXACTLY this format with the two context words visible
+   - Player sees both context words and must guess the middle word that links them
    - CRITICAL: The answer MUST create valid compound words on BOTH sides
    - **VERIFIED COMPOUND CHAINS (use these patterns)**:
-     - SUN → FLOWER → POT (SUNflower + FLOWERpot) ✅
-     - FIRE → WORK → SHOP (FIREwork + WORKshop) ✅
-     - BACK → PACK → AGE (BACKpack + PACKage) ✅
-     - DOOR → STEP → CHILD (DOORstep + STEPchild) ✅
+     - Prompt: "SUN → ??? → POT" Answer: FLOWER (SUNflower + FLOWERpot) ✅
+     - Prompt: "FIRE → ??? → SHOP" Answer: WORK (FIREwork + WORKshop) ✅
+     - Prompt: "BACK → ??? → AGE" Answer: PACK (BACKpack + PACKage) ✅
+     - Prompt: "DOOR → ??? → CHILD" Answer: STEP (DOORstep + STEPchild) ✅
 
-2. **wordle_guess**: 5-letter word with clever connection to trend
-   - Format: "[Clue from an interesting angle]"
-   - MUST be EXACTLY 5 letters
+2. **wordle_guess**: ⭐ MANDATORY - 5-letter word with clever connection to trend
+   - Format: "[Clue from an interesting angle] (5 letters)"
+   - MUST be EXACTLY 5 letters - NO EXCEPTIONS
+   - EVERY Daily Buzz MUST include exactly ONE wordle_guess
    - Trend "Marathon" → "What winners break at the end (5 letters)" → SWEAT
    - Trend "Concert" → "What you lose after the show (5 letters)" → VOICE
 
@@ -257,6 +264,8 @@ Generate ready-to-post content for each platform in **{{language}}**. Each post 
 export const FINAL_CHECKLIST_TEMPLATE = `## ⚠️ FINAL CHECKLIST
 
 Before outputting, verify each challenge:
+- [ ] **Wordle Required**: Is there EXACTLY ONE wordle_guess challenge with a 5-letter answer?
+- [ ] **Chain Format**: Does every word_chain use the format "WORD1 → ??? → WORD2"?
 - [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
 - [ ] **Common Word Test**: Would your grandma know this word?
 - [ ] **Aha Test**: Does the clue make players go "Ohhh, nice!"?

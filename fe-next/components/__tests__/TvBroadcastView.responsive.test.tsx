@@ -132,10 +132,10 @@ describe('TvBroadcastView - Responsive Layout', () => {
     const grid = screen.getByTestId('tv-grid').parentElement;
     const leaderboard = screen.getByTestId('tv-leaderboard').parentElement;
 
-    // Grid uses min-h-[200px] for mobile, leaderboard uses min-h-[150px]
+    // Grid uses min-h-[180px] for mobile, leaderboard uses min-h-[120px]
     // On desktop (md:), both use min-h-0 to fill CSS Grid cells
-    expect(grid).toHaveClass('min-h-[200px]');
-    expect(leaderboard).toHaveClass('min-h-[150px]');
+    expect(grid).toHaveClass('min-h-[180px]');
+    expect(leaderboard).toHaveClass('min-h-[120px]');
 
     // Grid uses overflow-hidden, leaderboard uses overflow-auto for scrolling
     expect(grid).toHaveClass('overflow-hidden');

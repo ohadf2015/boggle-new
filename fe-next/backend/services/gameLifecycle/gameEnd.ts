@@ -6,6 +6,7 @@
  */
 
 import type { Server } from 'socket.io';
+import type { Game } from '@/shared/types';
 import { getGame, transitionGameState } from '../../modules/gameStateManager';
 import {
   collectNonDictionaryWords,
@@ -76,7 +77,8 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   await calculateAndBroadcastFinalScores(io, gameCode);
 
   // Collect non-dictionary words for feedback
-  const nonDictWords = collectNonDictionaryWords(game);
+   
+  const nonDictWords = collectNonDictionaryWords(game as any);
   const playerCount = Object.keys(game.users).length;
 
   logger.info(

@@ -4573,7 +4573,10 @@ const en = {
       "notStarted": "Not Started",
       "accuracyTooltip": "{{student}}: {{accuracy}}% on \"{{word}}\"",
       "noVocabularyData": "No vocabulary data yet",
-      "practiceToSee": "Students need to practice to see mastery"
+      "practiceToSee": "Students need to practice to see mastery",
+      "viewLessons": "Lessons",
+      "viewVocabulary": "Vocabulary",
+      "backToClassroom": "Back to Classroom"
     },
     "achievements": {
       "title": "Achievements",

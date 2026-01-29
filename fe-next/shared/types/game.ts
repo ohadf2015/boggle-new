@@ -13,6 +13,14 @@ export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
 
 export type PresenceStatus = 'active' | 'idle' | 'afk';
 
+/** Chat history entry (also matches ChatMessagePayload in socket.ts) */
+export interface ChatHistoryEntry {
+  username: string;
+  message: string;
+  timestamp: number;
+  isHost: boolean;
+}
+
 export type LetterGrid = string[][];
 
 // ==================== Game Configuration ====================
@@ -199,6 +207,8 @@ export interface Game {
   peerValidationVotes?: Record<string, 'valid' | 'invalid'>;
   /** Maps word to the first player who found it (for first-to-find scoring) */
   firstFinderMap?: Record<string, FirstFinderEntry>;
+  /** Chat message history (persists across rounds, max 100 messages) */
+  chatHistory?: ChatHistoryEntry[];
 }
 
 export interface ActiveRoom {

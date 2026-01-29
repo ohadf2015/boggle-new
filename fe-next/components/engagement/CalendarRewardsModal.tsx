@@ -56,7 +56,9 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
         setFetchError(response.status === 401 ? 'Session expired. Please refresh the page.' : 'Failed to load calendar. Please try again.');
       }
     } catch (error) {
-      console.error('[Calendar] Error fetching status:', error);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[Calendar] Error fetching status:', errorMessage);
       setFetchError('Network error. Please check your connection.');
     } finally {
       setIsLoading(false);
@@ -102,7 +104,9 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
         toast.error(t('calendar.claimError') || 'Failed to claim reward');
       }
     } catch (error) {
-      console.error('[Calendar] Error claiming reward:', error);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[Calendar] Error claiming reward:', errorMessage);
       toast.error(t('calendar.claimError') || 'Failed to claim reward');
     } finally {
       setIsClaiming(false);

@@ -102,3 +102,14 @@ export {
   getCachedFriendshipStatus,
   invalidateFriendshipStatus,
 } from './friendship';
+
+// Distributed rate limiting
+export {
+  blockIpRedis,
+  checkRateLimitRedis,
+  clearRateLimitRedis,
+  getRateLimitStatsRedis,
+  isIpBlockedRedis,
+  RATE_LIMIT_KEYS,
+  unblockIpRedis,
+} from './rateLimit';

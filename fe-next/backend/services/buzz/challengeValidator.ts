@@ -13,6 +13,53 @@ import { isSportsRelatedChallenge } from './trendsService';
 import { repairTruncatedJson } from './utils';
 
 /**
+ * Validate that the answer does not appear in trend_topic or trending_context
+ * This prevents spoilers where users can see the answer in the challenge context
+ *
+ * @param challenge - The challenge to validate
+ * @returns true if the answer is NOT spoiled, false if it IS spoiled
+ */
+export function validateAnswerNotSpoiled(challenge: BuzzChallenge): boolean {
+  const answer = challenge.answer.toLowerCase();
+  const trendTopic = challenge.trend_topic.toLowerCase();
+  const trendingContext = challenge.trending_context.toLowerCase();
+
+  // For short answers (2-3 chars), only match as whole word to avoid false positives
+  // e.g., "AI" in "EMAIL" should not be a match
+  if (answer.length <= 3) {
+    // Use word boundary regex for short answers
+    const wordBoundaryRegex = new RegExp(`\\b${escapeRegex(answer)}\\b`, 'i');
+    if (wordBoundaryRegex.test(trendTopic)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found as word in trend_topic "${challenge.trend_topic}"`);
+      return false;
+    }
+    if (wordBoundaryRegex.test(trendingContext)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found as word in trending_context "${challenge.trending_context}"`);
+      return false;
+    }
+  } else {
+    // For longer answers, check if it appears anywhere (including as substring)
+    if (trendTopic.includes(answer)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found in trend_topic "${challenge.trend_topic}"`);
+      return false;
+    }
+    if (trendingContext.includes(answer)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found in trending_context "${challenge.trending_context}"`);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Escape special regex characters in a string
+ */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Field name mappings for normalizing AI output variations
  * AI models sometimes use slightly different field names than expected
  */
@@ -77,6 +124,7 @@ export function validateChallenges(
   const minLength = MIN_ANSWER_LENGTH[language] || 3;
   const rejectionReasons: Record<string, string[]> = {
     'invalid_length': [],
+    'answer_spoiled': [],
   };
 
   // NOTE: Brand name filtering disabled - we now allow brand/company names as answers
@@ -100,6 +148,12 @@ export function validateChallenges(
       }
     }
 
+    // Validate that answer is not spoiled in topic or context
+    if (!validateAnswerNotSpoiled(challenge)) {
+      rejectionReasons['answer_spoiled'].push(`${answer} (found in topic or context)`);
+      return false;
+    }
+
     return true;
   });
 
@@ -113,8 +167,18 @@ export function validateChallenges(
     if (rejectionReasons['invalid_length'].length > 0) {
       console.error(`  Invalid length (${rejectionReasons['invalid_length'].length}):`, rejectionReasons['invalid_length']);
     }
+    if (rejectionReasons['answer_spoiled'].length > 0) {
+      console.error(`  Answer spoiled (${rejectionReasons['answer_spoiled'].length}):`, rejectionReasons['answer_spoiled']);
+    }
 
     throw new Error(`Insufficient validated challenges: got ${validatedChallenges.length}, need 5`);
+  }
+
+  // Enforce at least one wordle_guess challenge requirement
+  const hasWordleGuess = validatedChallenges.some(c => c.type === 'wordle_guess');
+  if (!hasWordleGuess) {
+    console.error(`[BUZZ] Missing wordle_guess challenge - Daily Buzz requires at least one`);
+    throw new Error('Daily Buzz must include at least one wordle_guess challenge');
   }
 
   // Enforce max 1 sport riddle constraint
@@ -164,25 +228,47 @@ export function validateSingleChallenge(
 
 /**
  * Normalize fill_blank challenges to have correct underscore count
+ * and add first letter hint to guide guessing
  */
 export function normalizeBlankSizes(challenges: BuzzChallenge[]): BuzzChallenge[] {
   return challenges.map(challenge => {
     if (challenge.type !== 'fill_blank') return challenge;
 
-    const answerLength = challenge.answer.replace(/\s/g, '').length;
-    const spacedBlanks = Array(answerLength).fill('_').join(' ');
+    const answerWithoutSpaces = challenge.answer.replace(/\s/g, '');
+    const answerLength = answerWithoutSpaces.length;
+    const firstLetter = answerWithoutSpaces.charAt(0).toUpperCase();
 
-    let normalizedPrompt = challenge.prompt
-      .replace(/_{3,}/g, spacedBlanks)
-      .replace(/\*{3,}/g, spacedBlanks)
-      .replace(/\.{3,}/g, spacedBlanks)
-      .replace(/(\s*_\s*)+/g, (match) => {
-        const existingCount = (match.match(/_/g) || []).length;
-        if (existingCount !== answerLength) {
-          return ` ${spacedBlanks} `;
-        }
-        return match;
-      });
+    // Create blank pattern with first letter hint: "S _ _ _ _" for 5-letter answer
+    const remainingBlanks = Array(answerLength - 1).fill('_').join(' ');
+    const blanksWithFirstLetter = `${firstLetter} ${remainingBlanks}`;
+
+    // Check if first letter is already present in the prompt
+    const hasFirstLetterHint = new RegExp(`${escapeRegex(firstLetter)}\\s+(_\\s*)+`, 'i').test(challenge.prompt);
+
+    let normalizedPrompt = challenge.prompt;
+
+    if (hasFirstLetterHint) {
+      // First letter already present, just normalize underscore count
+      normalizedPrompt = normalizedPrompt.replace(
+        new RegExp(`${escapeRegex(firstLetter)}(\\s*_\\s*)+`, 'gi'),
+        blanksWithFirstLetter
+      );
+    } else {
+      // Replace blank patterns with first letter + remaining blanks
+      normalizedPrompt = normalizedPrompt
+        .replace(/_{3,}/g, blanksWithFirstLetter)
+        .replace(/\*{3,}/g, blanksWithFirstLetter)
+        .replace(/\.{3,}/g, blanksWithFirstLetter)
+        .replace(/(\s*_\s*)+/g, (match) => {
+          const existingCount = (match.match(/_/g) || []).length;
+          // Only replace if count doesn't match or count is exact but no first letter
+          if (existingCount !== answerLength - 1) {
+            return ` ${blanksWithFirstLetter} `;
+          }
+          // If existing underscores equal remaining blanks (answerLength - 1), just add first letter
+          return ` ${blanksWithFirstLetter} `;
+        });
+    }
 
     const letterCountPattern = /\((\d+)\s*letters?\)/i;
     if (letterCountPattern.test(normalizedPrompt)) {

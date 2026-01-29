@@ -6,17 +6,18 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, PresenceStatus, GameUser } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
   updateUserPresence,
-  updateUserHeartbeat
-} = require('../modules/gameStateManager');
+  updateUserHeartbeat,
+  forEachGame,
+} from '../modules/gameStateManager.js';
 
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const logger = require('../utils/logger');
-const { validatePayload, presenceUpdateSchema, heartbeatSchema } = require('../utils/socketValidation');
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import logger from '../utils/logger.js';
+import { validatePayload, presenceUpdateSchema, heartbeatSchema } from '../utils/socketValidation.js';
 
 // Types for payloads
 interface PresenceUpdatePayload {
@@ -53,8 +54,11 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game) return;
 
+    // Convert status to PresenceData - the updateUserPresence function determines final status
+    const presenceData = status === 'afk' ? { forceIdle: true } : { isWindowFocused: status === 'active' };
+
     // Update user presence
-    updateUserPresence(gameCode, username, status);
+    updateUserPresence(gameCode, username, presenceData);
 
     // Broadcast to room
     broadcastToRoom(io, getGameRoom(gameCode), 'userPresenceChanged', {
@@ -88,10 +92,8 @@ function startConnectionHealthCheck(io: Server): void {
   const STALE_THRESHOLD = 60000; // 1 minute without heartbeat
 
   setInterval(() => {
-    const { forEachGame } = require('../modules/gameStateManager');
-
-    forEachGame((gameCode: string, game: Game) => {
-      for (const [username, userData] of Object.entries(game.users || {}) as [string, GameUser][]) {
+    forEachGame((gameCode, game) => {
+      for (const [username, userData] of Object.entries(game.users || {})) {
         // Skip if user is already marked disconnected
         if (userData.disconnected) continue;
 
@@ -109,7 +111,5 @@ function startConnectionHealthCheck(io: Server): void {
     });
   }, HEALTH_CHECK_INTERVAL);
 }
-
-module.exports = { registerPresenceHandlers, startConnectionHealthCheck };
 
 export { registerPresenceHandlers, startConnectionHealthCheck };

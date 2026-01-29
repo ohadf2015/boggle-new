@@ -6,7 +6,7 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, LeaderboardEntry, WordDetail, Language, Avatar } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
@@ -21,25 +21,25 @@ const {
   trackAiApprovedWord,
   getFirstFinder,
   recordFirstFinder,
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { broadcastToRoom, getGameRoom, getSocketById, safeEmit } = require('../utils/socketHelpers');
-const { isWordOnBoardAsync } = require('../modules/wordValidatorPool');
-const { isProfane } = require('../utils/profanityFilter');
-const { calculateWordScore } = require('../modules/scoringEngine');
-const { checkAndAwardAchievements, ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
-const { isDictionaryWord } = require('../dictionary');
-const { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } = require('../modules/supabaseServer');
-const { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } = require('../modules/communityWordManager');
-const { emitError, ErrorMessages, ErrorCodes } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc, incPerGame } = require('../utils/metrics');
-const botManager = require('../modules/botManager');
-const logger = require('../utils/logger');
-const { isSocketMigrating } = require('./shared');
-const { processLongWordEngagement } = require('./engagementHandler');
-const { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } = require('../utils/socketValidation');
-const { spamDetector, PenaltyTier, InvalidReason } = require('../modules/spamDetector');
+import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
+import { isWordOnBoardAsync } from '../modules/wordValidatorPool.js';
+import { isProfane } from '../utils/profanityFilter.js';
+import { calculateWordScore } from '../modules/scoringEngine.js';
+import { checkAndAwardAchievements, ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
+import { isDictionaryWord } from '../dictionary.js';
+import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
+import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager.js';
+import { emitError, ErrorMessages, ErrorCodes } from '../utils/errorHandler.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { inc, incPerGame } from '../utils/metrics.js';
+import botManager from '../modules/botManager.js';
+import logger from '../utils/logger.js';
+import { isSocketMigrating, processLongWordEngagement } from './';
+import { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } from '../utils/socketValidation.js';
+import { spamDetector, PenaltyTier, InvalidReason } from '../modules/spamDetector.js';
+import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '1');
@@ -243,8 +243,16 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Log if accepted during grace period
+      // Grace period lock: Prevent race conditions in multi-instance deployments
+      // where multiple late word submissions could be processed in parallel
+      let gracePeriodLockId: string | null = null;
       if (isWithinGracePeriod) {
+        gracePeriodLockId = await acquireGracePeriodLock(gameCode);
+        if (!gracePeriodLockId) {
+          // Another instance is processing a grace period word, skip
+          logger.debug('WORD', `Grace period lock not acquired for ${gameCode}, skipping`);
+          return;
+        }
         logger.info('WORD', `Word accepted during grace period`, {
           gameCode,
           username,
@@ -252,6 +260,13 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           timeSinceEnd: Date.now() - game.gameEndedAt
         });
       }
+
+      // Helper to release grace period lock on early returns
+      const releaseGraceLockIfNeeded = async (): Promise<void> => {
+        if (gracePeriodLockId) {
+          await releaseGracePeriodLock(gameCode, gracePeriodLockId);
+        }
+      };
 
       markUserActivity(gameCode, username);
 
@@ -264,6 +279,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           reason: 'inappropriate'
         });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.PROFANITY, game);
+        await releaseGraceLockIfNeeded();
         return;
       }
 
@@ -275,6 +291,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           minLength: minLength
         });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.TOO_SHORT, game);
+        await releaseGraceLockIfNeeded();
         return;
       }
 
@@ -282,6 +299,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       if (playerHasWord(gameCode, username, normalizedWord)) {
         socket.emit('wordAlreadyFound', { word: normalizedWord });
         // Note: Not counted as spam - could be UX issue where user didn't see feedback
+        await releaseGraceLockIfNeeded();
         return;
       }
 
@@ -296,6 +314,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         if (isSupabaseConfigured()) {
           recordPlayerWrongWord(normalizedWord, game.language || 'en', 'not_on_board').catch(() => {});
         }
+        await releaseGraceLockIfNeeded();
         return;
       }
 
@@ -310,6 +329,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         });
         // Reset combo since word was already found
         // Note: We don't count this as spam - it's valid gameplay
+        await releaseGraceLockIfNeeded();
         return;
       }
 
@@ -332,21 +352,26 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
       }, lbThrottleMs);
 
+      // Release grace period lock after successful word processing
+      await releaseGraceLockIfNeeded();
+
     } catch (error: unknown) {
       const err = error as Error;
-      const gameCode = getGameBySocketId(socket.id);
-      const username = getUsernameBySocketId(socket.id);
+      const catchGameCode = getGameBySocketId(socket.id);
+      const catchUsername = getUsernameBySocketId(socket.id);
       // Log detailed error context for debugging
       logger.error('SOCKET', 'Error in submitWord handler', {
         error: err.message,
         stack: err.stack,
-        gameCode,
-        username,
+        gameCode: catchGameCode,
+        username: catchUsername,
         socketId: socket.id,
       });
       emitError(socket, ErrorCodes.WORD_PROCESSING_ERROR, {
-        correlationId: `${gameCode}-${Date.now()}`,
+        correlationId: `${catchGameCode}-${Date.now()}`,
       });
+      // Note: gracePeriodLockId is out of scope in catch block, but the lock has a short TTL (2s)
+      // so it will auto-expire if we can't release it here. This is acceptable for error cases.
     }
   });
 
@@ -652,7 +677,5 @@ function handlePeerRejection(io: Server, gameCode: string, game: Game, result: P
   const leaderboard: LeaderboardEntry[] = getLeaderboard(gameCode);
   broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
 }
-
-module.exports = { registerWordHandlers };
 
 export { registerWordHandlers };

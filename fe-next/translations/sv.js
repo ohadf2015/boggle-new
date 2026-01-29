@@ -4581,8 +4581,10 @@ const sv = {
       "notStarted": "Ej påbörjad",
       "accuracyTooltip": "{{student}}: {{accuracy}}% på \"{{word}}\"",
       "noVocabularyData": "Ingen ordförrådsdata ännu",
-      "practiceToSee": "Elever behöver öva för att se behärskning"
-,
+      "practiceToSee": "Elever behöver öva för att se behärskning",
+      "viewLessons": "Lektioner",
+      "viewVocabulary": "Ordförråd",
+      "backToClassroom": "Tillbaka till klassrum",
       "live": "Live",
       "offline": "Offline",
       "connecting": "Ansluter...",

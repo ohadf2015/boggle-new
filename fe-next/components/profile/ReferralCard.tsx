@@ -69,8 +69,10 @@ export function ReferralCard() {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (err) {
-      console.error('Error fetching referral data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load referral data');
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('Error fetching referral data:', errorMessage);
+      setError(errorMessage || 'Failed to load referral data');
     } finally {
       setLoading(false);
     }

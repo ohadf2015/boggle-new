@@ -95,7 +95,7 @@ export const FIELD_LABELS: Record<RegenerableField, string> = {
   image: 'Image Only',
 };
 
-// Prompt Template Types
+// Prompt Template Types (legacy - kept for backward compatibility)
 export const TEMPLATE_TYPES = ['riddle', 'image', 'challenge_general', 'social_content'] as const;
 export type TemplateType = typeof TEMPLATE_TYPES[number];
 
@@ -123,4 +123,67 @@ export interface PromptTemplate {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+// ============================================================================
+// Prompt Section Types (11 modular sections for AI prompt generation)
+// ============================================================================
+
+export const SECTION_TYPES = [
+  'section_intro',
+  'section_tone_guide',
+  'section_trends_context',
+  'section_priority_keywords',
+  'section_creative_philosophy',
+  'section_challenge_requirements',
+  'section_challenge_types',
+  'section_output_format',
+  'section_trending_summary_examples',
+  'section_social_media_instructions',
+  'section_final_checklist',
+] as const;
+
+export type SectionType = typeof SECTION_TYPES[number];
+
+export interface SectionStatus {
+  sectionType: SectionType;
+  displayName: string;
+  description: string;
+  icon: string;
+  isCustomized: boolean;
+  version?: number;
+  lastUpdated?: string;
+  placeholders: TemplatePlaceholder[];
+}
+
+export interface SectionContent {
+  sectionType: SectionType;
+  content: string;
+  fromDatabase: boolean;
+  version?: number;
+  language: string | null;
+}
+
+export interface PromptPreviewData {
+  assembledPrompt: string;
+  totalCharacters: number;
+  sections: Array<{
+    name: SectionType;
+    displayName: string;
+    content: string;
+    fromDatabase: boolean;
+  }>;
+  sampleData: Record<string, string>;
+}
+
+export interface MarkAsBadRequest {
+  date: string;
+  language: string;
+  challengeIndex: number;
+  feedback: string;
+}
+
+export interface SectionUpdateRequest {
+  content: string;
+  language?: string | null;
 }

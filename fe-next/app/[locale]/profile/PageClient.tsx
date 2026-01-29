@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { User, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NeoLoader } from '@/components/ui/NeoLoader';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
@@ -46,14 +46,25 @@ export default function ProfilePageClient(): React.JSX.Element {
   const { t, language } = useLanguage();
   const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
+
+  // Read initial tab from URL query parameter (e.g., ?tab=collection)
+  const getInitialSection = (): ProfileSection => {
+    const tabParam = searchParams.get('tab');
+    const validTabs: ProfileSection[] = ['overview', 'stats', 'achievements', 'collection'];
+    if (tabParam && validTabs.includes(tabParam as ProfileSection)) {
+      return tabParam as ProfileSection;
+    }
+    return 'overview';
+  };
 
   // State
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
-  const [activeSection, setActiveSection] = useState<ProfileSection>('overview');
+  const [activeSection, setActiveSection] = useState<ProfileSection>(getInitialSection);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
 
   // Hooks

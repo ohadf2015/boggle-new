@@ -17,15 +17,15 @@ import type {
   AchievementPayload
 } from '@/shared/types';
 
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { safeEmit } = require('../utils/socketHelpers');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc } = require('../utils/metrics');
-const { isSocketMigrating } = require('./shared');
-const { validatePayload, generateScoreCardSchema } = require('../utils/socketValidation');
-const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
-const logger = require('../utils/logger');
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager.js';
+import { safeEmit } from '../utils/socketHelpers.js';
+import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { inc } from '../utils/metrics.js';
+import { isSocketMigrating } from './';
+import { validatePayload, generateScoreCardSchema } from '../utils/socketValidation.js';
+import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
+import logger from '../utils/logger.js';
 
 // Rate limit weight for score card generation (medium-heavy operation)
 const SCORECARD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SCORECARD || '5');
@@ -343,15 +343,6 @@ function registerScorecardHandlers(io: Server, socket: Socket): void {
     }
   });
 }
-
-module.exports = {
-  registerScorecardHandlers,
-  // Export for testing
-  calculateRank,
-  calculateStats,
-  getTopWords,
-  generateScoreCardData
-};
 
 export {
   registerScorecardHandlers,

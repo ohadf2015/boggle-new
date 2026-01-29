@@ -4556,8 +4556,10 @@ const he = {
       "notStarted": "לא התחיל",
       "accuracyTooltip": "{{student}}: {{accuracy}}% ב-\"{{word}}\"",
       "noVocabularyData": "אין עדיין נתוני אוצר מילים",
-      "practiceToSee": "תלמידים צריכים לתרגל כדי לראות שליטה"
-,
+      "practiceToSee": "תלמידים צריכים לתרגל כדי לראות שליטה",
+      "viewLessons": "שיעורים",
+      "viewVocabulary": "אוצר מילים",
+      "backToClassroom": "חזרה לכיתה",
       "live": "שידור חי",
       "offline": "לא מקוון",
       "connecting": "מתחבר...",

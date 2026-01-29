@@ -26,10 +26,10 @@ export interface UseChallengeDataReturn {
   // Image operations
   isRegeneratingImage: boolean;
   regenerateImageError: string | null;
-  handleRegenerateImage: () => Promise<void>;
+  handleRegenerateImage: () => Promise<boolean>;
   isRemovingImage: boolean;
   removeImageError: string | null;
-  handleRemoveImage: () => Promise<void>;
+  handleRemoveImage: () => Promise<boolean>;
   clearImageErrors: () => void;
   // Type regeneration
   isRegeneratingType: boolean;
@@ -87,8 +87,8 @@ export function useChallengeData(): UseChallengeDataReturn {
     }
   }, []);
 
-  const handleRegenerateImage = useCallback(async () => {
-    if (!challengeData) return;
+  const handleRegenerateImage = useCallback<() => Promise<boolean>>(async () => {
+    if (!challengeData) return false;
 
     setImageRegenState({ loading: true, error: null });
 
@@ -133,14 +133,16 @@ export function useChallengeData(): UseChallengeDataReturn {
       });
 
       setImageRegenState({ loading: false, error: null });
+      return true;
     } catch (error) {
       const errorMsg = getTimeoutOrError(error, 'Failed to regenerate image');
       setImageRegenState({ loading: false, error: errorMsg });
+      return false;
     }
   }, [challengeData]);
 
-  const handleRemoveImage = useCallback(async () => {
-    if (!challengeData) return;
+  const handleRemoveImage = useCallback<() => Promise<boolean>>(async () => {
+    if (!challengeData) return false;
 
     setImageRemoveState({ loading: true, error: null });
 
@@ -176,9 +178,11 @@ export function useChallengeData(): UseChallengeDataReturn {
       });
 
       setImageRemoveState({ loading: false, error: null });
+      return true;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Failed to remove image';
       setImageRemoveState({ loading: false, error: errorMsg });
+      return false;
     }
   }, [challengeData]);
 

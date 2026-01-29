@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Clock, TrendingUp, Award, Gamepad2 } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, Award, Gamepad2, CheckCircle2, Sparkles, History, BarChart3 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function StudentLessonView() {
@@ -114,27 +114,54 @@ export default function StudentLessonView() {
 
   if (sortedLessons.length === 0) {
     return (
-      <div className="text-center py-16 space-y-6">
-        <BookOpen className="w-16 h-16 mx-auto mb-4 text-neo-white/30" />
-        <div>
-          <h3 className="text-xl font-neo-display text-neo-white mb-2">
+      <div className="text-center py-12 sm:py-16 space-y-6">
+        {/* Animated illustration area */}
+        <div className="relative mx-auto w-32 h-32 mb-6">
+          <div className="absolute inset-0 bg-neo-cyan/20 rounded-full animate-pulse" />
+          <div className="absolute inset-2 bg-neo-navy border-neo border-neo-black rounded-full flex items-center justify-center shadow-hard">
+            <BookOpen className="w-12 h-12 text-neo-cyan" />
+          </div>
+        </div>
+
+        {/* Welcome message */}
+        <div className="max-w-sm mx-auto">
+          <h3 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white mb-3">
             {t('student.lessons.empty.title')}
           </h3>
-          <p className="text-neo-white/70 font-neo-body mb-4">
+          <p className="text-neo-white/70 font-neo-body text-base leading-relaxed">
             {t('student.lessons.empty.subtitle')}
           </p>
         </div>
-        <Button
-          onClick={() => router.push(`/${language}/student/join`)}
-          className={cn(
-            'font-neo-display text-base',
-            'bg-neo-cyan hover:bg-neo-cyan/90',
-            'text-neo-black shadow-hard hover:shadow-hard-sm',
-            'transition-all'
-          )}
-        >
-          {t('student.lessons.empty.joinClassroom')}
-        </Button>
+
+        {/* Action buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Button
+            onClick={() => router.push(`/${language}/student/join`)}
+            size="lg"
+            className={cn(
+              'font-neo-display text-base px-6',
+              'bg-neo-cyan hover:bg-neo-cyan/90',
+              'text-neo-black shadow-hard hover:shadow-hard-sm',
+              'border-neo border-neo-black',
+              'transition-all'
+            )}
+          >
+            {t('student.lessons.empty.joinClassroom')}
+          </Button>
+          <Button
+            onClick={() => router.push(`/${language}`)}
+            variant="outline"
+            size="lg"
+            className={cn(
+              'font-neo-display text-base px-6',
+              'border-neo-white/30 text-neo-white/80 hover:text-neo-white',
+              'hover:border-neo-white/50 hover:bg-neo-white/5',
+              'transition-all'
+            )}
+          >
+            {t('common.backHome')}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -148,10 +175,12 @@ export default function StudentLessonView() {
           variant={sortBy === 'recent' ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            'font-neo-body',
-            sortBy === 'recent' && 'bg-neo-cyan text-neo-black shadow-hard'
+            'font-neo-body gap-1.5',
+            sortBy === 'recent' && 'bg-neo-cyan text-neo-black shadow-hard border-neo-black',
+            sortBy !== 'recent' && 'text-neo-white/70 hover:text-neo-white border-neo-white/30'
           )}
         >
+          <History className="w-4 h-4" />
           {t('student.lessons.sort.recent')}
         </Button>
         <Button
@@ -159,10 +188,12 @@ export default function StudentLessonView() {
           variant={sortBy === 'progress' ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            'font-neo-body',
-            sortBy === 'progress' && 'bg-neo-cyan text-neo-black shadow-hard'
+            'font-neo-body gap-1.5',
+            sortBy === 'progress' && 'bg-neo-cyan text-neo-black shadow-hard border-neo-black',
+            sortBy !== 'progress' && 'text-neo-white/70 hover:text-neo-white border-neo-white/30'
           )}
         >
+          <BarChart3 className="w-4 h-4" />
           {t('student.lessons.sort.progress')}
         </Button>
       </div>
@@ -192,9 +223,13 @@ export default function StudentLessonView() {
             <Card
               key={studentLesson.lessonId}
               className={cn(
-                'bg-neo-navy border-neo border-neo-black shadow-hard hover:shadow-hard-lg',
+                'bg-neo-navy border-neo shadow-hard hover:shadow-hard-lg',
                 'transition-all duration-200',
-                'overflow-hidden'
+                'overflow-hidden relative',
+                // Visual distinction based on status
+                status === 'assigned' && 'border-neo-cyan',
+                status === 'started' && 'border-neo-black',
+                status === 'completed' && 'border-neo-yellow'
               )}
             >
               <CardContent className="p-6 space-y-4">
@@ -212,12 +247,18 @@ export default function StudentLessonView() {
 
                   {/* Status Badge */}
                   {status === 'assigned' && (
-                    <span className="px-2 py-1 bg-neo-cyan text-neo-black text-xs font-neo-display font-bold rounded-neo">
+                    <span className="px-3 py-1.5 bg-neo-cyan text-neo-black text-xs font-neo-display font-bold rounded-neo border-2 border-neo-black shadow-hard-sm flex items-center gap-1.5 animate-pulse">
+                      <Sparkles className="w-3.5 h-3.5" />
                       {t('student.lessons.new')}
                     </span>
                   )}
                   {status === 'completed' && (
-                    <Award className="w-6 h-6 text-neo-yellow" />
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow/20 rounded-neo border-2 border-neo-yellow/50">
+                      <CheckCircle2 className="w-5 h-5 text-neo-yellow" />
+                      <span className="text-xs font-neo-display font-bold text-neo-yellow">
+                        {t('student.lessons.completed')}
+                      </span>
+                    </div>
                   )}
                 </div>
 

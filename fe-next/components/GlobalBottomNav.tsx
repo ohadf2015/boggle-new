@@ -2,13 +2,16 @@
 
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { Home, Brain, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeArea } from '../hooks/useSafeArea';
-import AuthModal from './auth/AuthModal';
+
+// Lazy load AuthModal - only shown when unauthenticated users tap Brain/Profile
+const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
 /**
  * GlobalBottomNav - Mobile-only bottom navigation bar

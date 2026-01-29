@@ -93,7 +93,9 @@ export function DailyChallengeLanding({
         buzzAvailable = availabilityData.available;
       }
     } catch (err) {
-      console.error('Failed to check buzz availability:', err);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('Failed to check buzz availability:', errorMessage);
     }
 
     // If not available, set status and skip further checks
@@ -129,7 +131,9 @@ export function DailyChallengeLanding({
         }
       }
     } catch (err) {
-      console.error('Failed to check buzz status:', err);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('Failed to check buzz status:', errorMessage);
     }
 
     // Fetch buzz preview data for image display (separate from status)
@@ -146,7 +150,9 @@ export function DailyChallengeLanding({
         }
       }
     } catch (err) {
-      console.error('Failed to fetch buzz preview:', err);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('Failed to fetch buzz preview:', errorMessage);
     }
 
     // Set buzz status based on played and completed flags

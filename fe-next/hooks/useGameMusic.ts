@@ -73,7 +73,8 @@ export function useGameMusic({
 
       case 'playing':
         // Only fade to in-game music on transition TO playing
-        if (previousPhase !== 'playing') {
+        // Skip if earthquake/fire-round is already active - let earthquake effect handle music
+        if (previousPhase !== 'playing' && earthquakeState === 'idle') {
           fadeToTrack(TRACKS.IN_GAME, 800, 800);
           hasTriggeredUrgentMusicRef.current = false;
           earthquakeMusicActiveRef.current = false;
@@ -91,7 +92,7 @@ export function useGameMusic({
         // No music change for waiting state
         break;
     }
-  }, [phase, enabled, fadeToTrack, playTrack, TRACKS]);
+  }, [phase, enabled, earthquakeState, fadeToTrack, playTrack, TRACKS]);
 
   // Handle urgent music after 33% of game time has elapsed
   useEffect(() => {

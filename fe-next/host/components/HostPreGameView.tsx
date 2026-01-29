@@ -321,14 +321,17 @@ function HostPreGameView({
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
         className="flex items-center justify-center gap-1 text-xs text-slate-400 hover:text-neo-cream transition-colors py-1"
+        aria-expanded={showAdvanced}
+        aria-controls="advanced-settings-panel"
       >
         <span>{t('common.advancedSettings') || 'More Options'}</span>
-        <ChevronDown className={cn('w-3 h-3 transition-transform', showAdvanced && 'rotate-180')} />
+        <ChevronDown className={cn('w-3 h-3 transition-transform', showAdvanced && 'rotate-180')} aria-hidden="true" />
       </button>
 
       <AnimatePresence>
         {showAdvanced && (
           <motion.div
+            id="advanced-settings-panel"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

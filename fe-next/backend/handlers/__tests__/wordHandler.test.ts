@@ -97,6 +97,7 @@ jest.mock('../../../backend/utils/socketHelpers', () => ({
   getGameRoom: jest.fn().mockImplementation((gameCode) => `game:${gameCode}`),
   getSocketById: jest.fn(),
   safeEmit: jest.fn(),
+  isSocketMigrating: jest.fn().mockReturnValue(false),
 }));
 
 jest.mock('../../../backend/modules/botManager', () => ({}));

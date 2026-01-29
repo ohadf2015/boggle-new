@@ -18,6 +18,7 @@ import { EducationBadgeGrid, type StudentAchievement } from '@/components/educat
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { getXpProgress } from '@/backend/modules/xpManager';
 
 export default function StudentProfilePageClient() {
   const { user, isAuthenticated, profile, loading } = useAuth();
@@ -27,13 +28,16 @@ export default function StudentProfilePageClient() {
   const [isChecking, setIsChecking] = useState(true);
   const [achievements, setAchievements] = useState<StudentAchievement[]>([]);
   const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
-  const { lessons } = useStudentProgress();
+  const { lessons, isLoading: isLoadingProgress } = useStudentProgress();
 
   // Get student XP and level from first lesson progress
   const studentProgress = lessons.length > 0 ? lessons[0].progress : null;
   const totalXp = studentProgress?.total_xp || 0;
-  const currentLevel = studentProgress?.current_level || 1;
   const currentStreak = studentProgress?.current_streak || 0;
+
+  // Calculate actual XP progress using the XP manager
+  const xpProgress = getXpProgress(totalXp);
+  const currentLevel = xpProgress.currentLevel;
 
   useEffect(() => {
     // Wait for auth to finish loading before checking authentication
@@ -156,22 +160,28 @@ export default function StudentProfilePageClient() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-neo-white/70 font-neo-body text-sm">
-                {t('education.xp.progress')}
+                {xpProgress.xpInCurrentLevel} / {xpProgress.xpNeededForNextLevel} XP
               </span>
-              <span className="text-neo-white/70 font-neo-body text-sm">
-                {t('education.xp.nextLevel')}: {currentLevel + 1}
-              </span>
+              {!xpProgress.isMaxLevel ? (
+                <span className="text-neo-white/70 font-neo-body text-sm">
+                  {t('education.xp.nextLevel')}: {currentLevel + 1}
+                </span>
+              ) : (
+                <span className="text-neo-pink font-neo-display font-bold text-sm">
+                  {t('education.xp.maxLevel')}
+                </span>
+              )}
             </div>
             <div
               className="h-4 bg-neo-navy-light border-2 border-neo-black rounded-neo overflow-hidden"
               role="progressbar"
               aria-label="Level progress"
-              aria-valuenow={50}
+              aria-valuenow={xpProgress.progressPercent}
               aria-valuemax={100}
             >
               <div
                 className="h-full bg-neo-cyan transition-all duration-500"
-                style={{ width: '50%' }}
+                style={{ width: `${xpProgress.progressPercent}%` }}
               />
             </div>
           </div>
@@ -179,32 +189,46 @@ export default function StudentProfilePageClient() {
 
         {/* Statistics Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
-            <div className="text-neo-white/60 font-neo-body text-sm mb-1">
-              {t('education.student.lessonsAssigned')}
-            </div>
-            <div className="text-3xl font-neo-display font-black text-neo-white">
-              {lessons.length}
-            </div>
-          </div>
+          {isLoadingProgress ? (
+            // Skeleton loaders for stats
+            <>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
+                  <div className="h-4 w-24 bg-neo-white/10 rounded mb-2" />
+                  <div className="h-9 w-16 bg-neo-white/20 rounded" />
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
+                <div className="text-neo-white/60 font-neo-body text-sm mb-1">
+                  {t('education.student.lessonsAssigned')}
+                </div>
+                <div className="text-3xl font-neo-display font-black text-neo-white">
+                  {lessons.length}
+                </div>
+              </div>
 
-          <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
-            <div className="text-neo-white/60 font-neo-body text-sm mb-1">
-              {t('education.practice.wordsFound')}
-            </div>
-            <div className="text-3xl font-neo-display font-black text-neo-yellow">
-              {studentProgress?.words_mastered?.length || 0}
-            </div>
-          </div>
+              <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
+                <div className="text-neo-white/60 font-neo-body text-sm mb-1">
+                  {t('education.practice.wordsFound')}
+                </div>
+                <div className="text-3xl font-neo-display font-black text-neo-yellow">
+                  {studentProgress?.words_mastered?.length || 0}
+                </div>
+              </div>
 
-          <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
-            <div className="text-neo-white/60 font-neo-body text-sm mb-1">
-              {t('education.practice.complete')}
-            </div>
-            <div className="text-3xl font-neo-display font-black text-neo-cyan">
-              {studentProgress?.total_practice_sessions || 0}
-            </div>
-          </div>
+              <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
+                <div className="text-neo-white/60 font-neo-body text-sm mb-1">
+                  {t('education.practice.complete')}
+                </div>
+                <div className="text-3xl font-neo-display font-black text-neo-cyan">
+                  {studentProgress?.total_practice_sessions || 0}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Achievement Grid */}

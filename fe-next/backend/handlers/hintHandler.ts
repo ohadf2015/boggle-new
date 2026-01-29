@@ -11,16 +11,17 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, Language } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { findWordsForBots, getCachedTrie } = require('../modules/boggleSolver');
-const { safeEmit } = require('../utils/socketHelpers');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const logger = require('../utils/logger');
+import { findWordsForBots, getCachedTrie } from '../modules/boggleSolver.js';
+import { safeEmit } from '../utils/socketHelpers.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import logger from '../utils/logger.js';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 
 // Configuration
 const HINTS_PER_GAME = 3;
@@ -65,6 +66,15 @@ interface GameAIService {
 
 // Track hints per game: gameCode -> { hintsUsed: number, lastHintTime: number }
 const gameHintState = new Map<string, HintState>();
+
+// Subscribe to cleanup events (breaks circular dependency with shared.ts)
+gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  gameHintState.delete(gameCode);
+});
+
+gameCleanupEmitter.onGameReset(({ gameCode }) => {
+  gameHintState.delete(gameCode);
+});
 
 /**
  * Check if hints are available for this game/player
@@ -264,7 +274,7 @@ function registerHintHandlers(io: Server, socket: Socket): void {
     }
 
     // Check if hints are available
-    const hintCheck = canUseHint(gameCode, game);
+    const hintCheck = canUseHint(gameCode, game as unknown as Parameters<typeof canUseHint>[1]);
     if (!hintCheck.available) {
       safeEmit(socket, 'hintError', {
         message: hintCheck.reason,
@@ -274,7 +284,7 @@ function registerHintHandlers(io: Server, socket: Socket): void {
     }
 
     // Get unfound words
-    const unfoundWords = getUnfoundWords(game, username);
+    const unfoundWords = getUnfoundWords(game as unknown as Game, username);
     if (unfoundWords.length === 0) {
       safeEmit(socket, 'hintError', {
         message: 'No more words to hint!',
@@ -344,14 +354,6 @@ function getGameHintState(gameCode: string): { hintsUsed: number; lastHintTime: 
     maxHints: HINTS_PER_GAME,
   };
 }
-
-module.exports = {
-  registerHintHandlers,
-  clearGameHintState,
-  getGameHintState,
-  canUseHint,
-  HINTS_PER_GAME,
-};
 
 export {
   registerHintHandlers,

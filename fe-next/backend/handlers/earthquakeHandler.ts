@@ -15,17 +15,27 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, LetterGrid, Language, DifficultyLevel, GridPosition } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   updateGame,
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const { generateRandomTable } = require('../utils/gameUtils');
-const { DIFFICULTIES } = require('../utils/consts');
-const { makePositionsMap } = require('../modules/wordValidator');
-const logger = require('../utils/logger');
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { generateRandomTable } from '../utils/gameUtils.js';
+import { DIFFICULTIES } from '../utils/consts.js';
+import { makePositionsMap } from '../modules/wordValidator.js';
+import logger from '../utils/logger.js';
+import { gameCleanupEmitter } from '../events/gameCleanup';
+
+// Subscribe to cleanup events (breaks circular dependency with shared.ts)
+gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  clearEarthquakeTimers(gameCode);
+});
+
+gameCleanupEmitter.onGameReset(({ gameCode }) => {
+  clearEarthquakeTimers(gameCode);
+});
 
 // Types for payloads
 interface TriggerEarthquakePayload {
@@ -115,7 +125,8 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
     logger.info('EARTHQUAKE', `Host triggered earthquake for game ${gameCode} (triggerTime: ${triggerTime}s remaining)`);
 
     // Execute earthquake sequence
-    executeEarthquakeSequence(io, gameCode, game);
+    // Type assertion needed: GameState and Game have slightly different type definitions
+    executeEarthquakeSequence(io, gameCode, game as unknown as Game);
   });
 }
 
@@ -166,7 +177,7 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
     );
 
     // Generate new letter positions map for word validation
-    const newPositions: Map<string, GridPosition[]> = makePositionsMap(newGrid, language);
+    const newPositions = makePositionsMap(newGrid, language);
 
     // Update game state with new grid AND positions map
     // CRITICAL: letterPositions MUST be updated along with letterGrid
@@ -211,12 +222,6 @@ function clearGameEarthquakeState(gameCode: string): void {
   clearEarthquakeTimers(gameCode);
   logger.debug('EARTHQUAKE', `Cleared earthquake state for game ${gameCode}`);
 }
-
-module.exports = {
-  registerEarthquakeHandlers,
-  clearGameEarthquakeState,
-  EARTHQUAKE_CONFIG,
-};
 
 export {
   registerEarthquakeHandlers,

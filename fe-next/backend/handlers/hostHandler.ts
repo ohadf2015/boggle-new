@@ -6,14 +6,14 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   markHostActive,
   reactivateHost
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger.js';
 
 /**
  * Register host-related socket event handlers
@@ -54,7 +54,5 @@ function registerHostHandlers(io: Server, socket: Socket): void {
     socket.emit('hostReactivated', { success: true });
   });
 }
-
-module.exports = { registerHostHandlers };
 
 export { registerHostHandlers };

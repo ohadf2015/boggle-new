@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 2683,
+    "totalKeysInCode": 2732,
     "keyCountByLanguage": {
-      "en": 3659,
-      "he": 3659,
-      "sv": 3677,
-      "ja": 3677,
-      "es": 3677
+      "en": 3710,
+      "he": 3710,
+      "sv": 3728,
+      "ja": 3728,
+      "es": 3692
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 7,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,12 +130,113 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "common.backHome",
+      "usages": [
+        {
+          "file": "components/student/StudentLessonView.tsx",
+          "line": 162
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.clipboardError",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.codePasted",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.emptyClipboard",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "key": "playerView.mobileNavigation",
+      "usages": [
+        {
+          "file": "player/components/PlayerWaitingView.tsx",
+          "line": 243
+        }
+      ]
+    },
+    {
+      "key": "student.lessons.completed",
+      "usages": [
+        {
+          "file": "components/student/StudentLessonView.tsx",
+          "line": 259
+        }
+      ]
+    },
+    {
+      "key": "tvBroadcast.liveGameInProgress",
+      "usages": [
+        {
+          "file": "host/components/tv-broadcast/TvGameHeader.tsx",
+          "line": 46
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "education.analytics.lessonEffectiveness",
+      "education.analytics.avgXpGain",
+      "education.analytics.completionRate",
+      "education.analytics.avgAccuracy",
+      "education.analytics.timeToMastery",
+      "education.analytics.studentProgress",
+      "education.analytics.student",
+      "education.analytics.level",
+      "education.analytics.mastery",
+      "education.analytics.accuracy",
+      "education.analytics.streak",
+      "education.analytics.lastActive",
+      "education.analytics.noStudents",
+      "education.analytics.inviteStudents",
+      "education.analytics.struggling",
+      "education.analytics.daysAgo",
+      "education.analytics.today",
+      "education.analytics.yesterday",
+      "education.analytics.students",
+      "education.analytics.noLessons",
+      "education.analytics.assignLessonsHint",
+      "education.analytics.vocabularyMastery",
+      "education.analytics.masteryLevels",
+      "education.analytics.mastered",
+      "education.analytics.practicing",
+      "education.analytics.live",
+      "education.analytics.offline",
+      "education.analytics.connecting",
+      "education.analytics.connectionError",
+      "education.analytics.activeNow",
+      "education.analytics.noActivity",
+      "education.analytics.updatedAgo",
+      "education.analytics.notStarted",
+      "education.analytics.accuracyTooltip",
+      "education.analytics.noVocabularyData",
+      "education.analytics.practiceToSee"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

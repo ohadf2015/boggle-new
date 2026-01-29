@@ -41,8 +41,11 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             animate={{ opacity: [1, 0.5, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
             className="flex items-center gap-2 bg-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
+            role="status"
+            aria-live="polite"
+            aria-label={t('tvBroadcast.liveGameInProgress') || 'Live game in progress'}
           >
-            <Radio className="w-5 h-5" />
+            <Radio className="w-5 h-5" aria-hidden="true" />
             <span className="font-black text-lg uppercase tracking-wider">{t('tvBroadcast.live')}</span>
           </motion.div>
         </motion.div>

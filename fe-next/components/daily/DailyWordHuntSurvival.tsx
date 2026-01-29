@@ -202,7 +202,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Category and example hints (if unlocked) */}
       {state.showCategory && (
-        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5">
+        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5 text-purple-900 dark:text-purple-100">
           <span className="font-bold">
             {t('wordHunt.survival.category')?.replace('{category}', state.category) ||
               `Category: ${state.category}`}
@@ -210,7 +210,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
       {state.showExample && (
-        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5">
+        <div className="text-[11px] bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5 text-green-900 dark:text-green-100">
           <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span>{' '}
           {state.exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>

@@ -24,7 +24,7 @@ const {
 
 const { loadCommunityWords } = require('./modules/communityWordManager');
 const { cleanupEmptyRooms } = require('./modules/gameStateManager');
-const { initRateLimit, resetRateLimit, isIpBlocked, RateLimiter } = require('./utils/rateLimiter');
+const { initRateLimit, resetRateLimit, isIpBlocked, isIpBlockedAsync, RateLimiter } = require('./utils/rateLimiter');
 const logger = require('./utils/logger');
 
 /**
@@ -54,7 +54,7 @@ function initializeSocketHandlers(io: Server): void {
   io.on('connection', (socket: Socket) => {
     const clientIp: string = RateLimiter.getClientIp(socket);
 
-    // Check if IP is blocked before allowing connection
+    // Quick check: local in-memory IP block (instant)
     if (isIpBlocked(clientIp)) {
       logger.warn('SOCKET', `Blocked IP ${clientIp} attempted connection - rejecting`);
       socket.emit('error', { message: 'Too many requests. Please try again later.' });
@@ -65,10 +65,28 @@ function initializeSocketHandlers(io: Server): void {
     // Initialize rate limiting for this socket with IP tracking
     initRateLimit(socket);
 
-    logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
+    // Async check: Redis distributed IP block (catches blocks from other instances)
+    // This runs after connection is established but before handlers are registered
+    isIpBlockedAsync(clientIp)
+      .then((blocked: boolean) => {
+        if (blocked) {
+          logger.warn('SOCKET', `Redis-blocked IP ${clientIp} detected - disconnecting`);
+          socket.emit('error', { message: 'Too many requests. Please try again later.' });
+          socket.disconnect(true);
+          return;
+        }
 
-    // Register all event handlers for this socket
-    registerAllHandlers(io, socket);
+        logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
+
+        // Register all event handlers for this socket
+        registerAllHandlers(io, socket);
+      })
+      .catch((err: Error) => {
+        // On Redis error, allow connection (fail open)
+        logger.warn('SOCKET', `Redis check failed for ${clientIp}: ${err.message} - allowing connection`);
+        logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);
+        registerAllHandlers(io, socket);
+      });
 
     // Clean up rate limiting on disconnect
     socket.on('disconnect', () => {

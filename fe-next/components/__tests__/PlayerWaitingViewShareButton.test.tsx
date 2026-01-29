@@ -169,7 +169,8 @@ describe('PlayerWaitingView Mobile Bottom Tabs Sticky', () => {
   it('should have bottom tabs with fixed positioning classes', () => {
     render(<PlayerWaitingView {...defaultProps} />);
 
-    const bottomNav = screen.getByRole('navigation');
+    // Nav now uses role="tablist" for proper tab navigation semantics
+    const bottomNav = screen.getByRole('tablist');
 
     // Check for sticky/fixed positioning classes
     // The nav should have flex-shrink-0 to prevent compression
@@ -182,7 +183,8 @@ describe('PlayerWaitingView Mobile Bottom Tabs Sticky', () => {
   it('should have safe area padding for bottom tabs', () => {
     render(<PlayerWaitingView {...defaultProps} />);
 
-    const bottomNav = screen.getByRole('navigation');
+    // Nav now uses role="tablist" for proper tab navigation semantics
+    const bottomNav = screen.getByRole('tablist');
 
     // Check for safe-area-inset padding (for notched devices)
     expect(bottomNav.className).toContain('pb-[env(safe-area-inset-bottom)]');

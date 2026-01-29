@@ -29,7 +29,9 @@ export function CalendarButton({ className, variant = 'icon' }: CalendarButtonPr
         setHasUnclaimedReward(data.canClaimToday);
       }
     } catch (error) {
-      console.error('[CalendarButton] Error checking reward:', error);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[CalendarButton] Error checking reward:', errorMessage);
     }
   }, [user?.id]);
 

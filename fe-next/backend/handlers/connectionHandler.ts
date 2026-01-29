@@ -6,7 +6,7 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, ActiveRoom } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
@@ -18,21 +18,21 @@ const {
   isRoomEmpty,
   getNextEligibleHost,
   transferHost
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const {
+import {
   broadcastToRoom,
   getGameRoom,
   safeEmit,
   getSocketById,
   leaveAllGameRooms
-} = require('../utils/socketHelpers');
+} from '../utils/socketHelpers.js';
 
-const timerManager = require('../utils/timerManager');
-const { resetRateLimit } = require('../utils/rateLimiter');
-const { cleanupPlayerData } = require('../utils/playerCleanup');
-const { cleanupGameBots } = require('../modules/botManager');
-const logger = require('../utils/logger');
+import { clearGameTimer } from '../utils/timerManager.js';
+import { resetRateLimit } from '../utils/rateLimiter.js';
+import { cleanupPlayerData } from '../utils/playerCleanup.js';
+import { cleanupGameBots } from '../modules/botManager.js';
+import logger from '../utils/logger.js';
 
 // Configuration
 const HOST_RECONNECTION_GRACE_PERIOD = parseInt(process.env.HOST_RECONNECTION_GRACE_PERIOD || '30000');
@@ -72,10 +72,11 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
     if (!game) return;
 
     // Check if this is the host disconnecting
+    // Type assertion needed: GameState and Game have slightly different type definitions
     if (game.hostSocketId === socket.id) {
-      handleHostDisconnect(io, socket, game, gameCode, username, reason);
+      handleHostDisconnect(io, socket, game as unknown as Game, gameCode, username || 'Unknown', reason);
     } else if (username) {
-      handlePlayerDisconnect(io, socket, game, gameCode, username, reason);
+      handlePlayerDisconnect(io, socket, game as unknown as Game, gameCode, username, reason);
     }
   });
 }
@@ -103,10 +104,10 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   // Check if room is now empty (no other active players)
   if (isRoomEmpty(gameCode)) {
     logger.info('SOCKET', `Room ${gameCode} is empty after host ${username} disconnected - closing immediately`);
-    timerManager.clearGameTimer(gameCode);
+    clearGameTimer(gameCode);
     cleanupGameBots(gameCode);
     deleteGame(gameCode);
-    io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
     return;
   }
 
@@ -133,7 +134,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
       });
 
       // Update active rooms
-      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
       return;
     } else {
       logger.warn('SOCKET', `Failed to transfer host in game ${gameCode}: ${transferResult.error}`);
@@ -170,7 +171,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
           broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
             users: getGameUsers(gameCode) as GameUser[]
           });
-          io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+          io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
           return;
         }
       }
@@ -178,7 +179,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
       logger.info('SOCKET', `Host reconnection timeout for game ${gameCode} - closing room`);
 
       // Stop timer and bots
-      timerManager.clearGameTimer(gameCode);
+      clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
 
       // Notify all players
@@ -188,7 +189,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
       // Clean up game
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
     }
   }, HOST_RECONNECTION_GRACE_PERIOD);
 
@@ -210,10 +211,10 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
     // Check if room is now empty and close it immediately
     if (isRoomEmpty(gameCode)) {
       logger.info('SOCKET', `Room ${gameCode} is empty after bot ${username} removed - closing immediately`);
-      timerManager.clearGameTimer(gameCode);
+      clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
       return;
     }
 
@@ -231,10 +232,10 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
     // Check if room is now empty (all players disconnected)
     if (isRoomEmpty(gameCode)) {
       logger.info('SOCKET', `Room ${gameCode} is empty after ${username} disconnected - closing immediately`);
-      timerManager.clearGameTimer(gameCode);
+      clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
       return;
     }
 
@@ -249,7 +250,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
       const currentGame = getGame(gameCode);
       if (!currentGame) return;
 
-      const currentUserData: GameUserWithTimeout | undefined = currentGame.users?.[username];
+      const currentUserData: GameUserWithTimeout | undefined = currentGame.users?.[username] as unknown as GameUserWithTimeout | undefined;
       if (currentUserData && currentUserData.disconnected) {
         logger.info('SOCKET', `Player ${username} reconnection timeout - removing from game ${gameCode}`);
 
@@ -260,10 +261,10 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
         // Check if room is now empty and close it immediately
         if (isRoomEmpty(gameCode)) {
           logger.info('SOCKET', `Room ${gameCode} is empty after ${username} timeout - closing immediately`);
-          timerManager.clearGameTimer(gameCode);
+          clearGameTimer(gameCode);
           cleanupGameBots(gameCode);
           deleteGame(gameCode);
-          io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+          io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
           return;
         }
 
@@ -277,7 +278,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
           users: getGameUsers(gameCode) as GameUser[]
         });
 
-        io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+        io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
       }
     }, PLAYER_RECONNECTION_GRACE_PERIOD);
 
@@ -287,7 +288,5 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
     logger.debug('SOCKET', `Started ${PLAYER_RECONNECTION_GRACE_PERIOD}ms reconnection timer for ${username} in game ${gameCode}`);
   }
 }
-
-module.exports = { registerConnectionHandlers };
 
 export { registerConnectionHandlers };

@@ -61,7 +61,7 @@ jest.mock('path', () => ({
   join: jest.fn((...args: string[]) => args.join('/')),
 }));
 
-// Mock VertexAI
+// Mock VertexAI - Default mock with English challenges (no spoilers)
 const mockGenerateContent = jest.fn().mockResolvedValue({
   response: {
     candidates: [
@@ -71,54 +71,53 @@ const mockGenerateContent = jest.fn().mockResolvedValue({
             {
               text: JSON.stringify({
                 date: '2026-01-13',
-                language: 'he',
-                trending_summary: 'מגמות מובילות: ישראל, טכנולוגיה, ספורט',
+                language: 'en',
+                trending_summary: 'Tech & Sports',
                 challenges: [
                   {
                     type: 'anagram',
-                    trend_topic: 'ישראל',
-                    prompt: 'פתרו: לארשי',
-                    answer: 'ישראל',
-                    hint: 'שם מדינה',
+                    trend_topic: 'technology',
+                    prompt: 'Unscramble: CHEYT',
+                    answer: 'TECHY',
+                    hint: 'Tech savvy',
                     difficulty: 'easy',
-                    trending_context: 'ישראל בחדשות',
+                    trending_context: 'Tech trends',
                   },
                   {
                     type: 'fill_blank',
-                    trend_topic: 'טכנולוגיה',
-                    prompt: 'השלימו: טכ_ _ _ _ _ _',
-                    answer: 'טכנולוגיה',
-                    hint: 'חדשנות',
-                    difficulty: 'medium',
-                    trending_context: 'חדשות טכנולוגיה',
-                  },
-                  {
-                    type: 'definition_match',
-                    trend_topic: 'ספורט',
-                    prompt: 'התאימו את המילה',
-                    answer: 'ספורט',
-                    options: ['ספורט', 'משחק', 'פעילות', 'ריצה'],
-                    hint: 'פעילות גופנית',
-                    difficulty: 'medium',
-                    trending_context: 'אירועי ספורט',
-                  },
-                  {
-                    type: 'anagram',
-                    trend_topic: 'רקורד',
-                    prompt: 'פתרו: דרוקר',
-                    answer: 'רקורד',
-                    hint: 'הישג',
+                    trend_topic: 'sports',
+                    prompt: 'The team scored a _____ (4 letters)',
+                    answer: 'GOAL',
+                    hint: 'Point in soccer',
                     difficulty: 'easy',
-                    trending_context: 'רקורד חדש',
+                    trending_context: 'Sports news',
                   },
                   {
-                    type: 'fill_blank',
-                    trend_topic: 'שחקנית',
-                    prompt: 'השלימו: שח_ _ _ _',
-                    answer: 'שחקנית',
-                    hint: 'אמנית',
+                    type: 'wordle_guess',
+                    trend_topic: 'Super Bowl',
+                    prompt: 'What fans eat during the big game (5 letters)',
+                    answer: 'SNACK',
+                    hint: 'Munchies',
                     difficulty: 'easy',
-                    trending_context: 'חדשות סלבריטאים',
+                    trending_context: 'Super Bowl party',
+                  },
+                  {
+                    type: 'riddle',
+                    trend_topic: 'music',
+                    prompt: 'I have keys but no locks',
+                    answer: 'PIANO',
+                    hint: 'Musical instrument',
+                    difficulty: 'medium',
+                    trending_context: 'Music trending',
+                  },
+                  {
+                    type: 'word_chain',
+                    trend_topic: 'entertainment',
+                    prompt: 'BALL → ? → NET',
+                    answer: 'GAME',
+                    hint: 'Competition',
+                    difficulty: 'medium',
+                    trending_context: 'Fun activities',
                   },
                 ],
               }),
@@ -255,11 +254,10 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                         trending_context: 'חדשות טכנולוגיה',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'התאימו את המילה',
-                        answer: 'ספורט',
-                        options: ['ספורט', 'משחק', 'פעילות', 'ריצה'],
+                        prompt: 'What athletes feel after a race (5 letters)',
+                        answer: 'SWEAT',
                         hint: 'פעילות גופנית',
                         difficulty: 'medium',
                         trending_context: 'אירועי ספורט',
@@ -481,11 +479,10 @@ describe('Sports riddle constraint validation', () => {
                         trending_context: 'Music trending',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'technology',
-                        prompt: 'A device for computing',
-                        answer: 'COMPUTER',
-                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        prompt: 'A common tech term (5 letters)',
+                        answer: 'SMART',
                         hint: 'Desktop or laptop',
                         difficulty: 'easy',
                         trending_context: 'Tech news',
@@ -493,8 +490,8 @@ describe('Sports riddle constraint validation', () => {
                       {
                         type: 'word_chain',
                         trend_topic: 'music',
-                        prompt: 'SONG → ? → TUNE',
-                        answer: 'MELODY',
+                        prompt: 'SONG → ??? → TUNE',
+                        answer: 'MUSIC',
                         hint: 'Musical sequence',
                         difficulty: 'medium',
                         trending_context: 'Music chain',
@@ -645,11 +642,10 @@ describe('Wordle challenge validation', () => {
                         trending_context: 'Music trending',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'technology',
-                        prompt: 'A device for computing',
-                        answer: 'COMPUTER',
-                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        prompt: 'A common tech term (5 letters)',
+                        answer: 'SMART',
                         hint: 'Desktop or laptop',
                         difficulty: 'easy',
                         trending_context: 'Tech news',
@@ -761,11 +757,10 @@ describe('Wordle challenge validation', () => {
                         trending_context: 'Music trending',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'technology',
-                        prompt: 'A device for computing',
-                        answer: 'COMPUTER',
-                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        prompt: 'A common tech term (5 letters)',
+                        answer: 'SMART',
                         hint: 'Desktop or laptop',
                         difficulty: 'easy',
                         trending_context: 'Tech news',
@@ -783,11 +778,10 @@ describe('Wordle challenge validation', () => {
     const today = new Date();
     const result = await generateDailyBuzz(today, 'en');
 
-    // The wordle_guess with 5-letter answer should be included
+    // The wordle_guess challenges with 5-letter answers should be included
     const wordleChallenges = result.challenges.filter(c => c.type === 'wordle_guess');
-    expect(wordleChallenges.length).toBe(1);
-    expect(wordleChallenges[0].answer).toBe('SNACK');
-    expect(wordleChallenges[0].answer.length).toBe(5);
+    expect(wordleChallenges.length).toBe(2);
+    expect(wordleChallenges.every(c => c.answer.length === 5)).toBe(true);
   });
 });
 
@@ -936,11 +930,10 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
                         trending_context: 'Music trending',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'technology',
-                        prompt: 'A device for computing',
-                        answer: 'COMPUTER',
-                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        prompt: 'A common tech term (5 letters)',
+                        answer: 'SMART',
                         hint: 'Desktop or laptop',
                         difficulty: 'easy',
                         trending_context: 'Tech news',
@@ -1013,11 +1006,10 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
                         trending_context: 'Music trending',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'technology',
-                        prompt: 'A device for computing',
-                        answer: 'COMPUTER',
-                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        prompt: 'A common tech term (5 letters)',
+                        answer: 'SMART',
                         hint: 'Desktop or laptop',
                         difficulty: 'easy',
                         trending_context: 'Tech news',
@@ -1197,29 +1189,28 @@ describe('Japanese 2-letter word validation', () => {
                         type: 'fill_blank',
                         trend_topic: '東京タワー',
                         prompt: '___の街 (2文字)',
-                        answer: '東京', // 2-letter kanji compound
+                        answer: '首都', // 2-letter kanji compound (capital city)
                         hint: '日本の首都',
                         difficulty: 'easy',
-                        trending_context: '東京のイベント',
+                        trending_context: 'タワーのイベント',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: '花火大会',
-                        prompt: '夏の風物詩',
-                        answer: '花火', // 2-letter kanji compound
-                        options: ['花火', '祭り', '浴衣', '夏休み'],
+                        prompt: '夏の風物詩 (5文字)',
+                        answer: 'なつまつり', // 5-letter hiragana (summer festival)
                         hint: '夜空に咲く',
                         difficulty: 'medium',
-                        trending_context: '花火大会',
+                        trending_context: '夏の楽しみ',
                       },
                       {
                         type: 'riddle',
-                        trend_topic: '地震速報',
+                        trend_topic: '地震',
                         prompt: '地面が動く現象',
-                        answer: '地震', // 2-letter kanji compound
+                        answer: 'じしん', // 3-letter hiragana (avoiding spoiler)
                         hint: '揺れる',
                         difficulty: 'medium',
-                        trending_context: '地震速報',
+                        trending_context: '地震ニュース',
                       },
                       {
                         type: 'anagram',
@@ -1251,12 +1242,12 @@ describe('Japanese 2-letter word validation', () => {
     const twoLetterChallenges = result.challenges.filter(c => c.answer.length === 2);
     expect(twoLetterChallenges.length).toBeGreaterThan(0);
 
-    // Verify specific 2-letter words are present
+    // Verify specific Japanese words are present (updated to match mock data without spoilers)
     const answers = result.challenges.map(c => c.answer);
-    expect(answers).toContain('ゆれ');
-    expect(answers).toContain('東京');
-    expect(answers).toContain('花火');
-    expect(answers).toContain('地震');
+    expect(answers).toContain('ゆれ'); // 2-letter hiragana
+    expect(answers).toContain('首都'); // 2-letter kanji (replaced 東京 to avoid spoiler)
+    expect(answers).toContain('なつまつり'); // 5-letter hiragana wordle answer
+    expect(answers).toContain('じしん'); // 3-letter hiragana (replaced 地震 to avoid spoiler)
   });
 
   it('should still reject 2-letter English answers', async () => {
@@ -1322,11 +1313,10 @@ describe('Japanese 2-letter word validation', () => {
                         trending_context: 'Music trending',
                       },
                       {
-                        type: 'definition_match',
+                        type: 'wordle_guess',
                         trend_topic: 'technology',
-                        prompt: 'A device for computing',
-                        answer: 'COMPUTER',
-                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        prompt: 'A common tech term (5 letters)',
+                        answer: 'SMART',
                         hint: 'Desktop or laptop',
                         difficulty: 'easy',
                         trending_context: 'Tech news',

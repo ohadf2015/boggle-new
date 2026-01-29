@@ -18,15 +18,15 @@ import type {
   OneMoreGamePrompt
 } from '@/shared/types';
 
-const {
+import {
   generateDailyChallenges,
   updateChallengeProgress,
   claimChallengeReward,
   getTodaysChallenges,
   getChallengeStats,
-} = require('../modules/dailyChallengesManager');
+} from '../modules/dailyChallengesManager.js';
 
-const {
+import {
   recordLogin,
   getStreakXpMultiplier,
   getCalendarStatus,
@@ -38,11 +38,11 @@ const {
   rollMysteryReward,
   logMysteryReward,
   getEngagementStatus,
-} = require('../modules/engagementManager');
+} from '../modules/engagementManager.js';
 
-const { safeEmit } = require('../utils/socketHelpers');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const logger = require('../utils/logger');
+import { safeEmit } from '../utils/socketHelpers.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import logger from '../utils/logger.js';
 
 // Types for payloads
 interface PlayerIdPayload {
@@ -143,7 +143,20 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
 
     try {
-      const challenges: DailyChallenge[] = await getTodaysChallenges(playerId);
+      const dbChallenges = await getTodaysChallenges(playerId);
+      // Transform database format to client format
+      const challenges: DailyChallenge[] = dbChallenges.map(c => ({
+        id: c.id || '',
+        type: c.challenge_type,
+        title: c.title,
+        description: c.description,
+        target: c.target_value,
+        current: c.current_value,
+        tier: c.challenge_tier,
+        xpReward: c.xp_reward,
+        completed: c.completed,
+        claimed: c.claimed,
+      }));
       safeEmit(socket, 'engagement:dailyChallenges', { challenges });
       logger.debug('ENGAGEMENT', `Sent daily challenges to ${playerId}`);
     } catch (error: unknown) {
@@ -235,7 +248,7 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
 
     try {
-      const status: CalendarStatusType = await getCalendarStatus(playerId);
+      const status = await getCalendarStatus(playerId);
       safeEmit(socket, 'engagement:calendarStatus', status);
     } catch (error: unknown) {
       const err = error as Error;
@@ -347,13 +360,27 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
 
     try {
-      const status: EngagementStatusType = await getEngagementStatus(playerId);
-      const challenges: DailyChallenge[] = await getTodaysChallenges(playerId);
-      const stats: ChallengeStatsType = await getChallengeStats(playerId);
+      const status = await getEngagementStatus(playerId);
+      const dbChallenges = await getTodaysChallenges(playerId);
+      const stats = await getChallengeStats(playerId);
+
+      // Transform database format to client format
+      const dailyChallenges: DailyChallenge[] = dbChallenges.map(c => ({
+        id: c.id || '',
+        type: c.challenge_type,
+        title: c.title,
+        description: c.description,
+        target: c.target_value,
+        current: c.current_value,
+        tier: c.challenge_tier,
+        xpReward: c.xp_reward,
+        completed: c.completed,
+        claimed: c.claimed,
+      }));
 
       safeEmit(socket, 'engagement:status', {
         ...status,
-        dailyChallenges: challenges,
+        dailyChallenges,
         challengeStats: stats,
       });
     } catch (error: unknown) {
@@ -377,7 +404,7 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
 
   try {
     // Update daily challenge progress
-    const challengeUpdate: ChallengeUpdateResult = await updateChallengeProgress(playerId, gameStats);
+    const challengeUpdate = await updateChallengeProgress(playerId, gameStats);
 
     if (challengeUpdate.completed.length > 0) {
       safeEmit(socket, 'engagement:challengeCompleted', {
@@ -392,19 +419,19 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
     }
 
     // Calculate and send near-miss notifications
-    const nearMisses: NearMiss[] = calculateNearMisses(gameStats, gameStats.achievements || []);
+    const nearMisses = calculateNearMisses(gameStats, gameStats.achievements || []);
     if (nearMisses.length > 0) {
       safeEmit(socket, 'engagement:nearMisses', { nearMisses });
     }
 
     // Get one-more-game prompt
-    const prompt: OneMoreGamePrompt | null = getOneMoreGamePrompt(gameStats);
+    const prompt = getOneMoreGamePrompt(gameStats);
     if (prompt) {
       safeEmit(socket, 'engagement:oneMoreGame', { prompt });
     }
 
     // Roll for mystery rewards
-    const mysteryReward: MysteryReward | null = rollMysteryReward('game_completion');
+    const mysteryReward = rollMysteryReward('game_completion');
     if (mysteryReward) {
       await logMysteryReward(playerId, gameCode, mysteryReward);
       safeEmit(socket, 'engagement:mysteryReward', { reward: mysteryReward });
@@ -413,7 +440,7 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
 
     // Check for win reward
     if (gameStats.isWinner) {
-      const winReward: MysteryReward | null = rollMysteryReward('win');
+      const winReward = rollMysteryReward('win');
       if (winReward) {
         await logMysteryReward(playerId, gameCode, winReward);
         safeEmit(socket, 'engagement:mysteryReward', { reward: winReward });
@@ -439,7 +466,7 @@ async function processLongWordEngagement(socket: Socket, playerId: string, word:
   if (!playerId || word.length < 8) return;
 
   try {
-    const reward: MysteryReward | null = rollMysteryReward('long_word');
+    const reward = rollMysteryReward('long_word');
     if (reward) {
       await logMysteryReward(playerId, gameCode, reward);
       safeEmit(socket, 'engagement:mysteryReward', { reward });
@@ -463,7 +490,7 @@ async function processAchievementEngagement(socket: Socket, playerId: string, ac
   if (!playerId) return;
 
   try {
-    const reward: MysteryReward | null = rollMysteryReward('achievement');
+    const reward = rollMysteryReward('achievement');
     if (reward) {
       await logMysteryReward(playerId, gameCode, reward);
       safeEmit(socket, 'engagement:mysteryReward', { reward });
@@ -474,13 +501,6 @@ async function processAchievementEngagement(socket: Socket, playerId: string, ac
     logger.error('ENGAGEMENT', `Error processing achievement engagement: ${err.message}`);
   }
 }
-
-module.exports = {
-  registerEngagementHandlers,
-  processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
-};
 
 export {
   registerEngagementHandlers,

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ChevronDown, ChevronUp, Edit2, Check, X } from 'lucide-react';
+import { Sparkles, Check, X } from 'lucide-react';
 import { useBuzzGeneration, useChallengeData } from './buzz/hooks';
 import { GenerationControls, ChallengeViewer } from './buzz/components';
-import PromptTemplateEditor from './buzz/PromptTemplateEditor';
+import { SectionEditor } from './buzz/section-editor';
+import { getSession } from '@/lib/supabase';
 import type { DailyBuzzDataAdmin } from './buzz/types';
 
 /**
@@ -23,11 +24,22 @@ export default function DailyBuzzAdminPanel(): React.ReactElement {
     new Date().toISOString().split('T')[0]
   );
 
-  // Prompt template editor state
-  const [showTemplates, setShowTemplates] = useState(false);
+  // Auth token for API calls
+  const [authToken, setAuthToken] = useState<string | undefined>(undefined);
 
   // Success message state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Fetch auth token on mount
+  useEffect(() => {
+    async function fetchAuthToken(): Promise<void> {
+      const result = await getSession();
+      if (result.data.session?.access_token) {
+        setAuthToken(result.data.session.access_token);
+      }
+    }
+    fetchAuthToken();
+  }, []);
 
   // Challenge data hook
   const {
@@ -128,6 +140,7 @@ export default function DailyBuzzAdminPanel(): React.ReactElement {
         onRegenerateByType={handleRegenerateByType}
         onClearTypeError={clearTypeError}
         onSuccess={showSuccess}
+        authToken={authToken}
       />
 
       {/* Quick Links */}
@@ -153,39 +166,14 @@ export default function DailyBuzzAdminPanel(): React.ReactElement {
         </div>
       </div>
 
-      {/* Prompt Templates Section */}
-      <div className="bg-slate-800/50 border-2 border-slate-700 rounded-xl p-6 space-y-4">
-        <button
-          onClick={() => setShowTemplates(!showTemplates)}
-          className="w-full flex items-center justify-between"
-        >
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Edit2 className="w-5 h-5 text-neo-yellow" />
-            Prompt Templates
-          </h2>
-          {showTemplates ? (
-            <ChevronUp className="w-5 h-5 text-slate-400" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-slate-400" />
-          )}
-        </button>
-        <p className="text-sm text-slate-400">
-          Customize the AI prompts used to generate riddles, images, and social content
-        </p>
-
-        <AnimatePresence>
-          {showTemplates && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <PromptTemplateEditor />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Prompt Sections Editor */}
+      {authToken && (
+        <SectionEditor
+          authToken={authToken}
+          language="en"
+          onSuccess={showSuccess}
+        />
+      )}
     </motion.div>
   );
 }

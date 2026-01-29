@@ -3,7 +3,8 @@
  * Specifically testing AI field name normalization
  */
 
-import { parseAIResponse } from '../buzz/challengeValidator';
+import { parseAIResponse, validateChallenges } from '../buzz/challengeValidator';
+import type { BuzzChallenge } from '../buzz/types';
 
 describe('parseAIResponse - AI field name normalization', () => {
   // Test case 1: AI returns 'trending_topic' instead of 'trend_topic'
@@ -426,5 +427,60 @@ describe('parseAIResponse - AI field name normalization', () => {
       expect(challenge.prompt).toBeDefined();
       expect(challenge.trending_context).toBeDefined();
     });
+  });
+});
+
+describe('validateChallenges - wordle_guess requirement', () => {
+  const createChallenge = (type: string, answer: string): BuzzChallenge => ({
+    type: type as BuzzChallenge['type'],
+    trend_topic: 'Test Topic',
+    prompt: 'Test prompt',
+    answer,
+    difficulty: 'easy',
+    trending_context: 'Test context',
+  });
+
+  it('should pass validation when wordle_guess is present', () => {
+    const challenges = [
+      createChallenge('riddle', 'ANSWER'),
+      createChallenge('wordle_guess', 'BRAIN'), // 5 letters - valid
+      createChallenge('anagram', 'PUZZLE'),
+      createChallenge('fill_blank', 'GAME'),
+      createChallenge('word_chain', 'CHAIN'),
+    ];
+
+    const result = validateChallenges(challenges, 'en');
+    expect(result.length).toBe(5);
+    expect(result.some(c => c.type === 'wordle_guess')).toBe(true);
+  });
+
+  it('should throw error when no wordle_guess challenge is present', () => {
+    const challenges = [
+      createChallenge('riddle', 'ANSWER'),
+      createChallenge('riddle', 'BRAIN'),
+      createChallenge('anagram', 'PUZZLE'),
+      createChallenge('fill_blank', 'GAME'),
+      createChallenge('word_chain', 'CHAIN'),
+    ];
+
+    expect(() => validateChallenges(challenges, 'en')).toThrow(
+      'Daily Buzz must include at least one wordle_guess challenge'
+    );
+  });
+
+  it('should reject wordle_guess with wrong letter count', () => {
+    const challenges = [
+      createChallenge('riddle', 'ANSWER'),
+      createChallenge('wordle_guess', 'BRAINS'), // 6 letters - invalid, will be filtered out
+      createChallenge('anagram', 'PUZZLE'),
+      createChallenge('fill_blank', 'GAME'),
+      createChallenge('word_chain', 'CHAIN'),
+      createChallenge('riddle', 'EXTRA'), // Add extra to have 5 valid challenges after filtering
+    ];
+
+    // The invalid wordle_guess (6 letters) gets filtered out, leaving no valid wordle_guess
+    expect(() => validateChallenges(challenges, 'en')).toThrow(
+      'Daily Buzz must include at least one wordle_guess challenge'
+    );
   });
 });

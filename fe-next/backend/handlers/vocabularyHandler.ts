@@ -9,7 +9,7 @@ import type { Socket } from 'socket.io';
 import type { GameState } from '../modules/gameState/types';
 import { checkWordIntegration } from '@/hooks/useWordIntegration';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger.js';
 
 /**
  * Payload for selecting/deselecting a vocabulary word
@@ -93,7 +93,7 @@ export function registerVocabularyHandlers(
 ): void {
   socket.on('selectVocabularyWord', async (payload: SelectWordPayload) => {
     try {
-      const { getGameBySocketId } = require('../modules/gameStateManager');
+      const { getGameBySocketId } = await import('../modules/gameStateManager.js');
       const gameCode = getGameBySocketId(socket.id);
 
       if (!gameCode) {
@@ -116,8 +116,3 @@ export function registerVocabularyHandlers(
   });
 }
 
-// CommonJS exports
-module.exports = {
-  handleSelectVocabularyWord,
-  registerVocabularyHandlers,
-};

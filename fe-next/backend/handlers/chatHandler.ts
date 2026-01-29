@@ -5,15 +5,14 @@
 
 import type { Server, Socket } from 'socket.io';
 import type { Game, ChatMessagePayload } from '@/shared/types';
-
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const { cleanProfanity } = require('../utils/profanityFilter');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc } = require('../utils/metrics');
-const { isSocketMigrating } = require('./shared');
-const { validatePayload, chatMessageSchema } = require('../utils/socketValidation');
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { cleanProfanity } from '../utils/profanityFilter';
+import { emitError, ErrorMessages } from '../utils/errorHandler';
+import { checkRateLimit } from '../utils/rateLimiter';
+import { inc } from '../utils/metrics';
+import { isSocketMigrating } from './shared';
+import { validatePayload, chatMessageSchema } from '../utils/socketValidation';
 
 // Rate limit weight for chat
 const CHAT_WEIGHT = parseInt(process.env.RATE_WEIGHT_CHAT || '1');
@@ -123,7 +122,5 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     socket.emit('chatHistory', { messages: game.chatHistory });
   });
 }
-
-module.exports = { registerChatHandlers };
 
 export { registerChatHandlers };

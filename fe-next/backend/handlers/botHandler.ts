@@ -6,7 +6,7 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, Avatar, ActiveRoom } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   addUserToGame,
@@ -15,16 +15,16 @@ const {
   getActiveRooms,
   deleteGame,
   isRoomEmpty
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const botManager = require('../modules/botManager');
-const timerManager = require('../utils/timerManager');
-const logger = require('../utils/logger');
-const { validatePayload, addBotSchema, removeBotSchema } = require('../utils/socketValidation');
-const { isInProgress } = require('../utils/gameStateMachine');
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import * as botManager from '../modules/botManager.js';
+import { clearGameTimer } from '../utils/timerManager.js';
+import logger from '../utils/logger.js';
+import { validatePayload, addBotSchema, removeBotSchema } from '../utils/socketValidation.js';
+import { isInProgress } from '../utils/gameStateMachine.js';
 
 // Configuration
 const MAX_PLAYERS_PER_ROOM = 50;
@@ -118,14 +118,14 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     }
 
     // Create the bot with the game's language for localized names
-    const bot: Bot = botManager.addBot(gameCode, difficulty, game.users, game.language || 'en');
+    // Type assertion needed: gameStateManager.GameUser and botManager.GameUser have slightly different avatar types
+    const bot: Bot = botManager.addBot(gameCode, difficulty, game.users as unknown as Record<string, botManager.GameUser>, game.language || 'en');
 
     // Add bot as a user
     addUserToGame(gameCode, bot.username, `bot-${bot.id}`, {
       avatar: bot.avatar,
       isHost: false,
       playerId: bot.id,
-      isBot: true
     });
 
     // Mark user as bot in game state
@@ -152,7 +152,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       }
     });
 
-    io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
   });
 
   // Handle removing a bot from the room (host only)
@@ -208,10 +208,10 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       // Check if room is now empty and close it immediately
       if (isRoomEmpty(gameCode)) {
         logger.info('BOT', `Room ${gameCode} is empty after bot removal - closing immediately`);
-        timerManager.clearGameTimer(gameCode);
+        clearGameTimer(gameCode);
         botManager.stopAllBots(gameCode);
         deleteGame(gameCode);
-        io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+        io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
         socket.emit('botRemoved', {
           success: true,
           username: botUsernameToFind
@@ -229,7 +229,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
         username: botUsernameToFind
       });
 
-      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
       return;
     }
 
@@ -257,10 +257,10 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     // Check if room is now empty and close it immediately
     if (isRoomEmpty(gameCode)) {
       logger.info('BOT', `Room ${gameCode} is empty after bot "${removedUsername}" removal - closing immediately`);
-      timerManager.clearGameTimer(gameCode);
+      clearGameTimer(gameCode);
       botManager.stopAllBots(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
       socket.emit('botRemoved', {
         success: true,
         botId: botToRemove.id,
@@ -281,7 +281,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       username: removedUsername
     });
 
-    io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
   });
 
   // Handle get bots list
@@ -353,13 +353,13 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     for (let i = 0; i < botsToAdd; i++) {
       // Rotate through difficulties for variety
       const difficulty = difficulties[i % difficulties.length];
-      const bot: Bot = botManager.addBot(gameCode, difficulty, game.users, game.language || 'en');
+      // Type assertion needed: gameStateManager.GameUser and botManager.GameUser have slightly different avatar types
+      const bot: Bot = botManager.addBot(gameCode, difficulty, game.users as unknown as Record<string, botManager.GameUser>, game.language || 'en');
 
       addUserToGame(gameCode, bot.username, `bot-${bot.id}`, {
         avatar: bot.avatar,
         isHost: false,
         playerId: bot.id,
-        isBot: true
       });
 
       if (game.users[bot.username]) {
@@ -378,7 +378,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     });
 
     socket.emit('autoFillComplete', { botsAdded });
-    io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    io.emit('activeRooms', { rooms: getActiveRooms() as unknown as ActiveRoom[] });
   });
 
   // Handle auto-start timer request
@@ -466,7 +466,5 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     autoStartTimers.set(gameCode, countdownInterval);
   });
 }
-
-module.exports = { registerBotHandlers };
 
 export { registerBotHandlers };

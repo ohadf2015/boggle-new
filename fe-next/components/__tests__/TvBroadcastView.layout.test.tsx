@@ -190,13 +190,13 @@ describe('TvBroadcastView Layout Issues', () => {
 
     // Grid container now uses min-h for mobile, not flex-1
     // On desktop (md:), it uses min-h-0
-    const gridContainer = container.querySelector('.min-h-\\[200px\\].md\\:min-h-0.flex.items-center.justify-center');
+    const gridContainer = container.querySelector('.min-h-\\[180px\\].md\\:min-h-0.flex.items-center.justify-center');
     expect(gridContainer).toBeInTheDocument();
 
     // Should have overflow-hidden to prevent content from spilling
     expect(gridContainer).toHaveClass('overflow-hidden');
 
     // Verify it's a grid cell child (not using flex-1 anymore)
-    expect(gridContainer).toHaveClass('min-h-[200px]');
+    expect(gridContainer).toHaveClass('min-h-[180px]');
   });
 });

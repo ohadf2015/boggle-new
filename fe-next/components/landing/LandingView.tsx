@@ -599,7 +599,7 @@ const LandingView: React.FC = () => {
               className="relative"
             >
               <Link
-                href={`/${language}/profile`}
+                href={`/${language}/profile?tab=collection`}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2",
                   "bg-gradient-to-r from-neo-pink/90 to-purple-600/90",

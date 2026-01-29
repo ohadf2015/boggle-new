@@ -6,24 +6,24 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, LetterGrid, Language, TournamentStanding, GridPosition, Avatar } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
   getGameUsers,
   updateGame,
   setTournamentIdForGame
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { broadcastToRoom, getGameRoom, safeEmit } = require('../utils/socketHelpers');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { makePositionsMap } = require('../modules/wordValidator');
-const { generateRandomTable } = require('../utils/gameUtils');
-const gameStartCoordinator = require('../utils/gameStartCoordinator');
-const tournamentManager = require('../modules/tournamentManager');
-const logger = require('../utils/logger');
-const { startGameTimer } = require('./shared');
+import { broadcastToRoom, getGameRoom, safeEmit } from '../utils/socketHelpers.js';
+import { emitError, ErrorMessages } from '../utils/errorHandler.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { makePositionsMap } from '../modules/wordValidator.js';
+import { generateRandomTable } from '../utils/gameUtils.js';
+import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import tournamentManager from '../modules/tournamentManager.js';
+import logger from '../utils/logger.js';
+import { startGameTimer } from './';
 
 // Types for payloads
 interface CreateTournamentPayload {
@@ -294,7 +294,5 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     logger.info('TOURNAMENT', `Tournament ${tournamentId} cancelled for game ${gameCode}`);
   });
 }
-
-module.exports = { registerTournamentHandlers };
 
 export { registerTournamentHandlers };

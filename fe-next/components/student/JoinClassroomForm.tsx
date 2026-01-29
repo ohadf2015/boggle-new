@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useJoinClassroom } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import Header from '@/components/Header';
 
 /**
  * JoinClassroomForm - Student classroom join form
@@ -32,7 +33,7 @@ interface JoinClassroomFormProps {
 }
 
 const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' }) => {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const router = useRouter();
   const { joinClassroom } = useJoinClassroom();
 
@@ -48,10 +49,13 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       if (cleaned) {
         setCode(cleaned);
         if (codeError) setCodeError(false);
+        toast.success(t('education.student.join.codePasted') || 'Code pasted!');
+      } else {
+        toast.error(t('education.student.join.emptyClipboard') || 'No valid code in clipboard');
       }
     } catch {
       // Clipboard API not available or permission denied
-      toast.error(t('common.error'));
+      toast.error(t('education.student.join.clipboardError') || 'Cannot access clipboard. Please paste manually.');
     }
   };
 
@@ -76,7 +80,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       if (result.success) {
         toast.success(t('education.student.join.success'));
         // Redirect to student dashboard
-        router.push('/student');
+        router.push(`/${language}/student`);
       } else {
         // Handle specific error cases
         if (result.error?.includes('already')) {
@@ -97,13 +101,15 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   };
 
   return (
-    <div dir={dir} className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-md"
-      >
+    <div dir={dir} className="min-h-screen bg-neo-navy flex flex-col">
+      <Header />
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="w-full max-w-md"
+        >
         <Card className="border-3 border-neo-black shadow-hard">
           <CardContent className="p-6 sm:p-8">
             {/* Header */}
@@ -111,7 +117,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               <h1 className="text-2xl sm:text-3xl font-black uppercase text-neo-white mb-2">
                 {t('education.student.join.title')}
               </h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-neo-white/70">
                 {t('education.student.join.subtitle')}
               </p>
             </div>
@@ -121,7 +127,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               <div className="space-y-2">
                 <Label
                   htmlFor="classroom-code"
-                  className="text-sm font-bold uppercase text-slate-400"
+                  className="text-sm font-bold uppercase text-neo-white/70"
                 >
                   {t('education.student.join.codeLabel')}
                 </Label>
@@ -166,7 +172,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <p id="code-hint" className="text-xs text-slate-400">
+                <p id="code-hint" className="text-xs text-neo-white/70">
                   {t('education.student.join.codeHint')}
                 </p>
                 {codeError && (
@@ -192,11 +198,11 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </form>
 
             {/* Back Link */}
-            <div className="mt-6 pt-6 border-t border-slate-700">
+            <div className="mt-6 pt-6 border-t border-neo-white/10">
               <button
-                onClick={() => router.push('/student')}
+                onClick={() => router.push(`/${language}/student`)}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 text-sm text-slate-400 hover:text-neo-cyan transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 text-sm text-neo-white/70 hover:text-neo-cyan transition-colors disabled:opacity-50"
               >
                 <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('common.back')}
@@ -204,7 +210,8 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 };
