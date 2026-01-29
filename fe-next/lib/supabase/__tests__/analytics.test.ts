@@ -1,4 +1,4 @@
-import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics } from '../analytics';
+import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics, getStudentsProgressSummary, getLessonEffectiveness } from '../analytics';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
@@ -348,5 +348,144 @@ describe('analytics - getStudentProgressMetrics', () => {
 
     // THEN
     expect(result.data?.vocabularyMastery).toBe(70); // 7/10 * 100
+  });
+});
+
+describe('analytics - getLessonEffectiveness', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return empty array when no lessons assigned', async () => {
+    // GIVEN: No lessons assigned to classroom
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    });
+
+    // WHEN
+    const result = await getLessonEffectiveness('classroom-empty');
+
+    // THEN
+    expect(result.data).toEqual([]);
+    expect(result.error).toBeNull();
+  });
+
+  it('should calculate averageXpGain correctly', async () => {
+    // GIVEN: One lesson with student progress
+    const mockAssignments = [{ lesson_id: 'lesson-1' }];
+    const mockLesson = { id: 'lesson-1', name: 'Basic Vocabulary' };
+    const mockProgress = [
+      { student_id: 'student-1', lesson_id: 'lesson-1', total_xp: 100, completed_at: null, words_attempted: {} },
+      { student_id: 'student-2', lesson_id: 'lesson-1', total_xp: 200, completed_at: null, words_attempted: {} },
+      { student_id: 'student-3', lesson_id: 'lesson-1', total_xp: 300, completed_at: null, words_attempted: {} },
+    ];
+    const mockMemberships = [
+      { student_id: 'student-1' },
+      { student_id: 'student-2' },
+      { student_id: 'student-3' },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockAssignments, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: [mockLesson], error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const result = await getLessonEffectiveness('classroom-1');
+
+    // THEN
+    expect(result.data).toHaveLength(1);
+    expect(result.data?.[0].averageXpGain).toBe(200); // (100 + 200 + 300) / 3
+  });
+
+  it('should calculate completionRate as percentage', async () => {
+    // GIVEN: 2 out of 3 students completed
+    const mockAssignments = [{ lesson_id: 'lesson-1' }];
+    const mockLesson = { id: 'lesson-1', name: 'Basic Vocabulary' };
+    const mockProgress = [
+      { student_id: 'student-1', lesson_id: 'lesson-1', total_xp: 100, completed_at: '2024-01-01', words_attempted: {} },
+      { student_id: 'student-2', lesson_id: 'lesson-1', total_xp: 200, completed_at: '2024-01-01', words_attempted: {} },
+      { student_id: 'student-3', lesson_id: 'lesson-1', total_xp: 300, completed_at: null, words_attempted: {} },
+    ];
+    const mockMemberships = [
+      { student_id: 'student-1' },
+      { student_id: 'student-2' },
+      { student_id: 'student-3' },
+    ];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockAssignments, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: [mockLesson], error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const result = await getLessonEffectiveness('classroom-1');
+
+    // THEN
+    expect(result.data?.[0].completionRate).toBeCloseTo(66.67, 1); // 2/3 * 100
+  });
+
+  it('should return lesson name from vocabulary_lessons', async () => {
+    // GIVEN: Lesson with name
+    const mockAssignments = [{ lesson_id: 'lesson-1' }];
+    const mockLesson = { id: 'lesson-1', name: 'Advanced Verbs' };
+    const mockProgress = [
+      { student_id: 'student-1', lesson_id: 'lesson-1', total_xp: 100, completed_at: null, words_attempted: {} },
+    ];
+    const mockMemberships = [{ student_id: 'student-1' }];
+
+    (supabase.from as jest.Mock)
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockAssignments, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockResolvedValue({ data: [mockLesson], error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+      })
+      .mockReturnValueOnce({
+        select: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+      });
+
+    // WHEN
+    const result = await getLessonEffectiveness('classroom-1');
+
+    // THEN
+    expect(result.data?.[0].lessonName).toBe('Advanced Verbs');
   });
 });
