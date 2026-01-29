@@ -36,10 +36,10 @@ Requirements for Adventure & Education Expansion milestone. Each maps to roadmap
 - [x] **GAMIFY-01**: Student earns XP from practice activities (flashcards, solo board, lesson completion)
 - [x] **GAMIFY-02**: Student sees XP progress bar toward next level
 - [x] **GAMIFY-03**: Student levels up based on XP accumulation
-- [ ] **GAMIFY-04**: Student sees classroom leaderboard (top students by XP, classroom-scoped)
-- [ ] **GAMIFY-05**: Student can earn 15-20 meaningful achievements (Bronze/Silver/Gold/Platinum tiers)
-- [ ] **GAMIFY-06**: Student sees achievement unlock modal when earning badge
-- [ ] **GAMIFY-07**: Student can view earned achievement badges in profile
+- [x] **GAMIFY-04**: Student sees classroom leaderboard (top students by XP, classroom-scoped)
+- [x] **GAMIFY-05**: Student can earn 15-20 meaningful achievements (Bronze/Silver/Gold/Platinum tiers)
+- [x] **GAMIFY-06**: Student sees achievement unlock modal when earning badge
+- [x] **GAMIFY-07**: Student can view earned achievement badges in profile
 - [x] **GAMIFY-08**: Student earns streak bonuses for consecutive practice days
 
 ### Student Analytics
@@ -134,10 +134,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GAMIFY-01 | Phase 18 | Complete |
 | GAMIFY-02 | Phase 18 | Complete |
 | GAMIFY-03 | Phase 18 | Complete |
-| GAMIFY-04 | Phase 19 | Pending |
-| GAMIFY-05 | Phase 19 | Pending |
-| GAMIFY-06 | Phase 19 | Pending |
-| GAMIFY-07 | Phase 19 | Pending |
+| GAMIFY-04 | Phase 19 | Complete |
+| GAMIFY-05 | Phase 19 | Complete |
+| GAMIFY-06 | Phase 19 | Complete |
+| GAMIFY-07 | Phase 19 | Complete |
 | GAMIFY-08 | Phase 18 | Complete |
 | ANALYTICS-01 | Phase 20 | Pending |
 | ANALYTICS-02 | Phase 20 | Pending |
@@ -178,4 +178,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 after roadmap creation (100% coverage achieved)*
+*Last updated: 2026-01-29 after Phase 19 completion (GAMIFY-04 to GAMIFY-07 complete)*
