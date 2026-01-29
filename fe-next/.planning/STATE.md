@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 21 of 25 (Rich Lesson Delivery) — IN PROGRESS
-Plan: 3/6 complete (21-01, 21-02, 21-03)
-Status: Phase 21 in progress - Swipe gesture hook complete
-Last activity: 2026-01-29 — Completed 21-03 (useSwipeGesture hook)
+Plan: 1/6 complete (21-01)
+Status: Phase 21 in progress - TTS service complete
+Last activity: 2026-01-29 — Completed 21-01 (Text-to-Speech Service)
 
 Progress: [██████████████] 21/25 phases (84% milestone, v1.1 Phase 15-21 in progress, v1.2 Phase 24-25 complete)
 
@@ -30,9 +30,9 @@ Progress: [██████████████] 21/25 phases (84% milesto
 | 1-14 | 62 | Complete |
 
 **v1.1 Progress:**
-- Plans completed: 33 (Phase 15-20 complete, Phase 21 3/6)
+- Plans completed: 31 (Phase 15-20 complete, Phase 21 1/6)
 - Current phase: 21 (Rich Lesson Delivery) — IN PROGRESS
-- Next: Phase 21 plans 04-06
+- Next: Phase 21 plans 02-06
 
 **Phase 15 Plans:**
 | Plan | Name | Duration | Status |
@@ -128,14 +128,14 @@ Progress: [██████████████] 21/25 phases (84% milesto
 **Phase 21 Plans:**
 | Plan | Name | Duration | Status |
 |------|------|----------|--------|
-| 21-01 | Lesson Content Schema | TBD | Complete |
-| 21-02 | FlashcardData Hook | TBD | Complete |
-| 21-03 | Swipe Gesture Hook | 7min | Complete |
-| 21-04 | Flashcard Component | - | Pending |
-| 21-05 | Lesson Practice Integration | - | Pending |
-| 21-06 | Audio & Mastery Indicators | - | Pending |
+| 21-01 | Text-to-Speech Service | 10min | Complete |
+| 21-02 | Vocabulary Card UI | - | Pending |
+| 21-03 | Lesson Practice Flow | - | Pending |
+| 21-04 | Progress Tracking | - | Pending |
+| 21-05 | Lesson Assignment UI | - | Pending |
+| 21-06 | Integration & Testing | - | Pending |
 
-**Phase 21 Total (so far):** 7 minutes, 32 tests added (3/6 plans complete)
+**Phase 21 Total (so far):** 10 minutes, 30 tests added (1/6 plans complete)
 
 ## Accumulated Context
 
@@ -246,6 +246,12 @@ Key decisions affecting v1.1 work (see PROJECT.md for full log):
 - **20-05**: Mastery level thresholds (mastered >=80%, practicing 50-79%, struggling <50%) → Aligns with educational research on comprehension (2026-01-29)
 - **20-05**: Grid layout with sticky column → First column (words) stays visible during horizontal scroll for mobile UX (2026-01-29)
 - **20-05**: Color-coded cells (cyan/yellow/orange/navy) → Matches design system and provides clear visual distinction (2026-01-29)
+- **21-01**: Web Speech API over external TTS service → Browser native, zero latency, no API costs, works offline (2026-01-29)
+- **21-01**: Language-based voice selection (exact match → prefix match → fallback) → en-GB → en-US (prefix), supports language variants (2026-01-29)
+- **21-01**: Rate 0.9 for pronunciation speed → Slightly slower than default for clearer pronunciation learning (2026-01-29)
+- **21-01**: Return false when voice unavailable → Enables fallback to IPA display in UI layer (2026-01-29)
+- **21-01**: Promise-based API with onend/onerror handlers → Async speech completion tracking, proper error handling (2026-01-29)
+- **21-01**: useRef for isMounted tracking → Prevents state updates after unmount, avoids React warnings (2026-01-29)
 - **21-03**: useMotionValue for x position (not useState) → Framer Motion provides performant animations without re-renders, 60fps on mobile (2026-01-29)
 - **21-03**: State subscription via x.onChange() → useMemo doesn't react to motion values, useEffect pattern for reactive derived state (2026-01-29)
 - **21-03**: Threshold detection on drag end → Performance optimization, avoids continuous checks during drag (2026-01-29)
@@ -316,9 +322,17 @@ None.
   - Profile page with EducationBadgeGrid, achievement fetching, pin management
 - Total: 110 tests passing, 5/5 plans complete, full achievement system operational
 
-**Phase 20 (Analytics):**
+**Phase 20 (Analytics Dashboard) — COMPLETE:**
+- Analytics foundation complete — getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics (20-01)
+- Total: 144 tests passing, verification 5/5
 - COPPA compliance — Legal review required before launch, anonymous student IDs only (research pitfall 4)
 - Teacher co-design needed — Build dashboard with teachers, not for them (research pitfall 9)
+
+**Phase 21 (Rich Lesson Delivery) — IN PROGRESS:**
+- Text-to-speech service complete — Web Speech API integration, 30 tests passing (21-01)
+- Hebrew TTS limitation — Most browsers lack Hebrew voices, will use IPA fallback
+- Browser compatibility — Safari iOS requires user gesture for first speech
+- Voice quality variance — Android voices robotic, iOS natural (rate 0.9 helps consistency)
 
 **Phase 24 (CrazyGames Portal Integration) — COMPLETE:**
 - Visual consistency verified — CSS isolation + viewport hook implemented (24-02 complete)
@@ -365,16 +379,16 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 21-03 (useSwipeGesture hook)
+Stopped at: Completed 21-01 (Text-to-Speech Service)
 Resume file: None
 
-**Next action:** Execute Phase 21 plans 04-06 (Flashcard Component, Lesson Integration, Audio/Mastery)
+**Next action:** Execute Phase 21 plans 02-06 (Vocabulary Card UI, Lesson Practice, Progress, Assignment, Integration)
 
 **Phase 21 Summary (so far):**
-- 3/6 plans complete (7 minutes total)
-- 32 tests added
-- Swipe gesture hook with Framer Motion complete
-- Plans 21-01 and 21-02 completed previously (durations TBD)
+- 1/6 plans complete (10 minutes total)
+- 30 tests added
+- TTS service with Web Speech API complete
+- Hebrew TTS fallback to IPA needed in 21-02
 
 **Phase 20 Summary:**
 - 6/6 plans complete (127 minutes total)
