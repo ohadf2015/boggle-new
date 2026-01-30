@@ -27,6 +27,7 @@ import { ScorePopup } from './juice/ScorePopup';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import { AdaptiveParticles } from './juice/AdaptiveParticles';
+import { ExplosionEffect } from './juice/ExplosionEffect';
 import { LevelUpCelebration, type LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 import AdventureGrid from './AdventureGrid';
@@ -73,6 +74,12 @@ interface ScorePopup {
   y: number;
   word?: string;
   bonus?: string;
+}
+
+interface PendingExplosion {
+  id: number;
+  position: { x: number; y: number };
+  intensity: 1 | 2 | 3 | 4;
 }
 
 interface LastReportedTimerState {
@@ -233,6 +240,8 @@ const AdventureGame = memo<AdventureGameProps>(
       completeLevel,
       resetGame,
       markCascadeComplete,
+      isCascading,
+      cascadePhase,
     } = useAdventureGame({
       levelConfig: adjustedLevelConfig,
       initialGrid,
@@ -257,6 +266,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
     const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
+    const [pendingExplosions, setPendingExplosions] = useState<PendingExplosion[]>([]);
 
     // Chain particle burst state
     const [chainBurstConfig, setChainBurstConfig] = useState<{
@@ -275,6 +285,9 @@ const AdventureGame = memo<AdventureGameProps>(
     const validationErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Track last word for explosion calculation
+    const lastSubmittedWordRef = useRef<{ word: string; path: Array<{ row: number; col: number }> } | null>(null);
 
     // Track entry sequence phases
     const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
@@ -326,7 +339,7 @@ const AdventureGame = memo<AdventureGameProps>(
     } = useAdventureSelection({
       tiles,
       gridSize: levelConfig.gridSize,
-      disabled: !isPlaying || isPaused || isValidating,
+      disabled: !isPlaying || isPaused || isValidating || isCascading,
       gridRef,
     });
 
@@ -674,6 +687,49 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [tiles, calculateTileCenter]);
 
+    // Trigger explosion at REMOVING phase start for 3+ tile words
+    useEffect(() => {
+      if (cascadePhase === 'removing' && lastSubmittedWordRef.current) {
+        const { word, path } = lastSubmittedWordRef.current;
+
+        // Only explode for 3+ tile words
+        if (path.length >= 3) {
+          // Calculate center position of cleared tiles
+          let centerX = 0;
+          let centerY = 0;
+
+          for (const pos of path) {
+            const tileCenter = calculateTileCenter(pos.row, pos.col);
+            centerX += tileCenter.x;
+            centerY += tileCenter.y;
+          }
+
+          centerX /= path.length;
+          centerY /= path.length;
+
+          // Calculate intensity from word length (3-4=1, 5-6=2, 7-9=3, 10+=4)
+          let intensity: 1 | 2 | 3 | 4 = 1;
+          if (word.length >= 10) {
+            intensity = 4;
+          } else if (word.length >= 7) {
+            intensity = 3;
+          } else if (word.length >= 5) {
+            intensity = 2;
+          }
+
+          // Add explosion to pending list
+          setPendingExplosions(prev => [...prev, {
+            id: Date.now(),
+            position: { x: centerX, y: centerY },
+            intensity,
+          }]);
+        }
+
+        // Clear ref after processing
+        lastSubmittedWordRef.current = null;
+      }
+    }, [cascadePhase, calculateTileCenter]);
+
     // Handle pause toggle
     const handlePauseToggle = useCallback(() => {
       if (isPaused) {
@@ -688,30 +744,30 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle tile selection (for click)
     const handleTileSelect = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating) return;
+        if (!isPlaying || isPaused || isValidating || isCascading) return;
         selectTile(index);
       },
-      [isPlaying, isPaused, isValidating, selectTile]
+      [isPlaying, isPaused, isValidating, isCascading, selectTile]
     );
 
     // Handle drag start
     const handleDragStart = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating) return;
+        if (!isPlaying || isPaused || isValidating || isCascading) return;
         // Clear previous selection and start new one
         clearSelection();
         selectTile(index);
       },
-      [isPlaying, isPaused, isValidating, clearSelection, selectTile]
+      [isPlaying, isPaused, isValidating, isCascading, clearSelection, selectTile]
     );
 
     // Handle drag enter (when dragging over tiles)
     const handleDragEnter = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating) return;
+        if (!isPlaying || isPaused || isValidating || isCascading) return;
         selectTile(index);
       },
-      [isPlaying, isPaused, isValidating, selectTile]
+      [isPlaying, isPaused, isValidating, isCascading, selectTile]
     );
 
     // Handle word submission with validation
@@ -719,7 +775,7 @@ const AdventureGame = memo<AdventureGameProps>(
       async (_word: string, _indices: number[]) => {
         // Use currentWord and getPath() from selection hook for validated path
         // minWordLength from levelConfig (World 1 = 2, others = 3)
-        if (!isPlaying || isPaused || currentWord.length < minWordLength || isValidating) return;
+        if (!isPlaying || isPaused || currentWord.length < minWordLength || isValidating || isCascading) return;
 
         // Clear previous timeouts to prevent stale state updates
         if (validationErrorTimeoutRef.current) {
@@ -784,6 +840,10 @@ const AdventureGame = memo<AdventureGameProps>(
 
           // Valid word - submit with calculated score and path for special tile effects
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
+
+          // Store word for explosion calculation at REMOVING phase
+          lastSubmittedWordRef.current = { word: currentWord, path };
+
           submitWordWithPath(currentWord, scoreValue, path);
           clearSelection();
           // Clear any hint and reset inactivity timer
@@ -811,7 +871,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus]
     );
 
     // Handle level-up modal dismiss
@@ -1058,8 +1118,8 @@ const AdventureGame = memo<AdventureGameProps>(
               onWordSubmit={handleWordSubmit}
               onDragStart={handleDragStart}
               onDragEnter={handleDragEnter}
-              interactive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating}
-              disabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
+              interactive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating && !isCascading}
+              disabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating || isCascading}
               showWordPreview
               className="max-w-md w-full"
               pathPoints={pathPoints}
@@ -1299,6 +1359,18 @@ const AdventureGame = memo<AdventureGameProps>(
             onComplete={() => setParticleConfig(null)}
           />
         )}
+
+        {/* Explosion Effects (triggered at REMOVING phase) */}
+        {pendingExplosions.map((explosion) => (
+          <ExplosionEffect
+            key={explosion.id}
+            position={explosion.position}
+            intensity={explosion.intensity}
+            onComplete={() => {
+              setPendingExplosions(prev => prev.filter(e => e.id !== explosion.id));
+            }}
+          />
+        ))}
 
         {/* Level-Up Celebration Modal */}
         <LevelUpCelebration
