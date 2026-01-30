@@ -16,6 +16,7 @@ import type {
 } from '@/types/adventure';
 import { WORLDS_COUNT, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
+import { useSpecialTileActivation } from './useSpecialTileActivation';
 
 // ==============================================
 // TYPES
@@ -333,6 +334,21 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       if (path && path.length > 0) {
+        // Check for multiplier tiles (2x each, stackable) - Phase 27-04
+        const multiplierPositions = path.filter(
+          (pos) => newTiles[pos.row]?.[pos.col]?.type === 'multiplier'
+        );
+        for (const pos of multiplierPositions) {
+          finalScore *= 2; // Each multiplier tile multiplies by 2x (stackable)
+          const tile = newTiles[pos.row]?.[pos.col];
+          if (tile) {
+            tile.activationEffect = 'multiply';
+            tile.activationTimestamp = activationTimestamp;
+            // Single use: convert to standard tile after activation
+            tile.type = 'standard';
+          }
+        }
+
         // Check for gold tile multiplier (3x) and set activation effect
         const goldPositions = path.filter(
           (pos) => newTiles[pos.row]?.[pos.col]?.type === 'gold'
@@ -440,6 +456,32 @@ function gameReducer(state: GameState, action: GameAction): GameState {
                   // Note: isCleared stays false so tile can be selected
                   iceClearedCount++;
                 }
+              }
+            }
+          }
+        }
+
+        // Unlock locked tiles when word contains same letter - Phase 27-04
+        // Get all letters used in the word (uppercase for comparison)
+        const wordLetters = new Set<string>();
+        for (const pos of path) {
+          const tile = newTiles[pos.row]?.[pos.col];
+          if (tile) {
+            wordLetters.add(tile.letter.toUpperCase());
+          }
+        }
+
+        // Check all locked tiles in grid
+        for (let row = 0; row < gridSize; row++) {
+          for (let col = 0; col < gridSize; col++) {
+            const tile = newTiles[row][col];
+            if (tile.type === 'locked') {
+              // Unlock if word contains this letter
+              if (wordLetters.has(tile.letter.toUpperCase())) {
+                tile.activationEffect = 'unlock';
+                tile.activationTimestamp = activationTimestamp;
+                // Convert to standard tile (unlocked tiles become usable)
+                tile.type = 'standard';
               }
             }
           }
@@ -660,6 +702,9 @@ export function useAdventureGame({
       // The explosion will be triggered at REMOVING phase in AdventureGame component
     },
   });
+
+  // Special tile activation integration
+  const specialTileActivation = useSpecialTileActivation();
 
   // Combo timeout ref
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
