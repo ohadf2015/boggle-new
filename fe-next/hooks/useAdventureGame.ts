@@ -15,6 +15,7 @@ import type {
   TileActivationEffect,
 } from '@/types/adventure';
 import { WORLDS_COUNT, LEVELS_PER_WORLD } from '@/lib/adventure';
+import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
 
 // ==============================================
 // TYPES
@@ -64,6 +65,10 @@ interface UseAdventureGameReturn {
   markCascadeComplete: () => void;
   /** Clear all activation effects from tiles */
   clearActivationEffects: () => void;
+  /** Whether cascade is currently processing (blocks input) */
+  isCascading: boolean;
+  /** Current cascade phase */
+  cascadePhase: CascadePhase;
 }
 
 // ==============================================
@@ -648,6 +653,14 @@ export function useAdventureGame({
   // Game state reducer
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
+  // Cascade loop integration
+  const cascade = useCascadeLoop({
+    onPhaseChange: (phase: CascadePhase) => {
+      // Cascade phase changes can be used by components for explosion timing
+      // The explosion will be triggered at REMOVING phase in AdventureGame component
+    },
+  });
+
   // Combo timeout ref
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -718,12 +731,16 @@ export function useAdventureGame({
 
       dispatch({ type: 'SUBMIT_WORD', payload: { word, score, path } });
 
+      // Trigger cascade with removed tile indices
+      const removedIndices = path.map((pos) => `tile-${pos.row}-${pos.col}`);
+      cascade.startCascade(removedIndices);
+
       // Set new combo timeout
       comboTimeoutRef.current = setTimeout(() => {
         dispatch({ type: 'COMBO_TIMEOUT' });
       }, COMBO_TIMEOUT_MS);
     },
-    []
+    [cascade]
   );
 
   const completeLevel = useCallback(() => {
@@ -774,5 +791,7 @@ export function useAdventureGame({
     isWildcard,
     markCascadeComplete,
     clearActivationEffects,
+    isCascading: cascade.state.isProcessing,
+    cascadePhase: cascade.state.phase,
   };
 }
