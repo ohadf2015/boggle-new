@@ -785,6 +785,11 @@ const AdventureGame = memo<AdventureGameProps>(
       [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength]
     );
 
+    // Handle level-up modal dismiss
+    const handleLevelUpClose = useCallback(() => {
+      setLevelUpData(null);
+    }, []);
+
     // Handle level complete continue
     const handleContinue = useCallback(() => {
       setShowLevelComplete(false);
@@ -794,6 +799,7 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle retry
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
+      setHasAwardedLevelRewards(false); // Reset reward flag for retry
       clearSelection();
       resetGame();
       startGame();
