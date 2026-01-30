@@ -236,11 +236,22 @@ export default function sitemap() {
     });
 
     // Individual blog articles
-    routes.push({
-      url: `${baseUrl}${localePath}/blog/improve-word-game-skills`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
+    const blogArticles = [
+      '10-surprising-benefits-word-games',
+      'science-behind-word-games',
+      'daily-challenge-strategies',
+      'multilingual-word-learning',
+      'top-player-secrets',
+      'improve-word-game-skills',
+    ];
+
+    blogArticles.forEach((slug) => {
+      routes.push({
+        url: `${baseUrl}${localePath}/blog/${slug}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
     });
   });
 

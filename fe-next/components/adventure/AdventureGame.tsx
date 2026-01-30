@@ -19,6 +19,10 @@ import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiRea
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { useBossHealth } from '@/hooks/useBossHealth';
+import { useAdventureXp } from '@/hooks/useAdventureXp';
+import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
+import { useScreenShake } from '@/hooks/useScreenShake';
+import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { ScorePopupFly } from '@/components/animations';
 import { ComboTierBadge } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
@@ -154,6 +158,37 @@ const AdventureGame = memo<AdventureGameProps>(
   ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars }) => {
     // Validate config
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
+
+    // Meta-progression hooks
+    // TODO: Replace 'temp-user-id' with actual user ID from auth context in future phase
+    const {
+      totalXp,
+      currentLevel,
+      xpProgress,
+      awardXp,
+      pendingUpdate: xpPendingUpdate,
+      acknowledgePersistence: acknowledgeXpPersistence,
+    } = useAdventureXp({
+      userId: 'temp-user-id',
+      initialXp: 0, // TODO: Load from user profile
+    });
+
+    const {
+      gold,
+      upgrades,
+      addGold,
+      purchase,
+      getUpgradeEffect,
+      pendingUpdate: currencyPendingUpdate,
+      acknowledgePersistence: acknowledgeCurrencyPersistence,
+    } = useAdventureCurrency({
+      userId: 'temp-user-id',
+      initialGold: 0, // TODO: Load from user profile
+      initialUpgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 }, // TODO: Load from user profile
+    });
+
+    const { shakeRef, shake } = useScreenShake();
+    const particleBudget = useParticleBudget();
 
     // Game state from hook
     const {
@@ -781,6 +816,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
     return (
       <div
+        ref={shakeRef}
         data-testid="adventure-game"
         role="main"
         aria-label="Adventure Mode Game"

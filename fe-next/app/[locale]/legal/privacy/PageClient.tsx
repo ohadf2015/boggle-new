@@ -100,35 +100,103 @@ export default function PrivacyPolicyPageClient(): React.ReactElement {
           'text-xl font-bold mb-3',
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
-          {t('legal.privacy.advertising.title')}
+          {t('legal.privacy.advertisingPartners.title')}
         </h2>
         <p className={cn(
           'leading-relaxed mb-3',
           isDarkMode ? 'text-gray-300' : 'text-gray-600'
         )}>
-          {t('legal.privacy.advertising.intro')}
+          {t('legal.privacy.advertisingPartners.intro')}
+        </p>
+
+        <h3 className={cn(
+          'text-lg font-semibold mb-2 mt-4',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.privacy.advertisingPartners.howItWorks.title')}
+        </h3>
+        <ul className={cn(
+          'list-disc pl-6 space-y-2 mb-3',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          <li>{t('legal.privacy.advertisingPartners.howItWorks.cookies')}</li>
+          <li>{t('legal.privacy.advertisingPartners.howItWorks.control')}</li>
+          <li>{t('legal.privacy.advertisingPartners.howItWorks.noSale')}</li>
+          <li>{t('legal.privacy.advertisingPartners.howItWorks.revenue')}</li>
+          <li>{t('legal.privacy.advertisingPartners.howItWorks.thirdParty')}</li>
+        </ul>
+
+        <h3 className={cn(
+          'text-lg font-semibold mb-2 mt-4',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.privacy.advertisingPartners.yourChoices.title')}
+        </h3>
+        <p className={cn(
+          'leading-relaxed mb-2',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.privacy.advertisingPartners.yourChoices.intro')}
         </p>
         <ul className={cn(
           'list-disc pl-6 space-y-2 mb-3',
           isDarkMode ? 'text-gray-300' : 'text-gray-600'
         )}>
-          <li>{t('legal.privacy.advertising.googleAdsense')}</li>
-          <li>{t('legal.privacy.advertising.cookies')}</li>
-          <li>{t('legal.privacy.advertising.personalization')}</li>
-          <li>{t('legal.privacy.advertising.thirdPartyAccess')}</li>
+          <li>
+            {t('legal.privacy.advertisingPartners.yourChoices.optOut')}:{' '}
+            <a
+              href="https://www.google.com/settings/ads"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neo-cyan hover:underline font-medium"
+            >
+              Google Ad Settings
+            </a>
+          </li>
+          <li>
+            {t('legal.privacy.advertisingPartners.yourChoices.googlePrivacy')}:{' '}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neo-cyan hover:underline font-medium"
+            >
+              Google Privacy Policy
+            </a>
+          </li>
+          <li>
+            {t('legal.privacy.advertisingPartners.yourChoices.partnerPolicy')}:{' '}
+            <a
+              href="https://support.google.com/adsense/answer/48182"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neo-cyan hover:underline font-medium"
+            >
+              AdSense Partner Policy
+            </a>
+          </li>
         </ul>
-        <p className={cn(
-          'leading-relaxed mb-2',
-          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+
+        <div className={cn(
+          'p-4 rounded-neo border-2 border-neo-black mt-4',
+          isDarkMode ? 'bg-slate-800' : 'bg-neo-yellow/10'
         )}>
-          {t('legal.privacy.advertising.optOut')}
-        </p>
-        <p className={cn(
-          'leading-relaxed text-sm',
-          isDarkMode ? 'text-gray-400' : 'text-gray-500'
-        )}>
-          {t('legal.privacy.advertising.learnMore')}
-        </p>
+          <p className={cn(
+            'text-sm font-medium',
+            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+          )}>
+            <strong>{t('legal.privacy.advertisingPartners.important.title')}</strong>{' '}
+            {t('legal.privacy.advertisingPartners.important.content')}{' '}
+            <a
+              href="https://www.aboutads.info/choices"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neo-cyan hover:underline"
+            >
+              aboutads.info
+            </a>.
+          </p>
+        </div>
       </section>
 
       {/* Section 5: Cookies */}

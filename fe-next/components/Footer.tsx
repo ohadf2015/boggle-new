@@ -38,7 +38,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             aria-label="Footer navigation"
           >
             <Link
-              href={`/${language}/rules`}
+              href={`/${language}/about`}
               className="
                 min-h-[44px] px-2 flex items-center
                 text-xs font-bold uppercase tracking-wide
@@ -47,11 +47,11 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.aboutGame') || 'About the Game'}
+              {t('footer.about') || 'About'}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
-              href={`/${language}/leaderboard`}
+              href={`/${language}/blog`}
               className="
                 min-h-[44px] px-2 flex items-center
                 text-xs font-bold uppercase tracking-wide
@@ -60,7 +60,20 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.leaderboard') || 'Leaderboard'}
+              {t('footer.blog') || 'Blog'}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/faq`}
+              className="
+                min-h-[44px] px-2 flex items-center
+                text-xs font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.faq') || 'FAQ'}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link

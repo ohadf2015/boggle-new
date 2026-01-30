@@ -313,11 +313,11 @@ export default function SecretsPageClient(): React.ReactElement {
 
           <section className="mb-8">
             <h2 className={cn('text-2xl font-bold mb-4', isDarkMode ? 'text-white' : 'text-neo-black')}>
-              The Uncomfortable Truth About &quot;Natural Talent&quot;
+              The Uncomfortable Truth About &ldquo;Natural Talent&rdquo;
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              After interviewing 50+ top-ranked players, a pattern emerged: none of them believed they had &quot;natural
-              talent&quot; for word games. What they had was:
+              After interviewing 50+ top-ranked players, a pattern emerged: none of them believed they had &ldquo;natural
+              talent&rdquo; for word games. What they had was:
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               <li><strong>Systematic practice methods</strong> instead of random play</li>
