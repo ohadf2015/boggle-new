@@ -64,13 +64,13 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
 
     // Auto-close after 3 seconds
     useEffect(() => {
-      if (isOpen) {
-        const timeout = setTimeout(() => {
-          onClose();
-        }, 3000);
+      if (!isOpen) return;
 
-        return () => clearTimeout(timeout);
-      }
+      const timeout = setTimeout(() => {
+        onClose();
+      }, 3000);
+
+      return () => clearTimeout(timeout);
     }, [isOpen, onClose]);
 
     // Don't render if not open

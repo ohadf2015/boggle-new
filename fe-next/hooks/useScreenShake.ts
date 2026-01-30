@@ -23,7 +23,7 @@ import { useDevicePerformance } from './useDevicePerformance';
 
 interface UseScreenShakeReturn {
   /** Ref to attach to the element that should shake */
-  shakeRef: React.RefObject<HTMLDivElement>;
+  shakeRef: React.RefObject<HTMLDivElement | null>;
   /**
    * Trigger shake animation
    * @param intensity - Shake magnitude in pixels (2-8px, default: 4px)

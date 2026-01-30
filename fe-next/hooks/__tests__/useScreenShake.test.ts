@@ -18,7 +18,10 @@ jest.mock('../useDevicePerformance', () => ({
 }));
 
 // Mock Web Animations API
-const mockAnimate = jest.fn(() => ({
+const mockAnimate = jest.fn<
+  { finished: Promise<void>; cancel: jest.Mock },
+  [Keyframe[] | PropertyIndexedKeyframes | null, KeyframeAnimationOptions?]
+>(() => ({
   finished: Promise.resolve(),
   cancel: jest.fn(),
 }));
@@ -31,7 +34,7 @@ describe('useScreenShake', () => {
 
     // Create a mock element with animate method
     mockElement = document.createElement('div');
-    mockElement.animate = mockAnimate;
+    mockElement.animate = mockAnimate as unknown as typeof mockElement.animate;
 
     // Reset mock implementation
     const { useDevicePerformance } = require('../useDevicePerformance');
@@ -96,10 +99,10 @@ describe('useScreenShake', () => {
         result.current.shake();
       });
 
-      const keyframes = mockAnimate.mock.calls[0][0];
+      const keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
       const hasDefaultIntensity = keyframes.some(
-        (frame: { transform?: string }) =>
-          frame.transform?.includes('4px') || frame.transform?.includes('-4px')
+        (frame: Keyframe) =>
+          (frame.transform as string | undefined)?.includes('4px') || (frame.transform as string | undefined)?.includes('-4px')
       );
       expect(hasDefaultIntensity).toBe(true);
     });
@@ -115,10 +118,10 @@ describe('useScreenShake', () => {
         result.current.shake(8); // High intensity
       });
 
-      const keyframes = mockAnimate.mock.calls[0][0];
+      const keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
       const hasHighIntensity = keyframes.some(
-        (frame: { transform?: string }) =>
-          frame.transform?.includes('8px') || frame.transform?.includes('-8px')
+        (frame: Keyframe) =>
+          (frame.transform as string | undefined)?.includes('8px') || (frame.transform as string | undefined)?.includes('-8px')
       );
       expect(hasHighIntensity).toBe(true);
     });
@@ -135,10 +138,10 @@ describe('useScreenShake', () => {
         result.current.shake(0); // Should clamp to 2
       });
 
-      let keyframes = mockAnimate.mock.calls[0][0];
+      let keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
       let hasMinIntensity = keyframes.some(
-        (frame: { transform?: string }) =>
-          frame.transform?.includes('2px') || frame.transform?.includes('-2px')
+        (frame: Keyframe) =>
+          (frame.transform as string | undefined)?.includes('2px') || (frame.transform as string | undefined)?.includes('-2px')
       );
       expect(hasMinIntensity).toBe(true);
 
@@ -149,10 +152,10 @@ describe('useScreenShake', () => {
         result.current.shake(100); // Should clamp to 8
       });
 
-      keyframes = mockAnimate.mock.calls[0][0];
+      keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
       const hasMaxIntensity = keyframes.some(
-        (frame: { transform?: string }) =>
-          frame.transform?.includes('8px') || frame.transform?.includes('-8px')
+        (frame: Keyframe) =>
+          (frame.transform as string | undefined)?.includes('8px') || (frame.transform as string | undefined)?.includes('-8px')
       );
       expect(hasMaxIntensity).toBe(true);
     });
@@ -170,7 +173,7 @@ describe('useScreenShake', () => {
         result.current.shake();
       });
 
-      const options = mockAnimate.mock.calls[0][1];
+      const options = mockAnimate.mock.calls[0][1]!;
       expect(options.duration).toBe(200);
     });
 
@@ -185,7 +188,7 @@ describe('useScreenShake', () => {
         result.current.shake(4, 300);
       });
 
-      const options = mockAnimate.mock.calls[0][1];
+      const options = mockAnimate.mock.calls[0][1]!;
       expect(options.duration).toBe(300);
     });
 
@@ -201,7 +204,7 @@ describe('useScreenShake', () => {
         result.current.shake(4, 50); // Should clamp to 100
       });
 
-      let options = mockAnimate.mock.calls[0][1];
+      let options = mockAnimate.mock.calls[0][1]!;
       expect(options.duration).toBe(100);
 
       mockAnimate.mockClear();
@@ -211,7 +214,7 @@ describe('useScreenShake', () => {
         result.current.shake(4, 500); // Should clamp to 300
       });
 
-      options = mockAnimate.mock.calls[0][1];
+      options = mockAnimate.mock.calls[0][1]!;
       expect(options.duration).toBe(300);
     });
   });
@@ -237,9 +240,9 @@ describe('useScreenShake', () => {
       // Should not call shake animation
       const shakeAnimations = mockAnimate.mock.calls.filter(
         call => {
-          const keyframes = call[0];
-          return keyframes.some(
-            (frame: { transform?: string }) => frame.transform?.includes('translate')
+          const keyframes = call[0] as Keyframe[];
+          return keyframes?.some(
+            (frame: Keyframe) => (frame.transform as string | undefined)?.includes('translate')
           );
         }
       );
@@ -266,9 +269,9 @@ describe('useScreenShake', () => {
       // Should call opacity flash animation instead
       const flashAnimations = mockAnimate.mock.calls.filter(
         call => {
-          const keyframes = call[0];
-          return keyframes.some(
-            (frame: { opacity?: number }) => typeof frame.opacity === 'number'
+          const keyframes = call[0] as Keyframe[];
+          return keyframes?.some(
+            (frame: Keyframe) => typeof frame.opacity === 'number'
           );
         }
       );
@@ -288,7 +291,7 @@ describe('useScreenShake', () => {
         result.current.shake();
       });
 
-      const keyframes = mockAnimate.mock.calls[0][0];
+      const keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
 
       // Check all keyframes only use transform
       keyframes.forEach((frame: Record<string, unknown>) => {
@@ -319,12 +322,12 @@ describe('useScreenShake', () => {
         result.current.shake();
       });
 
-      const keyframes = mockAnimate.mock.calls[0][0];
+      const keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
 
       // All transform values should use translate
       const allTransformsUseTranslate = keyframes.every(
-        (frame: { transform?: string }) =>
-          !frame.transform || frame.transform.includes('translate')
+        (frame: Keyframe) =>
+          !frame.transform || (frame.transform as string).includes('translate')
       );
       expect(allTransformsUseTranslate).toBe(true);
     });
@@ -342,7 +345,7 @@ describe('useScreenShake', () => {
         result.current.shake();
       });
 
-      const keyframes = mockAnimate.mock.calls[0][0];
+      const keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
 
       // Should have at least 5 keyframes for natural shake
       expect(keyframes.length).toBeGreaterThanOrEqual(5);
@@ -359,7 +362,7 @@ describe('useScreenShake', () => {
         result.current.shake();
       });
 
-      const keyframes = mockAnimate.mock.calls[0][0];
+      const keyframes = mockAnimate.mock.calls[0][0] as Keyframe[];
 
       // First keyframe should be at origin
       expect(keyframes[0].transform).toMatch(/translate\(0px,\s*0px\)/);
