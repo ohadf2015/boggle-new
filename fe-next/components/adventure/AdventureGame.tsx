@@ -21,6 +21,7 @@ import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { useBossHealth } from '@/hooks/useBossHealth';
 import { useAdventureXp } from '@/hooks/useAdventureXp';
 import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
+import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { ScorePopup } from './juice/ScorePopup';
@@ -200,6 +201,18 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const { shakeRef, shake } = useScreenShake();
     const particleBudget = useParticleBudget();
+
+    // Power-up inventory for persistence
+    const powerUpInventory = usePowerUpInventory();
+
+    // Reset cooldowns on level change (POWER-06 requirement)
+    const previousLevelRef = useRef(levelConfig.level);
+    useEffect(() => {
+      if (levelConfig.level !== previousLevelRef.current) {
+        powerUpInventory.resetCooldowns();
+        previousLevelRef.current = levelConfig.level;
+      }
+    }, [levelConfig.level, powerUpInventory]);
 
     // Task 3: Level-up modal state
     // NOTE: Must be declared BEFORE any hooks that reference them (including upgradeBonuses useMemo)
