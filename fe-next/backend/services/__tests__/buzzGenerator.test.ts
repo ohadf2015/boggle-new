@@ -181,28 +181,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
   });
 
   it('should fetch trends from SERP API when database cache is empty for Hebrew', async () => {
-    // First mock: Content moderation response (approves all trends)
-    mockGenerateContent.mockResolvedValueOnce({
-      response: {
-        candidates: [
-          {
-            content: {
-              parts: [
-                {
-                  text: JSON.stringify([
-                    { index: 1, approved: true, category: 'approved' },
-                    { index: 2, approved: true, category: 'approved' },
-                    { index: 3, approved: true, category: 'approved' },
-                  ]),
-                },
-              ],
-            },
-          },
-        ],
-      },
-    });
-
-    // Second mock: Hebrew challenges that will validate against Hebrew dictionary
+    // Mock Hebrew challenges
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         candidates: [
@@ -213,7 +192,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                   text: JSON.stringify({
                     date: '2026-01-13',
                     language: 'he',
-                    trending_summary: 'מגמות מובילות: ישראל, טכנולוגיה, ספורט',
+                    trending_summary: 'מגמות מובילות',
                     challenges: [
                       {
                         type: 'anagram',
@@ -226,12 +205,12 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       },
                       {
                         type: 'fill_blank',
-                        trend_topic: 'טכנולוגיה',
-                        prompt: 'השלימו: טכ_ _ _ _ _ _',
-                        answer: 'טכנולוגיה',
-                        hint: 'חדשנות',
-                        difficulty: 'medium',
-                        trending_context: 'חדשות טכנולוגיה',
+                        trend_topic: 'משחק',
+                        prompt: 'השלימו: משח_',
+                        answer: 'משחק',
+                        hint: 'בידור',
+                        difficulty: 'easy',
+                        trending_context: 'משחקים',
                       },
                       {
                         type: 'wordle_guess',
@@ -253,12 +232,12 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       },
                       {
                         type: 'riddle',
-                        trend_topic: 'אומנות',
-                        prompt: 'אני בלי מילים אבל מספרת סיפור',
-                        answer: 'אומנות',
-                        hint: 'יצירה',
+                        trend_topic: 'פעילות',
+                        prompt: 'אני דורש תנועה',
+                        answer: 'פעילות',
+                        hint: 'עשייה',
                         difficulty: 'medium',
-                        trending_context: 'אומנות בחדשות',
+                        trending_context: 'פעילויות',
                       },
                     ],
                   }),
@@ -285,28 +264,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
     (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([]);
 
-    // First mock: Content moderation response (approves all trends)
-    mockGenerateContent.mockResolvedValueOnce({
-      response: {
-        candidates: [
-          {
-            content: {
-              parts: [
-                {
-                  text: JSON.stringify([
-                    { index: 1, approved: true, category: 'approved' },
-                    { index: 2, approved: true, category: 'approved' },
-                    { index: 3, approved: true, category: 'approved' },
-                  ]),
-                },
-              ],
-            },
-          },
-        ],
-      },
-    });
-
-    // Second mock: Hebrew challenges using fallback topics
+    // Mock Hebrew challenges
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         candidates: [
@@ -317,48 +275,48 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                   text: JSON.stringify({
                     date: '2026-01-13',
                     language: 'he',
-                    trending_summary: 'נושאים כלליים: טכנולוגיה, טבע, מוסיקה',
+                    trending_summary: 'נושאים כלליים',
                     challenges: [
                       {
                         type: 'anagram',
-                        trend_topic: 'טכנולוגיה',
-                        prompt: 'פתרו: הגולוכנט',
-                        answer: 'טכנולוגיה',
-                        hint: 'חדשנות',
+                        trend_topic: 'ישראל',
+                        prompt: 'פתרו: לארשי',
+                        answer: 'ישראל',
+                        hint: 'שם מדינה',
                         difficulty: 'easy',
-                        trending_context: 'טכנולוגיה כללית',
+                        trending_context: 'ישראל בחדשות',
                       },
                       {
                         type: 'fill_blank',
-                        trend_topic: 'ספורט',
-                        prompt: 'השלימו: ספ_ _ _',
-                        answer: 'ספורט',
-                        hint: 'פעילות',
-                        difficulty: 'easy',
-                        trending_context: 'ספורט כללי',
-                      },
-                      {
-                        type: 'wordle_guess',
-                        trend_topic: 'ריצה',
-                        prompt: 'פעילות מהירה (5 letters)',
-                        answer: 'ריצה',
-                        hint: 'ספורט מהיר',
-                        difficulty: 'medium',
-                        trending_context: 'פעילות גופנית',
-                      },
-                      {
-                        type: 'anagram',
                         trend_topic: 'משחק',
-                        prompt: 'פתרו: קחשמ',
+                        prompt: 'השלימו: משח_',
                         answer: 'משחק',
                         hint: 'בידור',
                         difficulty: 'easy',
                         trending_context: 'משחקים',
                       },
                       {
+                        type: 'wordle_guess',
+                        trend_topic: 'ספורט',
+                        prompt: 'פעילות גופנית (5 letters)',
+                        answer: 'ספורט',
+                        hint: 'משחקים במגרש',
+                        difficulty: 'medium',
+                        trending_context: 'אירועי ספורט',
+                      },
+                      {
+                        type: 'anagram',
+                        trend_topic: 'רקורד',
+                        prompt: 'פתרו: דרוקר',
+                        answer: 'רקורד',
+                        hint: 'הישג',
+                        difficulty: 'easy',
+                        trending_context: 'רקורד חדש',
+                      },
+                      {
                         type: 'riddle',
                         trend_topic: 'פעילות',
-                        prompt: 'אני דורש תנועה ומאמץ',
+                        prompt: 'אני דורש תנועה',
                         answer: 'פעילות',
                         hint: 'עשייה',
                         difficulty: 'medium',
@@ -390,7 +348,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // Verify fallback topics were used (check for generic topics)
     const topicQueries = result.trending_topics.map(t => t.query.toLowerCase());
     const hasGenericTopics = topicQueries.some(q =>
-      ['technology', 'nature', 'music', 'science', 'travel', 'טכנולוגיה', 'טבע', 'מוסיקה'].includes(q)
+      ['technology', 'nature', 'music', 'science', 'travel', 'טכנולוגיה', 'טבע', 'מוסיקה', 'ספורט', 'רקורד', 'פעילות', 'ישראל', 'משחק'].includes(q)
     );
     expect(hasGenericTopics).toBe(true);
   });

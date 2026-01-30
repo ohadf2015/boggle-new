@@ -34,6 +34,7 @@ const nextConfig = {
   // - @supabase/ssr: Fix "module is not defined" error (CommonJS/ESM interop)
   // - date-fns: Fix "module is not defined" on mobile browsers (JAVASCRIPT-NEXTJS-9S, 9Z, 19)
   // - framer-motion: Fix CommonJS/ESM interop issues on student pages
+  // - react-hot-toast: Fix "module is not defined" in practice/education components (JAVASCRIPT-NEXTJS-9S, 9Z)
   transpilePackages: [
     'three',
     '@react-three/fiber',
@@ -42,6 +43,7 @@ const nextConfig = {
     '@supabase/ssr',
     'date-fns',
     'framer-motion',
+    'react-hot-toast',
   ],
 
   // Compiler optimizations
