@@ -28,7 +28,7 @@ import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTie
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import { AdaptiveParticles } from './juice/AdaptiveParticles';
 import { LevelUpCelebration, type LevelUpPayload } from '@/components/education/LevelUpCelebration';
-import { calculateAdventureXp } from '@/backend/utils/adventureXpUtils';
+import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -193,6 +193,31 @@ const AdventureGame = memo<AdventureGameProps>(
     const { shakeRef, shake } = useScreenShake();
     const particleBudget = useParticleBudget();
 
+    // Task 3: Level-up modal state
+    // NOTE: Must be declared BEFORE any hooks that reference them (including upgradeBonuses useMemo)
+    const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
+    const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
+
+    // Task 4: Get upgrade multipliers (memoized to avoid recalculating every render)
+    // NOTE: Must be declared BEFORE adjustedLevelConfig which uses upgradeBonuses.timeBonus
+    const upgradeBonuses = useMemo(() => {
+      return {
+        timeBonus: getUpgradeEffect('timeBonus').multiplier,
+        scoreBonus: getUpgradeEffect('scoreBonus').multiplier,
+        xpBonus: getUpgradeEffect('xpBonus').multiplier,
+      };
+    }, [getUpgradeEffect]);
+
+    // Apply time bonus to level config (create modified config with bonus time)
+    const adjustedLevelConfig = useMemo(() => {
+      // Time bonus multiplier increases starting time
+      const bonusTime = Math.floor(levelConfig.timerSeconds * (upgradeBonuses.timeBonus - 1));
+      return {
+        ...levelConfig,
+        timerSeconds: levelConfig.timerSeconds + bonusTime,
+      };
+    }, [levelConfig, upgradeBonuses.timeBonus]);
+
     // Game state from hook
     const {
       gameState,
@@ -209,7 +234,7 @@ const AdventureGame = memo<AdventureGameProps>(
       resetGame,
       markCascadeComplete,
     } = useAdventureGame({
-      levelConfig,
+      levelConfig: adjustedLevelConfig,
       initialGrid,
     });
 
@@ -424,12 +449,12 @@ const AdventureGame = memo<AdventureGameProps>(
         };
         onTimerStateChange({
           timeRemaining,
-          totalTime: levelConfig.timerSeconds,
+          totalTime: adjustedLevelConfig.timerSeconds,
           isPlaying: actuallyPlaying,
           isPaused,
         });
       }
-    }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, levelConfig.timerSeconds]);
+    }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, adjustedLevelConfig.timerSeconds]);
 
     // Boss low-time taunt trigger (when timer drops below 15 seconds)
     const bossLowTimeTriggedRef = useRef(false);
@@ -506,15 +531,18 @@ const AdventureGame = memo<AdventureGameProps>(
         const isPerfectClear = gameState.stars === 3;
 
         // Time bonus if completed quickly (more than 50% time remaining)
-        const hasTimeBonus = timeRemaining > (levelConfig.timerSeconds * 0.5);
+        const hasTimeBonus = timeRemaining > (adjustedLevelConfig.timerSeconds * 0.5);
 
-        // Calculate XP
-        const earnedXp = calculateAdventureXp({
+        // Calculate XP (apply XP bonus multiplier from upgrades)
+        const baseXp = calculateAdventureXp(
           difficulty,
-          comboMultiplier: Math.max(1, gameState.comboCount),
-          isPerfectClear,
-          hasTimeBonus,
-        });
+          Math.max(1, gameState.comboCount),
+          {
+            perfectClear: isPerfectClear,
+            timeBonus: hasTimeBonus ? 0.1 : 0, // +10% for quick completion
+          }
+        );
+        const earnedXp = Math.floor(baseXp * upgradeBonuses.xpBonus);
 
         const oldLevel = currentLevel;
         const levelUpResult = awardXp(earnedXp);
@@ -526,7 +554,7 @@ const AdventureGame = memo<AdventureGameProps>(
         addGold(totalGold);
 
         // Check if player leveled up
-        if (levelUpResult.didLevelUp) {
+        if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
           setLevelUpData({
             oldLevel,
             newLevel: levelUpResult.newLevel,
@@ -536,7 +564,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
         setHasAwardedLevelRewards(true);
       }
-    }, [gameState.isComplete, gameState.stars, gameState.comboCount, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.timerSeconds, awardXp, addGold, currentLevel]);
+    }, [gameState.isComplete, gameState.stars, gameState.comboCount, timeRemaining, hasAwardedLevelRewards, levelConfig.level, adjustedLevelConfig.timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus]);
 
     // Check for level completion and record attempt
     useEffect(() => {
@@ -715,7 +743,8 @@ const AdventureGame = memo<AdventureGameProps>(
         if (result.isValid && result.score) {
           // Get position BEFORE clearing selection
           const startPos = getPopupStartPosition();
-          let scoreValue = result.score;
+          // Task 4: Apply score bonus multiplier from upgrades
+          let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus);
 
           // Apply boss mechanic multiplier on boss levels
           let bossBonus: string | undefined;
@@ -782,7 +811,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength]
+      [isPlaying, isPaused, isValidating, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus]
     );
 
     // Handle level-up modal dismiss
@@ -863,19 +892,6 @@ const AdventureGame = memo<AdventureGameProps>(
       intensity: number;
       origin: { x: number; y: number };
     } | null>(null);
-
-    // Task 3: Level-up modal state
-    const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
-    const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
-
-    // Task 4: Get upgrade multipliers (memoized to avoid recalculating every render)
-    const upgradeBonuses = useMemo(() => {
-      return {
-        timeBonus: getUpgradeEffect('timeBonus').multiplier,
-        scoreBonus: getUpgradeEffect('scoreBonus').multiplier,
-        xpBonus: getUpgradeEffect('xpBonus').multiplier,
-      };
-    }, [getUpgradeEffect]);
 
     // Handle combo tier changes - trigger screen shake and particles
     const handleComboTierChange = useCallback((tier: ComboTier) => {
