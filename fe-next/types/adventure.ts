@@ -293,3 +293,50 @@ export const WORLD_NAMES = [
  * Union type of all world names
  */
 export type WorldName = (typeof WORLD_NAMES)[number];
+
+// ==============================================
+// POWER-UP SYSTEM
+// ==============================================
+
+/**
+ * Types of power-ups available in adventure mode
+ * - freezeTime: Pauses the countdown timer (instant effect)
+ * - hint: Reveals a valid word on the board (instant effect)
+ * - scoreMultiplier: 2x score for 30 seconds (duration effect)
+ */
+export type PowerUpType = 'freezeTime' | 'hint' | 'scoreMultiplier';
+
+/**
+ * State of a power-up in the cooldown state machine
+ * Lifecycle: ready -> active -> cooldown -> ready
+ */
+export type PowerUpState = 'ready' | 'active' | 'cooldown';
+
+/**
+ * Configuration for power-up effect durations (in seconds)
+ * - 0 = instant activation (freezeTime, hint)
+ * - >0 = duration-based effect (scoreMultiplier: 30s)
+ */
+export const POWER_UP_CONFIG: Record<PowerUpType, { effectDuration: number }> = {
+  freezeTime: { effectDuration: 0 },
+  hint: { effectDuration: 0 },
+  scoreMultiplier: { effectDuration: 30 },
+};
+
+/**
+ * Power-up instance with cooldown state tracking
+ */
+export interface PowerUp {
+  /** Type of power-up */
+  type: PowerUpType;
+  /** Current state in lifecycle */
+  state: PowerUpState;
+  /** Remaining cooldown time in seconds (0 when ready or active) */
+  remainingCooldown: number;
+  /** Total cooldown duration (always 60s) */
+  totalCooldown: number;
+  /** Timestamp when power-up was activated (for drift-free calculation) */
+  activatedAt?: number;
+  /** Effect duration in seconds (0 for instant, 30 for scoreMultiplier) */
+  effectDuration: number;
+}
