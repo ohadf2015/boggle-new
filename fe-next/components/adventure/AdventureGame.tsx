@@ -38,7 +38,8 @@ import LevelEntryOverlay from './LevelEntryOverlay';
 import LexiReaction from './LexiReaction';
 import { BossOverlay } from './boss';
 import GameplayBackground from './themed/GameplayBackground';
-import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
+import { PowerUpBar } from './power-ups';
+import type { LevelConfig, TileState, GridTileState, HintResult } from '@/types/adventure';
 
 // ==============================================
 // TYPES
@@ -267,6 +268,13 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showLevelComplete, setShowLevelComplete] = useState(false);
     const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
     const [pendingExplosions, setPendingExplosions] = useState<PendingExplosion[]>([]);
+
+    // Power-up state
+    const [scoreMultiplier, setScoreMultiplier] = useState(1);
+    const [multiplierExpiresAt, setMultiplierExpiresAt] = useState<number | undefined>();
+    const [hintWord, setHintWord] = useState<string | undefined>();
+    const [hintTiles, setHintTiles] = useState<Array<{ row: number; col: number }> | undefined>();
+    const [hintExpiresAt, setHintExpiresAt] = useState<number | undefined>();
 
     // Chain particle burst state
     const [chainBurstConfig, setChainBurstConfig] = useState<{
@@ -802,6 +810,9 @@ const AdventureGame = memo<AdventureGameProps>(
           // Task 4: Apply score bonus multiplier from upgrades
           let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus);
 
+          // Apply power-up score multiplier (stacks multiplicatively with other bonuses)
+          scoreValue = Math.floor(scoreValue * scoreMultiplier);
+
           // Apply boss mechanic multiplier on boss levels
           let bossBonus: string | undefined;
           if (isBossActive && bossConfig) {
@@ -871,7 +882,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier]
     );
 
     // Handle level-up modal dismiss
@@ -897,6 +908,37 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle exit - directly use onExit since no additional logic needed
     const handleExit = onExit;
 
+    // Power-up handlers
+    const handleFreezeTime = useCallback((newTime: number) => {
+      // Update timer state - capped at totalTime
+      const cappedTime = Math.min(newTime, adjustedLevelConfig.timerSeconds);
+      // Note: Timer state is managed by useAdventureGame hook
+      // The power-up effect adds time which is reflected in timeRemaining
+      // This handler just receives the new time for coordination
+    }, [adjustedLevelConfig.timerSeconds]);
+
+    const handleHint = useCallback((hint: HintResult) => {
+      setHintWord(hint.word);
+      setHintTiles(hint.tiles);
+      setHintExpiresAt(Date.now() + 5000);
+      // Clear hint after 5 seconds
+      setTimeout(() => {
+        setHintWord(undefined);
+        setHintTiles(undefined);
+        setHintExpiresAt(undefined);
+      }, 5000);
+    }, []);
+
+    const handleScoreMultiplier = useCallback((expiresAt: number) => {
+      setScoreMultiplier(2);
+      setMultiplierExpiresAt(expiresAt);
+      // Reset after 30 seconds
+      setTimeout(() => {
+        setScoreMultiplier(1);
+        setMultiplierExpiresAt(undefined);
+      }, 30000);
+    }, []);
+
     // Handle hint button click
     const handleHintClick = useCallback(() => {
       if (hasHintsAvailable) {
@@ -906,10 +948,16 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [hasHintsAvailable, getHint, dismissAutoHint]);
 
     // Convert hint path to indices for grid highlighting
+    // Combines both manual hints and power-up hints
     const hintHighlightIndices = useMemo(() => {
+      // Power-up hint takes precedence
+      if (hintTiles) {
+        return hintTiles.map(pos => pos.row * levelConfig.gridSize + pos.col);
+      }
+      // Otherwise use manual hint from hint button
       if (!currentHint?.path) return [];
       return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-    }, [currentHint, levelConfig.gridSize]);
+    }, [currentHint, levelConfig.gridSize, hintTiles]);
 
     // Handle score popup completion with safety timeout fallback
     const handlePopupComplete = useCallback(() => {
@@ -1225,6 +1273,20 @@ const AdventureGame = memo<AdventureGameProps>(
             )}
           </aside>
         </main>
+
+        {/* Power-Up Bar (only during active gameplay) */}
+        {entryPhase === 'playing' && isPlaying && !isPaused && !showLevelComplete && (
+          <PowerUpBar
+            timeRemaining={timeRemaining}
+            totalTime={adjustedLevelConfig.timerSeconds}
+            tiles={tiles2D}
+            wordsFound={gameState.wordsFound}
+            cascadeActive={isCascading}
+            onFreezeTime={handleFreezeTime}
+            onHint={handleHint}
+            onScoreMultiplier={handleScoreMultiplier}
+          />
+        )}
 
         {/* Boss Battle Overlay (all boss UI components) */}
         <BossOverlay
