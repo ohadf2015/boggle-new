@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 26 - Meta-Progression Foundation
-Plan: 9/9 (COMPLETE - Gap Closure)
-Status: Phase 26 complete - All gaps closed, 100% verification achieved
-Last activity: 2026-01-30 — Completed 26-09-PLAN.md (Gap Closure)
+Phase: 27 - Dynamic Board Mechanics
+Plan: 3 (IN PROGRESS - Explosion Visual Effects)
+Status: Phase 27 in progress - Explosion effects complete, cascade loop done
+Last activity: 2026-01-30 — Completed 27-03-PLAN.md (Explosion Visual Effects)
 
-Progress: [██████████] 100% (9/9 plans complete)
+Progress: [███░░░░░░░] 30% (3/10 plans estimated for Phase 27)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [██████████] 100% (9/9 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 9 (Phase 26 COMPLETE - all gaps closed, 100% verification)
-- Current phase: Phase 26 complete, ready for Phase 27 (Dynamic Board Mechanics)
+- Plans completed: 12 (Phase 26: 9 plans COMPLETE, Phase 27: 3 plans IN PROGRESS)
+- Current phase: Phase 27 - Dynamic Board Mechanics (cascade loop + explosions complete)
 
 ## Accumulated Context
 
@@ -169,6 +169,20 @@ Key decisions from previous milestones:
 - Translation-first compliance: Replaced hardcoded "XP" with t('adventure.xp.label') in all 4 languages
 - Gaming abbreviations vary by language: XP (en), נק' (he), EP (sv), 経験値 (ja) - respect cultural norms
 
+**Phase 27-01 (Cascade Loop State Machine, 2026-01-30):**
+- 5-phase cascade cycle: idle → removing → falling → spawning → checking (repeats until no matches)
+- Phase timing: 250ms per phase (750ms total cascade), configurable via milliseconds (not frame counts)
+- Pure functions exported: applyGravity, spawnNewTiles, checkForMatches for external use/testing
+- Reduced motion support: 1ms phase durations for instant transitions (no "skip animation" flag)
+- onPhaseChange callback: Enables UI coordination (shake on remove, particles on spawn)
+
+**Phase 27-03 (Explosion Visual Effects, 2026-01-30):**
+- Radial particle burst pattern: 360° spread for omnidirectional explosion feel (vs directional fountain)
+- Intensity scaling (1-4): Maps to 15/30/45/60 particles based on word length (3-4/5-6/7-9/10+ letters)
+- Reuse Phase 26 particle budget: Maintains consistency with adaptive particle framework, zero new infrastructure
+- CSS explosion-ring animation: GPU-accelerated transform-only (scale + opacity) for 60fps performance
+- Normalized position calculation: Pixel coords → 0-1 range for fireConfetti origin accuracy
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -194,10 +208,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-09-PLAN.md (Gap Closure) - Phase 26 100% VERIFIED
+Stopped at: Completed 27-03-PLAN.md (Explosion Visual Effects) - Phase 27 in progress
 Resume file: None
 
-**Next action:** Begin Phase 27 (Dynamic Board Mechanics) - Candy Crush cascades, tile movement, explosions
+**Next action:** Continue Phase 27 (Dynamic Board Mechanics) - Special tile activation, tile swap, grid integration
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -221,4 +235,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Plan 26-07 complete: Adventure HUD Components)*
+*Last updated: 2026-01-30 (Plan 27-03 complete: Explosion Visual Effects)*
