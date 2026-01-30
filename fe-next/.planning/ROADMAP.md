@@ -3,8 +3,9 @@
 ## Milestones
 
 - ✅ **v1.0 Stabilization** - Phases 1-14 (shipped 2026-01-25)
-- 🚧 **v1.1 Adventure & Education Expansion** - Phases 15-23 (in progress)
-- 🚧 **v1.2 Platform Integration** - Phases 24-25 (in progress)
+- ✅ **v1.1 Adventure & Education Expansion** - Phases 15-21 (shipped 2026-01-29)
+- ✅ **v1.2 Platform Integration** - Phases 24-25 (shipped 2026-01-26)
+- 🚧 **v2.0 Adventure Overhaul** - Phases 26-35 (in progress)
 
 ## Phases
 
@@ -77,9 +78,10 @@
 
 </details>
 
-### 🚧 v1.1 Adventure & Education Expansion (In Progress)
+<details>
+<summary>✅ v1.1 Adventure & Education Expansion (Phases 15-21) - SHIPPED 2026-01-29</summary>
 
-**Milestone Goal:** Expand adventure mode with Worlds 4-5, boss battles, and chain combos while enhancing education mode with analytics and gamification.
+**Milestone Goal:** Expand adventure mode with boss battles and chain combos while enhancing education mode with analytics and gamification.
 
 #### ✅ Phase 15: Chain Combo System — COMPLETE
 **Goal**: Implement satisfying chain reactions with combo multipliers
@@ -224,55 +226,28 @@ Plans:
 - [x] 21-05-PLAN.md — Daily Buzz Context Service (Wave 1, 27 tests)
 - [x] 21-06-PLAN.md — FlashcardReview Integration (Wave 3, 10 tests)
 
-#### Phase 22: World Theming Expansion
-**Goal**: Deliver immersive theming for Worlds 4-5
-**Depends on**: Nothing (parallel to gameplay features)
-**Requirements**: WORLD-01, WORLD-02, WORLD-03, WORLD-04, WORLD-05, WORLD-06, WORLD-07, WORLD-08
-**Success Criteria** (what must be TRUE):
-  1. User sees World 4 Idiom Archipelago with parallax backgrounds (3-5 layers, tropical islands)
-  2. User sees World 4 with themed particles (palm fronds, seashells, waves)
-  3. User sees World 4 with board decorations (tiki borders, island accents)
-  4. User sees World 5 Compound Canyon with parallax backgrounds (3-5 layers, desert cliffs)
-  5. User sees World 5 with themed particles (dust, tumbleweeds, heat shimmer)
-  6. User sees World 5 with board decorations (canyon rock borders, desert accents)
-  7. All World 4-5 AI-generated assets optimized (WebP, <200KB) following established pipeline
-**Plans**: TBD
+</details>
 
-Plans:
-- [ ] 22-01: TBD during plan-phase
-
-#### Phase 23: Tech Debt Cleanup
-**Goal**: Resolve accumulated technical debt and polish
-**Depends on**: Nothing (parallel cleanup work)
-**Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
-**Success Criteria** (what must be TRUE):
-  1. Entry sequence timing optimized from 2.38s to 2s target (380ms reduction)
-  2. Video MP4 rendering pipeline functional (Remotion render script produces playable MP4s)
-  3. Bug fixes for BUG-004 through BUG-008 resolved and verified
-  4. Lexi stuck detection implemented (30s inactivity triggers contextual help)
-**Plans**: TBD
-
-Plans:
-- [ ] 23-01: TBD during plan-phase
-
-### 🚧 v1.2 Platform Integration (In Progress)
+<details>
+<summary>✅ v1.2 Platform Integration (Phases 24-25) - SHIPPED 2026-01-26</summary>
 
 **Milestone Goal:** Enable game distribution through CrazyGames portal and native mobile apps.
 
-#### Phase 24: CrazyGames Portal Integration
+#### ✅ Phase 24: CrazyGames Portal Integration — COMPLETE
 **Goal**: Complete CrazyGames SDK integration for portal distribution
 **Depends on**: Nothing (independent platform work)
 **Requirements**: CG-01 through CG-10 (from CONTEXT.md)
 **Success Criteria** (what must be TRUE):
-  1. Initial download size <50MB (currently 131MB public folder, 57MB music alone)
-  2. Game looks identical when embedded in CrazyGames iframe vs standalone
-  3. External OAuth hidden, CrazyGames SDK authentication used instead
-  4. Multiplayer invite system uses CrazyGames SDK inviteLink/showInviteButton
-  5. Gameplay lifecycle events (start/stop/happytime) fire correctly for metrics
-  6. QR code functionality works with CrazyGames invite links
-  7. Landscape mode on desktop displays without scrollbars
-  8. Mobile responsive behavior preserved in iframe embedding
+  1. ✓ Initial download size <50MB (currently 131MB public folder, 57MB music alone)
+  2. ✓ Game looks identical when embedded in CrazyGames iframe vs standalone
+  3. ✓ External OAuth hidden, CrazyGames SDK authentication used instead
+  4. ✓ Multiplayer invite system uses CrazyGames SDK inviteLink/showInviteButton
+  5. ✓ Gameplay lifecycle events (start/stop/happytime) fire correctly for metrics
+  6. ✓ QR code functionality works with CrazyGames invite links
+  7. ✓ Landscape mode on desktop displays without scrollbars
+  8. ✓ Mobile responsive behavior preserved in iframe embedding
 **Plans**: 7 plans in 4 waves
+**Completed**: 2026-01-26
 
 Plans:
 - [x] 24-01-PLAN.md — Lazy audio loading (Wave 1)
@@ -283,19 +258,20 @@ Plans:
 - [x] 24-06-PLAN.md — Enhanced SDK Integration (Wave 3)
 - [x] 24-07-PLAN.md — Gap closure: build fix & OAuth hiding (Wave 4)
 
-#### Phase 25: Capacitor Native Apps Integration
+#### ✅ Phase 25: Capacitor Native Apps Integration — COMPLETE
 **Goal**: Integrate Capacitor to create native iOS and Android apps from the Next.js webapp with minimal code maintenance overhead
 **Depends on**: Nothing (independent platform work)
 **Requirements**: Native app distribution via App Store and Google Play, consistent UI across platforms
 **Success Criteria** (what must be TRUE):
-  1. Native apps load production webapp in WebView (server.url approach)
-  2. All webapp features work including SSR, Server Components, and Socket.IO multiplayer
-  3. Safe areas display correctly on notched devices (iPhone X+, Android cutouts)
-  4. Native haptics enhance user feedback on iOS and Android
-  5. Offline fallback screen appears when server unreachable
-  6. Build scripts generate iOS and Android app bundles
-  7. UI looks consistent across desktop, mobile web, and native apps
-**Plans**: 4 plans in 3 waves
+  1. ✓ Native apps load production webapp in WebView (server.url approach)
+  2. ✓ All webapp features work including SSR, Server Components, and Socket.IO multiplayer
+  3. ✓ Safe areas display correctly on notched devices (iPhone X+, Android cutouts)
+  4. ✓ Native haptics enhance user feedback on iOS and Android
+  5. ✓ Offline fallback screen appears when server unreachable
+  6. ✓ Build scripts generate iOS and Android app bundles
+  7. ✓ UI looks consistent across desktop, mobile web, and native apps
+**Plans**: 6 plans in 3 waves
+**Completed**: 2026-01-26
 
 Plans:
 - [x] 25-01-PLAN.md — Capacitor core setup (packages, config, platforms) (Wave 1)
@@ -305,18 +281,185 @@ Plans:
 - [x] 25-05-PLAN.md — Wire orphaned native integrations (Wave 1, gap closure)
 - [x] 25-06-PLAN.md — Generic haptics abstraction layer (Wave 1, gap closure)
 
+</details>
+
+### 🚧 v2.0 Adventure Overhaul (Phases 26-35)
+
+**Milestone Goal:** Transform Adventure Mode from static word-finding into a visually spectacular, feature-rich experience with dynamic board mechanics, power systems, meta-progression, and cinematic boss battles.
+
+#### Phase 26: Meta-Progression Foundation
+**Goal**: Players see persistent progression and feel rewarded across all adventure levels
+**Depends on**: Nothing (foundation for other systems)
+**Requirements**: META-01, META-02, META-03, META-04, META-05, META-06, JUICE-01, JUICE-02, JUICE-03, JUICE-04, JUICE-05, UI-01, UI-02, UI-03, UI-04, UI-05
+**Success Criteria** (what must be TRUE):
+  1. User earns XP from adventure level completion and sees progress bar advance toward next level
+  2. User levels up with celebration animation when reaching XP threshold
+  3. User earns gold currency from levels and can spend it on permanent stat upgrades (+10% time, +5% score)
+  4. User sees persistent player level displayed across all worlds
+  5. User sees satisfying feedback: screen shake on combos, particle effects with adaptive budget, score popups with arc trajectory
+  6. User sees streamlined HUD with clear visual hierarchy (timer, score, objectives, cooldown indicators)
+**Plans**: TBD
+
+Plans:
+- [ ] 26-01: TBD during plan-phase
+
+#### Phase 27: Dynamic Board Mechanics
+**Goal**: Board feels alive with Candy Crush-style cascades and smooth animations
+**Depends on**: Phase 26 (uses meta-progression for unlock gating)
+**Requirements**: BOARD-01, BOARD-02, BOARD-03, BOARD-04, BOARD-05, BOARD-06
+**Success Criteria** (what must be TRUE):
+  1. User sees tiles cascade when words removed (collapse → fall → refill in 0.25s steps)
+  2. User sees smooth tile movement with quadratic/elastic easing at 60fps on mobile (iPhone 12 baseline)
+  3. User sees explosion effects for multi-tile clearing
+  4. User sees special tile types (frozen, locked, multiplier) with distinct visuals
+  5. Cascades trigger automatically when words removed without player action
+**Plans**: TBD
+
+Plans:
+- [ ] 27-01: TBD during plan-phase
+
+#### Phase 28: Power-Up System
+**Goal**: Players have strategic mid-game options that feel rewarding without being mandatory
+**Depends on**: Phase 26 (meta-progression unlocks power-ups), Phase 27 (power-ups affect board state)
+**Requirements**: POWER-01, POWER-02, POWER-03, POWER-04, POWER-05, POWER-06, POWER-07
+**Success Criteria** (what must be TRUE):
+  1. User can activate "Freeze Time" (extends timer 10s), "Hint" (reveals valid word), "Score Multiplier" (2x for 30s)
+  2. User sees power-up cooldown timers (60s between uses) with radial progress visualization
+  3. User sees activation animations (0.25s burst effect) when triggering power-ups
+  4. Power-ups inventory persists across levels
+  5. Every level is beatable without power-ups (skill-based balance verified in testing)
+**Plans**: TBD
+
+Plans:
+- [ ] 28-01: TBD during plan-phase
+
+#### Phase 29: Adaptive Difficulty System
+**Goal**: All skill levels stay in flow state through invisible difficulty adjustments
+**Depends on**: Phase 27 (board mechanics), Phase 28 (power-ups)
+**Requirements**: DIFF-01, DIFF-02, DIFF-03, DIFF-04, DIFF-05
+**Success Criteria** (what must be TRUE):
+  1. User can select explicit difficulty (Easy/Medium/Hard) when starting level
+  2. System selects pre-game difficulty based on performance (3-state: easy/normal/hard, invisible)
+  3. System provides gradual unlock hints after 3 failures
+  4. Difficulty adjustments are invisible to user (no obvious rubber-banding)
+  5. Boss fights have fixed difficulty (learnable patterns, excluded from adaptive scaling)
+**Plans**: TBD
+
+Plans:
+- [ ] 29-01: TBD during plan-phase
+
+#### Phase 30: Boss Battle Overhaul
+**Goal**: Boss battles feel like epic cinematic fights, not just harder puzzles
+**Depends on**: Phase 27 (board mechanics), Phase 28 (power-ups), Phase 29 (difficulty)
+**Requirements**: BOSS-01, BOSS-02, BOSS-03, BOSS-04, BOSS-05, BOSS-06, BOSS-07, BOSS-08
+**Success Criteria** (what must be TRUE):
+  1. User battles bosses with 5-phase state machine (intro → phase1 → phase2 → enraged → victory/defeat)
+  2. User sees segmented HP bar with phase indicators showing boss progression
+  3. User sees telegraphed boss attacks (2s visual warning before activation)
+  4. User sees 5-10s cinematic intro (skippable after 2s) when entering boss battle
+  5. Bosses have 2-3 unique abilities per boss registered in extensible ability system
+  6. User sees unique graphics per boss (Image MCP + rembg pipeline)
+  7. Boss entrance and defeat have cinematic sequences
+**Plans**: TBD
+
+Plans:
+- [ ] 30-01: TBD during plan-phase
+
+#### Phase 31: Skill Tree & Progression Depth
+**Goal**: Long-term progression provides meaningful horizontal choices, not just bigger numbers
+**Depends on**: Phase 26 (meta-progression), Phase 28 (unlocks power-up slots)
+**Requirements**: SKILL-01, SKILL-02, SKILL-03, SKILL-04, SKILL-05, SKILL-06, ACHIEVE-01, ACHIEVE-02, ACHIEVE-03, ACHIEVE-04
+**Success Criteria** (what must be TRUE):
+  1. User can unlock skills in branching tree (3 paths: Power, Strategy, Utility)
+  2. User earns skill points on level up and sees skill tree visualization with locked/unlocked states
+  3. Skills provide horizontal progression (enable strategies, not just +10% stats)
+  4. User unlocks power-up slots and advanced power-ups via skill progression
+  5. User earns achievements for gameplay milestones with unlock modal celebration
+  6. User can view earned achievements in profile with completion progress (Bronze/Silver/Gold/Platinum tiers)
+**Plans**: TBD
+
+Plans:
+- [ ] 31-01: TBD during plan-phase
+
+#### Phase 32: Visual Polish & Effects
+**Goal**: Every action feels spectacular with layered particle effects and celebrations
+**Depends on**: Phase 26 (particle budget), Phase 27 (board animations), Phase 30 (boss battles)
+**Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05, POLISH-06
+**Success Criteria** (what must be TRUE):
+  1. User sees confetti effects on level victory
+  2. User sees fireworks on boss defeat
+  3. User sees 10+ combo full-screen celebration effects
+  4. User sees layered particle effects (background, mid-ground, foreground)
+  5. Particle system enforces budget (max 50-100 on screen, adaptive reduction on low-end devices)
+  6. All effects respect reduced-motion accessibility preference
+**Plans**: TBD
+
+Plans:
+- [ ] 32-01: TBD during plan-phase
+
+#### Phase 33: Cinematic System
+**Goal**: Key moments feel like movie scenes with professional cinematics
+**Depends on**: Phase 30 (boss battles), Phase 32 (visual polish)
+**Requirements**: CINE-01, CINE-02, CINE-03, CINE-04, CINE-05
+**Success Criteria** (what must be TRUE):
+  1. User sees boss entrance cutscene (5-10s, Remotion-based) before battle starts
+  2. User sees victory celebration sequence with particle effects and music
+  3. User sees defeat sequence providing encouragement
+  4. All cinematics are skippable after 2s (accessibility requirement)
+  5. Cinematics use Remotion + Lottie + Skia for effects
+**Plans**: TBD
+
+Plans:
+- [ ] 33-01: TBD during plan-phase
+
+#### Phase 34: Dynamic Difficulty Tuning (AI Director)
+**Goal**: Game invisibly adapts to keep players in flow state without feeling artificial
+**Depends on**: Phase 29 (basic difficulty), Phase 30 (boss battles excluded)
+**Requirements**: DDA-01, DDA-02, DDA-03, DDA-04, DDA-05
+**Success Criteria** (what must be TRUE):
+  1. System tracks performance metrics (words per minute, success rate, combo length)
+  2. AI Director adjusts intensity based on player flow state (invisible adjustments)
+  3. Mid-game adjustments are invisible (gradual, not sudden rubber-banding)
+  4. Analytics track difficulty effectiveness showing player engagement metrics
+  5. System excludes boss fights from adaptive scaling (fixed difficulty for pattern learning)
+**Plans**: TBD
+
+Plans:
+- [ ] 34-01: TBD during plan-phase
+
+#### Phase 35: World Expansion & Tech Debt Cleanup
+**Goal**: Complete v1.1 carryover work and deliver Worlds 4-5 theming
+**Depends on**: Phase 32 (visual pipeline proven)
+**Requirements**: WORLD-01, WORLD-02, WORLD-03, WORLD-04, WORLD-05, WORLD-06, WORLD-07, WORLD-08, DEBT-01, DEBT-02, DEBT-03, DEBT-04
+**Success Criteria** (what must be TRUE):
+  1. User sees World 4 Idiom Archipelago with parallax backgrounds (3-5 layers, tropical islands)
+  2. User sees World 4 with themed particles (palm fronds, seashells, waves) and board decorations (tiki borders)
+  3. User sees World 5 Compound Canyon with parallax backgrounds (3-5 layers, desert cliffs)
+  4. User sees World 5 with themed particles (dust, tumbleweeds, heat shimmer) and board decorations (canyon rock borders)
+  5. All World 4-5 AI-generated assets optimized (WebP, <200KB) following established pipeline
+  6. Entry sequence timing optimized from 2.38s to 2s target (380ms reduction)
+  7. Video MP4 rendering pipeline functional (Remotion render script produces playable MP4s)
+  8. Bug fixes for BUG-004 through BUG-008 resolved and Lexi stuck detection implemented (30s inactivity triggers help)
+**Plans**: TBD
+
+Plans:
+- [ ] 35-01: TBD during plan-phase
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 → 23 → 24 → 25
+Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 → 33 → 34 → 35
 
 **Dependencies:**
-- Phase 16 (Boss Foundation) depends on Phase 15 (Combo scoring)
-- Phase 17 (Boss Expansion) depends on Phase 16 (State machine proven)
-- Phase 18 (XP System) depends on Phase 15 (Combo scoring for XP calculations)
-- Phase 19 (Achievements) depends on Phase 18 (XP milestones)
-- Phase 20 (Analytics) depends on Phase 18 (XP data to analyze)
-- Phases 21, 22, 23, 24, 25 are parallel (no dependencies)
+- Phase 27 (Board Mechanics) depends on Phase 26 (Meta-progression foundation)
+- Phase 28 (Power-Ups) depends on Phase 26 (unlocks) + Phase 27 (board state)
+- Phase 29 (Adaptive Difficulty) depends on Phase 27 + Phase 28
+- Phase 30 (Boss Overhaul) depends on Phase 27 + Phase 28 + Phase 29
+- Phase 31 (Skill Tree) depends on Phase 26 (meta) + Phase 28 (power-up unlocks)
+- Phase 32 (Visual Polish) depends on Phase 26 (particle budget) + Phase 27 (animations) + Phase 30 (bosses)
+- Phase 33 (Cinematics) depends on Phase 30 (bosses) + Phase 32 (visual effects)
+- Phase 34 (AI Director) depends on Phase 29 (basic difficulty) + Phase 30 (boss exclusion)
+- Phase 35 (World Expansion) depends on Phase 32 (visual pipeline)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -327,12 +470,20 @@ Phases execute in numeric order: 15 → 16 → 17 → 18 → 19 → 20 → 21 �
 | 19. Achievement System | v1.1 | 5/5 | ✅ Complete | 2026-01-29 |
 | 20. Student Analytics Dashboard | v1.1 | 6/6 | ✅ Complete | 2026-01-29 |
 | 21. Rich Lesson Delivery | v1.1 | 6/6 | ✅ Complete | 2026-01-29 |
-| 22. World Theming Expansion | v1.1 | 0/TBD | Not started | - |
-| 23. Tech Debt Cleanup | v1.1 | 0/TBD | Not started | - |
 | 24. CrazyGames Portal Integration | v1.2 | 7/7 | ✅ Complete | 2026-01-26 |
 | 25. Capacitor Native Apps | v1.2 | 6/6 | ✅ Complete | 2026-01-26 |
+| 26. Meta-Progression Foundation | v2.0 | 0/TBD | Not started | - |
+| 27. Dynamic Board Mechanics | v2.0 | 0/TBD | Not started | - |
+| 28. Power-Up System | v2.0 | 0/TBD | Not started | - |
+| 29. Adaptive Difficulty System | v2.0 | 0/TBD | Not started | - |
+| 30. Boss Battle Overhaul | v2.0 | 0/TBD | Not started | - |
+| 31. Skill Tree & Progression Depth | v2.0 | 0/TBD | Not started | - |
+| 32. Visual Polish & Effects | v2.0 | 0/TBD | Not started | - |
+| 33. Cinematic System | v2.0 | 0/TBD | Not started | - |
+| 34. Dynamic Difficulty Tuning | v2.0 | 0/TBD | Not started | - |
+| 35. World Expansion & Tech Debt | v2.0 | 0/TBD | Not started | - |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-29 after Phase 21 execution complete (78 tests added, verification passed 6/6)*
+*Last updated: 2026-01-30 after v2.0 milestone phases defined (10 phases, 76 requirements mapped)*

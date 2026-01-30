@@ -169,15 +169,128 @@ Explicitly excluded from v2.0 milestone.
 
 Which phases cover which requirements. Updated during roadmap creation.
 
+### Phase 26: Meta-Progression Foundation
+- META-01, META-02, META-03, META-04, META-05, META-06
+- JUICE-01, JUICE-02, JUICE-03, JUICE-04, JUICE-05
+- UI-01, UI-02, UI-03, UI-04, UI-05
+
+### Phase 27: Dynamic Board Mechanics
+- BOARD-01, BOARD-02, BOARD-03, BOARD-04, BOARD-05, BOARD-06
+
+### Phase 28: Power-Up System
+- POWER-01, POWER-02, POWER-03, POWER-04, POWER-05, POWER-06, POWER-07
+
+### Phase 29: Adaptive Difficulty System
+- DIFF-01, DIFF-02, DIFF-03, DIFF-04, DIFF-05
+
+### Phase 30: Boss Battle Overhaul
+- BOSS-01, BOSS-02, BOSS-03, BOSS-04, BOSS-05, BOSS-06, BOSS-07, BOSS-08
+
+### Phase 31: Skill Tree & Progression Depth
+- SKILL-01, SKILL-02, SKILL-03, SKILL-04, SKILL-05, SKILL-06
+- ACHIEVE-01, ACHIEVE-02, ACHIEVE-03, ACHIEVE-04
+
+### Phase 32: Visual Polish & Effects
+- POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05, POLISH-06
+
+### Phase 33: Cinematic System
+- CINE-01, CINE-02, CINE-03, CINE-04, CINE-05
+
+### Phase 34: Dynamic Difficulty Tuning (AI Director)
+- DDA-01, DDA-02, DDA-03, DDA-04, DDA-05
+
+### Phase 35: World Expansion & Tech Debt Cleanup
+- WORLD-01, WORLD-02, WORLD-03, WORLD-04, WORLD-05, WORLD-06, WORLD-07, WORLD-08
+- DEBT-01, DEBT-02, DEBT-03, DEBT-04
+
+**Coverage Summary:**
+- v2.0 requirements: 76 total
+- Mapped to phases: 76/76 (100%)
+- Unmapped: 0
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
-
-**Coverage:**
-- v2.0 requirements: 0 total
-- Mapped to phases: 0
-- Unmapped: 0
+| META-01 | Phase 26 | Pending |
+| META-02 | Phase 26 | Pending |
+| META-03 | Phase 26 | Pending |
+| META-04 | Phase 26 | Pending |
+| META-05 | Phase 26 | Pending |
+| META-06 | Phase 26 | Pending |
+| JUICE-01 | Phase 26 | Pending |
+| JUICE-02 | Phase 26 | Pending |
+| JUICE-03 | Phase 26 | Pending |
+| JUICE-04 | Phase 26 | Pending |
+| JUICE-05 | Phase 26 | Pending |
+| UI-01 | Phase 26 | Pending |
+| UI-02 | Phase 26 | Pending |
+| UI-03 | Phase 26 | Pending |
+| UI-04 | Phase 26 | Pending |
+| UI-05 | Phase 26 | Pending |
+| BOARD-01 | Phase 27 | Pending |
+| BOARD-02 | Phase 27 | Pending |
+| BOARD-03 | Phase 27 | Pending |
+| BOARD-04 | Phase 27 | Pending |
+| BOARD-05 | Phase 27 | Pending |
+| BOARD-06 | Phase 27 | Pending |
+| POWER-01 | Phase 28 | Pending |
+| POWER-02 | Phase 28 | Pending |
+| POWER-03 | Phase 28 | Pending |
+| POWER-04 | Phase 28 | Pending |
+| POWER-05 | Phase 28 | Pending |
+| POWER-06 | Phase 28 | Pending |
+| POWER-07 | Phase 28 | Pending |
+| DIFF-01 | Phase 29 | Pending |
+| DIFF-02 | Phase 29 | Pending |
+| DIFF-03 | Phase 29 | Pending |
+| DIFF-04 | Phase 29 | Pending |
+| DIFF-05 | Phase 29 | Pending |
+| BOSS-01 | Phase 30 | Pending |
+| BOSS-02 | Phase 30 | Pending |
+| BOSS-03 | Phase 30 | Pending |
+| BOSS-04 | Phase 30 | Pending |
+| BOSS-05 | Phase 30 | Pending |
+| BOSS-06 | Phase 30 | Pending |
+| BOSS-07 | Phase 30 | Pending |
+| BOSS-08 | Phase 30 | Pending |
+| SKILL-01 | Phase 31 | Pending |
+| SKILL-02 | Phase 31 | Pending |
+| SKILL-03 | Phase 31 | Pending |
+| SKILL-04 | Phase 31 | Pending |
+| SKILL-05 | Phase 31 | Pending |
+| SKILL-06 | Phase 31 | Pending |
+| ACHIEVE-01 | Phase 31 | Pending |
+| ACHIEVE-02 | Phase 31 | Pending |
+| ACHIEVE-03 | Phase 31 | Pending |
+| ACHIEVE-04 | Phase 31 | Pending |
+| POLISH-01 | Phase 32 | Pending |
+| POLISH-02 | Phase 32 | Pending |
+| POLISH-03 | Phase 32 | Pending |
+| POLISH-04 | Phase 32 | Pending |
+| POLISH-05 | Phase 32 | Pending |
+| POLISH-06 | Phase 32 | Pending |
+| CINE-01 | Phase 33 | Pending |
+| CINE-02 | Phase 33 | Pending |
+| CINE-03 | Phase 33 | Pending |
+| CINE-04 | Phase 33 | Pending |
+| CINE-05 | Phase 33 | Pending |
+| DDA-01 | Phase 34 | Pending |
+| DDA-02 | Phase 34 | Pending |
+| DDA-03 | Phase 34 | Pending |
+| DDA-04 | Phase 34 | Pending |
+| DDA-05 | Phase 34 | Pending |
+| WORLD-01 | Phase 35 | Pending |
+| WORLD-02 | Phase 35 | Pending |
+| WORLD-03 | Phase 35 | Pending |
+| WORLD-04 | Phase 35 | Pending |
+| WORLD-05 | Phase 35 | Pending |
+| WORLD-06 | Phase 35 | Pending |
+| WORLD-07 | Phase 35 | Pending |
+| WORLD-08 | Phase 35 | Pending |
+| DEBT-01 | Phase 35 | Pending |
+| DEBT-02 | Phase 35 | Pending |
+| DEBT-03 | Phase 35 | Pending |
+| DEBT-04 | Phase 35 | Pending |
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after initial definition*
+*Last updated: 2026-01-30 after roadmap creation (76/76 requirements mapped to phases 26-35)*
