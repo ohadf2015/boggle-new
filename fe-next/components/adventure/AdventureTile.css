@@ -1599,3 +1599,63 @@
 .tile-bomb-row-indicator span {
   width: 4px;
 }
+
+/* ==============================================
+   EXPLOSION EFFECT
+   ============================================== */
+
+@keyframes tile-explode {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.8);
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+    box-shadow: 0 0 20px 10px rgba(255, 107, 53, 0.6);
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+    box-shadow: 0 0 40px 20px rgba(255, 107, 53, 0);
+  }
+}
+
+@keyframes explosion-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+    border-width: 4px;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+.tile-exploding {
+  animation: tile-explode 0.3s ease-out forwards;
+}
+
+.explosion-ring {
+  position: absolute;
+  border: 4px solid rgba(255, 107, 53, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: explosion-ring 0.4s ease-out forwards;
+}
+
+/* Reduced motion: instant fade, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .tile-exploding {
+    animation: none;
+    opacity: 0;
+    transform: scale(0);
+  }
+  .explosion-ring {
+    animation: none;
+    display: none;
+  }
+}
