@@ -181,6 +181,95 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
   });
 
   it('should fetch trends from SERP API when database cache is empty for Hebrew', async () => {
+    // First mock: Content moderation response (approves all trends)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify([
+                    { index: 1, approved: true, category: 'approved' },
+                    { index: 2, approved: true, category: 'approved' },
+                    { index: 3, approved: true, category: 'approved' },
+                  ]),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Second mock: Hebrew challenges that will validate against Hebrew dictionary
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-13',
+                    language: 'he',
+                    trending_summary: 'מגמות מובילות: ישראל, טכנולוגיה, ספורט',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'ישראל',
+                        prompt: 'פתרו: לארשי',
+                        answer: 'ישראל',
+                        hint: 'שם מדינה',
+                        difficulty: 'easy',
+                        trending_context: 'ישראל בחדשות',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'טכנולוגיה',
+                        prompt: 'השלימו: טכ_ _ _ _ _ _',
+                        answer: 'טכנולוגיה',
+                        hint: 'חדשנות',
+                        difficulty: 'medium',
+                        trending_context: 'חדשות טכנולוגיה',
+                      },
+                      {
+                        type: 'wordle_guess',
+                        trend_topic: 'ספורט',
+                        prompt: 'פעילות גופנית (5 letters)',
+                        answer: 'ספורט',
+                        hint: 'משחקים במגרש',
+                        difficulty: 'medium',
+                        trending_context: 'אירועי ספורט',
+                      },
+                      {
+                        type: 'anagram',
+                        trend_topic: 'רקורד',
+                        prompt: 'פתרו: דרוקר',
+                        answer: 'רקורד',
+                        hint: 'הישג',
+                        difficulty: 'easy',
+                        trending_context: 'רקורד חדש',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'אומנות',
+                        prompt: 'אני בלי מילים אבל מספרת סיפור',
+                        answer: 'אומנות',
+                        hint: 'יצירה',
+                        difficulty: 'medium',
+                        trending_context: 'אומנות בחדשות',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
     const today = new Date();
     const language = 'he';
 
@@ -195,6 +284,95 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // Mock both cache and SERP API to return empty
     (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
     (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([]);
+
+    // First mock: Content moderation response (approves all trends)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify([
+                    { index: 1, approved: true, category: 'approved' },
+                    { index: 2, approved: true, category: 'approved' },
+                    { index: 3, approved: true, category: 'approved' },
+                  ]),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Second mock: Hebrew challenges using fallback topics
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-13',
+                    language: 'he',
+                    trending_summary: 'נושאים כלליים: טכנולוגיה, טבע, מוסיקה',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'טכנולוגיה',
+                        prompt: 'פתרו: הגולוכנט',
+                        answer: 'טכנולוגיה',
+                        hint: 'חדשנות',
+                        difficulty: 'easy',
+                        trending_context: 'טכנולוגיה כללית',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'ספורט',
+                        prompt: 'השלימו: ספ_ _ _',
+                        answer: 'ספורט',
+                        hint: 'פעילות',
+                        difficulty: 'easy',
+                        trending_context: 'ספורט כללי',
+                      },
+                      {
+                        type: 'wordle_guess',
+                        trend_topic: 'ריצה',
+                        prompt: 'פעילות מהירה (5 letters)',
+                        answer: 'ריצה',
+                        hint: 'ספורט מהיר',
+                        difficulty: 'medium',
+                        trending_context: 'פעילות גופנית',
+                      },
+                      {
+                        type: 'anagram',
+                        trend_topic: 'משחק',
+                        prompt: 'פתרו: קחשמ',
+                        answer: 'משחק',
+                        hint: 'בידור',
+                        difficulty: 'easy',
+                        trending_context: 'משחקים',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'פעילות',
+                        prompt: 'אני דורש תנועה ומאמץ',
+                        answer: 'פעילות',
+                        hint: 'עשייה',
+                        difficulty: 'medium',
+                        trending_context: 'פעילויות',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
 
     const today = new Date();
     const language = 'he';
@@ -212,7 +390,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // Verify fallback topics were used (check for generic topics)
     const topicQueries = result.trending_topics.map(t => t.query.toLowerCase());
     const hasGenericTopics = topicQueries.some(q =>
-      ['technology', 'nature', 'music', 'science', 'travel'].includes(q)
+      ['technology', 'nature', 'music', 'science', 'travel', 'טכנולוגיה', 'טבע', 'מוסיקה'].includes(q)
     );
     expect(hasGenericTopics).toBe(true);
   });
@@ -256,9 +434,9 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'מה משחקים בו במגרש (4 letters)',
-                        answer: 'כדור',
-                        hint: 'פעילות גופנית',
+                        prompt: 'פעילות גופנית (5 letters)',
+                        answer: 'ספורט',
+                        hint: 'משחקים במגרש',
                         difficulty: 'medium',
                         trending_context: 'אירועי ספורט',
                       },
@@ -327,9 +505,9 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     {
       "type": "wordle_guess",
       "trend_topic": "ספורט",
-      "prompt": "מה משחקים בו במגרש (4 letters)",
-      "answer": "כדור",
-      "hint": "פעילות גופנית",
+      "prompt": "פעילות גופנית (5 letters)",
+      "answer": "ספורט",
+      "hint": "משחקים במגרש",
       "difficulty": "medium",
       "trending_context": "אירועי ספורט"
     },
@@ -1206,8 +1384,8 @@ describe('Japanese 2-letter word validation', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: '花火大会',
-                        prompt: '夏の風物詩 (4文字)',
-                        answer: 'はなび', // 4-letter hiragana (fireworks)
+                        prompt: '夏の楽しみ (5文字)',
+                        answer: 'まつりば', // 5-letter hiragana (festival place)
                         hint: '夜空に咲く',
                         difficulty: 'medium',
                         trending_context: '夏の楽しみ',
@@ -1255,7 +1433,7 @@ describe('Japanese 2-letter word validation', () => {
     const answers = result.challenges.map(c => c.answer);
     expect(answers).toContain('ゆれ'); // 2-letter hiragana
     expect(answers).toContain('首都'); // 2-letter kanji (replaced 東京 to avoid spoiler)
-    expect(answers).toContain('はなび'); // 4-letter hiragana wordle answer
+    expect(answers).toContain('まつりば'); // 5-letter hiragana wordle answer
     expect(answers).toContain('じしん'); // 3-letter hiragana (replaced 地震 to avoid spoiler)
   });
 
