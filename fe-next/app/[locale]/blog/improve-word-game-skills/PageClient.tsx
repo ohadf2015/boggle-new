@@ -84,7 +84,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
             isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
           )}>
             <p className={cn('text-lg font-medium mb-0', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              Whether you're a casual player or a competitive word game enthusiast, there's always room to improve.
+              Whether you&apos;re a casual player or a competitive word game enthusiast, there&apos;s always room to improve.
               This guide shares battle-tested strategies that top players use to dominate word games like LexiClash.
             </p>
           </div>
@@ -94,17 +94,17 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               1. Build Your Foundation: Vocabulary Expansion
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              The most obvious—yet often neglected—aspect of word games is vocabulary. You can't find words you don't know exist.
-              Here's how to systematically expand your word arsenal:
+              The most obvious—yet often neglected—aspect of word games is vocabulary. You can&apos;t find words you don&apos;t know exist.
+              Here&apos;s how to systematically expand your word arsenal:
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              <li><strong>Read actively:</strong> Don't just read for content. When you encounter unfamiliar words, write them down.
+              <li><strong>Read actively:</strong> Don&apos;t just read for content. When you encounter unfamiliar words, write them down.
               Keep a running list on your phone and review it weekly.</li>
               <li><strong>Learn word roots:</strong> Understanding Latin and Greek roots helps you decode unfamiliar words.
-              For example, knowing that "bene" means "good" helps you recognize words like benevolent, benefactor, and benediction.</li>
-              <li><strong>Focus on 2-letter and 3-letter words:</strong> These short words are game-changers. Words like "qi," "xu," "jo,"
-              and "aa" might seem odd, but they're valid and incredibly useful when you're stuck with difficult letters.</li>
-              <li><strong>Study word lists strategically:</strong> Don't try to memorize everything. Start with high-value categories like
+              For example, knowing that &quot;bene&quot; means &quot;good&quot; helps you recognize words like benevolent, benefactor, and benediction.</li>
+              <li><strong>Focus on 2-letter and 3-letter words:</strong> These short words are game-changers. Words like &quot;qi,&quot; &quot;xu,&quot; &quot;jo,&quot;
+              and &quot;aa&quot; might seem odd, but they&apos;re valid and incredibly useful when you&apos;re stuck with difficult letters.</li>
+              <li><strong>Study word lists strategically:</strong> Don&apos;t try to memorize everything. Start with high-value categories like
               Q-without-U words, words with rare letters (Z, X, J), and common word endings (-tion, -ing, -ed).</li>
             </ul>
           </section>
@@ -114,7 +114,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               2. Master Pattern Recognition
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              Expert players don't see random letters—they see patterns. This skill transforms you from a beginner to an advanced player.
+              Expert players don&apos;t see random letters—they see patterns. This skill transforms you from a beginner to an advanced player.
             </p>
 
             <h3 className={cn('text-xl font-bold mb-3', isDarkMode ? 'text-white' : 'text-neo-black')}>
@@ -164,14 +164,14 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               3. Develop a Strategic Mindset
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              Word games aren't just about vocabulary—they're about strategy. Here are tactics that separate good players from great ones:
+              Word games aren&apos;t just about vocabulary—they&apos;re about strategy. Here are tactics that separate good players from great ones:
             </p>
 
             <h3 className={cn('text-xl font-bold mb-3', isDarkMode ? 'text-white' : 'text-neo-black')}>
               Think Several Moves Ahead
             </h3>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              Don't just look for the best word right now. Consider how your move affects future turns.
+              Don&apos;t just look for the best word right now. Consider how your move affects future turns.
               Sometimes playing a medium-scoring word that sets you up perfectly for the next round is smarter than
               going for maximum points immediately.
             </p>
@@ -195,9 +195,9 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               In timed games, speed matters. Practice these techniques:
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              <li>Don't overthink obvious words. If you see a decent word, play it and keep moving.</li>
+              <li>Don&apos;t overthink obvious words. If you see a decent word, play it and keep moving.</li>
               <li>Save your thinking time for difficult situations, not every single turn.</li>
-              <li>Set a mental timer for each turn (e.g., "I'll spend max 15 seconds finding a word").</li>
+              <li>Set a mental timer for each turn (e.g., &quot;I&apos;ll spend max 15 seconds finding a word&quot;).</li>
             </ul>
           </section>
 
@@ -206,7 +206,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               4. Practice Deliberately
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              Random practice helps, but deliberate practice transforms your game. Here's how to make every session count:
+              Random practice helps, but deliberate practice transforms your game. Here&apos;s how to make every session count:
             </p>
 
             <div className={cn(
@@ -215,7 +215,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
             )}>
               <h4 className={cn('font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>Daily Challenges</h4>
               <p className={cn('text-sm mb-2', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-                LexiClash's daily challenges are perfect for deliberate practice because everyone gets the same puzzle.
+                LexiClash&apos;s daily challenges are perfect for deliberate practice because everyone gets the same puzzle.
                 After completing it, compare your score with top players to see where you missed words.
               </p>
             </div>
@@ -228,7 +228,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               <li>Which words did I miss that I should have known?</li>
-              <li>Were there patterns I didn't recognize?</li>
+              <li>Were there patterns I didn&apos;t recognize?</li>
               <li>Did I make strategic mistakes (not just vocabulary gaps)?</li>
               <li>How could I have used my time better?</li>
             </ul>
@@ -255,9 +255,9 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               <li><strong>Watch competitive games:</strong> Observe how top players approach different situations.</li>
-              <li><strong>Join communities:</strong> Discuss strategies with other enthusiasts. You'll learn tricks you'd never discover alone.</li>
-              <li><strong>Play against stronger opponents:</strong> You'll lose more, but you'll learn faster.</li>
-              <li><strong>Ask questions:</strong> Most expert players enjoy sharing knowledge. Don't be shy about asking how they found a particular word.</li>
+              <li><strong>Join communities:</strong> Discuss strategies with other enthusiasts. You&apos;ll learn tricks you&apos;d never discover alone.</li>
+              <li><strong>Play against stronger opponents:</strong> You&apos;ll lose more, but you&apos;ll learn faster.</li>
+              <li><strong>Ask questions:</strong> Most expert players enjoy sharing knowledge. Don&apos;t be shy about asking how they found a particular word.</li>
             </ul>
           </section>
 
@@ -269,10 +269,10 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               Your mental state dramatically affects performance. Follow these tips for peak gameplay:
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              <li><strong>Play when you're fresh:</strong> Your first game of the day is usually your best. Don't grind when you're exhausted.</li>
+              <li><strong>Play when you&apos;re fresh:</strong> Your first game of the day is usually your best. Don&apos;t grind when you&apos;re exhausted.</li>
               <li><strong>Take breaks:</strong> After intense sessions, step away. Your brain needs recovery time to consolidate learning.</li>
               <li><strong>Stay hydrated:</strong> Sounds obvious, but dehydration kills cognitive performance.</li>
-              <li><strong>Don't tilt:</strong> After a bad loss, take a breather instead of immediately queuing another game. Frustration clouds judgment.</li>
+              <li><strong>Don&apos;t tilt:</strong> After a bad loss, take a breather instead of immediately queuing another game. Frustration clouds judgment.</li>
             </ul>
           </section>
 
@@ -284,7 +284,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
               Your Action Plan
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              Improvement doesn't happen overnight, but it does happen with consistent effort. Here's your roadmap:
+              Improvement doesn&apos;t happen overnight, but it does happen with consistent effort. Here&apos;s your roadmap:
             </p>
             <ol className={cn('space-y-3', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               <li><strong>Week 1-2:</strong> Learn 10 new 2-3 letter words daily. Master the fundamentals.</li>

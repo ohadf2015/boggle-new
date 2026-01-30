@@ -213,6 +213,58 @@ export default function sitemap() {
     });
   });
 
+  // Blog pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+
+    // Blog index
+    routes.push({
+      url: `${baseUrl}${localePath}/blog`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/blog`,
+          he: `${baseUrl}/he/blog`,
+          en: `${baseUrl}/en/blog`,
+          sv: `${baseUrl}/sv/blog`,
+          ja: `${baseUrl}/ja/blog`,
+          es: `${baseUrl}/es/blog`,
+        },
+      },
+    });
+
+    // Individual blog articles
+    routes.push({
+      url: `${baseUrl}${localePath}/blog/improve-word-game-skills`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    });
+  });
+
+  // FAQ pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/faq`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/faq`,
+          he: `${baseUrl}/he/faq`,
+          en: `${baseUrl}/en/faq`,
+          sv: `${baseUrl}/sv/faq`,
+          ja: `${baseUrl}/ja/faq`,
+          es: `${baseUrl}/es/faq`,
+        },
+      },
+    });
+  });
+
   // Legal pages for all locales
   locales.forEach((locale) => {
     // Always use explicit locale path

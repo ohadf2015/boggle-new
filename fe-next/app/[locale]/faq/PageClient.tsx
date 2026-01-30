@@ -216,7 +216,7 @@ export default function FAQPageClient(): React.ReactElement {
             Still have questions?
           </h3>
           <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-            We're here to help! Reach out to us anytime.
+            We&apos;re here to help! Reach out to us anytime.
           </p>
           <Link href={`/${locale}/contact`}>
             <Button className="rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
