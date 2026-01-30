@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Bomb, Link2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType, TileActivationEffect } from '@/types/adventure';
@@ -522,6 +522,7 @@ const AdventureGrid = memo(
             disabled && 'adventure-grid-disabled opacity-60 pointer-events-none'
           )}
         >
+          <AnimatePresence mode="popLayout">
           {tiles.map((tile, index) => {
             const isSelected = selectedSet.has(index);
             const isHintHighlighted = hintSet.has(index);
@@ -540,6 +541,7 @@ const AdventureGrid = memo(
             return (
               <motion.div
                 key={tile.id}
+                layoutId={tile.id}
                 data-row={tile.row}
                 data-col={tile.col}
                 role="gridcell"
@@ -908,6 +910,7 @@ const AdventureGrid = memo(
               </motion.div>
             );
           })}
+          </AnimatePresence>
 
           {/* Word Path Trail - z-20 to render above tiles (which have z-10 when selected) */}
           {pathPoints && pathPoints.length >= 2 && (
