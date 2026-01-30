@@ -24,8 +24,11 @@ import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { ScorePopupFly } from '@/components/animations';
-import { ComboTierBadge } from '@/components/animations/ComboTierBadge';
+import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
+import { AdaptiveParticles } from './juice/AdaptiveParticles';
+import { LevelUpCelebration, type LevelUpPayload } from '@/components/education/LevelUpCelebration';
+import { calculateAdventureXp } from '@/backend/utils/adventureXpUtils';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
 import AdventureTimer from './AdventureTimer';
@@ -805,6 +808,10 @@ const AdventureGame = memo<AdventureGameProps>(
       origin: { x: number; y: number };
     } | null>(null);
 
+    // Task 3: Level-up modal state
+    const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
+    const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
+
     // Handle combo tier changes - trigger screen shake and particles
     const handleComboTierChange = useCallback((tier: ComboTier) => {
       // Map combo tier thresholds to shake intensity (pixels)
@@ -905,6 +912,7 @@ const AdventureGame = memo<AdventureGameProps>(
             <ComboTierBadge
               comboCount={gameState.comboCount}
               className="absolute top-[10%] left-1/2 -translate-x-1/2 z-50"
+              onTierChange={handleComboTierChange}
             />
 
             {/* Minimum Word Length Hint - Shows when selecting but not yet meeting minimum */}
@@ -1195,6 +1203,16 @@ const AdventureGame = memo<AdventureGameProps>(
             position={chainBurstConfig.position}
             world={levelConfig.world}
             onComplete={() => setChainBurstConfig(null)}
+          />
+        )}
+
+        {/* Adaptive Particles for combo tier changes */}
+        {particleConfig && (
+          <AdaptiveParticles
+            type="combo"
+            intensity={particleConfig.intensity}
+            origin={particleConfig.origin}
+            onComplete={() => setParticleConfig(null)}
           />
         )}
       </div>

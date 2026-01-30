@@ -95,6 +95,10 @@ const mockLevelConfig: LevelConfig = {
   objectives: [
     { type: 'scoreTarget', target: 500 },
   ],
+  specialTiles: [],
+  difficulty: 'EASY',
+  chapterNumber: 1,
+  levelInChapter: 1,
   minWordLength: 2,
   isBossLevel: false,
 };
