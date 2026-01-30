@@ -107,9 +107,9 @@ describe('supabaseRealtimeNotifications', () => {
       logSpy.mockRestore();
     });
 
-    it('should handle mismatch error with warning instead of error', () => {
+    it('should handle mismatch error with log instead of error', () => {
       // GIVEN: A subscription with error callback
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
       const errorSpy = jest.spyOn(console, 'error').mockImplementation();
       const onError = jest.fn();
 
@@ -119,12 +119,12 @@ describe('supabaseRealtimeNotifications', () => {
       const mismatchError = new Error('mismatch between server and client bindings');
       subscribeCallback?.('CHANNEL_ERROR', mismatchError);
 
-      // THEN: Should warn (not error) and call error callback
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('configuration mismatch'));
+      // THEN: Should log (not error) and call error callback
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Realtime subscription unavailable'));
       expect(errorSpy).not.toHaveBeenCalled();
       expect(onError).toHaveBeenCalledWith('mismatch between server and client bindings');
 
-      warnSpy.mockRestore();
+      logSpy.mockRestore();
       errorSpy.mockRestore();
     });
 

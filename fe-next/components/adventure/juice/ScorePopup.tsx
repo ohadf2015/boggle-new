@@ -76,6 +76,7 @@ export function ScorePopup({
     return (
       <motion.div
         className="fixed z-50 pointer-events-none"
+        data-testid="score-popup-fly"
         style={{
           left: position.x,
           top: position.y,
@@ -102,6 +103,7 @@ export function ScorePopup({
   return (
     <motion.div
       className="fixed z-50 pointer-events-none"
+      data-testid="score-popup-fly"
       style={{
         left: position.x,
         top: position.y,

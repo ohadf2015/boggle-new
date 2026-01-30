@@ -154,7 +154,7 @@ describe('Scoring Engine', () => {
 describe('Scoring Edge Cases', () => {
 
   test('empty string word', () => {
-    expect(calculateWordScore('')).toBe(-1);
+    expect(calculateWordScore('')).toBe(0);
   });
 
   test('very long word', () => {

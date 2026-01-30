@@ -121,7 +121,7 @@ export function calculateWordScore(
   fireRoundMultiplier: number = 1
 ): number {
   const length = word.length;
-  if (length === 1) return 0; // Single letters not allowed
+  if (length < 2) return 0; // Empty strings and single letters not allowed
 
   const baseScore = length - 1; // Each letter beyond the first gets 1 point
   const bonus = getComboBonus(comboLevel, length);

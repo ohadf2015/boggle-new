@@ -148,6 +148,7 @@ export function ScorePopupFly({
         <motion.div
           key={popup.id}
           className={cn('fixed pointer-events-none z-[150]', className)}
+          data-testid="score-popup-fly"
           style={{ left: popup.x, top: popup.y }}
           initial={{
             x: '-50%',

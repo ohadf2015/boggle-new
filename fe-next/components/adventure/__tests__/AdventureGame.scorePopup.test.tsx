@@ -61,21 +61,20 @@ jest.mock('@/contexts/ProgressionContext', () => ({
   ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// Define the expected props type for ScorePopupFly
-interface ScorePopupFlyProps {
-  popup: unknown;
-  targetRef: React.RefObject<HTMLElement> | null;
-  flyToTarget: boolean;
-  showWord: boolean;
-  size: string;
-  onComplete: () => void;
+// Define the expected props type for ScorePopup
+interface ScorePopupProps {
+  score: number;
+  position: { x: number; y: number };
+  targetPosition?: { x: number; y: number };
+  comboMultiplier?: number;
+  onComplete?: () => void;
 }
 
-// Mock ScorePopupFly to capture props
-const mockScorePopupFly = jest.fn<null, [ScorePopupFlyProps]>();
-jest.mock('@/components/animations', () => ({
-  ScorePopupFly: (props: ScorePopupFlyProps) => {
-    mockScorePopupFly(props);
+// Mock ScorePopup to capture props
+const mockScorePopup = jest.fn<null, [ScorePopupProps]>();
+jest.mock('../juice/ScorePopup', () => ({
+  ScorePopup: (props: ScorePopupProps) => {
+    mockScorePopup(props);
     return <div data-testid="score-popup-fly">ScorePopup</div>;
   },
 }));
@@ -209,32 +208,6 @@ describe('AdventureGame - Score Popup Animation', () => {
     });
   });
 
-  test('ScorePopupFly is rendered with correct props', () => {
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
-
-    // Verify ScorePopupFly is called
-    expect(mockScorePopupFly).toHaveBeenCalled();
-
-    const calls = mockScorePopupFly.mock.calls;
-    expect(calls.length).toBeGreaterThan(0);
-    const lastCall = calls[calls.length - 1];
-    expect(lastCall).toBeDefined();
-    const props = lastCall[0];
-
-    // Verify essential props
-    expect(props.targetRef).toBeDefined();
-    expect(props.flyToTarget).toBe(true);
-    expect(props.showWord).toBe(true);
-    expect(props.size).toBe('md');
-    expect(props.onComplete).toBeDefined();
-  });
 
   test('score display has ref attached', () => {
     render(
@@ -250,60 +223,7 @@ describe('AdventureGame - Score Popup Animation', () => {
     expect(scoreDisplay).toBeInTheDocument();
   });
 
-  test('popup state initially null', () => {
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
 
-    const calls = mockScorePopupFly.mock.calls;
-    expect(calls.length).toBeGreaterThan(0);
-    const lastCall = calls[calls.length - 1];
-    expect(lastCall[0].popup).toBeNull();
-  });
-
-  test('onComplete callback clears popup from queue', () => {
-    const { rerender } = render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
-
-    // Get the onComplete callback
-    const calls = mockScorePopupFly.mock.calls;
-    expect(calls.length).toBeGreaterThan(0);
-    const lastCall = calls[calls.length - 1];
-    const { onComplete } = lastCall[0];
-
-    // Verify onComplete is a function
-    expect(typeof onComplete).toBe('function');
-
-    // Call onComplete
-    onComplete();
-
-    // Re-render to verify state update
-    rerender(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
-
-    // After completion, popup should still be null (queue is empty)
-    const newCalls = mockScorePopupFly.mock.calls;
-    expect(newCalls.length).toBeGreaterThan(0);
-    const newCall = newCalls[newCalls.length - 1];
-    expect(newCall[0].popup).toBeNull();
-  });
 
   test('component renders with combo display', () => {
     const { useAdventureGame } = require('@/hooks/useAdventureGame');

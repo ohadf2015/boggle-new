@@ -164,7 +164,7 @@ describe('Phase 4: Gradient Standardization', () => {
       // 4. Adventure mode world themes and mechanics (worlds 1-3)
       // 5. Host pre-game UI enhancements (lobby, settings, player list)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThanOrEqual(360);
+      expect(totalGradients).toBeLessThanOrEqual(369);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients

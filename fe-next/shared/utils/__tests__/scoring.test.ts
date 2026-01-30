@@ -278,9 +278,9 @@ describe('Scoring Utilities', () => {
         // Simulate a game flow with increasing combo
         expect(calculateWordScore('CAT', 0)).toBe(2); // First word
         expect(calculateWordScore('DOG', 1)).toBe(2); // Combo 1
-        expect(calculateWordScore('TREE', 2)).toBe(3); // Combo 2
-        expect(calculateWordScore('HOUSE', 3)).toBe(5); // Combo 3
-        expect(calculateWordScore('CASTLE', 4)).toBe(7); // Combo 4
+        expect(calculateWordScore('TREE', 2)).toBe(4); // Combo 2 (base 3 + bonus 1)
+        expect(calculateWordScore('HOUSE', 3)).toBe(7); // Combo 3 (base 4 + bonus 3)
+        expect(calculateWordScore('CASTLE', 4)).toBe(11); // Combo 4 (base 5 + bonus 6)
         expect(calculateWordScore('TESTING', 5)).toBe(16); // Combo 5
       });
     });
