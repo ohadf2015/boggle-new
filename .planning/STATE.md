@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 28 - Power-Up System
-Plan: 2 of 7 (Power-Up Effect Functions COMPLETE)
+Plan: 4 of 6 (PowerUpBar & Inventory COMPLETE)
 Status: Phase 28 In Progress
-Last activity: 2026-01-30 — Completed 28-02-PLAN.md (Power-Up Effect Functions)
+Last activity: 2026-01-30 — Completed 28-04-PLAN.md (PowerUpBar Container & Inventory Persistence)
 
-Progress: [███████████░] 89% (17/19 v2.0 plans complete: Phase 26: 9/9, Phase 27: 6/6, Phase 28: 2/7)
+Progress: [████████████░] 91% (15/16 v2.0 plans complete: Phase 26: 9/9, Phase 27: 7/7, Phase 28: 4/6)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -35,10 +35,12 @@ Progress: [███████████░] 89% (17/19 v2.0 plans complete:
 2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) ✅ COMPLETE
    - Candy Crush cascades, tile movement, explosions, special tiles
 
-3. **Phase 28: Power-Up System** (7 reqs: POWER) 🔄 IN PROGRESS (2/7 plans)
+3. **Phase 28: Power-Up System** (7 reqs: POWER) 🔄 IN PROGRESS (4/6 plans)
    - Freeze Time, Hint, Score Multiplier with cooldowns and balance
    - ✅ 28-01: Power-Up Type Definitions and State Machine
    - ✅ 28-02: Power-Up Effect Functions (TDD)
+   - ✅ 28-03: Power-Up UI Components (PowerUpButton + PowerUpActivationEffect)
+   - ✅ 28-04: PowerUpBar Container & Inventory Persistence
 
 4. **Phase 29: Adaptive Difficulty System** (5 reqs: DIFF)
    - Pre-game difficulty selection, invisible adjustments, gradual hints
@@ -74,6 +76,24 @@ Progress: [███████████░] 89% (17/19 v2.0 plans complete:
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 28-04 (PowerUpBar Container & Inventory Persistence, 2026-01-30):**
+- Timestamp-based cooldown persistence: Store Date.now() in localStorage (not remaining seconds) for drift-free accuracy across tab switches/sleep
+- resetCooldowns() for level transitions: Research recommendation for better UX - players start fresh each level without waiting
+- All power-ups unlocked by default in v2.0: Focus on core gameplay, unlock gating deferred to future phase for progressive enhancement
+- PowerUpBar fixed bottom-center: Above word input, below HUD overlays - persistent UI element with clear visual hierarchy
+- Icons for instant recognition: snowflake (❄️) freeze, lightbulb (💡) hint, star (⭐) multiplier - universally understood symbols
+- Cascade blocking toast feedback: "Wait for cascade to complete" message maintains UX flow when power-ups temporarily disabled
+- localStorage key 'power-up-inventory': Dedicated key separate from game state for clean separation of concerns
+- Container component pattern: PowerUpBar orchestrates 3 usePowerUpState hooks and integrates with usePowerUpEffects for clean architecture
+
+**Phase 28-03 (Power-Up UI Components, 2026-01-30):**
+- PowerUpButton neo-brutalist styling: bg-neo-purple, border-3, shadow-hard matches established design system
+- CooldownIndicator integration: Radial progress display with icon shows remaining time visually (no text clutter)
+- PowerUpActivationEffect 0.25s burst: Shake intensity 4 + particles intensity 2 balances impact feel with performance
+- Color schemes per power-up: cyan/blue (freeze), yellow/gold (hint), purple/pink (multiplier) for instant recognition
+- Zero animation for reduced motion: WCAG 2.1 compliant, respects prefers-reduced-motion for accessibility
+- 28 tests total: 17 PowerUpButton + 11 PowerUpActivationEffect verify behavior, not implementation details
 
 **Phase 28-02 (Power-Up Effect Functions, 2026-01-30):**
 - DFS word-finding algorithm: 8-way adjacency search with backtracking finds all valid words on board for hint system
@@ -225,10 +245,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 28-02-PLAN.md (Power-Up Effect Functions)
+Stopped at: Completed 28-04-PLAN.md (PowerUpBar Container & Inventory Persistence)
 Resume file: None
 
-**Next action:** Continue Phase 28 (Plan 28-03: Power-Up UI Components, or Plan 28-04: Integration)
+**Next action:** Continue Phase 28 - Plans 28-05 (HUD Integration) and 28-06 (Balance Tuning) remaining
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
