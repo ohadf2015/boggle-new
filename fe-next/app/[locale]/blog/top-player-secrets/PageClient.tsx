@@ -147,7 +147,7 @@ export default function SecretsPageClient(): React.ReactElement {
             <p className={cn('text-lg font-medium mb-0', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               Ever wonder why some players consistently dominate leaderboards while you&apos;re stuck in the middle? It&apos;s
               not just practice hours or vocabulary size. Top players use specific psychological techniques and training
-              methods that most casual players never discover. These aren&apos;t the obvious "practice more" tips—these are
+              methods that most casual players never discover. These aren&apos;t the obvious &ldquo;practice more&rdquo; tips—these are
               the insider secrets that separate good from exceptional.
             </p>
           </div>
@@ -313,11 +313,11 @@ export default function SecretsPageClient(): React.ReactElement {
 
           <section className="mb-8">
             <h2 className={cn('text-2xl font-bold mb-4', isDarkMode ? 'text-white' : 'text-neo-black')}>
-              The Uncomfortable Truth About "Natural Talent"
+              The Uncomfortable Truth About &quot;Natural Talent&quot;
             </h2>
             <p className={cn('mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              After interviewing 50+ top-ranked players, a pattern emerged: none of them believed they had "natural
-              talent" for word games. What they had was:
+              After interviewing 50+ top-ranked players, a pattern emerged: none of them believed they had &quot;natural
+              talent&quot; for word games. What they had was:
             </p>
             <ul className={cn('space-y-2 mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
               <li><strong>Systematic practice methods</strong> instead of random play</li>
