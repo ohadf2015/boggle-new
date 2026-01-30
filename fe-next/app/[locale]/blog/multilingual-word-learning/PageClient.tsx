@@ -197,7 +197,7 @@ export default function MultilingualPageClient(): React.ReactElement {
                 isDarkMode ? 'bg-slate-700' : 'bg-neo-yellow/10'
               )}>
                 <p className={cn('font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  Example: Root כ-ת-ב (K-T-B) = "write"
+                  Example: Root כ-ת-ב (K-T-B) = &quot;write&quot;
                 </p>
                 <ul className={cn('text-sm space-y-1', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                   <li>כָּתַב (katav) = wrote</li>
@@ -228,7 +228,7 @@ export default function MultilingualPageClient(): React.ReactElement {
                 isDarkMode ? 'bg-slate-700' : 'bg-neo-lime/10'
               )}>
                 <p className={cn('font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  Example: Base word "happy"
+                  Example: Base word &quot;happy&quot;
                 </p>
                 <ul className={cn('text-sm space-y-1', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                   <li>unhappy (prefix: un-)</li>
