@@ -1,62 +1,117 @@
-# Requirements: LexiClash v1.1
+# Requirements: LexiClash v2.0
 
-**Defined:** 2026-01-25
+**Defined:** 2026-01-30
 **Core Value:** Adventure mode must feel immersive and connected to its themed worlds
 
-## v1.1 Requirements
+## v2.0 Requirements
 
-Requirements for Adventure & Education Expansion milestone. Each maps to roadmap phases.
+Requirements for Adventure Overhaul milestone. Each maps to roadmap phases.
 
-### Boss Battles
+### Meta-Progression Foundation
 
-- [ ] **BOSS-01**: User can battle end-of-world bosses with phase transitions (intro → phase1 → phase2 → enraged → victory/defeat)
-- [ ] **BOSS-02**: User sees boss HP bar with phase indicators during battle
-- [ ] **BOSS-03**: Boss mechanic popQuiz — random word requirements each turn
-- [ ] **BOSS-04**: Boss mechanic hiveMind — sticky tiles that persist between turns
-- [ ] **BOSS-05**: Boss mechanic synonymShift — bonus damage for synonym pairs
-- [ ] **BOSS-06**: Boss mechanic idiomIslands — complete idiom phrases for bonus
-- [ ] **BOSS-07**: Boss mechanic compoundMerge — merge compound words for combo
-- [ ] **BOSS-08**: Boss mechanic anagramScramble — solve anagrams for critical hits
-- [ ] **BOSS-09**: Boss mechanic palindromeMirror — palindrome words deal double damage
-- [ ] **BOSS-10**: Boss mechanic neologismNebula — rare words grant power-ups
-- [ ] **BOSS-11**: Boss mechanic polyglotPeaks — multilingual hints for bonus
-- [ ] **BOSS-12**: Boss mechanic allMechanics — final boss combining all mechanics
-- [ ] **BOSS-13**: Boss difficulty adapts based on player's average performance (80% completion target)
+- [ ] **META-01**: User earns XP from adventure level completion
+- [ ] **META-02**: User sees XP progress bar toward next level
+- [ ] **META-03**: User levels up based on XP accumulation
+- [ ] **META-04**: User earns gold currency from level completion
+- [ ] **META-05**: User can spend gold on permanent stat upgrades (+10% time, +5% score)
+- [ ] **META-06**: User sees persistent player level across all worlds
 
-### Chain Combos
+### Game Juice & Visual Feedback
 
-- [ ] **COMBO-01**: User can link chain tiles for 1.5x combo multiplier
-- [ ] **COMBO-02**: User sees combo meter with tiered visual feedback (Nice! → Great! → Amazing! → LEGENDARY!)
-- [ ] **COMBO-03**: User sees themed particle effects on combo completion
-- [ ] **COMBO-04**: User sees letter cascade animations during chain reactions
-- [ ] **COMBO-05**: Combo scoring integrates with existing scoring engine
+- [ ] **JUICE-01**: User sees screen shake (0.1-0.3s, 2-8px intensity) on combo completion
+- [ ] **JUICE-02**: User sees particle effects with adaptive budget (50-100 particles max)
+- [ ] **JUICE-03**: User sees combo scaling animations (Nice! → Great! → Amazing! → LEGENDARY!)
+- [ ] **JUICE-04**: User sees score popup animations with arc trajectory to counter
+- [ ] **JUICE-05**: Animations respect reduced-motion preference (accessibility)
 
-### Education Gamification
+### UI Framework
 
-- [x] **GAMIFY-01**: Student earns XP from practice activities (flashcards, solo board, lesson completion)
-- [x] **GAMIFY-02**: Student sees XP progress bar toward next level
-- [x] **GAMIFY-03**: Student levels up based on XP accumulation
-- [x] **GAMIFY-04**: Student sees classroom leaderboard (top students by XP, classroom-scoped)
-- [x] **GAMIFY-05**: Student can earn 15-20 meaningful achievements (Bronze/Silver/Gold/Platinum tiers)
-- [x] **GAMIFY-06**: Student sees achievement unlock modal when earning badge
-- [x] **GAMIFY-07**: Student can view earned achievement badges in profile
-- [x] **GAMIFY-08**: Student earns streak bonuses for consecutive practice days
+- [ ] **UI-01**: User sees HUD with clear visual hierarchy (timer, score, objectives)
+- [ ] **UI-02**: User sees determinate progress bars for objectives
+- [ ] **UI-03**: User sees floating score animations during gameplay
+- [ ] **UI-04**: User sees clear focus on board during gameplay (streamlined interface)
+- [ ] **UI-05**: User sees cooldown visualization (radial progress) for power-ups
 
-### Student Analytics
+### Dynamic Board Mechanics
 
-- [x] **ANALYTICS-01**: Teacher can view analytics dashboard with student progress
-- [x] **ANALYTICS-02**: Teacher can see individual student progress metrics
-- [x] **ANALYTICS-03**: Teacher can view lesson effectiveness charts
-- [x] **ANALYTICS-04**: Teacher can see vocabulary mastery heatmap by student
-- [x] **ANALYTICS-05**: Teacher sees real-time progress updates during class sessions
+- [ ] **BOARD-01**: User sees tiles cascade (Candy Crush pattern: collapse → fall → refill, 0.25s per step)
+- [ ] **BOARD-02**: User sees smooth tile movement (quadratic/elastic easing)
+- [ ] **BOARD-03**: User sees explosion effects for multi-tile clearing
+- [ ] **BOARD-04**: User sees special tile types (frozen, locked, multiplier)
+- [ ] **BOARD-05**: Cascades trigger automatically when words removed
+- [ ] **BOARD-06**: Board transformations animate at 60fps on mobile (iPhone 12 baseline)
 
-### Lesson Delivery
+### Power-Up System
 
-- [ ] **LESSON-01**: Student sees rich vocabulary explanations (definitions, pronunciation, usage)
-- [ ] **LESSON-02**: Student sees contextual examples from Daily Buzz trending content
-- [ ] **LESSON-03**: Student can practice with swipe-based flashcard review
+- [ ] **POWER-01**: User can activate "Freeze Time" power-up (extends timer by 10s)
+- [ ] **POWER-02**: User can activate "Hint" power-up (reveals valid word on board)
+- [ ] **POWER-03**: User can activate "Score Multiplier" power-up (2x score for 30s)
+- [ ] **POWER-04**: User sees power-up cooldown timers (60s between uses)
+- [ ] **POWER-05**: User sees activation animations (0.25s burst effect)
+- [ ] **POWER-06**: Power-ups inventory persists across levels
+- [ ] **POWER-07**: Every level is beatable without power-ups (skill-based balance)
 
-### World Theming (Worlds 4-5)
+### Adaptive Difficulty
+
+- [ ] **DIFF-01**: User can select explicit difficulty (Easy/Medium/Hard)
+- [ ] **DIFF-02**: System selects pre-game difficulty based on performance (3-state: easy/normal/hard)
+- [ ] **DIFF-03**: System provides gradual unlock hints after 3 failures
+- [ ] **DIFF-04**: Difficulty adjustments are invisible to user (no rubber-banding perception)
+- [ ] **DIFF-05**: Boss fights have fixed difficulty (learnable patterns)
+
+### Boss Battle Overhaul
+
+- [ ] **BOSS-01**: User battles bosses with 5-phase state machine (intro → phase1 → phase2 → enraged → victory/defeat)
+- [ ] **BOSS-02**: User sees segmented HP bar with phase indicators
+- [ ] **BOSS-03**: User sees telegraphed boss attacks (2s visual warning before activation)
+- [ ] **BOSS-04**: User sees 5-10s cinematic intro (skippable after 2s)
+- [ ] **BOSS-05**: Bosses have 2-3 unique abilities per boss
+- [ ] **BOSS-06**: Boss abilities registered in extensible ability system
+- [ ] **BOSS-07**: Boss entrance and defeat have cinematic sequences
+- [ ] **BOSS-08**: User sees unique graphics per boss (Image MCP + rembg pipeline)
+
+### Skill Tree & Progression Depth
+
+- [ ] **SKILL-01**: User can unlock skills in branching tree (3 paths: Power, Strategy, Utility)
+- [ ] **SKILL-02**: User earns skill points on level up
+- [ ] **SKILL-03**: User sees skill tree visualization with locked/unlocked states
+- [ ] **SKILL-04**: Skills provide horizontal progression (enable strategies, not just +10% stats)
+- [ ] **SKILL-05**: User unlocks power-up slots via skill tree
+- [ ] **SKILL-06**: User unlocks advanced power-ups via skill progression
+
+### Achievement System
+
+- [ ] **ACHIEVE-01**: User earns achievements for gameplay milestones
+- [ ] **ACHIEVE-02**: User sees achievement unlock modal when earning badge
+- [ ] **ACHIEVE-03**: User can view earned achievements in profile
+- [ ] **ACHIEVE-04**: Achievements have tiers (Bronze/Silver/Gold/Platinum)
+
+### Visual Polish & Effects
+
+- [ ] **POLISH-01**: User sees confetti effects on level victory
+- [ ] **POLISH-02**: User sees fireworks on boss defeat
+- [ ] **POLISH-03**: User sees 10+ combo full-screen celebration effects
+- [ ] **POLISH-04**: User sees layered particle effects (background, mid-ground, foreground)
+- [ ] **POLISH-05**: User sees victory/defeat cinematics (Remotion-generated)
+- [ ] **POLISH-06**: Particle system enforces budget (max 50-100 on screen, adaptive)
+
+### Cinematic System
+
+- [ ] **CINE-01**: User sees boss entrance cutscene (5-10s, Remotion-based)
+- [ ] **CINE-02**: User sees victory celebration sequence
+- [ ] **CINE-03**: User sees defeat sequence
+- [ ] **CINE-04**: All cinematics are skippable after 2s
+- [ ] **CINE-05**: Cinematics use Remotion + Lottie + Skia for effects
+
+### Dynamic Difficulty Tuning (Advanced)
+
+- [ ] **DDA-01**: System tracks performance metrics (words per minute, success rate, combo length)
+- [ ] **DDA-02**: AI Director adjusts intensity based on player flow state
+- [ ] **DDA-03**: Mid-game adjustments are invisible (gradual, not sudden)
+- [ ] **DDA-04**: Analytics track difficulty effectiveness
+- [ ] **DDA-05**: System excludes boss fights from adaptive scaling
+
+### World Expansion (v1.1 Carryover)
 
 - [ ] **WORLD-01**: World 4 Idiom Archipelago has parallax backgrounds (3-5 layers, tropical islands)
 - [ ] **WORLD-02**: World 4 Idiom Archipelago has themed particles (palm fronds, seashells, waves)
@@ -67,7 +122,7 @@ Requirements for Adventure & Education Expansion milestone. Each maps to roadmap
 - [ ] **WORLD-07**: World 5 Compound Canyon has board decorations (canyon rock borders, desert accents)
 - [ ] **WORLD-08**: World 5 has AI-generated background assets (WebP, <200KB)
 
-### Tech Debt
+### Tech Debt Cleanup (v1.1 Carryover)
 
 - [ ] **DEBT-01**: Entry sequence timing optimized from 2.38s to 2s target
 - [ ] **DEBT-02**: Video MP4 rendering pipeline functional (Remotion render script)
@@ -76,36 +131,39 @@ Requirements for Adventure & Education Expansion milestone. Each maps to roadmap
 
 ## Future Requirements
 
-Deferred to v1.2+ milestones.
+Deferred to v2.1+ milestones.
 
 ### Advanced Features
 
-- **ADV-01**: Worlds 6-10 full theming (after 4-5 proven)
-- **ADV-02**: Audio theming per world (world-specific sound loops)
-- **ADV-03**: Haptic feedback for combos and boss hits
-- **ADV-04**: Social leaderboards (school-wide, requires privacy review)
-- **ADV-05**: Video celebrations for boss victories
+- **ADV-01**: Combo power-ups (combine 2+ for mega effects)
+- **ADV-02**: Contextual power-up suggestions (when player stuck)
+- **ADV-03**: Charge-based power-up system (earn through combos)
+- **ADV-04**: Prestige system with cross-run unlocks
+- **ADV-05**: 4+ phase boss battles (2 phases sufficient for v2.0)
+- **ADV-06**: Environmental boss effects (weather, lighting)
+- **ADV-07**: Multiple currencies (stick with single gold for v2.0)
+- **ADV-08**: Roguelike cross-run progression
 
-### Education Expansion
+### Polish & Refinement
 
-- **EDU-01**: Parent progress reports
-- **EDU-02**: Curriculum alignment mapping
-- **EDU-03**: Custom achievement creation by teachers
-- **EDU-04**: Class average benchmarking
+- **POL-01**: Audio theming per world (world-specific sound loops)
+- **POL-02**: Haptic feedback for combos and boss hits
+- **POL-03**: 3D effects (not aligned with Neo-Brutalist style, deferred)
+- **POL-04**: Per-level unique mechanics (cognitive load concern)
 
 ## Out of Scope
 
-Explicitly excluded from v1.1 milestone.
+Explicitly excluded from v2.0 milestone.
 
 | Feature | Reason |
 |---------|--------|
 | Multiplayer adventure mode | Scope creep, single-player polish first |
-| 3D effects or environments | Not aligned with Neo-Brutalist style, performance concerns |
-| Per-level custom mechanics | Cognitive load, tutorial fatigue |
+| 3D effects or environments | Not aligned with Neo-Brutalist design, performance concerns |
+| Complex AI boss behavior | Start with rule-based, defer adaptive AI to future |
 | Procedurally generated levels | Quality control, hand-crafted preferred |
-| Lengthy unskippable cutscenes | Accessibility violation, player frustration |
-| Complex AI boss behavior | Start with rule-based, defer adaptive AI |
-| Mobile app (native) | Web-first strategy |
+| Lengthy unskippable cutscenes | Accessibility violation, player frustration (all cinematics skip after 2s) |
+| Free-to-play monetization | Premium game, power-ups never required |
+| Cross-platform cloud saves | Web-first for v2.0, defer to platform integration |
 
 ## Traceability
 
@@ -113,69 +171,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BOSS-01 | Phase 16 | Pending |
-| BOSS-02 | Phase 16 | Pending |
-| BOSS-03 | Phase 16 | Pending |
-| BOSS-04 | Phase 16 | Pending |
-| BOSS-05 | Phase 16 | Pending |
-| BOSS-06 | Phase 17 | Pending |
-| BOSS-07 | Phase 17 | Pending |
-| BOSS-08 | Phase 17 | Pending |
-| BOSS-09 | Phase 17 | Pending |
-| BOSS-10 | Phase 17 | Pending |
-| BOSS-11 | Phase 17 | Pending |
-| BOSS-12 | Phase 17 | Pending |
-| BOSS-13 | Phase 16 | Pending |
-| COMBO-01 | Phase 15 | Pending |
-| COMBO-02 | Phase 15 | Pending |
-| COMBO-03 | Phase 15 | Pending |
-| COMBO-04 | Phase 15 | Pending |
-| COMBO-05 | Phase 15 | Pending |
-| GAMIFY-01 | Phase 18 | Complete |
-| GAMIFY-02 | Phase 18 | Complete |
-| GAMIFY-03 | Phase 18 | Complete |
-| GAMIFY-04 | Phase 19 | Complete |
-| GAMIFY-05 | Phase 19 | Complete |
-| GAMIFY-06 | Phase 19 | Complete |
-| GAMIFY-07 | Phase 19 | Complete |
-| GAMIFY-08 | Phase 18 | Complete |
-| ANALYTICS-01 | Phase 20 | Complete |
-| ANALYTICS-02 | Phase 20 | Complete |
-| ANALYTICS-03 | Phase 20 | Complete |
-| ANALYTICS-04 | Phase 20 | Complete |
-| ANALYTICS-05 | Phase 20 | Complete |
-| LESSON-01 | Phase 21 | Pending |
-| LESSON-02 | Phase 21 | Pending |
-| LESSON-03 | Phase 21 | Pending |
-| WORLD-01 | Phase 22 | Pending |
-| WORLD-02 | Phase 22 | Pending |
-| WORLD-03 | Phase 22 | Pending |
-| WORLD-04 | Phase 22 | Pending |
-| WORLD-05 | Phase 22 | Pending |
-| WORLD-06 | Phase 22 | Pending |
-| WORLD-07 | Phase 22 | Pending |
-| WORLD-08 | Phase 22 | Pending |
-| DEBT-01 | Phase 23 | Pending |
-| DEBT-02 | Phase 23 | Pending |
-| DEBT-03 | Phase 23 | Pending |
-| DEBT-04 | Phase 23 | Pending |
+| (To be filled by roadmapper) | | |
 
 **Coverage:**
-- v1.1 requirements: 44 total
-- Mapped to phases: 44 (100% coverage ✓)
+- v2.0 requirements: 0 total
+- Mapped to phases: 0
 - Unmapped: 0
 
-**Phase assignment breakdown:**
-- Phase 15 (Chain Combo System): 5 requirements (COMBO-01 to COMBO-05)
-- Phase 16 (Boss Battle Foundation): 6 requirements (BOSS-01 to BOSS-05, BOSS-13)
-- Phase 17 (Boss Mechanic Expansion): 7 requirements (BOSS-06 to BOSS-12)
-- Phase 18 (Education XP System): 4 requirements (GAMIFY-01 to GAMIFY-03, GAMIFY-08)
-- Phase 19 (Achievement System): 4 requirements (GAMIFY-04 to GAMIFY-07)
-- Phase 20 (Student Analytics Dashboard): 5 requirements (ANALYTICS-01 to ANALYTICS-05)
-- Phase 21 (Rich Lesson Delivery): 3 requirements (LESSON-01 to LESSON-03)
-- Phase 22 (World Theming Expansion): 8 requirements (WORLD-01 to WORLD-08)
-- Phase 23 (Tech Debt Cleanup): 4 requirements (DEBT-01 to DEBT-04)
-
 ---
-*Requirements defined: 2026-01-25*
-*Last updated: 2026-01-29 after Phase 20 completion (ANALYTICS-01 to ANALYTICS-05 complete)*
+*Requirements defined: 2026-01-30*
+*Last updated: 2026-01-30 after initial definition*
