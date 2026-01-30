@@ -307,10 +307,40 @@ describe('AdventureGame - Power-Up Integration', () => {
   });
 
   it('should handle Freeze Time power-up activation', async () => {
-    // Test verifies Freeze Time handler integration
-    // Handler receives new time value (timeRemaining + 10s)
-    // Capped at totalTime to prevent overflow
-    // Full flow tested via PowerUpBar component tests
+    // Create a mock that tracks addTime calls
+    const mockAddTime = jest.fn();
+
+    // Create a mock hook with addTime method
+    const useAdventureGameMock = require('@/hooks/useAdventureGame').useAdventureGame as jest.Mock;
+    useAdventureGameMock.mockReturnValue({
+      ...useAdventureGameMock(),
+      timeRemaining: 50, // Start with 50 seconds
+      addTime: mockAddTime,
+    });
+
+    const user = userEvent.setup();
+
+    render(
+      <AdventureGame
+        levelConfig={mockLevelConfig}
+        initialGrid={mockInitialGrid}
+        onLevelComplete={jest.fn()}
+        onExit={jest.fn()}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('freeze-time-button')).toBeInTheDocument();
+    });
+
+    // Click Freeze Time button
+    const freezeButton = screen.getByTestId('freeze-time-button');
+    await user.click(freezeButton);
+
+    // Verify addTime was called with 10 seconds
+    await waitFor(() => {
+      expect(mockAddTime).toHaveBeenCalledWith(10);
+    });
   });
 
   it('should handle Hint power-up activation', async () => {
