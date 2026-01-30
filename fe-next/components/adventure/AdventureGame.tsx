@@ -911,12 +911,12 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Power-up handlers
     const handleFreezeTime = useCallback((newTime: number) => {
-      // Update timer state - capped at totalTime
-      const cappedTime = Math.min(newTime, adjustedLevelConfig.timerSeconds);
-      // Note: Timer state is managed by useAdventureGame hook
-      // The power-up effect adds time which is reflected in timeRemaining
-      // This handler just receives the new time for coordination
-    }, [adjustedLevelConfig.timerSeconds]);
+      // Apply the time extension via the hook's addTime method
+      // Note: newTime from PowerUpBar already calculates the extension
+      // We extract just the added seconds (10s for Freeze Time)
+      const FREEZE_TIME_SECONDS = 10;
+      addTime(FREEZE_TIME_SECONDS);
+    }, [addTime]);
 
     const handleHint = useCallback((hint: HintResult) => {
       setHintWord(hint.word);
