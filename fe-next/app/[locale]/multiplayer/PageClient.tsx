@@ -216,7 +216,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         isHost: data.isHost,
         roomName: data.roomName || roomName || '',
         hostUsername: data.isHost ? joinedUsername : undefined,
-        language: data.language || roomLanguage || undefined,
+        language: data.language || roomLanguage || 'en',
       });
     },
     onUpdateUsers: (users) => {
