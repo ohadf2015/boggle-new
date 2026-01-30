@@ -154,6 +154,9 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // Mock getTrendsFromDbCache to return null (no cached trends)
     (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
 
+    // Mock storeTrendsInDbCache to return resolved promise
+    (serpApiClient.storeTrendsInDbCache as jest.Mock).mockResolvedValue(undefined);
+
     // Mock fetchGoogleTrends to return sample trends matching SERP API structure
     (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([
       {
@@ -181,8 +184,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
   });
 
   it('should fetch trends from SERP API when database cache is empty for Hebrew', async () => {
-    // Mock Hebrew challenges
-    mockGenerateContent.mockResolvedValueOnce({
+    // Mock Hebrew challenges (provide for multiple AI calls - moderation + generation)
+    const hebrewResponse = {
       response: {
         candidates: [
           {
@@ -196,48 +199,48 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                     challenges: [
                       {
                         type: 'anagram',
-                        trend_topic: 'ישראל',
+                        trend_topic: 'חדשות',
                         prompt: 'פתרו: לארשי',
                         answer: 'ישראל',
                         hint: 'שם מדינה',
                         difficulty: 'easy',
-                        trending_context: 'ישראל בחדשות',
+                        trending_context: 'חדשות היום',
                       },
                       {
                         type: 'fill_blank',
-                        trend_topic: 'משחק',
+                        trend_topic: 'בידור',
                         prompt: 'השלימו: משח_',
                         answer: 'משחק',
                         hint: 'בידור',
                         difficulty: 'easy',
-                        trending_context: 'משחקים',
+                        trending_context: 'בידור היום',
                       },
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'פעילות גופנית (5 letters)',
-                        answer: 'ספורט',
-                        hint: 'משחקים במגרש',
+                        prompt: 'כדור גדול (4 letters)',
+                        answer: 'כדור',
+                        hint: 'משחק',
                         difficulty: 'medium',
                         trending_context: 'אירועי ספורט',
                       },
                       {
                         type: 'anagram',
-                        trend_topic: 'רקורד',
+                        trend_topic: 'הישגים',
                         prompt: 'פתרו: דרוקר',
                         answer: 'רקורד',
                         hint: 'הישג',
                         difficulty: 'easy',
-                        trending_context: 'רקורד חדש',
+                        trending_context: 'הישגים חדשים',
                       },
                       {
                         type: 'riddle',
-                        trend_topic: 'פעילות',
+                        trend_topic: 'תנועה',
                         prompt: 'אני דורש תנועה',
                         answer: 'פעילות',
                         hint: 'עשייה',
                         difficulty: 'medium',
-                        trending_context: 'פעילויות',
+                        trending_context: 'תנועה יומית',
                       },
                     ],
                   }),
@@ -247,7 +250,11 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
           },
         ],
       },
-    });
+    };
+
+    // Provide mock for multiple AI calls (content moderation + challenge generation)
+    mockGenerateContent.mockResolvedValueOnce(hebrewResponse);
+    mockGenerateContent.mockResolvedValueOnce(hebrewResponse);
 
     const today = new Date();
     const language = 'he';
@@ -264,8 +271,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
     (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([]);
 
-    // Mock Hebrew challenges
-    mockGenerateContent.mockResolvedValueOnce({
+    // Mock Hebrew challenges (provide for multiple AI calls)
+    const hebrewResponse = {
       response: {
         candidates: [
           {
@@ -279,48 +286,48 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                     challenges: [
                       {
                         type: 'anagram',
-                        trend_topic: 'ישראל',
+                        trend_topic: 'חדשות',
                         prompt: 'פתרו: לארשי',
                         answer: 'ישראל',
                         hint: 'שם מדינה',
                         difficulty: 'easy',
-                        trending_context: 'ישראל בחדשות',
+                        trending_context: 'חדשות היום',
                       },
                       {
                         type: 'fill_blank',
-                        trend_topic: 'משחק',
+                        trend_topic: 'בידור',
                         prompt: 'השלימו: משח_',
                         answer: 'משחק',
                         hint: 'בידור',
                         difficulty: 'easy',
-                        trending_context: 'משחקים',
+                        trending_context: 'בידור היום',
                       },
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'פעילות גופנית (5 letters)',
-                        answer: 'ספורט',
-                        hint: 'משחקים במגרש',
+                        prompt: 'כדור גדול (4 letters)',
+                        answer: 'כדור',
+                        hint: 'משחק',
                         difficulty: 'medium',
                         trending_context: 'אירועי ספורט',
                       },
                       {
                         type: 'anagram',
-                        trend_topic: 'רקורד',
+                        trend_topic: 'הישגים',
                         prompt: 'פתרו: דרוקר',
                         answer: 'רקורד',
                         hint: 'הישג',
                         difficulty: 'easy',
-                        trending_context: 'רקורד חדש',
+                        trending_context: 'הישגים חדשים',
                       },
                       {
                         type: 'riddle',
-                        trend_topic: 'פעילות',
+                        trend_topic: 'תנועה',
                         prompt: 'אני דורש תנועה',
                         answer: 'פעילות',
                         hint: 'עשייה',
                         difficulty: 'medium',
-                        trending_context: 'פעילויות',
+                        trending_context: 'תנועה יומית',
                       },
                     ],
                   }),
@@ -330,7 +337,11 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
           },
         ],
       },
-    });
+    };
+
+    // Provide mock for multiple AI calls
+    mockGenerateContent.mockResolvedValueOnce(hebrewResponse);
+    mockGenerateContent.mockResolvedValueOnce(hebrewResponse);
 
     const today = new Date();
     const language = 'he';
@@ -359,7 +370,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // The word צפיה (viewing) should be validated even if dictionary only has צפייה (double yud)
 
     // Update mock to return response with a word that requires dictionary module features
-    mockGenerateContent.mockResolvedValueOnce({
+    const hebrewResponse = {
       response: {
         candidates: [
           {
@@ -373,48 +384,48 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                     challenges: [
                       {
                         type: 'anagram',
-                        trend_topic: 'ישראל',
+                        trend_topic: 'חדשות',
                         prompt: 'פתרו: לארשי',
                         answer: 'ישראל',
                         hint: 'שם מדינה',
                         difficulty: 'easy',
-                        trending_context: 'ישראל בחדשות',
+                        trending_context: 'חדשות היום',
                       },
                       {
                         type: 'fill_blank',
-                        trend_topic: 'טכנולוגיה',
+                        trend_topic: 'חדשנות',
                         prompt: 'השלימו: טכ_ _ _ _ _ _',
                         answer: 'טכנולוגיה',
                         hint: 'חדשנות',
                         difficulty: 'medium',
-                        trending_context: 'חדשות טכנולוגיה',
+                        trending_context: 'חדשנות דיגיטלית',
                       },
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'פעילות גופנית (5 letters)',
-                        answer: 'ספורט',
-                        hint: 'משחקים במגרש',
+                        prompt: 'כדור גדול (4 letters)',
+                        answer: 'כדור',
+                        hint: 'משחק',
                         difficulty: 'medium',
                         trending_context: 'אירועי ספורט',
                       },
                       {
                         type: 'anagram',
-                        trend_topic: 'רקורד',
+                        trend_topic: 'הישגים',
                         prompt: 'פתרו: דרוקר',
                         answer: 'רקורד',
                         hint: 'הישג',
                         difficulty: 'easy',
-                        trending_context: 'רקורד חדש',
+                        trending_context: 'הישגים חדשים',
                       },
                       {
                         type: 'fill_blank',
-                        trend_topic: 'שחקנית',
+                        trend_topic: 'סלבריטאים',
                         prompt: 'השלימו: שח_ _ _ _',
                         answer: 'שחקנית',
                         hint: 'אמנית',
                         difficulty: 'easy',
-                        trending_context: 'חדשות סלבריטאים',
+                        trending_context: 'חדשות הבידור',
                       },
                     ],
                   }),
@@ -424,7 +435,11 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
           },
         ],
       },
-    });
+    };
+
+    // Provide mock for multiple AI calls (content moderation + challenge generation)
+    mockGenerateContent.mockResolvedValueOnce(hebrewResponse);
+    mockGenerateContent.mockResolvedValueOnce(hebrewResponse);
 
     const today = new Date();
     const language = 'he';
@@ -436,6 +451,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
   });
 
   it('should repair and parse truncated JSON responses', async () => {
+    // Reset mock to avoid interference
+    mockGenerateContent.mockClear();
     // Simulate a truncated JSON response (common with maxOutputTokens limits)
     const truncatedResponse = `{
   "date": "2026-01-13",
@@ -444,48 +461,48 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
   "challenges": [
     {
       "type": "anagram",
-      "trend_topic": "ישראל",
+      "trend_topic": "חדשות",
       "prompt": "פתרו: לארשי",
       "answer": "ישראל",
       "hint": "שם מדינה",
       "difficulty": "easy",
-      "trending_context": "ישראל בחדשות"
+      "trending_context": "חדשות היום"
     },
     {
       "type": "fill_blank",
-      "trend_topic": "טכנולוגיה",
+      "trend_topic": "חדשנות",
       "prompt": "השלימו: טכ_ _ _ _ _ _",
       "answer": "טכנולוגיה",
       "hint": "חדשנות",
       "difficulty": "medium",
-      "trending_context": "חדשות טכנולוגיה"
+      "trending_context": "חדשנות דיגיטלית"
     },
     {
       "type": "wordle_guess",
       "trend_topic": "ספורט",
-      "prompt": "פעילות גופנית (5 letters)",
-      "answer": "ספורט",
-      "hint": "משחקים במגרש",
+      "prompt": "כדור גדול (4 letters)",
+      "answer": "כדור",
+      "hint": "משחק",
       "difficulty": "medium",
       "trending_context": "אירועי ספורט"
     },
     {
       "type": "anagram",
-      "trend_topic": "רקורד",
+      "trend_topic": "הישגים",
       "prompt": "פתרו: דרוקר",
       "answer": "רקורד",
       "hint": "הישג",
       "difficulty": "easy",
-      "trending_context": "רקורד חדש"
+      "trending_context": "הישגים חדשים"
     },
     {
       "type": "fill_blank",
-      "trend_topic": "שחקנית",
+      "trend_topic": "סלבריטאים",
       "prompt": "השלימו: שח_ _ _ _",
       "answer": "שחקנית",
       "hint": "אמנית",
       "difficulty": "easy",
-      "trending_context": "חדשות סלבריטאים"
+      "trending_context": "חדשות הבידור"
     },
     {
       "type": "definition_match",
@@ -500,8 +517,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     {
       "type": "defi`;  // Intentionally truncated mid-word
 
-    // Update mock to return truncated response
-    mockGenerateContent.mockResolvedValueOnce({
+    // Update mock to return truncated response (use mockResolvedValue for all AI calls)
+    mockGenerateContent.mockResolvedValue({
       response: {
         candidates: [
           {
@@ -575,7 +592,7 @@ describe('Sports riddle constraint validation', () => {
 
   it('should filter out extra sports riddles beyond the first one', async () => {
     // AI returns multiple sports-related riddles - only first should be kept
-    mockGenerateContent.mockResolvedValueOnce({
+    const sportsResponse = {
       response: {
         candidates: [
           {
@@ -634,12 +651,22 @@ describe('Sports riddle constraint validation', () => {
                       },
                       {
                         type: 'word_chain',
-                        trend_topic: 'music',
-                        prompt: 'SONG → ??? → TUNE',
-                        answer: 'MUSIC',
-                        hint: 'Musical sequence',
+                        trend_topic: 'entertainment',
+                        prompt: 'PLAY → ??? → SHOW',
+                        answer: 'DRAMA',
+                        hint: 'Theatrical genre',
                         difficulty: 'medium',
-                        trending_context: 'Music chain',
+                        trending_context: 'Entertainment chain',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'science',
+                        prompt: 'A force that pulls objects toward Earth',
+                        answer: 'GRAVITY',
+                        options: ['GRAVITY', 'MAGNETS', 'FRICTION', 'INERTIA'],
+                        hint: 'Newton discovered it',
+                        difficulty: 'easy',
+                        trending_context: 'Science news',
                       },
                     ],
                   }),
@@ -649,7 +676,11 @@ describe('Sports riddle constraint validation', () => {
           },
         ],
       },
-    });
+    };
+
+    // Provide mock for multiple AI calls (content moderation + challenge generation)
+    mockGenerateContent.mockResolvedValueOnce(sportsResponse);
+    mockGenerateContent.mockResolvedValueOnce(sportsResponse);
 
     const today = new Date();
     const result = await generateDailyBuzz(today, 'en');
@@ -937,6 +968,9 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Reset mockGenerateContent to default English challenges
+    mockGenerateContent.mockClear();
+
     // Mock environment variables
     process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
       project_id: 'test-project',
@@ -1035,7 +1069,7 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
   });
 
   it('should accept options object with deleteBeforeRegenerate', async () => {
-    mockGenerateContent.mockResolvedValueOnce({
+    const optionsTestResponse = {
       response: {
         candidates: [
           {
@@ -1100,7 +1134,11 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
           },
         ],
       },
-    });
+    };
+
+    // Provide mock for multiple AI calls (content moderation + challenge generation)
+    mockGenerateContent.mockResolvedValueOnce(optionsTestResponse);
+    mockGenerateContent.mockResolvedValueOnce(optionsTestResponse);
 
     const today = new Date();
 
@@ -1111,7 +1149,7 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
   });
 
   it('should still support legacy cachedTrends array parameter', async () => {
-    mockGenerateContent.mockResolvedValueOnce({
+    const legacyTestResponse = {
       response: {
         candidates: [
           {
@@ -1176,7 +1214,11 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
           },
         ],
       },
-    });
+    };
+
+    // Provide mock for multiple AI calls (content moderation + challenge generation)
+    mockGenerateContent.mockResolvedValueOnce(legacyTestResponse);
+    mockGenerateContent.mockResolvedValueOnce(legacyTestResponse);
 
     const today = new Date();
     const legacyTrends = [
