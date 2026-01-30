@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** v2.0 Adventure Overhaul - Phase 27 Dynamic Board Mechanics
+**Current focus:** v2.0 Adventure Overhaul - Phase 28 Power-Up System
 
 ## Current Position
 
-Phase: 27 - Dynamic Board Mechanics
-Plan: 6/6 (Special Tile Integration COMPLETE)
-Status: Phase 27 COMPLETE ✅
-Last activity: 2026-01-30 — Completed 27-06-PLAN.md (Special Tile Integration)
+Phase: 28 - Power-Up System
+Plan: 1 of 7 (Power-Up Foundation COMPLETE)
+Status: Phase 28 In Progress
+Last activity: 2026-01-30 — Completed 28-01-PLAN.md (Power-Up Type Definitions and State Machine)
 
-Progress: [██████████] 100% (6/6 plans complete in Phase 27)
+Progress: [███████████░] 86% (16/19 v2.0 plans complete: Phase 26: 9/9, Phase 27: 6/6, Phase 28: 1/7)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -35,8 +35,9 @@ Progress: [██████████] 100% (6/6 plans complete in Phase 27)
 2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) ✅ COMPLETE
    - Candy Crush cascades, tile movement, explosions, special tiles
 
-3. **Phase 28: Power-Up System** (7 reqs: POWER)
+3. **Phase 28: Power-Up System** (7 reqs: POWER) 🔄 IN PROGRESS (1/7 plans)
    - Freeze Time, Hint, Score Multiplier with cooldowns and balance
+   - ✅ 28-01: Power-Up Type Definitions and State Machine
 
 4. **Phase 29: Adaptive Difficulty System** (5 reqs: DIFF)
    - Pre-game difficulty selection, invisible adjustments, gradual hints
@@ -66,11 +67,21 @@ Progress: [██████████] 100% (6/6 plans complete in Phase 27)
 **v2.0 Progress:**
 - Phase 26 complete: 9/9 plans (100%)
 - Phase 27 complete: 6/6 plans (100%)
-- Total v2.0 plans complete: 15 of 70+ (early progress)
+- Phase 28 in progress: 1/7 plans (14%)
+- Total v2.0 plans complete: 16 of 70+ (23% overall)
 
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 28-01 (Power-Up Type Definitions and State Machine, 2026-01-30):**
+- Timestamp-based cooldown using Date.now(): Prevents drift from setInterval accumulation, calculates remaining from elapsed time
+- 60-second cooldown constant: Single value (COOLDOWN_DURATION) for all power-ups keeps system simple and balanced
+- Effect duration differentiation: Instant (0s) for freezeTime/hint transitions immediately, duration (30s) for scoreMultiplier uses setTimeout
+- useRef for timestamp storage: Avoids re-renders when updating activatedAt, state only changes for UI-relevant updates
+- 100ms UI update interval: Smooth countdown display during cooldown (10 updates/second balances UX and performance)
+- State machine lifecycle: ready -> activate() -> active -> cooldown (60s) -> ready with boolean rejection during cooldown
+- TDD with 98% coverage: 16 tests verify state transitions, timestamp calculations, and edge cases (drift prevention, negative clamp)
 
 **Phase 27-06 (Special Tile Integration, 2026-01-30):**
 - Multiplier tiles inline processing: Processed in SUBMIT_WORD reducer like existing tiles (gold, ice, bomb) for consistency
@@ -206,10 +217,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-06-PLAN.md (Special Tile Integration - Phase 27 COMPLETE)
+Stopped at: Completed 28-01-PLAN.md (Power-Up Type Definitions and State Machine)
 Resume file: None
 
-**Next action:** Start Phase 28 (Power-Up System)
+**Next action:** Continue Phase 28 (Plan 28-02: Power-Up UI Components)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -233,4 +244,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Phase 27 COMPLETE: Dynamic Board Mechanics - all 6 plans delivered)*
+*Last updated: 2026-01-30 (Phase 28 Plan 01 COMPLETE: Power-Up Type Definitions and State Machine)*
