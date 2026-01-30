@@ -4603,6 +4603,62 @@ const ja = {
       "level": "レベル{level}",
       "xp": "{xp} XP"
     },
+    "header": {
+      "title": "LexiClash",
+      "subtitle": "教育",
+      "homeLink": "教育ホーム",
+      "menu": "教育メニュー",
+      "navigation": "ナビゲーション",
+      "teacherDashboard": "教師ダッシュボード",
+      "studentDashboard": "マイレッスン",
+      "educationHome": "教育ホーム",
+      "breadcrumbs": {
+        "navigation": "教育ナビゲーション",
+        "education": "教育",
+        "teacher": "教師ダッシュボード",
+        "student": "生徒ダッシュボード",
+        "lessons": "レッスン",
+        "classrooms": "クラスルーム",
+        "classroomGame": "クラスゲーム",
+        "join": "クラスに参加",
+        "profile": "プロフィール"
+      }
+    },
+    "classroomGame": {
+      "title": "クラスゲーム",
+      "shareCode": "このコードを生徒と共有してください",
+      "waitingForPlayers": "プレイヤーを待っています...",
+      "settings": "ゲーム設定",
+      "vocabularyWords": "語彙単語",
+      "playable": "プレイ可能",
+      "noPlayableWords": "このレッスンにプレイ可能な単語がありません",
+      "startGame": "ゲーム開始",
+      "starting": "開始中...",
+      "lessonNotFound": "レッスンが見つかりません",
+      "lessonNotFoundDesc": "リクエストされたレッスンが見つかりませんでした。",
+      "backToEducation": "教育に戻る"
+    },
+    "onboarding": {
+      "step": "ステップ",
+      "of": "/",
+      "getStarted": "始めましょう！",
+      "welcome": {
+        "title": "教育モードへようこそ！",
+        "description": "LexiClash教育は、魅力的な語彙レッスンを作成し、生徒の進捗を追跡するのに役立ちます。セットアップを始めましょう！"
+      },
+      "classroom": {
+        "title": "最初のクラスルームを作成",
+        "description": "クラスルームを作成することから始めましょう。生徒がレッスンに参加してアクセスするために使用できる固有のコードが発行されます。"
+      },
+      "lesson": {
+        "title": "最初のレッスンを作成",
+        "description": "語彙単語を追加してカスタムレッスンを作成します。生徒はあなたの語彙を使ってフラッシュカードやワードゲームで練習できます。"
+      },
+      "invite": {
+        "title": "生徒を招待",
+        "description": "クラスルームコードを生徒と共有してください。参加してレッスンを練習し、クラスゲームで競争できます！"
+      }
+    },
     "analytics": {
       "title": "クラス分析",
       "subtitle": "生徒の進捗を追跡し、学習機会を特定",

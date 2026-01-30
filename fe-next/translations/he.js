@@ -4578,6 +4578,62 @@ const he = {
       "level": "רמה {level}",
       "xp": "{xp} נקודות ניסיון"
     },
+    "header": {
+      "title": "LexiClash",
+      "subtitle": "חינוך",
+      "homeLink": "דף הבית - חינוך",
+      "menu": "תפריט חינוך",
+      "navigation": "ניווט",
+      "teacherDashboard": "לוח מורה",
+      "studentDashboard": "השיעורים שלי",
+      "educationHome": "דף הבית - חינוך",
+      "breadcrumbs": {
+        "navigation": "ניווט חינוכי",
+        "education": "חינוך",
+        "teacher": "לוח מורה",
+        "student": "לוח תלמיד",
+        "lessons": "שיעורים",
+        "classrooms": "כיתות",
+        "classroomGame": "משחק כיתתי",
+        "join": "הצטרף לכיתה",
+        "profile": "פרופיל"
+      }
+    },
+    "classroomGame": {
+      "title": "משחק כיתתי",
+      "shareCode": "שתף קוד זה עם התלמידים",
+      "waitingForPlayers": "ממתין לשחקנים...",
+      "settings": "הגדרות משחק",
+      "vocabularyWords": "מילות אוצר",
+      "playable": "ניתנות למשחק",
+      "noPlayableWords": "אין מילים ניתנות למשחק בשיעור זה",
+      "startGame": "התחל משחק",
+      "starting": "מתחיל...",
+      "lessonNotFound": "השיעור לא נמצא",
+      "lessonNotFoundDesc": "השיעור המבוקש לא נמצא.",
+      "backToEducation": "חזרה לחינוך"
+    },
+    "onboarding": {
+      "step": "שלב",
+      "of": "מתוך",
+      "getStarted": "בואו נתחיל!",
+      "welcome": {
+        "title": "ברוכים הבאים למצב חינוכי!",
+        "description": "LexiClash חינוך עוזר לך ליצור שיעורי אוצר מילים מעניינים ולעקוב אחר התקדמות התלמידים. בואו נתחיל!"
+      },
+      "classroom": {
+        "title": "צור את הכיתה הראשונה שלך",
+        "description": "התחל ביצירת כיתה. תקבל קוד ייחודי שהתלמידים יוכלו להשתמש בו כדי להצטרף ולגשת לשיעורים שלך."
+      },
+      "lesson": {
+        "title": "בנה את השיעור הראשון שלך",
+        "description": "הוסף מילות אוצר כדי ליצור שיעורים מותאמים אישית. התלמידים יוכלו לתרגל עם כרטיסיות ומשחקי מילים באמצעות אוצר המילים שלך."
+      },
+      "invite": {
+        "title": "הזמן את התלמידים שלך",
+        "description": "שתף את קוד הכיתה עם התלמידים. הם יוכלו להצטרף, לתרגל שיעורים ולהתחרות במשחקי כיתה!"
+      }
+    },
     "analytics": {
       "title": "ניתוח כיתתי",
       "subtitle": "מעקב אחר התקדמות תלמידים וזיהוי הזדמנויות למידה",

@@ -4603,6 +4603,62 @@ const sv = {
       "level": "Nivå {level}",
       "xp": "{xp} XP"
     },
+    "header": {
+      "title": "LexiClash",
+      "subtitle": "Utbildning",
+      "homeLink": "Utbildning Hem",
+      "menu": "Utbildningsmeny",
+      "navigation": "Navigering",
+      "teacherDashboard": "Läraröversikt",
+      "studentDashboard": "Mina lektioner",
+      "educationHome": "Utbildning Hem",
+      "breadcrumbs": {
+        "navigation": "Utbildningsnavigering",
+        "education": "Utbildning",
+        "teacher": "Läraröversikt",
+        "student": "Elevöversikt",
+        "lessons": "Lektioner",
+        "classrooms": "Klassrum",
+        "classroomGame": "Klassrumsspel",
+        "join": "Gå med i klassrum",
+        "profile": "Profil"
+      }
+    },
+    "classroomGame": {
+      "title": "Klassrumsspel",
+      "shareCode": "Dela denna kod med eleverna",
+      "waitingForPlayers": "Väntar på spelare...",
+      "settings": "Spelinställningar",
+      "vocabularyWords": "Ordförrådsord",
+      "playable": "spelbara",
+      "noPlayableWords": "Inga spelbara ord i denna lektion",
+      "startGame": "Starta spel",
+      "starting": "Startar...",
+      "lessonNotFound": "Lektionen hittades inte",
+      "lessonNotFoundDesc": "Den begärda lektionen kunde inte hittas.",
+      "backToEducation": "Tillbaka till utbildning"
+    },
+    "onboarding": {
+      "step": "Steg",
+      "of": "av",
+      "getStarted": "Sätt igång!",
+      "welcome": {
+        "title": "Välkommen till utbildningsläget!",
+        "description": "LexiClash Utbildning hjälper dig skapa engagerande ordförrådsövningar och följa elevernas framsteg. Låt oss komma igång!"
+      },
+      "classroom": {
+        "title": "Skapa ditt första klassrum",
+        "description": "Börja med att skapa ett klassrum. Du får en unik kod som eleverna kan använda för att gå med och komma åt dina lektioner."
+      },
+      "lesson": {
+        "title": "Bygg din första lektion",
+        "description": "Lägg till ordförrådsord för att skapa anpassade lektioner. Eleverna kan öva med flashkort och ordspel med ditt ordförråd."
+      },
+      "invite": {
+        "title": "Bjud in dina elever",
+        "description": "Dela din klassrumskod med eleverna. De kan gå med, öva lektioner och tävla i klassrumsspel!"
+      }
+    },
     "analytics": {
       "title": "Klassanalys",
       "subtitle": "Följ elevernas framsteg och identifiera lärandemöjligheter",

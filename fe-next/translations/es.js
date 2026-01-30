@@ -4392,7 +4392,13 @@ const es = {
       "saving": "Guardando...",
       "saved": "¡Lección guardada!",
       "noLessons": "Sin lecciones aún",
-      "createFirst": "Crea tu primera lección de vocabulario"
+      "createFirst": "Crea tu primera lección de vocabulario",
+      "definition": "Definición",
+      "examples": "Ejemplos de Uso",
+      "contextualExamples": "En Contexto",
+      "pronounce": "Escuchar pronunciación",
+      "speaking": "Reproduciendo...",
+      "pronunciationFallback": "Pronunciación"
     },
     "lessons": {
       "assign": {
@@ -4560,6 +4566,21 @@ const es = {
         "monthDesc": "¡30 días de excelencia!"
       }
     },
+    "lesson": {
+      "definition": "Definición",
+      "examples": "Ejemplos de Uso",
+      "contextualExamples": "En Contexto",
+      "pronounce": "Escuchar pronunciación",
+      "speaking": "Reproduciendo...",
+      "pronunciationFallback": "Pronunciación",
+      "gotIt": "Lo sé",
+      "dontKnow": "No lo sé",
+      "tapToReveal": "Toca para revelar",
+      "classicMode": "Modo Clásico",
+      "swipeMode": "Modo Deslizar",
+      "autoPronounce": "Auto-pronunciar",
+      "enrichingContent": "Cargando contenido enriquecido..."
+    },
     "leaderboard": {
       "title": "Tabla de Clasificación del Aula",
       "yourPosition": "Tu Posición",
@@ -4570,6 +4591,62 @@ const es = {
       "joinClassroomPrompt": "Únete a un aula para ver la tabla de clasificación",
       "level": "Nv. {level}",
       "xp": "{xp} XP"
+    },
+    "header": {
+      "title": "LexiClash",
+      "subtitle": "Educación",
+      "homeLink": "Inicio Educación",
+      "menu": "Menú Educación",
+      "navigation": "Navegación",
+      "teacherDashboard": "Panel del Profesor",
+      "studentDashboard": "Mis Lecciones",
+      "educationHome": "Inicio Educación",
+      "breadcrumbs": {
+        "navigation": "Navegación educativa",
+        "education": "Educación",
+        "teacher": "Panel del Profesor",
+        "student": "Panel del Estudiante",
+        "lessons": "Lecciones",
+        "classrooms": "Aulas",
+        "classroomGame": "Juego del Aula",
+        "join": "Unirse al Aula",
+        "profile": "Perfil"
+      }
+    },
+    "classroomGame": {
+      "title": "Juego del Aula",
+      "shareCode": "Comparte este código con los estudiantes",
+      "waitingForPlayers": "Esperando jugadores...",
+      "settings": "Configuración del Juego",
+      "vocabularyWords": "Palabras de Vocabulario",
+      "playable": "jugables",
+      "noPlayableWords": "No hay palabras jugables en esta lección",
+      "startGame": "Iniciar Juego",
+      "starting": "Iniciando...",
+      "lessonNotFound": "Lección No Encontrada",
+      "lessonNotFoundDesc": "No se pudo encontrar la lección solicitada.",
+      "backToEducation": "Volver a Educación"
+    },
+    "onboarding": {
+      "step": "Paso",
+      "of": "de",
+      "getStarted": "¡Empezar!",
+      "welcome": {
+        "title": "¡Bienvenido al Modo Educación!",
+        "description": "LexiClash Educación te ayuda a crear lecciones de vocabulario atractivas y seguir el progreso de los estudiantes. ¡Comencemos!"
+      },
+      "classroom": {
+        "title": "Crea tu Primera Aula",
+        "description": "Comienza creando un aula. Recibirás un código único que los estudiantes pueden usar para unirse y acceder a tus lecciones."
+      },
+      "lesson": {
+        "title": "Crea tu Primera Lección",
+        "description": "Agrega palabras de vocabulario para crear lecciones personalizadas. Los estudiantes pueden practicar con tarjetas y juegos de palabras usando tu vocabulario."
+      },
+      "invite": {
+        "title": "Invita a tus Estudiantes",
+        "description": "¡Comparte el código del aula con los estudiantes. Podrán unirse, practicar lecciones y competir en juegos del aula!"
+      }
     },
     "analytics": {
       "title": "Análisis de Clase",
@@ -4585,7 +4662,46 @@ const es = {
       "assignLessons": "Asigna lecciones a los estudiantes para ver análisis",
       "loading": "Cargando análisis...",
       "error": "Error al cargar análisis",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "lessonEffectiveness": "Efectividad de Lecciones",
+      "avgXpGain": "Ganancia XP Promedio",
+      "completionRate": "Tasa de Finalización",
+      "avgAccuracy": "Precisión Promedio",
+      "timeToMastery": "Tiempo para Dominar",
+      "studentProgress": "Progreso del Estudiante",
+      "student": "Estudiante",
+      "level": "Nivel",
+      "mastery": "Dominio",
+      "accuracy": "Precisión",
+      "streak": "Racha",
+      "lastActive": "Última Actividad",
+      "noStudents": "Aún no hay estudiantes en esta aula",
+      "inviteStudents": "Comparte el código de unión para invitar estudiantes",
+      "struggling": "Necesita Ayuda",
+      "daysAgo": "hace {{count}} días",
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "students": "Estudiantes",
+      "noLessons": "No hay lecciones asignadas a esta aula",
+      "assignLessonsHint": "Crea y asigna lecciones para ver datos de efectividad",
+      "vocabularyMastery": "Dominio de Vocabulario",
+      "masteryLevels": "Niveles de Dominio",
+      "mastered": "Dominado",
+      "practicing": "Practicando",
+      "live": "En Vivo",
+      "offline": "Desconectado",
+      "connecting": "Conectando...",
+      "connectionError": "Problema de conexión",
+      "activeNow": "{{count}} activos ahora",
+      "noActivity": "Sin actividad",
+      "updatedAgo": "Actualizado hace {{time}}",
+      "notStarted": "No Iniciado",
+      "accuracyTooltip": "{{student}}: {{accuracy}}% en \"{{word}}\"",
+      "noVocabularyData": "Aún no hay datos de vocabulario",
+      "practiceToSee": "Los estudiantes deben practicar para ver el dominio",
+      "viewLessons": "Lecciones",
+      "viewVocabulary": "Vocabulario",
+      "backToClassroom": "Volver al Aula"
     },
     "achievements": {
       "title": "Logros",
