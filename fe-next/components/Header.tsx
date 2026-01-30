@@ -2,7 +2,7 @@ import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility, Brain, Lock } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility, Brain, Lock, Newspaper } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -701,6 +701,20 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     <BookOpen className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.aboutGame') || 'About the Game'}</span>
+                                            </Link>
+                                            <Link
+                                                href={`/${language}/blog`}
+                                                onClick={() => setShowMobileMenu(false)}
+                                                className={cn(
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "shadow-hard-sm hover:shadow-hard"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-orange border-3 border-neo-black text-neo-black">
+                                                    <Newspaper className="w-4 h-4" aria-hidden="true" />
+                                                </span>
+                                                <span>{t('footer.blog') || 'Blog'}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/leaderboard`}

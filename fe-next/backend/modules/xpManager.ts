@@ -458,25 +458,3 @@ function toRoman(num: number): string {
   return result;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  calculateGameXp,
-  getXpForLevel,
-  getLevelFromXp,
-  getXpProgress,
-  getTitleForLevel,
-  getUnlockedTitles,
-  checkLevelUp,
-  getLevelTier,
-  getNextMilestone,
-  // Prestige exports
-  canPrestige,
-  getPrestigeMultiplier,
-  getPrestigeDisplay,
-  getNextPrestigeRewards,
-  getPrestigeInfo,
-  applyPrestigeMultiplier,
-  XP_CONFIG,
-  LEVEL_TITLES,
-  PRESTIGE_CONFIG,
-};

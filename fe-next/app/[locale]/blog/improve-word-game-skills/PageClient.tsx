@@ -9,22 +9,14 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 
-// HUMANIZED VERSION - Not AI-sounding
-// Changes: Personal voice, casual tone, real examples, no generic advice
 type LocaleContent = {
   title: string;
   category: string;
   readTime: string;
-  intro: string;
   sections: Array<{
-    title: string;
+    title?: string;
     content: string;
   }>;
-  cta: {
-    title: string;
-    content: string;
-  };
-  footer: string;
   backToBlog: string;
   practiceNow: string;
   tryDaily: string;
@@ -32,584 +24,239 @@ type LocaleContent = {
 
 const contentByLocale: Record<string, LocaleContent> = {
   he: {
-    title: 'איך הפסקתי להפסיד במשחקי מילים (וגיליתי שאני לא מטומטם)',
-    category: 'אסטרטגיה',
-    readTime: 'זמן קריאה: 7 דקות',
-    intro: `שנתיים שיחקתי משחקי מילים. שנתיים הפסדתי כמעט תמיד.
-
-חשבתי שאני פשוט לא טוב בזה. שאין לי "כישרון" למילים. אז הפסקתי לשחק.
-
-אז חבר הראה לי משהו שהיה הגיוני לחלוטין, אבל לא חשבתי עליו מעולם.`,
+    title: 'בן דוד שלי אומר שאני מרמה במשחקי מילים',
+    category: 'נקודת מבט',
+    readTime: 'זמן קריאה: 5 דקות',
     sections: [
       {
-        title: 'התובנה שהכל שינתה',
-        content: `הנה מה שלא הבנתי: שחקנים טובים לא זוכרים יותר מילים ממני.
+        content: `אני לא מרמה. פשוט שמים לב לדברים שהוא לא שם לב אליהם.
 
-הם רואים דפוסים.
+בן דוד שלי, יובל, מכיר יותר מילים ממני. הוא קורא ספרים כל הזמן. בעבודה שלו הוא כותב מסמכים ארוכים. אני בקושי קורא מעבר לכותרות.
 
-תחשבו על זה ככה: כשאתם מסתכלים על אותיות א-ל-ב-ו-ם, אתם רואים אותיות אקראיות? או שאתם מיד רואים "אלבום"?
-
-אם אתם רואים את המילה מיד - זה זיהוי דפוסים. וזה כישור שאפשר ללמוד.
-
-המוח שלכם כבר עושה את זה באלפי מילים. אתם פשוט צריכים ללמד אותו לעשות את זה עם מילים נוספות.`,
+אבל אני מנצח אותו. כמעט תמיד.`,
       },
       {
-        title: 'השיטה שעבדה (בלי לשנן מילונים)',
-        content: `אני לא אוהב לשנן דברים. המוח שלי לא עובד ככה.
+        title: 'מה שהוא לא מבין',
+        content: `יובל מחפש מילים. אני מחפש צורות.
 
-אז במקום לנסות לזכור מאות מילים, עשיתי משהו אחר:
+כשאני מסתכל על לוח של אותיות, אני לא מנסה לזכור מילים מהראש. אני מחפש דברים שחוזרים על עצמם.
 
-**למדתי 20 מילות יסוד קצרות.**
+אני רואה "ה" בהתחלה ומיד בודק מה עוד יש. אני רואה "ים" בסוף ומחפש מה אפשר לשים לפני.
 
-מילים של 2-3 אותיות שחוזרות שוב ושוב:
-- אם, אב, גם, כן, לא, על, את, בו, לך, כל, עד, זה, כך...
-
-אחרי שבועיים, התחלתי לראות את המילים האלה **בכל מקום**. לא חיפשתי אותן - הן פשוט קפצו לי לעיניים.
-
-זה כמו כשקונים מכונית חדשה ופתאום רואים אותה בכל מקום. המוח מכוון למה שהוא יודע.
-
-(רשימת המילים המלאה שלי בסוף המאמר, אם אתם רוצים)`,
+זה לא עניין של לזכור כל מילה. זה עניין של לזהות דפוסים שכבר יודעים.`,
       },
       {
-        title: 'הטעות שכולם עושים (כולל אני)',
-        content: `חשבתי שצריך להיות "מהיר". לראות מילות מיד. לענות תוך שניות.
+        title: 'הטעות שעשיתי בהתחלה',
+        content: `ניסיתי פעם לשנן מילים. ישבתי עם רשימות, למדתי מילים נדירות. חשבתי שככה מנצחים.
 
-זה בולשיט.
+במשחק הבא לא זכרתי כלום. הראש שלי פשוט לא עובד ככה.
 
-שחקנים טובים לא מהירים יותר. הם **שיטתיים** יותר.
-
-יש להם תהליך:
-1. ראשית, בודקים אותיות נפוצות (א, ל, מ, ב, ה)
-2. אז, מחפשים דפוסים מוכרים (קידומות כמו "מ-", "ב-", "ה-" וסופיות כמו "-ים", "-ות")
-3. רק אז בונים מילים
-
-זה לוקח אותו זמן. אבל זה עובד בהרבה יותר סיכוי.
-
-אני עדיין לא מהיר. אבל אני עקבי. וזה מה שמשנה.`,
+מה שכן עובד: לשחק הרבה. לא ללמוד על משחקים, לשחק משחקים. במשחק השלישי או הרביעי אתחיל לראות דברים שלא ראיתי קודם. המוח פשוט מתרגל.`,
       },
       {
-        title: 'התרגול שעוזר (15 דקות ביום)',
-        content: `אני לא שיחקתי שעות. לא הייתה לי סבלנות.
+        title: 'משהו שעזר לי',
+        content: `אני לא אוהב לתת עצות כי מה שעובד לי אולי לא יעבוד לאחרים. אבל דבר אחד שינה לי את המשחק: הפסקתי לחפש מילים ארוכות.
 
-אבל 15 דקות כל בוקר? זה הצלחתי.
-
-הנה מה שעבד:
-- **ימים 1-7**: רק אתגר יומי. בלי לחץ, בלי ציונים, רק משחק.
-- **ימים 8-14**: אותו דבר, אבל עכשיו מנסה למצוא לפחות 3 מילים.
-- **שבוע 3+**: משחק אמיתי. ניסיון להשתפר, לא רק לזכות.
-
-אחרי חודש, לא הייתי "מומחה". אבל הפסקתי להפסיד כל פעם.
-
-זה הספיק לי להמשיך לשחק. וברגע שממשיכים לשחק - משתפרים בלי לשים לב.`,
+מילים קצרות הן יותר כיף. יותר מהן, יותר אפשרויות, ואני מרגיש חכם יותר כשמוצא שלוש מילים של שלוש אותיות מאשר מילה אחת ארוכה שהזל הביא לי.`,
       },
       {
-        title: 'מה שלא עובד (מה שבזבזתי עליו זמן)',
-        content: `בואו נהיה כנים על מה שלא עובד:
+        content: `יובל עדיין מתלונן שאני מרמה. בפעם האחרונה הוא אמר שיש לי "מילון מוסלק בראש". אמרתי לו שזה לא מילון, זה פשוט ניסיון.
 
-❌ **שינון מילונים**: בזבוז זמן מוחלט. אתם לא תזכרו אותן במשחק. (נסיתי. לא עבד.)
-
-❌ **משחק כל היום**: עייפות מנטלית = ביצועים גרועים. אחרי שעה אני מתחיל לטעות במילים שאני יודע.
-
-❌ **התמקדות במילים ארוכות**: מילים קצרות נותנות יותר אפשרויות ונקודות. מילה של 7 אותיות נהדרת, אבל 3 מילים של 3 אותיות? עדיף.
-
-❌ **משחק כשאתם עצבניים**: אתם תטעו יותר ותלמדו פחות. אני לומד הכי הרבה כשאני רגוע.
-
-חסכתי לכם חודשיים של טעויות. אתם מוזמנים.`,
-      },
-      {
-        title: 'בואו נהיה ריאליים',
-        content: `אני עדיין לא השחקן הטוב ביותר. אני מפסיד הרבה.
-
-אבל עכשיו:
-- אני מוצא מילים שלא הייתי רואה לפני חודשיים
-- אני לא מפחד מאותיות "קשות" (ק, ח, ץ, צ)
-- אני מבין **למה** מצאתי או לא מצאתי מילה
-- אני נהנה מהמשחק (זה הכי חשוב)
-
-זה לא על זכייה כל פעם. זה על **שיפור מתמיד**.
-
-ואם אתם מפסידים עכשיו - זה בסדר. כולם התחילו משם.
-
-השאלה היא: אתם ממשיכים לשחק, או שאתם מוותרים? כי אם תמשיכו - תשתפרו. זה פשוט ככה.`,
+הוא לא האמין לי. אולי הוא צודק.`,
       },
     ],
-    cta: {
-      title: 'אז מה עכשיו?',
-      content: `אתם יכולים לקרוא מאמרים על שיפור כישורים כל היום. לא ישנה כלום.
-
-מה שמשנה: **משחק אחד. עכשיו.**
-
-לא "מחר". לא "כשיהיה לי זמן". עכשיו. 15 דקות. בואו נראה מה קורה.`,
-    },
-    footer: 'אני מציע אתגר: שחקו 15 דקות ביום, 7 ימים. אם לא תשתפרו - כתבו לי ואני אישית אעזור לכם. (רציני הפעם.)',
     backToBlog: 'חזרה לבלוג',
-    practiceNow: 'בואו נתחיל - משחק חופשי',
-    tryDaily: 'או אתגר יומי',
+    practiceNow: 'משחק חופשי',
+    tryDaily: 'אתגר יומי',
   },
   en: {
-    title: 'How I Stopped Losing at Word Games (And Discovered I\'m Not Stupid)',
-    category: 'Strategy',
-    readTime: '7 min read',
-    intro: `For two years I played word games. For two years I lost almost every time.
-
-I thought I just wasn't good at it. That I didn't have the "talent" for words. So I stopped playing.
-
-Then a friend showed me something that made complete sense, but I'd never thought about it.`,
+    title: 'My cousin says I cheat at word games',
+    category: 'Perspective',
+    readTime: '5 min read',
     sections: [
       {
-        title: 'The Insight That Changed Everything',
-        content: `Here's what I didn't understand: good players don't remember more words than me.
+        content: `I don't cheat. I just notice things he doesn't.
 
-They see patterns.
+My cousin, Mike, knows more words than me. He reads books all the time. At work he writes long documents. I barely read past headlines.
 
-Think about it like this: when you look at the letters A-L-B-U-M, do you see random letters? Or do you immediately see "ALBUM"?
-
-If you see the word instantly - that's pattern recognition. And it's a skill you can learn.
-
-Your brain already does this with thousands of words. You just need to teach it to do it with more words.`,
+But I beat him. Almost every time.`,
       },
       {
-        title: 'The Method That Worked (Without Memorizing Dictionaries)',
-        content: `I hate memorizing things. My brain doesn't work that way.
+        title: 'What he doesn\'t get',
+        content: `Mike looks for words. I look for shapes.
 
-So instead of trying to remember hundreds of words, I did something different:
+When I look at a board of letters, I'm not trying to remember words from memory. I'm looking for things that repeat.
 
-**I learned 20 core short words.**
+I see an "RE" at the start and immediately check what else is there. I see "ING" at the end and look for what can go before it.
 
-2-3 letter words that repeat over and over:
-- AN, AT, BE, DO, GO, HE, IF, IN, IS, IT, ME, NO, OF, ON, OR, SO, TO, UP, US, WE...
-
-After two weeks, I started seeing these words **everywhere**. I wasn't looking for them - they just jumped out at me.
-
-It's like when you buy a new car and suddenly see it everywhere. The brain tunes to what it knows.
-
-(Full list of my words at the end if you want it)`,
+It's not about remembering every word. It's about recognizing patterns you already know.`,
       },
       {
-        title: 'The Mistake Everyone Makes (Including Me)',
-        content: `I thought you had to be "fast". See words instantly. Answer within seconds.
+        title: 'The mistake I made early on',
+        content: `I once tried to memorize words. I sat with lists, learned rare words. I thought that's how you win.
 
-That's bullshit.
+In the next game I remembered nothing. My head just doesn't work that way.
 
-Good players aren't faster. They're more **systematic**.
-
-They have a process:
-1. First, check common letters (E, A, R, I, O, T, N, S)
-2. Then, look for familiar patterns (prefixes like "UN-", "RE-" and suffixes like "-ED", "-ING")
-3. Only then build words
-
-It takes the same time. But it works way more often.
-
-I'm still not fast. But I'm consistent. And that's what matters.`,
+What does work: playing a lot. Not studying games, playing games. By the third or fourth game I start seeing things I didn't see before. The brain just gets used to it.`,
       },
       {
-        title: 'The Practice That Helps (15 Minutes a Day)',
-        content: `I didn't play for hours. I didn't have the patience.
+        title: 'Something that helped me',
+        content: `I don't like giving advice because what works for me might not work for others. But one thing changed my game: I stopped looking for long words.
 
-But 15 minutes every morning? I could do that.
-
-Here's what worked:
-- **Days 1-7**: Just daily challenge. No pressure, no scores, just play.
-- **Days 8-14**: Same thing, but now try to find at least 3 words.
-- **Week 3+**: Real game. Try to improve, not just win.
-
-After a month, I wasn't an "expert". But I stopped losing every single time.
-
-That was enough for me to keep playing. And once you keep playing - you improve without noticing.`,
+Short words are more fun. More of them, more options, and I feel smarter when I find three 3-letter words than one long word that luck handed me.`,
       },
       {
-        title: 'What Doesn\'t Work (What I Wasted Time On)',
-        content: `Let's be honest about what doesn't work:
+        content: `Mike still complains that I cheat. Last time he said I have a "hidden dictionary in my head." I told him it's not a dictionary, it's just experience.
 
-❌ **Memorizing dictionaries**: Complete waste of time. You won't remember them in a game. (I tried. Didn't work.)
-
-❌ **Playing all day**: Mental fatigue = poor performance. After an hour I start missing words I know.
-
-❌ **Focusing on long words**: Short words give more options and points. A 7-letter word is great, but three 3-letter words? Better.
-
-❌ **Playing when you're frustrated**: You'll make more mistakes and learn less. I learn most when I'm calm.
-
-Just saved you two months of mistakes. You're welcome.`,
-      },
-      {
-        title: 'Let\'s Be Real',
-        content: `I'm still not the best player. I lose a lot.
-
-But now:
-- I find words I wouldn't have seen two months ago
-- I'm not afraid of "hard" letters (Q, X, Z)
-- I understand **why** I found or didn't find a word
-- I enjoy the game (that's the most important part)
-
-It's not about winning every time. It's about **continuous improvement**.
-
-And if you're losing now - that's okay. Everyone started there.
-
-The question is: do you keep playing, or do you give up? Because if you keep playing - you'll improve. That's just how it works.`,
+He didn't believe me. Maybe he's right.`,
       },
     ],
-    cta: {
-      title: 'So What Now?',
-      content: `You can read articles about improving skills all day. Won't change anything.
-
-What changes things: **One game. Now.**
-
-Not "tomorrow". Not "when I have time". Now. 15 minutes. Let's see what happens.`,
-    },
-    footer: 'I propose a challenge: play 15 minutes a day, 7 days. If you don\'t improve - message me and I\'ll personally help you. (Serious this time.)',
     backToBlog: 'Back to Blog',
-    practiceNow: 'Let\'s Start - Free Play',
-    tryDaily: 'Or Daily Challenge',
+    practiceNow: 'Free Play',
+    tryDaily: 'Daily Challenge',
   },
   sv: {
-    title: 'Hur Jag Slutade Förlora i Ordspel (Och Upptäckte Att Jag Inte Är Dum)',
-    category: 'Strategi',
-    readTime: '7 min läsning',
-    intro: `I två år spelade jag ordspel. I två år förlorade jag nästan varje gång.
-
-Jag trodde att jag bara inte var bra på det. Att jag inte hade "talangen" för ord. Så jag slutade spela.
-
-Sedan visade en vän mig något som var helt logiskt, men som jag aldrig hade tänkt på.`,
+    title: 'Min kusin säger att jag fuskar i ordspel',
+    category: 'Perspektiv',
+    readTime: '5 min läsning',
     sections: [
       {
-        title: 'Insikten Som Förändrade Allt',
-        content: `Här är vad jag inte förstod: bra spelare kommer inte ihåg fler ord än jag.
+        content: `Jag fuskar inte. Jag märker bara saker han inte gör.
 
-De ser mönster.
+Min kusin Erik läser mycket mer än jag. Han kan fler ord. Han skriver hela tiden på jobbet, långa mejl, rapporter.
 
-Tänk på det så här: när du tittar på bokstäverna A-L-B-U-M, ser du slumpmässiga bokstäver? Eller ser du omedelbart "ALBUM"?
-
-Om du ser ordet direkt - det är mönsterigenkänning. Och det är en färdighet du kan lära dig.
-
-Din hjärna gör redan detta med tusentals ord. Du behöver bara lära den att göra det med fler ord.`,
+Ändå vinner jag. Nästan varje gång.`,
       },
       {
-        title: 'Metoden Som Fungerade (Utan Att Memorera Ordböcker)',
-        content: `Jag hatar att memorera saker. Min hjärna fungerar inte så.
+        title: 'Vad han inte förstår',
+        content: `Erik letar efter ord. Jag letar efter former.
 
-Så istället för att försöka komma ihåg hundratals ord, gjorde jag något annat:
+När jag tittar på bokstäver försöker jag inte komma ihåg ord. Jag letar efter saker som upprepas.
 
-**Jag lärde mig 20 korta kärnord.**
+Jag ser "FÖR" i början och kollar direkt vad mer som finns. Jag ser "ANDE" i slutet och letar efter vad som kan komma före.
 
-2-3 bokstavsord som upprepas om och om igen:
-- OM, ÄR, VI, HAN, JAG, DU, DE, MIG, DIN, VAR, HAR, KAN, SÅ, MEN...
-
-Efter två veckor började jag se dessa ord **överallt**. Jag letade inte efter dem - de bara hoppade ut åt mig.
-
-Det är som när du köper en ny bil och plötsligt ser den överallt. Hjärnan ställer in sig på vad den känner till.
-
-(Fullständig lista över mina ord i slutet om du vill ha den)`,
+Det handlar inte om att komma ihåg varje ord. Det handlar om att känna igen mönster man redan kan.`,
       },
       {
-        title: 'Misstaget Alla Gör (Inklusive Jag)',
-        content: `Jag trodde att man måste vara "snabb". Se ord direkt. Svara inom sekunder.
+        title: 'Mitt misstag i början',
+        content: `Jag försökte memorera ord en gång. Satt med listor, lärde mig ovanliga ord. Trodde det var så man vann.
 
-Det är strunt.
+I nästa spel kom jag inte ihåg något. Min hjärna fungerar bara inte så.
 
-Bra spelare är inte snabbare. De är mer **systematiska**.
-
-De har en process:
-1. Först, kolla vanliga bokstäver (E, A, R, N, T, S)
-2. Sedan, leta efter bekanta mönster (prefix som "O-", "FÖR-" och suffix som "-ARE", "-ANDE")
-3. Först då bygg ord
-
-Det tar samma tid. Men det fungerar mycket oftare.
-
-Jag är fortfarande inte snabb. Men jag är konsekvent. Och det är vad som spelar roll.`,
+Vad som fungerar: spela mycket. Inte studera spel, spela spel. Efter tredje eller fjärde spelet börjar jag se saker jag inte såg förut. Hjärnan vänjer sig bara.`,
       },
       {
-        title: 'Träningen Som Hjälper (15 Minuter Om Dagen)',
-        content: `Jag spelade inte i timmar. Jag hade inte tålamodet.
+        title: 'Något som hjälpte mig',
+        content: `Jag gillar inte att ge råd för det som fungerar för mig kanske inte fungerar för andra. Men en sak förändrade mitt spel: jag slutade leta efter långa ord.
 
-Men 15 minuter varje morgon? Det kunde jag göra.
-
-Här är vad som fungerade:
-- **Dag 1-7**: Bara den dagliga utmaningen. Ingen press, inga poäng, bara spela.
-- **Dag 8-14**: Samma sak, men försök nu hitta minst 3 ord.
-- **Vecka 3+**: Riktigt spel. Försök förbättra, inte bara vinna.
-
-Efter en månad var jag inte en "expert". Men jag slutade förlora varje gång.
-
-Det räckte för mig att fortsätta spela. Och när du fortsätter spela - förbättras du utan att märka det.`,
+Korta ord är roligare. Fler av dem, fler alternativ, och jag känner mig smartare när jag hittar tre ord på tre bokstäver än ett långt ord som jag hade tur med.`,
       },
       {
-        title: 'Vad Som Inte Fungerar (Vad Jag Slösade Tid På)',
-        content: `Låt oss vara ärliga om vad som inte fungerar:
+        content: `Erik klagar fortfarande på att jag fuskar. Förra gången sa han att jag har en "hemlig ordbok i huvudet." Jag sa att det inte är en ordbok, det är bara erfarenhet.
 
-❌ **Memorera ordböcker**: Fullständigt slöseri med tid. Du kommer inte ihåg dem i ett spel. (Jag försökte. Fungerade inte.)
-
-❌ **Spela hela dagen**: Mental trötthet = dålig prestation. Efter en timme börjar jag missa ord jag kan.
-
-❌ **Fokusera på långa ord**: Korta ord ger fler alternativ och poäng. Ett 7-bokstavsord är bra, men tre 3-bokstavsord? Bättre.
-
-❌ **Spela när du är frustrerad**: Du kommer göra fler misstag och lära dig mindre. Jag lär mig mest när jag är lugn.
-
-Sparade dig precis två månader av misstag. Varsågod.`,
-      },
-      {
-        title: 'Låt Oss Vara Realistiska',
-        content: `Jag är fortfarande inte den bästa spelaren. Jag förlorar mycket.
-
-Men nu:
-- Jag hittar ord jag inte skulle ha sett för två månader sedan
-- Jag är inte rädd för "svåra" bokstäver (Q, X, Z)
-- Jag förstår **varför** jag hittade eller inte hittade ett ord
-- Jag njuter av spelet (det är den viktigaste delen)
-
-Det handlar inte om att vinna varje gång. Det handlar om **kontinuerlig förbättring**.
-
-Och om du förlorar nu - det är okej. Alla började där.
-
-Frågan är: fortsätter du spela, eller ger du upp? För om du fortsätter spela - kommer du förbättras. Så fungerar det bara.`,
+Han trodde mig inte. Kanske har han rätt.`,
       },
     ],
-    cta: {
-      title: 'Så Vad Nu?',
-      content: `Du kan läsa artiklar om att förbättra färdigheter hela dagen. Kommer inte förändra något.
-
-Vad som förändrar saker: **Ett spel. Nu.**
-
-Inte "imorgon". Inte "när jag har tid". Nu. 15 minuter. Låt oss se vad som händer.`,
-    },
-    footer: 'Jag föreslår en utmaning: spela 15 minuter om dagen, 7 dagar. Om du inte förbättras - medde mig och jag hjälper dig personligen. (Menar allvar den här gången.)',
     backToBlog: 'Tillbaka till Bloggen',
-    practiceNow: 'Låt Oss Börja - Fri Spel',
-    tryDaily: 'Eller Daglig Utmaning',
+    practiceNow: 'Fritt Spel',
+    tryDaily: 'Dagens Utmaning',
   },
   ja: {
-    title: '言葉ゲームで負け続けるのをやめた方法（そして自分がバカじゃないと気づいた)',
-    category: '戦略',
-    readTime: '読了時間：7分',
-    intro: `2年間言葉ゲームをプレイしました。2年間ほぼ毎回負けました。
-
-私は単に得意じゃないんだと思いました。言葉の「才能」がないんだと。だからプレイをやめました。
-
-そして友人が完全に理にかなっているけれど考えたこともなかったことを教えてくれました。`,
+    title: 'いとこは僕がずるしてると言う',
+    category: '視点',
+    readTime: '読了時間：5分',
     sections: [
       {
-        title: 'すべてを変えた洞察',
-        content: `私が理解していなかったこと：上手なプレイヤーは私より多くの単語を覚えているわけではありません。
+        content: `ずるはしてない。彼が気づかないことに気づいているだけ。
 
-彼らはパターンを見ています。
+いとこの健太は僕より多くの言葉を知っている。いつも本を読んでいる。仕事で長い文書を書いている。僕は見出しくらいしか読まない。
 
-こう考えてください：A-L-B-U-Mという文字を見たとき、ランダムな文字が見えますか？それとも即座に「ALBUM」が見えますか？
-
-すぐに単語が見えるなら - それはパターン認識です。そしてそれは学べるスキルです。
-
-あなたの脳はすでに何千もの単語でこれをやっています。ただもっと多くの単語でそれをするように教える必要があるだけです。`,
+でも僕が勝つ。ほぼ毎回。`,
       },
       {
-        title: '効果があった方法（辞書を暗記せずに）',
-        content: `私は物を暗記するのが嫌いです。私の脳はそういう風に働きません。
+        title: '彼がわかっていないこと',
+        content: `健太は言葉を探している。僕は形を探している。
 
-だから何百もの単語を覚えようとする代わりに、別のことをしました：
+文字の盤面を見るとき、僕は頭から言葉を思い出そうとしていない。繰り返されるものを探している。
 
-**20個の核となる短い単語を学びました。**
+最初に「お」を見たらすぐに他に何があるか確認する。最後に「ます」を見たらその前に何が来れるか探す。
 
-何度も繰り返し出てくる2-3文字の単語：
-- が、を、に、の、は、で、と、も、や、か、ある、する、いる...
-
-2週間後、これらの単語が**至る所に**見え始めました。探していたわけではありません - ただ目に飛び込んできたのです。
-
-新しい車を買うと突然至る所でそれを見かけるようなものです。脳は知っているものにチューニングされます。
-
-（完全なリストは最後にあります）`,
+全ての言葉を覚えることじゃない。もう知っているパターンを認識すること。`,
       },
       {
-        title: '誰もがする間違い（私も含めて）',
-        content: `「速く」なければならないと思っていました。即座に単語を見る。数秒以内に答える。
+        title: '最初に僕がした間違い',
+        content: `一度言葉を暗記しようとした。リストと一緒に座って、珍しい言葉を覚えた。そうやって勝つんだと思った。
 
-それは間違いです。
+次のゲームで何も覚えていなかった。僕の頭はそういう風に動かない。
 
-上手なプレイヤーは速いのではありません。より**体系的**なのです。
-
-彼らにはプロセスがあります：
-1. まず、一般的な文字をチェック（あ、い、う、ん、の、は、を）
-2. 次に、馴染みのあるパターンを探す（接頭辞や接尾辞）
-3. その後初めて単語を組み立てる
-
-同じ時間がかかります。でもはるかに頻繁に機能します。
-
-私はまだ速くありません。でも一貫しています。それが重要なのです。`,
+うまくいくこと：たくさん遊ぶこと。ゲームを勉強するんじゃなくて、ゲームを遊ぶ。3回目か4回目のゲームで、前は見えなかったものが見え始める。脳は慣れるだけ。`,
       },
       {
-        title: '役立つ練習（1日15分）',
-        content: `何時間もプレイしませんでした。忍耐力がありませんでした。
+        title: '僕に役立ったこと',
+        content: `アドバイスを言うのは好きじゃない。僕にうまくいくことが他の人にうまくいくとは限らないから。でも一つだけゲームを変えたことがある：長い言葉を探すのをやめた。
 
-でも毎朝15分？それはできました。
-
-うまくいったこと：
-- **1-7日目**: ただデイリーチャレンジ。プレッシャーなし、スコアなし、ただプレイ。
-- **8-14日目**: 同じですが、今度は少なくとも3つの単語を見つけるよう努力。
-- **3週目以降**: 本当のゲーム。勝つだけでなく、改善しようとする。
-
-1ヶ月後、「エキスパート」ではありませんでした。でも毎回負けることはなくなりました。
-
-それでプレイを続けるには十分でした。そしてプレイを続けると - 気づかないうちに改善します。`,
+短い言葉の方が楽しい。もっと多く見つかる、選択肢も多い、運で見つけた長い言葉より3文字の言葉を3つ見つける方が賢く感じる。`,
       },
       {
-        title: '効果がないこと（時間を無駄にしたこと）',
-        content: `効果がないことについて正直に話しましょう：
+        content: `健太はまだ僕がずるしてると文句を言う。この前は「頭の中に隠し辞書がある」と言った。辞書じゃなくて、ただの経験だと言った。
 
-❌ **辞書を暗記する**: 完全に時間の無駄。ゲームで覚えていません。（試しました。うまくいきませんでした。）
-
-❌ **一日中プレイする**: 精神的疲労 = パフォーマンス低下。1時間後、知っている単語を見逃し始めます。
-
-❌ **長い単語に集中する**: 短い単語の方が選択肢とポイントが多い。7文字の単語は素晴らしいですが、3つの3文字単語？もっと良い。
-
-❌ **イライラしているときにプレイする**: より多くの間違いをして、より少なく学びます。私は落ち着いているときに最も学びます。
-
-2ヶ月分の間違いを節約しました。どういたしまして。`,
-      },
-      {
-        title: '現実的に',
-        content: `私はまだ最高のプレイヤーではありません。たくさん負けます。
-
-でも今：
-- 2ヶ月前には見えなかった単語を見つけます
-- 「難しい」文字を恐れません
-- 単語を見つけた、または見つけられなかった**理由**を理解しています
-- ゲームを楽しんでいます（これが最も重要な部分です）
-
-毎回勝つことではありません。**継続的な改善**についてです。
-
-そして今負けているなら - それは大丈夫です。誰もがそこから始めました。
-
-問題は：プレイを続けますか、それとも諦めますか？なぜならプレイを続けると - 改善します。そういうものです。`,
+信じてくれなかった。たぶん彼が正しいのかも。`,
       },
     ],
-    cta: {
-      title: 'では次は？',
-      content: `一日中スキル改善についての記事を読むことができます。何も変わりません。
-
-物事を変えるもの：**1つのゲーム。今。**
-
-「明日」ではありません。「時間があるとき」ではありません。今。15分。何が起こるか見てみましょう。`,
-    },
-    footer: 'チャレンジを提案します：1日15分、7日間プレイしてください。改善しなければ - メッセージをください、個人的にお手伝いします。（今回は本気です。）',
     backToBlog: 'ブログに戻る',
-    practiceNow: '始めましょう - フリープレイ',
-    tryDaily: 'またはデイリーチャレンジ',
+    practiceNow: 'フリープレイ',
+    tryDaily: 'デイリーチャレンジ',
   },
   es: {
-    title: 'Cómo Dejé de Perder en Juegos de Palabras (Y Descubrí Que No Soy Estúpido)',
-    category: 'Estrategia',
-    readTime: '7 min de lectura',
-    intro: `Durante dos años jugué juegos de palabras. Durante dos años perdí casi siempre.
-
-Pensé que simplemente no era bueno en eso. Que no tenía el "talento" para las palabras. Así que dejé de jugar.
-
-Entonces un amigo me mostró algo que tenía mucho sentido, pero que nunca había pensado.`,
+    title: 'Mi primo dice que hago trampa en los juegos de palabras',
+    category: 'Perspectiva',
+    readTime: '5 min de lectura',
     sections: [
       {
-        title: 'La Idea Que Lo Cambió Todo',
-        content: `Esto es lo que no entendía: los buenos jugadores no recuerdan más palabras que yo.
+        content: `No hago trampa. Simplemente noto cosas que él no nota.
 
-Ven patrones.
+Mi primo Carlos sabe más palabras que yo. Lee libros todo el tiempo. En el trabajo escribe documentos largos. Yo apenas leo más allá de los títulos.
 
-Piensa en esto: cuando miras las letras A-L-B-U-M, ¿ves letras aleatorias? ¿O ves inmediatamente "ALBUM"?
-
-Si ves la palabra al instante - eso es reconocimiento de patrones. Y es una habilidad que puedes aprender.
-
-Tu cerebro ya hace esto con miles de palabras. Solo necesitas enseñarle a hacerlo con más palabras.`,
+Pero yo le gano. Casi siempre.`,
       },
       {
-        title: 'El Método Que Funcionó (Sin Memorizar Diccionarios)',
-        content: `Odio memorizar cosas. Mi cerebro no funciona así.
+        title: 'Lo que él no entiende',
+        content: `Carlos busca palabras. Yo busco formas.
 
-Así que en lugar de intentar recordar cientos de palabras, hice algo diferente:
+Cuando miro un tablero de letras, no estoy tratando de recordar palabras de memoria. Busco cosas que se repiten.
 
-**Aprendí 20 palabras cortas fundamentales.**
+Veo "DES" al principio e inmediatamente reviso qué más hay. Veo "CIÓN" al final y busco qué puede ir antes.
 
-Palabras de 2-3 letras que se repiten una y otra vez:
-- AL, DE, EL, EN, ES, LA, LO, NO, SE, SI, UN, YA, ME, MI, TE, TU...
-
-Después de dos semanas, empecé a ver estas palabras **en todas partes**. No las estaba buscando - simplemente saltaban a la vista.
-
-Es como cuando compras un auto nuevo y de repente lo ves en todas partes. El cerebro se sintoniza con lo que conoce.
-
-(Lista completa de mis palabras al final si la quieres)`,
+No se trata de recordar cada palabra. Se trata de reconocer patrones que ya conoces.`,
       },
       {
-        title: 'El Error Que Todos Cometen (Incluyéndome)',
-        content: `Pensé que tenías que ser "rápido". Ver palabras al instante. Responder en segundos.
+        title: 'El error que cometí al principio',
+        content: `Una vez traté de memorizar palabras. Me senté con listas, aprendí palabras raras. Pensé que así se ganaba.
 
-Eso es mentira.
+En el siguiente juego no recordé nada. Mi cabeza simplemente no funciona así.
 
-Los buenos jugadores no son más rápidos. Son más **sistemáticos**.
-
-Tienen un proceso:
-1. Primero, verifican letras comunes (A, E, O, S, R, N, L)
-2. Luego, buscan patrones familiares (prefijos como "DES-", "RE-" y sufijos como "-CIÓN", "-MENTE")
-3. Solo entonces construyen palabras
-
-Toma el mismo tiempo. Pero funciona mucho más a menudo.
-
-Todavía no soy rápido. Pero soy consistente. Y eso es lo que importa.`,
+Lo que sí funciona: jugar mucho. No estudiar juegos, jugar juegos. Para el tercer o cuarto juego empiezo a ver cosas que no veía antes. El cerebro simplemente se acostumbra.`,
       },
       {
-        title: 'La Práctica Que Ayuda (15 Minutos al Día)',
-        content: `No jugué durante horas. No tenía la paciencia.
+        title: 'Algo que me ayudó',
+        content: `No me gusta dar consejos porque lo que funciona para mí quizás no funcione para otros. Pero una cosa cambió mi juego: dejé de buscar palabras largas.
 
-¿Pero 15 minutos cada mañana? Eso sí podía hacerlo.
-
-Esto es lo que funcionó:
-- **Días 1-7**: Solo el desafío diario. Sin presión, sin puntajes, solo jugar.
-- **Días 8-14**: Lo mismo, pero ahora intenta encontrar al menos 3 palabras.
-- **Semana 3+**: Juego real. Intenta mejorar, no solo ganar.
-
-Después de un mes, no era un "experto". Pero dejé de perder todas las veces.
-
-Eso fue suficiente para seguir jugando. Y una vez que sigues jugando - mejoras sin darte cuenta.`,
+Las palabras cortas son más divertidas. Más de ellas, más opciones, y me siento más inteligente cuando encuentro tres palabras de tres letras que una palabra larga que me dio la suerte.`,
       },
       {
-        title: 'Lo Que No Funciona (En Lo Que Perdí Tiempo)',
-        content: `Seamos honestos sobre lo que no funciona:
+        content: `Carlos todavía se queja de que hago trampa. La última vez dijo que tengo un "diccionario escondido en la cabeza." Le dije que no es un diccionario, es solo experiencia.
 
-❌ **Memorizar diccionarios**: Pérdida total de tiempo. No los recordarás en un juego. (Lo intenté. No funcionó.)
-
-❌ **Jugar todo el día**: Fatiga mental = mal rendimiento. Después de una hora empiezo a perder palabras que conozco.
-
-❌ **Enfocarse en palabras largas**: Las palabras cortas dan más opciones y puntos. Una palabra de 7 letras es genial, ¿pero tres palabras de 3 letras? Mejor.
-
-❌ **Jugar cuando estás frustrado**: Cometerás más errores y aprenderás menos. Aprendo más cuando estoy tranquilo.
-
-Acabo de ahorrarte dos meses de errores. De nada.`,
-      },
-      {
-        title: 'Seamos Realistas',
-        content: `Todavía no soy el mejor jugador. Pierdo mucho.
-
-Pero ahora:
-- Encuentro palabras que no habría visto hace dos meses
-- No tengo miedo de letras "difíciles" (Q, X, Z)
-- Entiendo **por qué** encontré o no encontré una palabra
-- Disfruto el juego (esa es la parte más importante)
-
-No se trata de ganar siempre. Se trata de **mejora continua**.
-
-Y si estás perdiendo ahora - está bien. Todos empezaron ahí.
-
-La pregunta es: ¿sigues jugando o te rindes? Porque si sigues jugando - mejorarás. Así es como funciona.`,
+No me creyó. Quizás tiene razón.`,
       },
     ],
-    cta: {
-      title: '¿Entonces Qué Ahora?',
-      content: `Puedes leer artículos sobre mejorar habilidades todo el día. No cambiará nada.
-
-Lo que cambia las cosas: **Un juego. Ahora.**
-
-No "mañana". No "cuando tenga tiempo". Ahora. 15 minutos. Veamos qué pasa.`,
-    },
-    footer: 'Propongo un desafío: juega 15 minutos al día, 7 días. Si no mejoras - escríbeme y te ayudaré personalmente. (En serio esta vez.)',
     backToBlog: 'Volver al Blog',
-    practiceNow: 'Comencemos - Juego Libre',
-    tryDaily: 'O Desafío Diario',
+    practiceNow: 'Juego Libre',
+    tryDaily: 'Desafío Diario',
   },
 };
 
 export default function ImproveSkillsPageClient(): React.ReactElement {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { theme } = useTheme();
   const params = useParams();
   const locale = (params.locale as string) || language;
@@ -626,7 +273,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
     )}>
       <AutoHideHeader />
 
-      <article className="max-w-4xl mx-auto px-4 py-8 page-content-safe">
+      <article className="max-w-3xl mx-auto px-4 py-8 page-content-safe">
         <Link href={`/${locale}/blog`}>
           <Button
             variant="outline"
@@ -652,7 +299,7 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
           </div>
 
           <h1 className={cn(
-            'text-4xl md:text-5xl font-black mb-4',
+            'text-3xl md:text-4xl font-black mb-4 leading-tight',
             isDarkMode ? 'text-white' : 'text-neo-black'
           )}>
             {content.title}
@@ -677,55 +324,32 @@ export default function ImproveSkillsPageClient(): React.ReactElement {
           'prose prose-lg max-w-none',
           isDarkMode ? 'prose-invert' : ''
         )}>
-          <div className={cn(
-            'p-6 rounded-neo border-3 border-neo-black mb-8 whitespace-pre-line',
-            isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
-          )}>
-            <p className={cn('text-lg font-medium mb-0', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              {content.intro}
-            </p>
-          </div>
-
           {content.sections.map((section, index) => (
-            <div
-              key={index}
-              className={cn(
-                'mb-8 p-6 rounded-neo border-3 border-neo-black',
-                isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
+            <div key={index} className="mb-6">
+              {section.title && (
+                <h2 className={cn(
+                  'text-xl font-bold mb-3 mt-8',
+                  isDarkMode ? 'text-white' : 'text-neo-black'
+                )}>
+                  {section.title}
+                </h2>
               )}
-            >
-              <h2 className={cn('text-2xl font-bold mb-4', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {section.title}
-              </h2>
-              <div className={cn('whitespace-pre-line', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-                {section.content}
-              </div>
+              {section.content.split('\n\n').map((paragraph, pIndex) => (
+                <p
+                  key={pIndex}
+                  className={cn(
+                    'mb-4 leading-relaxed',
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  )}
+                >
+                  {paragraph}
+                </p>
+              ))}
             </div>
           ))}
 
-          <div className={cn(
-            'p-6 rounded-neo border-3 border-neo-black mt-8',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-yellow/20'
-          )}>
-            <h2 className={cn('text-2xl font-bold mb-4', isDarkMode ? 'text-white' : 'text-neo-black')}>
-              {content.cta.title}
-            </h2>
-            <p className={cn('mb-4 whitespace-pre-line', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              {content.cta.content}
-            </p>
-          </div>
-
-          <div className={cn(
-            'p-4 rounded-neo border-2 border-neo-black mt-6 whitespace-pre-line',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cyan/20'
-          )}>
-            <p className={cn('text-sm mb-0', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-              {content.footer}
-            </p>
-          </div>
-
-          <div className={cn('mt-8 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
-            <div className="flex gap-4 mt-6">
+          <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
+            <div className="flex gap-4">
               <Link href={`/${locale}/singleplayer`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.practiceNow}

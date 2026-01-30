@@ -148,6 +148,20 @@ const EXPECTED_ERROR_PATTERNS = [
   /play\(\) failed/i,
   /autoplay/i,
   /user denied permission/i,
+  /Playback was unable to start/i,
+  /Failed to start the audio device/i,
+  /audio device/i,
+  /InvalidStateError/i,
+
+  // Audio loading/decoding issues (expected on some devices)
+  /HTML5 Audio pool exhausted/i,
+  /pool exhausted/i,
+  /Decoding audio data failed/i,
+  /audio.*decoding/i,
+  /Failed to load.*audio/i,
+  /Failed to play.*audio/i,
+  /onloaderror/i,
+  /onplayerror/i,
 
   // Rate limiting (handled gracefully by UI)
   /rate limit/i,
@@ -175,6 +189,9 @@ const EXPECTED_ERROR_PATTERNS = [
   /websocket error/i,
   /connect_error/i,
   /polling error/i,
+  /socket not connected/i,
+  /Cannot join/i,
+  /cannot emit/i,
 ];
 
 /**

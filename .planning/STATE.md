@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 27 - Dynamic Board Mechanics
-Plan: 5/6 (Tile Removal and Refill Logic COMPLETE)
-Status: Phase 27 in progress
-Last activity: 2026-01-30 — Completed 27-05-PLAN.md (Tile Removal and Refill Logic)
+Plan: 6/6 (Special Tile Integration COMPLETE)
+Status: Phase 27 COMPLETE ✅
+Last activity: 2026-01-30 — Completed 27-06-PLAN.md (Special Tile Integration)
 
-Progress: [████████░░] 83.3% (5/6 plans complete in Phase 27)
+Progress: [██████████] 100% (6/6 plans complete in Phase 27)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -32,7 +32,7 @@ Progress: [████████░░] 83.3% (5/6 plans complete in Phase 27
 1. **Phase 26: Meta-Progression Foundation** (21 reqs: META + JUICE + UI) ✅ COMPLETE
    - XP/leveling, gold currency, stat upgrades, game juice, HUD framework
 
-2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) 🔄 IN PROGRESS (4/6)
+2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) ✅ COMPLETE
    - Candy Crush cascades, tile movement, explosions, special tiles
 
 3. **Phase 28: Power-Up System** (7 reqs: POWER)
@@ -65,12 +65,19 @@ Progress: [████████░░] 83.3% (5/6 plans complete in Phase 27
 
 **v2.0 Progress:**
 - Phase 26 complete: 9/9 plans (100%)
-- Phase 27 active: 5/6 plans (83.3%)
-- Total v2.0 plans complete: 14 of 70+ (early progress)
+- Phase 27 complete: 6/6 plans (100%)
+- Total v2.0 plans complete: 15 of 70+ (early progress)
 
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 27-06 (Special Tile Integration, 2026-01-30):**
+- Multiplier tiles inline processing: Processed in SUBMIT_WORD reducer like existing tiles (gold, ice, bomb) for consistency
+- Locked tile grid-wide check: All locked tiles unlock when word contains same letter (not just adjacent) for intuitive mechanic
+- Multiplier single use: Tiles convert to standard after use to prevent overpowered scoring and balance progression
+- Processing order: Special tiles activate -> score calculated -> cascade triggers -> explosion fires -> animations
+- 42 integration tests: Comprehensive coverage of frozen, locked, multiplier tiles plus full Phase 27 integration
 
 **Phase 27-05 (Tile Removal and Refill Logic, 2026-01-30):**
 - Explosion fires at REMOVING phase START: Before Framer Motion exit animation (visual sequence: flash -> scale -> fade)
@@ -191,13 +198,18 @@ None - Starting fresh milestone with roadmap complete.
 - Entry sequence timing still 2.38s (380ms over target)
 - Video MP4 files not rendered (render script exists)
 
+**Phase 27 Balance Tuning Needed:**
+- Multiplier tile frequency per level (gameplay testing required)
+- Locked tile difficulty curve (early levels might be too hard)
+- Cascade + special tiles performance on iPhone 11 (low-end device testing)
+
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-05-PLAN.md (Tile Removal and Refill Logic)
+Stopped at: Completed 27-06-PLAN.md (Special Tile Integration - Phase 27 COMPLETE)
 Resume file: None
 
-**Next action:** Continue Phase 27 with plan 27-06 (final plan)
+**Next action:** Start Phase 28 (Power-Up System)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -221,5 +233,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Plan 27-04 complete: Special Tile Activation Mechanics)*
-*Last updated: 2026-01-30 (Plan 27-01 complete: Cascade Loop State Machine)*
+*Last updated: 2026-01-30 (Phase 27 COMPLETE: Dynamic Board Mechanics - all 6 plans delivered)*
