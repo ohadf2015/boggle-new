@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 26 - Meta-Progression Foundation
-Plan: 7/8 (in progress - Wave 3)
-Status: Plans 26-01 through 26-07 complete (XP, gold, screen shake, XP UI, currency UI, particles, HUD)
-Last activity: 2026-01-30 — Completed 26-07-PLAN.md (Adventure HUD Components)
+Plan: 8/8 (COMPLETE - Wave 3)
+Status: Phase 26 complete - All meta-progression systems integrated
+Last activity: 2026-01-30 — Completed 26-08-PLAN.md (Meta-Progression Integration)
 
-Progress: [███████░░░] 75% (6/8 plans complete)
+Progress: [██████████] 100% (8/8 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [███████░░░] 75% (6/8 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 6 (26-01 XP, 26-02 gold, 26-03 screen shake, 26-04 XP UI, 26-05 currency UI, 26-06 particles, 26-07 HUD)
-- Current phase: Phase 26 in progress (Wave 3)
+- Plans completed: 8 (Phase 26 COMPLETE - all meta-progression systems)
+- Current phase: Phase 26 complete, ready for Phase 27 (Dynamic Board Mechanics)
 
 ## Accumulated Context
 
@@ -155,6 +155,14 @@ Key decisions from previous milestones:
 - Responsive design hides XP bar on small screens: Preserves critical info (level, gold, timer) on mobile
 - Board-first design principle: HUD at edges only, no center overlap, gameplay never obstructed
 
+**Phase 26-08 (Meta-Progression Integration, 2026-01-30):**
+- Hooks integrated with temp-user-id: Auth wiring deferred to future phase, enables full testing now
+- Upgrade multipliers applied to base values: (base × upgrade) × combo ensures impactful but balanced
+- Score popup arc trajectory: Targets score counter position for visual continuity, falls back to fade
+- Combo juice intensity scaling: Shake 2-8px and particles 10-50 based on tier (Nice/Great/Amazing/LEGENDARY)
+- Level-up modal auto-dismisses: 3s timeout maintains game momentum, instant skip for reduced motion
+- Integration test pattern: Mock hooks + verify state changes + test end-to-end flows (10 scenarios, 308 lines)
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -180,10 +188,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-07-PLAN.md (Adventure HUD Components)
+Stopped at: Completed 26-08-PLAN.md (Meta-Progression Integration) - Phase 26 COMPLETE
 Resume file: None
 
-**Next action:** Continue with remaining Phase 26 plans (26-08 Stat Upgrades, 26-09 In-Game Integration)
+**Next action:** Begin Phase 27 (Dynamic Board Mechanics) - Candy Crush cascades, tile movement, explosions
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
