@@ -127,7 +127,7 @@ jest.mock('../juice/ExplosionEffect', () => ({
       if (props.onComplete) {
         props.onComplete();
       }
-    }, []);
+    }, [props]);
     return null;
   },
 }));
