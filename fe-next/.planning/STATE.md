@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 26 - Meta-Progression Foundation
-Plan: 5/8 (in progress - Wave 2)
-Status: Plans 26-01, 26-02, 26-03, 26-04 complete (XP utilities, gold, screen shake, XP UI)
-Last activity: 2026-01-30 — Completed 26-04-PLAN.md (Adventure XP UI Components)
+Plan: 6/8 (in progress - Wave 2)
+Status: Plans 26-01 through 26-05 complete (XP, gold, screen shake, XP UI, currency UI)
+Last activity: 2026-01-30 — Completed 26-05-PLAN.md (Currency Display & Upgrade Shop)
 
-Progress: [█████░░░░░] 50% (4/8 plans complete)
+Progress: [██████░░░░] 62.5% (5/8 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -134,6 +134,13 @@ Key decisions from previous milestones:
 - Auto-close modal after 3 seconds: Smooth UX flow without explicit dismiss, keeps game momentum
 - Framer Motion for animations: Declarative API with spring physics, zero duration when reduced motion enabled
 
+**Phase 26-05 (Currency Display & Upgrade Shop, 2026-01-30):**
+- usePrefersReducedMotion hook for accessibility: WCAG 2.1 compliance, reusable across animated components
+- CurrencyDisplay with coin icon: Clear gold visualization, number formatting with commas
+- Recent gain animation: Flies up and fades (0.8s), instant for reduced motion users
+- UpgradeShop purchase validation: Checks affordability and max stacks, clear feedback
+- Neo-brutalist card layout: Hard shadows, chunky borders, high contrast (yellow/lime/black)
+
 **Phase 26-06 (Adaptive Particle System & Score Popup, 2026-01-30):**
 - Three-tier particle budgets: low (30), medium (60), high (100) particles based on device
 - Zero particles for reduced motion users: Accessibility first, WCAG 2.1 compliant
@@ -166,10 +173,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-04-PLAN.md (Adventure XP UI Components)
+Stopped at: Completed 26-05-PLAN.md (Currency Display & Upgrade Shop)
 Resume file: None
 
-**Next action:** Continue with remaining Phase 26 plans (26-05 HUD UI, 26-07 Stat Upgrades, 26-08 In-Game Integration)
+**Next action:** Continue with remaining Phase 26 plans (26-06 HUD UI, 26-07 Stat Upgrades, 26-08 In-Game Integration)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
