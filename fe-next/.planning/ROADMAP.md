@@ -312,26 +312,27 @@ Plans:
 - [x] 26-08-PLAN.md — AdventureGame integration + verification (Wave 3)
 - [x] 26-09-PLAN.md — Gap closure: Score popup arc trajectory + XP translation (Wave 1)
 
-#### Phase 27: Dynamic Board Mechanics
+#### ✅ Phase 27: Dynamic Board Mechanics — COMPLETE
 **Goal**: Board feels alive with Candy Crush-style cascades and smooth animations
 **Depends on**: Phase 26 (uses meta-progression for unlock gating)
 **Requirements**: BOARD-01, BOARD-02, BOARD-03, BOARD-04, BOARD-05, BOARD-06
 **Success Criteria** (what must be TRUE):
-  1. User sees tiles cascade when words removed (collapse → fall → refill in 0.25s steps)
-  2. User sees smooth tile movement with quadratic/elastic easing at 60fps on mobile (iPhone 12 baseline)
-  3. User sees explosion effects for multi-tile clearing
-  4. User sees special tile types (frozen, locked, multiplier) with distinct visuals
-  5. Cascades trigger automatically when words removed without player action
+  1. ✓ User sees tiles cascade when words removed (collapse → fall → refill in 0.25s steps)
+  2. ✓ User sees smooth tile movement with quadratic/elastic easing at 60fps on mobile (iPhone 12 baseline)
+  3. ✓ User sees explosion effects for multi-tile clearing
+  4. ✓ User sees special tile types (frozen, locked, multiplier) with distinct visuals
+  5. ✓ Cascades trigger automatically when words removed without player action
 **Plans**: 7 plans in 5 waves (including gap closure)
+**Completed**: 2026-01-30
 
 Plans:
 - [x] 27-01-PLAN.md — Cascade loop state machine (TDD, Wave 1)
-- [x] 27-02-PLAN.md — Framer Motion layout animations (Wave 1)
+- [x] 27-02-PLAN.md — Framer Motion layout animations (Wave 2)
 - [x] 27-03-PLAN.md — Explosion effects for multi-tile clearing (Wave 2)
 - [x] 27-04-PLAN.md — Special tile activation logic (TDD, Wave 2)
 - [x] 27-05-PLAN.md — Tile removal and refill logic (Wave 3)
 - [x] 27-06-PLAN.md — Special tile integration + full verification (Wave 4)
-- [ ] 27-07-PLAN.md — Gap closure: Locked/multiplier tile CSS styling (Wave 5)
+- [x] 27-07-PLAN.md — Gap closure: Locked/multiplier tile CSS styling (Wave 5)
 
 #### Phase 28: Power-Up System
 **Goal**: Players have strategic mid-game options that feel rewarding without being mandatory
@@ -488,7 +489,7 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 24. CrazyGames Portal Integration | v1.2 | 7/7 | ✅ Complete | 2026-01-26 |
 | 25. Capacitor Native Apps | v1.2 | 6/6 | ✅ Complete | 2026-01-26 |
 | 26. Meta-Progression Foundation | v2.0 | 9/9 | ✅ Complete | 2026-01-30 |
-| 27. Dynamic Board Mechanics | v2.0 | 0/TBD | Not started | - |
+| 27. Dynamic Board Mechanics | v2.0 | 7/7 | ✅ Complete | 2026-01-30 |
 | 28. Power-Up System | v2.0 | 0/TBD | Not started | - |
 | 29. Adaptive Difficulty System | v2.0 | 0/TBD | Not started | - |
 | 30. Boss Battle Overhaul | v2.0 | 0/TBD | Not started | - |
@@ -501,4 +502,4 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-30 after v2.0 milestone phases defined (10 phases, 76 requirements mapped)*
+*Last updated: 2026-01-30 after Phase 27 complete (Dynamic Board Mechanics)*
