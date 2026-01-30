@@ -344,10 +344,15 @@ Plans:
   3. User sees activation animations (0.25s burst effect) when triggering power-ups
   4. Power-ups inventory persists across levels
   5. Every level is beatable without power-ups (skill-based balance verified in testing)
-**Plans**: TBD
+**Plans**: 6 plans in 5 waves
 
 Plans:
-- [ ] 28-01: TBD during plan-phase
+- [ ] 28-01-PLAN.md — Power-up types + usePowerUpState hook (TDD, Wave 1)
+- [ ] 28-02-PLAN.md — Power-up effect functions (TDD, Wave 2)
+- [ ] 28-03-PLAN.md — PowerUpButton + PowerUpActivationEffect components (Wave 2)
+- [ ] 28-04-PLAN.md — PowerUpBar container + usePowerUpInventory persistence (Wave 3)
+- [ ] 28-05-PLAN.md — AdventureGame integration with all effects (Wave 4)
+- [ ] 28-06-PLAN.md — Skill balance verification + human verification (Wave 5)
 
 #### Phase 29: Adaptive Difficulty System
 **Goal**: All skill levels stay in flow state through invisible difficulty adjustments
@@ -490,7 +495,7 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 25. Capacitor Native Apps | v1.2 | 6/6 | ✅ Complete | 2026-01-26 |
 | 26. Meta-Progression Foundation | v2.0 | 9/9 | ✅ Complete | 2026-01-30 |
 | 27. Dynamic Board Mechanics | v2.0 | 7/7 | ✅ Complete | 2026-01-30 |
-| 28. Power-Up System | v2.0 | 0/TBD | Not started | - |
+| 28. Power-Up System | v2.0 | 0/6 | Planned | - |
 | 29. Adaptive Difficulty System | v2.0 | 0/TBD | Not started | - |
 | 30. Boss Battle Overhaul | v2.0 | 0/TBD | Not started | - |
 | 31. Skill Tree & Progression Depth | v2.0 | 0/TBD | Not started | - |
@@ -502,4 +507,4 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-30 after Phase 27 complete (Dynamic Board Mechanics)*
+*Last updated: 2026-01-30 after Phase 28 planning complete (Power-Up System)*
