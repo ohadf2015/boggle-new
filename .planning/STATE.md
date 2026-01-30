@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 27 - Dynamic Board Mechanics
-Plan: 2/6 (Framer Layout Animations COMPLETE)
+Plan: 4/6 (Special Tile Activation Mechanics COMPLETE)
 Status: Phase 27 in progress
-Last activity: 2026-01-30 — Completed 27-02-PLAN.md (Framer Layout Animations)
+Last activity: 2026-01-30 — Completed 27-04-PLAN.md (Special Tile Activation Mechanics)
 
-Progress: [███░░░░░░░] 33.3% (2/6 plans complete in Phase 27)
+Progress: [███████░░░] 66.7% (4/6 plans complete in Phase 27)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -32,7 +32,7 @@ Progress: [███░░░░░░░] 33.3% (2/6 plans complete in Phase 27
 1. **Phase 26: Meta-Progression Foundation** (21 reqs: META + JUICE + UI) ✅ COMPLETE
    - XP/leveling, gold currency, stat upgrades, game juice, HUD framework
 
-2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) 🔄 IN PROGRESS (2/6)
+2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) 🔄 IN PROGRESS (4/6)
    - Candy Crush cascades, tile movement, explosions, special tiles
 
 3. **Phase 28: Power-Up System** (7 reqs: POWER)
@@ -71,6 +71,13 @@ Progress: [███░░░░░░░] 33.3% (2/6 plans complete in Phase 27
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 27-04 (Special Tile Activation Mechanics, 2026-01-30):**
+- Frozen tiles skip gravity during cascade: isFrozen=true stay in place (visual continuity - appear anchored)
+- Locked tiles block spawning in their position: Can't spawn over locked tiles until unlocked (strategic layer)
+- Multiplier stacking multiplicative: 2x * 2x = 4x, with gold 3x + multiplier 2x = 6x (high-score strategies)
+- Pure function exports: checkFrozenThaw, checkLockedUnlock, applyMultiplier for unit testing without hook overhead
+- 8-way adjacency for frozen thaw: Diagonals count (more forgiving UX, consistent with grid-based game expectations)
 
 **Phase 27-02 (Framer Layout Animations, 2026-01-30):**
 - AnimatePresence mode="popLayout": Allows exiting tiles to pop out while remaining tiles rearrange smoothly
@@ -180,10 +187,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-02-PLAN.md (Framer Layout Animations)
+Stopped at: Completed 27-04-PLAN.md (Special Tile Activation Mechanics)
 Resume file: None
 
-**Next action:** Continue Phase 27 with plan 27-03 (Explosion Effects)
+**Next action:** Continue Phase 27 with plan 27-05 (Tile Removal and Refill Logic)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -207,4 +214,5 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
+*Last updated: 2026-01-30 (Plan 27-04 complete: Special Tile Activation Mechanics)*
 *Last updated: 2026-01-30 (Plan 27-01 complete: Cascade Loop State Machine)*
