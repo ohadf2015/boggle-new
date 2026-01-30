@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 27 - Dynamic Board Mechanics
-Plan: 1/6 (Cascade Loop State Machine COMPLETE)
+Plan: 2/6 (Framer Layout Animations COMPLETE)
 Status: Phase 27 in progress
-Last activity: 2026-01-30 — Completed 27-01-PLAN.md (Cascade Loop State Machine)
+Last activity: 2026-01-30 — Completed 27-02-PLAN.md (Framer Layout Animations)
 
-Progress: [██░░░░░░░░] 16.7% (1/6 plans complete in Phase 27)
+Progress: [███░░░░░░░] 33.3% (2/6 plans complete in Phase 27)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -32,7 +32,7 @@ Progress: [██░░░░░░░░] 16.7% (1/6 plans complete in Phase 27
 1. **Phase 26: Meta-Progression Foundation** (21 reqs: META + JUICE + UI) ✅ COMPLETE
    - XP/leveling, gold currency, stat upgrades, game juice, HUD framework
 
-2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) 🔄 IN PROGRESS (1/6)
+2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) 🔄 IN PROGRESS (2/6)
    - Candy Crush cascades, tile movement, explosions, special tiles
 
 3. **Phase 28: Power-Up System** (7 reqs: POWER)
@@ -65,12 +65,18 @@ Progress: [██░░░░░░░░] 16.7% (1/6 plans complete in Phase 27
 
 **v2.0 Progress:**
 - Phase 26 complete: 9/9 plans (100%)
-- Phase 27 active: 1/6 plans (16.7%)
-- Total v2.0 plans complete: 10 of 70+ (early progress)
+- Phase 27 active: 2/6 plans (33.3%)
+- Total v2.0 plans complete: 11 of 70+ (early progress)
 
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 27-02 (Framer Layout Animations, 2026-01-30):**
+- AnimatePresence mode="popLayout": Allows exiting tiles to pop out while remaining tiles rearrange smoothly
+- Spring physics stiffness 500 damping 30: Higher stiffness for snappy game-like movement with controlled bounce
+- Animation timing 200ms: Fits within 250ms cascade phases with 50ms buffer for safety
+- LayoutId using tile.id: Stable identifier enables Framer Motion to track tiles across position changes
 
 **Phase 27-01 (Cascade Loop State Machine, 2026-01-30):**
 - 250ms per phase for smooth animations: Balances visibility with gameplay speed (750ms total)
@@ -174,10 +180,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-01-PLAN.md (Cascade Loop State Machine)
+Stopped at: Completed 27-02-PLAN.md (Framer Layout Animations)
 Resume file: None
 
-**Next action:** Continue Phase 27 with plan 27-02 (Tile Removal and Refill)
+**Next action:** Continue Phase 27 with plan 27-03 (Explosion Effects)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
