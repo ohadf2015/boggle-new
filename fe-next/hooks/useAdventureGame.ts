@@ -70,6 +70,8 @@ interface UseAdventureGameReturn {
   isCascading: boolean;
   /** Current cascade phase */
   cascadePhase: CascadePhase;
+  /** Add time to the countdown timer (for power-ups) */
+  addTime: (seconds: number) => void;
 }
 
 // ==============================================
@@ -80,6 +82,7 @@ type GameAction =
   | { type: 'START_GAME' }
   | { type: 'PAUSE_GAME' }
   | { type: 'TICK' }
+  | { type: 'ADD_TIME'; payload: { seconds: number } }
   | {
       type: 'SUBMIT_WORD';
       payload: {
@@ -271,6 +274,14 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         };
       }
 
+      return { ...state, timeRemaining: newTime };
+    }
+
+    case 'ADD_TIME': {
+      const newTime = Math.min(
+        state.timeRemaining + action.payload.seconds,
+        state.levelConfig.timerSeconds
+      );
       return { ...state, timeRemaining: newTime };
     }
 
@@ -819,6 +830,10 @@ export function useAdventureGame({
     dispatch({ type: 'CLEAR_ACTIVATION_EFFECTS' });
   }, []);
 
+  const addTime = useCallback((seconds: number) => {
+    dispatch({ type: 'ADD_TIME', payload: { seconds } });
+  }, []);
+
   return {
     gameState: state.gameState,
     tiles: state.tiles,
@@ -838,5 +853,6 @@ export function useAdventureGame({
     clearActivationEffects,
     isCascading: cascade.state.isProcessing,
     cascadePhase: cascade.state.phase,
+    addTime,
   };
 }
