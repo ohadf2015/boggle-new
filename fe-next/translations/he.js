@@ -4093,6 +4093,13 @@ const he = {
       "continue": "המשך",
       "maxLevel": "רמה מקסימלית!"
     },
+    "powerUps": {
+      "freezeTime": "הקפא זמן",
+      "hint": "רמז",
+      "scoreMultiplier": "ניקוד כפול",
+      "ready": "מוכן",
+      "cooldown": "{{seconds}} שניות"
+    },
     "upgrades": {
       "maxLevel": "רמה מקסימלית",
       "purchase": "רכישה",

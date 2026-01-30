@@ -4087,6 +4087,13 @@ const en = {
       "continue": "Continue",
       "maxLevel": "MAX LEVEL!"
     },
+    "powerUps": {
+      "freezeTime": "Freeze Time",
+      "hint": "Hint",
+      "scoreMultiplier": "2x Score",
+      "ready": "Ready",
+      "cooldown": "{{seconds}}s"
+    },
     "upgrades": {
       "maxLevel": "Max Level",
       "purchase": "Purchase",

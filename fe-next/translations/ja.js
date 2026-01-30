@@ -4118,6 +4118,13 @@ const ja = {
       "continue": "続ける",
       "maxLevel": "最大レベル！"
     },
+    "powerUps": {
+      "freezeTime": "タイム凍結",
+      "hint": "ヒント",
+      "scoreMultiplier": "2倍スコア",
+      "ready": "準備完了",
+      "cooldown": "{{seconds}}秒"
+    },
     "upgrades": {
       "maxLevel": "最大レベル",
       "purchase": "購入",

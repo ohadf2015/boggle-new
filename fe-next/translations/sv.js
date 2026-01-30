@@ -4118,6 +4118,13 @@ const sv = {
       "continue": "Fortsätt",
       "maxLevel": "MAXNIVÅ!"
     },
+    "powerUps": {
+      "freezeTime": "Frys tid",
+      "hint": "Tips",
+      "scoreMultiplier": "2x Poang",
+      "ready": "Redo",
+      "cooldown": "{{seconds}}s"
+    },
     "upgrades": {
       "maxLevel": "Maxnivå",
       "purchase": "Köp",
