@@ -14,9 +14,8 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import AdventureTimer from '@/components/adventure/AdventureTimer';
 import AdventureXpProgressBar from '@/components/adventure/meta/AdventureXpProgressBar';
 import { CurrencyDisplay } from '@/components/adventure/meta/CurrencyDisplay';
-import { ObjectiveProgress } from './ObjectiveProgress';
+import { ObjectiveProgress, type ObjectiveProgressProps } from './ObjectiveProgress';
 import { CooldownIndicator } from './CooldownIndicator';
-import type { ObjectiveProgressProps } from './ObjectiveProgress';
 
 // ============================================
 // TYPE DEFINITIONS
