@@ -4092,7 +4092,8 @@ const en = {
       "hint": "Hint",
       "scoreMultiplier": "2x Score",
       "ready": "Ready",
-      "cooldown": "{{seconds}}s"
+      "cooldown": "{{seconds}}s",
+      "cascadeBlocked": "Wait for cascade to complete"
     },
     "upgrades": {
       "maxLevel": "Max Level",

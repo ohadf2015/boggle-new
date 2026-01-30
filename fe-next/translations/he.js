@@ -4098,7 +4098,8 @@ const he = {
       "hint": "רמז",
       "scoreMultiplier": "ניקוד כפול",
       "ready": "מוכן",
-      "cooldown": "{{seconds}} שניות"
+      "cooldown": "{{seconds}} שניות",
+      "cascadeBlocked": "המתן לסיום המפולת"
     },
     "upgrades": {
       "maxLevel": "רמה מקסימלית",

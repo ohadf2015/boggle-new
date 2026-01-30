@@ -4123,7 +4123,8 @@ const sv = {
       "hint": "Tips",
       "scoreMultiplier": "2x Poang",
       "ready": "Redo",
-      "cooldown": "{{seconds}}s"
+      "cooldown": "{{seconds}}s",
+      "cascadeBlocked": "Vänta tills kaskaden är klar"
     },
     "upgrades": {
       "maxLevel": "Maxnivå",

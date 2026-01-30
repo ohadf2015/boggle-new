@@ -4123,7 +4123,8 @@ const ja = {
       "hint": "ヒント",
       "scoreMultiplier": "2倍スコア",
       "ready": "準備完了",
-      "cooldown": "{{seconds}}秒"
+      "cooldown": "{{seconds}}秒",
+      "cascadeBlocked": "カスケード完了を待つ"
     },
     "upgrades": {
       "maxLevel": "最大レベル",

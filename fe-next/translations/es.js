@@ -4107,6 +4107,14 @@ const es = {
       "continue": "Continuar",
       "maxLevel": "¡NIVEL MÁXIMO!"
     },
+    "powerUps": {
+      "freezeTime": "Congelar tiempo",
+      "hint": "Pista",
+      "scoreMultiplier": "2x Puntos",
+      "ready": "Listo",
+      "cooldown": "{{seconds}}s",
+      "cascadeBlocked": "Espera a que termine la cascada"
+    },
     "upgrades": {
       "maxLevel": "Nivel máximo",
       "purchase": "Comprar",
