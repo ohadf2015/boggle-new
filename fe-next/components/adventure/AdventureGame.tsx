@@ -23,7 +23,7 @@ import { useAdventureXp } from '@/hooks/useAdventureXp';
 import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
-import { ScorePopupFly } from '@/components/animations';
+import { ScorePopup } from './juice/ScorePopup';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import { AdaptiveParticles } from './juice/AdaptiveParticles';
@@ -279,7 +279,7 @@ const AdventureGame = memo<AdventureGameProps>(
     // Track entry sequence phases
     const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
 
-    // Ref for score display target (for ScorePopupFly animation)
+    // Ref for score display target (for ScorePopup animation)
     const scoreDisplayRef = useRef<HTMLDivElement>(null);
 
     // Cleanup all timeouts on unmount
@@ -1261,15 +1261,18 @@ const AdventureGame = memo<AdventureGameProps>(
         )}
 
         {/* Score Popup Animation */}
-        <ScorePopupFly
-          popup={currentPopup}
-          targetRef={scoreDisplayRef}
-          flyToTarget
-          showWord
-          size="md"
-          duration={1800}
-          onComplete={handlePopupComplete}
-        />
+        {currentPopup && (
+          <ScorePopup
+            score={currentPopup.value}
+            position={{ x: currentPopup.x, y: currentPopup.y }}
+            targetPosition={scoreDisplayRef.current ? {
+              x: scoreDisplayRef.current.getBoundingClientRect().left + scoreDisplayRef.current.getBoundingClientRect().width / 2,
+              y: scoreDisplayRef.current.getBoundingClientRect().top + scoreDisplayRef.current.getBoundingClientRect().height / 2,
+            } : undefined}
+            comboMultiplier={currentPopup.bonus ? parseFloat(currentPopup.bonus.replace('x', '')) : undefined}
+            onComplete={handlePopupComplete}
+          />
+        )}
 
         {/* Lexi Mascot Reactions */}
         <LexiReaction
