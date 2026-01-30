@@ -210,6 +210,27 @@ jest.mock('@/hooks/useParticleBudget', () => ({
   }),
 }));
 
+// Mock Power-Up Inventory - resetCooldowns can be tracked via mockInventoryResetCooldowns
+let mockInventoryResetCooldowns = jest.fn();
+jest.mock('@/hooks/usePowerUpInventory', () => ({
+  usePowerUpInventory: () => ({
+    inventory: {
+      freezeTimeUnlocked: true,
+      hintUnlocked: true,
+      scoreMultiplierUnlocked: true,
+      cooldownStartedAt: {
+        freezeTime: 0,
+        hint: 0,
+        scoreMultiplier: 0,
+      },
+    },
+    isUnlocked: () => true,
+    startCooldown: jest.fn(),
+    getCooldownRemaining: () => 0,
+    resetCooldowns: mockInventoryResetCooldowns,
+  }),
+}));
+
 // Mock PowerUpBar component for controlled testing
 jest.mock('../power-ups', () => ({
   PowerUpBar: ({
@@ -471,33 +492,13 @@ describe('AdventureGame - Power-Up Integration', () => {
   });
 
   describe('Level Transition - Cooldown Reset', () => {
+    beforeEach(() => {
+      // Reset mock before each test
+      mockInventoryResetCooldowns.mockClear();
+    });
+
     it('should reset cooldowns when level changes', async () => {
       // Don't use fake timers for this test to avoid animation conflicts
-      const mockResetCooldowns = jest.fn();
-
-      // Mock inventory with resetCooldowns tracking
-      const mockInventory = {
-        inventory: {
-          freezeTimeUnlocked: true,
-          hintUnlocked: true,
-          scoreMultiplierUnlocked: true,
-          cooldownStartedAt: {
-            freezeTime: Date.now(),
-            hint: 0,
-            scoreMultiplier: 0,
-          },
-        },
-        isUnlocked: () => true,
-        startCooldown: jest.fn(),
-        getCooldownRemaining: () => 30,
-        resetCooldowns: mockResetCooldowns,
-      };
-
-      // Mock usePowerUpInventory to return mock
-      jest.mock('@/hooks/usePowerUpInventory', () => ({
-        usePowerUpInventory: () => mockInventory,
-      }));
-
       const { rerender } = render(
         <AdventureGame
           levelConfig={{ ...mockLevelConfig, level: 1 }}
@@ -507,8 +508,8 @@ describe('AdventureGame - Power-Up Integration', () => {
         />
       );
 
-      // Clear call count from mount
-      mockResetCooldowns.mockClear();
+      // Clear call count from mount (in case there were any initialization calls)
+      mockInventoryResetCooldowns.mockClear();
 
       // Change level (simulating level completion and next level load)
       rerender(
@@ -523,35 +524,11 @@ describe('AdventureGame - Power-Up Integration', () => {
       // resetCooldowns should be called when level changes
       // Implementation detail: AdventureGame detects level change via useEffect
       await waitFor(() => {
-        expect(mockResetCooldowns).toHaveBeenCalled();
+        expect(mockInventoryResetCooldowns).toHaveBeenCalled();
       }, { timeout: 1000 });
     });
 
     it('should not reset cooldowns on initial mount', () => {
-      const mockResetCooldowns = jest.fn();
-
-      // Mock inventory
-      const mockInventory = {
-        inventory: {
-          freezeTimeUnlocked: true,
-          hintUnlocked: true,
-          scoreMultiplierUnlocked: true,
-          cooldownStartedAt: {
-            freezeTime: 0,
-            hint: 0,
-            scoreMultiplier: 0,
-          },
-        },
-        isUnlocked: () => true,
-        startCooldown: jest.fn(),
-        getCooldownRemaining: () => 0,
-        resetCooldowns: mockResetCooldowns,
-      };
-
-      jest.mock('@/hooks/usePowerUpInventory', () => ({
-        usePowerUpInventory: () => mockInventory,
-      }));
-
       render(
         <AdventureGame
           levelConfig={mockLevelConfig}
@@ -562,7 +539,7 @@ describe('AdventureGame - Power-Up Integration', () => {
       );
 
       // resetCooldowns should NOT be called on initial mount
-      expect(mockResetCooldowns).not.toHaveBeenCalled();
+      expect(mockInventoryResetCooldowns).not.toHaveBeenCalled();
     });
   });
 });
