@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 2750,
+    "totalKeysInCode": 2758,
     "keyCountByLanguage": {
       "en": 3739,
       "he": 3739,
@@ -8,7 +8,7 @@
       "ja": 3757,
       "es": 3699
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 9,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,7 +130,89 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "education.header.breadcrumbs.classroomGame",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.classrooms",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.education",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.join",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.lessons",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.navigation",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.profile",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.student",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "education.header.breadcrumbs.teacher",
+      "usages": [
+        {
+          "file": "components/education/EducationBreadcrumbs.tsx",
+          "line": 74
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

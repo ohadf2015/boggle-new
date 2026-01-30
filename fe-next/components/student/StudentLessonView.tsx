@@ -27,26 +27,13 @@ export default function StudentLessonView() {
 
   const [sortBy, setSortBy] = useState<'dueDate' | 'progress' | 'recent'>('recent');
 
-  // Start a multiplayer game with lesson vocabulary (mirrors teacher LessonBuilder pattern)
+  // Start a classroom game with lesson vocabulary (education-specific route)
   const handleStartGame = (studentLesson: typeof lessons[0]) => {
     const lesson = studentLesson.lesson;
     if (!lesson) return;
 
-    // Get vocabulary words that can be integrated into the game board
-    const vocabularyWords = (lesson.words || [])
-      .filter((w) => w.canIntegrate)
-      .map((w) => w.word);
-
-    // Store lesson info in sessionStorage for the multiplayer page to use
-    sessionStorage.setItem('lessonGameData', JSON.stringify({
-      lessonId: studentLesson.lessonId,
-      lessonName: lesson.name || 'Practice Game',
-      vocabularyWords,
-      language: lesson.language || language,
-    }));
-
-    // Navigate to multiplayer with lesson flag
-    router.push(`/${language}/multiplayer?fromLesson=true`);
+    // Navigate to classroom game route (education-specific, no main app escape)
+    router.push(`/${language}/education/classroom-game?lessonId=${studentLesson.lessonId}`);
   };
 
   // Check if a lesson has vocabulary words that can be used in a game

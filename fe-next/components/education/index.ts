@@ -38,3 +38,17 @@ export type { StudentAchievement } from './EducationBadgeGrid';
 
 export { default as AchievementProgressCard } from './AchievementProgressCard';
 export type { AchievementProgressCardProps } from './AchievementProgressCard';
+
+export { EducationHeader } from './EducationHeader';
+export { default as EducationHeaderDefault } from './EducationHeader';
+
+export { EducationBreadcrumbs } from './EducationBreadcrumbs';
+export { default as EducationBreadcrumbsDefault } from './EducationBreadcrumbs';
+
+export { ClassroomGameLobby } from './ClassroomGameLobby';
+export { default as ClassroomGameLobbyDefault } from './ClassroomGameLobby';
+export type { ClassroomGameLobbyProps } from './ClassroomGameLobby';
+
+export { TeacherOnboarding } from './TeacherOnboarding';
+export { default as TeacherOnboardingDefault } from './TeacherOnboarding';
+export type { TeacherOnboardingProps } from './TeacherOnboarding';

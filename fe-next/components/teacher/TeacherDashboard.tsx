@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Header from '@/components/Header';
+import { EducationHeader } from '@/components/education/EducationHeader';
+import { TeacherOnboarding } from '@/components/education/TeacherOnboarding';
 import { cn } from '@/lib/utils';
 import * as Tabs from '@radix-ui/react-tabs';
 import ClassroomManager from './ClassroomManager';
@@ -29,7 +30,10 @@ export default function TeacherDashboard() {
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <Header />
+      <EducationHeader />
+
+      {/* Teacher Onboarding Wizard - shows on first visit */}
+      <TeacherOnboarding />
 
       <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* Page Header */}

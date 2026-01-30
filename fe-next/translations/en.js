@@ -2314,6 +2314,9 @@ const en = {
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
     "adventureModeDesc": "100 levels across 10 worlds",
+    "education": "Education",
+    "educationDesc": "For teachers & students",
+    "educationBadge": "FOR TEACHERS",
     "signInToUnlock": "Sign in to unlock",
     "openRooms": "rooms",
     "playersLive": "live",
@@ -4384,7 +4387,10 @@ const en = {
       "chartTitle": "Class Progress Over Time",
       "wordsLearned": "Words Learned",
       "accuracy": "Accuracy %",
-      "expandDetails": "View word breakdown"
+      "expandDetails": "View word breakdown",
+      "exportCSV": "Export CSV",
+      "exportSuccess": "Progress exported successfully!",
+      "noDataToExport": "No data to export"
     },
     "stats": {
       "totalStudents": "Total Students",
@@ -4549,6 +4555,62 @@ const en = {
       "joinClassroomPrompt": "Join a classroom to see the leaderboard",
       "level": "Lv. {level}",
       "xp": "{xp} XP"
+    },
+    "header": {
+      "title": "LexiClash",
+      "subtitle": "Education",
+      "homeLink": "Education Home",
+      "menu": "Education Menu",
+      "navigation": "Navigation",
+      "teacherDashboard": "Teacher Dashboard",
+      "studentDashboard": "My Lessons",
+      "educationHome": "Education Home",
+      "breadcrumbs": {
+        "navigation": "Education navigation",
+        "education": "Education",
+        "teacher": "Teacher Dashboard",
+        "student": "Student Dashboard",
+        "lessons": "Lessons",
+        "classrooms": "Classrooms",
+        "classroomGame": "Classroom Game",
+        "join": "Join Classroom",
+        "profile": "Profile"
+      }
+    },
+    "classroomGame": {
+      "title": "Classroom Game",
+      "shareCode": "Share this code with students",
+      "waitingForPlayers": "Waiting for players...",
+      "settings": "Game Settings",
+      "vocabularyWords": "Vocabulary Words",
+      "playable": "playable",
+      "noPlayableWords": "No playable words in this lesson",
+      "startGame": "Start Game",
+      "starting": "Starting...",
+      "lessonNotFound": "Lesson Not Found",
+      "lessonNotFoundDesc": "The requested lesson could not be found.",
+      "backToEducation": "Back to Education"
+    },
+    "onboarding": {
+      "step": "Step",
+      "of": "of",
+      "getStarted": "Let's Go!",
+      "welcome": {
+        "title": "Welcome to Education Mode!",
+        "description": "LexiClash Education helps you create engaging vocabulary lessons and track student progress. Let's get you set up!"
+      },
+      "classroom": {
+        "title": "Create Your First Classroom",
+        "description": "Start by creating a classroom. You'll get a unique code that students can use to join and access your lessons."
+      },
+      "lesson": {
+        "title": "Build Your First Lesson",
+        "description": "Add vocabulary words to create custom lessons. Students can practice with flashcards and word games using your vocabulary."
+      },
+      "invite": {
+        "title": "Invite Your Students",
+        "description": "Share your classroom code with students. They'll be able to join, practice lessons, and compete in classroom games!"
+      }
     },
     "analytics": {
       "title": "Class Analytics",

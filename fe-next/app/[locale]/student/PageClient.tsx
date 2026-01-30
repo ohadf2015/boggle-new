@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
-import Header from '@/components/Header';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
 import { cn } from '@/lib/utils';
@@ -74,7 +74,7 @@ export default function StudentPageClient() {
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <Header />
+      <EducationHeader />
 
       {/* Reduced padding: mobile 12px, sm 16px (was 24px) */}
       <div className="w-full max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8 flex-1">

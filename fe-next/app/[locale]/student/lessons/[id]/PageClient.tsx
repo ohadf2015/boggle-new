@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLesson } from '@/hooks/useVocabularyLesson';
 import { usePracticeProgress, type PracticeType } from '@/hooks/usePracticeSession';
-import Header from '@/components/Header';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import {
   PracticeModeSelector,
@@ -188,7 +188,7 @@ function PracticeContent({
   // Mode selector view
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden min-h-screen', isRTL && 'rtl')}>
-      <Header />
+      <EducationHeader showBackButton />
 
       <div className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* XP Progress above mode selector */}

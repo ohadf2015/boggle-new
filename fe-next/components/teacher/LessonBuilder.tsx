@@ -70,30 +70,8 @@ export default function LessonBuilder() {
   };
 
   const handleStartGame = (lesson: VocabularyLesson) => {
-    // Get the vocabulary words that can be integrated
-    const vocabularyWords = lesson.words
-      .filter((w) => w.canIntegrate)
-      .map((w) => w.word);
-
-    // Get default template settings if available
-    const defaultTemplate = templates.find((t) => t.is_default && t.lesson_id === lesson.id);
-
-    // Store lesson info in sessionStorage for the host page to use
-    sessionStorage.setItem('lessonGameData', JSON.stringify({
-      lessonId: lesson.id,
-      lessonName: lesson.name,
-      vocabularyWords,
-      language: lesson.language,
-      templateSettings: defaultTemplate ? {
-        timerSeconds: defaultTemplate.timer_seconds,
-        difficulty: defaultTemplate.difficulty,
-        minWordLength: defaultTemplate.min_word_length,
-        allowLateJoin: defaultTemplate.allow_late_join,
-      } : null,
-    }));
-
-    // Navigate to multiplayer page with lesson flag
-    router.push(`/${language}/multiplayer?fromLesson=true`);
+    // Navigate to classroom game route (education-specific, no main app escape)
+    router.push(`/${language}/education/classroom-game?lessonId=${lesson.id}`);
   };
 
   // Get default template for a lesson

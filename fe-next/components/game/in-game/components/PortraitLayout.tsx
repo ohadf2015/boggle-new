@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useEffect, type ReactNode, type RefObject } from 'react';
+import React, { memo, useState, useEffect, useCallback, type ReactNode, type RefObject } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -182,10 +182,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   }, [currentFeedback]);
 
   // Clear floating score after animation completes
-  const handleScoreAnimationComplete = () => {
+  // useCallback ensures stable reference to prevent infinite animation loop
+  const handleScoreAnimationComplete = useCallback(() => {
     setFloatingScore(null);
     setIsFireRoundScore(false);
-  };
+  }, []);
 
   return (
     <>

@@ -2,12 +2,23 @@
 
 /**
  * Conditional Providers - Intelligently loads providers based on route
- * Landing pages get minimal providers, game pages get full stack
+ *
+ * ARCHITECTURE:
+ * - EssentialProviders is ALWAYS mounted and provides base functionality
+ *   (Theme, Language, Auth, Music, SFX, Haptics, Accessibility, Motion, Navigation)
+ * - GameSpecificProviders are conditionally added INSIDE EssentialProviders
+ *   for game pages (Socket, GameState, Achievements, Coins, etc.)
+ *
+ * CRITICAL: EssentialProviders must NEVER unmount during navigation.
+ * This prevents issues like:
+ * - Duplicate MusicProvider instances causing duplicate audio playback
+ * - Loss of audio state (current track, volume, mute state)
+ * - Memory leaks from unreleased Howl instances
  */
 
 import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo } from 'react';
-import { Providers } from './providers';
+import { GameSpecificProviders } from './providers';
 import { EssentialProviders } from './essential-providers';
 import type { Language } from '@/shared/types/game';
 
@@ -33,18 +44,8 @@ const GAME_ROUTES = [
   '/hebrew-multiplayer-word-game',  // SEO page
 ];
 
-// Routes that need partial providers (auth but not game state)
-const AUTH_ROUTES = [
-  '/profile',
-  '/settings',
-  '/friends',
-  '/leaderboard',
-  '/education',
-  '/admin',
-];
-
 /**
- * Determines if the current route needs game providers
+ * Determines if the current route needs game-specific providers
  */
 function needsGameProviders(pathname: string | null): boolean {
   if (!pathname) return false;
@@ -56,57 +57,33 @@ function needsGameProviders(pathname: string | null): boolean {
 }
 
 /**
- * Determines if the current route needs auth providers
- */
-function needsAuthProviders(pathname: string | null): boolean {
-  if (!pathname) return false;
-
-  const path = pathname.replace(/^\/(en|he|sv|ja|es)/, '');
-
-  return AUTH_ROUTES.some(route => path.startsWith(route)) || needsGameProviders(pathname);
-}
-
-/**
  * ConditionalProviders - Routes to appropriate provider stack
  *
- * - Landing page: EssentialProviders only (~50KB)
- * - Game pages: Full Providers stack (~500KB+)
- * - Auth pages: Essential + Auth providers (~150KB)
+ * IMPORTANT: EssentialProviders is ALWAYS rendered to ensure:
+ * - Single MusicProvider instance (prevents duplicate music)
+ * - Consistent audio state across navigation
+ * - No memory leaks from provider remounting
  *
- * During SSR, always use EssentialProviders to avoid context errors
+ * Game-specific providers are added conditionally inside EssentialProviders.
  */
 export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
   const pathname = usePathname();
 
-  const providerType = useMemo(() => {
-    // During SSR (pathname is null), default to essential providers
-    if (!pathname) {
-      return 'essential';
-    }
-
-    if (needsGameProviders(pathname)) {
-      return 'full';
-    }
-    if (needsAuthProviders(pathname)) {
-      return 'auth';
-    }
-    return 'essential';
+  const needsGameStack = useMemo(() => {
+    return needsGameProviders(pathname);
   }, [pathname]);
 
-  // Landing page and static pages: Use minimal providers
-  if (providerType === 'essential') {
-    return (
-      <EssentialProviders lang={lang}>
-        {children}
-      </EssentialProviders>
-    );
-  }
-
-  // Game pages: Use full provider stack
-  // TODO: Implement 'auth' provider level for profile/settings pages
+  // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
+  // Conditionally add game-specific providers inside
   return (
-    <Providers lang={lang}>
-      {children}
-    </Providers>
+    <EssentialProviders lang={lang}>
+      {needsGameStack ? (
+        <GameSpecificProviders>
+          {children}
+        </GameSpecificProviders>
+      ) : (
+        children
+      )}
+    </EssentialProviders>
   );
 }

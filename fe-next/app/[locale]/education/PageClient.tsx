@@ -6,13 +6,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import ModeCard from '@/components/landing/ModeCard';
 import AuthModal from '@/components/auth/AuthModal';
-import Header from '@/components/Header';
+import { EducationHeader } from '@/components/education/EducationHeader';
 
 /**
  * Education Landing Page
  *
  * Entry point for education mode with Teacher/Student role selection.
  * Teacher access requires authentication, Student access is public.
+ * Uses EducationHeader to create self-contained education experience.
  */
 export default function EducationPageClient() {
   const { t, language } = useLanguage();
@@ -21,7 +22,7 @@ export default function EducationPageClient() {
 
   return (
     <div className="min-h-screen bg-neo-navy">
-      <Header />
+      <EducationHeader />
 
       {/* Reduced padding: mobile 16px, sm 24px, lg 32px (was 48px) */}
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">

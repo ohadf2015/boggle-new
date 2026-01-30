@@ -1,52 +1,35 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
 import SpectatorBanner from '@/components/SpectatorBanner';
-import { SocketContext, getSharedSocket, releaseSharedSocket, getSharedSocketIfExists, getSocketURL } from '@/utils/SocketContext';
-import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
+import { SocketContext } from '@/utils/SocketContext';
+import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TrainingGatewayModal } from '@/components/training';
-import { shouldShowTrainingGateway, markGatewaySeen } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
-import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
+import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { sanitizeRoomName } from '@/utils/consts';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useConnectionToasts } from '@/hooks/useConnectionToasts';
+import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
+import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
+import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
+import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import type { Language, ActiveRoom } from '@/shared/types/game';
-
-interface ResultsData {
-  scores: Array<{
-    username: string;
-    score: number;
-    words: string[];
-  }>;
-  letterGrid: string[][];
-  /** Whether duplicate word rule is disabled (for rooms with >7 players) */
-  duplicateRuleDisabled?: boolean;
-  /** Number of players in the game */
-  playerCount?: number;
-}
-
-interface GameStartData {
-  letterGrid: string[][];
-  timerSeconds: number;
-  language: Language;
-}
 
 // Hex color validation pattern (must match backend schema)
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -54,28 +37,24 @@ const DEFAULT_AVATAR_COLOR = '#FF6B6B';
 
 /**
  * Sanitizes avatar color to ensure it matches the required hex format.
- * Backend validation requires: /^#[0-9A-Fa-f]{6}$/
- * @param color - The color to validate (may be invalid, undefined, or CSS variable)
- * @param avatarImage - Optional avatar image ID to derive color from
- * @returns A valid hex color string
  */
-function sanitizeAvatarColor(color: string | undefined | null, avatarImage?: string | null): string {
-  // If color is valid hex format, return it
+function sanitizeAvatarColor(
+  color: string | undefined | null,
+  avatarImage?: string | null
+): string {
   if (color && HEX_COLOR_PATTERN.test(color)) {
     return color;
   }
 
-  // Try to derive color from avatar image
   if (avatarImage) {
     const avatarData = getAvatarEmojiAndColor(avatarImage);
     return avatarData.color;
   }
 
-  // Fall back to default color
   return DEFAULT_AVATAR_COLOR;
 }
 
-// Dynamic imports for code splitting - only load when needed
+// Dynamic imports for code splitting
 const HostView = nextDynamic(() => import('@/host/HostView'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
@@ -96,9 +75,6 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
   ssr: false,
 });
 
-// QuickJoinView removed - invitation flow now uses MultiplayerFlow with InvitationQuickJoin
-
-// Loading skeleton component with playful design
 function ViewLoadingSkeleton(): React.JSX.Element {
   return (
     <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative">
@@ -110,494 +86,117 @@ function ViewLoadingSkeleton(): React.JSX.Element {
   );
 }
 
-const SOCKET_CONFIG = {
-  RECONNECTION_ATTEMPTS: 10,
-  RECONNECTION_DELAY: 1000,
-  RECONNECTION_DELAY_MAX: 30000,
-  HOST_KEEP_ALIVE_INTERVAL: 30000,
-  CONNECTION_TIMEOUT: 15000, // Reduced from 20s for faster feedback on slow connections
-  ROOMS_LOADING_TIMEOUT: 3000, // Reduced timeout for active rooms - show UI faster
-};
-
-// Note: Socket singleton is now managed by SocketContext.tsx
-// Use getSharedSocket(), releaseSharedSocket(), and getSharedSocketIfExists()
-
 export default function MultiplayerPageClient(): React.JSX.Element {
   const [gameCode, setGameCode] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-  const [guestAvatar, setGuestAvatar] = useState<{ emoji: string; color: string } | null>(null);
   const [roomName, setRoomName] = useState<string>('');
   const [hostUsername, setHostUsername] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHost, setIsHost] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
-  const [showResults, setShowResults] = useState<boolean>(false);
-  const [resultsData, setResultsData] = useState<ResultsData | null>(null);
-  const [attemptingReconnect, setAttemptingReconnect] = useState<boolean>(false);
   const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
-  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number }>>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [roomsLoading, setRoomsLoading] = useState<boolean>(true); // Track rooms loading state
-  const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null); // Store game start data for players returning from results
-  const [gameStartTime, setGameStartTime] = useState<number | null>(null); // Track when current game started for duration calculation
-  const [isJoining, setIsJoining] = useState<boolean>(false); // Track join/create loading state
-  const [authLoadingStartTime, setAuthLoadingStartTime] = useState<number | null>(null); // Track when auth loading started
+  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number }>>(
+    []
+  );
+  const [isJoining, setIsJoining] = useState<boolean>(false);
 
-  // Lesson integration state - vocabulary words from teacher's lesson to use for board generation
-  const [lessonData, setLessonData] = useState<{
-    lessonId: string;
-    lessonName: string;
-    vocabularyWords: string[];
-    language: Language;
-    templateSettings?: {
-      timerSeconds: number;
-      difficulty: string;
-      minWordLength: number;
-      allowLateJoin: boolean;
-    } | null;
-  } | null>(null);
-
-  // Late joiner & spectator state
-  const [isSpectator, setIsSpectator] = useState<boolean>(false);
-
-  // Training gateway state - show prompt before allowing multiplayer for new players
-  const [showTrainingGateway, setShowTrainingGateway] = useState<boolean>(false);
-  const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>([]);
-
-  const socketRef = useRef<Socket | null>(null);
-  const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
-  const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Store calculated game duration when results are shown to prevent recalculation
-  // if state is reset before cognitive scoring effect executes
-  const gameDurationRef = useRef<number | null>(null);
-  const wasConnectedRef = useRef<boolean>(false);
-  const showResultsRef = useRef<boolean>(showResults);
-
-  // Connection status toast notifications for better UX
   useConnectionToasts();
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
   const { playTrack, fadeToTrack, TRACKS } = useMusic();
 
-  // Track auth loading start time for timeout
-  useEffect(() => {
-    if (loading && !authLoadingStartTime) {
-      setAuthLoadingStartTime(Date.now());
-    } else if (!loading) {
-      setAuthLoadingStartTime(null);
-    }
-  }, [loading, authLoadingStartTime]);
+  // Custom hooks for modular functionality
+  const {
+    username,
+    setUsername,
+    guestAvatar,
+    setGuestAvatar,
+    authLoadingStartTime,
+    setAuthLoadingStartTime,
+    usernameManuallySetRef,
+    hasSetRandomNameRef,
+  } = useMultiplayerAuth(language as Language);
 
-  // Track if we should auto-join (prefilled room + existing username)
-  const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
-  const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+  const {
+    shouldAutoJoin,
+    setShouldAutoJoin,
+    prefilledRoomCode,
+    setPrefilledRoomCode,
+    lessonData,
+  } = useMultiplayerSession({
+    language: language as Language,
+    socket: null, // Will be set by socket hook
+    isConnected: false, // Will be set by socket hook
+    isActive,
+    attemptingReconnect: false, // Will be set by socket hook
+    username,
+    profile,
+    usernameManuallySetRef,
+    hasSetRandomNameRef,
+    onSetGameCode: setGameCode,
+    onSetUsername: setUsername,
+    onSetRoomName: setRoomName,
+    onSetGuestAvatar: setGuestAvatar,
+    onSetAttemptingReconnect: () => {}, // Will be set by socket hook
+    onSetRoomLanguage: setRoomLanguage,
+    onSetLessonData: () => {},
+    t,
+  });
 
-  // Track if username has been manually set by the user or loaded from session/localStorage
-  // This prevents auth loading from overwriting user-entered names
-  const usernameManuallySetRef = useRef<boolean>(false);
+  const {
+    showResults,
+    setShowResults,
+    resultsData,
+    setResultsData,
+    isSpectator,
+    setIsSpectator,
+    spectators,
+    setSpectators,
+    showTrainingGateway,
+    setShowTrainingGateway,
+    pendingGameStart,
+    setPendingGameStart,
+    gameStartTime,
+    setGameStartTime,
+    gameDuration,
+    handleShowResults,
+    handleReturnToRoom,
+    handleUpgradeToPlayer: baseHandleUpgradeToPlayer,
+  } = useMultiplayerGameFlow({
+    isActive,
+    showResults: false,
+    socket: null, // Will be set by socket hook
+    gameCode,
+    isAuthenticated,
+    refreshProfile,
+  });
 
-  // Music transitions based on game state
-  // Note: We always call playTrack/fadeToTrack even if audio isn't unlocked yet
-  // The MusicContext will queue the request and play when user interacts
-  useEffect(() => {
-    if (showResults) {
-      // Results screen - bossa music is already playing from validation phase
-      // Don't change the music, let it continue
-      return;
-    } else if (!isActive) {
-      // Lobby - play lobby music
-      playTrack(TRACKS.LOBBY);
-    } else if (isActive) {
-      // In room waiting - play before game music
-      // (in_game music is triggered by HostView/PlayerView when game actually starts)
-      playTrack(TRACKS.BEFORE_GAME);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, showResults]);
-
-  // Check if we should show the training gateway for new players
-  // Only show on initial load, not when returning from an active game
-  // IMPORTANT: Don't show when joining via invitation link - let them join directly
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (isActive || showResults) return; // Don't show during/after game
-
-    // Check if player is joining via invitation link
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomFromUrl = urlParams.get('room');
-
-    // Skip training gateway if joining via invitation - let them join directly
-    if (roomFromUrl) return;
-
-    // Check if player should see training gateway
-    const shouldShow = shouldShowTrainingGateway();
-    if (shouldShow) {
-      // CRITICAL FIX: Mark as seen IMMEDIATELY before setting up the timer
-      // This prevents the race condition where the effect re-runs before the
-      // modal's useEffect has a chance to call markGatewaySeen()
-      // The modal's useEffect will also call this (idempotent), but calling it
-      // here ensures the flag is set even if the effect re-runs during the 500ms delay
-      markGatewaySeen();
-
-      // Small delay to let the page render first
-      const timer = setTimeout(() => {
-        setShowTrainingGateway(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isActive, showResults]);
-
-  // Initialize state from URL and session
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const initializeState = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomFromUrl = urlParams.get('room');
-      const fromLesson = urlParams.get('fromLesson') === 'true';
-      logger.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl, '| fromLesson:', fromLesson);
-      const savedUsername = getStoredUsername() || '';
-      const savedSession = getSession();
-
-      // Check for lesson data from teacher dashboard
-      if (fromLesson) {
-        try {
-          const storedLessonData = sessionStorage.getItem('lessonGameData');
-          if (storedLessonData) {
-            const parsed = JSON.parse(storedLessonData);
-            logger.log('[LESSON] Loaded lesson data:', parsed.lessonName, 'with', parsed.vocabularyWords?.length, 'words');
-            setLessonData(parsed);
-            // Set room language from lesson if available
-            if (parsed.language) {
-              setRoomLanguage(parsed.language as Language);
-            }
-          }
-        } catch (err) {
-          logger.error('[LESSON] Failed to parse lesson data:', err);
-        }
-      }
-
-      let joiningNewRoomViaInvitation = false;
-      const hasSession = savedSession && savedSession.gameCode;
-
-      if (roomFromUrl) {
-        logger.log('[Init] Setting prefilledRoomCode to:', roomFromUrl);
-        setGameCode(roomFromUrl);
-        setPrefilledRoomCode(roomFromUrl);
-        if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
-          clearSession();
-          joiningNewRoomViaInvitation = true;
-        }
-        if (savedUsername && savedUsername.trim()) {
-          setUsername(savedUsername);
-          setShouldAutoJoin(true);
-        }
-      } else if (hasSession) {
-        // Only auto-reconnect if this is a page refresh, not intentional navigation
-        // Check if user arrived via refresh (reload) vs navigation
-        const isPageRefresh = (() => {
-          try {
-            const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-            const firstEntry = navEntries[0];
-            if (firstEntry) {
-              return firstEntry.type === 'reload';
-            }
-            // Fallback for older browsers
-            return performance.navigation?.type === 1;
-          } catch {
-            return false;
-          }
-        })();
-
-        if (isPageRefresh) {
-          setGameCode(savedSession.gameCode);
-          setAttemptingReconnect(true);
-        } else {
-          // User intentionally navigated to main page - clear session and let them start fresh
-          logger.log('[Init] User navigated to main page, clearing session');
-          clearSession();
-        }
-      }
-
-      if (roomFromUrl && savedUsername) {
-        // Already set above, derive avatar from name
-        setGuestAvatar(getAvatarForName(savedUsername));
-        usernameManuallySetRef.current = true; // Mark as set from localStorage
-      } else if (joiningNewRoomViaInvitation) {
-        if (savedUsername) {
-          setUsername(savedUsername);
-          setGuestAvatar(getAvatarForName(savedUsername));
-          usernameManuallySetRef.current = true; // Mark as set from localStorage
-        } else {
-          // Set a fun random default name for guests with matching avatar
-          const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-          setUsername(name);
-          setGuestAvatar(avatar);
-        }
-      } else if (savedSession?.username) {
-        setUsername(savedSession.username);
-        setGuestAvatar(getAvatarForName(savedSession.username));
-        usernameManuallySetRef.current = true; // Mark as set from session
-      } else if (savedUsername) {
-        setUsername(savedUsername);
-        setGuestAvatar(getAvatarForName(savedUsername));
-        usernameManuallySetRef.current = true; // Mark as set from localStorage
-      }
-      // Note: We don't set random guest names here anymore
-      // For guests without saved names, the auth effect or handleJoin will handle it
-      // This prevents authenticated users from briefly seeing random guest names
-
-      // Also set roomName for hosting if not already set
-      if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
-        setRoomName(savedSession.roomName);
-      }
-      // Note: We don't set random room names here anymore for the same reason
-    };
-
-    Promise.resolve().then(initializeState);
-  }, [language]);
-
-  // Set username and roomName from profile display_name for authenticated users
-  // Uses fallback chain from OAuth metadata if profile hasn't loaded yet
-  // For guests without saved names, generate random names only after auth is confirmed
-  const hasSetRandomNameRef = useRef<boolean>(false);
-  useEffect(() => {
-    // Wait for auth to finish loading
-    if (loading) return;
-
-    if (user) {
-      // Authenticated user - use display name from profile/OAuth
-      // BUT only if username wasn't already set from localStorage/session/form
-      const displayName =
-        profile?.display_name ||                    // Best: profile display name
-        user?.user_metadata?.full_name ||           // Good: OAuth full name
-        user?.user_metadata?.name ||                // Okay: OAuth name
-        user?.email?.split('@')[0] ||               // Fallback: email prefix
-        '';
-
-      // Only set if username is empty OR if it hasn't been manually set yet
-      // This prevents overwriting user-typed names when auth loads
-      if (displayName && !usernameManuallySetRef.current && !username.trim()) {
-        setUsername(displayName);
-        usernameManuallySetRef.current = true; // Mark as set from auth
-      }
-    } else if (!hasSetRandomNameRef.current) {
-      // Guest user - check if we need to generate a random name
-      // Use ref to prevent setting random names multiple times
-      const savedUsername = getStoredUsername() || '';
-
-      // IMPORTANT: Check current username state first - user may have typed a name in the form
-      // Only generate random name if BOTH saved and current username are empty
-      if (!savedUsername.trim() && !username.trim()) {
-        // No saved username AND no current username - generate a fun random name
-        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-        logger.log('[AUTH] Generated random name for guest:', name, 'avatar:', avatar.emoji);
-        setUsername(name);
-        setGuestAvatar(avatar);
-        hasSetRandomNameRef.current = true;
-      } else if (savedUsername.trim() && !username.trim()) {
-        // Have saved username but current state is empty - restore from localStorage
-        logger.log('[AUTH] Using saved username:', savedUsername);
-        setUsername(savedUsername);
-        setGuestAvatar(getAvatarForName(savedUsername));
-      } else if (username.trim()) {
-        // User has already entered a name - don't override it, just set avatar
-        logger.log('[AUTH] Preserving user-entered username:', username);
-        setGuestAvatar(getAvatarForName(username));
-      }
-    }
-  }, [user, profile?.display_name, loading, language, username]);
-
-  // Refresh profile on mount for authenticated users to get latest display_name
-  useEffect(() => {
-    if (isAuthenticated && user?.id && refreshProfile) {
-      refreshProfile();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
-
-  useEffect(() => {
-    attemptingReconnectRef.current = attemptingReconnect;
-  }, [attemptingReconnect]);
-
-  useEffect(() => {
-    showResultsRef.current = showResults;
-  }, [showResults]);
-
-  // Initialize Socket.IO connection using shared singleton
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Get or create shared socket instance
-    // IMPORTANT: Always go through full listener setup, even for existing sockets
-    // This fixes the bug where existing sockets from SocketProvider didn't have game event listeners
-    const existingSocket = getSharedSocketIfExists();
-    const isReusingSocket = existingSocket && existingSocket.connected;
-
-    const socketUrl = getSocketURL();
-    logger.log('[SOCKET.IO] MultiplayerPage using shared socket:', socketUrl, isReusingSocket ? '(reusing existing)' : '(creating new)');
-
-    // Get socket - either existing or create new
-    const socketInstance = isReusingSocket ? existingSocket : getSharedSocket();
-    socketRef.current = socketInstance;
-
-    // For existing connected sockets, set state immediately and request active rooms
-    if (isReusingSocket) {
-      // Set state synchronously to avoid race condition with handleJoin
-      setSocket(socketInstance);
-      setIsConnected(true);
-      // Emit after state is set (can be sync since socket is already connected)
-      socketInstance.emit('getActiveRooms');
-    }
-
-    // Remove any existing listeners before adding new ones (prevents duplicates on re-mount)
-    const eventNames = [
-      'connect', 'disconnect', 'connect_error', 'reconnect', 'reconnect_failed',
-      'joined', 'updateUsers', 'activeRooms', 'joinedAsSpectator', 'spectatorList',
-      'spectatorUpgraded', 'debugGameStateResponse', 'error', 'startGame', 'resetGame',
-      'hostLeftRoomClosing', 'sessionMigrated', 'warning', 'rateLimited', 'hostTransferred', 'pong'
-    ];
-    eventNames.forEach(event => socketInstance.off(event));
-
-    // Connection events
-    socketInstance.on('connect', () => {
-      logger.log('[SOCKET.IO] Connected:', socketInstance.id);
-      setIsConnected(true);
-      setSocket(socketInstance);
-
-      // Request active rooms on connect
-      socketInstance.emit('getActiveRooms');
-
-      // Handle reconnection to game
-      if (wasConnectedRef.current) {
-        const savedSession = getSession();
-        if (savedSession?.gameCode) {
-          logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
-          toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
-            id: 'socket-reconnecting-to-game', // Deduplicate with toast ID
-            duration: 2000,
-          });
-
-          // Build auth context inline for reconnection
-          const buildAuthContext = async () => {
-            try {
-              // First check if user is authenticated via Supabase session
-              // (user state may not be set yet during reconnect, so check session directly)
-              const { data: { session } } = await getSupabaseSession();
-              if (session?.user?.id) {
-                return { authUserId: session.user.id, guestTokenHash: null, guestSessionId: null };
-              }
-
-              // Fall back to guest token
-              const guestSessionId = getGuestSessionId();
-              if (guestSessionId) {
-                const hash = await hashToken(guestSessionId);
-                return { authUserId: null, guestTokenHash: hash, guestSessionId };
-              }
-              return { authUserId: null, guestTokenHash: null, guestSessionId: null };
-            } catch (error) {
-              logger.error('[AUTH] Failed to build auth context during reconnection:', error);
-              return { authUserId: null, guestTokenHash: null, guestSessionId: null };
-            }
-          };
-
-          buildAuthContext().then((authContext) => {
-            // Check if socket is still connected after async operation
-            if (!socketInstance.connected) {
-              logger.warn('[SOCKET.IO] Socket disconnected during auth context build, skipping reconnection emit');
-              return;
-            }
-            if (savedSession.isHost) {
-              // Fallback for roomName: use saved value, or generate from hostname
-              const reconnectRoomName = savedSession.roomName || `${savedSession.hostUsername || savedSession.username} Room`;
-              socketInstance.emit('createGame', {
-                gameCode: savedSession.gameCode,
-                roomName: reconnectRoomName,
-                language: savedSession.language || language,
-                hostUsername: savedSession.hostUsername || savedSession.username,
-                ...authContext,
-                avatar: profile ? {
-                  emoji: profile.avatar_emoji,
-                  color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
-                } : getAvatarForName(savedSession.hostUsername || savedSession.username || ''),
-              });
-            } else {
-              socketInstance.emit('join', {
-                gameCode: savedSession.gameCode,
-                username: savedSession.username,
-                ...authContext,
-                avatar: profile ? {
-                  emoji: profile.avatar_emoji,
-                  color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
-                } : getAvatarForName(savedSession.username || ''),
-              });
-            }
-          });
-        }
-      }
-      wasConnectedRef.current = true;
-    });
-
-    socketInstance.on('disconnect', (reason) => {
-      logger.log('[SOCKET.IO] Disconnected:', reason);
-      setIsConnected(false);
-      setIsJoining(false); // Clear joining state on disconnect to prevent stuck button
-
-      if (reason === 'io server disconnect') {
-        socketInstance.connect();
-      }
-    });
-
-    socketInstance.on('connect_error', (error) => {
-      logger.error('[SOCKET.IO] Connection error:', error.message);
-      captureSocketError(error, {
-        event: 'connect_error',
-        gameCode: gameCode || undefined,
-        socketId: socketInstance.id || undefined,
-        username: username || undefined,
-      });
-      setError(t('errors.unstableConnection') || 'Connection error');
-      setIsJoining(false); // Clear joining state on connection error
-    });
-
-    socketInstance.on('reconnect', (attemptNumber) => {
-      logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
-      setIsConnected(true);
-      // Note: useConnectionToasts already handles showing reconnect toast with deduplication
-      // Don't show duplicate toast here - the hook will handle it
-    });
-
-    socketInstance.on('reconnect_failed', () => {
-      logger.error('[SOCKET.IO] Reconnection failed');
-      captureSocketError(new Error('Reconnection exhausted after max attempts'), {
-        event: 'reconnect_failed',
-        gameCode: gameCode || undefined,
-        socketId: socketInstance.id || undefined,
-        username: username || undefined,
-      });
-      setError(t('errors.connectionLost') || 'Connection lost');
-      setIsJoining(false); // Clear joining state on reconnection failure
-    });
-
-    // Game events
-    socketInstance.on('joined', (data) => {
+  const {
+    socket,
+    isConnected,
+    roomsLoading,
+    attemptingReconnect,
+    setAttemptingReconnect,
+    setRoomsLoading,
+    refreshRooms,
+  } = useMultiplayerSocket({
+    language: language as Language,
+    gameCode,
+    username,
+    roomName,
+    isActive,
+    isHost,
+    roomLanguage,
+    onJoined: (data) => {
       logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
-      addGameBreadcrumb('room_joined', {
-        gameCode: data.gameCode,
-        isHost: data.isHost,
-        username: data.username,
-      });
       setIsHost(data.isHost);
       setIsActive(true);
       setError('');
       setAttemptingReconnect(false);
       setShouldAutoJoin(false);
-      setIsJoining(false); // Clear loading state
-      setPrefilledRoomCode(''); // Clear prefilled room code on successful join
+      setIsJoining(false);
+      setPrefilledRoomCode('');
 
       if (data.language) {
         setRoomLanguage(data.language);
@@ -615,27 +214,18 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         gameCode: data.gameCode || gameCode,
         username: joinedUsername,
         isHost: data.isHost,
-        // Use server response roomName first (reliable), then local state as fallback
         roomName: data.roomName || roomName || '',
         hostUsername: data.isHost ? joinedUsername : undefined,
-        language: data.language || roomLanguage,
+        language: data.language || roomLanguage || undefined,
       });
-    });
-
-    socketInstance.on('updateUsers', (data) => {
-      if (data.users) {
-        setPlayersInRoom(data.users);
-      }
-    });
-
-    socketInstance.on('activeRooms', (data) => {
-      setActiveRooms(data.rooms || []);
-      setRoomsLoading(false);
-    });
-
-    // Spectator & Late Joiner events
-    socketInstance.on('joinedAsSpectator', (data) => {
-      logger.log('[SPECTATOR] Joined as spectator:', data);
+    },
+    onUpdateUsers: (users) => {
+      setPlayersInRoom(users);
+    },
+    onActiveRooms: (rooms) => {
+      setActiveRooms(rooms);
+    },
+    onJoinedAsSpectator: (data) => {
       setIsSpectator(true);
       setGameCode(data.gameCode);
       setRoomName(data.roomName);
@@ -654,16 +244,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         duration: 4000,
         icon: '👀',
       });
-    });
-
-    socketInstance.on('spectatorList', (data) => {
-      logger.log('[SPECTATOR] Spectator list updated:', data.spectators?.length || 0);
-      setSpectators(data.spectators || []);
-    });
-
-    socketInstance.on('spectatorUpgraded', (data) => {
-      if (data.success && data.username === username) {
-        logger.log('[SPECTATOR] Upgraded to player, late join:', data.lateJoin);
+    },
+    onSpectatorList: (spectatorList) => {
+      setSpectators(spectatorList);
+    },
+    onSpectatorUpgraded: (data) => {
+      if (data.success) {
         setIsSpectator(false);
         setIsActive(true);
         setPlayersInRoom(data.users || []);
@@ -673,90 +259,49 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           icon: '🎮',
         });
       }
-    });
+    },
+    onError: (data) => {
+      setIsJoining(false);
 
-    // Fallback: if rooms don't load quickly, stop showing loading state for better UX on slow connections
-    const roomsLoadingTimeout = setTimeout(() => {
-      setRoomsLoading(false);
-    }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
-
-    // Debug handler to check server-side game state
-    socketInstance.on('debugGameStateResponse', (data) => {
-      logger.log('[DEBUG] Server game state:', data);
-    });
-
-    socketInstance.on('error', (data) => {
-      setIsJoining(false); // Clear loading state on any error
-
-      // Handle empty error objects (Socket.IO internal errors) - log as debug, not error
-      // Also handle Error instances that may appear as {} when logged
-      // Note: Error objects from different realms may fail instanceof check, so also check for Error-like objects
-      const isErrorLike = data && typeof data === 'object' && ('stack' in data || 'message' in data);
-
-      // Extract message, handling various error formats
-      const errorMessage = data?.message || (typeof data === 'string' ? data : null);
-      const errorCode = data?.code;
-
-      // Check if we have any meaningful content to log/process
-      const hasNoMeaningfulContent = !data ||
-        (typeof data === 'object' && Object.keys(data).length === 0) ||
-        (isErrorLike && !errorMessage);
-
-      if (hasNoMeaningfulContent) {
-        // Only log in debug mode - these are internal Socket.IO events
-        logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)');
-        return; // Don't process empty errors further
-      }
-
-      // Log meaningful errors with the extracted message
-      logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
-
-      // Capture to Sentry only for unexpected errors (not user errors like room not found)
-      const errorToCapture = new Error(errorMessage || errorCode || 'Unknown socket error');
-      if (!isExpectedError(errorToCapture)) {
-        captureSocketError(errorToCapture, {
-          event: 'error',
-          gameCode: gameCode || undefined,
-          socketId: socketInstance.id || undefined,
-          username: username || undefined,
-          isHost,
-        });
-      }
-
-      // If error is about game not in progress, query server for actual state
-      if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
-        logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
-        socketInstance.emit('debugGameState');
-      }
-
-      // Handle specific error cases
-      if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
-        if (attemptingReconnectRef.current) {
+      if (
+        data.message?.includes('not found') ||
+        data.message?.includes('Game not found') ||
+        data.message?.includes('closed')
+      ) {
+        if (attemptingReconnect) {
           setError(t('errors.sessionExpired'));
           toast.error(t('errors.sessionExpired'), { duration: 4000, icon: '⚠️' });
         } else {
-          // Show friendly message for room not found
-          const errorKey = data.message?.includes('closed') ? 'errors.roomClosed' : 'errors.gameCodeNotExist';
+          const errorKey = data.message?.includes('closed')
+            ? 'errors.roomClosed'
+            : 'errors.gameCodeNotExist';
           setError(t(errorKey) || t('errors.gameCodeNotExist'));
-          toast.error(t('errors.roomNoLongerExists') || t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
+          toast.error(
+            t('errors.roomNoLongerExists') || t('errors.gameCodeNotExist'),
+            { duration: 4000, icon: '❌' }
+          );
         }
         setGameCode('');
-        setPrefilledRoomCode(''); // Clear prefilled room so user sees main join page
+        setPrefilledRoomCode('');
         setIsActive(false);
         setAttemptingReconnect(false);
         setShouldAutoJoin(false);
         clearSession();
 
-        // Auto-refresh room list after error
-        socketInstance.emit('getActiveRooms');
+        if (socket) {
+          socket.emit('getActiveRooms');
+        }
 
-        // Remove room parameter from URL without page reload
+        // Remove room parameter from URL
         if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
           const url = new URL(window.location.href);
           url.searchParams.delete('room');
           window.history.replaceState({}, '', url.pathname + (url.search || ''));
         }
-      } else if (data.message?.includes('already in use') || data.message?.includes('Game code already')) {
+      } else if (
+        data.message?.includes('already in use') ||
+        data.message?.includes('Game code already')
+      ) {
         setError(t('errors.gameCodeExists'));
         toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌' });
         setIsActive(false);
@@ -772,639 +317,300 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       } else {
         const errorMsg = data.message || 'An error occurred';
         setError(errorMsg);
-        // Show toast for all other errors to ensure user gets visual feedback
         toast.error(errorMsg, { duration: 4000, icon: '❌' });
       }
-    });
-
-    // Handle game start at page level to avoid race conditions
-    // Store game start data so PlayerView can consume it when it mounts or updates
-    // This ensures the event is captured even if PlayerView is still loading (dynamic import)
-    // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
-    socketInstance.on('startGame', (data) => {
-      logger.log('[SOCKET.IO] startGame received:', data);
-      addGameBreadcrumb('game_started', {
-        language: data.language,
-        timerSeconds: data.timerSeconds,
-        gridSize: data.letterGrid?.length,
-      });
-
-      // Always store pending game start data for PlayerView to consume
+    },
+    onGameStart: (data) => {
       setPendingGameStart(data);
-      // Track game start time for duration calculation
       setGameStartTime(Date.now());
 
-      // If viewing results, transition back to game
-      if (showResultsRef.current) {
+      if (showResults) {
         logger.log('[SOCKET.IO] Closing results to start new game');
         setShowResults(false);
         setResultsData(null);
       }
-      // Toast notification is handled by PlayerView/HostView to avoid duplicates
-    });
-
-    // Handle game reset - keep players in the room for new game
-    // Note: Toast notification is handled by PlayerView/HostView to avoid duplicates
-    socketInstance.on('resetGame', () => {
-      logger.log('[SOCKET.IO] Game reset - staying in room for new game');
-      // Update ref SYNCHRONOUSLY before state change to prevent race condition
-      // where startGame arrives before the ref useEffect updates
-      showResultsRef.current = false;
+    },
+    onGameReset: () => {
       setShowResults(false);
       setResultsData(null);
-      // Toast notification is handled by PlayerView/HostView to avoid duplicates
-    });
-
-    socketInstance.on('hostLeftRoomClosing', (data) => {
-      toast.error(data.message || t('playerView.roomClosed'), {
-        icon: '🚪',
-        duration: 5000,
-      });
-      // Preserve username in localStorage for smooth fallback to lobby
+    },
+    onHostLeftRoomClosing: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
-      setTimeout(() => window.location.reload(), 2000);
-    });
-
-    // Handle session migration (another tab took over)
-    socketInstance.on('sessionMigrated', (data) => {
-      logger.log('[SOCKET.IO] Session migrated:', data);
-      toast(data.message || 'Your session was moved to another tab', {
-        icon: '🔄',
-        duration: 5000,
-      });
-      // Clear local state - session is now in another tab
+    },
+    onSessionMigrated: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false);
       setIsHost(false);
       setGameCode('');
-    });
-
-    // Handle joining as spectator (room is full)
-    socketInstance.on('joinedAsSpectator', (data) => {
-      logger.log('[SOCKET.IO] Joined as spectator:', data);
-      setIsJoining(false); // Clear loading state
-      setPrefilledRoomCode(''); // Clear prefilled room code
-      setAttemptingReconnect(false);
-      setShouldAutoJoin(false);
-
-      toast(t('common.roomFull') || 'Room is full. You joined as a spectator.', {
-        icon: '👀',
-        duration: 5000,
-      });
-
-      // Set spectator state - user can watch but not participate
-      if (data.language) {
-        setRoomLanguage(data.language);
-      }
-      // Note: We don't set isActive=true since spectators can't participate
-      // They're in the socket room but not in the game
-    });
-
-    // Handle server warnings (e.g., Redis failures)
-    socketInstance.on('warning', (data) => {
-      logger.warn('[SOCKET.IO] Warning:', data);
-      if (data.type === 'persistence') {
-        toast.error(data.message || 'Game state could not be saved. Progress may be lost on server restart.', {
-          icon: '⚠️',
-          duration: 6000,
-        });
-      } else {
-        toast.error(data.message || 'A warning occurred', {
-          icon: '⚠️',
-          duration: 4000,
-        });
-      }
-    });
-
-    // Handle rate limiting - user is sending too many requests
-    socketInstance.on('rateLimited', () => {
-      logger.warn('[SOCKET.IO] Rate limited by server');
-      setIsJoining(false); // Clear loading state
-      toast.error(t('errors.rateLimited') || 'Too many requests. Please wait a moment and try again.', {
-        icon: '⏳',
-        duration: 4000,
-      });
-    });
-
-    socketInstance.on('hostTransferred', (data) => {
+    },
+    onWarning: () => {},
+    onRateLimited: () => {
+      setIsJoining(false);
+    },
+    onHostTransferred: (data) => {
       if (data.newHost === username) {
         setIsHost(true);
-        saveSession({
-          gameCode,
-          username,
-          isHost: true,
-          roomName: roomName || username,
-          language: roomLanguage || 'en',
+      }
+    },
+    t,
+  });
+
+  // Music transitions based on game state
+  React.useEffect(() => {
+    if (showResults) {
+      return;
+    } else if (!isActive) {
+      playTrack(TRACKS.LOBBY);
+    } else if (isActive) {
+      playTrack(TRACKS.BEFORE_GAME);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, showResults]);
+
+  const handleJoin = useCallback(
+    async (
+      isHostMode: boolean,
+      roomLang?: Language | null,
+      overrideGameCode?: string,
+      overrideRoomName?: string
+    ) => {
+      console.log(
+        `🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`
+      );
+
+      if (!socket || !isConnected) {
+        console.error('❌ [JOIN] Cannot join - socket not connected', {
+          socket: !!socket,
+          isConnected,
         });
-        toast.success(t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
-      } else {
-        toast(`${data.newHost} ${t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
+        setError(t('errors.notConnected') || 'Not connected to server');
+        toast.error(t('common.notConnected') || 'Not connected to server', {
+          duration: 3000,
+          icon: '⚠️',
+        });
+        return;
       }
-    });
 
-    socketInstance.on('pong', () => {
-      // Heartbeat response - connection is alive
-    });
+      // Wait for auth to finish loading
+      const AUTH_LOADING_TIMEOUT = 5000;
+      const authLoadingTooLong =
+        authLoadingStartTime && Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT;
 
-    // Defer state update to avoid calling setState directly within effect
-    Promise.resolve().then(() => {
-      setSocket(socketInstance);
-    });
-
-    return () => {
-      logger.log('[SOCKET.IO] MultiplayerPage cleaning up');
-      clearTimeout(roomsLoadingTimeout);
-      // Remove this component's listeners but keep socket alive for other components
-      socketInstance.off('connect');
-      socketInstance.off('disconnect');
-      socketInstance.off('connect_error');
-      socketInstance.off('reconnect');
-      socketInstance.off('reconnect_failed');
-      socketInstance.off('joined');
-      socketInstance.off('updateUsers');
-      socketInstance.off('activeRooms');
-      socketInstance.off('joinedAsSpectator');
-      socketInstance.off('spectatorList');
-      socketInstance.off('spectatorUpgraded');
-      socketInstance.off('debugGameStateResponse');
-      socketInstance.off('error');
-      socketInstance.off('startGame');
-      socketInstance.off('resetGame');
-      socketInstance.off('hostLeftRoomClosing');
-      socketInstance.off('sessionMigrated');
-      socketInstance.off('warning');
-      socketInstance.off('rateLimited');
-      socketInstance.off('hostTransferred');
-      socketInstance.off('pong');
-      // Release reference to shared socket only if we created one (not reusing existing)
-      // When reusing, getSharedSocketIfExists() doesn't increment refcount
-      if (!isReusingSocket) {
-        releaseSharedSocket();
+      if (loading && !authLoadingTooLong) {
+        logger.log('[AUTH] Auth still loading, waiting...');
+        toast.error(t('common.loadingProfile') || 'Loading profile, please wait...', {
+          duration: 2000,
+          icon: '⏳',
+        });
+        return;
       }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- gameCode, username, roomName, roomLanguage are used in handlers but shouldn't trigger socket recreation
-  }, [t, language]);
 
-  // Host keep-alive
-  useEffect(() => {
-    if (!isActive || !isHost || !socket || !isConnected) {
-      if (hostKeepAliveIntervalRef.current) {
-        clearInterval(hostKeepAliveIntervalRef.current);
-        hostKeepAliveIntervalRef.current = null;
+      if (authLoadingTooLong) {
+        logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
       }
-      return;
-    }
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && socket && isConnected) {
-        socket.emit('hostReactivate', { gameCode });
+      // Compute effective username
+      let effectiveUsername = user
+        ? profile?.display_name ||
+          user?.user_metadata?.full_name ||
+          user?.user_metadata?.name ||
+          user?.email?.split('@')[0] ||
+          username
+        : username;
+
+      // Generate random name for guests without username
+      let generatedAvatar: { emoji: string; color: string } | null = null;
+      if (!effectiveUsername?.trim() && !user) {
+        const { name, avatar } = getRandomDefaultNameWithAvatar(language as Language);
+        effectiveUsername = name;
+        generatedAvatar = avatar;
+        setGuestAvatar(avatar);
+        logger.log('[JOIN] Generated random name for guest:', name);
       }
-    };
 
-    hostKeepAliveIntervalRef.current = setInterval(() => {
-      if (document.visibilityState === 'visible' && socket && isConnected) {
-        socket.emit('hostKeepAlive', { gameCode });
+      if (effectiveUsername !== username) {
+        setUsername(effectiveUsername);
       }
-    }, SOCKET_CONFIG.HOST_KEEP_ALIVE_INTERVAL);
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Send initial reactivation
-    socket.emit('hostReactivate', { gameCode });
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (hostKeepAliveIntervalRef.current) {
-        clearInterval(hostKeepAliveIntervalRef.current);
-        hostKeepAliveIntervalRef.current = null;
-      }
-    };
-  }, [isActive, isHost, socket, isConnected, gameCode]);
-
-  // Helper to get auth context for socket events
-  const getAuthContext = useCallback(async () => {
-    if (!isSupabaseEnabled) return { authUserId: null, guestTokenHash: null, guestSessionId: null };
-
-    // Use user.id directly - don't require profile for stats recording
-    if (user?.id) {
-      return { authUserId: user.id, guestTokenHash: null, guestSessionId: null };
-    }
-
-    const guestSessionId = getGuestSessionId();
-    if (guestSessionId) {
-      const hash = await hashToken(guestSessionId);
-      return { authUserId: null, guestTokenHash: hash, guestSessionId };
-    }
-
-    return { authUserId: null, guestTokenHash: null, guestSessionId: null };
-  }, [isSupabaseEnabled, user]);
-
-  // Auto-join effect
-  useEffect(() => {
-    if (!shouldAutoJoin || !socket || !isConnected || isActive || attemptingReconnect) {
-      return;
-    }
-
-    if (prefilledRoomCode && username && username.trim()) {
-      // Capture current values to avoid stale closure issues
-      const currentUsername = username;
-      const currentProfile = profile;
-      const currentPrefilledRoomCode = prefilledRoomCode;
-
-      const autoJoinTimeout = setTimeout(async () => {
-        if (socket && socket.connected && !isActive) {
-          const authContext = await getAuthContext();
-          // Check socket is still connected after async operation
-          if (!socket.connected) {
-            logger.warn('[AUTO-JOIN] Socket disconnected during auth context build, skipping auto-join');
-            return;
+      const avatarImageId = getStoredAvatarId();
+      const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
+      const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
+      const effectiveAvatar = profile
+        ? {
+            emoji: profile.avatar_emoji,
+            color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage),
+            avatarImage: effectiveAvatarImage,
           }
-          socket.emit('join', {
-            gameCode: currentPrefilledRoomCode,
-            username: currentUsername,
-            ...authContext,
-            avatar: currentProfile ? {
-              emoji: currentProfile.avatar_emoji,
-              color: sanitizeAvatarColor(currentProfile.avatar_color, currentProfile.avatar_image),
-            } : getAvatarForName(currentUsername),
-            profilePictureUrl: currentProfile?.profile_picture_url,
-          });
-          setShouldAutoJoin(false);
-        }
-      }, 200);
-      return () => clearTimeout(autoJoinTimeout);
-    }
-    return undefined;
-  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile]);
-
-  // Session reconnection
-  useEffect(() => {
-    if (!attemptingReconnect || !socket || !isConnected || isActive) {
-      return;
-    }
-
-    const savedSession = getSession();
-    if (!savedSession?.gameCode) {
-      Promise.resolve().then(() => setAttemptingReconnect(false));
-      return;
-    }
-
-    // Check if session is too old (more than 5 minutes of inactivity)
-    const sessionAge = Date.now() - savedSession.timestamp;
-    const maxInactivity = 5 * 60 * 1000; // 5 minutes
-
-    if (sessionAge > maxInactivity) {
-      // Session is too old, don't auto-reconnect - user needs to manually rejoin
-      logger.log('[SESSION] Session too old for auto-reconnect, clearing session');
-      clearSession();
-      Promise.resolve().then(() => setAttemptingReconnect(false));
-      return;
-    }
-
-    const reconnectTimeout = setTimeout(async () => {
-      const authContext = await getAuthContext();
-
-      if (savedSession.isHost) {
-        // hostUsername is required for reconnection
-        if (!savedSession.hostUsername) {
-          clearSession();
-          setAttemptingReconnect(false);
-          return;
-        }
-        // Fallback for roomName: use saved value, or generate from hostname
-        const reconnectRoomName = savedSession.roomName || `${savedSession.hostUsername} Room`;
-        socket.emit('createGame', {
-          gameCode: savedSession.gameCode,
-          roomName: reconnectRoomName,
-          hostUsername: savedSession.hostUsername,
-          language: savedSession.language || language,
-          ...authContext,
-          avatar: profile ? {
-            emoji: profile.avatar_emoji,
-            color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
-          } : getAvatarForName(savedSession.hostUsername),
-          profilePictureUrl: profile?.profile_picture_url,
-        });
-      } else {
-        if (!savedSession.username) {
-          clearSession();
-          setAttemptingReconnect(false);
-          return;
-        }
-        socket.emit('join', {
-          gameCode: savedSession.gameCode,
-          username: savedSession.username,
-          ...authContext,
-          avatar: profile ? {
-            emoji: profile.avatar_emoji,
-            color: sanitizeAvatarColor(profile.avatar_color, profile.avatar_image),
-          } : getAvatarForName(savedSession.username),
-          profilePictureUrl: profile?.profile_picture_url,
-        });
-      }
-    }, 500);
-
-    return () => clearTimeout(reconnectTimeout);
-  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
-
-  const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string, overrideRoomName?: string) => {
-    console.log(`🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
-
-    if (!socket || !isConnected) {
-      console.error('❌ [JOIN] Cannot join - socket not connected', { socket: !!socket, isConnected });
-      setError(t('errors.notConnected') || 'Not connected to server');
-      toast.error(t('common.notConnected') || 'Not connected to server', {
-        duration: 3000,
-        icon: '⚠️',
-      });
-      return;
-    }
-
-    // Wait for auth to finish loading before creating/joining game
-    // But allow joining after 5 seconds even if auth is still loading (to prevent permanent block)
-    const AUTH_LOADING_TIMEOUT = 5000;
-    const authLoadingTooLong = authLoadingStartTime && (Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT);
-
-    if (loading && !authLoadingTooLong) {
-      logger.log('[AUTH] Auth still loading, waiting...');
-      toast.error(t('common.loadingProfile') || 'Loading profile, please wait...', {
-        duration: 2000,
-        icon: '⏳',
-      });
-      return;
-    }
-
-    if (authLoadingTooLong) {
-      logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
-    }
-
-    // Compute the correct username at join time to avoid stale state issues
-    // When authenticated, always prefer the profile/OAuth display name over any generated guest name
-    let effectiveUsername = user
-      ? (profile?.display_name ||
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
-        user?.email?.split('@')[0] ||
-        username)
-      : username;
-
-    // For guests without a username, generate a fun random name on the spot
-    // This handles cases where handleJoin is called before the auth effect runs
-    let generatedAvatar: { emoji: string; color: string } | null = null;
-    if (!effectiveUsername?.trim() && !user) {
-      const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-      effectiveUsername = name;
-      generatedAvatar = avatar;
-      setGuestAvatar(avatar);
-      logger.log('[JOIN] Generated random name for guest:', name);
-    }
-
-    // Also update state to keep it in sync for future use
-    if (effectiveUsername !== username) {
-      setUsername(effectiveUsername);
-    }
-
-    // Get selected avatar image from localStorage (includes user's selection from modal)
-    const avatarImageId = getStoredAvatarId();
-
-    // Determine avatar to use: prioritize modal selection > profile > guest state > just-generated > derive from name
-    // Sanitize profile color to ensure it matches backend validation pattern
-    const effectiveAvatarImage = avatarImageId || profile?.avatar_image;
-    const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
-    const effectiveAvatar = profile
-      ? { emoji: profile.avatar_emoji, color: sanitizeAvatarColor(profile.avatar_color, effectiveAvatarImage), avatarImage: effectiveAvatarImage }
-      : {
-        ...fallbackAvatar,
-        color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
-        avatarImage: avatarImageId || undefined
-      };
-
-    setError('');
-    setIsJoining(true); // Show loading state
-
-    // Safety timeout: clear isJoining after 10 seconds if no response
-    const safetyTimeout = setTimeout(() => {
-      setIsJoining(false);
-      console.warn('⏱️ [JOIN] Safety timeout triggered - no response received within 10 seconds');
-      logger.warn('[JOIN] Safety timeout triggered - no response received within 10 seconds');
-      toast.error(t('errors.connectionTimeout') || 'Connection timeout. Please try again.', {
-        duration: 4000,
-        icon: '⚠️',
-      });
-    }, 10000);
-
-    // Clear safety timeout when response is received (via joined/error/rateLimited events)
-    const clearSafetyTimeout = () => clearTimeout(safetyTimeout);
-    socket.once('joined', clearSafetyTimeout);
-    socket.once('error', clearSafetyTimeout);
-    socket.once('joinedAsSpectator', clearSafetyTimeout);
-    socket.once('rateLimited', clearSafetyTimeout);
-
-    // Use overrideGameCode if provided, otherwise use state gameCode
-    const codeToUse = overrideGameCode || gameCode;
-
-    // Build auth context for game result tracking
-    let authUserId = null;
-    let guestTokenHash = null;
-    let guestSessionId: string | null = null;
-
-    if (isSupabaseEnabled) {
-      // For stats recording, we only need the user.id from Supabase auth
-      // Don't require profile to exist - user may have logged in but not completed profile setup
-      if (user?.id) {
-        // Authenticated user (has Supabase auth, regardless of profile status)
-        authUserId = user.id;
-        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username: effectiveUsername, hasProfile: !!profile });
-      } else {
-        // Guest user - get or create guest session
-        guestSessionId = getGuestSessionId();
-        if (guestSessionId) {
-          guestTokenHash = await hashToken(guestSessionId);
-        }
-        logger.log('[AUTH] Joining as guest:', { hasUser: !!user, guestTokenHash: !!guestTokenHash, guestSessionId: !!guestSessionId });
-      }
-    }
-
-    if (isHostMode) {
-      // For hosts, determine username and room name separately
-      // Authenticated users: use their display name as username, custom room name for room
-      // Guest users: use both hostUsername and roomName from state
-      const finalHostUsername = user ? effectiveUsername : (hostUsername || effectiveUsername);
-      // Use overrideRoomName if provided (from direct submission), or fall back to state, or generate default
-      // Use dash instead of apostrophe to avoid validation issues with special characters
-      const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
-
-      // For hosts: prioritize modal selection, then profile, then generated/guest avatar
-      // Sanitize profile color to ensure it matches backend validation pattern
-      const hostAvatarImage = avatarImageId || profile?.avatar_image;
-      const hostFallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
-      const hostAvatar = profile
-        ? { emoji: profile.avatar_emoji, color: sanitizeAvatarColor(profile.avatar_color, hostAvatarImage), avatarImage: hostAvatarImage }
         : {
-          ...hostFallbackAvatar,
-          color: sanitizeAvatarColor(hostFallbackAvatar.color, avatarImageId),
-          avatarImage: avatarImageId || undefined
+            ...fallbackAvatar,
+            color: sanitizeAvatarColor(fallbackAvatar.color, avatarImageId),
+            avatarImage: avatarImageId || undefined,
+          };
+
+      setError('');
+      setIsJoining(true);
+
+      const safetyTimeout = setTimeout(() => {
+        setIsJoining(false);
+        console.warn('⏱️ [JOIN] Safety timeout triggered');
+        logger.warn('[JOIN] Safety timeout triggered');
+        toast.error(
+          t('errors.connectionTimeout') || 'Connection timeout. Please try again.',
+          {
+            duration: 4000,
+            icon: '⚠️',
+          }
+        );
+      }, 10000);
+
+      const clearSafetyTimeout = () => clearTimeout(safetyTimeout);
+      socket.once('joined', clearSafetyTimeout);
+      socket.once('error', clearSafetyTimeout);
+      socket.once('joinedAsSpectator', clearSafetyTimeout);
+      socket.once('rateLimited', clearSafetyTimeout);
+
+      const codeToUse = overrideGameCode || gameCode;
+
+      // Build auth context
+      let authUserId = null;
+      let guestTokenHash = null;
+      let guestSessionId: string | null = null;
+
+      if (isSupabaseEnabled) {
+        if (user?.id) {
+          authUserId = user.id;
+          logger.log('[AUTH] Joining as authenticated user:', {
+            authUserId,
+            username: effectiveUsername,
+            hasProfile: !!profile,
+          });
+        } else {
+          guestSessionId = getGuestSessionId();
+          if (guestSessionId) {
+            guestTokenHash = await hashToken(guestSessionId);
+          }
+          logger.log('[AUTH] Joining as guest:', {
+            hasUser: !!user,
+            guestTokenHash: !!guestTokenHash,
+            guestSessionId: !!guestSessionId,
+          });
+        }
+      }
+
+      if (isHostMode) {
+        const finalHostUsername = user ? effectiveUsername : hostUsername || effectiveUsername;
+        const finalRoomName = sanitizeRoomName(
+          overrideRoomName || roomName || `${finalHostUsername} Room`
+        );
+
+        const hostAvatarImage = avatarImageId || profile?.avatar_image;
+        const hostFallbackAvatar =
+          generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
+        const hostAvatar = profile
+          ? {
+              emoji: profile.avatar_emoji,
+              color: sanitizeAvatarColor(profile.avatar_color, hostAvatarImage),
+              avatarImage: hostAvatarImage,
+            }
+          : {
+              ...hostFallbackAvatar,
+              color: sanitizeAvatarColor(hostFallbackAvatar.color, avatarImageId),
+              avatarImage: avatarImageId || undefined,
+            };
+
+        const createGamePayload = {
+          gameCode: codeToUse,
+          roomName: finalRoomName,
+          hostUsername: finalHostUsername,
+          language: roomLang || language,
+          authUserId,
+          guestTokenHash,
+          guestSessionId,
+          avatar: hostAvatar,
+          profilePictureUrl: profile?.profile_picture_url,
         };
 
-      const createGamePayload = {
-        gameCode: codeToUse,
-        roomName: finalRoomName,
-        hostUsername: finalHostUsername,
-        language: roomLang || language,
-        authUserId,
-        guestTokenHash,
-        guestSessionId,
-        avatar: hostAvatar,
-        profilePictureUrl: profile?.profile_picture_url,
-      };
+        console.log('[JOIN] Emitting createGame event:', {
+          gameCode: codeToUse,
+          roomName: finalRoomName,
+          hostUsername: finalHostUsername,
+          language: roomLang || language,
+          hasAuth: !!authUserId,
+          hasGuestToken: !!guestTokenHash,
+          hasAvatar: !!hostAvatar,
+          socketConnected: socket.connected,
+          socketId: socket.id,
+        });
 
-      // Production-safe logging (always visible)
-      console.log('[JOIN] Emitting createGame event:', {
-        gameCode: codeToUse,
-        roomName: finalRoomName,
-        hostUsername: finalHostUsername,
-        language: roomLang || language,
-        hasAuth: !!authUserId,
-        hasGuestToken: !!guestTokenHash,
-        hasAvatar: !!hostAvatar,
-        socketConnected: socket.connected,
-        socketId: socket.id
-      });
+        socket.emit('createGame', createGamePayload);
+      } else {
+        const joinPayload = {
+          gameCode: codeToUse,
+          username: effectiveUsername,
+          authUserId,
+          guestTokenHash,
+          guestSessionId,
+          avatar: effectiveAvatar,
+          profilePictureUrl: profile?.profile_picture_url,
+        };
 
-      socket.emit('createGame', createGamePayload);
+        logger.log('[JOIN] Emitting join event:', {
+          gameCode: codeToUse,
+          username: effectiveUsername,
+          hasAuth: !!authUserId,
+          hasGuestToken: !!guestTokenHash,
+          socketConnected: socket.connected,
+          socketId: socket.id,
+        });
 
-      console.log('[JOIN] createGame event emitted, waiting for response...');
-    } else {
-      const joinPayload = {
-        gameCode: codeToUse,
-        username: effectiveUsername,
-        authUserId,
-        guestTokenHash,
-        guestSessionId,
-        avatar: effectiveAvatar,
-        profilePictureUrl: profile?.profile_picture_url,
-      };
-
-      logger.log('[JOIN] Emitting join event:', {
-        gameCode: codeToUse,
-        username: effectiveUsername,
-        hasAuth: !!authUserId,
-        hasGuestToken: !!guestTokenHash,
-        socketConnected: socket.connected,
-        socketId: socket.id
-      });
-
-      socket.emit('join', joinPayload);
-
-      logger.log('[JOIN] join event emitted, waiting for response...');
-    }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar, hostUsername]);
-
-  const refreshRooms = useCallback(() => {
-    if (socket && isConnected) {
-      setRoomsLoading(true);
-      socket.emit('getActiveRooms');
-    }
-  }, [socket, isConnected]);
+        socket.emit('join', joinPayload);
+      }
+    },
+    [
+      socket,
+      isConnected,
+      gameCode,
+      username,
+      roomName,
+      language,
+      t,
+      isSupabaseEnabled,
+      user,
+      profile,
+      loading,
+      authLoadingStartTime,
+      guestAvatar,
+      hostUsername,
+      setGuestAvatar,
+      setUsername,
+    ]
+  );
 
   const handleUpgradeToPlayer = useCallback(() => {
-    if (!socket || !gameCode) {
-      logger.warn('[SPECTATOR] Cannot upgrade: no socket or gameCode');
-      return;
-    }
+    baseHandleUpgradeToPlayer(username);
+  }, [baseHandleUpgradeToPlayer, username]);
 
-    logger.info('[SPECTATOR] Requesting upgrade to player in game:', gameCode);
-    socket.emit('upgradeToPlayer', { gameCode });
-  }, [socket, gameCode]);
-
-  const handleReturnToRoom = useCallback(() => {
-    // Emit ready confirmation to server before hiding results
-    if (socket && gameCode) {
-      socket.emit('confirmReadyForNextGame');
-    }
-    setShowResults(false);
-    setResultsData(null);
-    // Reset game state atomically - these must be reset together to prevent
-    // calculateGameDuration() from returning stale/incorrect values
-    setPendingGameStart(null);
-    setGameStartTime(null);
-    // Reset stored duration for next game
-    gameDurationRef.current = null;
-  }, [socket, gameCode]);
-
-  const handleShowResults = useCallback((data: unknown) => {
-    setResultsData(data as ResultsData);
-    setShowResults(true);
-    // Track multiplayer game completion for new player badge
-    import('@/utils/multiplayerProgressStorage').then(({ recordGameCompleted }) => {
-      recordGameCompleted();
-    });
-    // Refresh profile to sync updated stats (wins, score, etc.) from the backend
-    // This ensures the profile stats displayed in the UI reflect the game results
-    if (isAuthenticated && refreshProfile) {
-      refreshProfile();
-    }
-  }, [isAuthenticated, refreshProfile]);
-
-  // Calculate and store game duration when results are first shown
-  // This ensures the duration remains stable even if gameStartTime/pendingGameStart are reset
-  useEffect(() => {
-    if (showResults && resultsData && gameDurationRef.current === null) {
-      // Calculate duration once when results are first shown
-      if (gameStartTime && pendingGameStart?.timerSeconds) {
-        // Calculate actual elapsed time, but cap at configured timer duration
-        const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-        gameDurationRef.current = Math.min(elapsed, pendingGameStart.timerSeconds);
-      } else {
-        // Fallback to configured duration if we don't have start time
-        gameDurationRef.current = pendingGameStart?.timerSeconds || 180;
-      }
-    }
-  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
-
-  // Memoized game duration - uses ref value if available, otherwise calculates
-  // This ensures stable duration value for cognitive scoring calculations
-  const gameDuration = useMemo(() => {
-    // If we have a stored duration from when results were shown, use it
-    // This prevents recalculation if state is reset before cognitive scoring executes
-    if (gameDurationRef.current !== null) {
-      return gameDurationRef.current;
-    }
-    
-    // Fallback calculation if ref not set yet (shouldn't happen in normal flow)
-    if (!showResults || !resultsData) {
-      return pendingGameStart?.timerSeconds || 180;
-    }
-    
-    if (gameStartTime && pendingGameStart?.timerSeconds) {
-      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-      return Math.min(elapsed, pendingGameStart.timerSeconds);
-    }
-    return pendingGameStart?.timerSeconds || 180;
-  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
-
-  // QuickJoinView handlers removed - invitation flow now handled by MultiplayerFlow
-
-  // Manual reconnect handler
   const handleManualReconnect = useCallback(() => {
     if (socket && !socket.connected) {
       socket.connect();
     }
   }, [socket]);
 
-  // Create context value
-  const socketContextValue = {
-    socket,
-    isConnected,
-    connectionError: error,
-    isReconnecting: attemptingReconnect,
-    reconnectAttempt: 0, // Local override doesn't track attempts
-    maxReconnectAttempts: 20,
-    manualReconnect: handleManualReconnect,
-  };
+  const socketContextValue = useMemo(
+    () => ({
+      socket,
+      isConnected,
+      connectionError: error,
+      isReconnecting: attemptingReconnect,
+      reconnectAttempt: 0,
+      maxReconnectAttempts: 20,
+      manualReconnect: handleManualReconnect,
+    }),
+    [socket, isConnected, error, attemptingReconnect, handleManualReconnect]
+  );
 
   const renderView = () => {
     if (showResults) {
@@ -1420,7 +626,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             playerCount={resultsData?.playerCount}
             isHost={isHost}
             roomLanguage={roomLanguage ?? undefined}
-            gridSize={resultsData?.letterGrid && Array.isArray(resultsData.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
+            gridSize={
+              resultsData?.letterGrid &&
+              Array.isArray(resultsData.letterGrid) &&
+              resultsData.letterGrid.length > 0
+                ? resultsData.letterGrid.length
+                : 4
+            }
             gameDuration={gameDuration}
           />
         </FeatureErrorBoundary>
@@ -1428,8 +640,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     }
 
     if (!isActive) {
-      // MultiplayerFlow handles both normal flow and invitation links
-      // When prefilledRoomCode is set, it shows InvitationQuickJoin or ProfileSetup accordingly
       return (
         <FeatureErrorBoundary featureName="Lobby">
           <MultiplayerFlow
@@ -1487,10 +697,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   return (
     <SocketContext.Provider value={socketContextValue}>
-      {/* Connection status indicator */}
       <ConnectionDot />
 
-      {/* Training gateway modal - prompts new players to try training first */}
       <TrainingGatewayModal
         isOpen={showTrainingGateway}
         onClose={() => setShowTrainingGateway(false)}
@@ -1498,7 +706,6 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         returnTo="multiplayer"
       />
 
-      {/* Spectator status banner */}
       <SpectatorBanner
         isSpectating={isSpectator}
         onRequestUpgrade={handleUpgradeToPlayer}
@@ -1508,7 +715,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
       <AutoHideHeader />
       <ErrorBoundary>
-        <div tabIndex={-1} className='h-dvh flex flex-col min-h-0 w-full overflow-hidden'>
+        <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-hidden">
           {renderView()}
         </div>
       </ErrorBoundary>

@@ -521,17 +521,29 @@ const LandingView: React.FC = () => {
                 className="w-full max-w-md"
               />
 
-              {/* Secondary card - Adventure Mode (spans full width with larger max-width) */}
-              <ModeCard
-                title={t('landing.adventureMode') || 'Adventure'}
-                description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
-                href={`/${language}/adventure`}
-                icon={<Map className="w-6 h-6" />}
-                variant="lime"
-                secondary
-                badge="BETA"
-                className="sm:col-span-2 w-full max-w-2xl"
-              />
+              {/* Secondary cards row - Adventure Mode and Education (spans full width) */}
+              <div className="sm:col-span-2 w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <ModeCard
+                  title={t('landing.adventureMode') || 'Adventure'}
+                  description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
+                  href={`/${language}/adventure`}
+                  icon={<Map className="w-6 h-6" />}
+                  variant="lime"
+                  secondary
+                  badge="BETA"
+                  className="w-full"
+                />
+                <ModeCard
+                  title={t('landing.education') || 'Education'}
+                  description={t('landing.educationDesc') || 'For teachers & students'}
+                  href={`/${language}/education`}
+                  icon={<GraduationCap className="w-6 h-6" />}
+                  variant="purple"
+                  secondary
+                  badge={t('landing.educationBadge') || 'FOR TEACHERS'}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         )}

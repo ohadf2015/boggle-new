@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useEffect, type ReactNode } from 'react';
+import React, { memo, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import CircularTimer from '@/components/CircularTimer';
@@ -152,10 +152,11 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
   }, [currentFeedback]);
 
   // Clear floating score after animation completes
-  const handleScoreAnimationComplete = () => {
+  // useCallback ensures stable reference to prevent infinite animation loop
+  const handleScoreAnimationComplete = useCallback(() => {
     setFloatingScore(null);
     setIsFireRoundScore(false);
-  };
+  }, []);
 
   return (
     <>

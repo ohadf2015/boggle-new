@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
-import { ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { ChevronDown, ChevronRight, Users, Download } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function StudentProgressView() {
   const { t, language } = useLanguage();
@@ -51,6 +53,54 @@ export default function StudentProgressView() {
     };
   });
 
+  // Export progress data to CSV
+  const handleExportCSV = useCallback(() => {
+    if (studentStats.length === 0) {
+      toast.error(t('teacher.progress.noDataToExport') || 'No data to export');
+      return;
+    }
+
+    // Build CSV content
+    const headers = [
+      t('teacher.progress.student') || 'Student',
+      t('teacher.progress.wordsAttempted') || 'Words Attempted',
+      t('teacher.progress.wordsMastered') || 'Words Mastered',
+      t('teacher.progress.accuracy') || 'Accuracy (%)',
+      t('teacher.progress.lastActive') || 'Last Active',
+    ];
+
+    const rows = studentStats.map((student) => [
+      `Student ${student.student_id.slice(0, 8)}`,
+      student.wordsAttempted,
+      student.wordsMastered,
+      student.accuracy.toFixed(1),
+      new Date(student.lastActive).toLocaleDateString(),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) => row.join(',')),
+    ].join('\n');
+
+    // Create download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    const classroomName = selectedClassroom?.name || 'classroom';
+    const lessonName = selectedLesson?.name || 'lesson';
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.download = `${classroomName}-${lessonName}-progress-${timestamp}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success(t('teacher.progress.exportSuccess') || 'Progress exported successfully!');
+  }, [studentStats, selectedClassroom, selectedLesson, t]);
+
   if (loadingClassrooms || loadingLessons) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -61,8 +111,10 @@ export default function StudentProgressView() {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Header with filters and export */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
         <div>
           <label className="block text-sm font-neo-body text-neo-white mb-2">
             {t('teacher.dashboard.classrooms')}
@@ -108,6 +160,22 @@ export default function StudentProgressView() {
               ))}
           </select>
         </div>
+        </div>
+
+        {/* Export Button */}
+        <Button
+          onClick={handleExportCSV}
+          disabled={studentStats.length === 0 || !selectedClassroomId || !selectedLessonId}
+          className={cn(
+            'flex items-center gap-2 font-neo-body font-bold whitespace-nowrap',
+            'bg-neo-lime text-neo-black border-neo border-neo-black',
+            'shadow-hard hover:shadow-hard-lg',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
+          )}
+        >
+          <Download className="w-4 h-4" />
+          {t('teacher.progress.exportCSV') || 'Export CSV'}
+        </Button>
       </div>
 
       {/* Progress Table */}
