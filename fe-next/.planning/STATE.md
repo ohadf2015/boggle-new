@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 26 - Meta-Progression Foundation
-Plan: 3/8 (in progress - Wave 1)
-Status: Plans 26-01, 26-02, 26-03 complete (XP utilities, gold currency, screen shake)
-Last activity: 2026-01-30 — Completed 26-02-PLAN.md (Gold Currency System)
+Plan: 6/8 (in progress - Wave 2)
+Status: Plans 26-01, 26-02, 26-03, 26-06 complete (XP, gold, screen shake, particles & score popups)
+Last activity: 2026-01-30 — Completed 26-06-PLAN.md (Adaptive Particle System & Score Popup)
 
-Progress: [███░░░░░░░] 37.5% (3/8 plans complete)
+Progress: [█████░░░░░] 50% (4/8 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [███░░░░░░░] 37.5% (3/8 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 3 (26-01 adventure XP, 26-02 gold currency, 26-03 screen shake)
-- Current phase: Phase 26 in progress (Wave 1)
+- Plans completed: 4 (26-01 XP, 26-02 gold, 26-03 screen shake, 26-06 particles & score popups)
+- Current phase: Phase 26 in progress (Wave 2)
 
 ## Accumulated Context
 
@@ -127,6 +127,13 @@ Key decisions from previous milestones:
 - Reduced motion flash alternative: Opacity flash maintains feedback without motion (WCAG compliant)
 - Conservative parameter ranges: Intensity 2-8px, duration 100-300ms to prevent nausea/motion fatigue
 
+**Phase 26-06 (Adaptive Particle System & Score Popup, 2026-01-30):**
+- Three-tier particle budgets: low (30), medium (60), high (100) particles based on device
+- Zero particles for reduced motion users: Accessibility first, WCAG 2.1 compliant
+- Intensity scaling (1-4x): Single component handles all combo tiers without config duplication
+- Arc trajectory with quadratic bezier: Natural parabolic motion for score popups (0.8s arc, 0.3s reduced motion fade)
+- AdaptiveParticles is purely visual: No text rendering, separation from ComboTierBadge
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -152,10 +159,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-02-PLAN.md (Gold Currency System)
+Stopped at: Completed 26-06-PLAN.md (Adaptive Particle System & Score Popup)
 Resume file: None
 
-**Next action:** Continue with remaining Phase 26 Wave 1 plans (26-04) and Wave 2/3
+**Next action:** Continue with remaining Phase 26 Wave 2 plans (26-04, 26-05, 26-07, 26-08)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
