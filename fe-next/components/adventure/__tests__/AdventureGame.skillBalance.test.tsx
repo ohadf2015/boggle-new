@@ -14,8 +14,7 @@
  * not actual gameplay (automated verification).
  */
 
-import { getLevelConfig, generateObjectives } from '@/lib/adventure/levelConfig';
-import { generateGrid } from '@/lib/adventure/gridGenerator';
+import { getLevelConfig } from '@/lib/adventure/levelConfig';
 import type { LevelConfig, LevelObjective } from '@/types/adventure';
 
 // ==============================================

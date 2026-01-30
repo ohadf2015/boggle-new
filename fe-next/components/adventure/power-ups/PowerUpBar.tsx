@@ -14,6 +14,7 @@ import toast from 'react-hot-toast';
 import { PowerUpButton } from './PowerUpButton';
 import { PowerUpActivationEffect } from './PowerUpActivationEffect';
 import { usePowerUpState } from '@/hooks/usePowerUpState';
+import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
 import { usePowerUpEffects, type HintResult } from '@/hooks/usePowerUpEffects';
 import type { TileState, PowerUpType } from '@/types/adventure';
 
