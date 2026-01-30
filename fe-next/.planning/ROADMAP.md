@@ -322,14 +322,16 @@ Plans:
   3. User sees explosion effects for multi-tile clearing
   4. User sees special tile types (frozen, locked, multiplier) with distinct visuals
   5. Cascades trigger automatically when words removed without player action
-**Plans**: 5 plans in 3 waves
+**Plans**: 7 plans in 5 waves (including gap closure)
 
 Plans:
-- [ ] 27-01-PLAN.md — Cascade loop state machine (TDD, Wave 1)
-- [ ] 27-02-PLAN.md — Framer Motion layout animations (Wave 1)
-- [ ] 27-03-PLAN.md — Explosion effects for multi-tile clearing (Wave 2)
-- [ ] 27-04-PLAN.md — Special tile activation logic (TDD, Wave 2)
-- [ ] 27-05-PLAN.md — AdventureGame integration + 60fps verification (Wave 3)
+- [x] 27-01-PLAN.md — Cascade loop state machine (TDD, Wave 1)
+- [x] 27-02-PLAN.md — Framer Motion layout animations (Wave 1)
+- [x] 27-03-PLAN.md — Explosion effects for multi-tile clearing (Wave 2)
+- [x] 27-04-PLAN.md — Special tile activation logic (TDD, Wave 2)
+- [x] 27-05-PLAN.md — Tile removal and refill logic (Wave 3)
+- [x] 27-06-PLAN.md — Special tile integration + full verification (Wave 4)
+- [ ] 27-07-PLAN.md — Gap closure: Locked/multiplier tile CSS styling (Wave 5)
 
 #### Phase 28: Power-Up System
 **Goal**: Players have strategic mid-game options that feel rewarding without being mandatory
