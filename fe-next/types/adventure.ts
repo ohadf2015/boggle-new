@@ -266,6 +266,20 @@ export interface AdventureGameState {
   isComplete: boolean;
   /** Stars earned (0 until level complete) */
   stars: 0 | 1 | 2 | 3;
+
+  // Power-up state (POWER-03: Score Multiplier)
+  /** Active score multiplier (1 = normal, 2 = power-up active) */
+  scoreMultiplier?: number;
+  /** Timestamp when multiplier expires (Date.now() + 30000) */
+  multiplierExpiresAt?: number;
+
+  // Hint state (POWER-02: Hint)
+  /** Currently displayed hint word */
+  hintWord?: string;
+  /** Tile positions for hint highlight */
+  hintTiles?: Array<{ row: number; col: number }>;
+  /** Timestamp when hint expires (Date.now() + 5000) */
+  hintExpiresAt?: number;
 }
 
 // ==============================================
