@@ -17,6 +17,11 @@ import { POWER_UP_CONFIG, type PowerUpType, type PowerUp, type PowerUpState } fr
 const COOLDOWN_DURATION = 60; // seconds
 const UI_UPDATE_INTERVAL = 100; // ms for smooth UI updates
 
+interface UsePowerUpStateOptions {
+  /** Initial cooldown timestamp for persistence restoration */
+  initialCooldownTimestamp?: number;
+}
+
 interface UsePowerUpStateReturn {
   /** Current power-up state */
   powerUp: PowerUp;
@@ -26,15 +31,48 @@ interface UsePowerUpStateReturn {
   isReady: boolean;
 }
 
-export function usePowerUpState(type: PowerUpType): UsePowerUpStateReturn {
+export function usePowerUpState(
+  type: PowerUpType,
+  options: UsePowerUpStateOptions = {}
+): UsePowerUpStateReturn {
+  const { initialCooldownTimestamp = 0 } = options;
   const effectDuration = POWER_UP_CONFIG[type].effectDuration;
 
+  // Calculate initial state based on timestamp
+  const getInitialState = useCallback((): PowerUpState => {
+    if (initialCooldownTimestamp === 0) {
+      return 'ready';
+    }
+
+    const elapsed = (Date.now() - initialCooldownTimestamp) / 1000;
+    const remaining = Math.max(0, COOLDOWN_DURATION - elapsed);
+
+    return remaining > 0 ? 'cooldown' : 'ready';
+  }, [initialCooldownTimestamp]);
+
+  const getInitialCooldown = useCallback((): number => {
+    if (initialCooldownTimestamp === 0) {
+      return 0;
+    }
+
+    const elapsed = (Date.now() - initialCooldownTimestamp) / 1000;
+    return Math.max(0, COOLDOWN_DURATION - elapsed);
+  }, [initialCooldownTimestamp]);
+
   // State for triggering re-renders on UI updates
-  const [state, setState] = useState<PowerUpState>('ready');
-  const [remainingCooldown, setRemainingCooldown] = useState(0);
+  const [state, setState] = useState<PowerUpState>(getInitialState);
+  const [remainingCooldown, setRemainingCooldown] = useState(getInitialCooldown);
 
   // Refs to avoid re-renders on timestamp updates
-  const activatedAtRef = useRef<number | undefined>(undefined);
+  // Initialize activatedAt from initial timestamp if in cooldown
+  const getInitialActivatedAt = useCallback((): number | undefined => {
+    if (initialCooldownTimestamp > 0 && getInitialState() === 'cooldown') {
+      return initialCooldownTimestamp;
+    }
+    return undefined;
+  }, [initialCooldownTimestamp, getInitialState]);
+
+  const activatedAtRef = useRef<number | undefined>(getInitialActivatedAt());
   const effectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const uiUpdateIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 

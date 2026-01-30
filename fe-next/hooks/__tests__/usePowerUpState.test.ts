@@ -294,4 +294,97 @@ describe('usePowerUpState - TDD Cycle', () => {
       expect(result.current.powerUp.state).toBe('ready');
     });
   });
+
+  describe('Initial Cooldown Timestamp (Persistence Integration)', () => {
+    it('should initialize with cooldown state when timestamp provided', () => {
+      // GIVEN - timestamp from 30 seconds ago (active cooldown)
+      const thirtySecondsAgo = Date.now() - 30000;
+
+      // WHEN
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          initialCooldownTimestamp: thirtySecondsAgo,
+        })
+      );
+
+      // THEN - should be in cooldown state, not ready
+      expect(result.current.powerUp.state).toBe('cooldown');
+      expect(result.current.isReady).toBe(false);
+      expect(result.current.powerUp.remainingCooldown).toBeGreaterThan(29);
+      expect(result.current.powerUp.remainingCooldown).toBeLessThanOrEqual(30);
+    });
+
+    it('should initialize as ready when timestamp is 0', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          initialCooldownTimestamp: 0,
+        })
+      );
+
+      // THEN
+      expect(result.current.powerUp.state).toBe('ready');
+      expect(result.current.isReady).toBe(true);
+      expect(result.current.powerUp.remainingCooldown).toBe(0);
+    });
+
+    it('should initialize as ready when timestamp is expired', () => {
+      // GIVEN - timestamp from 70 seconds ago (cooldown is 60s)
+      const seventySecondsAgo = Date.now() - 70000;
+
+      // WHEN
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          initialCooldownTimestamp: seventySecondsAgo,
+        })
+      );
+
+      // THEN
+      expect(result.current.powerUp.state).toBe('ready');
+      expect(result.current.isReady).toBe(true);
+      expect(result.current.powerUp.remainingCooldown).toBe(0);
+    });
+
+    it('should handle partial cooldown from timestamp', () => {
+      // GIVEN - timestamp from 45 seconds ago (15s remaining)
+      const fortyFiveSecondsAgo = Date.now() - 45000;
+
+      // WHEN
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          initialCooldownTimestamp: fortyFiveSecondsAgo,
+        })
+      );
+
+      // THEN
+      expect(result.current.powerUp.state).toBe('cooldown');
+      expect(result.current.powerUp.remainingCooldown).toBeGreaterThan(14);
+      expect(result.current.powerUp.remainingCooldown).toBeLessThanOrEqual(15);
+    });
+
+    it('should transition to ready after remaining cooldown expires', async () => {
+      // GIVEN - timestamp from 50 seconds ago (10s remaining)
+      const fiftySecondsAgo = Date.now() - 50000;
+
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          initialCooldownTimestamp: fiftySecondsAgo,
+        })
+      );
+
+      expect(result.current.powerUp.state).toBe('cooldown');
+
+      // WHEN - advance past remaining cooldown
+      act(() => {
+        jest.advanceTimersByTime(11000); // 11 seconds
+      });
+
+      // THEN - should transition to ready
+      await waitFor(() => {
+        expect(result.current.powerUp.state).toBe('ready');
+        expect(result.current.isReady).toBe(true);
+        expect(result.current.powerUp.remainingCooldown).toBe(0);
+      });
+    });
+  });
 });
