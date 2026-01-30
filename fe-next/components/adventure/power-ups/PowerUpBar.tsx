@@ -129,6 +129,9 @@ export function PowerUpBar({
       return;
     }
 
+    // Persist cooldown to inventory
+    inventory.startCooldown('freezeTime');
+
     // Apply effect
     const result = activateFreezeTime();
     if (result === false) {
@@ -146,6 +149,7 @@ export function PowerUpBar({
   }, [
     cascadeActive,
     freezeTimeState,
+    inventory,
     activateFreezeTime,
     onFreezeTime,
     t,
