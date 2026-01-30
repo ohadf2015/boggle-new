@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 27 - Dynamic Board Mechanics
-Plan: 7 of 7 complete (Gap Closure: Locked/Multiplier Tile CSS)
-Status: Phase 27 COMPLETE - All gap closures addressed
-Last activity: 2026-01-30 — Completed 27-07-PLAN.md (Gap Closure: Locked/Multiplier CSS Styling)
+Phase: 28 - Power-Up System
+Plan: 3 of 6 complete (Power-Up UI Components)
+Status: In Progress - Wave 2 (parallel execution with 28-02)
+Last activity: 2026-01-30 — Completed 28-03-PLAN.md (PowerUpButton + PowerUpActivationEffect)
 
-Progress: [████░░░░░░] 40% (13/33 v2.0 plans complete)
+Progress: [█████░░░░░] 42% (14/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -190,6 +190,21 @@ Key decisions from previous milestones:
 - Reduced motion support: Static box-shadow and filter feedback when prefers-reduced-motion enabled
 - CSS testing pattern: Verify class definitions and keyframe animations exist in test suite
 
+**Phase 28-01 (Power-Up State Machine, 2026-01-30):**
+- 3-state lifecycle: ready → active → cooldown → ready (automatic transitions)
+- activatePowerUp: Instant effects (freezeTime, hint) or duration-based (scoreMultiplier 30s)
+- tickCooldown: Drift-free countdown using timestamps (not interval accumulation)
+- 60-second cooldown for all power-ups (balances strategic use vs accessibility)
+- TDD: 16 tests, 98% coverage, RED-GREEN-REFACTOR verified
+
+**Phase 28-03 (Power-Up UI Components, 2026-01-30):**
+- PowerUpButton: Neo-brutalist styling (bg-neo-purple, border-3, shadow-hard), state-based interaction
+- CooldownIndicator integration: Radial progress display with icon
+- PowerUpActivationEffect: 0.25s burst (shake intensity 4, particles intensity 2)
+- Color schemes: cyan/blue (freeze), yellow/gold (hint), purple/pink (multiplier)
+- Zero animation for reduced motion users: Accessibility first (WCAG 2.1 compliant)
+- 28 tests passing (17 PowerUpButton + 11 PowerUpActivationEffect)
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -215,10 +230,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-07-PLAN.md (Gap Closure: Locked/Multiplier CSS) - Phase 27 COMPLETE
+Stopped at: Completed 28-03-PLAN.md (PowerUpButton + PowerUpActivationEffect) - Phase 28 Wave 2
 Resume file: None
 
-**Next action:** Phase 27 complete - ready for Phase 28 (Power-Up System)
+**Next action:** Continue Phase 28 - Plans 28-04, 28-05, 28-06 remaining (HUD integration, activation logic, balance)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
