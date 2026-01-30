@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 27 - Dynamic Board Mechanics
-Plan: 3 (IN PROGRESS - Explosion Visual Effects)
-Status: Phase 27 in progress - Explosion effects complete, cascade loop done
-Last activity: 2026-01-30 — Completed 27-03-PLAN.md (Explosion Visual Effects)
+Plan: 7 of 7 complete (Gap Closure: Locked/Multiplier Tile CSS)
+Status: Phase 27 COMPLETE - All gap closures addressed
+Last activity: 2026-01-30 — Completed 27-07-PLAN.md (Gap Closure: Locked/Multiplier CSS Styling)
 
-Progress: [███░░░░░░░] 30% (3/10 plans estimated for Phase 27)
+Progress: [████░░░░░░] 40% (13/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [███░░░░░░░] 30% (3/10 plans estimated for Phase 2
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 12 (Phase 26: 9 plans COMPLETE, Phase 27: 3 plans IN PROGRESS)
-- Current phase: Phase 27 - Dynamic Board Mechanics (cascade loop + explosions complete)
+- Plans completed: 13 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans COMPLETE + 3 gap closures)
+- Current phase: Phase 27 - Dynamic Board Mechanics (COMPLETE)
 
 ## Accumulated Context
 
@@ -183,6 +183,13 @@ Key decisions from previous milestones:
 - CSS explosion-ring animation: GPU-accelerated transform-only (scale + opacity) for 60fps performance
 - Normalized position calculation: Pixel coords → 0-1 range for fireConfetti origin accuracy
 
+**Phase 27-07 (Gap Closure: Locked/Multiplier Tile CSS, 2026-01-30):**
+- Grey/steel theme for locked tiles: Desaturation filter, chain pattern, steel bar overlay conveys restricted state
+- Lime/gold theme for multiplier tiles: Brightness boost, radiant energy, sparkle effects convey bonus/reward state
+- GPU-accelerated CSS only: Transform, opacity, filter properties for 60fps performance
+- Reduced motion support: Static box-shadow and filter feedback when prefers-reduced-motion enabled
+- CSS testing pattern: Verify class definitions and keyframe animations exist in test suite
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -208,10 +215,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-03-PLAN.md (Explosion Visual Effects) - Phase 27 in progress
+Stopped at: Completed 27-07-PLAN.md (Gap Closure: Locked/Multiplier CSS) - Phase 27 COMPLETE
 Resume file: None
 
-**Next action:** Continue Phase 27 (Dynamic Board Mechanics) - Special tile activation, tile swap, grid integration
+**Next action:** Phase 27 complete - ready for Phase 28 (Power-Up System)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
