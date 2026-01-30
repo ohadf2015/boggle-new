@@ -171,6 +171,9 @@ export function PowerUpBar({
       return;
     }
 
+    // Persist cooldown to inventory
+    inventory.startCooldown('hint');
+
     // Apply effect
     const result = activateHint();
     if (result === false) {
@@ -185,7 +188,7 @@ export function PowerUpBar({
 
     // Call parent callback with result
     onHint(result as HintResult);
-  }, [cascadeActive, hintState, activateHint, onHint, t]);
+  }, [cascadeActive, hintState, inventory, activateHint, onHint, t]);
 
   /**
    * Handle Score Multiplier activation
@@ -202,6 +205,9 @@ export function PowerUpBar({
     if (!success) {
       return;
     }
+
+    // Persist cooldown to inventory
+    inventory.startCooldown('scoreMultiplier');
 
     // Apply effect
     const result = activateScoreMultiplier();
@@ -220,6 +226,7 @@ export function PowerUpBar({
   }, [
     cascadeActive,
     scoreMultiplierState,
+    inventory,
     activateScoreMultiplier,
     onScoreMultiplier,
     t,

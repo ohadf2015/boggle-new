@@ -243,6 +243,7 @@ const AdventureGame = memo<AdventureGameProps>(
       markCascadeComplete,
       isCascading,
       cascadePhase,
+      addTime,
     } = useAdventureGame({
       levelConfig: adjustedLevelConfig,
       initialGrid,
