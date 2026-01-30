@@ -212,17 +212,37 @@ LexiClash is a multiplayer word game (Boggle-style) with real-time gameplay, imm
 
 ## Current Milestone: v2.0 Adventure Overhaul
 
-**Goal:** Transform Adventure Mode into a feature-rich, visually spectacular experience with dynamic board mechanics, power systems, meta-progression, and cinematic boss battles.
+**Goal:** Transform Adventure Mode from static word-finding into a visually spectacular, feature-rich experience with dynamic board mechanics, power systems, meta-progression, and cinematic boss battles.
 
-**Target features:**
-- Dynamic board mechanics (moving tiles, collapsing cascades, Candy Crush-style explosions)
-- Power-up system with mid-game boosters (freeze time, hints, score multipliers)
-- Meta-progression with permanent upgrades and skill trees
-- Boss battle overhaul with unique graphics, special abilities, and cinematic presence
-- Enhanced visual content pipeline (Remotion videos, Image MCP graphics, Python background removal)
-- Polished in-game UI with improved hierarchy, animated feedback, and progress indicators
-- Dynamic difficulty system adapting to player performance
-- Complete v1.1 carryover work (Worlds 4-5, tech debt cleanup)
+**6 Core Phases:**
+1. **Foundation** - Meta-progression (XP, levels, currency), game juice (particles, screen shake), UI framework
+2. **Dynamic Mechanics** - Tile cascades (Candy Crush-style), power-ups (Freeze/Hint/Multiplier), basic adaptive difficulty
+3. **Boss Battles** - State machine, telegraphed attacks, segmented HP bars, cinematic intros
+4. **Meta-Progression Depth** - Branching skill tree (Power/Strategy/Utility), permanent upgrades, achievements
+5. **Visual Polish** - Enhanced particles (confetti, fireworks), victory/defeat cinematics, advanced feedback
+6. **Dynamic Difficulty Tuning** - AI Director, performance tracking, invisible adjustments
+
+**Plus v1.1 Carryover:**
+- World 4-5 theming (Idiom Archipelago, Compound Canyon)
+- Tech debt cleanup (entry timing 2.38s→2s, MP4 rendering, bugs BUG-004→008, Lexi stuck detection)
+
+**Technology Stack (from Research):**
+- GSAP 3.14.2 for complex board animations
+- Framer Motion 12.23.24 for UI feedback
+- tsParticles 3.x (new) for particle effects
+- Zustand 5.0.10 for game state
+- XState 5.24.0 for boss state machines
+- Immer for nested state updates
+- Remotion + Lottie + Skia for cinematics
+- rembg (Python) for background removal
+- Image MCP + FLUX.1 for boss graphics
+
+**Critical Architecture Decisions (from Research):**
+- Transform-first animations (GPU-accelerated only, no layout properties)
+- Domain-separated reducers (game/board/powerups/meta/difficulty)
+- Horizontal power-up progression (enable strategies, not inflate numbers)
+- Invisible adaptive difficulty (pre-game adjustments primary)
+- Particle budget enforcement (50-100 max, adaptive reduction)
 
 ---
-*Last updated: 2026-01-30 after v2.0 milestone start*
+*Last updated: 2026-01-30 after v2.0 milestone initialized with research complete*

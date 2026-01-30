@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: Research (In Progress)
-Plan: 0/TBD (Research in progress)
-Status: Conducting deep research for v2.0 Adventure Overhaul milestone
-Last activity: 2026-01-30 — Started v2.0 research phase
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v2.0 Adventure Overhaul
+Last activity: 2026-01-30 — Milestone v2.0 started, research complete
 
-Progress: Research Phase - Gathering insights on dynamic mechanics, power systems, boss overhaul, visual pipeline
+Progress: [░░░░░░░░░░] 0% (Requirements definition in progress)
 
 ## v2.0 Milestone Scope
 
