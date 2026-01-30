@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 27 - Dynamic Board Mechanics
-Plan: 4/6 (Special Tile Activation Mechanics COMPLETE)
+Plan: 5/6 (Tile Removal and Refill Logic COMPLETE)
 Status: Phase 27 in progress
-Last activity: 2026-01-30 — Completed 27-04-PLAN.md (Special Tile Activation Mechanics)
+Last activity: 2026-01-30 — Completed 27-05-PLAN.md (Tile Removal and Refill Logic)
 
-Progress: [███████░░░] 66.7% (4/6 plans complete in Phase 27)
+Progress: [████████░░] 83.3% (5/6 plans complete in Phase 27)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
 - v1.2 completed Phases 24-25 (platform integration)
 - v2.0 starts at Phase 26 (continues from last delivered phase 25)
   - Phase 26 complete: Meta-Progression Foundation (9/9 plans)
-  - Phase 27 active: Dynamic Board Mechanics (1/6 plans)
+  - Phase 27 active: Dynamic Board Mechanics (5/6 plans)
 
 ## v2.0 Milestone Scope
 
@@ -65,12 +65,19 @@ Progress: [███████░░░] 66.7% (4/6 plans complete in Phase 27
 
 **v2.0 Progress:**
 - Phase 26 complete: 9/9 plans (100%)
-- Phase 27 active: 2/6 plans (33.3%)
-- Total v2.0 plans complete: 11 of 70+ (early progress)
+- Phase 27 active: 5/6 plans (83.3%)
+- Total v2.0 plans complete: 14 of 70+ (early progress)
 
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 27-05 (Tile Removal and Refill Logic, 2026-01-30):**
+- Explosion fires at REMOVING phase START: Before Framer Motion exit animation (visual sequence: flash -> scale -> fade)
+- Input blocked during cascade: isCascading check in all interaction handlers prevents race conditions
+- Explosion intensity from word length: 3-4=1, 5-6=2, 7-9=3, 10+=4 (scales with achievement magnitude)
+- Explosion position as tile center: Average of all cleared tile positions (centered visual effect)
+- lastSubmittedWord ref pattern: Coordinate state between submission handler and phase change effect
 
 **Phase 27-04 (Special Tile Activation Mechanics, 2026-01-30):**
 - Frozen tiles skip gravity during cascade: isFrozen=true stay in place (visual continuity - appear anchored)
@@ -187,10 +194,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 27-04-PLAN.md (Special Tile Activation Mechanics)
+Stopped at: Completed 27-05-PLAN.md (Tile Removal and Refill Logic)
 Resume file: None
 
-**Next action:** Continue Phase 27 with plan 27-05 (Tile Removal and Refill Logic)
+**Next action:** Continue Phase 27 with plan 27-06 (final plan)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
