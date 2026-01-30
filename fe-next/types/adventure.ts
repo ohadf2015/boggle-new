@@ -20,8 +20,10 @@ import type { BossTwistType } from './boss';
  * - rainbow: Wildcard that matches any letter
  * - chain: Links adjacent tiles together for combo bonuses
  * - time: Adds bonus time when used in a word
+ * - locked: Cannot be used until unlocked by word with same letter
+ * - multiplier: Multiplies word score by 2x when used
  */
-export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time';
+export type TileType = 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time' | 'locked' | 'multiplier';
 
 /**
  * Types of activation effects that can play when a special tile is used
@@ -33,6 +35,8 @@ export type TileActivationEffect =
   | 'wildcard'  // Rainbow tile used as wildcard
   | 'link'      // Chain tile linked neighbors
   | 'timeBonus' // Time tile added seconds
+  | 'unlock'    // Locked tile unlocked
+  | 'multiply'  // Multiplier tile activated
   | null;
 
 /**
