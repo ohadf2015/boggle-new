@@ -488,6 +488,56 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [isPlaying, startGame, startBossBattle]);
 
+    // Task 3: Award XP and gold on level complete
+    useEffect(() => {
+      // Only award once per level attempt
+      if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars > 0) {
+        // Calculate XP based on level difficulty and performance
+        const difficultyMap: Record<number, 'easy' | 'medium' | 'hard'> = {
+          1: 'easy',
+          2: 'easy',
+          3: 'medium',
+          4: 'medium',
+          5: 'hard',
+        };
+        const difficulty = difficultyMap[levelConfig.level] || 'medium';
+
+        // Perfect clear bonus if all objectives met with stars
+        const isPerfectClear = gameState.stars === 3;
+
+        // Time bonus if completed quickly (more than 50% time remaining)
+        const hasTimeBonus = timeRemaining > (levelConfig.timerSeconds * 0.5);
+
+        // Calculate XP
+        const earnedXp = calculateAdventureXp({
+          difficulty,
+          comboMultiplier: Math.max(1, gameState.comboCount),
+          isPerfectClear,
+          hasTimeBonus,
+        });
+
+        const oldLevel = currentLevel;
+        const levelUpResult = awardXp(earnedXp);
+
+        // Award gold (10-30 gold based on stars, + 50 bonus for perfect clear)
+        const baseGold = 10 * gameState.stars;
+        const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
+        const totalGold = baseGold + perfectClearGoldBonus;
+        addGold(totalGold);
+
+        // Check if player leveled up
+        if (levelUpResult.didLevelUp) {
+          setLevelUpData({
+            oldLevel,
+            newLevel: levelUpResult.newLevel,
+            newTitles: [], // TODO: Add title system in future phase
+          });
+        }
+
+        setHasAwardedLevelRewards(true);
+      }
+    }, [gameState.isComplete, gameState.stars, gameState.comboCount, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.timerSeconds, awardXp, addGold, currentLevel]);
+
     // Check for level completion and record attempt
     useEffect(() => {
       if (gameState.isComplete || timeRemaining === 0) {
