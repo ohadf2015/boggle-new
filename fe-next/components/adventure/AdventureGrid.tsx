@@ -83,6 +83,8 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   rainbow: 'tile-rainbow',
   chain: 'tile-chain',
   time: 'tile-time',
+  locked: 'tile-locked',
+  multiplier: 'tile-multiplier',
 };
 
 const TILE_TYPE_LABELS: Record<TileType, string> = {
@@ -93,6 +95,8 @@ const TILE_TYPE_LABELS: Record<TileType, string> = {
   rainbow: 'rainbow tile (wildcard)',
   chain: 'chain tile (link bonus)',
   time: 'time tile (+5 seconds)',
+  locked: 'locked tile (unlock with matching letter)',
+  multiplier: 'multiplier tile (2x score)',
 };
 
 const GRID_COLS_CLASSES: Record<number, string> = {

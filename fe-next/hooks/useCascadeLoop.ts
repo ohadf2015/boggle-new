@@ -155,6 +155,9 @@ function cascadeReducer(state: CascadeState, action: CascadeAction): CascadeStat
 /**
  * Calculate which tiles fall and how far after removals
  *
+ * Special Tile Behavior:
+ * - Frozen tiles (isFrozen=true) stay in place and do NOT fall
+ *
  * @param tiles - Current grid state
  * @returns Map of tile ID (row-col) to fall distance in rows
  */
@@ -177,9 +180,12 @@ export function applyGravity(tiles: TileState[][]): Map<string, number> {
       if (tile.isCleared) {
         clearedBelow++;
       } else if (clearedBelow > 0) {
-        // This tile has cleared tiles below it, so it will fall
-        const tileId = `${row}-${col}`;
-        fallingTiles.set(tileId, clearedBelow);
+        // SPECIAL TILE CHECK: Frozen tiles stay in place (skip gravity)
+        if (!tile.isFrozen) {
+          // This tile has cleared tiles below it, so it will fall
+          const tileId = `${row}-${col}`;
+          fallingTiles.set(tileId, clearedBelow);
+        }
       }
     }
   }
@@ -189,6 +195,10 @@ export function applyGravity(tiles: TileState[][]): Map<string, number> {
 
 /**
  * Generate new tiles for all cleared spaces
+ *
+ * Special Tile Behavior:
+ * - Locked tiles (type='locked') block spawning in their position
+ * - Only spawn tiles in positions that are cleared AND not blocked by locked tiles
  *
  * @param tiles - Current grid state
  * @param gridSize - Grid dimension
@@ -201,7 +211,9 @@ export function spawnNewTiles(tiles: TileState[][], gridSize: number): string[] 
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
       const tile = tiles[row][col];
-      if (tile.isCleared) {
+
+      // SPECIAL TILE CHECK: Skip spawning in positions with locked tiles
+      if (tile.isCleared && tile.type !== 'locked') {
         spawningTiles.push(`${row}-${col}`);
       }
     }

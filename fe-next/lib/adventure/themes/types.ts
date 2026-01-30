@@ -106,8 +106,8 @@ export interface TileVisualConfig {
   badgeBackground?: string;
   /** Whether to show texture overlay on tile */
   showTexture: boolean;
-  /** Custom overlay component name (frost, flames, etc.) */
-  overlayType?: 'frost' | 'flames' | 'sparkle' | 'chain-link' | 'clock' | 'none';
+  /** Custom overlay component name (frost, flames, lock, etc.) */
+  overlayType?: 'frost' | 'flames' | 'sparkle' | 'chain-link' | 'clock' | 'lock' | 'none';
 }
 
 /**

@@ -156,6 +156,27 @@ const tileStyles: TileStyleMap = {
     showTexture: false,
     overlayType: 'clock',
   },
+  locked: {
+    baseClasses: 'rounded-neo border-2',
+    gradientFrom: 'gray-600',
+    gradientTo: 'gray-800',
+    borderColor: 'border-gray-900',
+    shadowStyle: 'hard',
+    showTexture: false,
+    overlayType: 'lock',
+  },
+  multiplier: {
+    baseClasses: 'rounded-neo border-2',
+    gradientFrom: 'purple-400',
+    gradientTo: 'pink-500',
+    borderColor: 'border-purple-600',
+    shadowStyle: 'glow',
+    shadowColor: 'rgba(168, 85, 247, 0.5)',
+    badgeText: '2x',
+    badgeBackground: 'bg-neo-black',
+    showTexture: false,
+    overlayType: 'sparkle',
+  },
 };
 
 // ==============================================

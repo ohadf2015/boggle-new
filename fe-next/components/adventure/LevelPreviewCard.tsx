@@ -22,6 +22,8 @@ import {
   Rainbow,
   Link,
   Timer,
+  Lock,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -59,6 +61,8 @@ const TILE_TYPE_INFO: Record<Exclude<TileType, 'standard'>, { icon: React.Compon
   rainbow: { icon: Rainbow, key: 'adventure.tiles.rainbow', color: 'text-neo-pink' },
   chain: { icon: Link, key: 'adventure.tiles.chain', color: 'text-neo-orange' },
   time: { icon: Timer, key: 'adventure.tiles.time', color: 'text-neo-lime' },
+  locked: { icon: Lock, key: 'adventure.tiles.locked', color: 'text-gray-400' },
+  multiplier: { icon: Zap, key: 'adventure.tiles.multiplier', color: 'text-purple-400' },
 };
 
 // ==============================================

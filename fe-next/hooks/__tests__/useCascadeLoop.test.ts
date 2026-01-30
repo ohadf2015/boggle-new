@@ -69,6 +69,37 @@ describe('applyGravity', () => {
     expect(fallingTiles.get('0-1')).toBe(2);
   });
 
+  it('should skip frozen tiles during gravity (frozen tiles stay in place)', () => {
+    // GIVEN: Grid with frozen tile and cleared tiles below
+    const grid = [
+      [createTile('A', { type: 'ice', isFrozen: true }), createTile('B')],
+      [createTile('C', { isCleared: true }), createTile('D')],
+      [createTile('E', { isCleared: true }), createTile('F')],
+    ];
+
+    // WHEN
+    const fallingTiles = applyGravity(grid);
+
+    // THEN: Frozen tile should NOT appear in falling tiles (stays in place)
+    expect(fallingTiles.has('0-0')).toBe(false);
+  });
+
+  it('should allow normal tiles to fall past frozen tiles', () => {
+    // GIVEN: Frozen tile in middle, normal tile above, cleared below
+    const grid = [
+      [createTile('A'), createTile('B')],
+      [createTile('C', { type: 'ice', isFrozen: true }), createTile('D')],
+      [createTile('E', { isCleared: true }), createTile('F')],
+    ];
+
+    // WHEN
+    const fallingTiles = applyGravity(grid);
+
+    // THEN: Normal tile A should fall (frozen tile doesn't block column)
+    expect(fallingTiles.has('0-0')).toBe(true);
+    expect(fallingTiles.get('0-0')).toBe(1);
+  });
+
   it('should return empty map when no cleared tiles exist', () => {
     // GIVEN
     const grid = createGrid(3, 'A');
@@ -130,6 +161,39 @@ describe('spawnNewTiles', () => {
       // Verify tile IDs are in "row-col" format
       expect(tileId).toMatch(/^\d+-\d+$/);
     });
+  });
+
+  it('should NOT spawn tiles in positions blocked by locked tiles', () => {
+    // GIVEN: Grid with locked tile and cleared tile in same position
+    const grid = [
+      [createTile('A', { type: 'locked' }), createTile('B')],
+      [createTile('C', { isCleared: true }), createTile('D')],
+    ];
+    const gridSize = 2;
+
+    // WHEN
+    const spawningTiles = spawnNewTiles(grid, gridSize);
+
+    // THEN: Should only spawn for cleared tile (not locked position)
+    expect(spawningTiles.length).toBe(1);
+    expect(spawningTiles).toContain('1-0'); // Cleared tile
+    expect(spawningTiles).not.toContain('0-0'); // Locked tile position
+  });
+
+  it('should spawn normally when locked tile is NOT in the cleared position', () => {
+    // GIVEN: Locked tile in one position, cleared tile elsewhere
+    const grid = [
+      [createTile('A', { type: 'locked' }), createTile('B', { isCleared: true })],
+      [createTile('C'), createTile('D')],
+    ];
+    const gridSize = 2;
+
+    // WHEN
+    const spawningTiles = spawnNewTiles(grid, gridSize);
+
+    // THEN: Should spawn for cleared tile normally
+    expect(spawningTiles.length).toBe(1);
+    expect(spawningTiles).toContain('0-1');
   });
 
   it('should return empty array when no cleared tiles exist', () => {

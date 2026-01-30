@@ -45,6 +45,8 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   rainbow: 'tile-rainbow',
   chain: 'tile-chain',
   time: 'tile-time',
+  locked: 'tile-locked',
+  multiplier: 'tile-multiplier',
 };
 
 // Tile type translation keys - labels are retrieved via t() for i18n support
@@ -56,6 +58,8 @@ const TILE_TYPE_KEYS: Record<TileType, string> = {
   rainbow: 'adventure.tiles.rainbow',
   chain: 'adventure.tiles.chain',
   time: 'adventure.tiles.time',
+  locked: 'adventure.tiles.locked',
+  multiplier: 'adventure.tiles.multiplier',
 };
 
 // ==============================================
@@ -150,6 +154,8 @@ const AdventureTile = memo<AdventureTileProps>(
       rainbow: 'tile-rainbow-enhanced',
       chain: 'tile-chain-enhanced',
       time: 'tile-time-enhanced',
+      locked: 'tile-locked-enhanced',
+      multiplier: 'tile-multiplier-enhanced',
       standard: '',
     }[type] : '';
 

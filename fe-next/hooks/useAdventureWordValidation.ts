@@ -26,7 +26,7 @@ export interface WordValidationResult {
 /** Tile state for score calculation with special tile multipliers */
 export interface TileStateForValidation {
   letter: string;
-  type: 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time';
+  type: 'standard' | 'gold' | 'ice' | 'bomb' | 'rainbow' | 'chain' | 'time' | 'locked' | 'multiplier';
   isCleared: boolean;
 }
 
