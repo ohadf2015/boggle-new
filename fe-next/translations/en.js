@@ -2327,6 +2327,18 @@ const en = {
     "kofiFooter": "Buy Us a Coffee",
     "kofiTooltip": "Support LexiClash development"
   },
+  "blog": {
+    "backToBlog": "Back to Blog",
+    "dailyChallenge": "Daily Challenge",
+    "date": "Published",
+    "experience": "Experience",
+    "interview": "Interview",
+    "practice": "Practice Now",
+    "readTime": "5 min read",
+    "research": "Research",
+    "startPlaying": "Start Playing",
+    "tryDaily": "Try Daily Challenge"
+  },
   "landing": {
     "playingNow": "Playing Now",
     "welcomeTitle": "Ready to Play?",

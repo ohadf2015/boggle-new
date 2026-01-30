@@ -2324,6 +2324,18 @@ const ja = {
     "kofiFooter": "コーヒーをおごる",
     "kofiTooltip": "LexiClashの開発を応援"
   },
+  "blog": {
+    "backToBlog": "ブログに戻る",
+    "dailyChallenge": "デイリーチャレンジ",
+    "date": "公開日",
+    "experience": "体験記",
+    "interview": "インタビュー",
+    "practice": "今すぐ練習",
+    "readTime": "5分で読める",
+    "research": "研究",
+    "startPlaying": "プレイ開始",
+    "tryDaily": "デイリーチャレンジに挑戦"
+  },
   "landing": {
     "playingNow": "プレイ中",
     "welcomeTitle": "準備OK？",
@@ -2337,6 +2349,9 @@ const ja = {
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
     "adventureModeDesc": "10の世界で100レベル",
+    "education": "教育",
+    "educationDesc": "教師と生徒向け",
+    "educationBadge": "教師向け",
     "signInToUnlock": "ログインして解除",
     "openRooms": "部屋が開放中",
     "playersLive": "プレイ中",
@@ -4438,7 +4453,10 @@ const ja = {
       "assignLessons": "レッスンを割り当てて進捗を追跡しましょう",
       "chartTitle": "クラスの進捗推移",
       "wordsLearned": "習得単語数",
-      "expandDetails": "詳細を見る"
+      "expandDetails": "詳細を見る",
+      "exportCSV": "CSVエクスポート",
+      "exportSuccess": "エクスポート完了！",
+      "noDataToExport": "エクスポートするデータがありません"
     },
     "stats": {
       "totalStudents": "生徒数",

@@ -2334,6 +2334,18 @@ const he = {
     "kofiFooter": "קנה לנו קפה",
     "kofiTooltip": "תמוך בפיתוח לקסיקלאש"
   },
+  "blog": {
+    "backToBlog": "חזרה לבלוג",
+    "dailyChallenge": "אתגר יומי",
+    "date": "פורסם",
+    "experience": "חוויה",
+    "interview": "ראיון",
+    "practice": "תרגל עכשיו",
+    "readTime": "5 דקות קריאה",
+    "research": "מחקר",
+    "startPlaying": "התחל לשחק",
+    "tryDaily": "נסה את האתגר היומי"
+  },
   "landing": {
     "playingNow": "משחקים עכשיו",
     "welcomeTitle": "מוכנים לשחק?",
@@ -2347,6 +2359,9 @@ const he = {
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "adventureMode": "הרפתקה",
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
+    "education": "חינוך",
+    "educationDesc": "למורים ותלמידים",
+    "educationBadge": "למורים",
     "signInToUnlock": "התחבר כדי לפתוח",
     "openRooms": "חדרים פתוחים",
     "playersLive": "משחקים עכשיו",
@@ -4413,7 +4428,10 @@ const he = {
       "assignLessons": "שייכו שיעורים כדי לעקוב אחר התקדמות",
       "chartTitle": "התקדמות הכיתה",
       "wordsLearned": "מילים שנלמדו",
-      "expandDetails": "הצג פירוט"
+      "expandDetails": "הצג פירוט",
+      "exportCSV": "ייצא CSV",
+      "exportSuccess": "הייצוא הושלם בהצלחה!",
+      "noDataToExport": "אין נתונים לייצוא"
     },
     "stats": {
       "totalStudents": "סה״כ תלמידים",

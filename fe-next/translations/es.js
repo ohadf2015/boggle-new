@@ -2321,6 +2321,18 @@ const es = {
     "kofiFooter": "Invítanos un Café",
     "kofiTooltip": "Apoya el desarrollo de LexiClash"
   },
+  "blog": {
+    "backToBlog": "Volver al Blog",
+    "dailyChallenge": "Desafío Diario",
+    "date": "Publicado",
+    "experience": "Experiencia",
+    "interview": "Entrevista",
+    "practice": "Practica Ahora",
+    "readTime": "5 min de lectura",
+    "research": "Investigación",
+    "startPlaying": "Empezar a Jugar",
+    "tryDaily": "Prueba el Desafío Diario"
+  },
   "landing": {
     "playingNow": "Jugando Ahora",
     "welcomeTitle": "¿Listos para jugar?",
@@ -2334,6 +2346,9 @@ const es = {
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
     "adventureModeDesc": "100 niveles en 10 mundos",
+    "education": "Educación",
+    "educationDesc": "Para profesores y estudiantes",
+    "educationBadge": "PARA PROFESORES",
     "signInToUnlock": "Inicia sesión para desbloquear",
     "openRooms": "salas abiertas",
     "playersLive": "jugando ahora",
@@ -4085,6 +4100,7 @@ const es = {
       }
     },
     "xp": {
+      "label": "XP",
       "level": "Nivel",
       "levelUp": "¡Subiste de Nivel!",
       "newLevel": "Alcanzaste el nivel",
@@ -4426,7 +4442,10 @@ const es = {
       "assignLessons": "Asigna lecciones para ver el progreso",
       "chartTitle": "Progreso del Aula",
       "wordsLearned": "Palabras Aprendidas",
-      "expandDetails": "Ver detalles"
+      "expandDetails": "Ver detalles",
+      "exportCSV": "Exportar CSV",
+      "exportSuccess": "¡Progreso exportado!",
+      "noDataToExport": "Sin datos para exportar"
     },
     "stats": {
       "totalStudents": "Total Estudiantes",

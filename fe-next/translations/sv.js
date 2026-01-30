@@ -2324,6 +2324,18 @@ const sv = {
     "kofiFooter": "Köp oss en kaffe",
     "kofiTooltip": "Stöd LexiClash-utveckling"
   },
+  "blog": {
+    "backToBlog": "Tillbaka till bloggen",
+    "dailyChallenge": "Daglig utmaning",
+    "date": "Publicerad",
+    "experience": "Erfarenhet",
+    "interview": "Intervju",
+    "practice": "Öva nu",
+    "readTime": "5 min läsning",
+    "research": "Forskning",
+    "startPlaying": "Börja spela",
+    "tryDaily": "Prova daglig utmaning"
+  },
   "landing": {
     "playingNow": "Spelar Nu",
     "welcomeTitle": "Redo att spela?",
@@ -2337,6 +2349,9 @@ const sv = {
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
     "adventureModeDesc": "100 nivåer i 10 världar",
+    "education": "Utbildning",
+    "educationDesc": "För lärare och elever",
+    "educationBadge": "FÖR LÄRARE",
     "signInToUnlock": "Logga in för att låsa upp",
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
@@ -4438,7 +4453,10 @@ const sv = {
       "assignLessons": "Tilldela lektioner för att börja följa framsteg",
       "chartTitle": "Klassframsteg över tid",
       "wordsLearned": "Inlärda ord",
-      "expandDetails": "Visa orddetaljer"
+      "expandDetails": "Visa orddetaljer",
+      "exportCSV": "Exportera CSV",
+      "exportSuccess": "Framsteg exporterade!",
+      "noDataToExport": "Ingen data att exportera"
     },
     "stats": {
       "totalStudents": "Totalt elever",
