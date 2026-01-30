@@ -4068,6 +4068,7 @@ const en = {
       }
     },
     "xp": {
+      "label": "XP",
       "level": "Level",
       "levelUp": "Level Up!",
       "newLevel": "You reached level",

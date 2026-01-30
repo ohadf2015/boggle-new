@@ -142,7 +142,7 @@ const AdventureXpProgressBar = memo<AdventureXpProgressBarProps>(({
               'font-neo-body text-neo-black/50 dark:text-neo-white/50',
               sizeConfig.xpText
             )}>
-              XP
+              {t('adventure.xp.label')}
             </span>
           </div>
         )}

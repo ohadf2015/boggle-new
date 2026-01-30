@@ -4096,6 +4096,7 @@ const sv = {
       }
     },
     "xp": {
+      "label": "EP",
       "level": "Nivå",
       "levelUp": "Nivå Upp!",
       "newLevel": "Du nådde nivå",

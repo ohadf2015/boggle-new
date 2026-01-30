@@ -4071,6 +4071,7 @@ const he = {
       }
     },
     "xp": {
+      "label": "נק'",
       "level": "רמה",
       "levelUp": "עליית רמה!",
       "newLevel": "הגעת לרמה",

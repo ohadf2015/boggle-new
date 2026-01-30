@@ -4096,6 +4096,7 @@ const ja = {
       }
     },
     "xp": {
+      "label": "経験値",
       "level": "レベル",
       "levelUp": "レベルアップ！",
       "newLevel": "レベル到達",
