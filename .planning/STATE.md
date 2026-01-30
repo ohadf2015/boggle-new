@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 28 - Power-Up System
-Plan: 1 of 7 (Power-Up Foundation COMPLETE)
+Plan: 2 of 7 (Power-Up Effect Functions COMPLETE)
 Status: Phase 28 In Progress
-Last activity: 2026-01-30 — Completed 28-01-PLAN.md (Power-Up Type Definitions and State Machine)
+Last activity: 2026-01-30 — Completed 28-02-PLAN.md (Power-Up Effect Functions)
 
-Progress: [███████████░] 86% (16/19 v2.0 plans complete: Phase 26: 9/9, Phase 27: 6/6, Phase 28: 1/7)
+Progress: [███████████░] 89% (17/19 v2.0 plans complete: Phase 26: 9/9, Phase 27: 6/6, Phase 28: 2/7)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -35,9 +35,10 @@ Progress: [███████████░] 86% (16/19 v2.0 plans complete:
 2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) ✅ COMPLETE
    - Candy Crush cascades, tile movement, explosions, special tiles
 
-3. **Phase 28: Power-Up System** (7 reqs: POWER) 🔄 IN PROGRESS (1/7 plans)
+3. **Phase 28: Power-Up System** (7 reqs: POWER) 🔄 IN PROGRESS (2/7 plans)
    - Freeze Time, Hint, Score Multiplier with cooldowns and balance
    - ✅ 28-01: Power-Up Type Definitions and State Machine
+   - ✅ 28-02: Power-Up Effect Functions (TDD)
 
 4. **Phase 29: Adaptive Difficulty System** (5 reqs: DIFF)
    - Pre-game difficulty selection, invisible adjustments, gradual hints
@@ -67,12 +68,19 @@ Progress: [███████████░] 86% (16/19 v2.0 plans complete:
 **v2.0 Progress:**
 - Phase 26 complete: 9/9 plans (100%)
 - Phase 27 complete: 6/6 plans (100%)
-- Phase 28 in progress: 1/7 plans (14%)
-- Total v2.0 plans complete: 16 of 70+ (23% overall)
+- Phase 28 in progress: 2/7 plans (29%)
+- Total v2.0 plans complete: 17 of 70+ (24% overall)
 
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 28-02 (Power-Up Effect Functions, 2026-01-30):**
+- DFS word-finding algorithm: 8-way adjacency search with backtracking finds all valid words on board for hint system
+- Hint prioritization by length: Sort by descending length to give better hints (longer words = better player experience)
+- Cascade blocking pattern: All effects return false during cascadeActive instead of throwing (graceful degradation, no race conditions)
+- Pure functions exported: applyFreezeTime, applyHint, applyScoreMultiplier enable independent testing without hook overhead
+- Time cap enforcement: Math.min(timeRemaining + 10, totalTime) prevents freeze time from exceeding level max (balance)
 
 **Phase 28-01 (Power-Up Type Definitions and State Machine, 2026-01-30):**
 - Timestamp-based cooldown using Date.now(): Prevents drift from setInterval accumulation, calculates remaining from elapsed time
@@ -217,10 +225,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 28-01-PLAN.md (Power-Up Type Definitions and State Machine)
+Stopped at: Completed 28-02-PLAN.md (Power-Up Effect Functions)
 Resume file: None
 
-**Next action:** Continue Phase 28 (Plan 28-02: Power-Up UI Components)
+**Next action:** Continue Phase 28 (Plan 28-03: Power-Up UI Components, or Plan 28-04: Integration)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
