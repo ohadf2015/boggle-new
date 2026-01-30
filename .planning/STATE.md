@@ -1,252 +1,204 @@
-# LexiClash Project State
+# Project State
+
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-01-30)
+
+**Core value:** Adventure mode must feel immersive and connected to its themed worlds
+**Current focus:** v2.0 Adventure Overhaul - Phase 27 Dynamic Board Mechanics
 
 ## Current Position
 
-**Phase:** 24 of 26 (CrazyGames Portal Integration) - IN PROGRESS
-**Plan:** 1 complete (24-01)
-**Status:** Phase 24 in progress (1/6 plans complete)
-**Last activity:** 2026-01-26 - Completed 24-01-PLAN.md (Lazy Audio Loading)
+Phase: 27 - Dynamic Board Mechanics
+Plan: 1/6 (Cascade Loop State Machine COMPLETE)
+Status: Phase 27 in progress
+Last activity: 2026-01-30 — Completed 27-01-PLAN.md (Cascade Loop State Machine)
 
-**Progress:** ████████████████████░░░░ 24/26 phases (92% of milestone complete, v1.1 in progress)
+Progress: [██░░░░░░░░] 16.7% (1/6 plans complete in Phase 27)
 
-## Recent Completions
+**Phase numbering context:**
+- v1.1 completed Phases 15-21 (education + adventure features)
+- v1.2 completed Phases 24-25 (platform integration)
+- v2.0 starts at Phase 26 (continues from last delivered phase 25)
+  - Phase 26 complete: Meta-Progression Foundation (9/9 plans)
+  - Phase 27 active: Dynamic Board Mechanics (1/6 plans)
 
-### Phase 24: CrazyGames Portal Integration (IN PROGRESS)
-- ✅ **24-01**: Lazy audio loading (createLazyHowl, progressive preloading, 0 bytes initial download)
+## v2.0 Milestone Scope
 
-### Phase 19: Achievement System (COMPLETE)
-- ✅ **19-01**: Achievement system foundation (18 badges, 4-tier progression, TDD achievement manager)
-- ✅ **19-02**: Classroom leaderboard (top 3 + rank, inactive detection, Neo-Brutalist styling)
-- ✅ **19-03**: Achievement unlock detection + celebration (useAchievementUnlock hook, tier-appropriate modals, confetti, 30 tests)
-- ✅ **19-04**: Profile badge display (AchievementProgressCard, EducationBadgeGrid, pin functionality, 33 tests)
-- ✅ **19-05**: Achievement system integration (dashboard leaderboard, practice unlock triggers, profile page, 22 tests)
+**Transform Adventure Mode** from static word-finding into visually spectacular, feature-rich experience.
 
-### Phase 18: Education XP System (COMPLETE)
-- ✅ **18-01**: Database XP columns and triggers
-- ✅ **18-02**: educationXpManager module with TDD
-- ✅ **18-03**: Practice XP awarding hook
-- ✅ **18-04**: Level-up celebration modal
-- ✅ **18-05**: Practice XP integration
+**10 Phases (26-35) covering 76 requirements:**
 
-### Phase 15: Chain Combo System (COMPLETE - Wave 2 Complete)
-- ✅ **15-01**: Chain tile 1.5x combo multiplier logic (Wave 1)
-- ✅ **15-02**: ComboTierBadge component (Wave 1)
-- ✅ **15-03**: ChainParticleBurst component (Wave 1)
-- ✅ **15-05**: Adventure game combo feedback integration (Wave 2)
+1. **Phase 26: Meta-Progression Foundation** (21 reqs: META + JUICE + UI) ✅ COMPLETE
+   - XP/leveling, gold currency, stat upgrades, game juice, HUD framework
 
-### Phase 14: Education Mode Complete (COMPLETE)
-- ✅ **14-01**: Education landing page with role selection
-- ✅ **14-02**: Student join classroom flow (6-char code input, clipboard paste, translations)
-- ✅ **14-04**: Student assignment visibility (assigned/started/completed lessons)
+2. **Phase 27: Dynamic Board Mechanics** (6 reqs: BOARD) 🔄 IN PROGRESS (1/6)
+   - Candy Crush cascades, tile movement, explosions, special tiles
 
-### Phase 14 Deliverables (In Progress)
-- **Education landing**: /education page with teacher/student role selection
-- **Student join flow**: /student/join page with 6-character code input
-- **Clipboard paste**: One-click code entry from clipboard
-- **Join translations**: 10 keys in 4 languages (en, he, sv, ja)
-- **Authentication guards**: Protected routes with redirect and loading states
-- **Neo-brutalist forms**: Consistent design with existing multiplayer join flow
-- **Student dashboard**: Enhanced to show assigned lessons with status badges
-- **Assignment tracking**: Students see lessons before starting practice
-- **Status indicators**: NEW badge for assigned, progress bars for started, Award icon for completed
-- **Assignment translations**: 4 keys in 4 languages (new, start, continue, joinClassroom)
+3. **Phase 28: Power-Up System** (7 reqs: POWER)
+   - Freeze Time, Hint, Score Multiplier with cooldowns and balance
 
-### Phase 13: Translation Completion (COMPLETE)
-- ✅ **13-01**: Verify translation completeness (All Phase 11 teacher/student keys verified present in all 5 languages)
+4. **Phase 29: Adaptive Difficulty System** (5 reqs: DIFF)
+   - Pre-game difficulty selection, invisible adjustments, gradual hints
 
-### Phase 13 Deliverables (Complete)
-- **Verification script**: verify-phase11-translations.sh automated line count checker
-- **Translation coverage**: 10/10 sections verified (teacher + student in en, he, sv, ja, es)
-- **Teacher sections**: 80-81 lines per language (consistent across all 5 languages)
-- **Student sections**: 19 lines per language (exact match across all 5 languages)
-- **Zero missing keys**: Pre-commit hook confirms all keys present
-- **Documentation**: 13-VERIFICATION.md with methodology, evidence, and must-haves checklist
+5. **Phase 30: Boss Battle Overhaul** (8 reqs: BOSS)
+   - 5-phase state machine, telegraphed attacks, cinematics, unique graphics
 
-### Phase 12: Asset WebP Migration Completion (COMPLETE)
-- ✅ **12-01**: Background and parallax restoration (11 WebP files, 3 backgrounds, 8 parallax layers)
-- ✅ **12-02**: Git configuration and migration verification (backup folders gitignored, zero stale .png refs)
-- ✅ **12-03**: Static file serving verification (61 WebP images verified, all worlds working)
+6. **Phase 31: Skill Tree & Progression Depth** (10 reqs: SKILL + ACHIEVE)
+   - Branching skill tree, horizontal progression, achievement system
 
-### Phase 11: Teacher Vocabulary Builder (COMPLETE)
-- ✅ **11-01**: Database schema (5 tables, 27 RLS policies, role-based access)
-- ✅ **11-02**: Word integration check (TDD hook, 100% coverage, 22 tests)
-- ✅ **11-03**: Data fetching hooks (4 hooks, Supabase queries, optimistic updates)
-- ✅ **11-04**: Socket event handlers (vocabulary selection, TDD, 10 tests)
-- ✅ **11-05**: Teacher dashboard (Wave 4 components)
-- ✅ **11-06**: Host word selector (multiplayer results UI)
-- ✅ **11-07**: Student lesson view (practice interface, mastery tracking)
+7. **Phase 32: Visual Polish & Effects** (6 reqs: POLISH)
+   - Confetti, fireworks, layered particles with budget enforcement
 
-### Phase 11 Deliverables (Complete)
-- **Database schema**: 5 tables with RLS policies
-- **Join codes**: Auto-generated 6-character codes
-- **Role system**: user_role enum (student, teacher, admin)
-- **Access control**: 27 RLS policies for granular permissions
-- **Word validation hook**: checkWordIntegration with 100% test coverage
-- **Multi-language support**: Validates words in 4 languages (en, he, sv, ja, es)
-- **Data layer**: 14 Supabase query functions, 6 React hooks
-- **Teacher hooks**: useClassrooms, useClassroom, useLessons, useLesson
-- **Student hooks**: useJoinClassroom, useStudentProgress, useClassProgress, useLessonStats
-- **Optimistic updates**: All mutations update UI instantly before server confirmation
-- **Socket handlers**: Vocabulary word selection with host validation and integration checks
-- **Teacher dashboard**: Complete Wave 4 UI components (classroom/lesson management, progress tracking)
-- **Host word selector**: Multiplayer results UI for vocabulary word selection with integration status
-- **Student dashboard**: Lesson list with progress visualization at /student
-- **Student practice**: Interactive flashcard interface with mastery tracking (3 correct in a row)
-- **Celebration animations**: Checkmark, star burst, trophy for student engagement
+8. **Phase 33: Cinematic System** (5 reqs: CINE)
+   - Remotion-based cutscenes, victory/defeat sequences, skippable after 2s
 
-### Phase 10: Bug Fixes & Stabilization (COMPLETE)
-- ✅ **10-01**: Bug discovery and research (10 bugs identified)
-- ✅ **10-02**: Performance validation infrastructure
-- ✅ **10-03**: Critical bug fixes (BUG-002, BUG-003)
-- ✅ **10-04**: Multi-language edge case verification (30 tests)
-- ✅ **10-05**: Phase verification (all 5 success criteria met)
+9. **Phase 34: Dynamic Difficulty Tuning (AI Director)** (5 reqs: DDA)
+   - Performance tracking, invisible adjustments, analytics
 
-## Accumulated Decisions
+10. **Phase 35: World Expansion & Tech Debt** (12 reqs: WORLD + DEBT)
+    - Worlds 4-5 theming, entry timing fix, MP4 rendering, bug fixes
 
-| ID | Decision | Rationale | Phase | Impact |
-|----|----------|-----------|-------|---------|
-| teacher-vocab-001 | Use enum for user roles instead of multiple boolean flags | Single user_role enum (student/teacher/admin) is more maintainable than is_admin, is_teacher flags | 11-01 | Database, Auth |
-| teacher-vocab-002 | Auto-generate 6-character join codes excluding confusing characters | Easy to type, avoids confusion between 0/O, 1/I, uses HJKLMNPQRSTUVWXYZ23456789 | 11-01 | UX, Database |
-| teacher-vocab-003 | Store words as JSONB array with canIntegrate flag | Flexible structure allows words with optional definitions and integration flags | 11-01 | Database, API |
-| teacher-vocab-004 | Use CASCADE and SET NULL for foreign key constraints | Deleting classroom removes memberships (CASCADE), deleting classroom keeps lessons (SET NULL) | 11-01 | Database |
-| teacher-vocab-005 | Treat dictionary-not-loaded (null) as not-integrable | Safer default - prevents unintegrable words from being flagged as integrable | 11-02 | Word Validation |
-| teacher-vocab-006 | Validate in order - empty > length > dictionary | Performance optimization - fast checks first, expensive dictionary lookup last | 11-02 | Performance |
-| teacher-vocab-007 | Export both standalone function and React hook | Flexibility for different usage contexts (utils vs components) | 11-02 | API Design |
-| teacher-vocab-008 | Use custom hooks with useState/useCallback instead of React Query | Project doesn't use React Query; follows existing patterns (useFriends, useCoins) | 11-03 | Data Fetching |
-| teacher-vocab-009 | Implement optimistic updates in all mutation hooks | Provides instant UI feedback while maintaining data consistency | 11-03 | UX |
-| teacher-vocab-010 | Mastery threshold is 3+ correct attempts per word | Balances between too easy (1 correct) and too strict (5+ correct) | 11-03 | Progress Tracking |
-| teacher-vocab-011 | Separate hooks for lists vs single items (useClassrooms vs useClassroom) | Follows React best practices and allows focused state management | 11-03 | Architecture |
-| teacher-vocab-012 | Socket handlers use getGameBySocketId to find game context | Consistent with multiplayer patterns, no need to pass gameCode in payload | 11-04 | Socket Architecture |
-| teacher-vocab-013 | selectedVocabulary stored as Set<string> for O(1) lookups | Performance optimization for frequent add/remove/has operations | 11-04 | Data Structure |
-| teacher-vocab-014 | Words stored in original case (not normalized) for teacher UI | Maintains game context, normalization happens in checkWordIntegration | 11-04 | Data Representation |
-| teacher-vocab-015 | Only show word selector to hosts who are teachers when game is finished | Prevents students/non-teachers from accessing teacher tools | 11-06 | UI Visibility |
-| teacher-vocab-016 | Sort words by score (highest first) in word selector | Prioritizes high-value vocabulary for teacher review | 11-06 | UX |
-| teacher-vocab-017 | Use checkmark/warning icons to indicate integration status | Visual indicators show which words can be embedded in grids vs track-only | 11-06 | UI Design |
-| teacher-vocab-018 | Show selected word count in save button | "Save as Lesson (3)" provides clarity on how many words will be saved | 11-06 | UX |
-| teacher-vocab-019 | Spelling practice mode as MVP (show definition, type word) | Most relevant for vocabulary acquisition; other modes can be added later | 11-07 | Practice Modes |
-| teacher-vocab-020 | Mastery requires 3 correct IN A ROW (not 3 correct total) | True mastery requires consistent accuracy; incorrect answer resets streak to 0 | 11-07 | Learning Logic |
-| teacher-vocab-021 | Progress bar colors: cyan for in-progress, yellow for complete | Aligns with neo-brutalist palette (neo-cyan, neo-yellow) for clear visual status | 11-07 | UI Design |
-| multilang-001 | Use document.documentElement.lang and .dir for language/direction testing | Standard DOM API for verifying language and text direction settings | 10-04 | Testing |
-| multilang-002 | Test character length with .length property for all languages | JavaScript .length correctly counts Unicode characters for Hebrew, Japanese, Swedish | 10-04 | Testing |
-| multilang-003 | Verify RTL shadow flipping via CSS [dir='rtl'] selectors | CSS handles shadow direction changes automatically, tests verify attribute is set | 10-04 | Testing |
-| asset-webp-001 | Use specific backup folder paths in .gitignore (not broad wildcards) | Explicit paths like public/images/adventure-png-backup/ prevent accidental exclusions | 12-02 | Git, Asset Management |
-| asset-webp-002 | Retain PNG backups (gitignored) for 30-60 days post-migration | Zero-cost safety net allows easy rollback if quality/compatibility issues surface | 12-03 | Asset Management |
-| asset-webp-003 | Human verification required for visual asset migrations | Network tab inspection and visual testing catch issues automated tests miss | 12-03 | Quality Assurance |
-| edu-landing-001 | Separate education landing from main game landing | Clear separation of educational vs recreational use cases | 14-01 | UX, Navigation |
-| edu-landing-002 | Teacher access requires authentication, Student access is public | Teachers need accounts for classroom management, students can browse before joining | 14-01 | Authentication, Access Control |
-| edu-landing-003 | Use ModeCard component with locked state for teacher access | Reuses existing landing pattern, provides clear visual feedback | 14-01 | UI Consistency |
-| combo-visual-001 | Position ComboTierBadge at top 10% of grid container | Centered above grid is visible without overlapping score or objectives | 15-05 | UI Layout |
-| combo-visual-002 | Trigger ChainParticleBurst on activationEffect === 'link' | Uses existing tile state system, no new state management needed | 15-05 | Animation Triggering |
-| combo-visual-003 | Calculate tile center position using grid bounds and tile size | Accurate pixel positioning for particle burst origin | 15-05 | Animation Positioning |
-| combo-visual-004 | Mock ComboTierBadge/ChainParticleBurst in lexi test instead of framer-motion | Avoids useSpring dependency conflicts in test environment | 15-05 | Testing Strategy |
-| achievement-001 | 18 achievements across 4 categories (5 progress, 4 skill, 5 consistency, 4 exploration) | Balanced distribution covers all aspects of student engagement | 19-01 | Gamification |
-| achievement-002 | 4-tier progression system: Bronze/Silver/Gold/Platinum | Industry-standard tiering provides clear progression path | 19-01 | UX, Gamification |
-| achievement-003 | 2 secret achievements (~11% of total) | Creates discovery moments without overwhelming students | 19-01 | Gamification |
-| achievement-004 | Secret achievements return null tier until bronze unlocked | Hides progress tracking to preserve surprise element | 19-01 | UX |
-| achievement-005 | Tier calculation uses cascading threshold checks (platinum → gold → silver → bronze) | Efficient O(1) tier determination without loops | 19-01 | Performance |
-| leaderboard-001 | Classroom-scoped leaderboard (not global) | Privacy-conscious design - students only compete within their classroom (FERPA compliance) | 19-02 | UX, Privacy |
-| leaderboard-002 | Show top 3 + current user rank | Balances motivation (see top performers) with privacy (limited exposure) | 19-02 | UX |
-| leaderboard-003 | Aggregate XP across all lessons in classroom | Reflects overall student effort, not just single lesson | 19-02 | Data Aggregation |
-| leaderboard-004 | Mark students inactive after 7 days | Visual indicator for teachers/students, encourages re-engagement | 19-02 | Student Engagement |
-| profile-badges-001 | Display achievements with tier-colored icon circles | Visual tier hierarchy (bronze/silver/gold/platinum) using color coding | 19-04 | UI Design |
-| profile-badges-002 | Max 3 pinned badges in featured section | Balances student customization with focused showcase | 19-04 | UX |
-| profile-badges-003 | Show ??? for secret badges until bronze unlocked | Creates discovery moments without spoiling surprises | 19-04 | UX |
-| profile-badges-004 | Collapsible category sections with earned count | Reduces visual clutter while showing progress at a glance | 19-04 | UI Design |
-| profile-badges-005 | Sort earned badges before locked, by tier desc within earned | Highlights achievements first, showcases highest tiers | 19-04 | UX |
-| audio-lazy-001 | createLazyHowl always sets preload:false, html5:true | Prevents automatic loading (0 bytes initial download), enables streaming | 24-01 | Audio, Performance |
-| audio-lazy-002 | Progressive preloading by priority (CRITICAL/HIGH/NORMAL/LOW) | Balances UX (core sounds ready quickly) with performance (rare sounds lazy) | 24-01 | Audio, UX |
-| audio-lazy-003 | preloadAudioOnDemand returns Promise, playback waits for loading | Guarantees audio is ready before play(), prevents silent failures | 24-01 | Audio, Reliability |
+**Coverage:** 76/76 v2.0 requirements mapped (100%)
 
-## Blockers & Concerns
+## Performance Metrics
 
-### Build Stability
-- **Issue**: Next.js 16 Turbopack has intermittent build failures
-- **Impact**: Production builds may fail
-- **Workaround**: Development server works correctly, all tests pass
-- **Status**: Pre-existing issue, unrelated to recent changes
-- **Action**: Consider downgrading to Next.js 15 or disabling Turbopack
+**v2.0 Progress:**
+- Phase 26 complete: 9/9 plans (100%)
+- Phase 27 active: 1/6 plans (16.7%)
+- Total v2.0 plans complete: 10 of 70+ (early progress)
 
-### None Critical
-All critical bugs fixed in Phase 10 Wave 1.
+## Accumulated Context
+
+### v2.0 Decisions
+
+**Phase 27-01 (Cascade Loop State Machine, 2026-01-30):**
+- 250ms per phase for smooth animations: Balances visibility with gameplay speed (750ms total)
+- MVP limitation checkForMatches stub: Single cascade only, match detection deferred (BOARD-05)
+- Safety limit 10 iterations: Prevents infinite loops, graceful failure mode
+- Pure function exports: applyGravity, spawnNewTiles, checkForMatches enable independent testing/reuse
+- Reduced motion support: 0ms phase transitions via matchMedia for WCAG 2.1 AA compliance
+
+**Phase 26-09 (Gap Closure, 2026-01-30):**
+- Replace ScorePopupFly with juice/ScorePopup: Quadratic bezier arc trajectory vs linear keyframes for natural parabolic motion
+- Dynamic targetPosition calculation: Ensures arc trajectory accuracy across screen sizes and layouts
+- Translation-first compliance: Replaced hardcoded "XP" with t('adventure.xp.label') in all 4 languages
+- Gaming abbreviations vary by language: XP (en), נק' (he), EP (sv), 経験値 (ja) - respect cultural norms
+
+**Phase 26-08 (Meta-Progression Integration, 2026-01-30):**
+- Hooks integrated with temp-user-id: Auth wiring deferred to future phase, enables full testing now
+- Upgrade multipliers applied to base values: (base × upgrade) × combo ensures impactful but balanced
+- Score popup arc trajectory: Targets score counter position for visual continuity, falls back to fade
+- Combo juice intensity scaling: Shake 2-8px and particles 10-50 based on tier (Nice/Great/Amazing/LEGENDARY)
+- Level-up modal auto-dismisses: 3s timeout maintains game momentum, instant skip for reduced motion
+- Integration test pattern: Mock hooks + verify state changes + test end-to-end flows (10 scenarios, 308 lines)
+
+**Phase 26-07 (Adventure HUD Components, 2026-01-30):**
+- Fixed positioning at top/bottom with semi-transparent backgrounds (70% opacity): Board remains focal point
+- Radial SVG progress with depleting arc: Clockwise depletion as time progresses, space-efficient (24-48px)
+- Visual hierarchy prioritizes timer and score: Timer > Score > Objectives > XP/Gold > Cooldowns
+- Responsive design hides XP bar on small screens: Preserves critical info (level, gold, timer) on mobile
+- Board-first design principle: HUD at edges only, no center overlap, gameplay never obstructed
+
+**Phase 26-06 (Adaptive Particle System & Score Popup, 2026-01-30):**
+- Three-tier particle budgets: low (30), medium (60), high (100) particles based on device
+- Zero particles for reduced motion users: Accessibility first, WCAG 2.1 compliant
+- Intensity scaling (1-4x): Single component handles all combo tiers without config duplication
+- Arc trajectory with quadratic bezier: Natural parabolic motion for score popups (0.8s arc, 0.3s reduced motion fade)
+- AdaptiveParticles is purely visual: No text rendering, separation from ComboTierBadge
+
+**Phase 26-05 (Currency Display & Upgrade Shop, 2026-01-30):**
+- usePrefersReducedMotion hook for accessibility: WCAG 2.1 compliance, reusable across animated components
+- CurrencyDisplay with coin icon: Clear gold visualization, number formatting with commas
+- Recent gain animation: Flies up and fades (0.8s), instant for reduced motion users
+- UpgradeShop purchase validation: Checks affordability and max stacks, clear feedback
+- Neo-brutalist card layout: Hard shadows, chunky borders, high contrast (yellow/lime/black)
+
+**Phase 26-04 (Adventure XP UI Components, 2026-01-30):**
+- useAdventureXp hook returns pending updates: Separates state from persistence, allows parent to batch/handle errors
+- Cyan color theme for adventure mode: Differentiates from education yellow, creates distinct identity
+- Confetti skipped for reduced motion: Accessibility compliance (WCAG 2.1 AA), prevents motion sickness
+- Auto-close modal after 3 seconds: Smooth UX flow without explicit dismiss, keeps game momentum
+- Framer Motion for animations: Declarative API with spring physics, zero duration when reduced motion enabled
+
+**Phase 26-03 (Screen Shake, 2026-01-30):**
+- Web Animations API over Framer Motion: Zero dependencies, better performance for simple shake
+- Transform-only animations: GPU-accelerated, no layout thrashing (verified via grep check)
+- Reduced motion flash alternative: Opacity flash maintains feedback without motion (WCAG compliant)
+- Conservative parameter ranges: Intensity 2-8px, duration 100-300ms to prevent nausea/motion fatigue
+
+**Phase 26-02 (Gold Currency, 2026-01-30):**
+- Exponential gold growth (1.2x per level): Rewards progression without late-game inflation
+- Exponential upgrade costs (1.5x per stack): Creates strategic choices, prevents easy max-out
+- Max 5 stacks per upgrade: Clear ceiling prevents power creep, maintains balance
+- Pure functions for currency logic: No side effects, easy to test and reason about
+
+**Phase 26-01 (Adventure XP Utilities, 2026-01-30):**
+- RuneScape XP formula: `floor(i + 300 * 2^(i/7)) / 4` for smooth exponential progression
+- Max level 50: Manageable v2.0 scope, expandable in v2.1+
+- Separate adventure XP from education XP: Different progression philosophies (excitement vs learning pace)
+- Pure functions: No external state for easy testing and reusability across frontend/backend
+
+**Roadmap Architecture (2026-01-30):**
+- Start phase numbering at 26 (continues from v1.2 Phase 25)
+- 10 phases derived from requirement categories (not arbitrary structure)
+- Front-load technical risk: Board mechanics (Phase 27) before boss overhaul (Phase 30)
+- Horizontal power-up progression: Enable strategies, not inflate numbers
+- Invisible adaptive difficulty: Pre-game primary, mid-game subtle
+- Particle budget enforcement: Max 50-100 particles, adaptive reduction
+- Transform-first animations: GPU-accelerated only, no layout properties
+- Boss battles excluded from adaptive difficulty: Fixed patterns for learning
+
+### Pending Todos
+
+None - Starting fresh milestone with roadmap complete.
+
+### Blockers/Concerns
+
+**v2.0 Architecture Risks (from research):**
+- React Context re-render cascade risk (InGameContext has 57 properties)
+  - Mitigation: Use Zustand for high-frequency state (boss HP, combos)
+- Framer Motion layout thrashing risk (animating width/height)
+  - Mitigation: Transform-first architecture, code review enforcement
+- Power creep risk (power-ups become mandatory)
+  - Mitigation: Test every level without power-ups first
+- Rubber-banding perception risk (adaptive difficulty too obvious)
+  - Mitigation: Pre-game adjustments primary, invisible mid-game
+
+**v1.1 Carryover (included in Phase 35):**
+- World 4-5 theming (Phase 22) not completed
+- Tech debt cleanup (Phase 23) not completed
+- Entry sequence timing still 2.38s (380ms over target)
+- Video MP4 files not rendered (render script exists)
 
 ## Session Continuity
 
-**Last session:** 2026-01-26 01:19 UTC
-**Stopped at:** Completed 24-01-PLAN.md (Lazy Audio Loading) - Phase 24 in progress (1/6 complete)
-**Resume file:** None
+Last session: 2026-01-30
+Stopped at: Completed 27-01-PLAN.md (Cascade Loop State Machine)
+Resume file: None
 
-## Key Metrics
+**Next action:** Continue Phase 27 with plan 27-02 (Tile Removal and Refill)
 
-- **Total tests**: 3,481 tests passing (3,494 total)
-- **Daily challenge tests**: 311/311 passing (100%)
-- **Multi-language tests**: 30/30 passing (Hebrew RTL, Japanese, Swedish, English)
-- **Translation coverage**: 3041 keys per language (5 languages: en, he, sv, ja, es)
-- **Build status**: ✅ Production build passing
-- **Lint status**: ✅ Passing (0 errors)
-- **Test status**: ✅ All Phase 10 tests passing
-- **Phase verification**: ✅ All 5 success criteria met
+**v2.0 Milestone Goals:**
+Transform Adventure Mode with:
+1. Dynamic board mechanics (moving tiles, cascades, explosions)
+2. Power-up system with mid-game boosters
+3. Meta-progression and skill trees
+4. Boss battle overhaul with unique graphics/mechanics
+5. Enhanced visual content pipeline (Remotion, Image MCP, Python)
+6. Polished in-game UI with improved hierarchy
+7. Dynamic difficulty adaptation
+8. Complete v1.1 carryover (Worlds 4-5, tech debt)
 
-## Tech Stack Additions
+**Technology Additions (from research):**
+- GSAP 3.14.2 for complex board animations
+- tsParticles 3.x for particle effects
+- XState 5.24.0 for boss state machines
+- Immer for nested state updates
+- Remotion + Lottie + Skia for cinematics
+- rembg (Python) for background removal
+- Image MCP + FLUX.1 for boss graphics
 
-### Phase 24-01
-- **Audio optimization**: Lazy loading utilities (createLazyHowl, preloadAudioOnDemand, preloadByPriority)
-- **Progressive loading**: CRITICAL sounds on first interaction, HIGH during idle, LOW on-demand
-- **Performance**: 67MB audio → 0 bytes initial download (music 57MB + SFX 10MB eliminated from initial load)
-- **Streaming**: html5: true enables progressive download instead of loading entire file
-
-### Phase 19-02
-- **Leaderboard patterns**: Classroom-scoped XP aggregation, inactive student detection, top-N + current rank display
-- **Data patterns**: Multi-lesson XP aggregation via student_lesson_progress table
-- **UI patterns**: Rank badges (emoji + color coding), inactive indicators, current user highlighting
-
-### Phase 19-01
-- **Achievement patterns**: Tier-based progression (bronze/silver/gold/platinum), cascading threshold checks
-- **Badge system**: Grouped badges (dedication, mastery, wins, exploration), icon + emoji system
-
-### Phase 12-01
-- **Asset patterns**: Backup directory structure, WebP migration from backup
-- **File organization**: Separated backgrounds/ and parallax/ subdirectories
-
-### Phase 11-07
-- **Practice patterns**: Flashcard-style practice, mastery tracking with streaks, celebration animations
-- **Libraries added**: date-fns (for due date formatting)
-- **Student UI patterns**: Progress bars with color coding, lesson cards, interactive practice
-
-### Phase 11-04
-- **Socket patterns**: Event handler registration, host validation, game state validation
-- **TDD patterns**: RED-GREEN-REFACTOR cycle, comprehensive test coverage before implementation
-- **Set usage**: Set<string> for O(1) operations on vocabulary selection
-
-### Phase 11-03
-- **Hook patterns**: Custom hooks with useState/useCallback, optimistic updates, useMounted pattern
-- **Data fetching**: Supabase query utilities, error handling, state management
-
-### Phase 11-02
-- **Testing patterns**: TDD with RED-GREEN-REFACTOR, Jest mocking, Given-When-Then structure
-- **Validation patterns**: Early returns, validation order optimization, multi-language support
-
-### Phase 11-01
-- **Database patterns**: Row-level security, join codes, helper functions, user role enums
-
-### Phase 10-04
-- **Testing patterns**: Multi-language testing, RTL testing, Unicode validation
-
-## Brief Alignment Status
-
-**Phase 13: COMPLETE (100%) - ALL PHASES COMPLETE**
-
-**Translation Verification Summary:**
-- ✅ All 93 Phase 11 teacher/student keys verified present in all 5 languages
-- ✅ Teacher sections: 80-81 lines per language (he, sv, ja, es match en within ±1 line)
-- ✅ Student sections: 19 lines per language (exact match across all languages)
-- ✅ Zero missing keys confirmed by automated script
-- ✅ Pre-commit hook validation passes (all keys present)
-- ✅ 13-VERIFICATION.md created with methodology and evidence
-
-**Project Status:**
-- **13/13 phases complete (100%)**
-- **56/56 plans executed**
-- All v1 features implemented and verified
-- Ready for production deployment
-
-**Blockers:** None
+---
+*State initialized: 2026-01-30 for v2.0 milestone*
+*Last updated: 2026-01-30 (Plan 27-01 complete: Cascade Loop State Machine)*
