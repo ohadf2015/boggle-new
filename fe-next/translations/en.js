@@ -1931,6 +1931,29 @@ const en = {
         "optOut": "You can opt out of personalized advertising by visiting Google's Ads Settings at https://www.google.com/settings/ads or by using industry opt-out tools.",
         "learnMore": "For more information about how Google uses data when you use our site, visit https://policies.google.com/technologies/partner-sites"
       },
+      "advertisingPartners": {
+        "title": "Advertising Partners",
+        "intro": "We partner with advertising networks to display ads on our website. These partners help keep LexiClash free for all players.",
+        "howItWorks": {
+          "title": "How Advertising Works",
+          "cookies": "Advertising partners may use cookies to track your browsing activity across websites",
+          "control": "You have control over personalized advertising through your browser and ad settings",
+          "noSale": "We never sell your personal data to advertisers",
+          "revenue": "Ad revenue helps us keep LexiClash free to play",
+          "thirdParty": "Third-party advertisers have their own privacy policies"
+        },
+        "yourChoices": {
+          "title": "Your Choices",
+          "intro": "You have several options to control how advertising works for you:",
+          "optOut": "Opt out of personalized ads",
+          "googlePrivacy": "Review Google's privacy practices",
+          "partnerPolicy": "Learn about AdSense partner policies"
+        },
+        "important": {
+          "title": "Important:",
+          "content": "Even if you opt out of personalized advertising, you may still see ads, but they won't be based on your interests. You can also manage your ad preferences through"
+        }
+      },
       "cookies": {
         "title": "5. Cookies and Local Storage",
         "content": "We use essential cookies and local storage for: authentication tokens (Supabase), username and preferences (localStorage), theme settings (dark/light mode), and language preferences. We also use LogRocket cookies for analytics purposes. We do not use advertising or tracking cookies."
@@ -2295,7 +2318,10 @@ const en = {
     "aboutGame": "About the Game",
     "leaderboard": "Leaderboard",
     "contact": "Contact",
-    "interactiveTutorial": "Interactive Tutorial"
+    "interactiveTutorial": "Interactive Tutorial",
+    "about": "About",
+    "blog": "Blog",
+    "faq": "FAQ"
   },
   "support": {
     "kofiFooter": "Buy Us a Coffee",
@@ -4040,6 +4066,18 @@ const en = {
         "star2": "Excellent work!",
         "star3": "Perfect score!"
       }
+    },
+    "xp": {
+      "level": "Level",
+      "levelUp": "Level Up!",
+      "newLevel": "You reached level",
+      "continue": "Continue",
+      "maxLevel": "MAX LEVEL!"
+    },
+    "upgrades": {
+      "maxLevel": "Max Level",
+      "purchase": "Purchase",
+      "needMore": "Need {amount} more gold"
     },
     "bosses": {
       "fightBoss": "Fight Boss",

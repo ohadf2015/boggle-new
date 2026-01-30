@@ -1740,6 +1740,29 @@ const es = {
         "optOut": "Puedes optar por no recibir anuncios personalizados visitando la configuración de anuncios de Google en https://www.google.com/settings/ads o utilizando herramientas de exclusión de la industria.",
         "learnMore": "Para obtener más información sobre cómo Google utiliza los datos cuando utilizas nuestro sitio, visita https://policies.google.com/technologies/partner-sites"
       },
+      "advertisingPartners": {
+        "title": "Socios Publicitarios",
+        "intro": "Nos asociamos con redes publicitarias para mostrar anuncios en nuestro sitio web. Estos socios ayudan a mantener LexiClash gratuito para todos los jugadores.",
+        "howItWorks": {
+          "title": "Cómo funciona la publicidad",
+          "cookies": "Los socios publicitarios pueden usar cookies para rastrear tu actividad de navegación en sitios web",
+          "control": "Tienes control sobre la publicidad personalizada a través de la configuración de tu navegador y anuncios",
+          "noSale": "Nunca vendemos tus datos personales a anunciantes",
+          "revenue": "Los ingresos publicitarios nos ayudan a mantener LexiClash gratuito",
+          "thirdParty": "Los anunciantes de terceros tienen sus propias políticas de privacidad"
+        },
+        "yourChoices": {
+          "title": "Tus opciones",
+          "intro": "Tienes varias opciones para controlar cómo funciona la publicidad para ti:",
+          "optOut": "Desactivar anuncios personalizados",
+          "googlePrivacy": "Revisar las prácticas de privacidad de Google",
+          "partnerPolicy": "Conocer las políticas de socios de AdSense"
+        },
+        "important": {
+          "title": "Importante:",
+          "content": "Incluso si desactivas la publicidad personalizada, es posible que aún veas anuncios, pero no estarán basados en tus intereses. También puedes administrar tus preferencias de anuncios a través de"
+        }
+      },
       "cookies": {
         "title": "Cookies y Almacenamiento Local",
         "content": "Usamos cookies y almacenamiento local del navegador para mantener su sesión."
@@ -2289,7 +2312,10 @@ const es = {
     "aboutGame": "Sobre el Juego",
     "leaderboard": "Clasificación",
     "contact": "Contacto",
-    "interactiveTutorial": "Tutorial Interactivo"
+    "interactiveTutorial": "Tutorial Interactivo",
+    "about": "Acerca de",
+    "blog": "Blog",
+    "faq": "Preguntas frecuentes"
   },
   "support": {
     "kofiFooter": "Invítanos un Café",
@@ -4057,6 +4083,18 @@ const es = {
         "star2": "¡Excelente trabajo!",
         "star3": "¡Puntuación perfecta!"
       }
+    },
+    "xp": {
+      "level": "Nivel",
+      "levelUp": "¡Subiste de Nivel!",
+      "newLevel": "Alcanzaste el nivel",
+      "continue": "Continuar",
+      "maxLevel": "¡NIVEL MÁXIMO!"
+    },
+    "upgrades": {
+      "maxLevel": "Nivel máximo",
+      "purchase": "Comprar",
+      "needMore": "Necesitas {amount} más de oro"
     },
     "bosses": {
       "fightBoss": "Luchar contra el jefe",

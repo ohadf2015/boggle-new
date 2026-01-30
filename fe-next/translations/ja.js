@@ -2193,6 +2193,29 @@ const ja = {
         "optOut": "Googleの広告設定（https://www.google.com/settings/ads）を訪問するか、業界のオプトアウトツールを使用して、パーソナライズド広告をオプトアウトできます。",
         "learnMore": "当社のサイトを使用する際にGoogleがデータをどのように使用するかについての詳細は、https://policies.google.com/technologies/partner-sitesをご覧ください"
       },
+      "advertisingPartners": {
+        "title": "広告パートナー",
+        "intro": "当社は広告ネットワークと提携し、ウェブサイトに広告を表示しています。これらのパートナーは、すべてのプレイヤーにLexiClashを無料で提供し続けることを支援しています。",
+        "howItWorks": {
+          "title": "広告の仕組み",
+          "cookies": "広告パートナーは、ウェブサイト全体でお客様の閲覧活動を追跡するためにCookieを使用することがあります",
+          "control": "ブラウザと広告設定を通じてパーソナライズド広告をコントロールできます",
+          "noSale": "お客様の個人データを広告主に販売することは絶対にありません",
+          "revenue": "広告収入は、LexiClashを無料で提供し続けるのに役立っています",
+          "thirdParty": "サードパーティ広告主には独自のプライバシーポリシーがあります"
+        },
+        "yourChoices": {
+          "title": "お客様の選択",
+          "intro": "広告の動作を制御するためのオプションがいくつかあります：",
+          "optOut": "パーソナライズド広告をオプトアウト",
+          "googlePrivacy": "Googleのプライバシー慣行を確認",
+          "partnerPolicy": "AdSenseパートナーポリシーについて学ぶ"
+        },
+        "important": {
+          "title": "重要：",
+          "content": "パーソナライズド広告をオプトアウトしても広告は表示されますが、お客様の興味に基づいたものではありません。また、以下から広告の設定を管理することもできます"
+        }
+      },
       "cookies": {
         "title": "5. Cookieとローカルストレージ",
         "content": "以下の目的でエッセンシャルCookieとローカルストレージを使用します：認証トークン（Supabase）、ユーザー名と設定（localStorage）、テーマ設定（ダーク/ライトモード）、言語設定。また、分析目的でLogRocket Cookieを使用します。広告やトラッキングCookieは使用しません。"
@@ -2292,7 +2315,10 @@ const ja = {
     "aboutGame": "ゲームについて",
     "leaderboard": "ランキング",
     "contact": "お問い合わせ",
-    "interactiveTutorial": "インタラクティブチュートリアル"
+    "interactiveTutorial": "インタラクティブチュートリアル",
+    "about": "概要",
+    "blog": "ブログ",
+    "faq": "よくある質問"
   },
   "support": {
     "kofiFooter": "コーヒーをおごる",
@@ -4068,6 +4094,18 @@ const ja = {
         "star2": "素晴らしい!",
         "star3": "完璧!"
       }
+    },
+    "xp": {
+      "level": "レベル",
+      "levelUp": "レベルアップ！",
+      "newLevel": "レベル到達",
+      "continue": "続ける",
+      "maxLevel": "最大レベル！"
+    },
+    "upgrades": {
+      "maxLevel": "最大レベル",
+      "purchase": "購入",
+      "needMore": "あと{amount}ゴールド必要"
     },
     "bosses": {
       "fightBoss": "ボスと戦う",

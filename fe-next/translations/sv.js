@@ -2193,6 +2193,29 @@ const sv = {
         "optOut": "Du kan avanmäla personliga annonser genom att besöka Googles annonsinställningar på https://www.google.com/settings/ads eller genom att använda branschverktyg för avanmälan.",
         "learnMore": "För mer information om hur Google använder data när du använder vår webbplats, besök https://policies.google.com/technologies/partner-sites"
       },
+      "advertisingPartners": {
+        "title": "Annonspartners",
+        "intro": "Vi samarbetar med annonsnätverk för att visa annonser på vår webbplats. Dessa partners hjälper till att hålla LexiClash gratis för alla spelare.",
+        "howItWorks": {
+          "title": "Hur annonsering fungerar",
+          "cookies": "Annonspartners kan använda cookies för att spåra din surfaktivitet över webbplatser",
+          "control": "Du har kontroll över personaliserad annonsering genom dina webbläsar- och annonsinställningar",
+          "noSale": "Vi säljer aldrig din personliga data till annonsörer",
+          "revenue": "Annonsintäkter hjälper oss att hålla LexiClash gratis att spela",
+          "thirdParty": "Tredjepartsannonsörer har sina egna integritetspolicyer"
+        },
+        "yourChoices": {
+          "title": "Dina val",
+          "intro": "Du har flera alternativ för att kontrollera hur annonsering fungerar för dig:",
+          "optOut": "Välj bort personaliserade annonser",
+          "googlePrivacy": "Granska Googles integritetspraxis",
+          "partnerPolicy": "Läs om AdSense partnerregler"
+        },
+        "important": {
+          "title": "Viktigt:",
+          "content": "Även om du väljer bort personaliserad annonsering kan du fortfarande se annonser, men de kommer inte att baseras på dina intressen. Du kan också hantera dina annonspreferenser via"
+        }
+      },
       "cookies": {
         "title": "5. Cookies och lokal lagring",
         "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Vi använder inte reklam- eller spårningscookies."
@@ -2292,7 +2315,10 @@ const sv = {
     "aboutGame": "Om Spelet",
     "leaderboard": "Topplista",
     "contact": "Kontakt",
-    "interactiveTutorial": "Interaktiv handledning"
+    "interactiveTutorial": "Interaktiv handledning",
+    "about": "Om oss",
+    "blog": "Blogg",
+    "faq": "Vanliga frågor"
   },
   "support": {
     "kofiFooter": "Köp oss en kaffe",
@@ -4068,6 +4094,18 @@ const sv = {
         "star2": "Utmarkt arbete!",
         "star3": "Perfekt poang!"
       }
+    },
+    "xp": {
+      "level": "Nivå",
+      "levelUp": "Nivå Upp!",
+      "newLevel": "Du nådde nivå",
+      "continue": "Fortsätt",
+      "maxLevel": "MAXNIVÅ!"
+    },
+    "upgrades": {
+      "maxLevel": "Maxnivå",
+      "purchase": "Köp",
+      "needMore": "Behöver {amount} mer guld"
     },
     "bosses": {
       "fightBoss": "Bekampa bossen",
