@@ -868,6 +868,15 @@ const AdventureGame = memo<AdventureGameProps>(
     const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
     const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
 
+    // Task 4: Get upgrade multipliers (memoized to avoid recalculating every render)
+    const upgradeBonuses = useMemo(() => {
+      return {
+        timeBonus: getUpgradeEffect('timeBonus').multiplier,
+        scoreBonus: getUpgradeEffect('scoreBonus').multiplier,
+        xpBonus: getUpgradeEffect('xpBonus').multiplier,
+      };
+    }, [getUpgradeEffect]);
+
     // Handle combo tier changes - trigger screen shake and particles
     const handleComboTierChange = useCallback((tier: ComboTier) => {
       // Map combo tier thresholds to shake intensity (pixels)
@@ -1271,6 +1280,12 @@ const AdventureGame = memo<AdventureGameProps>(
             onComplete={() => setParticleConfig(null)}
           />
         )}
+
+        {/* Level-Up Celebration Modal */}
+        <LevelUpCelebration
+          levelUpData={levelUpData}
+          onClose={handleLevelUpClose}
+        />
       </div>
     );
   }
