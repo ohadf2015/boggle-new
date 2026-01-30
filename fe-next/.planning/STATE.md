@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 28 - Power-Up System
-Plan: 7 of 7 complete (Freeze Time Effect Wiring)
+Plan: 8 of 8 complete (Wire Power-Up Inventory Persistence)
 Status: Phase Complete
-Last activity: 2026-01-30 — Completed 28-07-PLAN.md (Freeze Time extends timer via addTime method)
+Last activity: 2026-01-30 — Completed 28-08-PLAN.md (Power-up cooldowns persist to localStorage, reset on level transitions)
 
-Progress: [█████░░░░░] 52% (17/33 v2.0 plans complete)
+Progress: [█████░░░░░] 55% (18/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,7 +77,7 @@ Progress: [█████░░░░░] 52% (17/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 17 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans COMPLETE + 3 gap closures, Phase 28: 7 plans COMPLETE)
+- Plans completed: 18 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans COMPLETE + 3 gap closures, Phase 28: 8 plans COMPLETE)
 - Current phase: Phase 28 - Power-Up System COMPLETE
 
 ## Accumulated Context
@@ -236,6 +236,14 @@ Key decisions from previous milestones:
 - Freeze Time power-up now fully functional with actual timer extension
 - TDD pattern: Failing tests first, implementation second, integration verification third
 
+**Phase 28-08 (Wire Power-Up Inventory Persistence, 2026-01-30):**
+- usePowerUpState extended with initialCooldownTimestamp option for persistence restoration
+- PowerUpBar integrated with usePowerUpInventory (calls startCooldown on activation, passes timestamps to state machines)
+- AdventureGame detects level changes via useEffect + previousLevelRef and calls resetCooldowns
+- localStorage persistence: Cooldowns survive browser refresh, navigation, tab switching
+- Level transition behavior: Cooldowns reset to 0 when levelConfig.level changes (fresh start per level)
+- 62 total tests passing across all power-up hooks and components (100% integration coverage)
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -261,10 +269,11 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 28-07-SUMMARY.md (Freeze Time effect wiring) - Phase 28 COMPLETE
+Stopped at: Completed 28-08-SUMMARY.md (Wire Power-Up Inventory Persistence) - Phase 28 COMPLETE
 Resume file: None
 
 **Next action:** Start Phase 29 - Adaptive Difficulty System
+**Note:** All POWER-* requirements (POWER-01 through POWER-07) now complete and verified
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
