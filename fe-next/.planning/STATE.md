@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 28 - Power-Up System
-Plan: 3 of 6 complete (Power-Up UI Components)
-Status: In Progress - Wave 2 (parallel execution with 28-02)
-Last activity: 2026-01-30 — Completed 28-03-PLAN.md (PowerUpButton + PowerUpActivationEffect)
+Plan: 5 of 6 complete (Power-Up Integration)
+Status: In Progress - Wave 4 complete
+Last activity: 2026-01-30 — Completed 28-05-PLAN.md (PowerUpBar integrated into AdventureGame)
 
-Progress: [█████░░░░░] 42% (14/33 v2.0 plans complete)
+Progress: [█████░░░░░] 45% (15/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [█████░░░░░] 42% (14/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 13 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans COMPLETE + 3 gap closures)
-- Current phase: Phase 27 - Dynamic Board Mechanics (COMPLETE)
+- Plans completed: 15 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans COMPLETE + 3 gap closures, Phase 28: 5 plans COMPLETE)
+- Current phase: Phase 28 - Power-Up System (5/6 plans complete)
 
 ## Accumulated Context
 
@@ -205,6 +205,23 @@ Key decisions from previous milestones:
 - Zero animation for reduced motion users: Accessibility first (WCAG 2.1 compliant)
 - 28 tests passing (17 PowerUpButton + 11 PowerUpActivationEffect)
 
+**Phase 28-04 (PowerUpBar Component, 2026-01-30):**
+- PowerUpBar container: Fixed bottom-center positioning with horizontal button layout
+- State machine integration: usePowerUpState hooks for each power-up (ready/active/cooldown)
+- Effect activation: usePowerUpEffects hooks with cascade blocking logic
+- Cascade blocking: All buttons disabled when cascadeActive=true (prevents mid-cascade activation)
+- Visual effects: PowerUpActivationEffect triggered on activation (0.25s burst)
+- Persistence ready: Accepts dictionary prop for hint validation preparation
+
+**Phase 28-05 (Power-Up Integration, 2026-01-30):**
+- PowerUpBar integrated into AdventureGame with conditional rendering (entryPhase='playing', not paused, not complete)
+- Power-up state management: scoreMultiplier, multiplierExpiresAt, hintWord, hintTiles, hintExpiresAt
+- Effect handlers: handleFreezeTime (timer callback), handleHint (5s tile highlight), handleScoreMultiplier (30s 2x multiplier)
+- Score calculation integration: scoreValue multiplied by scoreMultiplier (stacks multiplicatively with gold tiles)
+- Hint highlighting: hintTiles converted to indices and passed to AdventureGrid via hintHighlightIndices
+- Auto-clear timers: Hint (5s) and Score Multiplier (30s) automatically reset state
+- Integration tests: 11 tests verifying all effects, conditional rendering, and multiplicative stacking (gold 3x × multiplier 2x = 6x)
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -230,10 +247,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 28-03-PLAN.md (PowerUpButton + PowerUpActivationEffect) - Phase 28 Wave 2
+Stopped at: Completed 28-05-SUMMARY.md (PowerUpBar integrated into AdventureGame) - Phase 28 Wave 4 complete
 Resume file: None
 
-**Next action:** Continue Phase 28 - Plans 28-04, 28-05, 28-06 remaining (HUD integration, activation logic, balance)
+**Next action:** Continue Phase 28 - Plan 28-06 remaining (power-up persistence and state recovery)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -257,4 +274,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Phase 27 complete: Dynamic Board Mechanics verified)*
+*Last updated: 2026-01-30 (Phase 28 Wave 4 complete: PowerUpBar integration verified)*
