@@ -798,6 +798,34 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [currentPopup]);
 
+    // Task 2: Wire screen shake and adaptive particles on combos
+    const [particleConfig, setParticleConfig] = useState<{
+      trigger: boolean;
+      intensity: number;
+      origin: { x: number; y: number };
+    } | null>(null);
+
+    // Handle combo tier changes - trigger screen shake and particles
+    const handleComboTierChange = useCallback((tier: ComboTier) => {
+      // Map combo tier thresholds to shake intensity (pixels)
+      const shakeIntensityMap: Record<number, number> = {
+        2: 2,  // Nice! - subtle shake
+        4: 4,  // Great! - moderate shake
+        7: 6,  // Amazing! - strong shake
+        10: 8, // Legendary! - intense shake
+      };
+      const intensity = shakeIntensityMap[tier.threshold] || 2;
+      shake(intensity);
+
+      // Trigger adaptive particles (intensity 1-4 based on tier)
+      const particleIntensity = Math.ceil(tier.threshold / 3); // 2→1, 4→2, 7→3, 10→4
+      setParticleConfig({
+        trigger: true,
+        intensity: particleIntensity,
+        origin: { x: 0.5, y: 0.4 }, // Center-top for combo celebrations
+      });
+    }, [shake]);
+
     // Calculate star count for display
     const starsEarned = gameState.stars;
 

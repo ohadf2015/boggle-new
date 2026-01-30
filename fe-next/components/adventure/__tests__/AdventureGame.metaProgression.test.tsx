@@ -93,7 +93,7 @@ const mockLevelConfig: LevelConfig = {
   gridSize: 4,
   timerSeconds: 120,
   objectives: [
-    { type: 'score', target: 500, completed: false },
+    { type: 'scoreTarget', target: 500 },
   ],
   minWordLength: 2,
   isBossLevel: false,
@@ -218,10 +218,9 @@ describe('AdventureGame - Meta-Progression Integration', () => {
       xpProgress: {
         currentLevel: 1,
         xpInCurrentLevel: 0,
-        xpForCurrentLevel: 0,
-        xpForNextLevel: 100,
-        xpToNextLevel: 100,
-        progressPercentage: 0,
+        xpNeededForNextLevel: 100,
+        progressPercent: 0,
+        isMaxLevel: false,
       },
       awardXp: jest.fn(() => ({ leveledUp: false })),
       pendingUpdate: null,
