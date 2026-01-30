@@ -301,11 +301,13 @@ export function useSurvivalGameLogic({
 
     const attemptsToUse = finalAttempts || state.attempts;
     // Only count target attempts (not discovery attempts) for attemptsUsed
-    // BUG FIX: Ensure at least 1 attempt when won - handles auto-win scenario where
-    // player discovers all letters through word discoveries without making target guesses.
+    // BUG FIX: Ensure at least 1 attempt for ALL game completions (win or lose)
+    // Handles scenarios where player completes without making target guesses:
+    // - Auto-win: discovers all letters through word discoveries
+    // - Loss: runs out of life before making any target guesses
     // Without this fix, attemptsUsed=0 fails validation and blocks leaderboard submission.
     const rawTargetAttemptsCount = attemptsToUse.filter(a => !a.isDiscovery).length;
-    const targetAttemptsCount = won ? Math.max(1, rawTargetAttemptsCount) : rawTargetAttemptsCount;
+    const targetAttemptsCount = Math.max(1, rawTargetAttemptsCount);
 
     const result: SurvivalGameResult = {
       solved: won,

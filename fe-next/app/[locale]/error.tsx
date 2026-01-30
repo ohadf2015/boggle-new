@@ -13,6 +13,13 @@ function isChunkLoadError(error: Error): boolean {
   // Check for explicit chunk load error name
   if (name === 'chunkloaderror') return true;
 
+  // Check for "module is not defined" - CommonJS/ESM bundling issue
+  // This happens when Turbopack fails to transpile a CommonJS module for browser
+  // Fixes JAVASCRIPT-NEXTJS-9S: ReferenceError: module is not defined
+  if (name === 'referenceerror' && message.includes('module is not defined')) {
+    return true;
+  }
+
   // Check for specific chunk-related error messages
   // Note: 'failed to fetch' alone is too broad - only match if it's clearly a chunk/module error
   return (
@@ -87,7 +94,8 @@ export default function Error({
       sessionStorage.removeItem('chunk_error_refresh');
     }
 
-    console.error('Page error:', error);
+    // Log error with message for better debugging (Error objects serialize to {} in console)
+    console.error('Page error:', error.name, error.message);
     captureError(error, {
       errorBoundary: {
         type: 'page-error',

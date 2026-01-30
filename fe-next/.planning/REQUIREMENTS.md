@@ -210,22 +210,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| META-01 | Phase 26 | Pending |
-| META-02 | Phase 26 | Pending |
-| META-03 | Phase 26 | Pending |
-| META-04 | Phase 26 | Pending |
-| META-05 | Phase 26 | Pending |
-| META-06 | Phase 26 | Pending |
-| JUICE-01 | Phase 26 | Pending |
-| JUICE-02 | Phase 26 | Pending |
-| JUICE-03 | Phase 26 | Pending |
-| JUICE-04 | Phase 26 | Pending |
-| JUICE-05 | Phase 26 | Pending |
-| UI-01 | Phase 26 | Pending |
-| UI-02 | Phase 26 | Pending |
-| UI-03 | Phase 26 | Pending |
-| UI-04 | Phase 26 | Pending |
-| UI-05 | Phase 26 | Pending |
+| META-01 | Phase 26 | Complete |
+| META-02 | Phase 26 | Complete |
+| META-03 | Phase 26 | Complete |
+| META-04 | Phase 26 | Complete |
+| META-05 | Phase 26 | Complete |
+| META-06 | Phase 26 | Complete |
+| JUICE-01 | Phase 26 | Complete |
+| JUICE-02 | Phase 26 | Complete |
+| JUICE-03 | Phase 26 | Complete |
+| JUICE-04 | Phase 26 | Complete |
+| JUICE-05 | Phase 26 | Complete |
+| UI-01 | Phase 26 | Complete |
+| UI-02 | Phase 26 | Complete |
+| UI-03 | Phase 26 | Complete |
+| UI-04 | Phase 26 | Complete |
+| UI-05 | Phase 26 | Complete |
 | BOARD-01 | Phase 27 | Pending |
 | BOARD-02 | Phase 27 | Pending |
 | BOARD-03 | Phase 27 | Pending |

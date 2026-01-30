@@ -25,15 +25,17 @@ function calculateAttemptsUsed(
 }
 
 /**
- * Fixed version that ensures minimum 1 attempt when won
+ * Fixed version that ensures minimum 1 attempt for all completions
  */
 function calculateAttemptsUsedFixed(
   attempts: TargetAttempt[],
   won: boolean
 ): number {
   const targetAttemptsCount = attempts.filter((a) => !a.isDiscovery).length;
-  // When won, ensure at least 1 attempt (the mental/auto-win counts as an attempt)
-  return won ? Math.max(1, targetAttemptsCount) : targetAttemptsCount;
+  // Ensure at least 1 attempt for ALL completions (win or lose)
+  // - completing the game counts as an attempt even with no explicit guesses
+  // - this prevents validation errors (attemptsUsed must be 1-10)
+  return Math.max(1, targetAttemptsCount);
 }
 
 describe('attemptsUsed validation', () => {
@@ -75,8 +77,9 @@ describe('attemptsUsed validation', () => {
       expect(fixedResult).toBeGreaterThanOrEqual(1);
     });
 
-    it('should return 0 attemptsUsed when player loses with no target guesses', () => {
-      // If player loses (life ran out) without any target guesses, 0 is valid
+    it('should return 1 attemptsUsed when player loses with no target guesses', () => {
+      // If player loses (life ran out) without any target guesses, still counts as 1 attempt
+      // Completing the game (even by losing) requires minimum 1 attempt for valid submission
       const discoveryOnlyAttempts: TargetAttempt[] = [
         {
           word: 'CAT',
@@ -88,9 +91,9 @@ describe('attemptsUsed validation', () => {
 
       const won = false;
 
-      // When lost, 0 is acceptable (player ran out of life without guessing)
+      // FIX: Even losses need minimum 1 attempt for valid leaderboard submission
       const result = calculateAttemptsUsedFixed(discoveryOnlyAttempts, won);
-      expect(result).toBe(0);
+      expect(result).toBe(1);
     });
 
     it('should preserve actual attempt count when player made target guesses', () => {

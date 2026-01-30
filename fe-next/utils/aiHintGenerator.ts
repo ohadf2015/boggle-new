@@ -262,7 +262,22 @@ export async function generateProgressiveHints(
         return generateFallbackHints(normalizedWord, language);
       }
 
-      const data = await response.json();
+      // Check content-type before parsing as JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        const responseText = await response.text().catch(() => '');
+        console.warn('[HintGenerator] Non-JSON response received:', contentType, responseText.substring(0, 100));
+        return generateFallbackHints(normalizedWord, language);
+      }
+
+      // Safely parse JSON with error handling
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.warn('[HintGenerator] Failed to parse JSON response:', parseError);
+        return generateFallbackHints(normalizedWord, language);
+      }
 
       // Validate response structure
       if (!validateHintResponse(data)) {

@@ -73,11 +73,11 @@ export function subscribeToNotifications(
 
         // Check if this is a configuration mismatch error (Supabase Dashboard issue)
         // This requires enabling Realtime filters in Supabase Dashboard, not a code fix
+        // Using console.log instead of console.warn to avoid Sentry noise - graceful fallback works fine
         if (errorMessage.includes('mismatch') || errorMessage.includes('bindings')) {
-          console.warn(
-            'Notifications Realtime subscription failed due to configuration mismatch. ' +
-            'This requires enabling row-level Realtime filters in Supabase Dashboard. ' +
-            'Falling back to polling for notifications.'
+          console.log(
+            '[Notifications] Realtime subscription unavailable (Supabase Dashboard config). ' +
+            'Using polling fallback - no action needed.'
           );
         } else {
           console.error('Error subscribing to notifications channel:', errorMessage);

@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 2800,
+    "totalKeysInCode": 2809,
     "keyCountByLanguage": {
       "en": 3811,
       "he": 3805,
@@ -8,7 +8,7 @@
       "ja": 3823,
       "es": 3823
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 9,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,7 +130,101 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "blog.backToBlog",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/multilingual-word-learning/PageClient.humanized.tsx",
+          "line": 772
+        },
+        {
+          "file": "app/[locale]/blog/top-player-secrets/PageClient.humanized.tsx",
+          "line": 543
+        }
+      ]
+    },
+    {
+      "key": "blog.dailyChallenge",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/multilingual-word-learning/PageClient.humanized.tsx",
+          "line": 884
+        }
+      ]
+    },
+    {
+      "key": "blog.date",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/multilingual-word-learning/PageClient.humanized.tsx",
+          "line": 804
+        },
+        {
+          "file": "app/[locale]/blog/top-player-secrets/PageClient.humanized.tsx",
+          "line": 575
+        }
+      ]
+    },
+    {
+      "key": "blog.experience",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/multilingual-word-learning/PageClient.humanized.tsx",
+          "line": 783
+        }
+      ]
+    },
+    {
+      "key": "blog.interview",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/top-player-secrets/PageClient.humanized.tsx",
+          "line": 554
+        }
+      ]
+    },
+    {
+      "key": "blog.practice",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/top-player-secrets/PageClient.humanized.tsx",
+          "line": 658
+        }
+      ]
+    },
+    {
+      "key": "blog.readTime",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/multilingual-word-learning/PageClient.humanized.tsx",
+          "line": 808
+        },
+        {
+          "file": "app/[locale]/blog/top-player-secrets/PageClient.humanized.tsx",
+          "line": 579
+        }
+      ]
+    },
+    {
+      "key": "blog.startPlaying",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/multilingual-word-learning/PageClient.humanized.tsx",
+          "line": 879
+        }
+      ]
+    },
+    {
+      "key": "blog.tryDaily",
+      "usages": [
+        {
+          "file": "app/[locale]/blog/top-player-secrets/PageClient.humanized.tsx",
+          "line": 653
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "landing.education",
