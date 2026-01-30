@@ -256,8 +256,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'What athletes feel after a race (5 letters)',
-                        answer: 'SWEAT',
+                        prompt: 'מה משחקים בו במגרש (4 letters)',
+                        answer: 'כדור',
                         hint: 'פעילות גופנית',
                         difficulty: 'medium',
                         trending_context: 'אירועי ספורט',
@@ -325,11 +325,10 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
       "trending_context": "חדשות טכנולוגיה"
     },
     {
-      "type": "definition_match",
+      "type": "wordle_guess",
       "trend_topic": "ספורט",
-      "prompt": "התאימו את המילה",
-      "answer": "ספורט",
-      "options": ["ספורט", "משחק", "פעילות", "ריצה"],
+      "prompt": "מה משחקים בו במגרש (4 letters)",
+      "answer": "כדור",
       "hint": "פעילות גופנית",
       "difficulty": "medium",
       "trending_context": "אירועי ספורט"
@@ -351,6 +350,16 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
       "hint": "אמנית",
       "difficulty": "easy",
       "trending_context": "חדשות סלבריטאים"
+    },
+    {
+      "type": "definition_match",
+      "trend_topic": "מוסיקה",
+      "prompt": "התאימו את המילה",
+      "answer": "שיר",
+      "options": ["שיר", "משחק", "פעילות", "ריצה"],
+      "hint": "מנגינה",
+      "difficulty": "medium",
+      "trending_context": "מוסיקה בחדשות"
     },
     {
       "type": "defi`;  // Intentionally truncated mid-word
@@ -1197,8 +1206,8 @@ describe('Japanese 2-letter word validation', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: '花火大会',
-                        prompt: '夏の風物詩 (5文字)',
-                        answer: 'なつまつり', // 5-letter hiragana (summer festival)
+                        prompt: '夏の風物詩 (4文字)',
+                        answer: 'はなび', // 4-letter hiragana (fireworks)
                         hint: '夜空に咲く',
                         difficulty: 'medium',
                         trending_context: '夏の楽しみ',
@@ -1246,7 +1255,7 @@ describe('Japanese 2-letter word validation', () => {
     const answers = result.challenges.map(c => c.answer);
     expect(answers).toContain('ゆれ'); // 2-letter hiragana
     expect(answers).toContain('首都'); // 2-letter kanji (replaced 東京 to avoid spoiler)
-    expect(answers).toContain('なつまつり'); // 5-letter hiragana wordle answer
+    expect(answers).toContain('はなび'); // 4-letter hiragana wordle answer
     expect(answers).toContain('じしん'); // 3-letter hiragana (replaced 地震 to avoid spoiler)
   });
 

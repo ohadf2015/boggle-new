@@ -122,6 +122,7 @@ export function validateChallenges(
   language: string
 ): BuzzChallenge[] {
   const minLength = MIN_ANSWER_LENGTH[language] || 3;
+  const wordleLength = WORDLE_WORD_LENGTH[language] || 5;
   const rejectionReasons: Record<string, string[]> = {
     'invalid_length': [],
     'answer_spoiled': [],
@@ -133,11 +134,11 @@ export function validateChallenges(
   const validatedChallenges = challenges.filter((challenge) => {
     const answer = challenge.answer;
 
-    // Special validation for wordle_guess: must be exactly 5 letters
+    // Special validation for wordle_guess: must match language-specific length
     if (challenge.type === 'wordle_guess') {
-      if (answer.length !== WORDLE_WORD_LENGTH) {
-        rejectionReasons['invalid_length'].push(`${answer} (${answer.length} letters, need ${WORDLE_WORD_LENGTH})`);
-        console.warn(`[BUZZ] Wordle answer must be exactly ${WORDLE_WORD_LENGTH} letters: "${answer}" (${answer.length} letters)`);
+      if (answer.length !== wordleLength) {
+        rejectionReasons['invalid_length'].push(`${answer} (${answer.length} letters, need ${wordleLength})`);
+        console.warn(`[BUZZ] Wordle answer must be exactly ${wordleLength} letters for ${language}: "${answer}" (${answer.length} letters)`);
         return false;
       }
     } else {
@@ -210,10 +211,11 @@ export function validateSingleChallenge(
 ): boolean {
   const answer = challenge.answer;
   const minLength = MIN_ANSWER_LENGTH[language] || 3;
+  const wordleLength = WORDLE_WORD_LENGTH[language] || 5;
 
   if (challenge.type === 'wordle_guess') {
-    if (answer.length !== WORDLE_WORD_LENGTH) {
-      console.warn(`[BUZZ] Wordle answer must be exactly ${WORDLE_WORD_LENGTH} letters: "${answer}" (${answer.length} letters)`);
+    if (answer.length !== wordleLength) {
+      console.warn(`[BUZZ] Wordle answer must be exactly ${wordleLength} letters for ${language}: "${answer}" (${answer.length} letters)`);
       return false;
     }
   } else {

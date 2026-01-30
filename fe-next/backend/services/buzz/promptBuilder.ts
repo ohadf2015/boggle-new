@@ -36,6 +36,7 @@ import {
 } from './promptSections';
 import { selectTrendsForChallenge, extractKeywordsFromBreakdowns } from './trendsService';
 import { getPromptTemplateLoader, clearPromptTemplateCache } from './promptTemplateLoader';
+import { WORDLE_WORD_LENGTH } from './constants';
 
 /**
  * Build the improvement examples section for the AI prompt
@@ -106,9 +107,10 @@ export function buildAIPrompt(
   const languageToneGuide = getLanguageToneGuide(language);
   const languageName = getLanguageName(language);
   const nationality = getNationality(language);
+  const wordleLength = String(WORDLE_WORD_LENGTH[language] || 5);
 
   // Common template values
-  const templateValues = { language, region, date, languageName, nationality };
+  const templateValues = { language, region, date, languageName, nationality, wordleLength };
 
   // Build the prompt by composing sections
   const sections = [
@@ -229,9 +231,10 @@ export async function buildAIPromptAsync(
   const languageToneGuide = getLanguageToneGuide(language);
   const languageName = getLanguageName(language);
   const nationality = getNationality(language);
+  const wordleLength = String(WORDLE_WORD_LENGTH[language] || 5);
 
   // Common template values
-  const templateValues = { language, region, date, languageName, nationality };
+  const templateValues = { language, region, date, languageName, nationality, wordleLength };
 
   // Helper to get section with tracking
   const getSectionWithTracking = async (
@@ -263,11 +266,11 @@ export async function buildAIPromptAsync(
     getSectionWithTracking('TRENDS_CONTEXT', { trendsContext }),
     getSectionWithTracking('CREATIVE_PHILOSOPHY', {}),
     getSectionWithTracking('CHALLENGE_REQUIREMENTS', { langExamples }),
-    getSectionWithTracking('CHALLENGE_TYPES', {}),
+    getSectionWithTracking('CHALLENGE_TYPES', { wordleLength }),
     getSectionWithTracking('OUTPUT_FORMAT', templateValues),
     getSectionWithTracking('TRENDING_SUMMARY_EXAMPLES', {}),
     getSectionWithTracking('SOCIAL_MEDIA_INSTRUCTIONS', templateValues),
-    getSectionWithTracking('FINAL_CHECKLIST', templateValues),
+    getSectionWithTracking('FINAL_CHECKLIST', { wordleLength }),
   ]);
 
   // Log OUTPUT_FORMAT section for debugging

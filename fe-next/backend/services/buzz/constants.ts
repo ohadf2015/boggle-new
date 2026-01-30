@@ -32,9 +32,26 @@ export const MIN_ANSWER_LENGTH: Record<string, number> = {
 export const MAX_ANSWER_LENGTH = 15;
 
 /**
- * Wordle challenge requires exactly 5-letter words
+ * Wordle challenge word length by language
+ * English: 5 letters (standard Wordle)
+ * Hebrew: 4 letters (typical Hebrew word length)
+ * Swedish: 5 letters (like English)
+ * Japanese: 4 characters (kanji/kana compounds)
+ * Spanish: 5 letters (like English)
  */
-export const WORDLE_WORD_LENGTH = 5;
+export const WORDLE_WORD_LENGTH: Record<string, number> = {
+  en: 5,
+  he: 4,
+  sv: 5,
+  ja: 4,
+  es: 5,
+};
+
+/**
+ * @deprecated Use WORDLE_WORD_LENGTH[language] instead
+ * Kept for backward compatibility
+ */
+export const WORDLE_WORD_LENGTH_DEFAULT = 5;
 
 /**
  * Vertex AI Gemini model configuration

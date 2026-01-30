@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 2758,
+    "totalKeysInCode": 2785,
     "keyCountByLanguage": {
-      "en": 3739,
+      "en": 3785,
       "he": 3739,
       "sv": 3757,
       "ja": 3757,
       "es": 3699
     },
-    "missingFromEnglish": 9,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 4,
@@ -130,100 +130,165 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "education.header.breadcrumbs.classroomGame",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 86
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.classrooms",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 83
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.education",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 53
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.join",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 89
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.lessons",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 80
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.navigation",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 120
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.profile",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 92
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.student",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 77
-        }
-      ]
-    },
-    {
-      "key": "education.header.breadcrumbs.teacher",
-      "usages": [
-        {
-          "file": "components/education/EducationBreadcrumbs.tsx",
-          "line": 74
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
+    "he": [
+      "landing.education",
+      "landing.educationDesc",
+      "landing.educationBadge",
+      "teacher.progress.exportCSV",
+      "teacher.progress.exportSuccess",
+      "teacher.progress.noDataToExport",
+      "education.header.title",
+      "education.header.subtitle",
+      "education.header.homeLink",
+      "education.header.menu",
+      "education.header.navigation",
+      "education.header.teacherDashboard",
+      "education.header.studentDashboard",
+      "education.header.educationHome",
+      "education.header.breadcrumbs.navigation",
+      "education.header.breadcrumbs.education",
+      "education.header.breadcrumbs.teacher",
+      "education.header.breadcrumbs.student",
+      "education.header.breadcrumbs.lessons",
+      "education.header.breadcrumbs.classrooms",
+      "education.header.breadcrumbs.classroomGame",
+      "education.header.breadcrumbs.join",
+      "education.header.breadcrumbs.profile",
+      "education.classroomGame.title",
+      "education.classroomGame.shareCode",
+      "education.classroomGame.waitingForPlayers",
+      "education.classroomGame.settings",
+      "education.classroomGame.vocabularyWords",
+      "education.classroomGame.playable",
+      "education.classroomGame.noPlayableWords",
+      "education.classroomGame.startGame",
+      "education.classroomGame.starting",
+      "education.classroomGame.lessonNotFound",
+      "education.classroomGame.lessonNotFoundDesc",
+      "education.classroomGame.backToEducation",
+      "education.onboarding.step",
+      "education.onboarding.of",
+      "education.onboarding.getStarted",
+      "education.onboarding.welcome.title",
+      "education.onboarding.welcome.description",
+      "education.onboarding.classroom.title",
+      "education.onboarding.classroom.description",
+      "education.onboarding.lesson.title",
+      "education.onboarding.lesson.description",
+      "education.onboarding.invite.title",
+      "education.onboarding.invite.description"
+    ],
+    "sv": [
+      "landing.education",
+      "landing.educationDesc",
+      "landing.educationBadge",
+      "teacher.progress.exportCSV",
+      "teacher.progress.exportSuccess",
+      "teacher.progress.noDataToExport",
+      "education.header.title",
+      "education.header.subtitle",
+      "education.header.homeLink",
+      "education.header.menu",
+      "education.header.navigation",
+      "education.header.teacherDashboard",
+      "education.header.studentDashboard",
+      "education.header.educationHome",
+      "education.header.breadcrumbs.navigation",
+      "education.header.breadcrumbs.education",
+      "education.header.breadcrumbs.teacher",
+      "education.header.breadcrumbs.student",
+      "education.header.breadcrumbs.lessons",
+      "education.header.breadcrumbs.classrooms",
+      "education.header.breadcrumbs.classroomGame",
+      "education.header.breadcrumbs.join",
+      "education.header.breadcrumbs.profile",
+      "education.classroomGame.title",
+      "education.classroomGame.shareCode",
+      "education.classroomGame.waitingForPlayers",
+      "education.classroomGame.settings",
+      "education.classroomGame.vocabularyWords",
+      "education.classroomGame.playable",
+      "education.classroomGame.noPlayableWords",
+      "education.classroomGame.startGame",
+      "education.classroomGame.starting",
+      "education.classroomGame.lessonNotFound",
+      "education.classroomGame.lessonNotFoundDesc",
+      "education.classroomGame.backToEducation",
+      "education.onboarding.step",
+      "education.onboarding.of",
+      "education.onboarding.getStarted",
+      "education.onboarding.welcome.title",
+      "education.onboarding.welcome.description",
+      "education.onboarding.classroom.title",
+      "education.onboarding.classroom.description",
+      "education.onboarding.lesson.title",
+      "education.onboarding.lesson.description",
+      "education.onboarding.invite.title",
+      "education.onboarding.invite.description"
+    ],
+    "ja": [
+      "landing.education",
+      "landing.educationDesc",
+      "landing.educationBadge",
+      "teacher.progress.exportCSV",
+      "teacher.progress.exportSuccess",
+      "teacher.progress.noDataToExport",
+      "education.header.title",
+      "education.header.subtitle",
+      "education.header.homeLink",
+      "education.header.menu",
+      "education.header.navigation",
+      "education.header.teacherDashboard",
+      "education.header.studentDashboard",
+      "education.header.educationHome",
+      "education.header.breadcrumbs.navigation",
+      "education.header.breadcrumbs.education",
+      "education.header.breadcrumbs.teacher",
+      "education.header.breadcrumbs.student",
+      "education.header.breadcrumbs.lessons",
+      "education.header.breadcrumbs.classrooms",
+      "education.header.breadcrumbs.classroomGame",
+      "education.header.breadcrumbs.join",
+      "education.header.breadcrumbs.profile",
+      "education.classroomGame.title",
+      "education.classroomGame.shareCode",
+      "education.classroomGame.waitingForPlayers",
+      "education.classroomGame.settings",
+      "education.classroomGame.vocabularyWords",
+      "education.classroomGame.playable",
+      "education.classroomGame.noPlayableWords",
+      "education.classroomGame.startGame",
+      "education.classroomGame.starting",
+      "education.classroomGame.lessonNotFound",
+      "education.classroomGame.lessonNotFoundDesc",
+      "education.classroomGame.backToEducation",
+      "education.onboarding.step",
+      "education.onboarding.of",
+      "education.onboarding.getStarted",
+      "education.onboarding.welcome.title",
+      "education.onboarding.welcome.description",
+      "education.onboarding.classroom.title",
+      "education.onboarding.classroom.description",
+      "education.onboarding.lesson.title",
+      "education.onboarding.lesson.description",
+      "education.onboarding.invite.title",
+      "education.onboarding.invite.description"
+    ],
     "es": [
+      "landing.education",
+      "landing.educationDesc",
+      "landing.educationBadge",
       "teacher.lesson.definition",
       "teacher.lesson.examples",
       "teacher.lesson.contextualExamples",
       "teacher.lesson.pronounce",
       "teacher.lesson.speaking",
       "teacher.lesson.pronunciationFallback",
+      "teacher.progress.exportCSV",
+      "teacher.progress.exportSuccess",
+      "teacher.progress.noDataToExport",
       "education.lesson.definition",
       "education.lesson.examples",
       "education.lesson.contextualExamples",
@@ -237,6 +302,46 @@
       "education.lesson.swipeMode",
       "education.lesson.autoPronounce",
       "education.lesson.enrichingContent",
+      "education.header.title",
+      "education.header.subtitle",
+      "education.header.homeLink",
+      "education.header.menu",
+      "education.header.navigation",
+      "education.header.teacherDashboard",
+      "education.header.studentDashboard",
+      "education.header.educationHome",
+      "education.header.breadcrumbs.navigation",
+      "education.header.breadcrumbs.education",
+      "education.header.breadcrumbs.teacher",
+      "education.header.breadcrumbs.student",
+      "education.header.breadcrumbs.lessons",
+      "education.header.breadcrumbs.classrooms",
+      "education.header.breadcrumbs.classroomGame",
+      "education.header.breadcrumbs.join",
+      "education.header.breadcrumbs.profile",
+      "education.classroomGame.title",
+      "education.classroomGame.shareCode",
+      "education.classroomGame.waitingForPlayers",
+      "education.classroomGame.settings",
+      "education.classroomGame.vocabularyWords",
+      "education.classroomGame.playable",
+      "education.classroomGame.noPlayableWords",
+      "education.classroomGame.startGame",
+      "education.classroomGame.starting",
+      "education.classroomGame.lessonNotFound",
+      "education.classroomGame.lessonNotFoundDesc",
+      "education.classroomGame.backToEducation",
+      "education.onboarding.step",
+      "education.onboarding.of",
+      "education.onboarding.getStarted",
+      "education.onboarding.welcome.title",
+      "education.onboarding.welcome.description",
+      "education.onboarding.classroom.title",
+      "education.onboarding.classroom.description",
+      "education.onboarding.lesson.title",
+      "education.onboarding.lesson.description",
+      "education.onboarding.invite.title",
+      "education.onboarding.invite.description",
       "education.analytics.lessonEffectiveness",
       "education.analytics.avgXpGain",
       "education.analytics.completionRate",

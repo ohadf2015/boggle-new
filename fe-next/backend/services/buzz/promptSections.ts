@@ -149,12 +149,12 @@ export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER
      - Prompt: "BACK → ??? → AGE" Answer: PACK (BACKpack + PACKage) ✅
      - Prompt: "DOOR → ??? → CHILD" Answer: STEP (DOORstep + STEPchild) ✅
 
-2. **wordle_guess**: ⭐ MANDATORY - 5-letter word with clever connection to trend
-   - Format: "[Clue from an interesting angle] (5 letters)"
-   - MUST be EXACTLY 5 letters - NO EXCEPTIONS
+2. **wordle_guess**: ⭐ MANDATORY - {{wordleLength}}-letter word with clever connection to trend
+   - Format: "[Clue from an interesting angle] ({{wordleLength}} letters)"
+   - MUST be EXACTLY {{wordleLength}} letters - NO EXCEPTIONS
    - EVERY Daily Buzz MUST include exactly ONE wordle_guess
-   - Trend "Marathon" → "What winners break at the end (5 letters)" → SWEAT
-   - Trend "Concert" → "What you lose after the show (5 letters)" → VOICE
+   - Trend "Marathon" → "What winners break at the end ({{wordleLength}} letters)" → Answer must be {{wordleLength}} letters
+   - Trend "Concert" → "What you lose after the show ({{wordleLength}} letters)" → Answer must be {{wordleLength}} letters
 
 3. **trending_trio**: Three related words connected to a trend
    - Format: "Find the 3 words that connect: [CLUE about the trend]"
@@ -264,7 +264,7 @@ Generate ready-to-post content for each platform in **{{language}}**. Each post 
 export const FINAL_CHECKLIST_TEMPLATE = `## ⚠️ FINAL CHECKLIST
 
 Before outputting, verify each challenge:
-- [ ] **Wordle Required**: Is there EXACTLY ONE wordle_guess challenge with a 5-letter answer?
+- [ ] **Wordle Required**: Is there EXACTLY ONE wordle_guess challenge with a {{wordleLength}}-letter answer?
 - [ ] **Chain Format**: Does every word_chain use the format "WORD1 → ??? → WORD2"?
 - [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
 - [ ] **Common Word Test**: Would your grandma know this word?
