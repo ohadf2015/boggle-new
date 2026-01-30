@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 26 - Meta-Progression Foundation
-Plan: 8/8 (COMPLETE - Wave 3)
-Status: Phase 26 complete - All meta-progression systems integrated
-Last activity: 2026-01-30 — Completed 26-08-PLAN.md (Meta-Progression Integration)
+Plan: 9/9 (COMPLETE - Gap Closure)
+Status: Phase 26 complete - All gaps closed, 100% verification achieved
+Last activity: 2026-01-30 — Completed 26-09-PLAN.md (Gap Closure)
 
-Progress: [██████████] 100% (8/8 plans complete)
+Progress: [██████████] 100% (9/9 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,7 +77,7 @@ Progress: [██████████] 100% (8/8 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 8 (Phase 26 COMPLETE - all meta-progression systems)
+- Plans completed: 9 (Phase 26 COMPLETE - all gaps closed, 100% verification)
 - Current phase: Phase 26 complete, ready for Phase 27 (Dynamic Board Mechanics)
 
 ## Accumulated Context
@@ -163,6 +163,12 @@ Key decisions from previous milestones:
 - Level-up modal auto-dismisses: 3s timeout maintains game momentum, instant skip for reduced motion
 - Integration test pattern: Mock hooks + verify state changes + test end-to-end flows (10 scenarios, 308 lines)
 
+**Phase 26-09 (Gap Closure, 2026-01-30):**
+- Replace ScorePopupFly with juice/ScorePopup: Quadratic bezier arc trajectory vs linear keyframes for natural parabolic motion
+- Dynamic targetPosition calculation: Ensures arc trajectory accuracy across screen sizes and layouts
+- Translation-first compliance: Replaced hardcoded "XP" with t('adventure.xp.label') in all 4 languages
+- Gaming abbreviations vary by language: XP (en), נק' (he), EP (sv), 経験値 (ja) - respect cultural norms
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -188,7 +194,7 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-08-PLAN.md (Meta-Progression Integration) - Phase 26 COMPLETE
+Stopped at: Completed 26-09-PLAN.md (Gap Closure) - Phase 26 100% VERIFIED
 Resume file: None
 
 **Next action:** Begin Phase 27 (Dynamic Board Mechanics) - Candy Crush cascades, tile movement, explosions
