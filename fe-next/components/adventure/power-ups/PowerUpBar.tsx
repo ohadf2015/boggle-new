@@ -80,10 +80,19 @@ export function PowerUpBar({
 }: PowerUpBarProps) {
   const { t } = useLanguage();
 
-  // State machines for each power-up
-  const freezeTimeState = usePowerUpState('freezeTime');
-  const hintState = usePowerUpState('hint');
-  const scoreMultiplierState = usePowerUpState('scoreMultiplier');
+  // Inventory for persistence
+  const inventory = usePowerUpInventory();
+
+  // State machines for each power-up with initial cooldown from inventory
+  const freezeTimeState = usePowerUpState('freezeTime', {
+    initialCooldownTimestamp: inventory.inventory.cooldownStartedAt.freezeTime,
+  });
+  const hintState = usePowerUpState('hint', {
+    initialCooldownTimestamp: inventory.inventory.cooldownStartedAt.hint,
+  });
+  const scoreMultiplierState = usePowerUpState('scoreMultiplier', {
+    initialCooldownTimestamp: inventory.inventory.cooldownStartedAt.scoreMultiplier,
+  });
 
   // Effect activation functions
   const { activateFreezeTime, activateHint, activateScoreMultiplier } =
