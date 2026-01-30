@@ -115,6 +115,12 @@ Key decisions from previous milestones:
 - Separate adventure XP from education XP: Different progression philosophies (excitement vs learning pace)
 - Pure functions: No external state for easy testing and reusability across frontend/backend
 
+**Phase 26-02 (Gold Currency, 2026-01-30):**
+- Exponential gold growth (1.2x per level): Rewards progression without late-game inflation
+- Exponential upgrade costs (1.5x per stack): Creates strategic choices, prevents easy max-out
+- Max 5 stacks per upgrade: Clear ceiling prevents power creep, maintains balance
+- Pure functions for currency logic: No side effects, easy to test and reason about
+
 **Phase 26-03 (Screen Shake, 2026-01-30):**
 - Web Animations API over Framer Motion: Zero dependencies, better performance for simple shake
 - Transform-only animations: GPU-accelerated, no layout thrashing (verified via grep check)
@@ -146,10 +152,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-01-PLAN.md (Adventure XP Utilities)
+Stopped at: Completed 26-02-PLAN.md (Gold Currency System)
 Resume file: None
 
-**Next action:** Continue with remaining Phase 26 Wave 1 plans (26-02, 26-04) and Wave 2/3
+**Next action:** Continue with remaining Phase 26 Wave 1 plans (26-04) and Wave 2/3
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -173,4 +179,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Plan 26-03 complete: Screen shake hook with Web Animations API)*
+*Last updated: 2026-01-30 (Plan 26-02 complete: Gold currency system with stat upgrades)*
