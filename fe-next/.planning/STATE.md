@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 26 - Meta-Progression Foundation
-Plan: 6/8 (in progress - Wave 2)
-Status: Plans 26-01 through 26-05 complete (XP, gold, screen shake, XP UI, currency UI)
-Last activity: 2026-01-30 — Completed 26-05-PLAN.md (Currency Display & Upgrade Shop)
+Plan: 7/8 (in progress - Wave 3)
+Status: Plans 26-01 through 26-07 complete (XP, gold, screen shake, XP UI, currency UI, particles, HUD)
+Last activity: 2026-01-30 — Completed 26-07-PLAN.md (Adventure HUD Components)
 
-Progress: [██████░░░░] 62.5% (5/8 plans complete)
+Progress: [███████░░░] 75% (6/8 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [██████░░░░] 62.5% (5/8 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 4 (26-01 XP, 26-02 gold, 26-03 screen shake, 26-06 particles & score popups)
-- Current phase: Phase 26 in progress (Wave 2)
+- Plans completed: 6 (26-01 XP, 26-02 gold, 26-03 screen shake, 26-04 XP UI, 26-05 currency UI, 26-06 particles, 26-07 HUD)
+- Current phase: Phase 26 in progress (Wave 3)
 
 ## Accumulated Context
 
@@ -148,6 +148,13 @@ Key decisions from previous milestones:
 - Arc trajectory with quadratic bezier: Natural parabolic motion for score popups (0.8s arc, 0.3s reduced motion fade)
 - AdaptiveParticles is purely visual: No text rendering, separation from ComboTierBadge
 
+**Phase 26-07 (Adventure HUD Components, 2026-01-30):**
+- Fixed positioning at top/bottom with semi-transparent backgrounds (70% opacity): Board remains focal point
+- Radial SVG progress with depleting arc: Clockwise depletion as time progresses, space-efficient (24-48px)
+- Visual hierarchy prioritizes timer and score: Timer > Score > Objectives > XP/Gold > Cooldowns
+- Responsive design hides XP bar on small screens: Preserves critical info (level, gold, timer) on mobile
+- Board-first design principle: HUD at edges only, no center overlap, gameplay never obstructed
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -173,10 +180,10 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 26-05-PLAN.md (Currency Display & Upgrade Shop)
+Stopped at: Completed 26-07-PLAN.md (Adventure HUD Components)
 Resume file: None
 
-**Next action:** Continue with remaining Phase 26 plans (26-06 HUD UI, 26-07 Stat Upgrades, 26-08 In-Game Integration)
+**Next action:** Continue with remaining Phase 26 plans (26-08 Stat Upgrades, 26-09 In-Game Integration)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -200,4 +207,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Plan 26-02 complete: Gold currency system with stat upgrades)*
+*Last updated: 2026-01-30 (Plan 26-07 complete: Adventure HUD Components)*
