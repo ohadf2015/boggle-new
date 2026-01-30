@@ -83,13 +83,13 @@ export function usePowerUpState(type: PowerUpType): UsePowerUpStateReturn {
   useEffect(() => {
     if (state === 'cooldown') {
       uiUpdateIntervalRef.current = setInterval(updateUI, UI_UPDATE_INTERVAL);
-
-      return () => {
-        if (uiUpdateIntervalRef.current) {
-          clearInterval(uiUpdateIntervalRef.current);
-        }
-      };
     }
+
+    return () => {
+      if (uiUpdateIntervalRef.current) {
+        clearInterval(uiUpdateIntervalRef.current);
+      }
+    };
   }, [state, updateUI]);
 
   /**
