@@ -103,14 +103,17 @@ jest.mock('@/components/education/LevelUpCelebration', () => ({
 }));
 
 // Mock AdaptiveParticles component
-jest.mock('../juice/AdaptiveParticles', () => ({
-  AdaptiveParticles: ({ onComplete }: any) => {
-    React.useEffect(() => {
-      onComplete?.();
-    }, [onComplete]);
+jest.mock('../juice/AdaptiveParticles', () => {
+  const MockAdaptiveParticles = ({ onComplete }: { onComplete?: () => void }) => {
+    // Use setTimeout instead of useEffect to avoid lint errors in mock
+    if (onComplete) {
+      setTimeout(onComplete, 0);
+    }
     return <div data-testid="adaptive-particles">Particles</div>;
-  },
-}));
+  };
+  MockAdaptiveParticles.displayName = 'MockAdaptiveParticles';
+  return { AdaptiveParticles: MockAdaptiveParticles };
+});
 
 // Mock calculateAdventureXp utility
 jest.mock('@/shared/utils/adventureXpUtils', () => ({
@@ -357,15 +360,9 @@ describe('AdventureGame - Meta-Progression Integration', () => {
     });
 
     it('should fire adaptive particles on combo tier changes', async () => {
-      // Track particle render
-      let particlesRendered = false;
-      jest.requireMock('../juice/AdaptiveParticles').AdaptiveParticles = ({ onComplete }: any) => {
-        particlesRendered = true;
-        React.useEffect(() => {
-          onComplete?.();
-        }, [onComplete]);
-        return <div data-testid="adaptive-particles">Particles</div>;
-      };
+      // Track particle render via the existing mock
+      // The AdaptiveParticles mock is already set up at the top of the file
+      // and will render when combo tier changes (triggered by ComboTierBadge mock)
 
       render(
         <AdventureGame
@@ -377,8 +374,9 @@ describe('AdventureGame - Meta-Progression Integration', () => {
       );
 
       // AdaptiveParticles should render when combo tier changes (triggered by ComboTierBadge mock)
+      // The mock at the top returns a testable div
       await waitFor(() => {
-        expect(particlesRendered).toBe(true);
+        expect(screen.getByTestId('adaptive-particles')).toBeInTheDocument();
       }, { timeout: 2000 });
     });
   });
