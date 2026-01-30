@@ -29,6 +29,8 @@ interface AdventureTileProps {
   enableEffects?: boolean;
   /** Additional CSS classes */
   className?: string;
+  /** Layout ID for shared layout animations (enables tile movement) */
+  layoutId?: string;
 }
 
 // ==============================================
@@ -129,7 +131,7 @@ TimeEffects.displayName = 'TimeEffects';
 // ==============================================
 
 const AdventureTile = memo<AdventureTileProps>(
-  ({ tile, isSelected = false, enableEffects = true, className }) => {
+  ({ tile, isSelected = false, enableEffects = true, className, layoutId }) => {
     const { letter, type, isCleared, isFrozen, cascadeDelay } = tile;
     const { t } = useLanguage();
 
@@ -153,6 +155,8 @@ const AdventureTile = memo<AdventureTileProps>(
 
     return (
       <motion.div
+        layout
+        layoutId={layoutId}
         role="gridcell"
         aria-label={ariaLabel}
         aria-selected={isSelected}
@@ -227,7 +231,19 @@ const AdventureTile = memo<AdventureTileProps>(
           y: isSelected ? -3 : 0,
           rotate: isSelected ? [0, -2, 2, 0] : 0,
         }}
+        exit={{
+          scale: 0,
+          opacity: 0,
+          transition: { duration: 0.2 } // 200ms fits in REMOVING phase (250ms)
+        }}
         transition={{
+          layout: {
+            type: 'spring',
+            stiffness: 500,
+            damping: 30,
+            duration: 0.2 // 200ms fits in FALLING phase (250ms)
+          },
+          // Keep existing spring for scale/y/rotate animations
           type: 'spring',
           stiffness: 400,
           damping: 25,
