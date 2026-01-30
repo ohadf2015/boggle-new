@@ -340,3 +340,14 @@ export interface PowerUp {
   /** Effect duration in seconds (0 for instant, 30 for scoreMultiplier) */
   effectDuration: number;
 }
+
+/**
+ * Result of hint power-up effect
+ * Contains the revealed word and its tile positions on the board
+ */
+export interface HintResult {
+  /** The word revealed by the hint */
+  word: string;
+  /** Array of tile positions that form the word path */
+  tiles: Array<{ row: number; col: number }>;
+}
