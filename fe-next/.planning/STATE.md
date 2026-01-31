@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 30 - Boss Battle Overhaul
-Plan: 8 of 8 complete
+Phase: 31 - Skill Tree & Progression Depth
+Plan: 9 of 9 complete
 Status: COMPLETE ✓
-Last activity: 2026-01-31 - Completed Phase 30 (Boss Battle Overhaul)
+Last activity: 2026-02-01 - Completed Phase 31 (Skill Tree & Progression Depth)
 
-Progress: [██████████] 100% (33/33 v2.0 Phase 26-30 plans complete)
+Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [██████████] 100% (33/33 v2.0 Phase 26-30 plans co
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 34 (Phase 26: 9, Phase 27: 7, Phase 28: 8, Phase 29: 2, Phase 30: 8)
-- Current phase: Phase 30 - Boss Battle Overhaul COMPLETE (8/8 plans, 300+ tests)
+- Plans completed: 42 (Phase 26: 9, Phase 27: 7, Phase 28: 8, Phase 29: 8, Phase 30: 8, Phase 31: 9)
+- Current phase: Phase 31 - Skill Tree & Progression Depth COMPLETE (9/9 plans, verified)
 
 ## Accumulated Context
 
@@ -132,19 +132,29 @@ Last session: 2026-01-31T20:00:00Z
 Stopped at: Completed Phase 30 - Boss Battle Overhaul
 Resume file: None
 
-**Next action:** Plan Phase 31 (Skill Tree & Progression Depth)
-**Note:** All v2.0 core systems now complete (Phases 26-30)
+**Next action:** Plan Phase 32 (Visual Polish & Effects)
+**Note:** All v2.0 progression systems now complete (Phases 26-31)
 
-## Phase 30 Progress — COMPLETE ✓
+## Phase 31 Progress — COMPLETE ✓
 
-- [x] 30-01: XState 5-Phase State Machine (useBossStateMachine hook, 60 tests)
-- [x] 30-02: SegmentedHPBar and PhaseIndicator components (29 tests)
-- [x] 30-03: Attack Telegraph System (45 tests)
-- [x] 30-04: Boss Ability System (52 tests)
-- [x] 30-05: Boss Ability Definitions (24 abilities, 41 tests)
-- [x] 30-06: Boss Graphics (10 WebP images)
-- [x] 30-07: Cinematic Sequences (84 tests, Remotion-based)
-- [x] 30-08: Integration (all systems wired, verified)
+- [x] 31-01: Types, Store, Utilities foundation (TDD)
+- [x] 31-02: useSkillTreeStore Zustand persistence (TDD)
+- [x] 31-03: useSkillPoints skill point awarding (TDD)
+- [x] 31-04: SkillTreeView, SkillNode, SkillPath components
+- [x] 31-05: SkillUnlockModal celebration
+- [x] 31-06: Achievement utilities tests (TDD)
+- [x] 31-07: Achievement UI components tests
+- [x] 31-08: Skill effects utilities (TDD)
+- [x] 31-09: Integration + Gap closure (combo_amplifier wiring)
+
+**Phase 31 Delivered:**
+- 13 skills across 3 paths (Power, Strategy, Utility)
+- 85% horizontal skills (11/13 enable strategies, not stats)
+- Zustand store with localStorage persistence
+- Skill effects properly wired to gameplay (boss damage, combo bonus, power-up slots)
+- 17 achievements with Bronze/Silver/Gold/Platinum tiers
+- Achievement unlock modal with confetti
+- Achievement grid with category filters
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:

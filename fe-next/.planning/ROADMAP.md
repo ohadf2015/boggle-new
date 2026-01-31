@@ -404,21 +404,31 @@ Plans:
 - [x] 30-07-PLAN.md — Cinematic system (Wave 6)
 - [x] 30-08-PLAN.md — Integration & human verification (Wave 7)
 
-#### Phase 31: Skill Tree & Progression Depth
+#### ✅ Phase 31: Skill Tree & Progression Depth — COMPLETE
 **Goal**: Long-term progression provides meaningful horizontal choices, not just bigger numbers
 **Depends on**: Phase 26 (meta-progression), Phase 28 (unlocks power-up slots)
 **Requirements**: SKILL-01, SKILL-02, SKILL-03, SKILL-04, SKILL-05, SKILL-06, ACHIEVE-01, ACHIEVE-02, ACHIEVE-03, ACHIEVE-04
 **Success Criteria** (what must be TRUE):
-  1. User can unlock skills in branching tree (3 paths: Power, Strategy, Utility)
-  2. User earns skill points on level up and sees skill tree visualization with locked/unlocked states
-  3. Skills provide horizontal progression (enable strategies, not just +10% stats)
-  4. User unlocks power-up slots and advanced power-ups via skill progression
-  5. User earns achievements for gameplay milestones with unlock modal celebration
-  6. User can view earned achievements in profile with completion progress (Bronze/Silver/Gold/Platinum tiers)
-**Plans**: TBD
+  1. ✓ User can unlock skills in branching tree (3 paths: Power, Strategy, Utility)
+  2. ✓ User earns skill points on level up and sees skill tree visualization with locked/unlocked states
+  3. ✓ Skills provide horizontal progression (enable strategies, not just +10% stats)
+  4. ✓ User unlocks power-up slots and advanced power-ups via skill progression
+  5. ✓ User earns achievements for gameplay milestones with unlock modal celebration
+  6. ✓ User can view earned achievements in profile with completion progress (Bronze/Silver/Gold/Platinum tiers)
+  7. ✓ User notices combo damage increase after unlocking combo_amplifier skill
+**Plans**: 9 plans (01-08 + gap closure)
+**Completed**: 2026-02-01
 
 Plans:
-- [ ] 31-01: TBD during plan-phase
+- [x] 31-01-PLAN.md — Types, Store, Utilities foundation (TDD, Wave 1)
+- [x] 31-02-PLAN.md — useSkillTreeStore Zustand persistence (TDD, Wave 1)
+- [x] 31-03-PLAN.md — useSkillPoints skill point awarding (TDD, Wave 1)
+- [x] 31-04-PLAN.md — SkillTreeView, SkillNode, SkillPath components (Wave 2)
+- [x] 31-05-PLAN.md — SkillUnlockModal celebration (Wave 2)
+- [x] 31-06-PLAN.md — Achievement utilities tests (TDD, Wave 2)
+- [x] 31-07-PLAN.md — Achievement UI components tests (Wave 3)
+- [x] 31-08-PLAN.md — Skill effects utilities (TDD, Wave 3)
+- [x] 31-09-PLAN.md — Integration (Wave 4) + Gap closure (combo_amplifier wiring)
 
 #### Phase 32: Visual Polish & Effects
 **Goal**: Every action feels spectacular with layered particle effects and celebrations
@@ -515,8 +525,8 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 27. Dynamic Board Mechanics | v2.0 | 7/7 | ✅ Complete | 2026-01-30 |
 | 28. Power-Up System | v2.0 | 8/8 | ✅ Complete | 2026-01-30 |
 | 29. Adaptive Difficulty System | v2.0 | 8/8 | ✅ Complete | 2026-01-31 |
-| 30. Boss Battle Overhaul | v2.0 | 0/8 | 🚧 Planned | - |
-| 31. Skill Tree & Progression Depth | v2.0 | 0/TBD | Not started | - |
+| 30. Boss Battle Overhaul | v2.0 | 8/8 | ✅ Complete | 2026-01-31 |
+| 31. Skill Tree & Progression Depth | v2.0 | 9/9 | ✅ Complete | 2026-02-01 |
 | 32. Visual Polish & Effects | v2.0 | 0/TBD | Not started | - |
 | 33. Cinematic System | v2.0 | 0/TBD | Not started | - |
 | 34. Dynamic Difficulty Tuning | v2.0 | 0/TBD | Not started | - |
