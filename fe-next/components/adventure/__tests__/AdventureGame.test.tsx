@@ -136,6 +136,34 @@ jest.mock('@/contexts/ProgressionContext', () => ({
   }),
 }));
 
+// Mock useAdaptiveDifficulty hook
+jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+  useAdaptiveDifficulty: () => ({
+    tier: 'normal',
+    adjustedConfig: {
+      world: 1,
+      level: 1,
+      gridSize: 4,
+      timerSeconds: 120,
+      objectives: [
+        { type: 'wordCount', target: 5, isPrimary: true },
+        { type: 'scoreTarget', target: 200, isPrimary: false },
+      ],
+      specialTiles: [
+        { row: 0, col: 0, type: 'gold' },
+        { row: 2, col: 2, type: 'gold' },
+      ],
+      difficulty: 'EASY',
+      chapterNumber: 1,
+      levelInChapter: 1,
+      isBossLevel: false,
+    },
+    hintData: { level: 'none' },
+    powerUpCooldownMultiplier: 1.0,
+    recordCompletion: jest.fn(),
+  }),
+}));
+
 // Mock useAdventureHints hook
 jest.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
