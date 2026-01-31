@@ -18,7 +18,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
  */
 function renderPhaseIndicator(phase: 'phase1' | 'phase2' | 'enraged') {
   return render(
-    <LanguageProvider locale="en">
+    <LanguageProvider initialLanguage="en">
       <PhaseIndicator phase={phase} />
     </LanguageProvider>
   );

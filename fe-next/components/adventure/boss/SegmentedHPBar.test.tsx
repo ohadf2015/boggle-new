@@ -31,7 +31,7 @@ function renderHPBar({
   bossName = 'adventure.bosses.msGrammar.name',
 }: RenderProps) {
   return render(
-    <LanguageProvider locale="en">
+    <LanguageProvider initialLanguage="en">
       <SegmentedHPBar
         currentHP={currentHP}
         maxHP={maxHP}
@@ -265,7 +265,7 @@ describe('SegmentedHPBar', () => {
       expect(screen.getByText('1000 / 1000')).toBeInTheDocument();
 
       rerender(
-        <LanguageProvider locale="en">
+        <LanguageProvider initialLanguage="en">
           <SegmentedHPBar
             currentHP={500}
             maxHP={1000}
@@ -318,7 +318,7 @@ describe('SegmentedHPBar', () => {
       expect(indicator).toHaveClass('bg-neo-cyan');
 
       rerender(
-        <LanguageProvider locale="en">
+        <LanguageProvider initialLanguage="en">
           <SegmentedHPBar
             currentHP={300}
             maxHP={1000}

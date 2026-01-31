@@ -270,7 +270,8 @@ describe('CinematicPlayer', () => {
       // Find the call with matching inputProps
       const calls = Player.mock.calls;
       const matchingCall = calls.find(
-        (call: unknown[]) => call[0]?.inputProps?.testContent === 'Custom Content'
+        (call: unknown[]) => (call[0] as Record<string, unknown>)?.inputProps &&
+          ((call[0] as Record<string, Record<string, unknown>>)?.inputProps?.testContent === 'Custom Content')
       );
       expect(matchingCall).toBeTruthy();
     });
@@ -290,7 +291,7 @@ describe('CinematicPlayer', () => {
       // Find the call with matching durationInFrames
       const calls = Player.mock.calls;
       const matchingCall = calls.find(
-        (call: unknown[]) => call[0]?.durationInFrames === 300
+        (call: unknown[]) => (call[0] as Record<string, unknown>)?.durationInFrames === 300
       );
       expect(matchingCall).toBeTruthy();
     });
