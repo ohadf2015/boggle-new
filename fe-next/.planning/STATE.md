@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 30 - Boss Battle Overhaul
-Plan: 4 of 8 complete
+Plan: 5 of 8 complete
 Status: In Progress
-Last activity: 2026-01-31 — Completed 30-04-PLAN.md (Boss Ability System)
+Last activity: 2026-01-31 — Completed 30-05-PLAN.md (Boss Ability Definitions)
 
-Progress: [███████░░░] 85% (30/33 v2.0 plans complete)
+Progress: [████████░░] 88% (31/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [███████░░░] 85% (30/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 30 (Phase 26: 9 COMPLETE, Phase 27: 7 COMPLETE, Phase 28: 8 COMPLETE, Phase 29: 2 COMPLETE, Phase 30: 4 complete)
-- Current phase: Phase 30 - Boss Battle Overhaul (4/8 plans complete)
+- Plans completed: 31 (Phase 26: 9 COMPLETE, Phase 27: 7 COMPLETE, Phase 28: 8 COMPLETE, Phase 29: 2 COMPLETE, Phase 30: 5 complete)
+- Current phase: Phase 30 - Boss Battle Overhaul (5/8 plans complete)
 
 ## Accumulated Context
 
@@ -293,6 +293,15 @@ Key decisions from previous milestones:
 - Condition operators: Phase supports =, <, >, <=, >=; HP threshold supports <, <=, >, >=
 - 52 tests total (16 registry + 36 hook) with 100% coverage
 
+**Phase 30-05 (Boss Ability Definitions, 2026-01-31):**
+- 24 abilities across 10 bosses (2-3 per boss)
+- Personality-driven design: Each ability matches boss theme and twist mechanic
+- Phase-gated activation: Basic in phase1, advanced in phase2, ultimate in enraged
+- Effect types: requirement, lock_tiles, scramble, change_tiles, timer_penalty, spawn_special
+- Priority system: 10 (basic), 15 (advanced), 20-25 (ultimate)
+- Translations in all 4 languages (en, he, sv, ja)
+- 41 tests verifying structure and registration
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -317,12 +326,12 @@ None - Starting fresh milestone with roadmap complete.
 
 ## Session Continuity
 
-Last session: 2026-01-31T17:22:00Z
-Stopped at: Completed 30-04-PLAN.md (Boss Ability System)
+Last session: 2026-01-31T17:55:00Z
+Stopped at: Completed 30-05-PLAN.md (Boss Ability Definitions)
 Resume file: None
 
-**Next action:** Continue Phase 30-05 (Visual Phase Transitions)
-**Note:** Boss ability system foundation complete with registry pattern and useBossAbilities hook
+**Next action:** Continue Phase 30-06 (Boss Graphics)
+**Note:** 24 boss abilities defined with translations, ready for visual integration
 
 ## Phase 30 Progress
 
@@ -330,10 +339,10 @@ Resume file: None
 - [x] 30-02: SegmentedHPBar and PhaseIndicator components
 - [x] 30-03: Attack Telegraph System
 - [x] 30-04: Boss Ability System (52 tests)
-- [ ] 30-05: Visual Phase Transitions
-- [ ] 30-06: Ability Cooldowns UI
-- [ ] 30-07: Phase-Based Ability Escalation
-- [ ] 30-08: Integration Testing
+- [x] 30-05: Boss Ability Definitions (24 abilities, 41 tests)
+- [ ] 30-06: Boss Graphics
+- [ ] 30-07: Cinematic Sequences
+- [ ] 30-08: Integration
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -357,4 +366,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-31 (Phase 30 in progress: 4/8 plans complete - boss ability system done)*
+*Last updated: 2026-01-31 (Phase 30 in progress: 5/8 plans complete - 24 boss abilities defined)*
