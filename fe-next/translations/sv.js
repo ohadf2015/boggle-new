@@ -131,6 +131,7 @@ const sv = {
     "share": "Dela",
     "bot": "Bot",
     "minutes": "min",
+    "seconds": "sekunder",
     "advancedSettings": "Fler alternativ",
     "settings": "Inställningar",
     "tapToDismiss": "Tryck för att stänga",
@@ -174,7 +175,12 @@ const sv = {
     "clear": "Rensa",
     "player": "Spelare",
     "clearSearch": "Rensa sökning",
-    "opensInNewTab": "öppnas i ny flik"
+    "opensInNewTab": "öppnas i ny flik",
+    "aria": {
+      "levelProgress": "Nivåprogression",
+      "overallProgress": "Övergripande progression",
+      "navigation": "Navigation"
+    }
   },
   "nav": {
     "bottomNavigation": "Nedre navigering",
@@ -4145,6 +4151,16 @@ const sv = {
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",
       "enraged": "RASANDE!",
+      "phases": {
+        "phase1": "FAS 1",
+        "phase2": "FAS 2"
+      },
+      "telegraph": {
+        "incoming": "Inkommande Attack!",
+        "warning": "Akta dig!",
+        "prepare": "Förbered dig!",
+        "progress": "Attack laddas"
+      },
       "common": {
         "anagramPair": "Anagrampar hittade! Kritisk träff!",
         "requirementMet": "Krav uppfyllt!",
@@ -4387,6 +4403,7 @@ const sv = {
       "delete": "Ta bort klassrum",
       "confirmDelete": "Ta bort klassrummet? Elever förlorar tillgång.",
       "name": "Klassrumsnamn",
+      "namePlaceholder": "t.ex. Avancerad engelska",
       "joinCode": "Gå med-kod",
       "copyCode": "Kopiera kod",
       "codeCopied": "Koden kopierad!",
@@ -4398,7 +4415,24 @@ const sv = {
       "language": "Språk",
       "created": "Skapad {{date}}",
       "noClassrooms": "Inga klassrum än",
-      "createFirst": "Skapa ditt första klassrum för att börja"
+      "createFirst": "Skapa ditt första klassrum för att börja",
+      "validation": {
+        "nameRequired": "Klassrumsnamn krävs"
+      },
+      "success": {
+        "created": "Klassrum skapat!",
+        "updated": "Klassrum uppdaterat!",
+        "deleted": "Klassrum raderat!"
+      },
+      "error": {
+        "createFailed": "Kunde inte skapa klassrum",
+        "updateFailed": "Kunde inte uppdatera klassrum",
+        "deleteFailed": "Kunde inte radera klassrum"
+      },
+      "dialog": {
+        "createDescription": "Skapa ett nytt klassrum med namn och språkinställningar",
+        "editDescription": "Redigera klassrumsnamn och språkinställningar"
+      }
     },
     "classrooms": {
       "students": {
@@ -4415,7 +4449,9 @@ const sv = {
       "delete": "Ta bort lektion",
       "confirmDelete": "Ta bort lektionen? Elevframsteg försvinner.",
       "name": "Lektionsnamn",
+      "namePlaceholder": "t.ex. Djurvokabulär",
       "description": "Beskrivning (valfritt)",
+      "descriptionPlaceholder": "Valfri beskrivning",
       "words": "{{count}} ord",
       "word": "1 ord",
       "noWords": "Inga ord än",
@@ -4438,7 +4474,18 @@ const sv = {
       "contextualExamples": "I sammanhang",
       "pronounce": "Lyssna på uttal",
       "speaking": "Talar...",
-      "pronunciationFallback": "Uttal"
+      "pronunciationFallback": "Uttal",
+      "validation": {
+        "nameRequired": "Lektionsnamn krävs",
+        "wordsRequired": "Lägg till minst ett ord"
+      },
+      "error": {
+        "createFailed": "Kunde inte skapa lektion"
+      },
+      "dialog": {
+        "createDescription": "Skapa en ny vokabulärlektion med ord och definitioner"
+      },
+      "moreWords": "+{{count}} fler ord"
     },
     "lessons": {
       "assign": {
@@ -4469,7 +4516,9 @@ const sv = {
       "expandDetails": "Visa orddetaljer",
       "exportCSV": "Exportera CSV",
       "exportSuccess": "Framsteg exporterade!",
-      "noDataToExport": "Ingen data att exportera"
+      "noDataToExport": "Ingen data att exportera",
+      "noProgressYet": "Ingen elevprogression för denna lektion ännu",
+      "selectFilters": "Välj ett klassrum och en lektion för att se progression"
     },
     "stats": {
       "totalStudents": "Totalt elever",
@@ -4626,6 +4675,7 @@ const sv = {
     },
     "leaderboard": {
       "title": "Klassrumets Topplista",
+      "ariaLabel": "Klassrumtopplista som visar toppstuderande",
       "yourPosition": "Din Position",
       "youAreRank": "Du är #{rank}",
       "studentsInClass": "{count} elever",

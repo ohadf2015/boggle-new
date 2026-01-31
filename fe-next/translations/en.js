@@ -136,6 +136,7 @@ const en = {
     "share": "Share",
     "bot": "Bot",
     "minutes": "min",
+    "seconds": "seconds",
     "advancedSettings": "More Options",
     "settings": "Settings",
     "tapToDismiss": "Tap to close",
@@ -174,7 +175,12 @@ const en = {
     "clear": "Clear",
     "player": "Player",
     "clearSearch": "Clear search",
-    "opensInNewTab": "opens in new tab"
+    "opensInNewTab": "opens in new tab",
+    "aria": {
+      "levelProgress": "Level progress",
+      "overallProgress": "Overall progress",
+      "navigation": "Navigation"
+    }
   },
   "nav": {
     "bottomNavigation": "Bottom navigation",
@@ -4114,6 +4120,16 @@ const en = {
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
       "enraged": "ENRAGED!",
+      "phases": {
+        "phase1": "PHASE 1",
+        "phase2": "PHASE 2"
+      },
+      "telegraph": {
+        "incoming": "Incoming Attack!",
+        "warning": "Watch Out!",
+        "prepare": "Prepare yourself!",
+        "progress": "Attack charging"
+      },
       "common": {
         "anagramPair": "Anagram pair found! Critical hit!",
         "requirementMet": "Requirement met!",
@@ -4356,6 +4372,7 @@ const en = {
       "delete": "Delete Classroom",
       "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
       "name": "Classroom Name",
+      "namePlaceholder": "e.g., English Advanced",
       "joinCode": "Join Code",
       "copyCode": "Copy Code",
       "codeCopied": "Join code copied!",
@@ -4367,7 +4384,24 @@ const en = {
       "language": "Language",
       "created": "Created {{date}}",
       "noClassrooms": "No classrooms yet",
-      "createFirst": "Create your first classroom to get started"
+      "createFirst": "Create your first classroom to get started",
+      "validation": {
+        "nameRequired": "Classroom name is required"
+      },
+      "success": {
+        "created": "Classroom created!",
+        "updated": "Classroom updated!",
+        "deleted": "Classroom deleted!"
+      },
+      "error": {
+        "createFailed": "Failed to create classroom",
+        "updateFailed": "Failed to update classroom",
+        "deleteFailed": "Failed to delete classroom"
+      },
+      "dialog": {
+        "createDescription": "Create a new classroom with name and language settings",
+        "editDescription": "Edit classroom name and language settings"
+      }
     },
     "classrooms": {
       "students": {
@@ -4384,7 +4418,9 @@ const en = {
       "delete": "Delete Lesson",
       "confirmDelete": "Delete this lesson? Student progress will be lost.",
       "name": "Lesson Name",
+      "namePlaceholder": "e.g., Animal Vocabulary",
       "description": "Description (optional)",
+      "descriptionPlaceholder": "Optional description",
       "words": "{{count}} words",
       "word": "1 word",
       "noWords": "No words yet",
@@ -4407,7 +4443,18 @@ const en = {
       "contextualExamples": "In Context",
       "pronounce": "Listen to pronunciation",
       "speaking": "Speaking...",
-      "pronunciationFallback": "Pronunciation"
+      "pronunciationFallback": "Pronunciation",
+      "validation": {
+        "nameRequired": "Lesson name is required",
+        "wordsRequired": "Add at least one word"
+      },
+      "error": {
+        "createFailed": "Failed to create lesson"
+      },
+      "dialog": {
+        "createDescription": "Create a new vocabulary lesson with words and definitions"
+      },
+      "moreWords": "+{{count}} more words"
     },
     "lessons": {
       "assign": {
@@ -4447,6 +4494,8 @@ const en = {
       "accuracy": "Accuracy",
       "lastActive": "Last Active",
       "noData": "No progress data yet",
+      "noProgressYet": "No student progress for this lesson yet",
+      "selectFilters": "Select a classroom and lesson to view progress",
       "assignLessons": "Assign lessons to start tracking student progress",
       "chartTitle": "Class Progress Over Time",
       "wordsLearned": "Words Learned",
@@ -4611,6 +4660,7 @@ const en = {
     },
     "leaderboard": {
       "title": "Classroom Leaderboard",
+      "ariaLabel": "Classroom leaderboard showing top students",
       "yourPosition": "Your Position",
       "youAreRank": "You're #{rank}",
       "studentsInClass": "{count} students",

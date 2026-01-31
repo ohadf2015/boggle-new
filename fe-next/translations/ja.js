@@ -133,6 +133,7 @@ const ja = {
     "share": "共有",
     "bot": "ボット",
     "minutes": "分",
+    "seconds": "秒",
     "advancedSettings": "その他",
     "settings": "設定",
     "tapToDismiss": "タップで閉じる",
@@ -174,7 +175,12 @@ const ja = {
     "pts": "pt",
     "player": "プレイヤー",
     "clearSearch": "検索をクリア",
-    "opensInNewTab": "新しいタブで開きます"
+    "opensInNewTab": "新しいタブで開きます",
+    "aria": {
+      "levelProgress": "レベル進捗",
+      "overallProgress": "全体の進捗",
+      "navigation": "ナビゲーション"
+    }
   },
   "nav": {
     "bottomNavigation": "下部ナビゲーション",
@@ -4145,6 +4151,16 @@ const ja = {
       "skipIntro": "スキップ",
       "readyToFight": "いくぞ！",
       "enraged": "激怒!",
+      "phases": {
+        "phase1": "フェーズ1",
+        "phase2": "フェーズ2"
+      },
+      "telegraph": {
+        "incoming": "攻撃が来る!",
+        "warning": "気をつけて!",
+        "prepare": "準備せよ!",
+        "progress": "攻撃チャージ中"
+      },
       "common": {
         "anagramPair": "アナグラムペア発見！クリティカルヒット！",
         "requirementMet": "条件達成!",
@@ -4387,6 +4403,7 @@ const ja = {
       "delete": "クラス削除",
       "confirmDelete": "クラスを削除しますか？生徒はレッスンにアクセスできなくなります",
       "name": "クラス名",
+      "namePlaceholder": "例：上級英語",
       "joinCode": "参加コード",
       "copyCode": "コードをコピー",
       "codeCopied": "参加コードをコピーしました！",
@@ -4398,7 +4415,24 @@ const ja = {
       "language": "言語",
       "created": "{{date}}に作成",
       "noClassrooms": "まだクラスがありません",
-      "createFirst": "最初のクラスを作成しましょう"
+      "createFirst": "最初のクラスを作成しましょう",
+      "validation": {
+        "nameRequired": "クラス名が必要です"
+      },
+      "success": {
+        "created": "クラスを作成しました！",
+        "updated": "クラスを更新しました！",
+        "deleted": "クラスを削除しました！"
+      },
+      "error": {
+        "createFailed": "クラスの作成に失敗しました",
+        "updateFailed": "クラスの更新に失敗しました",
+        "deleteFailed": "クラスの削除に失敗しました"
+      },
+      "dialog": {
+        "createDescription": "名前と言語設定で新しいクラスを作成",
+        "editDescription": "クラス名と言語設定を編集"
+      }
     },
     "classrooms": {
       "students": {
@@ -4415,7 +4449,9 @@ const ja = {
       "delete": "レッスン削除",
       "confirmDelete": "レッスンを削除しますか？生徒の進捗が失われます",
       "name": "レッスン名",
+      "namePlaceholder": "例：動物の語彙",
       "description": "説明（任意）",
+      "descriptionPlaceholder": "説明（任意）",
       "words": "{{count}}単語",
       "word": "1単語",
       "noWords": "まだ単語がありません",
@@ -4438,7 +4474,18 @@ const ja = {
       "contextualExamples": "文脈での使用",
       "pronounce": "発音を聞く",
       "speaking": "再生中...",
-      "pronunciationFallback": "発音"
+      "pronunciationFallback": "発音",
+      "validation": {
+        "nameRequired": "レッスン名が必要です",
+        "wordsRequired": "少なくとも1つの単語を追加してください"
+      },
+      "error": {
+        "createFailed": "レッスンの作成に失敗しました"
+      },
+      "dialog": {
+        "createDescription": "単語と定義を含む新しい語彙レッスンを作成"
+      },
+      "moreWords": "+{{count}}個の単語"
     },
     "lessons": {
       "assign": {
@@ -4469,7 +4516,9 @@ const ja = {
       "expandDetails": "詳細を見る",
       "exportCSV": "CSVエクスポート",
       "exportSuccess": "エクスポート完了！",
-      "noDataToExport": "エクスポートするデータがありません"
+      "noDataToExport": "エクスポートするデータがありません",
+      "noProgressYet": "このレッスンの生徒の進捗はまだありません",
+      "selectFilters": "クラスとレッスンを選択して進捗を表示"
     },
     "stats": {
       "totalStudents": "生徒数",
@@ -4626,6 +4675,7 @@ const ja = {
     },
     "leaderboard": {
       "title": "クラスリーダーボード",
+      "ariaLabel": "トップ生徒を表示するクラスリーダーボード",
       "yourPosition": "あなたの順位",
       "youAreRank": "あなたは#{rank}位です",
       "studentsInClass": "{count}人の生徒",

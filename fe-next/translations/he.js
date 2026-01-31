@@ -134,6 +134,7 @@ const he = {
     "share": "שתף",
     "bot": "בוט",
     "minutes": "דק׳",
+    "seconds": "שניות",
     "advancedSettings": "עוד אפשרויות",
     "settings": "הגדרות",
     "tapToDismiss": "הקש לסגירה",
@@ -174,7 +175,12 @@ const he = {
     "clear": "נקה",
     "player": "שחקן",
     "clearSearch": "נקה חיפוש",
-    "opensInNewTab": "נפתח בלשונית חדשה"
+    "opensInNewTab": "נפתח בלשונית חדשה",
+    "aria": {
+      "levelProgress": "התקדמות ברמה",
+      "overallProgress": "התקדמות כללית",
+      "navigation": "ניווט"
+    }
   },
   "nav": {
     "bottomNavigation": "ניווט תחתון",
@@ -4120,6 +4126,16 @@ const he = {
       "skipIntro": "דלג",
       "readyToFight": "קדימה!",
       "enraged": "זועם!",
+      "phases": {
+        "phase1": "שלב 1",
+        "phase2": "שלב 2"
+      },
+      "telegraph": {
+        "incoming": "התקפה מתקרבת!",
+        "warning": "היזהר!",
+        "prepare": "התכונן!",
+        "progress": "ההתקפה נטענת"
+      },
       "common": {
         "anagramPair": "נמצא זוג אנגרמות! פגיעה קריטית!",
         "requirementMet": "דרישה התקיימה!",
@@ -4362,6 +4378,7 @@ const he = {
       "delete": "מחק כיתה",
       "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
       "name": "שם הכיתה",
+      "namePlaceholder": "לדוגמה, אנגלית מתקדמת",
       "joinCode": "קוד הצטרפות",
       "copyCode": "העתק קוד",
       "codeCopied": "הקוד הועתק!",
@@ -4373,7 +4390,24 @@ const he = {
       "language": "שפה",
       "created": "נוצר ב-{{date}}",
       "noClassrooms": "אין כיתות עדיין",
-      "createFirst": "צרו את הכיתה הראשונה שלכם"
+      "createFirst": "צרו את הכיתה הראשונה שלכם",
+      "validation": {
+        "nameRequired": "שם הכיתה נדרש"
+      },
+      "success": {
+        "created": "הכיתה נוצרה!",
+        "updated": "הכיתה עודכנה!",
+        "deleted": "הכיתה נמחקה!"
+      },
+      "error": {
+        "createFailed": "יצירת הכיתה נכשלה",
+        "updateFailed": "עדכון הכיתה נכשל",
+        "deleteFailed": "מחיקת הכיתה נכשלה"
+      },
+      "dialog": {
+        "createDescription": "צור כיתה חדשה עם שם והגדרות שפה",
+        "editDescription": "ערוך שם כיתה והגדרות שפה"
+      }
     },
     "classrooms": {
       "students": {
@@ -4390,7 +4424,9 @@ const he = {
       "delete": "מחק שיעור",
       "confirmDelete": "למחוק את השיעור? התקדמות התלמידים תאבד.",
       "name": "שם השיעור",
+      "namePlaceholder": "לדוגמה, אוצר מילים של בעלי חיים",
       "description": "תיאור (אופציונלי)",
+      "descriptionPlaceholder": "תיאור אופציונלי",
       "words": "{{count}} מילים",
       "word": "מילה אחת",
       "noWords": "אין מילים עדיין",
@@ -4413,7 +4449,18 @@ const he = {
       "contextualExamples": "בהקשר",
       "pronounce": "הקשב להגייה",
       "speaking": "מדבר...",
-      "pronunciationFallback": "הגייה"
+      "pronunciationFallback": "הגייה",
+      "validation": {
+        "nameRequired": "שם השיעור נדרש",
+        "wordsRequired": "הוסיפו לפחות מילה אחת"
+      },
+      "error": {
+        "createFailed": "יצירת השיעור נכשלה"
+      },
+      "dialog": {
+        "createDescription": "צור שיעור אוצר מילים חדש עם מילים והגדרות"
+      },
+      "moreWords": "+{{count}} מילים נוספות"
     },
     "lessons": {
       "assign": {
@@ -4438,6 +4485,8 @@ const he = {
       "accuracy": "דיוק",
       "lastActive": "פעילות אחרונה",
       "noData": "אין נתונים עדיין",
+      "noProgressYet": "אין עדיין התקדמות תלמידים לשיעור זה",
+      "selectFilters": "בחרו כיתה ושיעור לצפייה בהתקדמות",
       "assignLessons": "שייכו שיעורים כדי לעקוב אחר התקדמות",
       "chartTitle": "התקדמות הכיתה",
       "wordsLearned": "מילים שנלמדו",
@@ -4601,6 +4650,7 @@ const he = {
     },
     "leaderboard": {
       "title": "לוח מובילים כיתתי",
+      "ariaLabel": "לוח מובילים כיתתי המציג תלמידים מובילים",
       "yourPosition": "המיקום שלך",
       "youAreRank": "אתה במקום #{rank}",
       "studentsInClass": "{count} תלמידים",
