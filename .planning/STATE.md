@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 28 - Power-Up System
-Plan: 4 of 6 (PowerUpBar & Inventory COMPLETE)
-Status: Phase 28 In Progress
-Last activity: 2026-01-30 — Completed 28-04-PLAN.md (PowerUpBar Container & Inventory Persistence)
+Phase: 29 - Adaptive Difficulty System
+Plan: 1 of 5 (Hint Escalation COMPLETE)
+Status: Phase 29 In Progress
+Last activity: 2026-01-31 — Completed 29-03-PLAN.md (Hint Escalation System)
 
-Progress: [████████████░] 91% (15/16 v2.0 plans complete: Phase 26: 9/9, Phase 27: 7/7, Phase 28: 4/6)
+Progress: [████████████░] 92% (16/17 v2.0 plans complete: Phase 26: 9/9, Phase 27: 7/7, Phase 28: 4/6, Phase 29: 1/5)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -42,8 +42,9 @@ Progress: [████████████░] 91% (15/16 v2.0 plans comple
    - ✅ 28-03: Power-Up UI Components (PowerUpButton + PowerUpActivationEffect)
    - ✅ 28-04: PowerUpBar Container & Inventory Persistence
 
-4. **Phase 29: Adaptive Difficulty System** (5 reqs: DIFF)
+4. **Phase 29: Adaptive Difficulty System** (5 reqs: DIFF) 🔄 IN PROGRESS (1/5 plans)
    - Pre-game difficulty selection, invisible adjustments, gradual hints
+   - ✅ 29-03: Hint Escalation System (progressive hints based on failures)
 
 5. **Phase 30: Boss Battle Overhaul** (8 reqs: BOSS)
    - 5-phase state machine, telegraphed attacks, cinematics, unique graphics
@@ -70,12 +71,21 @@ Progress: [████████████░] 91% (15/16 v2.0 plans comple
 **v2.0 Progress:**
 - Phase 26 complete: 9/9 plans (100%)
 - Phase 27 complete: 6/6 plans (100%)
-- Phase 28 in progress: 2/7 plans (29%)
-- Total v2.0 plans complete: 17 of 70+ (24% overall)
+- Phase 28 in progress: 4/6 plans (67%)
+- Phase 29 in progress: 1/5 plans (20%)
+- Total v2.0 plans complete: 16 of 70+ (23% overall)
 
 ## Accumulated Context
 
 ### v2.0 Decisions
+
+**Phase 29-03 (Hint Escalation System, 2026-01-31):**
+- Progressive escalation thresholds: 3/4/5+ attempts create clear stages (none -> length -> lengthAndStart -> fullReveal)
+- Pure function architecture: Separated hint logic from state for testability, enables reuse across UI/backend contexts
+- i18n message keys with placeholders: difficulty.hint.[level] pattern with {length}, {letter}, {word} supports dynamic content
+- Uppercase display strings: startLetter and targetWord uppercase matches board tile aesthetics
+- Hint level resets between levels: Attempt count tracks same-level failures only (not cumulative across levels)
+- 17 tests with 100% coverage: Comprehensive TDD verification of all thresholds and hint data generation
 
 **Phase 28-04 (PowerUpBar Container & Inventory Persistence, 2026-01-30):**
 - Timestamp-based cooldown persistence: Store Date.now() in localStorage (not remaining seconds) for drift-free accuracy across tab switches/sleep
@@ -244,11 +254,11 @@ None - Starting fresh milestone with roadmap complete.
 
 ## Session Continuity
 
-Last session: 2026-01-30
-Stopped at: Completed 28-04-PLAN.md (PowerUpBar Container & Inventory Persistence)
+Last session: 2026-01-31
+Stopped at: Completed 29-03-PLAN.md (Hint Escalation System)
 Resume file: None
 
-**Next action:** Continue Phase 28 - Plans 28-05 (HUD Integration) and 28-06 (Balance Tuning) remaining
+**Next action:** Continue Phase 29 - Plans 29-04 (State Tracking) and 29-05 (UI Integration) remaining
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
