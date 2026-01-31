@@ -14,12 +14,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { POWER_UP_CONFIG, type PowerUpType, type PowerUp, type PowerUpState } from '../types/adventure';
 
-const COOLDOWN_DURATION = 60; // seconds
+const COOLDOWN_DURATION = 60; // seconds (base duration)
 const UI_UPDATE_INTERVAL = 100; // ms for smooth UI updates
 
 interface UsePowerUpStateOptions {
   /** Initial cooldown timestamp for persistence restoration */
   initialCooldownTimestamp?: number;
+  /** Cooldown multiplier for adaptive difficulty (default 1.0) */
+  cooldownMultiplier?: number;
 }
 
 interface UsePowerUpStateReturn {
@@ -35,8 +37,11 @@ export function usePowerUpState(
   type: PowerUpType,
   options: UsePowerUpStateOptions = {}
 ): UsePowerUpStateReturn {
-  const { initialCooldownTimestamp = 0 } = options;
+  const { initialCooldownTimestamp = 0, cooldownMultiplier = 1.0 } = options;
   const effectDuration = POWER_UP_CONFIG[type].effectDuration;
+
+  // Calculate effective cooldown duration with multiplier
+  const effectiveCooldown = Math.floor(COOLDOWN_DURATION * cooldownMultiplier);
 
   // Calculate initial state based on timestamp
   const getInitialState = useCallback((): PowerUpState => {
@@ -45,10 +50,10 @@ export function usePowerUpState(
     }
 
     const elapsed = (Date.now() - initialCooldownTimestamp) / 1000;
-    const remaining = Math.max(0, COOLDOWN_DURATION - elapsed);
+    const remaining = Math.max(0, effectiveCooldown - elapsed);
 
     return remaining > 0 ? 'cooldown' : 'ready';
-  }, [initialCooldownTimestamp]);
+  }, [initialCooldownTimestamp, effectiveCooldown]);
 
   const getInitialCooldown = useCallback((): number => {
     if (initialCooldownTimestamp === 0) {
@@ -56,8 +61,8 @@ export function usePowerUpState(
     }
 
     const elapsed = (Date.now() - initialCooldownTimestamp) / 1000;
-    return Math.max(0, COOLDOWN_DURATION - elapsed);
-  }, [initialCooldownTimestamp]);
+    return Math.max(0, effectiveCooldown - elapsed);
+  }, [initialCooldownTimestamp, effectiveCooldown]);
 
   // State for triggering re-renders on UI updates
   const [state, setState] = useState<PowerUpState>(getInitialState);
@@ -94,10 +99,10 @@ export function usePowerUpState(
 
     // For cooldown state, calculate from activation time + effect duration
     const totalElapsed = elapsedSeconds - effectDuration;
-    const remaining = Math.max(0, COOLDOWN_DURATION - totalElapsed);
+    const remaining = Math.max(0, effectiveCooldown - totalElapsed);
 
     return remaining;
-  }, [state, effectDuration]);
+  }, [state, effectDuration, effectiveCooldown]);
 
   /**
    * Update UI cooldown display
@@ -147,18 +152,18 @@ export function usePowerUpState(
       // Instant power-up - transition to cooldown immediately
       effectTimeoutRef.current = setTimeout(() => {
         setState('cooldown');
-        setRemainingCooldown(COOLDOWN_DURATION);
+        setRemainingCooldown(effectiveCooldown);
       }, 0);
     } else {
       // Duration-based power-up - wait for effect duration
       effectTimeoutRef.current = setTimeout(() => {
         setState('cooldown');
-        setRemainingCooldown(COOLDOWN_DURATION);
+        setRemainingCooldown(effectiveCooldown);
       }, effectDuration * 1000);
     }
 
     return true;
-  }, [state, effectDuration]);
+  }, [state, effectDuration, effectiveCooldown]);
 
   /**
    * Cleanup timeouts on unmount
@@ -179,7 +184,7 @@ export function usePowerUpState(
     type,
     state,
     remainingCooldown,
-    totalCooldown: COOLDOWN_DURATION,
+    totalCooldown: effectiveCooldown,
     activatedAt: activatedAtRef.current,
     effectDuration,
   };

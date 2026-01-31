@@ -295,6 +295,174 @@ describe('usePowerUpState - TDD Cycle', () => {
     });
   });
 
+  describe('Cooldown Multiplier (Adaptive Difficulty)', () => {
+    it('should use base cooldown with default multiplier (1.0)', () => {
+      // GIVEN
+      const { result } = renderHook(() => usePowerUpState('freezeTime'));
+
+      // WHEN
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      // THEN - 60s cooldown (60 * 1.0)
+      expect(result.current.powerUp.remainingCooldown).toBeCloseTo(60, 0);
+      expect(result.current.powerUp.totalCooldown).toBe(60);
+    });
+
+    it('should extend cooldown with multiplier 1.5 (hard tier)', () => {
+      // GIVEN - hard tier uses 1.5x multiplier
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          cooldownMultiplier: 1.5,
+        })
+      );
+
+      // WHEN
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      // THEN - 90s cooldown (60 * 1.5)
+      expect(result.current.powerUp.remainingCooldown).toBeCloseTo(90, 0);
+      expect(result.current.powerUp.totalCooldown).toBe(90);
+    });
+
+    it('should reduce cooldown with multiplier 0.5', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          cooldownMultiplier: 0.5,
+        })
+      );
+
+      // WHEN
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      // THEN - 30s cooldown (60 * 0.5)
+      expect(result.current.powerUp.remainingCooldown).toBeCloseTo(30, 0);
+      expect(result.current.powerUp.totalCooldown).toBe(30);
+    });
+
+    it('should apply multiplier to cooldown countdown', () => {
+      // GIVEN - 2x multiplier = 120s cooldown
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          cooldownMultiplier: 2.0,
+        })
+      );
+
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      // THEN - starts at 120s
+      expect(result.current.powerUp.remainingCooldown).toBeCloseTo(120, 0);
+
+      // WHEN - 30 seconds pass
+      act(() => {
+        jest.advanceTimersByTime(30000);
+      });
+
+      // THEN - should be 90s remaining
+      expect(result.current.powerUp.remainingCooldown).toBeCloseTo(90, 0);
+    });
+
+    it('should transition to ready after full multiplied cooldown', async () => {
+      // GIVEN - 0.5x multiplier = 30s cooldown
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          cooldownMultiplier: 0.5,
+        })
+      );
+
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      expect(result.current.powerUp.state).toBe('cooldown');
+
+      // WHEN - advance 30 seconds (full cooldown)
+      act(() => {
+        jest.advanceTimersByTime(30000);
+      });
+
+      // THEN - should transition to ready
+      await waitFor(() => {
+        expect(result.current.powerUp.state).toBe('ready');
+        expect(result.current.isReady).toBe(true);
+      });
+    });
+
+    it('should handle multiplier 0 (instant cooldown)', async () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          cooldownMultiplier: 0,
+        })
+      );
+
+      // WHEN
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      // THEN - should immediately be ready (0s cooldown)
+      await waitFor(() => {
+        expect(result.current.powerUp.state).toBe('ready');
+        expect(result.current.isReady).toBe(true);
+        expect(result.current.powerUp.remainingCooldown).toBe(0);
+      });
+    });
+
+    it('should floor cooldown duration to avoid fractional values', () => {
+      // GIVEN - 1.5x multiplier on 60s = 90.0s
+      const { result } = renderHook(() =>
+        usePowerUpState('freezeTime', {
+          cooldownMultiplier: 1.5,
+        })
+      );
+
+      act(() => {
+        result.current.activate();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      // THEN - totalCooldown should be integer
+      expect(result.current.powerUp.totalCooldown).toBe(90);
+      expect(Number.isInteger(result.current.powerUp.totalCooldown)).toBe(true);
+    });
+  });
+
   describe('Initial Cooldown Timestamp (Persistence Integration)', () => {
     it('should initialize with cooldown state when timestamp provided', () => {
       // GIVEN - timestamp from 30 seconds ago (active cooldown)
