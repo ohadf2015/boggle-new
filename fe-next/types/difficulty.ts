@@ -48,3 +48,20 @@ export interface LevelAttemptWithScore extends LevelAttempt {
   /** Combined performance score (0-1) calculated from weighted metrics */
   combinedScore: number;
 }
+
+// ==============================================
+// TIER ADJUSTMENTS
+// ==============================================
+
+/**
+ * Tier-based adjustments to level configuration
+ * Applied to make levels easier (easy tier) or harder (hard tier)
+ */
+export interface TierAdjustments {
+  /** Timer multiplier (1.2 for easy, 1.0 for normal, 0.85 for hard) */
+  timerMultiplier: number;
+  /** Score target multiplier (0.8 for easy, 1.0 for normal, 1.0 for hard) */
+  scoreTargetMultiplier: number;
+  /** Power-up cooldown multiplier (1.0 for easy/normal, 1.5 for hard) */
+  powerUpCooldownMultiplier: number;
+}
