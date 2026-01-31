@@ -391,10 +391,17 @@ Plans:
   5. Bosses have 2-3 unique abilities per boss registered in extensible ability system
   6. User sees unique graphics per boss (Image MCP + rembg pipeline)
   7. Boss entrance and defeat have cinematic sequences
-**Plans**: TBD
+**Plans**: 8 plans in 7 waves
 
 Plans:
-- [ ] 30-01: TBD during plan-phase
+- [ ] 30-01-PLAN.md — XState 5-phase state machine (TDD, Wave 1)
+- [ ] 30-02-PLAN.md — Segmented HP bar redesign (Wave 2)
+- [ ] 30-03-PLAN.md — Attack telegraph system (Wave 2)
+- [ ] 30-04-PLAN.md — Boss ability system foundation (TDD, Wave 3)
+- [ ] 30-05-PLAN.md — Boss abilities for 10 bosses (Wave 4)
+- [ ] 30-06-PLAN.md — Boss graphics pipeline (Wave 5)
+- [ ] 30-07-PLAN.md — Cinematic system (Wave 6)
+- [ ] 30-08-PLAN.md — Integration & human verification (Wave 7)
 
 #### Phase 31: Skill Tree & Progression Depth
 **Goal**: Long-term progression provides meaningful horizontal choices, not just bigger numbers
@@ -506,8 +513,8 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 26. Meta-Progression Foundation | v2.0 | 9/9 | ✅ Complete | 2026-01-30 |
 | 27. Dynamic Board Mechanics | v2.0 | 7/7 | ✅ Complete | 2026-01-30 |
 | 28. Power-Up System | v2.0 | 8/8 | ✅ Complete | 2026-01-30 |
-| 29. Adaptive Difficulty System | v2.0 | 0/8 | 🚧 Planned | - |
-| 30. Boss Battle Overhaul | v2.0 | 0/TBD | Not started | - |
+| 29. Adaptive Difficulty System | v2.0 | 8/8 | ✅ Complete | 2026-01-31 |
+| 30. Boss Battle Overhaul | v2.0 | 0/8 | 🚧 Planned | - |
 | 31. Skill Tree & Progression Depth | v2.0 | 0/TBD | Not started | - |
 | 32. Visual Polish & Effects | v2.0 | 0/TBD | Not started | - |
 | 33. Cinematic System | v2.0 | 0/TBD | Not started | - |
@@ -517,4 +524,4 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-31 after Phase 29 plan revision (Adaptive Difficulty System - split into 8 plans)*
+*Last updated: 2026-01-31 after Phase 30 planning complete (Boss Battle Overhaul - 8 plans in 7 waves)*
