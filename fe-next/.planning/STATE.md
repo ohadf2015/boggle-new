@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 29 - Adaptive Difficulty System
-Plan: 2 of 5 complete (Tier Assignment Logic)
+Plan: 3 of 5 complete (Config Adjuster)
 Status: In progress
-Last activity: 2026-01-31 — Completed 29-02-PLAN.md (Tier assignment with priority-based logic)
+Last activity: 2026-01-31 — Completed 29-04-PLAN.md (Config adjuster with tier-based modifications)
 
-Progress: [█████░░░░░] 61% (20/33 v2.0 plans complete)
+Progress: [█████░░░░░] 64% (21/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -259,6 +259,15 @@ Key decisions from previous milestones:
 - Reason strings for analytics: 4 distinct reasons (insufficient_data, high_failure_rate, consistent_mastery, balanced_performance)
 - Pure function design: No side effects, testable, reusable across components
 
+**Phase 29-04 (Config Adjuster, 2026-01-31):**
+- Tier-based level modifications: Easy (+20% timer, -20% score), Hard (-15% timer), Normal (unchanged)
+- Boss level exclusion: isBossLevel=true always returns unmodified config (consistent patterns for learning)
+- Selective modification: Only primary scoreTarget objectives adjusted, wordCount and secondary unchanged
+- Floor division: Math.floor() for timer/score to avoid fractional values in UI
+- Boss identification verified: Tests validate level 7 has isBossLevel=true across worlds
+- Immutability pattern: Pure function returns new config, never mutates input
+- 16 tests with 100% coverage on configAdjuster.ts
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -284,11 +293,11 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Completed 29-02-SUMMARY.md (Tier Assignment Logic) - Phase 29 2/5 plans complete
+Stopped at: Completed 29-04-SUMMARY.md (Config Adjuster) - Phase 29 3/5 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 03: Tier Adjustment Utilities)
-**Note:** Tier assignment logic complete with priority-based decision tree (easy/normal/hard)
+**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 05: Tier Adjustment Utilities)
+**Note:** Config adjuster complete with boss level exclusion verified (16 tests, 100% coverage)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
