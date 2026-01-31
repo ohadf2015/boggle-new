@@ -153,7 +153,8 @@ describe('getRecentAttempts', () => {
     world: number,
     level: number,
     combinedScore: number,
-    timestamp: string
+    timestamp: string,
+    isCompletion = true
   ): LevelAttemptWithScore => ({
     world,
     level,
@@ -162,9 +163,10 @@ describe('getRecentAttempts', () => {
     bestTimeRemaining: 30,
     objectiveProgress: {},
     attemptCount: 1,
-    consecutiveFailures: 0,
+    consecutiveFailures: isCompletion ? 0 : 1,
     firstAttemptAt: timestamp,
     lastAttemptAt: timestamp,
+    isCompletion,
     combinedScore,
   });
 

@@ -233,6 +233,9 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
     timerSeconds: 60,
     objectives: [{ type: 'scoreTarget', target: 100 }],
     specialTiles: [],
+    difficulty: 'EASY',
+    chapterNumber: 1,
+    levelInChapter: 1,
     isBossLevel: false,
     showBossIntro: false,
   };

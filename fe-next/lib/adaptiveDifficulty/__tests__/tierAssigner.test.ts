@@ -6,13 +6,29 @@
  */
 
 import { determineTier } from '../tierAssigner';
+import type { LevelAttemptWithScore } from '@/types/difficulty';
 
-// Mock type for LevelAttemptWithScore
-// Note: This may need to be imported from types/difficulty.ts when it exists
-type LevelAttemptWithScore = {
-  isCompletion: boolean;
-  combinedScore: number;
-};
+/**
+ * Helper to create minimal LevelAttemptWithScore for testing.
+ * Only isCompletion and combinedScore are used by determineTier,
+ * so we provide defaults for other required LevelAttempt fields.
+ */
+function createTestAttempt(isCompletion: boolean, combinedScore: number): LevelAttemptWithScore {
+  return {
+    world: 1,
+    level: 1,
+    bestWords: 5,
+    bestScore: 300,
+    bestTimeRemaining: 30,
+    objectiveProgress: {},
+    attemptCount: 1,
+    consecutiveFailures: isCompletion ? 0 : 1,
+    firstAttemptAt: '2024-01-01T10:00:00Z',
+    lastAttemptAt: '2024-01-01T10:00:00Z',
+    isCompletion,
+    combinedScore,
+  };
+}
 
 describe('determineTier', () => {
   describe('insufficient data cases', () => {
@@ -33,7 +49,7 @@ describe('determineTier', () => {
     test('should return normal tier for only 1 attempt', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 }
+        createTestAttempt(true, 0.9)
       ];
 
       // WHEN
@@ -49,8 +65,8 @@ describe('determineTier', () => {
     test('should return normal tier for only 2 attempts', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: true, combinedScore: 0.85 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(true, 0.85)
       ];
 
       // WHEN
@@ -68,9 +84,9 @@ describe('determineTier', () => {
     test('should downgrade when 2 out of 3 attempts failed (pattern: win, fail, fail)', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: false, combinedScore: 0.3 },
-        { isCompletion: false, combinedScore: 0.2 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(false, 0.3),
+        createTestAttempt(false, 0.2)
       ];
 
       // WHEN
@@ -86,9 +102,9 @@ describe('determineTier', () => {
     test('should downgrade when 2 out of 3 attempts failed (pattern: fail, fail, win)', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: false, combinedScore: 0.2 },
-        { isCompletion: false, combinedScore: 0.3 },
-        { isCompletion: true, combinedScore: 0.7 }
+        createTestAttempt(false, 0.2),
+        createTestAttempt(false, 0.3),
+        createTestAttempt(true, 0.7)
       ];
 
       // WHEN
@@ -104,9 +120,9 @@ describe('determineTier', () => {
     test('should downgrade when all 3 attempts failed', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: false, combinedScore: 0.1 },
-        { isCompletion: false, combinedScore: 0.2 },
-        { isCompletion: false, combinedScore: 0.15 }
+        createTestAttempt(false, 0.1),
+        createTestAttempt(false, 0.2),
+        createTestAttempt(false, 0.15)
       ];
 
       // WHEN
@@ -124,9 +140,9 @@ describe('determineTier', () => {
       // Wait, the plan says >= 2 failures triggers downgrade
       // So this should stay normal (only 1 failure)
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: false, combinedScore: 0.3 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(true, 0.9),
+        createTestAttempt(false, 0.3)
       ];
 
       // WHEN
@@ -151,9 +167,9 @@ describe('determineTier', () => {
       // This might be a typo in the plan. Let me implement the logic as stated (>= 2)
       // and create a test for 2 failures with high scores
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: false, combinedScore: 0.4 },
-        { isCompletion: false, combinedScore: 0.3 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(false, 0.4),
+        createTestAttempt(false, 0.3)
       ];
 
       // WHEN
@@ -171,9 +187,9 @@ describe('determineTier', () => {
     test('should upgrade when all 3 wins with scores > 0.8', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: true, combinedScore: 0.85 },
-        { isCompletion: true, combinedScore: 0.82 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(true, 0.85),
+        createTestAttempt(true, 0.82)
       ];
 
       // WHEN
@@ -189,9 +205,9 @@ describe('determineTier', () => {
     test('should NOT upgrade if one score is at threshold (0.8)', () => {
       // GIVEN - Plan says > 0.8, not >=
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: true, combinedScore: 0.85 },
-        { isCompletion: true, combinedScore: 0.8 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(true, 0.85),
+        createTestAttempt(true, 0.8)
       ];
 
       // WHEN
@@ -207,9 +223,9 @@ describe('determineTier', () => {
     test('should NOT upgrade if one score is below threshold (pattern from plan)', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: true, combinedScore: 0.85 },
-        { isCompletion: true, combinedScore: 0.75 }
+        createTestAttempt(true, 0.9),
+        createTestAttempt(true, 0.85),
+        createTestAttempt(true, 0.75)
       ];
 
       // WHEN
@@ -225,9 +241,9 @@ describe('determineTier', () => {
     test('should NOT upgrade if any attempt failed (even with high scores)', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.95 },
-        { isCompletion: true, combinedScore: 0.9 },
-        { isCompletion: false, combinedScore: 0.4 }
+        createTestAttempt(true, 0.95),
+        createTestAttempt(true, 0.9),
+        createTestAttempt(false, 0.4)
       ];
 
       // WHEN
@@ -246,9 +262,9 @@ describe('determineTier', () => {
     test('should stay normal with all wins but low scores', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.6 },
-        { isCompletion: true, combinedScore: 0.7 },
-        { isCompletion: true, combinedScore: 0.65 }
+        createTestAttempt(true, 0.6),
+        createTestAttempt(true, 0.7),
+        createTestAttempt(true, 0.65)
       ];
 
       // WHEN
@@ -264,9 +280,9 @@ describe('determineTier', () => {
     test('should stay normal with 1 failure and mixed scores', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.8 },
-        { isCompletion: false, combinedScore: 0.3 },
-        { isCompletion: true, combinedScore: 0.75 }
+        createTestAttempt(true, 0.8),
+        createTestAttempt(false, 0.3),
+        createTestAttempt(true, 0.75)
       ];
 
       // WHEN
@@ -282,9 +298,9 @@ describe('determineTier', () => {
     test('should stay normal with borderline mastery (exactly 0.8)', () => {
       // GIVEN
       const attempts: LevelAttemptWithScore[] = [
-        { isCompletion: true, combinedScore: 0.8 },
-        { isCompletion: true, combinedScore: 0.8 },
-        { isCompletion: true, combinedScore: 0.8 }
+        createTestAttempt(true, 0.8),
+        createTestAttempt(true, 0.8),
+        createTestAttempt(true, 0.8)
       ];
 
       // WHEN
