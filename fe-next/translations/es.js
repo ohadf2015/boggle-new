@@ -4309,6 +4309,77 @@ const es = {
           "defeat": "Gané pero... ¿me siento mal? ¿Queréis revancha? ¡Por favor decid que sí!"
         }
       }
+    },
+    "menu": {
+      "skills": "Habilidades",
+      "achievements": "Logros"
+    },
+    "skills": {
+      "title": "Árbol de Habilidades",
+      "points": "Puntos de Habilidad",
+      "paths": {
+        "power": "Poder",
+        "strategy": "Estrategia",
+        "utility": "Utilidad"
+      },
+      "locked": "Bloqueado",
+      "unlocked": "Desbloqueado",
+      "unlock": "Desbloquear",
+      "maxed": "Máximo",
+      "requires": "Requiere: {{skill}}",
+      "cost": "Costo: {{points}} puntos",
+      "power_strike": {
+        "name": "Golpe de Poder",
+        "description": "Palabras de 5+ letras hacen doble daño a jefes"
+      },
+      "critical_letters": {
+        "name": "Letras Críticas",
+        "description": "Las vocales tienen 20% de probabilidad de golpe crítico"
+      },
+      "combo_amplifier": {
+        "name": "Amplificador de Combo",
+        "description": "El multiplicador de combo llega a 15x en vez de 10x"
+      },
+      "boss_slayer": {
+        "name": "Cazador de Jefes",
+        "description": "+25% de daño contra todos los jefes"
+      },
+      "chain_mastery": {
+        "name": "Maestría de Cadena",
+        "description": "Temporizador de combo extendido 2 segundos"
+      },
+      "ice_breaker": {
+        "name": "Rompehielos",
+        "description": "Las fichas de hielo se rompen en un golpe en vez de dos"
+      },
+      "cascade_expert": {
+        "name": "Experto en Cascada",
+        "description": "Las cascadas de fichas generan puntos extra"
+      },
+      "tile_transmute": {
+        "name": "Transmutar Fichas",
+        "description": "5% de probabilidad de convertir fichas en oro después de palabras"
+      },
+      "quick_charge": {
+        "name": "Carga Rápida",
+        "description": "Los poderes especiales se recargan 25% más rápido"
+      },
+      "power_slot_2": {
+        "name": "Ranura de Poder II",
+        "description": "Desbloquea la segunda ranura de poder especial"
+      },
+      "extended_hints": {
+        "name": "Pistas Extendidas",
+        "description": "+2 pistas por nivel"
+      },
+      "power_slot_3": {
+        "name": "Ranura de Poder III",
+        "description": "Desbloquea la tercera ranura de poder especial"
+      },
+      "advanced_multiplier": {
+        "name": "Multiplicador Avanzado",
+        "description": "Todos los multiplicadores de puntuación aumentan 10%"
+      }
     }
   },
   "student": {

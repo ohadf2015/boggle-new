@@ -4562,7 +4562,59 @@ const he = {
       "unlock": "פתח",
       "maxed": "מקסימלי",
       "requires": "דורש: {{skill}}",
-      "cost": "עלות: {{points}} נקודות"
+      "cost": "עלות: {{points}} נקודות",
+      "power_strike": {
+        "name": "מכת עוצמה",
+        "description": "מילים עם 5+ אותיות גורמות נזק כפול לבוסים"
+      },
+      "critical_letters": {
+        "name": "אותיות קריטיות",
+        "description": "לתנועות יש 20% סיכוי לפגיעה קריטית"
+      },
+      "combo_amplifier": {
+        "name": "מגבר קומבו",
+        "description": "מכפיל הקומבו מגיע עד 15x במקום 10x"
+      },
+      "boss_slayer": {
+        "name": "צייד בוסים",
+        "description": "+25% נזק לכל קרבות הבוס"
+      },
+      "chain_mastery": {
+        "name": "שליטה בשרשראות",
+        "description": "טיימר הקומבו מוארך ב-2 שניות"
+      },
+      "ice_breaker": {
+        "name": "שובר קרח",
+        "description": "אריחי קרח נשברים במכה אחת במקום שתיים"
+      },
+      "cascade_expert": {
+        "name": "מומחה מפולות",
+        "description": "מפולות אריחים מייצרות נקודות בונוס"
+      },
+      "tile_transmute": {
+        "name": "המרת אריחים",
+        "description": "5% סיכוי להמיר אריחים לזהב אחרי מילים"
+      },
+      "quick_charge": {
+        "name": "טעינה מהירה",
+        "description": "כוחות מיוחדים נטענים 25% מהר יותר"
+      },
+      "power_slot_2": {
+        "name": "משבצת כוח II",
+        "description": "פותח משבצת כוח מיוחד שנייה"
+      },
+      "extended_hints": {
+        "name": "רמזים מורחבים",
+        "description": "+2 רמזים לכל שלב"
+      },
+      "power_slot_3": {
+        "name": "משבצת כוח III",
+        "description": "פותח משבצת כוח מיוחד שלישית"
+      },
+      "advanced_multiplier": {
+        "name": "מכפיל מתקדם",
+        "description": "כל מכפילי הניקוד מוגברים ב-10%"
+      }
     }
   },
   "student": {

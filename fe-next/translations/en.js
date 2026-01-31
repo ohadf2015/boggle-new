@@ -4556,7 +4556,59 @@ const en = {
       "unlock": "Unlock",
       "maxed": "Maxed",
       "requires": "Requires: {{skill}}",
-      "cost": "Cost: {{points}} points"
+      "cost": "Cost: {{points}} points",
+      "power_strike": {
+        "name": "Power Strike",
+        "description": "5+ letter words deal double damage to bosses"
+      },
+      "critical_letters": {
+        "name": "Critical Letters",
+        "description": "Vowels have 20% chance for critical hits"
+      },
+      "combo_amplifier": {
+        "name": "Combo Amplifier",
+        "description": "Combo multiplier caps at 15x instead of 10x"
+      },
+      "boss_slayer": {
+        "name": "Boss Slayer",
+        "description": "+25% damage to all boss encounters"
+      },
+      "chain_mastery": {
+        "name": "Chain Mastery",
+        "description": "Combo timer extended by 2 seconds"
+      },
+      "ice_breaker": {
+        "name": "Ice Breaker",
+        "description": "Ice tiles break in one hit instead of two"
+      },
+      "cascade_expert": {
+        "name": "Cascade Expert",
+        "description": "Tile cascades generate bonus points"
+      },
+      "tile_transmute": {
+        "name": "Tile Transmute",
+        "description": "5% chance to convert tiles to gold after words"
+      },
+      "quick_charge": {
+        "name": "Quick Charge",
+        "description": "Power-ups recharge 25% faster"
+      },
+      "power_slot_2": {
+        "name": "Power Slot II",
+        "description": "Unlock second power-up slot"
+      },
+      "extended_hints": {
+        "name": "Extended Hints",
+        "description": "+2 hints per level"
+      },
+      "power_slot_3": {
+        "name": "Power Slot III",
+        "description": "Unlock third power-up slot"
+      },
+      "advanced_multiplier": {
+        "name": "Advanced Multiplier",
+        "description": "All score multipliers increased by 10%"
+      }
     }
   },
   "student": {

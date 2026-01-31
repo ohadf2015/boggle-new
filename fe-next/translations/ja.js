@@ -4587,7 +4587,59 @@ const ja = {
       "unlock": "解放",
       "maxed": "最大",
       "requires": "必要: {{skill}}",
-      "cost": "コスト: {{points}}ポイント"
+      "cost": "コスト: {{points}}ポイント",
+      "power_strike": {
+        "name": "パワーストライク",
+        "description": "5文字以上の単語がボスに2倍ダメージ"
+      },
+      "critical_letters": {
+        "name": "クリティカルレター",
+        "description": "母音に20%のクリティカルヒット確率"
+      },
+      "combo_amplifier": {
+        "name": "コンボアンプ",
+        "description": "コンボ倍率が10xではなく15xまで上昇"
+      },
+      "boss_slayer": {
+        "name": "ボススレイヤー",
+        "description": "全ボス戦で+25%ダメージ"
+      },
+      "chain_mastery": {
+        "name": "チェーンマスター",
+        "description": "コンボタイマーが2秒延長"
+      },
+      "ice_breaker": {
+        "name": "アイスブレイカー",
+        "description": "氷タイルが2回ではなく1回で砕ける"
+      },
+      "cascade_expert": {
+        "name": "カスケードエキスパート",
+        "description": "タイル連鎖がボーナスポイントを生成"
+      },
+      "tile_transmute": {
+        "name": "タイル変換",
+        "description": "単語後にタイルがゴールドに変換される5%の確率"
+      },
+      "quick_charge": {
+        "name": "クイックチャージ",
+        "description": "パワーアップが25%早く回復"
+      },
+      "power_slot_2": {
+        "name": "パワースロットII",
+        "description": "2番目のパワーアップスロットを解放"
+      },
+      "extended_hints": {
+        "name": "ヒント拡張",
+        "description": "レベルごとに+2ヒント"
+      },
+      "power_slot_3": {
+        "name": "パワースロットIII",
+        "description": "3番目のパワーアップスロットを解放"
+      },
+      "advanced_multiplier": {
+        "name": "アドバンスド倍率",
+        "description": "全スコア倍率が10%増加"
+      }
     }
   },
   "student": {

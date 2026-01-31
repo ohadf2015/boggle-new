@@ -4587,7 +4587,59 @@ const sv = {
       "unlock": "Lås upp",
       "maxed": "Maxad",
       "requires": "Kräver: {{skill}}",
-      "cost": "Kostnad: {{points}} poäng"
+      "cost": "Kostnad: {{points}} poäng",
+      "power_strike": {
+        "name": "Kraftslag",
+        "description": "Ord med 5+ bokstäver gör dubbel skada mot bossar"
+      },
+      "critical_letters": {
+        "name": "Kritiska bokstäver",
+        "description": "Vokaler har 20% chans för kritisk träff"
+      },
+      "combo_amplifier": {
+        "name": "Komboförstärkare",
+        "description": "Kombomultiplikator maxar på 15x istället för 10x"
+      },
+      "boss_slayer": {
+        "name": "Bossdödare",
+        "description": "+25% skada mot alla bosstrider"
+      },
+      "chain_mastery": {
+        "name": "Kedjemästerskap",
+        "description": "Kombotimer förlängd med 2 sekunder"
+      },
+      "ice_breaker": {
+        "name": "Isbrytare",
+        "description": "Isbrickor bryts på ett slag istället för två"
+      },
+      "cascade_expert": {
+        "name": "Kaskadexpert",
+        "description": "Brickkaskader genererar bonuspoäng"
+      },
+      "tile_transmute": {
+        "name": "Brickförvandling",
+        "description": "5% chans att förvandla brickor till guld efter ord"
+      },
+      "quick_charge": {
+        "name": "Snabbladdning",
+        "description": "Specialkrafter laddar 25% snabbare"
+      },
+      "power_slot_2": {
+        "name": "Kraftplats II",
+        "description": "Låser upp andra specialkraftplatsen"
+      },
+      "extended_hints": {
+        "name": "Utökade tips",
+        "description": "+2 tips per nivå"
+      },
+      "power_slot_3": {
+        "name": "Kraftplats III",
+        "description": "Låser upp tredje specialkraftplatsen"
+      },
+      "advanced_multiplier": {
+        "name": "Avancerad multiplikator",
+        "description": "Alla poängmultiplikatorer ökas med 10%"
+      }
     }
   },
   "student": {
