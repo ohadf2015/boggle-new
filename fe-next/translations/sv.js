@@ -169,6 +169,7 @@ const sv = {
     "later": "Senare",
     "skip": "Hoppa",
     "done": "Klar",
+    "continue": "Fortsätt",
     "offline": "offline",
     "online": "online",
     "sending": "Skickar...",
@@ -187,6 +188,49 @@ const sv = {
     "home": "Hem",
     "brain": "Hjärna",
     "profile": "Profil"
+  },
+  "skills": {
+    "title": "Färdighetsträd",
+    "available": "Tillgängliga poäng",
+    "unlocked": "Färdighet upplåst!",
+    "paths": {
+      "power": "Kraft",
+      "strategy": "Strategi",
+      "utility": "Verktyg"
+    },
+    "powerStrike": {
+      "name": "Kraftslag"
+    },
+    "longWordMastery": {
+      "name": "Långa ord-mästerskap"
+    },
+    "devastatingBlow": {
+      "name": "Förödande slag"
+    },
+    "comboStarter": {
+      "name": "Kombostart"
+    },
+    "chainReaction": {
+      "name": "Kedjereaktion"
+    },
+    "comboMaster": {
+      "name": "Kombomästare"
+    },
+    "quickCharge": {
+      "name": "Snabbladdning"
+    },
+    "powerUpSlot": {
+      "name": "Power-up slot"
+    },
+    "hintMaster": {
+      "name": "Ledtrådsmästare"
+    },
+    "xpBoost": {
+      "name": "XP-boost"
+    },
+    "goldRush": {
+      "name": "Guldrusch"
+    }
   },
   "connection": {
     "reconnecting": "Återansluter...",
@@ -3929,6 +3973,10 @@ const sv = {
     "levels": "nivåer",
     "level": "Nivå",
     "backToMap": "Tillbaka till världskartan",
+    "menu": {
+      "skills": "Färdigheter",
+      "achievements": "Prestationer"
+    },
     "worldLabel": "Värld",
     "hiddenWord": "Dolt ord",
     "devPreview": "Utvecklingsförhandsgranskning",
@@ -4444,6 +4492,102 @@ const sv = {
           "defeat": "Jag vann men... jag mår dåligt? Vill ni ha revansch? Snälla säg ja!"
         }
       }
+    },
+    "achievements": {
+      "title": "Prestationer",
+      "earned": "intjänade",
+      "hidden": "Dold",
+      "unlocked": "Prestation upplåst!",
+      "upgraded": "Prestation uppgraderad!",
+      "categories": {
+        "gameplay": "Spelande",
+        "bosses": "Bossstrider",
+        "progression": "Framsteg",
+        "mastery": "Mästerskap"
+      },
+      "firstWord": {
+        "name": "Första stegen",
+        "desc": "Hitta ditt första ord"
+      },
+      "wordStreak5": {
+        "name": "Het serie",
+        "desc": "Bygg en 5x kombo"
+      },
+      "wordStreak10": {
+        "name": "Ostoppbar",
+        "desc": "Bygg en 10x kombo"
+      },
+      "longWord6": {
+        "name": "Ordsmed",
+        "desc": "Hitta ett ord med 6+ bokstäver"
+      },
+      "longWord8": {
+        "name": "Lingvist",
+        "desc": "Hitta ett ord med 8+ bokstäver"
+      },
+      "perfectLevel": {
+        "name": "Perfekt stjärna",
+        "desc": "Klara en nivå med 3 stjärnor"
+      },
+      "bossSlayer": {
+        "name": "Bossdräpare",
+        "desc": "Besegra en boss"
+      },
+      "bossSpeedrun": {
+        "name": "Snabbdemon",
+        "desc": "Besegra en boss med 30+ sekunder kvar"
+      },
+      "bossNoDamage": {
+        "name": "Orörd",
+        "desc": "Besegra en boss utan att missa ett ord"
+      },
+      "allBosses": {
+        "name": "Mästare",
+        "desc": "Besegra alla bossar"
+      },
+      "worldComplete": {
+        "name": "Världsresenär",
+        "desc": "Klara en värld"
+      },
+      "starCollector50": {
+        "name": "Stjärnsamlare",
+        "desc": "Samla 50 stjärnor"
+      },
+      "starCollector100": {
+        "name": "Konstellation",
+        "desc": "Samla 100 stjärnor"
+      },
+      "levelMaster": {
+        "name": "Nivåmästare",
+        "desc": "Få 3 stjärnor på 10 nivåer"
+      },
+      "skillUnlocked": {
+        "name": "Elev",
+        "desc": "Lås upp en färdighet"
+      },
+      "skillPathComplete": {
+        "name": "Specialist",
+        "desc": "Slutför en färdighetsväg"
+      },
+      "comboKing": {
+        "name": "Kombokung",
+        "desc": "Bygg en 15x kombo"
+      }
+    },
+    "skills": {
+      "title": "Färdighetsträd",
+      "points": "Färdighetspoäng",
+      "paths": {
+        "power": "Kraft",
+        "strategy": "Strategi",
+        "utility": "Verktyg"
+      },
+      "locked": "Låst",
+      "unlocked": "Upplåst",
+      "unlock": "Lås upp",
+      "maxed": "Maxad",
+      "requires": "Kräver: {{skill}}",
+      "cost": "Kostnad: {{points}} poäng"
     }
   },
   "student": {

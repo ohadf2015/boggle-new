@@ -172,6 +172,7 @@ const he = {
     "later": "אחר כך",
     "skip": "דלג",
     "done": "סיום",
+    "continue": "המשך",
     "clear": "נקה",
     "player": "שחקן",
     "clearSearch": "נקה חיפוש",
@@ -187,6 +188,49 @@ const he = {
     "home": "בית",
     "brain": "מוח",
     "profile": "פרופיל"
+  },
+  "skills": {
+    "title": "עץ כישורים",
+    "available": "נקודות זמינות",
+    "unlocked": "כישור נפתח!",
+    "paths": {
+      "power": "עוצמה",
+      "strategy": "אסטרטגיה",
+      "utility": "שירות"
+    },
+    "powerStrike": {
+      "name": "מכת עוצמה"
+    },
+    "longWordMastery": {
+      "name": "שליטה במילים ארוכות"
+    },
+    "devastatingBlow": {
+      "name": "מכה הרסנית"
+    },
+    "comboStarter": {
+      "name": "מתחיל קומבו"
+    },
+    "chainReaction": {
+      "name": "תגובת שרשרת"
+    },
+    "comboMaster": {
+      "name": "אדון הקומבו"
+    },
+    "quickCharge": {
+      "name": "טעינה מהירה"
+    },
+    "powerUpSlot": {
+      "name": "חריץ כוח"
+    },
+    "hintMaster": {
+      "name": "אדון הרמזים"
+    },
+    "xpBoost": {
+      "name": "הגברת ניסיון"
+    },
+    "goldRush": {
+      "name": "בהלת זהב"
+    }
   },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
@@ -3904,6 +3948,10 @@ const he = {
     "levels": "שלבים",
     "level": "שלב",
     "backToMap": "חזרה למפת העולם",
+    "menu": {
+      "skills": "כישורים",
+      "achievements": "הישגים"
+    },
     "worldLabel": "עולם",
     "hiddenWord": "מילה נסתרת",
     "devPreview": "תצוגה מקדימה",
@@ -4419,6 +4467,102 @@ const he = {
           "defeat": "ניצחתי אבל... אני מרגיש רע? רוצים ריוואנץ'? בבקשה תגידו כן!"
         }
       }
+    },
+    "achievements": {
+      "title": "הישגים",
+      "earned": "נצברו",
+      "hidden": "נסתר",
+      "unlocked": "הישג נפתח!",
+      "upgraded": "הישג שודרג!",
+      "categories": {
+        "gameplay": "משחק",
+        "bosses": "קרבות בוס",
+        "progression": "התקדמות",
+        "mastery": "מיומנות"
+      },
+      "firstWord": {
+        "name": "צעדים ראשונים",
+        "desc": "מצא את המילה הראשונה"
+      },
+      "wordStreak5": {
+        "name": "רצף לוהט",
+        "desc": "בנה קומבו של 5"
+      },
+      "wordStreak10": {
+        "name": "בלתי עציר",
+        "desc": "בנה קומבו של 10"
+      },
+      "longWord6": {
+        "name": "צורף מילים",
+        "desc": "מצא מילה עם 6+ אותיות"
+      },
+      "longWord8": {
+        "name": "בלשן",
+        "desc": "מצא מילה עם 8+ אותיות"
+      },
+      "perfectLevel": {
+        "name": "כוכב מושלם",
+        "desc": "סיים שלב עם 3 כוכבים"
+      },
+      "bossSlayer": {
+        "name": "צייד בוסים",
+        "desc": "נצח בוס"
+      },
+      "bossSpeedrun": {
+        "name": "שד מהירות",
+        "desc": "נצח בוס עם 30+ שניות שנותרו"
+      },
+      "bossNoDamage": {
+        "name": "בלתי ניתן לנגיעה",
+        "desc": "נצח בוס בלי לפספס מילה"
+      },
+      "allBosses": {
+        "name": "אלוף",
+        "desc": "נצח את כל הבוסים"
+      },
+      "worldComplete": {
+        "name": "מטייל עולמי",
+        "desc": "סיים עולם"
+      },
+      "starCollector50": {
+        "name": "אספן כוכבים",
+        "desc": "אסוף 50 כוכבים"
+      },
+      "starCollector100": {
+        "name": "קונסטלציה",
+        "desc": "אסוף 100 כוכבים"
+      },
+      "levelMaster": {
+        "name": "אדון השלבים",
+        "desc": "קבל 3 כוכבים ב-10 שלבים"
+      },
+      "skillUnlocked": {
+        "name": "תלמיד",
+        "desc": "פתח כישור"
+      },
+      "skillPathComplete": {
+        "name": "מומחה",
+        "desc": "השלם נתיב כישורים"
+      },
+      "comboKing": {
+        "name": "מלך הקומבו",
+        "desc": "בנה קומבו של 15"
+      }
+    },
+    "skills": {
+      "title": "עץ כישורים",
+      "points": "נקודות כישור",
+      "paths": {
+        "power": "עוצמה",
+        "strategy": "אסטרטגיה",
+        "utility": "שירות"
+      },
+      "locked": "נעול",
+      "unlocked": "פתוח",
+      "unlock": "פתח",
+      "maxed": "מקסימלי",
+      "requires": "דורש: {{skill}}",
+      "cost": "עלות: {{points}} נקודות"
     }
   },
   "student": {

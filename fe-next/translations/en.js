@@ -169,6 +169,7 @@ const en = {
     "later": "Later",
     "skip": "Skip",
     "done": "Done",
+    "continue": "Continue",
     "offline": "Offline",
     "online": "Online",
     "sending": "Sending...",
@@ -187,6 +188,49 @@ const en = {
     "home": "Home",
     "brain": "Brain",
     "profile": "Profile"
+  },
+  "skills": {
+    "title": "Skill Tree",
+    "available": "Available Points",
+    "unlocked": "Skill Unlocked!",
+    "paths": {
+      "power": "Power",
+      "strategy": "Strategy",
+      "utility": "Utility"
+    },
+    "powerStrike": {
+      "name": "Power Strike"
+    },
+    "longWordMastery": {
+      "name": "Long Word Mastery"
+    },
+    "devastatingBlow": {
+      "name": "Devastating Blow"
+    },
+    "comboStarter": {
+      "name": "Combo Starter"
+    },
+    "chainReaction": {
+      "name": "Chain Reaction"
+    },
+    "comboMaster": {
+      "name": "Combo Master"
+    },
+    "quickCharge": {
+      "name": "Quick Charge"
+    },
+    "powerUpSlot": {
+      "name": "Power-Up Slot"
+    },
+    "hintMaster": {
+      "name": "Hint Master"
+    },
+    "xpBoost": {
+      "name": "XP Boost"
+    },
+    "goldRush": {
+      "name": "Gold Rush"
+    }
   },
   "connection": {
     "reconnecting": "Getting you back in...",
@@ -3906,6 +3950,10 @@ const en = {
     "levels": "levels",
     "level": "Level",
     "backToMap": "Back to World Map",
+    "menu": {
+      "skills": "Skills",
+      "achievements": "Achievements"
+    },
     "worldLabel": "World",
     "hiddenWord": "Hidden Word",
     "devPreview": "Development Preview",
@@ -4413,6 +4461,102 @@ const en = {
           "defeat": "I won but... I feel bad? Want a rematch? Please say yes!"
         }
       }
+    },
+    "achievements": {
+      "title": "Achievements",
+      "earned": "earned",
+      "hidden": "Hidden",
+      "unlocked": "Achievement Unlocked!",
+      "upgraded": "Achievement Upgraded!",
+      "categories": {
+        "gameplay": "Gameplay",
+        "bosses": "Boss Battles",
+        "progression": "Progression",
+        "mastery": "Mastery"
+      },
+      "firstWord": {
+        "name": "First Steps",
+        "desc": "Find your first word"
+      },
+      "wordStreak5": {
+        "name": "Hot Streak",
+        "desc": "Build a 5x combo"
+      },
+      "wordStreak10": {
+        "name": "Unstoppable",
+        "desc": "Build a 10x combo"
+      },
+      "longWord6": {
+        "name": "Wordsmith",
+        "desc": "Find a 6+ letter word"
+      },
+      "longWord8": {
+        "name": "Linguist",
+        "desc": "Find an 8+ letter word"
+      },
+      "perfectLevel": {
+        "name": "Perfect Star",
+        "desc": "Complete a level with 3 stars"
+      },
+      "bossSlayer": {
+        "name": "Boss Slayer",
+        "desc": "Defeat a boss"
+      },
+      "bossSpeedrun": {
+        "name": "Speed Demon",
+        "desc": "Defeat a boss with 30+ seconds remaining"
+      },
+      "bossNoDamage": {
+        "name": "Untouchable",
+        "desc": "Defeat a boss without missing a word"
+      },
+      "allBosses": {
+        "name": "Champion",
+        "desc": "Defeat all bosses"
+      },
+      "worldComplete": {
+        "name": "World Traveler",
+        "desc": "Complete a world"
+      },
+      "starCollector50": {
+        "name": "Star Collector",
+        "desc": "Collect 50 stars"
+      },
+      "starCollector100": {
+        "name": "Constellation",
+        "desc": "Collect 100 stars"
+      },
+      "levelMaster": {
+        "name": "Level Master",
+        "desc": "Get 3 stars on 10 levels"
+      },
+      "skillUnlocked": {
+        "name": "Student",
+        "desc": "Unlock a skill"
+      },
+      "skillPathComplete": {
+        "name": "Specialist",
+        "desc": "Complete a skill path"
+      },
+      "comboKing": {
+        "name": "Combo King",
+        "desc": "Build a 15x combo"
+      }
+    },
+    "skills": {
+      "title": "Skill Tree",
+      "points": "Skill Points",
+      "paths": {
+        "power": "Power",
+        "strategy": "Strategy",
+        "utility": "Utility"
+      },
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "unlock": "Unlock",
+      "maxed": "Maxed",
+      "requires": "Requires: {{skill}}",
+      "cost": "Cost: {{points}} points"
     }
   },
   "student": {

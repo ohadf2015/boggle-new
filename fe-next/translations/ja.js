@@ -171,6 +171,7 @@ const ja = {
     "later": "後で",
     "skip": "スキップ",
     "done": "完了",
+    "continue": "続ける",
     "clear": "クリア",
     "pts": "pt",
     "player": "プレイヤー",
@@ -187,6 +188,49 @@ const ja = {
     "home": "ホーム",
     "brain": "脳トレ",
     "profile": "プロフィール"
+  },
+  "skills": {
+    "title": "スキルツリー",
+    "available": "利用可能ポイント",
+    "unlocked": "スキル解放！",
+    "paths": {
+      "power": "パワー",
+      "strategy": "戦略",
+      "utility": "ユーティリティ"
+    },
+    "powerStrike": {
+      "name": "パワーストライク"
+    },
+    "longWordMastery": {
+      "name": "長い単語マスタリー"
+    },
+    "devastatingBlow": {
+      "name": "壊滅的な一撃"
+    },
+    "comboStarter": {
+      "name": "コンボスターター"
+    },
+    "chainReaction": {
+      "name": "連鎖反応"
+    },
+    "comboMaster": {
+      "name": "コンボマスター"
+    },
+    "quickCharge": {
+      "name": "クイックチャージ"
+    },
+    "powerUpSlot": {
+      "name": "パワーアップスロット"
+    },
+    "hintMaster": {
+      "name": "ヒントマスター"
+    },
+    "xpBoost": {
+      "name": "経験値ブースト"
+    },
+    "goldRush": {
+      "name": "ゴールドラッシュ"
+    }
   },
   "connection": {
     "reconnecting": "戻しています...",
@@ -3929,6 +3973,10 @@ const ja = {
     "levels": "レベル",
     "level": "レベル",
     "backToMap": "ワールドマップに戻る",
+    "menu": {
+      "skills": "スキル",
+      "achievements": "実績"
+    },
     "worldLabel": "ワールド",
     "hiddenWord": "隠しワード",
     "devPreview": "開発プレビュー",
@@ -4444,6 +4492,102 @@ const ja = {
           "defeat": "勝ったけど...なんか悪いな？リマッチする？お願い、うんって言って！"
         }
       }
+    },
+    "achievements": {
+      "title": "実績",
+      "earned": "獲得済み",
+      "hidden": "非公開",
+      "unlocked": "実績解除！",
+      "upgraded": "実績アップグレード！",
+      "categories": {
+        "gameplay": "ゲームプレイ",
+        "bosses": "ボスバトル",
+        "progression": "進行",
+        "mastery": "マスタリー"
+      },
+      "firstWord": {
+        "name": "最初の一歩",
+        "desc": "最初の単語を見つける"
+      },
+      "wordStreak5": {
+        "name": "ホットストリーク",
+        "desc": "5倍コンボを達成"
+      },
+      "wordStreak10": {
+        "name": "止められない",
+        "desc": "10倍コンボを達成"
+      },
+      "longWord6": {
+        "name": "言葉職人",
+        "desc": "6文字以上の単語を見つける"
+      },
+      "longWord8": {
+        "name": "言語学者",
+        "desc": "8文字以上の単語を見つける"
+      },
+      "perfectLevel": {
+        "name": "パーフェクトスター",
+        "desc": "レベルを星3つでクリア"
+      },
+      "bossSlayer": {
+        "name": "ボススレイヤー",
+        "desc": "ボスを倒す"
+      },
+      "bossSpeedrun": {
+        "name": "スピードデーモン",
+        "desc": "30秒以上残してボスを倒す"
+      },
+      "bossNoDamage": {
+        "name": "無傷",
+        "desc": "単語を間違えずにボスを倒す"
+      },
+      "allBosses": {
+        "name": "チャンピオン",
+        "desc": "すべてのボスを倒す"
+      },
+      "worldComplete": {
+        "name": "ワールドトラベラー",
+        "desc": "ワールドをクリア"
+      },
+      "starCollector50": {
+        "name": "スターコレクター",
+        "desc": "50個の星を集める"
+      },
+      "starCollector100": {
+        "name": "星座",
+        "desc": "100個の星を集める"
+      },
+      "levelMaster": {
+        "name": "レベルマスター",
+        "desc": "10レベルで星3つを獲得"
+      },
+      "skillUnlocked": {
+        "name": "生徒",
+        "desc": "スキルを解放"
+      },
+      "skillPathComplete": {
+        "name": "スペシャリスト",
+        "desc": "スキルパスを完了"
+      },
+      "comboKing": {
+        "name": "コンボキング",
+        "desc": "15倍コンボを達成"
+      }
+    },
+    "skills": {
+      "title": "スキルツリー",
+      "points": "スキルポイント",
+      "paths": {
+        "power": "パワー",
+        "strategy": "戦略",
+        "utility": "ユーティリティ"
+      },
+      "locked": "ロック中",
+      "unlocked": "解放済み",
+      "unlock": "解放",
+      "maxed": "最大",
+      "requires": "必要: {{skill}}",
+      "cost": "コスト: {{points}}ポイント"
     }
   },
   "student": {

@@ -22,6 +22,9 @@ import { useBossHealth } from '@/hooks/useBossHealth';
 import { registerAllAbilities } from '@/lib/adventure/abilities';
 import { useAdventureXp } from '@/hooks/useAdventureXp';
 import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
+import { useSkillPoints } from '@/hooks/useSkillPoints';
+import { useSkillEffects } from '@/hooks/useSkillEffects';
+import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
@@ -216,6 +219,21 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const { shakeRef, shake } = useScreenShake();
     const particleBudget = useParticleBudget();
+
+    // Skill point awarding on level up (SKILL-02 requirement)
+    useSkillPoints({
+      currentLevel,
+      onLevelUp: ({ pointsAwarded }) => {
+        // Skill point notification handled by LevelUpCelebration
+        console.log(`Earned ${pointsAwarded} skill point(s)!`);
+      },
+    });
+
+    // Skill effects for gameplay modifiers (SKILL-04 requirement)
+    const skillEffects = useSkillEffects();
+
+    // Adventure achievements tracking (ACHIEVE-01 requirement)
+    const { earnAchievement } = useAdventureAchievements();
 
     // Power-up inventory for persistence
     const powerUpInventory = usePowerUpInventory();
@@ -640,6 +658,16 @@ const AdventureGame = memo<AdventureGameProps>(
 
           // Trigger boss victory/defeat taunt
           triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
+
+          // Earn boss slayer achievement on victory (ACHIEVE-01 requirement)
+          if (isVictory) {
+            earnAchievement('BOSS_SLAYER');
+          }
+        }
+
+        // Perfect level achievement for 3-star completion (ACHIEVE-01 requirement)
+        if (gameState.stars === 3) {
+          earnAchievement('PERFECT_LEVEL');
         }
 
         // Record attempt (including failures) for partial progress tracking
@@ -687,6 +715,7 @@ const AdventureGame = memo<AdventureGameProps>(
       endBossBattle,
       triggerBossTaunt,
       adjustedLevelConfig.timerSeconds,
+      earnAchievement,
     ]);
 
     // Helper to calculate popup start position from last selected tile
@@ -865,9 +894,14 @@ const AdventureGame = memo<AdventureGameProps>(
             const mechResult = checkBossWord(currentWord);
             scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
 
-            // Deal damage to boss
+            // Deal damage to boss with skill effects applied
             // Base damage = word score / 10 (scaled to reasonable HP pool)
-            const baseDamage = Math.floor(scoreValue / 10);
+            let baseDamage = Math.floor(scoreValue / 10);
+
+            // Apply skill effects: boss damage multiplier and long word bonus
+            baseDamage = Math.floor(baseDamage * skillEffects.bossDamageMultiplier);
+            baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(currentWord.length));
+
             const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
             const damageDealt = dealBossDamage(baseDamage, gameState.comboCount, mechanicMultiplier);
 
@@ -907,6 +941,26 @@ const AdventureGame = memo<AdventureGameProps>(
           clearCurrentHint();
           recordActivity();
 
+          // Track achievements (ACHIEVE-01 requirement)
+          // First word achievement
+          if (gameState.wordsFound.length === 0) {
+            earnAchievement('FIRST_WORD');
+          }
+          // Long word achievements
+          if (currentWord.length >= 6) {
+            earnAchievement('LONG_WORD_6');
+          }
+          if (currentWord.length >= 8) {
+            earnAchievement('LONG_WORD_8');
+          }
+          // Combo streak achievements
+          if (gameState.comboCount >= 5) {
+            earnAchievement('WORD_STREAK_5');
+          }
+          if (gameState.comboCount >= 10) {
+            earnAchievement('WORD_STREAK_10');
+          }
+
           // Reset after animation duration with proper cleanup
           wordSubmittedTimeoutRef.current = setTimeout(() => {
             setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
@@ -928,7 +982,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier, skillEffects, earnAchievement]
     );
 
     // Handle level-up modal dismiss
