@@ -102,7 +102,7 @@ This is a technique professional chess players use: looking at the entire board 
 Also, in timed games, three 3-letter words (9 letters total) often give more points than one 7-letter word that took you a long time to find.`,
       },
       {
-        title: 'Don't Get Stuck on One Word',
+        title: "Don't Get Stuck on One Word",
         content: `If you haven't found a word in 10-15 seconds, move on. The brain sometimes "locks" onto a certain pattern. Shifting focus to a different area of the board can release the block.
 
 Experienced Scrabble players call this "getting stuck in a shape"—when the brain is convinced a certain word exists and stops looking for others.`,
