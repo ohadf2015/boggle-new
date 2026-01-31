@@ -19,6 +19,7 @@ import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiRea
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { useBossHealth } from '@/hooks/useBossHealth';
+import { registerAllAbilities } from '@/lib/adventure/abilities';
 import { useAdventureXp } from '@/hooks/useAdventureXp';
 import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
@@ -227,6 +228,11 @@ const AdventureGame = memo<AdventureGameProps>(
         previousLevelRef.current = levelConfig.level;
       }
     }, [levelConfig.level, powerUpInventory]);
+
+    // Register all boss abilities on mount (required for Phase 30 integration)
+    useEffect(() => {
+      registerAllAbilities();
+    }, []);
 
     // Task 3: Level-up modal state
     // NOTE: Must be declared BEFORE any hooks that reference them (including upgradeBonuses useMemo)
@@ -1355,9 +1361,10 @@ const AdventureGame = memo<AdventureGameProps>(
           />
         )}
 
-        {/* Boss Battle Overlay (all boss UI components) */}
+        {/* Boss Battle Overlay (all boss UI components with Phase 30 integration) */}
         <BossOverlay
           boss={bossConfig}
+          maxHP={bossMaxHP}
           healthState={bossHealthState}
           currentTaunt={bossTaunt}
           showTaunt={showBossTaunt}
