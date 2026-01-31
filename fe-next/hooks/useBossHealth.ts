@@ -10,6 +10,20 @@
  * - enraged: Boss below 25% HP (mechanics intensify)
  * - victory: Player defeated boss (HP = 0)
  * - defeat: Player lost (timer expired)
+ *
+ * @deprecated This hook is deprecated in favor of `useBossStateMachine` from
+ * `@/lib/adventure/boss/useBossStateMachine`. The new state machine provides:
+ * - XState-powered state management with clear phase transitions
+ * - 3-segment HP tracking (phase1 -> phase2 -> enraged)
+ * - Built-in ability trigger integration
+ * - Attack telegraph timing
+ * - Cinematic coordination for intro/victory/defeat
+ *
+ * Migration: Replace useBossHealth with useBossStateMachine and update
+ * components to use the new state machine API. See BossOverlay.tsx for
+ * integration example.
+ *
+ * This hook will be removed in a future release.
  */
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -26,6 +40,19 @@ import type {
  * @returns Boss health state and control functions
  */
 export function useBossHealth(maxHP: number): UseBossHealthReturn {
+  // Emit deprecation warning (only once per component instance, only in development)
+  const hasWarnedRef = useRef(false);
+  useEffect(() => {
+    if (!hasWarnedRef.current && process.env.NODE_ENV === 'development') {
+      hasWarnedRef.current = true;
+      console.warn(
+        '[DEPRECATED] useBossHealth is deprecated. ' +
+          'Use useBossStateMachine from @/lib/adventure/boss/useBossStateMachine instead. ' +
+          'See BossOverlay.tsx for integration example.'
+      );
+    }
+  }, []);
+
   // State: Boss health tracking
   const [currentHP, setCurrentHP] = useState<number>(maxHP);
   const [phase, setPhase] = useState<BossPhase>('intro');
