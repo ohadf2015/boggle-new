@@ -257,15 +257,3 @@ export function getMasteryMessage(session: PracticeSessionXp): string {
   }
 }
 
-// ============================================
-// COMMONJS EXPORTS
-// ============================================
-// For backward compatibility with require()
-
-module.exports = {
-  EDUCATION_XP_CONFIG,
-  calculatePracticeXp,
-  getMasteryMessage,
-  getXpProgress,
-  getLevelFromXp,
-};

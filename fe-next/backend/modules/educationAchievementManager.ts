@@ -507,14 +507,3 @@ export function getUnlockPayload(
   };
 }
 
-// ============================================
-// COMMONJS EXPORTS
-// ============================================
-// For backward compatibility with require()
-
-module.exports = {
-  ACHIEVEMENT_DEFINITIONS,
-  checkAchievementProgress,
-  calculateNewUnlocks,
-  getUnlockPayload,
-};
