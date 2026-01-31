@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 29 - Adaptive Difficulty System
-Plan: 3 of 5 complete (Config Adjuster)
+Plan: 4 of 5 complete (Power-Up Cooldown Multiplier)
 Status: In progress
-Last activity: 2026-01-31 — Completed 29-04-PLAN.md (Config adjuster with tier-based modifications)
+Last activity: 2026-01-31 — Completed 29-06-PLAN.md (Power-up cooldown multiplier integration)
 
-Progress: [█████░░░░░] 64% (21/33 v2.0 plans complete)
+Progress: [█████░░░░░] 67% (22/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [█████░░░░░] 64% (21/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 19 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans + 3 gap closures COMPLETE, Phase 28: 8 plans COMPLETE, Phase 29: 1 plan complete)
-- Current phase: Phase 29 - Adaptive Difficulty System (1/5 plans complete)
+- Plans completed: 22 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans + 3 gap closures COMPLETE, Phase 28: 8 plans COMPLETE, Phase 29: 4 plans complete)
+- Current phase: Phase 29 - Adaptive Difficulty System (4/5 plans complete)
 
 ## Accumulated Context
 
@@ -268,6 +268,14 @@ Key decisions from previous milestones:
 - Immutability pattern: Pure function returns new config, never mutates input
 - 16 tests with 100% coverage on configAdjuster.ts
 
+**Phase 29-06 (Power-Up Cooldown Multiplier, 2026-01-31):**
+- usePowerUpState accepts cooldownMultiplier option (default 1.0 preserves existing behavior)
+- Hard tier uses 1.5x multiplier: 60s base → 90s effective cooldown
+- Math.floor applied to effectiveCooldown to prevent fractional UI values
+- All cooldown calculations use effectiveCooldown (initial state, countdown, persistence)
+- 7 new tests verify multiplier behavior (default, 1.5x, 0.5x, 2.0x, 0, fractional)
+- 28 total tests passing on usePowerUpState.ts
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -293,11 +301,11 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Completed 29-04-SUMMARY.md (Config Adjuster) - Phase 29 3/5 plans complete
+Stopped at: Completed 29-06-SUMMARY.md (Power-Up Cooldown Multiplier) - Phase 29 4/5 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 05: Tier Adjustment Utilities)
-**Note:** Config adjuster complete with boss level exclusion verified (16 tests, 100% coverage)
+**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 07: Tier Adjustment Utilities)
+**Note:** Power-up cooldown multiplier complete (28 tests, 100% coverage on usePowerUpState)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
