@@ -25,6 +25,23 @@ import {
 } from 'remotion';
 
 // ==============================================
+// SEEDED RANDOM (for pure render functions)
+// ==============================================
+
+/**
+ * Simple seeded PRNG using mulberry32 algorithm.
+ * Ensures fragments/confetti are deterministic across renders.
+ */
+function createSeededRandom(seed: number): () => number {
+  let t = seed + 0x6d2b79f5;
+  return () => {
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ==============================================
 // CONSTANTS
 // ==============================================
 
@@ -277,27 +294,29 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
     config: { damping: 15, stiffness: 100 },
   });
 
-  // Generate shatter fragments
+  // Generate shatter fragments (deterministic using seeded random)
   const fragments = useMemo(() => {
+    const rand = createSeededRandom(42); // Seed for fragments
     return Array.from({ length: 30 }, (_, i) => ({
-      x: width / 2 + (Math.random() - 0.5) * 100,
-      y: height / 2 + (Math.random() - 0.5) * 100,
-      size: 20 + Math.random() * 30,
-      rotation: (Math.PI * 2 * i) / 30 + Math.random() * 0.5,
-      color: Math.random() > 0.5 ? primaryColor : secondaryColor,
+      x: width / 2 + (rand() - 0.5) * 100,
+      y: height / 2 + (rand() - 0.5) * 100,
+      size: 20 + rand() * 30,
+      rotation: (Math.PI * 2 * i) / 30 + rand() * 0.5,
+      color: rand() > 0.5 ? primaryColor : secondaryColor,
     }));
   }, [width, height, primaryColor, secondaryColor]);
 
-  // Generate confetti particles
+  // Generate confetti particles (deterministic using seeded random)
   const confetti = useMemo(() => {
+    const rand = createSeededRandom(123); // Different seed for confetti
     const colors = [primaryColor, secondaryColor, '#FF6B35', '#FF1493', '#FFFFFF'];
     return Array.from({ length: 50 }, (_, i) => ({
-      x: Math.random() * width,
-      y: -20 - Math.random() * 200,
+      x: rand() * width,
+      y: -20 - rand() * 200,
       color: colors[i % colors.length],
-      speed: 3 + Math.random() * 3,
-      wobble: Math.random() * Math.PI * 2,
-      delay: Math.random() * 30,
+      speed: 3 + rand() * 3,
+      wobble: rand() * Math.PI * 2,
+      delay: rand() * 30,
     }));
   }, [width, primaryColor, secondaryColor]);
 

@@ -25,6 +25,23 @@ import {
 } from 'remotion';
 
 // ==============================================
+// SEEDED RANDOM (for pure render functions)
+// ==============================================
+
+/**
+ * Simple seeded PRNG using mulberry32 algorithm.
+ * Ensures particles are deterministic across renders.
+ */
+function createSeededRandom(seed: number): () => number {
+  let t = seed + 0x6d2b79f5;
+  return () => {
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ==============================================
 // CONSTANTS
 // ==============================================
 
@@ -86,15 +103,16 @@ const ParticleLayer: React.FC<ParticleLayerProps> = ({
   width,
   height,
 }) => {
-  // Generate stable particles with useMemo
+  // Generate stable particles with useMemo (deterministic using seeded random)
   const particles = useMemo(() => {
+    const rand = createSeededRandom(42); // Fixed seed for consistent particles
     return Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: Math.random() * width,
-      y: Math.random() * height,
-      size: 4 + Math.random() * 8,
-      speed: 0.5 + Math.random() * 1.5,
-      delay: Math.random() * 30,
+      x: rand() * width,
+      y: rand() * height,
+      size: 4 + rand() * 8,
+      speed: 0.5 + rand() * 1.5,
+      delay: rand() * 30,
     }));
   }, [count, width, height]);
 

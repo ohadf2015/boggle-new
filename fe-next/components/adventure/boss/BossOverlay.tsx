@@ -161,14 +161,12 @@ const BossOverlay = memo<BossOverlayProps>(
   }) => {
     const { t } = useLanguage();
 
-    // Not a boss level - render nothing
-    if (!boss) {
-      return null;
-    }
+    // ==============================================
+    // STATE MACHINE (always call hooks unconditionally)
+    // ==============================================
 
-    // ==============================================
-    // STATE MACHINE
-    // ==============================================
+    // Use a placeholder bossId when boss is null to satisfy hook rules
+    const effectiveBossId = boss?.id ?? 'placeholder';
 
     const {
       state,
@@ -184,11 +182,11 @@ const BossOverlay = memo<BossOverlayProps>(
       isDefeat,
     } = useBossStateMachine({
       maxHP,
-      bossId: boss.id,
+      bossId: effectiveBossId,
     });
 
     // ==============================================
-    // ABILITIES
+    // ABILITIES (always call hooks unconditionally)
     // ==============================================
 
     const {
@@ -199,7 +197,7 @@ const BossOverlay = memo<BossOverlayProps>(
       executeAbility,
       tickCooldowns,
       resetAbilities,
-    } = useBossAbilities(boss.id);
+    } = useBossAbilities(effectiveBossId);
 
     // ==============================================
     // ATTACK TELEGRAPH
@@ -233,8 +231,8 @@ const BossOverlay = memo<BossOverlayProps>(
     const abilityCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
-      // Only check abilities during active battle phases
-      if (!isActive) {
+      // Only check abilities during active battle phases (and only when boss exists)
+      if (!boss || !isActive) {
         if (abilityCheckIntervalRef.current) {
           clearInterval(abilityCheckIntervalRef.current);
           abilityCheckIntervalRef.current = null;
@@ -269,7 +267,7 @@ const BossOverlay = memo<BossOverlayProps>(
           clearInterval(abilityCheckIntervalRef.current);
         }
       };
-    }, [isActive, state, context, telegraphingAbility, checkActivation, startAbility, startTelegraph, tickCooldowns]);
+    }, [boss, isActive, state, context, telegraphingAbility, checkActivation, startAbility, startTelegraph, tickCooldowns]);
 
     // ==============================================
     // CINEMATIC HANDLERS
@@ -296,6 +294,15 @@ const BossOverlay = memo<BossOverlayProps>(
     const handleDefeatComplete = useCallback(() => {
       onRetry();
     }, [onRetry]);
+
+    // ==============================================
+    // EARLY RETURN (after all hooks are called)
+    // ==============================================
+
+    // Not a boss level - render nothing
+    if (!boss) {
+      return null;
+    }
 
     // ==============================================
     // LEGACY COMPATIBILITY
