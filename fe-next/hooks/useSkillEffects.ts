@@ -1,121 +1,103 @@
 /**
  * useSkillEffects Hook
  *
- * Computes active skill effects for gameplay based on unlocked skills.
- * Returns multipliers and bonuses that should be applied in AdventureGame.
- *
- * Usage:
- * ```
- * const {
- *   maxPowerUpSlots,
- *   powerUpCooldownMultiplier,
- *   comboMultiplierBonus,
- *   bossDamageMultiplier,
- *   hintDuration,
- *   getLongWordDamageMultiplier,
- * } = useSkillEffects();
- * ```
+ * Provides reactive skill effect values based on unlocked skills.
+ * Use this hook to get current skill modifiers for gameplay.
  */
 
-import { useMemo } from 'react';
-import { useSkillTreeStore, SKILL_CATALOG } from '@/stores/skillTreeStore';
-import type { SkillEffects } from '@/types/skills';
+import { useMemo, useCallback } from 'react';
+import { useSkillTreeStore } from './useSkillTreeStore';
+import {
+  getMaxPowerUpSlots,
+  getPowerUpCooldownMultiplier,
+  getComboMultiplierBonus,
+  getBossDamageMultiplier,
+  getHintDuration,
+  hasAdvancedMultiplier,
+  getLongWordDamageMultiplier,
+  getChainDurationBonus,
+} from '@/utils/skillEffects';
 
 // ==============================================
-// DEFAULT VALUES
+// TYPES
 // ==============================================
 
-const DEFAULT_EFFECTS: SkillEffects = {
-  maxPowerUpSlots: 3,
-  powerUpCooldownMultiplier: 1.0,
-  comboMultiplierBonus: 0,
-  bossDamageMultiplier: 1.0,
-  hintDuration: 5,
-  getLongWordDamageMultiplier: () => 1.0,
-  xpBonus: 1.0,
-  goldBonus: 1.0,
-};
+export interface UseSkillEffectsReturn {
+  /** Maximum power-up slots (1-3) */
+  maxPowerUpSlots: number;
+  /** Power-up cooldown multiplier (1.0 = normal, 0.833 = 10s reduction) */
+  powerUpCooldownMultiplier: number;
+  /** Combo multiplier bonus from skills */
+  comboMultiplierBonus: number;
+  /** Boss damage multiplier */
+  bossDamageMultiplier: number;
+  /** Hint display duration in ms */
+  hintDuration: number;
+  /** Whether advanced (3x) multiplier is unlocked */
+  hasAdvancedMultiplier: boolean;
+  /** Get damage multiplier for a word (based on length) */
+  getLongWordDamageMultiplier: (wordLength: number) => number;
+  /** Get chain tile duration bonus in ms */
+  getChainDurationBonus: () => number;
+}
 
 // ==============================================
 // HOOK
 // ==============================================
 
-export function useSkillEffects(): SkillEffects {
+export function useSkillEffects(): UseSkillEffectsReturn {
   const unlockedSkills = useSkillTreeStore((state) => state.unlockedSkills);
 
-  const effects = useMemo<SkillEffects>(() => {
-    // Start with defaults
-    let maxPowerUpSlots = DEFAULT_EFFECTS.maxPowerUpSlots;
-    let powerUpCooldownMultiplier = DEFAULT_EFFECTS.powerUpCooldownMultiplier;
-    let comboMultiplierBonus = DEFAULT_EFFECTS.comboMultiplierBonus;
-    let bossDamageMultiplier = DEFAULT_EFFECTS.bossDamageMultiplier;
-    let hintDuration = DEFAULT_EFFECTS.hintDuration;
-    let longWordDamageBonus = 1.0;
-    let xpBonus = DEFAULT_EFFECTS.xpBonus;
-    let goldBonus = DEFAULT_EFFECTS.goldBonus;
+  // Memoize computed values
+  const maxPowerUpSlotsValue = useMemo(
+    () => getMaxPowerUpSlots(unlockedSkills),
+    [unlockedSkills]
+  );
 
-    // Apply effects from each unlocked skill
-    for (const skillId of unlockedSkills) {
-      const skill = SKILL_CATALOG[skillId];
-      if (!skill) continue;
+  const powerUpCooldownMultiplierValue = useMemo(
+    () => getPowerUpCooldownMultiplier(unlockedSkills),
+    [unlockedSkills]
+  );
 
-      switch (skill.effectType) {
-        case 'maxPowerUpSlots':
-          // Take the highest value if multiple skills provide slots
-          maxPowerUpSlots = Math.max(maxPowerUpSlots, skill.effectValue);
-          break;
+  const comboMultiplierBonusValue = useMemo(
+    () => getComboMultiplierBonus(unlockedSkills),
+    [unlockedSkills]
+  );
 
-        case 'powerUpCooldownReduction':
-          // Multiply cooldown multipliers (0.9 * 0.85 = 0.765)
-          powerUpCooldownMultiplier *= skill.effectValue;
-          break;
+  const bossDamageMultiplierValue = useMemo(
+    () => getBossDamageMultiplier(unlockedSkills),
+    [unlockedSkills]
+  );
 
-        case 'comboMultiplierBonus':
-          // Additive bonus to combo multiplier
-          comboMultiplierBonus += skill.effectValue;
-          break;
+  const hintDurationValue = useMemo(
+    () => getHintDuration(unlockedSkills),
+    [unlockedSkills]
+  );
 
-        case 'bossDamageMultiplier':
-          // Multiply damage multipliers (1.1 * 1.25 = 1.375)
-          bossDamageMultiplier *= skill.effectValue;
-          break;
+  const hasAdvancedMultiplierValue = useMemo(
+    () => hasAdvancedMultiplier(unlockedSkills),
+    [unlockedSkills]
+  );
 
-        case 'hintDuration':
-          // Take the highest value
-          hintDuration = Math.max(hintDuration, skill.effectValue);
-          break;
+  // Callbacks for word-specific calculations
+  const getLongWordDamageMultiplierFn = useCallback(
+    (wordLength: number) => getLongWordDamageMultiplier(wordLength, unlockedSkills),
+    [unlockedSkills]
+  );
 
-        case 'longWordDamageBonus':
-          // Multiply long word bonuses
-          longWordDamageBonus *= skill.effectValue;
-          break;
+  const getChainDurationBonusFn = useCallback(
+    () => getChainDurationBonus(unlockedSkills),
+    [unlockedSkills]
+  );
 
-        case 'xpBonus':
-          // Multiply XP bonuses
-          xpBonus *= skill.effectValue;
-          break;
-
-        case 'goldBonus':
-          // Multiply gold bonuses
-          goldBonus *= skill.effectValue;
-          break;
-      }
-    }
-
-    return {
-      maxPowerUpSlots,
-      powerUpCooldownMultiplier,
-      comboMultiplierBonus,
-      bossDamageMultiplier,
-      hintDuration,
-      getLongWordDamageMultiplier: (wordLength: number) => {
-        // Apply long word bonus only for 6+ letter words
-        return wordLength >= 6 ? longWordDamageBonus : 1.0;
-      },
-      xpBonus,
-      goldBonus,
-    };
-  }, [unlockedSkills]);
-
-  return effects;
+  return {
+    maxPowerUpSlots: maxPowerUpSlotsValue,
+    powerUpCooldownMultiplier: powerUpCooldownMultiplierValue,
+    comboMultiplierBonus: comboMultiplierBonusValue,
+    bossDamageMultiplier: bossDamageMultiplierValue,
+    hintDuration: hintDurationValue,
+    hasAdvancedMultiplier: hasAdvancedMultiplierValue,
+    getLongWordDamageMultiplier: getLongWordDamageMultiplierFn,
+    getChainDurationBonus: getChainDurationBonusFn,
+  };
 }
