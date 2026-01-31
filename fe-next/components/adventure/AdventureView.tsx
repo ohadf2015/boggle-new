@@ -221,7 +221,7 @@ export default function AdventureView(): React.JSX.Element {
             0 // words count - can be expanded later
           );
         } catch (err) {
-          console.error('Failed to save progress:', err);
+          console.error('Failed to save progress:', err instanceof Error ? err.message : String(err));
         }
         // Navigate back to level grid regardless of save success
         // Use history.back() to maintain proper back button behavior

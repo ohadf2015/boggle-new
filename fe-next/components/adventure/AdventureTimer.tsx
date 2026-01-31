@@ -82,8 +82,8 @@ const AdventureTimer = memo<AdventureTimerProps>(
           'font-mono font-black',
           'transition-all duration-300',
 
-          // Size variants
-          size === 'compact' && 'timer-compact text-sm px-2 py-1',
+          // Size variants - extra small on mobile for compact
+          size === 'compact' && 'timer-compact text-xs sm:text-sm px-1.5 sm:px-2 py-0.5 sm:py-1 gap-1 sm:gap-2',
           size === 'normal' && 'text-lg',
           size === 'large' && 'timer-large text-2xl px-4 py-3',
 
@@ -112,7 +112,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
           data-testid="timer-icon"
           className={cn(
             'w-5 h-5',
-            size === 'compact' && 'w-4 h-4',
+            size === 'compact' && 'w-3 h-3 sm:w-4 sm:h-4',
             size === 'large' && 'w-6 h-6'
           )}
         />

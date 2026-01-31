@@ -410,11 +410,13 @@ const DailyChallenge: React.FC = () => {
               const checkData = await checkResponse.json();
               if (checkData.hasPlayed && checkData.result) {
                 // Player already played - reconstruct stored result from server data
+                // Pass streak from server for authenticated users (from database)
                 const serverResult = mapServerResultToStoredResult(
                   checkData.result,
                   date,
                   number,
-                  gameLanguage
+                  gameLanguage,
+                  checkData.streak?.currentStreak || 0
                 );
 
                 // Sync localStorage with server data
@@ -540,11 +542,13 @@ const DailyChallenge: React.FC = () => {
 
             if (checkData.result) {
               const number = getPuzzleNumber(date);
+              // Pass streak from server for authenticated users (from database)
               const serverResult = mapServerResultToStoredResult(
                 checkData.result,
                 date,
                 number,
-                gameLanguage
+                gameLanguage,
+                checkData.streak?.currentStreak || 0
               );
               setStoredResult(serverResult);
             }

@@ -275,12 +275,19 @@ export interface ServerWordHuntResult {
 /**
  * Maps server result data to StoredWordHuntResult format
  * Used when reconstructing local storage from server data (e.g., after localStorage clear)
+ *
+ * @param serverResult - The result data from the server
+ * @param date - The puzzle date
+ * @param puzzleNumber - The puzzle number
+ * @param language - The language code
+ * @param streakDays - Optional streak days from server (for authenticated users)
  */
 export function mapServerResultToStoredResult(
   serverResult: ServerWordHuntResult,
   date: string,
   puzzleNumber: number,
-  language: Language
+  language: Language,
+  streakDays: number = 0
 ): StoredWordHuntResult {
   const completedAt = serverResult.completedAt || new Date().toISOString();
 
@@ -301,7 +308,7 @@ export function mapServerResultToStoredResult(
       clueTokensSpent: 0,
       hintsUnlocked: 0,
       efficiencyScore: serverResult.efficiencyScore || 0,
-      streakDays: 0,
+      streakDays,
       completedAt,
     },
     completedAt,

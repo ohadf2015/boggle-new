@@ -48,7 +48,7 @@ export const NewPlayerBadge = memo<NewPlayerBadgeProps>(({
     <span
       className={cn(
         'inline-flex items-center font-black uppercase tracking-wider',
-        'bg-neo-pink text-neo-white rounded border border-neo-black/50',
+        'bg-neo-pink text-neo-black rounded border border-neo-black/50',
         sizeClasses[size],
         className
       )}

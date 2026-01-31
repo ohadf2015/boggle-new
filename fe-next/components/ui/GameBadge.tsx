@@ -77,7 +77,7 @@ export interface GameBadgeProps extends Omit<HTMLMotionProps<'span'>, 'children'
 // ==================== Variant Configurations ====================
 
 const VARIANT_STYLES: Record<GameBadgeVariant, string> = {
-  'new-player': 'bg-neo-pink text-neo-white border-neo-black/50',
+  'new-player': 'bg-neo-pink text-neo-black border-neo-black/50',
   'new-feature': 'bg-neo-lime text-neo-black border-neo-black',
   'late-joiner': 'bg-neo-pink/20 text-neo-black border-neo-black',
   'rank': 'bg-amber-400 text-neo-black border-neo-black',

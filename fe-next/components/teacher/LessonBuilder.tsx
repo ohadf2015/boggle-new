@@ -99,11 +99,11 @@ export default function LessonBuilder() {
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
-      toast.error('Lesson name is required');
+      toast.error(t('teacher.lesson.validation.nameRequired'));
       return;
     }
     if (words.length === 0) {
-      toast.error('Add at least one word');
+      toast.error(t('teacher.lesson.validation.wordsRequired'));
       return;
     }
 
@@ -130,7 +130,7 @@ export default function LessonBuilder() {
       });
       setWords([]);
     } else {
-      toast.error(result.error || 'Failed to create lesson');
+      toast.error(result.error || t('teacher.lesson.error.createFailed'));
     }
   };
 
@@ -233,7 +233,7 @@ export default function LessonBuilder() {
                     ))}
                     {lesson.words.length > 5 && (
                       <p className="text-xs text-slate-500 mt-2">
-                        +{lesson.words.length - 5} more words
+                        {t('teacher.lesson.moreWords').replace('{{count}}', String(lesson.words.length - 5))}
                       </p>
                     )}
                   </div>
@@ -250,7 +250,7 @@ export default function LessonBuilder() {
                       )}
                     >
                       <Play className={cn('w-4 h-4', isRTL ? 'ml-1' : 'mr-1')} />
-                      {t('education.template.startGame') || 'Start Game'}
+                      {t('education.template.startGame')}
                     </Button>
                     <Button
                       size="sm"
@@ -300,7 +300,7 @@ export default function LessonBuilder() {
               {t('teacher.lesson.create')}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
-              Form to create a new vocabulary lesson with words and definitions
+              {t('teacher.lesson.dialog.createDescription')}
             </Dialog.Description>
 
             <div className="space-y-4">
@@ -312,7 +312,7 @@ export default function LessonBuilder() {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Animal Vocabulary"
+                  placeholder={t('teacher.lesson.namePlaceholder')}
                   className="border-neo border-neo-black shadow-hard-sm"
                 />
               </div>
@@ -325,7 +325,7 @@ export default function LessonBuilder() {
                 <Input
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Optional description"
+                  placeholder={t('teacher.lesson.descriptionPlaceholder')}
                   className="border-neo border-neo-black shadow-hard-sm"
                 />
               </div>
@@ -469,7 +469,7 @@ export default function LessonBuilder() {
             <Dialog.Close asChild>
               <button
                 className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
-                aria-label="Close"
+                aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
               </button>

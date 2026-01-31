@@ -1,5 +1,27 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { normalizeWord, normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+
+/**
+ * Detect if a string contains Hebrew characters
+ * Used to ensure Hebrew normalization is applied even if language is missing
+ */
+function containsHebrew(text: string): boolean {
+  return /[\u0590-\u05FF]/.test(text);
+}
+
+/**
+ * Normalize a word for storage/comparison, with smart language detection
+ * Falls back to Hebrew normalization if Hebrew characters are detected
+ */
+function normalizeForStorage(word: string, language?: Language): string {
+  // If word contains Hebrew characters, always use Hebrew normalization
+  if (containsHebrew(word)) {
+    return normalizeHebrewWord(word);
+  }
+  // Otherwise use the specified language or default to lowercase
+  return normalizeWord(word, language || 'en');
+}
 
 // Types matching database schema from migration 056
 export type Language = 'en' | 'he' | 'sv' | 'ja';
@@ -705,7 +727,11 @@ export async function updateProgress(
     }
 
     const now = new Date().toISOString();
-    const { word, correct } = wordAttempt;
+    const { word: rawWord, correct } = wordAttempt;
+
+    // Normalize word for consistent storage (handles Hebrew final letters, case, etc.)
+    // This ensures "שלומ" and "שלום" are stored under the same key
+    const word = normalizeForStorage(rawWord);
 
     if (existing) {
       // Update existing progress
@@ -723,7 +749,9 @@ export async function updateProgress(
 
       // Check if word should be marked as mastered (3 correct IN A ROW)
       const wordsMastered = existing.words_mastered || [];
-      if (correct && updatedAttempt.correct >= 3 && !wordsMastered.includes(word)) {
+      // Normalize existing mastered words for comparison (handles legacy data with different forms)
+      const normalizedMastered = wordsMastered.map((w: string) => normalizeForStorage(w));
+      if (correct && updatedAttempt.correct >= 3 && !normalizedMastered.includes(word)) {
         wordsMastered.push(word);
       }
 

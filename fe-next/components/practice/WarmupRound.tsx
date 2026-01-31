@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
@@ -43,10 +44,10 @@ export default function WarmupRound({
   const { t, language: uiLanguage } = useLanguage();
   const isRTL = uiLanguage === 'he';
 
-  // Get vocabulary words that can be integrated
+  // Get vocabulary words that can be integrated (normalized for comparison)
   const vocabularyWords = useMemo(() =>
-    words.filter((w) => w.canIntegrate).map((w) => w.word.toUpperCase()),
-    [words]
+    words.filter((w) => w.canIntegrate).map((w) => normalizeWord(w.word, language)),
+    [words, language]
   );
 
   // Generate initial board with vocabulary words embedded
@@ -67,10 +68,11 @@ export default function WarmupRound({
   const [showComplete, setShowComplete] = useState(false);
   const [showHints, setShowHints] = useState(true);
 
-  // Check if word is a vocabulary word
+  // Check if word is a vocabulary word (using language-aware normalization)
   const isVocabularyWord = useCallback((word: string) => {
-    return vocabularyWords.includes(word.toUpperCase());
-  }, [vocabularyWords]);
+    const normalizedWord = normalizeWord(word, language);
+    return vocabularyWords.includes(normalizedWord);
+  }, [vocabularyWords, language]);
 
   // Get remaining vocabulary words to find
   const remainingVocabWords = useMemo(() => {
@@ -85,25 +87,26 @@ export default function WarmupRound({
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    const upperWord = word.toUpperCase();
+    // Use language-aware normalization (handles Hebrew final letters, etc.)
+    const normalizedWord = normalizeWord(word, language);
 
     // Skip if already found
-    if (foundWords.includes(upperWord)) return;
+    if (foundWords.includes(normalizedWord)) return;
 
     // Calculate score (longer words = more points)
     const wordScore = word.length * 10 + (word.length > 4 ? (word.length - 4) * 5 : 0);
-    const isVocab = isVocabularyWord(upperWord);
+    const isVocab = isVocabularyWord(normalizedWord);
     const bonusScore = isVocab ? 25 : 0;
 
-    setFoundWords((prev) => [...prev, upperWord]);
+    setFoundWords((prev) => [...prev, normalizedWord]);
     setScore((prev) => prev + wordScore + bonusScore);
 
     if (isVocab) {
-      setVocabularyFound((prev) => [...prev, upperWord]);
+      setVocabularyFound((prev) => [...prev, normalizedWord]);
     }
 
-    onWordFound?.(upperWord, isVocab);
-  }, [foundWords, isVocabularyWord, onWordFound]);
+    onWordFound?.(normalizedWord, isVocab);
+  }, [foundWords, isVocabularyWord, language, onWordFound]);
 
   // Handle regenerate board
   const handleRegenerate = useCallback(() => {

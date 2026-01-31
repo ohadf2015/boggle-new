@@ -1011,6 +1011,24 @@ router.get('/word-hunt/check-played/:date/:language', async (req: Request<{ date
 
     if (existingAttempt) {
       // Player has already played - return the result data
+      // For authenticated users, also fetch their streak from the database
+      let streakData = { currentStreak: 0, longestStreak: 0 };
+
+      if (playerId) {
+        const { data: playerStats } = await supabase
+          .from('word_hunt_player_stats')
+          .select('current_streak, longest_streak')
+          .eq('player_id', playerId)
+          .single();
+
+        if (playerStats) {
+          streakData = {
+            currentStreak: playerStats.current_streak || 0,
+            longestStreak: playerStats.longest_streak || 0
+          };
+        }
+      }
+
       res.json({
         hasPlayed: true,
         result: {
@@ -1022,7 +1040,8 @@ router.get('/word-hunt/check-played/:date/:language', async (req: Request<{ date
           targetWord: existingAttempt.target_word,
           attempts: existingAttempt.attempt_words,
           completedAt: existingAttempt.completed_at
-        }
+        },
+        streak: streakData
       });
     } else {
       // Player has not played yet

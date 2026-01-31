@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSocket } from '@/utils/SocketContext';
+import { useSocketOptional } from '@/utils/SocketContext';
 import type { Message, MessageThread, Challenge } from '@/shared/types/friends';
 import * as friendMessages from '@/utils/friendMessages';
 import logger from '@/utils/logger';
@@ -33,7 +33,9 @@ interface UseFriendMessagesReturn {
 }
 
 export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
-  const { socket, isConnected } = useSocket();
+  const socketContext = useSocketOptional();
+  const socket = socketContext?.socket ?? null;
+  const isConnected = socketContext?.isConnected ?? false;
   const [threads, setThreads] = useState<MessageThread[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);

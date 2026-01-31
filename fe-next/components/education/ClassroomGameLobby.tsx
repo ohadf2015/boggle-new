@@ -69,10 +69,10 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
     try {
       await navigator.clipboard.writeText(gameCode);
       setCopied(true);
-      toast.success(t('share.codeCopied') || 'Code copied!');
+      toast.success(t('share.codeCopied'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error(t('share.codeCopyError') || 'Failed to copy');
+      toast.error(t('share.codeCopyError'));
     }
   }, [gameCode, t]);
 
@@ -118,7 +118,7 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-neo-display text-neo-white mb-2">
-            {t('education.classroomGame.title') || 'Classroom Game'}
+            {t('education.classroomGame.title')}
           </h1>
           <p className="text-neo-white/70 font-neo-body flex items-center gap-2">
             <BookOpen className="w-4 h-4" />
@@ -136,7 +136,7 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
           )}
         >
           <ArrowLeft className={cn('w-4 h-4', isRTL ? 'ml-2 rotate-180' : 'mr-2')} />
-          {t('common.back') || 'Back'}
+          {t('common.back')}
         </Button>
       </div>
 
@@ -146,7 +146,7 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-start">
               <p className="text-sm text-neo-white/70 font-neo-body mb-1">
-                {t('education.classroomGame.shareCode') || 'Share this code with students'}
+                {t('education.classroomGame.shareCode')}
               </p>
               <div className="flex items-center gap-3">
                 <span className="text-4xl sm:text-5xl font-black text-neo-cyan tracking-widest font-mono">
@@ -156,12 +156,12 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
                   onClick={handleCopyCode}
                   className={cn(
                     'p-3 rounded-neo border-neo border-neo-black',
-                    'bg-neo-white text-neo-black',
+                    'bg-neo-cream text-neo-black',
                     'shadow-hard hover:shadow-hard-lg',
                     'transition-all',
                     copied && 'bg-neo-lime'
                   )}
-                  aria-label={t('share.copy') || 'Copy code'}
+                  aria-label={t('share.copy')}
                 >
                   {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                 </button>
@@ -171,7 +171,7 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
             <div className="flex items-center gap-2 px-4 py-2 rounded-neo border-neo border-neo-black bg-neo-navy/50">
               <Users className="w-5 h-5 text-neo-cyan" />
               <span className="text-neo-white font-bold">
-                {t('education.classroomGame.waitingForPlayers') || 'Waiting for players...'}
+                {t('education.classroomGame.waitingForPlayers')}
               </span>
             </div>
           </div>
@@ -185,14 +185,14 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-neo-white font-neo-display">
               <Settings className="w-5 h-5 text-neo-cyan" />
-              {t('education.classroomGame.settings') || 'Game Settings'}
+              {t('education.classroomGame.settings')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Timer Setting */}
             <div>
               <label className="block text-sm text-neo-white/70 mb-2">
-                {t('education.template.timer') || 'Game Duration'}
+                {t('education.template.timer')}
               </label>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-neo-cyan" />
@@ -205,10 +205,10 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
                     'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
                   )}
                 >
-                  <option value={2}>2 {t('common.minutes') || 'min'}</option>
-                  <option value={3}>3 {t('common.minutes') || 'min'}</option>
-                  <option value={5}>5 {t('common.minutes') || 'min'}</option>
-                  <option value={10}>10 {t('common.minutes') || 'min'}</option>
+                  <option value={2}>2 {t('common.minutes')}</option>
+                  <option value={3}>3 {t('common.minutes')}</option>
+                  <option value={5}>5 {t('common.minutes')}</option>
+                  <option value={10}>10 {t('common.minutes')}</option>
                 </select>
               </div>
             </div>
@@ -216,7 +216,7 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
             {/* Board Size Setting */}
             <div>
               <label className="block text-sm text-neo-white/70 mb-2">
-                {t('education.template.difficulty') || 'Board Size'}
+                {t('education.template.difficulty')}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {(['small', 'medium', 'large'] as const).map((size) => (
@@ -240,10 +240,10 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-neo-white font-bold">
-                  {t('education.template.allowLateJoin') || 'Allow Late Join'}
+                  {t('education.template.allowLateJoin')}
                 </p>
                 <p className="text-xs text-neo-white/50">
-                  {t('education.template.allowLateJoinDesc') || 'Players can join after game starts'}
+                  {t('education.template.allowLateJoinDesc')}
                 </p>
               </div>
               <button
@@ -271,10 +271,10 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
             <CardTitle className="flex items-center justify-between text-neo-white font-neo-display">
               <span className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-neo-pink" />
-                {t('education.classroomGame.vocabularyWords') || 'Vocabulary Words'}
+                {t('education.classroomGame.vocabularyWords')}
               </span>
               <span className="text-sm font-normal text-neo-white/70">
-                {playableWords.length}/{totalWords} {t('education.classroomGame.playable') || 'playable'}
+                {playableWords.length}/{totalWords} {t('education.classroomGame.playable')}
               </span>
             </CardTitle>
           </CardHeader>
@@ -296,7 +296,7 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
               </div>
             ) : (
               <p className="text-neo-white/50 text-center py-4">
-                {t('education.classroomGame.noPlayableWords') || 'No playable words in this lesson'}
+                {t('education.classroomGame.noPlayableWords')}
               </p>
             )}
           </CardContent>
@@ -324,12 +324,12 @@ export function ClassroomGameLobby({ lesson, onBack }: ClassroomGameLobbyProps) 
               <span className="animate-spin mr-2">
                 <Play className="w-6 h-6" />
               </span>
-              {t('education.classroomGame.starting') || 'Starting...'}
+              {t('education.classroomGame.starting')}
             </>
           ) : (
             <>
               <Play className={cn('w-6 h-6', isRTL ? 'ml-3' : 'mr-3')} />
-              {t('education.classroomGame.startGame') || 'Start Game'}
+              {t('education.classroomGame.startGame')}
             </>
           )}
         </Button>

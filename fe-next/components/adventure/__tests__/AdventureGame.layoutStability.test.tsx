@@ -207,7 +207,7 @@ describe('AdventureGame Layout Stability', () => {
       expect(feedbackContainer).toBeInTheDocument();
     });
 
-    it('should reserve minimum height for feedback area', () => {
+    it('should reserve fixed height for feedback area to prevent layout shift', () => {
       // WHEN
       const { container } = render(
         <AdventureGame
@@ -218,9 +218,9 @@ describe('AdventureGame Layout Stability', () => {
         />
       );
 
-      // THEN - feedback container should have min-height
+      // THEN - feedback container should have fixed height (responsive: h-[28px] mobile, sm:h-[36px] desktop)
       const feedbackContainer = container.querySelector('[data-testid="feedback-container"]');
-      expect(feedbackContainer).toHaveClass('min-h-[28px]');
+      expect(feedbackContainer).toHaveClass('h-[28px]');
     });
   });
 });

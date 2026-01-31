@@ -126,7 +126,7 @@ export function useMultiplayerSession(
             }
           }
         } catch (err) {
-          logger.error('[LESSON] Failed to parse lesson data:', err);
+          logger.error('[LESSON] Failed to parse lesson data:', err instanceof Error ? err.message : String(err));
         }
       }
 

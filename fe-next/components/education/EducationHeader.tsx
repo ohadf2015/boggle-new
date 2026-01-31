@@ -160,7 +160,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'transition-all duration-100',
                 'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
               )}
-              aria-label={t('common.back') || 'Back'}
+              aria-label={t('common.back')}
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
             </button>
@@ -174,7 +174,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               'hover:opacity-90 transition-opacity',
               'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-sm'
             )}
-            aria-label={t('education.header.homeLink') || 'Education Home'}
+            aria-label={t('education.header.homeLink')}
           >
             {/* Graduation cap icon */}
             <div
@@ -198,7 +198,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                   'leading-none'
                 )}
               >
-                {title || (t('education.header.title') || 'LexiClash')}
+                {title || t('education.header.title')}
               </span>
               <span
                 className={cn(
@@ -207,7 +207,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                   'leading-none'
                 )}
               >
-                {t('education.header.subtitle') || 'Education'}
+                {t('education.header.subtitle')}
               </span>
             </div>
           </Link>
@@ -256,7 +256,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
                 'transition-all duration-100'
               )}
-              aria-label={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
+              aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
               aria-expanded={showMobileMenu}
             >
               {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
@@ -304,20 +304,20 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 {/* Pane Header */}
                 <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
                   <span className="text-lg font-bold text-neo-black dark:text-white">
-                    {t('education.header.menu') || 'Education Menu'}
+                    {t('education.header.menu')}
                   </span>
                   <button
                     onClick={() => setShowMobileMenu(false)}
                     className={cn(
                       'flex items-center justify-center',
                       'min-w-[48px] min-h-[48px] w-12 h-12',
-                      'bg-white dark:bg-slate-700 text-neo-black dark:text-white',
+                      'bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white',
                       'border-3 border-neo-black dark:border-slate-500',
                       'rounded-neo shadow-hard-sm',
                       'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
                       'transition-all duration-100'
                     )}
-                    aria-label={t('common.closeMenu') || 'Close menu'}
+                    aria-label={t('common.closeMenu')}
                   >
                     <X className="text-xl" size={20} />
                   </button>
@@ -328,9 +328,9 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                   {/* Language Section */}
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                      {t('settings.language') || 'Language'}
+                      {t('settings.language')}
                     </span>
-                    <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-white dark:bg-slate-700">
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-slate-700">
                       <QuickLanguageSwitcher showLabel />
                     </div>
                   </div>
@@ -340,7 +340,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                   {/* Navigation Section */}
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                      {t('education.header.navigation') || 'Navigation'}
+                      {t('education.header.navigation')}
                     </span>
 
                     {/* Teacher Dashboard (if teacher) */}
@@ -352,13 +352,13 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                           isOnTeacherSection
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                            : 'bg-white dark:bg-slate-700 hover:bg-neo-cyan/30 dark:hover:bg-slate-600 text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-cream dark:bg-slate-700 hover:bg-neo-cyan/30 dark:hover:bg-slate-600 text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
                         )}
                       >
                         <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-3 border-neo-black text-neo-black">
                           <Users className="w-4 h-4" aria-hidden="true" />
                         </span>
-                        <span>{t('education.header.teacherDashboard') || 'Teacher Dashboard'}</span>
+                        <span>{t('education.header.teacherDashboard')}</span>
                       </Link>
                     )}
 
@@ -371,13 +371,13 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                           isOnStudentSection
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                            : 'bg-white dark:bg-slate-700 hover:bg-neo-cyan/30 dark:hover:bg-slate-600 text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-cream dark:bg-slate-700 hover:bg-neo-cyan/30 dark:hover:bg-slate-600 text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
                         )}
                       >
                         <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink/50 border-3 border-neo-black text-neo-black">
                           <BookOpen className="w-4 h-4" aria-hidden="true" />
                         </span>
-                        <span>{t('education.header.studentDashboard') || 'My Lessons'}</span>
+                        <span>{t('education.header.studentDashboard')}</span>
                       </Link>
                     )}
 
@@ -387,14 +387,14 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       onClick={() => setShowMobileMenu(false)}
                       className={cn(
                         'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
-                        'bg-white dark:bg-slate-700 hover:bg-neo-lime/30 dark:hover:bg-slate-600 text-neo-black dark:text-white',
+                        'bg-neo-cream dark:bg-slate-700 hover:bg-neo-lime/30 dark:hover:bg-slate-600 text-neo-black dark:text-white',
                         'shadow-hard-sm hover:shadow-hard'
                       )}
                     >
                       <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime/50 border-3 border-neo-black text-neo-black">
                         <GraduationCap className="w-4 h-4" aria-hidden="true" />
                       </span>
-                      <span>{t('education.header.educationHome') || 'Education Home'}</span>
+                      <span>{t('education.header.educationHome')}</span>
                     </Link>
                   </div>
 
@@ -405,7 +405,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       {/* Account Section */}
                       <div className="flex flex-col gap-2">
                         <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                          {t('common.account') || 'Account'}
+                          {t('common.account')}
                         </span>
 
                         {/* Sign Out */}
@@ -413,14 +413,14 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           onClick={handleSignOut}
                           className={cn(
                             'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
-                            'bg-white dark:bg-slate-700 hover:bg-neo-pink/30 dark:hover:bg-slate-600 text-neo-black dark:text-white',
+                            'bg-neo-cream dark:bg-slate-700 hover:bg-neo-pink/30 dark:hover:bg-slate-600 text-neo-black dark:text-white',
                             'shadow-hard-sm hover:shadow-hard'
                           )}
                         >
                           <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink/50 border-3 border-neo-black text-neo-black">
                             <LogOut className="w-4 h-4" aria-hidden="true" />
                           </span>
-                          <span>{t('auth.signOut') || 'Sign Out'}</span>
+                          <span>{t('auth.signOut')}</span>
                         </button>
                       </div>
                     </>
@@ -489,7 +489,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
           'transition-all duration-100',
           'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
         )}
-        aria-label={t('common.menu') || 'Menu'}
+        aria-label={t('common.menu')}
         aria-expanded={isOpen}
       >
         <Menu size={18} />
@@ -525,7 +525,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                   )}
                 >
                   <Users className="w-4 h-4" />
-                  {t('education.header.teacherDashboard') || 'Teacher Dashboard'}
+                  {t('education.header.teacherDashboard')}
                 </Link>
               )}
 
@@ -541,7 +541,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                   )}
                 >
                   <BookOpen className="w-4 h-4" />
-                  {t('education.header.studentDashboard') || 'My Lessons'}
+                  {t('education.header.studentDashboard')}
                 </Link>
               )}
 
@@ -554,7 +554,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 )}
               >
                 <GraduationCap className="w-4 h-4" />
-                {t('education.header.educationHome') || 'Education Home'}
+                {t('education.header.educationHome')}
               </Link>
             </div>
 
@@ -574,7 +574,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     )}
                   >
                     <LogOut className="w-4 h-4" />
-                    {t('auth.signOut') || 'Sign Out'}
+                    {t('auth.signOut')}
                   </button>
                 </div>
               </>

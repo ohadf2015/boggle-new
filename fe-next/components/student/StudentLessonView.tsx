@@ -13,9 +13,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Clock, TrendingUp, Award, Gamepad2, CheckCircle2, Sparkles, History, BarChart3 } from 'lucide-react';
+import { BookOpen, Clock, Gamepad2, CheckCircle2, Sparkles, History, BarChart3 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function StudentLessonView() {
@@ -101,54 +102,45 @@ export default function StudentLessonView() {
 
   if (sortedLessons.length === 0) {
     return (
-      <div className="text-center py-12 sm:py-16 space-y-6">
-        {/* Animated illustration area */}
-        <div className="relative mx-auto w-32 h-32 mb-6">
-          <div className="absolute inset-0 bg-neo-cyan/20 rounded-full animate-pulse" />
-          <div className="absolute inset-2 bg-neo-navy border-neo border-neo-black rounded-full flex items-center justify-center shadow-hard">
-            <BookOpen className="w-12 h-12 text-neo-cyan" />
-          </div>
-        </div>
-
-        {/* Welcome message */}
-        <div className="max-w-sm mx-auto">
-          <h3 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white mb-3">
-            {t('student.lessons.empty.title')}
-          </h3>
-          <p className="text-neo-white/70 font-neo-body text-base leading-relaxed">
-            {t('student.lessons.empty.subtitle')}
-          </p>
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Button
-            onClick={() => router.push(`/${language}/student/join`)}
-            size="lg"
-            className={cn(
-              'font-neo-display text-base px-6',
-              'bg-neo-cyan hover:bg-neo-cyan/90',
-              'text-neo-black shadow-hard hover:shadow-hard-sm',
-              'border-neo border-neo-black',
-              'transition-all'
-            )}
-          >
-            {t('student.lessons.empty.joinClassroom')}
-          </Button>
-          <Button
-            onClick={() => router.push(`/${language}`)}
-            variant="outline"
-            size="lg"
-            className={cn(
-              'font-neo-display text-base px-6',
-              'border-neo-white/30 text-neo-white/80 hover:text-neo-white',
-              'hover:border-neo-white/50 hover:bg-neo-white/5',
-              'transition-all'
-            )}
-          >
-            {t('common.backHome')}
-          </Button>
-        </div>
+      <div className="py-12 sm:py-16">
+        <EmptyState
+          type="custom"
+          title={t('student.lessons.empty.title')}
+          description={t('student.lessons.empty.subtitle')}
+          icon={<BookOpen className="w-full h-full text-neo-cyan" />}
+          showMascot={false}
+          size="lg"
+          action={
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button
+                onClick={() => router.push(`/${language}/student/join`)}
+                size="lg"
+                className={cn(
+                  'font-neo-display text-base px-6',
+                  'bg-neo-cyan hover:bg-neo-cyan/90',
+                  'text-neo-black shadow-hard hover:shadow-hard-sm',
+                  'border-neo border-neo-black',
+                  'transition-all'
+                )}
+              >
+                {t('student.lessons.empty.joinClassroom')}
+              </Button>
+              <Button
+                onClick={() => router.push(`/${language}`)}
+                variant="outline"
+                size="lg"
+                className={cn(
+                  'font-neo-display text-base px-6',
+                  'border-neo-white/30 text-neo-white/80 hover:text-neo-white',
+                  'hover:border-neo-white/50 hover:bg-neo-white/5',
+                  'transition-all'
+                )}
+              >
+                {t('common.backHome')}
+              </Button>
+            </div>
+          }
+        />
       </div>
     );
   }
@@ -302,7 +294,7 @@ export default function StudentLessonView() {
                       'flex-1 font-neo-display text-base',
                       status === 'assigned'
                         ? 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black'
-                        : 'bg-neo-pink hover:bg-neo-pink/90 text-neo-white',
+                        : 'bg-neo-pink hover:bg-neo-pink/90 text-neo-black',
                       'shadow-hard hover:shadow-hard-sm',
                       'transition-all'
                     )}

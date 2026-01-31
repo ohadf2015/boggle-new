@@ -61,7 +61,7 @@ export function ProfileBackButtons({
               : 'bg-white text-gray-700 hover:bg-gray-100'
             : isDarkMode
               ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
-              : 'bg-neo-pink text-neo-white hover:bg-neo-pink/90'
+              : 'bg-neo-pink text-neo-black hover:bg-neo-pink/90'
         )}
       >
         <ArrowLeft className="me-2 rtl:rotate-180" />

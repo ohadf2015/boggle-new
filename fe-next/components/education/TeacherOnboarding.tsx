@@ -159,7 +159,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
               'transition-colors',
               isRTL ? 'left-4' : 'right-4'
             )}
-            aria-label={t('common.skip') || 'Skip'}
+            aria-label={t('common.skip')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -217,10 +217,10 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
               {/* Step number */}
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neo-black/30 border border-neo-white/10">
                 <span className={cn('text-sm font-bold', step.color)}>
-                  {t('education.onboarding.step') || 'Step'} {currentStep + 1}
+                  {t('education.onboarding.step')} {currentStep + 1}
                 </span>
                 <span className="text-neo-white/50">
-                  {t('education.onboarding.of') || 'of'} {ONBOARDING_STEPS.length}
+                  {t('education.onboarding.of')} {ONBOARDING_STEPS.length}
                 </span>
               </div>
             </motion.div>
@@ -245,7 +245,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
               )}
             >
               <ChevronLeft className={cn('w-5 h-5', isRTL ? 'ml-1 rotate-180' : 'mr-1')} />
-              {t('common.previous') || 'Back'}
+              {t('common.previous')}
             </Button>
 
             {/* Next/Finish button */}
@@ -262,11 +262,11 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
               {isLastStep ? (
                 <>
                   <Check className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
-                  {t('education.onboarding.getStarted') || "Let's Go!"}
+                  {t('education.onboarding.getStarted')}
                 </>
               ) : (
                 <>
-                  {t('common.next') || 'Next'}
+                  {t('common.next')}
                   <ChevronRight className={cn('w-5 h-5', isRTL ? 'mr-1 rotate-180' : 'ml-1')} />
                 </>
               )}

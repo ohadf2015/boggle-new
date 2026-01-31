@@ -17,9 +17,12 @@
 import { memo } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { cn } from '@/lib/utils';
+import { NeoLoader } from '@/components/ui/NeoLoader';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -46,7 +49,8 @@ const RANK_COLORS = {
     emoji: '🥇',
   },
   2: {
-    bg: 'bg-neo-white/70',
+    // Silver uses slate background for better contrast in dark UI
+    bg: 'bg-slate-300',
     text: 'text-neo-black',
     border: 'border-neo-black',
     emoji: '🥈',
@@ -59,20 +63,6 @@ const RANK_COLORS = {
   },
 } as const;
 
-// ============================================
-// LOADING SKELETON
-// ============================================
-
-const LoadingSkeleton = () => (
-  <div data-testid="leaderboard-skeleton" className="space-y-4">
-    {[1, 2, 3].map((i) => (
-      <div
-        key={i}
-        className="h-20 bg-neo-navy/50 border-neo border-neo-black rounded-neo animate-pulse"
-      />
-    ))}
-  </div>
-);
 
 // ============================================
 // LEADERBOARD ENTRY
@@ -192,8 +182,8 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
     // Loading state
     if (isLoading) {
       return (
-        <div className={cn('w-full', className)}>
-          <LoadingSkeleton />
+        <div data-testid="leaderboard-skeleton" className={cn('w-full flex justify-center py-8', className)}>
+          <NeoLoader variant="dots" size="md" />
         </div>
       );
     }
@@ -210,14 +200,17 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           data-testid="classroom-leaderboard"
           dir={isRTL ? 'rtl' : 'ltr'}
           className={cn(
-            'w-full p-8 rounded-neo border-neo border-neo-black shadow-hard',
-            'bg-neo-navy text-center',
+            'w-full rounded-neo border-neo border-neo-black shadow-hard bg-neo-navy',
             className
           )}
         >
-          <p className="font-neo-body text-neo-white/70">
-            {t('education.leaderboard.noStudentsYet')}
-          </p>
+          <EmptyState
+            type="waiting-players"
+            title={t('education.leaderboard.noStudentsYet')}
+            icon={<Users className="w-full h-full" />}
+            showMascot={false}
+            size="sm"
+          />
         </div>
       );
     }

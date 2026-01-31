@@ -50,7 +50,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
 
     const breadcrumbs: BreadcrumbItem[] = [
       {
-        label: t('education.header.breadcrumbs.education') || 'Education',
+        label: t('education.header.breadcrumbs.education'),
         href: `/${language}/education`,
         isCurrent: segments.length === 1 && segments[0] === 'education',
       },
@@ -71,25 +71,25 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
 
       switch (segment) {
         case 'teacher':
-          label = t('education.header.breadcrumbs.teacher') || 'Teacher Dashboard';
+          label = t('education.header.breadcrumbs.teacher');
           break;
         case 'student':
-          label = t('education.header.breadcrumbs.student') || 'Student Dashboard';
+          label = t('education.header.breadcrumbs.student');
           break;
         case 'lessons':
-          label = t('education.header.breadcrumbs.lessons') || 'Lessons';
+          label = t('education.header.breadcrumbs.lessons');
           break;
         case 'classrooms':
-          label = t('education.header.breadcrumbs.classrooms') || 'Classrooms';
+          label = t('education.header.breadcrumbs.classrooms');
           break;
         case 'classroom-game':
-          label = t('education.header.breadcrumbs.classroomGame') || 'Classroom Game';
+          label = t('education.header.breadcrumbs.classroomGame');
           break;
         case 'join':
-          label = t('education.header.breadcrumbs.join') || 'Join';
+          label = t('education.header.breadcrumbs.join');
           break;
         case 'profile':
-          label = t('education.header.breadcrumbs.profile') || 'Profile';
+          label = t('education.header.breadcrumbs.profile');
           break;
         default:
           // For dynamic segments like lesson IDs, try to get a readable name
@@ -117,7 +117,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
 
   return (
     <nav
-      aria-label={t('education.header.breadcrumbs.navigation') || 'Education navigation'}
+      aria-label={t('education.header.breadcrumbs.navigation')}
       className={cn('flex items-center', className)}
     >
       <ol

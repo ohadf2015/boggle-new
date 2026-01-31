@@ -49,13 +49,13 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       if (cleaned) {
         setCode(cleaned);
         if (codeError) setCodeError(false);
-        toast.success(t('education.student.join.codePasted') || 'Code pasted!');
+        toast.success(t('education.student.join.codePasted'));
       } else {
-        toast.error(t('education.student.join.emptyClipboard') || 'No valid code in clipboard');
+        toast.error(t('education.student.join.emptyClipboard'));
       }
     } catch {
       // Clipboard API not available or permission denied
-      toast.error(t('education.student.join.clipboardError') || 'Cannot access clipboard. Please paste manually.');
+      toast.error(t('education.student.join.clipboardError'));
     }
   };
 
@@ -148,7 +148,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
                     className={cn(
-                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pr-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-gray-500",
+                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pr-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
                       codeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                     )}
                   />
@@ -161,13 +161,13 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                           variant="outline"
                           onClick={handlePaste}
                           className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-hard-pressed transition-all"
-                          aria-label={t('education.student.join.pasteButton') || 'Paste code'}
+                          aria-label={t('education.student.join.pasteButton')}
                         >
                           <ClipboardPaste className="w-4 h-4" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {t('education.student.join.pasteButton') || 'Paste code'}
+                        {t('education.student.join.pasteButton')}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -191,7 +191,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               >
                 <LogIn className="mr-2 w-5 h-5" />
                 {isSubmitting
-                  ? (t('education.student.join.joining') || 'Joining...')
+                  ? t('education.student.join.joining')
                   : t('education.student.join.button')
                 }
               </Button>

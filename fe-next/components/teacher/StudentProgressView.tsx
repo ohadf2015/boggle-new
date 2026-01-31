@@ -56,17 +56,17 @@ export default function StudentProgressView() {
   // Export progress data to CSV
   const handleExportCSV = useCallback(() => {
     if (studentStats.length === 0) {
-      toast.error(t('teacher.progress.noDataToExport') || 'No data to export');
+      toast.error(t('teacher.progress.noDataToExport'));
       return;
     }
 
     // Build CSV content
     const headers = [
-      t('teacher.progress.student') || 'Student',
-      t('teacher.progress.wordsAttempted') || 'Words Attempted',
-      t('teacher.progress.wordsMastered') || 'Words Mastered',
-      t('teacher.progress.accuracy') || 'Accuracy (%)',
-      t('teacher.progress.lastActive') || 'Last Active',
+      t('teacher.progress.student'),
+      t('teacher.progress.wordsAttempted'),
+      t('teacher.progress.wordsMastered'),
+      t('teacher.progress.accuracy'),
+      t('teacher.progress.lastActive'),
     ];
 
     const rows = studentStats.map((student) => [
@@ -98,7 +98,7 @@ export default function StudentProgressView() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    toast.success(t('teacher.progress.exportSuccess') || 'Progress exported successfully!');
+    toast.success(t('teacher.progress.exportSuccess'));
   }, [studentStats, selectedClassroom, selectedLesson, t]);
 
   if (loadingClassrooms || loadingLessons) {
@@ -174,7 +174,7 @@ export default function StudentProgressView() {
           )}
         >
           <Download className="w-4 h-4" />
-          {t('teacher.progress.exportCSV') || 'Export CSV'}
+          {t('teacher.progress.exportCSV')}
         </Button>
       </div>
 
@@ -200,7 +200,7 @@ export default function StudentProgressView() {
             <h3 className="text-xl font-neo-display text-neo-white mb-2">
               {t('teacher.progress.noData')}
             </h3>
-            <p className="text-slate-400">No student progress for this lesson yet</p>
+            <p className="text-slate-400">{t('teacher.progress.noProgressYet')}</p>
           </CardContent>
         </Card>
       ) : (

@@ -33,7 +33,7 @@ export default function ClassroomManager() {
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
-      toast.error('Classroom name is required');
+      toast.error(t('teacher.classroom.validation.nameRequired'));
       return;
     }
 
@@ -46,7 +46,7 @@ export default function ClassroomManager() {
       setIsCreateDialogOpen(false);
       setFormData({ name: '', language: language as Language });
     } else {
-      toast.error(result.error || 'Failed to create classroom');
+      toast.error(result.error || t('teacher.classroom.error.createFailed'));
     }
   };
 
@@ -61,11 +61,11 @@ export default function ClassroomManager() {
     setIsSaving(false);
 
     if (result.success) {
-      toast.success('Classroom updated');
+      toast.success(t('teacher.classroom.success.updated'));
       setIsEditDialogOpen(false);
       setSelectedClassroomId(null);
     } else {
-      toast.error(result.error || 'Failed to update classroom');
+      toast.error(result.error || t('teacher.classroom.error.updateFailed'));
     }
   };
 
@@ -77,11 +77,11 @@ export default function ClassroomManager() {
     setIsSaving(false);
 
     if (result.success) {
-      toast.success('Classroom deleted');
+      toast.success(t('teacher.classroom.success.deleted'));
       setIsDeleteDialogOpen(false);
       setSelectedClassroomId(null);
     } else {
-      toast.error(result.error || 'Failed to delete classroom');
+      toast.error(result.error || t('teacher.classroom.error.deleteFailed'));
     }
   };
 
@@ -278,8 +278,8 @@ export default function ClassroomManager() {
             </Dialog.Title>
             <Dialog.Description className="sr-only">
               {isCreateDialogOpen
-                ? 'Form to create a new classroom with name and language settings'
-                : 'Form to edit classroom name and language settings'}
+                ? t('teacher.classroom.dialog.createDescription')
+                : t('teacher.classroom.dialog.editDescription')}
             </Dialog.Description>
 
             <div className="space-y-4">
@@ -290,7 +290,7 @@ export default function ClassroomManager() {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., English Advanced"
+                  placeholder={t('teacher.classroom.namePlaceholder')}
                   className="border-neo border-neo-black shadow-hard-sm"
                 />
               </div>
@@ -340,7 +340,7 @@ export default function ClassroomManager() {
             <Dialog.Close asChild>
               <button
                 className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
-                aria-label="Close"
+                aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -372,7 +372,7 @@ export default function ClassroomManager() {
                 <Button
                   onClick={handleDelete}
                   disabled={isSaving}
-                  className="flex-1 bg-neo-pink text-neo-white font-bold shadow-hard hover:shadow-hard-pressed"
+                  className="flex-1 bg-neo-pink text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
                 >
                   {isSaving ? t('common.loading') : t('teacher.classroom.delete')}
                 </Button>

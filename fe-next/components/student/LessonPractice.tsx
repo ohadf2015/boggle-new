@@ -14,12 +14,35 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { useLesson } from '@/hooks/useVocabularyLesson';
 import { cn } from '@/lib/utils';
+import { normalizeWord, normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, X, Star, Trophy, ArrowLeft, Flame } from 'lucide-react';
 import toast from 'react-hot-toast';
+import type { Language } from '@/shared/types/game';
+
+/**
+ * Detect if a string contains Hebrew characters
+ * Used to ensure Hebrew normalization is applied even if lesson.language is missing
+ */
+function containsHebrew(text: string): boolean {
+  return /[\u0590-\u05FF]/.test(text);
+}
+
+/**
+ * Normalize a word for comparison, with smart language detection
+ * Falls back to Hebrew normalization if Hebrew characters are detected
+ */
+function normalizeForComparison(word: string, language?: Language): string {
+  // If word contains Hebrew characters, always use Hebrew normalization
+  if (containsHebrew(word)) {
+    return normalizeHebrewWord(word);
+  }
+  // Otherwise use the specified language or default to lowercase
+  return normalizeWord(word, language || 'en');
+}
 
 interface LessonPracticeProps {
   lessonId: string;
@@ -52,12 +75,21 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
     const masteredWords = currentProgress?.words_mastered || [];
     const wordsAttempted = currentProgress?.words_attempted || {};
 
-    return lesson.words.map((word) => ({
-      ...word,
-      isMastered: masteredWords.includes(word.word.toLowerCase()),
-      attempts: wordsAttempted[word.word.toLowerCase()]?.attempts || 0,
-      correctAttempts: wordsAttempted[word.word.toLowerCase()]?.correct || 0,
-    }));
+    // Normalize mastered words for comparison (handles Hebrew final letters)
+    const normalizedMasteredWords = masteredWords.map((w) => normalizeForComparison(w, lesson.language));
+
+    return lesson.words.map((word) => {
+      const normalizedWord = normalizeForComparison(word.word, lesson.language);
+      return {
+        ...word,
+        isMastered: normalizedMasteredWords.includes(normalizedWord),
+        // For attempts lookup, try both normalized and original key
+        attempts: wordsAttempted[normalizedWord]?.attempts ||
+                  wordsAttempted[word.word.toLowerCase()]?.attempts || 0,
+        correctAttempts: wordsAttempted[normalizedWord]?.correct ||
+                         wordsAttempted[word.word.toLowerCase()]?.correct || 0,
+      };
+    });
   }, [lesson, currentProgress]);
 
   // Prioritize unmastered words, then mastered (randomized once on mount)
@@ -115,9 +147,11 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
 
       setIsChecking(true);
 
-      // Check if answer is correct (case-insensitive, trimmed)
-      const userAnswer = answer.trim().toLowerCase();
-      const correctAnswer = currentWord.word.toLowerCase();
+      // Check if answer is correct (normalized for language, including Hebrew final letters)
+      // Uses smart detection to ensure Hebrew words are always normalized even if lesson.language is missing
+      const lessonLanguage = lesson?.language || (containsHebrew(currentWord.word) ? 'he' : language || 'en') as Language;
+      const userAnswer = normalizeForComparison(answer.trim(), lessonLanguage);
+      const correctAnswer = normalizeForComparison(currentWord.word.trim(), lessonLanguage);
       const correct = userAnswer === correctAnswer;
 
       setIsCorrect(correct);
@@ -152,7 +186,7 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
         handleNext();
       }, 1500);
     },
-    [currentWord, answer, isChecking, lessonId, recordAttempt, t, handleNext]
+    [currentWord, answer, isChecking, lessonId, recordAttempt, t, handleNext, lesson?.language, language]
   );
 
   // Handle skip
@@ -369,7 +403,7 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
                   <Button
                     type="submit"
                     disabled={!answer.trim() || showFeedback || isChecking}
-                    className="flex-1 bg-neo-pink hover:bg-neo-pink/90 text-neo-white font-neo-display shadow-hard"
+                    className="flex-1 bg-neo-pink hover:bg-neo-pink/90 text-neo-black font-neo-display shadow-hard"
                   >
                     {t('student.practice.submit')}
                   </Button>
