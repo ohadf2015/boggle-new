@@ -251,6 +251,14 @@ Key decisions from previous milestones:
 - Pure function architecture: All utilities stateless for testability and composability across frontend/backend
 - TDD RED-GREEN-REFACTOR: 17 tests, 100% coverage, all functions pure with no side effects
 
+**Phase 29-02 (Tier Assignment Logic, 2026-01-31):**
+- Priority-based decision tree: insufficient data → failure detection → mastery detection → default
+- Failure threshold: 2 failures in last 3 attempts triggers downgrade to easy tier
+- Mastery threshold: All 3 attempts complete with scores > 0.8 (strictly greater, not >=) triggers upgrade to hard
+- Failure detection prioritized over mastery: Prevents mixed signals from causing incorrect tier
+- Reason strings for analytics: 4 distinct reasons (insufficient_data, high_failure_rate, consistent_mastery, balanced_performance)
+- Pure function design: No side effects, testable, reusable across components
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -276,11 +284,11 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Completed 29-01-SUMMARY.md (Performance Tracker Utilities) - Phase 29 1/5 plans complete
+Stopped at: Completed 29-02-SUMMARY.md (Tier Assignment Logic) - Phase 29 2/5 plans complete
 Resume file: None
 
-**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 02: Tier Assigner)
-**Note:** Performance tracking foundation complete with weighted scoring and rolling window (3 attempts)
+**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 03: Tier Adjustment Utilities)
+**Note:** Tier assignment logic complete with priority-based decision tree (easy/normal/hard)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -304,4 +312,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-30 (Phase 28 complete: Freeze Time effect wiring, power-up system fully functional)*
+*Last updated: 2026-01-31 (Phase 29 in progress: 2/5 plans complete - performance tracker, tier assigner done)*
