@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 29 - Adaptive Difficulty System
-Plan: 8 of 8 complete (PHASE COMPLETE)
-Status: Phase Complete ✓ (Verified 4/4 success criteria + human approved)
-Last activity: 2026-01-31 — Completed 29-08-PLAN.md (Human verification approved)
+Phase: 30 - Boss Battle Overhaul
+Plan: 4 of 8 complete
+Status: In Progress
+Last activity: 2026-01-31 — Completed 30-04-PLAN.md (Boss Ability System)
 
-Progress: [██████░░░░] 79% (26/33 v2.0 plans complete)
+Progress: [███████░░░] 85% (30/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [██████░░░░] 79% (26/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 22 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans + 3 gap closures COMPLETE, Phase 28: 8 plans COMPLETE, Phase 29: 4 plans complete)
-- Current phase: Phase 29 - Adaptive Difficulty System (4/5 plans complete)
+- Plans completed: 30 (Phase 26: 9 COMPLETE, Phase 27: 7 COMPLETE, Phase 28: 8 COMPLETE, Phase 29: 2 COMPLETE, Phase 30: 4 complete)
+- Current phase: Phase 30 - Boss Battle Overhaul (4/8 plans complete)
 
 ## Accumulated Context
 
@@ -285,6 +285,14 @@ Key decisions from previous milestones:
 - Completion recording: recordCompletion called after recordAttempt for tier updates
 - 18 total tests passing (6 HintMessage + 12 AdventureGame integration)
 
+**Phase 30-04 (Boss Ability System, 2026-01-31):**
+- Registry pattern for abilities: Extensible architecture allows adding abilities without core code changes
+- Priority-based activation checking: Higher priority abilities checked first (sorted by getForBoss)
+- Phase order comparison: String array ['intro', 'phase1', 'phase2', 'enraged', 'victory', 'defeat'] enables operators
+- Cooldowns in milliseconds internally: Seconds in config for readability, ms for precision in tickCooldowns
+- Condition operators: Phase supports =, <, >, <=, >=; HP threshold supports <, <=, >, >=
+- 52 tests total (16 registry + 36 hook) with 100% coverage
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -309,12 +317,23 @@ None - Starting fresh milestone with roadmap complete.
 
 ## Session Continuity
 
-Last session: 2026-01-31
-Stopped at: Completed 29-07-SUMMARY.md (Adaptive Difficulty UI Integration) - Phase 29 COMPLETE (5/5 plans)
+Last session: 2026-01-31T17:22:00Z
+Stopped at: Completed 30-04-PLAN.md (Boss Ability System)
 Resume file: None
 
-**Next action:** Start Phase 30 - Boss Battle Overhaul
-**Note:** Adaptive difficulty system fully integrated into AdventureGame with hint rendering and tier adjustments
+**Next action:** Continue Phase 30-05 (Visual Phase Transitions)
+**Note:** Boss ability system foundation complete with registry pattern and useBossAbilities hook
+
+## Phase 30 Progress
+
+- [x] 30-01: XState 5-Phase State Machine (useBossStateMachine hook)
+- [x] 30-02: SegmentedHPBar and PhaseIndicator components
+- [x] 30-03: Attack Telegraph System
+- [x] 30-04: Boss Ability System (52 tests)
+- [ ] 30-05: Visual Phase Transitions
+- [ ] 30-06: Ability Cooldowns UI
+- [ ] 30-07: Phase-Based Ability Escalation
+- [ ] 30-08: Integration Testing
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
@@ -338,4 +357,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-31 (Phase 29 in progress: 2/5 plans complete - performance tracker, tier assigner done)*
+*Last updated: 2026-01-31 (Phase 30 in progress: 4/8 plans complete - boss ability system done)*
