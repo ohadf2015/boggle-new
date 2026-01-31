@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { SkillNode, SkillPath } from '@/types/skills';
+import type { SkillNode, SkillPath } from '@/types/adventure';
 
 // ==============================================
 // TYPES
@@ -126,7 +126,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
                 'text-neo-white'
               )}
             >
-              {t('skills.unlocked')}
+              {t('adventure.skills.unlocked')}
             </motion.h2>
 
             {/* Skill Name */}

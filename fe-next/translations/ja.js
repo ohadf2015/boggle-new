@@ -4583,7 +4583,7 @@ const ja = {
         "utility": "ユーティリティ"
       },
       "locked": "ロック中",
-      "unlocked": "解放済み",
+      "unlocked": "スキル解放！",
       "unlock": "解放",
       "maxed": "最大",
       "requires": "必要: {{skill}}",

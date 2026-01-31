@@ -4552,7 +4552,7 @@ const en = {
         "utility": "Utility"
       },
       "locked": "Locked",
-      "unlocked": "Unlocked",
+      "unlocked": "Skill Unlocked!",
       "unlock": "Unlock",
       "maxed": "Maxed",
       "requires": "Requires: {{skill}}",

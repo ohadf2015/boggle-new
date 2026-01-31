@@ -12,7 +12,7 @@ import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SkillTreeView, SkillUnlockModal } from '@/components/adventure/SkillTree';
-import type { SkillNode } from '@/types/skills';
+import type { SkillNode } from '@/types/adventure';
 
 export function SkillTreePageClient() {
   const { t } = useLanguage();

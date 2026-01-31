@@ -4323,7 +4323,7 @@ const es = {
         "utility": "Utilidad"
       },
       "locked": "Bloqueado",
-      "unlocked": "Desbloqueado",
+      "unlocked": "¡Habilidad Desbloqueada!",
       "unlock": "Desbloquear",
       "maxed": "Máximo",
       "requires": "Requiere: {{skill}}",

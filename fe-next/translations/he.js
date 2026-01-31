@@ -4558,7 +4558,7 @@ const he = {
         "utility": "שירות"
       },
       "locked": "נעול",
-      "unlocked": "פתוח",
+      "unlocked": "כישור נפתח!",
       "unlock": "פתח",
       "maxed": "מקסימלי",
       "requires": "דורש: {{skill}}",

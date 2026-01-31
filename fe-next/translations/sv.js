@@ -4583,7 +4583,7 @@ const sv = {
         "utility": "Verktyg"
       },
       "locked": "Låst",
-      "unlocked": "Upplåst",
+      "unlocked": "Färdighet upplåst!",
       "unlock": "Lås upp",
       "maxed": "Maxad",
       "requires": "Kräver: {{skill}}",

@@ -10,8 +10,9 @@
 import React, { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSkillTreeStore, SKILL_CATALOG, getSkillsByPath } from '@/stores/skillTreeStore';
-import type { SkillNode, SkillPath } from '@/types/skills';
+import { useSkillTreeStore } from '@/hooks/useSkillTreeStore';
+import { getSkillsByPath, canUnlockSkill } from '@/utils/skillTreeUtils';
+import type { SkillNode, SkillPath } from '@/types/adventure';
 
 // ==============================================
 // TYPES
@@ -142,8 +143,8 @@ function SkillNodeComponent({
 interface SkillPathComponentProps {
   path: SkillPath;
   skills: SkillNode[];
-  unlockedSkills: string[];
-  canUnlock: (id: string) => boolean;
+  unlockedSkills: Set<string>;
+  availablePoints: number;
   onUnlock: (skill: SkillNode) => void;
 }
 
@@ -151,21 +152,21 @@ function SkillPathComponent({
   path,
   skills,
   unlockedSkills,
-  canUnlock,
+  availablePoints,
   onUnlock,
 }: SkillPathComponentProps) {
   const { t } = useLanguage();
   const colors = PATH_COLORS[path];
 
   // Group skills by tier
-  const tier1 = skills.filter((s) => s.tier === 'tier1');
-  const tier2 = skills.filter((s) => s.tier === 'tier2');
-  const tier3 = skills.filter((s) => s.tier === 'tier3');
+  const tier1 = skills.filter((s) => s.tier === 1);
+  const tier2 = skills.filter((s) => s.tier === 2);
+  const tier3 = skills.filter((s) => s.tier === 3);
 
   const pathNames: Record<SkillPath, string> = {
-    power: 'skills.paths.power',
-    strategy: 'skills.paths.strategy',
-    utility: 'skills.paths.utility',
+    power: 'adventure.skills.paths.power',
+    strategy: 'adventure.skills.paths.strategy',
+    utility: 'adventure.skills.paths.utility',
   };
 
   return (
@@ -186,8 +187,8 @@ function SkillPathComponent({
           <SkillNodeComponent
             key={skill.id}
             skill={skill}
-            isUnlocked={unlockedSkills.includes(skill.id)}
-            canUnlock={canUnlock(skill.id)}
+            isUnlocked={unlockedSkills.has(skill.id)}
+            canUnlock={canUnlockSkill(skill.id, { unlockedSkills, availablePoints, totalPointsEarned: availablePoints })}
             onUnlock={() => onUnlock(skill)}
           />
         ))}
@@ -202,8 +203,8 @@ function SkillPathComponent({
           <SkillNodeComponent
             key={skill.id}
             skill={skill}
-            isUnlocked={unlockedSkills.includes(skill.id)}
-            canUnlock={canUnlock(skill.id)}
+            isUnlocked={unlockedSkills.has(skill.id)}
+            canUnlock={canUnlockSkill(skill.id, { unlockedSkills, availablePoints, totalPointsEarned: availablePoints })}
             onUnlock={() => onUnlock(skill)}
           />
         ))}
@@ -218,8 +219,8 @@ function SkillPathComponent({
           <SkillNodeComponent
             key={skill.id}
             skill={skill}
-            isUnlocked={unlockedSkills.includes(skill.id)}
-            canUnlock={canUnlock(skill.id)}
+            isUnlocked={unlockedSkills.has(skill.id)}
+            canUnlock={canUnlockSkill(skill.id, { unlockedSkills, availablePoints, totalPointsEarned: availablePoints })}
             onUnlock={() => onUnlock(skill)}
           />
         ))}
@@ -238,13 +239,12 @@ export function SkillTreeView({ onSkillUnlock, className }: SkillTreeViewProps) 
   // Store state and actions
   const availablePoints = useSkillTreeStore((state) => state.availablePoints);
   const unlockedSkills = useSkillTreeStore((state) => state.unlockedSkills);
-  const canUnlock = useSkillTreeStore((state) => state.canUnlock);
   const unlockSkill = useSkillTreeStore((state) => state.unlockSkill);
 
   // Handle skill unlock
   const handleUnlock = useCallback(
     (skill: SkillNode) => {
-      const success = unlockSkill(skill.id);
+      const success = unlockSkill(skill.id, skill.cost);
       if (success && onSkillUnlock) {
         onSkillUnlock(skill);
       }
@@ -262,10 +262,10 @@ export function SkillTreeView({ onSkillUnlock, className }: SkillTreeViewProps) 
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-black text-neo-white mb-2">
-          {t('skills.title')}
+          {t('adventure.skills.title')}
         </h2>
         <p className="text-neo-white/70">
-          {t('skills.available')}: <span className="text-neo-lime font-bold">{availablePoints}</span>
+          {t('adventure.skills.points')}: <span className="text-neo-lime font-bold">{availablePoints}</span>
         </p>
       </div>
 
@@ -275,21 +275,21 @@ export function SkillTreeView({ onSkillUnlock, className }: SkillTreeViewProps) 
           path="power"
           skills={powerSkills}
           unlockedSkills={unlockedSkills}
-          canUnlock={canUnlock}
+          availablePoints={availablePoints}
           onUnlock={handleUnlock}
         />
         <SkillPathComponent
           path="strategy"
           skills={strategySkills}
           unlockedSkills={unlockedSkills}
-          canUnlock={canUnlock}
+          availablePoints={availablePoints}
           onUnlock={handleUnlock}
         />
         <SkillPathComponent
           path="utility"
           skills={utilitySkills}
           unlockedSkills={unlockedSkills}
-          canUnlock={canUnlock}
+          availablePoints={availablePoints}
           onUnlock={handleUnlock}
         />
       </div>
