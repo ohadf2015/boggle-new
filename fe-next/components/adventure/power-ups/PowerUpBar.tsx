@@ -29,6 +29,8 @@ export interface PowerUpBarProps {
   tiles: TileState[][];
   wordsFound: string[];
   cascadeActive: boolean;
+  /** Cooldown multiplier from adaptive difficulty (default 1.0) */
+  cooldownMultiplier?: number;
   /** Callbacks for effect application */
   onFreezeTime: (newTime: number) => void;
   onHint: (hint: HintResult) => void;
@@ -72,6 +74,7 @@ export function PowerUpBar({
   tiles,
   wordsFound,
   cascadeActive,
+  cooldownMultiplier = 1.0,
   onFreezeTime,
   onHint,
   onScoreMultiplier,
@@ -83,15 +86,18 @@ export function PowerUpBar({
   // Inventory for persistence
   const inventory = usePowerUpInventory();
 
-  // State machines for each power-up with initial cooldown from inventory
+  // State machines for each power-up with initial cooldown from inventory and adaptive multiplier
   const freezeTimeState = usePowerUpState('freezeTime', {
     initialCooldownTimestamp: inventory.inventory.cooldownStartedAt.freezeTime,
+    cooldownMultiplier,
   });
   const hintState = usePowerUpState('hint', {
     initialCooldownTimestamp: inventory.inventory.cooldownStartedAt.hint,
+    cooldownMultiplier,
   });
   const scoreMultiplierState = usePowerUpState('scoreMultiplier', {
     initialCooldownTimestamp: inventory.inventory.cooldownStartedAt.scoreMultiplier,
+    cooldownMultiplier,
   });
 
   // Effect activation functions
@@ -244,17 +250,25 @@ export function PowerUpBar({
       {/* Power-Up Bar Container */}
       <div
         className={cn(
-          // Fixed positioning at bottom center
-          'fixed bottom-20 left-1/2 -translate-x-1/2',
+          // Fixed positioning at bottom center - responsive for mobile safe areas
+          'fixed left-1/2 -translate-x-1/2',
+          'bottom-4 sm:bottom-16 lg:bottom-20', // Closer to bottom on mobile for visibility
           'z-40', // Above game board, below HUD overlays
 
-          // Layout - horizontal flex
-          'flex items-center gap-2',
+          // Layout - horizontal flex with mobile-friendly spacing
+          'flex items-center gap-1.5 sm:gap-2',
 
-          // Styling - neo-brutalist
-          'px-4 py-3 rounded-neo',
-          'bg-neo-navy/70 backdrop-blur-sm',
-          'border-t-2 border-neo-black/20',
+          // Max width to prevent overflow on narrow screens
+          'max-w-[90vw] sm:max-w-none',
+
+          // Styling - neo-brutalist with mobile padding
+          'px-2 sm:px-4 py-2 sm:py-3 rounded-neo',
+          'bg-neo-navy/80 backdrop-blur-sm',
+          'border-2 border-neo-black/30',
+          'shadow-hard',
+
+          // Safe area padding for notched devices
+          'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
 
           // Allow pointer events (within pointer-events-none HUD)
           'pointer-events-auto',

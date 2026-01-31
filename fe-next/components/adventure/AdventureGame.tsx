@@ -24,6 +24,7 @@ import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
+import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { ScorePopup } from './juice/ScorePopup';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
@@ -40,6 +41,7 @@ import LexiReaction from './LexiReaction';
 import { BossOverlay } from './boss';
 import GameplayBackground from './themed/GameplayBackground';
 import { PowerUpBar } from './power-ups';
+import { HintMessage } from './HintMessage';
 import type { LevelConfig, TileState, GridTileState, HintResult } from '@/types/adventure';
 
 // ==============================================
@@ -171,6 +173,18 @@ const AdventureGame = memo<AdventureGameProps>(
     // Validate config
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
 
+    // Adaptive difficulty system (affects timer, score targets, power-up cooldowns, and hints)
+    const {
+      tier,
+      adjustedConfig,
+      hintData,
+      powerUpCooldownMultiplier,
+      recordCompletion,
+    } = useAdaptiveDifficulty({
+      world: levelConfig.world,
+      level: levelConfig.level,
+    });
+
     // Meta-progression hooks
     // TODO: Replace 'temp-user-id' with actual user ID from auth context in future phase
     const {
@@ -230,14 +244,15 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [getUpgradeEffect]);
 
     // Apply time bonus to level config (create modified config with bonus time)
+    // NOTE: adjustedConfig already has tier-based timer adjustments from useAdaptiveDifficulty
     const adjustedLevelConfig = useMemo(() => {
       // Time bonus multiplier increases starting time
-      const bonusTime = Math.floor(levelConfig.timerSeconds * (upgradeBonuses.timeBonus - 1));
+      const bonusTime = Math.floor(adjustedConfig.timerSeconds * (upgradeBonuses.timeBonus - 1));
       return {
-        ...levelConfig,
-        timerSeconds: levelConfig.timerSeconds + bonusTime,
+        ...adjustedConfig,
+        timerSeconds: adjustedConfig.timerSeconds + bonusTime,
       };
-    }, [levelConfig, upgradeBonuses.timeBonus]);
+    }, [adjustedConfig, upgradeBonuses.timeBonus]);
 
     // Game state from hook
     const {
@@ -638,12 +653,22 @@ const AdventureGame = memo<AdventureGameProps>(
           objectiveProgress,
           gameState.stars > 0
         );
+
+        // Record completion for adaptive difficulty tier updates
+        recordCompletion({
+          isCompletion: gameState.stars > 0,
+          timeRemaining,
+          timerSeconds: adjustedLevelConfig.timerSeconds,
+          score: gameState.score,
+          words: gameState.wordsFound.length,
+        });
       }
     }, [
       gameState.isComplete,
       timeRemaining,
       pauseGame,
       recordAttempt,
+      recordCompletion,
       levelConfig.world,
       levelConfig.level,
       gameState.wordsFound.length,
@@ -655,6 +680,7 @@ const AdventureGame = memo<AdventureGameProps>(
       bossHealthState.phase,
       endBossBattle,
       triggerBossTaunt,
+      adjustedLevelConfig.timerSeconds,
     ]);
 
     // Helper to calculate popup start position from last selected tile
@@ -962,16 +988,20 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [hasHintsAvailable, getHint, dismissAutoHint]);
 
     // Convert hint path to indices for grid highlighting
-    // Combines both manual hints and power-up hints
+    // Combines adaptive difficulty hints, power-up hints, and manual hints
     const hintHighlightIndices = useMemo(() => {
-      // Power-up hint takes precedence
+      // Adaptive difficulty hint takes highest precedence (appears after multiple failures)
+      if (hintData.level !== 'none' && hintData.highlightTiles && hintData.highlightTiles.length > 0) {
+        return hintData.highlightTiles.map(pos => pos.row * levelConfig.gridSize + pos.col);
+      }
+      // Power-up hint takes second precedence
       if (hintTiles) {
         return hintTiles.map(pos => pos.row * levelConfig.gridSize + pos.col);
       }
       // Otherwise use manual hint from hint button
       if (!currentHint?.path) return [];
       return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-    }, [currentHint, levelConfig.gridSize, hintTiles]);
+    }, [hintData, currentHint, levelConfig.gridSize, hintTiles]);
 
     // Handle score popup completion with safety timeout fallback
     const handlePopupComplete = useCallback(() => {
@@ -1066,91 +1096,97 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Simplified ambient background for gameplay - less distracting than full WorldBackground */}
         <GameplayBackground className="absolute inset-0 -z-10" />
 
-        {/* Header - Compact */}
+        {/* Header - Mobile-optimized compact layout */}
         <header
           className={cn(
             'flex items-center justify-between',
-            'px-3 py-1.5',
-            'bg-neo-navy/80 border-b-2 border-neo-black/30'
+            'px-2 sm:px-3 py-1',
+            'bg-neo-navy/80 border-b-2 border-neo-black/30',
+            'flex-shrink-0' // Prevent header from shrinking
           )}
         >
-          {/* Level Info */}
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-black">{t('adventure.level')} {levelConfig.level}</h1>
+          {/* Level Info - Compact on mobile */}
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <h1 className="text-sm sm:text-lg font-black whitespace-nowrap">
+              <span className="hidden sm:inline">{t('adventure.level')} </span>
+              <span className="sm:hidden">L</span>
+              {levelConfig.level}
+            </h1>
             <div
               ref={scoreDisplayRef}
               data-testid="score-display"
-              className="font-mono font-bold text-sm"
+              className="font-mono font-bold text-xs sm:text-sm"
             >
               {gameState.score}
             </div>
           </div>
 
-          {/* Timer and Pause */}
-          <div className="flex items-center gap-2">
+          {/* Timer and Pause - Always visible */}
+          <div className="flex items-center gap-1 sm:gap-2">
             <AdventureTimer timeRemaining={timeRemaining} size="compact" />
             <button
               onClick={handlePauseToggle}
               aria-label={isPaused ? 'Resume' : 'Pause'}
               className={cn(
-                'p-1.5 rounded-neo',
+                'p-1 sm:p-1.5 rounded-neo',
                 'bg-neo-white/10 hover:bg-neo-white/20',
                 'transition-colors duration-200'
               )}
             >
               {isPaused ? (
-                <Play className="w-4 h-4" />
+                <Play className="w-3 h-3 sm:w-4 sm:h-4" />
               ) : (
-                <Pause className="w-4 h-4" />
+                <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
               )}
             </button>
           </div>
         </header>
 
-        {/* Main Game Area - Compact layout to maximize screen usage */}
-        <main className="flex-1 flex flex-col lg:flex-row gap-2 p-2 overflow-y-auto min-h-0">
-          {/* Grid Section */}
-          <div className="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center gap-1 min-h-0 relative">
+        {/* Main Game Area - Compact layout, minimal spacing on mobile */}
+        <main className="flex-1 flex flex-col lg:flex-row lg:items-start lg:justify-center gap-0.5 sm:gap-2 p-0.5 sm:p-2 overflow-y-auto min-h-0">
+          {/* Grid Section - Centered, minimal top spacing on mobile */}
+          <div className="flex-shrink-0 flex flex-col items-center justify-start gap-0.5 sm:gap-1 min-h-0 relative mt-0 sm:mt-2 lg:mt-4">
             {/* Combo Tier Badge - Positioned above grid */}
             <ComboTierBadge
               comboCount={gameState.comboCount}
-              className="absolute top-[10%] left-1/2 -translate-x-1/2 z-50"
+              className="absolute top-0 sm:top-[10%] left-1/2 -translate-x-1/2 z-50"
               onTierChange={handleComboTierChange}
             />
 
-            {/* Minimum Word Length Hint - Shows when selecting but not yet meeting minimum */}
-            {selectedIndices.length > 0 && selectedIndices.length < minWordLength && (
-              <div
-                data-testid="min-word-hint"
-                className={cn(
-                  'px-3 py-1 rounded-full',
-                  'bg-neo-white/10 border border-neo-white/20',
-                  'text-neo-white/70 text-xs font-medium',
-                  'flex items-center gap-1.5'
-                )}
-              >
-                <span>
-                  {minWordLength === 2
-                    ? t('adventure.hints.minLetters2') || '2+ letters'
-                    : t('adventure.hints.minLetters3') || '3+ letters'}
-                </span>
-                <span className="font-bold text-neo-lime">
-                  {selectedIndices.length}/{minWordLength}
-                </span>
-              </div>
-            )}
-
-            {/* Feedback Container - Minimal height, absolute positioning prevents layout shift */}
+            {/* Feedback Container - Compact on mobile, fixed height prevents layout shift */}
             <div
               data-testid="feedback-container"
-              className="min-h-[28px] flex items-center justify-center"
+              className="h-[28px] sm:h-[36px] flex items-center justify-center relative"
             >
+              {/* Minimum Word Length Hint - Shows when selecting but not yet meeting minimum */}
+              {selectedIndices.length > 0 && selectedIndices.length < minWordLength && (
+                <div
+                  data-testid="min-word-hint"
+                  className={cn(
+                    'px-3 py-1 rounded-full',
+                    'bg-neo-white/10 border border-neo-white/20',
+                    'text-neo-white/70 text-xs font-medium',
+                    'flex items-center gap-1.5',
+                    'animate-in fade-in duration-150'
+                  )}
+                >
+                  <span>
+                    {minWordLength === 2
+                      ? t('adventure.hints.minLetters2') || '2+ letters'
+                      : t('adventure.hints.minLetters3') || '3+ letters'}
+                  </span>
+                  <span className="font-bold text-neo-lime">
+                    {selectedIndices.length}/{minWordLength}
+                  </span>
+                </div>
+              )}
+
               {/* Validation Feedback */}
               {validationFeedback.error && (
                 <div
                   data-testid="validation-error"
                   className={cn(
-                    'px-4 py-2 rounded-neo',
+                    'px-4 py-1.5 rounded-neo',
                     'bg-neo-red/20 border-2 border-neo-red',
                     'text-neo-red font-bold text-sm',
                     'animate-neo-shake'
@@ -1170,6 +1206,13 @@ const AdventureGame = memo<AdventureGameProps>(
                 </div>
               )}
             </div>
+
+            {/* Adaptive Difficulty Hint Message */}
+            {hintData.level !== 'none' && (
+              <div className="flex items-center justify-center">
+                <HintMessage hintData={hintData} />
+              </div>
+            )}
 
             <AdventureGrid
               ref={gridRef}
@@ -1193,21 +1236,26 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           </div>
 
-          {/* Sidebar - Objectives & Combo - Compact */}
+          {/* Sidebar - Objectives & Info - Mobile-optimized */}
           <aside
             className={cn(
-              'flex-shrink-0 lg:w-56 flex flex-col gap-2',
+              // Mobile: horizontal scroll, Desktop: fixed width sidebar
+              'flex-shrink-0 w-full lg:w-48 xl:w-56',
+              'flex flex-row lg:flex-col gap-1.5 sm:gap-2',
+              'overflow-x-auto lg:overflow-visible',
               'lg:border-l-2 lg:border-neo-black/20 lg:pl-2',
-              // Enhanced glass effect with higher opacity for better readability
-              'p-2 rounded-neo',
+              // Compact padding
+              'p-1.5 sm:p-2 rounded-neo',
               'bg-neo-navy/95 backdrop-blur-lg',
               'border-2 border-neo-white/20',
-              'shadow-hard'
+              'shadow-hard',
+              // Safe area for notched mobile devices
+              'mb-16 sm:mb-20 lg:mb-0' // Leave space for PowerUpBar on mobile
             )}
           >
-            {/* Objectives */}
-            <div>
-              <h2 className="text-xs font-bold text-neo-white/80 uppercase tracking-wide mb-1">
+            {/* Objectives - Takes more space on mobile */}
+            <div className="flex-shrink-0 min-w-[140px] lg:min-w-0">
+              <h2 className="text-[10px] sm:text-xs font-bold text-neo-white/80 uppercase tracking-wide mb-0.5 sm:mb-1">
                 {t('adventure.game.objectives')}
               </h2>
               <AdventureObjectives
@@ -1217,70 +1265,74 @@ const AdventureGame = memo<AdventureGameProps>(
               />
             </div>
 
-            {/* Combo Display - Compact */}
+            {/* Combo Display - Compact on mobile */}
             <div
               data-testid="combo-display"
               className={cn(
-                'p-2 rounded-neo',
+                'flex-shrink-0 min-w-[80px] lg:min-w-0',
+                'p-1.5 sm:p-2 rounded-neo',
                 'bg-neo-black/30 border-2 border-neo-cyan/30'
               )}
             >
-              <p className="text-xs font-bold text-neo-white/70 uppercase tracking-wide">
+              <p className="text-[10px] sm:text-xs font-bold text-neo-white/70 uppercase tracking-wide">
                 {t('adventure.game.combo')}
               </p>
-              <p className="text-xl font-black text-neo-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]">
+              <p className="text-lg sm:text-xl font-black text-neo-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]">
                 x{gameState.comboCount}
               </p>
             </div>
 
-            {/* Hint Button - Compact */}
+            {/* Hint Button - Compact on mobile */}
             <button
               onClick={handleHintClick}
               disabled={!hasHintsAvailable}
               data-testid="hint-button"
               aria-label={t('adventure.game.hint')}
               className={cn(
-                'flex items-center justify-center gap-1.5',
-                'p-2 rounded-neo',
-                'text-sm font-bold transition-all duration-200',
+                'flex-shrink-0 flex items-center justify-center gap-1',
+                'p-1.5 sm:p-2 rounded-neo',
+                'text-xs sm:text-sm font-bold transition-all duration-200',
+                'min-w-[70px] lg:min-w-0',
                 hasHintsAvailable
                   ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
                   : 'bg-neo-black/30 text-neo-white/40 border-2 border-neo-white/10 cursor-not-allowed'
               )}
             >
-              <Lightbulb className="w-4 h-4" />
-              {t('adventure.game.hint')}
+              <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('adventure.game.hint')}</span>
             </button>
 
-            {/* Auto-Hint Prompt - Compact */}
+            {/* Auto-Hint Prompt - Hidden on mobile to save space */}
             {showAutoHint && (
               <div
                 data-testid="auto-hint-prompt"
                 className={cn(
-                  'p-2 rounded-neo',
+                  'hidden sm:block flex-shrink-0',
+                  'p-1.5 sm:p-2 rounded-neo',
                   'bg-neo-yellow/20 border-2 border-neo-yellow/50',
                   'animate-neo-pop'
                 )}
               >
-                <p className="text-xs font-bold text-neo-yellow text-center">
+                <p className="text-[10px] sm:text-xs font-bold text-neo-yellow text-center">
                   {t('adventure.game.hintAvailable')}
                 </p>
               </div>
             )}
 
-            {/* Current Hint Display - Compact */}
+            {/* Current Hint Display - More compact on mobile */}
             {currentHint && (
               <div
                 data-testid="current-hint-display"
                 className={cn(
-                  'p-2 rounded-neo',
+                  'flex-shrink-0 min-w-[90px] lg:min-w-0',
+                  'p-1.5 sm:p-2 rounded-neo',
                   'bg-neo-lime/20 border-2 border-neo-lime/50'
                 )}
               >
-                <p className="text-xs font-bold text-neo-lime text-center">
+                <p className="text-[10px] sm:text-xs font-bold text-neo-lime text-center">
                   {t('adventure.game.hintUsed')}
                 </p>
-                <p className="text-base font-black text-neo-white text-center">
+                <p className="text-sm sm:text-base font-black text-neo-white text-center">
                   {currentHint.word}
                 </p>
               </div>
@@ -1296,6 +1348,7 @@ const AdventureGame = memo<AdventureGameProps>(
             tiles={tiles2D}
             wordsFound={gameState.wordsFound}
             cascadeActive={isCascading}
+            cooldownMultiplier={powerUpCooldownMultiplier}
             onFreezeTime={handleFreezeTime}
             onHint={handleHint}
             onScoreMultiplier={handleScoreMultiplier}
