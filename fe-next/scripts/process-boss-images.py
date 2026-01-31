@@ -1,176 +1,107 @@
 #!/usr/bin/env python3
 """
-Boss Image Processor for LexiClash Adventure Mode
+Boss Image Processor
 
-This script:
-1. Removes backgrounds from boss character images using rembg
-2. Compresses images to WebP format (<200KB target)
-3. Outputs optimized images ready for web use
+Removes backgrounds from boss images using rembg and optimizes them.
+Run: python scripts/process-boss-images.py
 
 Requirements:
-    pip install rembg pillow
-
-Usage:
-    python process-boss-images.py
+- pip install rembg pillow
 """
 
 import os
-import sys
 from pathlib import Path
 
 try:
     from rembg import remove
     from PIL import Image
-    import io
 except ImportError:
-    print("Missing dependencies. Please install:")
-    print("  pip install rembg pillow")
-    sys.exit(1)
+    print("Error: Required packages not installed.")
+    print("Run: pip install rembg pillow")
+    exit(1)
 
 
 # Configuration
-INPUT_DIR = Path(__file__).parent.parent / "public/images/adventure/bosses"
-OUTPUT_DIR = INPUT_DIR  # Output to same directory
-TARGET_SIZE_KB = 180  # Target file size in KB (leave buffer for 200KB limit)
-MAX_DIMENSION = 512  # Max width/height for boss portraits
+INPUT_DIR = Path("public/images/bosses")
+OUTPUT_DIR = Path("public/images/bosses")
+MAX_SIZE = (800, 800)  # Max dimensions
+TARGET_SIZE_KB = 200   # Target file size in KB
 
 
-def get_raw_images() -> list[Path]:
-    """Find all raw (unprocessed) boss images."""
-    return list(INPUT_DIR.glob("*-raw.png"))
+def process_image(input_path: Path, output_path: Path) -> dict:
+    """Remove background and optimize a single image."""
+    stats = {"input": input_path.name, "success": False}
 
+    try:
+        # Read and remove background
+        with open(input_path, "rb") as f:
+            input_data = f.read()
+            output_data = remove(input_data)
 
-def remove_background(input_path: Path) -> Image.Image:
-    """Remove background from image using rembg."""
-    print(f"  Removing background from {input_path.name}...")
+        # Load as PIL image for optimization
+        from io import BytesIO
+        img = Image.open(BytesIO(output_data))
 
-    with open(input_path, "rb") as f:
-        input_data = f.read()
+        # Convert to RGBA if needed
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
 
-    output_data = remove(input_data)
-    return Image.open(io.BytesIO(output_data)).convert("RGBA")
+        # Resize if too large
+        if img.size[0] > MAX_SIZE[0] or img.size[1] > MAX_SIZE[1]:
+            img.thumbnail(MAX_SIZE, Image.Resampling.LANCZOS)
 
+        # Save as PNG (WebP conversion done by sharp in Node.js)
+        output_png = output_path.with_suffix(".png")
+        img.save(output_png, "PNG", optimize=True)
 
-def resize_image(img: Image.Image, max_dim: int) -> Image.Image:
-    """Resize image to fit within max dimensions while maintaining aspect ratio."""
-    width, height = img.size
+        stats["output"] = output_png.name
+        stats["size_kb"] = output_png.stat().st_size / 1024
+        stats["success"] = True
 
-    if width <= max_dim and height <= max_dim:
-        return img
+        print(f"Processed: {input_path.name} -> {output_png.name} ({stats['size_kb']:.1f}KB)")
 
-    if width > height:
-        new_width = max_dim
-        new_height = int(height * (max_dim / width))
-    else:
-        new_height = max_dim
-        new_width = int(width * (max_dim / height))
+    except Exception as e:
+        stats["error"] = str(e)
+        print(f"Error processing {input_path.name}: {e}")
 
-    print(f"  Resizing from {width}x{height} to {new_width}x{new_height}")
-    return img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-
-
-def compress_to_webp(img: Image.Image, output_path: Path, target_kb: int) -> int:
-    """Compress image to WebP format, targeting a specific file size."""
-    # Start with high quality and reduce if needed
-    quality = 85
-    min_quality = 50
-
-    while quality >= min_quality:
-        buffer = io.BytesIO()
-        img.save(buffer, format="WEBP", quality=quality, method=6)
-        size_kb = len(buffer.getvalue()) / 1024
-
-        if size_kb <= target_kb:
-            # Save to file
-            with open(output_path, "wb") as f:
-                f.write(buffer.getvalue())
-            return int(size_kb)
-
-        quality -= 5
-
-    # If we can't meet target, save at minimum quality
-    buffer = io.BytesIO()
-    img.save(buffer, format="WEBP", quality=min_quality, method=6)
-    with open(output_path, "wb") as f:
-        f.write(buffer.getvalue())
-    return int(len(buffer.getvalue()) / 1024)
-
-
-def process_image(input_path: Path) -> tuple[str, int]:
-    """Process a single boss image: remove bg, resize, compress."""
-    # Generate output filename (remove -raw suffix, change to .webp)
-    output_name = input_path.stem.replace("-raw", "") + ".webp"
-    output_path = OUTPUT_DIR / output_name
-
-    # Step 1: Remove background
-    img = remove_background(input_path)
-
-    # Step 2: Resize if needed
-    img = resize_image(img, MAX_DIMENSION)
-
-    # Step 3: Compress to WebP
-    final_size = compress_to_webp(img, output_path, TARGET_SIZE_KB)
-
-    return output_name, final_size
+    return stats
 
 
 def main():
-    """Main entry point."""
-    print("=" * 60)
-    print("LexiClash Boss Image Processor")
-    print("=" * 60)
-    print()
+    """Process all boss images."""
+    print("Boss Image Processor")
+    print("=" * 50)
 
-    # Find raw images
-    raw_images = get_raw_images()
+    # Find all raw images
+    raw_images = list(INPUT_DIR.glob("*-raw.png"))
 
     if not raw_images:
         print(f"No raw images found in {INPUT_DIR}")
-        print("Looking for files matching pattern: *-raw.png")
-        sys.exit(1)
+        print("Expected files like: boss-ms-grammar-raw.png")
+        return
 
-    print(f"Found {len(raw_images)} raw boss images to process:")
-    for img in raw_images:
-        print(f"  - {img.name}")
-    print()
+    print(f"Found {len(raw_images)} images to process\n")
 
-    # Process each image
     results = []
-    for input_path in raw_images:
-        print(f"Processing {input_path.name}...")
-        try:
-            output_name, size_kb = process_image(input_path)
-            results.append((output_name, size_kb, "OK"))
-            print(f"  -> {output_name} ({size_kb} KB)")
-        except Exception as e:
-            results.append((input_path.name, 0, f"ERROR: {e}"))
-            print(f"  -> ERROR: {e}")
-        print()
+    for raw_path in sorted(raw_images):
+        # Output name without -raw suffix
+        output_name = raw_path.name.replace("-raw", "")
+        output_path = OUTPUT_DIR / output_name
+
+        result = process_image(raw_path, output_path)
+        results.append(result)
 
     # Summary
-    print("=" * 60)
-    print("PROCESSING COMPLETE")
-    print("=" * 60)
-    print()
-    print(f"{'Filename':<35} {'Size':<10} {'Status':<15}")
-    print("-" * 60)
-    for name, size, status in results:
-        size_str = f"{size} KB" if size > 0 else "N/A"
-        print(f"{name:<35} {size_str:<10} {status:<15}")
+    print("\n" + "=" * 50)
+    successful = sum(1 for r in results if r["success"])
+    print(f"Processed: {successful}/{len(results)} images")
 
-    # Check for any files over target
-    oversized = [r for r in results if r[1] > TARGET_SIZE_KB]
-    if oversized:
-        print()
-        print(f"WARNING: {len(oversized)} files exceed {TARGET_SIZE_KB} KB target")
-
-    print()
-    print(f"Output directory: {OUTPUT_DIR}")
-    print()
-    print("Next steps:")
-    print("  1. Review generated images visually")
-    print("  2. Delete *-raw.png files if satisfied")
-    print("  3. Commit the .webp files to git")
+    # Check file sizes
+    large_files = [r for r in results if r.get("size_kb", 0) > TARGET_SIZE_KB]
+    if large_files:
+        print(f"\nWarning: {len(large_files)} files exceed {TARGET_SIZE_KB}KB:")
+        for f in large_files:
+            print(f"  - {f['output']}: {f['size_kb']:.1f}KB")
 
 
 if __name__ == "__main__":

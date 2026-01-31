@@ -48,7 +48,7 @@ function defineBoss(
     displayName: `adventure.bosses.${id}.name`,
     personality,
     visualTheme,
-    imagePath: `/images/adventure/bosses/${imageSlug}.webp`,
+    imagePath: `/images/bosses/boss-${imageSlug}.webp`,
     twistMechanic: {
       ...twistMechanic,
       description: `adventure.bosses.${id}.mechanic`,
