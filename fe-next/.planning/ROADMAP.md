@@ -360,17 +360,21 @@ Plans:
 #### Phase 29: Adaptive Difficulty System
 **Goal**: All skill levels stay in flow state through invisible difficulty adjustments
 **Depends on**: Phase 27 (board mechanics), Phase 28 (power-ups)
-**Requirements**: DIFF-01, DIFF-02, DIFF-03, DIFF-04, DIFF-05
+**Requirements**: DIFF-02, DIFF-03, DIFF-04, DIFF-05 (DIFF-01 removed per CONTEXT.md - system is invisible, no player selection)
 **Success Criteria** (what must be TRUE):
-  1. User can select explicit difficulty (Easy/Medium/Hard) when starting level
-  2. System selects pre-game difficulty based on performance (3-state: easy/normal/hard, invisible)
-  3. System provides gradual unlock hints after 3 failures
-  4. Difficulty adjustments are invisible to user (no obvious rubber-banding)
-  5. Boss fights have fixed difficulty (learnable patterns, excluded from adaptive scaling)
-**Plans**: TBD
+  1. System selects pre-game difficulty based on performance (3-state: easy/normal/hard, invisible)
+  2. System provides gradual unlock hints after 3 failures on same level
+  3. Difficulty adjustments are invisible to user (no obvious rubber-banding)
+  4. Boss fights have fixed difficulty (learnable patterns, excluded from adaptive scaling)
+**Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 29-01: TBD during plan-phase
+- [ ] 29-01-PLAN.md — Performance tracker utilities TDD (Wave 1)
+- [ ] 29-02-PLAN.md — Tier assigner logic TDD (Wave 1)
+- [ ] 29-03-PLAN.md — Hint escalation system TDD (Wave 1)
+- [ ] 29-04-PLAN.md — Config adjuster + barrel exports (Wave 2)
+- [ ] 29-05-PLAN.md — useAdaptiveDifficulty hook + translations (Wave 2)
+- [ ] 29-06-PLAN.md — AdventureGame integration + verification (Wave 3)
 
 #### Phase 30: Boss Battle Overhaul
 **Goal**: Boss battles feel like epic cinematic fights, not just harder puzzles
@@ -499,7 +503,7 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 26. Meta-Progression Foundation | v2.0 | 9/9 | ✅ Complete | 2026-01-30 |
 | 27. Dynamic Board Mechanics | v2.0 | 7/7 | ✅ Complete | 2026-01-30 |
 | 28. Power-Up System | v2.0 | 8/8 | ✅ Complete | 2026-01-30 |
-| 29. Adaptive Difficulty System | v2.0 | 0/TBD | Not started | - |
+| 29. Adaptive Difficulty System | v2.0 | 0/6 | 🚧 Planned | - |
 | 30. Boss Battle Overhaul | v2.0 | 0/TBD | Not started | - |
 | 31. Skill Tree & Progression Depth | v2.0 | 0/TBD | Not started | - |
 | 32. Visual Polish & Effects | v2.0 | 0/TBD | Not started | - |
@@ -510,4 +514,4 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-30 after Phase 28 complete (Power-Up System)*
+*Last updated: 2026-01-31 after Phase 29 planning complete (Adaptive Difficulty System)*
