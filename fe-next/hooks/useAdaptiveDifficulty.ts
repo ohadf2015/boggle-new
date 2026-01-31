@@ -79,7 +79,7 @@ export function useAdaptiveDifficulty(
   options: UseAdaptiveDifficultyOptions
 ): UseAdaptiveDifficultyReturn {
   const { world, level } = options;
-  const { attempts, recordAttempt } = useProgression();
+  const { attempts = [], recordAttempt } = useProgression();
 
   // Initialize tier from localStorage
   const [tier, setTier] = useState<DifficultyTier>(() => getCurrentTier());
