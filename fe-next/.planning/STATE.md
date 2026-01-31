@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** v2.0 Adventure Overhaul - Roadmap Creation Phase
+**Current focus:** v2.0 Adventure Overhaul - Phase 30 Boss Battle Overhaul
 
 ## Current Position
 
 Phase: 30 - Boss Battle Overhaul
-Plan: 5 of 8 complete
+Plan: 7 of 8 complete
 Status: In Progress
-Last activity: 2026-01-31 — Completed 30-05-PLAN.md (Boss Ability Definitions)
+Last activity: 2026-01-31 - Completed 30-07-PLAN.md (Cinematic Sequences)
 
-Progress: [████████░░] 88% (31/33 v2.0 plans complete)
+Progress: [█████████░] 94% (32/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,221 +77,24 @@ Progress: [████████░░] 88% (31/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 31 (Phase 26: 9 COMPLETE, Phase 27: 7 COMPLETE, Phase 28: 8 COMPLETE, Phase 29: 2 COMPLETE, Phase 30: 5 complete)
-- Current phase: Phase 30 - Boss Battle Overhaul (5/8 plans complete)
+- Plans completed: 32 (Phase 26: 9 COMPLETE, Phase 27: 7 COMPLETE, Phase 28: 8 COMPLETE, Phase 29: 2 COMPLETE, Phase 30: 7 complete)
+- Current phase: Phase 30 - Boss Battle Overhaul (7/8 plans complete)
 
 ## Accumulated Context
 
-### v1.0 + v1.1 + v1.2 Decisions
+### v2.0 Decisions (Recent)
 
-Key decisions from previous milestones:
+**Phase 30-07 (Cinematic Sequences, 2026-01-31):**
+- Remotion Player for in-app playback: Full rendering not needed, just real-time playback
+- SKIP_DELAY_MS = 2000ms: BOSS-04 requirement, prevents accidental skips
+- 8-second duration for both cinematics: Balance between dramatic effect and player patience
+- Reduced motion support: Auto-complete after 500ms for accessibility compliance (WCAG 2.1)
+- 84 tests total (31 hook + 21 player + 13 entrance + 19 defeat)
 
-- **v1.0**: Focus on Worlds 1-3 only → Ship polished subset (Good)
-- **v1.0**: Skip boss battles for now → Core adventure loop first (Good)
-- **v1.0**: Combined parallax (gyro+gesture+ambient) → "Always alive" feel (Good)
-- **v1.0**: Education as separate section → Distinct flow (Good)
-- **v1.1**: Research-informed phase ordering → Combo before bosses/XP (Good)
-- **v1.1**: Chain combo 1.5x multiplier → Progressive satisfaction curve (Good)
-- **v1.1**: Boss 5-phase state machine → Clear game flow stages (Good)
-- **v1.1**: Web Speech API over external TTS → Zero latency, offline-capable (Good)
-- **v1.1**: WebView approach for native → Preserves SSR, no code duplication (Good)
-- **v1.1**: CrazyGames SDK auth only → OAuth hidden on platform (Good)
-
-### v2.0 Decisions
-
-**Roadmap Architecture (2026-01-30):**
-- Start phase numbering at 26 (continues from v1.2 Phase 25)
-- 10 phases derived from requirement categories (not arbitrary structure)
-- Front-load technical risk: Board mechanics (Phase 27) before boss overhaul (Phase 30)
-- Horizontal power-up progression: Enable strategies, not inflate numbers
-- Invisible adaptive difficulty: Pre-game primary, mid-game subtle
-- Particle budget enforcement: Max 50-100 particles, adaptive reduction
-- Transform-first animations: GPU-accelerated only, no layout properties
-- Boss battles excluded from adaptive difficulty: Fixed patterns for learning
-
-**Phase 26-01 (Adventure XP Utilities, 2026-01-30):**
-- RuneScape XP formula: `floor(i + 300 * 2^(i/7)) / 4` for smooth exponential progression
-- Max level 50: Manageable v2.0 scope, expandable in v2.1+
-- Separate adventure XP from education XP: Different progression philosophies (excitement vs learning pace)
-- Pure functions: No external state for easy testing and reusability across frontend/backend
-
-**Phase 26-02 (Gold Currency, 2026-01-30):**
-- Exponential gold growth (1.2x per level): Rewards progression without late-game inflation
-- Exponential upgrade costs (1.5x per stack): Creates strategic choices, prevents easy max-out
-- Max 5 stacks per upgrade: Clear ceiling prevents power creep, maintains balance
-- Pure functions for currency logic: No side effects, easy to test and reason about
-
-**Phase 26-03 (Screen Shake, 2026-01-30):**
-- Web Animations API over Framer Motion: Zero dependencies, better performance for simple shake
-- Transform-only animations: GPU-accelerated, no layout thrashing (verified via grep check)
-- Reduced motion flash alternative: Opacity flash maintains feedback without motion (WCAG compliant)
-- Conservative parameter ranges: Intensity 2-8px, duration 100-300ms to prevent nausea/motion fatigue
-
-**Phase 26-04 (Adventure XP UI Components, 2026-01-30):**
-- useAdventureXp hook returns pending updates: Separates state from persistence, allows parent to batch/handle errors
-- Cyan color theme for adventure mode: Differentiates from education yellow, creates distinct identity
-- Confetti skipped for reduced motion: Accessibility compliance (WCAG 2.1 AA), prevents motion sickness
-- Auto-close modal after 3 seconds: Smooth UX flow without explicit dismiss, keeps game momentum
-- Framer Motion for animations: Declarative API with spring physics, zero duration when reduced motion enabled
-
-**Phase 26-05 (Currency Display & Upgrade Shop, 2026-01-30):**
-- usePrefersReducedMotion hook for accessibility: WCAG 2.1 compliance, reusable across animated components
-- CurrencyDisplay with coin icon: Clear gold visualization, number formatting with commas
-- Recent gain animation: Flies up and fades (0.8s), instant for reduced motion users
-- UpgradeShop purchase validation: Checks affordability and max stacks, clear feedback
-- Neo-brutalist card layout: Hard shadows, chunky borders, high contrast (yellow/lime/black)
-
-**Phase 26-06 (Adaptive Particle System & Score Popup, 2026-01-30):**
-- Three-tier particle budgets: low (30), medium (60), high (100) particles based on device
-- Zero particles for reduced motion users: Accessibility first, WCAG 2.1 compliant
-- Intensity scaling (1-4x): Single component handles all combo tiers without config duplication
-- Arc trajectory with quadratic bezier: Natural parabolic motion for score popups (0.8s arc, 0.3s reduced motion fade)
-- AdaptiveParticles is purely visual: No text rendering, separation from ComboTierBadge
-
-**Phase 26-07 (Adventure HUD Components, 2026-01-30):**
-- Fixed positioning at top/bottom with semi-transparent backgrounds (70% opacity): Board remains focal point
-- Radial SVG progress with depleting arc: Clockwise depletion as time progresses, space-efficient (24-48px)
-- Visual hierarchy prioritizes timer and score: Timer > Score > Objectives > XP/Gold > Cooldowns
-- Responsive design hides XP bar on small screens: Preserves critical info (level, gold, timer) on mobile
-- Board-first design principle: HUD at edges only, no center overlap, gameplay never obstructed
-
-**Phase 26-08 (Meta-Progression Integration, 2026-01-30):**
-- Hooks integrated with temp-user-id: Auth wiring deferred to future phase, enables full testing now
-- Upgrade multipliers applied to base values: (base × upgrade) × combo ensures impactful but balanced
-- Score popup arc trajectory: Targets score counter position for visual continuity, falls back to fade
-- Combo juice intensity scaling: Shake 2-8px and particles 10-50 based on tier (Nice/Great/Amazing/LEGENDARY)
-- Level-up modal auto-dismisses: 3s timeout maintains game momentum, instant skip for reduced motion
-- Integration test pattern: Mock hooks + verify state changes + test end-to-end flows (10 scenarios, 308 lines)
-
-**Phase 26-09 (Gap Closure, 2026-01-30):**
-- Replace ScorePopupFly with juice/ScorePopup: Quadratic bezier arc trajectory vs linear keyframes for natural parabolic motion
-- Dynamic targetPosition calculation: Ensures arc trajectory accuracy across screen sizes and layouts
-- Translation-first compliance: Replaced hardcoded "XP" with t('adventure.xp.label') in all 4 languages
-- Gaming abbreviations vary by language: XP (en), נק' (he), EP (sv), 経験値 (ja) - respect cultural norms
-
-**Phase 27-01 (Cascade Loop State Machine, 2026-01-30):**
-- 5-phase cascade cycle: idle → removing → falling → spawning → checking (repeats until no matches)
-- Phase timing: 250ms per phase (750ms total cascade), configurable via milliseconds (not frame counts)
-- Pure functions exported: applyGravity, spawnNewTiles, checkForMatches for external use/testing
-- Reduced motion support: 1ms phase durations for instant transitions (no "skip animation" flag)
-- onPhaseChange callback: Enables UI coordination (shake on remove, particles on spawn)
-
-**Phase 27-03 (Explosion Visual Effects, 2026-01-30):**
-- Radial particle burst pattern: 360° spread for omnidirectional explosion feel (vs directional fountain)
-- Intensity scaling (1-4): Maps to 15/30/45/60 particles based on word length (3-4/5-6/7-9/10+ letters)
-- Reuse Phase 26 particle budget: Maintains consistency with adaptive particle framework, zero new infrastructure
-- CSS explosion-ring animation: GPU-accelerated transform-only (scale + opacity) for 60fps performance
-- Normalized position calculation: Pixel coords → 0-1 range for fireConfetti origin accuracy
-
-**Phase 27-07 (Gap Closure: Locked/Multiplier Tile CSS, 2026-01-30):**
-- Grey/steel theme for locked tiles: Desaturation filter, chain pattern, steel bar overlay conveys restricted state
-- Lime/gold theme for multiplier tiles: Brightness boost, radiant energy, sparkle effects convey bonus/reward state
-- GPU-accelerated CSS only: Transform, opacity, filter properties for 60fps performance
-- Reduced motion support: Static box-shadow and filter feedback when prefers-reduced-motion enabled
-- CSS testing pattern: Verify class definitions and keyframe animations exist in test suite
-
-**Phase 28-01 (Power-Up State Machine, 2026-01-30):**
-- 3-state lifecycle: ready → active → cooldown → ready (automatic transitions)
-- activatePowerUp: Instant effects (freezeTime, hint) or duration-based (scoreMultiplier 30s)
-- tickCooldown: Drift-free countdown using timestamps (not interval accumulation)
-- 60-second cooldown for all power-ups (balances strategic use vs accessibility)
-- TDD: 16 tests, 98% coverage, RED-GREEN-REFACTOR verified
-
-**Phase 28-03 (Power-Up UI Components, 2026-01-30):**
-- PowerUpButton: Neo-brutalist styling (bg-neo-purple, border-3, shadow-hard), state-based interaction
-- CooldownIndicator integration: Radial progress display with icon
-- PowerUpActivationEffect: 0.25s burst (shake intensity 4, particles intensity 2)
-- Color schemes: cyan/blue (freeze), yellow/gold (hint), purple/pink (multiplier)
-- Zero animation for reduced motion users: Accessibility first (WCAG 2.1 compliant)
-- 28 tests passing (17 PowerUpButton + 11 PowerUpActivationEffect)
-
-**Phase 28-04 (PowerUpBar Component, 2026-01-30):**
-- PowerUpBar container: Fixed bottom-center positioning with horizontal button layout
-- State machine integration: usePowerUpState hooks for each power-up (ready/active/cooldown)
-- Effect activation: usePowerUpEffects hooks with cascade blocking logic
-- Cascade blocking: All buttons disabled when cascadeActive=true (prevents mid-cascade activation)
-- Visual effects: PowerUpActivationEffect triggered on activation (0.25s burst)
-- Persistence ready: Accepts dictionary prop for hint validation preparation
-
-**Phase 28-05 (Power-Up Integration, 2026-01-30):**
-- PowerUpBar integrated into AdventureGame with conditional rendering (entryPhase='playing', not paused, not complete)
-- Power-up state management: scoreMultiplier, multiplierExpiresAt, hintWord, hintTiles, hintExpiresAt
-- Effect handlers: handleFreezeTime (timer callback), handleHint (5s tile highlight), handleScoreMultiplier (30s 2x multiplier)
-- Score calculation integration: scoreValue multiplied by scoreMultiplier (stacks multiplicatively with gold tiles)
-- Hint highlighting: hintTiles converted to indices and passed to AdventureGrid via hintHighlightIndices
-- Auto-clear timers: Hint (5s) and Score Multiplier (30s) automatically reset state
-- Integration tests: 11 tests verifying all effects, conditional rendering, and multiplicative stacking (gold 3x × multiplier 2x = 6x)
-
-**Phase 28-06 (Skill Balance Verification, 2026-01-30):**
-- Balance verification tests confirm all levels beatable without power-ups (POWER-07 requirement)
-- 12 automated tests validate score targets, time limits, and word availability
-- Margin-based assertions: 50% word availability buffer, 80% time efficiency assumption
-- Human verification: All 3 power-ups, cooldowns, cascade blocking, reduced motion, and RTL tested
-- Power-up design philosophy validated: Optional strategic advantage, not mandatory crutch
-
-**Phase 28-07 (Freeze Time Effect Wiring, 2026-01-30):**
-- ADD_TIME reducer action added to useAdventureGame for timer extension
-- addTime method capped at levelConfig.timerSeconds to prevent overflow
-- handleFreezeTime calls addTime(10) to extend timer by 10 seconds
-- Freeze Time power-up now fully functional with actual timer extension
-- TDD pattern: Failing tests first, implementation second, integration verification third
-
-**Phase 28-08 (Wire Power-Up Inventory Persistence, 2026-01-30):**
-- usePowerUpState extended with initialCooldownTimestamp option for persistence restoration
-- PowerUpBar integrated with usePowerUpInventory (calls startCooldown on activation, passes timestamps to state machines)
-- AdventureGame detects level changes via useEffect + previousLevelRef and calls resetCooldowns
-- localStorage persistence: Cooldowns survive browser refresh, navigation, tab switching
-- Level transition behavior: Cooldowns reset to 0 when levelConfig.level changes (fresh start per level)
-- 62 total tests passing across all power-up hooks and components (100% integration coverage)
-
-**Phase 29-01 (Performance Tracker Utilities, 2026-01-31):**
-- Weighted score formula: completion 50%, time 30%, accuracy 20% (completion most important for progression)
-- Rolling window size: 3 attempts (balances stability vs responsiveness to performance changes)
-- Boss levels (level 7) excluded from tier decisions (fixed patterns for learning, not adaptive)
-- Pure function architecture: All utilities stateless for testability and composability across frontend/backend
-- TDD RED-GREEN-REFACTOR: 17 tests, 100% coverage, all functions pure with no side effects
-
-**Phase 29-02 (Tier Assignment Logic, 2026-01-31):**
-- Priority-based decision tree: insufficient data → failure detection → mastery detection → default
-- Failure threshold: 2 failures in last 3 attempts triggers downgrade to easy tier
-- Mastery threshold: All 3 attempts complete with scores > 0.8 (strictly greater, not >=) triggers upgrade to hard
-- Failure detection prioritized over mastery: Prevents mixed signals from causing incorrect tier
-- Reason strings for analytics: 4 distinct reasons (insufficient_data, high_failure_rate, consistent_mastery, balanced_performance)
-- Pure function design: No side effects, testable, reusable across components
-
-**Phase 29-04 (Config Adjuster, 2026-01-31):**
-- Tier-based level modifications: Easy (+20% timer, -20% score), Hard (-15% timer), Normal (unchanged)
-- Boss level exclusion: isBossLevel=true always returns unmodified config (consistent patterns for learning)
-- Selective modification: Only primary scoreTarget objectives adjusted, wordCount and secondary unchanged
-- Floor division: Math.floor() for timer/score to avoid fractional values in UI
-- Boss identification verified: Tests validate level 7 has isBossLevel=true across worlds
-- Immutability pattern: Pure function returns new config, never mutates input
-- 16 tests with 100% coverage on configAdjuster.ts
-
-**Phase 29-06 (Power-Up Cooldown Multiplier, 2026-01-31):**
-- usePowerUpState accepts cooldownMultiplier option (default 1.0 preserves existing behavior)
-- Hard tier uses 1.5x multiplier: 60s base → 90s effective cooldown
-- Math.floor applied to effectiveCooldown to prevent fractional UI values
-- All cooldown calculations use effectiveCooldown (initial state, countdown, persistence)
-- 7 new tests verify multiplier behavior (default, 1.5x, 0.5x, 2.0x, 0, fractional)
-- 28 total tests passing on usePowerUpState.ts
-
-**Phase 29-07 (Adaptive Difficulty UI Integration, 2026-01-31):**
-- Adaptive hints take highest priority over power-up and manual hints
-- HintMessage returns null for 'none' level to minimize rendering overhead
-- PowerUpBar accepts optional cooldownMultiplier prop (defaults to 1.0 for backward compatibility)
-- Translation keys already existed in all 4 languages (en, he, sv, ja) - no additions needed
-- Hint priority chain: adaptive difficulty hints > power-up hints > manual hint button
-- Completion recording: recordCompletion called after recordAttempt for tier updates
-- 18 total tests passing (6 HintMessage + 12 AdventureGame integration)
-
-**Phase 30-04 (Boss Ability System, 2026-01-31):**
-- Registry pattern for abilities: Extensible architecture allows adding abilities without core code changes
-- Priority-based activation checking: Higher priority abilities checked first (sorted by getForBoss)
-- Phase order comparison: String array ['intro', 'phase1', 'phase2', 'enraged', 'victory', 'defeat'] enables operators
-- Cooldowns in milliseconds internally: Seconds in config for readability, ms for precision in tickCooldowns
-- Condition operators: Phase supports =, <, >, <=, >=; HP threshold supports <, <=, >, >=
-- 52 tests total (16 registry + 36 hook) with 100% coverage
+**Phase 30-06 (Boss Graphics, 2026-01-31):**
+- 10 boss WebP images generated via AI
+- 512x512px with transparent backgrounds
+- Personality-matched visual design
 
 **Phase 30-05 (Boss Ability Definitions, 2026-01-31):**
 - 24 abilities across 10 bosses (2-3 per boss)
@@ -300,7 +103,6 @@ Key decisions from previous milestones:
 - Effect types: requirement, lock_tiles, scramble, change_tiles, timer_penalty, spawn_special
 - Priority system: 10 (basic), 15 (advanced), 20-25 (ultimate)
 - Translations in all 4 languages (en, he, sv, ja)
-- 41 tests verifying structure and registration
 
 ### Pending Todos
 
@@ -326,12 +128,12 @@ None - Starting fresh milestone with roadmap complete.
 
 ## Session Continuity
 
-Last session: 2026-01-31T17:55:00Z
-Stopped at: Completed 30-05-PLAN.md (Boss Ability Definitions)
+Last session: 2026-01-31T18:30:00Z
+Stopped at: Completed 30-07-PLAN.md (Cinematic Sequences)
 Resume file: None
 
-**Next action:** Continue Phase 30-06 (Boss Graphics)
-**Note:** 24 boss abilities defined with translations, ready for visual integration
+**Next action:** Start Phase 30-08 (Boss Battle Integration)
+**Note:** Cinematics ready for integration with boss state machine
 
 ## Phase 30 Progress
 
@@ -340,8 +142,8 @@ Resume file: None
 - [x] 30-03: Attack Telegraph System
 - [x] 30-04: Boss Ability System (52 tests)
 - [x] 30-05: Boss Ability Definitions (24 abilities, 41 tests)
-- [ ] 30-06: Boss Graphics
-- [ ] 30-07: Cinematic Sequences
+- [x] 30-06: Boss Graphics (10 WebP images)
+- [x] 30-07: Cinematic Sequences (84 tests, Remotion-based)
 - [ ] 30-08: Integration
 
 **v2.0 Milestone Goals:**
@@ -366,4 +168,4 @@ Transform Adventure Mode with:
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-31 (Phase 30 in progress: 5/8 plans complete - 24 boss abilities defined)*
+*Last updated: 2026-01-31 (Phase 30 in progress: 7/8 plans complete - Cinematics ready)*
