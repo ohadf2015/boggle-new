@@ -379,29 +379,30 @@ Plans:
 - [x] 29-07-PLAN.md — AdventureGame integration + hint UI rendering (Wave 3)
 - [x] 29-08-PLAN.md — Human verification (Wave 4)
 
-#### Phase 30: Boss Battle Overhaul
+#### ✅ Phase 30: Boss Battle Overhaul — COMPLETE
 **Goal**: Boss battles feel like epic cinematic fights, not just harder puzzles
 **Depends on**: Phase 27 (board mechanics), Phase 28 (power-ups), Phase 29 (difficulty)
 **Requirements**: BOSS-01, BOSS-02, BOSS-03, BOSS-04, BOSS-05, BOSS-06, BOSS-07, BOSS-08
 **Success Criteria** (what must be TRUE):
-  1. User battles bosses with 5-phase state machine (intro → phase1 → phase2 → enraged → victory/defeat)
-  2. User sees segmented HP bar with phase indicators showing boss progression
-  3. User sees telegraphed boss attacks (2s visual warning before activation)
-  4. User sees 5-10s cinematic intro (skippable after 2s) when entering boss battle
-  5. Bosses have 2-3 unique abilities per boss registered in extensible ability system
-  6. User sees unique graphics per boss (Image MCP + rembg pipeline)
-  7. Boss entrance and defeat have cinematic sequences
-**Plans**: 8 plans in 7 waves
+  1. ✓ User battles bosses with 5-phase state machine (intro → phase1 → phase2 → enraged → victory/defeat)
+  2. ✓ User sees segmented HP bar with phase indicators showing boss progression
+  3. ✓ User sees telegraphed boss attacks (2s visual warning before activation)
+  4. ✓ User sees 5-10s cinematic intro (skippable after 2s) when entering boss battle
+  5. ✓ Bosses have 2-3 unique abilities per boss registered in extensible ability system
+  6. ✓ User sees unique graphics per boss (Image MCP + rembg pipeline)
+  7. ✓ Boss entrance and defeat have cinematic sequences
+**Plans**: 8 plans in 7 waves (300+ tests)
+**Completed**: 2026-01-31
 
 Plans:
-- [ ] 30-01-PLAN.md — XState 5-phase state machine (TDD, Wave 1)
-- [ ] 30-02-PLAN.md — Segmented HP bar redesign (Wave 2)
-- [ ] 30-03-PLAN.md — Attack telegraph system (Wave 2)
-- [ ] 30-04-PLAN.md — Boss ability system foundation (TDD, Wave 3)
-- [ ] 30-05-PLAN.md — Boss abilities for 10 bosses (Wave 4)
-- [ ] 30-06-PLAN.md — Boss graphics pipeline (Wave 5)
-- [ ] 30-07-PLAN.md — Cinematic system (Wave 6)
-- [ ] 30-08-PLAN.md — Integration & human verification (Wave 7)
+- [x] 30-01-PLAN.md — XState 5-phase state machine (TDD, Wave 1)
+- [x] 30-02-PLAN.md — Segmented HP bar redesign (Wave 2)
+- [x] 30-03-PLAN.md — Attack telegraph system (Wave 2)
+- [x] 30-04-PLAN.md — Boss ability system foundation (TDD, Wave 3)
+- [x] 30-05-PLAN.md — Boss abilities for 10 bosses (Wave 4)
+- [x] 30-06-PLAN.md — Boss graphics pipeline (Wave 5)
+- [x] 30-07-PLAN.md — Cinematic system (Wave 6)
+- [x] 30-08-PLAN.md — Integration & human verification (Wave 7)
 
 #### Phase 31: Skill Tree & Progression Depth
 **Goal**: Long-term progression provides meaningful horizontal choices, not just bigger numbers
