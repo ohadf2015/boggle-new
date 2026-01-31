@@ -4166,6 +4166,104 @@ const ja = {
         "requirementMet": "条件達成!",
         "requirementMissed": "条件未達成"
       },
+      "abilities": {
+        "popQuiz": {
+          "name": "抜き打ちテスト",
+          "desc": "5文字以上の単語を使え！"
+        },
+        "redPen": {
+          "name": "赤ペン",
+          "desc": "タイルがロックされた！"
+        },
+        "detention": {
+          "name": "居残り",
+          "desc": "5秒減少！"
+        },
+        "beeSwarm": {
+          "name": "蜂の群れ",
+          "desc": "べとべとタイル出現！"
+        },
+        "spellingSting": {
+          "name": "スペリングスティング",
+          "desc": "文字が変わった！"
+        },
+        "synonymShuffle": {
+          "name": "類義語シャッフル",
+          "desc": "行がシャッフル！"
+        },
+        "verboseCurse": {
+          "name": "冗長の呪い",
+          "desc": "6文字以上必要！"
+        },
+        "etymologyLock": {
+          "name": "語源ロック",
+          "desc": "列がロック！"
+        },
+        "islandLock": {
+          "name": "島ロック",
+          "desc": "タイルが孤立！"
+        },
+        "figurativeStorm": {
+          "name": "比喩の嵐",
+          "desc": "ボードがシャッフル！"
+        },
+        "assemblyLine": {
+          "name": "アセンブリライン",
+          "desc": "行が変化！"
+        },
+        "constructionZone": {
+          "name": "工事区域",
+          "desc": "対角線ロック！"
+        },
+        "puzzleScramble": {
+          "name": "パズルスクランブル",
+          "desc": "タイルがシャッフル！"
+        },
+        "anagramCurse": {
+          "name": "アナグラムの呪い",
+          "desc": "アナグラムを探せ！"
+        },
+        "puzzleChaos": {
+          "name": "パズルカオス",
+          "desc": "完全なカオス！"
+        },
+        "mirrorFlip": {
+          "name": "ミラーフリップ",
+          "desc": "行が反転！"
+        },
+        "palindromePower": {
+          "name": "パリンドロームパワー",
+          "desc": "回文を探せ！"
+        },
+        "starScatter": {
+          "name": "スタースキャッター",
+          "desc": "レア文字出現！"
+        },
+        "novaBurst": {
+          "name": "ノヴァバースト",
+          "desc": "宇宙的爆発！"
+        },
+        "babelCurse": {
+          "name": "バベルの呪い",
+          "desc": "文字が混乱！"
+        },
+        "polyglotLock": {
+          "name": "多言語ロック",
+          "desc": "タイルが封印！"
+        },
+        "wordFlame": {
+          "name": "ワードフレイム",
+          "desc": "文字が燃えている！"
+        },
+        "lexiconStorm": {
+          "name": "レキシコンストーム",
+          "desc": "単語が散乱！"
+        },
+        "ultimateWord": {
+          "name": "究極の言葉",
+          "desc": "最終チャレンジ！"
+        }
+      },
       "msGrammar": {
         "name": "ミス・グラマー",
         "mechanic": "抜き打ちテスト - 私の要件に合う単語を見つけて！",

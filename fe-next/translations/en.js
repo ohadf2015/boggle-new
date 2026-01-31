@@ -4135,6 +4135,104 @@ const en = {
         "requirementMet": "Requirement met!",
         "requirementMissed": "Missed requirement"
       },
+      "abilities": {
+        "popQuiz": {
+          "name": "Pop Quiz",
+          "desc": "Must use 5+ letter words!"
+        },
+        "redPen": {
+          "name": "Red Pen",
+          "desc": "Some tiles are locked!"
+        },
+        "detention": {
+          "name": "Detention",
+          "desc": "Lost 5 seconds!"
+        },
+        "beeSwarm": {
+          "name": "Bee Swarm",
+          "desc": "Sticky tiles appeared!"
+        },
+        "spellingSting": {
+          "name": "Spelling Sting",
+          "desc": "Letters changed!"
+        },
+        "synonymShuffle": {
+          "name": "Synonym Shuffle",
+          "desc": "Row scrambled!"
+        },
+        "verboseCurse": {
+          "name": "Verbose Curse",
+          "desc": "Need 6+ letter words!"
+        },
+        "etymologyLock": {
+          "name": "Etymology Lock",
+          "desc": "Column locked!"
+        },
+        "islandLock": {
+          "name": "Island Lock",
+          "desc": "Tiles marooned!"
+        },
+        "figurativeStorm": {
+          "name": "Figurative Storm",
+          "desc": "Board scrambled!"
+        },
+        "assemblyLine": {
+          "name": "Assembly Line",
+          "desc": "Row changed!"
+        },
+        "constructionZone": {
+          "name": "Construction Zone",
+          "desc": "Diagonal locked!"
+        },
+        "puzzleScramble": {
+          "name": "Puzzle Scramble",
+          "desc": "Tiles shuffled!"
+        },
+        "anagramCurse": {
+          "name": "Anagram Curse",
+          "desc": "Find anagrams!"
+        },
+        "puzzleChaos": {
+          "name": "Puzzle Chaos",
+          "desc": "Total chaos!"
+        },
+        "mirrorFlip": {
+          "name": "Mirror Flip",
+          "desc": "Rows flipped!"
+        },
+        "palindromePower": {
+          "name": "Palindrome Power",
+          "desc": "Find palindromes!"
+        },
+        "starScatter": {
+          "name": "Star Scatter",
+          "desc": "Rare letters appeared!"
+        },
+        "novaBurst": {
+          "name": "Nova Burst",
+          "desc": "Cosmic explosion!"
+        },
+        "babelCurse": {
+          "name": "Babel Curse",
+          "desc": "Letters confused!"
+        },
+        "polyglotLock": {
+          "name": "Polyglot Lock",
+          "desc": "Tiles sealed!"
+        },
+        "wordFlame": {
+          "name": "Word Flame",
+          "desc": "Letters burning!"
+        },
+        "lexiconStorm": {
+          "name": "Lexicon Storm",
+          "desc": "Words scattered!"
+        },
+        "ultimateWord": {
+          "name": "Ultimate Word",
+          "desc": "Final challenge!"
+        }
+      },
       "msGrammar": {
         "name": "Ms. Grammar",
         "mechanic": "Pop Quiz Protocol - Find words matching my requirements!",

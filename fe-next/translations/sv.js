@@ -4166,6 +4166,104 @@ const sv = {
         "requirementMet": "Krav uppfyllt!",
         "requirementMissed": "Krav missades"
       },
+      "abilities": {
+        "popQuiz": {
+          "name": "Överraskningsprov",
+          "desc": "Måste använda 5+ bokstavsord!"
+        },
+        "redPen": {
+          "name": "Röd Penna",
+          "desc": "Några brickor är låsta!"
+        },
+        "detention": {
+          "name": "Kvarsittning",
+          "desc": "Förlorade 5 sekunder!"
+        },
+        "beeSwarm": {
+          "name": "Bisvärm",
+          "desc": "Klibbiga brickor dök upp!"
+        },
+        "spellingSting": {
+          "name": "Stavningssting",
+          "desc": "Bokstäver ändrades!"
+        },
+        "synonymShuffle": {
+          "name": "Synonym-blandning",
+          "desc": "Rad blandad!"
+        },
+        "verboseCurse": {
+          "name": "Ordrik Förbannelse",
+          "desc": "Behöver 6+ bokstavsord!"
+        },
+        "etymologyLock": {
+          "name": "Etymologi-lås",
+          "desc": "Kolumn låst!"
+        },
+        "islandLock": {
+          "name": "Ö-lås",
+          "desc": "Brickor isolerade!"
+        },
+        "figurativeStorm": {
+          "name": "Bildlig Storm",
+          "desc": "Brädet blandat!"
+        },
+        "assemblyLine": {
+          "name": "Löpande Band",
+          "desc": "Rad ändrad!"
+        },
+        "constructionZone": {
+          "name": "Byggzon",
+          "desc": "Diagonal låst!"
+        },
+        "puzzleScramble": {
+          "name": "Pussel-blandning",
+          "desc": "Brickor blandade!"
+        },
+        "anagramCurse": {
+          "name": "Anagram-förbannelse",
+          "desc": "Hitta anagram!"
+        },
+        "puzzleChaos": {
+          "name": "Pussel-kaos",
+          "desc": "Totalt kaos!"
+        },
+        "mirrorFlip": {
+          "name": "Spegel-vändning",
+          "desc": "Rader vända!"
+        },
+        "palindromePower": {
+          "name": "Palindrom-kraft",
+          "desc": "Hitta palindrom!"
+        },
+        "starScatter": {
+          "name": "Stjärn-spridning",
+          "desc": "Sällsynta bokstäver dök upp!"
+        },
+        "novaBurst": {
+          "name": "Nova-explosion",
+          "desc": "Kosmisk explosion!"
+        },
+        "babelCurse": {
+          "name": "Babel-förbannelse",
+          "desc": "Bokstäver förvirrade!"
+        },
+        "polyglotLock": {
+          "name": "Polyglott-lås",
+          "desc": "Brickor förseglade!"
+        },
+        "wordFlame": {
+          "name": "Ordflamma",
+          "desc": "Bokstäver brinner!"
+        },
+        "lexiconStorm": {
+          "name": "Lexikon-storm",
+          "desc": "Ord spridda!"
+        },
+        "ultimateWord": {
+          "name": "Det Ultimata Ordet",
+          "desc": "Sista utmaningen!"
+        }
+      },
       "msGrammar": {
         "name": "Fröken Grammatik",
         "mechanic": "Prov-protokollet - Hitta ord som matchar mina krav!",

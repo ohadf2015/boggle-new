@@ -4141,6 +4141,104 @@ const he = {
         "requirementMet": "דרישה התקיימה!",
         "requirementMissed": "דרישה לא התקיימה"
       },
+      "abilities": {
+        "popQuiz": {
+          "name": "בוחן פתע",
+          "desc": "צריך מילים עם 5+ אותיות!"
+        },
+        "redPen": {
+          "name": "עט אדום",
+          "desc": "כמה אריחים ננעלו!"
+        },
+        "detention": {
+          "name": "עיכוב",
+          "desc": "הפסדתם 5 שניות!"
+        },
+        "beeSwarm": {
+          "name": "נחיל דבורים",
+          "desc": "אריחים דביקים הופיעו!"
+        },
+        "spellingSting": {
+          "name": "עקיצת איות",
+          "desc": "האותיות השתנו!"
+        },
+        "synonymShuffle": {
+          "name": "ערבוב מילים נרדפות",
+          "desc": "השורה התערבבה!"
+        },
+        "verboseCurse": {
+          "name": "קללת המילוליות",
+          "desc": "צריך מילים עם 6+ אותיות!"
+        },
+        "etymologyLock": {
+          "name": "נעילה אטימולוגית",
+          "desc": "העמודה ננעלה!"
+        },
+        "islandLock": {
+          "name": "נעילת אי",
+          "desc": "אריחים בודדים!"
+        },
+        "figurativeStorm": {
+          "name": "סערה מטאפורית",
+          "desc": "הלוח התערבב!"
+        },
+        "assemblyLine": {
+          "name": "קו ייצור",
+          "desc": "השורה השתנתה!"
+        },
+        "constructionZone": {
+          "name": "אזור בנייה",
+          "desc": "האלכסון ננעל!"
+        },
+        "puzzleScramble": {
+          "name": "ערבוב פאזל",
+          "desc": "האריחים התערבבו!"
+        },
+        "anagramCurse": {
+          "name": "קללת האנגרמה",
+          "desc": "מצאו אנגרמות!"
+        },
+        "puzzleChaos": {
+          "name": "כאוס פאזל",
+          "desc": "כאוס מוחלט!"
+        },
+        "mirrorFlip": {
+          "name": "היפוך מראה",
+          "desc": "השורות התהפכו!"
+        },
+        "palindromePower": {
+          "name": "כוח הפלינדרום",
+          "desc": "מצאו פלינדרומים!"
+        },
+        "starScatter": {
+          "name": "פיזור כוכבים",
+          "desc": "אותיות נדירות הופיעו!"
+        },
+        "novaBurst": {
+          "name": "התפרצות נובה",
+          "desc": "פיצוץ קוסמי!"
+        },
+        "babelCurse": {
+          "name": "קללת בבל",
+          "desc": "האותיות התבלבלו!"
+        },
+        "polyglotLock": {
+          "name": "נעילה רב-לשונית",
+          "desc": "אריחים אטומים!"
+        },
+        "wordFlame": {
+          "name": "להבת מילים",
+          "desc": "האותיות בוערות!"
+        },
+        "lexiconStorm": {
+          "name": "סערת לקסיקון",
+          "desc": "המילים התפזרו!"
+        },
+        "ultimateWord": {
+          "name": "המילה האולטימטיבית",
+          "desc": "האתגר האחרון!"
+        }
+      },
       "msGrammar": {
         "name": "גב' דקדוק",
         "mechanic": "פרוטוקול בוחן פתע - מצאו מילים שתואמות לדרישות שלי!",
