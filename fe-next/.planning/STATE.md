@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 29 - Adaptive Difficulty System
-Plan: 4 of 5 complete (Power-Up Cooldown Multiplier)
-Status: In progress
-Last activity: 2026-01-31 — Completed 29-06-PLAN.md (Power-up cooldown multiplier integration)
+Plan: 5 of 5 complete (PHASE COMPLETE)
+Status: Complete
+Last activity: 2026-01-31 — Completed 29-07-PLAN.md (Adaptive difficulty UI integration)
 
-Progress: [█████░░░░░] 67% (22/33 v2.0 plans complete)
+Progress: [█████░░░░░] 70% (23/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -276,6 +276,15 @@ Key decisions from previous milestones:
 - 7 new tests verify multiplier behavior (default, 1.5x, 0.5x, 2.0x, 0, fractional)
 - 28 total tests passing on usePowerUpState.ts
 
+**Phase 29-07 (Adaptive Difficulty UI Integration, 2026-01-31):**
+- Adaptive hints take highest priority over power-up and manual hints
+- HintMessage returns null for 'none' level to minimize rendering overhead
+- PowerUpBar accepts optional cooldownMultiplier prop (defaults to 1.0 for backward compatibility)
+- Translation keys already existed in all 4 languages (en, he, sv, ja) - no additions needed
+- Hint priority chain: adaptive difficulty hints > power-up hints > manual hint button
+- Completion recording: recordCompletion called after recordAttempt for tier updates
+- 18 total tests passing (6 HintMessage + 12 AdventureGame integration)
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -301,11 +310,11 @@ None - Starting fresh milestone with roadmap complete.
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Completed 29-06-SUMMARY.md (Power-Up Cooldown Multiplier) - Phase 29 4/5 plans complete
+Stopped at: Completed 29-07-SUMMARY.md (Adaptive Difficulty UI Integration) - Phase 29 COMPLETE (5/5 plans)
 Resume file: None
 
-**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 07: Tier Adjustment Utilities)
-**Note:** Power-up cooldown multiplier complete (28 tests, 100% coverage on usePowerUpState)
+**Next action:** Start Phase 30 - Boss Battle Overhaul
+**Note:** Adaptive difficulty system fully integrated into AdventureGame with hint rendering and tier adjustments
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
