@@ -4141,6 +4141,16 @@ const he = {
         "requirementMet": "דרישה התקיימה!",
         "requirementMissed": "דרישה לא התקיימה"
       },
+      "cinematics": {
+        "skip": "דלג",
+        "skipIn": "דלג בעוד {seconds}...",
+        "progress": "התקדמות הסרטון",
+        "loading": "טוען...",
+        "victory": "ניצחון!",
+        "defeated": "{bossName} הובס!",
+        "bossApproaches": "מתמודד מתקרב...",
+        "prepareForBattle": "התכונן לקרב!"
+      },
       "abilities": {
         "popQuiz": {
           "name": "בוחן פתע",

@@ -4166,6 +4166,16 @@ const ja = {
         "requirementMet": "条件達成!",
         "requirementMissed": "条件未達成"
       },
+      "cinematics": {
+        "skip": "スキップ",
+        "skipIn": "{seconds}秒後にスキップ...",
+        "progress": "ムービー進行中",
+        "loading": "読み込み中...",
+        "victory": "勝利！",
+        "defeated": "{bossName}を倒した！",
+        "bossApproaches": "挑戦者が現れた...",
+        "prepareForBattle": "戦いの準備をせよ！"
+      },
       "abilities": {
         "popQuiz": {
           "name": "抜き打ちテスト",

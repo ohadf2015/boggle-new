@@ -4135,6 +4135,16 @@ const en = {
         "requirementMet": "Requirement met!",
         "requirementMissed": "Missed requirement"
       },
+      "cinematics": {
+        "skip": "Skip",
+        "skipIn": "Skip in {seconds}...",
+        "progress": "Cinematic progress",
+        "loading": "Loading...",
+        "victory": "Victory!",
+        "defeated": "{bossName} defeated!",
+        "bossApproaches": "A challenger approaches...",
+        "prepareForBattle": "Prepare for battle!"
+      },
       "abilities": {
         "popQuiz": {
           "name": "Pop Quiz",

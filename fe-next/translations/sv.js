@@ -4166,6 +4166,16 @@ const sv = {
         "requirementMet": "Krav uppfyllt!",
         "requirementMissed": "Krav missades"
       },
+      "cinematics": {
+        "skip": "Hoppa over",
+        "skipIn": "Hoppa over om {seconds}...",
+        "progress": "Filmsekvens pagar",
+        "loading": "Laddar...",
+        "victory": "Seger!",
+        "defeated": "{bossName} besegrad!",
+        "bossApproaches": "En utmanare narmar sig...",
+        "prepareForBattle": "Forebered dig for strid!"
+      },
       "abilities": {
         "popQuiz": {
           "name": "Överraskningsprov",
