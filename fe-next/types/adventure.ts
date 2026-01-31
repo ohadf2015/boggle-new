@@ -365,3 +365,60 @@ export interface HintResult {
   /** Array of tile positions that form the word path */
   tiles: Array<{ row: number; col: number }>;
 }
+
+// ==============================================
+// SKILL TREE SYSTEM
+// ==============================================
+
+/**
+ * Skill tree paths (branching progression)
+ * - Power: Offensive bonuses, damage multipliers
+ * - Strategy: Board manipulation, combo enhancement
+ * - Utility: Quality of life, power-up improvements
+ */
+export type SkillPath = 'power' | 'strategy' | 'utility';
+
+/**
+ * Skill effect type
+ * - horizontal: Enables new strategies (75% of skills)
+ * - vertical: Stat boost (25% of skills, limited)
+ */
+export type SkillEffectType = 'horizontal' | 'vertical';
+
+/**
+ * Individual skill in the tree
+ */
+export interface SkillNode {
+  /** Unique identifier */
+  id: string;
+  /** i18n translation key for name */
+  nameKey: string;
+  /** i18n translation key for description */
+  descriptionKey: string;
+  /** Which path this skill belongs to */
+  path: SkillPath;
+  /** Tier within path (1, 2, or 3) */
+  tier: 1 | 2 | 3;
+  /** Skill points required to unlock */
+  cost: number;
+  /** Skill IDs that must be unlocked first */
+  prerequisites: string[];
+  /** Effect identifier for game logic */
+  effectId: string;
+  /** Type of progression (horizontal = strategy, vertical = stat) */
+  effectType: SkillEffectType;
+  /** Icon emoji or component key */
+  icon: string;
+}
+
+/**
+ * Player's skill tree state
+ */
+export interface SkillTreeState {
+  /** Set of unlocked skill IDs */
+  unlockedSkills: Set<string>;
+  /** Available skill points to spend */
+  availablePoints: number;
+  /** Total skill points earned */
+  totalPointsEarned: number;
+}

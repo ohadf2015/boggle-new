@@ -85,7 +85,7 @@ describe('GameBadge', () => {
       );
       const badge = container.querySelector('span');
       expect(badge).toHaveClass('bg-neo-pink');
-      expect(badge).toHaveClass('text-neo-white');
+      expect(badge).toHaveClass('text-neo-black'); // Black text for contrast on pink
     });
 
     it('should render new-feature variant', () => {

@@ -1,91 +1,83 @@
 /**
  * useSkillPoints Hook
  *
- * Tracks skill point awarding on level up.
+ * Wires adventure level-up events to skill point awards.
  * Awards 1 skill point per level gained.
  *
- * Usage in AdventureGame:
- * ```
- * useSkillPoints({
- *   currentLevel,
- *   onLevelUp: ({ pointsAwarded }) => {
- *     console.log(`Earned ${pointsAwarded} skill point(s)!`);
- *   },
- * });
+ * Usage:
+ * ```tsx
+ * const { currentLevel } = useAdventureXp({ userId, initialXp });
+ * useSkillPoints({ currentLevel });
  * ```
  */
 
-import { useEffect, useRef } from 'react';
-import { useSkillTreeStore } from '@/stores/skillTreeStore';
+import { useRef, useEffect } from 'react';
+import { useSkillTreeStore } from './useSkillTreeStore';
 
 // ==============================================
 // TYPES
 // ==============================================
 
 export interface UseSkillPointsOptions {
-  /** Current player level */
+  /** Current player level (from useAdventureXp) */
   currentLevel: number;
   /** Callback when skill points are awarded */
-  onLevelUp?: (data: { pointsAwarded: number; newTotal: number }) => void;
+  onLevelUp?: (data: LevelUpData) => void;
+}
+
+export interface LevelUpData {
+  previousLevel: number;
+  newLevel: number;
+  pointsAwarded: number;
 }
 
 export interface UseSkillPointsReturn {
+  /** Currently tracked level */
+  trackedLevel: number;
   /** Available skill points to spend */
   availablePoints: number;
-  /** Total points earned across all levels */
+  /** Total skill points earned */
   totalPointsEarned: number;
 }
-
-// ==============================================
-// CONSTANTS
-// ==============================================
-
-/** Skill points awarded per level */
-const POINTS_PER_LEVEL = 1;
 
 // ==============================================
 // HOOK
 // ==============================================
 
-export function useSkillPoints(
-  options: UseSkillPointsOptions
-): UseSkillPointsReturn {
+export function useSkillPoints(options: UseSkillPointsOptions): UseSkillPointsReturn {
   const { currentLevel, onLevelUp } = options;
 
-  // Track previous level to detect level ups
-  const previousLevelRef = useRef<number>(currentLevel);
-
-  // Get skill tree state and actions
+  // Store integration
+  const addSkillPoints = useSkillTreeStore((state) => state.addSkillPoints);
   const availablePoints = useSkillTreeStore((state) => state.availablePoints);
   const totalPointsEarned = useSkillTreeStore((state) => state.totalPointsEarned);
-  const awardPoints = useSkillTreeStore((state) => state.awardPoints);
 
-  // Detect level up and award points
+  // Track previous level to detect increases
+  const prevLevelRef = useRef(currentLevel);
+
+  // Detect level increases and award points
   useEffect(() => {
-    const previousLevel = previousLevelRef.current;
+    const previousLevel = prevLevelRef.current;
 
     if (currentLevel > previousLevel) {
-      // Calculate levels gained (handles multiple level ups at once)
-      const levelsGained = currentLevel - previousLevel;
-      const pointsToAward = levelsGained * POINTS_PER_LEVEL;
+      // Award 1 point per level gained
+      const pointsAwarded = currentLevel - previousLevel;
+      addSkillPoints(pointsAwarded);
 
-      // Award points
-      awardPoints(pointsToAward);
-
-      // Notify callback
-      if (onLevelUp) {
-        onLevelUp({
-          pointsAwarded: pointsToAward,
-          newTotal: totalPointsEarned + pointsToAward,
-        });
-      }
+      // Callback for UI celebrations
+      onLevelUp?.({
+        previousLevel,
+        newLevel: currentLevel,
+        pointsAwarded,
+      });
     }
 
-    // Update ref for next comparison
-    previousLevelRef.current = currentLevel;
-  }, [currentLevel, awardPoints, onLevelUp, totalPointsEarned]);
+    // Always update ref to track current level
+    prevLevelRef.current = currentLevel;
+  }, [currentLevel, addSkillPoints, onLevelUp]);
 
   return {
+    trackedLevel: currentLevel,
     availablePoints,
     totalPointsEarned,
   };

@@ -311,7 +311,11 @@ describe('AdventureGame', () => {
       render(<AdventureGame {...defaultProps} />);
 
       // THEN
-      expect(screen.getByText(/Level 1/)).toBeInTheDocument();
+      // Component renders "Level " (sm+) and "L" (mobile) + level number as separate elements
+      // So we check for heading containing level info
+      const heading = screen.getByRole('heading', { level: 1 });
+      expect(heading).toBeInTheDocument();
+      expect(heading).toHaveTextContent(/Level.*1|L.*1/);
     });
 
     it('should render the game grid', () => {

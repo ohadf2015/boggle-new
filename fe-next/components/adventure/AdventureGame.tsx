@@ -642,6 +642,9 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Check for level completion and record attempt
     useEffect(() => {
+      // Guard against running multiple times - completion is already handled
+      if (showLevelComplete) return;
+
       if (gameState.isComplete || timeRemaining === 0) {
         setShowLevelComplete(true);
         pauseGame();
@@ -698,6 +701,7 @@ const AdventureGame = memo<AdventureGameProps>(
         });
       }
     }, [
+      showLevelComplete, // Guard dependency - must be first to prevent infinite loops
       gameState.isComplete,
       timeRemaining,
       pauseGame,
