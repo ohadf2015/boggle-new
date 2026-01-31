@@ -357,26 +357,27 @@ Plans:
 - [x] 28-07-PLAN.md — Wire Freeze Time Effect (Gap closure, Wave 1)
 - [x] 28-08-PLAN.md — Wire Power-Up Inventory Persistence (Gap closure, Wave 1)
 
-#### Phase 29: Adaptive Difficulty System
+#### ✅ Phase 29: Adaptive Difficulty System — COMPLETE
 **Goal**: All skill levels stay in flow state through invisible difficulty adjustments
 **Depends on**: Phase 27 (board mechanics), Phase 28 (power-ups)
 **Requirements**: DIFF-02, DIFF-03, DIFF-04, DIFF-05 (DIFF-01 removed per CONTEXT.md - system is invisible, no player selection)
 **Success Criteria** (what must be TRUE):
-  1. System selects pre-game difficulty based on performance (3-state: easy/normal/hard, invisible)
-  2. System provides gradual unlock hints after 3 failures on same level
-  3. Difficulty adjustments are invisible to user (no obvious rubber-banding)
-  4. Boss fights have fixed difficulty (learnable patterns, excluded from adaptive scaling)
+  1. ✓ System selects pre-game difficulty based on performance (3-state: easy/normal/hard, invisible)
+  2. ✓ System provides gradual unlock hints after 3 failures on same level
+  3. ✓ Difficulty adjustments are invisible to user (no obvious rubber-banding)
+  4. ✓ Boss fights have fixed difficulty (learnable patterns, excluded from adaptive scaling)
 **Plans**: 8 plans in 4 waves
+**Completed**: 2026-01-31
 
 Plans:
-- [ ] 29-01-PLAN.md — Performance tracker utilities TDD (Wave 1)
-- [ ] 29-02-PLAN.md — Tier assigner logic TDD (Wave 1)
-- [ ] 29-03-PLAN.md — Hint escalation system TDD (Wave 1)
-- [ ] 29-04-PLAN.md — Config adjuster + barrel exports + boss verification (Wave 2)
-- [ ] 29-05-PLAN.md — useAdaptiveDifficulty hook + translations + ProgressionContext wiring (Wave 2)
-- [ ] 29-06-PLAN.md — Power-up cooldown multiplier support (Wave 3)
-- [ ] 29-07-PLAN.md — AdventureGame integration + hint UI rendering (Wave 3)
-- [ ] 29-08-PLAN.md — Human verification (Wave 4)
+- [x] 29-01-PLAN.md — Performance tracker utilities TDD (Wave 1)
+- [x] 29-02-PLAN.md — Tier assigner logic TDD (Wave 1)
+- [x] 29-03-PLAN.md — Hint escalation system TDD (Wave 1)
+- [x] 29-04-PLAN.md — Config adjuster + barrel exports + boss verification (Wave 2)
+- [x] 29-05-PLAN.md — useAdaptiveDifficulty hook + translations + ProgressionContext wiring (Wave 2)
+- [x] 29-06-PLAN.md — Power-up cooldown multiplier support (Wave 3)
+- [x] 29-07-PLAN.md — AdventureGame integration + hint UI rendering (Wave 3)
+- [x] 29-08-PLAN.md — Human verification (Wave 4)
 
 #### Phase 30: Boss Battle Overhaul
 **Goal**: Boss battles feel like epic cinematic fights, not just harder puzzles
