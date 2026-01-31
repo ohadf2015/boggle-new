@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 29 - Adaptive Difficulty System
-Plan: 1 of 5 complete (Performance Tracker Utilities)
+Plan: 2 of 5 complete (Tier Assignment Logic)
 Status: In progress
-Last activity: 2026-01-31 — Completed 29-01-PLAN.md (Performance tracking with weighted scoring and rolling window)
+Last activity: 2026-01-31 — Completed 29-02-PLAN.md (Tier assignment with priority-based logic)
 
-Progress: [█████░░░░░] 58% (19/33 v2.0 plans complete)
+Progress: [█████░░░░░] 61% (20/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
