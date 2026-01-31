@@ -443,7 +443,12 @@ const he = {
     "medium": "בינוני",
     "hard": "קשה",
     "expert": "מומחה",
-    "master": "אמן"
+    "master": "אמן",
+    "hint": {
+      "length": "למילה יש {length} אותיות",
+      "lengthAndStart": "למילה יש {length} אותיות ומתחילה ב-{letter}",
+      "fullReveal": "הנה המילה: {word}"
+    }
   },
   "joinView": {
     "createRoom": "צור",

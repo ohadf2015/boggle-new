@@ -443,7 +443,12 @@ const ja = {
     "medium": "普通",
     "hard": "難しい",
     "expert": "エキスパート",
-    "master": "マスター"
+    "master": "マスター",
+    "hint": {
+      "length": "単語は{length}文字です",
+      "lengthAndStart": "単語は{length}文字で、{letter}で始まります",
+      "fullReveal": "ここに単語があります：{word}"
+    }
   },
   "joinView": {
     "createRoom": "作成",

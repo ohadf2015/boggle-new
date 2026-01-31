@@ -443,7 +443,12 @@ const es = {
     "medium": "Medio",
     "hard": "Difícil",
     "expert": "Experto",
-    "master": "Maestro"
+    "master": "Maestro",
+    "hint": {
+      "length": "La palabra tiene {length} letras",
+      "lengthAndStart": "La palabra tiene {length} letras y comienza con {letter}",
+      "fullReveal": "Aquí está la palabra: {word}"
+    }
   },
   "joinView": {
     "createRoom": "Crear",

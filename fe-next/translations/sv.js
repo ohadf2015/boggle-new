@@ -443,7 +443,12 @@ const sv = {
     "medium": "Medel",
     "hard": "Svår",
     "expert": "Expert",
-    "master": "Mästare"
+    "master": "Mästare",
+    "hint": {
+      "length": "Ordet har {length} bokstäver",
+      "lengthAndStart": "Ordet har {length} bokstäver och börjar med {letter}",
+      "fullReveal": "Här är ordet: {word}"
+    }
   },
   "joinView": {
     "createRoom": "Skapa",
