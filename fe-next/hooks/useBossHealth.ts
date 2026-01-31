@@ -100,10 +100,11 @@ export function useBossHealth(maxHP: number): UseBossHealthReturn {
    * @param baseDamage - Base damage before multipliers
    * @param comboCount - Current combo count (from Phase 15)
    * @param mechanicMultiplier - Multiplier from boss mechanic bonus
+   * @param comboBonus - Bonus from skill effects (e.g., combo_amplifier adds 0.25)
    * @returns Actual damage dealt (0 if battle not active)
    */
   const dealDamage = useCallback(
-    (baseDamage: number, comboCount: number, mechanicMultiplier: number): number => {
+    (baseDamage: number, comboCount: number, mechanicMultiplier: number, comboBonus: number = 0): number => {
       // Use ref to get current phase (avoids closure issues)
       const currentPhase = phaseRef.current;
 
@@ -113,8 +114,8 @@ export function useBossHealth(maxHP: number): UseBossHealthReturn {
       }
 
       // Calculate total damage with multipliers
-      // Combo multiplier: 1 + (comboCount * 0.1)
-      const comboMultiplier = 1 + comboCount * 0.1;
+      // Combo multiplier: 1 + (comboCount * 0.1) + comboBonus (from skill effects)
+      const comboMultiplier = 1 + (comboCount * 0.1) + comboBonus;
       const totalDamage = Math.round(baseDamage * comboMultiplier * mechanicMultiplier);
 
       // Update HP using functional form to ensure we have latest value

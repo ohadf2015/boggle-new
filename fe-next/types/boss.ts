@@ -153,7 +153,7 @@ export interface UseBossHealthReturn {
   /** Current boss health state */
   healthState: BossHealthState;
   /** Deal damage to boss (returns actual damage dealt) */
-  dealDamage: (baseDamage: number, comboCount: number, mechanicMultiplier: number) => number;
+  dealDamage: (baseDamage: number, comboCount: number, mechanicMultiplier: number, comboBonus?: number) => number;
   /** Start the boss battle (transition from intro to active) */
   startBattle: () => void;
   /** End the battle (player ran out of time) */

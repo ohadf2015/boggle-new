@@ -907,7 +907,7 @@ const AdventureGame = memo<AdventureGameProps>(
             baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(currentWord.length));
 
             const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
-            const damageDealt = dealBossDamage(baseDamage, gameState.comboCount, mechanicMultiplier);
+            const damageDealt = dealBossDamage(baseDamage, gameState.comboCount, mechanicMultiplier, skillEffects.comboMultiplierBonus);
 
             // Trigger taunt based on mechanic result
             if (mechResult.triggerTaunt) {

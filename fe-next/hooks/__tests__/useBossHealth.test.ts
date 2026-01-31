@@ -115,6 +115,46 @@ describe('useBossHealth', () => {
       expect(result.current.healthState.totalDamageDealt).toBe(150);
     });
 
+    it('should apply combo bonus from skill effects (Phase 31 integration)', () => {
+      // GIVEN: Active boss battle
+      const maxHP = 1000;
+      const { result } = renderHook(() => useBossHealth(maxHP));
+      act(() => {
+        result.current.startBattle();
+      });
+
+      // WHEN: Damage is dealt with combo count AND combo bonus from combo_amplifier skill
+      // Formula: baseDamage * (1 + comboCount * 0.1 + comboBonus) * mechanicMultiplier
+      // 100 * (1 + 5 * 0.1 + 0.25) * 1.0 = 100 * 1.75 = 175
+      let damageDealt: number = 0;
+      act(() => {
+        damageDealt = result.current.dealDamage(100, 5, 1.0, 0.25);
+      });
+
+      // THEN: Damage includes combo bonus (100 * 1.75 = 175)
+      expect(damageDealt).toBe(175);
+      expect(result.current.healthState.currentHP).toBe(825);
+      expect(result.current.healthState.totalDamageDealt).toBe(175);
+    });
+
+    it('should default combo bonus to 0 when not provided', () => {
+      // GIVEN: Active boss battle
+      const maxHP = 1000;
+      const { result } = renderHook(() => useBossHealth(maxHP));
+      act(() => {
+        result.current.startBattle();
+      });
+
+      // WHEN: Damage is dealt without combo bonus parameter
+      let damageDealt: number = 0;
+      act(() => {
+        damageDealt = result.current.dealDamage(100, 5, 1.0);
+      });
+
+      // THEN: Combo bonus defaults to 0, so damage is 100 * 1.5 = 150
+      expect(damageDealt).toBe(150);
+    });
+
     it('should apply mechanic multiplier to damage', () => {
       // GIVEN: Active boss battle
       const maxHP = 1000;
