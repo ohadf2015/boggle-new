@@ -45,6 +45,8 @@ export type DifficultyTier = 'easy' | 'normal' | 'hard';
  * Combines completionRate, timeEfficiency, and wordAccuracy into single metric
  */
 export interface LevelAttemptWithScore extends LevelAttempt {
+  /** Whether the level was completed (true) or failed (false) */
+  isCompletion: boolean;
   /** Combined performance score (0-1) calculated from weighted metrics */
   combinedScore: number;
 }

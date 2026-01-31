@@ -10,18 +10,14 @@ import {
   HIGH_SCORE_THRESHOLD,
   ROLLING_WINDOW_SIZE,
 } from './constants';
+import type { DifficultyTier, LevelAttemptWithScore } from '@/types/difficulty';
 
-// Type definitions (minimal - will be moved to types/difficulty.ts later)
-export type DifficultyTier = 'easy' | 'normal' | 'hard';
+// Re-export type for consumers importing from this module
+export type { DifficultyTier, LevelAttemptWithScore };
 
 export type TierDecision = {
   tier: DifficultyTier;
   reason: string;
-};
-
-export type LevelAttemptWithScore = {
-  isCompletion: boolean;
-  combinedScore: number;
 };
 
 /**

@@ -15,7 +15,7 @@ export type { PerformanceMetrics } from '@/types/difficulty';
 
 // Tier assignment
 export { determineTier } from './tierAssigner';
-export type { TierDecision, LevelAttemptWithScore } from './tierAssigner';
+export type { TierDecision, LevelAttemptWithScore, DifficultyTier } from './tierAssigner';
 
 // Hint escalation
 export {
