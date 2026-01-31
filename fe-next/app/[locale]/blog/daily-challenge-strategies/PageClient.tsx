@@ -24,47 +24,51 @@ type LocaleContent = {
 
 const contentByLocale: Record<string, LocaleContent> = {
   he: {
-    title: 'אני לא טוב באתגר היומי. עדיין משחק',
-    category: 'סתם',
-    readTime: 'זמן קריאה: 3 דקות',
+    title: 'אסטרטגיות לאתגר היומי: מה באמת משנה',
+    category: 'אסטרטגיה',
+    readTime: 'זמן קריאה: 5 דקות',
     sections: [
       {
-        content: `כל בוקר אני בודק את הדירוג שלי. בדרך כלל אני איפשהו באמצע. לפעמים יותר גרוע.
-
-לא יודע למה אני ממשיך. זה לא שאני משתפר.`,
+        content: `אתגרים יומיים הם שונים ממשחק רגיל. יש מגבלת זמן, יש דירוג, ויש רק הזדמנות אחת. הנה מה שלמדתי מכמה חודשים של משחק יומי - ומה שמחקרים קוגניטיביים אומרים על ביצועים תחת לחץ.`,
       },
       {
-        title: 'דברים שניסיתי',
-        content: `ניסיתי לשחק מהר יותר. סיימתי עם פחות מילים.
+        title: 'התזמון חשוב',
+        content: `מחקרים על קוגניציה מראים שרוב האנשים מגיעים לשיא הביצועים המנטליים בשעות הבוקר המוקדמות, בדרך כלל 2-4 שעות אחרי ההתעוררות. זה הזמן שבו הקורטקס הפרה-פרונטלי (אזור התכנון וקבלת ההחלטות) הכי פעיל.
 
-ניסיתי לשחק לאט יותר. נגמר לי הזמן.
-
-ניסיתי לחפש מילים ארוכות. פספסתי עשר מילים קצרות.
-
-ניסיתי לחפש רק מילים קצרות. כל השאר מצאו את המילים הארוכות.`,
+אם אתם משחקים את האתגר היומי בלילה אחרי יום עבודה ארוך, אתם מתחרים עם גרסה פחות יעילה של עצמכם.`,
       },
       {
-        title: 'מה כן עובד לי',
-        content: `בבוקר אני יותר טוב. אם אני משחק בלילה, הראש לא שם.
+        title: 'סריקה לפני פעולה',
+        content: `כשהלוח נפתח, אל תתחילו לכתוב מיד. עשו סריקה מהירה - 5-10 שניות - של כל האותיות. המוח יתחיל לעבד ברקע גם כשאתם לא מודעים לזה.
 
-קפה עוזר. בלי קפה אני פספסתי מילה שהייתה ממש מול העיניים שלי.
-
-אם אני לחוץ על משהו אחר, אני גרוע יותר. המשחק דורש שקט בראש.`,
+זו טכניקה שמשתמשים בה שחקני שחמט מקצועיים: להסתכל על הלוח כולו לפני שמתמקדים בנקודה ספציפית.`,
       },
       {
-        title: 'מה לא עובד לי',
-        content: `"טיפים" מהאינטרנט. קראתי כמה. לא עזר.
+        title: 'מילים קצרות מייצרות מומנטום',
+        content: `בניגוד לאינטואיציה, להתחיל עם מילים קצרות זה לא "לבזבז זמן". כל מילה שנמצאת משחררת לחץ פסיכולוגי ומשחררת משאבים קוגניטיביים לחיפוש הבא.
 
-לנסות להתחרות במישהו ספציפי. יש בחור שכל יום מסיים ראשון. לא יודע איך הוא עושה את זה. אני גם לא צריך לדעת.
-
-לכעוס על עצמי. זה רק מחמיר.`,
+בנוסף, במשחקים עם הגבלת זמן, שלוש מילים של 3 אותיות (9 אותיות סך הכל) נותנות יותר נקודות מאשר מילה אחת של 7 אותיות שלקח לכם זמן רב למצוא.`,
       },
       {
-        content: `יש אנשים שטובים בדברים האלה. אני לא. וזה בסדר.
+        title: 'אל תתקעו על מילה אחת',
+        content: `אם לא מצאתם מילה תוך 10-15 שניות, עברו הלאה. המוח לפעמים "ננעל" על דפוס מסוים. שינוי פוקוס לאזור אחר בלוח יכול לשחרר את החסימה.
 
-אני לא משחק כדי לנצח. אני משחק כי יש לי עשר דקות פנויות בבוקר ואני לא רוצה לגלול באינסטגרם.
+שחקני סקראבל מנוסים קוראים לזה "היתקעות בצורה" - כשהמוח משוכנע שיש מילה מסוימת והוא מפסיק לחפש אחרות.`,
+      },
+      {
+        title: 'הפסקה קצרה באמצע',
+        content: `אם המשחק מאפשר, לקחת הפסקה של 5-10 שניות באמצע (גם אם זה רק לעצום עיניים) יכול לעזור. המוח ממשיך לעבד ברקע, ולפעמים התשובה "קופצת" אחרי ההפסקה.
 
-מחר אני אשחק שוב. כנראה אסיים באמצע. בסדר גמור.`,
+זה קשור לתופעה הקרויה "אפקט האינקובציה" - פתרונות שמגיעים אחרי שמפסיקים לחשוב עליהם באופן פעיל.`,
+      },
+      {
+        title: 'מה לגבי הדירוג?',
+        content: `אם הדירוג מלחיץ אתכם, כדאי לדעת: לחץ מפעיל את מערכת ה-"ברח או הילחם" ומפחית את יעילות הקורטקס הפרה-פרונטלי. במילים אחרות, ככל שאתם יותר לחוצים על התוצאה, כך התוצאה כנראה תהיה פחות טובה.
+
+גישה טובה יותר: להתמקד בתהליך (חיפוש שיטתי, סריקה של הלוח) ולא בתוצאה (דירוג, ניצחון).`,
+      },
+      {
+        content: `הדבר הכי חשוב: זה משחק. המטרה היא ליהנות. אם זה מלחיץ, אולי שווה לשחק את מצב התרגול החופשי במקום האתגר היומי.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -72,47 +76,51 @@ const contentByLocale: Record<string, LocaleContent> = {
     practice: 'תרגול',
   },
   en: {
-    title: "I'm not good at the daily challenge. Still playing",
-    category: 'Whatever',
-    readTime: '3 min read',
+    title: 'Daily Challenge Strategies: What Actually Matters',
+    category: 'Strategy',
+    readTime: '5 min read',
     sections: [
       {
-        content: `Every morning I check my ranking. Usually somewhere in the middle. Sometimes worse.
-
-Don't know why I keep going. It's not like I'm getting better.`,
+        content: `Daily challenges are different from regular play. There's a time limit, there's ranking, and there's only one chance. Here's what I learned from several months of daily play—and what cognitive research says about performance under pressure.`,
       },
       {
-        title: 'Things I tried',
-        content: `Tried playing faster. Ended up with fewer words.
+        title: 'Timing Matters',
+        content: `Cognitive research shows that most people reach peak mental performance in the early morning hours, typically 2-4 hours after waking. This is when the prefrontal cortex (the planning and decision-making area) is most active.
 
-Tried playing slower. Ran out of time.
-
-Tried looking for long words. Missed ten short ones.
-
-Tried looking only for short words. Everyone else found the long ones.`,
+If you're playing the daily challenge at night after a long workday, you're competing against a less efficient version of yourself.`,
       },
       {
-        title: 'What does work for me',
-        content: `I'm better in the morning. If I play at night, my head's not in it.
+        title: 'Scan Before Acting',
+        content: `When the board opens, don't start typing immediately. Do a quick scan—5-10 seconds—of all the letters. Your brain will start processing in the background even when you're not consciously aware of it.
 
-Coffee helps. Without coffee I missed a word that was right in front of me.
-
-If I'm stressed about something else, I'm worse. The game needs a quiet head.`,
+This is a technique professional chess players use: looking at the entire board before focusing on a specific point.`,
       },
       {
-        title: "What doesn't work for me",
-        content: `"Tips" from the internet. Read some. Didn't help.
+        title: 'Short Words Build Momentum',
+        content: `Counter-intuitively, starting with short words isn't "wasting time." Each found word releases psychological pressure and frees cognitive resources for the next search.
 
-Trying to compete with someone specific. There's a guy who finishes first every day. Don't know how he does it. Don't need to know either.
-
-Getting angry at myself. Just makes it worse.`,
+Also, in timed games, three 3-letter words (9 letters total) often give more points than one 7-letter word that took you a long time to find.`,
       },
       {
-        content: `Some people are good at these things. I'm not. And that's fine.
+        title: 'Don't Get Stuck on One Word',
+        content: `If you haven't found a word in 10-15 seconds, move on. The brain sometimes "locks" onto a certain pattern. Shifting focus to a different area of the board can release the block.
 
-I don't play to win. I play because I have ten minutes free in the morning and I don't want to scroll Instagram.
+Experienced Scrabble players call this "getting stuck in a shape"—when the brain is convinced a certain word exists and stops looking for others.`,
+      },
+      {
+        title: 'A Short Break Midway',
+        content: `If the game allows, taking a 5-10 second break in the middle (even just closing your eyes) can help. The brain continues processing in the background, and sometimes the answer "pops" after the break.
 
-Tomorrow I'll play again. Probably finish in the middle. Totally fine.`,
+This is related to the phenomenon called the "incubation effect"—solutions that arrive after you stop actively thinking about them.`,
+      },
+      {
+        title: 'What About the Ranking?',
+        content: `If ranking stresses you, know this: stress activates the "fight or flight" system and reduces the efficiency of the prefrontal cortex. In other words, the more stressed you are about the result, the worse the result is likely to be.
+
+A better approach: focus on the process (systematic search, scanning the board) not the outcome (ranking, winning).`,
+      },
+      {
+        content: `The most important thing: it's a game. The goal is to enjoy it. If it's stressful, maybe it's worth playing free practice mode instead of the daily challenge.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -120,47 +128,51 @@ Tomorrow I'll play again. Probably finish in the middle. Totally fine.`,
     practice: 'Practice',
   },
   sv: {
-    title: 'Jag är inte bra på dagliga utmaningen. Spelar fortfarande',
-    category: 'Vadsomhelst',
-    readTime: '3 min läsning',
+    title: 'Strategier för dagliga utmaningen: Vad som faktiskt spelar roll',
+    category: 'Strategi',
+    readTime: '5 min läsning',
     sections: [
       {
-        content: `Varje morgon kollar jag min ranking. Vanligtvis någonstans i mitten. Ibland sämre.
-
-Vet inte varför jag fortsätter. Det är inte som att jag blir bättre.`,
+        content: `Dagliga utmaningar skiljer sig från vanligt spel. Det finns en tidsgräns, det finns ranking, och det finns bara en chans. Här är vad jag lärde mig från flera månaders dagligt spelande—och vad kognitiv forskning säger om prestation under press.`,
       },
       {
-        title: 'Saker jag försökte',
-        content: `Försökte spela snabbare. Slutade med färre ord.
+        title: 'Timing spelar roll',
+        content: `Kognitiv forskning visar att de flesta når topp mental prestation under de tidiga morgontimmarna, vanligtvis 2-4 timmar efter uppvaknande. Det är då den prefrontala cortex (planerings- och beslutsområdet) är mest aktivt.
 
-Försökte spela långsammare. Tiden tog slut.
-
-Försökte leta efter långa ord. Missade tio korta.
-
-Försökte bara leta efter korta ord. Alla andra hittade de långa.`,
+Om du spelar den dagliga utmaningen på kvällen efter en lång arbetsdag tävlar du mot en mindre effektiv version av dig själv.`,
       },
       {
-        title: 'Vad som fungerar för mig',
-        content: `Jag är bättre på morgonen. Om jag spelar på kvällen är huvudet inte med.
+        title: 'Scanna innan du agerar',
+        content: `När brädet öppnas, börja inte skriva direkt. Gör en snabb scanning—5-10 sekunder—av alla bokstäver. Din hjärna börjar bearbeta i bakgrunden även när du inte är medvetet medveten om det.
 
-Kaffe hjälper. Utan kaffe missade jag ett ord som var rakt framför mig.
-
-Om jag är stressad över något annat är jag sämre. Spelet behöver ett lugnt huvud.`,
+Detta är en teknik professionella schackspelare använder: att titta på hela brädet innan de fokuserar på en specifik punkt.`,
       },
       {
-        title: 'Vad som inte fungerar för mig',
-        content: `"Tips" från internet. Läste några. Hjälpte inte.
+        title: 'Korta ord bygger momentum',
+        content: `Motintuitivt är att börja med korta ord inte "slöseri med tid." Varje hittat ord frigör psykologiskt tryck och frigör kognitiva resurser för nästa sökning.
 
-Att försöka konkurrera med någon specifik. Det finns en kille som slutar först varje dag. Vet inte hur han gör det. Behöver inte veta heller.
-
-Att bli arg på mig själv. Gör det bara värre.`,
+Dessutom, i tidsbegränsade spel ger tre trebokstavsord (9 bokstäver totalt) ofta fler poäng än ett sjubokstavsord som tog lång tid att hitta.`,
       },
       {
-        content: `Vissa människor är bra på sånt här. Jag är inte det. Och det är okej.
+        title: 'Fastna inte på ett ord',
+        content: `Om du inte hittat ett ord på 10-15 sekunder, gå vidare. Hjärnan "låser sig" ibland på ett visst mönster. Att flytta fokus till ett annat område av brädet kan släppa blockeringen.
 
-Jag spelar inte för att vinna. Jag spelar för att jag har tio minuter ledigt på morgonen och jag vill inte scrolla Instagram.
+Erfarna Scrabble-spelare kallar detta "att fastna i en form"—när hjärnan är övertygad om att ett visst ord finns och slutar leta efter andra.`,
+      },
+      {
+        title: 'En kort paus halvvägs',
+        content: `Om spelet tillåter kan en 5-10 sekunders paus i mitten (även bara att blunda) hjälpa. Hjärnan fortsätter bearbeta i bakgrunden, och ibland "dyker" svaret upp efter pausen.
 
-Imorgon spelar jag igen. Kommer förmodligen sluta i mitten. Helt okej.`,
+Detta relaterar till fenomenet kallat "inkubationseffekten"—lösningar som kommer efter att man slutat aktivt tänka på dem.`,
+      },
+      {
+        title: 'Hur är det med rankingen?',
+        content: `Om ranking stressar dig, vet detta: stress aktiverar "kamp eller flykt"-systemet och minskar effektiviteten i den prefrontala cortex. Med andra ord, ju mer stressad du är över resultatet, desto sämre blir troligen resultatet.
+
+Ett bättre tillvägagångssätt: fokusera på processen (systematisk sökning, scanning av brädet) inte resultatet (ranking, vinst).`,
+      },
+      {
+        content: `Det viktigaste: det är ett spel. Målet är att njuta. Om det är stressigt kanske det är värt att spela fritt övningsläge istället för den dagliga utmaningen.`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -168,47 +180,51 @@ Imorgon spelar jag igen. Kommer förmodligen sluta i mitten. Helt okej.`,
     practice: 'Öva',
   },
   ja: {
-    title: 'デイリーチャレンジは得意じゃない。それでもやってる',
-    category: 'なんとなく',
-    readTime: '読了時間：3分',
+    title: 'デイリーチャレンジ戦略：本当に重要なこと',
+    category: '戦略',
+    readTime: '読了時間：5分',
     sections: [
       {
-        content: `毎朝ランキングをチェックする。だいたい真ん中あたり。もっと悪い時もある。
-
-なぜ続けているかわからない。上手くなっているわけでもないし。`,
+        content: `デイリーチャレンジは通常のプレイとは違います。時間制限があり、ランキングがあり、チャンスは一度だけ。数ヶ月のデイリープレイから学んだこと、そしてプレッシャー下でのパフォーマンスについて認知研究が示していることをお伝えします。`,
       },
       {
-        title: '試したこと',
-        content: `速くプレイしてみた。見つけた単語が少なくなった。
+        title: 'タイミングが重要',
+        content: `認知研究によると、ほとんどの人は早朝、通常は起床後2〜4時間で精神的パフォーマンスのピークに達します。これは前頭前皮質（計画と意思決定の領域）が最も活発な時です。
 
-ゆっくりプレイしてみた。時間切れになった。
-
-長い単語を探してみた。短い単語を10個見逃した。
-
-短い単語だけ探してみた。みんな長い単語を見つけてた。`,
+長い仕事の日の後の夜にデイリーチャレンジをプレイしているなら、自分の効率の悪いバージョンと競争していることになります。`,
       },
       {
-        title: '私に効くこと',
-        content: `朝の方がいい。夜やると頭が働かない。
+        title: '行動する前にスキャン',
+        content: `ボードが開いたら、すぐに入力を始めないでください。すべての文字を5〜10秒でさっとスキャンしてください。意識していなくても、脳はバックグラウンドで処理を始めます。
 
-コーヒーは助かる。コーヒーなしで目の前にあった単語を見逃した。
-
-他のことでストレスがあると、もっと悪い。ゲームには静かな頭が必要。`,
+これはプロのチェスプレイヤーが使うテクニックです：特定のポイントに集中する前にボード全体を見ること。`,
       },
       {
-        title: '私に効かないこと',
-        content: `ネットの「コツ」。いくつか読んだ。役に立たなかった。
+        title: '短い言葉が勢いを作る',
+        content: `直感に反しますが、短い言葉から始めることは「時間の無駄」ではありません。見つけた言葉ごとに心理的プレッシャーが解放され、次の検索のための認知リソースが解放されます。
 
-特定の誰かと競おうとすること。毎日1位で終わる人がいる。どうやってるのかわからない。知る必要もない。
-
-自分に怒ること。もっと悪くなるだけ。`,
+また、時間制限のあるゲームでは、3文字の言葉3つ（合計9文字）は、見つけるのに長い時間がかかった7文字の言葉1つより多くのポイントを与えることがよくあります。`,
       },
       {
-        content: `こういうのが得意な人もいる。私はそうじゃない。それでいい。
+        title: '1つの言葉に固執しない',
+        content: `10〜15秒で言葉が見つからなければ、先に進みましょう。脳は特定のパターンに「ロック」することがあります。ボードの別の領域にフォーカスを移すと、ブロックが解除されることがあります。
 
-勝つためにプレイしてるわけじゃない。朝10分時間があって、インスタをスクロールしたくないからプレイしてる。
+経験豊富なスクラブルプレイヤーはこれを「形に固まる」と呼びます—脳が特定の言葉が存在すると確信し、他を探すのをやめる時です。`,
+      },
+      {
+        title: '途中で短い休憩',
+        content: `ゲームが許すなら、途中で5〜10秒の休憩を取る（目を閉じるだけでも）と役立ちます。脳はバックグラウンドで処理を続け、休憩後に答えが「ポップアップ」することがあります。
 
-明日もまたやる。たぶん真ん中あたりで終わる。全然問題ない。`,
+これは「インキュベーション効果」と呼ばれる現象に関連しています—積極的に考えるのをやめた後に解決策が来ること。`,
+      },
+      {
+        title: 'ランキングについては？',
+        content: `ランキングがストレスなら、これを知ってください：ストレスは「闘争または逃走」システムを活性化し、前頭前皮質の効率を低下させます。言い換えれば、結果についてストレスを感じれば感じるほど、結果は悪くなる可能性が高いです。
+
+より良いアプローチ：結果（ランキング、勝利）ではなく、プロセス（体系的な検索、ボードのスキャン）に集中すること。`,
+      },
+      {
+        content: `最も重要なこと：これはゲームです。目標は楽しむこと。ストレスなら、デイリーチャレンジではなくフリー練習モードでプレイする価値があるかもしれません。`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -216,47 +232,51 @@ Imorgon spelar jag igen. Kommer förmodligen sluta i mitten. Helt okej.`,
     practice: '練習',
   },
   es: {
-    title: 'No soy bueno en el desafío diario. Sigo jugando',
-    category: 'Lo que sea',
-    readTime: '3 min de lectura',
+    title: 'Estrategias para el desafío diario: Lo que realmente importa',
+    category: 'Estrategia',
+    readTime: '5 min de lectura',
     sections: [
       {
-        content: `Cada mañana reviso mi ranking. Generalmente en algún lugar del medio. A veces peor.
-
-No sé por qué sigo. No es que esté mejorando.`,
+        content: `Los desafíos diarios son diferentes del juego regular. Hay límite de tiempo, hay ranking, y solo hay una oportunidad. Aquí está lo que aprendí de varios meses de juego diario—y lo que la investigación cognitiva dice sobre el rendimiento bajo presión.`,
       },
       {
-        title: 'Cosas que intenté',
-        content: `Intenté jugar más rápido. Terminé con menos palabras.
+        title: 'El momento importa',
+        content: `La investigación cognitiva muestra que la mayoría de las personas alcanzan el máximo rendimiento mental en las primeras horas de la mañana, típicamente 2-4 horas después de despertar. Es cuando la corteza prefrontal (el área de planificación y toma de decisiones) está más activa.
 
-Intenté jugar más lento. Se me acabó el tiempo.
-
-Intenté buscar palabras largas. Perdí diez cortas.
-
-Intenté buscar solo palabras cortas. Todos los demás encontraron las largas.`,
+Si juegas el desafío diario por la noche después de un largo día de trabajo, estás compitiendo contra una versión menos eficiente de ti mismo.`,
       },
       {
-        title: 'Qué sí funciona para mí',
-        content: `Soy mejor en la mañana. Si juego en la noche, mi cabeza no está ahí.
+        title: 'Escanea antes de actuar',
+        content: `Cuando se abre el tablero, no empieces a escribir de inmediato. Haz un escaneo rápido—5-10 segundos—de todas las letras. Tu cerebro comenzará a procesar en segundo plano incluso cuando no eres consciente de ello.
 
-El café ayuda. Sin café perdí una palabra que estaba justo frente a mí.
-
-Si estoy estresado por otra cosa, soy peor. El juego necesita una cabeza tranquila.`,
+Esta es una técnica que usan los jugadores profesionales de ajedrez: mirar todo el tablero antes de enfocarse en un punto específico.`,
       },
       {
-        title: 'Qué no funciona para mí',
-        content: `"Consejos" de internet. Leí algunos. No ayudaron.
+        title: 'Palabras cortas generan impulso',
+        content: `Contra la intuición, empezar con palabras cortas no es "perder tiempo." Cada palabra encontrada libera presión psicológica y libera recursos cognitivos para la siguiente búsqueda.
 
-Intentar competir con alguien específico. Hay un tipo que termina primero todos los días. No sé cómo lo hace. Tampoco necesito saber.
-
-Enojarme conmigo mismo. Solo lo empeora.`,
+Además, en juegos con tiempo, tres palabras de 3 letras (9 letras en total) a menudo dan más puntos que una palabra de 7 letras que te tomó mucho tiempo encontrar.`,
       },
       {
-        content: `Algunas personas son buenas en estas cosas. Yo no. Y está bien.
+        title: 'No te atasques en una palabra',
+        content: `Si no has encontrado una palabra en 10-15 segundos, sigue adelante. El cerebro a veces se "bloquea" en cierto patrón. Cambiar el enfoque a un área diferente del tablero puede liberar el bloqueo.
 
-No juego para ganar. Juego porque tengo diez minutos libres en la mañana y no quiero estar en Instagram.
+Los jugadores experimentados de Scrabble llaman a esto "quedarse atascado en una forma"—cuando el cerebro está convencido de que cierta palabra existe y deja de buscar otras.`,
+      },
+      {
+        title: 'Una pausa corta a la mitad',
+        content: `Si el juego lo permite, tomar una pausa de 5-10 segundos a la mitad (incluso solo cerrar los ojos) puede ayudar. El cerebro continúa procesando en segundo plano, y a veces la respuesta "aparece" después de la pausa.
 
-Mañana jugaré otra vez. Probablemente termine en el medio. Totalmente bien.`,
+Esto se relaciona con el fenómeno llamado "efecto de incubación"—soluciones que llegan después de dejar de pensar activamente en ellas.`,
+      },
+      {
+        title: '¿Qué pasa con el ranking?',
+        content: `Si el ranking te estresa, sabe esto: el estrés activa el sistema de "lucha o huida" y reduce la eficiencia de la corteza prefrontal. En otras palabras, cuanto más estresado estés por el resultado, peor será probablemente el resultado.
+
+Un mejor enfoque: enfócate en el proceso (búsqueda sistemática, escaneo del tablero) no en el resultado (ranking, ganar).`,
+      },
+      {
+        content: `Lo más importante: es un juego. El objetivo es disfrutar. Si es estresante, quizás vale la pena jugar el modo de práctica libre en lugar del desafío diario.`,
       },
     ],
     backToBlog: 'Volver al Blog',

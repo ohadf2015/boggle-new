@@ -24,51 +24,49 @@ type LocaleContent = {
 
 const contentByLocale: Record<string, LocaleContent> = {
   he: {
-    title: 'כתבתי מילה בשוודית על לוח אנגלית',
-    category: 'לבד איתי',
-    readTime: 'זמן קריאה: 3 דקות',
+    title: 'למה המוח שלך מתבלבל בין שפות (ולמה זה בעצם טוב)',
+    category: 'מדע קוגניטיבי',
+    readTime: 'זמן קריאה: 5 דקות',
     sections: [
       {
-        content: `זה קרה בערב שישי. ישבתי עם הלפטופ, משחק מילים באנגלית. ראיתי את האותיות L-A-N-D ומיד כתבתי את זה.
-
-אבל משהו לא היה נכון. המשחק לא קיבל את המילה.
-
-לקח לי כמה שניות להבין: LAND זו מילה אנגלית. אבל במוח שלי היא הייתה שוודית. כי בשוודית LAND זה "מדינה", לא "קרקע".`,
+        content: `אם פעם שיחקת משחק מילים בשפה אחת ומצאת את עצמך כותב מילה משפה אחרת - אתה לא לבד. יש סיבה מדעית למה זה קורה, וזה קשור לאיך המוח מאחסן שפות.`,
       },
       {
-        title: 'מתי זה התחיל',
-        content: `בחודשים האחרונים התחלתי לשחק בשלוש שפות. לא בגלל שיש לי איזה תוכנית מסודרת, אלא בגלל שהאפליקציה נתנה אפשרות ופשוט ניסיתי.
+        title: 'המודל ההיררכי המתוקן',
+        content: `חוקרים מתארים את הדרך שבה המוח מאחסן שפות במשהו שנקרא "המודל ההיררכי המתוקן" (Revised Hierarchical Model). לפי המודל הזה, יש לנו מחסן מושגים משותף - כל מה שאנחנו יודעים על העולם - ולידו שני לקסיקונים נפרדים, אחד לכל שפה.
 
-אנגלית כי זו השפה שאני הכי חזק בה.
+כשאנחנו מתחילים ללמוד שפה שנייה, אנחנו משתמשים במילים מהשפה הראשונה כגשר. רואים כלב, חושבים "כלב" בעברית, ואז מתרגמים ל-"dog". עם הזמן, הקשר הישיר בין המושג לשפה השנייה מתחזק, והגשר הופך פחות נחוץ.
 
-שוודית כי גרתי שם שנתיים וזה כיף לחזור לזה.
-
-יפנית כי... למה לא?`,
+אבל - וזה החלק המעניין - שתי השפות תמיד פעילות במקביל.`,
       },
       {
-        title: 'הבלבול',
-        content: `הדבר המוזר הוא שבהתחלה הרגשתי שאני מסתדר. אחרי שבועיים הכל התערבב.
+        title: 'מחקר: שפות מתחרות על גישה',
+        content: `מחקר שפורסם ב-Bilingualism: Language and Cognition מצא שכששתי שפות פעילות, הן מתחרות על גישה לקסיקלית-סמנטית. השפה שלא בשימוש צריכה להידחק, ומתי שעוברים אליה - הרשת הלקסיקלית-סמנטית שלה צריכה להיות מופעלת מחדש.
 
-יושב מול לוח שוודי ומחפש מילים יפניות. יושב מול לוח יפני ומחפש את "och" (וו בשוודית). המוח פשוט מחליט לבד באיזו שפה הוא נמצא.
-
-אחי אמר לי שזה סימן שאני צריך לישון יותר. אולי הוא צודק.`,
+במילים פשוטות: המוח צריך לעבוד קשה יותר כשהוא עובר בין שפות. זה מסביר למה אחרי שעה של משחק באנגלית, המילה הראשונה שעולה לך יכולה להיות בעברית.`,
       },
       {
-        title: 'מה שגיליתי',
-        content: `אחרי הרבה טעויות מביכות, משהו השתנה.
+        title: 'הפתעה: הבלבול הוא אימון',
+        content: `מחקר מ-2023 ב-Frontiers in Psychology בדק 266 דוברים דו-לשוניים צרפתיים-קנדיים. הם מצאו שאנשים שעוברים בין שפות באופן קבוע ("מחליפי קוד") מפגינים יתרונות בשליטה מעכבת - היכולת לדכא תגובות אוטומטיות.
 
-התחלתי לשים לב לדפוסים. לא כאילו "עכשיו אני לומד", אלא פשוט שמתי לב שמילים שוודיות נראות אחרת מאנגליות. שמילים יפניות יש להן מקצב מסוים.
-
-זה כמו כשאתה שומע שיר ואתה יודע אם זה רוק או ג'אז בלי לחשוב על זה.`,
+הסיבה: כשאתה צריך לנטר באיזו שפה אתה נמצא ולבחור את השפה הנכונה תוך כדי תחרות בין שתי שפות פעילות, אתה מאמן את היכולת הקוגניטיבית שלך לשליטה וניטור מטרות.`,
       },
       {
-        content: `עכשיו אני משחק בעיקר באנגלית. שוודית בסופי שבוע. יפנית כשיש לי סבלנות.
+        title: 'משחקים ורכישת אוצר מילים',
+        content: `סקירה שיטתית מ-2024 ב-AWEJ ניתחה 17 מחקרים על למידה מבוססת משחקים ורכישת אוצר מילים. הממצא המרכזי: משחקים יוצרים סביבת למידה חיובית שבה הסטודנטים חווים רגשות חיוביים - מה שמשפר את שמירת המילים בזיכרון.
 
-עדיין כותב מילים בשפה הלא נכונה. עדיין מתבלבל בין LAND ל-LAND. אבל זה כבר פחות מרגיש כמו טעות ויותר כמו... משהו שקורה.
+מחקר נפרד של אוניברסיטת AWEJ (ספטמבר 2024) על 100 סטודנטים סעודיים מצא שמי שלמד עם משחקי וידאו דיווח על מעורבות גבוהה יותר, מוטיבציה מוגברת, וחרדת שפה מופחתת.`,
+      },
+      {
+        title: 'העברה בין-לשונית',
+        content: `מחקר מ-PMC (2024) על זיכרון עבודה והשפעה בין-לשונית מצא שידע של שתי מערכות לשוניות (או יותר) יכול להאיץ את רכישת שפה חדשה. החוקרים קוראים לזה "העברה בין-לשונית" (cross-linguistic transfer).
 
-אני חושב שזה מה שמעניין במשחקים בכמה שפות. לא שאתה הופך לפוליגלוט. אתה פשוט רואה כמה השפה שלך עובדת אחרת משפות אחרות.
+מה שעוד יותר מעניין: ממצאים נוירו-קוגניטיביים מראים ששפות של דו-לשוניים מופעלות באופן רציף, גם כשהם עובדים בסביבה חד-לשונית. המוח לא באמת "מכבה" שפה - הוא רק מדכא אותה.`,
+      },
+      {
+        content: `אז בפעם הבאה שתכתוב מילה בשפה הלא נכונה במשחק - תדע שזה לא טעות. זה סימן שהמוח שלך עובד בדיוק כמו שהוא צריך: עם כמה שפות פעילות במקביל, מתחרות על הבמה.
 
-או שאני פשוט צריך לישון יותר. אחי כנראה צודק.`,
+וזה, לפי המחקר, דבר טוב.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -76,51 +74,49 @@ const contentByLocale: Record<string, LocaleContent> = {
     practice: 'תרגול',
   },
   en: {
-    title: 'I wrote a Swedish word on an English board',
-    category: 'Just me',
-    readTime: '3 min read',
+    title: 'Why Your Brain Mixes Languages (And Why That\'s Actually Good)',
+    category: 'Cognitive Science',
+    readTime: '5 min read',
     sections: [
       {
-        content: `It happened on a Friday night. Sitting with my laptop, playing words in English. I saw the letters L-A-N-D and typed it immediately.
-
-But something was off. The game didn't accept the word.
-
-Took me a few seconds to figure it out: LAND is an English word. But in my head it was Swedish. Because in Swedish, LAND means "country", not "ground".`,
+        content: `If you've ever played a word game in one language and found yourself typing a word from another language, you're not alone. There's a scientific reason this happens, and it's connected to how your brain stores languages.`,
       },
       {
-        title: 'When it started',
-        content: `Last few months I've been playing in three languages. Not because I have some organized plan. The app gave me the option and I just tried it.
+        title: 'The Revised Hierarchical Model',
+        content: `Researchers describe how the brain stores languages using something called the "Revised Hierarchical Model." According to this model, we have a shared conceptual store - everything we know about the world - alongside two separate lexicons, one for each language.
 
-English because it's my strongest language.
+When we start learning a second language, we use words from our first language as a bridge. We see a dog, think "dog" in our native language, then translate. Over time, the direct connection between the concept and the second language strengthens, and the bridge becomes less necessary.
 
-Swedish because I lived there for two years and it's fun to go back.
-
-Japanese because... why not?`,
+But here's the interesting part: both languages remain active simultaneously.`,
       },
       {
-        title: 'The confusion',
-        content: `The weird thing is that at first I felt like I was managing. After two weeks everything got mixed up.
+        title: 'Research: Languages Compete for Access',
+        content: `Research published in Bilingualism: Language and Cognition found that when two languages are active, they compete for lexical-semantic access. The non-target language must be inhibited, and when switching to a language that has been inhibited, that lexical-semantic network must be reactivated.
 
-Sitting in front of a Swedish board looking for Japanese words. Sitting in front of a Japanese board looking for "och" (and in Swedish). The brain just decides on its own which language it's in.
-
-My brother told me it's a sign I need to sleep more. Maybe he's right.`,
+In simpler terms: the brain has to work harder when switching between languages. This explains why after an hour of playing in English, the first word that comes to mind might be in your native language.`,
       },
       {
-        title: 'What I figured out',
-        content: `After many embarrassing mistakes, something changed.
+        title: 'The Surprise: Confusion Is Training',
+        content: `A 2023 study in Frontiers in Psychology examined 266 French Canadian bilinguals. They found that people who regularly switch between languages ("code-switchers") demonstrate advantages in inhibitory control - the ability to suppress automatic responses.
 
-I started noticing patterns. Not like "now I'm learning", just noticed that Swedish words look different from English. That Japanese words have a certain rhythm.
-
-It's like when you hear a song and you know if it's rock or jazz without thinking about it.`,
+The reason: when you need to monitor which language you're in and select the correct language while both languages compete, you're training your cognitive capacity for control and goal-monitoring.`,
       },
       {
-        content: `Now I play mostly in English. Swedish on weekends. Japanese when I have patience.
+        title: 'Games and Vocabulary Acquisition',
+        content: `A 2024 systematic review in AWEJ analyzed 17 studies on game-based learning and vocabulary acquisition. The key finding: games create a positive learning environment where students experience positive emotions - which improves vocabulary retention.
 
-Still write words in the wrong language. Still confuse LAND with LAND. But it doesn't feel like a mistake anymore. More like... something that happens.
+A separate study from AWEJ (September 2024) involving 100 Saudi students found that those who learned through video games reported higher engagement, increased motivation, and reduced language anxiety.`,
+      },
+      {
+        title: 'Cross-Linguistic Transfer',
+        content: `A 2024 PMC study on working memory and cross-linguistic influence found that knowledge of two (or more) linguistic systems can accelerate the acquisition of a new language. Researchers call this "cross-linguistic transfer."
 
-I think that's what's interesting about playing in multiple languages. Not that you become a polyglot. You just see how your language works differently from other languages.
+What's even more interesting: neurocognitive findings show that bilinguals' languages are continuously activated, even when working in a monolingual-oriented environment. The brain doesn't actually "turn off" a language - it just suppresses it.`,
+      },
+      {
+        content: `So next time you type a word in the wrong language during a game, know that it's not a mistake. It's a sign that your brain is working exactly as it should: with multiple languages active simultaneously, competing for the stage.
 
-Or I just need to sleep more. My brother is probably right.`,
+And that, according to research, is a good thing.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -128,51 +124,49 @@ Or I just need to sleep more. My brother is probably right.`,
     practice: 'Practice',
   },
   sv: {
-    title: 'Jag skrev ett engelskt ord på en svensk bräda',
-    category: 'Bara jag',
-    readTime: '3 min läsning',
+    title: 'Varför din hjärna blandar språk (och varför det är bra)',
+    category: 'Kognitiv vetenskap',
+    readTime: '5 min läsning',
     sections: [
       {
-        content: `Det hände en fredagskväll. Satt med laptopen, spelade ord på svenska. Jag såg bokstäverna K-I-N-D och skrev det direkt.
-
-Men något var fel. Spelet accepterade inte ordet.
-
-Det tog några sekunder att förstå: KIND är ett svenskt ord som betyder "kind" (i ansiktet). Men i mitt huvud var det engelska, som betyder "snäll".`,
+        content: `Om du någonsin spelat ett ordspel på ett språk och plötsligt skrivit ett ord på ett annat språk - du är inte ensam. Det finns en vetenskaplig förklaring till varför detta händer, och det handlar om hur hjärnan lagrar språk.`,
       },
       {
-        title: 'När det började',
-        content: `De senaste månaderna har jag spelat på tre språk. Inte för att jag har någon organiserad plan. Appen gav mig möjligheten och jag testade bara.
+        title: 'Den reviderade hierarkiska modellen',
+        content: `Forskare beskriver hur hjärnan lagrar språk med hjälp av den "reviderade hierarkiska modellen" (Revised Hierarchical Model). Enligt denna modell har vi ett gemensamt konceptuellt förråd - allt vi vet om världen - tillsammans med två separata lexikon, ett för varje språk.
 
-Svenska för att det är mitt modersmål.
+När vi börjar lära oss ett andra språk använder vi ord från vårt första språk som en brygga. Vi ser en hund, tänker "hund" på modersmålet, och översätter sedan. Med tiden stärks den direkta kopplingen mellan konceptet och det andra språket, och bryggan blir mindre nödvändig.
 
-Engelska för att jag använder det varje dag på jobbet.
-
-Japanska för att... varför inte?`,
+Men det intressanta är: båda språken förblir aktiva samtidigt.`,
       },
       {
-        title: 'Förvirringen',
-        content: `Det konstiga är att först kände jag att jag klarade det. Efter två veckor blev allt blandning.
+        title: 'Forskning: Språk tävlar om tillgång',
+        content: `Forskning publicerad i Bilingualism: Language and Cognition visade att när två språk är aktiva tävlar de om lexikal-semantisk tillgång. Det icke-målspråket måste hämmas, och när man byter till ett språk som har hämmats måste det lexikal-semantiska nätverket återaktiveras.
 
-Sitter framför en engelsk bräda och letar efter svenska ord. Sitter framför en japansk bräda och letar efter "the". Hjärnan bestämmer själv vilket språk den är i.
-
-Min syster sa att det är ett tecken på att jag behöver sova mer. Kanske har hon rätt.`,
+Enkelt uttryckt: hjärnan måste arbeta hårdare när den växlar mellan språk. Detta förklarar varför det första ordet som dyker upp efter en timme av spel på engelska kan vara på svenska.`,
       },
       {
-        title: 'Vad jag upptäckte',
-        content: `Efter många pinsamma misstag ändrades något.
+        title: 'Överraskningen: Förvirring är träning',
+        content: `En studie från 2023 i Frontiers in Psychology undersökte 266 fransk-kanadensiska tvåspråkiga. De fann att personer som regelbundet växlar mellan språk ("kodväxlare") visar fördelar i inhiberingskontroll - förmågan att undertrycka automatiska svar.
 
-Jag började märka mönster. Inte som "nu lär jag mig", bara märkte att engelska ord ser annorlunda ut än svenska. Att japanska ord har en viss rytm.
-
-Det är som när du hör en låt och du vet om det är rock eller jazz utan att tänka på det.`,
+Anledningen: när du behöver övervaka vilket språk du är i och välja rätt språk medan båda språken konkurrerar, tränar du din kognitiva kapacitet för kontroll och målövervakning.`,
       },
       {
-        content: `Nu spelar jag mest på svenska. Engelska på helger. Japanska när jag har tålamod.
+        title: 'Spel och ordförrådsinlärning',
+        content: `En systematisk granskning från 2024 i AWEJ analyserade 17 studier om spelbaserat lärande och ordförrådsinlärning. Huvudfyndet: spel skapar en positiv inlärningsmiljö där studenter upplever positiva känslor - vilket förbättrar ordförrådsretentionen.
 
-Skriver fortfarande ord på fel språk. Blandar fortfarande KIND med KIND. Men det känns inte som ett misstag längre. Mer som... något som händer.
+En separat studie från AWEJ (september 2024) med 100 saudiska studenter fann att de som lärde sig genom videospel rapporterade högre engagemang, ökad motivation och minskad språkångest.`,
+      },
+      {
+        title: 'Tvärspråklig överföring',
+        content: `En PMC-studie från 2024 om arbetsminne och tvärspråkligt inflytande fann att kunskap om två (eller fler) språksystem kan påskynda inlärningen av ett nytt språk. Forskarna kallar detta "tvärspråklig överföring" (cross-linguistic transfer).
 
-Jag tror det är det som är intressant med att spela på flera språk. Inte att du blir polyglott. Du ser bara hur ditt språk fungerar annorlunda än andra språk.
+Ännu mer intressant: neurokognitiva fynd visar att tvåspråkigas språk är kontinuerligt aktiverade, även när de arbetar i en enspråkig miljö. Hjärnan stänger inte riktigt "av" ett språk - den undertrycker det bara.`,
+      },
+      {
+        content: `Så nästa gång du skriver ett ord på fel språk under ett spel, vet att det inte är ett misstag. Det är ett tecken på att din hjärna fungerar precis som den ska: med flera språk aktiva samtidigt som tävlar om scenen.
 
-Eller så behöver jag bara sova mer. Min syster har förmodligen rätt.`,
+Och det, enligt forskningen, är en bra sak.`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -180,51 +174,49 @@ Eller så behöver jag bara sova mer. Min syster har förmodligen rätt.`,
     practice: 'Öva',
   },
   ja: {
-    title: '英語のボードにスウェーデン語を書いた',
-    category: '独り言',
-    readTime: '読了時間：3分',
+    title: '脳が言語を混ぜる理由（そしてそれが良いことである理由）',
+    category: '認知科学',
+    readTime: '読了時間：5分',
     sections: [
       {
-        content: `金曜日の夜だった。ラップトップで英語の単語ゲームをしていた。L-A-N-Dという文字を見て、すぐに入力した。
-
-でも何かがおかしかった。ゲームがその単語を受け付けなかった。
-
-理解するのに数秒かかった：LANDは英語の単語だ。でも頭の中ではスウェーデン語だった。スウェーデン語でLANDは「国」という意味だから。`,
+        content: `ある言語でワードゲームをプレイしていて、別の言語の単語を入力してしまったことはありませんか？あなただけではありません。これが起こる科学的な理由があり、それは脳が言語をどのように保存するかに関係しています。`,
       },
       {
-        title: 'いつ始まったか',
-        content: `最近の数ヶ月、3つの言語でプレイしている。計画があったわけじゃない。アプリにオプションがあって、試してみただけ。
+        title: '改訂階層モデル',
+        content: `研究者たちは、脳が言語を保存する方法を「改訂階層モデル」（Revised Hierarchical Model）を使って説明しています。このモデルによると、私たちには共有の概念ストア（世界について知っているすべてのこと）と、各言語用の2つの別々の語彙があります。
 
-英語は一番得意な言語だから。
+第二言語を学び始めるとき、私たちは第一言語の単語を橋として使います。犬を見て、母国語で「犬」と考え、それから翻訳します。時間が経つにつれて、概念と第二言語の間の直接的なつながりが強くなり、橋は必要なくなります。
 
-スウェーデン語は2年住んでいたから、また触れるのが楽しい。
-
-日本語は...なぜダメ？`,
+しかし、興味深いのは、両方の言語が同時にアクティブなままであるということです。`,
       },
       {
-        title: '混乱',
-        content: `変なのは、最初はうまくいっていると思っていたこと。2週間後、全部が混ざった。
+        title: '研究：言語はアクセスを競う',
+        content: `Bilingualism: Language and Cognitionに発表された研究によると、2つの言語がアクティブなとき、それらは語彙・意味的アクセスを競います。ターゲットでない言語は抑制されなければならず、抑制されていた言語に切り替えるとき、その語彙・意味的ネットワークを再活性化する必要があります。
 
-スウェーデン語のボードの前に座って日本語の単語を探している。日本語のボードの前に座って「och」（スウェーデン語の「と」）を探している。脳が勝手にどの言語にいるか決める。
-
-兄がもっと寝る必要があると言った。たぶん正しい。`,
+簡単に言えば：言語を切り替えるとき、脳はより激しく働かなければなりません。これは、英語で1時間プレイした後、最初に思い浮かぶ単語が母国語である理由を説明しています。`,
       },
       {
-        title: '気づいたこと',
-        content: `たくさんの恥ずかしい間違いの後、何かが変わった。
+        title: '驚き：混乱はトレーニング',
+        content: `Frontiers in Psychologyの2023年の研究では、266人のフランス系カナダ人バイリンガルを調査しました。定期的に言語を切り替える人（「コードスイッチャー」）は、抑制制御（自動的な反応を抑える能力）に優位性を示すことがわかりました。
 
-パターンに気づき始めた。「今学んでいる」というわけじゃなく、スウェーデン語の単語が英語と違って見えることに気づいた。日本語の単語には特定のリズムがあること。
-
-曲を聴いて、考えなくてもロックかジャズかわかるのと同じ。`,
+理由：どの言語にいるかを監視し、両方の言語が競合している間に正しい言語を選択する必要があるとき、制御と目標監視のための認知能力をトレーニングしているのです。`,
       },
       {
-        content: `今は主に英語でプレイしている。週末はスウェーデン語。根気があるときは日本語。
+        title: 'ゲームと語彙習得',
+        content: `AWEJの2024年の系統的レビューでは、ゲームベースの学習と語彙習得に関する17の研究を分析しました。主な発見：ゲームは学生がポジティブな感情を経験するポジティブな学習環境を作り出し、それが語彙の保持を向上させます。
 
-まだ間違った言語で単語を書く。まだLANDとLANDを混同する。でももう間違いとは感じない。何というか...起こること。
+AWEJの別の研究（2024年9月）では、100人のサウジアラビアの学生を対象に、ビデオゲームを通じて学んだ学生は、より高いエンゲージメント、モチベーションの向上、言語不安の軽減を報告しました。`,
+      },
+      {
+        title: '言語間転移',
+        content: `作業記憶と言語間影響に関するPMCの2024年の研究では、2つ（またはそれ以上）の言語システムの知識が新しい言語の習得を加速できることがわかりました。研究者はこれを「言語間転移」（cross-linguistic transfer）と呼んでいます。
 
-複数の言語でプレイすることの面白さはこれだと思う。ポリグロットになるわけじゃない。自分の言語が他の言語とどう違うか見えるだけ。
+さらに興味深いのは、神経認知学的な発見によると、バイリンガルの言語は、単一言語の環境で作業しているときでも継続的に活性化されているということです。脳は実際には言語を「オフ」にしません - 抑制するだけです。`,
+      },
+      {
+        content: `だから次にゲーム中に間違った言語で単語を入力しても、それは間違いではないと知ってください。それはあなたの脳が正確に機能している証拠です：複数の言語が同時にアクティブで、ステージを競っています。
 
-それか、もっと寝る必要があるだけ。兄はたぶん正しい。`,
+そして、研究によると、それは良いことです。`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -232,51 +224,49 @@ Eller så behöver jag bara sova mer. Min syster har förmodligen rätt.`,
     practice: '練習',
   },
   es: {
-    title: 'Escribí una palabra en sueco en un tablero en inglés',
-    category: 'Solo yo',
-    readTime: '3 min de lectura',
+    title: 'Por qué tu cerebro mezcla idiomas (y por qué eso es bueno)',
+    category: 'Ciencia Cognitiva',
+    readTime: '5 min de lectura',
     sections: [
       {
-        content: `Fue un viernes por la noche. Sentado con mi laptop, jugando palabras en inglés. Vi las letras L-A-N-D y las escribí inmediatamente.
-
-Pero algo andaba mal. El juego no aceptó la palabra.
-
-Me tomó unos segundos entender: LAND es una palabra en inglés. Pero en mi cabeza era sueca. Porque en sueco, LAND significa "país", no "tierra".`,
+        content: `Si alguna vez has jugado un juego de palabras en un idioma y te has encontrado escribiendo una palabra de otro idioma, no estás solo. Hay una razón científica por la que esto sucede, y está relacionada con cómo tu cerebro almacena los idiomas.`,
       },
       {
-        title: 'Cuándo empezó',
-        content: `Los últimos meses he estado jugando en tres idiomas. No porque tenga algún plan organizado. La app me dio la opción y simplemente probé.
+        title: 'El Modelo Jerárquico Revisado',
+        content: `Los investigadores describen cómo el cerebro almacena idiomas usando algo llamado "Modelo Jerárquico Revisado" (Revised Hierarchical Model). Según este modelo, tenemos un almacén conceptual compartido - todo lo que sabemos sobre el mundo - junto con dos léxicos separados, uno para cada idioma.
 
-Inglés porque es mi idioma más fuerte.
+Cuando empezamos a aprender un segundo idioma, usamos palabras de nuestro primer idioma como puente. Vemos un perro, pensamos "perro" en nuestro idioma nativo, y luego traducimos. Con el tiempo, la conexión directa entre el concepto y el segundo idioma se fortalece, y el puente se vuelve menos necesario.
 
-Sueco porque viví ahí dos años y es divertido volver.
-
-Japonés porque... ¿por qué no?`,
+Pero aquí está lo interesante: ambos idiomas permanecen activos simultáneamente.`,
       },
       {
-        title: 'La confusión',
-        content: `Lo raro es que al principio sentía que lo estaba manejando. Después de dos semanas todo se mezcló.
+        title: 'Investigación: Los idiomas compiten por acceso',
+        content: `Investigación publicada en Bilingualism: Language and Cognition encontró que cuando dos idiomas están activos, compiten por acceso léxico-semántico. El idioma no objetivo debe ser inhibido, y cuando se cambia a un idioma que ha sido inhibido, esa red léxico-semántica debe ser reactivada.
 
-Sentado frente a un tablero sueco buscando palabras japonesas. Sentado frente a un tablero japonés buscando "och" (y en sueco). El cerebro decide solo en qué idioma está.
-
-Mi hermana me dijo que es señal de que necesito dormir más. Tal vez tiene razón.`,
+En términos más simples: el cerebro tiene que trabajar más duro cuando cambia entre idiomas. Esto explica por qué después de una hora jugando en inglés, la primera palabra que viene a la mente podría ser en tu idioma nativo.`,
       },
       {
-        title: 'Lo que descubrí',
-        content: `Después de muchos errores vergonzosos, algo cambió.
+        title: 'La sorpresa: La confusión es entrenamiento',
+        content: `Un estudio de 2023 en Frontiers in Psychology examinó a 266 bilingües franco-canadienses. Encontraron que las personas que cambian regularmente entre idiomas ("code-switchers") demuestran ventajas en control inhibitorio - la capacidad de suprimir respuestas automáticas.
 
-Empecé a notar patrones. No como "ahora estoy aprendiendo", solo noté que las palabras suecas se ven diferentes de las inglesas. Que las palabras japonesas tienen cierto ritmo.
-
-Es como cuando escuchas una canción y sabes si es rock o jazz sin pensarlo.`,
+La razón: cuando necesitas monitorear en qué idioma estás y seleccionar el idioma correcto mientras ambos idiomas compiten, estás entrenando tu capacidad cognitiva para el control y monitoreo de objetivos.`,
       },
       {
-        content: `Ahora juego principalmente en inglés. Sueco los fines de semana. Japonés cuando tengo paciencia.
+        title: 'Juegos y adquisición de vocabulario',
+        content: `Una revisión sistemática de 2024 en AWEJ analizó 17 estudios sobre aprendizaje basado en juegos y adquisición de vocabulario. El hallazgo clave: los juegos crean un ambiente de aprendizaje positivo donde los estudiantes experimentan emociones positivas - lo que mejora la retención de vocabulario.
 
-Todavía escribo palabras en el idioma equivocado. Todavía confundo LAND con LAND. Pero ya no se siente como un error. Más como... algo que pasa.
+Un estudio separado de AWEJ (septiembre 2024) con 100 estudiantes saudíes encontró que aquellos que aprendieron a través de videojuegos reportaron mayor compromiso, mayor motivación y reducida ansiedad lingüística.`,
+      },
+      {
+        title: 'Transferencia interlingüística',
+        content: `Un estudio de PMC de 2024 sobre memoria de trabajo e influencia interlingüística encontró que el conocimiento de dos (o más) sistemas lingüísticos puede acelerar la adquisición de un nuevo idioma. Los investigadores llaman a esto "transferencia interlingüística" (cross-linguistic transfer).
 
-Creo que eso es lo interesante de jugar en varios idiomas. No que te vuelves políglota. Solo ves cómo tu idioma funciona diferente de otros idiomas.
+Lo que es aún más interesante: hallazgos neurocognitivos muestran que los idiomas de los bilingües están continuamente activados, incluso cuando trabajan en un entorno monolingüe. El cerebro en realidad no "apaga" un idioma - solo lo suprime.`,
+      },
+      {
+        content: `Así que la próxima vez que escribas una palabra en el idioma equivocado durante un juego, sabe que no es un error. Es una señal de que tu cerebro está funcionando exactamente como debería: con múltiples idiomas activos simultáneamente, compitiendo por el escenario.
 
-O simplemente necesito dormir más. Mi hermana probablemente tiene razón.`,
+Y eso, según la investigación, es algo bueno.`,
       },
     ],
     backToBlog: 'Volver al Blog',

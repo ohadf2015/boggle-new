@@ -24,43 +24,57 @@ type LocaleContent = {
 
 const contentByLocale: Record<string, LocaleContent> = {
   he: {
-    title: 'למה אני מפסידה לאבא שלי כל פעם',
-    category: 'מחשבות',
-    readTime: 'זמן קריאה: 4 דקות',
+    title: 'מה המחקר אומר על שחקני מילים מומחים',
+    category: 'מדע קוגניטיבי',
+    readTime: 'זמן קריאה: 5 דקות',
     sections: [
       {
-        content: `אבא שלי בן 67. הוא גמלאי. הוא לא היה טוב בבית ספר, לפי מה שהוא מספר. ועדיין, כל שישי כשאנחנו יושבים לשחק, הוא מנצח.
-
-לא תמיד. אבל לפחות שבע מתוך עשר פעמים.`,
+        content: `יש אנשים שפשוט "רואים" מילים בלוח. הם לא מחפשים, לא סורקים - המילים פשוט קופצות להם. מה קורה במוח שלהם? חוקרים החליטו לבדוק.`,
       },
       {
-        title: 'מה שמתעצבן אותי',
-        content: `הוא לא מתאמץ. לא נראה לי שהוא מתאמץ.
+        title: 'המוח של שחקני סקרבל מומחים',
+        content: `מחקר שפורסם ב-Memory & Cognition בדק שחקני סקרבל תחרותיים. הם גילו שהשחקנים האלה מפגינים יכולות זיהוי מילים ויזואלי שונות באופן מהותי מאנשים רגילים.
 
-אני יושבת ומחפשת, סורקת את הלוח, מנסה למצוא מילים ארוכות. הוא מסתכל, שם מילה, מסתכל שוב, שם עוד מילה. בלי לחץ.
+הממצא המפתיע: שחקנים מומחים פחות תלויים במשמעות המילים כדי לשפוט אם הן אמיתיות. במקום זאת, הם מסתמכים יותר על מידע אורתוגרפי - הצורה הוויזואלית של המילים.
 
-פעם שאלתי אותו איך הוא עושה את זה. הוא אמר "אני לא יודע. אני פשוט רואה אותן."
-
-לא עזר לי בכלום.`,
+כפי שהחוקרים כותבים: "זיהוי מילים ויזואלי מעוצב על ידי ניסיון, ועם ניסיון, יש יעילויות שניתן להשיג גם במערכת זיהוי המילים של מבוגרים."`,
       },
       {
-        title: 'מה שמתי לב אליו',
-        content: `אז התחלתי לצפות בו במקום לשחק. שם לב שהוא לא מחפש מילים כמוני. הוא מחפש... חלקים. קטעים של מילים.
+        title: 'מחקר fMRI: מה קורה בפנים',
+        content: `מחקר ב-ScienceDirect השתמש ב-fMRI כדי להשוות פעילות מוחית ב-12 שחקני סקרבל תחרותיים עם 12 אנשים רגילים. התוצאות היו מפתיעות.
 
-הוא רואה "על" ומיד מחפש מה יכול לבוא לפני או אחרי. הוא לא מנסה לראות את כל המילה בבת אחת.
+במהלך משימות זיהוי מילים, שחקנים מומחים הפעילו אזורי מוח שלא קשורים בדרך כלל לשליפת משמעות - אלא לזיכרון עבודה ותפיסה ויזואלית.
 
-אני חושבת שזה כמו לקרוא ספר. בהתחלה קוראים אות אות. אחר כך מילה מילה. ואז פשוט רואים משפטים שלמים. הוא בשלב של משפטים, אני עדיין במילים.`,
+המשמעות: מומחים לא "חושבים" על מילים כמונו. הם רואים דפוסים.`,
       },
       {
-        title: 'מה שלא עובד לי',
-        content: `ניסיתי לעשות כמוהו. לא עובד. אני לא הוא.
+        title: 'הסוד: Chunking (קיבוץ)',
+        content: `ב-1973, צ'ייס וסיימון הראו שמומחי שחמט זוכרים מצבי לוח טוב יותר מטירונים - אבל רק כשהמצבים הגיוניים. כשהכלים מפוזרים אקראית, היתרון נעלם.
 
-מה שכן עובד לי: לשחק בלי לחץ. כשאני מודאגת מלנצח, אני מפסידה יותר. כשאני פשוט משחקת, מוצאת מילים שלא ראיתי קודם.
+הסיבה: מומחים לא זוכרים כלים בודדים. הם זוכרים "chunks" - קבוצות של כלים שיוצרות דפוס מוכר.
 
-אבא אומר שזה כי הוא כבר לא צריך להוכיח כלום. אולי הוא צודק.`,
+אותו עיקרון עובד במשחקי מילים. שחקנים מנוסים לא רואים אותיות בודדות. הם רואים צירופים נפוצים: "ת-ה" כקידומת, "ים" כסיומת. הלוח הופך מרשת של אותיות לאוסף של אבני בניין.`,
       },
       {
-        content: `עדיין מפסידה לו. אבל עכשיו לפחות אני יודעת למה.`,
+        title: 'הנתון המפתיע על תרגול',
+        content: `מחקר מצא ששחקני סקרבל תחרותיים מקדישים בממוצע 4.5 שעות בשבוע לשינון מילים מהמילון הרשמי.
+
+אבל הנה הפתעה: כששנשאלו אם הם לומדים את משמעויות המילים, רק 6.4% ענו "תמיד". השאר התחלקו בין "לפעמים" ל-"לעיתים רחוקות או אף פעם".
+
+בכל זאת, במבחנים הם הגדירו יותר מילים נכון. למה? כי גישה מהירה למילים (שנמדדה בזמני תגובה) קשורה לרמת המומחיות, לא לידע המשמעות.`,
+      },
+      {
+        title: 'מה זה אומר עליך',
+        content: `אתה לא צריך להיות מומחה כדי להשתמש בעקרונות האלה:
+
+1. חפש דפוסים, לא מילים שלמות. התחל לשים לב לצירופי אותיות נפוצים.
+
+2. תרגול חוזר משנה את המוח. ככל שתשחק יותר, יותר דפוסים יהפכו לאוטומטיים.
+
+3. המשמעות פחות חשובה ממה שחשבת. המוח יכול לזהות מילה כ"אמיתית" בלי לזכור מה היא אומרת.`,
+      },
+      {
+        content: `המחקר מראה שזיהוי מילים ויזואלי ממשיך להשתפר גם אצל מבוגרים. מה שנראה כמו "כישרון טבעי" הוא לרוב תוצאה של ניסיון מצטבר - והוכחה שהמוח שלנו גמיש יותר ממה שחשבנו.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -68,43 +82,57 @@ const contentByLocale: Record<string, LocaleContent> = {
     practice: 'תרגול',
   },
   en: {
-    title: 'Why I keep losing to my dad',
-    category: 'Thoughts',
-    readTime: '4 min read',
+    title: 'What Research Says About Expert Word Game Players',
+    category: 'Cognitive Science',
+    readTime: '5 min read',
     sections: [
       {
-        content: `My dad is 67. He's retired. He wasn't good at school, by his own account. And yet, every Sunday when we sit down to play, he wins.
-
-Not always. But at least seven times out of ten.`,
+        content: `Some people just "see" words on the board. They don't search, don't scan - the words just jump out at them. What's happening in their brains? Researchers decided to find out.`,
       },
       {
-        title: 'What frustrates me',
-        content: `He doesn't seem to try. It doesn't look like he's trying.
+        title: 'The Brain of Expert Scrabble Players',
+        content: `A study published in Memory & Cognition examined competitive Scrabble players. They discovered that these players exhibit fundamentally different visual word recognition abilities compared to regular people.
 
-I sit there searching, scanning the board, trying to find long words. He looks, places a word, looks again, places another word. No pressure.
+The surprising finding: expert players are less reliant on word meaning to judge whether words are real. Instead, they rely more on orthographic information - the visual shape of words.
 
-Once I asked him how he does it. He said "I don't know. I just see them."
-
-That didn't help me at all.`,
+As the researchers write: "Visual word recognition is shaped by experience and, with experience, there are efficiencies to be had even in the adult word recognition system."`,
       },
       {
-        title: 'What I noticed',
-        content: `So I started watching him instead of playing. I noticed he doesn't look for words like I do. He looks for... pieces. Fragments of words.
+        title: 'fMRI Research: What Happens Inside',
+        content: `A study in ScienceDirect used fMRI to compare brain activity in 12 competitive Scrabble players with 12 matched controls. The results were surprising.
 
-He sees "RE" and immediately looks for what can come before or after. He doesn't try to see the whole word at once.
+During word recognition tasks, expert players activated brain regions not generally associated with meaning retrieval - but rather those associated with working memory and visual perception.
 
-I think it's like reading a book. At first you read letter by letter. Then word by word. And then you just see whole sentences. He's at the sentence stage, I'm still at words.`,
+The implication: experts don't "think" about words like we do. They see patterns.`,
       },
       {
-        title: 'What doesn\'t work for me',
-        content: `I tried to do what he does. Doesn't work. I'm not him.
+        title: 'The Secret: Chunking',
+        content: `In 1973, Chase and Simon showed that chess experts remember board positions better than novices - but only when the positions make sense. When pieces are randomly scattered, the advantage disappears.
 
-What does work for me: playing without pressure. When I'm worried about winning, I lose more. When I just play, I find words I didn't see before.
+The reason: experts don't remember individual pieces. They remember "chunks" - groups of pieces that form a recognizable pattern.
 
-Dad says it's because he doesn't need to prove anything anymore. Maybe he's right.`,
+The same principle applies to word games. Experienced players don't see individual letters. They see common combinations: "RE" as a prefix, "ING" as a suffix. The board transforms from a grid of letters into a collection of building blocks.`,
       },
       {
-        content: `I still lose to him. But now at least I know why.`,
+        title: 'The Surprising Data on Practice',
+        content: `Research found that competitive Scrabble players dedicate an average of 4.5 hours per week to memorizing words from the official dictionary.
+
+But here's the surprise: when asked if they learn word meanings, only 6.4% answered "always." The rest split between "sometimes" and "rarely or never."
+
+Yet in tests, they defined more words correctly. Why? Because fast word access (measured by reaction times) correlates with expertise level, not meaning knowledge.`,
+      },
+      {
+        title: 'What This Means for You',
+        content: `You don't need to be an expert to use these principles:
+
+1. Look for patterns, not complete words. Start noticing common letter combinations.
+
+2. Repeated practice changes the brain. The more you play, the more patterns become automatic.
+
+3. Meaning matters less than you thought. The brain can recognize a word as "real" without remembering what it means.`,
+      },
+      {
+        content: `Research shows that visual word recognition continues to improve even in adults. What looks like "natural talent" is often the result of accumulated experience - and proof that our brains are more flexible than we thought.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -112,43 +140,57 @@ Dad says it's because he doesn't need to prove anything anymore. Maybe he's righ
     practice: 'Practice',
   },
   sv: {
-    title: 'Varför jag alltid förlorar mot min pappa',
-    category: 'Tankar',
-    readTime: '4 min läsning',
+    title: 'Vad forskning säger om experter på ordspel',
+    category: 'Kognitiv vetenskap',
+    readTime: '5 min läsning',
     sections: [
       {
-        content: `Min pappa är 67. Han är pensionär. Han var inte bra i skolan, enligt honom själv. Ändå, varje söndag när vi spelar, vinner han.
-
-Inte alltid. Men minst sju gånger av tio.`,
+        content: `Vissa människor "ser" bara ord på brädet. De söker inte, skannar inte - orden hoppar bara ut. Vad händer i deras hjärnor? Forskare bestämde sig för att ta reda på det.`,
       },
       {
-        title: 'Vad som frustrerar mig',
-        content: `Han verkar inte försöka. Det ser inte ut som om han anstränger sig.
+        title: 'Hjärnan hos Scrabble-experter',
+        content: `En studie publicerad i Memory & Cognition undersökte tävlingsinriktade Scrabble-spelare. De upptäckte att dessa spelare uppvisar fundamentalt annorlunda förmågor för visuell ordigenkänning jämfört med vanliga människor.
 
-Jag sitter och söker, skannar brädet, försöker hitta långa ord. Han tittar, lägger ett ord, tittar igen, lägger ett annat ord. Ingen press.
+Det överraskande fyndet: expertspelare är mindre beroende av ordets betydelse för att bedöma om ord är verkliga. Istället förlitar de sig mer på ortografisk information - ordets visuella form.
 
-En gång frågade jag hur han gör det. Han sa "Jag vet inte. Jag bara ser dem."
-
-Det hjälpte mig inte alls.`,
+Som forskarna skriver: "Visuell ordigenkänning formas av erfarenhet, och med erfarenhet finns det effektivitetsvinster även i den vuxna ordigenkänningssystemet."`,
       },
       {
-        title: 'Vad jag märkte',
-        content: `Så jag började titta på honom istället för att spela. Jag märkte att han inte letar efter ord som jag gör. Han letar efter... bitar. Delar av ord.
+        title: 'fMRI-forskning: Vad som händer inuti',
+        content: `En studie i ScienceDirect använde fMRI för att jämföra hjärnaktivitet hos 12 tävlings-Scrabble-spelare med 12 matchade kontroller. Resultaten var överraskande.
 
-Han ser "FÖR" och tittar direkt efter vad som kan komma före eller efter. Han försöker inte se hela ordet på en gång.
+Under ordigenkänningsuppgifter aktiverade expertspelare hjärnregioner som vanligtvis inte associeras med betydelsehämtning - utan snarare de som associeras med arbetsminne och visuell perception.
 
-Jag tror det är som att läsa en bok. Först läser man bokstav för bokstav. Sen ord för ord. Och sen ser man bara hela meningar. Han är på meningsstadiet, jag är fortfarande på ord.`,
+Implikationen: experter "tänker" inte på ord som vi gör. De ser mönster.`,
       },
       {
-        title: 'Vad som inte fungerar för mig',
-        content: `Jag försökte göra som han. Fungerar inte. Jag är inte han.
+        title: 'Hemligheten: Chunking',
+        content: `År 1973 visade Chase och Simon att schackexperter minns brädpositioner bättre än nybörjare - men endast när positionerna är meningsfulla. När pjäser placeras slumpmässigt försvinner fördelen.
 
-Vad som fungerar för mig: spela utan press. När jag oroar mig för att vinna, förlorar jag mer. När jag bara spelar, hittar jag ord jag inte såg förut.
+Anledningen: experter minns inte enskilda pjäser. De minns "chunks" - grupper av pjäser som bildar ett igenkännbart mönster.
 
-Pappa säger att det är för att han inte behöver bevisa något längre. Kanske har han rätt.`,
+Samma princip gäller för ordspel. Erfarna spelare ser inte enskilda bokstäver. De ser vanliga kombinationer: "FÖR" som prefix, "NING" som suffix. Brädet förvandlas från ett rutnät av bokstäver till en samling byggstenar.`,
       },
       {
-        content: `Jag förlorar fortfarande mot honom. Men nu vet jag åtminstone varför.`,
+        title: 'Överraskande data om övning',
+        content: `Forskning visade att tävlings-Scrabble-spelare ägnar i genomsnitt 4,5 timmar per vecka åt att memorera ord från den officiella ordboken.
+
+Men här är överraskningen: när de tillfrågades om de lär sig ordets betydelser svarade endast 6,4% "alltid". Resten delade sig mellan "ibland" och "sällan eller aldrig."
+
+Ändå definierade de fler ord korrekt i tester. Varför? Eftersom snabb ordåtkomst (mätt genom reaktionstider) korrelerar med expertisnivå, inte betydelsekunskap.`,
+      },
+      {
+        title: 'Vad detta betyder för dig',
+        content: `Du behöver inte vara expert för att använda dessa principer:
+
+1. Leta efter mönster, inte kompletta ord. Börja lägga märke till vanliga bokstavskombinationer.
+
+2. Upprepat övande förändrar hjärnan. Ju mer du spelar, desto fler mönster blir automatiska.
+
+3. Betydelse spelar mindre roll än du trodde. Hjärnan kan känna igen ett ord som "verkligt" utan att minnas vad det betyder.`,
+      },
+      {
+        content: `Forskning visar att visuell ordigenkänning fortsätter att förbättras även hos vuxna. Det som ser ut som "naturlig talang" är ofta resultatet av ackumulerad erfarenhet - och bevis på att våra hjärnor är mer flexibla än vi trodde.`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -156,43 +198,57 @@ Pappa säger att det är för att han inte behöver bevisa något längre. Kansk
     practice: 'Öva',
   },
   ja: {
-    title: 'なぜ父にいつも負けるのか',
-    category: '考察',
-    readTime: '読了時間：4分',
+    title: '研究が明かすワードゲーム上級者の秘密',
+    category: '認知科学',
+    readTime: '読了時間：5分',
     sections: [
       {
-        content: `父は67歳。定年退職している。本人曰く、学校では優秀じゃなかったらしい。それでも、毎週日曜日に遊ぶと、彼が勝つ。
-
-いつもじゃない。でも10回中7回は。`,
+        content: `ボード上の単語が「見える」人がいます。彼らは探さない、スキャンしない - 単語が飛び込んでくるのです。彼らの脳で何が起きているのでしょうか？研究者たちが調べることにしました。`,
       },
       {
-        title: 'イライラすること',
-        content: `父は頑張っているように見えない。
+        title: 'スクラブル上級者の脳',
+        content: `Memory & Cognitionに発表された研究は、競技スクラブルプレイヤーを調査しました。彼らは一般の人とは根本的に異なる視覚的単語認識能力を示すことがわかりました。
 
-私は座って探す。盤面をスキャンして、長い言葉を見つけようとする。父は見て、言葉を置いて、また見て、また言葉を置く。プレッシャーがない。
+驚くべき発見：上級者は単語が本物かどうかを判断する際、単語の意味にあまり頼りません。代わりに、正書法的情報 - 単語の視覚的な形 - により依存しています。
 
-一度、どうやっているのか聞いた。「わからない。ただ見えるんだ」と言われた。
-
-全然参考にならなかった。`,
+研究者は次のように書いています：「視覚的単語認識は経験によって形作られ、経験によって、成人の単語認識システムでも効率化が達成できます。」`,
       },
       {
-        title: '気づいたこと',
-        content: `だから遊ぶ代わりに父を観察し始めた。父は私のように言葉を探していないことに気づいた。探しているのは...パーツ。言葉の断片。
+        title: 'fMRI研究：内部で何が起きているか',
+        content: `ScienceDirectの研究は、fMRIを使用して12人の競技スクラブルプレイヤーと12人の対照群の脳活動を比較しました。結果は驚くべきものでした。
 
-「お」を見たら、すぐに前後に何が来れるか探している。言葉全体を一度に見ようとしていない。
+単語認識タスク中、上級者は通常、意味の検索に関連しない脳領域を活性化しました - むしろ作業記憶と視覚的知覚に関連する領域を。
 
-本を読むのと同じだと思う。最初は一文字ずつ読む。次に一語ずつ。そして文全体が見えるようになる。父は文の段階、私はまだ単語の段階。`,
+含意：上級者は私たちのように単語について「考えて」いません。彼らはパターンを見ているのです。`,
       },
       {
-        title: 'うまくいかないこと',
-        content: `父と同じようにやってみた。うまくいかない。私は父じゃない。
+        title: '秘密：チャンキング',
+        content: `1973年、チェイスとサイモンは、チェスの上級者は初心者よりも盤面の位置をよく覚えることを示しました - ただし、位置が意味を成す場合のみ。駒がランダムに配置されると、その優位性は消えます。
 
-うまくいくこと：プレッシャーなしで遊ぶこと。勝つことを心配すると、もっと負ける。ただ遊ぶと、見えなかった言葉が見つかる。
+理由：上級者は個々の駒を覚えていません。認識可能なパターンを形成する駒のグループである「チャンク」を覚えているのです。
 
-父は「もう何も証明する必要がないからだ」と言う。たぶん正しい。`,
+同じ原理がワードゲームにも適用されます。経験豊富なプレイヤーは個々の文字を見ません。一般的な組み合わせを見ます：接頭辞としての「お」、接尾辞としての「ます」。ボードは文字のグリッドから構成要素のコレクションに変わります。`,
       },
       {
-        content: `まだ父に負けている。でも少なくとも理由がわかった。`,
+        title: '練習に関する驚くべきデータ',
+        content: `研究によると、競技スクラブルプレイヤーは週平均4.5時間を公式辞書の単語の暗記に費やしています。
+
+しかし、ここに驚きがあります：単語の意味を学ぶかどうか尋ねられたとき、「常に」と答えたのはわずか6.4%でした。残りは「時々」と「まれに、またはまったくしない」に分かれました。
+
+しかし、テストではより多くの単語を正しく定義しました。なぜ？速い単語アクセス（反応時間で測定）は、意味の知識ではなく、専門性レベルと相関するからです。`,
+      },
+      {
+        title: 'これがあなたにとって意味すること',
+        content: `これらの原則を使うのに上級者である必要はありません：
+
+1. 完全な単語ではなく、パターンを探しましょう。一般的な文字の組み合わせに気づき始めましょう。
+
+2. 繰り返しの練習は脳を変えます。プレイすればするほど、より多くのパターンが自動的になります。
+
+3. 意味は思ったほど重要ではありません。脳は、それが何を意味するか覚えていなくても、単語を「本物」として認識できます。`,
+      },
+      {
+        content: `研究は、視覚的単語認識が大人でも改善し続けることを示しています。「自然な才能」に見えるものは、しばしば蓄積された経験の結果です - そして、私たちの脳が思ったより柔軟であることの証拠です。`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -200,43 +256,57 @@ Pappa säger att det är för att han inte behöver bevisa något längre. Kansk
     practice: '練習',
   },
   es: {
-    title: 'Por qué siempre pierdo contra mi papá',
-    category: 'Reflexiones',
-    readTime: '4 min de lectura',
+    title: 'Lo que la investigación dice sobre los expertos en juegos de palabras',
+    category: 'Ciencia Cognitiva',
+    readTime: '5 min de lectura',
     sections: [
       {
-        content: `Mi papá tiene 67 años. Está jubilado. No era bueno en la escuela, según él. Y aun así, cada domingo cuando nos sentamos a jugar, él gana.
-
-No siempre. Pero al menos siete de cada diez veces.`,
+        content: `Algunas personas simplemente "ven" palabras en el tablero. No buscan, no escanean - las palabras simplemente saltan. ¿Qué está pasando en sus cerebros? Los investigadores decidieron averiguarlo.`,
       },
       {
-        title: 'Lo que me frustra',
-        content: `No parece que se esfuerce. No se ve como si estuviera intentando.
+        title: 'El cerebro de los expertos en Scrabble',
+        content: `Un estudio publicado en Memory & Cognition examinó a jugadores competitivos de Scrabble. Descubrieron que estos jugadores exhiben habilidades de reconocimiento visual de palabras fundamentalmente diferentes en comparación con personas comunes.
 
-Yo me siento buscando, escaneando el tablero, tratando de encontrar palabras largas. Él mira, pone una palabra, mira de nuevo, pone otra palabra. Sin presión.
+El hallazgo sorprendente: los jugadores expertos dependen menos del significado de las palabras para juzgar si son reales. En cambio, se basan más en información ortográfica - la forma visual de las palabras.
 
-Una vez le pregunté cómo lo hace. Me dijo "No sé. Simplemente las veo."
-
-Eso no me ayudó en nada.`,
+Como escriben los investigadores: "El reconocimiento visual de palabras está moldeado por la experiencia y, con experiencia, hay eficiencias que se pueden lograr incluso en el sistema de reconocimiento de palabras adulto."`,
       },
       {
-        title: 'Lo que noté',
-        content: `Así que empecé a observarlo en lugar de jugar. Noté que no busca palabras como yo. Busca... pedazos. Fragmentos de palabras.
+        title: 'Investigación con fMRI: Qué pasa adentro',
+        content: `Un estudio en ScienceDirect usó fMRI para comparar la actividad cerebral en 12 jugadores competitivos de Scrabble con 12 controles emparejados. Los resultados fueron sorprendentes.
 
-Ve "DES" e inmediatamente busca qué puede venir antes o después. No intenta ver la palabra completa de una vez.
+Durante tareas de reconocimiento de palabras, los jugadores expertos activaron regiones cerebrales no generalmente asociadas con la recuperación de significado - sino más bien aquellas asociadas con la memoria de trabajo y la percepción visual.
 
-Creo que es como leer un libro. Al principio lees letra por letra. Luego palabra por palabra. Y después simplemente ves oraciones completas. Él está en la etapa de oraciones, yo todavía en palabras.`,
+La implicación: los expertos no "piensan" en las palabras como nosotros. Ven patrones.`,
       },
       {
-        title: 'Lo que no funciona para mí',
-        content: `Traté de hacer lo que él hace. No funciona. No soy él.
+        title: 'El secreto: Chunking',
+        content: `En 1973, Chase y Simon mostraron que los expertos en ajedrez recuerdan posiciones del tablero mejor que los novatos - pero solo cuando las posiciones tienen sentido. Cuando las piezas están dispersas aleatoriamente, la ventaja desaparece.
 
-Lo que sí funciona para mí: jugar sin presión. Cuando me preocupo por ganar, pierdo más. Cuando simplemente juego, encuentro palabras que no veía antes.
+La razón: los expertos no recuerdan piezas individuales. Recuerdan "chunks" - grupos de piezas que forman un patrón reconocible.
 
-Papá dice que es porque ya no tiene nada que probar. Quizás tenga razón.`,
+El mismo principio se aplica a los juegos de palabras. Los jugadores experimentados no ven letras individuales. Ven combinaciones comunes: "DES" como prefijo, "CIÓN" como sufijo. El tablero se transforma de una cuadrícula de letras en una colección de bloques de construcción.`,
       },
       {
-        content: `Todavía le pierdo. Pero ahora al menos sé por qué.`,
+        title: 'Datos sorprendentes sobre la práctica',
+        content: `La investigación encontró que los jugadores competitivos de Scrabble dedican un promedio de 4.5 horas por semana a memorizar palabras del diccionario oficial.
+
+Pero aquí está la sorpresa: cuando se les preguntó si aprenden los significados de las palabras, solo el 6.4% respondió "siempre". El resto se dividió entre "a veces" y "rara vez o nunca."
+
+Sin embargo, en las pruebas definieron más palabras correctamente. ¿Por qué? Porque el acceso rápido a palabras (medido por tiempos de reacción) se correlaciona con el nivel de experiencia, no con el conocimiento del significado.`,
+      },
+      {
+        title: 'Qué significa esto para ti',
+        content: `No necesitas ser un experto para usar estos principios:
+
+1. Busca patrones, no palabras completas. Empieza a notar combinaciones de letras comunes.
+
+2. La práctica repetida cambia el cerebro. Cuanto más juegues, más patrones se vuelven automáticos.
+
+3. El significado importa menos de lo que pensabas. El cerebro puede reconocer una palabra como "real" sin recordar lo que significa.`,
+      },
+      {
+        content: `La investigación muestra que el reconocimiento visual de palabras sigue mejorando incluso en adultos. Lo que parece "talento natural" es a menudo el resultado de experiencia acumulada - y prueba de que nuestros cerebros son más flexibles de lo que pensábamos.`,
       },
     ],
     backToBlog: 'Volver al Blog',

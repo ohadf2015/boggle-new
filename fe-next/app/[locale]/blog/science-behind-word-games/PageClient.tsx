@@ -24,45 +24,65 @@ type LocaleContent = {
 
 const contentByLocale: Record<string, LocaleContent> = {
   he: {
-    title: 'אמא שלי חושבת שזה טוב למוח. אני לא בטוח',
-    category: 'מחשבות',
-    readTime: 'זמן קריאה: 3 דקות',
+    title: 'מה קורה במוח כשאתם מחפשים מילים',
+    category: 'מדע',
+    readTime: 'זמן קריאה: 6 דקות',
     sections: [
       {
-        content: `"זה טוב למוח," אמא אמרה, כשראתה אותי משחק.
-
-אני לא יודע אם זה נכון. אני גם לא יודע אם זה לא נכון.`,
+        content: `כשאתם מסתכלים על לוח של אותיות ומחפשים מילים, המוח שלכם עושה משהו מורכב להפליא. הנה מה שמחקרי fMRI גילו על מה שקורה בפנים.`,
       },
       {
-        title: 'מה אני יודע',
-        content: `כשאני משחק, אני לא חושב על עבודה. לא חושב על הרשימה הארוכה של דברים שאני צריך לעשות. לא חושב על המייל שלא עניתי עליו.
+        title: 'רשת שלמה עובדת בו-זמנית',
+        content: `לפי סקירה שיטתית של מחקרי fMRI שפורסמה ב-AIMS Neuroscience, חיפוש מילים מפעיל מספר אזורים במוח במקביל:
 
-אני פשוט מחפש מילים.
+• אזור ברוקה (Broca's area) - אחראי על עיבוד פונולוגי, כלומר צלילי המילים
+• אזור ורניקה (Wernicke's area) - אחראי על הבנת משמעות המילים
+• קורטקס פרה-פרונטלי (DLPFC) - מנהל את "הפקח" שמתאם את הכל
+• הגנגליה הבזאלית (Basal Ganglia) - מתערבת כשהמשימה נהיית מורכבת
 
-זה משהו. אני לא יודע אם זה "טוב למוח" בצורה שאפשר למדוד, אבל זה משהו.`,
+זה לא אזור אחד שעובד - זו רשת שלמה.`,
       },
       {
-        title: 'מה אני לא יודע',
-        content: `האם אני יהיה יותר חכם אם אמשיך לשחק? כנראה שלא.
+        title: 'מה מיוחד בזיכרון העבודה המילולי',
+        content: `מטא-אנליזה שפורסמה ב-Frontiers in Human Neuroscience מצאה שזיכרון עבודה מילולי (verbal working memory) מפעיל בעיקר את הקורטקס הפרה-פרונטלי השמאלי, בעוד זיכרון עבודה מרחבי (spatial) מפעיל יותר את הצד הימני.
 
-האם אני ימנע דמנציה? אין לי מושג. אני לא חוקר.
-
-ראיתי כותרות על מחקרים שאומרים כזה או אחר. לא קראתי אותם. אתם כנראה גם לא קראתם.`,
+כשאתם מחזיקים בראש את האותיות הזמינות תוך כדי חיפוש מילים, אתם משתמשים במה שנקרא "הלולאה הפונולוגית" (phonological loop) - מנגנון שחוזר על המידע כדי לשמור אותו פעיל.`,
       },
       {
-        title: 'מה אני חושב',
-        content: `הדוד שלי משחק תשבצים כל יום מאז שפרש לפנסיה. הוא בן 78 ועדיין חד.
+        title: 'למה משימות מורכבות מפעילות יותר אזורים',
+        content: `המחקרים מראים קשר ישיר בין מורכבות המשימה לבין מספר אזורי המוח המעורבים. כשאתם מחפשים מילה ארוכה או נדירה, המוח מגייס אזורים נוספים - כולל אזורי פרה-מוטור (pre-motor) והצרבלום (cerebellum).
 
-הדודה שלי מעולם לא פתרה תשבץ. היא בת 76 ועדיין חדה.
-
-אולי המוח הוא יותר מסובך משיחק מילים יכול לפתור.`,
+זה מסביר למה משחק מילים מאתגר "מרגיש" אחרת ממשחק קל. המוח באמת עובד קשה יותר.`,
       },
       {
-        content: `אני משחק כי זה כיף. לא כי אמא אמרה שזה טוב למוח.
+        title: 'הקשר בין שפה לפעולה',
+        content: `מחקר מעניין מצא שכשאנשים שומרים מילים בזיכרון העבודה, במיוחד מילי פעולה (action words), הם מפעילים גם אזורים מוטוריים במוח - אותם אזורים שאחראים על תנועה.
 
-אם בסוף זה גם עוזר למוח, יופי. ואם לא, לפחות נהניתי.
+זה תומך ברעיון שהמוח לא מאחסן מילים כמו קבצים במחשב, אלא כרשתות של קשרים - בין צליל, משמעות, ופעולות קשורות.`,
+      },
+      {
+        title: 'מודל "זיכרון-איחוד-בקרה"',
+        content: `לפי מודל הגורט (Hagoort's MUC Model), עיבוד שפה במוח מתחלק לשלושה תהליכים:
+• זיכרון (Memory) - אחזור מילים מהמאגר השפתי
+• איחוד (Unification) - שילוב מילים למשפטים ומשמעויות
+• בקרה (Control) - ניהול התהליך וקבלת החלטות
 
-לא הכל צריך להיות "טוב לך". לפעמים דברים פשוט כיפיים.`,
+באזור ברוקה מתרחש האיחוד, באונה הטמפורלית הזיכרון, ובקורטקס הפרה-פרונטלי (DLPFC) הבקרה.
+
+כשאתם משחקים משחק מילים, שלושת התהליכים עובדים במקביל.`,
+      },
+      {
+        title: 'למה זה חשוב',
+        content: `ההבנה הזו מסבירה כמה דברים:
+
+1. למה משחקי מילים מרגישים "מאמצים" - הם באמת מפעילים רשתות מוחיות מורכבות
+2. למה תרגול משפר ביצועים - הרשתות האלה נהיות יעילות יותר עם שימוש
+3. למה משחקי מילים שונים ממשחקי תגובה מהירה - הם דורשים ידע שפתי אמיתי, לא רק רפלקסים
+
+המוח לא סתם "עובד" כשאתם מחפשים מילים. הוא מתרגל תיאום בין מערכות שונות - וזה משהו שיש לו ערך.`,
+      },
+      {
+        content: `מקורות: AIMS Neuroscience (2021), Frontiers in Human Neuroscience (2019), PMC - Brain correlates of action word memory (2022)`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -70,45 +90,65 @@ const contentByLocale: Record<string, LocaleContent> = {
     practice: 'תרגול',
   },
   en: {
-    title: "My mom thinks this is good for the brain. I'm not sure",
-    category: 'Thoughts',
-    readTime: '3 min read',
+    title: 'What Happens in Your Brain When You Search for Words',
+    category: 'Science',
+    readTime: '6 min read',
     sections: [
       {
-        content: `"It's good for the brain," my mom said when she saw me playing.
-
-I don't know if that's true. I also don't know if it's not true.`,
+        content: `When you look at a board of letters and search for words, your brain does something remarkably complex. Here's what fMRI research has revealed about what's happening inside.`,
       },
       {
-        title: 'What I do know',
-        content: `When I play, I'm not thinking about work. Not thinking about the long list of things I need to do. Not thinking about the email I didn't reply to.
+        title: 'A Whole Network Working Simultaneously',
+        content: `According to a systematic review of fMRI studies published in AIMS Neuroscience, word searching activates multiple brain regions in parallel:
 
-I'm just looking for words.
+• Broca's area - handles phonological processing (the sounds of words)
+• Wernicke's area - handles semantic processing (word meanings)
+• Dorsolateral Prefrontal Cortex (DLPFC) - manages the "executive" that coordinates everything
+• Basal Ganglia - gets involved when the task becomes complex
 
-That's something. I don't know if it's "good for the brain" in a measurable way, but it's something.`,
+It's not one area working - it's an entire network.`,
       },
       {
-        title: "What I don't know",
-        content: `Will I be smarter if I keep playing? Probably not.
+        title: 'What Makes Verbal Working Memory Special',
+        content: `A meta-analysis published in Frontiers in Human Neuroscience found that verbal working memory primarily activates the left prefrontal cortex, while spatial working memory activates more of the right side.
 
-Will I prevent dementia? No idea. I'm not a researcher.
-
-I've seen headlines about studies saying this or that. Haven't read them. You probably haven't either.`,
+When you hold available letters in mind while searching for words, you're using what's called the "phonological loop" - a mechanism that rehearses information to keep it active.`,
       },
       {
-        title: 'What I think',
-        content: `My uncle does crosswords every day since he retired. He's 78 and still sharp.
+        title: 'Why Complex Tasks Activate More Areas',
+        content: `Studies show a direct relationship between task complexity and the number of brain regions involved. When you search for a long or rare word, the brain recruits additional areas - including pre-motor regions and the cerebellum.
 
-My aunt has never solved a crossword. She's 76 and still sharp.
-
-Maybe the brain is more complicated than what a word game can solve.`,
+This explains why a challenging word game "feels" different from an easy one. The brain really is working harder.`,
       },
       {
-        content: `I play because it's fun. Not because my mom said it's good for the brain.
+        title: 'The Language-Action Connection',
+        content: `An interesting study found that when people hold words in working memory, especially action words, they also activate motor areas of the brain - the same areas responsible for movement.
 
-If it turns out it also helps the brain, great. And if not, at least I enjoyed it.
+This supports the idea that the brain doesn't store words like files on a computer, but as networks of associations - between sound, meaning, and related actions.`,
+      },
+      {
+        title: 'The "Memory-Unification-Control" Model',
+        content: `According to Hagoort's MUC Model, language processing in the brain divides into three processes:
+• Memory - retrieving words from our linguistic storage
+• Unification - combining words into sentences and meanings
+• Control - managing the process and making decisions
 
-Not everything needs to be "good for you". Sometimes things are just fun.`,
+Unification happens in Broca's area, memory in the temporal lobe, and control in the dorsolateral prefrontal cortex (DLPFC).
+
+When you play a word game, all three processes work in parallel.`,
+      },
+      {
+        title: 'Why This Matters',
+        content: `This understanding explains several things:
+
+1. Why word games feel "effortful" - they really do activate complex brain networks
+2. Why practice improves performance - these networks become more efficient with use
+3. Why word games differ from quick-reaction games - they require real linguistic knowledge, not just reflexes
+
+The brain isn't just "working" when you search for words. It's practicing coordination between different systems - and that has real value.`,
+      },
+      {
+        content: `Sources: AIMS Neuroscience (2021), Frontiers in Human Neuroscience (2019), PMC - Brain correlates of action word memory (2022)`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -116,45 +156,65 @@ Not everything needs to be "good for you". Sometimes things are just fun.`,
     practice: 'Practice',
   },
   sv: {
-    title: 'Min mamma tror det är bra för hjärnan. Jag är inte säker',
-    category: 'Tankar',
-    readTime: '3 min läsning',
+    title: 'Vad som händer i hjärnan när du söker efter ord',
+    category: 'Vetenskap',
+    readTime: '6 min läsning',
     sections: [
       {
-        content: `"Det är bra för hjärnan," sa min mamma när hon såg mig spela.
-
-Jag vet inte om det är sant. Jag vet heller inte om det inte är sant.`,
+        content: `När du tittar på ett bräde med bokstäver och söker efter ord gör din hjärna något anmärkningsvärt komplext. Här är vad fMRI-forskning har avslöjat om vad som händer inuti.`,
       },
       {
-        title: 'Vad jag vet',
-        content: `När jag spelar tänker jag inte på jobbet. Inte på den långa listan av saker jag behöver göra. Inte på mejlet jag inte svarat på.
+        title: 'Ett helt nätverk arbetar samtidigt',
+        content: `Enligt en systematisk genomgång av fMRI-studier publicerad i AIMS Neuroscience aktiverar ordsökning flera hjärnregioner parallellt:
 
-Jag letar bara efter ord.
+• Brocas område - hanterar fonologisk bearbetning (ordljud)
+• Wernickes område - hanterar semantisk bearbetning (ordmeningar)
+• Dorsolateral prefrontal cortex (DLPFC) - hanterar den "exekutiva" funktionen som koordinerar allt
+• Basala ganglierna - aktiveras när uppgiften blir komplex
 
-Det är något. Jag vet inte om det är "bra för hjärnan" på ett mätbart sätt, men det är något.`,
+Det är inte ett område som arbetar - det är ett helt nätverk.`,
       },
       {
-        title: 'Vad jag inte vet',
-        content: `Kommer jag bli smartare om jag fortsätter spela? Förmodligen inte.
+        title: 'Vad som gör verbalt arbetsminne speciellt',
+        content: `En metaanalys publicerad i Frontiers in Human Neuroscience fann att verbalt arbetsminne primärt aktiverar vänster prefrontal cortex, medan spatialt arbetsminne aktiverar mer av höger sida.
 
-Kommer jag förebygga demens? Ingen aning. Jag är ingen forskare.
-
-Jag har sett rubriker om studier som säger det ena eller andra. Har inte läst dem. Ni har förmodligen inte heller.`,
+När du håller tillgängliga bokstäver i minnet medan du söker efter ord använder du det som kallas "fonologiska loopen" - en mekanism som repeterar information för att hålla den aktiv.`,
       },
       {
-        title: 'Vad jag tror',
-        content: `Min farbror gör korsord varje dag sedan han gick i pension. Han är 78 och fortfarande skarp.
+        title: 'Varför komplexa uppgifter aktiverar fler områden',
+        content: `Studier visar ett direkt samband mellan uppgiftens komplexitet och antalet inblandade hjärnregioner. När du söker efter ett långt eller ovanligt ord rekryterar hjärnan ytterligare områden - inklusive premotoriska regioner och cerebellum.
 
-Min moster har aldrig löst ett korsord. Hon är 76 och fortfarande skarp.
-
-Kanske är hjärnan mer komplicerad än vad ett ordspel kan lösa.`,
+Detta förklarar varför ett utmanande ordspel "känns" annorlunda än ett enkelt. Hjärnan arbetar verkligen hårdare.`,
       },
       {
-        content: `Jag spelar för att det är kul. Inte för att min mamma sa att det är bra för hjärnan.
+        title: 'Kopplingen mellan språk och handling',
+        content: `En intressant studie fann att när människor håller ord i arbetsminnet, särskilt handlingsord, aktiverar de också motoriska områden i hjärnan - samma områden som ansvarar för rörelse.
 
-Om det visar sig att det också hjälper hjärnan, bra. Och om inte, åtminstone hade jag roligt.
+Detta stöder idén att hjärnan inte lagrar ord som filer på en dator, utan som nätverk av associationer - mellan ljud, mening och relaterade handlingar.`,
+      },
+      {
+        title: '"Minne-Enande-Kontroll"-modellen',
+        content: `Enligt Hagoorts MUC-modell delas språkbearbetning i hjärnan in i tre processer:
+• Minne - hämta ord från vårt språkliga förråd
+• Enande - kombinera ord till meningar och betydelser
+• Kontroll - hantera processen och fatta beslut
 
-Allt behöver inte vara "bra för dig". Ibland är saker bara roliga.`,
+Enande sker i Brocas område, minne i temporalloben och kontroll i dorsolateral prefrontal cortex (DLPFC).
+
+När du spelar ett ordspel arbetar alla tre processer parallellt.`,
+      },
+      {
+        title: 'Varför detta är viktigt',
+        content: `Denna förståelse förklarar flera saker:
+
+1. Varför ordspel känns "ansträngande" - de aktiverar verkligen komplexa hjärnnätverk
+2. Varför övning förbättrar prestanda - dessa nätverk blir mer effektiva med användning
+3. Varför ordspel skiljer sig från snabb-reaktionsspel - de kräver verklig språklig kunskap, inte bara reflexer
+
+Hjärnan "arbetar" inte bara när du söker efter ord. Den övar koordination mellan olika system - och det har verkligt värde.`,
+      },
+      {
+        content: `Källor: AIMS Neuroscience (2021), Frontiers in Human Neuroscience (2019), PMC - Brain correlates of action word memory (2022)`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -162,45 +222,65 @@ Allt behöver inte vara "bra för dig". Ibland är saker bara roliga.`,
     practice: 'Öva',
   },
   ja: {
-    title: '母は脳に良いと思っている。私はわからない',
-    category: '考え',
-    readTime: '読了時間：3分',
+    title: '言葉を探す時、脳で何が起きているか',
+    category: '科学',
+    readTime: '読了時間：6分',
     sections: [
       {
-        content: `「脳にいいのよ」と母が言った、私がプレイしているのを見て。
-
-それが本当かどうかわからない。本当じゃないかどうかもわからない。`,
+        content: `文字のボードを見て言葉を探す時、脳は驚くほど複雑なことをしています。fMRI研究が内部で何が起きているかを明らかにしました。`,
       },
       {
-        title: '私が知っていること',
-        content: `プレイしている時、仕事のことを考えていない。やらなきゃいけないことの長いリストのことも。返事していないメールのことも。
+        title: 'ネットワーク全体が同時に働いている',
+        content: `AIMS Neuroscienceに発表されたfMRI研究の系統的レビューによると、言葉の検索は複数の脳領域を同時に活性化します：
 
-ただ言葉を探している。
+• ブローカ野 - 音韻処理（言葉の音）を担当
+• ウェルニッケ野 - 意味処理（言葉の意味）を担当
+• 背外側前頭前皮質（DLPFC）- すべてを調整する「実行機能」を管理
+• 大脳基底核 - タスクが複雑になると関与
 
-それは何かだ。「脳に良い」かどうか測れる方法でわからないけど、何かだ。`,
+一つの領域が働いているのではなく、ネットワーク全体です。`,
       },
       {
-        title: '私が知らないこと',
-        content: `プレイし続けたら賢くなる？たぶんならない。
+        title: '言語ワーキングメモリの特別な点',
+        content: `Frontiers in Human Neuroscienceに発表されたメタ分析によると、言語ワーキングメモリは主に左前頭前皮質を活性化し、空間ワーキングメモリは右側をより多く活性化します。
 
-認知症を予防できる？わからない。研究者じゃない。
-
-これとかあれとか言う研究についての見出しを見たことはある。読んでいない。あなたもたぶん読んでいない。`,
+言葉を探しながら使える文字を頭に保持している時、「音韻ループ」と呼ばれるものを使っています。これは情報をアクティブに保つために繰り返すメカニズムです。`,
       },
       {
-        title: '私が思うこと',
-        content: `叔父は退職してから毎日クロスワードをする。78歳でまだ頭がいい。
+        title: 'なぜ複雑なタスクはより多くの領域を活性化するか',
+        content: `研究は、タスクの複雑さと関与する脳領域の数の間に直接的な関係があることを示しています。長いまたは珍しい言葉を探す時、脳は追加の領域（運動前野や小脳を含む）を動員します。
 
-叔母はクロスワードを一度も解いたことがない。76歳でまだ頭がいい。
-
-たぶん脳は言葉ゲームで解決できるより複雑なのかもしれない。`,
+これは、難しい言葉ゲームが簡単なものと「違う感じ」がする理由を説明しています。脳は本当により一生懸命働いているのです。`,
       },
       {
-        content: `楽しいからプレイしている。母が脳に良いと言ったからじゃない。
+        title: '言語と行動のつながり',
+        content: `興味深い研究では、人がワーキングメモリに言葉を保持している時、特に動作を表す言葉の場合、運動を担当する脳の運動野も活性化することがわかりました。
 
-もし結局脳にも良いなら、いいね。そうじゃなくても、少なくとも楽しんだ。
+これは、脳がコンピューターのファイルのように言葉を保存するのではなく、音、意味、関連する行動の間の連想のネットワークとして保存するという考えを支持しています。`,
+      },
+      {
+        title: '「記憶-統合-制御」モデル',
+        content: `ハゴートのMUCモデルによると、脳での言語処理は3つのプロセスに分かれます：
+• 記憶 - 言語的貯蔵から言葉を取り出す
+• 統合 - 言葉を文や意味に組み合わせる
+• 制御 - プロセスを管理し決定を下す
 
-全てが「自分のためになる」必要はない。時々物事はただ楽しいだけ。`,
+統合はブローカ野で、記憶は側頭葉で、制御は背外側前頭前皮質（DLPFC）で行われます。
+
+言葉ゲームをする時、3つのプロセスすべてが並行して働きます。`,
+      },
+      {
+        title: 'なぜこれが重要か',
+        content: `この理解はいくつかのことを説明します：
+
+1. なぜ言葉ゲームは「努力が必要」に感じるか - 本当に複雑な脳ネットワークを活性化している
+2. なぜ練習でパフォーマンスが向上するか - これらのネットワークは使用とともに効率的になる
+3. なぜ言葉ゲームは素早い反応ゲームと異なるか - 反射だけでなく、本当の言語知識を必要とする
+
+言葉を探す時、脳は単に「働いている」のではありません。異なるシステム間の調整を練習しているのです。そしてそれには本当の価値があります。`,
+      },
+      {
+        content: `出典：AIMS Neuroscience (2021)、Frontiers in Human Neuroscience (2019)、PMC - Brain correlates of action word memory (2022)`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -208,45 +288,65 @@ Allt behöver inte vara "bra för dig". Ibland är saker bara roliga.`,
     practice: '練習',
   },
   es: {
-    title: 'Mi mamá piensa que es bueno para el cerebro. No estoy seguro',
-    category: 'Pensamientos',
-    readTime: '3 min de lectura',
+    title: 'Qué pasa en tu cerebro cuando buscas palabras',
+    category: 'Ciencia',
+    readTime: '6 min de lectura',
     sections: [
       {
-        content: `"Es bueno para el cerebro," dijo mi mamá cuando me vio jugando.
-
-No sé si eso es verdad. Tampoco sé si no es verdad.`,
+        content: `Cuando miras un tablero de letras y buscas palabras, tu cerebro hace algo notablemente complejo. Esto es lo que la investigación con fMRI ha revelado sobre lo que sucede adentro.`,
       },
       {
-        title: 'Lo que sí sé',
-        content: `Cuando juego, no pienso en el trabajo. No pienso en la larga lista de cosas que tengo que hacer. No pienso en el correo que no contesté.
+        title: 'Una red completa trabajando simultáneamente',
+        content: `Según una revisión sistemática de estudios de fMRI publicada en AIMS Neuroscience, la búsqueda de palabras activa múltiples regiones del cerebro en paralelo:
 
-Solo busco palabras.
+• Área de Broca - maneja el procesamiento fonológico (los sonidos de las palabras)
+• Área de Wernicke - maneja el procesamiento semántico (significados de palabras)
+• Corteza prefrontal dorsolateral (DLPFC) - gestiona el "ejecutivo" que coordina todo
+• Ganglios basales - se involucran cuando la tarea se vuelve compleja
 
-Eso es algo. No sé si es "bueno para el cerebro" de manera medible, pero es algo.`,
+No es un área trabajando - es una red completa.`,
       },
       {
-        title: 'Lo que no sé',
-        content: `¿Seré más inteligente si sigo jugando? Probablemente no.
+        title: 'Qué hace especial a la memoria de trabajo verbal',
+        content: `Un metaanálisis publicado en Frontiers in Human Neuroscience encontró que la memoria de trabajo verbal activa principalmente la corteza prefrontal izquierda, mientras que la memoria de trabajo espacial activa más el lado derecho.
 
-¿Prevendré la demencia? Ni idea. No soy investigador.
-
-He visto titulares sobre estudios que dicen esto o aquello. No los he leído. Ustedes probablemente tampoco.`,
+Cuando mantienes las letras disponibles en mente mientras buscas palabras, estás usando lo que se llama el "bucle fonológico" - un mecanismo que repasa la información para mantenerla activa.`,
       },
       {
-        title: 'Lo que pienso',
-        content: `Mi tío hace crucigramas todos los días desde que se jubiló. Tiene 78 años y todavía está lúcido.
+        title: 'Por qué las tareas complejas activan más áreas',
+        content: `Los estudios muestran una relación directa entre la complejidad de la tarea y el número de regiones cerebrales involucradas. Cuando buscas una palabra larga o rara, el cerebro recluta áreas adicionales - incluyendo regiones premotoras y el cerebelo.
 
-Mi tía nunca ha resuelto un crucigrama. Tiene 76 años y todavía está lúcida.
-
-Tal vez el cerebro es más complicado de lo que un juego de palabras puede resolver.`,
+Esto explica por qué un juego de palabras desafiante "se siente" diferente a uno fácil. El cerebro realmente está trabajando más duro.`,
       },
       {
-        content: `Juego porque es divertido. No porque mi mamá dijo que es bueno para el cerebro.
+        title: 'La conexión lenguaje-acción',
+        content: `Un estudio interesante encontró que cuando las personas mantienen palabras en la memoria de trabajo, especialmente palabras de acción, también activan áreas motoras del cerebro - las mismas áreas responsables del movimiento.
 
-Si resulta que también ayuda al cerebro, genial. Y si no, al menos me divertí.
+Esto apoya la idea de que el cerebro no almacena palabras como archivos en una computadora, sino como redes de asociaciones - entre sonido, significado y acciones relacionadas.`,
+      },
+      {
+        title: 'El modelo "Memoria-Unificación-Control"',
+        content: `Según el Modelo MUC de Hagoort, el procesamiento del lenguaje en el cerebro se divide en tres procesos:
+• Memoria - recuperar palabras de nuestro almacén lingüístico
+• Unificación - combinar palabras en oraciones y significados
+• Control - gestionar el proceso y tomar decisiones
 
-No todo tiene que ser "bueno para ti". A veces las cosas simplemente son divertidas.`,
+La unificación ocurre en el área de Broca, la memoria en el lóbulo temporal y el control en la corteza prefrontal dorsolateral (DLPFC).
+
+Cuando juegas un juego de palabras, los tres procesos trabajan en paralelo.`,
+      },
+      {
+        title: 'Por qué esto importa',
+        content: `Esta comprensión explica varias cosas:
+
+1. Por qué los juegos de palabras se sienten "esforzados" - realmente activan redes cerebrales complejas
+2. Por qué la práctica mejora el rendimiento - estas redes se vuelven más eficientes con el uso
+3. Por qué los juegos de palabras difieren de los juegos de reacción rápida - requieren conocimiento lingüístico real, no solo reflejos
+
+El cerebro no solo "trabaja" cuando buscas palabras. Está practicando la coordinación entre diferentes sistemas - y eso tiene valor real.`,
+      },
+      {
+        content: `Fuentes: AIMS Neuroscience (2021), Frontiers in Human Neuroscience (2019), PMC - Brain correlates of action word memory (2022)`,
       },
     ],
     backToBlog: 'Volver al Blog',

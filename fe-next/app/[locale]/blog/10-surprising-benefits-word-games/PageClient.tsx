@@ -27,45 +27,67 @@ type LocaleContent = {
 
 const contentByLocale: Record<string, LocaleContent> = {
   he: {
-    title: 'סבתא שלי ניצחה אותי במשחק מילים. עדיין לא התאוששתי.',
-    subtitle: 'על מה שלמדתי כשהפסקתי לזלזל במשחקי מילים',
-    category: 'דעה',
-    readTime: 'זמן קריאה: 6 דקות',
+    title: 'מה המדע באמת אומר על משחקי מילים והמוח',
+    subtitle: 'סקירת המחקרים העדכניים מאוניברסיטאות אקסטר, קולומביה ודיוק',
+    category: 'מחקר',
+    readTime: 'זמן קריאה: 7 דקות',
     sections: [
       {
-        content: `בשבת האחרונה סבתא שלי, בת 82, הביסה אותי במשחק מילים. לא סתם הביסה - מחקה את הרצפה איתי. היא שמה מילים שאני לא בטוח שאי פעם שמעתי. שאלתי אותה איפה היא למדה את המילה "צפדינה". היא אמרה "מה זה צפדינה? זו מילה רגילה."`,
+        content: `יש הרבה טענות על משחקי מילים והמוח. חלקן מוגזמות, חלקן נכונות. הלכתי לבדוק מה המחקרים באמת מראים.`,
       },
       {
-        content: `אני עובד בהייטק. אני מבלה שעות מול מסך. אני קורא הרבה. והיא עדיין מנצחת. משהו פה לא הסתדר לי.`,
-      },
-      {
-        title: 'מה שגיליתי כשחפרתי',
-        content: `אז התחלתי לחפור. לא כי רציתי להוכיח משהו - סתם היה לי סקרני למה היא כל כך טובה.
+        title: 'המחקר הגדול: 19,000 משתתפים',
+        content: `ב-2019, חוקרים מאוניברסיטת אקסטר וקינגס קולג׳ לונדון פרסמו מחקר ב-International Journal of Geriatric Psychiatry. הם עקבו אחרי 19,000 מבוגרים בגילאי 50-93.
 
-מסתבר שסבתא לא סתם "משחקת משחקים". היא משחקת תשבצים כל בוקר כבר 40 שנה. זה לא תחביב, זה כמו להתקלח או לשתות קפה. חלק מהשגרה.
+הממצא המרכזי: מי שפתר תשבצים באופן קבוע הראה יכולת חשיבה לוגית של מישהו צעיר ממנו בעשר שנים, וזיכרון לטווח קצר של מישהו צעיר ב-8 שנים.
 
-קראתי איפשהו שאנשים שמשחקים משחקי מילים באופן קבוע שומרים על הזיכרון שלהם יותר טוב. לא יודע כמה זה מדויק, אבל כשאני רואה את סבתא - משהו בזה נשמע הגיוני.`,
+פרופ׳ קית׳ וסנס מאקסטר: "הביצועים היו טובים יותר באופן עקבי אצל מי שדיווח על פתרון חידות, והשתפרו בהדרגה עם תדירות השימוש."`,
       },
       {
-        title: 'הדבר עם המוח',
-        content: `הרופא של סבתא אמר לה פעם להמשיך עם התשבצים. היא סיפרה לי את זה כאילו זה משעמם, אבל נשמע שזה לא טריוויאלי. היא בת 82 ועדיין זוכרת איפה שמתי את המפתחות שלי טוב ממני.
+        title: 'תשבצים מול משחקי מחשב',
+        content: `מחקר מפתיע מאוניברסיטאות קולומביה ודיוק בחן 107 מבוגרים עם ליקוי קוגניטיבי קל. חצי קיבלו תשבצים ממוחשבים, חצי קיבלו משחקי זיכרון דיגיטליים.
 
-אני לא אומר שמשחקי מילים הם פלא רפואי. אני פשוט אומר שהיא עושה משהו נכון.`,
+אחרי 78 שבועות, קבוצת התשבצים הראתה שיפור קוגניטיבי. קבוצת המשחקים הדיגיטליים הראתה ירידה.
+
+ד״ר דבננד מקולומביה: "היתרונות נראו לא רק בקוגניציה אלא גם בתפקוד היומיומי, עם סימנים להתכווצות מוחית מופחתת ב-MRI."
+
+זה היה המחקר הראשון שתיעד יתרונות לטווח ארוך לאימון תשבצים ביתי.`,
       },
       {
-        title: 'מה שלמדתי',
-        content: `התחלתי לשחק קצת כל יום. לא הרבה, עשר דקות פה ושם. בהתחלה הרגשתי טיפש - מילים שחשבתי שאני מכיר פתאום לא עלו לי. אחרי כמה שבועות שמתי לב שאני מוצא מילים מהר יותר. לא רק במשחק, גם כשאני מנסה להסביר משהו.
+        title: 'מה לגבי מניעת דמנציה?',
+        content: `כאן צריך להיות זהירים. ד״ר אן קורבט מאקסטר הדגישה: "אנחנו לא יכולים לומר שפתרון חידות בהכרח מפחית את הסיכון לדמנציה בגיל מאוחר."
 
-עדיין מפסיד לסבתא. אולי תמיד אפסיד לה.`,
+המחקרים מראים קורלציה - קשר סטטיסטי - אבל לא בהכרח סיבתיות. יכול להיות שאנשים עם יכולות קוגניטיביות טובות יותר נוטים יותר לפתור תשבצים מלכתחילה.
+
+מה שכן ברור: משחקי מילים קשורים לתפקוד קוגניטיבי טוב יותר בהווה.`,
       },
       {
-        title: 'דבר אחד שהפתיע אותי',
-        content: `חשבתי שמשחקי מילים זה בשביל אנשים מבוגרים. סבתות וסבים שיושבים בסלון. אבל הילדים שלי התחילו לשחק איתי, ופתאום יש לנו משהו לעשות ביחד שלא כולל מסכים.
+        title: 'למי זה עוזר יותר?',
+        content: `המחקר מקולומביה ודיוק גילה משהו מעניין: אם אתם בשלב מוקדם מאוד של ליקוי קוגניטיבי, גם משחקי מחשב וגם תשבצים עוזרים באותה מידה. אבל בשלבים מאוחרים יותר, תשבצים היו יעילים יותר.
 
-הקטנה שלי, בת 9, מנצחת אותי לפעמים. אני לא יודע אם להיות גאה או מודאג.`,
+מחקר מטקסס A&M מ-2024 מצא שמשחקים, חידות וקריאה מאטים ירידה קוגניטיבית גם אצל מי שכבר יש לו ליקוי קל.`,
       },
       {
-        content: `אז ככה. אין לי מסקנות גדולות. סבתא עדיין האלופה. אני עדיין מנסה להשתפר. ואולי זה הכי טוב שאפשר לצפות.`,
+        title: 'הנקודה לגבי אוצר מילים',
+        content: `סקירה שיטתית של 17 מחקרים על לימוד מילים דרך משחקים מצאה שהמוח זוכר מילים טוב יותר כשהוא פוגש אותן בהקשר של פתרון בעיות.
+
+הסיבה: משחקים מספקים "הקשרים עשירים, מעורבות קוגניטיבית, וסיטואציות למידה וירטואליות" שמשפרים את יעילות הלמידה.
+
+במילים פשוטות: מילה שגילית בתשבץ נשארת בזיכרון טוב יותר ממילה שקראת ברשימה.`,
+      },
+      {
+        title: 'השורה התחתונה',
+        content: `המחקר מראה שמשחקי מילים קשורים ל:
+• תפקוד קוגניטיבי טוב יותר (מחקר אקסטר, 19,000 משתתפים)
+• האטה של ירידה קוגניטיבית (מחקר קולומביה-דיוק, 78 שבועות)
+• למידת מילים יעילה יותר (סקירה של 17 מחקרים)
+
+מה שהמחקר לא מוכיח (עדיין): שמשחקי מילים מונעים דמנציה.
+
+הייחוד של משחקי מילים לעומת "אימוני מוח" דיגיטליים הוא שהם דורשים ידע שפתי אמיתי, לא רק תגובה מהירה לגירויים חזותיים.`,
+      },
+      {
+        content: `מקורות: International Journal of Geriatric Psychiatry (2019), NEJM Evidence (2022), Duke University School of Medicine, University of Exeter PROTECT Study`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -73,45 +95,67 @@ const contentByLocale: Record<string, LocaleContent> = {
     startPracticing: 'תרגול',
   },
   en: {
-    title: 'My grandmother beat me at a word game. I still haven\'t recovered.',
-    subtitle: 'What I learned when I stopped dismissing word games',
-    category: 'Opinion',
-    readTime: '6 min read',
+    title: 'What Science Actually Says About Word Games and the Brain',
+    subtitle: 'A look at recent research from Exeter, Columbia, and Duke universities',
+    category: 'Research',
+    readTime: '7 min read',
     sections: [
       {
-        content: `Last Sunday my grandmother, 82, destroyed me at a word game. Not just beat me—completely wiped the floor with me. She put down words I'm not sure I've ever seen. I asked her where she learned "qoph." She said "What do you mean? It's just a letter."`,
+        content: `There are plenty of claims about word games and the brain. Some are exaggerated, some are accurate. I went to check what the research actually shows.`,
       },
       {
-        content: `I work in tech. I spend hours in front of screens. I read a lot. And she still wins. Something didn't add up.`,
-      },
-      {
-        title: 'What I found when I dug around',
-        content: `So I started looking into it. Not because I wanted to prove anything—I was just curious why she's so good at this.
+        title: 'The Big Study: 19,000 Participants',
+        content: `In 2019, researchers from the University of Exeter and King's College London published a study in the International Journal of Geriatric Psychiatry. They tracked 19,000 adults aged 50-93.
 
-Turns out my grandmother doesn't just "play games." She's been doing crosswords every morning for 40 years. It's not a hobby, it's like showering or drinking coffee. Part of the routine.
+The key finding: those who regularly solved crosswords showed grammatical reasoning equivalent to someone 10 years younger, and short-term memory of someone 8 years younger.
 
-I read somewhere that people who play word games regularly keep their memory sharper. I don't know how accurate that is, but when I see my grandmother—something about it makes sense.`,
+Professor Keith Wesnes from Exeter: "Performance was consistently better in those who reported engaging in puzzles, and generally improved incrementally with the frequency of puzzle use."`,
       },
       {
-        title: 'The brain thing',
-        content: `My grandmother's doctor once told her to keep doing crosswords. She told me this like it was boring, but it sounds like it wasn't trivial. She's 82 and still remembers where I put my keys better than I do.
+        title: 'Crosswords vs. Computer Games',
+        content: `A surprising study from Columbia and Duke universities examined 107 older adults with mild cognitive impairment. Half received computerized crosswords, half received digital memory games.
 
-I'm not saying word games are some medical miracle. I'm just saying she's doing something right.`,
+After 78 weeks, the crossword group showed cognitive improvement. The digital games group showed decline.
+
+Dr. D.P. Devanand from Columbia: "The benefits were seen not only in cognition but also in daily activities with indications of brain shrinkage on MRI that suggests the effects are clinically meaningful."
+
+This was the first study to document long-term benefits for home-based crossword training.`,
       },
       {
-        title: 'What I learned',
-        content: `I started playing a bit every day. Not much, ten minutes here and there. At first I felt stupid—words I thought I knew suddenly wouldn't come to me. After a few weeks I noticed I was finding words faster. Not just in the game, also when I'm trying to explain something.
+        title: 'What About Preventing Dementia?',
+        content: `Here we need to be careful. Dr. Anne Corbett from Exeter emphasized: "We can't say that playing these puzzles necessarily reduces the risk of dementia in later life."
 
-Still losing to grandma. Maybe I'll always lose to her.`,
+The studies show correlation—a statistical relationship—but not necessarily causation. It could be that people with better cognitive abilities are more likely to do crosswords in the first place.
+
+What is clear: word games are associated with better cognitive function in the present.`,
       },
       {
-        title: 'One thing that surprised me',
-        content: `I thought word games were for older people. Grandmas and grandpas sitting in the living room. But my kids started playing with me, and suddenly we have something to do together that doesn't involve screens.
+        title: 'Who Benefits Most?',
+        content: `The Columbia-Duke study found something interesting: if you're very early in the mild cognitive impairment process, both computer games and crosswords help equally. But in later stages, crosswords were more effective.
 
-My 9-year-old beats me sometimes. I don't know whether to be proud or worried.`,
+A 2024 study from Texas A&M found that games, puzzles, and reading slow cognitive decline even in those who already have mild impairment.`,
       },
       {
-        content: `So there it is. I don't have big conclusions. Grandma is still the champion. I'm still trying to get better. And maybe that's the best we can hope for.`,
+        title: 'The Vocabulary Point',
+        content: `A systematic review of 17 studies on learning words through games found that the brain remembers words better when it encounters them in a problem-solving context.
+
+The reason: games provide "rich contexts, cognitive engagement, and virtual learning situations" that improve learning effectiveness.
+
+In simple terms: a word you discovered in a crossword stays in memory better than a word you read on a list.`,
+      },
+      {
+        title: 'The Bottom Line',
+        content: `Research shows word games are associated with:
+• Better cognitive function (Exeter study, 19,000 participants)
+• Slower cognitive decline (Columbia-Duke study, 78 weeks)
+• More effective word learning (review of 17 studies)
+
+What research doesn't prove (yet): that word games prevent dementia.
+
+What makes word games unique compared to digital "brain training" is that they require real linguistic knowledge, not just quick reactions to visual stimuli.`,
+      },
+      {
+        content: `Sources: International Journal of Geriatric Psychiatry (2019), NEJM Evidence (2022), Duke University School of Medicine, University of Exeter PROTECT Study`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -119,37 +163,67 @@ My 9-year-old beats me sometimes. I don't know whether to be proud or worried.`,
     startPracticing: 'Practice',
   },
   sv: {
-    title: 'Farmor slog mig i ordspel. Igen.',
-    subtitle: 'Vad jag lärde mig när jag slutade underskatta ordspel',
-    category: 'Personligt',
-    readTime: '6 min läsning',
+    title: 'Vad forskningen faktiskt säger om ordspel och hjärnan',
+    subtitle: 'En genomgång av aktuell forskning från Exeter, Columbia och Duke',
+    category: 'Forskning',
+    readTime: '7 min läsning',
     sections: [
       {
-        content: `Förra söndagen förlorade jag mot farmor i ordspel. Hon är 84. Jag är 35 och jobbar med datorer hela dagen. Hon lade ord som jag aldrig hört talas om. När jag frågade hur hon kunde "fjäsing" sa hon bara: "Det är en fisk. Alla vet det."`,
+        content: `Det finns många påståenden om ordspel och hjärnan. Vissa är överdrivna, andra stämmer. Jag gick och kollade vad forskningen faktiskt visar.`,
       },
       {
-        content: `Jag har en känsla av att inte alla vet det.`,
-      },
-      {
-        title: 'Farmors hemlighet',
-        content: `Farmor gör korsord varje morgon. Har gjort det i typ 50 år. Det är inte som att hon sitter och pluggar ordlistor - hon bara gör det. Som att dricka kaffe eller läsa tidningen.
+        title: 'Den stora studien: 19 000 deltagare',
+        content: `År 2019 publicerade forskare från University of Exeter och King's College London en studie i International Journal of Geriatric Psychiatry. De följde 19 000 vuxna i åldrarna 50-93.
 
-Hon säger att det håller huvudet igång. Jag brukar skämta om det, men hon minns saker jag glömde förra veckan. Kanske skrattar hon sist.`,
-      },
-      {
-        title: 'Vad jag började göra',
-        content: `Jag laddade ner ett ordspel på mobilen. Tänkte att jag skulle spela lite på tunnelbanan. Första veckan var pinsam - jag hittade nästan ingenting. Ord som borde vara lätta fastnade någonstans.
+Huvudfyndet: de som regelbundet löste korsord visade logiskt tänkande motsvarande någon 10 år yngre, och korttidsminne som någon 8 år yngre.
 
-Efter några veckor blev det lättare. Inte för att jag lärt mig fler ord, utan för att hjärnan liksom... flöt bättre? Svårt att förklara. Men jag märker det även på jobbet när jag skriver mejl.`,
+Professor Keith Wesnes från Exeter: "Prestationen var konsekvent bättre hos dem som rapporterade att de sysslade med pussel, och förbättrades generellt stegvis med frekvensen av pusselanvändning."`,
       },
       {
-        title: 'Det oväntade',
-        content: `Mina barn började spela med mig. De är 7 och 11. Sjuåringen hittar ibland ord jag missar helt. Det är lite surt, men också ganska kul.
+        title: 'Korsord mot datorspel',
+        content: `En överraskande studie från Columbia och Duke undersökte 107 äldre vuxna med mild kognitiv nedsättning. Hälften fick datoriserade korsord, hälften fick digitala minnesspel.
 
-Vi sitter och spelar efter middagen ibland. Ingen tävling, bara spel. Det händer inte så ofta att vi gör något tillsammans utan skärmar.`,
+Efter 78 veckor visade korsordgruppen kognitiv förbättring. Gruppen med digitala spel visade försämring.
+
+Dr. D.P. Devanand från Columbia: "Fördelarna sågs inte bara i kognition utan också i dagliga aktiviteter med indikationer på hjärnkrympning på MRI som tyder på att effekterna är kliniskt meningsfulla."
+
+Detta var den första studien som dokumenterade långsiktiga fördelar för hembaserad korsordträning.`,
       },
       {
-        content: `Farmor vinner fortfarande. Varje gång. Men nu förstår jag åtminstone varför.`,
+        title: 'Vad med att förebygga demens?',
+        content: `Här måste vi vara försiktiga. Dr. Anne Corbett från Exeter betonade: "Vi kan inte säga att att spela dessa pussel nödvändigtvis minskar risken för demens senare i livet."
+
+Studierna visar korrelation – ett statistiskt samband – men inte nödvändigtvis orsakssamband. Det kan vara så att personer med bättre kognitiva förmågor är mer benägna att göra korsord från början.
+
+Vad som är klart: ordspel är förknippade med bättre kognitiv funktion i nuet.`,
+      },
+      {
+        title: 'Vem har mest nytta?',
+        content: `Columbia-Duke-studien fann något intressant: om du är mycket tidigt i processen med mild kognitiv nedsättning hjälper både datorspel och korsord lika mycket. Men i senare stadier var korsord mer effektiva.
+
+En studie från Texas A&M 2024 fann att spel, pussel och läsning bromsar kognitiv nedgång även hos dem som redan har mild nedsättning.`,
+      },
+      {
+        title: 'Ordförrådsaspekten',
+        content: `En systematisk genomgång av 17 studier om ordinlärning genom spel fann att hjärnan minns ord bättre när den möter dem i en problemlösningskontext.
+
+Anledningen: spel ger "rika sammanhang, kognitivt engagemang och virtuella inlärningssituationer" som förbättrar inlärningseffektiviteten.
+
+Enkelt uttryckt: ett ord du upptäckte i ett korsord stannar bättre i minnet än ett ord du läste på en lista.`,
+      },
+      {
+        title: 'Slutsatsen',
+        content: `Forskning visar att ordspel är förknippade med:
+• Bättre kognitiv funktion (Exeter-studien, 19 000 deltagare)
+• Långsammare kognitiv nedgång (Columbia-Duke-studien, 78 veckor)
+• Mer effektiv ordinlärning (genomgång av 17 studier)
+
+Vad forskning inte bevisar (än): att ordspel förebygger demens.
+
+Det som gör ordspel unika jämfört med digital "hjärnträning" är att de kräver verklig språklig kunskap, inte bara snabba reaktioner på visuella stimuli.`,
+      },
+      {
+        content: `Källor: International Journal of Geriatric Psychiatry (2019), NEJM Evidence (2022), Duke University School of Medicine, University of Exeter PROTECT Study`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -157,47 +231,67 @@ Vi sitter och spelar efter middagen ibland. Ingen tävling, bara spel. Det händ
     startPracticing: 'Öva',
   },
   ja: {
-    title: '祖母に言葉ゲームで負けた。まだ立ち直れていない。',
-    subtitle: '言葉ゲームを軽く見ていた自分が学んだこと',
-    category: '個人的な話',
-    readTime: '読了時間：6分',
+    title: '言葉ゲームと脳について、科学が実際に示していること',
+    subtitle: 'エクセター大学、コロンビア大学、デューク大学の最新研究から',
+    category: '研究',
+    readTime: '読了時間：7分',
     sections: [
       {
-        content: `先週の日曜日、85歳の祖母に言葉ゲームで完敗した。ただ負けたんじゃない。完全に叩きのめされた。聞いたこともないような言葉を次々と出してきた。「おばあちゃん、"鹹い"ってどこで覚えたの？」と聞いたら、「普通の言葉でしょ」と言われた。`,
+        content: `言葉ゲームと脳についてはさまざまな主張があります。誇張されたものもあれば、正確なものもあります。研究が実際に何を示しているか調べてみました。`,
       },
       {
-        content: `私はIT企業で働いている。毎日パソコンの前にいる。本も読む。それでも負ける。何かがおかしい。`,
+        title: '大規模研究：19,000人の参加者',
+        content: `2019年、エクセター大学とキングス・カレッジ・ロンドンの研究者がInternational Journal of Geriatric Psychiatryに研究を発表しました。50〜93歳の19,000人の成人を追跡しました。
+
+主な発見：定期的にクロスワードを解いていた人は、10歳若い人と同等の文法的推論能力を示し、短期記憶は8歳若い人と同等でした。
+
+エクセター大学のキース・ウェスネス教授：「パズルに取り組んでいると報告した人は一貫してパフォーマンスが良く、パズルの使用頻度に応じて段階的に改善していました。」`,
       },
       {
-        title: '調べてみたこと',
-        content: `気になって調べ始めた。別に何かを証明したかったわけじゃない。ただ、なぜこんなに強いのか知りたかった。
+        title: 'クロスワード対コンピューターゲーム',
+        content: `コロンビア大学とデューク大学の驚きの研究では、軽度認知障害を持つ107人の高齢者を調査しました。半数はコンピューター化されたクロスワードを、半数はデジタル記憶ゲームを受けました。
 
-祖母は毎朝クロスワードをやっている。もう40年以上続けているらしい。趣味というより、歯を磨くのと同じ。習慣。
+78週間後、クロスワード群は認知機能の改善を示しました。デジタルゲーム群は低下を示しました。
 
-言葉ゲームを続けている人は記憶力が落ちにくいという話をどこかで読んだ。本当かどうかわからないけど、祖母を見ていると、なんとなく納得してしまう。`,
+コロンビア大学のD.P.デバナンド博士：「効果は認知だけでなく日常活動にも見られ、MRIでの脳萎縮の減少の兆候は、効果が臨床的に意味があることを示唆しています。」
+
+これは自宅でのクロスワードトレーニングの長期的な利点を記録した最初の研究でした。`,
       },
       {
-        title: '脳のこと',
-        content: `祖母の主治医が「クロスワードを続けなさい」と言ったらしい。祖母はつまらなそうに話していたけど、大事なことみたいだ。85歳で、私が鍵をどこに置いたか、私より覚えている。
+        title: '認知症予防については？',
+        content: `ここは慎重になる必要があります。エクセター大学のアン・コルベット博士は強調しました：「これらのパズルをすることが必ずしも後年の認知症リスクを減らすとは言えません。」
 
-言葉ゲームが何かの奇跡だとは言わない。ただ、祖母は何か正しいことをしている。`,
+研究は相関関係（統計的な関係）を示していますが、必ずしも因果関係ではありません。認知能力の高い人がそもそもクロスワードをする傾向があるかもしれません。
+
+明らかなこと：言葉ゲームは現在のより良い認知機能と関連しています。`,
       },
       {
-        title: '自分で試してみた',
-        content: `毎日少しだけ遊ぶようになった。10分くらい。最初は自分の語彙力のなさにがっかりした。知っているはずの言葉が出てこない。
+        title: '誰に最も効果があるか？',
+        content: `コロンビア-デューク研究は興味深いことを発見しました：軽度認知障害の非常に初期段階であれば、コンピューターゲームもクロスワードも同じように役立ちます。しかし、後期段階ではクロスワードの方が効果的でした。
 
-数週間経って、言葉が出てくるのが早くなった気がする。ゲームの中だけじゃなく、仕事でメールを書くときも。
-
-まだ祖母には勝てない。たぶん一生勝てない。`,
+2024年のテキサスA&M大学の研究では、ゲーム、パズル、読書は、すでに軽度の障害がある人でも認知機能の低下を遅らせることがわかりました。`,
       },
       {
-        title: '意外だったこと',
-        content: `言葉ゲームは年配の人のものだと思っていた。でも子供たちと一緒に遊ぶようになった。9歳の娘が時々私に勝つ。嬉しいような、悔しいような。
+        title: '語彙について',
+        content: `ゲームを通じた単語学習に関する17の研究の系統的レビューでは、脳は問題解決の文脈で出会った単語をよりよく記憶することがわかりました。
 
-画面を使わない遊びを家族でするのは久しぶりだった。`,
+理由：ゲームは学習効果を高める「豊かなコンテキスト、認知的関与、仮想学習状況」を提供します。
+
+簡単に言えば：クロスワードで発見した単語は、リストで読んだ単語よりも記憶に残りやすいのです。`,
       },
       {
-        content: `結局、大した結論はない。祖母はまだチャンピオン。私はまだ練習中。それでいいのかもしれない。`,
+        title: '結論',
+        content: `研究は言葉ゲームが以下と関連していることを示しています：
+• より良い認知機能（エクセター研究、19,000人の参加者）
+• 認知機能低下の遅延（コロンビア-デューク研究、78週間）
+• より効果的な単語学習（17の研究のレビュー）
+
+研究がまだ証明していないこと：言葉ゲームが認知症を予防すること。
+
+デジタル「脳トレーニング」と比較した言葉ゲームの独自性は、視覚刺激への素早い反応だけでなく、実際の言語知識を必要とすることです。`,
+      },
+      {
+        content: `出典：International Journal of Geriatric Psychiatry (2019)、NEJM Evidence (2022)、Duke University School of Medicine、University of Exeter PROTECT Study`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -205,45 +299,67 @@ Vi sitter och spelar efter middagen ibland. Ingen tävling, bara spel. Det händ
     startPracticing: '練習する',
   },
   es: {
-    title: 'Mi abuela me ganó en un juego de palabras. Todavía no me recupero.',
-    subtitle: 'Lo que aprendí cuando dejé de subestimar los juegos de palabras',
-    category: 'Personal',
-    readTime: '6 min de lectura',
+    title: 'Lo que la ciencia realmente dice sobre los juegos de palabras y el cerebro',
+    subtitle: 'Un repaso de investigaciones recientes de Exeter, Columbia y Duke',
+    category: 'Investigación',
+    readTime: '7 min de lectura',
     sections: [
       {
-        content: `El domingo pasado mi abuela de 83 años me destruyó en un juego de palabras. No solo me ganó—me barrió el piso. Puso palabras que nunca había visto. Le pregunté dónde aprendió "zahúrda." Me dijo "¿Cómo que dónde? Es una palabra normal."`,
+        content: `Hay muchas afirmaciones sobre los juegos de palabras y el cerebro. Algunas son exageradas, otras son precisas. Fui a verificar qué muestra realmente la investigación.`,
       },
       {
-        content: `Trabajo en tecnología. Paso horas frente a pantallas. Leo mucho. Y ella sigue ganando. Algo no cuadraba.`,
-      },
-      {
-        title: 'Lo que descubrí',
-        content: `Empecé a investigar. No porque quisiera probar algo—solo tenía curiosidad de por qué es tan buena.
+        title: 'El estudio grande: 19,000 participantes',
+        content: `En 2019, investigadores de la Universidad de Exeter y King's College London publicaron un estudio en el International Journal of Geriatric Psychiatry. Siguieron a 19,000 adultos de 50 a 93 años.
 
-Resulta que mi abuela no solo "juega juegos." Hace crucigramas cada mañana desde hace 45 años. No es un pasatiempo, es como ducharse o tomar café. Parte de la rutina.
+El hallazgo clave: quienes resolvían crucigramas regularmente mostraron razonamiento gramatical equivalente a alguien 10 años más joven, y memoria a corto plazo de alguien 8 años más joven.
 
-Leí en algún lado que las personas que juegan juegos de palabras regularmente mantienen mejor la memoria. No sé qué tan preciso sea, pero cuando veo a mi abuela—tiene sentido.`,
+El Profesor Keith Wesnes de Exeter: "El rendimiento fue consistentemente mejor en quienes reportaron participar en puzzles, y generalmente mejoró incrementalmente con la frecuencia de uso."`,
       },
       {
-        title: 'Lo del cerebro',
-        content: `El médico de mi abuela le dijo una vez que siguiera con los crucigramas. Me lo contó como si fuera aburrido, pero parece que no era trivial. Tiene 83 y todavía recuerda dónde dejé mis llaves mejor que yo.
+        title: 'Crucigramas vs. juegos de computadora',
+        content: `Un estudio sorprendente de las universidades de Columbia y Duke examinó a 107 adultos mayores con deterioro cognitivo leve. La mitad recibió crucigramas computarizados, la mitad recibió juegos de memoria digitales.
 
-No digo que los juegos de palabras sean un milagro médico. Solo digo que ella está haciendo algo bien.`,
+Después de 78 semanas, el grupo de crucigramas mostró mejora cognitiva. El grupo de juegos digitales mostró declive.
+
+El Dr. D.P. Devanand de Columbia: "Los beneficios se vieron no solo en la cognición sino también en las actividades diarias, con indicios de menor contracción cerebral en la resonancia magnética que sugiere que los efectos son clínicamente significativos."
+
+Este fue el primer estudio en documentar beneficios a largo plazo del entrenamiento de crucigramas en casa.`,
       },
       {
-        title: 'Lo que aprendí',
-        content: `Empecé a jugar un poco cada día. No mucho, diez minutos por aquí y por allá. Al principio me sentí tonto—palabras que creía conocer de repente no me salían. Después de unas semanas noté que encontraba palabras más rápido. No solo en el juego, también cuando intento explicar algo.
+        title: '¿Qué hay de prevenir la demencia?',
+        content: `Aquí debemos ser cuidadosos. La Dra. Anne Corbett de Exeter enfatizó: "No podemos decir que jugar estos puzzles necesariamente reduce el riesgo de demencia en la vida posterior."
 
-Todavía pierdo contra la abuela. Quizás siempre pierda contra ella.`,
+Los estudios muestran correlación—una relación estadística—pero no necesariamente causalidad. Podría ser que las personas con mejores capacidades cognitivas tienen más probabilidades de hacer crucigramas en primer lugar.
+
+Lo que está claro: los juegos de palabras están asociados con mejor función cognitiva en el presente.`,
       },
       {
-        title: 'Algo que me sorprendió',
-        content: `Pensaba que los juegos de palabras eran para gente mayor. Abuelas y abuelos sentados en la sala. Pero mis hijos empezaron a jugar conmigo, y de repente tenemos algo que hacer juntos que no involucra pantallas.
+        title: '¿Quién se beneficia más?',
+        content: `El estudio Columbia-Duke encontró algo interesante: si estás muy temprano en el proceso de deterioro cognitivo leve, tanto los juegos de computadora como los crucigramas ayudan igual. Pero en etapas posteriores, los crucigramas fueron más efectivos.
 
-Mi hija de 9 años me gana a veces. No sé si estar orgulloso o preocupado.`,
+Un estudio de 2024 de Texas A&M encontró que los juegos, puzzles y la lectura ralentizan el declive cognitivo incluso en quienes ya tienen deterioro leve.`,
       },
       {
-        content: `Así que eso es todo. No tengo grandes conclusiones. La abuela sigue siendo la campeona. Yo sigo intentando mejorar. Y quizás eso es lo mejor que podemos esperar.`,
+        title: 'El punto del vocabulario',
+        content: `Una revisión sistemática de 17 estudios sobre aprender palabras a través de juegos encontró que el cerebro recuerda mejor las palabras cuando las encuentra en un contexto de resolución de problemas.
+
+La razón: los juegos proporcionan "contextos ricos, compromiso cognitivo y situaciones de aprendizaje virtual" que mejoran la efectividad del aprendizaje.
+
+En términos simples: una palabra que descubriste en un crucigrama permanece mejor en la memoria que una palabra que leíste en una lista.`,
+      },
+      {
+        title: 'La conclusión',
+        content: `La investigación muestra que los juegos de palabras están asociados con:
+• Mejor función cognitiva (estudio de Exeter, 19,000 participantes)
+• Declive cognitivo más lento (estudio Columbia-Duke, 78 semanas)
+• Aprendizaje de palabras más efectivo (revisión de 17 estudios)
+
+Lo que la investigación no prueba (aún): que los juegos de palabras previenen la demencia.
+
+Lo que hace únicos a los juegos de palabras comparados con el "entrenamiento cerebral" digital es que requieren conocimiento lingüístico real, no solo reacciones rápidas a estímulos visuales.`,
+      },
+      {
+        content: `Fuentes: International Journal of Geriatric Psychiatry (2019), NEJM Evidence (2022), Duke University School of Medicine, University of Exeter PROTECT Study`,
       },
     ],
     backToBlog: 'Volver al Blog',
