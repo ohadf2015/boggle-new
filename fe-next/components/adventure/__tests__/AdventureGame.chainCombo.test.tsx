@@ -365,7 +365,7 @@ describe('AdventureGame - Chain Combo Visual Feedback Integration', () => {
       expect(mockComboTierBadge).toHaveBeenCalledWith(
         expect.objectContaining({
           comboCount: 2,
-          className: expect.stringContaining('absolute top-[10%]'),
+          className: expect.stringContaining('sm:top-[10%]'),
         })
       );
     });
