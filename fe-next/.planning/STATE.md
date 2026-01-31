@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 28 - Power-Up System
-Plan: 8 of 8 complete (Wire Power-Up Inventory Persistence)
-Status: Phase Complete ✓ (Verified 7/7 truths)
-Last activity: 2026-01-30 — Completed 28-08-PLAN.md (Power-up cooldowns persist to localStorage, reset on level transitions)
+Phase: 29 - Adaptive Difficulty System
+Plan: 1 of 5 complete (Performance Tracker Utilities)
+Status: In progress
+Last activity: 2026-01-31 — Completed 29-01-PLAN.md (Performance tracking with weighted scoring and rolling window)
 
-Progress: [█████░░░░░] 55% (18/33 v2.0 plans complete)
+Progress: [█████░░░░░] 58% (19/33 v2.0 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -77,8 +77,8 @@ Progress: [█████░░░░░] 55% (18/33 v2.0 plans complete)
 
 **v2.0 Metrics:**
 - Roadmap phase: Complete
-- Plans completed: 18 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans COMPLETE + 3 gap closures, Phase 28: 8 plans COMPLETE)
-- Current phase: Phase 28 - Power-Up System COMPLETE
+- Plans completed: 19 (Phase 26: 9 plans COMPLETE, Phase 27: 4 plans + 3 gap closures COMPLETE, Phase 28: 8 plans COMPLETE, Phase 29: 1 plan complete)
+- Current phase: Phase 29 - Adaptive Difficulty System (1/5 plans complete)
 
 ## Accumulated Context
 
@@ -244,6 +244,13 @@ Key decisions from previous milestones:
 - Level transition behavior: Cooldowns reset to 0 when levelConfig.level changes (fresh start per level)
 - 62 total tests passing across all power-up hooks and components (100% integration coverage)
 
+**Phase 29-01 (Performance Tracker Utilities, 2026-01-31):**
+- Weighted score formula: completion 50%, time 30%, accuracy 20% (completion most important for progression)
+- Rolling window size: 3 attempts (balances stability vs responsiveness to performance changes)
+- Boss levels (level 7) excluded from tier decisions (fixed patterns for learning, not adaptive)
+- Pure function architecture: All utilities stateless for testability and composability across frontend/backend
+- TDD RED-GREEN-REFACTOR: 17 tests, 100% coverage, all functions pure with no side effects
+
 ### Pending Todos
 
 None - Starting fresh milestone with roadmap complete.
@@ -268,12 +275,12 @@ None - Starting fresh milestone with roadmap complete.
 
 ## Session Continuity
 
-Last session: 2026-01-30
-Stopped at: Completed 28-08-SUMMARY.md (Wire Power-Up Inventory Persistence) - Phase 28 COMPLETE
+Last session: 2026-01-31
+Stopped at: Completed 29-01-SUMMARY.md (Performance Tracker Utilities) - Phase 29 1/5 plans complete
 Resume file: None
 
-**Next action:** Start Phase 29 - Adaptive Difficulty System
-**Note:** All POWER-* requirements (POWER-01 through POWER-07) now complete and verified
+**Next action:** Continue Phase 29 - Adaptive Difficulty System (Plan 02: Tier Assigner)
+**Note:** Performance tracking foundation complete with weighted scoring and rolling window (3 attempts)
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
