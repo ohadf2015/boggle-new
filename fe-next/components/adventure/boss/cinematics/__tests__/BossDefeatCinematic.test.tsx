@@ -24,6 +24,7 @@ jest.mock('remotion', () => ({
     </div>
   ),
   Img: ({ src, style }: { src: string; style?: React.CSSProperties }) => (
+    // eslint-disable-next-line @next/next/no-img-element
     <img data-testid="remotion-img" src={src} style={style} alt="Boss" />
   ),
   useCurrentFrame: () => 150, // Mid-animation frame (victory text phase)

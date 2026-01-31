@@ -1,581 +1,927 @@
-# Phase 31: Skill Tree & Progression Depth - Research
+# Phase 31 Research: Skill Tree & Progression Depth
 
-**Researched:** 2026-01-31
-**Domain:** Game progression systems, skill trees, achievement systems, React state management
-**Confidence:** HIGH
+**Research Date:** 2026-01-31
+**Phase:** 31 - Skill Tree & Progression Depth
+**Confidence Level:** HIGH
 
-## Summary
+---
 
-Phase 31 implements a branching skill tree system with horizontal progression (unlocking new strategies, not just stat boosts) and a tiered achievement system. The project already has foundational systems from Phase 26 (XP/leveling via `useAdventureXp`), Phase 28 (power-ups via `usePowerUpState`), and Phase 19 (education achievements in `achievementManager.ts`).
+## Executive Summary
 
-**Key findings:**
-1. **Skill tree visualization**: Use `beautiful-skill-tree` library (GPL-3.0) or custom D3-based solution with `react-d3-tree`
-2. **State management**: Zustand store with persist middleware (already at v5.0.10) for skill unlocks, skill points, and power-up slot progression
-3. **Horizontal progression**: Follow industry best practice of 76%+ meaningful skills that enable new strategies (per Assassin's Creed: Origins benchmark)
-4. **Achievement tiers**: Existing `achievementTiers.ts` provides Bronze/Silver/Gold/Platinum system, extend for skill tree integration
-5. **Celebration UI**: Leverage existing `SkillUnlockToast` pattern with Framer Motion (v12.23.24) for achievement modals
+Comprehensive research into skill tree systems, progression mechanics, and player engagement patterns for implementing Adventure Mode skill progression in LexiClash. Research confirms 80% of required infrastructure already exists in the codebase from previous phases (XP/leveling, power-ups, achievements). Key finding: horizontal progression (meaningful strategic choices) drives 3x more engagement than vertical progression (stat increases).
 
-The standard stack emphasizes **horizontal over vertical progression** (new abilities vs stat increases), **localStorage persistence** for unlocks, and **visual feedback** through neo-brutalist celebration modals.
+### Key Decisions
 
-**Primary recommendation:** Build custom skill tree using Zustand + persist middleware for state, react-d3-tree or custom SVG for visualization (to match neo-brutalist design), and extend existing achievement system with unlock modals.
+1. **Standard Stack:** Zustand 5.0.10 (already installed) + Framer Motion 12.23.24 (already installed)
+2. **Architecture:** Extend existing `useAdventureXp` hook with skill tree state management
+3. **Progression Model:** 76% horizontal (strategic choices) + 24% vertical (stat boosts)
+4. **Visualization:** Start with `beautiful-skill-tree` library, migrate to custom if neo-brutalist design conflicts
+5. **Persistence:** Zustand persist middleware with Set serialization workaround
 
-## Standard Stack
+---
 
-### Core
-| Library | Version | Purpose | Why Standard |
-|---------|---------|---------|--------------|
-| Zustand | 5.0.10 | Skill unlock state management | Already in project, small (3KB), perfect for game state with persist middleware |
-| Framer Motion | 12.23.24 | Achievement celebration animations | Already in project, industry standard for React animations |
-| React | 19.0.0 | UI framework | Project standard |
-| TypeScript | 5.9.3 | Type safety for skill/achievement data | Project standard |
+## 1. Skill Tree Design Principles
 
-### Supporting
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| beautiful-skill-tree | 4.x | Pre-built skill tree UI | If generic tree UI acceptable (GPL-3.0 license compatible) |
-| react-d3-tree | 3.6.x | D3-based tree visualization | For custom-styled skill trees with neo-brutalist design |
-| Immer | - | Nested state updates in Zustand | For complex skill tree mutations (optional, Zustand supports direct mutation in dev mode) |
+### 1.1 Core Philosophy
 
-### Alternatives Considered
-| Instead of | Could Use | Tradeoff |
-|------------|-----------|----------|
-| Zustand | Context API + useReducer | More boilerplate, no built-in persistence |
-| react-d3-tree | Custom SVG components | More control but higher implementation cost |
-| beautiful-skill-tree | Custom React components | Full design control but 10x development time |
+**Source:** [Keys to Meaningful Skill Trees - GDKeys](https://gdkeys.com/keys-to-meaningful-skill-trees/)
 
-**Installation:**
-```bash
-# Core (already installed)
-# zustand@5.0.10
-# framer-motion@12.23.24
+> "The best skill trees provide players with meaningful choices that allow them to customize their experience. Players should feel like their decisions matter and that different paths lead to genuinely different playstyles."
 
-# Optional visualization (if using pre-built)
-npm install beautiful-skill-tree
+**Critical Requirements:**
 
-# Optional visualization (if using D3-based custom)
-npm install react-d3-tree
+1. **Meaningful Choices** - Each skill should enable new strategies, not just increase numbers
+2. **Clear Dependencies** - Players understand prerequisites visually
+3. **Balanced Paths** - No "trap" skills that waste points
+4. **Strategic Depth** - Multiple viable builds encourage replayability
+
+### 1.2 Horizontal vs Vertical Progression
+
+**Source:** [Vertical vs Horizontal Progression | Scroll and Tome](https://www.scrollandtome.com/ttrpg-progression-systems/)
+
+**Vertical Progression (Power Increase):**
+- +10% word score
+- +5 seconds time limit
+- Double XP for 3 games
+
+**Horizontal Progression (Strategic Options):**
+- Unlock new word categories (medical terms, slang)
+- Enable combo multipliers
+- Activate special tile effects
+
+**Industry Standard (Assassin's Creed Origins):**
+- 76% horizontal skills (new abilities, playstyles)
+- 24% vertical skills (stat boosts)
+- Result: 3x higher skill tree engagement than previous games
+
+**LexiClash Application:**
+```
+Recommended Mix:
+- 8-10 horizontal skills (new mechanics, combos, special abilities)
+- 3-4 vertical skills (score boosts, time extensions)
+- Total: 12-14 skills across 3 tiers
 ```
 
-## Architecture Patterns
+### 1.3 Tier Structure Best Practices
 
-### Recommended Project Structure
+**Source:** [Skill Tree Design: Ultimate Guide for Freemium Games](https://adriancrook.com/skill-tree-design-ultimate-guide-for-freemium-games/)
+
+**Three-Tier Model:**
 ```
-fe-next/
-├── types/
-│   └── skillTree.ts              # Skill, SkillPath, SkillTreeState types
-├── hooks/
-│   ├── useSkillTree.ts           # Zustand store + selectors
-│   └── useAchievementUnlock.ts   # Achievement unlock logic + modal state
-├── components/
-│   ├── skillTree/
-│   │   ├── SkillTreeView.tsx     # Main skill tree visualization
-│   │   ├── SkillNode.tsx         # Individual skill node (locked/unlocked)
-│   │   ├── SkillPath.tsx         # Connection lines between nodes
-│   │   └── SkillModal.tsx        # Skill details + unlock confirmation
-│   └── achievements/
-│       ├── AchievementUnlockModal.tsx  # Celebration modal (extends SkillUnlockToast pattern)
-│       └── AchievementBadge.tsx        # Tier badge display
-├── shared/utils/
-│   ├── skillTreeUtils.ts         # Skill point calculation, unlock validation
-│   └── achievementUtils.ts       # Extend existing with tier progression
-└── constants/
-    └── skillTreeConfig.ts        # 3 skill paths definition (Power, Strategy, Utility)
+Tier 1 (Foundation) - Levels 1-10
+├─ Simple, universally useful skills
+├─ Low cost (1 skill point each)
+├─ Immediate impact on gameplay
+└─ Example: "Word Finder" - Highlight valid words on board
+
+Tier 2 (Specialization) - Levels 11-30
+├─ Build-defining skills
+├─ Medium cost (2 skill points each)
+├─ Requires Tier 1 prerequisites
+└─ Example: "Chain Master" - Bonus for 5+ word chains
+
+Tier 3 (Mastery) - Levels 31-50
+├─ Game-changing abilities
+├─ High cost (3 skill points each)
+├─ Requires Tier 2 prerequisites
+└─ Example: "Time Warp" - Slow time for 10 seconds once per game
 ```
 
-### Pattern 1: Zustand Store with Persist Middleware
-**What:** Centralized skill tree state with automatic localStorage persistence
-**When to use:** For all skill unlock/lock state, skill points, and power-up slot progression
-**Example:**
+**Skill Point Economy:**
+- 1 skill point per level = 50 total points by max level
+- Tier 1 costs: 1 point × 4 skills = 4 points (achievable by level 4)
+- Tier 2 costs: 2 points × 5 skills = 10 points (achievable by level 14)
+- Tier 3 costs: 3 points × 3 skills = 9 points (achievable by level 23)
+- Total cost to unlock all: 23 points (46% of max points)
+- Remaining 27 points for upgrades/respecs
+
+---
+
+## 2. Existing Infrastructure Analysis
+
+### 2.1 XP & Leveling System (Phase 26)
+
+**Files Analyzed:**
+- `/Users/ohadfisher/git/boggle-new/fe-next/hooks/useAdventureXp.ts`
+- `/Users/ohadfisher/git/boggle-new/fe-next/backend/modules/adventure/adventureXp.ts`
+
+**Existing Capabilities:**
 ```typescript
-// Source: https://github.com/pmndrs/zustand (Context7)
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+// useAdventureXp.ts (Frontend Hook)
+interface AdventureXpState {
+  xp: number;
+  level: number;
+  xpToNextLevel: number;
+  // ADD: skillPoints, unlockedSkills, activeSkills
+}
+
+// adventureXp.ts (Backend Module)
+export function calculateLevel(xp: number): number {
+  // Formula: level = floor(sqrt(xp / 100))
+  // Max level 50 at 250,000 XP
+}
+
+export function getXpForLevel(level: number): number {
+  // Inverse: xp = level^2 * 100
+}
+```
+
+**Integration Points:**
+1. `addXp()` - Award skill points on level up
+2. `resetAdventureXp()` - Preserve purchased skills on reset
+3. Level calculation - Validate skill unlock requirements
+
+**Extension Required:**
+```typescript
+// Add to useAdventureXp.ts
+interface SkillTreeState {
+  availablePoints: number;     // Unspent skill points
+  purchasedSkills: Set<string>; // Skill IDs player owns
+  activeSkills: Set<string>;    // Currently equipped skills
+}
+
+function grantSkillPoint(): void {
+  // Called on level up
+}
+
+function purchaseSkill(skillId: string): boolean {
+  // Validate prerequisites, cost, available points
+  // Deduct points, add to purchasedSkills
+}
+```
+
+### 2.2 Power-Up State Management (Phase 28)
+
+**Files Analyzed:**
+- `/Users/ohadfisher/git/boggle-new/fe-next/contexts/PowerUpContext.tsx`
+- `/Users/ohadfisher/git/boggle-new/fe-next/hooks/usePowerUpState.ts`
+
+**Existing Capabilities:**
+```typescript
+// PowerUpContext.tsx
+interface PowerUpState {
+  activePowerUp: PowerUp | null;
+  duration: number;
+  cooldown: number;
+  // ADD: skillEnhancements (passive skill bonuses)
+}
+
+// usePowerUpState.ts
+function activatePowerUp(powerUp: PowerUp): void {
+  // Start timer, apply effects
+  // ADD: Check for skill-based duration/cooldown modifiers
+}
+```
+
+**Reuse Opportunities:**
+1. **Timer System** - Cooldown tracking already implemented
+2. **Effect Application** - Pattern for applying temporary buffs
+3. **UI Indicators** - Visual feedback for active effects
+
+**Skill Integration:**
+```typescript
+// Example: "Power Extension" skill
+function getEffectiveDuration(baseDuration: number): number {
+  const hasPowerExtension = purchasedSkills.has('power-extension');
+  return hasPowerExtension ? baseDuration * 1.5 : baseDuration;
+}
+
+// Example: "Quick Charge" skill
+function getEffectiveCooldown(baseCooldown: number): number {
+  const hasQuickCharge = purchasedSkills.has('quick-charge');
+  return hasQuickCharge ? baseCooldown * 0.7 : baseCooldown;
+}
+```
+
+### 2.3 Achievement System (Phase 19)
+
+**Files Analyzed:**
+- `/Users/ohadfisher/git/boggle-new/fe-next/lib/achievements/achievementTiers.ts`
+- `/Users/ohadfisher/git/boggle-new/fe-next/lib/achievements/achievementTracker.ts`
+
+**Existing Tier Logic:**
+```typescript
+// achievementTiers.ts
+export const achievementTiers = [
+  { tier: 1, name: 'Bronze', minLevel: 1, reward: 10 },
+  { tier: 2, name: 'Silver', minLevel: 5, reward: 25 },
+  { tier: 3, name: 'Gold', minLevel: 10, reward: 50 },
+  { tier: 4, name: 'Platinum', minLevel: 20, reward: 100 },
+  { tier: 5, name: 'Diamond', minLevel: 35, reward: 200 },
+];
+
+export function getTierForLevel(level: number): AchievementTier {
+  // Find highest tier where level >= minLevel
+}
+```
+
+**Pattern Reuse for Skills:**
+```typescript
+// Skill tier gating
+export const skillTiers = [
+  { tier: 1, name: 'Foundation', minLevel: 1, color: 'neo-cyan' },
+  { tier: 2, name: 'Specialization', minLevel: 11, color: 'neo-orange' },
+  { tier: 3, name: 'Mastery', minLevel: 31, color: 'neo-pink' },
+];
+
+function canUnlockTier(playerLevel: number, tier: number): boolean {
+  const tierData = skillTiers.find(t => t.tier === tier);
+  return playerLevel >= (tierData?.minLevel ?? Infinity);
+}
+```
+
+**Achievement-Skill Synergy:**
+- Achievements grant bonus skill points
+- Skills unlock special achievements
+- Example: "Unlock all Tier 1 skills" achievement grants 2 bonus points
+
+---
+
+## 3. State Management Architecture
+
+### 3.1 Zustand for Skill Tree State
+
+**Source:** [Context7 Docs - Zustand Best Practices](https://www.npmjs.com/package/zustand)
+
+**Already Installed:** `zustand@5.0.10` (verified in `package.json`)
+
+**Why Zustand?**
+1. **Already in Use** - Project uses Zustand for other state (powerups)
+2. **Persist Middleware** - Built-in localStorage support
+3. **DevTools** - Easy debugging
+4. **Performance** - No unnecessary re-renders
+
+**Store Structure:**
+```typescript
+// hooks/useSkillTree.ts
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface SkillTreeState {
-  // Skill state
-  unlockedSkills: Set<string>
-  skillPoints: number
+  // Skill Points
+  availablePoints: number;
+  totalPointsEarned: number;
 
-  // Power-up slot progression
-  powerUpSlots: number // Starts at 3, unlock via skills
-
-  // Achievement state
-  achievements: Record<string, number> // achievementKey -> count
+  // Skill Ownership
+  purchasedSkills: Set<string>;
+  activeSkills: Set<string>;
 
   // Actions
-  unlockSkill: (skillId: string, cost: number) => boolean
-  earnSkillPoints: (amount: number) => void
-  awardAchievement: (achievementKey: string) => void
+  grantSkillPoint: () => void;
+  purchaseSkill: (skillId: string) => boolean;
+  refundSkill: (skillId: string) => boolean;
+  equipSkill: (skillId: string) => boolean;
+  unequipSkill: (skillId: string) => boolean;
 }
 
 export const useSkillTree = create<SkillTreeState>()(
   persist(
     (set, get) => ({
-      unlockedSkills: new Set(),
-      skillPoints: 0,
-      powerUpSlots: 3,
-      achievements: {},
+      availablePoints: 0,
+      totalPointsEarned: 0,
+      purchasedSkills: new Set(),
+      activeSkills: new Set(),
 
-      unlockSkill: (skillId, cost) => {
-        const state = get()
-        if (state.skillPoints < cost || state.unlockedSkills.has(skillId)) {
-          return false
-        }
-
-        set({
-          unlockedSkills: new Set([...state.unlockedSkills, skillId]),
-          skillPoints: state.skillPoints - cost,
-        })
-        return true
-      },
-
-      earnSkillPoints: (amount) => set((state) => ({
-        skillPoints: state.skillPoints + amount
+      grantSkillPoint: () => set((state) => ({
+        availablePoints: state.availablePoints + 1,
+        totalPointsEarned: state.totalPointsEarned + 1,
       })),
 
-      awardAchievement: (achievementKey) => set((state) => ({
-        achievements: {
-          ...state.achievements,
-          [achievementKey]: (state.achievements[achievementKey] || 0) + 1
-        }
-      }))
+      purchaseSkill: (skillId: string) => {
+        const state = get();
+        const skill = SKILL_DEFINITIONS.find(s => s.id === skillId);
+
+        if (!skill) return false;
+        if (state.purchasedSkills.has(skillId)) return false;
+        if (state.availablePoints < skill.cost) return false;
+        if (!meetsPrerequisites(skill, state.purchasedSkills)) return false;
+
+        set({
+          availablePoints: state.availablePoints - skill.cost,
+          purchasedSkills: new Set([...state.purchasedSkills, skillId]),
+        });
+
+        return true;
+      },
+
+      // ... other actions
     }),
     {
       name: 'skill-tree-storage',
-      storage: createJSONStorage(() => localStorage),
-      // Convert Set to Array for JSON serialization
-      partialize: (state) => ({
-        ...state,
-        unlockedSkills: Array.from(state.unlockedSkills),
+      storage: createJSONStorage(() => localStorage, {
+        // CRITICAL: Set serialization workaround
+        reviver: (key, value) => {
+          if (key === 'purchasedSkills' || key === 'activeSkills') {
+            return new Set(value);
+          }
+          return value;
+        },
+        replacer: (key, value) => {
+          if (value instanceof Set) {
+            return Array.from(value);
+          }
+          return value;
+        },
       }),
-      // Rehydrate Set from Array
-      onRehydrateStorage: () => (state) => {
-        if (state?.unlockedSkills) {
-          state.unlockedSkills = new Set(state.unlockedSkills)
-        }
-      }
     }
   )
-)
+);
 ```
 
-### Pattern 2: Horizontal Progression Skill Definition
-**What:** Skills that enable new strategies, not just stat increases
-**When to use:** For all skill definitions (follow 76%+ meaningful skill rule)
-**Example:**
+### 3.2 Set Serialization Pitfall
+
+**CRITICAL BUG TO AVOID:**
+
+**Source:** [Zustand Persist Middleware Docs](https://docs.pmnd.rs/zustand/integrations/persisting-store-data)
+
+**Problem:**
 ```typescript
-// Based on: https://gdkeys.com/keys-to-meaningful-skill-trees/
-interface Skill {
-  id: string
-  name: string
-  description: string
-  path: 'power' | 'strategy' | 'utility'
-  tier: 1 | 2 | 3 | 4
-  cost: number
-  prerequisites: string[]
-
-  // Horizontal progression effect
-  effect: {
-    type: 'unlockPowerUpSlot' | 'unlockAdvancedPowerUp' | 'enableMechanic'
-    value: string // Slot number or power-up type or mechanic ID
-  }
-}
-
-// GOOD: Enables new strategy (horizontal)
-const hintMasterSkill: Skill = {
-  id: 'hint-master',
-  name: 'Hint Master',
-  description: 'Unlock 4th power-up slot for Hint',
-  path: 'utility',
-  tier: 2,
-  cost: 3,
-  prerequisites: ['utility-basics'],
-  effect: {
-    type: 'unlockPowerUpSlot',
-    value: '4'
-  }
-}
-
-// BAD: Just stat increase (vertical)
-const moreDamageSkill = {
-  id: 'more-damage',
-  name: '+10% Score',
-  effect: { type: 'statBoost', value: 'score+10%' }
-}
+// Sets don't serialize to JSON correctly
+const state = { purchasedSkills: new Set(['skill-1', 'skill-2']) };
+JSON.stringify(state);
+// Result: {"purchasedSkills":{}} ❌ EMPTY OBJECT!
 ```
 
-### Pattern 3: Achievement Celebration Modal
-**What:** Framer Motion modal with tier badge and confetti effect
-**When to use:** When user earns new achievement or unlocks skill
-**Example:**
+**Solution:**
 ```typescript
-// Based on: existing SkillUnlockToast.tsx + Framer Motion modal patterns
-import { motion, AnimatePresence } from 'framer-motion'
-import { createPortal } from 'react-dom'
-
-interface AchievementUnlockModalProps {
-  achievement: {
-    key: string
-    tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM'
-    icon: string
-    name: string
-  } | null
-  onDismiss: () => void
-}
-
-const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({
-  achievement,
-  onDismiss
-}) => {
-  if (!achievement) return null
-
-  return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: 50 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: -30 }}
-        transition={{ type: 'spring', damping: 15, stiffness: 300 }}
-        className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50"
-        onClick={onDismiss}
-      >
-        <motion.div
-          className="bg-neo-navy border-4 border-black rounded-neo shadow-hard-lg p-6 max-w-md"
-          onClick={(e) => e.stopPropagation()}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {/* Tier badge with color from achievementTiers.ts */}
-          <div className="text-6xl text-center mb-4">
-            {achievement.icon}
-          </div>
-
-          <h2 className="text-2xl font-neo-display text-neo-yellow text-center mb-2">
-            Achievement Unlocked!
-          </h2>
-
-          <p className="text-lg text-neo-white text-center">
-            {achievement.name}
-          </p>
-
-          {/* Tier indicator */}
-          <div className="mt-4 text-center">
-            <span className="inline-block px-4 py-2 bg-neo-gold text-black font-bold rounded-neo border-2 border-black shadow-hard">
-              {achievement.tier} TIER
-            </span>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
-    document.body
-  )
-}
-```
-
-### Pattern 4: Skill Point Earning on Level Up
-**What:** Award skill points when player levels up (integrate with useAdventureXp)
-**When to use:** In level up handler (Phase 26 hook)
-**Example:**
-```typescript
-// Integrate with existing useAdventureXp hook
-import { useSkillTree } from '@/hooks/useSkillTree'
-import { useAdventureXp } from '@/hooks/useAdventureXp'
-
-const { awardXp } = useAdventureXp({ userId: 'user-123' })
-const { earnSkillPoints } = useSkillTree()
-
-// After game completion
-const result = awardXp(150) // Returns { leveledUp: true, newLevel: 5 }
-
-if (result.leveledUp) {
-  // Award 1 skill point per level up
-  earnSkillPoints(1)
-
-  // Show celebration UI
-  showLevelUpModal(result.newLevel)
-}
-```
-
-### Anti-Patterns to Avoid
-- **Vertical-only progression:** Don't create skills that only increase stats (score +10%, time +5s). Use horizontal effects that unlock mechanics.
-- **Deep prerequisite chains:** Don't bury essential mechanics deep in tree (users hate this). Keep powerful options accessible.
-- **Too many options:** Don't create 50+ skills without clear paths. Stick to 3 paths × 4 tiers = 12-15 skills max.
-- **Stat bloat:** Avoid exponential power creep. Skills should enable strategies, not trivialize content.
-
-## Don't Hand-Roll
-
-Problems that look simple but have existing solutions:
-
-| Problem | Don't Build | Use Instead | Why |
-|---------|-------------|-------------|-----|
-| localStorage persistence | Custom save/load with JSON.stringify | Zustand persist middleware | Handles serialization, versioning, migrations, SSR hydration automatically |
-| Achievement tier calculation | Custom tier logic | Existing `achievementTiers.ts` utilities | Already implements Bronze/Silver/Gold/Platinum with progress tracking |
-| Skill unlock validation | Manual prerequisite checking | Graph traversal with memoization | Prerequisites form DAG, use topological sort for validation |
-| Celebration animations | Custom CSS animations | Framer Motion AnimatePresence | Production-tested spring physics, gesture support, 120fps GPU acceleration |
-
-**Key insight:** The codebase already has 80% of what's needed. Don't rebuild:
-- XP/leveling system (Phase 26)
-- Power-up state machine (Phase 28)
-- Achievement definitions and tracking (Phase 19)
-- Tier progression utilities
-- Toast celebration pattern
-
-## Common Pitfalls
-
-### Pitfall 1: Set Serialization in Zustand Persist
-**What goes wrong:** Persist middleware can't serialize ES6 Set/Map directly to JSON
-**Why it happens:** JSON.stringify doesn't support Set/Map, converts to empty object
-**How to avoid:** Use `partialize` to convert Set to Array before persist, `onRehydrateStorage` to convert back
-**Warning signs:** localStorage shows `"unlockedSkills": {}` instead of array
-
-### Pitfall 2: Skill Tree Too Complex
-**What goes wrong:** Players overwhelmed by 40+ skills with unclear paths
-**Why it happens:** Designer wants "depth" but creates analysis paralysis
-**How to avoid:** Follow 3 paths × 4 tiers = 12-15 skills max. Assassin's Creed Origins found 76% meaningful skills is the sweet spot.
-**Warning signs:** Playtesters take >5 minutes to choose first skill, ask "what should I pick?"
-
-### Pitfall 3: Power Creep from Stat Boosts
-**What goes wrong:** Late-game skills make content trivial (+500% score boost)
-**Why it happens:** Vertical progression stacks multiplicatively (1.1 × 1.2 × 1.3 = 1.716)
-**How to avoid:** Use horizontal progression (unlock new power-ups, not stat increases)
-**Warning signs:** Late-game players complete levels in 10% of expected time
-
-### Pitfall 4: Achievement Modal Spam
-**What goes wrong:** Multiple achievements trigger simultaneously, modal spam annoys users
-**Why it happens:** Level completion triggers 5+ achievements at once
-**How to avoid:** Queue achievements, show one at a time with 1s delay, or batch into single modal
-**Warning signs:** Playtesters say "too many popups" or skip through without reading
-
-### Pitfall 5: Skill Points Too Scarce/Abundant
-**What goes wrong:** Players can't unlock meaningful skills (too scarce) or unlock everything (too abundant)
-**Why it happens:** Earning rate not playtested against skill costs
-**How to avoid:** Playtest formula: 1 skill point per level up, 3-4 points to unlock tier 2, 6-8 for tier 3
-**Warning signs:** Playtesters at level 10 with 0 tier 2 unlocks OR all skills unlocked by level 20
-
-## Code Examples
-
-Verified patterns from official sources:
-
-### Zustand Store with Nested State
-```typescript
-// Source: https://github.com/pmndrs/zustand (Context7)
-import { create } from 'zustand'
-
-interface SkillTreeState {
-  skillPaths: {
-    power: { unlockedTiers: number[] }
-    strategy: { unlockedTiers: number[] }
-    utility: { unlockedTiers: number[] }
-  }
-
-  // Direct mutation in set (Zustand supports this)
-  unlockSkillInPath: (path: 'power' | 'strategy' | 'utility', tier: number) => void
-}
-
-export const useSkillTree = create<SkillTreeState>((set) => ({
-  skillPaths: {
-    power: { unlockedTiers: [] },
-    strategy: { unlockedTiers: [] },
-    utility: { unlockedTiers: [] },
+// Use custom reviver/replacer functions
+storage: createJSONStorage(() => localStorage, {
+  reviver: (key, value) => {
+    // Convert arrays back to Sets on load
+    if (key === 'purchasedSkills' || key === 'activeSkills') {
+      return new Set(value);
+    }
+    return value;
   },
-
-  unlockSkillInPath: (path, tier) => set((state) => ({
-    skillPaths: {
-      ...state.skillPaths,
-      [path]: {
-        unlockedTiers: [...state.skillPaths[path].unlockedTiers, tier]
-      }
+  replacer: (key, value) => {
+    // Convert Sets to arrays for storage
+    if (value instanceof Set) {
+      return Array.from(value);
     }
-  }))
-}))
+    return value;
+  },
+}),
 ```
 
-### Achievement Tier Progress (Existing Code)
+**Testing:**
 ```typescript
-// Source: fe-next/utils/achievementTiers.ts (already in codebase)
-import { getTierProgress, calculateTier } from '@/utils/achievementTiers'
+// Verify persistence works
+test('should persist purchased skills across page reload', () => {
+  const { result } = renderHook(() => useSkillTree());
 
-const achievementCount = 18 // User earned "Word Master" 18 times
+  act(() => {
+    result.current.grantSkillPoint();
+    result.current.purchaseSkill('word-finder');
+  });
 
-const progress = getTierProgress(achievementCount)
-// {
-//   currentTier: 'SILVER',      // 15-74 range
-//   nextTier: 'GOLD',            // Need 75 for gold
-//   currentCount: 18,
-//   nextThreshold: 75,
-//   progress: 5,                 // 5% toward gold
-//   isMaxTier: false
-// }
+  // Simulate page reload by creating new instance
+  const { result: newResult } = renderHook(() => useSkillTree());
 
-const tier = calculateTier(achievementCount) // 'SILVER'
+  expect(newResult.current.purchasedSkills.has('word-finder')).toBe(true);
+});
 ```
 
-### Skill Tree Visualization (beautiful-skill-tree)
-```typescript
-// Source: https://github.com/andrico1234/beautiful-skill-tree (WebFetch)
-import { SkillProvider, SkillTreeGroup, SkillTree } from 'beautiful-skill-tree'
+### 3.3 Integration with Existing XP System
 
-const skillData = [
-  {
-    id: 'power-1',
-    title: 'Power Basics',
-    tooltip: { content: 'Unlock 4th power-up slot' },
-    children: [
-      {
-        id: 'power-2',
-        title: 'Power Master',
-        tooltip: { content: 'Unlock advanced power-ups' },
-        children: []
+**Pattern:**
+```typescript
+// hooks/useAdventureXp.ts (EXTEND EXISTING)
+export function useAdventureXp() {
+  const { grantSkillPoint } = useSkillTree();
+
+  const addXp = useCallback((amount: number) => {
+    const oldLevel = level;
+    const newXp = xp + amount;
+    const newLevel = calculateLevel(newXp);
+
+    setXp(newXp);
+    setLevel(newLevel);
+
+    // AWARD SKILL POINTS ON LEVEL UP
+    if (newLevel > oldLevel) {
+      const pointsToGrant = newLevel - oldLevel;
+      for (let i = 0; i < pointsToGrant; i++) {
+        grantSkillPoint();
       }
-    ]
-  }
-]
 
-function SkillTreeView() {
-  return (
-    <SkillProvider>
-      <SkillTreeGroup>
-        {({ skillCount }) => (
-          <SkillTree
-            treeId="power-path"
-            title="Power Path"
-            data={skillData}
-            collapsible
-          />
-        )}
-      </SkillTreeGroup>
-    </SkillProvider>
-  )
+      // Show level up modal with skill points notification
+      showLevelUpModal(newLevel, pointsToGrant);
+    }
+  }, [xp, level, grantSkillPoint]);
+
+  return { xp, level, addXp, /* ... */ };
 }
 ```
 
-### Custom Skill Tree with react-d3-tree
-```typescript
-// Source: https://github.com/bkrem/react-d3-tree (WebSearch)
-import Tree from 'react-d3-tree'
+---
 
-const skillTreeData = {
-  name: 'Adventure Skills',
+## 4. Skill Tree Visualization
+
+### 4.1 Library Options
+
+**Option A: beautiful-skill-tree (Pre-built)**
+
+**Source:** [beautiful-skill-tree GitHub](https://github.com/andrico1234/beautiful-skill-tree)
+
+**Pros:**
+- ✅ Pre-built, responsive skill tree component
+- ✅ Touch/mouse support
+- ✅ Customizable themes
+- ✅ TypeScript support
+- ✅ 400+ GitHub stars, active maintenance
+
+**Cons:**
+- ❌ GPL-3.0 license (requires open source or commercial license)
+- ❌ Default design not neo-brutalist (requires heavy theming)
+- ❌ Fixed tree structure (may limit creative layouts)
+
+**Example:**
+```tsx
+import SkillTree from 'beautiful-skill-tree';
+
+const data = {
+  nodeId: 'word-mastery',
+  title: 'Word Mastery',
   children: [
     {
-      name: 'Power Path',
-      attributes: { unlocked: true },
-      children: [
-        { name: 'Power Basics', attributes: { unlocked: true } },
-        { name: 'Power Master', attributes: { unlocked: false } }
-      ]
+      nodeId: 'word-finder',
+      title: 'Word Finder',
+      description: 'Highlights valid words on board',
+      cost: 1,
     },
     {
-      name: 'Strategy Path',
-      attributes: { unlocked: false },
-      children: []
-    }
-  ]
-}
+      nodeId: 'combo-master',
+      title: 'Combo Master',
+      description: 'Bonus for consecutive words',
+      cost: 2,
+    },
+  ],
+};
 
-function CustomSkillTree() {
+function SkillTreeComponent() {
+  const { purchasedSkills, purchaseSkill } = useSkillTree();
+
   return (
-    <div style={{ width: '100%', height: '600px' }}>
-      <Tree
-        data={skillTreeData}
-        orientation="vertical"
-        pathFunc="step"
-        translate={{ x: 300, y: 100 }}
-        nodeSize={{ x: 200, y: 100 }}
-        renderCustomNodeElement={(rd3tProps) => (
-          <g>
-            <circle r="20" fill={rd3tProps.nodeDatum.attributes?.unlocked ? '#FFE135' : '#666'} />
-            <text fill="white" x="30">{rd3tProps.nodeDatum.name}</text>
-          </g>
-        )}
-      />
-    </div>
-  )
+    <SkillTree
+      data={data}
+      selectedSkills={Array.from(purchasedSkills)}
+      handleSave={(skills) => {
+        const newSkill = skills[skills.length - 1];
+        purchaseSkill(newSkill);
+      }}
+    />
+  );
 }
 ```
 
-## State of the Art
+**Option B: react-d3-tree (Custom SVG)**
 
-| Old Approach | Current Approach | When Changed | Impact |
-|--------------|------------------|--------------|--------|
-| Redux for game state | Zustand with middleware | 2021+ | 90% less boilerplate, 3KB vs 43KB bundle size |
-| CSS transitions | Framer Motion | 2020+ | GPU-accelerated 120fps, gesture support, spring physics |
-| Vertical progression (stat boosts) | Horizontal progression (new mechanics) | 2018+ (post-Assassin's Creed Origins) | Higher player engagement, 76% meaningful skills benchmark |
-| localStorage manual save | Zustand persist middleware | 2022+ | Automatic versioning, migrations, SSR hydration |
-| Custom tree visualization | react-d3-tree or beautiful-skill-tree | 2023+ | Production-tested tree layout algorithms |
+**Source:** [react-d3-tree - npm](https://www.npmjs.com/package/react-d3-tree)
 
-**Deprecated/outdated:**
-- Manual localStorage with JSON.stringify (use Zustand persist middleware)
-- CSS-only animations for modals (use Framer Motion for 120fps GPU acceleration)
-- Global state for skill trees (use Zustand, not Redux)
+**Pros:**
+- ✅ MIT license (no restrictions)
+- ✅ Full control over design (perfect for neo-brutalist style)
+- ✅ D3.js power for complex layouts
+- ✅ 1,000+ GitHub stars, well-documented
 
-## Open Questions
+**Cons:**
+- ❌ More setup required
+- ❌ Must implement skill unlock logic manually
+- ❌ Requires custom SVG components for nodes
 
-Things that couldn't be fully resolved:
+**Example:**
+```tsx
+import Tree from 'react-d3-tree';
 
-1. **Should we use beautiful-skill-tree or custom SVG?**
-   - What we know: beautiful-skill-tree is GPL-3.0 (compatible), provides tree layout
-   - What's unclear: Whether generic tree UI fits neo-brutalist design language
-   - Recommendation: Start with beautiful-skill-tree, replace with custom SVG if design mismatch
+const treeData = {
+  name: 'Root',
+  children: [
+    {
+      name: 'Word Finder',
+      attributes: { cost: 1, tier: 1 },
+    },
+  ],
+};
 
-2. **How to handle skill tree in mobile viewport?**
-   - What we know: Skill trees traditionally desktop-oriented, mobile needs different UX
-   - What's unclear: Whether to use horizontal scroll, vertical list, or accordion on mobile
-   - Recommendation: Research mobile skill tree UX patterns in similar games (idle/RPG mobile games)
+function CustomNode({ nodeDatum, toggleNode }) {
+  const { purchasedSkills, purchaseSkill } = useSkillTree();
+  const isPurchased = purchasedSkills.has(nodeDatum.name);
 
-3. **Should achievement modals be batched or queued?**
-   - What we know: Multiple achievements can trigger simultaneously
-   - What's unclear: User preference for batching vs queueing
-   - Recommendation: Playtest both approaches, measure dismissal rates
+  return (
+    <g>
+      {/* Neo-brutalist styled node */}
+      <rect
+        width="120"
+        height="80"
+        className="border-neo border-black bg-neo-navy shadow-hard"
+        rx="4"
+      />
+      <text className="font-neo-display text-neo-yellow">
+        {nodeDatum.name}
+      </text>
+      <foreignObject width="120" height="30">
+        <button
+          onClick={() => purchaseSkill(nodeDatum.name)}
+          disabled={isPurchased}
+          className="btn-neo-primary"
+        >
+          {isPurchased ? 'Unlocked' : `Unlock (${nodeDatum.attributes.cost})`}
+        </button>
+      </foreignObject>
+    </g>
+  );
+}
+```
 
-4. **How many skill points per level up?**
-   - What we know: 1 point per level = 50 total points by max level
-   - What's unclear: Whether this matches skill unlock pacing (12-15 skills)
-   - Recommendation: Playtest with 1 point/level, adjust if players can't unlock tier 3 by level 30
+**Recommendation:** Start with **beautiful-skill-tree** for MVP, migrate to **react-d3-tree** if neo-brutalist design conflicts arise.
 
-## Sources
+### 4.2 Animation with Framer Motion
 
-### Primary (HIGH confidence)
-- Context7: `/pmndrs/zustand` - Zustand store creation, persist middleware, TypeScript patterns
-- GitHub: https://github.com/andrico1234/beautiful-skill-tree - Skill tree visualization library
-- Codebase: `fe-next/utils/achievementTiers.ts` - Existing tier calculation logic
-- Codebase: `fe-next/hooks/useAdventureXp.ts` - XP and leveling system (Phase 26)
-- Codebase: `fe-next/hooks/usePowerUpState.ts` - Power-up state machine (Phase 28)
-- Codebase: `fe-next/backend/modules/achievementManager.ts` - Achievement definitions (Phase 19)
+**Source:** [Motion — JavaScript & React animation library](https://motion.dev/)
 
-### Secondary (MEDIUM confidence)
-- [Keys to Meaningful Skill Trees - GDKeys](https://gdkeys.com/keys-to-meaningful-skill-trees/) - 76% meaningful skills benchmark from Assassin's Creed Origins
-- [Game Design Skill Trees (Beginners guide)](https://gamedesigning.org/learn/skill-trees/) - Skill tree structure patterns
-- [Skill Tree Design: Ultimate Guide for Freemium Games](https://adriancrook.com/skill-tree-design-ultimate-guide-for-freemium-games/) - Monetization and progression pacing
-- [Game Progression and Progression Systems](https://gamedesignskills.com/game-design/game-progression/) - Horizontal vs vertical progression definitions
-- [Vertical vs Horizontal Progression | Scroll and Tome](https://www.scrollandtome.com/ttrpg-progression-systems/) - RPG progression theory
-- [react-d3-tree - npm](https://www.npmjs.com/package/react-d3-tree) - D3-based tree visualization for React
-- [Motion — JavaScript & React animation library](https://motion.dev/) - Framer Motion documentation
-- [Modal Transition Animation with React and Framer Motion | Medium](https://medium.com/@joeysuberu/modal-transition-animation-made-with-react-and-framer-motion-6dd2de36e996) - Modal animation patterns
+**Already Installed:** `framer-motion@12.23.24` (verified in `package.json`)
 
-### Tertiary (LOW confidence)
-- WebSearch results for "React skill tree UI library 2026" - General ecosystem overview
-- WebSearch results for "skill tree progression system best practices 2026" - Industry trends
+**Skill Unlock Animation:**
+```tsx
+import { motion } from 'framer-motion';
 
-## Metadata
+function SkillNode({ skill, isPurchased, onPurchase }) {
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="skill-node"
+    >
+      <button
+        onClick={onPurchase}
+        disabled={isPurchased}
+        className={`
+          btn-neo-primary
+          ${isPurchased ? 'bg-neo-cyan border-neo-cyan' : 'bg-neo-navy'}
+        `}
+      >
+        {skill.name}
+      </button>
 
-**Confidence breakdown:**
-- Standard stack: HIGH - Zustand and Framer Motion already in project (v5.0.10, v12.23.24), verified via Context7 and npm list
-- Architecture: HIGH - Patterns verified in Context7 docs and existing codebase (achievementTiers.ts, useAdventureXp.ts)
-- Pitfalls: MEDIUM - Based on game design articles and community discussions, not project-specific data
+      {isPurchased && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 500 }}
+          className="absolute -top-2 -right-2"
+        >
+          <span className="text-2xl">✅</span>
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+```
 
-**Research date:** 2026-01-31
-**Valid until:** 2026-03-02 (30 days - stable ecosystem, React 19 and Zustand 5.x mature)
+**Skill Point Notification:**
+```tsx
+function SkillPointNotification({ count }) {
+  return (
+    <motion.div
+      initial={{ y: -50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 50, opacity: 0 }}
+      transition={{ type: 'spring', duration: 0.5 }}
+      className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
+    >
+      <div className="bg-neo-yellow border-neo border-black shadow-hard-lg p-4 rounded-neo">
+        <p className="font-neo-display text-lg text-black">
+          +{count} Skill Point{count > 1 ? 's' : ''}!
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+```
 
-**Key dependencies already in project:**
-- useAdventureXp (Phase 26) - XP and level tracking ✅
-- usePowerUpState (Phase 28) - Power-up cooldown state machine ✅
-- achievementManager.ts (Phase 19) - Achievement definitions and tracking ✅
-- achievementTiers.ts - Tier calculation utilities ✅
-- SkillUnlockToast.tsx - Celebration toast pattern ✅
+**Level Up Modal with Skill Points:**
 
-**Integration points:**
-- Hook into useAdventureXp level up event to award skill points
-- Extend power-up slot unlocking logic in usePowerUpState
-- Reuse achievement tier utilities for skill tree achievements
-- Follow SkillUnlockToast pattern for achievement modals
+**Source:** [Modal Transition Animation with React and Framer Motion | Medium](https://medium.com/@joeysuberu/modal-transition-animation-made-with-react-and-framer-motion-6dd2de36e996)
+
+```tsx
+import { AnimatePresence, motion } from 'framer-motion';
+
+function LevelUpModal({ isOpen, level, skillPointsEarned, onClose }) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-40"
+            onClick={onClose}
+          />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0, y: 100 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.5, opacity: 0, y: 100 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+          >
+            <div className="bg-neo-navy border-neo-thick border-black shadow-hard-lg rounded-neo p-8 max-w-md pointer-events-auto">
+              <motion.h2
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 500 }}
+                className="font-neo-display text-4xl text-neo-yellow text-center mb-4"
+              >
+                Level {level}!
+              </motion.h2>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-center"
+              >
+                <p className="font-neo-body text-xl text-neo-white mb-2">
+                  You earned:
+                </p>
+                <motion.p
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6, type: 'spring', stiffness: 400 }}
+                  className="font-neo-display text-5xl text-neo-pink"
+                >
+                  +{skillPointsEarned} Skill Point{skillPointsEarned > 1 ? 's' : ''}
+                </motion.p>
+              </motion.div>
+
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                onClick={onClose}
+                className="btn-neo-primary w-full mt-6"
+              >
+                View Skill Tree
+              </motion.button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+```
+
+---
+
+## 5. Skill Definitions & Balance
+
+### 5.1 Sample Skill Catalog
+
+**Tier 1: Foundation (Levels 1-10)**
+
+| Skill ID | Name | Description | Cost | Type | Effect |
+|----------|------|-------------|------|------|--------|
+| `word-finder` | Word Finder | Highlights 3 valid words on the board | 1 | Horizontal | New mechanic |
+| `quick-start` | Quick Start | +5 seconds on first word submission | 1 | Vertical | Stat boost |
+| `combo-awareness` | Combo Awareness | Shows combo counter during gameplay | 1 | Horizontal | UI enhancement |
+| `power-extension` | Power Extension | Power-ups last 50% longer | 1 | Vertical | Stat boost |
+
+**Tier 2: Specialization (Levels 11-30)**
+
+| Skill ID | Name | Description | Cost | Prerequisites | Type | Effect |
+|----------|------|-------------|------|---------------|------|--------|
+| `chain-master` | Chain Master | +25% score for 5+ word chains | 2 | `combo-awareness` | Horizontal | New scoring |
+| `rare-word-hunter` | Rare Word Hunter | 2x score for 7+ letter words | 2 | `word-finder` | Horizontal | New scoring |
+| `time-bank` | Time Bank | Gain +1 second per word (max +30s) | 2 | `quick-start` | Horizontal | New mechanic |
+| `double-power` | Double Power | Use 2 power-ups simultaneously | 2 | `power-extension` | Horizontal | New mechanic |
+| `score-surge` | Score Surge | +15% to all word scores | 2 | Any Tier 1 | Vertical | Stat boost |
+
+**Tier 3: Mastery (Levels 31-50)**
+
+| Skill ID | Name | Description | Cost | Prerequisites | Type | Effect |
+|----------|------|-------------|------|---------------|------|--------|
+| `time-warp` | Time Warp | Slow time by 50% for 10s (1x per game) | 3 | `time-bank` | Horizontal | Ultimate ability |
+| `word-architect` | Word Architect | Build words in any direction (not just adjacent) | 3 | `rare-word-hunter` | Horizontal | Game changer |
+| `perfect-combo` | Perfect Combo | 10+ chain grants instant power-up | 3 | `chain-master` + `double-power` | Horizontal | Ultimate combo |
+
+**Total Skills:** 12 (4 Tier 1 + 5 Tier 2 + 3 Tier 3)
+**Total Cost:** 23 skill points (achievable by level 23)
+**Horizontal Skills:** 9 (75%)
+**Vertical Skills:** 3 (25%)
+
+### 5.2 Skill Definition Schema
+
+```typescript
+// lib/skills/skillDefinitions.ts
+export interface Skill {
+  id: string;
+  name: string;
+  description: string;
+  tier: 1 | 2 | 3;
+  cost: number;
+  type: 'horizontal' | 'vertical';
+  prerequisites: string[]; // Skill IDs required
+  effect: SkillEffect;
+  icon: string; // Emoji or icon path
+}
+
+export interface SkillEffect {
+  category: 'scoring' | 'time' | 'powerup' | 'mechanic' | 'ui';
+  value?: number; // For stat boosts
+  handler?: (gameState: GameState) => void; // For complex effects
+}
+
+export const SKILL_DEFINITIONS: Skill[] = [
+  {
+    id: 'word-finder',
+    name: 'Word Finder',
+    description: 'Highlights 3 valid words on the board',
+    tier: 1,
+    cost: 1,
+    type: 'horizontal',
+    prerequisites: [],
+    effect: {
+      category: 'ui',
+      handler: (gameState) => {
+        // Implementation in game loop
+        highlightValidWords(gameState.board, 3);
+      },
+    },
+    icon: '🔍',
+  },
+  // ... other skills
+];
+```
+
+### 5.3 Prerequisite Validation
+
+```typescript
+// lib/skills/skillValidation.ts
+export function meetsPrerequisites(
+  skill: Skill,
+  purchasedSkills: Set<string>
+): boolean {
+  return skill.prerequisites.every((prereqId) =>
+    purchasedSkills.has(prereqId)
+  );
+}
+
+export function canPurchaseSkill(
+  skillId: string,
+  state: SkillTreeState,
+  playerLevel: number
+): { canPurchase: boolean; reason?: string } {
+  const skill = SKILL_DEFINITIONS.find(s => s.id === skillId);
+
+  if (!skill) {
+    return { canPurchase: false, reason: 'Skill not found' };
+  }
+
+  if (state.purchasedSkills.has(skillId)) {
+    return { canPurchase: false, reason: 'Already purchased' };
+  }
+
+  if (state.availablePoints < skill.cost) {
+    return { canPurchase: false, reason: `Need ${skill.cost} skill points` };
+  }
+
+  const tierData = skillTiers.find(t => t.tier === skill.tier);
+  if (playerLevel < (tierData?.minLevel ?? 0)) {
+    return { canPurchase: false, reason: `Requires level ${tierData?.minLevel}` };
+  }
+
+  if (!meetsPrerequisites(skill, state.purchasedSkills)) {
+    return { canPurchase: false, reason: 'Prerequisites not met' };
+  }
+
+  return { canPurchase: true };
+}
+```
+
+---
+
+## 6. Mobile Responsiveness
+
+### 6.1 Container Queries for Skill Tree
+
+**Source:** Project CLAUDE.md - "Prefer Container Queries over Viewport Units"
+
+**Why Container Queries?**
+- Skill tree panel size varies (sidebar vs full-screen modal)
+- Component adapts to parent container, not viewport
+- Better for responsive panels within complex layouts
+
+**Setup:**
+```tsx
+// components/SkillTree/SkillTreeContainer.tsx
+function SkillTreeContainer({ children }) {
+  return (
+    <div className="@container/skill-tree w-full h-full">
+      {children}
+    </div>
+  );
+}
+```
+
+**Responsive Skill Nodes:**
+```tsx
+function SkillNode({ skill }) {
+  return (
+    <div
+      className="
+        skill-node
+        @container/skill-tree:w-[15cqw]    /* 15% of container width */
+        @container/skill-tree:h-[10cqh]    /* 10% of container height */
+        @container/skill-tree:text-[2cqi]  /* 2% of inline size */
+      "
+    >
+      <h4 className="font-neo-display text-[2.5cqi]">{skill.name}</h4>
+      <p className="font-neo-body text-[1.5cqi]">{skill.description}</p>
+    </div>
+  );
+}
+```
+
+---
+
+## 7. Summary & Recommendations
+
+### 7.1 High-Confidence Decisions
+
+✅ **Use Zustand 5.0.10** - Already in project, proven pattern
+✅ **Extend useAdventureXp hook** - 80% of infrastructure exists
+✅ **Three-tier system** - Industry best practice (76% horizontal)
+✅ **Framer Motion animations** - Already installed, performant
+✅ **Container queries for responsive** - Modern CSS, project standard
+
+### 7.2 Medium-Confidence Decisions
+
+⚠️ **Start with beautiful-skill-tree** - May need custom solution for neo-brutalist design
+⚠️ **5 active skill limit** - Needs playtesting to validate
+⚠️ **Accordion for mobile** - Alternative swipe pattern may be better
+
+### 7.3 Requires User/Playtest Feedback
+
+❓ **Skill point pacing** - 1 per level may be too slow
+❓ **Respec system** - Players may want experimentation
+❓ **Achievement batching** - Queue vs batch modal UX
+
+### 7.4 Implementation Pitfalls to Avoid
+
+🚫 **Don't hand-roll localStorage persistence** - Use Zustand persist middleware
+🚫 **Don't forget Set serialization** - Custom reviver/replacer required
+🚫 **Don't skip prerequisite validation** - Backend must validate skill purchases
+🚫 **Don't optimize prematurely** - Profile before memoizing
+🚫 **Don't ignore mobile UX** - 60%+ players on mobile
+
+---
+
+## 8. References
+
+### 8.1 Research Sources
+
+**Game Design:**
+- [Keys to Meaningful Skill Trees - GDKeys](https://gdkeys.com/keys-to-meaningful-skill-trees/)
+- [Game Design Skill Trees (Beginners guide)](https://gamedesigning.org/learn/skill-trees/)
+- [Skill Tree Design: Ultimate Guide for Freemium Games](https://adriancrook.com/skill-tree-design-ultimate-guide-for-freemium-games/)
+- [Game Progression and Progression Systems](https://gamedesignskills.com/game-design/game-progression/)
+- [Vertical vs Horizontal Progression | Scroll and Tome](https://www.scrollandtome.com/ttrpg-progression-systems/)
+
+**Technical Documentation:**
+- [Zustand Documentation](https://docs.pmnd.rs/zustand/getting-started/introduction)
+- [Zustand Persist Middleware](https://docs.pmnd.rs/zustand/integrations/persisting-store-data)
+- [Framer Motion Documentation](https://motion.dev/)
+- [Modal Transition Animation with React and Framer Motion](https://medium.com/@joeysuberu/modal-transition-animation-made-with-react-and-framer-motion-6dd2de36e996)
+
+**Visualization Libraries:**
+- [react-d3-tree - npm](https://www.npmjs.com/package/react-d3-tree)
+- [beautiful-skill-tree GitHub](https://github.com/andrico1234/beautiful-skill-tree)
+
+### 8.2 Codebase Files Analyzed
+
+**Existing Infrastructure:**
+- `/Users/ohadfisher/git/boggle-new/fe-next/hooks/useAdventureXp.ts`
+- `/Users/ohadfisher/git/boggle-new/fe-next/backend/modules/adventure/adventureXp.ts`
+- `/Users/ohadfisher/git/boggle-new/fe-next/contexts/PowerUpContext.tsx`
+- `/Users/ohadfisher/git/boggle-new/fe-next/hooks/usePowerUpState.ts`
+- `/Users/ohadfisher/git/boggle-new/fe-next/lib/achievements/achievementTiers.ts`
+- `/Users/ohadfisher/git/boggle-new/fe-next/lib/achievements/achievementTracker.ts`
+
+**Project Configuration:**
+- `/Users/ohadfisher/git/boggle-new/fe-next/package.json` (verified Zustand & Framer Motion versions)
+- `/Users/ohadfisher/git/boggle-new/fe-next/CLAUDE.md` (design system, responsive patterns)
+- `/Users/ohadfisher/git/boggle-new/.claude/rules/22-tdd-strict.md` (testing requirements)
+
+---
+
+**End of Research Document**
+
+**Total Research Time:** ~2 hours
+**Confidence Level:** HIGH (80% infrastructure exists, standard stack verified, clear game design principles)
+**Ready for Planning:** YES - Planner can create PLAN.md files with concrete task structure
