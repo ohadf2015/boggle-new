@@ -35,6 +35,7 @@ const customJestConfig = {
     '<rootDir>/types/**/*.test.{ts,tsx}',
     '<rootDir>/lib/**/*.test.{ts,tsx}',
     '<rootDir>/shared/**/*.test.{ts,tsx}',
+    '<rootDir>/stores/**/*.test.{ts,tsx}',
     '<rootDir>/__tests__/**/*.test.{ts,tsx}',
   ],
 
@@ -81,6 +82,7 @@ const customJestConfig = {
     'utils/**/*.{ts,tsx}',
     'lib/**/*.{ts,tsx}',
     'shared/**/*.{ts,tsx}',
+    'stores/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/*.test.{ts,tsx}',
