@@ -430,18 +430,19 @@ Plans:
 - [x] 31-08-PLAN.md — Skill effects utilities (TDD, Wave 3)
 - [x] 31-09-PLAN.md — Integration (Wave 4) + Gap closure (combo_amplifier wiring)
 
-#### Phase 32: Visual Polish & Effects
+#### ✅ Phase 32: Visual Polish & Effects — COMPLETE
 **Goal**: Every action feels spectacular with layered particle effects and celebrations
 **Depends on**: Phase 26 (particle budget), Phase 27 (board animations), Phase 30 (boss battles)
 **Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05, POLISH-06
 **Success Criteria** (what must be TRUE):
-  1. User sees confetti effects on level victory
-  2. User sees fireworks on boss defeat
-  3. User sees 10+ combo full-screen celebration effects
-  4. User sees layered particle effects (background, mid-ground, foreground)
-  5. Particle system enforces budget (max 50-100 on screen, adaptive reduction on low-end devices)
-  6. All effects respect reduced-motion accessibility preference
-**Plans**: 7 plans in 4 waves (COMPLETE)
+  1. ✓ User sees confetti effects on level victory
+  2. ✓ User sees fireworks on boss defeat
+  3. ✓ User sees 10+ combo full-screen celebration effects
+  4. ✓ User sees layered particle effects (background, mid-ground, foreground)
+  5. ✓ Particle system enforces budget (max 50-100 on screen, adaptive reduction on low-end devices)
+  6. ✓ All effects respect reduced-motion accessibility preference
+**Plans**: 7 plans in 4 waves
+**Completed**: 2026-02-01
 
 Plans:
 - [x] 32-01-PLAN.md — Layered particle system + Z-index constants (TDD, Wave 1)
@@ -452,20 +453,28 @@ Plans:
 - [x] 32-06-PLAN.md — Boss fireworks & cinematics integration + tests (Wave 3)
 - [x] 32-07-PLAN.md — Human verification checkpoint (Wave 4)
 
-#### Phase 33: Cinematic System
+#### ✅ Phase 33: Cinematic System — COMPLETE
 **Goal**: Key moments feel like movie scenes with professional cinematics
 **Depends on**: Phase 30 (boss battles), Phase 32 (visual polish)
 **Requirements**: CINE-01, CINE-02, CINE-03, CINE-04, CINE-05
 **Success Criteria** (what must be TRUE):
-  1. User sees boss entrance cutscene (5-10s, Remotion-based) before battle starts
-  2. User sees victory celebration sequence with particle effects and music
-  3. User sees defeat sequence providing encouragement
-  4. All cinematics are skippable after 2s (accessibility requirement)
-  5. Cinematics use Remotion + Lottie + Skia for effects
-**Plans**: TBD
+  1. ✓ User sees boss entrance cutscene (5-10s, Remotion-based) before battle starts
+  2. ✓ User sees victory celebration sequence with particle effects and music
+  3. ✓ User sees defeat sequence providing encouragement
+  4. ✓ All cinematics are skippable after 2s (accessibility requirement)
+  5. ✓ Cinematics use Remotion + Lottie + Skia for effects
+**Plans**: 0 plans - All requirements delivered in prior phases
+**Completed**: 2026-02-01
 
 Plans:
-- [ ] 33-01: TBD during plan-phase
+- [x] N/A — All CINE requirements delivered in Phase 30-07 (boss cinematics) and Phase 32-04/06 (victory/defeat cinematics)
+
+**Note:** Phase 33 requirements were incrementally delivered:
+- CINE-01: BossEntranceCinematic (Phase 30-07, 13 tests)
+- CINE-02: VictoryCinematic (Phase 32-04, 11 tests)
+- CINE-03: DefeatCinematic (Phase 32-04, 9 tests)
+- CINE-04: useCinematic hook with 2s skip (Phase 30-07, 52 tests)
+- CINE-05: Remotion compositions throughout (84+ tests)
 
 #### Phase 34: Dynamic Difficulty Tuning (AI Director)
 **Goal**: Game invisibly adapts to keep players in flow state without feeling artificial
@@ -477,10 +486,17 @@ Plans:
   3. Mid-game adjustments are invisible (gradual, not sudden rubber-banding)
   4. Analytics track difficulty effectiveness showing player engagement metrics
   5. System excludes boss fights from adaptive scaling (fixed difficulty for pattern learning)
-**Plans**: TBD
+**Plans**: 8 plans in 5 waves
 
 Plans:
-- [ ] 34-01: TBD during plan-phase
+- [ ] 34-01-PLAN.md — Types, constants, performance monitor (TDD, Wave 1)
+- [ ] 34-02-PLAN.md — Flow state detector with Csikszentmihalyi model (TDD, Wave 1)
+- [ ] 34-03-PLAN.md — Intensity controller for invisible pacing adjustments (TDD, Wave 2)
+- [ ] 34-04-PLAN.md — Zustand store + barrel exports (Wave 2)
+- [ ] 34-05-PLAN.md — Analytics logger for DDA events (Wave 2)
+- [ ] 34-06-PLAN.md — useAIDirector hook with Phase 29 integration (Wave 3)
+- [ ] 34-07-PLAN.md — AdventureGame integration (Wave 4)
+- [ ] 34-08-PLAN.md — Human verification checkpoint (Wave 5)
 
 #### Phase 35: World Expansion & Tech Debt Cleanup
 **Goal**: Complete v1.1 carryover work and deliver Worlds 4-5 theming
@@ -533,12 +549,12 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 29. Adaptive Difficulty System | v2.0 | 8/8 | ✅ Complete | 2026-01-31 |
 | 30. Boss Battle Overhaul | v2.0 | 8/8 | ✅ Complete | 2026-01-31 |
 | 31. Skill Tree & Progression Depth | v2.0 | 9/9 | ✅ Complete | 2026-02-01 |
-| 32. Visual Polish & Effects | v2.0 | 0/TBD | Not started | - |
-| 33. Cinematic System | v2.0 | 0/TBD | Not started | - |
-| 34. Dynamic Difficulty Tuning | v2.0 | 0/TBD | Not started | - |
+| 32. Visual Polish & Effects | v2.0 | 7/7 | ✅ Complete | 2026-02-01 |
+| 33. Cinematic System | v2.0 | 0/0 | ✅ Complete | 2026-02-01 |
+| 34. Dynamic Difficulty Tuning | v2.0 | 0/8 | Planned | - |
 | 35. World Expansion & Tech Debt | v2.0 | 0/TBD | Not started | - |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-01-31 after Phase 30 planning complete (Boss Battle Overhaul - 8 plans in 7 waves)*
+*Last updated: 2026-02-01 after Phase 34 planning complete (AI Director - 8 plans in 5 waves)*
