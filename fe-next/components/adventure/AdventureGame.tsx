@@ -29,6 +29,7 @@ import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
+import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { ScorePopup } from './juice/ScorePopup';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
@@ -43,6 +44,7 @@ import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import LexiReaction from './LexiReaction';
 import { BossOverlay } from './boss';
+import { ComboMilestoneOverlay } from './ComboMilestoneOverlay';
 import GameplayBackground from './themed/GameplayBackground';
 import { PowerUpBar } from './power-ups';
 import { HintMessage } from './HintMessage';
@@ -237,6 +239,9 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Power-up inventory for persistence
     const powerUpInventory = usePowerUpInventory();
+
+    // Combo milestone tracking (POLISH-03 requirement)
+    const { currentMilestone, checkMilestone } = useComboMilestone();
 
     // Reset cooldowns on level change (POWER-06 requirement)
     const previousLevelRef = useRef(levelConfig.level);
@@ -542,6 +547,13 @@ const AdventureGame = memo<AdventureGameProps>(
         bossLowTimeTriggedRef.current = false;
       }
     }, [isBossActive, isPlaying, timeRemaining, triggerBossTaunt]);
+
+    // Check combo milestone when combo count changes
+    useEffect(() => {
+      if (isPlaying && entryPhase === 'playing' && !isPaused) {
+        checkMilestone(gameState.comboCount);
+      }
+    }, [gameState.comboCount, isPlaying, entryPhase, isPaused, checkMilestone]);
 
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
@@ -1571,6 +1583,9 @@ const AdventureGame = memo<AdventureGameProps>(
           levelUpData={levelUpData}
           onClose={handleLevelUpClose}
         />
+
+        {/* Combo Milestone Overlay */}
+        <ComboMilestoneOverlay milestone={currentMilestone} />
       </div>
     );
   }
