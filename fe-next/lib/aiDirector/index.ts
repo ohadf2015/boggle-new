@@ -38,6 +38,20 @@ export {
   ADJUSTMENT_RATE,
 } from './constants';
 
+// Analytics logging
+export {
+  logDDAEvent,
+  createDDAEvent,
+  createDDAAnalyticsPayload,
+  aggregateDDAEffectiveness,
+} from './analyticsLogger';
+export type {
+  DDAAnalyticsEvent,
+  DDAAnalyticsPayload,
+  DDAEffectivenessMetrics,
+  AdjustmentTrigger,
+} from './analyticsLogger';
+
 // Types (re-export for convenience)
 export type {
   FlowState,

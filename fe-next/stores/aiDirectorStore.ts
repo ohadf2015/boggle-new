@@ -13,6 +13,7 @@
  */
 
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import type { FlowState, PerformanceWindow, IntensityAdjustment } from '@/types/aiDirector';
 import {
   createPerformanceMonitor,
@@ -249,9 +250,16 @@ export function useFlowState(): FlowState {
 
 /**
  * Get only the intensity adjustments
+ * Uses useShallow for stable reference when values are equal
  */
 export function useIntensityAdjustments(): IntensityAdjustment {
-  return useAIDirectorStore((state) => state.getAdjustments());
+  return useAIDirectorStore(
+    useShallow((state) =>
+      state.isBossBattle
+        ? DEFAULT_INTENSITY
+        : state.intensityAdjustments
+    )
+  );
 }
 
 /**
