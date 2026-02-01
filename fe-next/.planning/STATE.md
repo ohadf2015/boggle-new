@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 32 - Visual Polish & Effects
-Plan: 0 of 6 complete
-Status: PLANNED
-Last activity: 2026-02-01 - Phase 32 planning complete (6 plans in 4 waves)
+Plan: 1 of 6 complete
+Status: IN PROGRESS
+Last activity: 2026-02-01 - Completed 32-01-PLAN.md (Layered Particle System)
 
-Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete)
+Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 16% (1/6)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,12 @@ Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans co
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 32-01 (Layered Particle System, 2026-02-01):**
+- Z-index scale: 1000-based increments (1000/2000/3000/9000/9999) for clear layer separation
+- Budget split 20/60/20: Emphasizes midground layer as main celebration, background/foreground as depth accents
+- Timing delays: 100ms/200ms create perceived depth through staggered entry
+- Accessibility enforcement: prefersReducedMotion check at hook level prevents all particles when enabled
 
 **Phase 30-07 (Cinematic Sequences, 2026-01-31):**
 - Remotion Player for in-app playback: Full rendering not needed, just real-time playback
@@ -156,14 +162,20 @@ Resume file: None
 - Achievement unlock modal with confetti
 - Achievement grid with category filters
 
-## Phase 32 Progress — PLANNED
+## Phase 32 Progress — IN PROGRESS
 
-- [ ] 32-01: Layered particle system + Z-index constants (TDD, Wave 1)
+- [x] 32-01: Layered particle system + Z-index constants (TDD, Wave 1) ✓
 - [ ] 32-02: Boss defeat fireworks + combo milestone hook (TDD, Wave 1)
 - [ ] 32-03: Combo milestone overlay + translations (Wave 1)
 - [ ] 32-04: Victory/Defeat Remotion cinematics (Wave 2)
 - [ ] 32-05: AdventureGame integration + wiring (Wave 3)
 - [ ] 32-06: Human verification (Wave 4)
+
+**Phase 32-01 Delivered (2026-02-01):**
+- Z_INDEX constants for layered particles (1000-9999 scale)
+- fireLayeredCelebration with 20/60/20 budget split and 100ms/200ms delays
+- useLayeredCelebration hook with budget and reduced motion awareness
+- 19 comprehensive tests (9 confettiUtils + 10 hook tests)
 
 **Phase 32 Planning Summary:**
 - 6 plans across 4 waves
@@ -191,6 +203,14 @@ Transform Adventure Mode with:
 - rembg (Python) for background removal
 - Image MCP + FLUX.1 for boss graphics
 
+## Session Continuity
+
+Last session: 2026-02-01T08:03:50Z
+Stopped at: Completed 32-01-PLAN.md (Layered Particle System)
+Resume file: None
+
+**Next action:** Execute Phase 32-02 (Boss Defeat Fireworks)
+
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-01-31 (Phase 30 in progress: 7/8 plans complete - Cinematics ready)*
+*Last updated: 2026-02-01 (Phase 32 in progress: 1/6 plans complete - Layered Particles ready)*
