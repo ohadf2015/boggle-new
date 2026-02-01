@@ -466,7 +466,10 @@ const he = {
     "tournamentStarted": "הטורניר כבר התחיל",
     "tournamentInvalidState": "לא ניתן לעשות את זה עכשיו",
     "internal": "תקלה בשרת! אנחנו על זה",
-    "serviceUnavailable": "השירות לא זמין זמנית"
+    "serviceUnavailable": "השירות לא זמין זמנית",
+    "networkError": "שגיאת רשת. ההתקדמות שלך נשמרה מקומית.",
+    "leaderboardFailed": "לא הצלחנו לטעון את לוח התוצאות. נסה לרענן!",
+    "resultSubmissionFailed": "לא הצלחנו לשמור את התוצאה. ההתקדמות שלך נשמרה מקומית."
   },
   "notFound": {
     "heading": "אבדת במבוך המילים?",

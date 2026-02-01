@@ -10,6 +10,7 @@ import {
   type WordHuntResult,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
+import { neoErrorToast } from '@/components/NeoToast';
 import type { Language } from '@/types';
 
 interface UseResultSubmissionProps {
@@ -32,6 +33,8 @@ interface UseResultSubmissionProps {
   guestPlayer: GuestDailyPlayer | null;
   countryCodeReady: boolean;
   onSubmitSuccess: () => void;
+  /** Translation function for error messages */
+  t?: (key: string, fallback?: string) => string;
 }
 
 export function useResultSubmission({
@@ -46,6 +49,7 @@ export function useResultSubmission({
   guestPlayer,
   countryCodeReady,
   onSubmitSuccess,
+  t,
 }: UseResultSubmissionProps) {
   const hasSubmittedRef = useRef(false);
 
@@ -69,18 +73,20 @@ export function useResultSubmission({
         : !!guestFingerprint  // Guest: need fingerprint
       );
 
-    // Debug logging for submission conditions
-    console.log('[WordHunt Submit Check]', {
-      isNewCompletion,
-      needsRetrySubmission,
-      hasResult: !!result,
-      guestFingerprint: guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null',
-      countryCodeReady,
-      isAuthenticated,
-      hasProfile: !!profile,
-      canSubmit,
-      alreadySubmitted: hasSubmittedRef.current,
-    });
+    // Debug logging for submission conditions (dev-only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[WordHunt Submit Check]', {
+        isNewCompletion,
+        needsRetrySubmission,
+        hasResult: !!result,
+        guestFingerprint: guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null',
+        countryCodeReady,
+        isAuthenticated,
+        hasProfile: !!profile,
+        canSubmit,
+        alreadySubmitted: hasSubmittedRef.current,
+      });
+    }
 
     // Prevent double submission
     if (canSubmit && !hasSubmittedRef.current) {
@@ -154,18 +160,20 @@ export function useResultSubmission({
             })),
           };
 
-          // Debug logging for submission
-          console.log('[WordHunt Submit] Preparing submission:', {
-            isAuthenticated,
-            hasProfile: !!profile,
-            playerId: bodyData.playerId,
-            guestFingerprint: bodyData.guestFingerprint,
-            displayName: bodyData.displayName,
-            avatarEmoji: bodyData.avatarEmoji,
-            countryCode: bodyData.countryCode,
-            solved: bodyData.solved,
-            attemptsUsed: bodyData.attemptsUsed,
-          });
+          // Debug logging for submission (dev-only)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[WordHunt Submit] Preparing submission:', {
+              isAuthenticated,
+              hasProfile: !!profile,
+              playerId: bodyData.playerId,
+              guestFingerprint: bodyData.guestFingerprint,
+              displayName: bodyData.displayName,
+              avatarEmoji: bodyData.avatarEmoji,
+              countryCode: bodyData.countryCode,
+              solved: bodyData.solved,
+              attemptsUsed: bodyData.attemptsUsed,
+            });
+          }
 
           // Add survival mode fields if present
           if (result.wordsDiscovered) bodyData.wordsDiscovered = result.wordsDiscovered;
@@ -189,20 +197,29 @@ export function useResultSubmission({
             // Invalid words are expected user behavior, not system errors - don't log as error
             const isInvalidWordsError = response.status === 400 && errorText.includes('Invalid words');
             if (isInvalidWordsError) {
-              console.log('[WordHunt Submit] Submission rejected - contains invalid words:', errorText);
+              if (process.env.NODE_ENV === 'development') {
+                console.log('[WordHunt Submit] Submission rejected - contains invalid words:', errorText);
+              }
             } else {
+              // BUG-004: Show user-facing toast for submission failures
+              const errorMessage = t?.('errors.resultSubmissionFailed', 'Failed to save your result. Your progress is saved locally.');
+              if (errorMessage) {
+                neoErrorToast(errorMessage, { icon: '⚠️', duration: 4000 });
+              }
               console.error('Failed to submit Word Hunt result:', errorText);
             }
             return;
           }
 
           const responseData = await response.json();
-          console.log('[WordHunt Submit] Response:', {
-            success: responseData.success,
-            alreadySubmitted: responseData.alreadySubmitted,
-            dataId: responseData.data?.id,
-            playerType: bodyData.playerId ? 'authenticated' : 'guest',
-          });
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[WordHunt Submit] Response:', {
+              success: responseData.success,
+              alreadySubmitted: responseData.alreadySubmitted,
+              dataId: responseData.data?.id,
+              playerType: bodyData.playerId ? 'authenticated' : 'guest',
+            });
+          }
 
           // Mark the result as successfully submitted
           markWordHuntResultSubmitted(language);
@@ -210,6 +227,11 @@ export function useResultSubmission({
           // Notify parent of successful submission
           onSubmitSuccess();
         } catch (err) {
+          // BUG-004: Show user-facing toast for network errors
+          const errorMessage = t?.('errors.networkError', 'Network error. Your progress is saved locally.');
+          if (errorMessage) {
+            neoErrorToast(errorMessage, { icon: '📡', duration: 4000 });
+          }
           console.error('Failed to submit Word Hunt result:', err);
         }
       };

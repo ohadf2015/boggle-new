@@ -151,7 +151,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [puzzleDate, language, isAuthenticated, profile, guestFingerprint]);
 
-  // Use result submission hook
+  // Use result submission hook (BUG-004: pass t for error toast translations)
   useResultSubmission({
     result,
     puzzleNumber,
@@ -167,6 +167,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       setLeaderboardKey(prev => prev + 1);
       fetchStats();
     },
+    t,
   });
 
   // ============================================================================
@@ -403,8 +404,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Main Content - uses isolate-scroll on mobile for fixed tab bar compatibility */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll px-3 pb-[--mobile-bottom-safe] md:pb-6">
+      {/* Main Content - uses isolate-scroll-daily on mobile for fixed tab bar compatibility */}
+      {/* Note: isolate-scroll-daily only subtracts AutoHideHeader (60px), not GlobalBottomNav (64px) */}
+      {/* because daily pages hide GlobalBottomNav and have their own MobileTabBar with pb-[--mobile-bottom-safe] */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll-daily px-3 pb-[--mobile-bottom-safe] md:pb-6">
         {/* Mobile: Tab-based content */}
         <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && renderResultsContent()}

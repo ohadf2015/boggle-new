@@ -466,7 +466,10 @@ const ja = {
     "tournamentStarted": "トーナメントはすでに開始",
     "tournamentInvalidState": "今はできないよ",
     "internal": "サーバーエラー！対応中だよ",
-    "serviceUnavailable": "サービスは一時的に利用不可"
+    "serviceUnavailable": "サービスは一時的に利用不可",
+    "networkError": "ネットワークエラー。進捗はローカルに保存されました。",
+    "leaderboardFailed": "リーダーボードを読み込めませんでした。更新してね！",
+    "resultSubmissionFailed": "結果を保存できませんでした。進捗はローカルに保存されました。"
   },
   "notFound": {
     "heading": "言葉の迷路で迷子？",

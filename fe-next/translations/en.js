@@ -466,7 +466,10 @@ const en = {
     "tournamentStarted": "Tournament already started",
     "tournamentInvalidState": "Can't do that right now",
     "internal": "Server hiccup! We're on it",
-    "serviceUnavailable": "Service temporarily unavailable"
+    "serviceUnavailable": "Service temporarily unavailable",
+    "networkError": "Network error. Your progress is saved locally.",
+    "leaderboardFailed": "Couldn't load leaderboard. Try refreshing!",
+    "resultSubmissionFailed": "Failed to save your result. Your progress is saved locally."
   },
   "notFound": {
     "heading": "Lost in the Word Maze?",

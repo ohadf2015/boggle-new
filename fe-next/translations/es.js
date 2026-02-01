@@ -29,6 +29,12 @@ const es = {
       "ogTitle": "Perfil del Jugador y Estadísticas - LexiClash",
       "ogDescription": "Rastrea tus logros y estadísticas de juegos de palabras."
     },
+    "studentProfile": {
+      "title": "Perfil de Estudiante y Progreso | LexiClash Educación",
+      "description": "Ve tu perfil de estudiante de LexiClash, progreso de XP, lecciones completadas y logros educativos. Rastrea tu viaje de aprendizaje y dominio del vocabulario.",
+      "ogTitle": "Perfil de Estudiante - LexiClash Educación",
+      "ogDescription": "Rastrea tu progreso de aprendizaje, logros y dominio del vocabulario en LexiClash Educación."
+    },
     "terms": {
       "title": "Términos de Servicio | LexiClash",
       "description": "Lee los Términos de Servicio de LexiClash.",
@@ -410,7 +416,10 @@ const es = {
     "tournamentStarted": "El torneo ya empezó",
     "tournamentInvalidState": "No puedes hacer eso ahora",
     "internal": "¡Error del servidor! Estamos en eso",
-    "serviceUnavailable": "Servicio temporalmente no disponible"
+    "serviceUnavailable": "Servicio temporalmente no disponible",
+    "networkError": "Error de red. Tu progreso se guardó localmente.",
+    "leaderboardFailed": "No se pudo cargar la clasificación. ¡Intenta actualizar!",
+    "resultSubmissionFailed": "No se pudo guardar tu resultado. Tu progreso se guardó localmente."
   },
   "notFound": {
     "heading": "¿Perdido en el laberinto de palabras?",
