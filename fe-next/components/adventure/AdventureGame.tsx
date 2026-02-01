@@ -30,6 +30,7 @@ import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
+import { useAIDirector } from '@/hooks/useAIDirector';
 import { BossDefeatFireworks, type BossTier } from '@/components/celebration/BossDefeatFireworks';
 import { ScorePopup } from './juice/ScorePopup';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
@@ -246,6 +247,33 @@ const AdventureGame = memo<AdventureGameProps>(
     // Combo milestone tracking (POLISH-03 requirement)
     const { currentMilestone, checkMilestone } = useComboMilestone();
 
+    // AI Director for dynamic difficulty tuning (DDA-01 through DDA-05)
+    // Tracks player performance and provides invisible pacing adjustments
+    // Generate stable session ID for uniqueness (fallback for Jest environment)
+    const [aiDirectorSessionId] = useState(() => {
+      const randomPart = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID().slice(0, 8)
+        : Math.random().toString(36).slice(2, 10);
+      return `session-${levelConfig.world}-${levelConfig.level}-${randomPart}`;
+    });
+    const {
+      intensityAdjustments,
+      flowState,
+      startSession: startAIDirector,
+      endSession: endAIDirector,
+      recordWord: recordAIWord,
+      handleTransition: handleAITransition,
+      isBossBattle: isAIBossBattle,
+    } = useAIDirector({
+      world: levelConfig.world,
+      level: levelConfig.level,
+      sessionId: aiDirectorSessionId,
+      enableAnalytics: true,
+    });
+
+    // Track previous combo count for detecting combo breaks
+    const prevComboCountRef = useRef(0);
+
     // Reset cooldowns on level change (POWER-06 requirement)
     const previousLevelRef = useRef(levelConfig.level);
     useEffect(() => {
@@ -421,7 +449,16 @@ const AdventureGame = memo<AdventureGameProps>(
       gridRef,
     });
 
-    // Hint system hook
+    // Hint system hook with AI Director pacing adjustments (DDA-02)
+    // Apply hintEscalationRate to make hints appear faster when player is frustrated
+    // or slower when player is bored (to maintain challenge)
+    const adjustedInactivityThresholdMs = useMemo(() => {
+      const baseThreshold = 15000; // 15 seconds base
+      // Higher escalation rate = faster hints (lower threshold)
+      // hintEscalationRate: 0.5x (slower) to 2.0x (faster)
+      return Math.floor(baseThreshold / intensityAdjustments.hintEscalationRate);
+    }, [intensityAdjustments.hintEscalationRate]);
+
     const {
       hasHintsAvailable,
       getHint,
@@ -435,7 +472,7 @@ const AdventureGame = memo<AdventureGameProps>(
       language: language || 'en',
       foundWords: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
-      inactivityThresholdMs: 15000, // 15 seconds
+      inactivityThresholdMs: adjustedInactivityThresholdMs,
     });
 
     // Boss mechanics hook (active only on boss levels)
@@ -567,6 +604,12 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, checkMilestone]);
 
+    // Track combo count for detecting combo breaks (DDA-03)
+    // Updates AFTER handleWordSubmit reads prevComboCountRef
+    useEffect(() => {
+      prevComboCountRef.current = gameState.comboCount;
+    }, [gameState.comboCount]);
+
     // Trigger fireworks when boss is defeated (phase transitions to 'victory')
     const prevBossPhaseRef = useRef(bossHealthState.phase);
     useEffect(() => {
@@ -632,9 +675,11 @@ const AdventureGame = memo<AdventureGameProps>(
         setEntryPhase('playing');
         if (!isPlaying) {
           startGame();
+          // Start AI Director session when gameplay begins (DDA-01)
+          startAIDirector();
         }
       }
-    }, [isPlaying, startGame, showBossIntro, bossConfig]);
+    }, [isPlaying, startGame, showBossIntro, bossConfig, startAIDirector]);
 
     // Handle boss intro start (player ready to fight)
     const handleBossIntroStart = useCallback(() => {
@@ -642,10 +687,12 @@ const AdventureGame = memo<AdventureGameProps>(
       startBossBattle(); // Transition from intro → active phase
       if (!isPlaying) {
         startGame();
+        // Start AI Director session for boss battles (DDA-05 - gets neutral adjustments)
+        startAIDirector();
       }
       // Trigger start taunt after intro dismissal
       triggerBossTaunt('onStart');
-    }, [isPlaying, startGame, triggerBossTaunt, startBossBattle]);
+    }, [isPlaying, startGame, triggerBossTaunt, startBossBattle, startAIDirector]);
 
     // Handle boss intro skip
     const handleBossIntroSkip = useCallback(() => {
@@ -653,8 +700,10 @@ const AdventureGame = memo<AdventureGameProps>(
       startBossBattle(); // Transition from intro → active phase
       if (!isPlaying) {
         startGame();
+        // Start AI Director session for boss battles (DDA-05 - gets neutral adjustments)
+        startAIDirector();
       }
-    }, [isPlaying, startGame, startBossBattle]);
+    }, [isPlaying, startGame, startBossBattle, startAIDirector]);
 
     // Task 3: Award XP and gold on level complete
     useEffect(() => {
@@ -776,6 +825,9 @@ const AdventureGame = memo<AdventureGameProps>(
           score: gameState.score,
           words: gameState.wordsFound.length,
         });
+
+        // End AI Director session on level complete/fail (DDA-01)
+        endAIDirector();
       }
     }, [
       showLevelComplete, // Guard dependency - must be first to prevent infinite loops
@@ -799,6 +851,7 @@ const AdventureGame = memo<AdventureGameProps>(
       triggerBossTaunt,
       adjustedLevelConfig.timerSeconds,
       earnAchievement,
+      endAIDirector,
     ]);
 
     // Helper to calculate popup start position from last selected tile
@@ -1024,6 +1077,9 @@ const AdventureGame = memo<AdventureGameProps>(
           clearCurrentHint();
           recordActivity();
 
+          // Record valid word for AI Director performance tracking (DDA-01)
+          recordAIWord(true, gameState.comboCount);
+
           // Track achievements (ACHIEVE-01 requirement)
           // First word achievement
           if (gameState.wordsFound.length === 0) {
@@ -1054,6 +1110,15 @@ const AdventureGame = memo<AdventureGameProps>(
           setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
           clearSelection();
 
+          // Record invalid word for AI Director performance tracking (DDA-01)
+          recordAIWord(false, 0);
+
+          // Detect combo break and trigger AI Director transition (DDA-03)
+          // Combo breaks when player had an active combo and submitted invalid word
+          if (prevComboCountRef.current > 0) {
+            handleAITransition();
+          }
+
           // Trigger boss bad word taunt on boss levels
           if (isBossActive) {
             triggerBossTaunt('onBadWord');
@@ -1065,7 +1130,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier, skillEffects, earnAchievement]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
     );
 
     // Handle level-up modal dismiss
@@ -1106,7 +1171,9 @@ const AdventureGame = memo<AdventureGameProps>(
       // We extract just the added seconds (10s for Freeze Time)
       const FREEZE_TIME_SECONDS = 10;
       addTime(FREEZE_TIME_SECONDS);
-    }, [addTime]);
+      // Trigger AI Director transition at power-up activation (DDA-03)
+      handleAITransition();
+    }, [addTime, handleAITransition]);
 
     const handleHint = useCallback((hint: HintResult) => {
       setHintWord(hint.word);
@@ -1118,7 +1185,9 @@ const AdventureGame = memo<AdventureGameProps>(
         setHintTiles(undefined);
         setHintExpiresAt(undefined);
       }, 5000);
-    }, []);
+      // Trigger AI Director transition at power-up activation (DDA-03)
+      handleAITransition();
+    }, [handleAITransition]);
 
     const handleScoreMultiplier = useCallback((expiresAt: number) => {
       setScoreMultiplier(2);
@@ -1128,7 +1197,9 @@ const AdventureGame = memo<AdventureGameProps>(
         setScoreMultiplier(1);
         setMultiplierExpiresAt(undefined);
       }, 30000);
-    }, []);
+      // Trigger AI Director transition at power-up activation (DDA-03)
+      handleAITransition();
+    }, [handleAITransition]);
 
     // Handle hint button click
     const handleHintClick = useCallback(() => {
