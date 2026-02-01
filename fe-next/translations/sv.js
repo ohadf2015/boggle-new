@@ -4047,6 +4047,11 @@ const sv = {
         "zone1": "Palmstranden",
         "zone2": "Korallreven",
         "bossZone": "Tikitemplet"
+      },
+      "canyon": {
+        "zone1": "Dammiga stigar",
+        "zone2": "Roda klippmesaen",
+        "bossZone": "Askravinen"
       }
     },
     "themes": {

@@ -4047,6 +4047,11 @@ const ja = {
         "zone1": "ヤシの浜",
         "zone2": "サンゴ礁",
         "bossZone": "ティキ神殿"
+      },
+      "canyon": {
+        "zone1": "砂埃の道",
+        "zone2": "赤岩台地",
+        "bossZone": "雷鳴の峡谷"
       }
     },
     "themes": {

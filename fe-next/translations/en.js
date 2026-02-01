@@ -4005,6 +4005,11 @@ const en = {
         "zone1": "Palm Shores",
         "zone2": "Coral Reefs",
         "bossZone": "Tiki Temple"
+      },
+      "canyon": {
+        "zone1": "Dusty Trails",
+        "zone2": "Red Rock Mesa",
+        "bossZone": "Thunder Gorge"
       }
     },
     "themes": {
