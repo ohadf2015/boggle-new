@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 34 - Dynamic Difficulty Tuning (AI Director)
-Plan: 05 of 5 complete (All Wave 2 plans complete)
+Plan: 06 of 6 complete (All Wave 3 plans complete)
 Status: COMPLETE
-Last activity: 2026-02-01 - Completed 34-04-PLAN.md (AI Director Store)
+Last activity: 2026-02-01 - Completed 34-06-PLAN.md (useAIDirector Hook)
 
-Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% (5/5 plans complete)
+Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% (6/6 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,11 @@ Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% 
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 34-06 (useAIDirector Hook, 2026-02-01):**
+- checkIsWarmedUp function instead of boolean: ESLint purity rule prevents Date.now() during render
+- useShallow for intensity adjustments selector: Prevents infinite re-renders with object returns
+- Hook composition pattern: Combines multiple store selectors with Phase 29 hook
 
 **Phase 34-03 (Intensity Controller, 2026-02-01):**
 - 10% adjustment rate: ADJUSTMENT_RATE = 0.1 ensures changes are imperceptible to players
@@ -289,13 +294,14 @@ Transform Adventure Mode with:
 - rembg (Python) for background removal
 - Image MCP + FLUX.1 for boss graphics
 
-## Phase 34 Progress — IN PROGRESS
+## Phase 34 Progress — COMPLETE ✓
 
 - [x] 34-01: Types, Constants, Performance Monitor (TDD, Wave 1) - COMPLETE
 - [x] 34-02: Flow State Detector (TDD, Wave 1) - COMPLETE
 - [x] 34-03: Intensity Adjustments (TDD, Wave 2) - COMPLETE
 - [x] 34-04: AI Director Store + Hook (Wave 2) - COMPLETE
 - [x] 34-05: Analytics Logger (TDD, Wave 2) - COMPLETE
+- [x] 34-06: useAIDirector Hook (Wave 3) - COMPLETE
 
 **Phase 34-01 Delivered (2026-02-01):**
 - AI Director types: FlowState, PerformanceWindow, IntensityAdjustment, FlowThresholds
@@ -339,14 +345,31 @@ Transform Adventure Mode with:
 - Flow score formula: flow=1, learning=0.5, frustrated/bored=0
 - 15 comprehensive tests
 
+**Phase 34-06 Delivered (2026-02-01):**
+- useAIDirector hook with unified AI Director interface
+- Phase 29 integration via useAdaptiveDifficulty for pre-game tier
+- Analytics logging at session boundaries and transitions
+- Boss battle exclusion (DDA-05) compliance
+- useShallow for stable object selector references
+- checkIsWarmedUp function for purity compliance
+- 20 comprehensive tests
+
+**Phase 34 Complete Summary:**
+- 6 plans across 3 waves (all COMPLETE)
+- All DDA-01 through DDA-05 requirements delivered
+- 122 total AI Director tests passing
+- Key components: performanceMonitor, flowStateDetector, intensityController, aiDirectorStore, analyticsLogger, useAIDirector
+- Csikszentmihalyi flow model adapted for word games
+- 10% gradual adjustments prevent rubber-banding perception
+
 ## Session Continuity
 
-Last session: 2026-02-01T10:45:22Z
-Stopped at: Completed 34-05-PLAN.md (Analytics Logger)
+Last session: 2026-02-01T10:57:30Z
+Stopped at: Completed 34-06-PLAN.md (useAIDirector Hook)
 Resume file: None
 
-**Next action:** Phase 34 COMPLETE - All 5 plans delivered, ready for Phase 35
+**Next action:** Phase 34 COMPLETE - All 6 plans delivered, ready for Phase 35
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 34: 5/5 plans complete - Phase COMPLETE)*
+*Last updated: 2026-02-01 (Phase 34: 6/6 plans complete - Phase COMPLETE)*
