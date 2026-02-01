@@ -51,15 +51,14 @@ interface RenderResult {
 }
 
 // Remotion package types (declared for dynamic import)
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type BundleFunction = (options: { entryPoint: string; onProgress?: undefined }) => Promise<string>;
 type SelectCompositionFunction = (options: {
   serveUrl: string;
   id: string;
   inputProps: Record<string, unknown>;
-}) => Promise<any>;
+}) => Promise<unknown>;
 type RenderMediaFunction = (options: {
-  composition: any;
+  composition: unknown;
   serveUrl: string;
   codec: string;
   outputLocation: string;
@@ -70,7 +69,6 @@ type RenderMediaFunction = (options: {
   videoBitrate: string;
   onProgress: (progress: { progress: number }) => void;
 }) => Promise<void>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // ==============================================
 // CONSTANTS
@@ -258,13 +256,12 @@ async function renderComposition(config: CompositionConfig): Promise<RenderResul
 
   try {
     // Dynamic import to handle case where packages aren't installed
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const bundlerModule = await (Function('return import("@remotion/bundler")')() as Promise<{ bundle: BundleFunction }>);
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const rendererModule = await (Function('return import("@remotion/renderer")')() as Promise<{
+    // Note: These packages are optional - the script checks for them before calling renderComposition
+    const bundlerModule = await import('@remotion/bundler') as { bundle: BundleFunction };
+    const rendererModule = await import('@remotion/renderer') as {
       renderMedia: RenderMediaFunction;
       selectComposition: SelectCompositionFunction;
-    }>);
+    };
     const { bundle } = bundlerModule;
     const { renderMedia, selectComposition } = rendererModule;
 
