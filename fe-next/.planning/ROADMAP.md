@@ -441,10 +441,15 @@ Plans:
   4. User sees layered particle effects (background, mid-ground, foreground)
   5. Particle system enforces budget (max 50-100 on screen, adaptive reduction on low-end devices)
   6. All effects respect reduced-motion accessibility preference
-**Plans**: TBD
+**Plans**: 6 plans in 4 waves
 
 Plans:
-- [ ] 32-01: TBD during plan-phase
+- [ ] 32-01-PLAN.md — Layered particle system + Z-index constants (TDD, Wave 1)
+- [ ] 32-02-PLAN.md — Boss defeat fireworks + combo milestone hook (TDD, Wave 1)
+- [ ] 32-03-PLAN.md — Combo milestone overlay + translations (Wave 1)
+- [ ] 32-04-PLAN.md — Victory/Defeat Remotion cinematics (Wave 2)
+- [ ] 32-05-PLAN.md — AdventureGame integration + wiring (Wave 3)
+- [ ] 32-06-PLAN.md — Human verification (Wave 4)
 
 #### Phase 33: Cinematic System
 **Goal**: Key moments feel like movie scenes with professional cinematics

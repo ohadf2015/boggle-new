@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 31 - Skill Tree & Progression Depth
-Plan: 9 of 9 complete
-Status: COMPLETE ✓
-Last activity: 2026-02-01 - Completed Phase 31 (Skill Tree & Progression Depth)
+Phase: 32 - Visual Polish & Effects
+Plan: 0 of 6 complete
+Status: PLANNED
+Last activity: 2026-02-01 - Phase 32 planning complete (6 plans in 4 waves)
 
 Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete)
 
@@ -132,8 +132,8 @@ Last session: 2026-01-31T20:00:00Z
 Stopped at: Completed Phase 30 - Boss Battle Overhaul
 Resume file: None
 
-**Next action:** Plan Phase 32 (Visual Polish & Effects)
-**Note:** All v2.0 progression systems now complete (Phases 26-31)
+**Next action:** Execute Phase 32 (Visual Polish & Effects)
+**Note:** Phase 32 planned with 6 plans in 4 waves. Run `/gsd:execute-phase 32` to begin.
 
 ## Phase 31 Progress — COMPLETE ✓
 
@@ -155,6 +155,21 @@ Resume file: None
 - 17 achievements with Bronze/Silver/Gold/Platinum tiers
 - Achievement unlock modal with confetti
 - Achievement grid with category filters
+
+## Phase 32 Progress — PLANNED
+
+- [ ] 32-01: Layered particle system + Z-index constants (TDD, Wave 1)
+- [ ] 32-02: Boss defeat fireworks + combo milestone hook (TDD, Wave 1)
+- [ ] 32-03: Combo milestone overlay + translations (Wave 1)
+- [ ] 32-04: Victory/Defeat Remotion cinematics (Wave 2)
+- [ ] 32-05: AdventureGame integration + wiring (Wave 3)
+- [ ] 32-06: Human verification (Wave 4)
+
+**Phase 32 Planning Summary:**
+- 6 plans across 4 waves
+- 85% existing infrastructure reused (confettiUtils, useParticleBudget, NewYearFireworks, CinematicPlayer)
+- Key new components: useLayeredCelebration, useComboMilestone, BossDefeatFireworks, ComboMilestoneOverlay, VictoryCinematic, DefeatCinematic
+- All effects respect particle budgets (30/60/100) and reduced-motion preference
 
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
