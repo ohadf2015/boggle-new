@@ -13,6 +13,7 @@ import { WORLD_1_THEME } from './world1';
 import { WORLD_2_THEME } from './world2';
 import { WORLD_3_THEME } from './world3';
 import { WORLD_4_THEME } from './world4';
+import { WORLD_5_THEME } from './world5';
 
 // ==============================================
 // THEME REGISTRY
@@ -27,9 +28,9 @@ const WORLD_THEMES: Record<number, WorldTheme> = {
   2: WORLD_2_THEME,
   3: WORLD_3_THEME,
   4: WORLD_4_THEME,
-  // Worlds 5-10: Temporary placeholders using World 1 as base
-  // TODO: Implement full themes for worlds 5-10
-  5: createPlaceholderTheme(5, 'compoundCanyon', 'desert-cliffs', 'compounds', 'neo-red'),
+  5: WORLD_5_THEME,
+  // Worlds 6-10: Temporary placeholders using World 1 as base
+  // TODO: Implement full themes for worlds 6-10
   6: createPlaceholderTheme(6, 'anagramLabyrinth', 'escher-maze', 'anagrams', 'neo-pink'),
   7: createPlaceholderTheme(7, 'mirrorPalace', 'reflective-glass', 'palindromes', 'neo-cyan'),
   8: createPlaceholderTheme(8, 'neologismNebula', 'space-stars', 'rareWords', 'neo-purple'),
@@ -200,8 +201,8 @@ export function getAllWorldThemes(): WorldTheme[] {
  * @returns true if the theme is fully implemented
  */
 export function isThemeImplemented(worldId: number): boolean {
-  // Worlds 1-4 are fully implemented
-  return worldId >= 1 && worldId <= 4;
+  // Worlds 1-5 are fully implemented
+  return worldId >= 1 && worldId <= 5;
 }
 
 // ==============================================
@@ -228,3 +229,4 @@ export { WORLD_1_THEME } from './world1';
 export { WORLD_2_THEME } from './world2';
 export { WORLD_3_THEME } from './world3';
 export { WORLD_4_THEME } from './world4';
+export { WORLD_5_THEME } from './world5';
