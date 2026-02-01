@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // ==============================================
 // TYPES
@@ -54,10 +55,10 @@ const WORLD_THEMES: Record<number, { textColor: string; glowColor: string; gradi
 
 const DEFAULT_THEME = WORLD_THEMES[1];
 
-// Animation duration in ms
-const BURST_DURATION = 400;
-const HOLD_DURATION = 600;
-const FADE_DURATION = 300;
+// DEBT-01: Animation duration in ms (optimized for faster entry)
+const BURST_DURATION = OPTIMIZED_TIMING.title.burstMs;
+const HOLD_DURATION = OPTIMIZED_TIMING.title.holdMs;
+const FADE_DURATION = OPTIMIZED_TIMING.title.fadeMs;
 const TOTAL_DURATION = BURST_DURATION + HOLD_DURATION + FADE_DURATION;
 
 // ==============================================

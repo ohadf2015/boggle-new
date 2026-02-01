@@ -1,10 +1,13 @@
 /**
  * LevelEntryOverlay - Level Title Burst Animation Tests
+ *
+ * DEBT-01: Tests updated to use optimized timing constants
  */
 
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import LevelEntryOverlay from '../LevelEntryOverlay';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -74,9 +77,10 @@ describe('LevelEntryOverlay', () => {
 
     expect(onComplete).not.toHaveBeenCalled();
 
-    // Total duration: 400 (burst) + 600 (hold) + 300 (fade) = 1300ms
+    // DEBT-01: Total duration: 350 (burst) + 400 (hold) + 250 (fade) = 1000ms (was 1300ms)
+    const titleDuration = OPTIMIZED_TIMING.getTitleDuration();
     act(() => {
-      jest.advanceTimersByTime(1400);
+      jest.advanceTimersByTime(titleDuration + 10);
     });
 
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -213,7 +217,10 @@ describe('LevelEntryOverlay - Timing', () => {
       />
     );
 
-    // Animation should complete well under 2 seconds (actually ~1.3s)
+    // DEBT-01: Animation should complete at ~1s (optimized from ~1.3s)
+    const titleDuration = OPTIMIZED_TIMING.getTitleDuration();
+    expect(titleDuration).toBeLessThanOrEqual(1100); // 1s with buffer
+
     act(() => {
       jest.advanceTimersByTime(2000);
     });

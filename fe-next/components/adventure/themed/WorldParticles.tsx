@@ -331,9 +331,10 @@ const WorldParticles = memo<WorldParticlesProps>(({ particles, className }) => {
               '--drift-y': `${(particle.id % 5 - 2) * 30}px`,
               animationDelay: `${particle.delay}s`,
             } as React.CSSProperties}
+            // DEBT-01: Faster particle fade-in for quicker entry feel
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: particle.delay }}
+            transition={{ duration: 0.5, delay: particle.delay * 0.5 }}
           >
             {renderParticleShape(particles.type, particle, particle.color, particle.size)}
           </motion.div>

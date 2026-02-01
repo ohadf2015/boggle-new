@@ -1,11 +1,14 @@
 /**
  * AdventureObjectives - Slide-in Animation Tests
+ *
+ * DEBT-01: Tests updated to use optimized timing constants
  */
 
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import AdventureObjectives from '../AdventureObjectives';
 import type { LevelObjective } from '@/types/adventure';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -73,9 +76,10 @@ describe('AdventureObjectives - Slide-in Animation', () => {
 
     expect(onSlideInComplete).not.toHaveBeenCalled();
 
-    // 2 objectives * 100ms stagger + 300ms duration = 500ms
+    // DEBT-01: 2 objectives * 80ms stagger + 250ms duration = 410ms
+    const objectivesDuration = OPTIMIZED_TIMING.getObjectivesDuration(mockObjectives.length);
     act(() => {
-      jest.advanceTimersByTime(550);
+      jest.advanceTimersByTime(objectivesDuration + 10);
     });
 
     expect(onSlideInComplete).toHaveBeenCalledTimes(1);

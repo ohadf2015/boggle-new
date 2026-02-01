@@ -14,6 +14,7 @@ import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
 import { useParallax } from '@/hooks/useParallax';
 import WorldParticles from './WorldParticles';
 import type { ParallaxLayer, TextureConfig, ParticleConfig } from '@/lib/adventure/themes/types';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // ==============================================
 // TYPES
@@ -68,7 +69,8 @@ const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: layer.opacity }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      // DEBT-01: Reduced stagger for faster parallel entry
+      transition={{ duration: 0.3, delay: index * (OPTIMIZED_TIMING.parallel.parallaxLayerStaggerMs / 1000) }}
     />
   );
 });

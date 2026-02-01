@@ -22,6 +22,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import type { LevelObjective, ObjectiveType } from '@/types/adventure';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // ==============================================
 // TYPES
@@ -75,11 +76,12 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
     }, [showSlideIn]);
 
     // Calculate total animation time and call completion callback
+    // DEBT-01: Uses optimized timing constants for faster entry
     useEffect(() => {
       if (!showSlideIn || animationComplete) return;
 
-      // Calculate total animation time: each objective staggers 100ms + 300ms duration
-      const totalTime = objectives.length * 100 + 300;
+      // Calculate total animation time using optimized constants
+      const totalTime = OPTIMIZED_TIMING.getObjectivesDuration(objectives.length);
 
       const timer = setTimeout(() => {
         setAnimationComplete(true);
@@ -139,10 +141,11 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
               transition={
                 shouldAnimate
                   ? {
+                      // DEBT-01: Optimized spring config for faster entry
                       type: 'spring',
-                      stiffness: 400,
-                      damping: 30,
-                      delay: index * 0.1, // 100ms stagger between objectives
+                      stiffness: OPTIMIZED_TIMING.objectives.spring.stiffness,
+                      damping: OPTIMIZED_TIMING.objectives.spring.damping,
+                      delay: index * (OPTIMIZED_TIMING.objectives.staggerMs / 1000),
                     }
                   : { duration: 0 }
               }
