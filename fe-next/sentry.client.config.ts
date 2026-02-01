@@ -113,6 +113,17 @@ Sentry.init({
     "[API] AI hint generation failed",
     /\[api\].*ai hint generation failed/i,
     /unexpected token.*<!doctype/i,
+    // Remotion license notification - informational only, not an error
+    // Shows for open-source usage of Remotion Player component
+    /remotion.*license/i,
+    /acknowledgeRemotionLicense/i,
+    // DDA Analytics timeouts - non-blocking, handled gracefully with fallback
+    // Analytics failures don't affect gameplay (see lib/aiDirector/analyticsLogger.ts:109)
+    /\[DDA Analytics\].*failed to log event/i,
+    /\[DDA Analytics\].*408/i,
+    // Notifications subscription timeouts - handled with automatic retry
+    // See lib/supabaseRealtimeNotifications.ts:89 for retry logic
+    /notifications channel subscription timed out/i,
   ],
 
   denyUrls: [

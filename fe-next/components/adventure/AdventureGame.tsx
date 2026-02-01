@@ -25,7 +25,7 @@ import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { useSkillPoints } from '@/hooks/useSkillPoints';
 import { useSkillEffects } from '@/hooks/useSkillEffects';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
-import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
+// Power-ups removed from adventure mode
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
@@ -52,9 +52,9 @@ import { ComboMilestoneOverlay } from './ComboMilestoneOverlay';
 import { VictoryCinematic, VICTORY_DURATION_FRAMES, DefeatCinematic, DEFEAT_DURATION_FRAMES } from './cinematics';
 import { CinematicPlayer } from './boss/cinematics/CinematicPlayer';
 import GameplayBackground from './themed/GameplayBackground';
-import { PowerUpBar } from './power-ups';
+// Power-ups removed from adventure mode
 import { HintMessage } from './HintMessage';
-import type { LevelConfig, TileState, GridTileState, HintResult } from '@/types/adventure';
+import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 // ==============================================
 // TYPES
@@ -243,9 +243,6 @@ const AdventureGame = memo<AdventureGameProps>(
     // Adventure achievements tracking (ACHIEVE-01 requirement)
     const { earnAchievement } = useAdventureAchievements();
 
-    // Power-up inventory for persistence
-    const powerUpInventory = usePowerUpInventory();
-
     // Combo milestone tracking (POLISH-03 requirement)
     const { currentMilestone, checkMilestone } = useComboMilestone();
 
@@ -275,15 +272,6 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Track previous combo count for detecting combo breaks
     const prevComboCountRef = useRef(0);
-
-    // Reset cooldowns on level change (POWER-06 requirement)
-    const previousLevelRef = useRef(levelConfig.level);
-    useEffect(() => {
-      if (levelConfig.level !== previousLevelRef.current) {
-        powerUpInventory.resetCooldowns();
-        previousLevelRef.current = levelConfig.level;
-      }
-    }, [levelConfig.level, powerUpInventory]);
 
     // Register all boss abilities on mount (required for Phase 30 integration)
     useEffect(() => {
@@ -359,13 +347,6 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showLevelComplete, setShowLevelComplete] = useState(false);
     const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
     const [pendingExplosions, setPendingExplosions] = useState<PendingExplosion[]>([]);
-
-    // Power-up state
-    const [scoreMultiplier, setScoreMultiplier] = useState(1);
-    const [multiplierExpiresAt, setMultiplierExpiresAt] = useState<number | undefined>();
-    const [hintWord, setHintWord] = useState<string | undefined>();
-    const [hintTiles, setHintTiles] = useState<Array<{ row: number; col: number }> | undefined>();
-    const [hintExpiresAt, setHintExpiresAt] = useState<number | undefined>();
 
     // Chain particle burst state
     const [chainBurstConfig, setChainBurstConfig] = useState<{
@@ -782,9 +763,17 @@ const AdventureGame = memo<AdventureGameProps>(
       // Guard against running multiple times - completion is already handled
       if (showLevelComplete || showVictoryCinematic || showDefeatCinematic) return;
 
-      if (gameState.isComplete || timeRemaining === 0) {
+      // For boss levels: Only complete when boss HP = 0 (victory) or time runs out (defeat)
+      // For regular levels: Complete when objectives met or time runs out
+      const shouldComplete = isBossLevel
+        ? bossHealthState.phase === 'victory' || bossHealthState.phase === 'defeat' || timeRemaining === 0
+        : gameState.isComplete || timeRemaining === 0;
+
+      if (shouldComplete) {
         // Determine if victory or defeat
-        const isVictory = gameState.stars > 0 || bossHealthState.phase === 'victory';
+        const isVictory = isBossLevel
+          ? bossHealthState.phase === 'victory'
+          : gameState.stars > 0;
 
         // Show appropriate cinematic first (before level complete modal)
         if (isVictory) {
@@ -796,9 +785,6 @@ const AdventureGame = memo<AdventureGameProps>(
 
         // Handle boss battle completion
         if (isBossActive && isBossLevel) {
-          // Timer expired or objectives complete
-          const isVictory = bossHealthState.phase === 'victory' || gameState.stars > 0;
-
           // End boss battle (only if not already in victory/defeat phase)
           if (bossHealthState.phase !== 'victory' && bossHealthState.phase !== 'defeat') {
             endBossBattle(isVictory);
@@ -1041,9 +1027,6 @@ const AdventureGame = memo<AdventureGameProps>(
           // Task 4: Apply score bonus multiplier from upgrades
           let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus);
 
-          // Apply power-up score multiplier (stacks multiplicatively with other bonuses)
-          scoreValue = Math.floor(scoreValue * scoreMultiplier);
-
           // Apply boss mechanic multiplier on boss levels
           let bossBonus: string | undefined;
           if (isBossActive && bossConfig) {
@@ -1151,7 +1134,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
     );
 
     // Handle level-up modal dismiss
@@ -1185,43 +1168,6 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle exit - directly use onExit since no additional logic needed
     const handleExit = onExit;
 
-    // Power-up handlers
-    const handleFreezeTime = useCallback((newTime: number) => {
-      // Apply the time extension via the hook's addTime method
-      // Note: newTime from PowerUpBar already calculates the extension
-      // We extract just the added seconds (10s for Freeze Time)
-      const FREEZE_TIME_SECONDS = 10;
-      addTime(FREEZE_TIME_SECONDS);
-      // Trigger AI Director transition at power-up activation (DDA-03)
-      handleAITransition();
-    }, [addTime, handleAITransition]);
-
-    const handleHint = useCallback((hint: HintResult) => {
-      setHintWord(hint.word);
-      setHintTiles(hint.tiles);
-      setHintExpiresAt(Date.now() + 5000);
-      // Clear hint after 5 seconds
-      setTimeout(() => {
-        setHintWord(undefined);
-        setHintTiles(undefined);
-        setHintExpiresAt(undefined);
-      }, 5000);
-      // Trigger AI Director transition at power-up activation (DDA-03)
-      handleAITransition();
-    }, [handleAITransition]);
-
-    const handleScoreMultiplier = useCallback((expiresAt: number) => {
-      setScoreMultiplier(2);
-      setMultiplierExpiresAt(expiresAt);
-      // Reset after 30 seconds
-      setTimeout(() => {
-        setScoreMultiplier(1);
-        setMultiplierExpiresAt(undefined);
-      }, 30000);
-      // Trigger AI Director transition at power-up activation (DDA-03)
-      handleAITransition();
-    }, [handleAITransition]);
-
     // Handle hint button click
     const handleHintClick = useCallback(() => {
       if (hasHintsAvailable) {
@@ -1231,20 +1177,16 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [hasHintsAvailable, getHint, dismissAutoHint]);
 
     // Convert hint path to indices for grid highlighting
-    // Combines adaptive difficulty hints, power-up hints, and manual hints
+    // Combines adaptive difficulty hints and manual hints
     const hintHighlightIndices = useMemo(() => {
-      // Adaptive difficulty hint takes highest precedence (appears after multiple failures)
+      // Adaptive difficulty hint takes precedence (appears after multiple failures)
       if (hintData.level !== 'none' && hintData.highlightTiles && hintData.highlightTiles.length > 0) {
         return hintData.highlightTiles.map(pos => pos.row * levelConfig.gridSize + pos.col);
-      }
-      // Power-up hint takes second precedence
-      if (hintTiles) {
-        return hintTiles.map(pos => pos.row * levelConfig.gridSize + pos.col);
       }
       // Otherwise use manual hint from hint button
       if (!currentHint?.path) return [];
       return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
-    }, [hintData, currentHint, levelConfig.gridSize, hintTiles]);
+    }, [hintData, currentHint, levelConfig.gridSize]);
 
     // Handle score popup completion with safety timeout fallback
     const handlePopupComplete = useCallback(() => {
@@ -1385,10 +1327,10 @@ const AdventureGame = memo<AdventureGameProps>(
           </div>
         </header>
 
-        {/* Main Game Area - Compact layout, minimal spacing on mobile */}
-        <main className="flex-1 flex flex-col lg:flex-row lg:items-start lg:justify-center gap-0.5 sm:gap-2 p-0.5 sm:p-2 overflow-y-auto min-h-0">
-          {/* Grid Section - Centered, minimal top spacing on mobile */}
-          <div className="flex-shrink-0 flex flex-col items-center justify-start gap-0.5 sm:gap-1 min-h-0 relative mt-0 sm:mt-2 lg:mt-4">
+        {/* Main Game Area - Compact layout, minimal spacing on mobile, expanded on desktop */}
+        <main className="flex-1 flex flex-col lg:flex-row lg:items-center lg:justify-center gap-0.5 sm:gap-2 lg:gap-6 p-0.5 sm:p-2 lg:p-4 overflow-y-auto min-h-0">
+          {/* Grid Section - Centered, minimal top spacing on mobile, larger on desktop */}
+          <div className="flex-shrink-0 flex flex-col items-center justify-center gap-0.5 sm:gap-1 lg:gap-2 min-h-0 relative mt-0 sm:mt-2 lg:mt-0">
             {/* Combo Tier Badge - Positioned above grid */}
             <ComboTierBadge
               comboCount={gameState.comboCount}
@@ -1469,7 +1411,7 @@ const AdventureGame = memo<AdventureGameProps>(
               interactive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating && !isCascading}
               disabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating || isCascading}
               showWordPreview
-              className="max-w-md w-full"
+              className="max-w-md w-full lg:max-w-lg xl:max-w-xl"
               pathPoints={pathPoints}
               isWordValid={validationFeedback.isValid}
               wasWordSubmitted={validationFeedback.wasSubmitted}
@@ -1479,21 +1421,21 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           </div>
 
-          {/* Sidebar - Objectives & Info - Mobile-optimized */}
+          {/* Sidebar - Objectives & Info - Mobile-optimized, expanded on desktop */}
           <aside
             className={cn(
-              // Mobile: horizontal scroll, Desktop: fixed width sidebar
-              'flex-shrink-0 w-full lg:w-48 xl:w-56',
-              'flex flex-row lg:flex-col gap-1.5 sm:gap-2',
+              // Mobile: horizontal scroll, Desktop: wider sidebar for better readability
+              'flex-shrink-0 w-full lg:w-56 xl:w-64 2xl:w-72',
+              'flex flex-row lg:flex-col gap-1.5 sm:gap-2 lg:gap-3',
               'overflow-x-auto lg:overflow-visible',
-              'lg:border-l-2 lg:border-neo-black/20 lg:pl-2',
+              'lg:border-l-2 lg:border-neo-black/20 lg:pl-3',
               // Compact padding
               'p-1.5 sm:p-2 rounded-neo',
               'bg-neo-navy/95 backdrop-blur-lg',
               'border-2 border-neo-white/20',
               'shadow-hard',
               // Safe area for notched mobile devices
-              'mb-16 sm:mb-20 lg:mb-0' // Leave space for PowerUpBar on mobile
+              'mb-4 sm:mb-6 lg:mb-0'
             )}
           >
             {/* Objectives - Takes more space on mobile */}
@@ -1582,21 +1524,6 @@ const AdventureGame = memo<AdventureGameProps>(
             )}
           </aside>
         </main>
-
-        {/* Power-Up Bar (only during active gameplay) */}
-        {entryPhase === 'playing' && isPlaying && !isPaused && !showLevelComplete && (
-          <PowerUpBar
-            timeRemaining={timeRemaining}
-            totalTime={adjustedLevelConfig.timerSeconds}
-            tiles={tiles2D}
-            wordsFound={gameState.wordsFound}
-            cascadeActive={isCascading}
-            cooldownMultiplier={powerUpCooldownMultiplier}
-            onFreezeTime={handleFreezeTime}
-            onHint={handleHint}
-            onScoreMultiplier={handleScoreMultiplier}
-          />
-        )}
 
         {/* Boss Battle Overlay (all boss UI components with Phase 30 integration) */}
         <BossOverlay

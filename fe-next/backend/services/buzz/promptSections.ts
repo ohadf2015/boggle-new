@@ -109,7 +109,7 @@ export const CREATIVE_PHILOSOPHY_TEMPLATE = `## 🎯 THE CREATIVE PHILOSOPHY: SU
 // ============================================================================
 export const CHALLENGE_REQUIREMENTS_TEMPLATE = `## 📋 CHALLENGE REQUIREMENTS
 
-**Your Task**: Create 5-7 word mini-challenges using the rising trends above. PRIORITIZE the 🔥 rising trends - they're what's exploding RIGHT NOW.
+**Your Task**: Create 10-15 word mini-challenges using the rising trends above. PRIORITIZE the 🔥 rising trends - they're what's exploding RIGHT NOW.
 
 **Word Selection Rules**:
 1. NEVER use brand names, celebrity names, or country names AS ANSWERS
@@ -283,7 +283,7 @@ Before outputting, verify each challenge:
 - [ ] **Aha Test**: Does the clue make players go "Ohhh, nice!"?
 - [ ] **Riddle Depth**: Do riddles work on multiple levels (literal + metaphorical)?
 - [ ] **Freshness Test**: Have I prioritized the 🔥 RISING trends?
-- [ ] **Riddle Count**: Are there at least 2 sophisticated riddles in the set?
+- [ ] **Riddle Count**: Are there at least 3-4 sophisticated riddles in the set?
 - [ ] **Share Test**: Would someone screenshot this to send to a friend?
 - [ ] **Cringe Test**: Read each prompt aloud—does it sound natural or robotic?
 - [ ] **Native Speaker Test**: Would a {{nationality}} say this?

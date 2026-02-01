@@ -348,13 +348,15 @@ const BossOverlay = memo<BossOverlayProps>(
             ======================================== */}
         {showingActivePhase && !showingIntro && !showingVictory && !showingDefeat && (
           <>
-            {/* Segmented HP Bar with phase indicator */}
-            <SegmentedHPBar
-              currentHP={currentHP}
-              maxHP={effectiveMaxHP}
-              phase={stateToHPBarPhase(state)}
-              bossName={boss.displayName}
-            />
+            {/* Segmented HP Bar - Fixed at top of screen below header */}
+            <div className="fixed top-12 sm:top-14 left-0 right-0 z-30 pointer-events-none">
+              <SegmentedHPBar
+                currentHP={currentHP}
+                maxHP={effectiveMaxHP}
+                phase={stateToHPBarPhase(state)}
+                bossName={boss.displayName}
+              />
+            </div>
 
             {/* Boss Dialogue/Taunts */}
             {showTaunt && currentTaunt && (

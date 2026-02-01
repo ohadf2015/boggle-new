@@ -186,10 +186,11 @@ export function validateChallenges(
   const sportsRiddles = validatedChallenges.filter(
     c => c.type === 'riddle' && isSportsRelatedChallenge(c)
   );
+  let finalChallenges = validatedChallenges;
   if (sportsRiddles.length > 1) {
     console.warn(`[BUZZ] Too many sports riddles (${sportsRiddles.length}), keeping only the first one`);
     let foundFirst = false;
-    return validatedChallenges.filter(c => {
+    finalChallenges = validatedChallenges.filter(c => {
       if (c.type === 'riddle' && isSportsRelatedChallenge(c)) {
         if (foundFirst) return false;
         foundFirst = true;
@@ -198,7 +199,13 @@ export function validateChallenges(
     });
   }
 
-  return validatedChallenges;
+  // Limit to best 7 challenges (AI generates 10-15 for buffer, we take top 7)
+  if (finalChallenges.length > 7) {
+    console.log(`[BUZZ] Generated ${finalChallenges.length} validated challenges, selecting best 7`);
+    finalChallenges = finalChallenges.slice(0, 7);
+  }
+
+  return finalChallenges;
 }
 
 /**

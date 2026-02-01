@@ -150,6 +150,31 @@ export function CinematicPlayer({
   }, [isPlaying]);
 
   // ==============================================
+  // FRAME UPDATE LISTENER
+  // ==============================================
+
+  // Wire up Remotion Player's frameupdate event to useCinematic's handleFrameUpdate
+  // This is CRITICAL for:
+  // 1. Progress bar updates
+  // 2. Natural completion detection
+  // 3. Frame-based state tracking
+  // Without this, the player appears frozen/black screen
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    const handleFrame = (e: { detail: { frame: number } }) => {
+      handleFrameUpdate(e.detail.frame);
+    };
+
+    player.addEventListener('frameupdate', handleFrame);
+
+    return () => {
+      player.removeEventListener('frameupdate', handleFrame);
+    };
+  }, [handleFrameUpdate]);
+
+  // ==============================================
   // REDUCED MOTION HANDLING
   // ==============================================
 
@@ -208,6 +233,7 @@ export function CinematicPlayer({
         loop={false}
         showVolumeControls={false}
         controls={false}
+        acknowledgeRemotionLicense
         // Note: onFrame callback doesn't exist in @remotion/player
         // We'll use a workaround with timeupdate
       />

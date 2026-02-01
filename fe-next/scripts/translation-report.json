@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 2923,
+    "totalKeysInCode": 2920,
     "keyCountByLanguage": {
       "en": 4044,
       "he": 4044,
@@ -8,7 +8,7 @@
       "ja": 4062,
       "es": 3897
     },
-    "missingFromEnglish": 3,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 5,
@@ -153,47 +153,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "errors.count",
-      "usages": [
-        {
-          "file": "contexts/LanguageContext.tsx",
-          "line": 19
-        }
-      ]
-    },
-    {
-      "key": "errors.unknown",
-      "usages": [
-        {
-          "file": "contexts/LanguageContext.tsx",
-          "line": 20
-        }
-      ]
-    },
-    {
-      "key": "key",
-      "usages": [
-        {
-          "file": "contexts/LanguageContext.tsx",
-          "line": 181
-        },
-        {
-          "file": "contexts/LanguageContext.tsx",
-          "line": 181
-        },
-        {
-          "file": "contexts/LanguageContext.tsx",
-          "line": 181
-        },
-        {
-          "file": "contexts/LanguageContext.tsx",
-          "line": 181
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],

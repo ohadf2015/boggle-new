@@ -14,22 +14,22 @@ import type { GridTileState } from '@/types/adventure';
 
 /**
  * Selection threshold - must be within this % of cell radius to select.
- * 0.85 = 85% of cell radius from center.
+ * 0.65 = 65% of cell radius from center (more focused, deliberate selection).
  */
-export const CELL_SELECTION_THRESHOLD = 0.85;
+export const CELL_SELECTION_THRESHOLD = 0.65;
 
 /**
  * Diagonal selection threshold - slightly more lenient for diagonal movement.
- * Diagonals are harder to hit precisely, so we allow 95% of cell radius.
+ * Diagonals are harder to hit precisely, so we allow 75% of cell radius.
  */
-export const DIAGONAL_SELECTION_THRESHOLD = 0.95;
+export const DIAGONAL_SELECTION_THRESHOLD = 0.75;
 
 /**
  * Deadzone threshold in pixels.
  * Movement must exceed this distance before selection begins.
  * Prevents accidental selections from finger jitter.
  */
-export const DEADZONE_THRESHOLD = 8;
+export const DEADZONE_THRESHOLD = 12;
 
 // ==============================================
 // TYPES
@@ -183,8 +183,8 @@ export function isWithinSelectionThreshold(
   const threshold = isDiagonal ? DIAGONAL_SELECTION_THRESHOLD : CELL_SELECTION_THRESHOLD;
   const selectionThreshold = cellPosition.cellRadius * threshold;
 
-  // Fast swipes get more lenient threshold (up to 10% bonus)
-  const velocityBonus = swipeVelocity > 0.3 ? 0.1 : 0;
+  // Fast swipes get minimal lenient threshold (5% bonus max, reduced from 10%)
+  const velocityBonus = swipeVelocity > 0.5 ? 0.05 : 0;
 
   return cellPosition.distanceFromCenter <= selectionThreshold * (1 + velocityBonus);
 }

@@ -616,14 +616,8 @@ const AdventureGrid = memo(
 
                   // State classes
                   tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
-                  // Enhanced selection: thick ring + outline + glow + pulsing animation
-                  isSelected && [
-                    'tile-selected-enhanced',
-                    'ring-4 ring-neo-lime',
-                    'outline outline-[3px] outline-neo-black',
-                    'z-20',
-                    'shadow-[0_0_24px_rgba(191,255,0,0.9),0_0_48px_rgba(191,255,0,0.5)]',
-                  ],
+                  // Enhanced selection: CSS handles glow, ring, and animation
+                  isSelected && 'tile-selected-enhanced',
                   tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
 
                   // Bomb row preview: highlight tiles in bomb's row when bomb is selected
@@ -798,6 +792,36 @@ const AdventureGrid = memo(
                     <div className="tile-time-plus" />
                     <div className="tile-time-clock" />
                     <div className="tile-time-ring" />
+                  </>
+                )}
+
+                {/* ========== SELECTION RIPPLE EFFECT ========== */}
+                {/* Matches main game mode's satisfying ripple feedback */}
+                {isSelected && enableComplexAnimations && !prefersReducedMotion && (
+                  <>
+                    {/* Primary ripple - radial gradient expanding outward */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        borderRadius: '6px',
+                        background: 'radial-gradient(circle, rgba(255, 200, 100, 0.7), rgba(255, 150, 50, 0.4) 50%, transparent 75%)',
+                      }}
+                      initial={{ scale: 0.3, opacity: 1 }}
+                      animate={{ scale: 2.5, opacity: 0 }}
+                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    />
+                    {/* Secondary glow pulse */}
+                    <motion.div
+                      className="absolute inset-[-4px] pointer-events-none"
+                      style={{
+                        background: 'radial-gradient(circle at center, rgba(255, 200, 100, 0.9), transparent 60%)',
+                        filter: 'blur(4px)',
+                        borderRadius: '10px',
+                      }}
+                      initial={{ scale: 0, opacity: 1 }}
+                      animate={{ scale: [0, 1.5, 1.8], opacity: [1, 0.7, 0] }}
+                      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    />
                   </>
                 )}
 

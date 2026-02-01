@@ -715,9 +715,6 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
         username,
         avatar_emoji,
         avatar_color
-      ),
-      score_challenges!friend_challenges_challenge_id_fkey (
-        challenge_code
       )
     `)
     .eq('challenged_id', user.id)
@@ -741,13 +738,9 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
       avatar_emoji?: string;
       avatar_color?: string;
     }>;
-    score_challenges: Array<{
-      challenge_code: string;
-    }>;
   }
   return (challenges as unknown as ChallengeWithRelations[]).map((c: ChallengeWithRelations) => {
     const challenger = c.profiles?.[0];
-    const challenge = c.score_challenges?.[0];
     return {
       id: c.id,
       challengerId: c.challenger_id,
@@ -755,7 +748,7 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
       challengerAvatarEmoji: challenger?.avatar_emoji || '😊',
       challengerAvatarColor: challenger?.avatar_color || '#4F46E5',
       challengeId: c.challenge_id,
-      challengeCode: challenge?.challenge_code || '',
+      challengeCode: c.challenge_id, // challenge_id IS the challenge code (TEXT field, not foreign key)
       message: c.message,
       status: c.status,
       createdAt: c.created_at,

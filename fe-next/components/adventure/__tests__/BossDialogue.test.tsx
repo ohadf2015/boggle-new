@@ -118,11 +118,12 @@ describe('BossDialogue', () => {
   });
 
   describe('positioning', () => {
-    it('should position at top by default', () => {
+    it('should position at top by default (below header and HP bar)', () => {
       render(<BossDialogue {...defaultProps} />);
 
       const container = screen.getByTestId('boss-dialogue');
-      expect(container).toHaveClass('top-4');
+      // Positioned below header and HP bar for visibility
+      expect(container).toHaveClass('top-28');
       expect(container).not.toHaveClass('bottom-4');
     });
 
@@ -131,7 +132,7 @@ describe('BossDialogue', () => {
 
       const container = screen.getByTestId('boss-dialogue');
       expect(container).toHaveClass('bottom-4');
-      expect(container).not.toHaveClass('top-4');
+      expect(container).not.toHaveClass('top-28');
     });
   });
 

@@ -62,10 +62,11 @@ const BossDialogue = memo<BossDialogueProps>(
             key="boss-dialogue"
             data-testid="boss-dialogue"
             className={cn(
-              'absolute left-1/2 -translate-x-1/2 z-40',
+              'fixed left-1/2 -translate-x-1/2 z-40',
               'pointer-events-none',
               'max-w-xs w-full px-2',
-              position === 'top' ? 'top-4' : 'bottom-4'
+              // Position below header and HP bar for better visibility
+              position === 'top' ? 'top-28 sm:top-32' : 'bottom-4'
             )}
             initial={variants.initial}
             animate={variants.animate}
