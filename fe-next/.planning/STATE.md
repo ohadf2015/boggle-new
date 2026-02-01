@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 32 - Visual Polish & Effects
-Plan: 5 of 6 complete
-Status: IN PROGRESS
-Last activity: 2026-02-01 - Completed 32-05-PLAN.md (AdventureGame Integration)
+Plan: 6 of 6 complete
+Status: COMPLETE
+Last activity: 2026-02-01 - Completed 32-06-PLAN.md (Boss Fireworks & Cinematics Integration)
 
-Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 83% (5/6)
+Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 100% (6/6 COMPLETE)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,13 @@ Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans co
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 32-06 (Boss Fireworks & Cinematics Integration, 2026-02-01):**
+- Boss tier determination: Level-based (mini: 5/10, standard: 15, elite: 20+) matches existing boss system conventions
+- Fireworks auto-hide: Tier-based duration timeout (mini: 3.5s, standard: 5.5s, elite: 8.5s) matches fireworks duration + buffer
+- Cinematic-first completion: Victory/defeat cinematic shows before level complete modal (better narrative flow)
+- Modal gating: LevelCompleteModal only shows after cinematicComplete flag set
+- Double type casting: (as unknown as ComponentType<Record<string, unknown>>) for Remotion components with specific props
 
 **Phase 32-05 (AdventureGame Integration, 2026-02-01):**
 - Combo milestone check timing: useEffect triggers on gameState.comboCount changes (only during active gameplay: isPlaying && entryPhase === 'playing' && !isPaused)
@@ -173,14 +180,14 @@ Resume file: None
 - Achievement unlock modal with confetti
 - Achievement grid with category filters
 
-## Phase 32 Progress — IN PROGRESS
+## Phase 32 Progress — COMPLETE ✓
 
 - [x] 32-01: Layered particle system + Z-index constants (TDD, Wave 1) ✓
 - [x] 32-02: Boss defeat fireworks + combo milestone hook (TDD, Wave 1) ✓
 - [x] 32-03: Combo milestone overlay + translations (Wave 1) ✓
 - [x] 32-04: Victory/Defeat Remotion cinematics (Wave 2) ✓
 - [x] 32-05: AdventureGame integration + wiring (Wave 3) ✓
-- [ ] 32-06: Human verification (Wave 4)
+- [x] 32-06: Boss fireworks & cinematics integration + tests (Wave 3/4) ✓
 
 **Phase 32-01 Delivered (2026-02-01):**
 - Z_INDEX constants for layered particles (1000-9999 scale)
@@ -215,7 +222,20 @@ Resume file: None
 - Accessibility enforcement: reduced motion AND particle budget checks before effects
 - Bug fixes: TypeScript errors in boss fireworks useEffect and cinematic props (auto-fixed via Rule 1)
 
-**Phase 32 Planning Summary:**
+**Phase 32-06 Delivered (2026-02-01):**
+- Boss defeat fireworks integration: Phase transition detection (useRef + useEffect)
+- Tier-based fireworks: Mini (levels 5/10), Standard (15), Elite (20+)
+- Victory/defeat cinematics: Cinematic-first completion flow (before level complete modal)
+- Cinematic gating: Modal only shows after cinematicComplete flag
+- Integration tests: 10 comprehensive tests (POLISH-02, POLISH-05, POLISH-06)
+- Double type casting for Remotion components (CinematicPlayer compatibility)
+
+**Phase 32 Complete Summary:**
+- 6 plans across 4 waves (all COMPLETE)
+- All POLISH-01 through POLISH-06 requirements delivered
+- 85% existing infrastructure reused (confettiUtils, useParticleBudget, NewYearFireworks, CinematicPlayer)
+- Key new components: useLayeredCelebration, useComboMilestone, BossDefeatFireworks, ComboMilestoneOverlay, VictoryCinematic, DefeatCinematic
+- All effects respect particle budgets (30/60/100) and reduced-motion preference
 - 6 plans across 4 waves
 - 85% existing infrastructure reused (confettiUtils, useParticleBudget, NewYearFireworks, CinematicPlayer)
 - Key new components: useLayeredCelebration, useComboMilestone, BossDefeatFireworks, ComboMilestoneOverlay, VictoryCinematic, DefeatCinematic
@@ -243,12 +263,12 @@ Transform Adventure Mode with:
 
 ## Session Continuity
 
-Last session: 2026-02-01T08:39:51Z
-Stopped at: Completed 32-05-PLAN.md (AdventureGame Integration)
+Last session: 2026-02-01T08:46:32Z
+Stopped at: Completed Phase 32 - Visual Polish & Effects (6/6 plans COMPLETE)
 Resume file: None
 
-**Next action:** Execute Phase 32-06 (Human Verification)
+**Next action:** Phase 32 is complete. Ready to proceed to Phase 34 (Dynamic Difficulty Tuning) or Phase 35 (World Expansion & Tech Debt)
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 32 in progress: 5/6 plans complete - Wave 3 complete)*
+*Last updated: 2026-02-01 (Phase 32 COMPLETE: 6/6 plans - All visual polish requirements delivered)*
