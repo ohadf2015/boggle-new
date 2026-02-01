@@ -29,6 +29,12 @@ const ja = {
       "ogTitle": "プレイヤープロフィールとゲーム統計 - LexiClash",
       "ogDescription": "ワードゲームの実績、統計を追跡し、リーダーボードランキングを登りましょう。"
     },
+    "studentProfile": {
+      "title": "生徒プロフィールと進捗 | LexiClash 教育",
+      "description": "LexiClash生徒プロフィール、XP進捗、レッスン完了状況、教育実績を表示。学習の旅と語彙マスタリーを追跡しましょう。",
+      "ogTitle": "生徒プロフィール - LexiClash 教育",
+      "ogDescription": "LexiClash 教育で学習進捗、実績、語彙マスタリーを追跡しましょう。"
+    },
     "terms": {
       "title": "利用規約 | LexiClash",
       "description": "LexiClash利用規約を読む。このマルチプレイヤーワードゲームプラットフォームのユーザー権利、利用規定、アカウント管理、ゲームポリシーについて学びましょう。",
@@ -4036,6 +4042,11 @@ const ja = {
         "zone1": "根のトンネル",
         "zone2": "水晶の広間",
         "bossZone": "語源の間"
+      },
+      "archipelago": {
+        "zone1": "ヤシの浜",
+        "zone2": "サンゴ礁",
+        "bossZone": "ティキ神殿"
       }
     },
     "themes": {

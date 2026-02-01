@@ -29,6 +29,12 @@ const sv = {
       "ogTitle": "Spelarprofil och spelstatistik - LexiClash",
       "ogDescription": "Följ dina ordspelsprestationer, statistik och klättra i topplistans rankningar."
     },
+    "studentProfile": {
+      "title": "Elevprofil och framsteg | LexiClash Utbildning",
+      "description": "Visa din LexiClash-elevprofil, XP-framsteg, lektionsslutförande och utbildningsprestationer. Följ din inlärningsresa och ordförrådsbehärskning.",
+      "ogTitle": "Elevprofil - LexiClash Utbildning",
+      "ogDescription": "Följ dina inlärningsframsteg, prestationer och ordförrådsbehärskning i LexiClash Utbildning."
+    },
     "terms": {
       "title": "Användarvillkor | LexiClash",
       "description": "Läs LexiClash användarvillkor. Lär dig om användarrättigheter, acceptabel användning, kontohantering och våra spelregler för denna multiplayer-ordspelsplattform.",
@@ -4036,6 +4042,11 @@ const sv = {
         "zone1": "Rottunnlarna",
         "zone2": "Kristallhallarna",
         "bossZone": "Etymologikammaren"
+      },
+      "archipelago": {
+        "zone1": "Palmstranden",
+        "zone2": "Korallreven",
+        "bossZone": "Tikitemplet"
       }
     },
     "themes": {

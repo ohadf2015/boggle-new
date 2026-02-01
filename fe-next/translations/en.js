@@ -29,6 +29,12 @@ const en = {
       "ogTitle": "Player Profile & Game Stats - LexiClash",
       "ogDescription": "Track your word game achievements, statistics, and climb the leaderboard rankings."
     },
+    "studentProfile": {
+      "title": "Student Profile & Progress | LexiClash Education",
+      "description": "View your LexiClash student profile, XP progress, lesson completion, and educational achievements. Track your learning journey and vocabulary mastery.",
+      "ogTitle": "Student Profile - LexiClash Education",
+      "ogDescription": "Track your learning progress, achievements, and vocabulary mastery in LexiClash Education."
+    },
     "terms": {
       "title": "Terms of Service | LexiClash",
       "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer word game platform.",
@@ -3994,6 +4000,11 @@ const en = {
         "zone1": "Root Tunnels",
         "zone2": "Crystal Halls",
         "bossZone": "Etymology Chamber"
+      },
+      "archipelago": {
+        "zone1": "Palm Shores",
+        "zone2": "Coral Reefs",
+        "bossZone": "Tiki Temple"
       }
     },
     "themes": {
