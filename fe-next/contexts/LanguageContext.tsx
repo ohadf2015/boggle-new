@@ -10,7 +10,18 @@ import type { Language } from '@/types';
 interface LanguageContextValue {
   language: Language;
   setLanguage: (newLang: Language) => void;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  /**
+   * Translate a key with optional fallback and interpolation params.
+   * @param path - The translation key path (e.g., 'errors.networkError')
+   * @param fallbackOrParams - Either a fallback string or interpolation params object
+   * @param paramsWhenFallback - Interpolation params when first arg is a fallback string
+   *
+   * Usage examples:
+   * - Basic: translateFn('common.save')
+   * - With params: translateFn('common.loading', { count: 5 })
+   * - With fallback: translateFn('common.error', 'Something went wrong')
+   */
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
   dir: 'rtl' | 'ltr';
   currentFlag: string;
 }
@@ -169,18 +180,33 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
     }, [pathname, router]);
 
     // Memoize t function to prevent unnecessary re-renders of consumers
-    const t = useCallback((path: string, params: Record<string, string | number> = {}): string => {
+    // Supports: translateFn(path), translateFn(path, params), translateFn(path, fallback), translateFn(path, fallback, params)
+    const t = useCallback((
+        path: string,
+        fallbackOrParams?: string | Record<string, string | number>,
+        paramsWhenFallback?: Record<string, string | number>
+    ): string => {
+        // Determine fallback and params based on argument types
+        const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
+        const params: Record<string, string | number> = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
+            ? fallbackOrParams
+            : (paramsWhenFallback || {});
+
         const keys = path.split('.');
         // Use type assertion since Language type may include values not in translations
         let current: unknown = (translations as Record<string, unknown>)[language] || translations['he']; // Fallback to Hebrew if language is invalid
 
         if (!current) {
             logger.warn(`Translation missing for language: ${language}`);
-            return path;
+            return fallback || path;
         }
 
         for (const key of keys) {
             if (typeof current !== 'object' || current === null || !(key in current)) {
+                // Use fallback if provided, otherwise return the path
+                if (fallback) {
+                    return fallback;
+                }
                 logger.warn(`Translation missing for key: ${path} in language: ${language}`);
                 return path;
             }
@@ -204,7 +230,7 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             return result;
         }
 
-        return typeof current === 'string' ? current : path;
+        return typeof current === 'string' ? current : (fallback || path);
     }, [language]);
 
     // Memoize context value to prevent unnecessary re-renders of all consumers

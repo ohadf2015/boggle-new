@@ -67,12 +67,30 @@ export function securityHeaders(isDev: boolean): RequestHandler {
     "frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; " +
     "frame-ancestors 'none';";
 
+  // Permissions-Policy: Restrict browser features not needed by the game
+  // Allows: fullscreen (for immersive gameplay), autoplay (for game sounds)
+  // Denies: camera, microphone, geolocation, payment, usb, etc.
+  const permissionsPolicy = [
+    'camera=()',
+    'microphone=()',
+    'geolocation=()',
+    'payment=()',
+    'usb=()',
+    'magnetometer=()',
+    'gyroscope=()',
+    'accelerometer=()',
+    'autoplay=(self)',
+    'fullscreen=(self)',
+    'picture-in-picture=(self)',
+  ].join(', ');
+
   return (req: Request, res: Response, next: NextFunction): void => {
     res.setHeader('Content-Security-Policy', isDev ? cspDev : cspProd);
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', permissionsPolicy);
 
     if (!isDev) {
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

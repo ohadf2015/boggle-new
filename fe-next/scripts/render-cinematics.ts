@@ -257,7 +257,9 @@ async function renderComposition(config: CompositionConfig): Promise<RenderResul
   try {
     // Dynamic import to handle case where packages aren't installed
     // Note: These packages are optional - the script checks for them before calling renderComposition
+    // @ts-expect-error - Optional dependency, may not be installed
     const bundlerModule = await import('@remotion/bundler') as { bundle: BundleFunction };
+    // @ts-expect-error - Optional dependency, may not be installed
     const rendererModule = await import('@remotion/renderer') as {
       renderMedia: RenderMediaFunction;
       selectComposition: SelectCompositionFunction;

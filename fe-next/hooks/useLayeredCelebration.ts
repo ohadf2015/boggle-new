@@ -44,7 +44,7 @@ export interface UseLayeredCelebrationReturn {
  * ```
  */
 export function useLayeredCelebration(): UseLayeredCelebrationReturn {
-  const { max: particleBudget } = useParticleBudget();
+  const budget = useParticleBudget();
   const { prefersReducedMotion } = useDevicePerformance();
 
   const triggerCelebration = useCallback(() => {
@@ -54,13 +54,14 @@ export function useLayeredCelebration(): UseLayeredCelebrationReturn {
     }
 
     // Don't fire if budget is zero
-    if (particleBudget === 0) {
+    if (budget.combo === 0) {
       return;
     }
 
     // Fire layered celebration with device-appropriate budget
-    fireLayeredCelebration(particleBudget);
-  }, [particleBudget, prefersReducedMotion]);
+    // Duration of 2000ms is default for celebrations
+    fireLayeredCelebration(2000, budget);
+  }, [budget, prefersReducedMotion]);
 
   return {
     triggerCelebration,

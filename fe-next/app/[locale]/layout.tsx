@@ -6,6 +6,7 @@ import { ConditionalProviders } from '../conditional-providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import GoogleAdSense from '@/components/GoogleAdSense';
 import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
@@ -724,6 +725,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 </a>
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
+                <GoogleAdSense />
                 <CrazyGamesScript />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />

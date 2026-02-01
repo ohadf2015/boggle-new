@@ -47,12 +47,13 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
     {/* Failed players: Retry is primary, Share is secondary */}
     {!solved ? (
       <>
-        <div className="relative">
+        {/* Container needs max-w-btn and mx-auto to center, so coin badge aligns with button */}
+        <div className="relative max-w-btn mx-auto">
           <Button
             onClick={onRetry}
             disabled={!canAffordRetry}
             className={cn(
-              "w-full max-w-btn py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
+              "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
               canAffordRetry
                 ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
                 : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"

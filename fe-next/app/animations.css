@@ -1309,6 +1309,36 @@ body.crazygames-embed {
   }
 }
 
+/**
+ * Daily-specific scroll isolation variant
+ *
+ * For /daily pages where GlobalBottomNav is hidden and the component
+ * has its own MobileTabBar. Only subtracts AutoHideHeader (60px), NOT
+ * the main.pb-16 (64px) since daily pages don't have GlobalBottomNav.
+ *
+ * The component handles its own bottom padding via pb-[--mobile-bottom-safe].
+ */
+.isolate-scroll-daily {
+  /* Fixed height = viewport - AutoHideHeader(60) - safe-area */
+  /* NO subtraction for main.pb-16 since daily pages hide GlobalBottomNav */
+  height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* On desktop/tablet, revert to flex-based layout (no fixed tab bar) */
+@media (min-width: 768px) {
+  .isolate-scroll-daily {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
 /* ====================================
    ENHANCED FOCUS & ACCESSIBILITY
    ==================================== */

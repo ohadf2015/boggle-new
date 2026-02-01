@@ -315,15 +315,17 @@ export default function WarmupRound({
           </CardContent>
         </Card>
 
-        {/* Game grid */}
-        <div className="mb-4">
-          <GridComponent
-            grid={grid}
-            interactive
-            onWordSubmit={handleWordSubmit}
-            language={language}
-            animateOnMount
-          />
+        {/* Game grid - container needs proper dimensions for absolute-positioned inner grid */}
+        <div className="mb-4 flex items-center justify-center">
+          <div className="w-full max-w-[min(100%,calc(100vh-350px))]" style={{ aspectRatio: '1/1' }}>
+            <GridComponent
+              grid={grid}
+              interactive
+              onWordSubmit={handleWordSubmit}
+              language={language}
+              animateOnMount
+            />
+          </div>
         </div>
 
         {/* Found words */}

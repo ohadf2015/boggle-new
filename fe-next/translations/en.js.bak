@@ -73,6 +73,7 @@ const en = {
     "creating": "Creating...",
     "guest": "Guest",
     "back": "Back",
+    "backHome": "Back Home",
     "backToHome": "Back to Home",
     "backToMenu": "Back to Menu",
     "next": "Next",
@@ -135,6 +136,7 @@ const en = {
     "share": "Share",
     "bot": "Bot",
     "minutes": "min",
+    "seconds": "seconds",
     "advancedSettings": "More Options",
     "settings": "Settings",
     "tapToDismiss": "Tap to close",
@@ -167,19 +169,68 @@ const en = {
     "later": "Later",
     "skip": "Skip",
     "done": "Done",
+    "continue": "Continue",
     "offline": "Offline",
     "online": "Online",
     "sending": "Sending...",
     "clear": "Clear",
     "player": "Player",
     "clearSearch": "Clear search",
-    "opensInNewTab": "opens in new tab"
+    "opensInNewTab": "opens in new tab",
+    "aria": {
+      "levelProgress": "Level progress",
+      "overallProgress": "Overall progress",
+      "navigation": "Navigation"
+    }
   },
   "nav": {
     "bottomNavigation": "Bottom navigation",
     "home": "Home",
     "brain": "Brain",
     "profile": "Profile"
+  },
+  "skills": {
+    "title": "Skill Tree",
+    "available": "Available Points",
+    "unlocked": "Skill Unlocked!",
+    "paths": {
+      "power": "Power",
+      "strategy": "Strategy",
+      "utility": "Utility"
+    },
+    "powerStrike": {
+      "name": "Power Strike"
+    },
+    "longWordMastery": {
+      "name": "Long Word Mastery"
+    },
+    "devastatingBlow": {
+      "name": "Devastating Blow"
+    },
+    "comboStarter": {
+      "name": "Combo Starter"
+    },
+    "chainReaction": {
+      "name": "Chain Reaction"
+    },
+    "comboMaster": {
+      "name": "Combo Master"
+    },
+    "quickCharge": {
+      "name": "Quick Charge"
+    },
+    "powerUpSlot": {
+      "name": "Power-Up Slot"
+    },
+    "hintMaster": {
+      "name": "Hint Master"
+    },
+    "xpBoost": {
+      "name": "XP Boost"
+    },
+    "goldRush": {
+      "name": "Gold Rush"
+    }
   },
   "connection": {
     "reconnecting": "Getting you back in...",
@@ -442,7 +493,12 @@ const en = {
     "medium": "Medium",
     "hard": "Hard",
     "expert": "Expert",
-    "master": "Master"
+    "master": "Master",
+    "hint": {
+      "length": "The word has {length} letters",
+      "lengthAndStart": "The word has {length} letters and starts with {letter}",
+      "fullReveal": "Here's the word: {word}"
+    }
   },
   "joinView": {
     "createRoom": "Create",
@@ -700,6 +756,7 @@ const en = {
     "difficultyTooltipTimer": "Longer time = more words found"
   },
   "tvBroadcast": {
+    "liveGameInProgress": "Live Game in Progress",
     "joinAt": "Join at",
     "gameCode": "Game Code",
     "players": "Players",
@@ -852,7 +909,8 @@ const en = {
       "verifying": "Verifying with AI...",
       "scoring": "Calculating scores...",
       "finalizing": "Finalizing results..."
-    }
+    },
+    "mobileNavigation": "Mobile Navigation"
   },
   "waiting": {
     "milestoneFirst": "First one in!",
@@ -1928,6 +1986,29 @@ const en = {
         "optOut": "You can opt out of personalized advertising by visiting Google's Ads Settings at https://www.google.com/settings/ads or by using industry opt-out tools.",
         "learnMore": "For more information about how Google uses data when you use our site, visit https://policies.google.com/technologies/partner-sites"
       },
+      "advertisingPartners": {
+        "title": "Advertising Partners",
+        "intro": "We partner with advertising networks to display ads on our website. These partners help keep LexiClash free for all players.",
+        "howItWorks": {
+          "title": "How Advertising Works",
+          "cookies": "Advertising partners may use cookies to track your browsing activity across websites",
+          "control": "You have control over personalized advertising through your browser and ad settings",
+          "noSale": "We never sell your personal data to advertisers",
+          "revenue": "Ad revenue helps us keep LexiClash free to play",
+          "thirdParty": "Third-party advertisers have their own privacy policies"
+        },
+        "yourChoices": {
+          "title": "Your Choices",
+          "intro": "You have several options to control how advertising works for you:",
+          "optOut": "Opt out of personalized ads",
+          "googlePrivacy": "Review Google's privacy practices",
+          "partnerPolicy": "Learn about AdSense partner policies"
+        },
+        "important": {
+          "title": "Important:",
+          "content": "Even if you opt out of personalized advertising, you may still see ads, but they won't be based on your interests. You can also manage your ad preferences through"
+        }
+      },
       "cookies": {
         "title": "5. Cookies and Local Storage",
         "content": "We use essential cookies and local storage for: authentication tokens (Supabase), username and preferences (localStorage), theme settings (dark/light mode), and language preferences. We also use LogRocket cookies for analytics purposes. We do not use advertising or tracking cookies."
@@ -2292,11 +2373,26 @@ const en = {
     "aboutGame": "About the Game",
     "leaderboard": "Leaderboard",
     "contact": "Contact",
-    "interactiveTutorial": "Interactive Tutorial"
+    "interactiveTutorial": "Interactive Tutorial",
+    "about": "About",
+    "blog": "Blog",
+    "faq": "FAQ"
   },
   "support": {
     "kofiFooter": "Buy Us a Coffee",
     "kofiTooltip": "Support LexiClash development"
+  },
+  "blog": {
+    "backToBlog": "Back to Blog",
+    "dailyChallenge": "Daily Challenge",
+    "date": "Published",
+    "experience": "Experience",
+    "interview": "Interview",
+    "practice": "Practice Now",
+    "readTime": "5 min read",
+    "research": "Research",
+    "startPlaying": "Start Playing",
+    "tryDaily": "Try Daily Challenge"
   },
   "landing": {
     "playingNow": "Playing Now",
@@ -2311,6 +2407,9 @@ const en = {
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
     "adventureModeDesc": "100 levels across 10 worlds",
+    "education": "Education",
+    "educationDesc": "For teachers & students",
+    "educationBadge": "FOR TEACHERS",
     "signInToUnlock": "Sign in to unlock",
     "openRooms": "rooms",
     "playersLive": "live",
@@ -3851,6 +3950,10 @@ const en = {
     "levels": "levels",
     "level": "Level",
     "backToMap": "Back to World Map",
+    "menu": {
+      "skills": "Skills",
+      "achievements": "Achievements"
+    },
     "worldLabel": "World",
     "hiddenWord": "Hidden Word",
     "devPreview": "Development Preview",
@@ -4035,6 +4138,27 @@ const en = {
         "star3": "Perfect score!"
       }
     },
+    "xp": {
+      "label": "XP",
+      "level": "Level",
+      "levelUp": "Level Up!",
+      "newLevel": "You reached level",
+      "continue": "Continue",
+      "maxLevel": "MAX LEVEL!"
+    },
+    "powerUps": {
+      "freezeTime": "Freeze Time",
+      "hint": "Hint",
+      "scoreMultiplier": "2x Score",
+      "ready": "Ready",
+      "cooldown": "{{seconds}}s",
+      "cascadeBlocked": "Wait for cascade to complete"
+    },
+    "upgrades": {
+      "maxLevel": "Max Level",
+      "purchase": "Purchase",
+      "needMore": "Need {amount} more gold"
+    },
     "bosses": {
       "fightBoss": "Fight Boss",
       "bossIntro": "Boss Battle!",
@@ -4044,10 +4168,128 @@ const en = {
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
       "enraged": "ENRAGED!",
+      "phases": {
+        "phase1": "PHASE 1",
+        "phase2": "PHASE 2"
+      },
+      "telegraph": {
+        "incoming": "Incoming Attack!",
+        "warning": "Watch Out!",
+        "prepare": "Prepare yourself!",
+        "progress": "Attack charging"
+      },
       "common": {
         "anagramPair": "Anagram pair found! Critical hit!",
         "requirementMet": "Requirement met!",
         "requirementMissed": "Missed requirement"
+      },
+      "cinematics": {
+        "skip": "Skip",
+        "skipIn": "Skip in {seconds}...",
+        "progress": "Cinematic progress",
+        "loading": "Loading...",
+        "victory": "Victory!",
+        "defeated": "{bossName} defeated!",
+        "bossApproaches": "A challenger approaches...",
+        "prepareForBattle": "Prepare for battle!"
+      },
+      "abilities": {
+        "popQuiz": {
+          "name": "Pop Quiz",
+          "desc": "Must use 5+ letter words!"
+        },
+        "redPen": {
+          "name": "Red Pen",
+          "desc": "Some tiles are locked!"
+        },
+        "detention": {
+          "name": "Detention",
+          "desc": "Lost 5 seconds!"
+        },
+        "beeSwarm": {
+          "name": "Bee Swarm",
+          "desc": "Sticky tiles appeared!"
+        },
+        "spellingSting": {
+          "name": "Spelling Sting",
+          "desc": "Letters changed!"
+        },
+        "synonymShuffle": {
+          "name": "Synonym Shuffle",
+          "desc": "Row scrambled!"
+        },
+        "verboseCurse": {
+          "name": "Verbose Curse",
+          "desc": "Need 6+ letter words!"
+        },
+        "etymologyLock": {
+          "name": "Etymology Lock",
+          "desc": "Column locked!"
+        },
+        "islandLock": {
+          "name": "Island Lock",
+          "desc": "Tiles marooned!"
+        },
+        "figurativeStorm": {
+          "name": "Figurative Storm",
+          "desc": "Board scrambled!"
+        },
+        "assemblyLine": {
+          "name": "Assembly Line",
+          "desc": "Row changed!"
+        },
+        "constructionZone": {
+          "name": "Construction Zone",
+          "desc": "Diagonal locked!"
+        },
+        "puzzleScramble": {
+          "name": "Puzzle Scramble",
+          "desc": "Tiles shuffled!"
+        },
+        "anagramCurse": {
+          "name": "Anagram Curse",
+          "desc": "Find anagrams!"
+        },
+        "puzzleChaos": {
+          "name": "Puzzle Chaos",
+          "desc": "Total chaos!"
+        },
+        "mirrorFlip": {
+          "name": "Mirror Flip",
+          "desc": "Rows flipped!"
+        },
+        "palindromePower": {
+          "name": "Palindrome Power",
+          "desc": "Find palindromes!"
+        },
+        "starScatter": {
+          "name": "Star Scatter",
+          "desc": "Rare letters appeared!"
+        },
+        "novaBurst": {
+          "name": "Nova Burst",
+          "desc": "Cosmic explosion!"
+        },
+        "babelCurse": {
+          "name": "Babel Curse",
+          "desc": "Letters confused!"
+        },
+        "polyglotLock": {
+          "name": "Polyglot Lock",
+          "desc": "Tiles sealed!"
+        },
+        "wordFlame": {
+          "name": "Word Flame",
+          "desc": "Letters burning!"
+        },
+        "lexiconStorm": {
+          "name": "Lexicon Storm",
+          "desc": "Words scattered!"
+        },
+        "ultimateWord": {
+          "name": "Ultimate Word",
+          "desc": "Final challenge!"
+        }
       },
       "msGrammar": {
         "name": "Ms. Grammar",
@@ -4219,6 +4461,154 @@ const en = {
           "defeat": "I won but... I feel bad? Want a rematch? Please say yes!"
         }
       }
+    },
+    "achievements": {
+      "title": "Achievements",
+      "earned": "earned",
+      "hidden": "Hidden",
+      "unlocked": "Achievement Unlocked!",
+      "upgraded": "Achievement Upgraded!",
+      "categories": {
+        "gameplay": "Gameplay",
+        "bosses": "Boss Battles",
+        "progression": "Progression",
+        "mastery": "Mastery"
+      },
+      "firstWord": {
+        "name": "First Steps",
+        "desc": "Find your first word"
+      },
+      "wordStreak5": {
+        "name": "Hot Streak",
+        "desc": "Build a 5x combo"
+      },
+      "wordStreak10": {
+        "name": "Unstoppable",
+        "desc": "Build a 10x combo"
+      },
+      "longWord6": {
+        "name": "Wordsmith",
+        "desc": "Find a 6+ letter word"
+      },
+      "longWord8": {
+        "name": "Linguist",
+        "desc": "Find an 8+ letter word"
+      },
+      "perfectLevel": {
+        "name": "Perfect Star",
+        "desc": "Complete a level with 3 stars"
+      },
+      "bossSlayer": {
+        "name": "Boss Slayer",
+        "desc": "Defeat a boss"
+      },
+      "bossSpeedrun": {
+        "name": "Speed Demon",
+        "desc": "Defeat a boss with 30+ seconds remaining"
+      },
+      "bossNoDamage": {
+        "name": "Untouchable",
+        "desc": "Defeat a boss without missing a word"
+      },
+      "allBosses": {
+        "name": "Champion",
+        "desc": "Defeat all bosses"
+      },
+      "worldComplete": {
+        "name": "World Traveler",
+        "desc": "Complete a world"
+      },
+      "starCollector50": {
+        "name": "Star Collector",
+        "desc": "Collect 50 stars"
+      },
+      "starCollector100": {
+        "name": "Constellation",
+        "desc": "Collect 100 stars"
+      },
+      "levelMaster": {
+        "name": "Level Master",
+        "desc": "Get 3 stars on 10 levels"
+      },
+      "skillUnlocked": {
+        "name": "Student",
+        "desc": "Unlock a skill"
+      },
+      "skillPathComplete": {
+        "name": "Specialist",
+        "desc": "Complete a skill path"
+      },
+      "comboKing": {
+        "name": "Combo King",
+        "desc": "Build a 15x combo"
+      }
+    },
+    "skills": {
+      "title": "Skill Tree",
+      "points": "Skill Points",
+      "paths": {
+        "power": "Power",
+        "strategy": "Strategy",
+        "utility": "Utility"
+      },
+      "locked": "Locked",
+      "unlocked": "Skill Unlocked!",
+      "unlock": "Unlock",
+      "maxed": "Maxed",
+      "requires": "Requires: {{skill}}",
+      "cost": "Cost: {{points}} points",
+      "power_strike": {
+        "name": "Power Strike",
+        "description": "5+ letter words deal double damage to bosses"
+      },
+      "critical_letters": {
+        "name": "Critical Letters",
+        "description": "Vowels have 20% chance for critical hits"
+      },
+      "combo_amplifier": {
+        "name": "Combo Amplifier",
+        "description": "Combo multiplier caps at 15x instead of 10x"
+      },
+      "boss_slayer": {
+        "name": "Boss Slayer",
+        "description": "+25% damage to all boss encounters"
+      },
+      "chain_mastery": {
+        "name": "Chain Mastery",
+        "description": "Combo timer extended by 2 seconds"
+      },
+      "ice_breaker": {
+        "name": "Ice Breaker",
+        "description": "Ice tiles break in one hit instead of two"
+      },
+      "cascade_expert": {
+        "name": "Cascade Expert",
+        "description": "Tile cascades generate bonus points"
+      },
+      "tile_transmute": {
+        "name": "Tile Transmute",
+        "description": "5% chance to convert tiles to gold after words"
+      },
+      "quick_charge": {
+        "name": "Quick Charge",
+        "description": "Power-ups recharge 25% faster"
+      },
+      "power_slot_2": {
+        "name": "Power Slot II",
+        "description": "Unlock second power-up slot"
+      },
+      "extended_hints": {
+        "name": "Extended Hints",
+        "description": "+2 hints per level"
+      },
+      "power_slot_3": {
+        "name": "Power Slot III",
+        "description": "Unlock third power-up slot"
+      },
+      "advanced_multiplier": {
+        "name": "Advanced Multiplier",
+        "description": "All score multipliers increased by 10%"
+      }
     }
   },
   "student": {
@@ -4245,7 +4635,8 @@ const en = {
       "sort": {
         "recent": "Recent",
         "progress": "Progress"
-      }
+      },
+      "completed": "Completed"
     },
     "practice": {
       "title": "Practice Mode",
@@ -4285,6 +4676,7 @@ const en = {
       "delete": "Delete Classroom",
       "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
       "name": "Classroom Name",
+      "namePlaceholder": "e.g., English Advanced",
       "joinCode": "Join Code",
       "copyCode": "Copy Code",
       "codeCopied": "Join code copied!",
@@ -4296,7 +4688,24 @@ const en = {
       "language": "Language",
       "created": "Created {{date}}",
       "noClassrooms": "No classrooms yet",
-      "createFirst": "Create your first classroom to get started"
+      "createFirst": "Create your first classroom to get started",
+      "validation": {
+        "nameRequired": "Classroom name is required"
+      },
+      "success": {
+        "created": "Classroom created!",
+        "updated": "Classroom updated!",
+        "deleted": "Classroom deleted!"
+      },
+      "error": {
+        "createFailed": "Failed to create classroom",
+        "updateFailed": "Failed to update classroom",
+        "deleteFailed": "Failed to delete classroom"
+      },
+      "dialog": {
+        "createDescription": "Create a new classroom with name and language settings",
+        "editDescription": "Edit classroom name and language settings"
+      }
     },
     "classrooms": {
       "students": {
@@ -4313,7 +4722,9 @@ const en = {
       "delete": "Delete Lesson",
       "confirmDelete": "Delete this lesson? Student progress will be lost.",
       "name": "Lesson Name",
+      "namePlaceholder": "e.g., Animal Vocabulary",
       "description": "Description (optional)",
+      "descriptionPlaceholder": "Optional description",
       "words": "{{count}} words",
       "word": "1 word",
       "noWords": "No words yet",
@@ -4330,7 +4741,24 @@ const en = {
       "saving": "Saving...",
       "saved": "Lesson saved!",
       "noLessons": "No lessons yet",
-      "createFirst": "Create your first vocabulary lesson"
+      "createFirst": "Create your first vocabulary lesson",
+      "definition": "Definition",
+      "examples": "Usage Examples",
+      "contextualExamples": "In Context",
+      "pronounce": "Listen to pronunciation",
+      "speaking": "Speaking...",
+      "pronunciationFallback": "Pronunciation",
+      "validation": {
+        "nameRequired": "Lesson name is required",
+        "wordsRequired": "Add at least one word"
+      },
+      "error": {
+        "createFailed": "Failed to create lesson"
+      },
+      "dialog": {
+        "createDescription": "Create a new vocabulary lesson with words and definitions"
+      },
+      "moreWords": "+{{count}} more words"
     },
     "lessons": {
       "assign": {
@@ -4370,11 +4798,16 @@ const en = {
       "accuracy": "Accuracy",
       "lastActive": "Last Active",
       "noData": "No progress data yet",
+      "noProgressYet": "No student progress for this lesson yet",
+      "selectFilters": "Select a classroom and lesson to view progress",
       "assignLessons": "Assign lessons to start tracking student progress",
       "chartTitle": "Class Progress Over Time",
       "wordsLearned": "Words Learned",
       "accuracy": "Accuracy %",
-      "expandDetails": "View word breakdown"
+      "expandDetails": "View word breakdown",
+      "exportCSV": "Export CSV",
+      "exportSuccess": "Progress exported successfully!",
+      "noDataToExport": "No data to export"
     },
     "stats": {
       "totalStudents": "Total Students",
@@ -4477,7 +4910,10 @@ const en = {
         "pasteButton": "Paste code",
         "success": "Successfully joined classroom!",
         "invalidCode": "Invalid classroom code",
-        "alreadyMember": "You are already a member of this classroom"
+        "alreadyMember": "You are already a member of this classroom",
+        "codePasted": "Code pasted!",
+        "emptyClipboard": "Clipboard is empty",
+        "clipboardError": "Couldn't read clipboard"
       }
     },
     "xp": {
@@ -4511,8 +4947,24 @@ const en = {
         "monthDesc": "30 days of excellence!"
       }
     },
+    "lesson": {
+      "definition": "Definition",
+      "examples": "Usage Examples",
+      "contextualExamples": "In Context",
+      "pronounce": "Listen to pronunciation",
+      "speaking": "Speaking...",
+      "pronunciationFallback": "Pronunciation",
+      "gotIt": "Got It",
+      "dontKnow": "Don't Know",
+      "tapToReveal": "Tap to reveal",
+      "classicMode": "Classic Mode",
+      "swipeMode": "Swipe Mode",
+      "autoPronounce": "Auto-pronounce",
+      "enrichingContent": "Loading enriched content..."
+    },
     "leaderboard": {
       "title": "Classroom Leaderboard",
+      "ariaLabel": "Classroom leaderboard showing top students",
       "yourPosition": "Your Position",
       "youAreRank": "You're #{rank}",
       "studentsInClass": "{count} students",
@@ -4521,6 +4973,62 @@ const en = {
       "joinClassroomPrompt": "Join a classroom to see the leaderboard",
       "level": "Lv. {level}",
       "xp": "{xp} XP"
+    },
+    "header": {
+      "title": "LexiClash",
+      "subtitle": "Education",
+      "homeLink": "Education Home",
+      "menu": "Education Menu",
+      "navigation": "Navigation",
+      "teacherDashboard": "Teacher Dashboard",
+      "studentDashboard": "My Lessons",
+      "educationHome": "Education Home",
+      "breadcrumbs": {
+        "navigation": "Education navigation",
+        "education": "Education",
+        "teacher": "Teacher Dashboard",
+        "student": "Student Dashboard",
+        "lessons": "Lessons",
+        "classrooms": "Classrooms",
+        "classroomGame": "Classroom Game",
+        "join": "Join Classroom",
+        "profile": "Profile"
+      }
+    },
+    "classroomGame": {
+      "title": "Classroom Game",
+      "shareCode": "Share this code with students",
+      "waitingForPlayers": "Waiting for players...",
+      "settings": "Game Settings",
+      "vocabularyWords": "Vocabulary Words",
+      "playable": "playable",
+      "noPlayableWords": "No playable words in this lesson",
+      "startGame": "Start Game",
+      "starting": "Starting...",
+      "lessonNotFound": "Lesson Not Found",
+      "lessonNotFoundDesc": "The requested lesson could not be found.",
+      "backToEducation": "Back to Education"
+    },
+    "onboarding": {
+      "step": "Step",
+      "of": "of",
+      "getStarted": "Let's Go!",
+      "welcome": {
+        "title": "Welcome to Education Mode!",
+        "description": "LexiClash Education helps you create engaging vocabulary lessons and track student progress. Let's get you set up!"
+      },
+      "classroom": {
+        "title": "Create Your First Classroom",
+        "description": "Start by creating a classroom. You'll get a unique code that students can use to join and access your lessons."
+      },
+      "lesson": {
+        "title": "Build Your First Lesson",
+        "description": "Add vocabulary words to create custom lessons. Students can practice with flashcards and word games using your vocabulary."
+      },
+      "invite": {
+        "title": "Invite Your Students",
+        "description": "Share your classroom code with students. They'll be able to join, practice lessons, and compete in classroom games!"
+      }
     },
     "analytics": {
       "title": "Class Analytics",
@@ -4562,11 +5070,21 @@ const en = {
       "masteryLevels": "Mastery Levels",
       "mastered": "Mastered",
       "practicing": "Practicing",
+      "live": "Live",
+      "offline": "Offline",
+      "connecting": "Connecting...",
+      "connectionError": "Connection issue",
+      "activeNow": "{{count}} active now",
+      "noActivity": "No activity",
+      "updatedAgo": "Updated {{time}} ago",
       "struggling": "Struggling",
       "notStarted": "Not Started",
       "accuracyTooltip": "{{student}}: {{accuracy}}% on \"{{word}}\"",
       "noVocabularyData": "No vocabulary data yet",
-      "practiceToSee": "Students need to practice to see mastery"
+      "practiceToSee": "Students need to practice to see mastery",
+      "viewLessons": "Lessons",
+      "viewVocabulary": "Vocabulary",
+      "backToClassroom": "Back to Classroom"
     },
     "achievements": {
       "title": "Achievements",

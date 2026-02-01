@@ -264,6 +264,47 @@ describe('DailyWordHuntResults Mobile Scroll with Fixed Tab Bar', () => {
   });
 });
 
+describe('DailyWordHuntResults Daily-specific Scroll Isolation', () => {
+  const sourcePath = resolve(process.cwd(), 'components/daily/DailyWordHuntResults.tsx');
+  const source = readFileSync(sourcePath, 'utf-8');
+
+  describe('Daily pages use correct isolate-scroll variant', () => {
+    it('should NOT use base isolate-scroll class which subtracts GlobalBottomNav padding', () => {
+      // CRITICAL BUG FIX:
+      // The base `isolate-scroll` class subtracts 64px for `main.pb-16` (GlobalBottomNav space).
+      // But on /daily pages:
+      // 1. GlobalBottomNav is hidden
+      // 2. `main` doesn't have pb-16 padding
+      // 3. DailyWordHuntResults has its own MobileTabBar with pb-[--mobile-bottom-safe]
+      //
+      // This causes the scroll container to be 64px shorter than needed, cutting off content.
+      //
+      // SOLUTION: Use `isolate-scroll-daily` variant that only subtracts AutoHideHeader (60px)
+      // and lets the component handle its own bottom padding via pb-[--mobile-bottom-safe].
+
+      // Find the scrollable container with overflow-y-auto and isolate-scroll
+      const scrollableContainerPattern = /overflow-y-auto[^"]*isolate-scroll[^"]*"/g;
+      const matches = source.match(scrollableContainerPattern) || [];
+
+      // Should have at least one scrollable container
+      expect(matches.length).toBeGreaterThan(0);
+
+      // ASSERTION: Should NOT use base `isolate-scroll` (which subtracts 64px for GlobalBottomNav)
+      // Should use `isolate-scroll-daily` which is designed for daily pages without GlobalBottomNav
+      matches.forEach((match) => {
+        // Must NOT have just "isolate-scroll" without the daily variant
+        // Pattern: isolate-scroll followed by space or end of string (not isolate-scroll-daily)
+        const hasBaseIsolateScroll = /\bisolate-scroll\b(?!-)/.test(match);
+        const hasDailyVariant = /\bisolate-scroll-daily\b/.test(match);
+
+        // Should use the daily variant, NOT the base class
+        expect(hasDailyVariant).toBe(true);
+        expect(hasBaseIsolateScroll).toBe(false);
+      });
+    });
+  });
+});
+
 describe('BuzzResultsScreen Scroll Layout', () => {
   const sourcePath = resolve(process.cwd(), 'components/buzz/BuzzResultsScreen.tsx');
   const source = readFileSync(sourcePath, 'utf-8');

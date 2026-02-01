@@ -246,6 +246,7 @@ export function useResultSubmission({
     guestPlayer,
     countryCodeReady,
     onSubmitSuccess,
+    t,
   ]);
 
   return { hasSubmittedRef };

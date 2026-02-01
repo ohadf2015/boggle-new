@@ -119,6 +119,17 @@ export const CHALLENGE_REQUIREMENTS_TEMPLATE = `## 📋 CHALLENGE REQUIREMENTS
 5. You CAN reference proper nouns in CLUES, just not as answers
 {{langExamples}}
 
+**🚨 CRITICAL: NO ANSWER SPOILERS 🚨**
+The answer word MUST NOT appear anywhere that players can see BEFORE guessing:
+- ❌ NEVER use the trend_topic name (or any word from it) as the answer
+  - Bad: Trend "סולטיז" → Answer "סולטיז" (players see the trend before guessing!)
+  - Bad: Trend "לוליק לוי" → Answer "לוליק" (word is visible in the trend name!)
+- ❌ NEVER use a word that appears in your trending_context sentence
+  - Bad: trending_context mentions "כותרת" → Answer "כותרת" (spoiled!)
+- ✅ GOOD: Answer is a RELATED word that does NOT appear in visible text
+  - Trend "סולטיז" → Answer "CHIPS" or "SNACK" (related but hidden)
+  - Trend "לוליק לוי" → Answer "STAR" or "VOICE" (about him, not his name)
+
 **WORD POPULARITY still matters**:
 - Choose words people use DAILY, not obscure synonyms
 - Test: "Would a 12-year-old know this word?" → If yes, good choice
@@ -264,6 +275,7 @@ Generate ready-to-post content for each platform in **{{language}}**. Each post 
 export const FINAL_CHECKLIST_TEMPLATE = `## ⚠️ FINAL CHECKLIST
 
 Before outputting, verify each challenge:
+- [ ] **🚨 NO SPOILERS**: Does the answer appear in trend_topic or trending_context? If YES, CHANGE THE ANSWER!
 - [ ] **Wordle Required**: Is there EXACTLY ONE wordle_guess challenge with a {{wordleLength}}-letter answer?
 - [ ] **Chain Format**: Does every word_chain use the format "WORD1 → ??? → WORD2"?
 - [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
