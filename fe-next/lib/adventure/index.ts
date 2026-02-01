@@ -77,3 +77,18 @@ export {
   COMMON_CONSONANTS,
   RARE_CONSONANTS,
 } from './gridGenerator';
+
+// Entry timing constants (DEBT-01 optimization)
+export {
+  OPTIMIZED_TIMING,
+  CASCADE_STAGGER_MS,
+  CASCADE_SETTLE_MS,
+  CASCADE_SPRING,
+  OBJECTIVES_STAGGER_MS,
+  OBJECTIVES_DURATION_MS,
+  OBJECTIVES_SPRING,
+  TITLE_BURST_MS,
+  TITLE_HOLD_MS,
+  TITLE_FADE_MS,
+  TITLE_TOTAL_MS,
+} from './entryTiming';
