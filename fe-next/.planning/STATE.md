@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 34 - Dynamic Difficulty Tuning (AI Director)
-Plan: 02 of 5 complete (Wave 1 plans executing in parallel)
+Plan: 03 of 5 complete (Wave 2 complete)
 Status: IN PROGRESS
-Last activity: 2026-02-01 - Completed 34-02-PLAN.md (Flow State Detector)
+Last activity: 2026-02-01 - Completed 34-03-PLAN.md (Intensity Controller)
 
-Progress: [██████████] 100% (Phases 26-33) + Phase 34: 40% (2/5 plans complete)
+Progress: [██████████] 100% (Phases 26-33) + Phase 34: 60% (3/5 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,12 @@ Progress: [██████████] 100% (Phases 26-33) + Phase 34: 40% (
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 34-03 (Intensity Controller, 2026-02-01):**
+- 10% adjustment rate: ADJUSTMENT_RATE = 0.1 ensures changes are imperceptible to players
+- Stateful controller pattern: Factory function with closures maintains state across transitions
+- Transition-point application: Adjustments only applied at natural game moments (combo breaks, power-up uses)
+- celebrationDuration unchanged for frustrated: When player is struggling, we increase help but don't reduce celebration joy
 
 **Phase 34-02 (Flow State Detector, 2026-02-01):**
 - Two-metric threshold for state changes: Both success rate AND combo must exceed thresholds to classify as bored/frustrated (prevents single-metric false positives)
@@ -287,7 +293,7 @@ Transform Adventure Mode with:
 
 - [x] 34-01: Types, Constants, Performance Monitor (TDD, Wave 1) - COMPLETE
 - [x] 34-02: Flow State Detector (TDD, Wave 1) - COMPLETE
-- [ ] 34-03: Intensity Adjustments (Wave 2)
+- [x] 34-03: Intensity Adjustments (TDD, Wave 2) - COMPLETE
 - [ ] 34-04: Analytics Hooks (Wave 3)
 - [ ] 34-05: Integration (Wave 4)
 
@@ -307,14 +313,23 @@ Transform Adventure Mode with:
 - Custom threshold support for different game modes
 - 15 comprehensive tests
 
+**Phase 34-03 Delivered (2026-02-01):**
+- IntensityController interface with gradual pacing adjustments
+- createIntensityController factory function with stateful tracking
+- getAdjustmentsAtTransition pure function for computing adjustments
+- Intensity limits: hints (0.5-2.0x), power-ups (0-2), combo grace (0-3s)
+- 10% gradual adjustments prevent rubber-banding perception
+- No adjustments during flow/learning (good states)
+- 26 comprehensive tests
+
 ## Session Continuity
 
-Last session: 2026-02-01T10:32:19Z
-Stopped at: Completed 34-02-PLAN.md (Flow State Detector)
+Last session: 2026-02-01T10:42:23Z
+Stopped at: Completed 34-03-PLAN.md (Intensity Controller)
 Resume file: None
 
-**Next action:** Continue Phase 34 with 34-03 (Intensity Adjustments) in Wave 2
+**Next action:** Continue Phase 34 with 34-04 (Analytics Hooks) in Wave 3
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 34: 2/5 plans complete - Flow State Detector delivered)*
+*Last updated: 2026-02-01 (Phase 34: 3/5 plans complete - Intensity Controller delivered)*
