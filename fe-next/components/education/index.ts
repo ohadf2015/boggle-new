@@ -46,7 +46,6 @@ export { EducationBreadcrumbs } from './EducationBreadcrumbs';
 export { default as EducationBreadcrumbsDefault } from './EducationBreadcrumbs';
 
 export { ClassroomGameLobby } from './ClassroomGameLobby';
-export { default as ClassroomGameLobbyDefault } from './ClassroomGameLobby';
 export type { ClassroomGameLobbyProps } from './ClassroomGameLobby';
 
 export { TeacherOnboarding } from './TeacherOnboarding';

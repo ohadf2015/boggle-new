@@ -26,6 +26,7 @@ import {
 import { registerEarthquakeHandlers, clearGameEarthquakeState } from './earthquakeHandler.js';
 import { registerScorecardHandlers } from './scorecardHandler.js';
 import { registerVocabularyHandlers } from './vocabularyHandler.js';
+import { registerClassroomGameHandlers } from './classroomGameHandler.js';
 import {
   startGameTimer,
   endGame,
@@ -58,6 +59,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerVocabularyHandlers(socket, (code: string) => {
     return getGame(code);
   });
+  registerClassroomGameHandlers(io, socket);
 }
 
 export {
@@ -78,6 +80,7 @@ export {
   registerEarthquakeHandlers,
   registerScorecardHandlers,
   registerVocabularyHandlers,
+  registerClassroomGameHandlers,
   processGameEndEngagement,
   processLongWordEngagement,
   processAchievementEngagement,

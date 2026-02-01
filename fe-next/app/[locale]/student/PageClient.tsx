@@ -15,6 +15,7 @@ import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
+import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
 import { cn } from '@/lib/utils';
 
 // Dynamic import with ssr: false to avoid CommonJS/ESM interop issues
@@ -88,6 +89,15 @@ export default function StudentPageClient() {
             {t('student.dashboard.subtitle')}
           </p>
         </div>
+
+        {/* Classroom Game Banner (if active game exists) */}
+        {classroomId && (
+          <ClassroomGameBanner
+            classroomId={classroomId}
+            userId={user.id}
+            username={user.email || 'Student'}
+          />
+        )}
 
         {/* Main Content Grid */}
         {/* Reduced gap: mobile 16px, lg 24px (was 32px) */}

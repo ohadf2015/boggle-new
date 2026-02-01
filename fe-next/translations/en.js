@@ -470,7 +470,8 @@ const en = {
     "networkError": "Network error. Your progress is saved locally.",
     "leaderboardFailed": "Couldn't load leaderboard. Try refreshing!",
     "resultSubmissionFailed": "Failed to save your result. Your progress is saved locally.",
-    "resetFailed": "Server reset failed. Please try again."
+    "resetFailed": "Server reset failed. Please try again.",
+    "loadFailed": "Failed to load data. Please try again."
   },
   "notFound": {
     "heading": "Lost in the Word Maze?",
@@ -3146,7 +3147,8 @@ const en = {
   "multiplayer": {
     "mode": "Mode",
     "timer": "Timer",
-    "subtitle": "Compete with friends in real-time"
+    "subtitle": "Compete with friends in real-time",
+    "playersJoined": "players joined"
   },
   "stats": {
     "games": "Games",
@@ -4647,6 +4649,12 @@ const en = {
     }
   },
   "student": {
+        "activeGame": {
+      "title": "Game Starting!",
+      "teacherStarted": "{{teacher}} started a classroom game",
+      "joinNow": "Join Game Now",
+      "joining": "Joining..."
+    },
     "dashboard": {
       "title": "My Lessons",
       "subtitle": "Practice vocabulary and track your progress"
@@ -4995,7 +5003,9 @@ const en = {
       "classicMode": "Classic Mode",
       "swipeMode": "Swipe Mode",
       "autoPronounce": "Auto-pronounce",
-      "enrichingContent": "Loading enriched content..."
+      "enrichingContent": "Loading enriched content...",
+      "word": "word",
+      "words": "words"
     },
     "leaderboard": {
       "title": "Classroom Leaderboard",
@@ -5032,10 +5042,23 @@ const en = {
     },
     "classroomGame": {
       "title": "Classroom Game",
+      "createGame": "Create Classroom Game",
+      "createGameDesc": "Select lessons and classroom to start a multiplayer game",
       "shareCode": "Share this code with students",
       "waitingForPlayers": "Waiting for players...",
       "settings": "Game Settings",
       "vocabularyWords": "Vocabulary Words",
+      "lessons": "Lessons",
+      "selectLessons": "Select Lessons",
+      "selectClassroom": "Select Classroom",
+      "lessonsSelected": "{{count}} selected",
+      "noLessonsAvailable": "No lessons available",
+      "multiLessonHelp": "Words from all selected lessons will be combined",
+      "totalWords": "Total Words",
+      "noClassrooms": "No classrooms found. Create a classroom first.",
+      "classroomNotFound": "Classroom not found",
+      "missingRequirements": "Please select at least one lesson and a classroom",
+      "gameCreated": "Game created! Redirecting to lobby...",
       "playable": "playable",
       "noPlayableWords": "No playable words in this lesson",
       "startGame": "Start Game",
@@ -5044,6 +5067,7 @@ const en = {
       "lessonNotFoundDesc": "The requested lesson could not be found.",
       "backToEducation": "Back to Education"
     },
+    "students": "students",
     "onboarding": {
       "step": "Step",
       "of": "of",

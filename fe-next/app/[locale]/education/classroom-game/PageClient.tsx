@@ -105,11 +105,11 @@ export default function ClassroomGamePageClient() {
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-screen', isRTL && 'rtl')}>
-      <EducationHeader showBackButton title={lesson.name} />
+      <EducationHeader showBackButton title={lesson?.name || t('education.classroomGame.title')} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <ClassroomGameLobby
-          lesson={lesson}
+          initialLessonId={lessonId}
           onBack={handleBack}
         />
       </main>
