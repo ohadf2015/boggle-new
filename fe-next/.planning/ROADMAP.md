@@ -512,10 +512,18 @@ Plans:
   6. Entry sequence timing optimized from 2.38s to 2s target (380ms reduction)
   7. Video MP4 rendering pipeline functional (Remotion render script produces playable MP4s)
   8. Bug fixes for BUG-004 through BUG-008 resolved and Lexi stuck detection implemented (30s inactivity triggers help)
-**Plans**: TBD
+**Plans**: 9 plans in 4 waves
 
 Plans:
-- [ ] 35-01: TBD during plan-phase
+- [ ] 35-01-PLAN.md — World 4 Idiom Archipelago theme config (Wave 1)
+- [ ] 35-02-PLAN.md — World 5 Compound Canyon theme config (Wave 1)
+- [ ] 35-03-PLAN.md — useInactivityDetection hook TDD (Wave 1)
+- [ ] 35-04-PLAN.md — World 4 asset generation + optimization (Wave 2)
+- [ ] 35-05-PLAN.md — World 5 asset generation + optimization (Wave 2)
+- [ ] 35-06-PLAN.md — Entry sequence timing optimization (Wave 2)
+- [ ] 35-07-PLAN.md — Remotion MP4 render script (Wave 3)
+- [ ] 35-08-PLAN.md — Bug fixes BUG-004 to BUG-008 + Lexi stuck detection (Wave 3)
+- [ ] 35-09-PLAN.md — Human verification checkpoint (Wave 4)
 
 ## Progress
 
@@ -553,9 +561,9 @@ Phases execute in numeric order: 26 → 27 → 28 → 29 → 30 → 31 → 32 �
 | 32. Visual Polish & Effects | v2.0 | 7/7 | ✅ Complete | 2026-02-01 |
 | 33. Cinematic System | v2.0 | 0/0 | ✅ Complete | 2026-02-01 |
 | 34. Dynamic Difficulty Tuning | v2.0 | 8/8 | ✅ Complete | 2026-02-01 |
-| 35. World Expansion & Tech Debt | v2.0 | 0/TBD | Not started | - |
+| 35. World Expansion & Tech Debt | v2.0 | 0/9 | Planning complete | - |
 
 ---
 
 *Roadmap created: 2026-01-25 for v1.1 milestone*
-*Last updated: 2026-02-01 after Phase 34 complete (AI Director - 122 tests, all DDA requirements verified)*
+*Last updated: 2026-02-01 after Phase 35 planning complete (9 plans in 4 waves)*
