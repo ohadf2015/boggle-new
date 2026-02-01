@@ -70,18 +70,26 @@ describe('useLayeredCelebration', () => {
 
       // THEN
       expect(mockFireLayeredCelebration).toHaveBeenCalledTimes(1);
-      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(100); // max budget from mock
+      // fireLayeredCelebration(duration, budget) - 2000ms duration, full budget object
+      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(2000, {
+        tier: 'high',
+        max: 100,
+        combo: 15,
+        levelUp: 60,
+        word: 10,
+      });
     });
 
     it('should use particle budget from useParticleBudget hook', () => {
       // GIVEN
-      mockUseParticleBudget.mockReturnValue({
+      const mediumBudget = {
         tier: 'medium',
         max: 60,
         combo: 10,
         levelUp: 40,
         word: 6,
-      });
+      };
+      mockUseParticleBudget.mockReturnValue(mediumBudget);
 
       const { result } = renderHook(() => useLayeredCelebration());
 
@@ -89,18 +97,19 @@ describe('useLayeredCelebration', () => {
       result.current.triggerCelebration();
 
       // THEN
-      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(60); // medium tier max
+      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(2000, mediumBudget);
     });
 
     it('should handle low-end device budgets', () => {
       // GIVEN
-      mockUseParticleBudget.mockReturnValue({
+      const lowBudget = {
         tier: 'low',
         max: 30,
         combo: 5,
         levelUp: 20,
         word: 3,
-      });
+      };
+      mockUseParticleBudget.mockReturnValue(lowBudget);
 
       const { result } = renderHook(() => useLayeredCelebration());
 
@@ -108,7 +117,7 @@ describe('useLayeredCelebration', () => {
       result.current.triggerCelebration();
 
       // THEN
-      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(30); // low tier max
+      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(2000, lowBudget);
     });
   });
 
@@ -179,28 +188,30 @@ describe('useLayeredCelebration', () => {
 
     it('should update when particle budget changes', () => {
       // GIVEN
-      mockUseParticleBudget.mockReturnValue({
+      const highBudget = {
         tier: 'high',
         max: 100,
         combo: 15,
         levelUp: 60,
         word: 10,
-      });
+      };
+      mockUseParticleBudget.mockReturnValue(highBudget);
 
       const { result, rerender } = renderHook(() => useLayeredCelebration());
 
       // Trigger with initial budget
       result.current.triggerCelebration();
-      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(100);
+      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(2000, highBudget);
 
       // WHEN - Change budget
-      mockUseParticleBudget.mockReturnValue({
+      const lowBudget = {
         tier: 'low',
         max: 30,
         combo: 5,
         levelUp: 20,
         word: 3,
-      });
+      };
+      mockUseParticleBudget.mockReturnValue(lowBudget);
       rerender();
 
       // Clear previous calls
@@ -210,7 +221,7 @@ describe('useLayeredCelebration', () => {
       result.current.triggerCelebration();
 
       // THEN
-      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(30);
+      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(2000, lowBudget);
     });
   });
 
@@ -245,7 +256,13 @@ describe('useLayeredCelebration', () => {
 
       // THEN
       expect(mockFireLayeredCelebration).toHaveBeenCalledTimes(3);
-      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(100);
+      expect(mockFireLayeredCelebration).toHaveBeenCalledWith(2000, {
+        tier: 'high',
+        max: 100,
+        combo: 15,
+        levelUp: 60,
+        word: 10,
+      });
     });
   });
 });
