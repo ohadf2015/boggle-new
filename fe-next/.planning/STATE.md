@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 35 - World Expansion & Tech Debt (In Progress)
-Plan: 03 of 8 complete (Wave 1 complete)
+Plan: 06 of 8 complete (Waves 1-2 complete)
 Status: In progress
-Last activity: 2026-02-01 - Completed 35-02-PLAN.md (World 5 Compound Canyon theme)
+Last activity: 2026-02-01 - Completed 35-06-PLAN.md (Entry Timing Optimization)
 
-Progress: [██████████] 100% (Phases 26-34) + Phase 35: 37% (3/8 plans)
+Progress: [██████████] 100% (Phases 26-34) + Phase 35: 75% (6/8 plans)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -394,11 +394,11 @@ Transform Adventure Mode with:
 - [x] 35-01: World 4 Theme Foundation (Wave 1) - COMPLETE
 - [x] 35-02: World 5 Theme Foundation (Wave 1) - COMPLETE
 - [x] 35-03: useInactivityDetection Hook (TDD, Wave 1) - COMPLETE
-- [ ] 35-04: Lexi Stuck Detection Integration (Wave 2)
-- [ ] 35-05: Entry Timing Fix (Wave 2)
-- [ ] 35-06: MP4 Rendering Script (Wave 3)
-- [ ] 35-07: Bug Fixes & Polish (Wave 4)
-- [ ] 35-08: Human Verification Checkpoint (Wave 5)
+- [x] 35-04: Lexi Stuck Detection Integration (Wave 2) - COMPLETE
+- [x] 35-05: Entry Timing Fix (Wave 2) - COMPLETE
+- [x] 35-06: Entry Timing Optimization (Wave 2) - COMPLETE
+- [ ] 35-07: MP4 Rendering Script (Wave 3)
+- [ ] 35-08: Human Verification Checkpoint (Wave 4)
 
 **Phase 35-01 Delivered (2026-02-01):**
 - World 4 Idiom Archipelago complete theme configuration
@@ -430,14 +430,24 @@ Transform Adventure Mode with:
 - hooks/index.ts barrel export created
 - 29 comprehensive tests (836 lines)
 
+**Phase 35-06 Delivered (2026-02-01):**
+- Entry sequence timing optimized from 2.38s to 1.86s (22% faster)
+- Centralized OPTIMIZED_TIMING constants in lib/adventure/entryTiming.ts
+- Cascade: 580ms -> 450ms (25ms stagger, optimized spring)
+- Objectives: 500ms -> 410ms (80ms stagger, 250ms duration)
+- Title: 1300ms -> 1000ms (350ms burst, 400ms hold, 250ms fade)
+- Parallel animations: Reduced parallax stagger to 50ms
+- 38 comprehensive tests validating timing constants
+- 3 commits: timing constants, cascade optimization, parallel animations
+
 ## Session Continuity
 
-Last session: 2026-02-01T13:26:45Z
-Stopped at: Completed 35-02-PLAN.md (World 5 Compound Canyon theme)
+Last session: 2026-02-01T13:45:00Z
+Stopped at: Completed 35-06-PLAN.md (Entry Timing Optimization)
 Resume file: None
 
-**Next action:** Execute 35-04-PLAN.md (Lexi Stuck Detection Integration)
+**Next action:** Execute 35-07-PLAN.md (MP4 Rendering Script)
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 35: 3/8 plans complete)*
+*Last updated: 2026-02-01 (Phase 35: 6/8 plans complete)*
