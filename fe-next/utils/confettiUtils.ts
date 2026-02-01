@@ -14,6 +14,26 @@ let confettiCanvas: HTMLCanvasElement | null = null;
 let myConfetti: CreateTypes | null = null;
 let resizeHandler: (() => void) | null = null;
 
+// ==================== Z-Index Constants ====================
+
+/**
+ * Centralized z-index constants for layered particle effects
+ *
+ * These values establish a clear visual hierarchy:
+ * - BACKGROUND_PARTICLES (1000): Subtle background layer
+ * - MIDGROUND_PARTICLES (2000): Main celebration layer
+ * - FOREGROUND_PARTICLES (3000): Foreground accents
+ * - CELEBRATION_OVERLAY (9000): UI overlays (modals, toasts)
+ * - CINEMATIC_PLAYER (9999): Full-screen cinematics (highest)
+ */
+export const Z_INDEX = {
+  BACKGROUND_PARTICLES: 1000,
+  MIDGROUND_PARTICLES: 2000,
+  FOREGROUND_PARTICLES: 3000,
+  CELEBRATION_OVERLAY: 9000,
+  CINEMATIC_PLAYER: 9999,
+} as const;
+
 // ==================== Neo-Brutalist Confetti Configuration ====================
 
 /**
@@ -386,6 +406,73 @@ export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
       cancelAnimationFrame(rafId);
     }
   };
+}
+
+/**
+ * Fire layered celebration with background, midground, and foreground particles
+ *
+ * Creates depth perception through:
+ * - Budget split: 20% background, 60% midground, 20% foreground
+ * - Timing delays: 0ms, 100ms, 200ms
+ * - Z-index layering: 1000, 2000, 3000
+ * - Variable origins and spreads for depth
+ *
+ * @param totalBudget - Total particle budget (split across 3 layers)
+ *
+ * @example
+ * ```tsx
+ * // Fire celebration with 100 particles total (20/60/20 split)
+ * fireLayeredCelebration(100);
+ * ```
+ */
+export function fireLayeredCelebration(totalBudget: number): void {
+  // Budget split: 20% background, 60% midground, 20% foreground
+  const backgroundCount = Math.floor(totalBudget * 0.2);
+  const midgroundCount = Math.floor(totalBudget * 0.6);
+  const foregroundCount = Math.floor(totalBudget * 0.2);
+
+  // Layer 1: Background (immediate, subtle, distant)
+  fireConfetti({
+    particleCount: backgroundCount,
+    spread: 80,
+    origin: { y: 0.7 },
+    zIndex: Z_INDEX.BACKGROUND_PARTICLES,
+    scalar: 1.0,
+    startVelocity: 35,
+    flat: true,
+    shapes: NEO_BRUTALIST_SHAPES,
+    colors: NEO_BRUTALIST_COLORS,
+  });
+
+  // Layer 2: Midground (100ms delay, main celebration, largest)
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: midgroundCount,
+      spread: 100,
+      origin: { y: 0.6 },
+      zIndex: Z_INDEX.MIDGROUND_PARTICLES,
+      scalar: 1.3,
+      startVelocity: 50,
+      flat: true,
+      shapes: NEO_BRUTALIST_SHAPES,
+      colors: NEO_BRUTALIST_COLORS,
+    });
+  }, 100);
+
+  // Layer 3: Foreground (200ms delay, close accents, pop)
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: foregroundCount,
+      spread: 60,
+      origin: { y: 0.5 },
+      zIndex: Z_INDEX.FOREGROUND_PARTICLES,
+      scalar: 1.5,
+      startVelocity: 60,
+      flat: true,
+      shapes: NEO_BRUTALIST_SHAPES,
+      colors: NEO_BRUTALIST_COLORS,
+    });
+  }, 200);
 }
 
 // Export types for consumers
