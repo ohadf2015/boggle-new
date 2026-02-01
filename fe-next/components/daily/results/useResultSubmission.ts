@@ -34,7 +34,7 @@ interface UseResultSubmissionProps {
   countryCodeReady: boolean;
   onSubmitSuccess: () => void;
   /** Translation function for error messages */
-  t?: (key: string, fallback?: string) => string;
+  t?: (key: string) => string;
 }
 
 export function useResultSubmission({
@@ -202,10 +202,8 @@ export function useResultSubmission({
               }
             } else {
               // BUG-004: Show user-facing toast for submission failures
-              const errorMessage = t?.('errors.resultSubmissionFailed', 'Failed to save your result. Your progress is saved locally.');
-              if (errorMessage) {
-                neoErrorToast(errorMessage, { icon: '⚠️', duration: 4000 });
-              }
+              const errorMessage = t?.('errors.resultSubmissionFailed') || 'Failed to save your result. Your progress is saved locally.';
+              neoErrorToast(errorMessage, { icon: '⚠️', duration: 4000 });
               console.error('Failed to submit Word Hunt result:', errorText);
             }
             return;
@@ -228,10 +226,8 @@ export function useResultSubmission({
           onSubmitSuccess();
         } catch (err) {
           // BUG-004: Show user-facing toast for network errors
-          const errorMessage = t?.('errors.networkError', 'Network error. Your progress is saved locally.');
-          if (errorMessage) {
-            neoErrorToast(errorMessage, { icon: '📡', duration: 4000 });
-          }
+          const errorMessage = t?.('errors.networkError') || 'Network error. Your progress is saved locally.';
+          neoErrorToast(errorMessage, { icon: '📡', duration: 4000 });
           console.error('Failed to submit Word Hunt result:', err);
         }
       };

@@ -514,7 +514,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const { resetOnGameAction } = useLexiStuckDetection({
       onStuck: () => {
         // Show Lexi hint when player is stuck
-        neoInfoToast(t('adventure.lexi.stuckHint', 'Need a hint? Try looking for shorter words first!'), {
+        neoInfoToast(t('adventure.lexi.stuckHint') || 'Need a hint? Try looking for shorter words first!', {
           icon: '💡',
           duration: 5000,
         });

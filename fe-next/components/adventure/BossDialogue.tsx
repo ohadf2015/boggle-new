@@ -51,8 +51,8 @@ const BossDialogue = memo<BossDialogueProps>(
     const { t } = useLanguage();
 
     // BUG-008: Add fallbacks for dynamic translation keys
-    const translatedTaunt = t(currentTaunt, currentTaunt);
-    const translatedName = t(boss.displayName, boss.displayName);
+    const translatedTaunt = t(currentTaunt) || currentTaunt;
+    const translatedName = t(boss.displayName) || boss.displayName;
     const variants = SLIDE_VARIANTS[position];
 
     return (

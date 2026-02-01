@@ -663,13 +663,13 @@ const DailyChallenge: React.FC = () => {
           if (!resetResult.success) {
             // BUG-006: Show error toast when server reset fails
             console.warn('Server reset returned failure:', resetResult);
-            neoErrorToast(t('errors.resetFailed', 'Server reset failed. Please try again.'), { icon: '⚠️', duration: 4000 });
+            neoErrorToast(t('errors.resetFailed') || 'Server reset failed. Please try again.', { icon: '⚠️', duration: 4000 });
             return; // Prevent proceeding with local reset when server sync fails
           }
         } catch (serverError) {
           // BUG-006: Show error toast on network failure
           console.warn('Failed to reset server attempt:', serverError);
-          neoErrorToast(t('errors.networkError', 'Network error during reset.'), { icon: '📡', duration: 4000 });
+          neoErrorToast(t('errors.networkError') || 'Network error during reset.', { icon: '📡', duration: 4000 });
           return; // Prevent proceeding when server is unreachable
         }
       }
