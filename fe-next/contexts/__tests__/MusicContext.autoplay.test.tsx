@@ -167,7 +167,7 @@ describe('MusicContext - Auto-play and Transitions', () => {
     });
   });
 
-  it('should auto-play and loop track when it finishes', async () => {
+  it('should use native looping (loop: true) for seamless playback', async () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <MusicProvider>{children}</MusicProvider>
     );
@@ -194,16 +194,13 @@ describe('MusicContext - Auto-play and Transitions', () => {
     expect(inGameHowl).toBeDefined();
     expect(inGameHowl._playing).toBe(true);
 
-    // Simulate track ending (this should trigger auto-loop with crossfade)
-    await act(async () => {
-      inGameHowl._triggerEnd();
-      // Need to wait for preload (20ms) + crossfade logic
-      await new Promise(resolve => setTimeout(resolve, 150));
-    });
+    // Verify native looping is enabled - this means Howler handles the loop
+    // automatically without needing to call play() again
+    expect(inGameHowl._options.loop).toBe(true);
 
-    // Track should restart and be playing after the loop
-    expect(inGameHowl.play).toHaveBeenCalledTimes(2); // Initial + restart
-    expect(inGameHowl._playing).toBe(true); // Should still be playing
+    // With native loop: true, the track continues playing indefinitely
+    // without needing to trigger onend manually
+    expect(inGameHowl._playing).toBe(true);
   });
 
   it('should transition between tracks smoothly after initial load', async () => {

@@ -143,12 +143,10 @@ export function MusicProvider({ children }: MusicProviderProps) {
         if (typeof window === 'undefined') return;
 
         Object.entries(TRACKS).forEach(([key, src]) => {
-            // All tracks use manual looping with crossfade for smooth transitions
-            // Warning track (almostOutOfTime) loops from beginning, others from 10s mark
-            const isWarningTrack = key === 'almostOutOfTime';
-
+            // Use Howler's native loop: true for seamless, reliable looping
+            // This is simpler and avoids the complexity of manual crossfade-to-self
             howlsRef.current[key as TrackKey] = createLazyHowl(src, {
-                loop: false, // All tracks use manual crossfade looping for smooth transitions
+                loop: true, // Native looping for seamless playback
                 volume: 0,
                 // html5: true set by createLazyHowl for iOS Safari compatibility
                 // preload: false set by createLazyHowl to prevent automatic loading
@@ -173,46 +171,8 @@ export function MusicProvider({ children }: MusicProviderProps) {
                             });
                     }
                 },
-                onend: async () => {
-                    // When track ends, crossfade to itself for smooth looping
-                    if (currentTrackRef.current === key && howlsRef.current[key as TrackKey]) {
-                        // Don't restart if window is not focused or tab is hidden
-                        const isTabHidden = typeof document !== 'undefined' && document.visibilityState === 'hidden';
-                        if (!windowFocusedRef.current || isTabHidden) {
-                            logger.log(`[Music] Track ended but window not focused, not restarting:`, key);
-                            return;
-                        }
-
-                        // Warning track restarts from beginning, others from 10s mark
-                        const seekPosition = isWarningTrack ? 0 : 10;
-                        logger.log(`[Music] Track ended, restarting from ${seekPosition}s with crossfade:`, key);
-                        const howl = howlsRef.current[key as TrackKey];
-                        const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
-
-                        // Ensure track is loaded before restarting (critical for lazy loading)
-                        if (howl.state() === 'unloaded') {
-                            logger.log(`[Music] Track unloaded, preloading before restart:`, key);
-                            try {
-                                await preloadAudioOnDemand(howl);
-                                logger.log(`[Music] Track preloaded successfully, restarting:`, key);
-                            } catch (err) {
-                                logger.error(`[Music] Failed to preload track for restart:`, key, err);
-                                return; // Don't try to play if loading failed
-                            }
-                        }
-
-                        // Crossfade: start fading out current instance
-                        howl.fade(howl.volume(), 0, 2000);
-
-                        // Start new instance from seek position and fade in (overlapping with fade out)
-                        setTimeout(() => {
-                            howl.seek(seekPosition);
-                            howl.volume(0);
-                            howl.play();
-                            howl.fade(0, targetVolume, 2000);
-                        }, 0); // Start immediately for true crossfade
-                    }
-                },
+                // Note: With loop: true, onend is not called - Howler handles looping natively
+                // This avoids the previous bug where we tried to crossfade a single instance to itself
             });
         });
 
@@ -299,9 +259,25 @@ export function MusicProvider({ children }: MusicProviderProps) {
         if (currentHowlRef.current && !currentHowlRef.current.playing() && currentTrackRef.current) {
             try {
                 const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
-                currentHowlRef.current.play();
-                currentHowlRef.current.volume(targetVolume);
-                logger.log(`[Music] ${reason} - resumed current Howl`);
+                const currentHowl = currentHowlRef.current;
+
+                // Set volume before playing to ensure it starts at correct level
+                currentHowl.volume(targetVolume);
+                currentHowl.play();
+                logger.log(`[Music] ${reason} - resumed current Howl at volume`, targetVolume);
+
+                // Double-check volume is correct after a short delay
+                // Some browsers reset volume when resuming from suspended state
+                setTimeout(() => {
+                    if (currentHowlRef.current === currentHowl && currentHowl.playing()) {
+                        const actualVol = currentHowl.volume();
+                        const expectedVol = isMutedRef.current ? 0 : volumeRef.current;
+                        if (Math.abs(actualVol - expectedVol) > 0.05) {
+                            logger.log(`[Music] ${reason} - correcting volume from`, actualVol, 'to', expectedVol);
+                            currentHowl.volume(expectedVol);
+                        }
+                    }
+                }, 100);
             } catch (err) {
                 // Silently handle play errors (iOS can throw InvalidStateError) - log only in development
                 logger.log(`[Music] ${reason} - Howl play error:`, err);
@@ -577,6 +553,21 @@ export function MusicProvider({ children }: MusicProviderProps) {
             }
         } else {
             newHowl.fade(0, targetVolume, fadeInMs);
+
+            // FALLBACK: Ensure volume is set correctly after fade completes
+            // Some browsers (especially mobile) may not properly execute fades
+            // This ensures the volume reaches the target even if fade fails
+            fadeTimeoutRef.current = setTimeout(() => {
+                if (currentHowlRef.current === newHowl && newHowl.playing()) {
+                    const currentVol = newHowl.volume();
+                    const expectedVol = isMutedRef.current ? 0 : volumeRef.current;
+                    // Only fix if volume is significantly wrong (not just slightly off from fade)
+                    if (Math.abs(currentVol - expectedVol) > 0.1) {
+                        logger.log('[Music] Fade fallback - correcting volume from', currentVol, 'to', expectedVol);
+                        newHowl.volume(expectedVol);
+                    }
+                }
+            }, fadeInMs + 100); // Check shortly after fade should complete
         }
 
         currentHowlRef.current = newHowl;
