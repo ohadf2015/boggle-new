@@ -12,6 +12,7 @@ import type { TileType } from '@/types/adventure';
 import { WORLD_1_THEME } from './world1';
 import { WORLD_2_THEME } from './world2';
 import { WORLD_3_THEME } from './world3';
+import { WORLD_4_THEME } from './world4';
 
 // ==============================================
 // THEME REGISTRY
@@ -25,9 +26,9 @@ const WORLD_THEMES: Record<number, WorldTheme> = {
   1: WORLD_1_THEME,
   2: WORLD_2_THEME,
   3: WORLD_3_THEME,
-  // Worlds 4-10: Temporary placeholders using World 1 as base
-  // TODO: Implement full themes for worlds 4-10
-  4: createPlaceholderTheme(4, 'idiomArchipelago', 'tropical-islands', 'idioms', 'neo-orange'),
+  4: WORLD_4_THEME,
+  // Worlds 5-10: Temporary placeholders using World 1 as base
+  // TODO: Implement full themes for worlds 5-10
   5: createPlaceholderTheme(5, 'compoundCanyon', 'desert-cliffs', 'compounds', 'neo-red'),
   6: createPlaceholderTheme(6, 'anagramLabyrinth', 'escher-maze', 'anagrams', 'neo-pink'),
   7: createPlaceholderTheme(7, 'mirrorPalace', 'reflective-glass', 'palindromes', 'neo-cyan'),
@@ -199,8 +200,8 @@ export function getAllWorldThemes(): WorldTheme[] {
  * @returns true if the theme is fully implemented
  */
 export function isThemeImplemented(worldId: number): boolean {
-  // Worlds 1-3 are fully implemented
-  return worldId >= 1 && worldId <= 3;
+  // Worlds 1-4 are fully implemented
+  return worldId >= 1 && worldId <= 4;
 }
 
 // ==============================================
@@ -226,3 +227,4 @@ export type {
 export { WORLD_1_THEME } from './world1';
 export { WORLD_2_THEME } from './world2';
 export { WORLD_3_THEME } from './world3';
+export { WORLD_4_THEME } from './world4';
