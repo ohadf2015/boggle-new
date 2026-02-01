@@ -97,11 +97,11 @@ Requirements for Adventure Overhaul milestone. Each maps to roadmap phases.
 
 ### Cinematic System
 
-- [ ] **CINE-01**: User sees boss entrance cutscene (5-10s, Remotion-based)
-- [ ] **CINE-02**: User sees victory celebration sequence
-- [ ] **CINE-03**: User sees defeat sequence
-- [ ] **CINE-04**: All cinematics are skippable after 2s
-- [ ] **CINE-05**: Cinematics use Remotion + Lottie + Skia for effects
+- [x] **CINE-01**: User sees boss entrance cutscene (5-10s, Remotion-based) ✓ Phase 30-07
+- [x] **CINE-02**: User sees victory celebration sequence ✓ Phase 32-04
+- [x] **CINE-03**: User sees defeat sequence ✓ Phase 32-04
+- [x] **CINE-04**: All cinematics are skippable after 2s ✓ Phase 30-07
+- [x] **CINE-05**: Cinematics use Remotion + Lottie + Skia for effects ✓ Phase 30-07+
 
 ### Dynamic Difficulty Tuning (Advanced)
 
@@ -113,21 +113,21 @@ Requirements for Adventure Overhaul milestone. Each maps to roadmap phases.
 
 ### World Expansion (v1.1 Carryover)
 
-- [ ] **WORLD-01**: World 4 Idiom Archipelago has parallax backgrounds (3-5 layers, tropical islands)
-- [ ] **WORLD-02**: World 4 Idiom Archipelago has themed particles (palm fronds, seashells, waves)
-- [ ] **WORLD-03**: World 4 Idiom Archipelago has board decorations (tiki borders, island accents)
-- [ ] **WORLD-04**: World 4 has AI-generated background assets (WebP, <200KB)
-- [ ] **WORLD-05**: World 5 Compound Canyon has parallax backgrounds (3-5 layers, desert cliffs)
-- [ ] **WORLD-06**: World 5 Compound Canyon has themed particles (dust, tumbleweeds, heat shimmer)
-- [ ] **WORLD-07**: World 5 Compound Canyon has board decorations (canyon rock borders, desert accents)
-- [ ] **WORLD-08**: World 5 has AI-generated background assets (WebP, <200KB)
+- [x] **WORLD-01**: World 4 Idiom Archipelago has parallax backgrounds (3-5 layers, tropical islands) ✓ Phase 35-01, 35-04
+- [x] **WORLD-02**: World 4 Idiom Archipelago has themed particles (palm fronds, seashells, waves) ✓ Phase 35-04
+- [x] **WORLD-03**: World 4 Idiom Archipelago has board decorations (tiki borders, island accents) ✓ Phase 35-01
+- [x] **WORLD-04**: World 4 has AI-generated background assets (WebP, <200KB) ✓ Phase 35-04
+- [x] **WORLD-05**: World 5 Compound Canyon has parallax backgrounds (3-5 layers, desert cliffs) ✓ Phase 35-02, 35-05
+- [x] **WORLD-06**: World 5 Compound Canyon has themed particles (dust, tumbleweeds, heat shimmer) ✓ Phase 35-05
+- [x] **WORLD-07**: World 5 Compound Canyon has board decorations (canyon rock borders, desert accents) ✓ Phase 35-02
+- [x] **WORLD-08**: World 5 has AI-generated background assets (WebP, <200KB) ✓ Phase 35-05
 
 ### Tech Debt Cleanup (v1.1 Carryover)
 
-- [ ] **DEBT-01**: Entry sequence timing optimized from 2.38s to 2s target
-- [ ] **DEBT-02**: Video MP4 rendering pipeline functional (Remotion render script)
-- [ ] **DEBT-03**: Bug fixes for BUG-004 through BUG-008 resolved
-- [ ] **DEBT-04**: Lexi stuck detection implemented (30s inactivity triggers help)
+- [x] **DEBT-01**: Entry sequence timing optimized from 2.38s to 2s target ✓ Phase 35-06 (1.86s achieved)
+- [x] **DEBT-02**: Video MP4 rendering pipeline functional (Remotion render script) ✓ Phase 35-07
+- [x] **DEBT-03**: Bug fixes for BUG-004 through BUG-008 resolved ✓ Phase 35-08
+- [x] **DEBT-04**: Lexi stuck detection implemented (30s inactivity triggers help) ✓ Phase 35-08
 
 ## Future Requirements
 
@@ -268,11 +268,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | POLISH-04 | Phase 32 | Pending |
 | POLISH-05 | Phase 32 | Pending |
 | POLISH-06 | Phase 32 | Pending |
-| CINE-01 | Phase 33 | Pending |
-| CINE-02 | Phase 33 | Pending |
-| CINE-03 | Phase 33 | Pending |
-| CINE-04 | Phase 33 | Pending |
-| CINE-05 | Phase 33 | Pending |
+| CINE-01 | Phase 33 (delivered 30-07) | Complete |
+| CINE-02 | Phase 33 (delivered 32-04) | Complete |
+| CINE-03 | Phase 33 (delivered 32-04) | Complete |
+| CINE-04 | Phase 33 (delivered 30-07) | Complete |
+| CINE-05 | Phase 33 (delivered 30-07+) | Complete |
 | DDA-01 | Phase 34 | Pending |
 | DDA-02 | Phase 34 | Pending |
 | DDA-03 | Phase 34 | Pending |
