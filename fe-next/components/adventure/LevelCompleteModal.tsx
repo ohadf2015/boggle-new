@@ -7,14 +7,17 @@
 
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Check, X, Trophy, RotateCcw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParallax } from '@/hooks/useParallax';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
+import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import type { LevelObjective, ObjectiveType, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
@@ -155,6 +158,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     const { t } = useLanguage();
     const isPerfect = stars === 3;
     const isFailed = stars === 0;
+    const prefersReducedMotion = usePrefersReducedMotion();
+    const particleBudget = useParticleBudget();
 
     // Enhanced parallax for celebration - dramatic intensity scales with stars
     const PARALLAX_INTENSITY_BY_STARS: Record<number, number> = { 3: 1.5, 2: 1.0, 1: 0.6 };
@@ -188,6 +193,16 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
         repeatDelay: seededRandom(i * 3 + 4) * 2,
       }));
     }, []);
+
+    // Fire victory confetti on mount (only for victory, not defeat)
+    useEffect(() => {
+      if (isOpen && !isFailed && !prefersReducedMotion) {
+        // Respect particle budget tier
+        if (particleBudget.combo > 0) {
+          fireVictoryConfetti();
+        }
+      }
+    }, [isOpen, isFailed, prefersReducedMotion, particleBudget.combo]);
 
     if (!isOpen) return null;
 
