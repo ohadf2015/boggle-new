@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 34 - Dynamic Difficulty Tuning (AI Director) — VERIFIED COMPLETE
-Plan: 08 of 8 complete (All waves complete, human verification approved)
-Status: VERIFIED COMPLETE
-Last activity: 2026-02-01 - Phase 34 verified complete (8/8 plans, 122 tests)
+Phase: 35 - World Expansion & Tech Debt (In Progress)
+Plan: 03 of 8 complete (Wave 1)
+Status: In progress
+Last activity: 2026-02-01 - Completed 35-03-PLAN.md (useInactivityDetection hook)
 
-Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% (8/8 plans, verified)
+Progress: [██████████] 100% (Phases 26-34) + Phase 35: 37% (3/8 plans)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -389,14 +389,33 @@ Transform Adventure Mode with:
 - Csikszentmihalyi flow model adapted for word games
 - 10% gradual adjustments prevent rubber-banding perception
 
+## Phase 35 Progress — IN PROGRESS
+
+- [x] 35-01: World 4 Theme Foundation (Wave 1) - COMPLETE
+- [x] 35-02: World 5 Theme Foundation (Wave 1) - COMPLETE
+- [x] 35-03: useInactivityDetection Hook (TDD, Wave 1) - COMPLETE
+- [ ] 35-04: Lexi Stuck Detection Integration (Wave 2)
+- [ ] 35-05: Entry Timing Fix (Wave 2)
+- [ ] 35-06: MP4 Rendering Script (Wave 3)
+- [ ] 35-07: Bug Fixes & Polish (Wave 4)
+- [ ] 35-08: Human Verification Checkpoint (Wave 5)
+
+**Phase 35-03 Delivered (2026-02-01):**
+- useInactivityDetection hook with 30s default timeout
+- DOM event listeners (mousemove, keydown, touchstart, click)
+- Manual reset function for game actions
+- Enabled/disabled toggle support
+- hooks/index.ts barrel export created
+- 29 comprehensive tests (836 lines)
+
 ## Session Continuity
 
-Last session: 2026-02-01T12:00:00Z
-Stopped at: Completed Phase 34 - Dynamic Difficulty Tuning (AI Director) - VERIFIED
+Last session: 2026-02-01T13:10:00Z
+Stopped at: Completed 35-03-PLAN.md (useInactivityDetection hook)
 Resume file: None
 
-**Next action:** Execute Phase 35 (World Expansion & Tech Debt) - Run `/gsd:plan-phase 35` to begin
+**Next action:** Execute 35-04-PLAN.md (Lexi Stuck Detection Integration)
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 34: 8/8 plans complete - VERIFIED COMPLETE)*
+*Last updated: 2026-02-01 (Phase 35: 3/8 plans complete)*
