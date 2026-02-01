@@ -238,7 +238,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           }
 
           const responseData = await response.json();
-          console.log('Daily challenge submitted successfully:', responseData);
+          // BUG-007: Wrap debug logs in dev check
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Daily challenge submitted successfully:', responseData);
+          }
 
           // Refresh the leaderboard after successful submission
           setLeaderboardKey(prev => prev + 1);

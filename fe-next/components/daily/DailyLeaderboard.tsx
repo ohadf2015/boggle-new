@@ -230,7 +230,10 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
 
       const data = await response.json();
-      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts, guestPlayerCount: data.guestPlayerCount });
+      // BUG-007: Wrap debug logs in dev check
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts, guestPlayerCount: data.guestPlayerCount });
+      }
       setParticipants(data.data || []);
       setTotalCount(data.totalParticipants || 0);
       setTotalAttempts(data.totalAttempts || 0);

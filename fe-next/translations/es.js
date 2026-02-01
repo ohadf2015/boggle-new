@@ -419,7 +419,8 @@ const es = {
     "serviceUnavailable": "Servicio temporalmente no disponible",
     "networkError": "Error de red. Tu progreso se guardó localmente.",
     "leaderboardFailed": "No se pudo cargar la clasificación. ¡Intenta actualizar!",
-    "resultSubmissionFailed": "No se pudo guardar tu resultado. Tu progreso se guardó localmente."
+    "resultSubmissionFailed": "No se pudo guardar tu resultado. Tu progreso se guardó localmente.",
+    "resetFailed": "Error al reiniciar el servidor. Inténtalo de nuevo."
   },
   "notFound": {
     "heading": "¿Perdido en el laberinto de palabras?",

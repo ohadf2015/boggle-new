@@ -469,7 +469,8 @@ const en = {
     "serviceUnavailable": "Service temporarily unavailable",
     "networkError": "Network error. Your progress is saved locally.",
     "leaderboardFailed": "Couldn't load leaderboard. Try refreshing!",
-    "resultSubmissionFailed": "Failed to save your result. Your progress is saved locally."
+    "resultSubmissionFailed": "Failed to save your result. Your progress is saved locally.",
+    "resetFailed": "Server reset failed. Please try again."
   },
   "notFound": {
     "heading": "Lost in the Word Maze?",

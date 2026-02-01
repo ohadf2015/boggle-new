@@ -469,7 +469,8 @@ const sv = {
     "serviceUnavailable": "Tjänsten är tillfälligt otillgänglig",
     "networkError": "Nätverksfel. Dina framsteg sparas lokalt.",
     "leaderboardFailed": "Kunde inte ladda resultattavlan. Försök uppdatera!",
-    "resultSubmissionFailed": "Kunde inte spara ditt resultat. Dina framsteg sparas lokalt."
+    "resultSubmissionFailed": "Kunde inte spara ditt resultat. Dina framsteg sparas lokalt.",
+    "resetFailed": "Serveråterställning misslyckades. Försök igen."
   },
   "notFound": {
     "heading": "Vilse i ordlabyrinten?",

@@ -469,7 +469,8 @@ const he = {
     "serviceUnavailable": "השירות לא זמין זמנית",
     "networkError": "שגיאת רשת. ההתקדמות שלך נשמרה מקומית.",
     "leaderboardFailed": "לא הצלחנו לטעון את לוח התוצאות. נסה לרענן!",
-    "resultSubmissionFailed": "לא הצלחנו לשמור את התוצאה. ההתקדמות שלך נשמרה מקומית."
+    "resultSubmissionFailed": "לא הצלחנו לשמור את התוצאה. ההתקדמות שלך נשמרה מקומית.",
+    "resetFailed": "איפוס השרת נכשל. נסה שוב."
   },
   "notFound": {
     "heading": "אבדת במבוך המילים?",

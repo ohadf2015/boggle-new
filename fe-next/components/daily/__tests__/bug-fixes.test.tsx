@@ -271,6 +271,97 @@ describe('Bug Fixes - Phase 10', () => {
    * - Test passes, confirming bug is fixed
    */
 
+  describe('BUG-005: Authenticated user submission blocked without guestFingerprint', () => {
+    /**
+     * Severity: Medium (blocks authenticated user submissions)
+     * Component: components/daily/results/useResultSubmission.ts
+     *
+     * Bug: The canSubmit logic previously required guestFingerprint for ALL users.
+     * Authenticated users with profile but no guestFingerprint were blocked.
+     *
+     * Fixed: canSubmit now checks:
+     * - For authenticated: isAuthenticated && profile (NOT guestFingerprint)
+     * - For guests: guestFingerprint only
+     *
+     * Regression test ensures the fix stays in place.
+     */
+
+    it('should submit for authenticated user even when guestFingerprint is NULL (BUG-005 regression)', async () => {
+      // GIVEN: Authenticated user WITH profile, WITHOUT guestFingerprint
+      const validResult = createMockResult(3);
+
+      const props = {
+        result: validResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-24',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null, // KEY: null fingerprint
+        isAuthenticated: true,  // KEY: authenticated
+        profile: mockProfile,   // KEY: has profile
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      // WHEN: Rendering the hook
+      renderHook(() => useResultSubmission(props));
+
+      // THEN: Should submit to server (authenticated users don't need guestFingerprint)
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith(
+          '/api/daily-challenge/word-hunt/submit',
+          expect.objectContaining({
+            method: 'POST',
+          })
+        );
+      }, { timeout: 3000 });
+
+      // AND: Submission body should use playerId, not guestFingerprint
+      const submitCall = mockFetch.mock.calls.find(
+        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
+      );
+      expect(submitCall).toBeDefined();
+      const bodyText = submitCall![1].body;
+      const body = JSON.parse(bodyText);
+      expect(body.playerId).toBe(mockProfile.id);
+      expect(body.guestFingerprint).toBeNull();
+    });
+
+    it('should NOT submit for guest user when guestFingerprint is null (BUG-005 control)', async () => {
+      // GIVEN: Guest user WITHOUT profile AND WITHOUT guestFingerprint
+      const validResult = createMockResult(3);
+
+      const props = {
+        result: validResult,
+        puzzleNumber: 100,
+        puzzleDate: '2025-01-24',
+        language: 'en' as const,
+        isNewCompletion: true,
+        guestFingerprint: null, // KEY: null fingerprint
+        isAuthenticated: false, // KEY: NOT authenticated
+        profile: null,          // KEY: no profile
+        guestPlayer: null,
+        countryCodeReady: true,
+        onSubmitSuccess: mockOnSubmitSuccess,
+      };
+
+      // WHEN: Rendering the hook
+      renderHook(() => useResultSubmission(props));
+
+      // Wait for async operations
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      });
+
+      // THEN: Should NOT submit to server (guests need guestFingerprint)
+      const submitCalls = mockFetch.mock.calls.filter(
+        (call) => call[0] === '/api/daily-challenge/word-hunt/submit'
+      );
+      expect(submitCalls).toHaveLength(0);
+    });
+  });
+
   /**
    * BUG-001: E2E Test Server Port Conflict
    * BUG-010: Performance Tests Timeout Due to API Configuration

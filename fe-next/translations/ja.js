@@ -469,7 +469,8 @@ const ja = {
     "serviceUnavailable": "サービスは一時的に利用不可",
     "networkError": "ネットワークエラー。進捗はローカルに保存されました。",
     "leaderboardFailed": "リーダーボードを読み込めませんでした。更新してね！",
-    "resultSubmissionFailed": "結果を保存できませんでした。進捗はローカルに保存されました。"
+    "resultSubmissionFailed": "結果を保存できませんでした。進捗はローカルに保存されました。",
+    "resetFailed": "サーバーリセットに失敗しました。もう一度お試しください。"
   },
   "notFound": {
     "heading": "言葉の迷路で迷子？",
