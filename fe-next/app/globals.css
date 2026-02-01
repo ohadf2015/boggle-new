@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '../styles/combo-flash.css';
+
 /* ====================================
    NEO-BRUTALIST "JACKBOX PARTY PACK" THEME
    ==================================== */
