@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Adventure mode must feel immersive and connected to its themed worlds
-**Current focus:** v2.0 Adventure Overhaul - Phase 30 Boss Battle Overhaul
+**Current focus:** v2.0 Adventure Overhaul - Phase 34 Dynamic Difficulty Tuning
 
 ## Current Position
 
-Phase: 32 - Visual Polish & Effects
-Plan: 6 of 6 complete
-Status: COMPLETE
-Last activity: 2026-02-01 - Completed 32-06-PLAN.md (Boss Fireworks & Cinematics Integration)
+Phase: 34 - Dynamic Difficulty Tuning (AI Director)
+Plan: 02 of 5 complete (Wave 1 plans executing in parallel)
+Status: IN PROGRESS
+Last activity: 2026-02-01 - Completed 34-02-PLAN.md (Flow State Detector)
 
-Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 100% (6/6 COMPLETE)
+Progress: [██████████] 100% (Phases 26-33) + Phase 34: 40% (2/5 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,12 @@ Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans co
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 34-02 (Flow State Detector, 2026-02-01):**
+- Two-metric threshold for state changes: Both success rate AND combo must exceed thresholds to classify as bored/frustrated (prevents single-metric false positives)
+- Learning state as default fallback: Mixed metrics assume player is learning rather than struggling (prevents over-adjustment)
+- Custom thresholds via parameter: Different game modes may need different flow zones (casual vs competitive)
+- Csikszentmihalyi flow model: flow when skill matches challenge, bored when too easy, frustrated when too hard
 
 **Phase 32-06 (Boss Fireworks & Cinematics Integration, 2026-02-01):**
 - Boss tier determination: Level-based (mini: 5/10, standard: 15, elite: 20+) matches existing boss system conventions
@@ -241,6 +247,22 @@ Resume file: None
 - Key new components: useLayeredCelebration, useComboMilestone, BossDefeatFireworks, ComboMilestoneOverlay, VictoryCinematic, DefeatCinematic
 - All effects respect particle budgets (30/60/100) and reduced-motion preference
 
+## Phase 33 Progress — COMPLETE ✓
+
+All CINE-01 through CINE-05 requirements were delivered incrementally in prior phases:
+
+- [x] CINE-01: Boss entrance cutscene (Phase 30-07) — BossEntranceCinematic, 8s, 13 tests
+- [x] CINE-02: Victory celebration sequence (Phase 32-04) — VictoryCinematic, 6s, 11 tests
+- [x] CINE-03: Defeat sequence (Phase 32-04) — DefeatCinematic, 5s, 9 tests
+- [x] CINE-04: Skip after 2s (Phase 30-07) — useCinematic hook, SKIP_DELAY_MS=2000, 52 tests
+- [x] CINE-05: Remotion + effects (Phase 30-07+) — All cinematics use Remotion primitives, 84+ tests
+
+**Phase 33 Summary:**
+- No additional planning or implementation required
+- 169+ existing tests cover all cinematic functionality
+- Integration complete in AdventureGame with cinematic-first completion flow
+- Reduced motion accessibility support built-in
+
 **v2.0 Milestone Goals:**
 Transform Adventure Mode with:
 1. Dynamic board mechanics (moving tiles, cascades, explosions)
@@ -261,14 +283,38 @@ Transform Adventure Mode with:
 - rembg (Python) for background removal
 - Image MCP + FLUX.1 for boss graphics
 
+## Phase 34 Progress — IN PROGRESS
+
+- [x] 34-01: Types, Constants, Performance Monitor (TDD, Wave 1) - COMPLETE
+- [x] 34-02: Flow State Detector (TDD, Wave 1) - COMPLETE
+- [ ] 34-03: Intensity Adjustments (Wave 2)
+- [ ] 34-04: Analytics Hooks (Wave 3)
+- [ ] 34-05: Integration (Wave 4)
+
+**Phase 34-01 Delivered (2026-02-01):**
+- AI Director types: FlowState, PerformanceWindow, IntensityAdjustment, FlowThresholds
+- Constants: FLOW_THRESHOLDS (3-7 WPM, 70-90% success, 2-4 combo), EMA_ALPHA, warm-up settings
+- SlidingWindowTracker for last 10 words with WPM/success/combo calculation
+- ExponentialMovingAverage for smooth metric transitions
+- createPerformanceMonitor factory function
+- 23 comprehensive tests
+
+**Phase 34-02 Delivered (2026-02-01):**
+- detectFlowState: Classifies player as flow/bored/frustrated/learning
+- isInFlowChannel: Boolean helper for quick flow state check
+- calculateFlowScore: 0-1 score representing distance from optimal flow
+- Csikszentmihalyi flow model adapted for word games
+- Custom threshold support for different game modes
+- 15 comprehensive tests
+
 ## Session Continuity
 
-Last session: 2026-02-01T08:46:32Z
-Stopped at: Completed Phase 32 - Visual Polish & Effects (6/6 plans COMPLETE)
+Last session: 2026-02-01T10:32:19Z
+Stopped at: Completed 34-02-PLAN.md (Flow State Detector)
 Resume file: None
 
-**Next action:** Phase 32 complete. Ready to proceed to Phase 33 (Cinematic System)
+**Next action:** Continue Phase 34 with 34-03 (Intensity Adjustments) in Wave 2
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 32 COMPLETE: 6/6 plans - All visual polish requirements delivered)*
+*Last updated: 2026-02-01 (Phase 34: 2/5 plans complete - Flow State Detector delivered)*
