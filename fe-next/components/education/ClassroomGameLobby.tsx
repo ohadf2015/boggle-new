@@ -57,17 +57,6 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   });
 
   // Teacher validation - redirect if not a teacher
-  useEffect(() => {
-    if (!user) {
-      router.push(`/${language}/education`);
-      return;
-    }
-
-    // Check if user is a teacher (has created classrooms or lessons)
-    // For now, we'll allow any authenticated user and fetch their data
-    fetchTeacherData();
-  }, [user, language, router, fetchTeacherData]);
-
   // Fetch teacher's lessons and classrooms
   const fetchTeacherData = useCallback(async () => {
     if (!user) return;
@@ -97,6 +86,17 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       setIsLoading(false);
     }
   }, [user, selectedClassroomId, t]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push(`/${language}/education`);
+      return;
+    }
+
+    // Check if user is a teacher (has created classrooms or lessons)
+    // For now, we'll allow any authenticated user and fetch their data
+    fetchTeacherData();
+  }, [user, language, router, fetchTeacherData]);
 
   // Initialize Socket.IO connection
   useEffect(() => {
