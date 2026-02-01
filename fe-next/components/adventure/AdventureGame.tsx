@@ -1587,12 +1587,12 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Victory Cinematic */}
         {showVictoryCinematic && (
           <CinematicPlayer
-            composition={VictoryCinematic}
+            composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
-              level: levelConfig.level,
-              stars: gameState.stars,
-              score: gameState.score,
-              time: timeRemaining,
+              starsEarned: gameState.stars,
+              wordsFound: gameState.wordsFound.length,
+              finalScore: gameState.score,
+              timeRemaining: timeRemaining,
             }}
             durationSeconds={VICTORY_DURATION_FRAMES / 30}
             onComplete={handleCinematicComplete}
@@ -1602,14 +1602,13 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Defeat Cinematic */}
         {showDefeatCinematic && (
           <CinematicPlayer
-            composition={DefeatCinematic}
+            composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
-              level: levelConfig.level,
-              score: gameState.score,
               wordsFound: gameState.wordsFound.length,
               bestWord: gameState.wordsFound.reduce((best, word) =>
                 word.length > best.length ? word : best, ''
               ),
+              finalScore: gameState.score,
             }}
             durationSeconds={DEFEAT_DURATION_FRAMES / 30}
             onComplete={handleCinematicComplete}
