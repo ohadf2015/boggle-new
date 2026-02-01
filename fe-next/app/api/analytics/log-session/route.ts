@@ -77,6 +77,16 @@ export async function POST(request: NextRequest) {
       isFirstGame,
       startedAt,
       completedAt,
+      // DDA (Dynamic Difficulty Adjustment) fields
+      ddaFlowState,
+      ddaWordsPerMinute,
+      ddaSuccessRate,
+      ddaComboMaintenance,
+      ddaTimeInFlow,
+      ddaIntensityAdjustments,
+      ddaTier,
+      ddaIsBossBattle,
+      ddaAdjustmentTrigger,
     } = body;
 
     // Validate required fields for start action
@@ -192,6 +202,17 @@ export async function POST(request: NextRequest) {
       if (cluesUsed !== undefined) updates.cluesUsed = cluesUsed;
       if (finalRank !== undefined) updates.finalRank = finalRank;
       if (completedAt !== undefined) updates.completedAt = new Date(completedAt);
+
+      // DDA (Dynamic Difficulty Adjustment) fields
+      if (ddaFlowState !== undefined) updates.ddaFlowState = ddaFlowState;
+      if (ddaWordsPerMinute !== undefined) updates.ddaWordsPerMinute = ddaWordsPerMinute;
+      if (ddaSuccessRate !== undefined) updates.ddaSuccessRate = ddaSuccessRate;
+      if (ddaComboMaintenance !== undefined) updates.ddaComboMaintenance = ddaComboMaintenance;
+      if (ddaTimeInFlow !== undefined) updates.ddaTimeInFlow = ddaTimeInFlow;
+      if (ddaIntensityAdjustments !== undefined) updates.ddaIntensityAdjustments = ddaIntensityAdjustments;
+      if (ddaTier !== undefined) updates.ddaTier = ddaTier;
+      if (ddaIsBossBattle !== undefined) updates.ddaIsBossBattle = ddaIsBossBattle;
+      if (ddaAdjustmentTrigger !== undefined) updates.ddaAdjustmentTrigger = ddaAdjustmentTrigger;
 
       const success = await updateFn(sessionId, updates);
 
