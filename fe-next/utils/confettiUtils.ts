@@ -417,15 +417,19 @@ export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
  * - Z-index layering: 1000, 2000, 3000
  * - Variable origins and spreads for depth
  *
- * @param totalBudget - Total particle budget (split across 3 layers)
+ * @param duration - Duration of celebration in ms (unused, for API compatibility)
+ * @param budget - Particle budget object from useParticleBudget hook
  *
  * @example
  * ```tsx
- * // Fire celebration with 100 particles total (20/60/20 split)
- * fireLayeredCelebration(100);
+ * const budget = useParticleBudget();
+ * fireLayeredCelebration(2000, budget);
  * ```
  */
-export function fireLayeredCelebration(totalBudget: number): void {
+export function fireLayeredCelebration(duration: number, budget: { combo: number }): void {
+  // Use 80% of combo budget for safety margin
+  const totalBudget = Math.floor(budget.combo * 0.8);
+
   // Budget split: 20% background, 60% midground, 20% foreground
   const backgroundCount = Math.floor(totalBudget * 0.2);
   const midgroundCount = Math.floor(totalBudget * 0.6);
