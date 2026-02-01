@@ -118,6 +118,31 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     hasSetRandomNameRef,
   } = useMultiplayerAuth(language as Language);
 
+  // Memoize lesson data setter to prevent infinite loops in useMultiplayerSession
+  // CRITICAL: Inline arrow functions like `() => {}` create new references each render,
+  // causing useEffect deps to trigger, which sets state, causing another render → infinite loop
+  // Fixes JAVASCRIPT-NEXTJS-EX: Maximum update depth exceeded
+  const [lessonDataState, setLessonDataState] = useState<{
+    lessonId: string;
+    lessonName: string;
+    vocabularyWords: string[];
+    language: Language;
+    templateSettings?: {
+      timerSeconds: number;
+      difficulty: string;
+      minWordLength: number;
+      allowLateJoin: boolean;
+    } | null;
+  } | null>(null);
+
+  const handleSetLessonData = useCallback((data: typeof lessonDataState) => {
+    setLessonDataState(data);
+  }, []);
+
+  const handleSetAttemptingReconnect = useCallback(() => {
+    // Will be overridden by socket hook
+  }, []);
+
   const {
     shouldAutoJoin,
     setShouldAutoJoin,
@@ -138,9 +163,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onSetUsername: setUsername,
     onSetRoomName: setRoomName,
     onSetGuestAvatar: setGuestAvatar,
-    onSetAttemptingReconnect: () => {}, // Will be set by socket hook
+    onSetAttemptingReconnect: handleSetAttemptingReconnect,
     onSetRoomLanguage: setRoomLanguage,
-    onSetLessonData: () => {},
+    onSetLessonData: handleSetLessonData,
     t,
   });
 

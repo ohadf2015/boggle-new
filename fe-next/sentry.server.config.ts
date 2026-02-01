@@ -19,4 +19,20 @@ Sentry.init({
     process.env.SENTRY_RELEASE ||
     process.env.NEXT_PUBLIC_SENTRY_RELEASE ||
     undefined,
+
+  // Ignore expected/handled errors
+  ignoreErrors: [
+    // AI hint generation failures - handled gracefully with fallback hints
+    // These occur when Vertex AI returns error pages or rate limits
+    "[API] AI hint generation failed",
+    /\[api\].*ai hint generation failed/i,
+    /unexpected token.*<!doctype/i,
+    // Rate limiting - handled gracefully by clients
+    /rate limit/i,
+    /too many requests/i,
+    // Network timeouts - expected transient errors
+    /timeout/i,
+    /ETIMEDOUT/i,
+    /ECONNRESET/i,
+  ],
 });

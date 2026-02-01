@@ -113,20 +113,41 @@ export function useMultiplayerSession(
           const storedLessonData = sessionStorage.getItem('lessonGameData');
           if (storedLessonData) {
             const parsed = JSON.parse(storedLessonData);
-            logger.log(
-              '[LESSON] Loaded lesson data:',
-              parsed.lessonName,
-              'with',
-              parsed.vocabularyWords?.length,
-              'words'
-            );
-            setLessonData(parsed);
-            if (parsed.language) {
-              onSetRoomLanguage(parsed.language as Language);
+
+            // Validate that parsed data has required fields
+            // Fixes JAVASCRIPT-NEXTJS-ET: Failed to parse lesson data: {}
+            if (!parsed || typeof parsed !== 'object') {
+              logger.warn('[LESSON] Lesson data is not an object:', typeof parsed);
+              sessionStorage.removeItem('lessonGameData');
+            } else if (!parsed.lessonId || !parsed.lessonName || !Array.isArray(parsed.vocabularyWords)) {
+              logger.warn('[LESSON] Lesson data missing required fields:', {
+                hasLessonId: !!parsed.lessonId,
+                hasLessonName: !!parsed.lessonName,
+                hasVocabularyWords: Array.isArray(parsed.vocabularyWords),
+              });
+              sessionStorage.removeItem('lessonGameData');
+            } else {
+              logger.log(
+                '[LESSON] Loaded lesson data:',
+                parsed.lessonName,
+                'with',
+                parsed.vocabularyWords?.length,
+                'words'
+              );
+              setLessonData(parsed);
+              if (parsed.language) {
+                onSetRoomLanguage(parsed.language as Language);
+              }
             }
           }
         } catch (err) {
           logger.error('[LESSON] Failed to parse lesson data:', err instanceof Error ? err.message : String(err));
+          // Clean up invalid data to prevent repeated errors
+          try {
+            sessionStorage.removeItem('lessonGameData');
+          } catch {
+            // Ignore sessionStorage errors
+          }
         }
       }
 

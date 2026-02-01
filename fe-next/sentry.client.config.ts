@@ -70,6 +70,11 @@ Sentry.init({
     /from module \d+/i,
     /^Uncaught \(in promise\)/,
     /^Unhandled \(rejection\)/,
+    // Howler.js audio pool exhaustion - expected on mobile devices with many sounds
+    // Fixed by increasing pool size in howlerConfig.ts, but can still occur on low-memory devices
+    "HTML5 Audio pool exhausted",
+    /html5 audio pool exhausted/i,
+    /pool exhausted.*returning potentially locked audio/i,
     // AdSense errors/warnings (external library)
     "no_div",
     /adsbygoogle/i,
@@ -85,6 +90,10 @@ Sentry.init({
     // Socket.IO connection warnings - transient network errors with auto-retry
     "[SOCKET.IO] Connection error",
     /\[socket\.io\].*connection error/i,
+    // WebSocket/Socket.IO connection closed - transient network errors
+    // These are expected when users close tabs, lose network, or switch pages
+    "Connection closed",
+    /connection closed/i,
     // Avatar color validation error - client sends invalid hex, server rejects (expected)
     "avatar.color: Invalid string",
     /avatar\.color.*must match pattern/i,
@@ -99,6 +108,11 @@ Sentry.init({
     // Auth context errors - should not occur with proper provider setup (historical)
     "useAuth must be used within an AuthProvider",
     /useAuth must be used within.*provider/i,
+    // AI hint generation failures - handled gracefully with fallback hints
+    // These occur when Vertex AI returns error pages or rate limits
+    "[API] AI hint generation failed",
+    /\[api\].*ai hint generation failed/i,
+    /unexpected token.*<!doctype/i,
   ],
 
   denyUrls: [
