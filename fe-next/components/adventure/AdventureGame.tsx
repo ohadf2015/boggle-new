@@ -30,6 +30,7 @@ import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
+import { BossDefeatFireworks, type BossTier } from '@/components/celebration/BossDefeatFireworks';
 import { ScorePopup } from './juice/ScorePopup';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
@@ -45,6 +46,8 @@ import LevelEntryOverlay from './LevelEntryOverlay';
 import LexiReaction from './LexiReaction';
 import { BossOverlay } from './boss';
 import { ComboMilestoneOverlay } from './ComboMilestoneOverlay';
+import { VictoryCinematic, VICTORY_DURATION_FRAMES, DefeatCinematic, DEFEAT_DURATION_FRAMES } from './cinematics';
+import { CinematicPlayer } from './boss/cinematics/CinematicPlayer';
 import GameplayBackground from './themed/GameplayBackground';
 import { PowerUpBar } from './power-ups';
 import { HintMessage } from './HintMessage';
@@ -347,6 +350,15 @@ const AdventureGame = memo<AdventureGameProps>(
       isValid: false,
     });
 
+    // Boss defeat fireworks state
+    const [showBossFireworks, setShowBossFireworks] = useState(false);
+    const [defeatedBossTier, setDefeatedBossTier] = useState<BossTier>('standard');
+
+    // Victory/defeat cinematic state
+    const [showVictoryCinematic, setShowVictoryCinematic] = useState(false);
+    const [showDefeatCinematic, setShowDefeatCinematic] = useState(false);
+    const [cinematicComplete, setCinematicComplete] = useState(false);
+
     // Refs for timeout cleanup
     const validationErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -555,6 +567,51 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, checkMilestone]);
 
+    // Trigger fireworks when boss is defeated (phase transitions to 'victory')
+    const prevBossPhaseRef = useRef(bossHealthState.phase);
+    useEffect(() => {
+      let hideTimeout: NodeJS.Timeout | undefined;
+
+      // Detect phase transition to 'victory' (not on initial render)
+      if (bossHealthState.phase === 'victory' && prevBossPhaseRef.current !== 'victory') {
+        // Determine boss tier based on level number
+        // Mini boss: levels 5, 10 (every 5th level except multiples of 15/20)
+        // Standard boss: levels 15 (or multiples)
+        // Elite boss: levels 20+ (or final bosses)
+        const level = levelConfig.level;
+        let tier: BossTier = 'mini';
+        if (level >= 20 || level % 20 === 0) {
+          tier = 'elite';
+        } else if (level >= 15 || level % 15 === 0) {
+          tier = 'standard';
+        }
+
+        setDefeatedBossTier(tier);
+        setShowBossFireworks(true);
+
+        // Hide after animation completes (use tier config duration + buffer)
+        // mini: 3s, standard: 5s, elite: 8s
+        const durations: Record<BossTier, number> = {
+          mini: 3500,
+          standard: 5500,
+          elite: 8500,
+        };
+        hideTimeout = setTimeout(() => {
+          setShowBossFireworks(false);
+        }, durations[tier]);
+      }
+
+      // Update ref for next comparison
+      prevBossPhaseRef.current = bossHealthState.phase;
+
+      // Always return cleanup function (even if undefined timeout)
+      return () => {
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+        }
+      };
+    }, [bossHealthState.phase, levelConfig.level]);
+
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
@@ -655,10 +712,18 @@ const AdventureGame = memo<AdventureGameProps>(
     // Check for level completion and record attempt
     useEffect(() => {
       // Guard against running multiple times - completion is already handled
-      if (showLevelComplete) return;
+      if (showLevelComplete || showVictoryCinematic || showDefeatCinematic) return;
 
       if (gameState.isComplete || timeRemaining === 0) {
-        setShowLevelComplete(true);
+        // Determine if victory or defeat
+        const isVictory = gameState.stars > 0 || bossHealthState.phase === 'victory';
+
+        // Show appropriate cinematic first (before level complete modal)
+        if (isVictory) {
+          setShowVictoryCinematic(true);
+        } else {
+          setShowDefeatCinematic(true);
+        }
         pauseGame();
 
         // Handle boss battle completion
@@ -714,6 +779,8 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [
       showLevelComplete, // Guard dependency - must be first to prevent infinite loops
+      showVictoryCinematic,
+      showDefeatCinematic,
       gameState.isComplete,
       timeRemaining,
       pauseGame,
@@ -1004,6 +1071,14 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle level-up modal dismiss
     const handleLevelUpClose = useCallback(() => {
       setLevelUpData(null);
+    }, []);
+
+    // Handle cinematic completion (victory/defeat)
+    const handleCinematicComplete = useCallback(() => {
+      setShowVictoryCinematic(false);
+      setShowDefeatCinematic(false);
+      setCinematicComplete(true);
+      setShowLevelComplete(true);
     }, []);
 
     // Handle level complete continue
@@ -1509,10 +1584,42 @@ const AdventureGame = memo<AdventureGameProps>(
           onComplete={handleTitleComplete}
         />
 
+        {/* Victory Cinematic */}
+        {showVictoryCinematic && (
+          <CinematicPlayer
+            composition={VictoryCinematic}
+            compositionProps={{
+              level: levelConfig.level,
+              stars: gameState.stars,
+              score: gameState.score,
+              time: timeRemaining,
+            }}
+            durationSeconds={VICTORY_DURATION_FRAMES / 30}
+            onComplete={handleCinematicComplete}
+          />
+        )}
+
+        {/* Defeat Cinematic */}
+        {showDefeatCinematic && (
+          <CinematicPlayer
+            composition={DefeatCinematic}
+            compositionProps={{
+              level: levelConfig.level,
+              score: gameState.score,
+              wordsFound: gameState.wordsFound.length,
+              bestWord: gameState.wordsFound.reduce((best, word) =>
+                word.length > best.length ? word : best, ''
+              ),
+            }}
+            durationSeconds={DEFEAT_DURATION_FRAMES / 30}
+            onComplete={handleCinematicComplete}
+          />
+        )}
+
         {/* Level Complete: Standard Modal (boss levels use BossOverlay) */}
         {!isBossLevel && (
           <LevelCompleteModal
-            isOpen={showLevelComplete}
+            isOpen={showLevelComplete && cinematicComplete}
             stars={starsEarned}
             score={gameState.score}
             objectives={objectives}
@@ -1586,6 +1693,14 @@ const AdventureGame = memo<AdventureGameProps>(
 
         {/* Combo Milestone Overlay */}
         <ComboMilestoneOverlay milestone={currentMilestone} />
+
+        {/* Boss Defeat Fireworks */}
+        {isBossLevel && (
+          <BossDefeatFireworks
+            active={showBossFireworks}
+            bossTier={defeatedBossTier}
+          />
+        )}
       </div>
     );
   }
