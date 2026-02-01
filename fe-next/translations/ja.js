@@ -3993,6 +3993,8 @@ const ja = {
       "nice": "ナイス!",
       "great": "グレイト!",
       "amazing": "すごい!",
+      "incredible": "すごい!",
+      "unstoppable": "止められない!",
       "legendary": "伝説級!"
     },
     "worlds": {

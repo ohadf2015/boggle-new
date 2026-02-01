@@ -3993,6 +3993,8 @@ const sv = {
       "nice": "Snyggt!",
       "great": "Toppen!",
       "amazing": "Fantastiskt!",
+      "incredible": "OTROLIGT!",
+      "unstoppable": "OSTOPPBAR!",
       "legendary": "LEGENDARISKT!"
     },
     "worlds": {

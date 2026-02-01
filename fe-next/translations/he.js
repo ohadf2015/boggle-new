@@ -3968,6 +3968,8 @@ const he = {
       "nice": "!יפה",
       "great": "!מעולה",
       "amazing": "!מדהים",
+      "incredible": "!מדהים",
+      "unstoppable": "!בלתי ניתן לעצירה",
       "legendary": "!אגדי"
     },
     "worlds": {

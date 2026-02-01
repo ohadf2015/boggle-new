@@ -3963,6 +3963,8 @@ const en = {
       "nice": "Nice!",
       "great": "Great!",
       "amazing": "Amazing!",
+      "incredible": "INCREDIBLE!",
+      "unstoppable": "UNSTOPPABLE!",
       "legendary": "LEGENDARY!"
     },
     "worlds": {
