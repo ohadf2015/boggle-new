@@ -27,6 +27,7 @@ import {
   isDiagonalMove,
   hasExceededDeadzone,
 } from './adventureGridGeometry';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // ==============================================
 // TYPES
@@ -210,21 +211,19 @@ const AdventureGrid = memo(
       const chainCascade = useCascadeAnimation();
 
     // Calculate cascade delay per tile (diagonal wave pattern)
+    // DEBT-01: Optimized from 30ms to 25ms stagger for faster entry
     const getCascadeDelay = useCallback((row: number, col: number): number => {
-      // Diagonal wave: tiles closer to top-left appear first
-      const diagonalIndex = row + col;
-      const baseDelay = 30; // ms between each diagonal
-      return diagonalIndex * baseDelay;
+      return OPTIMIZED_TIMING.getCascadeDelay(row, col);
     }, []);
 
     // Cascade completion effect
     // Uses ref for callback to prevent effect re-running when parent re-renders
+    // DEBT-01: Uses optimized timing constants for faster entry sequence
     useEffect(() => {
       if (!showCascade || cascadeComplete) return;
 
-      // Calculate total cascade duration
-      const maxDiagonal = (gridSize - 1) * 2;
-      const totalDuration = maxDiagonal * 30 + 400; // stagger + spring settle time
+      // Calculate total cascade duration using optimized constants
+      const totalDuration = OPTIMIZED_TIMING.getCascadeDuration(gridSize);
 
       const timer = setTimeout(() => {
         setCascadeComplete(true);
@@ -571,10 +570,11 @@ const AdventureGrid = memo(
                     ? { duration: 0 }
                     : showCascade && !cascadeComplete
                       ? {
+                          // DEBT-01: Optimized spring config for faster settle
                           type: 'spring',
-                          stiffness: 400,
-                          damping: 25,
-                          mass: 0.8,
+                          stiffness: OPTIMIZED_TIMING.cascade.spring.stiffness,
+                          damping: OPTIMIZED_TIMING.cascade.spring.damping,
+                          mass: OPTIMIZED_TIMING.cascade.spring.mass,
                           delay: getCascadeDelay(tile.row, tile.col) / 1000,
                         }
                       : {

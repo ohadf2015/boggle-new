@@ -1,11 +1,14 @@
 /**
  * AdventureGrid - Tile Cascade Animation Tests
+ *
+ * DEBT-01: Tests updated to use optimized timing constants
  */
 
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
+import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // Mock dependencies
 jest.mock('@/hooks/useDevicePerformance', () => ({
@@ -79,10 +82,11 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
 
     expect(onCascadeComplete).not.toHaveBeenCalled();
 
-    // Fast forward past cascade duration (max diagonal * 30ms + 400ms settle)
-    // For 4x4: max diagonal = 6, so 6*30 + 400 = 580ms
+    // Fast forward past cascade duration using optimized constants
+    // DEBT-01: For 4x4: max diagonal = 6, so 6*25 + 300 = 450ms (was 580ms)
+    const cascadeDuration4x4 = OPTIMIZED_TIMING.getCascadeDuration(4);
     act(() => {
-      jest.advanceTimersByTime(600);
+      jest.advanceTimersByTime(cascadeDuration4x4 + 10);
     });
 
     expect(onCascadeComplete).toHaveBeenCalledTimes(1);
@@ -127,8 +131,10 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
     );
 
     // With prefersReducedMotion=false (current mock), cascade takes normal time
+    // DEBT-01: Uses optimized timing
+    const cascadeDuration4x4 = OPTIMIZED_TIMING.getCascadeDuration(4);
     act(() => {
-      jest.advanceTimersByTime(600);
+      jest.advanceTimersByTime(cascadeDuration4x4 + 10);
     });
 
     expect(onCascadeComplete).toHaveBeenCalledTimes(1);
@@ -188,15 +194,20 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
       />
     );
 
-    // For 5x5: max diagonal = 8, so 8*30 + 400 = 640ms
+    // DEBT-01: For 5x5: max diagonal = 8, so 8*25 + 300 = 500ms (was 640ms)
+    const cascadeDuration5x5 = OPTIMIZED_TIMING.getCascadeDuration(5);
+    const cascadeDuration4x4 = OPTIMIZED_TIMING.getCascadeDuration(4);
+
+    // Advance to just past 4x4 duration - 5x5 should NOT be complete yet
     act(() => {
-      jest.advanceTimersByTime(600);
+      jest.advanceTimersByTime(cascadeDuration4x4 + 10);
     });
 
     expect(onCascadeComplete5x5).not.toHaveBeenCalled();
 
+    // Advance to complete 5x5 duration
     act(() => {
-      jest.advanceTimersByTime(100);
+      jest.advanceTimersByTime(cascadeDuration5x5 - cascadeDuration4x4);
     });
 
     expect(onCascadeComplete5x5).toHaveBeenCalledTimes(1);
