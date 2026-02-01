@@ -3988,6 +3988,18 @@ const sv = {
     "continueToNext": "Fortsätt",
     "retryLevel": "Försök igen",
     "loadError": "Kunde inte ladda framsteg",
+    "cinematics": {
+      "victory": "SEGER!",
+      "timesUp": "Tiden Är Slut!",
+      "almostHadIt": "Bra försök! Du hade det nästan!",
+      "checkProgress": "Kolla vad du åstadkom:",
+      "wordsFound": "Ord Hittade",
+      "bestWord": "Bästa Ord",
+      "finalScore": "Slutpoäng",
+      "score": "Poäng",
+      "timeRemaining": "Tid Kvar",
+      "stars": "Stjärnor"
+    },
     "boss": "Boss",
     "combo": {
       "nice": "Snyggt!",

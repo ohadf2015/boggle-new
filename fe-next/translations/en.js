@@ -4042,6 +4042,18 @@ const en = {
     "continueToNext": "Continue",
     "retryLevel": "Retry",
     "loadError": "Failed to load progress",
+    "cinematics": {
+      "victory": "VICTORY!",
+      "timesUp": "Time's Up!",
+      "almostHadIt": "Nice try! You almost had it!",
+      "checkProgress": "Check out what you achieved:",
+      "wordsFound": "Words Found",
+      "bestWord": "Best Word",
+      "finalScore": "Final Score",
+      "score": "Score",
+      "timeRemaining": "Time Remaining",
+      "stars": "Stars"
+    },
     "errors": {
       "tooShort": "Word is too short",
       "invalidPath": "Invalid path - tiles must be adjacent",

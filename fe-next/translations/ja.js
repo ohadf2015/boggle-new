@@ -3988,6 +3988,18 @@ const ja = {
     "continueToNext": "続ける",
     "retryLevel": "リトライ",
     "loadError": "進捗の読み込みに失敗しました",
+    "cinematics": {
+      "victory": "勝利！",
+      "timesUp": "タイムアップ！",
+      "almostHadIt": "いい試みだった！あと少しだった！",
+      "checkProgress": "あなたの成果を確認しよう：",
+      "wordsFound": "見つけた単語",
+      "bestWord": "最高の単語",
+      "finalScore": "最終スコア",
+      "score": "スコア",
+      "timeRemaining": "残り時間",
+      "stars": "星"
+    },
     "boss": "ボス",
     "combo": {
       "nice": "ナイス!",

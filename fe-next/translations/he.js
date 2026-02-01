@@ -3963,6 +3963,18 @@ const he = {
     "continueToNext": "המשך",
     "retryLevel": "נסה שוב",
     "loadError": "נכשל לטעון התקדמות",
+    "cinematics": {
+      "victory": "!ניצחון",
+      "timesUp": "!הזמן נגמר",
+      "almostHadIt": "!ניסיון טוב! כמעט הצלחת",
+      "checkProgress": ":בדוק מה השגת",
+      "wordsFound": "מילים שנמצאו",
+      "bestWord": "המילה הטובה ביותר",
+      "finalScore": "ציון סופי",
+      "score": "ציון",
+      "timeRemaining": "זמן שנותר",
+      "stars": "כוכבים"
+    },
     "boss": "בוס",
     "combo": {
       "nice": "!יפה",
