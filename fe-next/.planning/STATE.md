@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 32 - Visual Polish & Effects
-Plan: 4 of 6 complete
+Plan: 5 of 6 complete
 Status: IN PROGRESS
-Last activity: 2026-02-01 - Completed 32-04-PLAN.md (Victory/Defeat Remotion Cinematics)
+Last activity: 2026-02-01 - Completed 32-05-PLAN.md (AdventureGame Integration)
 
-Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 67% (4/6)
+Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 83% (5/6)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,11 @@ Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans co
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 32-05 (AdventureGame Integration, 2026-02-01):**
+- Combo milestone check timing: useEffect triggers on gameState.comboCount changes (only during active gameplay: isPlaying && entryPhase === 'playing' && !isPaused)
+- Victory confetti trigger: useEffect fires on LevelCompleteModal mount (isOpen && !isFailed && !prefersReducedMotion && particleBudget.combo > 0)
+- Particle budget enforcement: Check particleBudget.combo > 0 before firing confetti (respects 'none' tier)
 
 **Phase 32-03 (Combo Milestone Overlay, 2026-02-01):**
 - Animation timing: 300ms screen flash chosen for WCAG seizure-safety (well below 500ms threshold)
@@ -174,7 +179,7 @@ Resume file: None
 - [x] 32-02: Boss defeat fireworks + combo milestone hook (TDD, Wave 1) ✓
 - [x] 32-03: Combo milestone overlay + translations (Wave 1) ✓
 - [x] 32-04: Victory/Defeat Remotion cinematics (Wave 2) ✓
-- [ ] 32-05: AdventureGame integration + wiring (Wave 3)
+- [x] 32-05: AdventureGame integration + wiring (Wave 3) ✓
 - [ ] 32-06: Human verification (Wave 4)
 
 **Phase 32-01 Delivered (2026-02-01):**
@@ -204,6 +209,12 @@ Resume file: None
 - 20 comprehensive tests (11 VictoryCinematic + 9 DefeatCinematic)
 - Barrel export with clean API (components, constants, types)
 
+**Phase 32-05 Delivered (2026-02-01):**
+- Combo milestone integration in AdventureGame (useComboMilestone + ComboMilestoneOverlay)
+- Victory confetti integration in LevelCompleteModal (fireVictoryConfetti on mount)
+- Accessibility enforcement: reduced motion AND particle budget checks before effects
+- Bug fixes: TypeScript errors in boss fireworks useEffect and cinematic props (auto-fixed via Rule 1)
+
 **Phase 32 Planning Summary:**
 - 6 plans across 4 waves
 - 85% existing infrastructure reused (confettiUtils, useParticleBudget, NewYearFireworks, CinematicPlayer)
@@ -232,12 +243,12 @@ Transform Adventure Mode with:
 
 ## Session Continuity
 
-Last session: 2026-02-01T08:19:50Z
-Stopped at: Completed 32-04-PLAN.md (Victory/Defeat Remotion Cinematics)
+Last session: 2026-02-01T08:39:51Z
+Stopped at: Completed 32-05-PLAN.md (AdventureGame Integration)
 Resume file: None
 
-**Next action:** Execute Phase 32-05 (AdventureGame Integration)
+**Next action:** Execute Phase 32-06 (Human Verification)
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 32 in progress: 4/6 plans complete - Wave 2 complete)*
+*Last updated: 2026-02-01 (Phase 32 in progress: 5/6 plans complete - Wave 3 complete)*
