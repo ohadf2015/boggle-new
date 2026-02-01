@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 32 - Visual Polish & Effects
-Plan: 3 of 6 complete
+Plan: 2 of 6 complete
 Status: IN PROGRESS
-Last activity: 2026-02-01 - Completed 32-03-PLAN.md (Combo Milestone Overlay)
+Last activity: 2026-02-01 - Completed 32-02-PLAN.md (Boss Defeat Fireworks & Combo Milestones)
 
 Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 50% (3/6)
 
@@ -184,10 +184,10 @@ Resume file: None
 - 19 comprehensive tests (9 confettiUtils + 10 hook tests)
 
 **Phase 32-02 Delivered (2026-02-01):**
-- BossDefeatFireworks component with ultra-layered particle effects
-- useComboMilestone hook for 10/15/20 combo threshold detection
-- 5-second cooldown between milestone triggers
-- 23 comprehensive tests (13 BossDefeatFireworks + 10 useComboMilestone)
+- BossDefeatFireworks component with tier-scaled fireworks (mini: 6/3s, standard: 10/5s, elite: 15/8s)
+- useComboMilestone hook for 10/15/20 combo threshold detection with budget scaling (60%/80%/100%)
+- fireLayeredCelebration 3-layer depth system (20% bg, 60% mid, 20% fg)
+- 16 comprehensive tests (6 BossDefeatFireworks + 10 useComboMilestone)
 
 **Phase 32-03 Delivered (2026-02-01):**
 - ComboMilestoneOverlay full-screen animated text component
