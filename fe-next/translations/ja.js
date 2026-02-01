@@ -4194,6 +4194,7 @@ const ja = {
       "stuck": {
         "default": "長い言葉を探してみて!"
       },
+      "stuckHint": "ヒントが必要？まずは短い言葉から探してみて！",
       "encourage": {
         "default": "諦めないで!できるよ!"
       },

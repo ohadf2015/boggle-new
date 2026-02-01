@@ -4163,6 +4163,7 @@ const en = {
       "stuck": {
         "default": "Try looking for longer words!"
       },
+      "stuckHint": "Need a hint? Try looking for shorter words first!",
       "encourage": {
         "default": "Don't give up! You've got this!"
       },

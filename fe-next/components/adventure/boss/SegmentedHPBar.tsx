@@ -217,7 +217,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
       {/* Header: Boss name + Phase indicator */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="font-neo-display text-lg font-bold text-neo-white">
-          {t(bossName)}
+          {t(bossName, bossName)}
         </h2>
         <PhaseIndicator phase={phase} />
       </div>
@@ -228,7 +228,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={hpPercentage}
-        aria-label={`${t(bossName)} health: ${hpPercentage}%`}
+        aria-label={`${t(bossName, bossName)} health: ${hpPercentage}%`}
         data-testid="segmented-hp-bar"
         className="relative w-full h-8 border-3 border-neo-black rounded-neo shadow-hard overflow-hidden flex"
       >

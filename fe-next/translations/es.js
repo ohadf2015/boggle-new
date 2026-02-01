@@ -4105,6 +4105,7 @@ const es = {
       "stuck": {
         "default": "¡Intenta buscar palabras más largas!"
       },
+      "stuckHint": "¿Necesitas una pista? ¡Intenta buscar palabras más cortas primero!",
       "encourage": {
         "default": "¡No te rindas! ¡Tú puedes!"
       },

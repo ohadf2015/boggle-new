@@ -77,13 +77,13 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
               'text-xs font-bold uppercase tracking-wide',
               modifierDisplay.textColor
             )}>
-              {t(mechanicNameKey)}
+              {t(mechanicNameKey, mechanic)}
             </span>
             <span className={cn(
               'text-[10px] opacity-80',
               modifierDisplay.textColor
             )}>
-              {t(mechanicDescKey)}
+              {t(mechanicDescKey, '')}
             </span>
           </div>
         )}
@@ -94,7 +94,7 @@ const ModifierBadge = memo<ModifierBadgeProps>(({ compact = false, className }) 
             'text-xs font-bold',
             modifierDisplay.textColor
           )}>
-            {t(mechanicNameKey)}
+            {t(mechanicNameKey, mechanic)}
           </span>
         )}
       </motion.div>

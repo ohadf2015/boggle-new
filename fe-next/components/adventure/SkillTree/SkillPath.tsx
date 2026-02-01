@@ -113,7 +113,7 @@ export const SkillPath = memo<SkillPathProps>(
         >
           <span className="text-xl" aria-hidden="true">{styles.icon}</span>
           <span className={cn('font-bold text-sm uppercase tracking-wide', styles.headerText)}>
-            {t(`adventure.skills.paths.${path}`)}
+            {t(`adventure.skills.paths.${path}`, path)}
           </span>
         </div>
 

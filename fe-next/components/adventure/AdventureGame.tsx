@@ -29,6 +29,8 @@ import { usePowerUpInventory } from '@/hooks/usePowerUpInventory';
 import { useScreenShake } from '@/hooks/useScreenShake';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
+import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
+import { neoInfoToast } from '@/components/NeoToast';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { useAIDirector } from '@/hooks/useAIDirector';
 import { BossDefeatFireworks, type BossTier } from '@/components/celebration/BossDefeatFireworks';
@@ -506,6 +508,23 @@ const AdventureGame = memo<AdventureGameProps>(
       isBossLevel && levelConfig.showBossIntro === true
     );
 
+    // Lexi stuck detection (DEBT-03 + DEBT-04 integration)
+    // Detects when player hasn't made progress and shows helpful hint
+    const isModalOpen = showLevelComplete || showVictoryCinematic || showDefeatCinematic || showBossIntro || showBossFireworks;
+    const { resetOnGameAction } = useLexiStuckDetection({
+      onStuck: () => {
+        // Show Lexi hint when player is stuck
+        neoInfoToast(t('adventure.lexi.stuckHint', 'Need a hint? Try looking for shorter words first!'), {
+          icon: '💡',
+          duration: 5000,
+        });
+      },
+      isPlaying: isPlaying && entryPhase === 'playing',
+      isPaused,
+      isModalOpen,
+      isBossLevel,
+    });
+
     // Lexi reaction state - transform game state to reaction format
     // Using ref + effect to avoid recreating object on every timer tick (60 runs/minute → ~6 runs/minute)
     const lexiGameStateRef = useRef<GameStateForReactions>({
@@ -965,8 +984,9 @@ const AdventureGame = memo<AdventureGameProps>(
       (index: number, _tile: GridTileState) => {
         if (!isPlaying || isPaused || isValidating || isCascading) return;
         selectTile(index);
+        resetOnGameAction(); // DEBT-04: Reset Lexi stuck detection timer on tile click
       },
-      [isPlaying, isPaused, isValidating, isCascading, selectTile]
+      [isPlaying, isPaused, isValidating, isCascading, selectTile, resetOnGameAction]
     );
 
     // Handle drag start
@@ -1076,6 +1096,7 @@ const AdventureGame = memo<AdventureGameProps>(
           // Clear any hint and reset inactivity timer
           clearCurrentHint();
           recordActivity();
+          resetOnGameAction(); // DEBT-04: Reset Lexi stuck detection timer
 
           // Record valid word for AI Director performance tracking (DDA-01)
           recordAIWord(true, gameState.comboCount);
@@ -1130,7 +1151,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, scoreMultiplier, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
     );
 
     // Handle level-up modal dismiss

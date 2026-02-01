@@ -4194,6 +4194,7 @@ const sv = {
       "stuck": {
         "default": "Prova att hitta langre ord!"
       },
+      "stuckHint": "Behover du en ledtrad? Prova att hitta kortare ord forst!",
       "encourage": {
         "default": "Ge inte upp! Du klarar det!"
       },

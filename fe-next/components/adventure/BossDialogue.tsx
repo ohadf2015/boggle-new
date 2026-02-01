@@ -50,8 +50,9 @@ const BossDialogue = memo<BossDialogueProps>(
   ({ boss, currentTaunt, isVisible, position = 'top' }) => {
     const { t } = useLanguage();
 
-    const translatedTaunt = t(currentTaunt);
-    const translatedName = t(boss.displayName);
+    // BUG-008: Add fallbacks for dynamic translation keys
+    const translatedTaunt = t(currentTaunt, currentTaunt);
+    const translatedName = t(boss.displayName, boss.displayName);
     const variants = SLIDE_VARIANTS[position];
 
     return (

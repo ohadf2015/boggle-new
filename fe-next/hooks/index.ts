@@ -6,7 +6,7 @@
  *
  * @example
  * ```tsx
- * import { useInactivityDetection } from '@/hooks';
+ * import { useInactivityDetection, useLexiStuckDetection } from '@/hooks';
  * // or
  * import { useInactivityDetection } from '@/hooks/useInactivityDetection';
  * ```
@@ -18,3 +18,10 @@ export type {
   UseInactivityDetectionOptions,
   UseInactivityDetectionReturn,
 } from './useInactivityDetection';
+
+// Game-aware Lexi stuck detection (wrapper around useInactivityDetection)
+export { useLexiStuckDetection } from './useLexiStuckDetection';
+export type {
+  UseLexiStuckDetectionOptions,
+  UseLexiStuckDetectionReturn,
+} from './useLexiStuckDetection';
