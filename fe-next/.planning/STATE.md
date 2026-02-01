@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-Phase: 35 - World Expansion & Tech Debt (In Progress)
-Plan: 07 of 8 complete (Waves 1-3 complete)
-Status: In progress
-Last activity: 2026-02-01 - Completed 35-07-PLAN.md (MP4 Rendering Script)
+Phase: 35 - World Expansion & Tech Debt (COMPLETE)
+Plan: 08 of 8 complete (All waves complete)
+Status: Phase complete
+Last activity: 2026-02-01 - Completed 35-08-PLAN.md (Bug Fixes + Lexi Stuck Detection)
 
-Progress: [██████████] 100% (Phases 26-34) + Phase 35: 87.5% (7/8 plans)
+Progress: [██████████] 100% (Phases 26-35) - v2.0 COMPLETE
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -398,7 +398,7 @@ Transform Adventure Mode with:
 - [x] 35-05: Entry Timing Fix (Wave 2) - COMPLETE
 - [x] 35-06: Entry Timing Optimization (Wave 2) - COMPLETE
 - [x] 35-07: MP4 Rendering Script (Wave 3) - COMPLETE
-- [ ] 35-08: Human Verification Checkpoint (Wave 4)
+- [x] 35-08: Bug Fixes + Lexi Stuck Detection (Wave 4) - COMPLETE
 
 **Phase 35-01 Delivered (2026-02-01):**
 - World 4 Idiom Archipelago complete theme configuration
@@ -448,14 +448,35 @@ Transform Adventure Mode with:
 - Default compositions: BossEntranceCinematic (8s), VictoryCinematic (6s), DefeatCinematic (5s)
 - 3 commits: script creation, npm scripts, lint cleanup
 
+**Phase 35-08 Delivered (2026-02-01):**
+- BUG-004: Surface console errors via neoErrorToast (networkError, resultSubmissionFailed)
+- BUG-005: Regression test for authenticated user submission
+- BUG-006: Server reset failure shows error toast, not success
+- BUG-007: Debug logs wrapped in NODE_ENV check
+- BUG-008: Dynamic translation fallbacks using || pattern
+- useLexiStuckDetection hook (game-aware inactivity detection)
+- 30s timeout for normal levels, 45s for boss levels
+- AdventureGame integration with resetOnGameAction on word submit/tile click
+- 16 tests passing (10 useLexiStuckDetection + 6 bug-fixes)
+- 4 commits: BUG-004, BUG-005/006/007, BUG-008+useLexiStuckDetection, type fixes
+
+**Phase 35 Complete Summary:**
+- 8 plans across 4 waves (all COMPLETE)
+- All WORLD-01 through WORLD-04 + DEBT-01 through DEBT-04 requirements delivered
+- Worlds 4-5 fully themed with parallax layers, particles, translations
+- Entry timing optimized from 2.38s to 1.86s (22% faster)
+- MP4 rendering script for Remotion cinematics
+- 5 bugs fixed with regression tests
+- useLexiStuckDetection integrated into AdventureGame
+
 ## Session Continuity
 
-Last session: 2026-02-01T13:36:28Z
-Stopped at: Completed 35-07-PLAN.md (MP4 Rendering Script)
+Last session: 2026-02-01T14:30:00Z
+Stopped at: Completed 35-08-PLAN.md (Bug Fixes + Lexi Stuck Detection)
 Resume file: None
 
-**Next action:** Execute 35-08-PLAN.md (Human Verification Checkpoint)
+**Next action:** v2.0 Adventure Overhaul COMPLETE - Ready for release
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 35: 7/8 plans complete)*
+*Last updated: 2026-02-01 (Phase 35: 8/8 plans complete - v2.0 COMPLETE)*
