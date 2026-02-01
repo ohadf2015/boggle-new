@@ -400,6 +400,16 @@ Transform Adventure Mode with:
 - [ ] 35-07: Bug Fixes & Polish (Wave 4)
 - [ ] 35-08: Human Verification Checkpoint (Wave 5)
 
+**Phase 35-01 Delivered (2026-02-01):**
+- World 4 Idiom Archipelago complete theme configuration
+- 5 parallax layers with depth progression (0.1, 0.25, 0.4, 0.55, 0.7)
+- Tropical droplet particles (count: 12, variant: tropical)
+- Neo-orange color palette with teal/cyan tile accents
+- MessageCircle icon for idiom mechanic display
+- Wave tile entry animation for ocean theme
+- 4-language translations (EN, HE, SV, JA)
+- 37 theme validation tests
+
 **Phase 35-03 Delivered (2026-02-01):**
 - useInactivityDetection hook with 30s default timeout
 - DOM event listeners (mousemove, keydown, touchstart, click)
