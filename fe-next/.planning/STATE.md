@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 32 - Visual Polish & Effects
-Plan: 1 of 6 complete
+Plan: 3 of 6 complete
 Status: IN PROGRESS
-Last activity: 2026-02-01 - Completed 32-01-PLAN.md (Layered Particle System)
+Last activity: 2026-02-01 - Completed 32-03-PLAN.md (Combo Milestone Overlay)
 
-Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 16% (1/6)
+Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans complete) + Phase 32: 50% (3/6)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,12 @@ Progress: [██████████] 100% (42/42 v2.0 Phase 26-31 plans co
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 32-03 (Combo Milestone Overlay, 2026-02-01):**
+- Animation timing: 300ms screen flash chosen for WCAG seizure-safety (well below 500ms threshold)
+- Z-index 9000: Overlays all game UI including HUD elements
+- Reduced motion: Static 15% opacity flash instead of animation (respects accessibility)
+- Translation structure: Reused existing adventure.combo section, added incredible/unstoppable keys
 
 **Phase 32-01 (Layered Particle System, 2026-02-01):**
 - Z-index scale: 1000-based increments (1000/2000/3000/9000/9999) for clear layer separation
@@ -165,8 +171,8 @@ Resume file: None
 ## Phase 32 Progress — IN PROGRESS
 
 - [x] 32-01: Layered particle system + Z-index constants (TDD, Wave 1) ✓
-- [ ] 32-02: Boss defeat fireworks + combo milestone hook (TDD, Wave 1)
-- [ ] 32-03: Combo milestone overlay + translations (Wave 1)
+- [x] 32-02: Boss defeat fireworks + combo milestone hook (TDD, Wave 1) ✓
+- [x] 32-03: Combo milestone overlay + translations (Wave 1) ✓
 - [ ] 32-04: Victory/Defeat Remotion cinematics (Wave 2)
 - [ ] 32-05: AdventureGame integration + wiring (Wave 3)
 - [ ] 32-06: Human verification (Wave 4)
@@ -176,6 +182,19 @@ Resume file: None
 - fireLayeredCelebration with 20/60/20 budget split and 100ms/200ms delays
 - useLayeredCelebration hook with budget and reduced motion awareness
 - 19 comprehensive tests (9 confettiUtils + 10 hook tests)
+
+**Phase 32-02 Delivered (2026-02-01):**
+- BossDefeatFireworks component with ultra-layered particle effects
+- useComboMilestone hook for 10/15/20 combo threshold detection
+- 5-second cooldown between milestone triggers
+- 23 comprehensive tests (13 BossDefeatFireworks + 10 useComboMilestone)
+
+**Phase 32-03 Delivered (2026-02-01):**
+- ComboMilestoneOverlay full-screen animated text component
+- combo-flash CSS animation with reduced-motion support
+- Combo milestone translations for 4 languages (en, he, sv, ja)
+- 6 component tests (rendering, styling, accessibility)
+- Framer Motion spring animations for playful entrance/exit
 
 **Phase 32 Planning Summary:**
 - 6 plans across 4 waves
@@ -205,12 +224,12 @@ Transform Adventure Mode with:
 
 ## Session Continuity
 
-Last session: 2026-02-01T08:03:50Z
-Stopped at: Completed 32-01-PLAN.md (Layered Particle System)
+Last session: 2026-02-01T08:06:01Z
+Stopped at: Completed 32-03-PLAN.md (Combo Milestone Overlay)
 Resume file: None
 
-**Next action:** Execute Phase 32-02 (Boss Defeat Fireworks)
+**Next action:** Execute Phase 32-04 (Victory/Defeat Cinematics)
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 32 in progress: 1/6 plans complete - Layered Particles ready)*
+*Last updated: 2026-02-01 (Phase 32 in progress: 3/6 plans complete - Wave 1 complete)*
