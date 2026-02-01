@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 34 - Dynamic Difficulty Tuning (AI Director)
-Plan: 06 of 6 complete (All Wave 3 plans complete)
+Plan: 07 of 7 complete (All waves complete including integration)
 Status: COMPLETE
-Last activity: 2026-02-01 - Completed 34-06-PLAN.md (useAIDirector Hook)
+Last activity: 2026-02-01 - Completed 34-07-PLAN.md (AdventureGame AI Director Integration)
 
-Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% (6/6 plans complete)
+Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% (7/7 plans complete)
 
 **Phase numbering context:**
 - v1.1 completed Phases 15-21 (education + adventure features)
@@ -83,6 +83,13 @@ Progress: [██████████] 100% (Phases 26-34) + Phase 34: 100% 
 ## Accumulated Context
 
 ### v2.0 Decisions (Recent)
+
+**Phase 34-07 (AdventureGame AI Director Integration, 2026-02-01):**
+- Session ID via crypto.randomUUID with Math.random fallback for Jest compatibility
+- Hint timing adjusted by dividing base threshold by hintEscalationRate (higher rate = faster hints)
+- Combo breaks detected via prevComboCountRef tracking before combo count updates
+- All three power-up handlers trigger AI Director transitions (DDA-03)
+- Combo grace period (comboGracePeriod) not wired - requires useAdventureGame hook modification
 
 **Phase 34-06 (useAIDirector Hook, 2026-02-01):**
 - checkIsWarmedUp function instead of boolean: ESLint purity rule prevents Date.now() during render
@@ -302,6 +309,7 @@ Transform Adventure Mode with:
 - [x] 34-04: AI Director Store + Hook (Wave 2) - COMPLETE
 - [x] 34-05: Analytics Logger (TDD, Wave 2) - COMPLETE
 - [x] 34-06: useAIDirector Hook (Wave 3) - COMPLETE
+- [x] 34-07: AdventureGame AI Director Integration (Wave 4) - COMPLETE
 
 **Phase 34-01 Delivered (2026-02-01):**
 - AI Director types: FlowState, PerformanceWindow, IntensityAdjustment, FlowThresholds
@@ -354,22 +362,32 @@ Transform Adventure Mode with:
 - checkIsWarmedUp function for purity compliance
 - 20 comprehensive tests
 
+**Phase 34-07 Delivered (2026-02-01):**
+- AdventureGame AI Director integration
+- Session lifecycle: startAIDirector on game start, endAIDirector on complete/fail
+- Word tracking: recordAIWord on every submission (valid/invalid)
+- Transition handling: handleAITransition on combo breaks and power-up activations
+- Hint timing: hintEscalationRate applied to inactivity threshold
+- Boss battles receive neutral adjustments automatically (DDA-05)
+- 80 lines added to AdventureGame.tsx
+
 **Phase 34 Complete Summary:**
-- 6 plans across 3 waves (all COMPLETE)
-- All DDA-01 through DDA-05 requirements delivered
-- 122 total AI Director tests passing
+- 7 plans across 4 waves (all COMPLETE)
+- All DDA-01 through DDA-05 requirements delivered and integrated
+- 122+ total AI Director tests passing
 - Key components: performanceMonitor, flowStateDetector, intensityController, aiDirectorStore, analyticsLogger, useAIDirector
+- Full gameplay integration in AdventureGame
 - Csikszentmihalyi flow model adapted for word games
 - 10% gradual adjustments prevent rubber-banding perception
 
 ## Session Continuity
 
-Last session: 2026-02-01T10:57:30Z
-Stopped at: Completed 34-06-PLAN.md (useAIDirector Hook)
+Last session: 2026-02-01T11:36:47Z
+Stopped at: Completed 34-07-PLAN.md (AdventureGame AI Director Integration)
 Resume file: None
 
-**Next action:** Phase 34 COMPLETE - All 6 plans delivered, ready for Phase 35
+**Next action:** Phase 34 COMPLETE - All 7 plans delivered, ready for Phase 35 (World Expansion & Tech Debt)
 
 ---
 *State initialized: 2026-01-30 for v2.0 milestone*
-*Last updated: 2026-02-01 (Phase 34: 6/6 plans complete - Phase COMPLETE)*
+*Last updated: 2026-02-01 (Phase 34: 7/7 plans complete - Phase COMPLETE)*
