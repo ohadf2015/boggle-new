@@ -95,8 +95,8 @@ describe('confettiUtils', () => {
       const { fireLayeredCelebration } = require('../confettiUtils');
 
       // WHEN/THEN - Should not throw
-      expect(() => fireLayeredCelebration(100)).not.toThrow();
-      expect(() => fireLayeredCelebration(0)).not.toThrow();
+      expect(() => fireLayeredCelebration(100, { combo: 100 })).not.toThrow();
+      expect(() => fireLayeredCelebration(0, { combo: 0 })).not.toThrow();
     });
   });
 });
