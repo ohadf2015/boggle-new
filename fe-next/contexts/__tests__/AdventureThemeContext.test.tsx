@@ -134,9 +134,9 @@ describe('AdventureThemeProvider', () => {
     // THEN - World 3 is implemented
     expect(screen.getByTestId('is-implemented')).toHaveTextContent('true');
 
-    // WHEN - World 4 is a placeholder
+    // WHEN - World 6 is a placeholder (worlds 1-5 are fully implemented)
     rerender(
-      <AdventureThemeProvider initialWorldId={4}>
+      <AdventureThemeProvider initialWorldId={6}>
         <TestConsumer />
       </AdventureThemeProvider>
     );

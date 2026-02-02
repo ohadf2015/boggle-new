@@ -313,7 +313,7 @@ describe('AdventureGrid Selection', () => {
       const cells = screen.getAllByRole('gridcell');
       // Selected cells should have selection visual indicator
       expect(cells[0]).toHaveClass('tile-selected-enhanced');
-      expect(cells[0]).toHaveClass('z-20'); // Higher z-index for better layering
+      // Visual effects (z-index, shadows, rings) are handled by CSS via tile-selected-enhanced class
     });
 
     it('should show sparkle effect when cell is first selected', () => {
@@ -361,8 +361,8 @@ describe('AdventureGrid Selection', () => {
 
       // THEN
       const cells = screen.getAllByRole('gridcell');
-      // Should have glow shadow class
-      expect(cells[0].className).toContain('shadow-');
+      // Selection visual styling is applied via tile-selected-enhanced class
+      expect(cells[0]).toHaveClass('tile-selected-enhanced');
     });
 
     it('should show ring around selected tiles', () => {
@@ -382,9 +382,9 @@ describe('AdventureGrid Selection', () => {
 
       // THEN
       const cells = screen.getAllByRole('gridcell');
-      // Enhanced selection with thicker ring (ring-4) for better visibility
-      expect(cells[0]).toHaveClass('ring-4');
-      expect(cells[0]).toHaveClass('ring-neo-lime');
+      // Enhanced selection styling is applied via tile-selected-enhanced class
+      expect(cells[0]).toHaveClass('tile-selected-enhanced');
+      expect(cells[1]).toHaveClass('tile-selected-enhanced');
     });
   });
 
