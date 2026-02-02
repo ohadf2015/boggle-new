@@ -12,12 +12,14 @@ export interface FeatureGates {
   practiceMode: boolean; // Unlocked after 20 games
 }
 
+export type FeatureKey = keyof FeatureGates;
+
 export interface UserStats {
   totalGamesPlayed: number;
 }
 
 // Feature unlock thresholds (games required)
-const THRESHOLDS = {
+export const THRESHOLDS = {
   advancedSettings: 5,
   customBotCount: 10,
   challengeMode: 15,
