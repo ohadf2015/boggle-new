@@ -24,7 +24,7 @@ interface UseUserStatsReturn {
  * const gates = getFeatureGates(userStats);
  */
 export function useUserStats(): UseUserStatsReturn {
-  const { profile } = useAuth();
+  const { profile, loading } = useAuth();
 
   // Memoize userStats to prevent unnecessary recalculations
   const userStats = useMemo<UserStats | null>(() => {
@@ -39,6 +39,6 @@ export function useUserStats(): UseUserStatsReturn {
 
   return {
     userStats,
-    isLoading: false, // Auth context doesn't provide loading state, profile is either available or null
+    isLoading: loading,
   };
 }
