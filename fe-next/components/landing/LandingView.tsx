@@ -133,7 +133,7 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
@@ -436,34 +436,36 @@ const LandingView: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Adventure Mode Card - Compact - spans full width as single row */}
-            <motion.div
-              className="col-span-2 group"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              <Link
-                href={`/${language}/adventure`}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
-                  'bg-gradient-to-br from-neo-lime to-lime-500',
-                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  // Reduced min-height: 64px on xs, 80px on sm (was 80/100px)
-                  'transition-all duration-200 min-h-[64px] sm:min-h-[80px]',
-                  'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.4))]',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-                )}
-                aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
+            {/* Adventure Mode Card - Only visible to admins */}
+            {isAdmin && (
+              <motion.div
+                className="col-span-2 group"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
               >
-                {/* Beta badge */}
-                <span className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3">
-                  BETA
-                </span>
-                <Map className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.adventureMode') || 'Adventure'}</span>
-              </Link>
-            </motion.div>
+                <Link
+                  href={`/${language}/adventure`}
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
+                    'bg-gradient-to-br from-neo-lime to-lime-500',
+                    'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                    // Reduced min-height: 64px on xs, 80px on sm (was 80/100px)
+                    'transition-all duration-200 min-h-[64px] sm:min-h-[80px]',
+                    'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.4))]',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                  )}
+                  aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
+                >
+                  {/* Beta badge */}
+                  <span className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3">
+                    BETA
+                  </span>
+                  <Map className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                  <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.adventureMode') || 'Adventure'}</span>
+                </Link>
+              </motion.div>
+            )}
           </div>
           </div>
         ) : (
@@ -521,19 +523,21 @@ const LandingView: React.FC = () => {
                 className="w-full max-w-md"
               />
 
-              {/* Secondary card - Adventure Mode (spans full width, centered) */}
-              <div className="sm:col-span-2 w-full max-w-md mx-auto">
-                <ModeCard
-                  title={t('landing.adventureMode') || 'Adventure'}
-                  description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
-                  href={`/${language}/adventure`}
-                  icon={<Map className="w-6 h-6" />}
-                  variant="lime"
-                  secondary
-                  badge="BETA"
-                  className="w-full"
-                />
-              </div>
+              {/* Secondary card - Adventure Mode (only visible to admins) */}
+              {isAdmin && (
+                <div className="sm:col-span-2 w-full max-w-md mx-auto">
+                  <ModeCard
+                    title={t('landing.adventureMode') || 'Adventure'}
+                    description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
+                    href={`/${language}/adventure`}
+                    icon={<Map className="w-6 h-6" />}
+                    variant="lime"
+                    secondary
+                    badge="BETA"
+                    className="w-full"
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

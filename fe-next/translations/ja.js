@@ -2437,6 +2437,9 @@ const ja = {
     "maybeLater": "また今度"
   },
   "singlePlayer": {
+    "play": "プレイ",
+    "playDesc": "ゲームに参加",
+    "howToPlay": "遊び方",
     "quickPlay": "クイックプレイ",
     "quickPlayDesc": "7×7 • 1分 • ボット戦",
     "chooseMode": "モードを選択",
@@ -2521,6 +2524,27 @@ const ja = {
       "practiceDesc": "時間制限なし、自分のペースで",
       "challenge": "チャレンジ",
       "challengeDesc": "タイムアタック、記録を作ろう"
+    },
+    "features": {
+      "unlocked": {
+        "advancedSettings": "詳細設定が解除されました！",
+        "advancedSettingsDesc": "ゲーム設定をカスタマイズできます",
+        "customBotCount": "ボット数のカスタムが解除！",
+        "customBotCountDesc": "対戦するボット数を選択できます",
+        "challengeMode": "チャレンジモードが解除！",
+        "challengeModeDesc": "タイムアタックで記録を作ろう",
+        "practiceMode": "練習モードが解除！",
+        "practiceModeDesc": "時間制限なし、自分のペースで"
+      },
+      "locked": {
+        "advancedSettings": "5回プレイで解除",
+        "customBotCount": "10回プレイで解除",
+        "challengeMode": "15回プレイで解除",
+        "practiceMode": "20回プレイで解除"
+      },
+      "nextUnlock": "次の解除：{feature}まであと{count}回",
+      "nextUnlockSingular": "次の解除：{feature}まであと1回",
+      "tryItNow": "今すぐ試す"
     }
   },
   "practice": {
@@ -3979,6 +4003,8 @@ const ja = {
   "adventure": {
     "title": "アドベンチャーモード",
     "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
+    "adminOnly": "管理者のみ",
+    "adminOnlyMessage": "アドベンチャーモードは管理者のみが利用できます。",
     "progress": "進捗",
     "levels": "レベル",
     "level": "レベル",

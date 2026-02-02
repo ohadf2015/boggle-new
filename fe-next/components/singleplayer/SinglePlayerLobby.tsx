@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSelector } from '@/components/join';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUserStats } from '@/hooks/useUserStats';
+import { getFeatureGates } from '@/utils/featureGates';
 import { cn } from '@/lib/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { getHighScore, getProgressStats, getAllTimeBest } from './highScoreManager';
@@ -83,6 +85,11 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 }) => {
   const { t, language: currentLanguage } = useLanguage();
   const isLandscape = useMobileLandscape();
+
+  // Feature gates - check which features are unlocked
+  const { userStats } = useUserStats();
+  const featureGates = getFeatureGates(userStats);
+  const canCustomizeBotCount = featureGates.customBotCount;
 
   // Game settings state
   const [mode, setMode] = useState<SinglePlayerMode>(initialSettings.mode);
@@ -292,29 +299,33 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     <Badge className="bg-bot-purple/30 text-bot-purple-light text-[10px] px-1.5 border border-bot-purple">AI</Badge>
                   </label>
                 </div>
-                <div className="flex gap-2 items-center mb-2">
-                  {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
+                {/* Bot customization - only show if feature unlocked */}
+                {canCustomizeBotCount && (
+                  <div className="flex gap-2 items-center mb-2">
+                    {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
+                      <button
+                        key={diff}
+                        onClick={() => setSelectedBotDifficulty(diff)}
+                        className={cn(
+                          'px-3 py-2 rounded text-xs font-bold uppercase border-2 border-neo-black/30 text-neo-black flex-1',
+                          selectedBotDifficulty === diff
+                            ? BOT_DIFFICULTY_CONFIG[diff].color
+                            : 'bg-white hover:bg-slate-100'
+                        )}
+                      >
+                        {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
+                      </button>
+                    ))}
                     <button
-                      key={diff}
-                      onClick={() => setSelectedBotDifficulty(diff)}
-                      className={cn(
-                        'px-3 py-2 rounded text-xs font-bold uppercase border-2 border-neo-black/30 text-neo-black flex-1',
-                        selectedBotDifficulty === diff
-                          ? BOT_DIFFICULTY_CONFIG[diff].color
-                          : 'bg-white hover:bg-slate-100'
-                      )}
+                      onClick={addBot}
+                      disabled={bots.length >= 5}
+                      className="px-3 py-2 text-sm bg-bot-purple hover:bg-bot-purple-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border-2 border-bot-border text-white font-bold shadow-hard-purple"
+                      aria-label="Add Bot"
                     >
-                      {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
+                      <Plus className="inline" />
                     </button>
-                  ))}
-                  <button
-                    onClick={addBot}
-                    disabled={bots.length >= 5}
-                    className="px-3 py-2 text-sm bg-bot-purple hover:bg-bot-purple-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-neo border-2 border-bot-border text-white font-bold shadow-hard-purple"
-                  >
-                    <Plus className="inline" />
-                  </button>
-                </div>
+                  </div>
+                )}
                 {bots.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {bots.map(bot => (
@@ -331,13 +342,16 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
                           {BOT_DIFFICULTY_CONFIG[bot.difficulty].icon}
                         </Badge>
-                        <button
-                          onClick={() => removeBot(bot.id)}
-                          className="w-5 h-5 flex items-center justify-center rounded-full text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20 transition-colors"
-                          aria-label={`Remove ${bot.name}`}
-                        >
-                          <X className="w-2.5 h-2.5" />
-                        </button>
+                        {/* Remove button - only show if feature unlocked */}
+                        {canCustomizeBotCount && (
+                          <button
+                            onClick={() => removeBot(bot.id)}
+                            className="w-5 h-5 flex items-center justify-center rounded-full text-neo-red/70 hover:text-neo-red hover:bg-neo-red/20 transition-colors"
+                            aria-label={`Remove ${bot.name}`}
+                          >
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -548,31 +562,35 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     {t('singlePlayer.opponents') || 'Opponents'}
                   </span>
                 </div>
-                <div className="flex gap-1 items-center mb-3">
-                  {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
-                    <button
-                      key={diff}
-                      onClick={() => setSelectedBotDifficulty(diff)}
-                      className={cn(
-                        'px-3 py-1.5 rounded text-xs font-bold uppercase border-2 border-neo-black/30 dark:border-slate-500 text-neo-black flex-1',
-                        selectedBotDifficulty === diff
-                          ? BOT_DIFFICULTY_CONFIG[diff].color
-                          : 'bg-white dark:bg-slate-600 dark:text-neo-white hover:bg-slate-100 dark:hover:bg-slate-500'
-                      )}
+                {/* Bot customization - only show if feature unlocked */}
+                {canCustomizeBotCount && (
+                  <div className="flex gap-1 items-center mb-3">
+                    {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
+                      <button
+                        key={diff}
+                        onClick={() => setSelectedBotDifficulty(diff)}
+                        className={cn(
+                          'px-3 py-1.5 rounded text-xs font-bold uppercase border-2 border-neo-black/30 dark:border-slate-500 text-neo-black flex-1',
+                          selectedBotDifficulty === diff
+                            ? BOT_DIFFICULTY_CONFIG[diff].color
+                            : 'bg-white dark:bg-slate-600 dark:text-neo-white hover:bg-slate-100 dark:hover:bg-slate-500'
+                        )}
+                      >
+                        {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
+                      </button>
+                    ))}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={addBot}
+                      disabled={bots.length >= 5}
+                      className="h-8 px-3 ml-2 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
+                      aria-label="Add"
                     >
-                      {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
-                    </button>
-                  ))}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={addBot}
-                    disabled={bots.length >= 5}
-                    className="h-8 px-3 ml-2 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
                 {bots.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {bots.map(bot => (
@@ -589,13 +607,16 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                         <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
                           {BOT_DIFFICULTY_CONFIG[bot.difficulty].icon}
                         </Badge>
-                        <button
-                          onClick={() => removeBot(bot.id)}
-                          className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
-                          aria-label={`Remove ${bot.name}`}
-                        >
-                          <X className="w-2.5 h-2.5" />
-                        </button>
+                        {/* Remove button - only show if feature unlocked */}
+                        {canCustomizeBotCount && (
+                          <button
+                            onClick={() => removeBot(bot.id)}
+                            className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
+                            aria-label={`Remove ${bot.name}`}
+                          >
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -687,31 +708,35 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                   <Badge className="bg-bot-purple/20 text-bot-purple border border-bot-purple text-[10px] px-1.5">AI</Badge>
                   {t('singlePlayer.opponents') || 'Opponents'}
                 </span>
-                <div className="flex gap-1 items-center">
-                  {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
-                    <button
-                      key={diff}
-                      onClick={() => setSelectedBotDifficulty(diff)}
-                      className={cn(
-                        'px-2 py-0.5 rounded text-xs font-bold uppercase border-2 border-neo-black/30 dark:border-slate-500 text-neo-black',
-                        selectedBotDifficulty === diff
-                          ? BOT_DIFFICULTY_CONFIG[diff].color
-                          : 'bg-white dark:bg-slate-600 dark:text-neo-white hover:bg-slate-100 dark:hover:bg-slate-500'
-                      )}
+                {/* Bot customization - only show if feature unlocked */}
+                {canCustomizeBotCount && (
+                  <div className="flex gap-1 items-center">
+                    {(['easy', 'medium', 'hard'] as BotDifficulty[]).map(diff => (
+                      <button
+                        key={diff}
+                        onClick={() => setSelectedBotDifficulty(diff)}
+                        className={cn(
+                          'px-2 py-0.5 rounded text-xs font-bold uppercase border-2 border-neo-black/30 dark:border-slate-500 text-neo-black',
+                          selectedBotDifficulty === diff
+                            ? BOT_DIFFICULTY_CONFIG[diff].color
+                            : 'bg-white dark:bg-slate-600 dark:text-neo-white hover:bg-slate-100 dark:hover:bg-slate-500'
+                        )}
+                      >
+                        {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
+                      </button>
+                    ))}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={addBot}
+                      disabled={bots.length >= 5}
+                      className="h-6 px-2 ml-1 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
+                      aria-label="Add"
                     >
-                      {t(BOT_DIFFICULTY_CONFIG[diff].labelKey) || diff}
-                    </button>
-                  ))}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={addBot}
-                    disabled={bots.length >= 5}
-                    className="h-6 px-2 ml-1 border-2 border-neo-black dark:border-slate-500 bg-neo-lime hover:bg-neo-lime/80 text-neo-black"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
               {bots.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -729,13 +754,16 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       <Badge className={cn('text-[10px] px-1.5 py-0', BOT_DIFFICULTY_CONFIG[bot.difficulty].color)}>
                         {BOT_DIFFICULTY_CONFIG[bot.difficulty].icon}
                       </Badge>
-                      <button
-                        onClick={() => removeBot(bot.id)}
-                        className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
-                        aria-label={`Remove ${bot.name}`}
-                      >
-                        <X className="w-2.5 h-2.5" />
-                      </button>
+                      {/* Remove button - only show if feature unlocked */}
+                      {canCustomizeBotCount && (
+                        <button
+                          onClick={() => removeBot(bot.id)}
+                          className="w-5 h-5 flex items-center justify-center rounded-full hover:text-neo-red hover:bg-neo-red/20 transition-colors"
+                          aria-label={`Remove ${bot.name}`}
+                        >
+                          <X className="w-2.5 h-2.5" />
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

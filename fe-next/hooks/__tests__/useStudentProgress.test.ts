@@ -23,7 +23,16 @@ jest.mock('@/hooks/useMounted', () => ({
 
 jest.mock('@/lib/supabase/teacher');
 jest.mock('@/utils/logger', () => ({
-  error: jest.fn()
+  default: {
+    warn: jest.fn(),
+    error: jest.fn(),
+    info: jest.fn(),
+    debug: jest.fn(),
+  },
+  warn: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn(),
+  debug: jest.fn(),
 }));
 
 describe('useStudentProgress - Enhanced with Assignments', () => {

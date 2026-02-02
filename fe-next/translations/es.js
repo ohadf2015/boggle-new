@@ -2384,6 +2384,9 @@ const es = {
     "maybeLater": "Quizás después"
   },
   "singlePlayer": {
+    "play": "Jugar",
+    "playDesc": "Entra al juego",
+    "howToPlay": "Cómo jugar",
     "quickPlay": "Jugar Rápido",
     "quickPlayDesc": "7×7 • 1 min • vs Bot",
     "chooseMode": "Elige tu modo",
@@ -2468,6 +2471,27 @@ const es = {
       "practiceDesc": "Sin tiempo, a tu ritmo",
       "challenge": "Desafío",
       "challengeDesc": "Contrarreloj, haz récords"
+    },
+    "features": {
+      "unlocked": {
+        "advancedSettings": "¡Configuración avanzada desbloqueada!",
+        "advancedSettingsDesc": "Ahora puedes personalizar el juego",
+        "customBotCount": "¡Cantidad de bots desbloqueada!",
+        "customBotCountDesc": "Elige cuántos bots enfrentar",
+        "challengeMode": "¡Modo desafío desbloqueado!",
+        "challengeModeDesc": "Contrarreloj y haz récords",
+        "practiceMode": "¡Modo práctica desbloqueado!",
+        "practiceModeDesc": "Sin tiempo - aprende a tu ritmo"
+      },
+      "locked": {
+        "advancedSettings": "Juega 5 partidas para desbloquear",
+        "customBotCount": "Juega 10 partidas para desbloquear",
+        "challengeMode": "Juega 15 partidas para desbloquear",
+        "practiceMode": "Juega 20 partidas para desbloquear"
+      },
+      "nextUnlock": "Próximo: {feature} en {count} partidas",
+      "nextUnlockSingular": "Próximo: {feature} en 1 partida",
+      "tryItNow": "Pruébalo ahora"
     }
   },
   "practice": {
@@ -3918,6 +3942,8 @@ const es = {
   "adventure": {
     "title": "Modo Aventura",
     "subtitle": "¡Viaja por 10 mundos temáticos, conquista 100 niveles y conviértete en el maestro de palabras definitivo!",
+    "adminOnly": "Solo administradores",
+    "adminOnlyMessage": "El modo aventura solo está disponible para administradores.",
     "progress": "Progreso",
     "levels": "niveles",
     "level": "Nivel",
