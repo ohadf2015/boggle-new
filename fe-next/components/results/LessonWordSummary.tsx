@@ -30,7 +30,7 @@ export function LessonWordSummary({
   lessonVocabulary,
   username,
   t
-}: LessonWordSummaryProps): JSX.Element | null {
+}: LessonWordSummaryProps) {
   const stats = useMemo(() => {
     // Return empty stats if no lesson vocabulary
     if (!lessonVocabulary || lessonVocabulary.size === 0) {
