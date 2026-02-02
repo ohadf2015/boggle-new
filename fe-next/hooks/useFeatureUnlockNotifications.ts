@@ -51,7 +51,7 @@ export function useFeatureUnlockNotifications() {
       // 1. Feature is now unlocked
       // 2. User has enough games to unlock it
       // 3. Notification hasn't been shown before
-      if (isUnlocked && gamesPlayed >= threshold && !hasSeenNotification) {
+      if (isUnlocked && threshold !== null && gamesPlayed >= threshold && !hasSeenNotification) {
         // Mark as shown immediately to prevent duplicates
         localStorage.setItem(storageKey, 'true');
 
