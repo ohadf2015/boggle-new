@@ -13,6 +13,8 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import { LeaderboardModal } from './LeaderboardModal';
 import type { SinglePlayerMode } from './SinglePlayerView';
+import { useUserStats } from '@/hooks/useUserStats';
+import { getFeatureGates } from '@/utils/featureGates';
 
 interface ChallengeInfo {
   highScore: number | null;
@@ -23,6 +25,7 @@ interface ChallengeInfo {
 interface PresetSelectorProps {
   onSelectPreset: (preset: PresetConfig) => void;
   onCustomGame: () => void;
+  onStartTutorial: () => void;
   challengeInfo: ChallengeInfo;
 }
 
@@ -68,11 +71,17 @@ const MODE_CONFIG: Record<Exclude<SinglePlayerMode, 'daily'>, {
 const PresetSelector: React.FC<PresetSelectorProps> = ({
   onSelectPreset,
   onCustomGame,
+  onStartTutorial,
   challengeInfo,
 }) => {
   const { t, dir } = useLanguage();
   const isLandscape = useMobileLandscape();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  // Feature gates - check which features are unlocked
+  const { userStats } = useUserStats();
+  const featureGates = getFeatureGates(userStats);
+  const canAccessAdvancedSettings = featureGates.advancedSettings;
 
   // Get the default (middle) preset for a mode and start game directly
   const handleModeSelect = (mode: Exclude<SinglePlayerMode, 'daily'>) => {
@@ -166,14 +175,14 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </button>
             </div>
 
-            {/* Quick Play Button - Primary CTA */}
+            {/* Play Button - Primary CTA (Unified Mode) */}
             <motion.button
               onClick={() => {
-                const quickPreset = getPresetById('quick');
-                if (quickPreset) onSelectPreset(quickPreset);
+                const defaultPreset = getDefaultPreset('solo-bots');
+                if (defaultPreset) onSelectPreset(defaultPreset);
               }}
               className={cn(
-                'p-3 rounded-neo border-4 border-neo-black transition-all relative overflow-hidden',
+                'p-4 rounded-neo border-4 border-neo-black transition-all relative overflow-hidden',
                 'flex items-center gap-3',
                 'shadow-hard-lg',
                 'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime'
@@ -191,28 +200,33 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 animate={{ x: '200%' }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
               />
-              <Play className="w-6 h-6 text-neo-black relative z-10" fill="currentColor" />
+              <Play className="w-7 h-7 text-neo-black relative z-10" fill="currentColor" />
               <div className="flex-1 text-left relative z-10">
-                <h4 className="text-sm font-black uppercase text-neo-black">
-                  {t('singlePlayer.quickPlay') || 'Quick Play'}
+                <h4 className="text-base font-black uppercase text-neo-black">
+                  {t('singlePlayer.play') || 'Play'}
                 </h4>
-                <p className="text-[10px] font-bold text-neo-black/70">
-                  {t('singlePlayer.quickPlayDesc') || '7×7 • 2 min • vs Bot'}
+                <p className="text-[11px] font-bold text-neo-black/70">
+                  {t('singlePlayer.playDesc') || 'Jump into a game'}
                 </p>
               </div>
             </motion.button>
 
-            {/* Mode Selector */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold uppercase text-neo-white/70">
-                {t('singlePlayer.chooseMode') || 'Choose Mode'}
-              </h3>
-              <div className="space-y-2">
-                {(['solo-bots', 'practice', 'challenge'] as const).map((mode, index) => (
-                  renderModeCard(mode, index)
-                ))}
-              </div>
-            </div>
+            {/* How to Play Button - Tutorial Access */}
+            <motion.button
+              onClick={onStartTutorial}
+              className={cn(
+                'p-3 rounded-neo border-3 border-neo-orange',
+                'bg-neo-orange/20',
+                'shadow-hard-sm hover:shadow-hard',
+                'transition-all flex items-center gap-2',
+                'text-sm font-bold text-neo-orange'
+              )}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Book className="w-5 h-5" />
+              <span>{t('singlePlayer.howToPlay') || 'How to Play'}</span>
+            </motion.button>
 
           </div>
 
@@ -236,38 +250,40 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </Card>
             )}
 
-            {/* Or divider + Advanced Settings button */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="space-y-3"
-            >
-              {/* Or divider */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-slate-600" />
-                <span className="text-xs font-bold uppercase text-slate-500">
-                  {t('common.or') || 'or'}
-                </span>
-                <div className="flex-1 h-px bg-slate-600" />
-              </div>
-
-              {/* Advanced Settings button */}
-              <button
-                onClick={onCustomGame}
-                className={cn(
-                  'w-full py-3 px-4 rounded-neo border-3 border-slate-600',
-                  'bg-slate-700/50',
-                  'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                  'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
-                  'transition-all flex items-center justify-center gap-2',
-                  'text-sm font-bold text-slate-300 hover:text-neo-white'
-                )}
+            {/* Or divider + Advanced Settings button - Only show if feature is unlocked */}
+            {canAccessAdvancedSettings && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-3"
               >
-                <Settings className="w-4 h-4" />
-                {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
-              </button>
-            </motion.div>
+                {/* Or divider */}
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-slate-600" />
+                  <span className="text-xs font-bold uppercase text-slate-500">
+                    {t('common.or') || 'or'}
+                  </span>
+                  <div className="flex-1 h-px bg-slate-600" />
+                </div>
+
+                {/* Advanced Settings button */}
+                <button
+                  onClick={onCustomGame}
+                  className={cn(
+                    'w-full py-3 px-4 rounded-neo border-3 border-slate-600',
+                    'bg-slate-700/50',
+                    'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                    'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
+                    'transition-all flex items-center justify-center gap-2',
+                    'text-sm font-bold text-slate-300 hover:text-neo-white'
+                  )}
+                >
+                  <Settings className="w-4 h-4" />
+                  {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
+                </button>
+              </motion.div>
+            )}
           </div>
         </div>
 
@@ -313,7 +329,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </button>
         </div>
 
-        {/* QUICK PLAY - Primary CTA for new players */}
+        {/* PLAY - Primary CTA (Unified Mode) */}
         <motion.button
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -324,16 +340,16 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           }}
           whileTap={{ scale: 0.98 }}
           onClick={() => {
-            const quickPreset = getPresetById('quick');
-            if (quickPreset) onSelectPreset(quickPreset);
+            const defaultPreset = getDefaultPreset('solo-bots');
+            if (defaultPreset) onSelectPreset(defaultPreset);
           }}
           className={cn(
-            'group relative p-4 sm:p-5 rounded-neo-lg border-4 border-neo-black transition-all w-full overflow-hidden',
-            'flex items-center justify-center gap-3',
+            'group relative p-5 sm:p-6 rounded-neo-lg border-4 border-neo-black transition-all w-full overflow-hidden',
+            'flex items-center justify-center gap-4',
             'shadow-hard-lg',
             'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime'
           )}
-          aria-label={t('singlePlayer.quickPlay') || 'Quick Play'}
+          aria-label={t('singlePlayer.play') || 'Play'}
         >
           {/* Animated shine effect */}
           <motion.div
@@ -342,31 +358,37 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             animate={{ x: '200%' }}
             transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
           />
-          <Play className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black relative z-10" fill="currentColor" />
+          <Play className="w-10 h-10 sm:w-12 sm:h-12 text-neo-black relative z-10" fill="currentColor" />
           <div className="text-left relative z-10">
-            <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-black">
-              {t('singlePlayer.quickPlay') || 'Quick Play'}
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-neo-black">
+              {t('singlePlayer.play') || 'Play'}
             </h2>
-            <p className="text-xs sm:text-sm font-bold text-neo-black/70">
-              {t('singlePlayer.quickPlayDesc') || '7×7 board • 2 min • vs Bot'}
+            <p className="text-sm sm:text-base font-bold text-neo-black/70">
+              {t('singlePlayer.playDesc') || 'Jump into a game'}
             </p>
           </div>
         </motion.button>
 
-        {/* Mode Selector Section */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
-            <Target className="w-3 h-3" />
-            <span>{t('singlePlayer.chooseMode') || 'Choose Your Mode'}</span>
-          </div>
-
-          {/* Mode Cards - 3 modes */}
-          <div className="grid grid-cols-3 gap-2">
-            {(['solo-bots', 'practice', 'challenge'] as const).map((mode, index) =>
-              renderModeCard(mode, index)
-            )}
-          </div>
-        </div>
+        {/* How to Play Button - Tutorial Access */}
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onStartTutorial}
+          className={cn(
+            'w-full py-3 px-4 rounded-neo border-3 border-neo-orange',
+            'bg-neo-orange/20',
+            'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
+            'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
+            'transition-all flex items-center justify-center gap-2',
+            'text-sm font-bold text-neo-orange hover:text-neo-orange'
+          )}
+        >
+          <Book className="w-4 h-4" />
+          {t('singlePlayer.howToPlay') || 'How to Play'}
+        </motion.button>
 
         {/* Challenge high score teaser */}
         {challengeInfo.highScore !== null && (
@@ -391,38 +413,40 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </motion.div>
         )}
 
-        {/* Or divider + Advanced Settings button */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="mt-4 space-y-3"
-        >
-          {/* Or divider */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-neo-black/20 dark:bg-slate-600" />
-            <span className="text-xs font-bold uppercase text-neo-black/50 dark:text-slate-500">
-              {t('common.or') || 'or'}
-            </span>
-            <div className="flex-1 h-px bg-neo-black/20 dark:bg-slate-600" />
-          </div>
-
-          {/* Advanced Settings button */}
-          <button
-            onClick={onCustomGame}
-            className={cn(
-              'w-full py-3 px-4 rounded-neo border-3 border-neo-black/30 dark:border-slate-600',
-              'bg-neo-cream/50 dark:bg-slate-700/50',
-              'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
-              'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
-              'transition-all flex items-center justify-center gap-2',
-              'text-sm font-bold text-neo-black/70 dark:text-slate-300 hover:text-neo-black dark:hover:text-neo-white'
-            )}
+        {/* Or divider + Advanced Settings button - Only show if feature is unlocked */}
+        {canAccessAdvancedSettings && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="mt-4 space-y-3"
           >
-            <Settings className="w-4 h-4" />
-            {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
-          </button>
-        </motion.div>
+            {/* Or divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-neo-black/20 dark:bg-slate-600" />
+              <span className="text-xs font-bold uppercase text-neo-black/50 dark:text-slate-500">
+                {t('common.or') || 'or'}
+              </span>
+              <div className="flex-1 h-px bg-neo-black/20 dark:bg-slate-600" />
+            </div>
+
+            {/* Advanced Settings button */}
+            <button
+              onClick={onCustomGame}
+              className={cn(
+                'w-full py-3 px-4 rounded-neo border-3 border-neo-black/30 dark:border-slate-600',
+                'bg-neo-cream/50 dark:bg-slate-700/50',
+                'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
+                'transition-all flex items-center justify-center gap-2',
+                'text-sm font-bold text-neo-black/70 dark:text-slate-300 hover:text-neo-black dark:hover:text-neo-white'
+              )}
+            >
+              <Settings className="w-4 h-4" />
+              {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
+            </button>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Global Leaderboard Modal */}

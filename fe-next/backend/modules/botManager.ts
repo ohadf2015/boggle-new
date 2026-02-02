@@ -327,6 +327,51 @@ export function addBot(gameCode: string, difficulty: string = 'medium', existing
 }
 
 /**
+ * Add a bot with adaptive difficulty based on player's skill level
+ * @param gameCode - Game code
+ * @param userId - User ID to calculate adaptive difficulty (optional)
+ * @param manualDifficulty - Manual difficulty override (optional, defaults to 'medium')
+ * @param existingUsers - Existing users to avoid name conflicts
+ * @param language - Bot language
+ * @returns Created bot
+ */
+export async function addBotWithAdaptiveDifficulty(
+  gameCode: string,
+  userId?: string,
+  manualDifficulty: string = 'medium',
+  existingUsers: Record<string, GameUser> = {},
+  language: string = 'en'
+): Promise<Bot> {
+  let difficulty = manualDifficulty;
+
+  // If userId provided, calculate adaptive difficulty
+  if (userId) {
+    try {
+      const { getRecentGames } = require('../services/playerGameHistory');
+      const { calculatePlayerLevel, selectBotDifficulty } = require('../services/adaptiveDifficulty');
+
+      // Fetch user's recent games
+      const recentGames = await getRecentGames(userId);
+
+      // Calculate player level based on performance
+      const playerLevel = await calculatePlayerLevel(recentGames);
+
+      // Select appropriate bot difficulty
+      difficulty = selectBotDifficulty(playerLevel);
+
+      logger.info('ADAPTIVE_DIFFICULTY', `User ${userId} level: ${playerLevel}, bot difficulty: ${difficulty}`);
+    } catch (error) {
+      logger.error('ADAPTIVE_DIFFICULTY', `Failed to calculate adaptive difficulty for ${userId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      // Fall back to manual difficulty on error
+      difficulty = manualDifficulty;
+    }
+  }
+
+  // Create bot with determined difficulty
+  return addBot(gameCode, difficulty, existingUsers, language);
+}
+
+/**
  * Remove a bot from a game
  * @param gameCode - Game code
  * @param botIdOrUsername - Bot ID or username
@@ -642,6 +687,7 @@ export function clearBotManagerCaches(): void {
 module.exports = {
   // Bot management
   addBot,
+  addBotWithAdaptiveDifficulty,
   removeBot,
   getGameBots,
   getBotByUsername,

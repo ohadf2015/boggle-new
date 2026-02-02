@@ -2441,6 +2441,9 @@ const en = {
     "maybeLater": "Maybe later"
   },
   "singlePlayer": {
+    "play": "Play",
+    "playDesc": "Jump into a game",
+    "howToPlay": "How to Play",
     "quickPlay": "Quick Play",
     "quickPlayDesc": "7×7 • 1 min • vs Bot",
     "chooseMode": "Pick Your Mode",
@@ -2525,6 +2528,27 @@ const en = {
       "practiceDesc": "No timer, learn at your pace",
       "challenge": "Challenge",
       "challengeDesc": "Beat the clock, set records"
+    },
+    "features": {
+      "unlocked": {
+        "advancedSettings": "Advanced Settings Unlocked!",
+        "advancedSettingsDesc": "You can now customize game settings",
+        "customBotCount": "Custom Bot Count Unlocked!",
+        "customBotCountDesc": "Choose how many bots to face",
+        "challengeMode": "Challenge Mode Unlocked!",
+        "challengeModeDesc": "Beat the clock and set records",
+        "practiceMode": "Practice Mode Unlocked!",
+        "practiceModeDesc": "No timer - learn at your pace"
+      },
+      "locked": {
+        "advancedSettings": "Play 5 games to unlock",
+        "customBotCount": "Play 10 games to unlock",
+        "challengeMode": "Play 15 games to unlock",
+        "practiceMode": "Play 20 games to unlock"
+      },
+      "nextUnlock": "Next unlock: {feature} in {count} games",
+      "nextUnlockSingular": "Next unlock: {feature} in 1 game",
+      "tryItNow": "Try it now"
     }
   },
   "practice": {
@@ -3958,6 +3982,8 @@ const en = {
   "adventure": {
     "title": "Adventure Mode",
     "subtitle": "Journey through 10 themed worlds, conquer 100 levels, and become the ultimate word master!",
+    "adminOnly": "Admin Only",
+    "adminOnlyMessage": "Adventure mode is only available to administrators.",
     "progress": "Progress",
     "levels": "levels",
     "level": "Level",

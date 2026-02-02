@@ -2437,6 +2437,9 @@ const sv = {
     "maybeLater": "Kanske senare"
   },
   "singlePlayer": {
+    "play": "Spela",
+    "playDesc": "Hoppa in i ett spel",
+    "howToPlay": "Hur man spelar",
     "quickPlay": "Snabbspel",
     "quickPlayDesc": "7×7 • 1 min • mot Bot",
     "chooseMode": "Välj ditt läge",
@@ -2521,6 +2524,27 @@ const sv = {
       "practiceDesc": "Ingen timer, lär i din takt",
       "challenge": "Utmaning",
       "challengeDesc": "Slå klockan, sätt rekord"
+    },
+    "features": {
+      "unlocked": {
+        "advancedSettings": "Avancerade inställningar olåsta!",
+        "advancedSettingsDesc": "Nu kan du anpassa spelinställningar",
+        "customBotCount": "Anpassat antal bottar olåst!",
+        "customBotCountDesc": "Välj hur många bottar du vill möta",
+        "challengeMode": "Utmaningsläge olåst!",
+        "challengeModeDesc": "Slå klockan och sätt rekord",
+        "practiceMode": "Övningsläge olåst!",
+        "practiceModeDesc": "Ingen timer - lär i din takt"
+      },
+      "locked": {
+        "advancedSettings": "Spela 5 matcher för att låsa upp",
+        "customBotCount": "Spela 10 matcher för att låsa upp",
+        "challengeMode": "Spela 15 matcher för att låsa upp",
+        "practiceMode": "Spela 20 matcher för att låsa upp"
+      },
+      "nextUnlock": "Nästa upplåsning: {feature} om {count} matcher",
+      "nextUnlockSingular": "Nästa upplåsning: {feature} om 1 match",
+      "tryItNow": "Prova nu"
     }
   },
   "practice": {
@@ -3979,6 +4003,8 @@ const sv = {
   "adventure": {
     "title": "Äventyrsläge",
     "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
+    "adminOnly": "Endast admin",
+    "adminOnlyMessage": "Äventyrsläge är endast tillgängligt för administratörer.",
     "progress": "Framsteg",
     "levels": "nivåer",
     "level": "Nivå",

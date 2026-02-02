@@ -13,6 +13,7 @@ import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useMusic } from '@/contexts/MusicContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useFeatureUnlockNotifications } from '@/hooks/useFeatureUnlockNotifications';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
@@ -119,6 +120,9 @@ const SinglePlayerView: React.FC = () => {
 
   const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
   const setIsInGame = useHideNavigation();
+
+  // Show feature unlock notifications when user reaches milestones
+  useFeatureUnlockNotifications();
 
   // Track the current isInGame value to prevent redundant updates
   const isInGameRef = useRef(false);
@@ -362,6 +366,18 @@ const SinglePlayerView: React.FC = () => {
     setPhase('lobby');
   }, []);
 
+  // Handle tutorial start - start practice game with tutorial overlays
+  const handleStartTutorial = useCallback(() => {
+    // TODO: Phase 3 - Implement tutorial flow
+    // For now, start a practice game (tutorial will be integrated later)
+    console.log('[Tutorial] Starting tutorial mode');
+
+    const practicePreset = getDefaultPreset('practice');
+    if (practicePreset) {
+      handleSelectPreset(practicePreset);
+    }
+  }, [handleSelectPreset]);
+
   const handleStartGame = useCallback((settings: Partial<SinglePlayerGameState>) => {
     // Unlock audio on user gesture (required for browser autoplay policy)
     unlockAudio();
@@ -466,6 +482,7 @@ const SinglePlayerView: React.FC = () => {
           <PresetSelector
             onSelectPreset={handleSelectPreset}
             onCustomGame={handleCustomGame}
+            onStartTutorial={handleStartTutorial}
             challengeInfo={{
               highScore: challengeHighScore?.score || null,
               wordCount: challengeHighScore?.wordCount,

@@ -2447,6 +2447,9 @@ const he = {
     "maybeLater": "אולי אחר כך"
   },
   "singlePlayer": {
+    "play": "שחק",
+    "playDesc": "קפוץ למשחק",
+    "howToPlay": "איך משחקים",
     "quickPlay": "משחק מהיר",
     "quickPlayDesc": "לוח 7×7 • 1 דק' • נגד בוט",
     "chooseMode": "בחר את המצב שלך",
@@ -2531,6 +2534,27 @@ const he = {
       "practiceDesc": "ללא טיימר, בקצב שלכם",
       "challenge": "אתגר",
       "challengeDesc": "נגד השעון, שברו שיאים"
+    },
+    "features": {
+      "unlocked": {
+        "advancedSettings": "הגדרות מתקדמות נפתחו!",
+        "advancedSettingsDesc": "עכשיו אפשר להתאים אישית את המשחק",
+        "customBotCount": "מספר בוטים מותאם נפתח!",
+        "customBotCountDesc": "בחרו כמה בוטים להתמודד מולם",
+        "challengeMode": "מצב אתגר נפתח!",
+        "challengeModeDesc": "נגד השעון ושברו שיאים",
+        "practiceMode": "מצב תרגול נפתח!",
+        "practiceModeDesc": "ללא טיימר - למדו בקצב שלכם"
+      },
+      "locked": {
+        "advancedSettings": "שחקו 5 משחקים לפתיחה",
+        "customBotCount": "שחקו 10 משחקים לפתיחה",
+        "challengeMode": "שחקו 15 משחקים לפתיחה",
+        "practiceMode": "שחקו 20 משחקים לפתיחה"
+      },
+      "nextUnlock": "הבא בתור: {feature} בעוד {count} משחקים",
+      "nextUnlockSingular": "הבא בתור: {feature} במשחק הבא",
+      "tryItNow": "נסו עכשיו"
     }
   },
   "practice": {
@@ -3954,6 +3978,8 @@ const he = {
   "adventure": {
     "title": "מצב הרפתקה",
     "subtitle": "מסע דרך 10 עולמות, כבשו 100 שלבים, והפכו לאדון המילים האולטימטיבי!",
+    "adminOnly": "מנהלים בלבד",
+    "adminOnlyMessage": "מצב הרפתקה זמין רק למנהלים.",
     "progress": "התקדמות",
     "levels": "שלבים",
     "level": "שלב",
