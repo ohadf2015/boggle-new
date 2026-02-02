@@ -35,6 +35,8 @@ describe('SinglePlayerLobby - Feature Gates', () => {
       id: 'bot-1',
       name: 'TestBot',
       difficulty: 'medium' as const,
+      score: 0,
+      wordsFound: [],
     }],
   };
 
