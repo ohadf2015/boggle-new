@@ -133,6 +133,8 @@ export interface WordDetail {
   foundByAvatar?: Avatar;
   /** Whether this player was the first to find this word */
   isFirstFinder?: boolean;
+  /** Whether this word is from lesson vocabulary (classroom games only) */
+  fromLesson?: boolean;
 }
 
 /** Entry tracking who found a word first */

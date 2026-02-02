@@ -96,6 +96,7 @@ export interface GameState {
   playerWordDetails?: Record<string, unknown[]>;
   playersReadyForNextGame: Record<string, boolean>;
   selectedVocabulary?: Set<string>;
+  lessonVocabulary?: Set<string>;
   chatHistory?: { username: string; message: string; timestamp: number; isHost?: boolean }[];
   totalBoardWords?: number;
   firstWordFound?: boolean;

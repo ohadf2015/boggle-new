@@ -316,6 +316,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // Continue anyway - word validation will use community validation as fallback
     }
 
+    // Check if this is a classroom game and fetch vocabulary
+    const { getClassroomGame } = await import('../modules/classroomGameManager.js');
+    const classroomGame = await getClassroomGame(gameCode);
+    const lessonVocabulary = classroomGame?.vocabularyWords
+      ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
+      : undefined;
+
     // Update game settings first
     updateGame(gameCode, {
       letterGrid,
@@ -326,7 +333,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       minWordLength: minWordLength || 2,
       difficulty: difficulty || 'MEDIUM',
       gameStartedAt: Date.now(),
-      boardTheme: boardTheme || null // Store theme for late joiners
+      boardTheme: boardTheme || null, // Store theme for late joiners
+      lessonVocabulary: lessonVocabulary
     });
 
     // Transition state using state machine

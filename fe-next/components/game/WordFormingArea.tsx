@@ -42,6 +42,8 @@ export interface WordFeedback {
   foundBy?: string;
   /** Avatar of the first finder */
   foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null;
+  /** Whether this word is from lesson vocabulary (classroom games) */
+  fromLesson?: boolean;
 }
 
 interface WordFormingAreaProps {
@@ -311,6 +313,34 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   +{visibleFeedback.score}
+                </motion.span>
+              )}
+            </AnimatePresence>
+
+            {/* Lesson word indicator */}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fromLesson && (
+                <motion.span
+                  key="lesson"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{
+                    scale: 1,
+                    rotate: 0,
+                    y: [0, -3, 0]
+                  }}
+                  exit={{ scale: 0 }}
+                  transition={{
+                    scale: { delay: 0.15, type: 'spring', stiffness: 600, damping: 20 },
+                    rotate: { delay: 0.15, type: 'spring', stiffness: 600, damping: 20 },
+                    y: { delay: 0.4, duration: 0.6, repeat: Infinity, repeatDelay: 1 }
+                  }}
+                  className={cn(
+                    'bg-gradient-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
+                    compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
+                  )}
+                  title="Lesson vocabulary word!"
+                >
+                  📚
                 </motion.span>
               )}
             </AnimatePresence>

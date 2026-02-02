@@ -38,6 +38,7 @@ export interface AddWordOptions {
   fireRoundMultiplier?: number;
   fireRoundBonus?: number;
   isBot?: boolean;
+  fromLesson?: boolean;
 }
 
 export interface LeaderboardPlayer {
@@ -122,6 +123,7 @@ export function addPlayerWord(
       isBot: options.isBot || false,
       fireRoundMultiplier: options.fireRoundMultiplier || 1,
       fireRoundBonus: options.fireRoundBonus || 0,
+      fromLesson: options.fromLesson || false,
     };
 
     game.playerWordDetails[username].push(wordDetail);

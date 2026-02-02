@@ -519,13 +519,17 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   const userData = game.users?.[username];
   recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
 
+  // Check if word is from lesson vocabulary (classroom games)
+  const fromLesson = game.lessonVocabulary?.has(normalizedWord.toUpperCase()) || false;
+
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: true,
     score: wordScore,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
     fireRoundMultiplier: fireRoundMultiplier,
-    fireRoundBonus: fireRoundBonus
+    fireRoundBonus: fireRoundBonus,
+    fromLesson: fromLesson
   });
 
   // Save to database if dictionary word
@@ -555,7 +559,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     fireRoundActive: fireRoundActive,
     fireRoundMultiplier: fireRoundMultiplier,
     fireRoundBonus: fireRoundBonus,
-    autoValidated: true
+    autoValidated: true,
+    fromLesson: fromLesson
   });
 
   // Broadcast playerFoundWord to room for TV broadcast mode
@@ -600,6 +605,9 @@ function handlePendingWord(socket: Socket, game: GameState, gameCode: string, us
   if (!game.playerCombos) game.playerCombos = {};
   game.playerCombos[username] = safeComboLevel;
 
+  // Check if word is from lesson vocabulary (classroom games)
+  const fromLesson = game.lessonVocabulary?.has(normalizedWord.toUpperCase()) || false;
+
   // Record this player as the first finder of this word (even for pending words)
   const userData = game.users?.[username];
   recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
@@ -611,7 +619,8 @@ function handlePendingWord(socket: Socket, game: GameState, gameCode: string, us
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
     fireRoundMultiplier: fireRoundMultiplier,
-    fireRoundBonus: fireRoundBonus
+    fireRoundBonus: fireRoundBonus,
+    fromLesson: fromLesson
   });
 
   inc('wordNeedsValidation');

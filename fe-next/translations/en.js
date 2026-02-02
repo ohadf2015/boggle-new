@@ -5067,6 +5067,16 @@ const en = {
       "lessonNotFoundDesc": "The requested lesson could not be found.",
       "backToEducation": "Back to Education"
     },
+    "lessonWords": {
+      "title": "Lesson Vocabulary",
+      "subtitle": "Your performance on lesson words",
+      "found": "Found",
+      "total": "Total",
+      "completion": "Score",
+      "foundList": "Words You Found",
+      "missedList": "Words You Missed",
+      "perfectScore": "Perfect! You found all lesson words!"
+    },
     "students": "students",
     "onboarding": {
       "step": "Step",
