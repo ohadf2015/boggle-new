@@ -29,7 +29,12 @@ describe('SinglePlayerLobby - Feature Gates', () => {
     difficulty: 'EASY' as const,
     language: 'en' as const,
     timerSeconds: 120,
-    grid: Array(16).fill('A').join(''), // 4x4 grid for EASY
+    grid: [
+      ['A', 'B', 'C', 'D'],
+      ['E', 'F', 'G', 'H'],
+      ['I', 'J', 'K', 'L'],
+      ['M', 'N', 'O', 'P'],
+    ], // 4x4 grid for EASY
     minWordLength: 3,
     bots: [{
       id: 'bot-1',
