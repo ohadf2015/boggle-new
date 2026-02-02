@@ -140,7 +140,11 @@ jest.mock('@/components/auth/AuthModal', () => {
 });
 
 // Store mock values to be changed between tests
-let mockAuthState = {
+let mockAuthState: {
+  isAuthenticated: boolean;
+  loading: boolean;
+  isAdmin?: boolean;
+} = {
   isAuthenticated: false,
   loading: false,
 };
@@ -212,8 +216,17 @@ describe('LandingView Loading State', () => {
   });
 
   it('should show Adventure Mode card on desktop', async () => {
+    // GIVEN - User is admin (Adventure Mode is admin-only)
+    mockAuthState = {
+      isAuthenticated: true,
+      isAdmin: true,
+      loading: false,
+    };
+
+    // WHEN
     render(<LandingView />);
 
+    // THEN
     await waitFor(() => {
       expect(screen.getByTestId('mode-card-landing.adventureMode')).toBeInTheDocument();
     });
