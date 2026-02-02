@@ -21,7 +21,7 @@ describe('useUserStats', () => {
     (useAuth as jest.Mock).mockReturnValue({
       user: null,
       profile: null,
-      isLoading: false,
+      loading: false, // AuthContext uses 'loading', not 'isLoading'
     });
 
     // WHEN
@@ -40,7 +40,7 @@ describe('useUserStats', () => {
         id: 'user-123',
         total_games: 10,
       },
-      isLoading: false,
+      loading: false, // AuthContext uses 'loading', not 'isLoading'
     });
 
     // WHEN
@@ -58,7 +58,7 @@ describe('useUserStats', () => {
     (useAuth as jest.Mock).mockReturnValue({
       user: null,
       profile: null,
-      isLoading: true,
+      loading: true, // AuthContext uses 'loading', not 'isLoading'
     });
 
     // WHEN
@@ -77,7 +77,7 @@ describe('useUserStats', () => {
         id: 'user-123',
         // total_games missing
       },
-      isLoading: false,
+      loading: false, // AuthContext uses 'loading', not 'isLoading'
     });
 
     // WHEN
@@ -100,7 +100,7 @@ describe('useUserStats', () => {
         id: 'user-123',
         total_games: 5,
       },
-      isLoading: false,
+      loading: false, // AuthContext uses 'loading', not 'isLoading'
     });
 
     // WHEN - Profile updates to 6 games
@@ -112,7 +112,7 @@ describe('useUserStats', () => {
         id: 'user-123',
         total_games: 6,
       },
-      isLoading: false,
+      loading: false, // AuthContext uses 'loading', not 'isLoading'
     });
 
     rerender();
