@@ -107,10 +107,10 @@ describe('AdventureGrid Contrast', () => {
 
       // THEN
       const cells = screen.getAllByRole('gridcell');
-      // Enhanced selection with thicker ring for better visibility
-      expect(cells[0]).toHaveClass('ring-4');
-      // Using lime for better visibility against world theming
-      expect(cells[0]).toHaveClass('ring-neo-lime');
+      // Enhanced selection styling is applied via tile-selected-enhanced class
+      // (ring, z-index, and other visual effects are handled by CSS)
+      expect(cells[0]).toHaveClass('tile-selected-enhanced');
+      expect(cells[1]).toHaveClass('tile-selected-enhanced');
     });
 
     it('should scale up selected tiles for visual emphasis', () => {
@@ -129,10 +129,8 @@ describe('AdventureGrid Contrast', () => {
 
       // THEN
       const cells = screen.getAllByRole('gridcell');
-      // Framer motion applies scale via style, check the class indicates selection
+      // Selection styling (scale, z-index, etc.) is applied via tile-selected-enhanced class
       expect(cells[0]).toHaveClass('tile-selected-enhanced');
-      // Higher z-index (z-20) for better layering above other tiles
-      expect(cells[0]).toHaveClass('z-20');
     });
   });
 });
