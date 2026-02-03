@@ -219,7 +219,11 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
       />
 
       {/* Victory title burst (0-2s) */}
-      <Sequence from={PHASE_FRAMES.TITLE_START} durationInFrames={60}>
+      <Sequence
+        from={PHASE_FRAMES.TITLE_START}
+        durationInFrames={60}
+        premountFor={15} // Pre-mount 0.5s before to prevent black frames
+      >
         <div
           style={{
             position: 'absolute',
@@ -252,7 +256,11 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
       </Sequence>
 
       {/* Star reveal (2-4s) */}
-      <Sequence from={PHASE_FRAMES.STARS_START} durationInFrames={60}>
+      <Sequence
+        from={PHASE_FRAMES.STARS_START}
+        durationInFrames={60}
+        premountFor={15}
+      >
         <div
           style={{
             position: 'absolute',
@@ -297,7 +305,7 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
       </Sequence>
 
       {/* Stats display (3-6s) */}
-      <Sequence from={PHASE_FRAMES.STATS_START}>
+      <Sequence from={PHASE_FRAMES.STATS_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -336,7 +344,7 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
       </Sequence>
 
       {/* Sparkle particles (throughout) */}
-      <Sequence from={30}>
+      <Sequence from={30} premountFor={10}>
         <div
           style={{
             position: 'absolute',

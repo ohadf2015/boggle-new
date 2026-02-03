@@ -113,21 +113,32 @@ async function generateChallengesWithAI(
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-      // Check if this is a validation error (insufficient challenges)
-      if (errorMessage.includes('Insufficient validated challenges')) {
+      // Check if this is a retryable validation error
+      const isInsufficientChallenges = errorMessage.includes('Insufficient validated challenges');
+      const isMissingWordleGuess = errorMessage.includes('Daily Buzz must include at least one wordle_guess');
+
+      if (isInsufficientChallenges || isMissingWordleGuess) {
         // Extract rejection count and reasons from error logs (if available)
-        const match = errorMessage.match(/got (\d+), need 5/);
-        if (match) {
-          lastRejectedCount = 5 - parseInt(match[1], 10);
+        if (isInsufficientChallenges) {
+          const match = errorMessage.match(/got (\d+), need 5/);
+          if (match) {
+            lastRejectedCount = 5 - parseInt(match[1], 10);
+          }
         }
 
-        // Collect generic rejection reasons for next attempt
-        rejectionReasons = [
-          `Invalid word length (too short or too long for ${language})`,
-          `Answer spoiled in prompt or hint`,
-          `Missing required wordle_guess challenge type`,
-          `Too many sports-related riddles`,
-        ];
+        // Collect specific rejection reasons for next attempt
+        rejectionReasons = [];
+
+        if (isMissingWordleGuess) {
+          rejectionReasons.push(`CRITICAL: Missing required wordle_guess challenge - MUST include exactly ONE wordle_guess in your output`);
+          lastRejectedCount = 1; // At least one challenge needs to be wordle_guess
+        }
+
+        if (isInsufficientChallenges) {
+          rejectionReasons.push(`Invalid word length (too short or too long for ${language})`);
+          rejectionReasons.push(`Answer spoiled in prompt or hint`);
+          rejectionReasons.push(`Too many sports-related riddles`);
+        }
 
         lastError = error instanceof Error ? error : new Error(errorMessage);
 

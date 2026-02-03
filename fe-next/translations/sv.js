@@ -137,6 +137,8 @@ const sv = {
     "share": "Dela",
     "bot": "Bot",
     "minutes": "min",
+    "playNow": "Spela Nu",
+    "tryAgainLater": "Försök Igen Senare",
     "seconds": "sekunder",
     "days": "dagar",
     "step": "Steg",
@@ -310,7 +312,11 @@ const sv = {
     "fireRoundLights": "Blinkande ljus",
     "keepAnimations": "Behåll effekter",
     "disableAnimations": "Inaktivera effekter",
-    "settingsHint": "Du kan ändra detta när som helst i Inställningar"
+    "settingsHint": "Du kan ändra detta när som helst i Inställningar",
+    "fireRoundTitle": "🔥 Eldrunda!",
+    "fireRoundPrompt": "Skärmskakning & blinkande ljus. Stänga av?",
+    "enable": "Aktivera",
+    "disable": "Inaktivera"
   },
   "spam": {
     "warning": "Lugnt! För många missar",
@@ -1453,6 +1459,7 @@ const sv = {
     "viewProgress": "Se Framsteg"
   },
   "achievements": {
+    "unlocked": "Prestation Upplåst!",
     "FIRST_BLOOD": {
       "name": "Första Blodet",
       "description": "Först att hitta ett ord"
@@ -2124,6 +2131,7 @@ const sv = {
     "loading": "Laddar topplista...",
     "error": "Kunde inte ladda topplista",
     "empty": "Inga poäng ännu. Var först att spela!",
+    "beFirstToPlay": "Var först att spela!",
     "refresh": "Uppdatera",
     "best": "Bäst",
     "totalPoints": "totalt",
@@ -3145,6 +3153,7 @@ const sv = {
     "friend": "Vän",
     "noFriendsYet": "Inga vänner än",
     "noPendingRequests": "Inga väntande förfrågningar",
+    "requestsWillAppearHere": "Förfrågningar visas här",
     "noUsersFound": "Inga användare hittades",
     "pending": "Väntar",
     "pendingRequests": "Väntande förfrågningar",
@@ -4291,7 +4300,10 @@ const sv = {
         "victory": "Seger!",
         "defeated": "{bossName} besegrad!",
         "bossApproaches": "En utmanare narmar sig...",
-        "prepareForBattle": "Forebered dig for strid!"
+        "prepareForBattle": "Forebered dig for strid!",
+        "errorTitle": "Videofel",
+        "errorDescription": "Något gick fel vid uppspelning. Försök igen eller hoppa över.",
+        "retry": "Försök igen"
       },
       "abilities": {
         "popQuiz": {

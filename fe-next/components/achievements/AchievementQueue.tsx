@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
 import AchievementPopup from './AchievementPopup';
+import { toast } from '@/components/ui/EnhancedToast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { AchievementPayload } from '@/shared/types/socket';
 
 interface AchievementQueueProps {
@@ -93,6 +95,7 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   const [currentAchievement, setCurrentAchievement] = useState<AchievementPayload | null>(null);
   const isDisplayingRef = useRef<boolean>(false);
   const queueRef = useRef<AchievementPayload[]>([]);
+  const { t } = useLanguage();
 
   useEffect(() => {
     queueRef.current = queue;
@@ -122,6 +125,19 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
 
     setQueue(prev => [...prev, achievement].slice(-5));
 
+    // Show toast notification for achievement
+    const achievementName = t(`achievements.${achievement.key}.name`) || achievement.key;
+    toast.success(
+      t('achievements.unlocked') || '🏆 Achievement Unlocked!',
+      achievementName,
+      {
+        label: t('common.share') || 'Share',
+        onClick: () => {
+          // Share functionality will be handled by the popup
+        },
+      }
+    );
+
     if (!isDisplayingRef.current) {
       setTimeout(() => {
         if (!isDisplayingRef.current && queueRef.current.length > 0) {
@@ -129,7 +145,7 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
         }
       }, 100);
     }
-  }, [processNext]);
+  }, [processNext, t]);
 
   return (
     <AchievementQueueContext.Provider value={{ queueAchievement }}>

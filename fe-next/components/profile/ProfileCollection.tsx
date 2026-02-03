@@ -7,6 +7,8 @@ import { CollectionGrid } from '@/components/CollectionGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Skeleton } from '@/components/ui/EnhancedLoading';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { PlayerCollectible } from '@/contexts/auth/authTypes';
 
 interface ProfileCollectionProps {
@@ -53,9 +55,18 @@ export function ProfileCollection({
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-6">
-          <NeoLoader variant="dots" size="md" />
+        <div className="grid grid-cols-4 gap-3 py-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} variant="circular" width={64} height={64} />
+          ))}
         </div>
+      ) : collectibles.length === 0 ? (
+        <EnhancedEmptyState
+          title={t('collectibles.emptyCollection') || 'No collectibles yet'}
+          description={t('collectibles.earnByPlaying') || 'Earn coins by playing games'}
+          icon="sparkles"
+          compact
+        />
       ) : (
         <CollectionGrid collectibles={collectibles} />
       )}

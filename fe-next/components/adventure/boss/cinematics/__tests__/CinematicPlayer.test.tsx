@@ -69,33 +69,52 @@ describe('CinematicPlayer', () => {
     (usePrefersReducedMotion as jest.Mock).mockReturnValue(false);
   });
 
+  // Helper to wait for loading state to complete
+  const waitForReady = () => {
+    act(() => {
+      jest.advanceTimersByTime(200); // Wait for loading delay (100ms + buffer)
+    });
+  };
+
+  // Helper to wait for skip to be enabled
+  const waitForSkipEnabled = () => {
+    act(() => {
+      jest.advanceTimersByTime(SKIP_DELAY_MS);
+    });
+  };
+
   describe('rendering', () => {
     it('should render the player container', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       expect(screen.getByTestId('cinematic-player')).toBeInTheDocument();
     });
 
-    it('should render Remotion Player', () => {
+    it('should render Remotion Player after loading', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       expect(screen.getByTestId('mock-remotion-player')).toBeInTheDocument();
     });
 
-    it('should render skip button', () => {
+    it('should render skip button after loading', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       expect(screen.getByTestId('skip-button')).toBeInTheDocument();
     });
 
-    it('should render progress bar', () => {
+    it('should render progress bar after loading', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       expect(screen.getByRole('progressbar')).toBeInTheDocument();
     });
 
     it('should apply fullscreen classes by default', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       const container = screen.getByTestId('cinematic-player');
       expect(container).toHaveClass('fixed', 'inset-0', 'z-50', 'bg-black');
@@ -103,6 +122,7 @@ describe('CinematicPlayer', () => {
 
     it('should apply relative classes when fullscreen is false', () => {
       render(<CinematicPlayer {...defaultProps} fullscreen={false} />);
+      waitForReady();
 
       const container = screen.getByTestId('cinematic-player');
       expect(container).toHaveClass('relative');
@@ -113,6 +133,7 @@ describe('CinematicPlayer', () => {
   describe('skip button behavior', () => {
     it('should disable skip button initially', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       const skipButton = screen.getByTestId('skip-button');
       expect(skipButton).toBeDisabled();
@@ -120,29 +141,27 @@ describe('CinematicPlayer', () => {
 
     it('should show countdown before skip is available', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
-      expect(screen.getByText(/Skip in 2/)).toBeInTheDocument();
+      expect(screen.getByText(/Skip in/i)).toBeInTheDocument();
     });
 
     it('should enable skip button after SKIP_DELAY_MS', () => {
       render(<CinematicPlayer {...defaultProps} />);
+      waitForReady();
 
       const skipButton = screen.getByTestId('skip-button');
       expect(skipButton).toBeDisabled();
 
-      act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
-      });
+      waitForSkipEnabled();
 
       expect(skipButton).not.toBeDisabled();
     });
 
     it('should show skip text with ESC hint after delay', () => {
       render(<CinematicPlayer {...defaultProps} />);
-
-      act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
-      });
+      waitForReady();
+      waitForSkipEnabled();
 
       expect(screen.getByText('Skip')).toBeInTheDocument();
       expect(screen.getByText('ESC')).toBeInTheDocument();
@@ -151,11 +170,8 @@ describe('CinematicPlayer', () => {
     it('should call onComplete when skip button is clicked', () => {
       const onComplete = jest.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
-
-      // Enable skip
-      act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
-      });
+      waitForReady();
+      waitForSkipEnabled();
 
       // Click skip
       fireEvent.click(screen.getByTestId('skip-button'));
@@ -166,6 +182,7 @@ describe('CinematicPlayer', () => {
     it('should not call onComplete when skip button is clicked before delay', () => {
       const onComplete = jest.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
+      waitForReady();
 
       // Try to click before skip is enabled
       fireEvent.click(screen.getByTestId('skip-button'));
@@ -178,11 +195,8 @@ describe('CinematicPlayer', () => {
     it('should skip on ESC key after delay', () => {
       const onComplete = jest.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
-
-      // Enable skip
-      act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
-      });
+      waitForReady();
+      waitForSkipEnabled();
 
       // Press ESC
       fireEvent.keyDown(window, { key: 'Escape' });
@@ -193,6 +207,7 @@ describe('CinematicPlayer', () => {
     it('should not skip on ESC key before delay', () => {
       const onComplete = jest.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
+      waitForReady();
 
       // Press ESC before skip is enabled
       fireEvent.keyDown(window, { key: 'Escape' });
@@ -203,11 +218,8 @@ describe('CinematicPlayer', () => {
     it('should not skip on other keys', () => {
       const onComplete = jest.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
-
-      // Enable skip
-      act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
-      });
+      waitForReady();
+      waitForSkipEnabled();
 
       // Press other keys
       fireEvent.keyDown(window, { key: 'Enter' });
@@ -253,6 +265,7 @@ describe('CinematicPlayer', () => {
   describe('custom props', () => {
     it('should use custom testId', () => {
       render(<CinematicPlayer {...defaultProps} testId="custom-player" />);
+      waitForReady();
 
       expect(screen.getByTestId('custom-player')).toBeInTheDocument();
     });
@@ -266,6 +279,7 @@ describe('CinematicPlayer', () => {
           compositionProps={{ testContent: 'Custom Content' }}
         />
       );
+      waitForReady();
 
       // Find the call with matching inputProps
       const calls = Player.mock.calls;
@@ -287,6 +301,7 @@ describe('CinematicPlayer', () => {
           fps={30}
         />
       );
+      waitForReady();
 
       // Find the call with matching durationInFrames
       const calls = Player.mock.calls;

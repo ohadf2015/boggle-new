@@ -71,6 +71,13 @@
   /* Mobile Layout Variables */
   --mobile-tab-bar-height: 4rem; /* 64px base height for bottom tab bars */
   --mobile-bottom-safe: calc(var(--mobile-tab-bar-height) + env(safe-area-inset-bottom, 0px));
+  
+  /* Header/Footer Height Variables for Content Spacing */
+  --header-height-mobile: 60px;
+  --header-height-tablet: 70px;
+  --header-height-desktop: 80px;
+  --footer-height: 60px;
+  --bottom-nav-height: 64px;
 
   /* Snappy Timing Functions */
   --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -794,7 +801,7 @@ body {
       /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
       /* FIX: Use CSS variable to GUARANTEE width === height for perfectly square grid */
       /* This prevents cells from being stretched when flex containers affect dimensions */
-      --board-size: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px));
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -807,7 +814,7 @@ body {
     .game-board-frame {
       /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
       /* FIX: Single variable ensures square container */
-      --board-size: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - 250px));
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -819,7 +826,7 @@ body {
     .game-board-frame {
       /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
       /* FIX: Single variable ensures square container */
-      --board-size: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - 240px));
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -1434,4 +1441,161 @@ body {
 .low-end-device .letter-glow-caverns {
   text-shadow: none !important;
 
+}
+
+
+/* ====================================
+   HEADER & FOOTER SAFE AREA UTILITIES
+   Prevents content from being hidden
+   behind sticky headers or fixed footers
+   ==================================== */
+
+/* Scroll padding for anchor links to account for sticky header */
+html {
+  scroll-padding-top: calc(var(--header-height-mobile) + 16px);
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: calc(var(--header-height-tablet) + 16px);
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-top: calc(var(--header-height-desktop) + 16px);
+  }
+}
+
+/* Main content wrapper - adds padding for sticky header on mobile */
+.main-content-safe {
+  /* Default padding for mobile (sticky header) */
+  padding-top: 0;
+  padding-bottom: var(--mobile-bottom-safe);
+}
+
+/* On desktop (lg+), header is static so no top padding needed */
+@media (min-width: 1024px) {
+  .main-content-safe {
+    padding-top: 0;
+  }
+}
+
+/* Content area with header awareness 
+   Use this when you need explicit spacing from header */
+.content-with-header-spacing {
+  padding-top: calc(var(--header-height-mobile) + 8px);
+}
+
+@media (min-width: 640px) {
+  .content-with-header-spacing {
+    padding-top: calc(var(--header-height-tablet) + 12px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-with-header-spacing {
+    padding-top: calc(var(--header-height-desktop) + 16px);
+  }
+}
+
+/* Safe area padding for footer (desktop) */
+.content-with-footer-spacing {
+  padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Combined safe area for both header and footer */
+.content-safe-full {
+  padding-top: calc(var(--header-height-mobile) + 8px);
+  padding-bottom: var(--mobile-bottom-safe);
+}
+
+@media (min-width: 640px) {
+  .content-safe-full {
+    padding-top: calc(var(--header-height-tablet) + 12px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-safe-full {
+    padding-top: calc(var(--header-height-desktop) + 16px);
+    padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Min-height utilities that account for header/footer */
+.min-height-screen-safe {
+  min-height: calc(100dvh - var(--header-height-mobile) - var(--mobile-bottom-safe));
+}
+
+@media (min-width: 640px) {
+  .min-height-screen-safe {
+    min-height: calc(100dvh - var(--header-height-tablet) - var(--mobile-bottom-safe));
+  }
+}
+
+@media (min-width: 1024px) {
+  .min-height-screen-safe {
+    min-height: calc(100dvh - var(--header-height-desktop) - var(--footer-height));
+  }
+}
+
+/* Fixed positioning utilities with safe areas */
+.fixed-safe-top {
+  top: max(env(safe-area-inset-top, 0px), 0px);
+}
+
+.fixed-safe-bottom {
+  bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+}
+
+/* Header height responsive utilities */
+.h-header {
+  height: var(--header-height-mobile);
+}
+
+@media (min-width: 640px) {
+  .h-header {
+    height: var(--header-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .h-header {
+    height: var(--header-height-desktop);
+  }
+}
+
+/* Margin top for fixed/sticky header spacing */
+.mt-header {
+  margin-top: var(--header-height-mobile);
+}
+
+@media (min-width: 640px) {
+  .mt-header {
+    margin-top: var(--header-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .mt-header {
+    margin-top: var(--header-height-desktop);
+  }
+}
+
+/* Padding top for fixed/sticky header spacing */
+.pt-header {
+  padding-top: var(--header-height-mobile);
+}
+
+@media (min-width: 640px) {
+  .pt-header {
+    padding-top: var(--header-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pt-header {
+    padding-top: var(--header-height-desktop);
+  }
 }

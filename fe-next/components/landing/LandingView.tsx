@@ -484,7 +484,7 @@ const LandingView: React.FC = () => {
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
             {/* Cards container - Daily Challenge Banner + Mode Cards in single grid */}
             {/* max-w-5xl (1024px) constrains overall width, individual cards have max-w-md (448px) */}
-            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 justify-items-center px-4 lg:px-6">
+            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 justify-items-center items-stretch px-4 lg:px-6">
               {/* Daily Challenge Banner - spans full width with its own max-width */}
               <div className="col-span-1 sm:col-span-2 w-full max-w-4xl mx-auto">
                 <Suspense fallback={

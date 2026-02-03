@@ -87,7 +87,7 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        'flex flex-col relative',
+        'flex flex-col relative main-content-safe',
         fullHeight ? 'h-full overflow-hidden' : 'min-h-full',
         isDarkMode
           ? 'bg-neo-navy'
@@ -105,15 +105,15 @@ export function PageLayout({
         />
       )}
 
-      {/* Auto-hide header */}
+      {/* Auto-hide header - sticky on mobile, static on desktop */}
       {showHeader && <AutoHideHeader />}
 
-      {/* Page content */}
+      {/* Page content with proper spacing */}
       <div
         className={cn(
           'flex-1 mx-auto w-full',
           fullHeight && 'min-h-0',
-          bottomNavAware && 'page-content-safe',
+          bottomNavAware && 'page-content-safe pb-16 sm:pb-0',
           maxWidthClasses[maxWidth],
           paddingClasses[padding]
         )}

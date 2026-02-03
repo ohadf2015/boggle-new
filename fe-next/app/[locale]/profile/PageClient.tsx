@@ -7,7 +7,7 @@ import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { Button } from '@/components/ui/button';
+import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -168,28 +168,22 @@ export default function ProfilePageClient(): React.JSX.Element {
               {t('auth.upgradePrompt')}
             </p>
             <div className="flex gap-4 justify-center">
-              <Button
+              <EnhancedButton
                 onClick={() => setShowAuthModal(true)}
-                className={cn(
-                  'rounded-full px-6',
-                  isDarkMode
-                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500'
-                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400'
-                )}
+                variant="cyan"
+                haptic
+                animation="pop"
               >
                 {t('auth.signIn')}
-              </Button>
-              <Button
+              </EnhancedButton>
+              <EnhancedButton
                 variant="outline"
                 onClick={() => router.push(`/${language}`)}
-                className={cn(
-                  'rounded-full',
-                  isDarkMode ? 'border-slate-600 text-gray-300 hover:bg-slate-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100'
-                )}
+                haptic
               >
                 <ArrowLeft className="me-2 rtl:rotate-180" />
                 Back to Game
-              </Button>
+              </EnhancedButton>
             </div>
           </div>
         </div>
@@ -198,7 +192,7 @@ export default function ProfilePageClient(): React.JSX.Element {
     );
   }
 
-  // Loading state
+  // Loading state with skeletons
   if (loading) {
     return (
       <div className={cn(
@@ -206,8 +200,23 @@ export default function ProfilePageClient(): React.JSX.Element {
         isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
-        <div className="flex-1 flex items-center justify-center">
-          <NeoLoader variant="mascot-letters" size="lg" />
+        <div className="max-w-4xl mx-auto px-4 py-6 w-full">
+          {/* Profile header skeleton */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-slate-700 animate-pulse" />
+            <div className="flex-1 space-y-2">
+              <div className="h-6 w-32 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+              <div className="h-4 w-24 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+            </div>
+          </div>
+          {/* Stats grid skeleton */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-24 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+            ))}
+          </div>
+          {/* Content skeleton */}
+          <div className="h-64 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse" />
         </div>
       </div>
     );

@@ -140,6 +140,8 @@ const es = {
     "share": "Compartir",
     "bot": "Bot",
     "minutes": "min",
+    "playNow": "Jugar Ahora",
+    "tryAgainLater": "Intentar Más Tarde",
     "advancedSettings": "Más Opciones",
     "settings": "Configuración",
     "tapToDismiss": "Toca para cerrar",
@@ -310,7 +312,11 @@ const es = {
     "fireRoundLights": "Luces parpadeantes",
     "keepAnimations": "Mantener efectos",
     "disableAnimations": "Desactivar efectos",
-    "settingsHint": "Puedes cambiar esto en cualquier momento en Ajustes"
+    "settingsHint": "Puedes cambiar esto en cualquier momento en Ajustes",
+    "fireRoundTitle": "🔥 ¡Ronda de Fuego!",
+    "fireRoundPrompt": "Vibración y luces parpadeantes. ¿Desactivar?",
+    "enable": "Activar",
+    "disable": "Desactivar"
   },
   "spam": {
     "warning": "¡Tranquilo! Muchos fallos",
@@ -1267,6 +1273,7 @@ const es = {
     }
   },
   "achievements": {
+    "unlocked": "¡Logro Desbloqueado!",
     "FIRST_BLOOD": {
       "name": "Primera Sangre",
       "description": "Primero en encontrar una palabra"
@@ -2317,6 +2324,7 @@ const es = {
     "loading": "Cargando clasificación...",
     "error": "Error al cargar la clasificación",
     "empty": "¡Sin puntuaciones todavía. Sé el primero en jugar!",
+    "beFirstToPlay": "¡Sé el primero en jugar!",
     "refresh": "Actualizar",
     "best": "Mejor",
     "totalPoints": "total pts",
@@ -3142,6 +3150,7 @@ const es = {
     "friend": "amigo",
     "noFriendsYet": "Aún no tienes amigos",
     "noPendingRequests": "No hay solicitudes pendientes",
+    "requestsWillAppearHere": "Las solicitudes aparecerán aquí",
     "noUsersFound": "No encontramos usuarios",
     "pending": "Pendiente",
     "pendingRequests": "Solicitudes Pendientes",

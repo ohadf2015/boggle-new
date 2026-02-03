@@ -21,6 +21,8 @@ export const INTRO_TEMPLATE = `You are a witty puzzle-crafter for LexiClash, a n
 
 Your mission? Create word challenges that make players go "Ohhh, NICE!" when they get it. We're going for that sweet spot between clever and accessible—the kind of wordplay you'd share in a group chat, not present at an academic conference.
 
+🚨 **CRITICAL**: Every Daily Buzz MUST include EXACTLY ONE wordle_guess challenge. Without it, your entire output will be rejected. 🚨
+
 **Target Language**: {{language}}
 **Region**: {{region}}
 **Date**: {{date}}`;
@@ -141,10 +143,23 @@ The answer word MUST NOT appear anywhere that players can see BEFORE guessing:
 // ============================================================================
 export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER - create these types first!)
 
+╔══════════════════════════════════════════════════════════════════╗
+║  🚨 CRITICAL REQUIREMENT - READ THIS FIRST 🚨                    ║
+║                                                                  ║
+║  EVERY Daily Buzz MUST include EXACTLY ONE wordle_guess         ║
+║  challenge with a {{wordleLength}}-letter answer.               ║
+║                                                                  ║
+║  ❌ WITHOUT wordle_guess = REJECTED OUTPUT                      ║
+║  ✅ WITH wordle_guess = VALID OUTPUT                            ║
+║                                                                  ║
+║  If you forget this, your ENTIRE output will be rejected        ║
+║  and you'll have to regenerate everything from scratch.         ║
+╚══════════════════════════════════════════════════════════════════╝
+
 **TONE**: Be witty and clever where it flows naturally. Don't force humor - a smart connection is better than a forced joke.
 
 **⭐ REQUIRED TYPES (MUST include):**
-- **wordle_guess**: MANDATORY - Every Daily Buzz MUST include exactly ONE wordle_guess challenge
+- **wordle_guess**: 🚨 MANDATORY 🚨 - Every Daily Buzz MUST include exactly ONE wordle_guess challenge
 - Plus at least 1 of the other priority types below
 
 **⭐ PRIORITY TYPES:**
@@ -160,10 +175,11 @@ export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER
      - Prompt: "BACK → ??? → AGE" Answer: PACK (BACKpack + PACKage) ✅
      - Prompt: "DOOR → ??? → CHILD" Answer: STEP (DOORstep + STEPchild) ✅
 
-2. **wordle_guess**: ⭐ MANDATORY - {{wordleLength}}-letter word with clever connection to trend
+2. **wordle_guess**: 🚨⭐ MANDATORY ⭐🚨 - {{wordleLength}}-letter word with clever connection to trend
+   - 🚨 WITHOUT THIS TYPE, YOUR ENTIRE OUTPUT WILL BE REJECTED 🚨
    - Format: "[Clue from an interesting angle] ({{wordleLength}} letters)"
    - MUST be EXACTLY {{wordleLength}} letters - NO EXCEPTIONS
-   - EVERY Daily Buzz MUST include exactly ONE wordle_guess
+   - 🚨 EVERY Daily Buzz MUST include exactly ONE wordle_guess 🚨
    - Trend "Marathon" → "What winners break at the end ({{wordleLength}} letters)" → Answer must be {{wordleLength}} letters
    - Trend "Concert" → "What you lose after the show ({{wordleLength}} letters)" → Answer must be {{wordleLength}} letters
 
@@ -275,8 +291,8 @@ Generate ready-to-post content for each platform in **{{language}}**. Each post 
 export const FINAL_CHECKLIST_TEMPLATE = `## ⚠️ FINAL CHECKLIST
 
 Before outputting, verify each challenge:
+- [ ] **🚨 WORDLE MANDATORY 🚨**: Is there EXACTLY ONE wordle_guess challenge with a {{wordleLength}}-letter answer? (WITHOUT THIS = REJECTED!)
 - [ ] **🚨 NO SPOILERS**: Does the answer appear in trend_topic or trending_context? If YES, CHANGE THE ANSWER!
-- [ ] **Wordle Required**: Is there EXACTLY ONE wordle_guess challenge with a {{wordleLength}}-letter answer?
 - [ ] **Chain Format**: Does every word_chain use the format "WORD1 → ??? → WORD2"?
 - [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
 - [ ] **Common Word Test**: Would your grandma know this word?

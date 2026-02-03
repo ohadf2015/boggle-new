@@ -5,91 +5,18 @@ import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { MASCOT_IMAGES, MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
+import {
+  getBaseVariant,
+  type ExtendedMascotVariant,
+  type MoodVariant,
+  type ActivityVariant,
+  VARIANT_MAP,
+  BASE_VARIANTS,
+} from './mascotUtils';
 
-/**
- * Extended variants for semantic meaning - ALL map to 4 GIF variants
- * These provide better semantic names for different contexts
- */
-export type MoodVariant =
-  | 'confused'      // → thinking
-  | 'proud'         // → happy
-  | 'nervous'       // → oops
-  | 'sad'           // → thinking
-  | 'winking'       // → happy
-  | 'celebrating'   // → happy
-  | 'victory'       // → happy
-  | 'excited'       // → happy
-  | 'encouraging'   // → happy
-  | 'pointing'      // → happy
-  | 'surprised'     // → oops
-  | 'sleepy'        // → thinking
-  | 'focused';      // → thinking
-
-/**
- * Activity-based variants - ALL map to 4 GIF variants
- */
-export type ActivityVariant =
-  | 'eating_pizza'     // → happy
-  | 'drinking_coffee'  // → thinking
-  | 'dancing'          // → happy
-  | 'waving'           // → happy
-  | 'holding_trophy'   // → happy
-  | 'holding_sign'     // → happy
-  | 'cheering'         // → happy
-  | 'skateboarding';   // → gaming
-
-/**
- * Extended mascot variants including semantic aliases
- */
-export type ExtendedMascotVariant = MascotVariant | MoodVariant | ActivityVariant;
-
-/**
- * Mapping table: ALL extended variants → 7 GIF variants
- * Now includes: happy, gaming, thinking, oops, celebration, dj, trophy
- */
-const VARIANT_MAP: Record<string, MascotVariant> = {
-  // Mood variants
-  confused: 'thinking',
-  proud: 'trophy',
-  nervous: 'oops',
-  sad: 'thinking',
-  winking: 'happy',
-  celebrating: 'celebration',
-  victory: 'celebration',
-  excited: 'celebration',
-  encouraging: 'happy',
-  pointing: 'happy',
-  surprised: 'oops',
-  sleepy: 'thinking',
-  focused: 'thinking',
-  // Activity variants
-  eating_pizza: 'happy',
-  drinking_coffee: 'thinking',
-  dancing: 'dj',
-  waving: 'happy',
-  holding_trophy: 'trophy',
-  holding_sign: 'happy',
-  cheering: 'celebration',
-  skateboarding: 'gaming',
-};
-
-/**
- * All base GIF variants
- */
-const BASE_VARIANTS: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
-
-/**
- * Get the base GIF variant for any ExtendedMascotVariant
- * ALL extended variants map to one of 7 GIF variants: happy, gaming, thinking, oops, celebration, dj, trophy
- */
-export function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
-  // If it's already a base variant, return as-is
-  if (BASE_VARIANTS.includes(variant as MascotVariant)) {
-    return variant as MascotVariant;
-  }
-  // Map extended variant to base GIF variant
-  return VARIANT_MAP[variant] || 'happy';
-}
+// Re-export types and utilities for backward compatibility
+export { getBaseVariant, VARIANT_MAP, BASE_VARIANTS };
+export type { ExtendedMascotVariant, MoodVariant, ActivityVariant };
 
 /**
  * Default state transitions for interactions

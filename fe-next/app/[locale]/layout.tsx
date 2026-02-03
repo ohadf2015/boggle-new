@@ -16,6 +16,7 @@ import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
+import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { fredoka, rubik } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -719,7 +720,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"
-                    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-3 focus:min-h-[44px] focus:min-w-[44px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-none focus:flex focus:items-center focus:justify-center"
+                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-3 focus:min-h-[48px] focus:min-w-[48px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-none focus:flex focus:items-center focus:justify-center focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2"
+                    aria-label={validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 >
                     {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 </a>
@@ -739,7 +741,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     <div className="flex-1 flex flex-col min-h-0 relative [overflow-x:clip]">
-                        <main id="main-content" className="relative z-10 overflow-visible pb-16 sm:pb-0" tabIndex={-1}>
+                        <main 
+                            id="main-content" 
+                            className="relative z-10 overflow-visible main-content-safe min-h-0 flex-1" 
+                            tabIndex={-1}
+                        >
                             {children}
                         </main>
                         <AutoHideFooter className="hidden sm:block relative z-10 flex-shrink-0" />
@@ -749,6 +755,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <PWAInstallPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />
+                    {/* Toast notifications container */}
+                    <ToastContainer position="bottom-right" />
                 </ConditionalProviders>
             </body>
         </html>

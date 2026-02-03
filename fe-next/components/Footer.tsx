@@ -40,8 +40,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <Link
               href={`/${language}/about`}
               className="
-                min-h-[44px] px-2 flex items-center
-                text-xs font-bold uppercase tracking-wide
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
                 text-neo-cream/90 hover:text-neo-cyan
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
@@ -53,8 +53,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <Link
               href={`/${language}/blog`}
               className="
-                min-h-[44px] px-2 flex items-center
-                text-xs font-bold uppercase tracking-wide
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
                 text-neo-cream/90 hover:text-neo-cyan
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
@@ -66,8 +66,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <Link
               href={`/${language}/faq`}
               className="
-                min-h-[44px] px-2 flex items-center
-                text-xs font-bold uppercase tracking-wide
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
                 text-neo-cream/90 hover:text-neo-cyan
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
@@ -79,8 +79,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <Link
               href={`/${language}/legal/terms`}
               className="
-                min-h-[44px] px-2 flex items-center
-                text-xs font-bold uppercase tracking-wide
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
                 text-neo-cream/90 hover:text-neo-lime
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
@@ -92,8 +92,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <Link
               href={`/${language}/legal/privacy`}
               className="
-                min-h-[44px] px-2 flex items-center
-                text-xs font-bold uppercase tracking-wide
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
                 text-neo-cream/90 hover:text-neo-lime
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
@@ -105,8 +105,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <Link
               href={`/${language}/contact`}
               className="
-                min-h-[44px] px-2 flex items-center
-                text-xs font-bold uppercase tracking-wide
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
                 text-neo-cream/90 hover:text-neo-cyan
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
@@ -123,7 +123,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
               className="
                 min-h-[44px] px-2 inline-flex items-center gap-1.5
-                text-xs font-bold uppercase tracking-wide
+                text-sm font-bold uppercase tracking-wide
                 text-neo-pink hover:text-neo-lime
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2

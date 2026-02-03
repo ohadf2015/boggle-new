@@ -142,6 +142,8 @@ const en = {
     "share": "Share",
     "bot": "Bot",
     "minutes": "min",
+    "playNow": "Play Now",
+    "tryAgainLater": "Try Again Later",
     "seconds": "seconds",
     "days": "days",
     "step": "Step",
@@ -310,7 +312,11 @@ const en = {
     "fireRoundLights": "Flashing Lights",
     "keepAnimations": "Keep Effects",
     "disableAnimations": "Disable Effects",
-    "settingsHint": "You can change this anytime in Settings"
+    "settingsHint": "You can change this anytime in Settings",
+    "fireRoundTitle": "🔥 Fire Round!",
+    "fireRoundPrompt": "Screen shake & flashing lights ahead. Disable?",
+    "enable": "Enable",
+    "disable": "Disable"
   },
   "spam": {
     "warning": "Take a breath! Too many wrong guesses",
@@ -1456,6 +1462,7 @@ const en = {
     "viewProgress": "View Progress"
   },
   "achievements": {
+    "unlocked": "Achievement Unlocked!",
     "FIRST_BLOOD": {
       "name": "First Blood",
       "description": "Drew first word"
@@ -2321,6 +2328,7 @@ const en = {
     "loading": "Loading leaderboard...",
     "error": "Failed to load leaderboard",
     "empty": "No scores yet. Be the first to play!",
+    "beFirstToPlay": "Be the first to play!",
     "refresh": "Refresh",
     "best": "Best",
     "totalPoints": "total pts",
@@ -3193,6 +3201,7 @@ const en = {
     "friend": "Friend",
     "noFriendsYet": "No friends yet!",
     "noPendingRequests": "All caught up!",
+    "requestsWillAppearHere": "Requests will appear here",
     "noUsersFound": "No players found",
     "pending": "Pending",
     "pendingRequests": "Pending Requests",
@@ -4260,7 +4269,10 @@ const en = {
         "victory": "Victory!",
         "defeated": "{bossName} defeated!",
         "bossApproaches": "A challenger approaches...",
-        "prepareForBattle": "Prepare for battle!"
+        "prepareForBattle": "Prepare for battle!",
+        "errorTitle": "Video Error",
+        "errorDescription": "Something went wrong while playing the cinematic. You can retry or skip to continue.",
+        "retry": "Retry"
       },
       "abilities": {
         "popQuiz": {

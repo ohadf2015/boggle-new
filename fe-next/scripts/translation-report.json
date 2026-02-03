@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 2957,
+    "totalKeysInCode": 2961,
     "keyCountByLanguage": {
-      "en": 4120,
-      "he": 4120,
-      "sv": 4138,
-      "ja": 4138,
-      "es": 4146
+      "en": 4127,
+      "he": 4127,
+      "sv": 4145,
+      "ja": 4145,
+      "es": 4150
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 5,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,7 +167,53 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "achievements.unlocked",
+      "usages": [
+        {
+          "file": "components/achievements/AchievementQueue.tsx",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "key": "common.playNow",
+      "usages": [
+        {
+          "file": "app/[locale]/leaderboard/PageClient.tsx",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "key": "common.tryAgainLater",
+      "usages": [
+        {
+          "file": "app/[locale]/leaderboard/PageClient.tsx",
+          "line": 247
+        }
+      ]
+    },
+    {
+      "key": "friends.requestsWillAppearHere",
+      "usages": [
+        {
+          "file": "components/friends/FriendsList.tsx",
+          "line": 475
+        }
+      ]
+    },
+    {
+      "key": "leaderboard.beFirstToPlay",
+      "usages": [
+        {
+          "file": "app/[locale]/leaderboard/PageClient.tsx",
+          "line": 235
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],
@@ -298,6 +344,9 @@
       "adventure.bosses.cinematics.defeated",
       "adventure.bosses.cinematics.bossApproaches",
       "adventure.bosses.cinematics.prepareForBattle",
+      "adventure.bosses.cinematics.errorTitle",
+      "adventure.bosses.cinematics.errorDescription",
+      "adventure.bosses.cinematics.retry",
       "adventure.bosses.msGrammar.name",
       "adventure.bosses.msGrammar.mechanic",
       "adventure.bosses.msGrammar.taunts.start1",

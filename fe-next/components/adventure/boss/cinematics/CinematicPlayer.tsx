@@ -16,7 +16,7 @@
 
 'use client';
 
-import React, { useEffect, useRef, ComponentType } from 'react';
+import React, { useEffect, useRef, ComponentType, useState, useCallback } from 'react';
 import { Player, PlayerRef } from '@remotion/player';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,6 +27,7 @@ import {
 } from '../../../../hooks/useCinematic';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { usePrefersReducedMotion } from '../../../../hooks/usePrefersReducedMotion';
+import { CinematicErrorBoundary } from './CinematicErrorBoundary';
 
 // ==============================================
 // TYPES
@@ -53,6 +54,8 @@ export interface CinematicPlayerProps {
   autoPlay?: boolean;
   /** Test ID for testing */
   testId?: string;
+  /** Enable debug mode with verbose logging (default: false) */
+  debug?: boolean;
 }
 
 // ==============================================
@@ -85,7 +88,7 @@ function SkipCountdown() {
 // MAIN COMPONENT
 // ==============================================
 
-export function CinematicPlayer({
+function CinematicPlayerInner({
   composition,
   compositionProps = {},
   durationSeconds,
@@ -96,10 +99,20 @@ export function CinematicPlayer({
   fps = DEFAULT_FPS,
   autoPlay = true,
   testId = 'cinematic-player',
+  debug = false,
 }: CinematicPlayerProps) {
   const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
   const playerRef = useRef<PlayerRef>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  // Debug logging - must be defined before use
+  const logDebug = useCallback((message: string, data?: unknown) => {
+    if (debug) {
+      console.log(`[CinematicPlayer] ${message}`, data ?? '');
+    }
+  }, [debug]);
 
   // Calculate frames from seconds
   const durationFrames = secondsToFrames(durationSeconds, fps);
@@ -110,13 +123,22 @@ export function CinematicPlayer({
     canSkip,
     progress,
     skip,
+    play,
     handleFrameUpdate,
   } = useCinematic({
     durationFrames,
     fps,
     onComplete,
-    autoPlay,
+    autoPlay: false, // We'll manually control play state
   });
+
+  // Start playing when ready and autoPlay is enabled
+  useEffect(() => {
+    if (isReady && autoPlay && !isPlaying) {
+      logDebug('Auto-starting playback');
+      play();
+    }
+  }, [isReady, autoPlay, isPlaying, play, logDebug]);
 
   // ==============================================
   // KEYBOARD CONTROLS
@@ -135,19 +157,39 @@ export function CinematicPlayer({
   }, [canSkip, skip]);
 
   // ==============================================
-  // PLAYER SYNC
+  // PLAYER SYNC & READY STATE
   // ==============================================
 
   useEffect(() => {
     const player = playerRef.current;
     if (!player) return;
 
-    if (isPlaying) {
-      player.play();
+    logDebug('Player sync', { isPlaying, isReady });
+
+    if (isPlaying && isReady) {
+      try {
+        player.play();
+      } catch (err) {
+        logDebug('Play error', err);
+        setHasError(true);
+      }
     } else {
       player.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, isReady, logDebug]);
+
+  // Handle player ready state - use a timeout-based approach instead of 'ready' event
+  // which may not be available in all Remotion versions
+  useEffect(() => {
+    // Set ready after a short delay to ensure Player has mounted
+    const timer = setTimeout(() => {
+      logDebug('Marking player as ready');
+      setIsReady(true);
+      setHasError(false);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [logDebug]);
 
   // ==============================================
   // FRAME UPDATE LISTENER
@@ -163,6 +205,8 @@ export function CinematicPlayer({
     const player = playerRef.current;
     if (!player) return;
 
+    logDebug('Setting up frameupdate listener');
+
     const handleFrame = (e: { detail: { frame: number } }) => {
       handleFrameUpdate(e.detail.frame);
     };
@@ -170,9 +214,10 @@ export function CinematicPlayer({
     player.addEventListener('frameupdate', handleFrame);
 
     return () => {
+      logDebug('Removing frameupdate listener');
       player.removeEventListener('frameupdate', handleFrame);
     };
-  }, [handleFrameUpdate]);
+  }, [handleFrameUpdate, logDebug]);
 
   // ==============================================
   // REDUCED MOTION HANDLING
@@ -183,12 +228,13 @@ export function CinematicPlayer({
     if (prefersReducedMotion && autoPlay) {
       // Give a brief moment for the component to mount, then complete
       const timeout = setTimeout(() => {
+        logDebug('Reduced motion: auto-completing');
         onComplete();
       }, 500);
       return () => clearTimeout(timeout);
     }
     return undefined;
-  }, [prefersReducedMotion, autoPlay, onComplete]);
+  }, [prefersReducedMotion, autoPlay, onComplete, logDebug]);
 
   // Don't render full cinematic if reduced motion is preferred
   if (prefersReducedMotion) {
@@ -200,6 +246,30 @@ export function CinematicPlayer({
         <div className="text-neo-yellow text-2xl font-neo-display">
           {t('adventure.bosses.cinematics.loading')}
         </div>
+      </div>
+    );
+  }
+
+  // Show loading state while waiting for player to be ready
+  if (!isReady && !hasError) {
+    return (
+      <div
+        className={fullscreen
+          ? 'fixed inset-0 z-50 bg-neo-navy flex items-center justify-center'
+          : 'relative bg-neo-navy flex items-center justify-center'
+        }
+        data-testid={`${testId}-loading`}
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <div className="w-16 h-16 border-4 border-neo-yellow border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-neo-yellow font-neo-display text-lg">
+            {t('adventure.bosses.cinematics.loading')}
+          </p>
+        </motion.div>
       </div>
     );
   }
@@ -229,13 +299,12 @@ export function CinematicPlayer({
           maxWidth: '100%',
           maxHeight: '100%',
         }}
-        autoPlay={autoPlay}
+        autoPlay={false} // We control playback manually after ready
         loop={false}
         showVolumeControls={false}
         controls={false}
         acknowledgeRemotionLicense
-        // Note: onFrame callback doesn't exist in @remotion/player
-        // We'll use a workaround with timeupdate
+
       />
 
       {/* Skip Button */}
@@ -299,8 +368,18 @@ export function CinematicPlayer({
 }
 
 // ==============================================
-// DISPLAY NAME
+// WRAPPED COMPONENT WITH ERROR BOUNDARY
 // ==============================================
+
+CinematicPlayerInner.displayName = 'CinematicPlayer';
+
+export function CinematicPlayer(props: CinematicPlayerProps) {
+  return (
+    <CinematicErrorBoundary onSkip={props.onComplete} testId={props.testId}>
+      <CinematicPlayerInner {...props} />
+    </CinematicErrorBoundary>
+  );
+}
 
 CinematicPlayer.displayName = 'CinematicPlayer';
 

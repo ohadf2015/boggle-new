@@ -165,6 +165,8 @@ function SinglePlayerGame({
         {...commonProps}
         targetHighScore={core.targetHighScore}
         totalBoardWords={core.totalBoardWords}
+        progressBarExpanded={core.progressBarExpanded}
+        onToggleProgressBar={core.handleToggleProgressBar}
         isTv={core.isTv}
       />
     );

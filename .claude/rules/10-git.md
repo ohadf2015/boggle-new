@@ -22,43 +22,28 @@ main          ← Production-ready code
 - `refactor/component-name` - Refactoring
 
 ### Branch Rules
-- **NEVER** commit directly to main (ALL changes must go through PR process)
-- **CREATE** a new branch for each feature/fix
+- **RECOMMENDED** to use feature branches for complex changes
+- **ALLOWED** to commit directly to main when maintainer approves
+- **CREATE** a new branch for collaborative work requiring review
 - **KEEP** branches focused on single task
 - **DELETE** branches after merging
-- **ALL merges to main require explicit approval** from maintainer
 
 ### Main Branch Protection
 
-**CRITICAL: Main branch is protected**
-
-The following rules are enforced for the main branch:
+**Main branch guidelines:**
 
 **Direct Commits:**
-- ❌ **NEVER** commit directly to main
-- ❌ **NEVER** push changes directly to main
-- ✅ **ALWAYS** use feature branches for ALL changes
-- ✅ **ALWAYS** create pull requests for review
+- ✅ **ALLOWED** for maintainers with proper testing
+- ✅ **RECOMMENDED** to use feature branches for large changes
+- ⚠️ **ENSURE** tests pass before pushing to main
+- ⚠️ **VERIFY** build succeeds before pushing to main
 
-**Merge Requirements:**
-- ✅ Pull request must be created
-- ✅ Code review must be completed
-- ✅ All tests must pass
-- ✅ **Explicit approval** from maintainer required
-- ✅ No merge conflicts
-
-**Exceptions:**
-Only these types of changes may be considered for direct commit (still requires approval):
-- Documentation typo fixes
-- Comment improvements
-- Non-functional changes
-
-**Even for exceptions, get approval first!**
-
-**Commands That Enforce This:**
-- `/piv_loop:execute` - Checks for feature branch before implementing
-- `/bug_fix:implement-fix` - Checks for feature branch before fixing
-- Both commands will stop and ask to create a branch if on main
+**Best Practices:**
+- Run full test suite before pushing
+- Ensure build is successful
+- Review changes carefully
+- Use descriptive commit messages
+- Consider feature branches for collaborative work
 
 ---
 

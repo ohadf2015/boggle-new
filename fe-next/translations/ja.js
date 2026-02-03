@@ -139,6 +139,8 @@ const ja = {
     "share": "共有",
     "bot": "ボット",
     "minutes": "分",
+    "playNow": "今すぐプレイ",
+    "tryAgainLater": "後で再試行",
     "seconds": "秒",
     "days": "日",
     "step": "ステップ",
@@ -310,7 +312,11 @@ const ja = {
     "fireRoundLights": "点滅ライト",
     "keepAnimations": "効果を維持",
     "disableAnimations": "効果を無効化",
-    "settingsHint": "設定でいつでも変更できます"
+    "settingsHint": "設定でいつでも変更できます",
+    "fireRoundTitle": "🔥 ファイアラウンド！",
+    "fireRoundPrompt": "画面の揺れと点滅あり。無効化？",
+    "enable": "有効",
+    "disable": "無効"
   },
   "spam": {
     "warning": "落ち着いて！ミスが多すぎ",
@@ -1453,6 +1459,7 @@ const ja = {
     "viewProgress": "進捗を見る"
   },
   "achievements": {
+    "unlocked": "実績解除！",
     "FIRST_BLOOD": {
       "name": "ファーストブラッド",
       "description": "最初に単語を見つける"
@@ -2124,6 +2131,7 @@ const ja = {
     "loading": "リーダーボードを読み込み中...",
     "error": "リーダーボードの読み込みに失敗しました",
     "empty": "まだスコアがありません。最初にプレイしよう！",
+    "beFirstToPlay": "最初にプレイしよう！",
     "refresh": "更新",
     "best": "ベスト",
     "totalPoints": "合計",
@@ -3150,6 +3158,7 @@ const ja = {
     "friend": "フレンド",
     "noFriendsYet": "まだフレンドがいません",
     "noPendingRequests": "保留中のリクエストはありません",
+    "requestsWillAppearHere": "リクエストがここに表示されます",
     "noUsersFound": "ユーザーが見つかりません",
     "pending": "保留中",
     "pendingRequests": "保留中のリクエスト",
@@ -4291,7 +4300,10 @@ const ja = {
         "victory": "勝利！",
         "defeated": "{bossName}を倒した！",
         "bossApproaches": "挑戦者が現れた...",
-        "prepareForBattle": "戦いの準備をせよ！"
+        "prepareForBattle": "戦いの準備をせよ！",
+        "errorTitle": "動画エラー",
+        "errorDescription": "ムービーの再生中に問題が発生しました。再試行するかスキップしてください。",
+        "retry": "再試行"
       },
       "abilities": {
         "popQuiz": {

@@ -633,61 +633,105 @@ export function useSinglePlayerCore({
     gameOverCalledRef.current = true;
 
     const finalizeAndEndGame = async () => {
-      setIsValidatingWords(true);
-      const finalWords = await finalizeWordValidation(foundWordsRef.current, settings.language, 3);
-      setIsValidatingWords(false);
+      try {
+        setIsValidatingWords(true);
+        const finalWords = await finalizeWordValidation(foundWordsRef.current, settings.language, 3);
+        setIsValidatingWords(false);
 
-      const validWords = finalWords.filter(w => w.isValid === true);
-      const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
-      const actualGameDuration = settings.mode === 'practice'
-        ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
-        : settings.timerSeconds;
+        const validWords = finalWords.filter(w => w.isValid === true);
+        const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
+        const actualGameDuration = settings.mode === 'practice'
+          ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
+          : settings.timerSeconds;
 
-      const validWordData: AchievementWordData[] = validWords.map(w => ({
-        word: w.word, score: w.score, timestamp: w.timestamp, timeSinceStart: w.timeSinceStart,
-        isValid: true, comboBonus: w.comboBonus,
-      }));
+        const validWordData: AchievementWordData[] = validWords.map(w => ({
+          word: w.word, score: w.score, timestamp: w.timestamp, timeSinceStart: w.timeSinceStart,
+          isValid: true, comboBonus: w.comboBonus,
+        }));
 
-      const allWordData: AchievementWordData[] = finalWords.map(w => ({
-        word: w.word, score: w.score, timestamp: w.timestamp, timeSinceStart: w.timeSinceStart,
-        isValid: w.isValid === true, comboBonus: w.comboBonus,
-      }));
+        const allWordData: AchievementWordData[] = finalWords.map(w => ({
+          word: w.word, score: w.score, timestamp: w.timestamp, timeSinceStart: w.timeSinceStart,
+          isValid: w.isValid === true, comboBonus: w.comboBonus,
+        }));
 
-      const finalAchievements = calculateFinalAchievements(validWordData, allWordData, actualGameDuration, combo.maxCombo);
-      const gameSessionId = crypto.randomUUID();
+        const finalAchievements = calculateFinalAchievements(validWordData, allWordData, actualGameDuration, combo.maxCombo);
+        const gameSessionId = crypto.randomUUID();
 
-      const allBotWords = settings.bots.flatMap(bot => {
-        const words = botWordsRef.current[bot.id] || [];
-        return words.filter(word => !word.match(/^word\d+$/));
-      });
-      const playerPendingWords = finalWords.filter(w => !w.isValid).map(w => w.word);
-      const combinedWords = [...new Set([...allBotWords, ...playerPendingWords])];
-      const botWordsForValidation = combinedWords.sort(() => Math.random() - 0.5).slice(0, 5);
+        const allBotWords = settings.bots.flatMap(bot => {
+          const words = botWordsRef.current[bot.id] || [];
+          return words.filter(word => !word.match(/^word\d+$/));
+        });
+        const playerPendingWords = finalWords.filter(w => !w.isValid).map(w => w.word);
+        const combinedWords = [...new Set([...allBotWords, ...playerPendingWords])];
+        const botWordsForValidation = combinedWords.sort(() => Math.random() - 0.5).slice(0, 5);
 
-      const results: SinglePlayerResultsData = {
-        playerScore: finalScore,
-        playerWords: validWords.map(w => w.word),
-        playerWordData: finalWords.map(w => ({
-          word: w.word, score: w.isValid ? w.score : 0, timestamp: w.timestamp,
-          timeSinceStart: w.timeSinceStart, isValid: w.isValid === true,
-          comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
-          fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
-        })),
-        gameDuration: actualGameDuration,
-        botScores: settings.bots.map(bot => ({
-          name: bot.name, score: botScoresRef.current[bot.id] || 0, words: botWordsRef.current[bot.id] || [],
-        })),
-        grid: gridRef.current!,
-        allPossibleWords: [],
-        isNewHighScore: false,
-        achievements: finalAchievements,
-        botWordsForValidation,
-        gameSessionId,
-        language: settings.language,
-      };
+        const results: SinglePlayerResultsData = {
+          playerScore: finalScore,
+          playerWords: validWords.map(w => w.word),
+          playerWordData: finalWords.map(w => ({
+            word: w.word, score: w.isValid ? w.score : 0, timestamp: w.timestamp,
+            timeSinceStart: w.timeSinceStart, isValid: w.isValid === true,
+            comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
+            fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
+          })),
+          gameDuration: actualGameDuration,
+          botScores: settings.bots.map(bot => ({
+            name: bot.name, score: botScoresRef.current[bot.id] || 0, words: botWordsRef.current[bot.id] || [],
+          })),
+          grid: gridRef.current!,
+          allPossibleWords: [],
+          isNewHighScore: false,
+          achievements: finalAchievements,
+          botWordsForValidation,
+          gameSessionId,
+          language: settings.language,
+        };
 
-      if (settings.mode === 'practice') trainingAnalysisFinishTraining();
-      onGameEndRef.current(results);
+        if (settings.mode === 'practice') trainingAnalysisFinishTraining();
+        onGameEndRef.current(results);
+      } catch (error) {
+        // Ensure game always transitions to results even if validation fails
+        console.error('Game end processing failed:', error);
+        setIsValidatingWords(false);
+
+        // Build fallback results from current state
+        const currentWords = foundWordsRef.current;
+        const validWords = currentWords.filter(w => w.isValid === true);
+        const fallbackScore = validWords.reduce((sum, w) => sum + w.score, 0);
+        const fallbackDuration = settings.mode === 'practice'
+          ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
+          : settings.timerSeconds;
+
+        const fallbackResults: SinglePlayerResultsData = {
+          playerScore: fallbackScore,
+          playerWords: validWords.map(w => w.word),
+          playerWordData: currentWords.map(w => ({
+            word: w.word,
+            score: w.isValid ? w.score : 0,
+            timestamp: w.timestamp,
+            timeSinceStart: w.timeSinceStart,
+            isValid: w.isValid === true,
+            comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
+            fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
+          })),
+          gameDuration: fallbackDuration,
+          botScores: settings.bots.map(bot => ({
+            name: bot.name,
+            score: botScoresRef.current[bot.id] || 0,
+            words: botWordsRef.current[bot.id] || [],
+          })),
+          grid: gridRef.current!,
+          allPossibleWords: [],
+          isNewHighScore: false,
+          achievements: [],
+          botWordsForValidation: [],
+          gameSessionId: crypto.randomUUID(),
+          language: settings.language,
+        };
+
+        if (settings.mode === 'practice') trainingAnalysisFinishTraining();
+        onGameEndRef.current(fallbackResults);
+      }
     };
 
     finalizeAndEndGame();

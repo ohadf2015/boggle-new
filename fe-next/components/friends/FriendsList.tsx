@@ -12,6 +12,8 @@ import {
   UserMinus,
 } from 'lucide-react';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { SkeletonCard } from '@/components/ui/EnhancedLoading';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,6 +21,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Avatar from '@/components/Avatar';
 import { FriendRow } from './FriendRow';
@@ -193,11 +196,20 @@ const FriendsList: React.FC<FriendsListProps> = ({
   if (isLoading) {
     return (
       <div className={cn(
-        'p-4 rounded-neo border-2 flex items-center justify-center',
+        'p-4 rounded-neo border-2 space-y-3',
         isDark ? 'bg-slate-800 border-white/10' : 'bg-gray-50 border-gray-200',
         className
       )}>
-        <NeoLoader variant="dots" size="md" />
+        {/* Skeleton tabs */}
+        <div className="flex gap-2 mb-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonCard key={i} hasImage={false} lines={0} className="py-2 px-4 w-24" />
+          ))}
+        </div>
+        {/* Skeleton friend rows */}
+        {Array.from({ length: 4 }).map((_, i) => (
+          <SkeletonCard key={i} hasImage lines={1} className="py-3" />
+        ))}
       </div>
     );
   }
@@ -265,18 +277,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
             </span>
           )}
         </div>
-        <Button
+        <EnhancedButton
           onClick={() => setShowAddFriend(true)}
           size="sm"
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
-            'hover:shadow-hard hover:-translate-y-0.5 transition-all',
-            'bg-neo-cyan text-neo-black font-bold text-sm'
-          )}
+          haptic
+          animation="pop"
+          className="bg-neo-cyan text-neo-black"
         >
           <UserPlus className="w-4 h-4" />
           {t('friends.add')}
-        </Button>
+        </EnhancedButton>
       </div>
 
       {/* Tab Navigation */}
@@ -384,18 +394,17 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   />
                 ))
               ) : (
-                <div className={cn(
-                  'text-center py-8 rounded-neo border-2',
-                  isDark ? 'bg-slate-800/50 border-white/10' : 'bg-gray-50 border-gray-200'
-                )}>
-                  <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                  <p className={cn('font-bold', isDark ? 'text-gray-300' : 'text-gray-600')}>
-                    {t('friends.noFriendsYet')}
-                  </p>
-                  <p className={cn('text-sm mt-1', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                    {t('friends.addFriendsToChallenge')}
-                  </p>
-                </div>
+                <EnhancedEmptyState
+                  title={t('friends.noFriendsYet') || 'No friends yet'}
+                  description={t('friends.addFriendsToChallenge') || 'Add friends to challenge them to a game!'}
+                  icon="sparkles"
+                  action={{
+                    label: t('friends.add') || 'Add Friend',
+                    onClick: () => setShowAddFriend(true),
+                    variant: 'primary',
+                  }}
+                  compact
+                />
               )}
             </div>
           </div>
@@ -461,15 +470,12 @@ const FriendsList: React.FC<FriendsListProps> = ({
             )}
 
             {pendingRequests.length === 0 && outgoingRequests.length === 0 && (
-              <div className={cn(
-                'text-center py-8 rounded-neo border-2',
-                isDark ? 'bg-slate-800/50 border-white/10' : 'bg-gray-50 border-gray-200'
-              )}>
-                <Bell className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p className={cn('font-bold', isDark ? 'text-gray-300' : 'text-gray-600')}>
-                  {t('friends.noPendingRequests')}
-                </p>
-              </div>
+              <EnhancedEmptyState
+                title={t('friends.noPendingRequests') || 'No pending requests'}
+                description={t('friends.requestsWillAppearHere') || 'Friend requests will appear here'}
+                icon="inbox"
+                compact
+              />
             )}
           </div>
         )}

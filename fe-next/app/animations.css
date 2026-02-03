@@ -1031,11 +1031,11 @@ body.crazygames-embed .game-view-container,
   padding-bottom: var(--mobile-bottom-safe);
 }
 
-/* On large screens (lg+), GlobalBottomNav is hidden (sm:hidden),
-   so no extra padding is needed */
+/* On larger screens (sm+), GlobalBottomNav is hidden,
+   but we need padding for the footer instead */
 @media (min-width: 640px) {
   .page-content-safe {
-    padding-bottom: 0;
+    padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
   }
 }
 

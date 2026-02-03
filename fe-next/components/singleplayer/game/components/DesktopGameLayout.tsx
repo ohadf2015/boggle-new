@@ -6,6 +6,7 @@ import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormin
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
@@ -69,6 +70,8 @@ export interface DesktopGameLayoutProps {
   directionGuidance: DirectionGuidanceState;
   // Training (practice mode)
   training: TrainingState | null;
+  progressBarExpanded: boolean;
+  onToggleProgressBar: () => void;
   // TV mode
   isTv: boolean;
   // Handlers
@@ -128,6 +131,8 @@ export function DesktopGameLayout({
   setShowHintPrompt,
   directionGuidance,
   training,
+  progressBarExpanded,
+  onToggleProgressBar,
   isTv,
   onWordSubmit,
   onPathSubmit,
@@ -244,6 +249,23 @@ export function DesktopGameLayout({
               </Button>
             )}
           </div>
+
+          {/* Training Progress Bar - practice mode */}
+          {isPracticeMode && training && (
+            <div className="w-full max-w-2xl px-4">
+              <TrainingProgressBar
+                completedSkills={training.completedSkills}
+                score={score}
+                wordsFound={validWordCount}
+                compact
+                expanded={progressBarExpanded}
+                onToggleExpand={onToggleProgressBar}
+                justUnlocked={training.justUnlocked}
+                onUnlockAnimationComplete={training.clearJustUnlocked}
+                isComplete={training.isComplete}
+              />
+            </div>
+          )}
 
           {/* Word Forming Area */}
           <div className="flex items-center justify-center">

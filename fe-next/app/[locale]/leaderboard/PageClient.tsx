@@ -5,8 +5,10 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { SkeletonCard } from '@/components/ui/EnhancedLoading';
+import { ErrorState, EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageStateHandler } from '@/components/layout/PageStateHandler';
 import { useTheme } from '@/utils/ThemeContext';
@@ -82,13 +84,16 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <p className={cn('text-lg', 'text-gray-600')}>
             Coming soon! Leaderboard feature is being set up.
           </p>
-          <Button
+          <EnhancedButton
             onClick={() => router.push(`/${language}`)}
-            className="mt-6 bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
+            variant="cyan"
+            className="mt-6"
+            haptic
+            animation="pop"
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
             {t('common.backToMenu')}
-          </Button>
+          </EnhancedButton>
         </div>
       </PageLayout>
     );
@@ -130,15 +135,16 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   : t('common.connecting') || 'Connecting...'}
               </span>
             </div>
-            <Button
+            <EnhancedButton
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => refetch()}
               className={cn(
                 'h-7 w-7 p-0 rounded-full',
                 isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
               )}
               title="Refresh"
+              haptic
             >
               {loading ? (
                 <NeoLoader variant="dots" size="sm" />
@@ -150,7 +156,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   )}
                 />
               )}
-            </Button>
+            </EnhancedButton>
           </div>
         </motion.div>
 
@@ -211,8 +217,37 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           error={error?.toString()}
           onRetry={refetch}
           isEmpty={!loading && !error && leaderboard.length === 0}
-          emptyIcon={<Medal className={cn('mx-auto text-4xl mb-4', isDarkMode ? 'text-gray-600' : 'text-gray-300')} />}
-          emptyText={t('leaderboard.noRankYet')}
+          loadingComponent={
+            <div className="space-y-4">
+              {/* Skeleton for user rank card */}
+              {profile && <SkeletonCard hasImage={false} lines={2} className="bg-neo-cream dark:bg-neo-navy" />}
+              {/* Skeleton for leaderboard table */}
+              <div className="space-y-2">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <SkeletonCard key={i} hasImage={false} lines={1} className="py-3 bg-neo-cream dark:bg-neo-navy" />
+                ))}
+              </div>
+            </div>
+          }
+          emptyComponent={
+            <EnhancedEmptyState
+              title={t('leaderboard.noRankYet') || 'No rankings yet'}
+              description={t('leaderboard.beFirstToPlay') || 'Be the first to play and claim the top spot!'}
+              icon="sparkles"
+              action={{
+                label: t('common.playNow') || 'Play Now',
+                onClick: () => router.push(`/${language}/singleplayer`),
+                variant: 'primary',
+              }}
+            />
+          }
+          errorComponent={
+            <ErrorState
+              title={t('common.error') || 'Something went wrong'}
+              description={error?.toString() || t('common.tryAgainLater') || 'Please try again later'}
+              onRetry={refetch}
+            />
+          }
         >
           {/* Leaderboard Table */}
           <motion.div
@@ -301,13 +336,15 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
         {/* Back Button */}
         <div className="mt-8 text-center">
-          <Button
+          <EnhancedButton
             onClick={() => router.push(`/${language}`)}
-            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg rounded-neo"
+            variant="cyan"
+            haptic
+            animation="pop"
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
             {t('common.backToMenu')}
-          </Button>
+          </EnhancedButton>
         </div>
       </div>
     </PageLayout>

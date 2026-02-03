@@ -140,6 +140,8 @@ const he = {
     "share": "שתף",
     "bot": "בוט",
     "minutes": "דק׳",
+    "playNow": "שחק עכשיו",
+    "tryAgainLater": "נסה שוב מאוחר יותר",
     "seconds": "שניות",
     "days": "ימים",
     "step": "שלב",
@@ -310,7 +312,11 @@ const he = {
     "fireRoundLights": "אורות מהבהבים",
     "keepAnimations": "השאר אפקטים",
     "disableAnimations": "כבה אפקטים",
-    "settingsHint": "אפשר לשנות בכל עת בהגדרות"
+    "settingsHint": "אפשר לשנות בכל עת בהגדרות",
+    "fireRoundTitle": "🔥 סיבוב אש!",
+    "fireRoundPrompt": "רעידת מסך ואורות מהבהבים. לכבות?",
+    "enable": "הפעל",
+    "disable": "כבה"
   },
   "spam": {
     "warning": "רגוע! יותר מדי פספוסים",
@@ -1464,6 +1470,7 @@ const he = {
     "viewProgress": "צפה בהתקדמות"
   },
   "achievements": {
+    "unlocked": "הישג נפתח!",
     "FIRST_BLOOD": {
       "name": "דם ראשון",
       "description": "ראשון למצוא מילה"
@@ -2329,6 +2336,7 @@ const he = {
     "loading": "טוען טבלת מובילים...",
     "error": "שגיאה בטעינת טבלת המובילים",
     "empty": "אין עדיין תוצאות. היה הראשון לשחק!",
+    "beFirstToPlay": "היה הראשון לשחק!",
     "refresh": "רענן",
     "best": "הכי טוב",
     "totalPoints": "סה״כ נק׳",
@@ -3148,6 +3156,7 @@ const he = {
     "friend": "חבר",
     "noFriendsYet": "עוד אין לך חברים",
     "noPendingRequests": "אין בקשות ממתינות",
+    "requestsWillAppearHere": "בקשות יופיעו כאן",
     "noUsersFound": "לא נמצאו משתמשים",
     "pending": "ממתין",
     "pendingRequests": "בקשות ממתינות",
@@ -4266,7 +4275,10 @@ const he = {
         "victory": "ניצחון!",
         "defeated": "{bossName} הובס!",
         "bossApproaches": "מתמודד מתקרב...",
-        "prepareForBattle": "התכונן לקרב!"
+        "prepareForBattle": "התכונן לקרב!",
+        "errorTitle": "שגיאת וידאו",
+        "errorDescription": "משהו השתבש בהפעלת הסצנה. נסה שוב או דלג להמשך.",
+        "retry": "נסה שוב"
       },
       "abilities": {
         "popQuiz": {
