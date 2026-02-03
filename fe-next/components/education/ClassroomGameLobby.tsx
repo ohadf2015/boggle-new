@@ -483,7 +483,6 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
                   checked={settings.allowLateJoin}
                   onChange={(e) => setSettings({ ...settings, allowLateJoin: e.target.checked })}
                   className="w-6 h-6 text-neo-cyan focus:ring-neo-cyan rounded"
-                  role="slider"
                 />
               </div>
             </div>
