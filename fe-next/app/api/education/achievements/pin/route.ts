@@ -76,11 +76,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Look up the achievement_id from the key
+    const { data: achievementDef, error: lookupError } = await supabase
+      .from('achievement_definitions')
+      .select('id')
+      .eq('key', achievementKey)
+      .single();
+
+    if (lookupError || !achievementDef) {
+      return NextResponse.json(
+        { error: `Achievement not found: ${achievementKey}` },
+        { status: 404 }
+      );
+    }
+
+    const achievementId = achievementDef.id;
+
     // If pinning, check if already at max pins (3)
     if (isPinned) {
       const { data: existingPins, error: countError } = await supabase
         .from('student_achievements')
-        .select('achievement_key')
+        .select('id')
         .eq('student_id', studentId)
         .eq('is_pinned', true);
 
@@ -96,31 +112,30 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // Upsert the pin status
+    // Update the pin status for existing achievement record
     const { data, error } = await supabase
       .from('student_achievements')
-      .upsert(
-        {
-          student_id: studentId,
-          achievement_key: achievementKey,
-          is_pinned: isPinned,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'student_id,achievement_key',
-        }
-      )
+      .update({ is_pinned: isPinned })
+      .eq('student_id', studentId)
+      .eq('achievement_id', achievementId)
       .select()
       .single();
 
     if (error) {
+      // If no record exists, the student hasn't earned this achievement yet
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: 'Cannot pin an achievement you have not earned yet' },
+          { status: 400 }
+        );
+      }
       throw new Error(`Failed to update pin: ${error.message}`);
     }
 
     return NextResponse.json({
       success: true,
       data: {
-        achievementKey: data.achievement_key,
+        achievementKey: achievementKey,
         isPinned: data.is_pinned,
       },
     });
@@ -153,9 +168,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Join with achievement_definitions to get the key
     const { data, error } = await supabase
       .from('student_achievements')
-      .select('achievement_key, is_pinned')
+      .select(`
+        is_pinned,
+        achievement_definitions!inner (
+          key
+        )
+      `)
       .eq('student_id', validStudentId)
       .eq('is_pinned', true);
 
@@ -166,7 +187,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       data: data?.map((pin) => ({
-        achievementKey: pin.achievement_key,
+        // Supabase inner join returns a single object, not an array
+        achievementKey: (pin.achievement_definitions as unknown as { key: string }).key,
         isPinned: pin.is_pinned,
       })) || [],
     });

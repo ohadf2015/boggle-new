@@ -22,6 +22,7 @@ jest.mock('../../contexts/LanguageContext', () => ({
         'education.achievements.categories.exploration': 'Exploration',
         'education.achievements.earned': '{count}/{total} earned',
         'education.achievements.secretRemaining': '{count} secret badges remain hidden...',
+        'education.achievements.pinLimit': '{current}/{max} pinned',
         'education.achievements.maxPinsReached': 'Unpin another badge first',
         'education.achievements.word_master.name': 'Word Master',
         'education.achievements.first_lesson.name': 'First Lesson',
@@ -41,13 +42,42 @@ jest.mock('../../contexts/LanguageContext', () => ({
   }),
 }));
 
+// Track pinned achievements for mock - can be modified in tests
+let mockPinnedKeys = new Set<string>(['first_lesson']);
+const mockTogglePin = jest.fn();
+
+// Helper to set mock pinned keys in tests
+const setMockPinnedKeys = (keys: string[]) => {
+  mockPinnedKeys = new Set(keys);
+};
+
+// Mock useAchievementPin hook
+jest.mock('../../hooks/useAchievementPin', () => ({
+  useAchievementPin: () => ({
+    pinnedKeys: mockPinnedKeys,
+    togglePin: mockTogglePin,
+    isLoading: false,
+    error: null,
+    clearError: jest.fn(),
+    maxPins: 3,
+    pinCount: mockPinnedKeys.size,
+    canPinMore: mockPinnedKeys.size < 3,
+  }),
+  mergePinStatus: (achievements: any[], pinnedKeys: Set<string>) => {
+    return achievements.map((achievement: any) => ({
+      ...achievement,
+      isPinned: pinnedKeys.has(achievement.achievementKey),
+    }));
+  },
+}));
+
 // Mock AchievementProgressCard
 jest.mock('./AchievementProgressCard', () => {
   return function MockAchievementProgressCard({ achievement, isPinned, onTogglePin, canPin }: any) {
     return (
       <div data-testid={`card-${achievement.key}`} data-pinned={isPinned} data-can-pin={canPin}>
         <span>{achievement.key}</span>
-        <button onClick={() => onTogglePin(achievement.key)}>
+        <button onClick={() => onTogglePin(achievement.key, isPinned)}>
           {isPinned ? 'Unpin' : 'Pin'}
         </button>
       </div>
@@ -58,50 +88,56 @@ jest.mock('./AchievementProgressCard', () => {
 describe('EducationBadgeGrid', () => {
   const mockAchievements = [
     {
-      achievement_key: 'word_master',
-      current_tier: 'bronze' as const,
-      progress_value: 75,
-      next_threshold: 150,
-      percent_complete: 50,
-      is_pinned: false,
-      is_secret: false,
-      category: 'progress',
+      achievementKey: 'word_master',
+      currentTier: 'bronze' as const,
+      progressValue: 75,
+      nextThreshold: 150,
+      percentComplete: 50,
+      isPinned: false,
+      isSecret: false,
+      category: 'progress' as const,
       icon: '🎓',
     },
     {
-      achievement_key: 'first_lesson',
-      current_tier: 'silver' as const,
-      progress_value: 5,
-      next_threshold: 10,
-      percent_complete: 50,
-      is_pinned: true,
-      is_secret: false,
-      category: 'progress',
+      achievementKey: 'first_lesson',
+      currentTier: 'silver' as const,
+      progressValue: 5,
+      nextThreshold: 10,
+      percentComplete: 50,
+      isPinned: true,
+      isSecret: false,
+      category: 'progress' as const,
       icon: '📚',
     },
     {
-      achievement_key: 'speed_demon',
-      current_tier: null,
-      progress_value: 5,
-      next_threshold: 10,
-      percent_complete: 0,
-      is_pinned: false,
-      is_secret: false,
-      category: 'skill',
+      achievementKey: 'speed_demon',
+      currentTier: null,
+      progressValue: 5,
+      nextThreshold: 10,
+      percentComplete: 0,
+      isPinned: false,
+      isSecret: false,
+      category: 'skill' as const,
       icon: '⚡',
     },
     {
-      achievement_key: 'streak_champion',
-      current_tier: null,
-      progress_value: 3,
-      next_threshold: 7,
-      percent_complete: 0,
-      is_pinned: false,
-      is_secret: true,
-      category: 'consistency',
+      achievementKey: 'streak_champion',
+      currentTier: null,
+      progressValue: 3,
+      nextThreshold: 7,
+      percentComplete: 0,
+      isPinned: false,
+      isSecret: true,
+      category: 'consistency' as const,
       icon: '👑',
     },
   ];
+
+  // Reset mock state before each test
+  beforeEach(() => {
+    setMockPinnedKeys(['first_lesson']); // Default: only first_lesson is pinned
+    mockTogglePin.mockClear();
+  });
 
   describe('Overall Completion', () => {
     it('shows overall completion percentage', () => {
@@ -144,12 +180,13 @@ describe('EducationBadgeGrid', () => {
     });
 
     it('does not show pinned section when no badges pinned', () => {
-      const unpinnedAchievements = mockAchievements.map(a => ({ ...a, is_pinned: false }));
+      // Clear all pinned badges
+      setMockPinnedKeys([]);
 
       render(
         <EducationBadgeGrid
           studentId="student-123"
-          achievements={unpinnedAchievements}
+          achievements={mockAchievements}
         />
       );
 
@@ -237,24 +274,23 @@ describe('EducationBadgeGrid', () => {
 
   describe('Pin Logic', () => {
     it('enforces max 3 pins', () => {
-      const threePinned = mockAchievements.map((a, i) => ({
-        ...a,
-        is_pinned: i < 3, // Pin first 3
-      }));
+      // Set 3 achievements as pinned via the mock
+      setMockPinnedKeys(['word_master', 'first_lesson', 'speed_demon']);
 
       render(
         <EducationBadgeGrid
           studentId="student-123"
-          achievements={threePinned}
+          achievements={mockAchievements}
         />
       );
 
-      // 4th card should not be able to pin
+      // 4th card (streak_champion) should not be able to pin
       const fourthCard = screen.getByTestId('card-streak_champion');
       expect(fourthCard).toHaveAttribute('data-can-pin', 'false');
     });
 
     it('allows pinning when less than 3 pinned', () => {
+      // Default: only 1 pinned (first_lesson)
       render(
         <EducationBadgeGrid
           studentId="student-123"
@@ -268,19 +304,17 @@ describe('EducationBadgeGrid', () => {
     });
 
     it('allows unpinning even when 3 pinned', () => {
-      const achievements = mockAchievements.map((a, i) => ({
-        ...a,
-        is_pinned: i < 3,
-      }));
+      // Set 3 achievements as pinned
+      setMockPinnedKeys(['word_master', 'first_lesson', 'speed_demon']);
 
       render(
         <EducationBadgeGrid
           studentId="student-123"
-          achievements={achievements}
+          achievements={mockAchievements}
         />
       );
 
-      // Pinned cards should always be able to unpin
+      // Pinned cards should always be able to unpin (canPin is true if already pinned)
       const firstCards = screen.getAllByTestId('card-word_master');
       // Check the one in featured section (first one)
       expect(firstCards[0]).toHaveAttribute('data-can-pin', 'true');
@@ -301,9 +335,8 @@ describe('EducationBadgeGrid', () => {
 
       fireEvent.click(pinButton);
 
-      // Would normally update database and re-render
-      // For now just verify handler is called
-      expect(pinButton).toBeInTheDocument();
+      // Verify the toggle handler was called with correct arguments
+      expect(mockTogglePin).toHaveBeenCalledWith('word_master', false);
     });
   });
 
@@ -325,7 +358,7 @@ describe('EducationBadgeGrid', () => {
         ...mockAchievements.slice(0, 3),
         {
           ...mockAchievements[3],
-          current_tier: 'bronze' as const, // Unlocked
+          currentTier: 'bronze' as const, // Unlocked
         },
       ];
 
@@ -358,7 +391,7 @@ describe('EducationBadgeGrid', () => {
     it('shows 100% when all achievements unlocked', () => {
       const allUnlocked = mockAchievements.map(a => ({
         ...a,
-        current_tier: 'platinum' as const,
+        currentTier: 'platinum' as const,
       }));
 
       render(

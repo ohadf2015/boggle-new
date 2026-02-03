@@ -63,9 +63,23 @@ export default function StudentProfilePageClient() {
       }
 
       try {
+        // Join with achievement_definitions to get key, category, icon, is_secret
         const { data, error } = await supabase
           .from('student_achievements')
-          .select('*')
+          .select(`
+            id,
+            student_id,
+            current_tier,
+            progress_value,
+            is_pinned,
+            unlocked_at,
+            achievement_definitions!inner (
+              key,
+              category,
+              icon,
+              is_secret
+            )
+          `)
           .eq('student_id', user.id);
 
         if (error) {
@@ -74,18 +88,28 @@ export default function StudentProfilePageClient() {
           return;
         }
 
-        // Transform database rows to StudentAchievement format (snake_case to camelCase)
-        const formattedAchievements: StudentAchievement[] = (data || []).map((row) => ({
-          achievementKey: row.achievement_key,
-          currentTier: row.current_tier,
-          progressValue: row.progress_value,
-          nextThreshold: row.next_threshold,
-          percentComplete: row.percent_complete,
-          isPinned: row.is_pinned,
-          isSecret: row.is_secret,
-          category: row.category,
-          icon: row.icon,
-        }));
+        // Transform database rows to StudentAchievement format
+        // Note: next_threshold and percent_complete are computed client-side or set to defaults
+        const formattedAchievements: StudentAchievement[] = (data || []).map((row) => {
+          // Supabase inner join returns a single object, not an array
+          const def = row.achievement_definitions as unknown as {
+            key: string;
+            category: string;
+            icon: string;
+            is_secret: boolean;
+          };
+          return {
+            achievementKey: def.key,
+            currentTier: row.current_tier,
+            progressValue: row.progress_value || 0,
+            nextThreshold: null, // TODO: Calculate from achievement_tiers if needed
+            percentComplete: 100, // Earned achievements are 100% for their current tier
+            isPinned: row.is_pinned || false,
+            isSecret: def.is_secret,
+            category: def.category as 'progress' | 'skill' | 'consistency' | 'exploration',
+            icon: def.icon,
+          };
+        });
 
         setAchievements(formattedAchievements);
         setIsLoadingAchievements(false);

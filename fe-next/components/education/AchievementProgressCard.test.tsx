@@ -344,7 +344,7 @@ describe('AchievementProgressCard', () => {
       const pinButton = screen.getByLabelText('Pin badge');
       fireEvent.click(pinButton);
 
-      expect(onTogglePin).toHaveBeenCalledWith('word_master');
+      expect(onTogglePin).toHaveBeenCalledWith('word_master', false);
     });
 
     it('shows filled star when pinned', () => {
