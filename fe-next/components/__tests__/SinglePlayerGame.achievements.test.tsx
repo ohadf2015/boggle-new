@@ -57,7 +57,7 @@ const MockAchievementDock = jest.fn(({ achievements, className }) => (
     ))}
   </div>
 ));
-MockAchievementDock.displayName = 'MockAchievementDock';
+(MockAchievementDock as any).displayName = 'MockAchievementDock';
 
 jest.mock('@/components/achievements/AchievementDock', () => ({
   __esModule: true,
