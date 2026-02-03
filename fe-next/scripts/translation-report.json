@@ -3,9 +3,9 @@
     "totalKeysInCode": 2957,
     "keyCountByLanguage": {
       "en": 4120,
-      "he": 4119,
-      "sv": 4137,
-      "ja": 4137,
+      "he": 4120,
+      "sv": 4138,
+      "ja": 4138,
       "es": 4050
     },
     "missingFromEnglish": 0,
@@ -169,15 +169,9 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "multiplayer.playersJoined"
-    ],
-    "sv": [
-      "multiplayer.playersJoined"
-    ],
-    "ja": [
-      "multiplayer.playersJoined"
-    ],
+    "he": [],
+    "sv": [],
+    "ja": [],
     "es": [
       "skills.title",
       "skills.available",

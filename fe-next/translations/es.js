@@ -201,6 +201,49 @@ const es = {
     "brain": "Cerebro",
     "profile": "Perfil"
   },
+  "skills": {
+    "title": "Árbol de Habilidades",
+    "available": "Puntos Disponibles",
+    "unlocked": "¡Habilidad Desbloqueada!",
+    "paths": {
+      "power": "Poder",
+      "strategy": "Estrategia",
+      "utility": "Utilidad"
+    },
+    "powerStrike": {
+      "name": "Golpe Poderoso"
+    },
+    "longWordMastery": {
+      "name": "Maestría de Palabras Largas"
+    },
+    "devastatingBlow": {
+      "name": "Golpe Devastador"
+    },
+    "comboStarter": {
+      "name": "Iniciador de Combos"
+    },
+    "chainReaction": {
+      "name": "Reacción en Cadena"
+    },
+    "comboMaster": {
+      "name": "Maestro del Combo"
+    },
+    "quickCharge": {
+      "name": "Carga Rápida"
+    },
+    "powerUpSlot": {
+      "name": "Espacio para Power-Up"
+    },
+    "hintMaster": {
+      "name": "Maestro de Pistas"
+    },
+    "xpBoost": {
+      "name": "Impulso de XP"
+    },
+    "goldRush": {
+      "name": "Fiebre del Oro"
+    }
+  },
   "connection": {
     "reconnecting": "Te regresamos...",
     "disconnected": "Conexión perdida",
@@ -433,7 +476,8 @@ const es = {
     "networkError": "Error de red. Tu progreso se guardó localmente.",
     "leaderboardFailed": "No se pudo cargar la clasificación. ¡Intenta actualizar!",
     "resultSubmissionFailed": "No se pudo guardar tu resultado. Tu progreso se guardó localmente.",
-    "resetFailed": "Error al reiniciar el servidor. Inténtalo de nuevo."
+    "resetFailed": "Error al reiniciar el servidor. Inténtalo de nuevo.",
+    "loadFailed": "No se pudo cargar. ¡Intenta de nuevo!"
   },
   "notFound": {
     "heading": "¿Perdido en el laberinto de palabras?",
@@ -3136,7 +3180,8 @@ const es = {
   "multiplayer": {
     "mode": "Modo",
     "timer": "Tiempo",
-    "subtitle": "Compite con amigos en tiempo real"
+    "subtitle": "Compite con amigos en tiempo real",
+    "playersJoined": "jugadores unidos"
   },
   "stats": {
     "games": "partidas",
@@ -4023,15 +4068,28 @@ const es = {
       }
     },
     "bosses": {
+      "fightBoss": "Enfrentar Jefe",
+      "bossIntro": "¡Batalla contra el Jefe!",
+      "bossDefeated": "¡Jefe Derrotado!",
+      "bossWins": "El Jefe gana...",
+      "twistMechanic": "Giro del Jefe",
+      "skipIntro": "Saltar",
+      "readyToFight": "¡Vamos!",
+      "enraged": "¡ENFURECIDO!",
       "phases": {
-        "phase1": "Fase 1",
-        "phase2": "Fase 2"
+        "phase1": "FASE 1",
+        "phase2": "FASE 2"
       },
       "telegraph": {
         "incoming": "¡Ataque entrante!",
-        "warning": "¡Alerta!",
+        "warning": "¡Cuidado!",
         "prepare": "¡Prepárate!",
-        "progress": "Progreso"
+        "progress": "Ataque cargándose"
+      },
+      "common": {
+        "anagramPair": "¡Par de anagramas! ¡Golpe crítico!",
+        "requirementMet": "¡Requisito cumplido!",
+        "requirementMissed": "Requisito no cumplido"
       },
       "cinematics": {
         "skip": "Saltar",
@@ -4140,20 +4198,7 @@ const es = {
           "name": "Palabra Suprema",
           "desc": "¡{damage} de daño devastador!"
         }
-      }
-    },
-    "cinematics": {
-      "victory": "¡VICTORIA!",
-      "timesUp": "¡Se Acabó el Tiempo!",
-      "almostHadIt": "¡Casi lo logras!",
-      "checkProgress": "Veamos tu progreso",
-      "wordsFound": "Palabras encontradas",
-      "bestWord": "Mejor palabra",
-      "finalScore": "Puntaje Final",
-      "score": "Puntaje",
-      "timeRemaining": "Tiempo restante",
-      "stars": "estrellas"
-    },
+      },
     "themes": {
       "sunny-pastoral": "Pastoral Soleado",
       "waterfalls": "Cascadas",
@@ -4506,6 +4551,18 @@ const es = {
         }
       }
     },
+    "cinematics": {
+      "victory": "¡VICTORIA!",
+      "timesUp": "¡Se Acabó el Tiempo!",
+      "almostHadIt": "¡Casi lo logras!",
+      "checkProgress": "Veamos tu progreso",
+      "wordsFound": "Palabras encontradas",
+      "bestWord": "Mejor palabra",
+      "finalScore": "Puntaje Final",
+      "score": "Puntaje",
+      "timeRemaining": "Tiempo restante",
+      "stars": "estrellas"
+    },
     "achievements": {
       "title": "Logros",
       "earned": "Ganado",
@@ -4818,7 +4875,9 @@ const es = {
       "delete": "Eliminar Lección",
       "confirmDelete": "¿Eliminar lección? Se perderá el progreso.",
       "name": "Nombre de Lección",
+      "namePlaceholder": "ej. Vocabulario de Animales",
       "description": "Descripción (opcional)",
+      "descriptionPlaceholder": "Descripción opcional",
       "words": "{{count}} palabras",
       "word": "1 palabra",
       "noWords": "Sin palabras aún",
@@ -4912,9 +4971,11 @@ const es = {
       "nameRequired": "El nombre es requerido",
       "timer": "Duración del Juego",
       "difficulty": "Tamaño del Tablero",
+      "boardSize": "Tamaño del Tablero",
       "boardPreview": "El tablero será de",
       "minWordLength": "Longitud Mínima de Palabra",
       "allowLateJoin": "Permitir Unirse Tarde",
+      "lateJoin": "Unirse Tarde",
       "allowLateJoinDesc": "Los jugadores pueden unirse después de iniciar",
       "setDefault": "Usar por Defecto",
       "setDefaultDesc": "Usar esta configuración por defecto para esta lección",
@@ -5299,6 +5360,18 @@ const es = {
         "hint": "Oculto hasta descubrirlo..."
       }
     }
+    },
+    "lessonWords": {
+      "title": "Vocabulario de la Lección",
+      "subtitle": "Tu rendimiento con las palabras de la lección",
+      "found": "Encontradas",
+      "total": "Total",
+      "completion": "Puntuación",
+      "foundList": "Palabras que Encontraste",
+      "missedList": "Palabras que Perdiste",
+      "perfectScore": "¡Perfecto! ¡Encontraste todas las palabras de la lección!"
+    },
+    "students": "estudiantes"
   },
   "crazygames": {
     "ads": {
