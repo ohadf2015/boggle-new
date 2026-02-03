@@ -3178,7 +3178,8 @@ const sv = {
   "multiplayer": {
     "mode": "Läge",
     "timer": "Timer",
-    "subtitle": "Tävla med vänner i realtid"
+    "subtitle": "Tävla med vänner i realtid",
+    "playersJoined": "spelare anslöt"
   },
   "stats": {
     "games": "Matcher",

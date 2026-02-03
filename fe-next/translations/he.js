@@ -662,7 +662,8 @@ const he = {
   "multiplayer": {
     "mode": "מצב משחק",
     "timer": "טיימר",
-    "subtitle": "התחרו עם חברים בזמן אמת"
+    "subtitle": "התחרו עם חברים בזמן אמת",
+    "playersJoined": "שחקנים הצטרפו"
   },
   "stats": {
     "games": "משחקים",
