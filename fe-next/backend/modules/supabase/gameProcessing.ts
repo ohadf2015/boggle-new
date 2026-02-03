@@ -105,8 +105,8 @@ async function processPlayerResult(
         logger.error('SUPABASE', `updatePlayerStats error for ${playerScore.username}`, statsRes.error.message);
       }
 
-      // Store XP info for socket emission
-      if (statsRes.xpInfo) {
+      // Store XP info for socket emission (only if stats were saved successfully)
+      if (!statsRes.error && statsRes.xpInfo) {
         xpResult = {
           ...statsRes.xpInfo,
           socketId: authInfo.socketId,
@@ -114,8 +114,8 @@ async function processPlayerResult(
         logger.debug('XP', `${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
       }
 
-      // Check for lifetime achievements based on updated stats
-      if (statsRes.updatedStats) {
+      // Check for lifetime achievements based on updated stats (only if stats were saved successfully)
+      if (!statsRes.error && statsRes.updatedStats) {
         const checkLifetimeAchievements = getLifetimeAchievementChecker();
         if (checkLifetimeAchievements) {
           const existingAchievements = playerScore.achievements || [];

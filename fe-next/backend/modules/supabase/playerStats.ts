@@ -208,9 +208,12 @@ export async function updatePlayerStats(
 
     if (error) {
       logger.error('SUPABASE', `Failed to update profile stats for ${playerId}`, error.message);
+      // CRITICAL: Don't return xpInfo/updatedStats when database save fails
+      // This prevents "phantom XP" where players see XP gains that weren't persisted
+      return { data: null, error };
     }
 
-    // Return XP info along with data for socket emission
+    // Calculate updated stats for socket emission (only when save succeeded)
     const updatedStats = {
       gamesPlayed: updates.total_games as number,
       gamesWon: ((updates.ranked_wins as number | undefined) || (profile.ranked_wins || 0)) +
@@ -220,9 +223,10 @@ export async function updatePlayerStats(
       uniqueDaysPlayed: (updates.unique_days_played as number | undefined) || (profile.unique_days_played || 0),
     };
 
+    // Return XP info only when database update succeeded
     return {
       data,
-      error,
+      error: null,
       xpInfo: {
         xpEarned: xpResult.totalXp,
         xpBreakdown: xpResult.breakdown,
