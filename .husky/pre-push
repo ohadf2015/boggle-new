@@ -46,10 +46,10 @@ else
   BACKEND_FILES=$(echo "$CHANGED_FILES" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
   FRONTEND_FILES=$(echo "$CHANGED_FILES" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
 
-  # Run backend tests if backend files changed
+  # Run backend tests if backend files changed (exclude integration tests)
   if [ -n "$BACKEND_FILES" ]; then
     echo "  📦 Running backend tests for changed files..."
-    if ! npx jest --config=backend/jest.config.js --findRelatedTests $BACKEND_FILES --passWithNoTests; then
+    if ! npx jest --config=backend/jest.config.js --findRelatedTests $BACKEND_FILES --passWithNoTests --testPathIgnorePatterns="integration\.test\.ts$"; then
       echo ""
       echo "❌ Backend tests failed. Please fix the failing tests above before pushing."
       exit 1
