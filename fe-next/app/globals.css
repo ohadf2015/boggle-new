@@ -801,7 +801,7 @@ body {
       /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
       /* FIX: Use CSS variable to GUARANTEE width === height for perfectly square grid */
       /* This prevents cells from being stretched when flex containers affect dimensions */
-      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px), 500px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -814,7 +814,7 @@ body {
     .game-board-frame {
       /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
       /* FIX: Single variable ensures square container */
-      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - 250px), 500px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
@@ -826,7 +826,7 @@ body {
     .game-board-frame {
       /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
       /* FIX: Single variable ensures square container */
-      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - 240px), 500px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);

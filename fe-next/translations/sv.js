@@ -5265,6 +5265,7 @@ const sv = {
       },
       "earned": "{count}/{total} uppnådda",
       "secretRemaining": "{count} hemliga märken är fortfarande dolda...",
+      "pinLimit": "{current}/{max} fästa",
       "first_lesson": {
         "name": "Första Lektionen",
         "description": "Slutför din första lektion",

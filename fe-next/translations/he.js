@@ -5240,6 +5240,7 @@ const he = {
       },
       "earned": "{count}/{total} הושגו",
       "secretRemaining": "{count} תגים סודיים נותרו מוסתרים...",
+      "pinLimit": "{current}/{max} מוצמדים",
       "first_lesson": {
         "name": "השיעור הראשון",
         "description": "השלם את השיעור הראשון שלך",

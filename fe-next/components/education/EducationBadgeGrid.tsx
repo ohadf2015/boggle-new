@@ -11,26 +11,15 @@
  * - Secret badge hint count
  */
 
-import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAchievementPin, mergePinStatus } from '../../hooks/useAchievementPin';
+import { StudentAchievement } from '../../types/education';
 import AchievementProgressCard from './AchievementProgressCard';
+import { cn } from '@/lib/utils';
 
-// ============================================
-// TYPES
-// ============================================
 
-export interface StudentAchievement {
-  achievement_key: string;
-  current_tier: 'bronze' | 'silver' | 'gold' | 'platinum' | null;
-  progress_value: number;
-  next_threshold: number | null;
-  percent_complete: number;
-  is_pinned: boolean;
-  is_secret: boolean;
-  category: string;
-  icon: string;
-}
 
 interface EducationBadgeGridProps {
   studentId: string;
@@ -46,8 +35,8 @@ const TIER_ORDER = { platinum: 4, gold: 3, silver: 2, bronze: 1, null: 0 };
 
 function sortAchievements(a: StudentAchievement, b: StudentAchievement): number {
   // Earned first
-  const aTierValue = a.current_tier ? TIER_ORDER[a.current_tier] : 0;
-  const bTierValue = b.current_tier ? TIER_ORDER[b.current_tier] : 0;
+  const aTierValue = a.currentTier ? TIER_ORDER[a.currentTier] : 0;
+  const bTierValue = b.currentTier ? TIER_ORDER[b.currentTier] : 0;
 
   if (aTierValue > 0 && bTierValue === 0) return -1;
   if (aTierValue === 0 && bTierValue > 0) return 1;
@@ -97,28 +86,44 @@ export default function EducationBadgeGrid({
   // Track collapsed sections
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
+  // Achievement pin hook
+  const {
+    pinnedKeys,
+    togglePin,
+    isLoading: isPinLoading,
+    error: pinError,
+    clearError,
+    maxPins,
+    pinCount,
+    canPinMore,
+  } = useAchievementPin(studentId);
+
+  // Merge achievements with pin status from hook
+  const achievementsWithPins = useMemo(
+    () => mergePinStatus(achievements, pinnedKeys),
+    [achievements, pinnedKeys]
+  );
+
   // Calculate overall completion
-  const earnedCount = achievements.filter(a => a.current_tier !== null).length;
-  const totalCount = achievements.length;
+  const earnedCount = achievementsWithPins.filter(a => a.currentTier !== null).length;
+  const totalCount = achievementsWithPins.length;
   const completionPercent = totalCount > 0 ? Math.round((earnedCount / totalCount) * 100) : 0;
 
   // Get pinned badges
-  const pinnedBadges = achievements.filter(a => a.is_pinned);
-  const pinnedCount = pinnedBadges.length;
+  const pinnedBadges = achievementsWithPins.filter(a => a.isPinned);
+  const pinnedCount = pinCount;
 
   // Group by category
-  const grouped = groupByCategory(achievements);
+  const grouped = groupByCategory(achievementsWithPins);
 
   // Count locked secrets
-  const lockedSecretsCount = achievements.filter(
-    a => a.is_secret && a.current_tier === null
+  const lockedSecretsCount = achievementsWithPins.filter(
+    a => a.isSecret && a.currentTier === null
   ).length;
 
   // Pin toggle handler
-  const handleTogglePin = async (achievementKey: string) => {
-    // TODO: Update database
-    // For now, just log
-    console.log('Toggle pin:', achievementKey);
+  const handleTogglePin = async (achievementKey: string, currentPinned: boolean) => {
+    await togglePin(achievementKey, currentPinned);
   };
 
   // Toggle category collapse
@@ -127,7 +132,7 @@ export default function EducationBadgeGrid({
   };
 
   return (
-    <div className={`space-y-8 ${className}`}>
+    <div className={cn('space-y-8', className)}>
       {/* Header Section */}
       <div className="space-y-4">
         <h2 className="font-neo-display text-3xl font-bold text-neo-white flex items-center gap-3">
@@ -173,21 +178,22 @@ export default function EducationBadgeGrid({
             {pinnedBadges.map(achievement => {
               return (
                 <AchievementProgressCard
-                  key={achievement.achievement_key}
+                  key={achievement.achievementKey}
                   achievement={{
-                    key: achievement.achievement_key,
+                    key: achievement.achievementKey,
                     category: achievement.category,
                     icon: achievement.icon,
-                    isSecret: achievement.is_secret,
-                    currentTier: achievement.current_tier,
-                    progressValue: achievement.progress_value,
-                    nextThreshold: achievement.next_threshold,
-                    isMaxTier: achievement.current_tier === 'platinum',
-                    percentComplete: achievement.percent_complete,
+                    isSecret: achievement.isSecret,
+                    currentTier: achievement.currentTier,
+                    progressValue: achievement.progressValue,
+                    nextThreshold: achievement.nextThreshold,
+                    isMaxTier: achievement.currentTier === 'platinum',
+                    percentComplete: achievement.percentComplete,
                   }}
                   isPinned={true}
                   onTogglePin={handleTogglePin}
                   canPin={true}
+                  isLoading={isPinLoading}
                 />
               );
             })}
@@ -200,7 +206,7 @@ export default function EducationBadgeGrid({
         const categoryAchievements = grouped[category];
         if (categoryAchievements.length === 0) return null;
 
-        const categoryEarnedCount = categoryAchievements.filter(a => a.current_tier !== null).length;
+        const categoryEarnedCount = categoryAchievements.filter(a => a.currentTier !== null).length;
         const isCollapsed = collapsed[category];
 
         return (
@@ -239,25 +245,26 @@ export default function EducationBadgeGrid({
               }`}
             >
               {categoryAchievements.map(achievement => {
-                const canPin = achievement.is_pinned || pinnedCount < 3;
+                const canPinAchievement = achievement.isPinned || canPinMore;
 
                 return (
                   <AchievementProgressCard
-                    key={achievement.achievement_key}
+                    key={achievement.achievementKey}
                     achievement={{
-                      key: achievement.achievement_key,
+                      key: achievement.achievementKey,
                       category: achievement.category,
                       icon: achievement.icon,
-                      isSecret: achievement.is_secret,
-                      currentTier: achievement.current_tier,
-                      progressValue: achievement.progress_value,
-                      nextThreshold: achievement.next_threshold,
-                      isMaxTier: achievement.current_tier === 'platinum',
-                      percentComplete: achievement.percent_complete,
+                      isSecret: achievement.isSecret,
+                      currentTier: achievement.currentTier,
+                      progressValue: achievement.progressValue,
+                      nextThreshold: achievement.nextThreshold,
+                      isMaxTier: achievement.currentTier === 'platinum',
+                      percentComplete: achievement.percentComplete,
                     }}
-                    isPinned={achievement.is_pinned}
+                    isPinned={achievement.isPinned}
                     onTogglePin={handleTogglePin}
-                    canPin={canPin}
+                    canPin={canPinAchievement}
+                    isLoading={isPinLoading}
                   />
                 );
               })}
@@ -265,6 +272,35 @@ export default function EducationBadgeGrid({
           </div>
         );
       })}
+
+      {/* Pin Error Toast */}
+      {pinError && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <div className="bg-neo-pink text-neo-black px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard-lg flex items-center gap-3">
+            <span className="font-neo-body">{pinError}</span>
+            <button
+              onClick={clearError}
+              className="font-bold hover:underline"
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pin Limit Indicator */}
+      <div className="text-center">
+        <p className={cn(
+          'text-sm font-neo-body',
+          canPinMore ? 'text-neo-white/60' : 'text-neo-yellow'
+        )}>
+          {t('education.achievements.pinLimit', {
+            current: pinCount,
+            max: maxPins,
+          })}
+        </p>
+      </div>
 
       {/* Footer: Secret Badges Hint */}
       {lockedSecretsCount > 0 && (

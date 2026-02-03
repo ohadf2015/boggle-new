@@ -5250,6 +5250,7 @@ const en = {
       },
       "earned": "{count}/{total} earned",
       "secretRemaining": "{count} secret badges remain hidden...",
+      "pinLimit": "{current}/{max} pinned",
       "first_lesson": {
         "name": "First Lesson",
         "description": "Complete your first lesson",

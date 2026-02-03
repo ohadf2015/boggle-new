@@ -30,8 +30,9 @@ export interface AchievementProgressCardProps {
     percentComplete: number; // Already calculated percent progress (0-100)
   };
   isPinned: boolean;
-  onTogglePin: (key: string) => void;
+  onTogglePin: (key: string, currentPinned: boolean) => void;
   canPin: boolean; // false if 3 already pinned and not this one
+  isLoading?: boolean;
 }
 
 // ============================================
@@ -70,6 +71,7 @@ export default function AchievementProgressCard({
   isPinned,
   onTogglePin,
   canPin,
+  isLoading = false,
 }: AchievementProgressCardProps) {
   const { t } = useLanguage();
 
@@ -148,7 +150,7 @@ export default function AchievementProgressCard({
             {/* Pin Button (only for earned badges) */}
             {isEarned && (
               <button
-                onClick={() => onTogglePin(achievement.key)}
+                onClick={() => onTogglePin(achievement.key, isPinned)}
                 disabled={!isPinned && !canPin}
                 aria-label={isPinned ? t('education.achievements.unpin') : t('education.achievements.pin')}
                 title={!isPinned && !canPin ? t('education.achievements.maxPinsReached') : ''}

@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 2961,
+    "totalKeysInCode": 2962,
     "keyCountByLanguage": {
-      "en": 4127,
-      "he": 4127,
-      "sv": 4145,
-      "ja": 4145,
-      "es": 4150
+      "en": 4132,
+      "he": 4132,
+      "sv": 4150,
+      "ja": 4150,
+      "es": 4155
     },
-    "missingFromEnglish": 5,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -169,47 +169,11 @@
   },
   "missingFromEnglish": [
     {
-      "key": "achievements.unlocked",
+      "key": "education.achievements.pinLimit",
       "usages": [
         {
-          "file": "components/achievements/AchievementQueue.tsx",
-          "line": 131
-        }
-      ]
-    },
-    {
-      "key": "common.playNow",
-      "usages": [
-        {
-          "file": "app/[locale]/leaderboard/PageClient.tsx",
-          "line": 238
-        }
-      ]
-    },
-    {
-      "key": "common.tryAgainLater",
-      "usages": [
-        {
-          "file": "app/[locale]/leaderboard/PageClient.tsx",
-          "line": 247
-        }
-      ]
-    },
-    {
-      "key": "friends.requestsWillAppearHere",
-      "usages": [
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 475
-        }
-      ]
-    },
-    {
-      "key": "leaderboard.beFirstToPlay",
-      "usages": [
-        {
-          "file": "app/[locale]/leaderboard/PageClient.tsx",
-          "line": 235
+          "file": "components/education/EducationBadgeGrid.tsx",
+          "line": 298
         }
       ]
     }

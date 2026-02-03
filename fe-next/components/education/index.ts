@@ -34,7 +34,7 @@ export { default as AchievementUnlockModal } from './AchievementUnlockModal';
 export type { AchievementUnlockModalProps } from './AchievementUnlockModal';
 
 export { default as EducationBadgeGrid } from './EducationBadgeGrid';
-export type { StudentAchievement } from './EducationBadgeGrid';
+export type { StudentAchievement } from '../../types/education';
 
 export { default as AchievementProgressCard } from './AchievementProgressCard';
 export type { AchievementProgressCardProps } from './AchievementProgressCard';

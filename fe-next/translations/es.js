@@ -5278,6 +5278,7 @@ const es = {
       },
       "earned": "{count}/{total} obtenidos",
       "secretRemaining": "{count} insignias secretas permanecen ocultas...",
+      "pinLimit": "{current}/{max} fijados",
       "first_lesson": {
         "name": "Primera Lección",
         "description": "Completa tu primera lección",

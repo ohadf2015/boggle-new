@@ -5265,6 +5265,7 @@ const ja = {
       },
       "earned": "{count}/{total}獲得",
       "secretRemaining": "{count}個の秘密のバッジが隠されています...",
+      "pinLimit": "{current}/{max} ピン留め",
       "first_lesson": {
         "name": "初めてのレッスン",
         "description": "最初のレッスンを完了する",

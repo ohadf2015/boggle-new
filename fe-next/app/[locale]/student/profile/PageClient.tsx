@@ -74,15 +74,15 @@ export default function StudentProfilePageClient() {
           return;
         }
 
-        // Transform database rows to StudentAchievement format
+        // Transform database rows to StudentAchievement format (snake_case to camelCase)
         const formattedAchievements: StudentAchievement[] = (data || []).map((row) => ({
-          achievement_key: row.achievement_key,
-          current_tier: row.current_tier,
-          progress_value: row.progress_value,
-          next_threshold: row.next_threshold,
-          percent_complete: row.percent_complete,
-          is_pinned: row.is_pinned,
-          is_secret: row.is_secret,
+          achievementKey: row.achievement_key,
+          currentTier: row.current_tier,
+          progressValue: row.progress_value,
+          nextThreshold: row.next_threshold,
+          percentComplete: row.percent_complete,
+          isPinned: row.is_pinned,
+          isSecret: row.is_secret,
           category: row.category,
           icon: row.icon,
         }));

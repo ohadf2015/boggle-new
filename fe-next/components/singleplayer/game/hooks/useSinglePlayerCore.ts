@@ -629,13 +629,25 @@ export function useSinglePlayerCore({
 
   // Handle game over
   useEffect(() => {
-    if (!isGameOver || gameOverCalledRef.current || !gridRef.current) return;
+    // Use grid state instead of ref to avoid sync timing issues
+    if (!isGameOver || gameOverCalledRef.current || !grid) return;
     gameOverCalledRef.current = true;
 
     const finalizeAndEndGame = async () => {
       try {
         setIsValidatingWords(true);
-        const finalWords = await finalizeWordValidation(foundWordsRef.current, settings.language, 3);
+
+        // Add timeout to prevent hanging - max 5 seconds for word validation
+        const validationPromise = finalizeWordValidation(foundWordsRef.current, settings.language, 3);
+        const timeoutPromise = new Promise<typeof foundWordsRef.current>((_, reject) =>
+          setTimeout(() => reject(new Error('Validation timeout')), 5000)
+        );
+
+        const finalWords = await Promise.race([validationPromise, timeoutPromise]).catch(() => {
+          // On timeout, use current words with pending marked as invalid
+          console.warn('Word validation timed out, using current state');
+          return foundWordsRef.current.map(w => w.isValid === null ? { ...w, isValid: false } : w);
+        });
         setIsValidatingWords(false);
 
         const validWords = finalWords.filter(w => w.isValid === true);
@@ -678,7 +690,7 @@ export function useSinglePlayerCore({
           botScores: settings.bots.map(bot => ({
             name: bot.name, score: botScoresRef.current[bot.id] || 0, words: botWordsRef.current[bot.id] || [],
           })),
-          grid: gridRef.current!,
+          grid: grid!,
           allPossibleWords: [],
           isNewHighScore: false,
           achievements: finalAchievements,
@@ -720,7 +732,7 @@ export function useSinglePlayerCore({
             score: botScoresRef.current[bot.id] || 0,
             words: botWordsRef.current[bot.id] || [],
           })),
-          grid: gridRef.current!,
+          grid: grid!,
           allPossibleWords: [],
           isNewHighScore: false,
           achievements: [],
@@ -735,7 +747,7 @@ export function useSinglePlayerCore({
     };
 
     finalizeAndEndGame();
-  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining]);
+  }, [isGameOver, grid, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining]);
 
   // Keyboard shortcuts
   useEffect(() => {
