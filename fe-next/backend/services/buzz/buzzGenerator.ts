@@ -55,37 +55,106 @@ export type { BuzzChallenge, DailyBuzzData, GenerateDailyBuzzOptions, PromptExam
 export { getDailyBuzz, deleteDailyBuzz, getPromptExamples, storePromptExample };
 
 /**
- * Generate challenges using Google Vertex AI Gemini
+ * Generate challenges using Google Vertex AI Gemini with retry logic
+ *
+ * Retries up to MAX_GENERATION_RETRIES times if validation fails.
+ * Each retry includes feedback about rejected challenges to help AI generate better ones.
  */
 async function generateChallengesWithAI(
   trends: TrendingTopic[],
   language: string,
   region: string
 ): Promise<AIGenerationResult> {
+  const MAX_GENERATION_RETRIES = 3;
   const selectedTrends = selectTrendsForChallenge(trends);
   const examples = await getPromptExamples(language, 20);
 
-  // Use async version to load database-customized templates
-  const { prompt, sectionsFromDatabase } = await buildAIPromptAsync(trends, language, region, examples);
+  let lastError: Error | null = null;
+  let lastRejectedCount = 0;
+  let rejectionReasons: string[] = [];
 
-  if (sectionsFromDatabase.length > 0) {
-    console.log(`[BUZZ] Using ${sectionsFromDatabase.length} custom templates from database: ${sectionsFromDatabase.join(', ')}`);
-  }
+  for (let attempt = 1; attempt <= MAX_GENERATION_RETRIES; attempt++) {
+    try {
+      // Build prompt with feedback from previous attempt (if any)
+      let feedbackSection = '';
+      if (attempt > 1 && rejectionReasons.length > 0) {
+        feedbackSection = `\n\n---\n\n## IMPORTANT FEEDBACK FROM PREVIOUS ATTEMPT (ATTEMPT ${attempt}/${MAX_GENERATION_RETRIES})\n\n`;
+        feedbackSection += `The previous generation had ${lastRejectedCount} rejected challenges:\n\n`;
+        rejectionReasons.forEach((reason, idx) => {
+          feedbackSection += `${idx + 1}. ${reason}\n`;
+        });
+        feedbackSection += `\nPlease generate ${5 + attempt * 2} challenges this time to ensure at least 5 pass validation.\n`;
+        feedbackSection += `Focus on avoiding the issues listed above.\n`;
+      }
 
-  try {
-    const responseText = await generateWithGemini(prompt);
-    const { challenges, social_content } = parseAIResponse(responseText);
-    return { challenges, selectedTrends, social_content };
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    console.error('[BUZZ] AI generation failed:', errorMessage);
-    if (errorStack) {
-      console.error('[BUZZ] Error stack:', errorStack);
+      // Use async version to load database-customized templates
+      const { prompt, sectionsFromDatabase } = await buildAIPromptAsync(trends, language, region, examples);
+      const promptWithFeedback = prompt + feedbackSection;
+
+      if (sectionsFromDatabase.length > 0 && attempt === 1) {
+        console.log(`[BUZZ] Using ${sectionsFromDatabase.length} custom templates from database: ${sectionsFromDatabase.join(', ')}`);
+      }
+
+      console.log(`[BUZZ] Generation attempt ${attempt}/${MAX_GENERATION_RETRIES}...`);
+
+      const responseText = await generateWithGemini(promptWithFeedback);
+      const { challenges, social_content } = parseAIResponse(responseText);
+
+      // Validate challenges - this will throw if insufficient
+      const validatedChallenges = validateChallenges(challenges, language);
+
+      // Success! Return the validated challenges
+      if (attempt > 1) {
+        console.log(`[BUZZ] ✅ Retry succeeded on attempt ${attempt}/${MAX_GENERATION_RETRIES}`);
+      }
+
+      return { challenges: validatedChallenges, selectedTrends, social_content };
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      // Check if this is a validation error (insufficient challenges)
+      if (errorMessage.includes('Insufficient validated challenges')) {
+        // Extract rejection count and reasons from error logs (if available)
+        const match = errorMessage.match(/got (\d+), need 5/);
+        if (match) {
+          lastRejectedCount = 5 - parseInt(match[1], 10);
+        }
+
+        // Collect generic rejection reasons for next attempt
+        rejectionReasons = [
+          `Invalid word length (too short or too long for ${language})`,
+          `Answer spoiled in prompt or hint`,
+          `Missing required wordle_guess challenge type`,
+          `Too many sports-related riddles`,
+        ];
+
+        lastError = error instanceof Error ? error : new Error(errorMessage);
+
+        // If we haven't exhausted retries, continue to next attempt
+        if (attempt < MAX_GENERATION_RETRIES) {
+          console.warn(`[BUZZ] Attempt ${attempt} failed: ${errorMessage}`);
+          console.log(`[BUZZ] Retrying with feedback... (${attempt + 1}/${MAX_GENERATION_RETRIES})`);
+          continue;
+        }
+
+        // Out of retries - throw the error
+        console.error(`[BUZZ] All ${MAX_GENERATION_RETRIES} generation attempts failed`);
+        throw lastError;
+      }
+
+      // Non-validation error (parsing, AI failure, etc.) - don't retry
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      console.error('[BUZZ] AI generation failed:', errorMessage);
+      if (errorStack) {
+        console.error('[BUZZ] Error stack:', errorStack);
+      }
+      throw new Error(`Failed to generate challenges with AI: ${errorMessage}`);
     }
-    // Preserve the original error message for debugging
-    throw new Error(`Failed to generate challenges with AI: ${errorMessage}`);
   }
+
+  // Should never reach here, but TypeScript needs this
+  throw lastError || new Error('All generation attempts failed');
 }
 
 /**
@@ -191,13 +260,10 @@ export async function generateDailyBuzz(
     }
   }
 
-  // Step 5: Generate challenges with AI
+  // Step 5: Generate challenges with AI (includes validation with retry logic)
   console.log(`[BUZZ] Step 5: Starting AI challenge generation with ${filteredTrends.length} trends for ${language}/${region}...`);
-  const { challenges, selectedTrends, social_content } = await generateChallengesWithAI(filteredTrends, language, region);
-  console.log(`[BUZZ] Step 5: AI challenge generation completed with ${challenges.length} challenges`);
-
-  // Step 6: Validate challenges
-  const validatedChallenges = validateChallenges(challenges, language);
+  const { challenges: validatedChallenges, selectedTrends, social_content } = await generateChallengesWithAI(filteredTrends, language, region);
+  console.log(`[BUZZ] Step 5: AI challenge generation completed with ${validatedChallenges.length} validated challenges`);
 
   // Step 7: Generate hero image
   let imageUrl: string | null = null;

@@ -253,7 +253,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <PlayerArchetypeBadge archetype={playerArchetype} size="sm" />
           )}
           {results.achievements && results.achievements.length > 0 && (
-            <div className="flex flex-wrap gap-1 justify-center">
+            <div className="flex flex-wrap gap-2 justify-center max-w-full px-2">
               {results.achievements.slice(0, 3).map((achievement, i) => (
                 <AchievementBadge key={achievement.key || `ach-${i}`} achievement={achievement} index={i} />
               ))}
