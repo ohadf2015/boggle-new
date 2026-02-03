@@ -12,7 +12,7 @@ function createChallenge(type: ChallengeType, answer: string, topic = 'test'): B
   return {
     type,
     trend_topic: topic,
-    prompt: `Test prompt for ${answer}`,
+    prompt: `Test prompt about ${topic}`, // Don't include answer in prompt (spoiler detection)
     answer,
     difficulty: 'easy' as const,
     trending_context: `Context for ${topic}`,
