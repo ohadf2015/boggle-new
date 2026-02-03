@@ -16,7 +16,9 @@ import { cn } from '@/lib/utils';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
+import AchievementDock from '@/components/achievements/AchievementDock';
 import type { LetterGrid, Language } from '@/shared/types/game';
+import type { SinglePlayerAchievement } from '@/utils/singlePlayerAchievements';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
 
@@ -88,6 +90,8 @@ export interface PortraitGameLayoutProps {
   setShowQuitConfirm: (show: boolean) => void;
   // Ref for auto-scroll
   gameStatsRef: React.RefObject<HTMLDivElement | null>;
+  // Achievements
+  liveAchievements: SinglePlayerAchievement[];
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -145,6 +149,7 @@ export function PortraitGameLayout({
   showQuitConfirm,
   setShowQuitConfirm,
   gameStatsRef,
+  liveAchievements,
   t,
 }: PortraitGameLayoutProps): React.ReactElement {
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
@@ -182,6 +187,12 @@ export function PortraitGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         t={(key) => t(key) || key}
+      />
+
+      {/* Achievement Dock - top right */}
+      <AchievementDock
+        achievements={liveAchievements}
+        className="absolute top-4 right-4 z-50"
       />
 
       {/* Header with controls */}

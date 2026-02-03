@@ -1,6 +1,7 @@
 /**
  * Tests for Answer Spoiler Detection
- * Ensures the answer does not appear in trend_topic or trending_context
+ * Ensures the answer does not appear in user-facing fields (prompt and hint)
+ * Note: trend_topic and trending_context are metadata and are not checked
  */
 
 import { validateAnswerNotSpoiled, normalizeBlankSizes } from '../buzz/challengeValidator';
@@ -18,81 +19,113 @@ describe('validateAnswerNotSpoiled', () => {
     ...overrides,
   });
 
-  describe('answer in trend_topic', () => {
-    it('should reject when answer appears exactly in trend_topic', () => {
+  describe('answer in prompt', () => {
+    it('should reject when answer appears exactly in prompt', () => {
       const challenge = createChallenge({
-        trend_topic: 'SMART Technology',
+        prompt: 'The SMART device is popular',
         answer: 'SMART',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
     });
 
-    it('should reject when answer appears case-insensitively in trend_topic', () => {
+    it('should reject when answer appears case-insensitively in prompt', () => {
       const challenge = createChallenge({
-        trend_topic: 'smart phones are popular',
+        prompt: 'A smart device that everyone wants',
         answer: 'SMART',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
     });
 
-    it('should accept when answer does NOT appear in trend_topic', () => {
+    it('should accept when answer does NOT appear in prompt', () => {
       const challenge = createChallenge({
-        trend_topic: 'Mobile Technology',
+        prompt: 'A mobile device that fits in your pocket',
         answer: 'PHONE',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(true);
     });
 
-    it('should reject when answer is a substring in trend_topic word', () => {
+    it('should reject when answer is a substring in prompt word', () => {
       const challenge = createChallenge({
-        trend_topic: 'Smartphones Revolution',
+        prompt: 'Smartphones are everywhere',
         answer: 'SMART',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
     });
   });
 
-  describe('answer in trending_context', () => {
-    it('should reject when answer appears in trending_context', () => {
+  describe('answer in hint', () => {
+    it('should reject when answer appears in hint', () => {
       const challenge = createChallenge({
-        trending_context: 'Everyone wants to be SMART these days',
+        hint: 'Everyone wants to be SMART these days',
         answer: 'SMART',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
     });
 
-    it('should reject when answer appears case-insensitively in trending_context', () => {
+    it('should reject when answer appears case-insensitively in hint', () => {
       const challenge = createChallenge({
-        trending_context: 'Being smart is valued in tech',
+        hint: 'Being smart is valued',
         answer: 'SMART',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
     });
 
-    it('should accept when answer does NOT appear in trending_context', () => {
+    it('should accept when answer does NOT appear in hint', () => {
       const challenge = createChallenge({
-        trending_context: 'Technology is advancing rapidly',
+        hint: 'Used for calling people',
         answer: 'PHONE',
       });
+      expect(validateAnswerNotSpoiled(challenge)).toBe(true);
+    });
+  });
+
+  describe('metadata fields (should be ignored)', () => {
+    it('should accept when answer appears in trend_topic (metadata field)', () => {
+      const challenge = createChallenge({
+        trend_topic: 'SMART Technology',
+        prompt: 'What device is everywhere?',
+        answer: 'SMART',
+      });
+      // trend_topic is metadata, not shown to user, so this is OK
+      expect(validateAnswerNotSpoiled(challenge)).toBe(true);
+    });
+
+    it('should accept when answer appears in trending_context (metadata field)', () => {
+      const challenge = createChallenge({
+        trending_context: 'Everyone wants to be SMART these days',
+        prompt: 'What quality is valued in tech?',
+        answer: 'SMART',
+      });
+      // trending_context is metadata, not shown to user, so this is OK
       expect(validateAnswerNotSpoiled(challenge)).toBe(true);
     });
   });
 
   describe('Hebrew language support', () => {
-    it('should detect Hebrew answer in trend_topic', () => {
+    it('should detect Hebrew answer in prompt', () => {
       const challenge = createChallenge({
-        trend_topic: 'טכנולוגיה חכמה',
+        prompt: 'טכנולוגיה חכמה היא העתיד',
         answer: 'חכמה',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
     });
 
-    it('should detect Hebrew answer in trending_context', () => {
+    it('should detect Hebrew answer in hint', () => {
       const challenge = createChallenge({
-        trending_context: 'השימוש בטכנולוגיה חכמה גובר',
+        hint: 'השימוש בטכנולוגיה חכמה גובר',
         answer: 'חכמה',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
+    });
+
+    it('should accept Hebrew answer in metadata fields', () => {
+      const challenge = createChallenge({
+        trend_topic: 'טכנולוגיה חכמה',
+        prompt: 'מה העתיד של הטכנולוגיה?',
+        answer: 'חכמה',
+      });
+      // trend_topic is metadata, so this is OK
+      expect(validateAnswerNotSpoiled(challenge)).toBe(true);
     });
   });
 
@@ -100,19 +133,28 @@ describe('validateAnswerNotSpoiled', () => {
     it('should handle short answers that might match common words', () => {
       // "AI" appears in "MAIL" but should only match as whole word
       const challenge = createChallenge({
-        trend_topic: 'EMAIL Services',
+        prompt: 'What powers EMAIL Services?',
         answer: 'AI',
       });
       // This should pass - AI is not a separate word in "EMAIL"
       expect(validateAnswerNotSpoiled(challenge)).toBe(true);
     });
 
-    it('should reject when short answer appears as standalone word', () => {
+    it('should reject when short answer appears as standalone word in prompt', () => {
       const challenge = createChallenge({
-        trend_topic: 'AI Revolution',
+        prompt: 'AI Revolution is here',
         answer: 'AI',
       });
       expect(validateAnswerNotSpoiled(challenge)).toBe(false);
+    });
+
+    it('should handle challenges without hint', () => {
+      const challenge = createChallenge({
+        hint: undefined as any,
+        prompt: 'What is the future?',
+        answer: 'SMART',
+      });
+      expect(validateAnswerNotSpoiled(challenge)).toBe(true);
     });
   });
 });

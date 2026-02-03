@@ -218,7 +218,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'כדור גדול (4 letters)',
+                        prompt: 'משחק עגול (4 letters)',
                         answer: 'כדור',
                         hint: 'משחק',
                         difficulty: 'medium',
@@ -262,8 +262,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // This should NOT throw an error - it should fetch from SERP API
     await expect(generateDailyBuzz(today, language)).resolves.toBeDefined();
 
-    // Verify fetchGoogleTrends was called with correct region
-    expect(serpApiClient.fetchGoogleTrends).toHaveBeenCalledWith('IL', expect.anything());
+    // Verify fetchGoogleTrends was called with correct region and enrichment flag
+    expect(serpApiClient.fetchGoogleTrends).toHaveBeenCalledWith('IL', expect.anything(), true);
   });
 
   it('should use fallback topics when SERP API returns no trends', async () => {
@@ -305,7 +305,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'כדור גדול (4 letters)',
+                        prompt: 'משחק עגול (4 letters)',
                         answer: 'כדור',
                         hint: 'משחק',
                         difficulty: 'medium',
@@ -403,7 +403,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
                       {
                         type: 'wordle_guess',
                         trend_topic: 'ספורט',
-                        prompt: 'כדור גדול (4 letters)',
+                        prompt: 'משחק עגול (4 letters)',
                         answer: 'כדור',
                         hint: 'משחק',
                         difficulty: 'medium',
@@ -480,7 +480,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     {
       "type": "wordle_guess",
       "trend_topic": "ספורט",
-      "prompt": "כדור גדול (4 letters)",
+      "prompt": "משחק עגול (4 letters)",
       "answer": "כדור",
       "hint": "משחק",
       "difficulty": "medium",

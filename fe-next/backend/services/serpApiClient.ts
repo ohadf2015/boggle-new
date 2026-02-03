@@ -7,7 +7,20 @@ import axios from 'axios';
 import { getRedisClient } from '../redisClient';
 
 /**
+ * News article from Google News enrichment
+ */
+export interface NewsArticle {
+  title: string;
+  link: string;
+  source: string;
+  snippet?: string;
+  date?: string;
+  thumbnail?: string;
+}
+
+/**
  * TrendingTopic interface matching actual SERP API response
+ * Extended with enrichment data from Google News and Related Searches
  * @see https://serpapi.com/google-trends-trending-now
  */
 export interface TrendingTopic {
@@ -21,6 +34,11 @@ export interface TrendingTopic {
   trend_breakdown?: string[];
   serpapi_google_trends_link?: string;
   serpapi_news_link?: string;
+  // Enrichment data (added by enrichTrendWithNews)
+  news_articles?: NewsArticle[];
+  related_searches?: string[];
+  people_also_ask?: string[];
+  enriched_at?: string;
 }
 
 interface SerpApiResponse {
@@ -34,17 +52,21 @@ const REDIS_PREFIX = 'serp:trends:';
 /**
  * Fetch trending topics from Google Trends via SERP API
  * Uses 24-hour caching to avoid redundant API calls
+ * Optionally enriches trends with news articles and related searches
  *
  * @param region - Two-letter country code (IL, US, SE, JP, ES)
  * @param language - Two-letter language code (he, en, sv, ja, es)
+ * @param enrichWithNews - If true, enriches top trends with news articles (default: false)
  * @returns Array of trending topics
  */
 export async function fetchGoogleTrends(
   region: string,
-  language?: string
+  language?: string,
+  enrichWithNews: boolean = false
 ): Promise<TrendingTopic[]> {
   const todayDate = getTodayDate();
-  const cacheKey = `${REDIS_PREFIX}${region}:${todayDate}`;
+  const enrichSuffix = enrichWithNews ? ':enriched' : '';
+  const cacheKey = `${REDIS_PREFIX}${region}:${todayDate}${enrichSuffix}`;
   const redis = getRedisClient();
 
   try {
@@ -52,7 +74,7 @@ export async function fetchGoogleTrends(
     if (redis) {
       const cached = await redis.get(cacheKey);
       if (cached) {
-        console.log(`[SERP] Using cached trends for ${region} from ${todayDate}`);
+        console.log(`[SERP] Using cached trends for ${region} from ${todayDate}${enrichWithNews ? ' (enriched)' : ''}`);
         return JSON.parse(cached);
       }
     }
@@ -73,10 +95,15 @@ export async function fetchGoogleTrends(
     });
 
     const apiResponseTime = Date.now() - startTime;
-    const trends = response.data.trending_searches || [];
+    let trends = response.data.trending_searches || [];
 
     if (trends.length === 0) {
       console.warn(`[SERP] No trends returned for ${region}`);
+    }
+
+    // Enrich with news articles if requested
+    if (enrichWithNews && trends.length > 0 && language) {
+      trends = await enrichTrendsWithNews(trends, language, 5);
     }
 
     // Cache in Redis for 24 hours
@@ -89,7 +116,7 @@ export async function fetchGoogleTrends(
       console.error('[SERP] Failed to log API request:', err)
     );
 
-    console.log(`[SERP] Fetched ${trends.length} trends for ${region} in ${apiResponseTime}ms`);
+    console.log(`[SERP] Fetched ${trends.length} trends for ${region} in ${apiResponseTime}ms${enrichWithNews ? ' (enriched)' : ''}`);
     return trends;
 
   } catch (error: unknown) {
@@ -102,7 +129,7 @@ export async function fetchGoogleTrends(
     );
 
     // Try to return yesterday's cached data as fallback
-    const yesterdayKey = `${REDIS_PREFIX}${region}:${getYesterdayDate()}`;
+    const yesterdayKey = `${REDIS_PREFIX}${region}:${getYesterdayDate()}${enrichSuffix}`;
     if (redis) {
       const fallback = await redis.get(yesterdayKey);
       if (fallback) {
@@ -219,6 +246,141 @@ async function logSerpApiRequest(
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[SERP] Failed to log request:', errorMessage);
   }
+}
+
+/**
+ * Enrich a single trend with news articles, related searches, and PAA questions
+ * Uses Google News Search and Google Search APIs via SERP
+ *
+ * @param trend - The trending topic to enrich
+ * @param language - Language code for news articles (he, en, sv, ja)
+ * @param maxArticles - Maximum number of news articles to fetch (default: 3)
+ * @returns Enriched trend with news_articles, related_searches, people_also_ask
+ */
+export async function enrichTrendWithNews(
+  trend: TrendingTopic,
+  language: string = 'en',
+  maxArticles: number = 3
+): Promise<TrendingTopic> {
+  const query = trend.query;
+
+  try {
+    // Fetch news articles about the trend
+    const newsResponse = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_news',
+        q: query,
+        hl: language,
+        gl: getRegionFromLanguage(language),
+        num: maxArticles,
+        api_key: process.env.SERPAPI_KEY
+      },
+      timeout: 10000
+    });
+
+    const newsArticles: NewsArticle[] = (newsResponse.data.news_results || [])
+      .slice(0, maxArticles)
+      .map((article: any) => ({
+        title: article.title,
+        link: article.link,
+        source: article.source?.name || 'Unknown',
+        snippet: article.snippet,
+        date: article.date,
+        thumbnail: article.thumbnail
+      }));
+
+    // Fetch related searches and People Also Ask from Google Search
+    const searchResponse = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google',
+        q: query,
+        hl: language,
+        gl: getRegionFromLanguage(language),
+        api_key: process.env.SERPAPI_KEY
+      },
+      timeout: 10000
+    });
+
+    const relatedSearches: string[] = (searchResponse.data.related_searches || [])
+      .slice(0, 5)
+      .map((rs: any) => rs.query);
+
+    const peopleAlsoAsk: string[] = (searchResponse.data.related_questions || [])
+      .slice(0, 3)
+      .map((paa: any) => paa.question);
+
+    console.log(`[SERP] Enriched "${query}" with ${newsArticles.length} articles, ${relatedSearches.length} related searches, ${peopleAlsoAsk.length} PAA`);
+
+    return {
+      ...trend,
+      news_articles: newsArticles,
+      related_searches: relatedSearches,
+      people_also_ask: peopleAlsoAsk,
+      enriched_at: new Date().toISOString()
+    };
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.warn(`[SERP] Failed to enrich trend "${query}":`, errorMessage);
+
+    // Return trend without enrichment on error
+    return trend;
+  }
+}
+
+/**
+ * Enrich multiple trends with news articles and related content
+ * Rate-limited to avoid API quota exhaustion
+ *
+ * @param trends - Array of trending topics to enrich
+ * @param language - Language code
+ * @param maxTrendsToEnrich - Maximum number of trends to enrich (default: 5 for top trends)
+ * @returns Array of enriched trends
+ */
+export async function enrichTrendsWithNews(
+  trends: TrendingTopic[],
+  language: string = 'en',
+  maxTrendsToEnrich: number = 5
+): Promise<TrendingTopic[]> {
+  if (!process.env.SERPAPI_KEY) {
+    console.warn('[SERP] SERPAPI_KEY not set, skipping trend enrichment');
+    return trends;
+  }
+
+  // Only enrich top N trends to save API quota
+  const trendsToEnrich = trends.slice(0, maxTrendsToEnrich);
+  const trendsToSkip = trends.slice(maxTrendsToEnrich);
+
+  console.log(`[SERP] Enriching ${trendsToEnrich.length}/${trends.length} trends with news & related searches...`);
+
+  // Enrich trends sequentially to avoid rate limiting (add 500ms delay between calls)
+  const enrichedTrends: TrendingTopic[] = [];
+
+  for (const trend of trendsToEnrich) {
+    const enriched = await enrichTrendWithNews(trend, language);
+    enrichedTrends.push(enriched);
+
+    // Small delay to avoid rate limiting (2 requests per trend = 1 second delay)
+    if (trendsToEnrich.indexOf(trend) < trendsToEnrich.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  return [...enrichedTrends, ...trendsToSkip];
+}
+
+/**
+ * Map language code to region code for SERP API
+ */
+function getRegionFromLanguage(language: string): string {
+  const languageToRegion: Record<string, string> = {
+    'he': 'IL',
+    'en': 'US',
+    'sv': 'SE',
+    'ja': 'JP',
+    'es': 'ES'
+  };
+  return languageToRegion[language] || 'US';
 }
 
 /**

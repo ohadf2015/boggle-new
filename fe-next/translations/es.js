@@ -180,7 +180,20 @@ const es = {
     "clear": "Limpiar",
     "player": "Jugador",
     "clearSearch": "Limpiar búsqueda",
-    "opensInNewTab": "se abre en nueva pestaña"
+    "opensInNewTab": "se abre en nueva pestaña",
+    "seconds": "segundos",
+    "days": "días",
+    "step": "Paso",
+    "of": "de",
+    "finish": "Terminar",
+    "showAdvanced": "Ver opciones",
+    "hideAdvanced": "Ocultar opciones",
+    "continue": "Continuar",
+    "aria": {
+      "levelProgress": "Progreso del nivel: {percent}%",
+      "overallProgress": "Progreso total: {percent}%",
+      "navigation": "Navegación"
+    },
   },
   "nav": {
     "bottomNavigation": "Navegación inferior",
@@ -851,6 +864,8 @@ const es = {
     "words": "Palabras",
     "alreadyFound": "Ya encontrada",
     "invalidWord": "Palabra inválida",
+    "loadFailed": "No se pudo cargar",
+    "loadFailed": "No se pudo cargar",
     "pendingValidation": "En verificación",
     "letterWords": "letras palabras",
     "swipeHintWithMin": "¡Desliza letras para encontrar palabras! (mín {min} letras)",
@@ -3964,7 +3979,9 @@ const es = {
       "nice": "¡Bien!",
       "great": "¡Genial!",
       "amazing": "¡Increíble!",
-      "legendary": "¡LEGENDARIO!"
+      "legendary": "¡LEGENDARIO!",
+      "incredible": "¡INCREÍBLE!",
+      "unstoppable": "¡IMPARABLE!"
     },
     "worlds": {
       "alphabetMeadows": "Praderas del Alfabeto",
@@ -3989,11 +4006,153 @@ const es = {
         "zone2": "Cascadas",
         "bossZone": "Estanque Profundo"
       },
+      "archipelago": {
+        "zone1": "Playa Soleada",
+        "zone2": "Selva Tropical",
+        "bossZone": "Templo Tiki"
+      },
+      "canyon": {
+        "zone1": "Desierto Rocoso",
+        "zone2": "Mesa Ventosa",
+        "bossZone": "Cañón del Trueno"
+      },
       "caverns": {
         "zone1": "Túneles de Raíces",
         "zone2": "Salones de Cristal",
         "bossZone": "Cámara de Etimología"
       }
+    },
+    "bosses": {
+      "phases": {
+        "phase1": "Fase 1",
+        "phase2": "Fase 2"
+      },
+      "telegraph": {
+        "incoming": "¡Ataque entrante!",
+        "warning": "¡Alerta!",
+        "prepare": "¡Prepárate!",
+        "progress": "Progreso"
+      },
+      "cinematics": {
+        "skip": "Saltar",
+        "skipIn": "Saltar en {seconds}s",
+        "progress": "Progreso",
+        "loading": "Cargando...",
+        "victory": "¡VICTORIA!",
+        "defeated": "¡Jefe Derrotado!",
+        "bossApproaches": "El jefe se acerca...",
+        "prepareForBattle": "¡Prepárate para la batalla!"
+      },
+      "abilities": {
+        "popQuiz": {
+          "name": "Examen Sorpresa",
+          "desc": "¡Palabras de 3 letras bloqueadas por {duration}s!"
+        },
+        "redPen": {
+          "name": "Lápiz Rojo",
+          "desc": "Las palabras dan -50% puntos por {duration}s"
+        },
+        "detention": {
+          "name": "Castigo",
+          "desc": "Ralentización del 50% por {duration}s"
+        },
+        "beeSwarm": {
+          "name": "Enjambre de Abejas",
+          "desc": "¡Palabras con B bloqueadas por {duration}s!"
+        },
+        "spellingSting": {
+          "name": "Picadura Ortográfica",
+          "desc": "Las palabras incorrectas quitan {damage} HP"
+        },
+        "synonymShuffle": {
+          "name": "Barajar Sinónimos",
+          "desc": "¡Letras mezcladas! Quedan {duration}s"
+        },
+        "verboseCurse": {
+          "name": "Maldición Verbosa",
+          "desc": "Solo palabras de 5+ letras por {duration}s"
+        },
+        "etymologyLock": {
+          "name": "Cierre Etimológico",
+          "desc": "¡Prefijos y sufijos bloqueados! {duration}s"
+        },
+        "islandLock": {
+          "name": "Cierre Isleño",
+          "desc": "Solo palabras que empiecen con vocal por {duration}s"
+        },
+        "figurativeStorm": {
+          "name": "Tormenta Figurativa",
+          "desc": "¡Letras volando! Más difícil por {duration}s"
+        },
+        "assemblyLine": {
+          "name": "Línea de Ensamblaje",
+          "desc": "¡Palabras compuestas dan el doble por {duration}s!"
+        },
+        "constructionZone": {
+          "name": "Zona de Construcción",
+          "desc": "¡Prefijos obligatorios por {duration}s!"
+        },
+        "puzzleScramble": {
+          "name": "Puzzle Revuelto",
+          "desc": "¡Tablero reorganizado! Quedan {duration}s"
+        },
+        "anagramCurse": {
+          "name": "Maldición Anagrama",
+          "desc": "Solo anagramas válidos por {duration}s"
+        },
+        "puzzleChaos": {
+          "name": "Caos de Puzzle",
+          "desc": "¡Mecánicas aleatorias activadas!"
+        },
+        "mirrorFlip": {
+          "name": "Volteo Espejo",
+          "desc": "¡Tablero volteado horizontalmente!"
+        },
+        "palindromePower": {
+          "name": "Poder Palíndromo",
+          "desc": "¡Palíndromos dan el triple de puntos!"
+        },
+        "starScatter": {
+          "name": "Dispersión Estelar",
+          "desc": "¡Letras dispersas por el tablero!"
+        },
+        "novaBurst": {
+          "name": "Explosión Nova",
+          "desc": "¡{damage} de daño masivo!"
+        },
+        "babelCurse": {
+          "name": "Maldición de Babel",
+          "desc": "¡Palabras multilingües requeridas!"
+        },
+        "polyglotLock": {
+          "name": "Cierre Políglota",
+          "desc": "Solo raíces de palabras extranjeras"
+        },
+        "wordFlame": {
+          "name": "Llama de Palabras",
+          "desc": "¡Daño continuo de {damage} HP/s!"
+        },
+        "lexiconStorm": {
+          "name": "Tormenta Léxica",
+          "desc": "¡Todas las mecánicas activas!"
+        },
+        "ultimateWord": {
+          "name": "Palabra Suprema",
+          "desc": "¡{damage} de daño devastador!"
+        }
+      }
+    },
+    "cinematics": {
+      "victory": "¡VICTORIA!",
+      "timesUp": "¡Se Acabó el Tiempo!",
+      "almostHadIt": "¡Casi lo logras!",
+      "checkProgress": "Veamos tu progreso",
+      "wordsFound": "Palabras encontradas",
+      "bestWord": "Mejor palabra",
+      "finalScore": "Puntaje Final",
+      "score": "Puntaje",
+      "timeRemaining": "Tiempo restante",
+      "stars": "estrellas"
     },
     "themes": {
       "sunny-pastoral": "Pastoral Soleado",
@@ -4347,6 +4506,87 @@ const es = {
         }
       }
     },
+    "achievements": {
+      "title": "Logros",
+      "earned": "Ganado",
+      "hidden": "Oculto",
+      "unlocked": "¡Logro Desbloqueado!",
+      "upgraded": "¡Logro Mejorado!",
+      "categories": {
+        "gameplay": "Juego",
+        "bosses": "Jefes",
+        "progression": "Progresión",
+        "mastery": "Maestría"
+      },
+      "firstWord": {
+        "name": "Primera Palabra",
+        "desc": "Encuentra tu primera palabra"
+      },
+      "wordStreak5": {
+        "name": "Racha de 5",
+        "desc": "Encuentra 5 palabras seguidas"
+      },
+      "wordStreak10": {
+        "name": "Racha de 10",
+        "desc": "Encuentra 10 palabras seguidas"
+      },
+      "longWord6": {
+        "name": "Palabra Larga",
+        "desc": "Encuentra una palabra de 6+ letras"
+      },
+      "longWord8": {
+        "name": "Palabra Épica",
+        "desc": "Encuentra una palabra de 8+ letras"
+      },
+      "perfectLevel": {
+        "name": "Nivel Perfecto",
+        "desc": "Completa un nivel sin recibir daño"
+      },
+      "bossSlayer": {
+        "name": "Cazajefes",
+        "desc": "Derrota tu primer jefe"
+      },
+      "bossSpeedrun": {
+        "name": "Speedrun de Jefe",
+        "desc": "Derrota un jefe en menos de 60s"
+      },
+      "bossNoDamage": {
+        "name": "Jefe sin Daño",
+        "desc": "Derrota un jefe sin recibir daño"
+      },
+      "allBosses": {
+        "name": "Maestro de Jefes",
+        "desc": "Derrota a todos los jefes"
+      },
+      "worldComplete": {
+        "name": "Mundo Completo",
+        "desc": "Completa todos los niveles de un mundo"
+      },
+      "starCollector50": {
+        "name": "Coleccionista de Estrellas",
+        "desc": "Gana 50 estrellas"
+      },
+      "starCollector100": {
+        "name": "Maestro Estelar",
+        "desc": "Gana 100 estrellas"
+      },
+      "levelMaster": {
+        "name": "Maestro de Niveles",
+        "desc": "Completa 20 niveles"
+      },
+      "skillUnlocked": {
+        "name": "Primera Habilidad",
+        "desc": "Desbloquea tu primera habilidad"
+      },
+      "skillPathComplete": {
+        "name": "Camino Completo",
+        "desc": "Completa una rama de habilidades"
+      },
+      "comboKing": {
+        "name": "Rey del Combo",
+        "desc": "Alcanza un combo de 10x"
+      }
+    },
     "menu": {
       "skills": "Habilidades",
       "achievements": "Logros"
@@ -4354,6 +4594,7 @@ const es = {
     "skills": {
       "title": "Árbol de Habilidades",
       "points": "Puntos de Habilidad",
+      "available": "Puntos Disponibles",
       "paths": {
         "power": "Poder",
         "strategy": "Estrategia",
@@ -4416,7 +4657,40 @@ const es = {
       "advanced_multiplier": {
         "name": "Multiplicador Avanzado",
         "description": "Todos los multiplicadores de puntuación aumentan 10%"
-      }
+      },
+      "powerStrike": {
+        "name": "Golpe Poderoso"
+      },
+      "longWordMastery": {
+        "name": "Maestría de Palabras Largas"
+      },
+      "devastatingBlow": {
+        "name": "Golpe Devastador"
+      },
+      "comboStarter": {
+        "name": "Iniciador de Combos"
+      },
+      "chainReaction": {
+        "name": "Reacción en Cadena"
+      },
+      "comboMaster": {
+        "name": "Maestro del Combo"
+      },
+      "quickCharge": {
+        "name": "Carga Rápida"
+      },
+      "powerUpSlot": {
+        "name": "Espacio para Power-Up"
+      },
+      "hintMaster": {
+        "name": "Maestro de Pistas"
+      },
+      "xpBoost": {
+        "name": "Impulso de XP"
+      },
+      "goldRush": {
+        "name": "Fiebre del Oro"
+      },
     }
   },
   "student": {
@@ -4444,7 +4718,14 @@ const es = {
         "recent": "Recientes",
         "progress": "Progreso"
       },
-      "completed": "Completado"
+      "completed": "Completado",
+      "complete": "Completo"
+    },
+    "activeGame": {
+      "title": "Juego Activo",
+      "teacherStarted": "Tu profesor inició un juego",
+      "joinNow": "Unirse Ahora",
+      "joining": "Uniéndose..."
     },
     "practice": {
       "title": "Modo Práctica",
@@ -4473,10 +4754,17 @@ const es = {
     "accessDenied": "Necesitas permisos de profesor para esta página.",
     "dashboard": {
       "title": "Panel del Profesor",
+      "subtitle": "Gestiona tus aulas, lecciones y progreso de estudiantes",
       "classrooms": "Aulas",
       "lessons": "Lecciones de Vocabulario",
       "students": "Estudiantes",
-      "progress": "Progreso"
+      "progress": "Progreso",
+      "manage": "GESTIONAR",
+      "build": "CREAR",
+      "createLesson": "Crear Nueva Lección",
+      "createLessonDescription": "Crea lecciones de vocabulario y asígnalas a tus aulas",
+      "quickTip": "Consejo Rápido",
+      "quickTipDescription": "¡Inicia un juego de aula para involucrar a los estudiantes con práctica de vocabulario multijugador. Los estudiantes pueden unirse con un código de juego simple!"
     },
     "classroom": {
       "create": "Crear Aula",
@@ -4492,6 +4780,24 @@ const es = {
       "members": "{{count}} estudiantes",
       "member": "1 estudiante",
       "noMembers": "Sin estudiantes aún",
+      "namePlaceholder": "Nombre de la clase",
+      "validation": {
+        "nameRequired": "El nombre es obligatorio"
+      },
+      "success": {
+        "created": "Clase creada exitosamente",
+        "updated": "Clase actualizada",
+        "deleted": "Clase eliminada"
+      },
+      "error": {
+        "createFailed": "No se pudo crear la clase",
+        "updateFailed": "No se pudo actualizar la clase",
+        "deleteFailed": "No se pudo eliminar la clase"
+      },
+      "dialog": {
+        "createDescription": "Crea una nueva clase para tus estudiantes",
+        "editDescription": "Edita los detalles de tu clase"
+      },
       "language": "Idioma",
       "created": "Creado {{date}}",
       "noClassrooms": "Sin aulas aún",
@@ -4584,6 +4890,10 @@ const es = {
       "selectWords": "Selecciona palabras para crear una lección"
     }
   },
+    "progress": {
+      "noProgressYet": "Sin progreso aún",
+      "selectFilters": "Selecciona clase y lección arriba"
+    },
   "education": {
     "landing": {
       "title": "Modo Educativo",
@@ -4729,6 +5039,10 @@ const es = {
       "inactive": "Inactivo",
       "noStudentsYet": "Aún no hay estudiantes en esta aula",
       "joinClassroomPrompt": "Únete a un aula para ver la tabla de clasificación",
+      "ariaLabel": "Tabla de líderes del aula mostrando los mejores estudiantes",
+      "rank": "Lugar",
+      "totalXP": "XP Total",
+      "streak": "Racha",
       "level": "Nv. {level}",
       "xp": "{xp} XP"
     },
@@ -4755,6 +5069,7 @@ const es = {
     },
     "classroomGame": {
       "title": "Juego del Aula",
+      "startGameDescription": "Inicia un juego de vocabulario multijugador para tu aula",
       "shareCode": "Comparte este código con los estudiantes",
       "waitingForPlayers": "Esperando jugadores...",
       "settings": "Configuración del Juego",
@@ -4765,7 +5080,26 @@ const es = {
       "starting": "Iniciando...",
       "lessonNotFound": "Lección No Encontrada",
       "lessonNotFoundDesc": "No se pudo encontrar la lección solicitada.",
-      "backToEducation": "Volver a Educación"
+      "backToEducation": "Volver a Educación",
+      "createGame": "Crear Juego",
+      "createGameDesc": "Selecciona lecciones y clase para iniciar un juego multijugador",
+      "lessons": "Lecciones",
+      "selectLessons": "Seleccionar lecciones",
+      "selectClassroom": "Seleccionar clase",
+      "lessonsSelected": "{{count}} seleccionadas",
+      "noLessonsAvailable": "No hay lecciones disponibles",
+      "multiLessonHelp": "Se combinarán palabras de todas las lecciones",
+      "totalWords": "Total de palabras",
+      "noClassrooms": "Sin clases",
+      "classroomNotFound": "Clase no encontrada",
+      "missingRequirements": "Selecciona al menos una lección y una clase",
+      "gameCreated": "¡Juego creado!",
+      "gameSettings": "Ajustes del Juego",
+      "reviewAndStart": "Revisar e Iniciar",
+      "selectClassroomAndLessons": "Selecciona Clase y Lecciones",
+      "selectClassroomAndLessonsDesc": "Elige una clase y una o más lecciones para practicar",
+      "shareCodeWithStudents": "Comparte este código con los estudiantes",
+      "words": "palabras"
     },
     "onboarding": {
       "step": "Paso",

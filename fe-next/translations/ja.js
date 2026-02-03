@@ -140,6 +140,12 @@ const ja = {
     "bot": "ボット",
     "minutes": "分",
     "seconds": "秒",
+    "days": "日",
+    "step": "ステップ",
+    "of": "/",
+    "finish": "完了",
+    "showAdvanced": "詳細設定を表示",
+    "hideAdvanced": "詳細設定を非表示",
     "advancedSettings": "その他",
     "settings": "設定",
     "tapToDismiss": "タップで閉じる",
@@ -470,7 +476,8 @@ const ja = {
     "networkError": "ネットワークエラー。進捗はローカルに保存されました。",
     "leaderboardFailed": "リーダーボードを読み込めませんでした。更新してね！",
     "resultSubmissionFailed": "結果を保存できませんでした。進捗はローカルに保存されました。",
-    "resetFailed": "サーバーリセットに失敗しました。もう一度お試しください。"
+    "resetFailed": "サーバーリセットに失敗しました。もう一度お試しください。",
+    "loadFailed": "読み込み失敗。もう一度試して！"
   },
   "notFound": {
     "heading": "言葉の迷路で迷子？",
@@ -4704,6 +4711,12 @@ const ja = {
     }
   },
   "student": {
+    "activeGame": {
+      "title": "ゲーム開始！",
+      "teacherStarted": "{{teacher}}がクラスゲームを開始しました",
+      "joinNow": "今すぐ参加",
+      "joining": "参加中..."
+    },
     "dashboard": {
       "title": "マイレッスン",
       "subtitle": "語彙を練習して上達しよう"
@@ -4728,7 +4741,8 @@ const ja = {
         "recent": "新しい順",
         "progress": "進捗順"
       },
-      "completed": "完了"
+      "completed": "完了",
+      "complete": "完了"
     },
     "practice": {
       "title": "練習モード",
@@ -4757,10 +4771,17 @@ const ja = {
     "accessDenied": "このページには教師権限が必要です",
     "dashboard": {
       "title": "教師ダッシュボード",
+      "subtitle": "クラス、レッスン、生徒の進捗を管理する",
       "classrooms": "クラス",
       "lessons": "語彙レッスン",
       "students": "生徒",
-      "progress": "進捗"
+      "progress": "進捗",
+      "manage": "管理",
+      "build": "作成",
+      "createLesson": "新しいレッスンを作成",
+      "createLessonDescription": "語彙レッスンを作成してクラスに割り当てる",
+      "quickTip": "クイックヒント",
+      "quickTipDescription": "クラスルームゲームを開始して、マルチプレイヤーの語彙練習で生徒を引き付けましょう。生徒は簡単なゲームコードで参加できます！"
     },
     "classroom": {
       "create": "クラス作成",
@@ -4919,9 +4940,11 @@ const ja = {
       "nameRequired": "テンプレート名が必要です",
       "timer": "ゲーム時間",
       "difficulty": "ボードサイズ",
+      "boardSize": "ボードサイズ",
       "boardPreview": "ボードは",
       "minWordLength": "最小単語長",
       "allowLateJoin": "途中参加を許可",
+      "lateJoin": "途中参加",
       "allowLateJoinDesc": "ゲーム開始後もプレイヤーが参加可能",
       "setDefault": "デフォルトに設定",
       "setDefaultDesc": "このレッスンのデフォルト設定として使用",
@@ -5036,7 +5059,9 @@ const ja = {
       "classicMode": "クラシックモード",
       "swipeMode": "スワイプモード",
       "autoPronounce": "自動発音",
-      "enrichingContent": "拡張コンテンツを読み込み中..."
+      "enrichingContent": "拡張コンテンツを読み込み中...",
+      "word": "単語",
+      "words": "単語"
     },
     "leaderboard": {
       "title": "クラスリーダーボード",
@@ -5048,7 +5073,10 @@ const ja = {
       "noStudentsYet": "まだこのクラスに生徒がいません",
       "joinClassroomPrompt": "リーダーボードを見るにはクラスに参加してください",
       "level": "レベル{level}",
-      "xp": "{xp} XP"
+      "xp": "{xp} XP",
+      "rank": "順位",
+      "totalXP": "合計XP",
+      "streak": "連続記録"
     },
     "header": {
       "title": "LexiClash",
@@ -5073,18 +5101,49 @@ const ja = {
     },
     "classroomGame": {
       "title": "クラスゲーム",
+      "createGame": "クラスゲームを作成",
+      "createGameDesc": "レッスンとクラスを選んでマルチプレイヤーゲームを開始",
+      "startGameDescription": "クラス用のマルチプレイヤー語彙ゲームを開始する",
       "shareCode": "このコードを生徒と共有してください",
       "waitingForPlayers": "プレイヤーを待っています...",
       "settings": "ゲーム設定",
       "vocabularyWords": "語彙単語",
+      "lessons": "レッスン",
+      "selectLessons": "レッスンを選択",
+      "selectClassroom": "クラスを選択",
+      "lessonsSelected": "{{count}}個選択中",
+      "noLessonsAvailable": "レッスンがありません",
+      "multiLessonHelp": "選択した全レッスンの単語が組み合わされます",
+      "totalWords": "合計単語数",
+      "noClassrooms": "クラスが見つかりません。先にクラスを作成してください。",
+      "classroomNotFound": "クラスが見つかりません",
+      "missingRequirements": "少なくとも1つのレッスンとクラスを選択してください",
+      "gameCreated": "ゲーム作成完了！ロビーに移動中...",
       "playable": "プレイ可能",
       "noPlayableWords": "このレッスンにプレイ可能な単語がありません",
       "startGame": "ゲーム開始",
       "starting": "開始中...",
       "lessonNotFound": "レッスンが見つかりません",
       "lessonNotFoundDesc": "リクエストされたレッスンが見つかりませんでした。",
-      "backToEducation": "教育に戻る"
+      "backToEducation": "教育に戻る",
+      "gameSettings": "ゲーム設定",
+      "reviewAndStart": "確認して開始",
+      "selectClassroomAndLessons": "クラスとレッスンを選択",
+      "selectClassroomAndLessonsDesc": "クラスと1つ以上のレッスンを選んで練習",
+      "shareCodeWithStudents": "コードを生徒と共有",
+      "words": "単語"
     },
+    "lessonWords": {
+      "title": "レッスン語彙",
+      "subtitle": "レッスン単語のパフォーマンス",
+      "found": "見つけた",
+      "total": "合計",
+      "completion": "スコア",
+      "foundList": "見つけた単語",
+      "missedList": "見逃した単語",
+      "perfectScore": "完璧！全単語を見つけました！"
+    },
+    "students": "人の生徒",
     "onboarding": {
       "step": "ステップ",
       "of": "/",

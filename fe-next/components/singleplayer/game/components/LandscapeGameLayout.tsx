@@ -16,7 +16,9 @@ import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { LandscapeTutorialOverlay } from './LandscapeTutorialOverlay';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
+import AchievementDock from '@/components/achievements/AchievementDock';
 import type { LetterGrid, Language } from '@/shared/types/game';
+import type { SinglePlayerAchievement } from '@/utils/singlePlayerAchievements';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
 
@@ -85,6 +87,8 @@ export interface LandscapeGameLayoutProps {
   // Tutorial
   showLandscapeTutorial: boolean;
   onDismissLandscapeTutorial: () => void;
+  // Achievements
+  liveAchievements: SinglePlayerAchievement[];
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -140,6 +144,7 @@ export function LandscapeGameLayout({
   setShowQuitConfirm,
   showLandscapeTutorial,
   onDismissLandscapeTutorial,
+  liveAchievements,
   t,
 }: LandscapeGameLayoutProps): React.ReactElement {
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
@@ -176,6 +181,12 @@ export function LandscapeGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         t={(key) => t(key) || key}
+      />
+
+      {/* Achievement Dock - top right */}
+      <AchievementDock
+        achievements={liveAchievements}
+        className="absolute top-4 right-4 z-50"
       />
 
       {/* Training Progress Bar - compact chip in landscape practice mode */}

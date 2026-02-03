@@ -141,6 +141,12 @@ const he = {
     "bot": "בוט",
     "minutes": "דק׳",
     "seconds": "שניות",
+    "days": "ימים",
+    "step": "שלב",
+    "of": "מתוך",
+    "finish": "סיים",
+    "showAdvanced": "הצג מתקדם",
+    "hideAdvanced": "הסתר מתקדם",
     "advancedSettings": "עוד אפשרויות",
     "settings": "הגדרות",
     "tapToDismiss": "הקש לסגירה",
@@ -470,7 +476,8 @@ const he = {
     "networkError": "שגיאת רשת. ההתקדמות שלך נשמרה מקומית.",
     "leaderboardFailed": "לא הצלחנו לטעון את לוח התוצאות. נסה לרענן!",
     "resultSubmissionFailed": "לא הצלחנו לשמור את התוצאה. ההתקדמות שלך נשמרה מקומית.",
-    "resetFailed": "איפוס השרת נכשל. נסה שוב."
+    "resetFailed": "איפוס השרת נכשל. נסה שוב.",
+    "loadFailed": "הטעינה נכשלה. נסה שוב 🔄"
   },
   "notFound": {
     "heading": "אבדת במבוך המילים?",
@@ -4679,6 +4686,12 @@ const he = {
     }
   },
   "student": {
+    "activeGame": {
+      "title": "משחק מתחיל! 🎮",
+      "teacherStarted": "{{teacher}} פתח משחק כיתתי",
+      "joinNow": "הצטרף עכשיו",
+      "joining": "מצטרף..."
+    },
     "dashboard": {
       "title": "השיעורים שלי",
       "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות"
@@ -4703,7 +4716,8 @@ const he = {
         "recent": "אחרונים",
         "progress": "התקדמות"
       },
-      "completed": "הושלם"
+      "completed": "הושלם",
+      "complete": "הושלם ✅"
     },
     "practice": {
       "title": "מצב תרגול",
@@ -4732,10 +4746,17 @@ const he = {
     "accessDenied": "צריך הרשאות מורה לדף זה.",
     "dashboard": {
       "title": "לוח המורה",
+      "subtitle": "נהל את הכיתות, השיעורים והתקדמות התלמידים שלך",
       "classrooms": "כיתות",
       "lessons": "שיעורי אוצר מילים",
       "students": "תלמידים",
-      "progress": "התקדמות"
+      "progress": "התקדמות",
+      "manage": "נהל",
+      "build": "בנה",
+      "createLesson": "צור שיעור חדש",
+      "createLessonDescription": "בנה שיעורי אוצר מילים והקצה אותם לכיתות שלך",
+      "quickTip": "טיפ מהיר",
+      "quickTipDescription": "התחל משחק כיתתי כדי למשוך את התלמידים עם תרגול אוצר מילים רב משתתפים. התלמידים יכולים להצטרף עם קוד משחק פשוט!"
     },
     "classroom": {
       "create": "צור כיתה",
@@ -4894,9 +4915,11 @@ const he = {
       "nameRequired": "שם התבנית נדרש",
       "timer": "משך המשחק",
       "difficulty": "גודל הלוח",
+      "boardSize": "גודל לוח",
       "boardPreview": "הלוח יהיה",
       "minWordLength": "אורך מילה מינימלי",
       "allowLateJoin": "אפשר הצטרפות מאוחרת",
+      "lateJoin": "הצטרפות מאוחרת",
       "allowLateJoinDesc": "שחקנים יכולים להצטרף אחרי תחילת המשחק",
       "setDefault": "הגדר כברירת מחדל",
       "setDefaultDesc": "השתמש בהגדרות אלה כברירת מחדל לשיעור זה",
@@ -5011,7 +5034,9 @@ const he = {
       "classicMode": "מצב קלאסי",
       "swipeMode": "מצב החלקה",
       "autoPronounce": "הגייה אוטומטית",
-      "enrichingContent": "טוען תוכן מועשר..."
+      "enrichingContent": "טוען תוכן מועשר...",
+      "word": "מילה",
+      "words": "מילים"
     },
     "leaderboard": {
       "title": "לוח מובילים כיתתי",
@@ -5023,7 +5048,10 @@ const he = {
       "noStudentsYet": "עדיין אין תלמידים בכיתה",
       "joinClassroomPrompt": "הצטרף לכיתה כדי לראות את לוח המובילים",
       "level": "רמה {level}",
-      "xp": "{xp} נקודות ניסיון"
+      "xp": "{xp} נקודות ניסיון",
+      "rank": "דירוג",
+      "totalXP": "סה״כ XP",
+      "streak": "רצף ימים"
     },
     "header": {
       "title": "LexiClash",
@@ -5048,18 +5076,49 @@ const he = {
     },
     "classroomGame": {
       "title": "משחק כיתתי",
+      "createGame": "יצירת משחק כיתתי",
+      "createGameDesc": "בחרו שיעורים וכיתה להתחלת משחק",
+      "startGameDescription": "הפעל משחק אוצר מילים רב משתתפים עבור הכיתה שלך",
       "shareCode": "שתף קוד זה עם התלמידים",
       "waitingForPlayers": "ממתין לשחקנים...",
       "settings": "הגדרות משחק",
       "vocabularyWords": "מילות אוצר",
+      "lessons": "שיעורים",
+      "selectLessons": "בחירת שיעורים",
+      "selectClassroom": "בחירת כיתה",
+      "lessonsSelected": "נבחרו {{count}}",
+      "noLessonsAvailable": "אין שיעורים זמינים",
+      "multiLessonHelp": "מילים מכל השיעורים ישולבו",
+      "totalWords": "סה״כ מילים",
+      "noClassrooms": "לא נמצאו כיתות. צרו כיתה תחילה",
+      "classroomNotFound": "הכיתה לא נמצאה",
+      "missingRequirements": "בחרו לפחות שיעור אחד וכיתה",
+      "gameCreated": "המשחק נוצר! מעבר ללובי...",
       "playable": "ניתנות למשחק",
       "noPlayableWords": "אין מילים ניתנות למשחק בשיעור זה",
       "startGame": "התחל משחק",
       "starting": "מתחיל...",
       "lessonNotFound": "השיעור לא נמצא",
       "lessonNotFoundDesc": "השיעור המבוקש לא נמצא.",
-      "backToEducation": "חזרה לחינוך"
+      "backToEducation": "חזרה לחינוך",
+      "gameSettings": "הגדרות משחק",
+      "reviewAndStart": "סקירה והתחלה",
+      "selectClassroomAndLessons": "בחירת כיתה ושיעורים",
+      "selectClassroomAndLessonsDesc": "בחרו כיתה ושיעור אחד או יותר לתרגול",
+      "shareCodeWithStudents": "שיתוף קוד עם תלמידים",
+      "words": "מילים"
     },
+    "lessonWords": {
+      "title": "אוצר מילים שיעורי",
+      "subtitle": "הביצועים שלך במילות השיעור",
+      "found": "נמצאו",
+      "total": "סה״כ",
+      "completion": "ניקוד",
+      "foundList": "מילים שמצאת",
+      "missedList": "מילים שפספסת",
+      "perfectScore": "מושלם! מצאת את כל המילים! 🎉"
+    },
+    "students": "תלמידים",
     "onboarding": {
       "step": "שלב",
       "of": "מתוך",

@@ -15,15 +15,16 @@ export const REGION_MAP: Record<string, string> = {
 };
 
 /**
- * Minimum answer length by language
- * Japanese kanji compounds are typically 2-4 characters
+ * Minimum answer length by language for Daily Challenge word hunt
+ * Most languages: 4 letters minimum for adequate challenge difficulty
+ * Japanese kanji compounds: 2 characters minimum (kanji are complex)
  */
 export const MIN_ANSWER_LENGTH: Record<string, number> = {
-  en: 3,
-  he: 3,
-  sv: 3,
+  en: 4,
+  he: 4,
+  sv: 4,
   ja: 2,
-  es: 3,
+  es: 4,
 };
 
 /**

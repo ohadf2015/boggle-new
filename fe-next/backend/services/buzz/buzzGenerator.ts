@@ -125,12 +125,14 @@ export async function generateDailyBuzz(
     if (!trends || trends.length === 0) {
       console.log('[BUZZ] No cached trends, fetching fresh from SERP API...');
       try {
-        trends = await fetchGoogleTrends(region, language);
+        // Enrich trends with news articles for better context (only for top 5 trends to save API quota)
+        const enrichWithNews = true;
+        trends = await fetchGoogleTrends(region, language, enrichWithNews);
         if (!trends || trends.length === 0) {
           console.warn('[BUZZ] No trends returned from SERP API, will use fallback topics');
           trends = getFallbackTopics(language);
         } else {
-          console.log(`[BUZZ] Fetched ${trends.length} fresh trends from SERP API`);
+          console.log(`[BUZZ] Fetched ${trends.length} fresh trends from SERP API${enrichWithNews ? ' (enriched with news)' : ''}`);
           // Store in DB cache for future use (fire and forget)
           storeTrendsInDbCache(region, date, trends, 0).catch(err =>
             console.error('[BUZZ] Failed to store trends in DB cache:', err)

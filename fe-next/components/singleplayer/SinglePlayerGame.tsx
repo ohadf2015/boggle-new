@@ -86,6 +86,7 @@ function SinglePlayerGame({
       onConfirmQuit: core.onQuit,
       showQuitConfirm: core.showQuitConfirm,
       setShowQuitConfirm: core.setShowQuitConfirm,
+      liveAchievements: core.liveAchievements,
       t: core.t,
     };
   }, [
@@ -131,6 +132,7 @@ function SinglePlayerGame({
     core.onQuit,
     core.showQuitConfirm,
     core.setShowQuitConfirm,
+    core.liveAchievements,
     core.t,
   ]);
 

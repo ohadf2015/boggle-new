@@ -321,9 +321,14 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
   }, [width, primaryColor, secondaryColor]);
 
   // Resolve image path
-  const imageSrc = bossImagePath.startsWith('/')
-    ? staticFile(bossImagePath.slice(1))
-    : staticFile(bossImagePath);
+  // Resolve image path for Remotion Player
+  // For client-side rendering, use the direct path (Remotion Player handles public folder)
+  // For server-side rendering (video export), use staticFile()
+  const imageSrc = typeof window !== 'undefined'
+    ? bossImagePath // Client-side: use direct path
+    : (bossImagePath.startsWith('/')
+        ? staticFile(bossImagePath.slice(1))
+        : staticFile(bossImagePath));
 
   // Calculate stagger shake offset
   const shakeX = staggerShake * Math.sin(frame * 2) * 15;

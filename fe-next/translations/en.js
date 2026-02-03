@@ -143,6 +143,12 @@ const en = {
     "bot": "Bot",
     "minutes": "min",
     "seconds": "seconds",
+    "days": "days",
+    "step": "Step",
+    "of": "of",
+    "finish": "Finish",
+    "showAdvanced": "Show Advanced",
+    "hideAdvanced": "Hide Advanced",
     "advancedSettings": "More Options",
     "settings": "Settings",
     "tapToDismiss": "Tap to close",
@@ -4705,7 +4711,8 @@ const en = {
         "recent": "Recent",
         "progress": "Progress"
       },
-      "completed": "Completed"
+      "completed": "Completed",
+      "complete": "Complete"
     },
     "practice": {
       "title": "Practice Mode",
@@ -4734,10 +4741,17 @@ const en = {
     "accessDenied": "You need teacher privileges to access this page.",
     "dashboard": {
       "title": "Teacher Dashboard",
+      "subtitle": "Manage your classrooms, lessons, and student progress",
       "classrooms": "Classrooms",
       "lessons": "Vocabulary Lessons",
       "students": "Students",
-      "progress": "Progress"
+      "progress": "Progress",
+      "manage": "MANAGE",
+      "build": "BUILD",
+      "createLesson": "Create New Lesson",
+      "createLessonDescription": "Build vocabulary lessons and assign them to your classrooms",
+      "quickTip": "Quick Tip",
+      "quickTipDescription": "Start a classroom game to engage students with multiplayer vocabulary practice. Students can join with a simple game code!"
     },
     "classroom": {
       "create": "Create Classroom",
@@ -4912,9 +4926,11 @@ const en = {
       "nameRequired": "Template name is required",
       "timer": "Game Duration",
       "difficulty": "Board Size",
+      "boardSize": "Board Size",
       "boardPreview": "Board will be",
       "minWordLength": "Minimum Word Length",
       "allowLateJoin": "Allow Late Join",
+      "lateJoin": "Late Join",
       "allowLateJoinDesc": "Players can join after game starts",
       "setDefault": "Set as Default",
       "setDefaultDesc": "Use these settings by default for this lesson",
@@ -5043,7 +5059,10 @@ const en = {
       "noStudentsYet": "No students in this classroom yet",
       "joinClassroomPrompt": "Join a classroom to see the leaderboard",
       "level": "Lv. {level}",
-      "xp": "{xp} XP"
+      "xp": "{xp} XP",
+      "rank": "Rank",
+      "totalXP": "Total XP",
+      "streak": "Streak"
     },
     "header": {
       "title": "LexiClash",
@@ -5070,6 +5089,7 @@ const en = {
       "title": "Classroom Game",
       "createGame": "Create Classroom Game",
       "createGameDesc": "Select lessons and classroom to start a multiplayer game",
+      "startGameDescription": "Launch a multiplayer vocabulary game for your classroom",
       "shareCode": "Share this code with students",
       "waitingForPlayers": "Waiting for players...",
       "settings": "Game Settings",
@@ -5091,7 +5111,13 @@ const en = {
       "starting": "Starting...",
       "lessonNotFound": "Lesson Not Found",
       "lessonNotFoundDesc": "The requested lesson could not be found.",
-      "backToEducation": "Back to Education"
+      "backToEducation": "Back to Education",
+      "gameSettings": "Game Settings",
+      "reviewAndStart": "Review and Start",
+      "selectClassroomAndLessons": "Select Classroom and Lessons",
+      "selectClassroomAndLessonsDesc": "Choose a classroom and one or more lessons to practice",
+      "shareCodeWithStudents": "Share Code with Students",
+      "words": "Words"
     },
     "lessonWords": {
       "title": "Lesson Vocabulary",

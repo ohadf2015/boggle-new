@@ -26,7 +26,13 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
-import { calculateFinalAchievements, type WordData as AchievementWordData } from '@/utils/singlePlayerAchievements';
+import {
+  calculateFinalAchievements,
+  checkLiveAchievements,
+  createAchievementState,
+  type WordData as AchievementWordData,
+  type SinglePlayerAchievement,
+} from '@/utils/singlePlayerAchievements';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 import { useBotSimulation } from './useBotSimulation';
@@ -99,6 +105,10 @@ export function useSinglePlayerCore({
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
   const [progressBarExpanded, setProgressBarExpanded] = useState(false);
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
+
+  // Achievement state
+  const [liveAchievements, setLiveAchievements] = useState<SinglePlayerAchievement[]>([]);
+  const achievementStateRef = useRef(createAchievementState());
 
   // Reveal word state
   const [revealState, setRevealState] = useState<{
@@ -405,6 +415,32 @@ export function useSinglePlayerCore({
           });
           announceWordResult(normalizedWord, true, fullScore);
           announceCombo(currentCombo + 1);
+
+          // Check for live achievements
+          const validatedWords = foundWordsRef.current
+            .filter(fw => fw.isValid === true)
+            .map(fw => ({
+              word: fw.word,
+              score: fw.score,
+              timestamp: fw.timestamp,
+              timeSinceStart: fw.timeSinceStart,
+              isValid: true,
+              comboBonus: fw.comboBonus,
+            }));
+
+          const newAchievements = checkLiveAchievements(
+            achievementStateRef.current,
+            validatedWords,
+            normalizedWord,
+            true,
+            timeSinceStart,
+            currentCombo + 1,
+            settings.timerSeconds
+          );
+
+          if (newAchievements.length > 0) {
+            setLiveAchievements(prev => [...prev, ...newAchievements]);
+          }
         } else {
           combo.resetCombo();
           setCurrentFeedback({ id: `pending-${now}`, type: 'pending', word: normalizedWord.toUpperCase(), timestamp: now });
@@ -414,7 +450,7 @@ export function useSinglePlayerCore({
         combo.resetCombo();
         setCurrentFeedback({ id: `pending-${Date.now()}`, type: 'pending', word: normalizedWord.toUpperCase(), timestamp: Date.now() });
       });
-  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission]);
+  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission]);
 
   // Keyboard input
   const keyboardInput = useKeyboardWordInput({
@@ -836,6 +872,8 @@ export function useSinglePlayerCore({
     // Computed
     totalBoardWords,
     targetHighScore,
+    // Achievements
+    liveAchievements,
     // Refs
     lastWordFoundTimeRef,
     gameStatsRef,

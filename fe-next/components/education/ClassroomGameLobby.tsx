@@ -1,14 +1,26 @@
+/**
+ * ClassroomGameLobby - Wizard Version
+ *
+ * Simplified 2-step wizard for creating classroom games:
+ * Step 1: Select classroom & lessons
+ * Step 2: Review, share code, and start
+ *
+ * Features:
+ * - Streamlined flow (2 steps instead of 5 cards)
+ * - Smart defaults for settings
+ * - Collapsed advanced options
+ * - Clear progress indication
+ */
+
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Play, Users, Clock, BookOpen, ArrowLeft, Copy, Check, Settings, School } from 'lucide-react';
+import { Play, Users, Copy, Check, BookOpen, School, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { WizardStep } from '@/components/ui/WizardStep';
 import { MultiLessonSelector } from './MultiLessonSelector';
 import { getLessons, getClassrooms, type VocabularyLesson, type Classroom } from '@/lib/supabase/teacher';
 import toast from 'react-hot-toast';
@@ -21,22 +33,16 @@ export interface ClassroomGameLobbyProps {
   onBack: () => void;
 }
 
-/**
- * ClassroomGameLobby - Education-specific game lobby (v2)
- *
- * Creates classroom-scoped multiplayer games with:
- * - Multi-lesson selection
- * - Teacher-only access
- * - Classroom selection
- * - Socket.IO integration for real-time notifications
- */
 export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLobbyProps) {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
   const isRTL = language === 'he';
 
-  // State
+  // Wizard state
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // Data state
   const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>(
@@ -48,16 +54,16 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Game settings state
+  // Game settings with smart defaults
   const [settings, setSettings] = useState({
     timerMinutes: 3,
     boardSize: 'medium' as 'small' | 'medium' | 'large',
     allowLateJoin: true,
   });
 
-  // Teacher validation - redirect if not a teacher
-  // Fetch teacher's lessons and classrooms
+  // Fetch teacher data
   const fetchTeacherData = useCallback(async () => {
     if (!user) return;
 
@@ -74,7 +80,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
 
       if (classroomsResult.data) {
         setClassrooms(classroomsResult.data);
-        // Auto-select first classroom if available
+        // Auto-select first classroom
         if (classroomsResult.data.length > 0 && !selectedClassroomId) {
           setSelectedClassroomId(classroomsResult.data[0].id);
         }
@@ -92,13 +98,10 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       router.push(`/${language}/education`);
       return;
     }
-
-    // Check if user is a teacher (has created classrooms or lessons)
-    // For now, we'll allow any authenticated user and fetch their data
     fetchTeacherData();
   }, [user, language, router, fetchTeacherData]);
 
-  // Initialize Socket.IO connection
+  // Initialize Socket.IO
   useEffect(() => {
     const socketInstance = io({
       path: '/api/socket',
@@ -111,7 +114,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
       if (data.success) {
         toast.success(t('education.classroomGame.gameCreated'));
-        // Navigate to multiplayer game
+        // Navigate to multiplayer (only time we leave education section)
         router.push(`/${language}/multiplayer?fromLesson=true&classroom=true&code=${data.gameCode}`);
       }
     });
@@ -128,7 +131,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     };
   }, [t, language, router]);
 
-  // Generate a random game code on mount
+  // Generate game code on mount
   useEffect(() => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
@@ -143,16 +146,15 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     return lessons.filter((l) => selectedLessonIds.includes(l.id));
   }, [lessons, selectedLessonIds]);
 
-  // Get all playable words from selected lessons
+  // Get all playable words
   const allPlayableWords = useMemo(() => {
     const words = selectedLessons.flatMap((lesson) =>
       lesson.words?.filter((w) => w.canIntegrate).map((w) => w.word) || []
     );
-    // Remove duplicates
     return [...new Set(words)];
   }, [selectedLessons]);
 
-  // Copy game code to clipboard
+  // Copy game code
   const handleCopyCode = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(gameCode);
@@ -164,7 +166,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     }
   }, [gameCode, t]);
 
-  // Start the game - create classroom game via Socket.IO
+  // Start the game
   const handleStartGame = useCallback(() => {
     if (!user || !socket || selectedLessonIds.length === 0 || !selectedClassroomId) {
       toast.error(t('education.classroomGame.missingRequirements'));
@@ -180,7 +182,6 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       return;
     }
 
-    // Create classroom game via Socket.IO
     socket.emit('createClassroomGame', {
       gameCode,
       classroomId: selectedClassroomId,
@@ -209,7 +210,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     t,
   ]);
 
-  // Get board size label
+  // Board size labels
   const getBoardSizeLabel = (size: string) => {
     switch (size) {
       case 'small':
@@ -223,254 +224,272 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     }
   };
 
+  // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-12" role="progressbar">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan"></div>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-neo-display text-neo-white mb-2">
-            {t('education.classroomGame.createGame')}
-          </h1>
-          <p className="text-neo-white/70 font-neo-body">
-            {t('education.classroomGame.createGameDesc')}
-          </p>
-        </div>
-
-        <Button
+  // No classrooms error
+  if (classrooms.length === 0) {
+    return (
+      <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
+        <p className="text-neo-white/70 font-neo-body mb-4">
+          {t('education.classroomGame.noClassrooms')}
+        </p>
+        <button
           onClick={onBack}
-          variant="outline"
           className={cn(
-            'border-neo border-neo-black shadow-hard',
-            'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
-            'transition-all'
+            'px-6 py-3 font-bold',
+            'bg-neo-cyan text-neo-black',
+            'border-neo border-neo-black rounded-neo shadow-hard',
+            'hover:shadow-hard-lg transition-all'
           )}
         >
-          <ArrowLeft className={cn('w-4 h-4', isRTL ? 'ml-2 rotate-180' : 'mr-2')} />
           {t('common.back')}
-        </Button>
+        </button>
       </div>
+    );
+  }
 
-      {/* Classroom Selector */}
-      <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-neo-white font-neo-display">
-            <School className="w-5 h-5 text-neo-cyan" />
-            {t('education.classroomGame.selectClassroom')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {classrooms.length > 0 ? (
-            <select
-              value={selectedClassroomId}
-              onChange={(e) => setSelectedClassroomId(e.target.value)}
-              className={cn(
-                'w-full px-4 py-3 bg-neo-navy border-neo border-neo-black',
-                'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
-                'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
-              )}
-            >
+  // Step 1: Select Classroom & Lessons
+  if (currentStep === 1) {
+    return (
+      <WizardStep
+        currentStep={1}
+        totalSteps={2}
+        title={t('education.classroomGame.selectClassroomAndLessons')}
+        description={t('education.classroomGame.selectClassroomAndLessonsDesc')}
+        onNext={() => setCurrentStep(2)}
+        onBack={onBack}
+        nextDisabled={selectedLessonIds.length === 0}
+      >
+        <div className="space-y-6">
+          {/* Classroom Selection */}
+          <div>
+            <label className="block text-neo-white font-bold mb-3">
+              <School className="w-5 h-5 inline mr-2 text-neo-cyan" />
+              {t('education.classroomGame.selectClassroom')}
+            </label>
+            <div className="space-y-2">
               {classrooms.map((classroom) => (
-                <option key={classroom.id} value={classroom.id}>
-                  {classroom.name} ({classroom.member_count || 0} {t('education.students')})
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p className="text-neo-white/60 py-4 text-center">
-              {t('education.classroomGame.noClassrooms')}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Multi-Lesson Selector */}
-      <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-neo-white font-neo-display">
-            <BookOpen className="w-5 h-5 text-neo-pink inline-block mr-2" />
-            {t('education.classroomGame.lessons')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MultiLessonSelector
-            lessons={lessons}
-            selectedLessonIds={selectedLessonIds}
-            onSelectChange={setSelectedLessonIds}
-          />
-
-          {/* Word count summary */}
-          {selectedLessonIds.length > 0 && (
-            <div className="mt-4 p-3 bg-neo-navy rounded-neo border border-neo-pink/30">
-              <p className="text-neo-white font-bold">
-                {t('education.classroomGame.totalWords')}: {allPlayableWords.length}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Game Code Card */}
-      <Card className="border-neo border-neo-cyan shadow-hard-lg bg-gradient-to-br from-neo-cyan/20 to-neo-cyan/10">
-        <CardContent className="py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-center sm:text-start">
-              <p className="text-sm text-neo-white/70 font-neo-body mb-1">
-                {t('education.classroomGame.shareCode')}
-              </p>
-              <div className="flex items-center gap-3">
-                <span className="text-4xl sm:text-5xl font-black text-neo-cyan tracking-widest font-mono">
-                  {gameCode}
-                </span>
-                <button
-                  onClick={handleCopyCode}
+                <label
+                  key={classroom.id}
                   className={cn(
-                    'p-3 rounded-neo border-neo border-neo-black',
-                    'bg-neo-cream text-neo-black',
-                    'shadow-hard hover:shadow-hard-lg',
-                    'transition-all',
-                    copied && 'bg-neo-lime'
+                    'flex items-center p-4 rounded-neo border-neo border-neo-black',
+                    'cursor-pointer transition-all',
+                    selectedClassroomId === classroom.id
+                      ? 'bg-neo-cyan/20 shadow-hard'
+                      : 'bg-neo-navy/50 hover:bg-neo-navy'
                   )}
-                  aria-label={t('share.copy')}
                 >
-                  {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                </button>
+                  <input
+                    type="radio"
+                    name="classroom"
+                    value={classroom.id}
+                    checked={selectedClassroomId === classroom.id}
+                    onChange={() => setSelectedClassroomId(classroom.id)}
+                    className="w-5 h-5 text-neo-cyan focus:ring-neo-cyan"
+                    aria-label={`Class ${classroom.name}`}
+                  />
+                  <span className="ml-3 text-neo-white font-bold flex-1">
+                    {classroom.name}
+                  </span>
+                  <span className="text-neo-white/70 text-sm">
+                    {classroom.member_count || 0} {t('education.students')}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Lesson Selection */}
+          <div>
+            <label className="block text-neo-white font-bold mb-3">
+              <BookOpen className="w-5 h-5 inline mr-2 text-neo-pink" />
+              {t('education.classroomGame.selectLessons')}
+            </label>
+            <MultiLessonSelector
+              lessons={lessons}
+              selectedLessonIds={selectedLessonIds}
+              onSelectChange={setSelectedLessonIds}
+            />
+
+            {/* Word count */}
+            {selectedLessonIds.length > 0 && (
+              <div className="mt-4 p-3 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30">
+                <p className="text-neo-white font-bold text-center">
+                  {allPlayableWords.length} {t('education.classroomGame.words')}
+                </p>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 px-4 py-2 rounded-neo border-neo border-neo-black bg-neo-navy/50">
-              <Users className="w-5 h-5 text-neo-cyan" />
-              <span className="text-neo-white font-bold">
-                {t('education.classroomGame.waitingForPlayers')}
-              </span>
-            </div>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </WizardStep>
+    );
+  }
 
-      {/* Game Settings */}
-      <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-neo-white font-neo-display">
-            <Settings className="w-5 h-5 text-neo-cyan" />
-            {t('education.classroomGame.settings')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Timer Setting */}
-          <div>
-            <label className="block text-sm text-neo-white/70 mb-2">
-              {t('education.template.timer')}
-            </label>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-neo-cyan" />
-              <select
-                value={settings.timerMinutes}
-                onChange={(e) => setSettings({ ...settings, timerMinutes: Number(e.target.value) })}
-                className={cn(
-                  'flex-1 px-4 py-2 bg-neo-navy border-neo border-neo-black',
-                  'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
-                )}
-              >
-                <option value={2}>2 {t('common.minutes')}</option>
-                <option value={3}>3 {t('common.minutes')}</option>
-                <option value={5}>5 {t('common.minutes')}</option>
-                <option value={10}>10 {t('common.minutes')}</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Board Size Setting */}
-          <div>
-            <label className="block text-sm text-neo-white/70 mb-2">
-              {t('education.template.difficulty')}
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {(['small', 'medium', 'large'] as const).map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSettings({ ...settings, boardSize: size })}
-                  className={cn(
-                    'px-4 py-2 font-bold rounded-neo border-neo border-neo-black transition-all',
-                    settings.boardSize === size
-                      ? 'bg-neo-cyan text-neo-black shadow-hard'
-                      : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
-                  )}
-                >
-                  {getBoardSizeLabel(size)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Late Join Toggle */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-neo-white font-bold">
-                {t('education.template.allowLateJoin')}
-              </p>
-              <p className="text-xs text-neo-white/50">
-                {t('education.template.allowLateJoinDesc')}
-              </p>
-            </div>
+  // Step 2: Review & Start
+  return (
+    <WizardStep
+      currentStep={2}
+      totalSteps={2}
+      title={t('education.classroomGame.reviewAndStart')}
+      description={t('education.classroomGame.shareCodeWithStudents')}
+      onNext={handleStartGame}
+      onBack={() => setCurrentStep(1)}
+      nextLabel={t('education.classroomGame.startGame')}
+      isLoading={isStarting}
+    >
+      <div className="space-y-6">
+        {/* Game Code */}
+        <div className="p-6 rounded-neo border-neo border-neo-cyan bg-gradient-to-br from-neo-cyan/20 to-neo-cyan/10 shadow-hard-lg">
+          <p className="text-sm text-neo-white/70 font-neo-body mb-2 text-center">
+            {t('education.classroomGame.shareCode')}
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <span className="text-5xl font-black text-neo-cyan tracking-widest font-mono">
+              {gameCode}
+            </span>
             <button
-              onClick={() => setSettings({ ...settings, allowLateJoin: !settings.allowLateJoin })}
+              onClick={handleCopyCode}
               className={cn(
-                'relative w-14 h-8 rounded-full border-neo border-neo-black transition-colors',
-                settings.allowLateJoin ? 'bg-neo-cyan' : 'bg-neo-navy/50'
+                'p-3 rounded-neo border-neo border-neo-black',
+                'bg-neo-cream text-neo-black',
+                'shadow-hard hover:shadow-hard-lg',
+                'transition-all',
+                copied && 'bg-neo-lime'
               )}
-              role="switch"
-              aria-checked={settings.allowLateJoin}
+              aria-label={t('share.copy')}
             >
-              <motion.div
-                className="absolute top-1 w-6 h-6 rounded-full bg-neo-white border-2 border-neo-black shadow-hard-sm"
-                animate={{ left: settings.allowLateJoin ? '28px' : '4px' }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-              />
+              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
             </button>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex items-center justify-center gap-2 mt-4 px-4 py-2 rounded-neo border-neo border-neo-black bg-neo-navy/50">
+            <Users className="w-5 h-5 text-neo-cyan" />
+            <span className="text-neo-white font-bold text-sm">
+              {t('education.classroomGame.waitingForPlayers')}
+            </span>
+          </div>
+        </div>
 
-      {/* Start Game Button */}
-      <div className="flex justify-center pt-4">
-        <Button
-          onClick={handleStartGame}
-          disabled={isStarting || selectedLessonIds.length === 0 || !selectedClassroomId || classrooms.length === 0}
-          size="lg"
-          className={cn(
-            'px-12 py-6 text-xl font-black',
-            'bg-neo-lime text-neo-black',
-            'border-neo-thick border-neo-black rounded-neo shadow-hard-lg',
-            'hover:shadow-hard-xl hover:translate-y-[-2px]',
-            'active:shadow-hard active:translate-y-0',
-            'transition-all duration-150',
-            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0'
+        {/* Smart Defaults Summary */}
+        <div className="p-4 rounded-neo border-neo border-neo-black bg-neo-navy/50">
+          <h4 className="text-neo-white font-bold mb-3">
+            {t('education.classroomGame.gameSettings')}
+          </h4>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div>
+              <p className="text-neo-white/50 text-xs mb-1">{t('education.template.timer')}</p>
+              <p className="text-neo-white font-bold">{settings.timerMinutes} {t('common.minutes')}</p>
+            </div>
+            <div>
+              <p className="text-neo-white/50 text-xs mb-1">{t('education.template.boardSize')}</p>
+              <p className="text-neo-white font-bold">{getBoardSizeLabel(settings.boardSize)}</p>
+            </div>
+            <div>
+              <p className="text-neo-white/50 text-xs mb-1">{t('education.template.lateJoin')}</p>
+              <p className="text-neo-white font-bold">{settings.allowLateJoin ? '✓' : '✗'}</p>
+            </div>
+          </div>
+
+          {/* Advanced Settings Toggle */}
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className={cn(
+              'w-full mt-4 px-4 py-2 rounded-neo',
+              'border-neo border-neo-black bg-neo-navy/30',
+              'text-neo-white font-bold text-sm',
+              'hover:bg-neo-navy transition-all',
+              'flex items-center justify-center gap-2'
+            )}
+          >
+            {showAdvanced ? (
+              <>
+                <ChevronUp className="w-4 h-4" />
+                {t('common.hideAdvanced')}
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" />
+                {t('common.showAdvanced')}
+              </>
+            )}
+          </button>
+
+          {/* Advanced Settings (Collapsed) */}
+          {showAdvanced && (
+            <div className="mt-4 space-y-4 pt-4 border-t border-neo-white/10">
+              {/* Timer */}
+              <div>
+                <label className="block text-sm text-neo-white/70 mb-2">
+                  {t('education.template.timer')}
+                </label>
+                <select
+                  value={settings.timerMinutes}
+                  onChange={(e) => setSettings({ ...settings, timerMinutes: Number(e.target.value) })}
+                  className={cn(
+                    'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
+                    'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
+                    'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                  )}
+                  role="combobox"
+                >
+                  <option value={2}>2 {t('common.minutes')}</option>
+                  <option value={3}>3 {t('common.minutes')}</option>
+                  <option value={5}>5 {t('common.minutes')}</option>
+                  <option value={10}>10 {t('common.minutes')}</option>
+                </select>
+              </div>
+
+              {/* Board Size */}
+              <div>
+                <label className="block text-sm text-neo-white/70 mb-2">
+                  {t('education.template.difficulty')}
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['small', 'medium', 'large'] as const).map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSettings({ ...settings, boardSize: size })}
+                      className={cn(
+                        'px-4 py-2 font-bold rounded-neo border-neo border-neo-black transition-all',
+                        settings.boardSize === size
+                          ? 'bg-neo-cyan text-neo-black shadow-hard'
+                          : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                      )}
+                    >
+                      {getBoardSizeLabel(size)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Late Join */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-neo-white font-bold text-sm">
+                    {t('education.template.allowLateJoin')}
+                  </p>
+                  <p className="text-xs text-neo-white/50">
+                    {t('education.template.allowLateJoinDesc')}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.allowLateJoin}
+                  onChange={(e) => setSettings({ ...settings, allowLateJoin: e.target.checked })}
+                  className="w-6 h-6 text-neo-cyan focus:ring-neo-cyan rounded"
+                  role="slider"
+                />
+              </div>
+            </div>
           )}
-        >
-          {isStarting ? (
-            <>
-              <span className="animate-spin mr-2">
-                <Play className="w-6 h-6" />
-              </span>
-              {t('education.classroomGame.starting')}
-            </>
-          ) : (
-            <>
-              <Play className={cn('w-6 h-6', isRTL ? 'ml-3' : 'mr-3')} />
-              {t('education.classroomGame.startGame')}
-            </>
-          )}
-        </Button>
+        </div>
       </div>
-    </div>
+    </WizardStep>
   );
 }

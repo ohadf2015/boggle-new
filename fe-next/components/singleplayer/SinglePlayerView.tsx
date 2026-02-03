@@ -4,8 +4,6 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
-import PresetSelector from './PresetSelector';
-import SinglePlayerLobby from './SinglePlayerLobby';
 import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
 import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManager';
@@ -20,7 +18,7 @@ import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game'
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
-export type SinglePlayerPhase = 'preset-selection' | 'lobby' | 'playing' | 'results';
+export type SinglePlayerPhase = 'playing' | 'results';
 
 export interface BotOpponent {
   id: string;
@@ -118,7 +116,7 @@ const SinglePlayerView: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
+  const [phase, setPhase] = useState<SinglePlayerPhase>('playing');
   const setIsInGame = useHideNavigation();
 
   // Show feature unlock notifications when user reaches milestones
@@ -175,7 +173,7 @@ const SinglePlayerView: React.FC = () => {
 
   // Map SinglePlayerPhase to GamePhase for the music hook
   // 'playing' phase music is handled by SinglePlayerGame component
-  const musicPhase: GamePhase = phase === 'playing' ? 'waiting' : (phase === 'preset-selection' ? 'lobby' : phase);
+  const musicPhase: GamePhase = phase === 'playing' ? 'waiting' : phase;
 
   // Use shared music hook for lobby and results phases
   // Playing phase is handled by SinglePlayerGame for timer-based transitions
@@ -213,7 +211,7 @@ const SinglePlayerView: React.FC = () => {
   // Auto-start practice mode when coming from onboarding (autoStart=practice)
   useEffect(() => {
     // Only run once - prevents infinite loop when uiLanguage changes during hydration
-    if (autoStart === 'practice' && phase === 'preset-selection' && !hasAutoStartedRef.current) {
+    if (autoStart === 'practice' && !hasAutoStartedRef.current) {
       hasAutoStartedRef.current = true;
       // Get the default practice preset (explorer - EASY, no timer, no bots)
       const practicePreset = getDefaultPreset('practice');
@@ -229,6 +227,35 @@ const SinglePlayerView: React.FC = () => {
           grid: null,
           minWordLength,
         }));
+        setPhase('playing');
+      }
+    }
+  }, [autoStart, phase, uiLanguage]);
+
+  // Auto-start bot game when autoStart=bots (direct from landing page)
+  useEffect(() => {
+    if (autoStart === 'bots' && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
+      // Get the default solo-bots preset (MEDIUM difficulty, 2 medium bots, 120s timer)
+      const botsPreset = getDefaultPreset('solo-bots');
+
+      if (botsPreset) {
+        const bots = generateBotsForPreset(
+          botsPreset.settings.bots,
+          botsPreset.settings.botDifficulty
+        );
+
+        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        setGameState({
+          mode: 'solo-bots',
+          difficulty: botsPreset.settings.difficulty,
+          timerSeconds: botsPreset.settings.timerSeconds,
+          bots,
+          language: uiLanguage as Language,
+          grid: null,
+          minWordLength,
+        });
+
         setPhase('playing');
       }
     }
@@ -361,22 +388,6 @@ const SinglePlayerView: React.FC = () => {
     setPhase('playing');
   }, [uiLanguage, generateBots, unlockAudio]);
 
-  // Handle custom game - go to detailed lobby
-  const handleCustomGame = useCallback(() => {
-    setPhase('lobby');
-  }, []);
-
-  // Handle tutorial start - start practice game with tutorial overlays
-  const handleStartTutorial = useCallback(() => {
-    // TODO: Phase 3 - Implement tutorial flow
-    // For now, start a practice game (tutorial will be integrated later)
-    console.log('[Tutorial] Starting tutorial mode');
-
-    const practicePreset = getDefaultPreset('practice');
-    if (practicePreset) {
-      handleSelectPreset(practicePreset);
-    }
-  }, [handleSelectPreset]);
 
   const handleStartGame = useCallback((settings: Partial<SinglePlayerGameState>) => {
     // Unlock audio on user gesture (required for browser autoplay policy)
@@ -436,8 +447,8 @@ const SinglePlayerView: React.FC = () => {
   }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
 
   const handlePlayAgain = () => {
-    setResultsData(null);
-    setPhase('preset-selection');
+    // Navigate back to landing page
+    router.push(`/${uiLanguage}/`);
   };
 
   // Quick rematch - immediately start a new game with same settings
@@ -452,13 +463,8 @@ const SinglePlayerView: React.FC = () => {
   }, [unlockAudio]);
 
   const handleBackToLobby = () => {
-    setResultsData(null);
-    setPhase('preset-selection');
-  };
-
-  // Back from custom lobby to preset selection
-  const handleBackToPresets = () => {
-    setPhase('preset-selection');
+    // Navigate back to landing page
+    router.push(`/${uiLanguage}/`);
   };
 
   return (
@@ -478,27 +484,6 @@ const SinglePlayerView: React.FC = () => {
       <AutoHideHeader />
 
       <main className="w-full px-2 sm:px-3 lg:px-4 py-4 sm:py-4 lg:py-6 landscape-content overflow-x-hidden">
-        {phase === 'preset-selection' && (
-          <PresetSelector
-            onSelectPreset={handleSelectPreset}
-            onCustomGame={handleCustomGame}
-            onStartTutorial={handleStartTutorial}
-            challengeInfo={{
-              highScore: challengeHighScore?.score || null,
-              wordCount: challengeHighScore?.wordCount,
-              longestWord: challengeHighScore?.longestWord,
-            }}
-          />
-        )}
-
-        {phase === 'lobby' && (
-          <SinglePlayerLobby
-            initialSettings={gameState}
-            onStartGame={handleStartGame}
-            onBack={handleBackToPresets}
-          />
-        )}
-
         {phase === 'playing' && (
           <SinglePlayerGame
             settings={gameState}

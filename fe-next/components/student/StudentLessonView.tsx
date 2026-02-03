@@ -1,12 +1,12 @@
 /**
- * StudentLessonView Component
+ * StudentLessonView - Simplified Version
  *
- * Displays assigned vocabulary lessons with progress tracking and practice buttons
+ * Clean lesson cards with single primary action
+ * Reduced visual clutter, focus on learning
  */
 
 'use client';
 
-import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,9 +15,7 @@ import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Clock, Gamepad2, CheckCircle2, Sparkles, History, BarChart3 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { BookOpen, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function StudentLessonView() {
   const { t, language } = useLanguage();
@@ -25,64 +23,6 @@ export default function StudentLessonView() {
   const router = useRouter();
   const isRTL = language === 'he';
   const { lessons, isLoading, error } = useStudentProgress();
-
-  const [sortBy, setSortBy] = useState<'dueDate' | 'progress' | 'recent'>('recent');
-
-  // Start a classroom game with lesson vocabulary (education-specific route)
-  const handleStartGame = (studentLesson: typeof lessons[0]) => {
-    const lesson = studentLesson.lesson;
-    if (!lesson) return;
-
-    // Navigate to classroom game route (education-specific, no main app escape)
-    router.push(`/${language}/education/classroom-game?lessonId=${studentLesson.lessonId}`);
-  };
-
-  // Check if a lesson has vocabulary words that can be used in a game
-  const hasPlayableWords = (studentLesson: typeof lessons[0]) => {
-    const lesson = studentLesson.lesson;
-    if (!lesson?.words) return false;
-    return lesson.words.some((w) => w.canIntegrate);
-  };
-
-  // Sort lessons based on selected criteria
-  const sortedLessons = useMemo(() => {
-    const lessonsCopy = [...lessons];
-
-    switch (sortBy) {
-      case 'dueDate':
-        // Sort by due date (if assignment exists), then by assigned/started date
-        return lessonsCopy.sort((a, b) => {
-          const aDate = a.dueDate || a.assignedAt || a.progress?.started_at || '';
-          const bDate = b.dueDate || b.assignedAt || b.progress?.started_at || '';
-          return new Date(bDate).getTime() - new Date(aDate).getTime();
-        });
-
-      case 'progress':
-        // Sort by mastery percentage (descending)
-        return lessonsCopy.sort((a, b) => {
-          const aProgress = a.progress;
-          const bProgress = b.progress;
-
-          if (!aProgress) return 1; // No progress, push to end
-          if (!bProgress) return -1; // No progress, push to end
-
-          const aTotal = Object.keys(aProgress.words_attempted || {}).length || 1;
-          const aMastered = (aProgress.words_mastered || []).length;
-          const aPercent = (aMastered / aTotal) * 100;
-
-          const bTotal = Object.keys(bProgress.words_attempted || {}).length || 1;
-          const bMastered = (bProgress.words_mastered || []).length;
-          const bPercent = (bMastered / bTotal) * 100;
-
-          return bPercent - aPercent;
-        });
-
-      case 'recent':
-      default:
-        // Already sorted by status in hook (assigned, started, completed)
-        return lessonsCopy;
-    }
-  }, [lessons, sortBy]);
 
   if (isLoading) {
     return (
@@ -100,9 +40,9 @@ export default function StudentLessonView() {
     );
   }
 
-  if (sortedLessons.length === 0) {
+  if (lessons.length === 0) {
     return (
-      <div className="py-12 sm:py-16">
+      <div className="py-12">
         <EmptyState
           type="custom"
           title={t('student.lessons.empty.title')}
@@ -111,34 +51,18 @@ export default function StudentLessonView() {
           showMascot={false}
           size="lg"
           action={
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button
-                onClick={() => router.push(`/${language}/student/join`)}
-                size="lg"
-                className={cn(
-                  'font-neo-display text-base px-6',
-                  'bg-neo-cyan hover:bg-neo-cyan/90',
-                  'text-neo-black shadow-hard hover:shadow-hard-sm',
-                  'border-neo border-neo-black',
-                  'transition-all'
-                )}
-              >
-                {t('student.lessons.empty.joinClassroom')}
-              </Button>
-              <Button
-                onClick={() => router.push(`/${language}`)}
-                variant="outline"
-                size="lg"
-                className={cn(
-                  'font-neo-display text-base px-6',
-                  'border-neo-white/30 text-neo-white/80 hover:text-neo-white',
-                  'hover:border-neo-white/50 hover:bg-neo-white/5',
-                  'transition-all'
-                )}
-              >
-                {t('common.backHome')}
-              </Button>
-            </div>
+            <Button
+              onClick={() => router.push(`/${language}/student/join`)}
+              size="lg"
+              className={cn(
+                'font-neo-display text-base px-8',
+                'bg-neo-cyan hover:bg-neo-cyan/90',
+                'text-neo-black shadow-hard hover:shadow-hard-lg',
+                'border-neo border-neo-black'
+              )}
+            >
+              {t('student.lessons.empty.joinClassroom')}
+            </Button>
           }
         />
       </div>
@@ -146,186 +70,143 @@ export default function StudentLessonView() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Sort Controls */}
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          onClick={() => setSortBy('recent')}
-          variant={sortBy === 'recent' ? 'default' : 'outline'}
-          size="sm"
-          className={cn(
-            'font-neo-body gap-1.5',
-            sortBy === 'recent' && 'bg-neo-cyan text-neo-black shadow-hard border-neo-black',
-            sortBy !== 'recent' && 'text-neo-white/70 hover:text-neo-white border-neo-white/30'
-          )}
-        >
-          <History className="w-4 h-4" />
-          {t('student.lessons.sort.recent')}
-        </Button>
-        <Button
-          onClick={() => setSortBy('progress')}
-          variant={sortBy === 'progress' ? 'default' : 'outline'}
-          size="sm"
-          className={cn(
-            'font-neo-body gap-1.5',
-            sortBy === 'progress' && 'bg-neo-cyan text-neo-black shadow-hard border-neo-black',
-            sortBy !== 'progress' && 'text-neo-white/70 hover:text-neo-white border-neo-white/30'
-          )}
-        >
-          <BarChart3 className="w-4 h-4" />
-          {t('student.lessons.sort.progress')}
-        </Button>
-      </div>
+    <div className="space-y-4">
+      {/* Simplified: Show lessons sorted by status (assigned → started → completed) */}
+      {lessons.map((studentLesson) => {
+        const { status, lesson, progress } = studentLesson;
 
-      {/* Lesson Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedLessons.map((studentLesson) => {
-          const { status, lesson, progress, assignment } = studentLesson;
+        // Calculate progress stats
+        const lessonWords = lesson?.words || [];
+        const totalWords = lessonWords.length || 1;
+        const masteredWords = (progress?.words_mastered || []).length;
+        const masteryPercent = progress
+          ? Math.round((masteredWords / totalWords) * 100)
+          : 0;
 
-          // Calculate progress stats
-          const lessonWords = lesson?.words || [];
-          const totalWords = lessonWords.length || 1;
-          const masteredWords = (progress?.words_mastered || []).length;
-          const masteryPercent = progress
-            ? Math.round((masteredWords / totalWords) * 100)
-            : 0;
+        // Get lesson name
+        const lessonName = lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
 
-          // Get lesson name
-          const lessonName = lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
+        // Determine button text and style
+        const getButtonProps = () => {
+          switch (status) {
+            case 'assigned':
+              return {
+                text: t('student.lessons.start'),
+                className: 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
+                icon: <Sparkles className="w-5 h-5" />,
+              };
+            case 'started':
+              return {
+                text: t('student.lessons.continue'),
+                className: 'bg-neo-pink hover:bg-neo-pink/90 text-neo-black',
+                icon: <ArrowRight className={cn('w-5 h-5', isRTL && 'rotate-180')} />,
+              };
+            case 'completed':
+              return {
+                text: t('student.lessons.review'),
+                className: 'bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black',
+                icon: <CheckCircle2 className="w-5 h-5" />,
+              };
+            default:
+              return {
+                text: t('student.lessons.start'),
+                className: 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
+                icon: null,
+              };
+          }
+        };
 
-          // Get date for display
-          const displayDate = status === 'assigned'
-            ? assignment?.created_at
-            : progress?.started_at;
+        const buttonProps = getButtonProps();
 
-          return (
-            <Card
-              key={studentLesson.lessonId}
-              className={cn(
-                'bg-neo-navy border-neo shadow-hard hover:shadow-hard-lg',
-                'transition-all duration-200',
-                'overflow-hidden relative',
-                // Visual distinction based on status
-                status === 'assigned' && 'border-neo-cyan',
-                status === 'started' && 'border-neo-black',
-                status === 'completed' && 'border-neo-yellow'
-              )}
-            >
-              <CardContent className="p-6 space-y-4">
-                {/* Lesson Header */}
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-neo-display text-neo-white mb-1">
-                      {lessonName}
-                    </h3>
-                    <p className="text-sm text-neo-white/60 font-neo-body flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {displayDate && formatDistanceToNow(new Date(displayDate), { addSuffix: true })}
-                    </p>
-                  </div>
+        return (
+          <div
+            key={studentLesson.lessonId}
+            className={cn(
+              'p-6 rounded-neo border-neo border-neo-black bg-neo-navy/80',
+              'shadow-hard hover:shadow-hard-lg transition-all',
+              // Subtle status indicators via border color
+              status === 'assigned' && 'border-neo-cyan',
+              status === 'completed' && 'border-neo-yellow'
+            )}
+          >
+            <div className="flex items-center justify-between gap-4">
+              {/* Left: Lesson info */}
+              <div className="flex-1">
+                {/* Lesson name */}
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-xl font-neo-display text-neo-white">
+                    {lessonName}
+                  </h3>
 
-                  {/* Status Badge */}
+                  {/* Status badge */}
                   {status === 'assigned' && (
-                    <span className="px-3 py-1.5 bg-neo-cyan text-neo-black text-xs font-neo-display font-bold rounded-neo border-2 border-neo-black shadow-hard-sm flex items-center gap-1.5 animate-pulse">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      {t('student.lessons.new')}
+                    <span className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-xs font-bold rounded-neo border border-neo-cyan/50">
+                      NEW
                     </span>
                   )}
                   {status === 'completed' && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow/20 rounded-neo border-2 border-neo-yellow/50">
-                      <CheckCircle2 className="w-5 h-5 text-neo-yellow" />
-                      <span className="text-xs font-neo-display font-bold text-neo-yellow">
-                        {t('student.lessons.completed')}
-                      </span>
-                    </div>
+                    <span className="px-2 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-neo border border-neo-yellow/50">
+                      ✓ DONE
+                    </span>
                   )}
                 </div>
 
-                {/* Progress Stats - only show for started/completed */}
-                {status !== 'assigned' && progress && (
-                  <div className="space-y-2">
-                    {/* Word Count */}
-                    <div className="flex items-center justify-between text-sm font-neo-body">
-                      <span className="text-neo-white/70">{t('student.lessons.words')}</span>
-                      <span className="text-neo-white font-bold">{totalWords}</span>
-                    </div>
+                {/* Progress info - compact */}
+                <div className="flex items-center gap-6 text-sm text-neo-white/70">
+                  <span>{totalWords} {t('student.lessons.words')}</span>
 
-                    {/* Mastered Count */}
-                    <div className="flex items-center justify-between text-sm font-neo-body">
-                      <span className="text-neo-white/70">{t('student.lessons.mastered')}</span>
+                  {/* Show progress for started/completed */}
+                  {status !== 'assigned' && progress && (
+                    <>
                       <span className="text-neo-cyan font-bold">
-                        {masteredWords} / {totalWords}
+                        {masteredWords} {t('student.lessons.mastered')}
                       </span>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="relative w-full h-4 bg-neo-black border-2 border-neo-black overflow-hidden">
-                      <div
-                        className={cn(
-                          'h-full transition-all duration-300',
-                          status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan'
-                        )}
-                        style={{ width: `${masteryPercent}%` }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-neo-body font-bold text-neo-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                          {masteryPercent}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Assigned lesson info */}
-                {status === 'assigned' && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm font-neo-body">
-                      <span className="text-neo-white/70">{t('student.lessons.words')}</span>
-                      <span className="text-neo-white font-bold">{totalWords}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => router.push(`/${language}/student/lessons/${studentLesson.lessonId}`)}
-                    className={cn(
-                      'flex-1 font-neo-display text-base',
-                      status === 'assigned'
-                        ? 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black'
-                        : 'bg-neo-pink hover:bg-neo-pink/90 text-neo-black',
-                      'shadow-hard hover:shadow-hard-sm',
-                      'transition-all'
-                    )}
-                  >
-                    {status === 'assigned' && t('student.lessons.start')}
-                    {status === 'started' && t('student.lessons.continue')}
-                    {status === 'completed' && t('student.lessons.review')}
-                  </Button>
-
-                  {/* Play Game button - only show if lesson has playable vocabulary */}
-                  {hasPlayableWords(studentLesson) && (
-                    <Button
-                      onClick={() => handleStartGame(studentLesson)}
-                      variant="outline"
-                      className={cn(
-                        'font-neo-display text-base',
-                        'border-neo-yellow text-neo-yellow hover:bg-neo-yellow/20',
-                        'shadow-hard hover:shadow-hard-sm',
-                        'transition-all'
-                      )}
-                      title={t('student.lessons.playGameHint')}
-                    >
-                      <Gamepad2 className="w-5 h-5" />
-                    </Button>
+                      <span className="text-neo-yellow font-bold">
+                        {masteryPercent}% {t('student.lessons.complete')}
+                      </span>
+                    </>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+
+                {/* Progress bar for started/completed - compact */}
+                {status !== 'assigned' && progress && (
+                  <div className="mt-3 w-full h-2 bg-neo-black border border-neo-black overflow-hidden rounded">
+                    <div
+                      className={cn(
+                        'h-full transition-all duration-300',
+                        status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan'
+                      )}
+                      style={{ width: `${masteryPercent}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Right: Single primary action */}
+              <div>
+                <Button
+                  onClick={() => router.push(`/${language}/student/lessons/${studentLesson.lessonId}`)}
+                  size="lg"
+                  className={cn(
+                    'font-neo-display text-base px-8',
+                    buttonProps.className,
+                    'shadow-hard hover:shadow-hard-lg',
+                    'border-neo border-neo-black',
+                    'transition-all'
+                  )}
+                >
+                  {buttonProps.icon && (
+                    <span className={cn(isRTL ? 'ml-2' : 'mr-2')}>
+                      {buttonProps.icon}
+                    </span>
+                  )}
+                  {buttonProps.text}
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -11,7 +11,9 @@ import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { DesktopStatsPanel, DesktopWordList } from '../../desktop';
+import AchievementDock from '@/components/achievements/AchievementDock';
 import type { LetterGrid, Language } from '@/shared/types/game';
+import type { SinglePlayerAchievement } from '@/utils/singlePlayerAchievements';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
 
@@ -80,6 +82,8 @@ export interface DesktopGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
+  // Achievements
+  liveAchievements: SinglePlayerAchievement[];
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -134,6 +138,7 @@ export function DesktopGameLayout({
   onConfirmQuit,
   showQuitConfirm,
   setShowQuitConfirm,
+  liveAchievements,
   t,
 }: DesktopGameLayoutProps): React.ReactElement {
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
@@ -170,6 +175,12 @@ export function DesktopGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         t={(key) => t(key) || key}
+      />
+
+      {/* Achievement Dock - top right */}
+      <AchievementDock
+        achievements={liveAchievements}
+        className="absolute top-4 right-4 z-50"
       />
 
       {/* 3-Column Desktop Layout */}

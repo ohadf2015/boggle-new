@@ -55,18 +55,6 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
 }));
 
 // Mock child components
-jest.mock('../PresetSelector', () => {
-  const MockPresetSelector = () => <div data-testid="preset-selector">Preset Selector</div>;
-  MockPresetSelector.displayName = 'MockPresetSelector';
-  return MockPresetSelector;
-});
-
-jest.mock('../SinglePlayerLobby', () => {
-  const MockSinglePlayerLobby = () => <div data-testid="lobby">Lobby</div>;
-  MockSinglePlayerLobby.displayName = 'MockSinglePlayerLobby';
-  return MockSinglePlayerLobby;
-});
-
 jest.mock('../SinglePlayerGame', () => {
   const MockSinglePlayerGame = () => <div data-testid="game">Game</div>;
   MockSinglePlayerGame.displayName = 'MockSinglePlayerGame';
@@ -141,11 +129,11 @@ describe('SinglePlayerView - preset=bots navigation bug', () => {
     mockSearchParams = new Map();
   });
 
-  it('should show preset selector when no URL parameters', async () => {
+  it('should show game when no URL parameters (starts playing directly)', async () => {
     render(<SinglePlayerView />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('preset-selector')).toBeInTheDocument();
+      expect(screen.getByTestId('game')).toBeInTheDocument();
     });
   });
 
@@ -163,7 +151,7 @@ describe('SinglePlayerView - preset=bots navigation bug', () => {
     }, { timeout: 3000 });
 
     // Should NOT show the preset selector
-    expect(screen.queryByTestId('preset-selector')).not.toBeInTheDocument();
+    // Preset selector no longer exists after simplification
   });
 
   it('should not conflict with autoStart=practice parameter', async () => {
@@ -178,7 +166,7 @@ describe('SinglePlayerView - preset=bots navigation bug', () => {
       expect(screen.getByTestId('game')).toBeInTheDocument();
     });
 
-    expect(screen.queryByTestId('preset-selector')).not.toBeInTheDocument();
+    // Preset selector no longer exists after simplification
   });
 
   it('should handle preset parameter after fresh page load (no prior state)', async () => {
@@ -241,9 +229,9 @@ describe('SinglePlayerView - preset=bots navigation bug', () => {
 
     const { rerender } = render(<SinglePlayerView />);
 
-    // Initial render shows preset selector
+    // Initial render shows game (no preset selector after simplification)
     await waitFor(() => {
-      expect(screen.getByTestId('preset-selector')).toBeInTheDocument();
+      expect(screen.getByTestId('game')).toBeInTheDocument();
     });
 
     // Now simulate searchParams changing (client-side navigation)
@@ -310,6 +298,6 @@ describe('SinglePlayerView - preset=bots navigation bug', () => {
 
     // Game is showing, preset=bots is still in URL, component should NOT restart
     expect(screen.getByTestId('game')).toBeInTheDocument();
-    expect(screen.queryByTestId('preset-selector')).not.toBeInTheDocument();
+    // Preset selector no longer exists after simplification
   });
 });

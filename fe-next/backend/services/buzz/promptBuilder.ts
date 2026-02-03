@@ -163,7 +163,7 @@ export function buildAIPrompt(
 
 /**
  * Format trends into display context
- * Enhanced to showcase breakdown words as potential answer candidates
+ * Enhanced with news articles, related searches, and breakdown words
  */
 function formatTrendsContext(trends: TrendingTopic[]): string {
   return trends
@@ -183,8 +183,29 @@ function formatTrendsContext(trends: TrendingTopic[]): string {
         breakdownSection = `\n   **Related words (USE as answers!)**: ${breakdownItems.slice(0, 8).join(', ')}`;
       }
 
+      // Build enrichment section with news articles and related searches
+      let enrichmentSection = '';
+
+      if (trend.news_articles && trend.news_articles.length > 0) {
+        enrichmentSection += `\n   **Latest News**:`;
+        trend.news_articles.slice(0, 2).forEach((article, i) => {
+          enrichmentSection += `\n     ${i + 1}. ${article.title} (${article.source})`;
+          if (article.snippet) {
+            enrichmentSection += `\n        ${article.snippet}`;
+          }
+        });
+      }
+
+      if (trend.related_searches && trend.related_searches.length > 0) {
+        enrichmentSection += `\n   **Related Searches**: ${trend.related_searches.slice(0, 3).join(' • ')}`;
+      }
+
+      if (trend.people_also_ask && trend.people_also_ask.length > 0) {
+        enrichmentSection += `\n   **Common Questions**: ${trend.people_also_ask.slice(0, 2).join(' / ')}`;
+      }
+
       return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches${riseIndicator}
-   Category: ${categoryInfo}${breakdownSection}`;
+   Category: ${categoryInfo}${breakdownSection}${enrichmentSection}`;
     })
     .join('\n\n');
 }

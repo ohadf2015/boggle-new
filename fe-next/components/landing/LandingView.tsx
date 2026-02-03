@@ -132,7 +132,7 @@ const PlayfulBackground = dynamic(
 const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const { playTrack, TRACKS } = useMusic();
+  const { playTrack, unlockAudio, TRACKS } = useMusic();
   const { isAuthenticated, isAdmin, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
@@ -207,6 +207,16 @@ const LandingView: React.FC = () => {
       setShowReferralCallout(true);
     }
   }, [showTutorialCallout]);
+
+  /**
+   * Handle Single Player button click
+   * Unlocks audio (required for autoplay policy) and navigates to bot game
+   */
+  const handleSinglePlayerClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default Link behavior
+    unlockAudio(); // Critical for audio autoplay policy
+    router.push(`/${language}/singleplayer?autoStart=bots`);
+  };
 
   // Dismiss referral callout and persist to localStorage
   const handleDismissReferral = (e: React.MouseEvent) => {
@@ -413,7 +423,8 @@ const LandingView: React.FC = () => {
               className="group"
             >
               <Link
-                href={`/${language}/singleplayer`}
+                href={`/${language}/singleplayer?autoStart=bots`}
+                onClick={handleSinglePlayerClick}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-cyan to-cyan-400',

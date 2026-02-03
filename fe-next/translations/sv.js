@@ -138,6 +138,12 @@ const sv = {
     "bot": "Bot",
     "minutes": "min",
     "seconds": "sekunder",
+    "days": "dagar",
+    "step": "Steg",
+    "of": "av",
+    "finish": "Klart",
+    "showAdvanced": "Visa avancerat",
+    "hideAdvanced": "Dölj avancerat",
     "advancedSettings": "Fler alternativ",
     "settings": "Inställningar",
     "tapToDismiss": "Tryck för att stänga",
@@ -419,6 +425,7 @@ const sv = {
     "sessionExpired": "Sessionen slutade. Dags att börja om!",
     "roomNoLongerExists": "Rummet stängdes - alla gick",
     "roomClosed": "Rummet stängdes - dags för ett nytt",
+    "loadFailed": "Gick inte att ladda. Försök igen!",
     "gameCodeNotExist": "Koden hittades inte. Kolla och försök!",
     "usernameTaken": "Någon var snabbare! Prova annat namn",
     "gameCodeExists": "Den koden är upptagen. Välj en ny!",
@@ -4704,6 +4711,12 @@ const sv = {
     }
   },
   "student": {
+    "activeGame": {
+      "title": "Spel startar!",
+      "teacherStarted": "{{teacher}} startade ett klassrumsspel",
+      "joinNow": "Gå med nu",
+      "joining": "Går med..."
+    },
     "dashboard": {
       "title": "Mina lektioner",
       "subtitle": "Öva glosor och följ dina framsteg"
@@ -4728,7 +4741,8 @@ const sv = {
         "recent": "Senaste",
         "progress": "Framsteg"
       },
-      "completed": "Slutförd"
+      "completed": "Slutförd",
+      "complete": "Klar"
     },
     "practice": {
       "title": "Övningsläge",
@@ -4757,10 +4771,17 @@ const sv = {
     "accessDenied": "Du behöver lärarbehörighet för denna sida.",
     "dashboard": {
       "title": "Lärarpanel",
+      "subtitle": "Hantera dina klassrum, lektioner och elevernas framsteg",
       "classrooms": "Klassrum",
       "lessons": "Glosor",
       "students": "Elever",
-      "progress": "Framsteg"
+      "progress": "Framsteg",
+      "manage": "HANTERA",
+      "build": "BYGG",
+      "createLesson": "Skapa ny lektion",
+      "createLessonDescription": "Bygg gloslektioner och tilldela dem till dina klassrum",
+      "quickTip": "Snabbtips",
+      "quickTipDescription": "Starta ett klassrumsspel för att engagera elever med flerspelar glosövning. Elever kan gå med med en enkel spelkod!"
     },
     "classroom": {
       "create": "Skapa klassrum",
@@ -4919,9 +4940,11 @@ const sv = {
       "nameRequired": "Mallnamn krävs",
       "timer": "Speltid",
       "difficulty": "Brädstorlek",
+      "boardSize": "Brädstorlek",
       "boardPreview": "Brädet blir",
       "minWordLength": "Minsta ordlängd",
       "allowLateJoin": "Tillåt sen anslutning",
+      "lateJoin": "Sen anslutning",
       "allowLateJoinDesc": "Spelare kan ansluta efter spelets start",
       "setDefault": "Ange som standard",
       "setDefaultDesc": "Använd dessa inställningar som standard för denna lektion",
@@ -5036,7 +5059,9 @@ const sv = {
       "classicMode": "Klassiskt läge",
       "swipeMode": "Svep-läge",
       "autoPronounce": "Auto-uttala",
-      "enrichingContent": "Laddar berikat innehåll..."
+      "enrichingContent": "Laddar berikat innehåll...",
+      "word": "ord",
+      "words": "ord"
     },
     "leaderboard": {
       "title": "Klassrumets Topplista",
@@ -5048,7 +5073,10 @@ const sv = {
       "noStudentsYet": "Inga elever i klassrummet än",
       "joinClassroomPrompt": "Gå med i ett klassrum för att se topplistan",
       "level": "Nivå {level}",
-      "xp": "{xp} XP"
+      "xp": "{xp} XP",
+      "rank": "Placering",
+      "totalXP": "Totalt XP",
+      "streak": "Svit"
     },
     "header": {
       "title": "LexiClash",
@@ -5073,18 +5101,49 @@ const sv = {
     },
     "classroomGame": {
       "title": "Klassrumsspel",
+      "createGame": "Skapa klassrumsspel",
+      "createGameDesc": "Välj lektioner och klassrum för att starta ett flerspelarspel",
+      "startGameDescription": "Starta ett flerspelar ordförrådsspel för ditt klassrum",
       "shareCode": "Dela denna kod med eleverna",
       "waitingForPlayers": "Väntar på spelare...",
       "settings": "Spelinställningar",
       "vocabularyWords": "Ordförrådsord",
+      "lessons": "Lektioner",
+      "selectLessons": "Välj lektioner",
+      "selectClassroom": "Välj klassrum",
+      "lessonsSelected": "{{count}} valda",
+      "noLessonsAvailable": "Inga lektioner tillgängliga",
+      "multiLessonHelp": "Ord från alla valda lektioner kombineras",
+      "totalWords": "Totalt antal ord",
+      "noClassrooms": "Inga klassrum hittades. Skapa ett klassrum först.",
+      "classroomNotFound": "Klassrum hittades inte",
+      "missingRequirements": "Välj minst en lektion och ett klassrum",
+      "gameCreated": "Spel skapat! Skickar till lobby...",
       "playable": "spelbara",
       "noPlayableWords": "Inga spelbara ord i denna lektion",
       "startGame": "Starta spel",
       "starting": "Startar...",
       "lessonNotFound": "Lektionen hittades inte",
       "lessonNotFoundDesc": "Den begärda lektionen kunde inte hittas.",
-      "backToEducation": "Tillbaka till utbildning"
+      "backToEducation": "Tillbaka till utbildning",
+      "gameSettings": "Spelinställningar",
+      "reviewAndStart": "Granska och starta",
+      "selectClassroomAndLessons": "Välj klassrum och lektioner",
+      "selectClassroomAndLessonsDesc": "Välj ett klassrum och en eller flera lektioner att öva",
+      "shareCodeWithStudents": "Dela kod med elever",
+      "words": "Ord"
     },
+    "lessonWords": {
+      "title": "Lektionsordförråd",
+      "subtitle": "Din prestation på lektionsorden",
+      "found": "Hittade",
+      "total": "Totalt",
+      "completion": "Resultat",
+      "foundList": "Ord du hittade",
+      "missedList": "Ord du missade",
+      "perfectScore": "Perfekt! Du hittade alla lektionsord!"
+    },
+    "students": "elever",
     "onboarding": {
       "step": "Steg",
       "of": "av",

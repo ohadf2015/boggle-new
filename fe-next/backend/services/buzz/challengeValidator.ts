@@ -13,38 +13,41 @@ import { isSportsRelatedChallenge } from './trendsService';
 import { repairTruncatedJson } from './utils';
 
 /**
- * Validate that the answer does not appear in trend_topic or trending_context
- * This prevents spoilers where users can see the answer in the challenge context
+ * Validate that the answer does not appear in user-facing fields (prompt and hint)
+ * This prevents spoilers where users can see the answer before solving
+ *
+ * Note: trend_topic and trending_context are metadata fields not shown to users,
+ * so it's acceptable for them to contain the answer
  *
  * @param challenge - The challenge to validate
  * @returns true if the answer is NOT spoiled, false if it IS spoiled
  */
 export function validateAnswerNotSpoiled(challenge: BuzzChallenge): boolean {
   const answer = challenge.answer.toLowerCase();
-  const trendTopic = challenge.trend_topic.toLowerCase();
-  const trendingContext = challenge.trending_context.toLowerCase();
+  const prompt = challenge.prompt.toLowerCase();
+  const hint = challenge.hint?.toLowerCase() || '';
 
   // For short answers (2-3 chars), only match as whole word to avoid false positives
   // e.g., "AI" in "EMAIL" should not be a match
   if (answer.length <= 3) {
     // Use word boundary regex for short answers
     const wordBoundaryRegex = new RegExp(`\\b${escapeRegex(answer)}\\b`, 'i');
-    if (wordBoundaryRegex.test(trendTopic)) {
-      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found as word in trend_topic "${challenge.trend_topic}"`);
+    if (wordBoundaryRegex.test(prompt)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found as word in prompt "${challenge.prompt}"`);
       return false;
     }
-    if (wordBoundaryRegex.test(trendingContext)) {
-      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found as word in trending_context "${challenge.trending_context}"`);
+    if (hint && wordBoundaryRegex.test(hint)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found as word in hint "${challenge.hint}"`);
       return false;
     }
   } else {
     // For longer answers, check if it appears anywhere (including as substring)
-    if (trendTopic.includes(answer)) {
-      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found in trend_topic "${challenge.trend_topic}"`);
+    if (prompt.includes(answer)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found in prompt "${challenge.prompt}"`);
       return false;
     }
-    if (trendingContext.includes(answer)) {
-      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found in trending_context "${challenge.trending_context}"`);
+    if (hint && hint.includes(answer)) {
+      console.warn(`[BUZZ] Answer spoiler detected: "${answer}" found in hint "${challenge.hint}"`);
       return false;
     }
   }
