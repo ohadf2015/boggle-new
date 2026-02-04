@@ -1,412 +1,507 @@
 /**
- * AdventureTile Tests
+ * AdventureTile Component Tests
  *
- * Tests for adventure mode special tile visual rendering
- * Following TDD: Write tests FIRST, then implement
+ * TDD RED Phase: Tests for individual tile rendering extracted from AdventureGrid
+ *
+ * Tests cover:
+ * - Tile selection states
+ * - Special tile type rendering (gold, ice, bomb, rainbow, chain, time)
+ * - Cascade animations
+ * - World theming
+ * - Accessibility (ARIA labels)
+ * - Performance (reduced motion)
+ * - Activation effects
+ * - Event handlers
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import AdventureTile from '../AdventureTile';
-import type { TileState } from '@/types/adventure';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
+import type { GridTileState } from '@/types/adventure';
 
-// Mock LanguageContext to provide translation function
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => {
-      // Return translated labels for tile types
-      const translations: Record<string, string> = {
-        'adventure.tiles.gold': 'Gold (3x points)',
-        'adventure.tiles.ice': 'Ice (obstacle)',
-        'adventure.tiles.bomb': 'Bomb (clears row)',
-        'adventure.tiles.rainbow': 'Rainbow (wildcard)',
-        'adventure.tiles.chain': 'Chain (link bonus)',
-        'adventure.tiles.time': 'Time (+5 seconds)',
-      };
-      return translations[key] || key;
-    },
-    language: 'en',
-    dir: 'ltr',
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, className, onClick, onMouseDown, onMouseEnter, onTouchStart, ...props }: any) =>
+      React.createElement(
+        'div',
+        {
+          className,
+          onClick,
+          onMouseDown,
+          onMouseEnter,
+          onTouchStart,
+          'data-motion': 'true',
+          ...props,
+        },
+        children
+      ),
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
+// Mock hooks
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    prefersReducedMotion: false,
+    enableComplexAnimations: true,
   }),
 }));
 
-// ==============================================
-// TEST FIXTURES
-// ==============================================
+jest.mock('@/hooks/useCascadeAnimation', () => ({
+  useCascadeAnimation: () => ({
+    delays: new Map(),
+    startCascade: jest.fn(),
+  }),
+}));
 
-function createTileState(overrides?: Partial<TileState>): TileState {
-  return {
-    letter: 'A',
-    type: 'standard',
-    isCleared: false,
-    ...overrides,
-  };
-}
+// Mock TileBadge component
+jest.mock('../TileBadge', () => ({
+  TileBadge: ({ type }: { type: string }) => (
+    <div data-testid={`tile-badge-${type}`}>Badge: {type}</div>
+  ),
+}));
 
-// ==============================================
-// TESTS
-// ==============================================
+// Import component AFTER mocks
+import { AdventureTile } from '../AdventureTile';
 
 describe('AdventureTile', () => {
-  describe('Standard Tile', () => {
-    it('should render letter correctly', () => {
-      // GIVEN
-      const tile = createTileState({ letter: 'X' });
+  const baseTile: GridTileState = {
+    id: 'tile-0',
+    letter: 'A',
+    row: 0,
+    col: 0,
+    type: 'standard',
+    isCleared: false,
+    isFrozen: false,
+  };
 
-      // WHEN
-      render(<AdventureTile tile={tile} />);
+  const defaultProps = {
+    tile: baseTile,
+    index: 0,
+    isSelected: false,
+    isHintHighlighted: false,
+    canInteract: true,
+    worldId: 1,
+    bombRowPreview: null,
+    showCascade: false,
+    cascadeComplete: true,
+    getCascadeDelay: () => 0,
+    prefersReducedMotion: false,
+    enableComplexAnimations: true,
+    onClick: jest.fn(),
+    onMouseDown: jest.fn(),
+    onMouseEnter: jest.fn(),
+    onTouchStart: jest.fn(),
+    getTileAriaLabel: (tile: GridTileState) => `Letter ${tile.letter}`,
+  };
 
-      // THEN
-      expect(screen.getByText('X')).toBeInTheDocument();
+  describe('Basic Rendering', () => {
+    it('should render tile with letter', () => {
+      render(<AdventureTile {...defaultProps} />);
+      expect(screen.getByText('A')).toBeInTheDocument();
     });
 
-    it('should render with standard tile styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'standard' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).not.toHaveClass('tile-gold');
-      expect(container.firstChild).not.toHaveClass('tile-ice');
-      expect(container.firstChild).not.toHaveClass('tile-bomb');
-      expect(container.firstChild).not.toHaveClass('tile-rainbow');
+    it('should have role="gridcell"', () => {
+      const { container } = render(<AdventureTile {...defaultProps} />);
+      const gridcell = container.querySelector('[role="gridcell"]');
+      expect(gridcell).toBeInTheDocument();
     });
 
-    it('should apply cleared state styling', () => {
-      // GIVEN
-      const tile = createTileState({ isCleared: true });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-cleared');
-    });
-  });
-
-  describe('Gold Tile', () => {
-    it('should render with gold styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'gold' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-gold');
+    it('should have correct aria-label', () => {
+      const { container } = render(<AdventureTile {...defaultProps} />);
+      const gridcell = container.querySelector('[role="gridcell"]');
+      expect(gridcell).toHaveAttribute('aria-label', 'Letter A');
     });
 
-    it('should display 3x multiplier indicator', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'gold' });
-
-      // WHEN
-      render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(screen.getByText('3x')).toBeInTheDocument();
+    it('should have data-row and data-col attributes', () => {
+      const { container } = render(<AdventureTile {...defaultProps} />);
+      const gridcell = container.querySelector('[role="gridcell"]');
+      expect(gridcell).toHaveAttribute('data-row', '0');
+      expect(gridcell).toHaveAttribute('data-col', '0');
     });
 
-    it('should apply gold glow effect', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'gold' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN - Check for glow class or style
-      const tileElement = container.firstChild as HTMLElement;
-      expect(tileElement.className).toMatch(/gold/i);
+    it('should render as framer motion.div', () => {
+      const { container } = render(<AdventureTile {...defaultProps} />);
+      const motionDiv = container.querySelector('[data-motion="true"]');
+      expect(motionDiv).toBeInTheDocument();
     });
   });
 
-  describe('Ice Tile', () => {
-    it('should render with ice styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'ice', isFrozen: true });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-ice');
+  describe('Selection States', () => {
+    it('should apply selected class when isSelected=true', () => {
+      const { container } = render(<AdventureTile {...defaultProps} isSelected={true} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-selected-enhanced');
     });
 
-    it('should display frozen visual when isFrozen is true', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'ice', isFrozen: true });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-frozen');
+    it('should have aria-selected=true when selected', () => {
+      const { container } = render(<AdventureTile {...defaultProps} isSelected={true} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveAttribute('aria-selected', 'true');
     });
 
-    it('should NOT display frozen visual after clearing', () => {
-      // GIVEN
-      const tile = createTileState({
-        type: 'ice',
-        isFrozen: false,
-        isCleared: true,
-      });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).not.toHaveClass('tile-frozen');
+    it('should have aria-selected=false when not selected', () => {
+      const { container } = render(<AdventureTile {...defaultProps} isSelected={false} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveAttribute('aria-selected', 'false');
     });
 
-    it('should have frost overlay element', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'ice', isFrozen: true });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      const frostOverlay = container.querySelector('.frost-overlay');
-      expect(frostOverlay).toBeInTheDocument();
+    it('should NOT apply selected class when isSelected=false', () => {
+      const { container } = render(<AdventureTile {...defaultProps} isSelected={false} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('tile-selected-enhanced');
     });
   });
 
-  describe('Bomb Tile', () => {
-    it('should render with bomb styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'bomb' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-bomb');
+  describe('Tile Types', () => {
+    it('should apply tile-gold class for gold tiles', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={goldTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-gold');
     });
 
-    it('should display bomb icon', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'bomb' });
-
-      // WHEN
-      render(<AdventureTile tile={tile} />);
-
-      // THEN - Check for bomb icon (could be SVG or emoji)
-      const bombIcon = screen.getByTestId('bomb-icon');
-      expect(bombIcon).toBeInTheDocument();
+    it('should render gold tile with yellow gradient', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={goldTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile?.className).toContain('from-neo-yellow');
     });
 
-    it('should have enhanced animation class', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'bomb' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN - Enhanced CSS animations are applied via tile-bomb-enhanced class
-      expect(container.firstChild).toHaveClass('tile-bomb-enhanced');
-    });
-  });
-
-  describe('Rainbow Tile', () => {
-    it('should render with rainbow styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'rainbow' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-rainbow');
+    it('should apply tile-ice class for ice tiles', () => {
+      const iceTile = { ...baseTile, type: 'ice' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={iceTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-ice');
     });
 
-    it('should display wildcard indicator', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'rainbow' });
-
-      // WHEN
-      render(<AdventureTile tile={tile} />);
-
-      // THEN - Wildcard badge uses ✦ symbol
-      expect(screen.getByText('✦')).toBeInTheDocument();
+    it('should apply tile-bomb class for bomb tiles', () => {
+      const bombTile = { ...baseTile, type: 'bomb' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={bombTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-bomb');
     });
 
-    it('should have rainbow enhanced animation', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'rainbow' });
+    it('should apply tile-rainbow class for rainbow tiles', () => {
+      const rainbowTile = { ...baseTile, type: 'rainbow' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={rainbowTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-rainbow');
+    });
 
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
+    it('should apply tile-chain class for chain tiles', () => {
+      const chainTile = { ...baseTile, type: 'chain' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={chainTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-chain');
+    });
 
-      // THEN - Rainbow gradient is now applied via CSS animation class
-      expect(container.firstChild).toHaveClass('tile-rainbow-enhanced');
+    it('should apply tile-time class for time tiles', () => {
+      const timeTile = { ...baseTile, type: 'time' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={timeTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-time');
     });
   });
 
-  describe('Chain Tile', () => {
-    it('should render with chain styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'chain' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-chain');
+  describe('TileBadge Integration', () => {
+    it('should render TileBadge component', () => {
+      render(<AdventureTile {...defaultProps} />);
+      expect(screen.getByTestId('tile-badge-standard')).toBeInTheDocument();
     });
 
-    it('should display chain link icon', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'chain' });
-
-      // WHEN
-      render(<AdventureTile tile={tile} />);
-
-      // THEN - Check for chain icon via testId
-      const chainIcon = screen.getByTestId('chain-icon');
-      expect(chainIcon).toBeInTheDocument();
-    });
-
-    it('should have chain enhanced animation class', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'chain' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN - Enhanced CSS animations are applied via tile-chain-enhanced class
-      expect(container.firstChild).toHaveClass('tile-chain-enhanced');
-    });
-
-    it('should render chain energy line effects when enableEffects is true', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'chain' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} enableEffects={true} />);
-
-      // THEN - Chain effects should include energy lines
-      const chainLines = container.querySelectorAll('.tile-chain-line');
-      expect(chainLines.length).toBeGreaterThan(0);
+    it('should pass tile type to TileBadge', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const };
+      render(<AdventureTile {...defaultProps} tile={goldTile} />);
+      expect(screen.getByTestId('tile-badge-gold')).toBeInTheDocument();
     });
   });
 
-  describe('Time Tile', () => {
-    it('should render with time styling', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'time' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveClass('tile-time');
+  describe('World Theming', () => {
+    it('should apply world 1 texture class to standard tiles', () => {
+      const { container } = render(<AdventureTile {...defaultProps} worldId={1} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-texture-meadows');
     });
 
-    it('should display clock icon', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'time' });
-
-      // WHEN
-      render(<AdventureTile tile={tile} />);
-
-      // THEN - Check for time icon via testId
-      const timeIcon = screen.getByTestId('time-icon');
-      expect(timeIcon).toBeInTheDocument();
+    it('should apply world 2 texture class to standard tiles', () => {
+      const { container } = render(<AdventureTile {...defaultProps} worldId={2} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-texture-springs');
     });
 
-    it('should have time enhanced animation class', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'time' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN - Enhanced CSS animations are applied via tile-time-enhanced class
-      expect(container.firstChild).toHaveClass('tile-time-enhanced');
+    it('should apply world 3 texture class to standard tiles', () => {
+      const { container } = render(<AdventureTile {...defaultProps} worldId={3} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-texture-caverns');
     });
 
-    it('should render time particle effects when enableEffects is true', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'time' });
+    it('should NOT apply texture class to special tiles (gold)', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={goldTile} worldId={1} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('tile-texture-meadows');
+    });
 
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} enableEffects={true} />);
+    it('should apply world-specific border class to standard tiles', () => {
+      const { container } = render(<AdventureTile {...defaultProps} worldId={2} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-border-springs');
+    });
 
-      // THEN - Time effects should include particles
-      const timeParticles = container.querySelectorAll('.tile-time-particle');
-      expect(timeParticles.length).toBeGreaterThan(0);
+    it('should apply letter glow class based on world', () => {
+      const { container } = render(<AdventureTile {...defaultProps} worldId={2} />);
+      const letter = screen.getByText('A');
+      expect(letter).toHaveClass('letter-glow-springs');
     });
   });
 
-  describe('Selection State', () => {
-    it('should apply selected styling when isSelected is true', () => {
-      // GIVEN
-      const tile = createTileState();
-
-      // WHEN
+  describe('Enhanced Effects (Complex Animations)', () => {
+    it('should apply enhanced class for gold tiles when complex animations enabled', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const };
       const { container } = render(
-        <AdventureTile tile={tile} isSelected={true} />
+        <AdventureTile {...defaultProps} tile={goldTile} enableComplexAnimations={true} />
       );
-
-      // THEN - Selection now uses enhanced class with additional effects
-      expect(container.firstChild).toHaveClass('tile-selected-enhanced');
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-gold-enhanced');
     });
 
-    it('should NOT apply selected styling when isSelected is false', () => {
-      // GIVEN
-      const tile = createTileState();
-
-      // WHEN
+    it('should NOT apply enhanced class when complex animations disabled', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const };
       const { container } = render(
-        <AdventureTile tile={tile} isSelected={false} />
+        <AdventureTile {...defaultProps} tile={goldTile} enableComplexAnimations={false} />
       );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('tile-gold-enhanced');
+    });
 
-      // THEN
-      expect(container.firstChild).not.toHaveClass('tile-selected-enhanced');
+    it('should apply enhanced class for ice tiles', () => {
+      const iceTile = { ...baseTile, type: 'ice' as const };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={iceTile} enableComplexAnimations={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-ice-enhanced');
+    });
+
+    it('should NOT apply enhanced class for cleared ice tiles', () => {
+      const iceTile = { ...baseTile, type: 'ice' as const, isCleared: true };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={iceTile} enableComplexAnimations={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('tile-ice-enhanced');
+    });
+
+    it('should apply enhanced class for bomb tiles', () => {
+      const bombTile = { ...baseTile, type: 'bomb' as const };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={bombTile} enableComplexAnimations={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-bomb-enhanced');
+    });
+
+    it('should apply enhanced class for rainbow tiles', () => {
+      const rainbowTile = { ...baseTile, type: 'rainbow' as const };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={rainbowTile} enableComplexAnimations={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-rainbow-enhanced');
+    });
+
+    it('should apply enhanced class for chain tiles', () => {
+      const chainTile = { ...baseTile, type: 'chain' as const };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={chainTile} enableComplexAnimations={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-chain-enhanced');
+    });
+
+    it('should apply enhanced class for time tiles', () => {
+      const timeTile = { ...baseTile, type: 'time' as const };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={timeTile} enableComplexAnimations={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-time-enhanced');
+    });
+  });
+
+  describe('Activation Effects', () => {
+    it('should apply melt activation effect class', () => {
+      const iceTile = { ...baseTile, type: 'ice' as const, activationEffect: 'melt' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={iceTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-effect-melt');
+    });
+
+    it('should apply explode activation effect class', () => {
+      const bombTile = { ...baseTile, type: 'bomb' as const, activationEffect: 'explode' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={bombTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-effect-explode');
+    });
+
+    it('should apply collect activation effect class', () => {
+      const goldTile = { ...baseTile, type: 'gold' as const, activationEffect: 'collect' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={goldTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-effect-collect');
+    });
+
+    it('should apply wildcard activation effect class', () => {
+      const rainbowTile = { ...baseTile, type: 'rainbow' as const, activationEffect: 'wildcard' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={rainbowTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-effect-wildcard');
+    });
+
+    it('should apply link activation effect class', () => {
+      const chainTile = { ...baseTile, type: 'chain' as const, activationEffect: 'link' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={chainTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-effect-link');
+    });
+
+    it('should apply timeBonus activation effect class', () => {
+      const timeTile = { ...baseTile, type: 'time' as const, activationEffect: 'timeBonus' as const };
+      const { container } = render(<AdventureTile {...defaultProps} tile={timeTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-effect-timeBonus');
+    });
+  });
+
+  describe('State Classes', () => {
+    it('should apply cleared class when tile is cleared', () => {
+      const clearedTile = { ...baseTile, isCleared: true };
+      const { container } = render(<AdventureTile {...defaultProps} tile={clearedTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-cleared');
+    });
+
+    it('should apply frozen class for frozen ice tiles', () => {
+      const frozenTile = { ...baseTile, type: 'ice' as const, isFrozen: true };
+      const { container } = render(<AdventureTile {...defaultProps} tile={frozenTile} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('tile-frozen');
+    });
+
+    it('should NOT apply frozen class for non-ice tiles', () => {
+      const tile = { ...baseTile, type: 'gold' as const, isFrozen: true };
+      const { container } = render(<AdventureTile {...defaultProps} tile={tile} />);
+      const tileElement = container.querySelector('[role="gridcell"]');
+      expect(tileElement).not.toHaveClass('tile-frozen');
+    });
+  });
+
+  describe('Bomb Row Preview', () => {
+    it('should apply bomb-row-preview class when tile in bomb row', () => {
+      const tileInRow1 = { ...baseTile, row: 1, col: 2 };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={tileInRow1} bombRowPreview={1} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('bomb-row-preview');
+    });
+
+    it('should NOT apply bomb-row-preview class when tile NOT in bomb row', () => {
+      const tileInRow2 = { ...baseTile, row: 2, col: 1 };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={tileInRow2} bombRowPreview={1} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('bomb-row-preview');
+    });
+
+    it('should NOT apply bomb-row-preview when bombRowPreview is null', () => {
+      const tileInRow1 = { ...baseTile, row: 1, col: 2 };
+      const { container } = render(
+        <AdventureTile {...defaultProps} tile={tileInRow1} bombRowPreview={null} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('bomb-row-preview');
+    });
+  });
+
+  describe('Hint Highlighting', () => {
+    it('should apply hint highlight classes when isHintHighlighted=true and NOT selected', () => {
+      const { container } = render(
+        <AdventureTile {...defaultProps} isHintHighlighted={true} isSelected={false} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveClass('ring-2');
+      expect(tile).toHaveClass('ring-neo-yellow');
+      expect(tile).toHaveClass('animate-pulse');
+    });
+
+    it('should NOT apply hint highlight when tile is selected', () => {
+      const { container } = render(
+        <AdventureTile {...defaultProps} isHintHighlighted={true} isSelected={true} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      // Should not have hint classes (isSelected takes priority)
+      expect(tile).not.toHaveClass('animate-pulse');
+    });
+
+    it('should NOT apply hint highlight when isHintHighlighted=false', () => {
+      const { container } = render(
+        <AdventureTile {...defaultProps} isHintHighlighted={false} isSelected={false} />
+      );
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).not.toHaveClass('animate-pulse');
+    });
+  });
+
+  describe('Event Handlers', () => {
+    it('should call onClick when tile is clicked', () => {
+      const onClick = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onClick={onClick} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      fireEvent.click(tile!);
+      expect(onClick).toHaveBeenCalled();
+    });
+
+    it('should call onMouseDown when mouse pressed', () => {
+      const onMouseDown = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onMouseDown={onMouseDown} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      fireEvent.mouseDown(tile!);
+      expect(onMouseDown).toHaveBeenCalled();
+    });
+
+    it('should call onMouseEnter when mouse enters', () => {
+      const onMouseEnter = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onMouseEnter={onMouseEnter} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      fireEvent.mouseEnter(tile!);
+      expect(onMouseEnter).toHaveBeenCalled();
+    });
+
+    it('should call onTouchStart when touch starts', () => {
+      const onTouchStart = jest.fn();
+      const { container } = render(<AdventureTile {...defaultProps} onTouchStart={onTouchStart} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      fireEvent.touchStart(tile!);
+      expect(onTouchStart).toHaveBeenCalled();
     });
   });
 
   describe('Cascade Animation', () => {
-    it('should apply cascade delay style when cascadeDelay is provided', () => {
-      // GIVEN
-      const tile = createTileState({ cascadeDelay: 200 });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      const tileElement = container.firstChild as HTMLElement;
-      expect(tileElement.style.animationDelay).toBe('200ms');
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('should have accessible role', () => {
-      // GIVEN
-      const tile = createTileState({ letter: 'B' });
-
-      // WHEN
-      const { container } = render(<AdventureTile tile={tile} />);
-
-      // THEN
-      expect(container.firstChild).toHaveAttribute('role', 'gridcell');
-    });
-
-    it('should have accessible label for special tiles', () => {
-      // GIVEN
-      const tile = createTileState({ type: 'gold', letter: 'G' });
-
-      // WHEN
-      render(<AdventureTile tile={tile} />);
-
-      // THEN - Aria label should include translated tile type
-      const tileElement = screen.getByRole('gridcell');
-      expect(tileElement).toHaveAttribute(
-        'aria-label',
-        expect.stringContaining('Gold')
+    it('should use cascade delay when showCascade=true', () => {
+      const getCascadeDelay = jest.fn(() => 50);
+      render(
+        <AdventureTile
+          {...defaultProps}
+          showCascade={true}
+          cascadeComplete={false}
+          getCascadeDelay={getCascadeDelay}
+        />
       );
+      expect(getCascadeDelay).toHaveBeenCalledWith(0, 0); // tile at row=0, col=0
     });
   });
 });

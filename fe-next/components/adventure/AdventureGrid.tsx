@@ -16,7 +16,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
-import { TileBadge } from './TileBadge';
+import { AdventureTile } from './AdventureTile';
 import './AdventureTile.css';
 import {
   type GridMeasurements,
@@ -76,18 +76,6 @@ interface AdventureGridProps {
 // CONSTANTS
 // ==============================================
 
-const TILE_TYPE_CLASSES: Record<TileType, string> = {
-  standard: '',
-  gold: 'tile-gold',
-  ice: 'tile-ice',
-  bomb: 'tile-bomb',
-  rainbow: 'tile-rainbow',
-  chain: 'tile-chain',
-  time: 'tile-time',
-  locked: 'tile-locked',
-  multiplier: 'tile-multiplier',
-};
-
 const TILE_TYPE_LABELS: Record<TileType, string> = {
   standard: '',
   gold: 'gold tile (3x multiplier)',
@@ -105,35 +93,6 @@ const GRID_COLS_CLASSES: Record<number, string> = {
   5: 'grid-cols-5',
   6: 'grid-cols-6',
 };
-
-// World-specific theming classes
-const TEXTURE_CLASSES: Record<number, string> = {
-  1: 'tile-texture-meadows',
-  2: 'tile-texture-springs',
-  3: 'tile-texture-caverns',
-};
-
-const BORDER_CLASSES: Record<number, string> = {
-  1: 'tile-border-meadows',
-  2: 'tile-border-springs',
-  3: 'tile-border-caverns',
-};
-
-const LETTER_GLOW_CLASSES: Record<number, string> = {
-  1: 'letter-glow-meadows',
-  2: 'letter-glow-springs',
-  3: 'letter-glow-caverns',
-};
-
-// Tile types that should NOT receive texture/border theming
-const SPECIAL_TILE_TYPES: Set<TileType> = new Set([
-  'gold',
-  'ice',
-  'bomb',
-  'rainbow',
-  'chain',
-  'time',
-]);
 
 // ==============================================
 // COMPONENT
@@ -531,313 +490,31 @@ const AdventureGrid = memo(
             const isHintHighlighted = hintSet.has(index);
             const canInteract = interactive && !disabled && !tile.isCleared;
 
-            // World-specific theming
-            const isStandardTile = !SPECIAL_TILE_TYPES.has(tile.type);
-            const textureClass = isStandardTile ? TEXTURE_CLASSES[worldId] : '';
-            const borderClass = isStandardTile ? BORDER_CLASSES[worldId] : '';
-            const letterGlowClass = LETTER_GLOW_CLASSES[worldId] || LETTER_GLOW_CLASSES[1];
-
             // Chain cascade delay for chained tiles (takes priority over tile.cascadeDelay)
             const chainCascadeDelay = tile.isChained ? chainCascade.delays.get(index) : undefined;
-            const effectiveCascadeDelay = chainCascadeDelay ?? tile.cascadeDelay;
 
             return (
-              <motion.div
+              <AdventureTile
                 key={tile.id}
-                layoutId={tile.id}
-                data-row={tile.row}
-                data-col={tile.col}
-                role="gridcell"
-                aria-label={getTileAriaLabel(tile)}
-                aria-selected={isSelected}
+                tile={tile}
+                index={index}
+                isSelected={isSelected}
+                isHintHighlighted={isHintHighlighted}
+                canInteract={canInteract}
+                worldId={worldId}
+                bombRowPreview={bombRowPreview}
+                showCascade={showCascade}
+                cascadeComplete={cascadeComplete}
+                getCascadeDelay={getCascadeDelay}
+                prefersReducedMotion={prefersReducedMotion}
+                enableComplexAnimations={enableComplexAnimations}
                 onClick={() => handleTileClick(index, tile)}
                 onMouseDown={(e) => handleDragStart(e, index, tile)}
                 onMouseEnter={() => handleDragEnter(index, tile)}
                 onTouchStart={(e) => handleDragStart(e, index, tile)}
-                initial={showCascade && !cascadeComplete ? {
-                  y: -100,
-                  opacity: 0,
-                  scale: 0.8,
-                } : undefined}
-                animate={{
-                  y: isSelected ? -4 : 0,
-                  opacity: 1,
-                  scale: isSelected ? 1.15 : 1,
-                  rotate: isSelected && !prefersReducedMotion ? [0, -2, 2, 0] : 0,
-                }}
-                transition={
-                  prefersReducedMotion
-                    ? { duration: 0 }
-                    : showCascade && !cascadeComplete
-                      ? {
-                          // DEBT-01: Optimized spring config for faster settle
-                          type: 'spring',
-                          stiffness: OPTIMIZED_TIMING.cascade.spring.stiffness,
-                          damping: OPTIMIZED_TIMING.cascade.spring.damping,
-                          mass: OPTIMIZED_TIMING.cascade.spring.mass,
-                          delay: getCascadeDelay(tile.row, tile.col) / 1000,
-                        }
-                      : {
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 20,
-                          mass: 0.5,
-                        }
-                }
-                whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
-                style={{
-                  animationDelay: effectiveCascadeDelay
-                    ? `${effectiveCascadeDelay}ms`
-                    : undefined,
-                }}
-                className={cn(
-                  // Base tile styles
-                  'relative aspect-square flex items-center justify-center',
-                  'font-black text-xl cursor-pointer',
-                  'border-2 border-neo-black/30 rounded-neo',
-
-                  // World-specific theming
-                  textureClass,
-                  borderClass,
-
-                  // Type-specific classes
-                  TILE_TYPE_CLASSES[tile.type],
-
-                  // Enhanced effect classes for special tiles
-                  enableComplexAnimations && tile.type === 'gold' && 'tile-gold-enhanced',
-                  enableComplexAnimations && tile.type === 'ice' && !tile.isCleared && 'tile-ice-enhanced',
-                  enableComplexAnimations && tile.type === 'bomb' && 'tile-bomb-enhanced',
-                  enableComplexAnimations && tile.type === 'rainbow' && 'tile-rainbow-enhanced',
-                  enableComplexAnimations && tile.type === 'chain' && 'tile-chain-enhanced',
-                  enableComplexAnimations && tile.type === 'time' && 'tile-time-enhanced',
-
-                  // Activation effect classes (one-time animation when tile effect triggers)
-                  enableComplexAnimations && tile.activationEffect && `tile-effect-${tile.activationEffect}`,
-
-                  // State classes
-                  tile.isCleared && 'tile-cleared opacity-40 cursor-not-allowed',
-                  // Enhanced selection: CSS handles glow, ring, and animation
-                  isSelected && 'tile-selected-enhanced',
-                  tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
-
-                  // Bomb row preview: highlight tiles in bomb's row when bomb is selected
-                  bombRowPreview !== null && tile.row === bombRowPreview && 'bomb-row-preview',
-
-                  // Hint highlight: show which tiles form the hinted word
-                  isHintHighlighted && !isSelected && [
-                    'ring-2 ring-neo-yellow',
-                    'shadow-[0_0_16px_rgba(255,225,53,0.7),0_0_32px_rgba(255,225,53,0.3)]',
-                    'animate-pulse',
-                  ],
-
-                  // Standard tile background
-                  tile.type === 'standard' &&
-                    'bg-gradient-to-br from-neo-white via-gray-100 to-gray-200 text-neo-black overflow-hidden',
-
-                  // Gold tile - golden glow
-                  tile.type === 'gold' && [
-                    'bg-gradient-to-br from-neo-yellow via-yellow-400 to-amber-500',
-                    'text-neo-black',
-                    'border-amber-600/60',
-                  ],
-
-                  // Ice tile - blue frost
-                  tile.type === 'ice' && [
-                    'bg-gradient-to-br from-cyan-200 via-blue-300 to-cyan-400',
-                    'text-blue-900',
-                    'border-cyan-500/60',
-                  ],
-
-                  // Bomb tile - danger red
-                  tile.type === 'bomb' && [
-                    'bg-gradient-to-br from-red-500 via-red-600 to-orange-600',
-                    'text-neo-white',
-                    'border-red-700/60',
-                  ],
-
-                  // Rainbow tile - animated via CSS
-                  tile.type === 'rainbow' && [
-                    'text-neo-black',
-                    'border-purple-500/60',
-                  ],
-
-                  // Chain tile - purple link
-                  tile.type === 'chain' && [
-                    'bg-gradient-to-br from-purple-400 via-violet-500 to-violet-600',
-                    'text-neo-white',
-                    'border-purple-700/60',
-                  ],
-
-                  // Time tile - emerald clock
-                  tile.type === 'time' && [
-                    'bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600',
-                    'text-neo-white',
-                    'border-emerald-600/60',
-                  ]
-                )}
-              >
-                {/* ========== GOLD TILE EFFECTS ========== */}
-                {tile.type === 'gold' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-gold-sparkle tile-gold-sparkle--1" />
-                    <div className="tile-gold-sparkle tile-gold-sparkle--2" />
-                    <div className="tile-gold-sparkle tile-gold-sparkle--3" />
-                  </>
-                )}
-
-                {/* ========== ICE TILE EFFECTS ========== */}
-                {/* Only show ice effects when tile is NOT cleared (melted) */}
-                {tile.type === 'ice' && !tile.isCleared && enableComplexAnimations && (
-                  <>
-                    <span className="tile-ice-snowflake tile-ice-snowflake--1">❄</span>
-                    <span className="tile-ice-snowflake tile-ice-snowflake--2">❄</span>
-                    <span className="tile-ice-snowflake tile-ice-snowflake--3">❄</span>
-                  </>
-                )}
-
-                {/* ========== BOMB TILE EFFECTS ========== */}
-                {tile.type === 'bomb' && !tile.isCleared && enableComplexAnimations && (
-                  <>
-                    <div className="tile-bomb-rings">
-                      <div className="tile-bomb-ring" />
-                      <div className="tile-bomb-ring tile-bomb-ring--2" />
-                      <div className="tile-bomb-ring tile-bomb-ring--3" />
-                    </div>
-                    <div className="tile-bomb-spark" />
-                  </>
-                )}
-
-                {/* ========== RAINBOW TILE EFFECTS ========== */}
-                {tile.type === 'rainbow' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-rainbow-particle tile-rainbow-particle--1" />
-                    <div className="tile-rainbow-particle tile-rainbow-particle--2" />
-                    <div className="tile-rainbow-particle tile-rainbow-particle--3" />
-                    <div className="tile-rainbow-star" />
-                  </>
-                )}
-
-                {/* ========== CHAIN TILE EFFECTS ========== */}
-                {tile.type === 'chain' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-chain-line tile-chain-line--top" />
-                    <div className="tile-chain-line tile-chain-line--bottom" />
-                  </>
-                )}
-
-                {/* ========== TIME TILE EFFECTS ========== */}
-                {tile.type === 'time' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-time-hand" />
-                    <div className="tile-time-particle tile-time-particle--1" />
-                    <div className="tile-time-particle tile-time-particle--2" />
-                    <div className="tile-time-particle tile-time-particle--3" />
-                  </>
-                )}
-
-                {/* ========== ACTIVATION EFFECT PARTICLES ========== */}
-                {/* Melt effect - water drops and splash */}
-                {tile.activationEffect === 'melt' && enableComplexAnimations && (
-                  <div className="tile-melt-splash" />
-                )}
-
-                {/* Explode effect - shockwaves and debris */}
-                {tile.activationEffect === 'explode' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-explode-shockwave" />
-                    <div className="tile-explode-shockwave tile-explode-shockwave--2" />
-                    <div className="tile-explode-shockwave tile-explode-shockwave--3" />
-                    <div className="tile-explode-debris tile-explode-debris--1" />
-                    <div className="tile-explode-debris tile-explode-debris--2" />
-                    <div className="tile-explode-debris tile-explode-debris--3" />
-                    <div className="tile-explode-debris tile-explode-debris--4" />
-                    <div className="tile-explode-debris tile-explode-debris--5" />
-                    <div className="tile-explode-debris tile-explode-debris--6" />
-                  </>
-                )}
-
-                {/* Collect effect - coins and sparkle */}
-                {tile.activationEffect === 'collect' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-collect-sparkle" />
-                    <div className="tile-collect-coin tile-collect-coin--1" />
-                    <div className="tile-collect-coin tile-collect-coin--2" />
-                    <div className="tile-collect-coin tile-collect-coin--3" />
-                    <div className="tile-collect-coin tile-collect-coin--4" />
-                  </>
-                )}
-
-                {/* Wildcard effect - rainbow rings and star */}
-                {tile.activationEffect === 'wildcard' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-wildcard-ring tile-wildcard-ring--1" />
-                    <div className="tile-wildcard-ring tile-wildcard-ring--2" />
-                    <div className="tile-wildcard-ring tile-wildcard-ring--3" />
-                    <div className="tile-wildcard-star" />
-                  </>
-                )}
-
-                {/* Link effect - pulse rings and icon */}
-                {tile.activationEffect === 'link' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-link-pulse" />
-                    <div className="tile-link-pulse tile-link-pulse--2" />
-                    <div className="tile-link-icon">🔗</div>
-                  </>
-                )}
-
-                {/* Time bonus effect - floating +5s and clock */}
-                {tile.activationEffect === 'timeBonus' && enableComplexAnimations && (
-                  <>
-                    <div className="tile-time-plus" />
-                    <div className="tile-time-clock" />
-                    <div className="tile-time-ring" />
-                  </>
-                )}
-
-                {/* ========== SELECTION RIPPLE EFFECT ========== */}
-                {/* Matches main game mode's satisfying ripple feedback */}
-                {isSelected && enableComplexAnimations && !prefersReducedMotion && (
-                  <>
-                    {/* Primary ripple - radial gradient expanding outward */}
-                    <motion.div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        borderRadius: '6px',
-                        background: 'radial-gradient(circle, rgba(255, 200, 100, 0.7), rgba(255, 150, 50, 0.4) 50%, transparent 75%)',
-                      }}
-                      initial={{ scale: 0.3, opacity: 1 }}
-                      animate={{ scale: 2.5, opacity: 0 }}
-                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    />
-                    {/* Secondary glow pulse */}
-                    <motion.div
-                      className="absolute inset-[-4px] pointer-events-none"
-                      style={{
-                        background: 'radial-gradient(circle at center, rgba(255, 200, 100, 0.9), transparent 60%)',
-                        filter: 'blur(4px)',
-                        borderRadius: '10px',
-                      }}
-                      initial={{ scale: 0, opacity: 1 }}
-                      animate={{ scale: [0, 1.5, 1.8], opacity: [1, 0.7, 0] }}
-                      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    />
-                  </>
-                )}
-
-                {/* Letter */}
-                <span className={cn(
-                  'relative z-10 select-none',
-                  letterGlowClass,
-                  'drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]',
-                  (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
-                )}>
-                  {tile.letter}
-                </span>
-
-                {/* Tile badge (gold, rainbow, bomb, chain, time, frost overlay) */}
-                <TileBadge type={tile.type} isFrozen={tile.isFrozen} />
-              </motion.div>
+                getTileAriaLabel={getTileAriaLabel}
+                chainCascadeDelay={chainCascadeDelay}
+              />
             );
           })}
           </AnimatePresence>
