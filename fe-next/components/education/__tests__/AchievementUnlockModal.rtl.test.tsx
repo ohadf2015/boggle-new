@@ -45,6 +45,7 @@ jest.mock('framer-motion', () => ({
 
 describe('AchievementUnlockModal - RTL Positioning (Toast Mode)', () => {
   const bronzeUnlock = {
+    achievementKey: 'test-bronze-achievement',
     tier: 'bronze' as const,
     icon: '🏆',
     isNew: true,
@@ -52,6 +53,7 @@ describe('AchievementUnlockModal - RTL Positioning (Toast Mode)', () => {
   };
 
   const goldUnlock = {
+    achievementKey: 'test-gold-achievement',
     tier: 'gold' as const,
     icon: '🏆',
     isNew: true,
