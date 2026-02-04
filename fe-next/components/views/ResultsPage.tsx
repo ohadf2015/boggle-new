@@ -15,10 +15,10 @@ import { useCoinContext } from '@/contexts/CoinContext';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
-import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
 import type { ResultsPageProps } from '@/types/components';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
+import { useResultsData } from '@/hooks/useResultsData';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
 // Dynamic imports for heavy components (loaded after initial render)
@@ -134,28 +134,32 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     newScore: number;
   } | null>(null);
 
-  // Calculate if current player is the winner
-  const sortedScores = useMemo(() => {
-    return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
-  }, [finalScores]);
+  // Extract all data processing logic into a custom hook
+  const {
+    sortedScores,
+    winner,
+    isCurrentUserWinner,
+    currentPlayerRank,
+    currentPlayerData,
+    currentPlayerValidWords,
+    otherPlayers,
+    bannerPlayer,
+    bannerRank,
+    isCurrentUserInBanner,
+    playerArchetypes,
+    currentPlayerArchetype,
+    missedWords,
+    shareCardStats,
+    isBotsOnlyGame,
+    normalizeUsername,
+  } = useResultsData({
+    finalScores,
+    username,
+    gameDuration: 180, // Default 3-minute game
+  });
 
-  // Normalize username for comparison (trim whitespace, case-insensitive)
-  // This prevents rank mismatch bugs when frontend username differs slightly from server
-  const normalizeUsername = useCallback((name: string | undefined | null): string => {
-    return (name || '').trim().toLowerCase();
-  }, []);
-
-  // Detect if all opponents are bots (for NextStepPrompt - suggest brain training)
-  const isBotsOnlyGame = useMemo(() => {
-    if (!sortedScores || sortedScores.length === 0) return false;
-    const normalizedUsername = normalizeUsername(username);
-    const opponents = sortedScores.filter(p => normalizeUsername(p.username) !== normalizedUsername);
-    // Game is bots-only if there are opponents and ALL of them are bots
-    return opponents.length > 0 && opponents.every(p => p.isBot === true);
-  }, [sortedScores, username, normalizeUsername]);
-
-  const winner = sortedScores[0];
-  const isCurrentUserWinner = normalizeUsername(winner?.username) === normalizeUsername(username);
+  // Derived value for share prompt visibility
+  const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
 
   // CrazyGames lifecycle - stop gameplay when results page loads
   // Call happytime if winner (throttled to once per 30s)
@@ -174,49 +178,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gamesPlayed: guestStats.gamesPlayed,
     isMultiplayer: true,
   });
-
-  // Calculate current player's rank (1-based: 1st, 2nd, 3rd, etc.)
-  const currentPlayerRank = useMemo(() => {
-    if (!username || sortedScores.length === 0) return -1;
-    const normalizedUsername = normalizeUsername(username);
-    const index = sortedScores.findIndex(p => normalizeUsername(p.username) === normalizedUsername);
-    return index >= 0 ? index + 1 : -1;
-  }, [sortedScores, username, normalizeUsername]);
-
-  // Always show the current player in the celebration banner
-  // This ensures personalized feedback regardless of rank
-  const bannerPlayer = useMemo(() => {
-    if (currentPlayerRank >= 1) {
-      return sortedScores[currentPlayerRank - 1];
-    }
-    return winner;
-  }, [currentPlayerRank, sortedScores, winner]);
-
-  // Get current player data for share prompt
-  const currentPlayerData = useMemo(() => {
-    if (!finalScores || !username) return null;
-    const normalizedUsername = normalizeUsername(username);
-    return finalScores.find(p => normalizeUsername(p.username) === normalizedUsername);
-  }, [finalScores, username, normalizeUsername]);
-
-  // Memoize current player's valid words - used in multiple places
-  const currentPlayerValidWords = useMemo(() => {
-    return currentPlayerData?.allWords?.filter(w => w.validated && w.score > 0) || [];
-  }, [currentPlayerData]);
-
-  // Memoize other players list (excluding current user)
-  const otherPlayers = useMemo(() => {
-    const normalizedUsername = normalizeUsername(username);
-    return sortedScores.filter(p => normalizeUsername(p.username) !== normalizedUsername);
-  }, [sortedScores, username, normalizeUsername]);
-
-  // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
-  // BUT if player has 0 score AND there are other players, treat them as non-winner (rank 4+)
-  // When playing alone (only 1 player), always show actual rank (1st) even with zero score
-  const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
-  const totalPlayers = sortedScores.length;
-  const bannerRank = hasZeroScore && totalPlayers > 1 ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
-  const isCurrentUserInBanner = normalizeUsername(bannerPlayer?.username) === normalizeUsername(username);
 
   // Update guest stats when results load (only once)
   useEffect(() => {
@@ -534,49 +495,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Use transition for non-urgent UI updates
   const [isPending, startTransition] = useTransition();
-
-  // Defer expensive archetype calculations - can be delayed without affecting UX
-  const deferredFinalScores = useDeferredValue(finalScores);
-
-  // Calculate player archetypes for all players (deferred for better performance)
-  const playerArchetypes = useMemo(() => {
-    if (!deferredFinalScores || deferredFinalScores.length === 0) return new Map<string, PlayerArchetype>();
-    return calculateAllPlayerArchetypes(deferredFinalScores, 180); // Default 3 min game
-  }, [deferredFinalScores]);
-
-  // Get current player's archetype
-  const currentPlayerArchetype = useMemo(() => {
-    if (!username) return null;
-    return playerArchetypes.get(username) || null;
-  }, [playerArchetypes, username]);
-
-  // Calculate max combo and longest word for sharing
-  const shareCardStats = useMemo(() => {
-    if (!currentPlayerData) return { maxCombo: undefined, longestWord: undefined };
-
-    const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
-
-    // Find max combo from combo bonuses (combo bonus > 0 means they had a combo)
-    const maxCombo = validWords.reduce((max, w) => {
-      const comboLevel = (w as { comboBonus?: number }).comboBonus;
-      return comboLevel && comboLevel > max ? comboLevel : max;
-    }, 0);
-
-    // Find longest word
-    const longestWord = validWords.reduce<string | undefined>(
-      (longest, w) => w.word.length > (longest?.length || 0) ? w.word : longest,
-      undefined
-    );
-
-    return { maxCombo: maxCombo > 0 ? maxCombo : undefined, longestWord };
-  }, [currentPlayerData]);
-
-  // Calculate missed words for current player (high-value words others found)
-  const missedWords = useMemo(() => {
-    if (!username || !allPlayerWords) return [];
-    return getMissedWords(username, allPlayerWords, 10);
-  }, [username, allPlayerWords]);
-
 
   // Note: Confetti is now handled by ResultsWinnerBanner with rank-specific colors
 
