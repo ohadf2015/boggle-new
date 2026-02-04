@@ -507,9 +507,9 @@ const he = {
     "skipButton": "דלג"
   },
   "error": {
-    "subscriptionFailed": "ההרשמה נכשלה. אנא נסה שוב.",
+    "subscriptionFailed": "אופס, משהו השתבש. ננסה שוב?",
     "generic": "אופס, זה לא עבד!",
-    "notAuthenticated": "התחבר כדי להמשיך לשחק!"
+    "notAuthenticated": "התחברו כדי להמשיך!"
   },
   "difficulty": {
     "easy": "קל",
@@ -518,9 +518,9 @@ const he = {
     "expert": "מומחה",
     "master": "אמן",
     "hint": {
-      "length": "למילה יש {length} אותיות",
-      "lengthAndStart": "למילה יש {length} אותיות ומתחילה ב-{letter}",
-      "fullReveal": "הנה המילה: {word}"
+      "length": "{length} אותיות. תתחילו!",
+      "lengthAndStart": "{length} אותיות, מתחילה ב-{letter}",
+      "fullReveal": "הנה: {word}"
     }
   },
   "joinView": {
@@ -1022,32 +1022,32 @@ const he = {
     "tryIt": "נסו בעצמכם! 🎮"
   },
   "lateJoiner": {
-    "welcomeTitle": "המשחק כבר התחיל!",
-    "welcomeMessage": ":הצטרפת באמצע המשחק. הנה מה שאתה צריך לדעת",
-    "timeRemaining": "זמן נותר",
-    "currentLeaders": "מובילים נוכחיים",
-    "quickTip1": "החלק אותיות מחוברות לבניית מילים",
-    "quickTip2": "שחרר כדי לשלוח",
+    "welcomeTitle": "יאללה, התחילו בלעדיך!",
+    "welcomeMessage": "הגעת באמצע - הנה מה שצריך לדעת:",
+    "timeRemaining": "נשאר",
+    "currentLeaders": "מי מוביל",
+    "quickTip1": "החליקו אותיות לבניית מילים",
+    "quickTip2": "שחררו לשליחה",
     "quickTip3": "מילים ארוכות = יותר נקודות!",
-    "gotIt": "הבנתי, בואו נשחק!",
-    "badge": "הצטרף באיחור"
+    "gotIt": "קיבלתי, יאללה!",
+    "badge": "איחור אופנתי"
   },
   "spectator": {
-    "upgraded": "הצטרפת! בוא נשחק!",
-    "youAreSpectating": "צופה בקרב!",
+    "upgraded": "נכנסת! יאללה לשחק!",
+    "youAreSpectating": "צופה בבאלגן!",
     "status": "צופה 👀",
-    "explanation": "החדר מלא! אתה צופה, אבל תחכה - אולי ייפתח מקום.",
-    "requestToPlay": "בקש לשחק",
-    "join": "הצטרף"
+    "explanation": "החדר פוצץ! צופים בינתיים - נודיע אם מישהו עוזב.",
+    "requestToPlay": "תנו לי להיכנס!",
+    "join": "כנס"
   },
   "hints": {
     "hint": "רמז",
-    "loading": "מקבל רמז...",
-    "noHintsLeft": "אין רמזים נותרים",
+    "loading": "רגע...",
+    "noHintsLeft": "נגמרו הרמזים!",
     "letters": "אותיות",
     "startsWith": "מתחילה ב",
-    "tapOrEscToDismiss": "הקש או לחץ Escape לסגירה",
-    "requestHint": "קבל רמז"
+    "tapOrEscToDismiss": "הקישו לסגירה",
+    "requestHint": "צריכים עזרה?"
   },
   "achievementDock": {
     "title": "ההישגים שלך"
@@ -1060,11 +1060,11 @@ const he = {
   },
   "chat": {
     "title": "צ'אט החדר",
-    "placeholder": "הקלד הודעה...",
-    "noMessages": "אין הודעות עדיין",
-    "startChatting": "התחילו לשוחח!",
-    "send": "שלח הודעה",
-    "newMessages": "הודעות צ'אט חדשות"
+    "placeholder": "כתבו משהו...",
+    "noMessages": "שקט פה...",
+    "startChatting": "יאללה לדבר!",
+    "send": "שלח",
+    "newMessages": "הודעות חדשות"
   },
   "results": {
     "results": "תוצאות",
@@ -1795,7 +1795,7 @@ const he = {
     "userMenu": "תפריט משתמש",
     "alreadyHaveAccount": "יש לך כבר חשבון? התחבר",
     "noAccount": "אין לך חשבון? הירשם",
-    "invalidCredentials": "אימייל או סיסמה שגויים",
+    "invalidCredentials": "הממ, משהו לא מסתדר. ננסה שוב?",
     "continueAsGuest": "המשך כאורח",
     "continueWithGoogle": "המשך עם Google",
     "continueWithDiscord": "המשך עם Discord",
@@ -3154,7 +3154,7 @@ const he = {
     "addFriendsToChallenge": "הוסף חברים כדי לאתגר",
     "challenge": "אתגר",
     "friend": "חבר",
-    "noFriendsYet": "עוד אין לך חברים",
+    "noFriendsYet": "החברה ריקה!",
     "noPendingRequests": "אין בקשות ממתינות",
     "requestsWillAppearHere": "בקשות יופיעו כאן",
     "noUsersFound": "לא נמצאו משתמשים",
@@ -3174,7 +3174,7 @@ const he = {
     },
     "messageLimit": "{current}/{max} תווים",
     "errors": {
-      "sendFailed": "שליחת ההודעה נכשלה"
+      "sendFailed": "לא עבר. ננסה שוב?"
     },
     "status": {
       "online": "מחובר",
@@ -3194,7 +3194,7 @@ const he = {
     "finding": "מחפש...",
     "noWordsLeft": "לא נשארו מילים של 5+ אותיות לחשוף",
     "notEnoughCoins": "צריך {cost} מטבעות (יש לך {balance})",
-    "gameNotActive": "המשחק לא פעיל",
+    "gameNotActive": "קודם תתחילו משחק!",
     "coins": "מטבעות",
     "base": "בסיס",
     "usedForReveals": "השתמשו במטבעות כדי לחשוף מילים במשחקי יחיד!"

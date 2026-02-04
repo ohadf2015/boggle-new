@@ -40,7 +40,8 @@ jest.mock('@/components/teacher/analytics/StudentProgressTable', () => ({
 }));
 
 jest.mock('@/components/teacher/analytics/LessonEffectivenessChart', () => ({
-  LessonEffectivenessChart: ({ classroomId }: any) => (
+  __esModule: true,
+  default: ({ classroomId }: any) => (
     <div data-testid="lesson-effectiveness-chart">Chart for {classroomId}</div>
   ),
 }));

@@ -399,12 +399,18 @@ const en = {
     "codeCopyError": "Couldn't copy",
     "buttonLabel": "Invite",
     "modalTitle": "Rally Your Squad",
-    "copyLink": "Copy",
+    "copyLink": "Copy Link",
+    "saveImage": "Save Image",
+    "share": "Share",
     "copy": "Copy",
     "copied": "Copied!",
+    "generating": "Generating...",
     "whatsapp": "WhatsApp",
     "more": "More",
-    "title": "Join my LexiClash game!",
+    "title": "Share Your Results!",
+    "subtitle": "Challenge your friends to beat your score",
+    "playAt": "Play at",
+    "beatMyScore": "Can you beat my score?",
     "text": "Join my game with code: {{code}}",
     "inviteTitle": "Word war is ON! 🎮",
     "shareVictory": "Show Off",
@@ -500,14 +506,14 @@ const en = {
   },
   "profileCustomization": {
     "title": "Make it yours!",
-    "subtitle": "Choose your avatar and name",
-    "avatarLabel": "Pick your character",
-    "namePlaceholder": "Enter your name",
+    "subtitle": "Pick your look and name",
+    "avatarLabel": "Your character",
+    "namePlaceholder": "Your name",
     "saveButton": "Save",
     "skipButton": "Skip"
   },
   "error": {
-    "subscriptionFailed": "Subscription failed. Please try again.",
+    "subscriptionFailed": "Hmm, that didn't go through. One more try?",
     "generic": "Oops, that didn't work!",
     "notAuthenticated": "Sign in to keep playing!"
   },
@@ -518,9 +524,9 @@ const en = {
     "expert": "Expert",
     "master": "Master",
     "hint": {
-      "length": "The word has {length} letters",
-      "lengthAndStart": "The word has {length} letters and starts with {letter}",
-      "fullReveal": "Here's the word: {word}"
+      "length": "{length} letters. You got this!",
+      "lengthAndStart": "{length} letters, starts with '{letter}'",
+      "fullReveal": "It's {word}!"
     }
   },
   "joinView": {
@@ -1014,32 +1020,32 @@ const en = {
     "tryIt": "Try It!"
   },
   "lateJoiner": {
-    "welcomeTitle": "Game in Progress!",
-    "welcomeMessage": "You joined mid-game. Here's what you need to know:",
-    "timeRemaining": "Time remaining",
-    "currentLeaders": "Current leaders",
-    "quickTip1": "Swipe connecting letters to build words",
-    "quickTip2": "Release to submit",
-    "quickTip3": "Longer words = more points!",
-    "gotIt": "Got it, let's play!",
-    "badge": "Late Joiner"
+    "welcomeTitle": "Game's already hot!",
+    "welcomeMessage": "You're jumping in mid-action. Quick rundown:",
+    "timeRemaining": "Time left",
+    "currentLeaders": "Who's winning",
+    "quickTip1": "Swipe letters to build words",
+    "quickTip2": "Release to send",
+    "quickTip3": "Long words = big points!",
+    "gotIt": "Got it, let's go!",
+    "badge": "Fashionably Late"
   },
   "spectator": {
-    "upgraded": "You're in! Let's play!",
-    "youAreSpectating": "Watching the battle!",
+    "upgraded": "You're in! Let's go!",
+    "youAreSpectating": "Watching the action!",
     "status": "👀 SPECTATING",
-    "explanation": "Room full! Watch the game - we'll notify you if a spot opens.",
-    "requestToPlay": "Request to Play",
-    "join": "Join Game"
+    "explanation": "Room's packed! Watch the chaos - we'll ping you if someone bails.",
+    "requestToPlay": "I Want In!",
+    "join": "Jump In"
   },
   "hints": {
     "hint": "Hint",
-    "loading": "Getting hint...",
-    "noHintsLeft": "No hints remaining",
+    "loading": "Finding something good...",
+    "noHintsLeft": "Out of hints!",
     "letters": "letters",
     "startsWith": "starts with",
-    "tapOrEscToDismiss": "Tap or press Escape to dismiss",
-    "requestHint": "Get a hint"
+    "tapOrEscToDismiss": "Tap or Esc to close",
+    "requestHint": "Need a nudge?"
   },
   "achievementDock": {
     "title": "Your Achievements"
@@ -1052,11 +1058,11 @@ const en = {
   },
   "chat": {
     "title": "Room Chat",
-    "placeholder": "Type a message...",
-    "noMessages": "No messages yet",
-    "startChatting": "Start chatting!",
-    "send": "Send message",
-    "newMessages": "New chat messages"
+    "placeholder": "Say something...",
+    "noMessages": "Crickets...",
+    "startChatting": "Break the ice!",
+    "send": "Send",
+    "newMessages": "New messages"
   },
   "results": {
     "results": "Battle Report",
@@ -1135,7 +1141,7 @@ const en = {
     "readyExplanation": "Ready up to show you're in!",
     "scoringTip": "Scoring Tip",
     "scoringTipText": "Longer words = bigger points!",
-    "sharedWordsExplanation": "Words others found too score zero.",
+    "sharedWordsExplanation": "Same word as someone else? Zero points. Be unique!",
     "yourPlace": "{place} of {total}",
     "pointsFromFirst": "{points} pts from 1st",
     "potentialScore": "+{points} pts potential"
@@ -1143,16 +1149,16 @@ const en = {
   "nextStep": {
     "backToLobby": "Back to Lobby",
     "letsGo": "Let's Go!",
-    "challengeBots": "Challenge Bots",
-    "challengeBotsDesc": "Test your skills against AI opponents",
-    "challengeBotsAgain": "Play Again!",
-    "challengeBotsAgainDesc": "Start a new game with bots",
-    "tryDailyChallenge": "Try Daily Challenge",
-    "tryDailyChallengeDesc": "Same puzzle for everyone worldwide - compete globally!",
-    "goMultiplayer": "Go Multiplayer",
-    "goMultiplayerDesc": "Challenge real players in live word battles",
-    "brainTraining": "Brain Training",
-    "brainTrainingDesc": "Boost your cognitive skills with focused exercises"
+    "challengeBots": "Fight Bots",
+    "challengeBotsDesc": "Think you can beat the machines?",
+    "challengeBotsAgain": "Run it back!",
+    "challengeBotsAgainDesc": "Same bots, new board, fresh revenge",
+    "tryDailyChallenge": "Daily Challenge",
+    "tryDailyChallengeDesc": "Everyone gets the same puzzle. Where do you rank?",
+    "goMultiplayer": "Battle Friends",
+    "goMultiplayerDesc": "Real humans, real competition, real bragging rights",
+    "brainTraining": "Brain Gym",
+    "brainTrainingDesc": "Level up your mental game"
   },
   "player": {
     "new": "NEW"
@@ -1785,9 +1791,9 @@ const en = {
     "signUp": "Sign Up",
     "loginCrazyGames": "Login",
     "userMenu": "User menu",
-    "alreadyHaveAccount": "Already have an account? Sign in",
-    "noAccount": "Don't have an account? Sign up",
-    "invalidCredentials": "Invalid email or password",
+    "alreadyHaveAccount": "Already a member? Sign in",
+    "noAccount": "New here? Sign up",
+    "invalidCredentials": "Hmm, that combo didn't work. Try again?",
     "continueAsGuest": "Play as Guest",
     "continueWithGoogle": "Continue with Google",
     "continueWithDiscord": "Continue with Discord",
@@ -1896,8 +1902,8 @@ const en = {
       }
     },
     "callback": {
-      "completingSignIn": "Completing sign in...",
-      "takingTooLong": "This is taking longer than expected. Try again?",
+      "completingSignIn": "Finishing up...",
+      "takingTooLong": "Taking a bit longer than usual. Wanna try again?",
       "tryAgain": "Try Again"
     }
   },
@@ -2442,17 +2448,17 @@ const en = {
     "tutorial": "Tutorial"
   },
   "modeDiscovery": {
-    "title": "Ready for More?",
-    "description": "Great job on your training! Now try these exciting modes:",
+    "title": "Want More?",
+    "description": "You nailed that! Check out these modes:",
     "daily": {
       "title": "Daily Challenge",
-      "description": "New puzzle every day!"
+      "description": "Fresh puzzle drops every day"
     },
     "bots": {
-      "title": "Play vs Bots",
-      "description": "Test your skills!"
+      "title": "Fight Bots",
+      "description": "See how you stack up"
     },
-    "maybeLater": "Maybe later"
+    "maybeLater": "Not now"
   },
   "singlePlayer": {
     "play": "Play",
@@ -2469,15 +2475,15 @@ const en = {
     "finish": "Finish",
     "victory": "Victory!",
     "gameOver": "Game Over",
-    "verifyingWords": "Verifying words...",
-    "practiceComplete": "Practice Done!",
+    "verifyingWords": "Checking your words...",
+    "practiceComplete": "Nice practice!",
     "newHighScore": "New Record!",
     "noWordsFound": "No words found",
     "tryAgain": "Try Again!",
     "keepPracticing": "Keep Practicing!",
     "fewWordsFound": "Found {count} words",
     "fewWordsFoundSingular": "Found 1 word",
-    "achievementsNotSaved": "Solo achievements aren't saved to your profile.",
+    "achievementsNotSaved": "Solo games don't count toward your profile.",
     "botWordsFound": "Bot Words Found",
     "noWordsToShow": "Word details not available",
     "wordsFound": "Words Found",
@@ -2503,11 +2509,11 @@ const en = {
     "botWords": "Words",
     "beatYourRecord": "New record!",
     "soloVsBots": "Solo vs Bots",
-    "soloVsBotsDesc": "Compete against AI opponents of varying difficulty levels",
+    "soloVsBotsDesc": "Battle AI rivals from easy to brutal",
     "practiceMode": "Practice",
-    "practiceModeDesc": "No timer - learn and explore at your own pace",
+    "practiceModeDesc": "Chill mode - no clock, no stress",
     "challengeMode": "Challenge",
-    "challengeModeDesc": "Beat your personal records and track improvement",
+    "challengeModeDesc": "Chase your best scores",
     "preset": {
       "customGame": "Custom Game Setup",
       "quick": "Quick",
@@ -3199,22 +3205,22 @@ const en = {
     "addFriendsToChallenge": "Add Friends",
     "challenge": "Challenge",
     "friend": "Friend",
-    "noFriendsYet": "No friends yet!",
+    "noFriendsYet": "Your squad is empty!",
     "noPendingRequests": "All caught up!",
-    "requestsWillAppearHere": "Requests will appear here",
-    "noUsersFound": "No players found",
+    "requestsWillAppearHere": "Friend requests show up here",
+    "noUsersFound": "Nobody matches that",
     "pending": "Pending",
     "pendingRequests": "Pending Requests",
     "remove": "Remove",
     "requests": "Requests",
-    "searchByUsername": "Search by username...",
+    "searchByUsername": "Find a player...",
     "sentRequests": "Sent Requests",
-    "signInRequired": "Sign in to add friends",
-    "typeAtLeast2Chars": "Type at least 2 characters",
+    "signInRequired": "Sign in first to build your squad",
+    "typeAtLeast2Chars": "Keep typing (2+ chars)",
     "messages": "Messages",
-    "noMessages": "No messages yet",
-    "startConversation": "Start a conversation!",
-    "typeMessage": "Type a message...",
+    "noMessages": "Nothing yet...",
+    "startConversation": "Say hi!",
+    "typeMessage": "Say something...",
     "sendMessage": "Send",
     "challenges": {
       "send": "Send Challenge",
@@ -3224,7 +3230,7 @@ const en = {
     },
     "messageLimit": "{current}/{max} characters",
     "errors": {
-      "sendFailed": "Failed to send message"
+      "sendFailed": "Message didn't go through. Try again?"
     },
     "status": {
       "online": "Online",
@@ -3239,15 +3245,15 @@ const en = {
   },
   "reveal": {
     "revealWord": "Reveal",
-    "finding": "Finding...",
-    "noWordsLeft": "No 5+ letter words left to reveal",
-    "notEnoughCoins": "Need {cost} coins (have {balance})",
-    "gameNotActive": "Game not active",
+    "finding": "Hunting...",
+    "noWordsLeft": "No big words left to show!",
+    "notEnoughCoins": "{cost} coins needed (you have {balance})",
+    "gameNotActive": "Start a game first!",
     "coins": "Coins",
     "base": "Base",
-    "usedForReveals": "Use coins to reveal words in single player games!",
-    "revealFree": "Free reveal!",
-    "revealCost": "Reveal ({cost} coins)"
+    "usedForReveals": "Spend coins to reveal hidden words!",
+    "revealFree": "Free one!",
+    "revealCost": "Reveal ({cost})"
   },
   "accessibility": {
     "title": "Your Way",
@@ -3305,7 +3311,7 @@ const en = {
   },
   "pwa": {
     "installTitle": "Get the App",
-    "installDescription": "Install LexiClash for faster play and offline access!",
+    "installDescription": "Faster play, works offline, no app store needed!",
     "installButton": "Install"
   },
   "newYear": {
@@ -3816,8 +3822,8 @@ const en = {
         "admin": "Admin",
         "ai": "AI"
       },
-      "noWordsFound": "No words found",
-      "tryAdjustingFilters": "Try adjusting your filters",
+      "noWordsFound": "Nothing here",
+      "tryAdjustingFilters": "Try different filters",
       "loadMore": "Load More",
       "loading": "Loading...",
       "deleting": "Deleting...",
@@ -3863,24 +3869,24 @@ const en = {
   },
   "tvTutorial": {
     "welcome": {
-      "title": "Welcome to TV Mode",
-      "description": "Perfect for parties! Cast to a big screen and let everyone play."
+      "title": "TV Mode",
+      "description": "Party time! Throw it on the big screen and let everyone battle."
     },
     "qr": {
-      "title": "QR Code & Room Code",
-      "description": "Players scan the QR code or enter the room code to join instantly."
+      "title": "Join Code",
+      "description": "Scan the QR or punch in the code. Boom, you're in."
     },
     "grid": {
-      "title": "Game Grid",
-      "description": "The letter grid displays here for everyone to see. Words appear as players find them."
+      "title": "The Grid",
+      "description": "Everyone sees the same letters. Words pop up as people find them."
     },
     "leaderboard": {
-      "title": "Live Leaderboard",
-      "description": "Real-time scores and rankings. Watch the competition heat up!"
+      "title": "Live Scores",
+      "description": "Rankings update in real-time. Watch friends turn into rivals!"
     },
     "timer": {
-      "title": "Game Timer",
-      "description": "The countdown shows how much time is left. Fire rounds add extra excitement!"
+      "title": "The Clock",
+      "description": "Time's always ticking. Fire rounds crank up the chaos!"
     },
     "letsGo": "Let's Go!",
     "ariaLabel": "TV Mode Tutorial",
@@ -3996,7 +4002,7 @@ const en = {
   },
   "adventure": {
     "title": "Adventure Mode",
-    "subtitle": "Journey through 10 themed worlds, conquer 100 levels, and become the ultimate word master!",
+    "subtitle": "10 worlds. 100 levels. One ultimate word master.",
     "adminOnly": "Admin Only",
     "adminOnlyMessage": "Adventure mode is only available to administrators.",
     "progress": "Progress",
@@ -4924,10 +4930,10 @@ const en = {
     "landing": {
       "title": "Education Mode",
       "teacher": "I'm a Teacher",
-      "teacherDesc": "Create classrooms, build vocabulary lessons, and track student progress",
+      "teacherDesc": "Build lessons, create classrooms, watch students level up",
       "student": "I'm a Student",
-      "studentDesc": "Join your classroom and practice vocabulary lessons",
-      "signInRequired": "Sign in required"
+      "studentDesc": "Join your class and practice your vocab",
+      "signInRequired": "Sign in first"
     },
     "template": {
       "create": "Create Template",
@@ -4990,27 +4996,27 @@ const en = {
     },
     "student": {
       "dashboard": "My Lessons",
-      "joinClassroom": "Join Classroom",
-      "enterCode": "Enter classroom code",
-      "progress": "Your Progress",
-      "startPractice": "Start Practice",
-      "noLessons": "No lessons assigned yet",
-      "askTeacher": "Ask your teacher for a classroom code",
+      "joinClassroom": "Join a Class",
+      "enterCode": "Got a code?",
+      "progress": "How You're Doing",
+      "startPractice": "Start",
+      "noLessons": "No lessons yet!",
+      "askTeacher": "Get a code from your teacher to get started",
       "lessonsAssigned": "Lessons Assigned",
       "join": {
-        "title": "Join Classroom",
-        "subtitle": "Enter the code from your teacher",
-        "codeLabel": "Classroom Code",
-        "codeHint": "Ask your teacher for the 6-character classroom code",
-        "button": "Join Classroom",
+        "title": "Join a Class",
+        "subtitle": "Pop in your teacher's code",
+        "codeLabel": "Class Code",
+        "codeHint": "6 characters from your teacher",
+        "button": "Join",
         "joining": "Joining...",
-        "pasteButton": "Paste code",
-        "success": "Successfully joined classroom!",
-        "invalidCode": "Invalid classroom code",
-        "alreadyMember": "You are already a member of this classroom",
-        "codePasted": "Code pasted!",
-        "emptyClipboard": "Clipboard is empty",
-        "clipboardError": "Couldn't read clipboard"
+        "pasteButton": "Paste",
+        "success": "You're in!",
+        "invalidCode": "That code doesn't work",
+        "alreadyMember": "You're already in this class!",
+        "codePasted": "Pasted!",
+        "emptyClipboard": "Nothing to paste",
+        "clipboardError": "Couldn't grab clipboard"
       }
     },
     "xp": {
@@ -5062,14 +5068,14 @@ const en = {
       "words": "words"
     },
     "leaderboard": {
-      "title": "Classroom Leaderboard",
+      "title": "Class Rankings",
       "ariaLabel": "Classroom leaderboard showing top students",
-      "yourPosition": "Your Position",
-      "youAreRank": "You're #{rank}",
+      "yourPosition": "You",
+      "youAreRank": "#{rank}",
       "studentsInClass": "{count} students",
       "inactive": "Inactive",
-      "noStudentsYet": "No students in this classroom yet",
-      "joinClassroomPrompt": "Join a classroom to see the leaderboard",
+      "noStudentsYet": "No one here yet!",
+      "joinClassroomPrompt": "Join a class to see rankings",
       "level": "Lv. {level}",
       "xp": "{xp} XP",
       "rank": "Rank",

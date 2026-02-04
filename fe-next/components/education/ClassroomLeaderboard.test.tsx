@@ -246,9 +246,10 @@ describe('ClassroomLeaderboard', () => {
         />
       );
 
-      // THEN: Should show "Your Position" section
-      expect(screen.getByText('Your Position')).toBeInTheDocument();
-      expect(screen.getByText("You're #4")).toBeInTheDocument();
+      // THEN: Should show current user position section
+      expect(screen.getByText('You')).toBeInTheDocument();
+      // Verify rank is displayed (there may be multiple #4 on page)
+      expect(screen.getAllByText('#4').length).toBeGreaterThan(0);
       expect(screen.getByText('150 XP')).toBeInTheDocument();
       expect(screen.getByText('Lv. 2')).toBeInTheDocument();
     });
@@ -358,7 +359,7 @@ describe('ClassroomLeaderboard', () => {
       );
 
       // THEN: Should show empty message
-      expect(screen.getByText('No students in this classroom yet')).toBeInTheDocument();
+      expect(screen.getByText('No one here yet!')).toBeInTheDocument();
     });
   });
 
@@ -396,7 +397,7 @@ describe('ClassroomLeaderboard', () => {
       );
 
       // THEN: Should use translation keys
-      expect(screen.getByText('Classroom Leaderboard')).toBeInTheDocument();
+      expect(screen.getByText('Class Rankings')).toBeInTheDocument();
       expect(screen.getByText('1 students')).toBeInTheDocument();
     });
 

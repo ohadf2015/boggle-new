@@ -507,9 +507,9 @@ const es = {
     "skipButton": "Saltar"
   },
   "error": {
-    "subscriptionFailed": "La suscripción falló. Por favor intenta de nuevo.",
+    "subscriptionFailed": "Hmm, algo falló. ¿Intentamos de nuevo?",
     "generic": "¡Ups, eso no funcionó!",
-    "notAuthenticated": "¡Inicia sesión para seguir jugando!"
+    "notAuthenticated": "¡Inicia sesión para seguir!"
   },
   "difficulty": {
     "easy": "Fácil",
@@ -518,9 +518,9 @@ const es = {
     "expert": "Experto",
     "master": "Maestro",
     "hint": {
-      "length": "La palabra tiene {length} letras",
-      "lengthAndStart": "La palabra tiene {length} letras y comienza con {letter}",
-      "fullReveal": "Aquí está la palabra: {word}"
+      "length": "{length} letras. ¡Tú puedes!",
+      "lengthAndStart": "{length} letras, empieza con {letter}",
+      "fullReveal": "La respuesta: {word}"
     }
   },
   "joinView": {
@@ -956,12 +956,12 @@ const es = {
   },
   "hints": {
     "hint": "Pista",
-    "loading": "Obteniendo pista...",
-    "noHintsLeft": "No quedan pistas",
+    "loading": "Un momento...",
+    "noHintsLeft": "¡Sin pistas!",
     "letters": "letras",
-    "startsWith": "comienza con",
-    "tapOrEscToDismiss": "Toca o presiona Escape para cerrar",
-    "requestHint": "Obtener pista"
+    "startsWith": "empieza con",
+    "tapOrEscToDismiss": "Toca para cerrar",
+    "requestHint": "¿Necesitas ayuda?"
   },
   "achievementDock": {
     "title": "Tus Logros"
@@ -973,31 +973,31 @@ const es = {
     }
   },
   "lateJoiner": {
-    "welcomeTitle": "¡Juego en Progreso!",
-    "welcomeMessage": "Te uniste a mitad del juego. Esto es lo que necesitas saber:",
-    "timeRemaining": "Tiempo restante",
-    "currentLeaders": "Líderes actuales",
-    "quickTip1": "Desliza sobre letras conectadas para formar palabras",
+    "welcomeTitle": "¡Ya empezaron sin ti!",
+    "welcomeMessage": "Llegaste a mitad. Aquí va lo importante:",
+    "timeRemaining": "Queda",
+    "currentLeaders": "Van ganando",
+    "quickTip1": "Desliza letras para formar palabras",
     "quickTip2": "Suelta para enviar",
-    "quickTip3": "¡Palabras más largas = más puntos!",
-    "gotIt": "¡Entendido, a jugar!",
-    "badge": "Llegada Tardía"
+    "quickTip3": "¡Palabras largas = más puntos!",
+    "gotIt": "¡Listo, vamos!",
+    "badge": "Llegó con estilo"
   },
   "spectator": {
-    "upgraded": "¡Estás dentro! ¡A jugar!",
-    "youAreSpectating": "¡Viendo la batalla!",
+    "upgraded": "¡Entraste! ¡Dale!",
+    "youAreSpectating": "¡Viendo la acción!",
     "status": "👀 ESPECTANDO",
-    "explanation": "¡La sala está llena! Estás mirando, pero aguanta - puede que se abra un lugar.",
-    "requestToPlay": "Pedir Jugar",
-    "join": "Unirse"
+    "explanation": "¡Sala llena! Mira el caos - te avisamos si alguien sale.",
+    "requestToPlay": "¡Quiero jugar!",
+    "join": "Entrar"
   },
   "chat": {
     "title": "Chat de Sala",
-    "placeholder": "Escribe un mensaje...",
-    "noMessages": "Aún no hay mensajes",
-    "startChatting": "¡Comienza a chatear!",
-    "send": "Enviar mensaje",
-    "newMessages": "Nuevos mensajes de chat"
+    "placeholder": "Escribe algo...",
+    "noMessages": "Silencio total...",
+    "startChatting": "¡Digan algo!",
+    "send": "Enviar",
+    "newMessages": "Mensajes nuevos"
   },
   "results": {
     "results": "Resultados",
@@ -1598,7 +1598,7 @@ const es = {
     "userMenu": "Menú de usuario",
     "alreadyHaveAccount": "¿Ya tienes una cuenta? Inicia sesión",
     "noAccount": "¿No tienes cuenta? Regístrate",
-    "invalidCredentials": "Correo o contraseña inválidos",
+    "invalidCredentials": "Hmm, eso no cuadra. ¿Intentamos de nuevo?",
     "continueAsGuest": "Continuar como Invitado",
     "continueWithGoogle": "Continuar con Google",
     "continueWithDiscord": "Continuar con Discord",
@@ -3148,7 +3148,7 @@ const es = {
     "addFriendsToChallenge": "Agrega amigos para desafiarlos",
     "challenge": "Desafiar",
     "friend": "amigo",
-    "noFriendsYet": "Aún no tienes amigos",
+    "noFriendsYet": "¡Tu lista está vacía!",
     "noPendingRequests": "No hay solicitudes pendientes",
     "requestsWillAppearHere": "Las solicitudes aparecerán aquí",
     "noUsersFound": "No encontramos usuarios",
@@ -3173,7 +3173,7 @@ const es = {
     },
     "messageLimit": "{current}/{max} caracteres",
     "errors": {
-      "sendFailed": "Error al enviar mensaje"
+      "sendFailed": "No se envió. ¿Otra vez?"
     },
     "status": {
       "online": "En línea",

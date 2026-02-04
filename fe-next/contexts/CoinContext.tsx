@@ -12,7 +12,7 @@
  * - Duplicate award prevention via session tracking
  */
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getCoins,
@@ -421,7 +421,8 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     }
   }, [addCoins]);
 
-  const value: CoinContextValue = {
+  // Memoize context value to prevent unnecessary re-renders in consumers
+  const value = useMemo<CoinContextValue>(() => ({
     coins,
     isLoading,
     canAfford,
@@ -434,7 +435,18 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     awardWatchedAd,
     costs: COIN_COSTS,
     rewards: COIN_REWARDS,
-  };
+  }), [
+    coins,
+    isLoading,
+    canAfford,
+    addCoins,
+    spendCoins,
+    refreshCoins,
+    awardDailyCompletion,
+    awardGameCompletion,
+    awardComboMilestone,
+    awardWatchedAd,
+  ]);
 
   return (
     <CoinContext.Provider value={value}>

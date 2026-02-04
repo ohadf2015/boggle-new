@@ -20,7 +20,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
 import { AnalyticsDashboard } from '@/components/teacher/analytics/AnalyticsDashboard';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
-import { LessonEffectivenessChart } from '@/components/teacher/analytics/LessonEffectivenessChart';
+import LessonEffectivenessChart from '@/components/teacher/analytics/LessonEffectivenessChart';
 import { VocabularyHeatmap } from '@/components/teacher/analytics/VocabularyHeatmap';
 import { LiveActivityIndicator } from '@/components/teacher/analytics/LiveActivityIndicator';
 import { NeoLoader } from '@/components/ui/NeoLoader';

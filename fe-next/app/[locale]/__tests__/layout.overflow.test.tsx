@@ -70,22 +70,20 @@ describe('Layout Mobile Scroll Architecture', () => {
     expect(layoutSource).toContain('body className="antialiased screen-fit"');
   });
 
-  it('main should use overflow-visible to allow content to flow naturally', () => {
-    // Main content should use overflow-visible to:
-    // 1. Allow child content to scroll naturally (scroll handled at body level)
-    // 2. Support bottom padding for mobile nav (pb-16 sm:pb-0)
-    // NOTE: Scroll is handled at body level, NOT at main level
+  it('main should have proper scroll and layout classes', () => {
+    // Main content uses overflow-auto for scrollable content area
+    // Combined with flex-1 and min-h-0 for proper flex sizing
     const mainMatch = layoutSource.match(/<main[^>]*className="([^"]*)"/);
 
     expect(mainMatch).toBeTruthy();
 
     if (mainMatch) {
       const mainClasses = mainMatch[1];
-      // Main uses overflow-visible so child content can scroll at body level
-      expect(mainClasses).toContain('overflow-visible');
-      // Main has bottom padding for mobile nav (removed on sm+ screens)
-      expect(mainClasses).toContain('pb-16');
-      expect(mainClasses).toContain('sm:pb-0');
+      // Main uses overflow-auto for scrollable content
+      expect(mainClasses).toContain('overflow-auto');
+      // Main has flex-1 and min-h-0 for proper flex sizing
+      expect(mainClasses).toContain('flex-1');
+      expect(mainClasses).toContain('min-h-0');
     }
   });
 });

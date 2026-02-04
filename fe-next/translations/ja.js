@@ -507,8 +507,8 @@ const ja = {
     "skipButton": "スキップ"
   },
   "error": {
-    "subscriptionFailed": "登録に失敗しました。もう一度お試しください。",
-    "generic": "うまくいかなかった！",
+    "subscriptionFailed": "あれ、うまくいかなかった。もう一回？",
+    "generic": "おっと、うまくいかなかった！",
     "notAuthenticated": "ログインして続けよう！"
   },
   "difficulty": {
@@ -518,9 +518,9 @@ const ja = {
     "expert": "エキスパート",
     "master": "マスター",
     "hint": {
-      "length": "単語は{length}文字です",
-      "lengthAndStart": "単語は{length}文字で、{letter}で始まります",
-      "fullReveal": "ここに単語があります：{word}"
+      "length": "{length}文字だよ。ガンバ！",
+      "lengthAndStart": "{length}文字、{letter}で始まる",
+      "fullReveal": "答え：{word}"
     }
   },
   "joinView": {
@@ -1011,32 +1011,32 @@ const ja = {
     "tryIt": "やってみよう！"
   },
   "lateJoiner": {
-    "welcomeTitle": "ゲーム進行中！",
-    "welcomeMessage": "ゲームの途中で参加しました。知っておくべきこと:",
-    "timeRemaining": "残り時間",
-    "currentLeaders": "現在のリーダー",
-    "quickTip1": "つながる文字をスワイプして単語を作る",
-    "quickTip2": "離して送信",
-    "quickTip3": "長い単語 = より多くのポイント！",
-    "gotIt": "わかりました、プレイしましょう！",
-    "badge": "途中参加"
+    "welcomeTitle": "もう始まってるよ！",
+    "welcomeMessage": "途中参加！サクッと説明：",
+    "timeRemaining": "残り",
+    "currentLeaders": "今のリーダー",
+    "quickTip1": "文字をスワイプして単語を作ろう",
+    "quickTip2": "離して送信！",
+    "quickTip3": "長い単語 = 高得点！",
+    "gotIt": "OK、いくよ！",
+    "badge": "遅れてきたヒーロー"
   },
   "spectator": {
-    "upgraded": "参加できるよ！プレイしよう!",
-    "youAreSpectating": "バトルを観戦中！",
+    "upgraded": "入れた！いくよ！",
+    "youAreSpectating": "バトル観戦中！",
     "status": "👀 観戦中",
-    "explanation": "部屋が満員です！今は観戦モードですが、空きが出るかもしれません。",
-    "requestToPlay": "プレイ参加申請",
-    "join": "参加する"
+    "explanation": "満員！観戦しながら待っててね - 空いたら教えるよ。",
+    "requestToPlay": "参加したい！",
+    "join": "参加"
   },
   "hints": {
     "hint": "ヒント",
-    "loading": "ヒント取得中...",
-    "noHintsLeft": "ヒント残りなし",
+    "loading": "ちょっと待って...",
+    "noHintsLeft": "ヒント切れ！",
     "letters": "文字",
     "startsWith": "で始まる",
-    "tapOrEscToDismiss": "タップまたはEscキーで閉じる",
-    "requestHint": "ヒントをもらう"
+    "tapOrEscToDismiss": "タップで閉じる",
+    "requestHint": "ヒント欲しい？"
   },
   "achievementDock": {
     "title": "あなたの実績"
@@ -1049,11 +1049,11 @@ const ja = {
   },
   "chat": {
     "title": "ルームチャット",
-    "placeholder": "メッセージを入力...",
-    "noMessages": "まだメッセージがありません",
-    "startChatting": "チャットを始めましょう！",
-    "send": "メッセージを送信",
-    "newMessages": "新しいチャットメッセージ"
+    "placeholder": "何か書いてね...",
+    "noMessages": "シーン...",
+    "startChatting": "話そう！",
+    "send": "送信",
+    "newMessages": "新メッセージ"
   },
   "results": {
     "results": "結果",
@@ -1784,7 +1784,7 @@ const ja = {
     "userMenu": "ユーザーメニュー",
     "alreadyHaveAccount": "すでにアカウントをお持ちですか？ログイン",
     "noAccount": "アカウントをお持ちでないですか？新規登録",
-    "invalidCredentials": "メールアドレスまたはパスワードが無効です",
+    "invalidCredentials": "うーん、合わないみたい。もう一回？",
     "continueAsGuest": "ゲストとして続ける",
     "continueWithGoogle": "Googleで続ける",
     "continueWithDiscord": "Discordで続ける",
@@ -3156,7 +3156,7 @@ const ja = {
     "addFriendsToChallenge": "フレンドを追加してチャレンジしよう",
     "challenge": "チャレンジ",
     "friend": "フレンド",
-    "noFriendsYet": "まだフレンドがいません",
+    "noFriendsYet": "フレンドリストが空っぽ！",
     "noPendingRequests": "保留中のリクエストはありません",
     "requestsWillAppearHere": "リクエストがここに表示されます",
     "noUsersFound": "ユーザーが見つかりません",
@@ -3181,7 +3181,7 @@ const ja = {
     },
     "messageLimit": "{current}/{max}文字",
     "errors": {
-      "sendFailed": "メッセージの送信に失敗しました"
+      "sendFailed": "送れなかった。もう一回？"
     },
     "status": {
       "online": "オンライン",
@@ -3199,7 +3199,7 @@ const ja = {
     "finding": "検索中...",
     "noWordsLeft": "表示する5文字以上の単語がありません",
     "notEnoughCoins": "{cost}コインが必要です（現在{balance}）",
-    "gameNotActive": "ゲームがアクティブではありません",
+    "gameNotActive": "まずゲームを始めよう！",
     "coins": "コイン",
     "base": "基本",
     "usedForReveals": "コインを使ってシングルプレイヤーゲームで単語を表示しましょう！",

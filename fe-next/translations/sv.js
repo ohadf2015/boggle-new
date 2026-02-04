@@ -507,9 +507,9 @@ const sv = {
     "skipButton": "Hoppa över"
   },
   "error": {
-    "subscriptionFailed": "Prenumerationen misslyckades. Försök igen.",
+    "subscriptionFailed": "Hmm, det gick inte. Testa igen?",
     "generic": "Hoppsan, det funkade inte!",
-    "notAuthenticated": "Logga in för att fortsätta spela!"
+    "notAuthenticated": "Logga in för att fortsätta!"
   },
   "difficulty": {
     "easy": "Lätt",
@@ -518,9 +518,9 @@ const sv = {
     "expert": "Expert",
     "master": "Mästare",
     "hint": {
-      "length": "Ordet har {length} bokstäver",
-      "lengthAndStart": "Ordet har {length} bokstäver och börjar med {letter}",
-      "fullReveal": "Här är ordet: {word}"
+      "length": "{length} bokstäver. Du klarar det!",
+      "lengthAndStart": "{length} bokstäver, börjar med {letter}",
+      "fullReveal": "Svaret: {word}"
     }
   },
   "joinView": {
@@ -1011,32 +1011,32 @@ const sv = {
     "tryIt": "Testa!"
   },
   "lateJoiner": {
-    "welcomeTitle": "Spelet pågår!",
-    "welcomeMessage": "Du gick med mitt i spelet. Här är vad du behöver veta:",
+    "welcomeTitle": "Hoppa in - spelet är igång!",
+    "welcomeMessage": "Du kom mitt i. Snabb briefing:",
     "timeRemaining": "Tid kvar",
-    "currentLeaders": "Nuvarande ledare",
-    "quickTip1": "Svep kopplade bokstäver för att bygga ord",
+    "currentLeaders": "Ledare just nu",
+    "quickTip1": "Svep bokstäver för att bygga ord",
     "quickTip2": "Släpp för att skicka",
     "quickTip3": "Längre ord = fler poäng!",
-    "gotIt": "Jag fattar, låt oss spela!",
-    "badge": "Sen anslutning"
+    "gotIt": "Fattar, kör!",
+    "badge": "Fashionably late"
   },
   "spectator": {
-    "upgraded": "Du är med! Kör!",
-    "youAreSpectating": "Tittar på matchen!",
+    "upgraded": "Du är med! Kör hårt!",
+    "youAreSpectating": "Kollar på matchen!",
     "status": "👀 ÅSKÅDAR",
-    "explanation": "Rummet är fullt! Du tittar bara nu, men ett ställe kanske öppnas.",
-    "requestToPlay": "Be om att spela",
+    "explanation": "Fullsatt! Häng kvar - vi säger till om någon hoppar av.",
+    "requestToPlay": "Jag vill spela!",
     "join": "Gå med"
   },
   "hints": {
     "hint": "Ledtråd",
-    "loading": "Hämtar ledtråd...",
-    "noHintsLeft": "Inga ledtrådar kvar",
+    "loading": "Vänta...",
+    "noHintsLeft": "Slut på ledtrådar!",
     "letters": "bokstäver",
     "startsWith": "börjar med",
-    "tapOrEscToDismiss": "Tryck eller Escape för att stänga",
-    "requestHint": "Få en ledtråd"
+    "tapOrEscToDismiss": "Tryck för att stänga",
+    "requestHint": "Behöver en hint?"
   },
   "achievementDock": {
     "title": "Dina prestationer"
@@ -1049,11 +1049,11 @@ const sv = {
   },
   "chat": {
     "title": "Rumschatt",
-    "placeholder": "Skriv ett meddelande...",
-    "noMessages": "Inga meddelanden ännu",
-    "startChatting": "Börja chatta!",
-    "send": "Skicka meddelande",
-    "newMessages": "Nya chattmeddelanden"
+    "placeholder": "Skriv något...",
+    "noMessages": "Tyst här...",
+    "startChatting": "Säg något!",
+    "send": "Skicka",
+    "newMessages": "Nya meddelanden"
   },
   "results": {
     "results": "Resultat",
@@ -1784,7 +1784,7 @@ const sv = {
     "userMenu": "Användarmeny",
     "alreadyHaveAccount": "Har du redan ett konto? Logga in",
     "noAccount": "Har du inget konto? Registrera dig",
-    "invalidCredentials": "Ogiltig e-post eller lösenord",
+    "invalidCredentials": "Hmm, det stämmer inte. Försök igen?",
     "continueAsGuest": "Fortsätt som gäst",
     "continueWithGoogle": "Fortsätt med Google",
     "continueWithDiscord": "Fortsätt med Discord",
@@ -3151,7 +3151,7 @@ const sv = {
     "addFriendsToChallenge": "Lägg till vänner för att utmana",
     "challenge": "Utmana",
     "friend": "Vän",
-    "noFriendsYet": "Inga vänner än",
+    "noFriendsYet": "Inga polare än!",
     "noPendingRequests": "Inga väntande förfrågningar",
     "requestsWillAppearHere": "Förfrågningar visas här",
     "noUsersFound": "Inga användare hittades",
@@ -3171,7 +3171,7 @@ const sv = {
     },
     "messageLimit": "{current}/{max} tecken",
     "errors": {
-      "sendFailed": "Misslyckades att skicka meddelande"
+      "sendFailed": "Gick inte. Testa igen?"
     },
     "status": {
       "online": "Online",

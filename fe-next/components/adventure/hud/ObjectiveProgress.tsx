@@ -155,7 +155,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                   'rounded-neo border-2',
                   'transition-all duration-300',
                   objective.isComplete
-                    ? 'bg-neo-lime/10 border-neo-lime/80'
+                    ? 'objective-complete bg-neo-lime/10 border-neo-lime/80'
                     : `${colors.bg} ${colors.border}`
                 )}
               >
@@ -201,6 +201,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                   {/* Progress bar with animation */}
                   <div className="relative h-1.5 bg-neo-black/30 rounded-full overflow-hidden">
                     <motion.div
+                      data-testid={`progress-${objective.id}`}
                       className={cn(
                         'absolute inset-y-0 left-0 rounded-full',
                         objective.isComplete

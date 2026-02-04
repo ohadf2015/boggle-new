@@ -276,6 +276,21 @@ function AuthCallbackContent(): React.JSX.Element {
           return;
         }
 
+        // Check for OAuth error parameters FIRST
+        // OAuth providers return errors like ?error=access_denied&error_description=...
+        const oauthError = searchParams.get('error');
+        const oauthErrorDescription = searchParams.get('error_description');
+        if (oauthError) {
+          const errorMessage = oauthErrorDescription || oauthError;
+          logger.warn(`Auth callback: OAuth provider returned error: ${oauthError}`, {
+            error: oauthError,
+            description: oauthErrorDescription
+          });
+          broadcastAuthFailed(errorMessage);
+          safeRedirect(`/${locale}?auth_error=true&reason=${encodeURIComponent(oauthError)}`);
+          return;
+        }
+
         // IMPORTANT: Check for existing session FIRST with retry
         // This handles the case where another tab already completed the auth
         // Retry mechanism handles cookie sync timing issues across tabs
@@ -436,9 +451,14 @@ function AuthCallbackContent(): React.JSX.Element {
         }
 
         // Fallback: redirect to home with error
-        logger.warn('Auth callback: No session found, redirecting with error');
+        // Log diagnostic info - use variables already declared above (code, accessToken)
+        logger.warn('Auth callback: No session found, redirecting with error', {
+          hadCode: !!code,
+          hadHashTokens: !!accessToken,
+          url: window.location.href.replace(/code=[^&]+/, 'code=REDACTED')
+        });
         broadcastAuthFailed('No session found');
-        safeRedirect(`/${locale}?auth_error=true`);
+        safeRedirect(`/${locale}?auth_error=true&reason=no_session`);
       } catch (err) {
         logger.error('Auth callback exception:', err);
         releaseCodeLock();

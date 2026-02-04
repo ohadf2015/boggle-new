@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 2962,
     "keyCountByLanguage": {
-      "en": 4132,
-      "he": 4132,
-      "sv": 4150,
-      "ja": 4150,
-      "es": 4155
+      "en": 4139,
+      "he": 4133,
+      "sv": 4151,
+      "ja": 4151,
+      "es": 4156
     },
-    "missingFromEnglish": 1,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,22 +167,39 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "education.achievements.pinLimit",
-      "usages": [
-        {
-          "file": "components/education/EducationBadgeGrid.tsx",
-          "line": 298
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
+    "he": [
+      "share.saveImage",
+      "share.share",
+      "share.generating",
+      "share.subtitle",
+      "share.playAt",
+      "share.beatMyScore"
+    ],
+    "sv": [
+      "share.saveImage",
+      "share.share",
+      "share.generating",
+      "share.subtitle",
+      "share.playAt",
+      "share.beatMyScore"
+    ],
+    "ja": [
+      "share.saveImage",
+      "share.share",
+      "share.generating",
+      "share.subtitle",
+      "share.playAt",
+      "share.beatMyScore"
+    ],
     "es": [
+      "share.saveImage",
+      "share.share",
+      "share.generating",
+      "share.subtitle",
+      "share.playAt",
+      "share.beatMyScore",
       "adventure.progress",
       "adventure.menu.skills",
       "adventure.menu.achievements",
@@ -960,6 +977,7 @@
       "education.achievements.categories.exploration",
       "education.achievements.earned",
       "education.achievements.secretRemaining",
+      "education.achievements.pinLimit",
       "education.achievements.first_lesson.name",
       "education.achievements.first_lesson.description",
       "education.achievements.first_lesson.hint",
@@ -1850,6 +1868,7 @@
       "adventure.education.achievements.categories.exploration",
       "adventure.education.achievements.earned",
       "adventure.education.achievements.secretRemaining",
+      "adventure.education.achievements.pinLimit",
       "adventure.education.achievements.first_lesson.name",
       "adventure.education.achievements.first_lesson.description",
       "adventure.education.achievements.first_lesson.hint",

@@ -901,8 +901,8 @@ const AdventureGame = memo<AdventureGameProps>(
           position,
         });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tiles, calculateTileCenter, effects.setChainBurstConfig]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
+    }, [tiles, calculateTileCenter]);
 
     // Trigger explosion at REMOVING phase start for 3+ tile words
     useEffect(() => {
@@ -945,8 +945,8 @@ const AdventureGame = memo<AdventureGameProps>(
         // Clear ref after processing
         lastSubmittedWordRef.current = null;
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cascadePhase, calculateTileCenter, effects.addExplosion]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
+    }, [cascadePhase, calculateTileCenter]);
 
     // Handle pause toggle
     const handlePauseToggle = useCallback(() => {
@@ -1128,8 +1128,8 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition, effects.addScorePopup]
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
     );
 
     // Handle level-up modal dismiss
@@ -1238,8 +1238,8 @@ const AdventureGame = memo<AdventureGameProps>(
         intensity: particleIntensity as 1 | 2 | 3 | 4 | 5,
         origin: { x: 0.5, y: 0.4 }, // Center-top for combo celebrations
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [effects.shake, effects.setParticleConfig]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
+    }, []);
 
     // Calculate star count for display
     const starsEarned = gameState.stars;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { LessonEffectivenessChart } from '../LessonEffectivenessChart';
+// Import the inner component directly to avoid next/dynamic issues in tests
+import { LessonEffectivenessChart } from '../LessonEffectivenessChartInner';
 import * as useLessonEffectivenessModule from '@/hooks/useLessonEffectiveness';
 
 // Mock LanguageContext

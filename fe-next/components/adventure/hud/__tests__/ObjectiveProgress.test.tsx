@@ -12,6 +12,7 @@ jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
 // Mock usePrefersReducedMotion hook
@@ -65,8 +66,9 @@ describe('ObjectiveProgress', () => {
         <ObjectiveProgress objectives={mockObjectives} className="custom-class" />
       );
 
-      const list = container.querySelector('[role="list"]');
-      expect(list).toHaveClass('custom-class');
+      // className is applied to the root container element
+      const rootElement = container.firstChild as HTMLElement;
+      expect(rootElement).toHaveClass('custom-class');
     });
   });
 
