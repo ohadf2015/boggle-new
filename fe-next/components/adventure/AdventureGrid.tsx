@@ -9,7 +9,6 @@
 
 import React, { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bomb, Link2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GridTileState, TileType, TileActivationEffect } from '@/types/adventure';
 import { WordPathTrail, SelectionSparkle } from '@/components/animations';
@@ -17,6 +16,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
+import { TileBadge } from './TileBadge';
 import './AdventureTile.css';
 import {
   type GridMeasurements,
@@ -835,106 +835,8 @@ const AdventureGrid = memo(
                   {tile.letter}
                 </span>
 
-                {/* Gold badge */}
-                {tile.type === 'gold' && (
-                  <span
-                    className={cn(
-                      'tile-gold-badge',
-                      'absolute -top-1.5 -right-1.5 z-20',
-                      'min-w-[20px] h-[20px]',
-                      'flex items-center justify-center',
-                      'bg-neo-black text-neo-yellow',
-                      'text-[10px] font-black',
-                      'rounded-full border-2 border-neo-yellow',
-                      'shadow-[0_0_10px_rgba(255,225,53,0.7)]'
-                    )}
-                  >
-                    3x
-                  </span>
-                )}
-
-                {/* Rainbow wildcard badge */}
-                {tile.type === 'rainbow' && (
-                  <span
-                    className={cn(
-                      'absolute -top-1.5 -right-1.5 z-20',
-                      'min-w-[20px] h-[20px]',
-                      'flex items-center justify-center',
-                      'bg-neo-black text-neo-white',
-                      'text-[14px] font-black',
-                      'rounded-full border-2 border-purple-400',
-                      'shadow-[0_0_10px_rgba(168,85,247,0.6)]'
-                    )}
-                  >
-                    ✦
-                  </span>
-                )}
-
-                {/* Bomb icon badge */}
-                {tile.type === 'bomb' && (
-                  <>
-                    <div
-                      className={cn(
-                        'absolute -top-1 -right-1 z-20',
-                        'w-5 h-5',
-                        'flex items-center justify-center',
-                        'bg-neo-black rounded-full',
-                        'border-2 border-orange-500',
-                        'shadow-[0_0_8px_rgba(255,100,0,0.6)]'
-                      )}
-                    >
-                      <Bomb className="w-3 h-3 text-neo-yellow" />
-                    </div>
-                    {/* Row indicator - shows bomb clears entire row */}
-                    <div className="tile-bomb-row-indicator">
-                      <span />
-                    </div>
-                  </>
-                )}
-
-                {/* Chain link badge */}
-                {tile.type === 'chain' && (
-                  <div
-                    className={cn(
-                      'absolute -top-1 -right-1 z-20',
-                      'w-5 h-5',
-                      'flex items-center justify-center',
-                      'bg-neo-black rounded-full',
-                      'border-2 border-purple-400',
-                      'shadow-[0_0_8px_rgba(138,43,226,0.6)]'
-                    )}
-                  >
-                    <Link2 className="w-3 h-3 text-purple-400" />
-                  </div>
-                )}
-
-                {/* Time bonus badge */}
-                {tile.type === 'time' && (
-                  <div
-                    className={cn(
-                      'absolute -top-1 -right-1 z-20',
-                      'w-5 h-5',
-                      'flex items-center justify-center',
-                      'bg-neo-black rounded-full',
-                      'border-2 border-emerald-400',
-                      'shadow-[0_0_8px_rgba(16,185,129,0.6)]'
-                    )}
-                  >
-                    <Clock className="w-3 h-3 text-emerald-400" />
-                  </div>
-                )}
-
-                {/* Frost overlay for frozen ice tiles */}
-                {tile.type === 'ice' && tile.isFrozen && (
-                  <div
-                    className={cn(
-                      'frost-overlay absolute inset-0 rounded-neo',
-                      'bg-gradient-to-br from-white/50 via-cyan-100/40 to-blue-200/50',
-                      'backdrop-blur-[2px]',
-                      'pointer-events-none z-5'
-                    )}
-                  />
-                )}
+                {/* Tile badge (gold, rainbow, bomb, chain, time, frost overlay) */}
+                <TileBadge type={tile.type} isFrozen={tile.isFrozen} />
               </motion.div>
             );
           })}
