@@ -225,7 +225,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
   }
 
   return (
-    <div className={cn("fixed bottom-20 right-4 z-40 space-y-2", className)}>
+    <div className={cn("fixed bottom-20 ltr:right-4 rtl:left-4 z-40 space-y-2", className)}>
       <AnimatePresence>
         {visibleAchievements.map((progress) => (
           <motion.div

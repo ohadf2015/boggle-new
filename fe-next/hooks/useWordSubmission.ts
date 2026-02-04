@@ -49,7 +49,7 @@ function getComboBonus(comboLevel: number, wordLength: number): number {
 
 export interface WordFeedback {
   id: string;
-  type: 'accepted' | 'rejected' | 'pending' | 'duplicate';
+  type: 'accepted' | 'rejected' | 'pending' | 'duplicate' | 'checking';
   word: string;
   score?: number;
   message?: string;
@@ -322,6 +322,14 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       timeSinceStart,
       isValid: null, // Pending validation
     }]);
+
+    // Step 4.5: Show immediate 'checking' feedback for instant user response
+    setCurrentFeedback({
+      id: `checking-${now}`,
+      type: 'checking',
+      word: normalizedWord.toUpperCase(),
+      timestamp: now,
+    });
 
     // Step 5: Validate with dictionary API
     fetch('/api/dictionary/check', {

@@ -34,7 +34,7 @@ interface AchievementPopupProps {
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  */
 const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): React.ReactElement | null => {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
   const [progress, setProgress] = useState<number>(0);
   const [showShareHint, setShowShareHint] = useState(false);
@@ -127,18 +127,21 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
 
   if (!localizedAchievement) return null;
 
+  // RTL-aware animation: slide from left in RTL, from right in LTR
+  const slideDirection = dir === 'rtl' ? -300 : 300;
+
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ x: 300, opacity: 0 }}
+        initial={{ x: slideDirection, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 300, opacity: 0 }}
+        exit={{ x: slideDirection, opacity: 0 }}
         transition={{
           type: 'spring',
           stiffness: 300,
           damping: 25,
         }}
-        className="fixed top-20 right-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
+        className="fixed top-20 ltr:right-4 rtl:left-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}

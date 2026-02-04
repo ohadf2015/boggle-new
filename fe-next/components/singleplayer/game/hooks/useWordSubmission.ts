@@ -5,6 +5,8 @@ import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator'
 import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { usePrevalidation } from '@/hooks/usePrevalidation';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ComboSystemReturn } from '@/hooks/useComboSystem';
@@ -66,6 +68,8 @@ interface UseWordSubmissionReturn {
   foundWordsSetRef: React.MutableRefObject<Set<string>>;
   /** Reset state for new game */
   resetWordSubmission: () => void;
+  /** Prefetch validation for a word being formed (call as user types) */
+  prefetchValidation: (word: string) => void;
 }
 
 /**
@@ -92,6 +96,12 @@ export function useWordSubmission({
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
+
+  // Client-side dictionary cache for instant validation
+  const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(language);
+
+  // Pre-validation cache for words being typed
+  const { prefetch: prefetchValidation, getCached: getPrevalidationCached, clearCache: clearPrevalidationCache } = usePrevalidation(language);
 
   // Refs for latest values (to avoid stale closures)
   const foundWordsRef = useRef<FoundWord[]>([]);
@@ -225,7 +235,94 @@ export function useWordSubmission({
     foundWordsRef.current = [...foundWordsRef.current, newWord];
     setFoundWords(foundWordsRef.current);
 
-    // Step 5: Check dictionary via backend API
+    // Helper function to handle valid word
+    const handleValidWord = () => {
+      const wordLenScore = Math.max(normalizedWord.length - 1, 1);
+      const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
+      const scoreWithoutMultiplier = wordLenScore + comboBonus;
+      const multiplier = getScoreMultiplier();
+      const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
+
+      // Update found words
+      foundWordsRef.current = foundWordsRef.current.map(fw =>
+        fw.word === normalizedWord && fw.timestamp === now
+          ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
+          : fw
+      );
+      setFoundWords(foundWordsRef.current);
+
+      // Update score
+      setScore(prev => prev + fullScore);
+      playWordAcceptedSound();
+      hapticForWordScore(normalizedWord.length);
+
+      // Notify hint system
+      onWordFound?.();
+
+      // Update combo
+      combo.incrementCombo(true);
+
+      // Training callback
+      onTrainingTrackValidWord?.(normalizedWord.length);
+
+      if (combo.validWordCount > 1) {
+        playComboSound(currentCombo + 1);
+      }
+
+      // Show accepted feedback
+      setCurrentFeedback({
+        id: `accept-${now}`,
+        type: 'accepted',
+        word: normalizedWord.toUpperCase(),
+        score: fullScore,
+        fireRoundActive,
+        fireRoundBonus,
+        timestamp: now,
+      });
+      announceWordResult(normalizedWord, true, fullScore);
+      announceCombo(currentCombo + 1);
+    };
+
+    // Helper function to handle pending word
+    const handlePendingWord = () => {
+      combo.resetCombo();
+      setCurrentFeedback({
+        id: `pending-${now}`,
+        type: 'pending',
+        word: normalizedWord.toUpperCase(),
+        timestamp: now,
+      });
+      recordNotInDictionary(normalizedWord, language, 'single_player');
+    };
+
+    // Step 4.5: Try client-side dictionary cache for INSTANT validation
+    if (isDictionaryCacheLoaded && checkWordInCache(normalizedWord)) {
+      // Word found in local cache - instant validation, no API call needed!
+      handleValidWord();
+      return;
+    }
+
+    // Step 4.6: Check prevalidation cache (from typing-ahead)
+    const prevalidated = getPrevalidationCached(normalizedWord);
+    if (prevalidated === true) {
+      // Word was prevalidated while typing - instant validation!
+      handleValidWord();
+      return;
+    } else if (prevalidated === false) {
+      // Word was prevalidated as invalid - instant pending!
+      handlePendingWord();
+      return;
+    }
+
+    // Step 4.7: Show immediate 'checking' feedback while API is in flight
+    setCurrentFeedback({
+      id: `checking-${now}`,
+      type: 'checking',
+      word: normalizedWord.toUpperCase(),
+      timestamp: now,
+    });
+
+    // Step 5: Check dictionary via backend API (fallback for words not in cache)
     fetch('/api/dictionary/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -239,61 +336,9 @@ export function useWordSubmission({
       })
       .then(result => {
         if (result.isValid) {
-          // Word is valid
-          const wordLenScore = Math.max(normalizedWord.length - 1, 1);
-          const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
-          const scoreWithoutMultiplier = wordLenScore + comboBonus;
-          const multiplier = getScoreMultiplier();
-          const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
-
-          // Update found words
-          foundWordsRef.current = foundWordsRef.current.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
-              : fw
-          );
-          setFoundWords(foundWordsRef.current);
-
-          // Update score
-          setScore(prev => prev + fullScore);
-          playWordAcceptedSound();
-          hapticForWordScore(normalizedWord.length);
-
-          // Notify hint system
-          onWordFound?.();
-
-          // Update combo
-          combo.incrementCombo(true);
-
-          // Training callback
-          onTrainingTrackValidWord?.(normalizedWord.length);
-
-          if (combo.validWordCount > 1) {
-            playComboSound(currentCombo + 1);
-          }
-
-          // Show accepted feedback
-          setCurrentFeedback({
-            id: `accept-${now}`,
-            type: 'accepted',
-            word: normalizedWord.toUpperCase(),
-            score: fullScore,
-            fireRoundActive,
-            fireRoundBonus,
-            timestamp: now,
-          });
-          announceWordResult(normalizedWord, true, fullScore);
-          announceCombo(currentCombo + 1);
+          handleValidWord();
         } else {
-          // Word NOT in dictionary - stays pending
-          combo.resetCombo();
-          setCurrentFeedback({
-            id: `pending-${now}`,
-            type: 'pending',
-            word: normalizedWord.toUpperCase(),
-            timestamp: now,
-          });
-          recordNotInDictionary(normalizedWord, language, 'single_player');
+          handlePendingWord();
         }
       })
       .catch(() => {
@@ -323,6 +368,9 @@ export function useWordSubmission({
     calculateWordScore,
     onTrainingTrackValidWord,
     onWordFound,
+    isDictionaryCacheLoaded,
+    checkWordInCache,
+    getPrevalidationCached,
   ]);
 
   const resetWordSubmission = useCallback(() => {
@@ -331,7 +379,8 @@ export function useWordSubmission({
     setCurrentFeedback(null);
     foundWordsRef.current = [];
     foundWordsSetRef.current.clear();
-  }, []);
+    clearPrevalidationCache();
+  }, [clearPrevalidationCache]);
 
   return {
     foundWords,
@@ -341,5 +390,6 @@ export function useWordSubmission({
     foundWordsRef,
     foundWordsSetRef,
     resetWordSubmission,
+    prefetchValidation,
   };
 }

@@ -49,7 +49,7 @@ const TOAST_DISMISS_MS = 3000;
 // ==============================================
 
 const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onClose }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const titleId = useId();
 
   // Determine display mode based on tier
@@ -115,16 +115,16 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
           aria-modal="false"
           aria-labelledby={titleId}
           className={cn(
-            'fixed top-4 right-4 z-[300]',
+            'fixed top-4 ltr:right-4 rtl:left-4 z-[300]',
             'w-full max-w-sm mx-4 sm:mx-0',
             'bg-neo-navy border-3 border-neo-black',
             'rounded-neo shadow-hard',
             'p-4',
             'cursor-pointer'
           )}
-          initial={{ opacity: 0, x: 50, scale: 0.9 }}
+          initial={{ opacity: 0, x: dir === 'rtl' ? -50 : 50, scale: 0.9 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={{ opacity: 0, x: 50, scale: 0.9 }}
+          exit={{ opacity: 0, x: dir === 'rtl' ? -50 : 50, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           onClick={onClose}
         >

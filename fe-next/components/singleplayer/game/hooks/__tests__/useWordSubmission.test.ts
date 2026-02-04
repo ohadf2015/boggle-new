@@ -22,6 +22,35 @@ jest.mock('@/utils/invalidWordTracker', () => ({
   recordInvalidWord: jest.fn(),
 }));
 
+// Mock useDictionaryCache to prevent dictionary loading in tests
+const mockCheckWord = jest.fn().mockReturnValue(false);
+const mockDictionaryCacheState = {
+  isLoaded: false,
+  isLoading: false,
+  wordCount: 0,
+  error: null,
+};
+
+jest.mock('@/hooks/useDictionaryCache', () => ({
+  useDictionaryCache: () => ({
+    checkWord: mockCheckWord,
+    ...mockDictionaryCacheState,
+  }),
+}));
+
+// Mock usePrevalidation for pre-typing validation
+const mockPrefetch = jest.fn();
+const mockGetCached = jest.fn().mockReturnValue(undefined);
+const mockClearCache = jest.fn();
+
+jest.mock('@/hooks/usePrevalidation', () => ({
+  usePrevalidation: () => ({
+    prefetch: mockPrefetch,
+    getCached: mockGetCached,
+    clearCache: mockClearCache,
+  }),
+}));
+
 // Import mocked modules
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 
@@ -201,6 +230,243 @@ describe('useWordSubmission', () => {
       expect(result.current.currentFeedback?.type).toBe('rejected');
       expect(result.current.currentFeedback?.message).toBe('playerView.wordAlreadyFound');
       expect(mockCombo.resetCombo).toHaveBeenCalled();
+    });
+  });
+
+  describe('immediate optimistic feedback', () => {
+    it('should show checking feedback immediately before API responds', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      // Create a delayed promise to simulate network latency
+      let resolveApi: (value: unknown) => void;
+      const apiPromise = new Promise((resolve) => {
+        resolveApi = resolve;
+      });
+      (global.fetch as jest.Mock).mockReturnValue(
+        apiPromise.then(() => ({
+          ok: true,
+          json: () => Promise.resolve({ isValid: true }),
+        }))
+      );
+
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions())
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('test');
+      });
+
+      // Immediately after submit, feedback should be 'checking'
+      expect(result.current.currentFeedback?.type).toBe('checking');
+      expect(result.current.currentFeedback?.word).toBe('TEST');
+
+      // Now resolve the API
+      await act(async () => {
+        resolveApi!(undefined);
+        await apiPromise;
+      });
+
+      // After API responds, feedback should be 'accepted'
+      await waitFor(() => {
+        expect(result.current.currentFeedback?.type).toBe('accepted');
+      });
+    });
+
+    it('should transition from checking to pending when word not in dictionary', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      let resolveApi: (value: unknown) => void;
+      const apiPromise = new Promise((resolve) => {
+        resolveApi = resolve;
+      });
+      (global.fetch as jest.Mock).mockReturnValue(
+        apiPromise.then(() => ({
+          ok: true,
+          json: () => Promise.resolve({ isValid: false }),
+        }))
+      );
+
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions())
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('xyz');
+      });
+
+      // Immediately shows checking
+      expect(result.current.currentFeedback?.type).toBe('checking');
+
+      // Resolve API with invalid result
+      await act(async () => {
+        resolveApi!(undefined);
+        await apiPromise;
+      });
+
+      // Should transition to pending
+      await waitFor(() => {
+        expect(result.current.currentFeedback?.type).toBe('pending');
+      });
+    });
+  });
+
+  describe('instant validation with dictionary cache', () => {
+    it('should validate instantly when word is in client-side cache', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      // Enable dictionary cache and make it return true for 'hello'
+      mockDictionaryCacheState.isLoaded = true;
+      mockCheckWord.mockImplementation((word: string) => word === 'hello');
+
+      const playWordAcceptedSound = jest.fn();
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions({ playWordAcceptedSound }))
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('hello');
+      });
+
+      // Should be accepted IMMEDIATELY without API call
+      expect(result.current.currentFeedback?.type).toBe('accepted');
+      expect(result.current.currentFeedback?.word).toBe('HELLO');
+      expect(playWordAcceptedSound).toHaveBeenCalled();
+
+      // API should NOT have been called
+      expect(global.fetch).not.toHaveBeenCalledWith(
+        '/api/dictionary/check',
+        expect.anything()
+      );
+
+      // Reset mock state for other tests
+      mockDictionaryCacheState.isLoaded = false;
+      mockCheckWord.mockReturnValue(false);
+    });
+
+    it('should fall back to API when word not in cache', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      // Cache loaded but word not in it
+      mockDictionaryCacheState.isLoaded = true;
+      mockCheckWord.mockReturnValue(false);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ isValid: true }),
+      });
+
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions())
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('test');
+      });
+
+      // Should show checking first (API in flight)
+      expect(result.current.currentFeedback?.type).toBe('checking');
+
+      // Wait for API
+      await waitFor(() => {
+        expect(result.current.currentFeedback?.type).toBe('accepted');
+      });
+
+      // API should have been called
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/dictionary/check',
+        expect.anything()
+      );
+
+      // Reset mock state
+      mockDictionaryCacheState.isLoaded = false;
+    });
+
+    it('should validate instantly when word was prevalidated while typing', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      // Prevalidation cache returns true for the word
+      mockGetCached.mockImplementation((word: string) =>
+        word === 'hello' ? true : undefined
+      );
+
+      const playWordAcceptedSound = jest.fn();
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions({ playWordAcceptedSound }))
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('hello');
+      });
+
+      // Should be accepted IMMEDIATELY without API call
+      expect(result.current.currentFeedback?.type).toBe('accepted');
+      expect(playWordAcceptedSound).toHaveBeenCalled();
+
+      // API should NOT have been called
+      expect(global.fetch).not.toHaveBeenCalledWith(
+        '/api/dictionary/check',
+        expect.anything()
+      );
+
+      // Reset mock
+      mockGetCached.mockReturnValue(undefined);
+    });
+
+    it('should mark pending instantly when prevalidation returned invalid', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      // Prevalidation cache returns false for the word
+      mockGetCached.mockImplementation((word: string) =>
+        word === 'xyz' ? false : undefined
+      );
+
+      const mockCombo = createMockCombo();
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions({ combo: mockCombo }))
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('xyz');
+      });
+
+      // Should be pending IMMEDIATELY without API call
+      expect(result.current.currentFeedback?.type).toBe('pending');
+      expect(mockCombo.resetCombo).toHaveBeenCalled();
+
+      // API should NOT have been called
+      expect(global.fetch).not.toHaveBeenCalledWith(
+        '/api/dictionary/check',
+        expect.anything()
+      );
+
+      // Reset mock
+      mockGetCached.mockReturnValue(undefined);
+    });
+
+    it('should expose prefetchValidation function', () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions())
+      );
+
+      expect(result.current.prefetchValidation).toBeDefined();
+      expect(typeof result.current.prefetchValidation).toBe('function');
+
+      // Call prefetch
+      act(() => {
+        result.current.prefetchValidation('test');
+      });
+
+      expect(mockPrefetch).toHaveBeenCalledWith('test');
     });
   });
 
