@@ -28,6 +28,7 @@ import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 // Power-ups removed from adventure mode
 import { useAdventureEffects } from './effects/hooks/useAdventureEffects';
 import { useAdventureCinematics } from './hooks/useAdventureCinematics';
+import { useAdventureEntryPhase } from './hooks/useAdventureEntryPhase';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { neoInfoToast } from '@/components/NeoToast';
@@ -367,8 +368,9 @@ const AdventureGame = memo<AdventureGameProps>(
     // Track last word for explosion calculation
     const lastSubmittedWordRef = useRef<{ word: string; path: Array<{ row: number; col: number }> } | null>(null);
 
-    // Track entry sequence phases
-    const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
+    // Entry phase state machine (cascade → objectives → title → playing)
+    const entryPhaseManager = useAdventureEntryPhase();
+    const { entryPhase } = entryPhaseManager;
 
     // Note: scoreDisplayRef now managed by useAdventureEffects hook
 
@@ -647,28 +649,28 @@ const AdventureGame = memo<AdventureGameProps>(
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
-      setEntryPhase('objectives');
-    }, [markCascadeComplete]);
+      entryPhaseManager.advanceToObjectives();
+    }, [markCascadeComplete, entryPhaseManager]);
 
     // Handle objectives slide-in completion to advance to title phase
     const handleObjectivesComplete = useCallback(() => {
-      setEntryPhase('title');
-    }, []);
+      entryPhaseManager.advanceToTitle();
+    }, [entryPhaseManager]);
 
     // Handle title animation completion to start gameplay (or show boss intro)
     const handleTitleComplete = useCallback(() => {
       if (showBossIntro && bossConfig) {
         // Boss levels: show intro cutscene before starting gameplay
-        setEntryPhase('playing');
+        entryPhaseManager.advanceToPlaying();
       } else {
-        setEntryPhase('playing');
+        entryPhaseManager.advanceToPlaying();
         if (!isPlaying) {
           startGame();
           // Start AI Director session when gameplay begins (DDA-01)
           startAIDirector();
         }
       }
-    }, [isPlaying, startGame, showBossIntro, bossConfig, startAIDirector]);
+    }, [isPlaying, startGame, showBossIntro, bossConfig, startAIDirector, entryPhaseManager]);
 
     // Handle boss intro start (player ready to fight)
     const handleBossIntroStart = useCallback(() => {
