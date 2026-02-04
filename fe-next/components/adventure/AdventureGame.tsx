@@ -15,7 +15,7 @@ import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
-import { useLexiReactions, type GameStateForReactions } from '@/hooks/useLexiReactions';
+import { type GameStateForReactions } from '@/hooks/useLexiReactions';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { useBossHealth } from '@/hooks/useBossHealth';
@@ -26,20 +26,16 @@ import { useSkillPoints } from '@/hooks/useSkillPoints';
 import { useSkillEffects } from '@/hooks/useSkillEffects';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 // Power-ups removed from adventure mode
-import { useScreenShake } from '@/hooks/useScreenShake';
-import { useParticleBudget } from '@/hooks/useParticleBudget';
+import { useAdventureEffects } from './effects/hooks/useAdventureEffects';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { neoInfoToast } from '@/components/NeoToast';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { useAIDirector } from '@/hooks/useAIDirector';
-import { BossDefeatFireworks, type BossTier } from '@/components/celebration/BossDefeatFireworks';
-import { ScorePopup } from './juice/ScorePopup';
+import { type BossTier } from '@/components/celebration/BossDefeatFireworks';
 import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
-import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
-import { AdaptiveParticles } from './juice/AdaptiveParticles';
-import { ExplosionEffect } from './juice/ExplosionEffect';
-import { LevelUpCelebration, type LevelUpPayload } from '@/components/education/LevelUpCelebration';
+import { type LevelUpPayload } from '@/components/education/LevelUpCelebration';
+import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 import AdventureGrid from './AdventureGrid';
 import AdventureObjectives from './AdventureObjectives';
@@ -225,8 +221,7 @@ const AdventureGame = memo<AdventureGameProps>(
       initialUpgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 }, // TODO: Load from user profile
     });
 
-    const { shakeRef, shake } = useScreenShake();
-    const particleBudget = useParticleBudget();
+    // Note: useScreenShake and useParticleBudget now managed by useAdventureEffects hook (called later)
 
     // Skill point awarding on level up (SKILL-02 requirement)
     useSkillPoints({
@@ -345,14 +340,9 @@ const AdventureGame = memo<AdventureGameProps>(
     // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
-    const [popupQueue, setPopupQueue] = useState<ScorePopup[]>([]);
-    const [pendingExplosions, setPendingExplosions] = useState<PendingExplosion[]>([]);
+    // Note: popupQueue and pendingExplosions now managed by useAdventureEffects hook
 
-    // Chain particle burst state
-    const [chainBurstConfig, setChainBurstConfig] = useState<{
-      trigger: boolean;
-      position: { x: number; y: number };
-    } | null>(null);
+    // Note: chainBurstConfig now managed by useAdventureEffects hook
 
     // Consolidated validation feedback state
     const [validationFeedback, setValidationFeedback] = useState<ValidationFeedback>({
@@ -381,8 +371,7 @@ const AdventureGame = memo<AdventureGameProps>(
     // Track entry sequence phases
     const [entryPhase, setEntryPhase] = useState<'cascade' | 'objectives' | 'title' | 'playing'>('cascade');
 
-    // Ref for score display target (for ScorePopup animation)
-    const scoreDisplayRef = useRef<HTMLDivElement>(null);
+    // Note: scoreDisplayRef now managed by useAdventureEffects hook
 
     // Cleanup all timeouts on unmount
     useEffect(() => {
@@ -399,8 +388,7 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, []);
 
-    // Current popup from queue
-    const currentPopup = popupQueue[0] ?? null;
+    // Note: currentPopup now managed by useAdventureEffects hook
 
     // Word validation hook (must come before selection hook which depends on isValidating)
     // Pass tiles for score calculation with special tile multipliers (gold 3x, rainbow 1.25x)
@@ -543,10 +531,12 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [gameState.wordsFound, gameState.comboCount, gameState.isComplete, gameState.stars, levelConfig.world]);
 
-    // Lexi reactions hook
-    const { reaction, dismissReaction } = useLexiReactions({
-      gameState: lexiGameState,
-      isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+    // All visual effects managed by composite hook
+    const effects = useAdventureEffects({
+      gameStateForReactions: {
+        gameState: lexiGameState,
+        isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+      },
     });
 
     // Report timer state to parent for music coordination
@@ -904,12 +894,13 @@ const AdventureGame = memo<AdventureGameProps>(
         const chainTile = chainActivatedTiles[0];
         const position = calculateTileCenter(chainTile.row, chainTile.col);
 
-        setChainBurstConfig({
+        effects.setChainBurstConfig({
           trigger: true,
           position,
         });
       }
-    }, [tiles, calculateTileCenter]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tiles, calculateTileCenter, effects.setChainBurstConfig]);
 
     // Trigger explosion at REMOVING phase start for 3+ tile words
     useEffect(() => {
@@ -942,17 +933,18 @@ const AdventureGame = memo<AdventureGameProps>(
           }
 
           // Add explosion to pending list
-          setPendingExplosions(prev => [...prev, {
+          effects.addExplosion({
             id: Date.now(),
             position: { x: centerX, y: centerY },
             intensity,
-          }]);
+          });
         }
 
         // Clear ref after processing
         lastSubmittedWordRef.current = null;
       }
-    }, [cascadePhase, calculateTileCenter]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cascadePhase, calculateTileCenter, effects.addExplosion]);
 
     // Handle pause toggle
     const handlePauseToggle = useCallback(() => {
@@ -1059,14 +1051,14 @@ const AdventureGame = memo<AdventureGameProps>(
           const comboBonus = gameState.comboCount > 1 ? `${gameState.comboCount}x` : undefined;
 
           // Add score popup to queue
-          setPopupQueue(prev => [...prev, {
+          effects.addScorePopup({
             id: Date.now(),
             value: scoreValue,
             x: startPos.x,
             y: startPos.y,
             word: currentWord,
             bonus: bossBonus || comboBonus,
-          }]);
+          });
 
           // Valid word - submit with calculated score and path for special tile effects
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
@@ -1134,7 +1126,8 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition, effects.addScorePopup]
     );
 
     // Handle level-up modal dismiss
@@ -1195,8 +1188,8 @@ const AdventureGame = memo<AdventureGameProps>(
         clearTimeout(popupQueueTimeoutRef.current);
         popupQueueTimeoutRef.current = null;
       }
-      setPopupQueue(prev => prev.slice(1));
-    }, []);
+      effects.handlePopupComplete();
+    }, [effects]);
 
     // Safety mechanism: clear stuck popups after max duration
     useEffect(() => {
@@ -1206,10 +1199,10 @@ const AdventureGame = memo<AdventureGameProps>(
         popupQueueTimeoutRef.current = null;
       }
 
-      if (currentPopup) {
+      if (effects.currentPopup) {
         const POPUP_MAX_DURATION_MS = 3000; // Max 3 seconds per popup
         popupQueueTimeoutRef.current = setTimeout(() => {
-          setPopupQueue(prev => prev.slice(1));
+          effects.handlePopupComplete();
           popupQueueTimeoutRef.current = null;
         }, POPUP_MAX_DURATION_MS);
       }
@@ -1221,14 +1214,11 @@ const AdventureGame = memo<AdventureGameProps>(
           popupQueueTimeoutRef.current = null;
         }
       };
-    }, [currentPopup]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [effects.currentPopup, effects.handlePopupComplete]);
 
     // Task 2: Wire screen shake and adaptive particles on combos
-    const [particleConfig, setParticleConfig] = useState<{
-      trigger: boolean;
-      intensity: number;
-      origin: { x: number; y: number };
-    } | null>(null);
+    // Note: particleConfig now managed by useAdventureEffects hook
 
     // Handle combo tier changes - trigger screen shake and particles
     const handleComboTierChange = useCallback((tier: ComboTier) => {
@@ -1240,16 +1230,16 @@ const AdventureGame = memo<AdventureGameProps>(
         10: 8, // Legendary! - intense shake
       };
       const intensity = shakeIntensityMap[tier.threshold] || 2;
-      shake(intensity);
+      effects.shake(intensity);
 
       // Trigger adaptive particles (intensity 1-4 based on tier)
       const particleIntensity = Math.ceil(tier.threshold / 3); // 2→1, 4→2, 7→3, 10→4
-      setParticleConfig({
-        trigger: true,
-        intensity: particleIntensity,
+      effects.setParticleConfig({
+        intensity: particleIntensity as 1 | 2 | 3 | 4 | 5,
         origin: { x: 0.5, y: 0.4 }, // Center-top for combo celebrations
       });
-    }, [shake]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [effects.shake, effects.setParticleConfig]);
 
     // Calculate star count for display
     const starsEarned = gameState.stars;
@@ -1269,7 +1259,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
     return (
       <div
-        ref={shakeRef}
+        ref={effects.shakeRef}
         data-testid="adventure-game"
         role="main"
         aria-label="Adventure Mode Game"
@@ -1298,7 +1288,7 @@ const AdventureGame = memo<AdventureGameProps>(
               {levelConfig.level}
             </h1>
             <div
-              ref={scoreDisplayRef}
+              ref={effects.scoreDisplayRef}
               data-testid="score-display"
               className="font-mono font-bold text-xs sm:text-sm"
             >
@@ -1651,74 +1641,27 @@ const AdventureGame = memo<AdventureGameProps>(
           />
         )}
 
-        {/* Score Popup Animation */}
-        {currentPopup && (
-          <ScorePopup
-            score={currentPopup.value}
-            position={{ x: currentPopup.x, y: currentPopup.y }}
-            targetPosition={scoreDisplayRef.current ? {
-              x: scoreDisplayRef.current.getBoundingClientRect().left + scoreDisplayRef.current.getBoundingClientRect().width / 2,
-              y: scoreDisplayRef.current.getBoundingClientRect().top + scoreDisplayRef.current.getBoundingClientRect().height / 2,
-            } : undefined}
-            comboMultiplier={currentPopup.bonus ? parseFloat(currentPopup.bonus.replace('x', '')) : undefined}
-            onComplete={handlePopupComplete}
-          />
-        )}
-
-        {/* Lexi Mascot Reactions */}
-        <LexiReaction
-          reaction={reaction}
-          onDismiss={dismissReaction}
-        />
-
-        {/* Chain Particle Burst */}
-        {chainBurstConfig && (
-          <ChainParticleBurst
-            trigger={chainBurstConfig.trigger}
-            position={chainBurstConfig.position}
-            world={levelConfig.world}
-            onComplete={() => setChainBurstConfig(null)}
-          />
-        )}
-
-        {/* Adaptive Particles for combo tier changes */}
-        {particleConfig && (
-          <AdaptiveParticles
-            type="combo"
-            intensity={particleConfig.intensity}
-            origin={particleConfig.origin}
-            onComplete={() => setParticleConfig(null)}
-          />
-        )}
-
-        {/* Explosion Effects (triggered at REMOVING phase) */}
-        {pendingExplosions.map((explosion) => (
-          <ExplosionEffect
-            key={explosion.id}
-            position={explosion.position}
-            intensity={explosion.intensity}
-            onComplete={() => {
-              setPendingExplosions(prev => prev.filter(e => e.id !== explosion.id));
-            }}
-          />
-        ))}
-
-        {/* Level-Up Celebration Modal */}
-        <LevelUpCelebration
+        {/* All visual effects managed by AdventureEffectsLayer */}
+        <AdventureEffectsLayer
+          currentPopup={effects.currentPopup}
+          onPopupComplete={effects.handlePopupComplete}
+          scoreDisplayRef={effects.scoreDisplayRef}
+          reaction={effects.reaction}
+          onDismissReaction={effects.dismissReaction}
+          chainBurstConfig={effects.chainBurstConfig}
+          onChainBurstComplete={() => effects.setChainBurstConfig(null)}
+          world={levelConfig.world}
+          particleConfig={effects.particleConfig}
+          onParticleComplete={() => effects.setParticleConfig(null)}
+          pendingExplosions={effects.pendingExplosions}
+          onExplosionComplete={effects.removeExplosion}
           levelUpData={levelUpData}
-          onClose={handleLevelUpClose}
+          onLevelUpClose={handleLevelUpClose}
+          currentMilestone={currentMilestone}
+          isBossLevel={isBossLevel}
+          showBossFireworks={showBossFireworks}
+          defeatedBossTier={defeatedBossTier}
         />
-
-        {/* Combo Milestone Overlay */}
-        <ComboMilestoneOverlay milestone={currentMilestone} />
-
-        {/* Boss Defeat Fireworks */}
-        {isBossLevel && (
-          <BossDefeatFireworks
-            active={showBossFireworks}
-            bossTier={defeatedBossTier}
-          />
-        )}
       </div>
     );
   }
