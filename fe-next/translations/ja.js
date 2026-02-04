@@ -1460,6 +1460,7 @@ const ja = {
   },
   "achievements": {
     "unlocked": "実績解除！",
+    "upgraded": "実績アップグレード！",
     "FIRST_BLOOD": {
       "name": "ファーストブラッド",
       "description": "最初に単語を見つける"

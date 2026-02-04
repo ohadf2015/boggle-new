@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext, ReactNode } from 'react';
-import AchievementPopup from './AchievementPopup';
+import { UnifiedAchievementModal } from './UnifiedAchievementModal';
 import { toast } from '@/components/ui/EnhancedToast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { AchievementPayload } from '@/shared/types/socket';
@@ -72,9 +72,10 @@ const AchievementQueue = ({ children }: AchievementQueueProps): React.ReactEleme
     <>
       {typeof children === 'function' ? children({ queueAchievement }) : children}
       {currentAchievement && (
-        <AchievementPopup
+        <UnifiedAchievementModal
+          type="socket"
           achievement={currentAchievement}
-          onComplete={handlePopupComplete}
+          onClose={handlePopupComplete}
         />
       )}
     </>
@@ -151,9 +152,10 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
     <AchievementQueueContext.Provider value={{ queueAchievement }}>
       {children}
       {currentAchievement && (
-        <AchievementPopup
+        <UnifiedAchievementModal
+          type="socket"
           achievement={currentAchievement}
-          onComplete={handlePopupComplete}
+          onClose={handlePopupComplete}
         />
       )}
     </AchievementQueueContext.Provider>

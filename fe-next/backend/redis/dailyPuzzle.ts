@@ -69,6 +69,28 @@ export async function getCachedDailyLeaderboard(
   }
 }
 
+/**
+ * Invalidate the cached daily puzzle for a specific date and language
+ * Call this when the admin changes the word via the dashboard
+ */
+export async function invalidateDailyPuzzleCache(date: string, language: string): Promise<boolean> {
+  if (!isRedisAvailable() || !getRedisClient()) {
+    return false;
+  }
+
+  try {
+    const client = getRedisClient()!;
+    const key = KEYS.dailyPuzzle(date, language);
+    const deleted = await circuitBreaker.execute(() => client.del(key));
+    logger.info('REDIS', `Invalidated daily puzzle cache for ${date}/${language}: ${deleted > 0 ? 'success' : 'not found'}`);
+    return deleted > 0;
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('REDIS', `Error invalidating daily puzzle cache: ${err.message}`);
+    return false;
+  }
+}
+
 export async function cacheDailyLeaderboard(
   date: string,
   language: string,

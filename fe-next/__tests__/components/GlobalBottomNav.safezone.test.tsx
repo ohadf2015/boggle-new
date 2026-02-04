@@ -3,12 +3,12 @@
  *
  * Bug Context:
  * - GlobalBottomNav is a fixed element at the bottom of the screen
- * - It has height of h-16 (64px) plus device safe area inset
+ * - The actual tab bar height includes: min-height (56px) + padding (16px) + border (4px) = ~76px
  * - Content using `page-content-safe` class was only adding device safe area + 16px
  * - This caused content to be hidden behind the bottom nav on mobile
  *
  * Expected Behavior:
- * - `--mobile-bottom-safe` CSS variable should include FULL nav height (64px + safe area)
+ * - `--mobile-bottom-safe` CSS variable should include FULL nav height (80px + safe area)
  * - `page-content-safe` class should use `--mobile-bottom-safe` on mobile
  * - On desktop (lg+), no extra padding needed (nav is hidden)
  */
@@ -37,9 +37,10 @@ describe('GlobalBottomNav safe zone', () => {
       expect(globalsCSS).toContain('--mobile-bottom-safe');
     });
 
-    test('should include mobile tab bar height (64px)', () => {
-      // The variable should reference --mobile-tab-bar-height which is 4rem (64px)
-      expect(globalsCSS).toContain('--mobile-tab-bar-height: 4rem');
+    test('should include mobile tab bar height (80px)', () => {
+      // The variable should reference --mobile-tab-bar-height which is 5rem (80px)
+      // This accounts for: min-height (56px) + padding (16px) + border (4px) + safety margin
+      expect(globalsCSS).toContain('--mobile-tab-bar-height: 5rem');
       expect(globalsCSS).toMatch(
         /--mobile-bottom-safe:\s*calc\([^)]*--mobile-tab-bar-height/
       );
@@ -82,10 +83,15 @@ describe('GlobalBottomNav safe zone', () => {
   });
 
   describe('GlobalBottomNav height consistency', () => {
-    test('globals.css --mobile-tab-bar-height should match GlobalBottomNav h-16', () => {
-      // GlobalBottomNav uses h-16 (64px = 4rem)
-      // This should match the CSS variable
-      expect(globalsCSS).toContain('--mobile-tab-bar-height: 4rem');
+    test('globals.css --mobile-tab-bar-height should account for full tab bar height', () => {
+      // The CSS variable must account for:
+      // - .mobile-tab-bar min-height: 56px
+      // - .mobile-tab-bar padding-top: 0.5rem (8px)
+      // - .mobile-tab-bar padding-bottom: at least 0.5rem (8px)
+      // - Parent wrapper border-t-4: 4px
+      // Total base height: 76px minimum
+      // Using 5rem (80px) for safety margin
+      expect(globalsCSS).toContain('--mobile-tab-bar-height: 5rem');
     });
   });
 });

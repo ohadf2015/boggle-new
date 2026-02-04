@@ -1469,6 +1469,7 @@ const en = {
   },
   "achievements": {
     "unlocked": "Achievement Unlocked!",
+    "upgraded": "Achievement Upgraded!",
     "FIRST_BLOOD": {
       "name": "First Blood",
       "description": "Drew first word"

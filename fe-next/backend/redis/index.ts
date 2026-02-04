@@ -74,6 +74,7 @@ export {
   cacheDailyPuzzle,
   getCachedDailyLeaderboard,
   getCachedDailyPuzzle,
+  invalidateDailyPuzzleCache,
 } from './dailyPuzzle';
 
 // Distributed locking

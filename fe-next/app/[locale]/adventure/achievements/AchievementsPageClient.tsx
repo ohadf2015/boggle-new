@@ -11,10 +11,8 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  AchievementGrid,
-  AchievementUnlockModal,
-} from '@/components/adventure/achievements';
+import { AchievementGrid } from '@/components/adventure/achievements';
+import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 import {
   ADVENTURE_ACHIEVEMENTS,
@@ -68,7 +66,8 @@ export function AchievementsPageClient() {
 
         {/* Detail Modal */}
         {selectedAchievement && (
-          <AchievementUnlockModal
+          <UnifiedAchievementModal
+            type="adventure"
             achievement={selectedAchievement.achievement}
             count={selectedAchievement.count}
             isNew={false}

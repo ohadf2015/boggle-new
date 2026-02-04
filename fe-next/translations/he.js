@@ -1471,6 +1471,7 @@ const he = {
   },
   "achievements": {
     "unlocked": "הישג נפתח!",
+    "upgraded": "הישג שודרג!",
     "FIRST_BLOOD": {
       "name": "דם ראשון",
       "description": "ראשון למצוא מילה"

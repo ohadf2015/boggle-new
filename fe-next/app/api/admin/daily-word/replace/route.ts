@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
+import { invalidateDailyPuzzleCache } from '@/backend/redis/dailyPuzzle';
 import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
 
@@ -149,6 +150,12 @@ export async function POST(request: NextRequest) {
       };
     }
 
+    // Invalidate Redis cache so players get the new word immediately
+    // This must happen BEFORE board regeneration so any concurrent requests
+    // fetch the new word from the database
+    const cacheInvalidated = await invalidateDailyPuzzleCache(puzzleDate, language);
+    console.log(`[Admin] Cache invalidation for ${puzzleDate}/${language}: ${cacheInvalidated ? 'success' : 'skipped/failed'}`);
+
     // Regenerate board immediately if requested (default: true)
     let boardRegenerateResult = null;
     if (regenerateBoard) {
@@ -196,6 +203,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       word: wordUpdateResult,
+      cacheInvalidated,
       boardRegenerate: boardRegenerateResult,
       reset: resetResult,
     });

@@ -1460,6 +1460,7 @@ const sv = {
   },
   "achievements": {
     "unlocked": "Prestation Upplåst!",
+    "upgraded": "Prestation Uppgraderad!",
     "FIRST_BLOOD": {
       "name": "Första Blodet",
       "description": "Först att hitta ett ord"

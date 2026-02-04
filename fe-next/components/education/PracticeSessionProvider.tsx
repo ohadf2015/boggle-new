@@ -27,7 +27,7 @@ import useEducationXp, {
   type DailyStreak,
 } from '@/hooks/useEducationXp';
 import useAchievementUnlock from '@/hooks/useAchievementUnlock';
-import AchievementUnlockModal from './AchievementUnlockModal';
+import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
@@ -285,10 +285,13 @@ export function PracticeSessionProvider({
       {children}
 
       {/* Achievement unlock celebration modal */}
-      <AchievementUnlockModal
-        unlock={currentUnlock}
-        onClose={acknowledgeUnlock}
-      />
+      {currentUnlock && (
+        <UnifiedAchievementModal
+          type="education"
+          unlock={currentUnlock}
+          onClose={acknowledgeUnlock}
+        />
+      )}
     </PracticeSessionContext.Provider>
   );
 }

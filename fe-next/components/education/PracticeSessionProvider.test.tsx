@@ -84,10 +84,10 @@ jest.mock('@/hooks/useAchievementUnlock', () => ({
   })),
 }));
 
-// Mock AchievementUnlockModal component
-jest.mock('./AchievementUnlockModal', () => ({
+// Mock UnifiedAchievementModal component
+jest.mock('@/components/achievements/UnifiedAchievementModal', () => ({
   __esModule: true,
-  default: jest.fn(() => <div data-testid="achievement-modal">Achievement Modal</div>),
+  UnifiedAchievementModal: jest.fn(() => <div data-testid="achievement-modal">Achievement Modal</div>),
 }));
 
 // Mock LanguageContext
@@ -544,7 +544,25 @@ describe('PracticeSessionProvider', () => {
       });
     });
 
-    it('renders AchievementUnlockModal', () => {
+    it('renders AchievementUnlockModal when currentUnlock is set', () => {
+      // Import the mock to modify it
+      const useAchievementUnlockModule = jest.requireMock('@/hooks/useAchievementUnlock');
+
+      // Set currentUnlock to a valid unlock payload
+      useAchievementUnlockModule.default.mockReturnValueOnce({
+        pendingUnlocks: [],
+        currentUnlock: {
+          achievementKey: 'test-achievement',
+          tier: 'bronze',
+          icon: '🏆',
+          isNew: true,
+          isUpgrade: false,
+        },
+        acknowledgeUnlock: mockAcknowledgeUnlock,
+        checkForUnlocks: mockCheckForUnlocks,
+        isChecking: false,
+      });
+
       render(
         <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
           <TestConsumer />

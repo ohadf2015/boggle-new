@@ -7,8 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
 import UnifiedShareModal from '../modals/UnifiedShareModal';
-import { useNativeShare } from '../../hooks/useNativeShare';
-import { generatePersonalizedShareMessage, getJoinUrl, type GameResultForShare } from '../../utils/share';
+import { type GameResultForShare } from '../../utils/share';
 
 interface Achievement {
   id?: string;
@@ -241,32 +240,11 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     longestWord,
   }), [score, wordCount, isWinner, achievements, streakDays, maxCombo, archetype, placement, totalPlayers, longestWord]);
 
-  // Native share support
-  const { canNativeShare, nativeShare } = useNativeShare();
-
-  // Generate share URL and message
-  const joinUrl = getJoinUrl(gameCode, 'share-win');
-  const shareMessage = useMemo(() => {
-    return generatePersonalizedShareMessage(gameCode, gameResult, language, 'victory-prompt');
-  }, [gameCode, gameResult, language]);
-
-  // Smart share handler: try native share first, then modal
-  const handleShare = useCallback(async () => {
-    if (canNativeShare) {
-      const success = await nativeShare({
-        title: language === 'he' ? 'ניצחתי ב-LexiClash!' : 'I won at LexiClash!',
-        text: shareMessage,
-        url: joinUrl,
-      });
-      // If native share succeeded, we're done. If cancelled/failed, show modal
-      if (!success) {
-        setIsShareModalOpen(true);
-      }
-    } else {
-      // Desktop: show modal directly
-      setIsShareModalOpen(true);
-    }
-  }, [canNativeShare, nativeShare, shareMessage, joinUrl, language]);
+  // Share handler: always open modal first for better UX
+  // Modal has nice branded UI ready for screenshot/sharing
+  const handleShare = useCallback(() => {
+    setIsShareModalOpen(true);
+  }, []);
 
   // Streak encouragement - motivate users close to milestones
   const streakEncouragement = useMemo(() => {

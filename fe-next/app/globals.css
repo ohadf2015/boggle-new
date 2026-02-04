@@ -69,7 +69,14 @@
   --border-neo-thick: 4px;
 
   /* Mobile Layout Variables */
-  --mobile-tab-bar-height: 4rem; /* 64px base height for bottom tab bars */
+  /* Tab bar height calculation:
+   * - .mobile-tab-bar min-height: 56px
+   * - .mobile-tab-bar padding-top: 0.5rem (8px)
+   * - .mobile-tab-bar padding-bottom: at least 0.5rem (8px)
+   * - ResultsPage wrapper border-t-4: 4px
+   * Total base height: 76px (4.75rem)
+   * Using 5rem (80px) for extra safety margin */
+  --mobile-tab-bar-height: 5rem; /* 80px - accounts for min-height + padding + border */
   --mobile-bottom-safe: calc(var(--mobile-tab-bar-height) + env(safe-area-inset-bottom, 0px));
   
   /* Header/Footer Height Variables for Content Spacing */

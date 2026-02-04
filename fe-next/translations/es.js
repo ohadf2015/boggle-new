@@ -1274,6 +1274,7 @@ const es = {
   },
   "achievements": {
     "unlocked": "¡Logro Desbloqueado!",
+    "upgraded": "¡Logro Mejorado!",
     "FIRST_BLOOD": {
       "name": "Primera Sangre",
       "description": "Primero en encontrar una palabra"

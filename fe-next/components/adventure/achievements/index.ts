@@ -4,4 +4,4 @@
 
 export { AchievementGrid } from './AchievementGrid';
 export { AchievementCard } from './AchievementCard';
-export { AchievementUnlockModal } from './AchievementUnlockModal';
+// AchievementUnlockModal replaced by UnifiedAchievementModal from @/components/achievements
