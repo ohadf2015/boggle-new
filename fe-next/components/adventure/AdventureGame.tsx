@@ -27,6 +27,7 @@ import { useSkillEffects } from '@/hooks/useSkillEffects';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 // Power-ups removed from adventure mode
 import { useAdventureEffects } from './effects/hooks/useAdventureEffects';
+import { useAdventureCinematics } from './hooks/useAdventureCinematics';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { neoInfoToast } from '@/components/NeoToast';
@@ -355,10 +356,8 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showBossFireworks, setShowBossFireworks] = useState(false);
     const [defeatedBossTier, setDefeatedBossTier] = useState<BossTier>('standard');
 
-    // Victory/defeat cinematic state
-    const [showVictoryCinematic, setShowVictoryCinematic] = useState(false);
-    const [showDefeatCinematic, setShowDefeatCinematic] = useState(false);
-    const [cinematicComplete, setCinematicComplete] = useState(false);
+    // Victory/defeat cinematic management
+    const cinematics = useAdventureCinematics();
 
     // Refs for timeout cleanup
     const validationErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -479,7 +478,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Lexi stuck detection (DEBT-03 + DEBT-04 integration)
     // Detects when player hasn't made progress and shows helpful hint
-    const isModalOpen = showLevelComplete || showVictoryCinematic || showDefeatCinematic || showBossIntro || showBossFireworks;
+    const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || showBossIntro || showBossFireworks;
     const { resetOnGameAction } = useLexiStuckDetection({
       onStuck: () => {
         // Show Lexi hint when player is stuck
@@ -751,7 +750,7 @@ const AdventureGame = memo<AdventureGameProps>(
     // Check for level completion and record attempt
     useEffect(() => {
       // Guard against running multiple times - completion is already handled
-      if (showLevelComplete || showVictoryCinematic || showDefeatCinematic) return;
+      if (showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic) return;
 
       // For boss levels: Only complete when boss HP = 0 (victory) or time runs out (defeat)
       // For regular levels: Complete when objectives met or time runs out
@@ -767,9 +766,9 @@ const AdventureGame = memo<AdventureGameProps>(
 
         // Show appropriate cinematic first (before level complete modal)
         if (isVictory) {
-          setShowVictoryCinematic(true);
+          cinematics.showVictory();
         } else {
-          setShowDefeatCinematic(true);
+          cinematics.showDefeat();
         }
         pauseGame();
 
@@ -824,10 +823,11 @@ const AdventureGame = memo<AdventureGameProps>(
         // End AI Director session on level complete/fail (DDA-01)
         endAIDirector();
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
       showLevelComplete, // Guard dependency - must be first to prevent infinite loops
-      showVictoryCinematic,
-      showDefeatCinematic,
+      cinematics.showVictoryCinematic,
+      cinematics.showDefeatCinematic,
       gameState.isComplete,
       timeRemaining,
       pauseGame,
@@ -1137,11 +1137,9 @@ const AdventureGame = memo<AdventureGameProps>(
 
     // Handle cinematic completion (victory/defeat)
     const handleCinematicComplete = useCallback(() => {
-      setShowVictoryCinematic(false);
-      setShowDefeatCinematic(false);
-      setCinematicComplete(true);
+      cinematics.handleCinematicComplete();
       setShowLevelComplete(true);
-    }, []);
+    }, [cinematics]);
 
     // Handle level complete continue
     const handleContinue = useCallback(() => {
@@ -1594,7 +1592,7 @@ const AdventureGame = memo<AdventureGameProps>(
         />
 
         {/* Victory Cinematic */}
-        {showVictoryCinematic && (
+        {cinematics.showVictoryCinematic && (
           <CinematicPlayer
             composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
@@ -1609,7 +1607,7 @@ const AdventureGame = memo<AdventureGameProps>(
         )}
 
         {/* Defeat Cinematic */}
-        {showDefeatCinematic && (
+        {cinematics.showDefeatCinematic && (
           <CinematicPlayer
             composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
@@ -1627,7 +1625,7 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Level Complete: Standard Modal (boss levels use BossOverlay) */}
         {!isBossLevel && (
           <LevelCompleteModal
-            isOpen={showLevelComplete && cinematicComplete}
+            isOpen={showLevelComplete && cinematics.cinematicComplete}
             stars={starsEarned}
             score={gameState.score}
             objectives={objectives}
