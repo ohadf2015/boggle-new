@@ -13,7 +13,7 @@ import {
   LifetimeAchievement
 } from './client';
 import { recordGameResult } from './gameResults';
-import { updatePlayerStats } from './playerStats';
+import { updatePlayerStats, ensureProfileExists } from './playerStats';
 import { updateLeaderboardEntry, updateRankedProgress } from './leaderboard';
 import { updateGuestStats } from './guestTokens';
 
@@ -87,7 +87,17 @@ async function processPlayerResult(
       // Authenticated user - run operations in parallel where possible
       logger.debug('SUPABASE', `Recording result for authenticated user: ${playerScore.username}`);
 
+      // Phase 0: Ensure profile exists BEFORE recording game result
+      // This fixes the race condition where recordGameResult fails with FK violation
+      // if the profile doesn't exist yet (new users who haven't completed onboarding)
+      const profileExists = await ensureProfileExists(authInfo.authUserId);
+      if (!profileExists) {
+        logger.error('SUPABASE', `Failed to ensure profile exists for ${playerScore.username}, skipping game result recording`);
+        // Continue anyway - stats update will also try to create the profile
+      }
+
       // Phase 1: Record game result and update profile stats in parallel
+      // Now safe because profile is guaranteed to exist (or we're in error recovery mode)
       const [gameResultRes, statsRes] = await Promise.all([
         recordGameResult({
           playerId: authInfo.authUserId,

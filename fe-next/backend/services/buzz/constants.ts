@@ -16,16 +16,10 @@ export const REGION_MAP: Record<string, string> = {
 
 /**
  * Minimum answer length by language for Daily Challenge word hunt
- * Most languages: 4 letters minimum for adequate challenge difficulty
- * Japanese kanji compounds: 2 characters minimum (kanji are complex)
+ * Re-exported from shared constants for backwards compatibility
+ * @see @/shared/constants/gameConstants.ts for the canonical definition
  */
-export const MIN_ANSWER_LENGTH: Record<string, number> = {
-  en: 4,
-  he: 4,
-  sv: 4,
-  ja: 2,
-  es: 4,
-};
+export { MIN_ANSWER_LENGTH, getMinAnswerLength } from '@/shared/constants/gameConstants';
 
 /**
  * Maximum answer length for all languages

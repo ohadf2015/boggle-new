@@ -3,7 +3,7 @@
  * Validates XP calculation and profile updates
  */
 
-import { updatePlayerStats } from '../playerStats';
+import { updatePlayerStats, ensureProfileExists } from '../playerStats';
 import type { GameStats } from '../client';
 
 // Mock dependencies
@@ -324,5 +324,138 @@ describe('updatePlayerStats', () => {
         playerCount: 1,
       });
     });
+  });
+});
+
+describe('ensureProfileExists', () => {
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Setup mock Supabase client
+    mockClient = {
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn(),
+      insert: jest.fn().mockReturnThis(),
+      auth: {
+        admin: {
+          getUserById: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+        },
+      },
+    };
+
+    getSupabase.mockReturnValue(mockClient);
+  });
+
+  test('should return true if profile already exists', async () => {
+    // GIVEN: Profile exists
+    const playerId = 'existing-user-123';
+    mockClient.single.mockResolvedValueOnce({
+      data: { id: playerId },
+      error: null,
+    });
+
+    // WHEN: Check if profile exists
+    const result = await ensureProfileExists(playerId);
+
+    // THEN: Should return true without creating a new profile
+    expect(result).toBe(true);
+    expect(mockClient.insert).not.toHaveBeenCalled();
+  });
+
+  test('should create profile and return true if profile not found', async () => {
+    // GIVEN: Profile doesn't exist (PGRST116 error)
+    const playerId = 'new-user-123';
+    mockClient.single.mockResolvedValueOnce({
+      data: null,
+      error: { code: 'PGRST116', message: 'Not found' },
+    });
+
+    // Mock successful profile creation
+    mockClient.insert.mockReturnValueOnce({
+      data: null,
+      error: null,
+    });
+
+    // WHEN: Ensure profile exists
+    const result = await ensureProfileExists(playerId);
+
+    // THEN: Should create profile and return true
+    expect(result).toBe(true);
+    expect(mockClient.insert).toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith(
+      'SUPABASE',
+      expect.stringContaining('Profile not found')
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      'SUPABASE',
+      expect.stringContaining('Created minimal profile')
+    );
+  });
+
+  test('should retry with suffix on username collision', async () => {
+    // GIVEN: Profile doesn't exist
+    const playerId = 'new-user-456';
+    mockClient.single.mockResolvedValueOnce({
+      data: null,
+      error: { code: 'PGRST116', message: 'Not found' },
+    });
+
+    // First insert fails with unique constraint violation on username
+    mockClient.insert.mockReturnValueOnce({
+      data: null,
+      error: { code: '23505', message: 'duplicate key value violates unique constraint "profiles_username_key"' },
+    });
+
+    // Second insert succeeds with suffixed username
+    mockClient.insert.mockReturnValueOnce({
+      data: null,
+      error: null,
+    });
+
+    // WHEN: Ensure profile exists
+    const result = await ensureProfileExists(playerId);
+
+    // THEN: Should retry and succeed
+    expect(result).toBe(true);
+    expect(mockClient.insert).toHaveBeenCalledTimes(2);
+    expect(logger.warn).toHaveBeenCalledWith(
+      'SUPABASE',
+      expect.stringContaining('Username collision')
+    );
+  });
+
+  test('should return false on database error', async () => {
+    // GIVEN: Database error
+    const playerId = 'error-user-123';
+    mockClient.single.mockResolvedValueOnce({
+      data: null,
+      error: { code: 'DB_ERROR', message: 'Connection failed' },
+    });
+
+    // WHEN: Ensure profile exists
+    const result = await ensureProfileExists(playerId);
+
+    // THEN: Should return false
+    expect(result).toBe(false);
+    expect(logger.error).toHaveBeenCalledWith(
+      'SUPABASE',
+      expect.stringContaining('Error checking profile'),
+      'Connection failed'
+    );
+  });
+
+  test('should return false if Supabase not configured', async () => {
+    // GIVEN: Supabase not configured
+    getSupabase.mockReturnValue(null);
+
+    // WHEN: Ensure profile exists
+    const result = await ensureProfileExists('any-user-123');
+
+    // THEN: Should return false
+    expect(result).toBe(false);
   });
 });

@@ -16,6 +16,7 @@ import { WordFeedbackToast } from './WordFeedbackToast';
 
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './survival/types';
+import { getMinAnswerLength } from '@/shared/constants/gameConstants';
 
 import {
   useSurvivalGameLogic,
@@ -102,7 +103,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     gameLanguage: language,
     enabled: !state.isGameOver,
     onWordSubmit: actions.handleWordSubmit,
-    minWordLength: 2, // Match swipe behavior - needed for Japanese kanji compounds
+    minWordLength: getMinAnswerLength(language), // Language-specific minimum (4 for most, 2 for Japanese)
   });
 
   // Hide bottom navigation during active gameplay

@@ -192,6 +192,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // Add new user
     const userAvatar = avatar || generateRandomAvatar();
+    logger.info('PLAYER_JOIN', `Adding user ${username} to game ${gameCode} with authUserId=${authUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
     addUserToGame(gameCode, username, socket.id, {
       avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
       isHost: false,
@@ -498,7 +499,8 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
  * Handle player reconnection to an existing game
  */
 function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: string, username: string, authUserId?: string, guestTokenHash?: string): void {
-  logger.info('SOCKET', `Reconnection detected for ${username}`);
+  const existingAuthUserId = game.users[username]?.authUserId;
+  logger.info('SOCKET', `Reconnection detected for ${username}: existingAuthUserId=${existingAuthUserId || 'NONE'}, newAuthUserId=${authUserId || 'NONE'}`);
 
   if (game.users[username]) {
     game.users[username].disconnected = false;
@@ -512,9 +514,11 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
     broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', { username });
   }
 
+  // Pass auth context - use undefined (not null) to preserve existing values
+  // The updateUserSocketId function will only overwrite if new values are truthy
   updateUserSocketId(gameCode, username, socket.id, {
-    authUserId: authUserId || null,
-    guestTokenHash: guestTokenHash || null
+    authUserId: authUserId,
+    guestTokenHash: guestTokenHash
   });
 
   if (game.hostUsername === username) {

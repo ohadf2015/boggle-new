@@ -72,6 +72,28 @@ export const DEFAULT_MIN_WORD_LENGTH = 2;
 export const MIN_WORD_LENGTH = 2;
 export const MAX_WORD_LENGTH = 50;
 
+/**
+ * Minimum answer length by language for Daily Challenge word hunt
+ * Most languages: 4 letters minimum for adequate challenge difficulty
+ * Japanese kanji compounds: 2 characters minimum (kanji are complex)
+ */
+export const MIN_ANSWER_LENGTH: Record<string, number> = {
+  en: 4,
+  he: 4,
+  sv: 4,
+  ja: 2,
+  es: 4,
+};
+
+/**
+ * Get minimum word length for a language in Daily Word Hunt
+ * @param language - Language code (en, he, sv, ja, es)
+ * @returns Minimum word length (4 for most languages, 2 for Japanese)
+ */
+export function getMinAnswerLength(language: string): number {
+  return MIN_ANSWER_LENGTH[language] ?? 4;
+}
+
 // ==================== Room Settings ====================
 
 export const MAX_PLAYERS_PER_ROOM = 50;

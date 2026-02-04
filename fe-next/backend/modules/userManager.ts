@@ -257,11 +257,16 @@ export function updateUserSocketId(
   game.users[username].socketId = newSocketId;
 
   // Update auth context if provided (for reconnection with new auth state)
+  // IMPORTANT: Only overwrite if the new value is truthy (not null/undefined)
+  // This preserves the existing auth context when reconnecting without auth data
   if (authContext) {
-    if (authContext.authUserId !== undefined) {
+    // Only update authUserId if the new value is truthy (a real user ID)
+    // This prevents clearing an existing authUserId when reconnecting without auth data
+    if (authContext.authUserId) {
       game.users[username].authUserId = authContext.authUserId;
     }
-    if (authContext.guestTokenHash !== undefined) {
+    // Only update guestTokenHash if the new value is truthy
+    if (authContext.guestTokenHash) {
       game.users[username].guestTokenHash = authContext.guestTokenHash;
     }
   }

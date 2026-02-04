@@ -39,6 +39,9 @@ export async function recordGameResultsToSupabase(
         guestSessionId: userData.guestSessionId,
         socketId: userData.socketId,
       };
+
+      // Debug: Log auth info for each player
+      logger.info('GAME_RESULTS', `Player ${username} auth context: authUserId=${userData.authUserId || 'NONE'}, guestHash=${userData.guestTokenHash ? 'yes' : 'no'}`);
     }
 
     // Build gameInfo from game object

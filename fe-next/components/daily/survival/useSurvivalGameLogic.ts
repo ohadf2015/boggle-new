@@ -19,6 +19,7 @@ import {
   getLifeBonusForWord,
 } from './constants';
 import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
+import { getMinAnswerLength } from '@/shared/constants/gameConstants';
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -416,7 +417,8 @@ export function useSurvivalGameLogic({
   // This shows feedback overlay and persists yellow/green letters without counting as a "try"
   const handleDiscoveryFeedback = useCallback((word: string, target: string) => {
     // Skip if word is too short for meaningful feedback
-    if (word.length < 2) return;
+    const minLength = getMinAnswerLength(language);
+    if (word.length < minLength) return;
 
     // Pass language to enable Hebrew final letter normalization
     const feedback = getLetterFeedback(word, target, language);
@@ -454,8 +456,9 @@ export function useSurvivalGameLogic({
 
   // Handle word discovery
   const handleWordDiscovery = useCallback(async (word: string) => {
-    if (word.length < 2) {
-      showToast('too-short', t('wordHunt.feedback.tooShort') || 'Minimum 2 letters');
+    const minLength = getMinAnswerLength(language);
+    if (word.length < minLength) {
+      showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${minLength} letters`);
       return;
     }
 

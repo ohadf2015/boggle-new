@@ -17,6 +17,115 @@ function getRandomPlayerNameGenerator() {
 }
 
 /**
+ * Ensure a player profile exists in the database.
+ * Creates a minimal profile if one doesn't exist.
+ * This is needed before recording game results due to FK constraint.
+ *
+ * @returns true if profile exists (or was created), false on error
+ */
+export async function ensureProfileExists(playerId: string): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+
+  // Check if profile exists
+  const { data: existingProfile, error: fetchError } = await client
+    .from('profiles')
+    .select('id')
+    .eq('id', playerId)
+    .single();
+
+  if (existingProfile) {
+    return true; // Profile already exists
+  }
+
+  // If error is "not found", create the profile
+  if (fetchError?.code === 'PGRST116') {
+    logger.info('SUPABASE', `Profile not found for ${playerId}, creating minimal profile for FK constraint`);
+
+    // Fetch auth user metadata to get their name from OAuth provider
+    const { data: authUser } = await client.auth.admin.getUserById(playerId);
+    const userMetadata = authUser?.user?.user_metadata;
+
+    // Extract first name from OAuth metadata
+    const oauthFullName = userMetadata?.full_name || userMetadata?.name;
+    const getFirstName = (fullName: string): string => {
+      if (!fullName) return '';
+      const firstName = fullName.split(' ')[0];
+      if (/^[A-Z]+$/.test(firstName)) {
+        return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+      }
+      return firstName;
+    };
+    const oauthFirstName = oauthFullName ? getFirstName(oauthFullName) : null;
+
+    let username: string;
+    let displayName: string;
+    let avatarEmoji: string;
+    let avatarColor: string;
+
+    if (oauthFirstName) {
+      username = oauthFirstName;
+      displayName = oauthFirstName;
+      const genericAvatars = [
+        { emoji: '😊', color: '#4F46E5' },
+        { emoji: '🎮', color: '#059669' },
+        { emoji: '⭐', color: '#D97706' },
+        { emoji: '🎯', color: '#DC2626' },
+        { emoji: '🏆', color: '#7C3AED' },
+      ];
+      const randomAvatar = genericAvatars[Math.floor(Math.random() * genericAvatars.length)];
+      avatarEmoji = randomAvatar.emoji;
+      avatarColor = randomAvatar.color;
+    } else {
+      const generateRandomPlayerName = getRandomPlayerNameGenerator();
+      const randomPlayerData = generateRandomPlayerName!([], 'en');
+      username = randomPlayerData.name;
+      displayName = randomPlayerData.name;
+      avatarEmoji = randomPlayerData.avatar.emoji;
+      avatarColor = randomPlayerData.avatar.color;
+    }
+
+    // Try to create the profile - handle username uniqueness constraint
+    let createAttempts = 0;
+    const maxAttempts = 3;
+
+    while (createAttempts < maxAttempts) {
+      const { error: createError } = await client
+        .from('profiles')
+        .insert({
+          id: playerId,
+          username: createAttempts === 0 ? username : `${username}${Math.floor(Math.random() * 10000)}`,
+          display_name: displayName,
+          avatar_emoji: avatarEmoji,
+          avatar_color: avatarColor
+        });
+
+      if (!createError) {
+        logger.info('SUPABASE', `Created minimal profile for ${playerId}`);
+        return true;
+      }
+
+      // Check if it's a unique constraint violation on username
+      if (createError.code === '23505' && createError.message?.includes('username')) {
+        createAttempts++;
+        logger.warn('SUPABASE', `Username collision, retrying with suffix (attempt ${createAttempts}/${maxAttempts})`);
+        continue;
+      }
+
+      logger.error('SUPABASE', `Failed to create profile for ${playerId}`, createError.message);
+      return false;
+    }
+
+    logger.error('SUPABASE', `Failed to create profile after ${maxAttempts} attempts for ${playerId}`);
+    return false;
+  }
+
+  // Some other error occurred
+  logger.error('SUPABASE', `Error checking profile for ${playerId}`, fetchError?.message);
+  return false;
+}
+
+/**
  * Update player profile stats after a game
  */
 export async function updatePlayerStats(
@@ -249,4 +358,5 @@ export async function updatePlayerStats(
 // CommonJS exports for backward compatibility
 module.exports = {
   updatePlayerStats,
+  ensureProfileExists,
 };
