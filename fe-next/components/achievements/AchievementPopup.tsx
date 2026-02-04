@@ -130,15 +130,15 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ x: language === 'he' ? -300 : 300, opacity: 0 }}
+        initial={{ x: 300, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: language === 'he' ? -300 : 300, opacity: 0 }}
+        exit={{ x: 300, opacity: 0 }}
         transition={{
           type: 'spring',
           stiffness: 300,
           damping: 25,
         }}
-        className="fixed top-20 end-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
+        className="fixed top-20 right-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}

@@ -209,6 +209,8 @@ const SinglePlayerView: React.FC = () => {
   const hasAutoStartedRef = useRef(false);
 
   // Auto-start practice mode when coming from onboarding (autoStart=practice)
+  // Note: 'phase' intentionally NOT in deps - this effect should only run once on mount
+  // based on URL params, not re-run when phase changes (which would cause infinite loop)
   useEffect(() => {
     // Only run once - prevents infinite loop when uiLanguage changes during hydration
     if (autoStart === 'practice' && !hasAutoStartedRef.current) {
@@ -230,9 +232,12 @@ const SinglePlayerView: React.FC = () => {
         setPhase('playing');
       }
     }
-  }, [autoStart, phase, uiLanguage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, uiLanguage]);
 
   // Auto-start bot game when autoStart=bots (direct from landing page)
+  // Note: 'phase' intentionally NOT in deps - this effect should only run once on mount
+  // based on URL params, not re-run when phase changes (which would cause infinite loop)
   useEffect(() => {
     if (autoStart === 'bots' && !hasAutoStartedRef.current) {
       hasAutoStartedRef.current = true;
@@ -259,7 +264,8 @@ const SinglePlayerView: React.FC = () => {
         setPhase('playing');
       }
     }
-  }, [autoStart, phase, uiLanguage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, uiLanguage]);
 
   // Auto-start with preset when preset param is provided (e.g., preset=bots from NextStepPrompt)
   // This handles navigation from practice mode results to "Challenge Bots"
@@ -441,9 +447,10 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
-    // Reset hasAutoStartedRef so user can navigate to a new preset from results page
-    // This allows "Play Against Bots" button in NextStepPrompt to work after practice mode
-    hasAutoStartedRef.current = false;
+    // Note: We intentionally do NOT reset hasAutoStartedRef here.
+    // If user navigates to a new URL (e.g., ?preset=bots), the component remounts
+    // and hasAutoStartedRef resets naturally. Resetting here would cause infinite
+    // game loops because the useEffects would re-trigger with the existing URL params.
   }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
 
   const handlePlayAgain = () => {
