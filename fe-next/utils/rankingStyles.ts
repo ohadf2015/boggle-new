@@ -228,3 +228,85 @@ export function indexToRank(index: number): number {
 export function rankToIndex(rank: number): number {
   return rank - 1;
 }
+
+// ============================================================
+// DAILY LEADERBOARD STYLES (for DailyLeaderboard, TabbedDailyLeaderboard, GlobalLeaderboard)
+// ============================================================
+
+/**
+ * Get Tailwind classes for daily leaderboard row background, border, and effects.
+ *
+ * Consolidates duplicate getRankColors() functions from DailyLeaderboard.tsx,
+ * TabbedDailyLeaderboard.tsx, and GlobalLeaderboard.tsx.
+ *
+ * @param rank - Player's rank position (1-indexed)
+ * @param isCurrentUser - Whether this row represents the current user
+ * @returns Tailwind class string for row styling
+ *
+ * @example
+ * ```tsx
+ * <div className={`flex items-center ${getRankRowClasses(rank, isCurrentUser)}`}>
+ *   {/* row content *}
+ * </div>
+ * ```
+ */
+export function getRankRowClasses(rank: number, isCurrentUser: boolean): string {
+  // Current user gets cyan highlight regardless of rank
+  if (isCurrentUser) {
+    return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
+  }
+
+  // Rank 1 - Gold tier
+  if (rank === 1) {
+    return 'bg-gradient-to-r from-tier-gold/20 to-yellow-50 dark:from-tier-gold/40 dark:to-yellow-900/20 border-tier-gold dark:border-tier-gold';
+  }
+
+  // Rank 2 - Silver tier
+  if (rank === 2) {
+    return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
+  }
+
+  // Rank 3 - Bronze tier
+  if (rank === 3) {
+    return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
+  }
+
+  // Rank 4+ - Default styling with hover state
+  return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
+}
+
+/**
+ * Get Tailwind classes for daily leaderboard rank badge (number circle) styling.
+ *
+ * Consolidates duplicate getRankBadgeColors() functions from DailyLeaderboard.tsx,
+ * TabbedDailyLeaderboard.tsx, and GlobalLeaderboard.tsx.
+ *
+ * @param rank - Player's rank position (1-indexed)
+ * @returns Tailwind class string for badge styling
+ *
+ * @example
+ * ```tsx
+ * <div className={`rounded-full w-8 h-8 ${getRankBadgeClasses(rank)}`}>
+ *   {rank}
+ * </div>
+ * ```
+ */
+export function getRankBadgeClasses(rank: number): string {
+  // Rank 1 - Gold badge
+  if (rank === 1) {
+    return 'bg-gradient-to-br from-tier-gold to-yellow-400 text-amber-900 border-tier-gold-border';
+  }
+
+  // Rank 2 - Silver badge
+  if (rank === 2) {
+    return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+  }
+
+  // Rank 3 - Bronze badge
+  if (rank === 3) {
+    return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
+  }
+
+  // Rank 4+ - Default badge
+  return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
+}

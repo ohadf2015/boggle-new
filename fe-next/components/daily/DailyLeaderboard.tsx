@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
-import { getRankDisplay } from '@/utils/rankingStyles';
+import { getRankDisplay, getRankRowClasses, getRankBadgeClasses } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
@@ -68,31 +68,6 @@ const ParticipantRow = memo<{
   // Format time since completion
   const timeAgo = formatDistanceToNow(participant.completed_at, t);
 
-  // Enhanced rank colors for better contrast
-  const getRankColors = () => {
-    if (isCurrentUser) {
-      return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
-    }
-    if (rank === 1) {
-      return 'bg-gradient-to-r from-tier-gold/20 to-yellow-50 dark:from-tier-gold/40 dark:to-yellow-900/20 border-tier-gold dark:border-tier-gold';
-    }
-    if (rank === 2) {
-      return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
-    }
-    if (rank === 3) {
-      return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
-    }
-    return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
-  };
-
-  // Rank badge colors
-  const getRankBadgeColors = () => {
-    if (rank === 1) return 'bg-gradient-to-br from-tier-gold to-yellow-400 text-amber-900 border-tier-gold-border';
-    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
-    if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
-    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -100,7 +75,7 @@ const ParticipantRow = memo<{
       transition={{ delay: index * 0.05, duration: 0.3 }}
       className={`
         flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
-        ${getRankColors()}
+        ${getRankRowClasses(rank, isCurrentUser)}
         ${compact ? 'py-2' : ''}
         ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
       `}
@@ -109,7 +84,7 @@ const ParticipantRow = memo<{
       <div
         className={`
           w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
-          ${getRankBadgeColors()}
+          ${getRankBadgeClasses(rank)}
           border-2 shadow-sm
         `}
       >
