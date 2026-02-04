@@ -12,8 +12,7 @@
  * - Event handler callbacks
  */
 
-import { renderHook, act } from '@testing-library/react';
-import { fireEvent } from '@testing-library/react';
+import { renderHook, act, fireEvent } from '@testing-library/react';
 import type { GridTileState } from '@/types/adventure';
 
 // Import hook AFTER defining test structure (TDD RED - will fail to import)

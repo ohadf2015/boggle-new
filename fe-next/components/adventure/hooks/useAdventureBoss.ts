@@ -12,6 +12,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { useBossHealth } from '@/hooks/useBossHealth';
 import { type BossTier } from '@/components/celebration/BossDefeatFireworks';
+import { type BossTaunts } from '@/types/boss';
 
 export interface UseAdventureBossProps {
   /** Whether this is a boss level */
@@ -67,7 +68,7 @@ export interface UseAdventureBossReturn {
   /** Deal damage to boss with multipliers */
   dealBossDamage: (baseDamage: number, combo: number, mechanicMultiplier: number, comboBonus: number) => number;
   /** Trigger specific boss taunt */
-  triggerBossTaunt: (event: string) => void;
+  triggerBossTaunt: (event: keyof BossTaunts) => void;
   /** Start boss battle (transition from intro to active) */
   startBossBattle: () => void;
   /** End boss battle (victory or defeat) */

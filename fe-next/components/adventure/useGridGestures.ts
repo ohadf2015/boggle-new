@@ -30,7 +30,7 @@ import {
 
 export interface UseGridGesturesProps {
   /** Ref to grid container DOM element */
-  gridRef: RefObject<HTMLDivElement>;
+  gridRef: RefObject<HTMLDivElement | null>;
   /** Grid dimension (4x4, 5x5, etc.) */
   gridSize: number;
   /** Array of tile states */

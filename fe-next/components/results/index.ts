@@ -22,7 +22,7 @@ export { default as BonusBadgesRow } from './BonusBadgesRow';
 export { default as CoinRewardDisplay } from './CoinRewardDisplay';
 export type { CoinReward, CoinRewardMode } from './CoinRewardDisplay';
 
-export { SinglePlayerActions, MultiplayerActions } from './ResultsActionButtons';
+export { ResultsActionButtons } from './ResultsActionButtons';
 
 export { default as ResultsWinnerBanner } from './ResultsWinnerBanner';
 

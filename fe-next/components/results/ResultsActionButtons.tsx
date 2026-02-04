@@ -62,7 +62,7 @@ export function ResultsActionButtons({
   onStartGame,
   onMarkReady,
   onExit,
-}: ResultsActionButtonsProps): JSX.Element {
+}: ResultsActionButtonsProps) {
   const { t } = useLanguage();
 
   // Single player mode - just exit button
