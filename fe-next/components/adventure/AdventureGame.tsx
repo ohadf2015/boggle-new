@@ -17,8 +17,6 @@ import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 import { type GameStateForReactions } from '@/hooks/useLexiReactions';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
-import { useBossMechanics } from '@/hooks/useBossMechanics';
-import { useBossHealth } from '@/hooks/useBossHealth';
 import { registerAllAbilities } from '@/lib/adventure/abilities';
 import { useAdventureXp } from '@/hooks/useAdventureXp';
 import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
@@ -29,6 +27,7 @@ import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 import { useAdventureEffects } from './effects/hooks/useAdventureEffects';
 import { useAdventureCinematics } from './hooks/useAdventureCinematics';
 import { useAdventureEntryPhase } from './hooks/useAdventureEntryPhase';
+import { useAdventureBoss } from './hooks/useAdventureBoss';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { neoInfoToast } from '@/components/NeoToast';
@@ -353,10 +352,6 @@ const AdventureGame = memo<AdventureGameProps>(
       isValid: false,
     });
 
-    // Boss defeat fireworks state
-    const [showBossFireworks, setShowBossFireworks] = useState(false);
-    const [defeatedBossTier, setDefeatedBossTier] = useState<BossTier>('standard');
-
     // Victory/defeat cinematic management
     const cinematics = useAdventureCinematics();
 
@@ -447,36 +442,41 @@ const AdventureGame = memo<AdventureGameProps>(
       inactivityThresholdMs: adjustedInactivityThresholdMs,
     });
 
-    // Boss mechanics hook (active only on boss levels)
+    // Boss gameplay hook (consolidates mechanics, health, intro, defeat detection)
     const isBossLevel = levelConfig.isBossLevel;
-    const {
-      isActive: isBossActive,
-      boss: bossConfig,
-      currentTaunt: bossTaunt,
-      showTaunt: showBossTaunt,
-      checkWord: checkBossWord,
-      triggerTaunt: triggerBossTaunt,
-      bossState,
-    } = useBossMechanics({
-      worldId: isBossLevel ? levelConfig.world : null,
+    const boss = useAdventureBoss({
+      isBossLevel,
+      worldId: levelConfig.world,
+      levelNumber: levelConfig.level,
+      showBossIntroConfig: levelConfig.showBossIntro === true,
+      timeRemaining,
+      isPlaying,
+      onStartGame: startGame,
+      onStartAIDirector: startAIDirector,
     });
 
-    // Boss health hook (tracks HP and phase transitions)
-    const bossMaxHP = isBossLevel ? 100 : 0; // Boss HP (could be configured per boss in future)
+    // Destructure boss state for easier access
     const {
-      healthState: bossHealthState,
-      dealDamage: dealBossDamage,
-      startBattle: startBossBattle,
-      endBattle: endBossBattle,
-      resetHealth: resetBossHealth,
-      hpPercentage: bossHPPercentage,
+      isBossActive,
+      bossConfig,
+      bossTaunt,
+      showBossTaunt,
+      bossHealthState,
+      bossHPPercentage,
       isEnraged: isBossEnraged,
-    } = useBossHealth(bossMaxHP);
-
-    // Boss intro state (shown before gameplay on boss levels)
-    const [showBossIntro, setShowBossIntro] = useState(
-      isBossLevel && levelConfig.showBossIntro === true
-    );
+      bossState,
+      showBossIntro,
+      showBossFireworks,
+      defeatedBossTier,
+      checkBossWord,
+      dealBossDamage,
+      triggerBossTaunt,
+      startBossBattle,
+      endBossBattle,
+      resetBossHealth,
+      handleBossIntroStart,
+      handleBossIntroSkip,
+    } = boss;
 
     // Lexi stuck detection (DEBT-03 + DEBT-04 integration)
     // Detects when player hasn't made progress and shows helpful hint
@@ -575,18 +575,7 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, adjustedLevelConfig.timerSeconds]);
 
-    // Boss low-time taunt trigger (when timer drops below 15 seconds)
-    const bossLowTimeTriggedRef = useRef(false);
-    useEffect(() => {
-      if (isBossActive && isPlaying && timeRemaining <= 15 && timeRemaining > 0 && !bossLowTimeTriggedRef.current) {
-        bossLowTimeTriggedRef.current = true;
-        triggerBossTaunt('onLowTime');
-      }
-      // Reset trigger on game reset
-      if (timeRemaining > 15) {
-        bossLowTimeTriggedRef.current = false;
-      }
-    }, [isBossActive, isPlaying, timeRemaining, triggerBossTaunt]);
+    // Note: Boss low-time taunt now handled by useAdventureBoss hook
 
     // Check combo milestone when combo count changes
     useEffect(() => {
@@ -601,50 +590,7 @@ const AdventureGame = memo<AdventureGameProps>(
       prevComboCountRef.current = gameState.comboCount;
     }, [gameState.comboCount]);
 
-    // Trigger fireworks when boss is defeated (phase transitions to 'victory')
-    const prevBossPhaseRef = useRef(bossHealthState.phase);
-    useEffect(() => {
-      let hideTimeout: NodeJS.Timeout | undefined;
-
-      // Detect phase transition to 'victory' (not on initial render)
-      if (bossHealthState.phase === 'victory' && prevBossPhaseRef.current !== 'victory') {
-        // Determine boss tier based on level number
-        // Mini boss: levels 5, 10 (every 5th level except multiples of 15/20)
-        // Standard boss: levels 15 (or multiples)
-        // Elite boss: levels 20+ (or final bosses)
-        const level = levelConfig.level;
-        let tier: BossTier = 'mini';
-        if (level >= 20 || level % 20 === 0) {
-          tier = 'elite';
-        } else if (level >= 15 || level % 15 === 0) {
-          tier = 'standard';
-        }
-
-        setDefeatedBossTier(tier);
-        setShowBossFireworks(true);
-
-        // Hide after animation completes (use tier config duration + buffer)
-        // mini: 3s, standard: 5s, elite: 8s
-        const durations: Record<BossTier, number> = {
-          mini: 3500,
-          standard: 5500,
-          elite: 8500,
-        };
-        hideTimeout = setTimeout(() => {
-          setShowBossFireworks(false);
-        }, durations[tier]);
-      }
-
-      // Update ref for next comparison
-      prevBossPhaseRef.current = bossHealthState.phase;
-
-      // Always return cleanup function (even if undefined timeout)
-      return () => {
-        if (hideTimeout) {
-          clearTimeout(hideTimeout);
-        }
-      };
-    }, [bossHealthState.phase, levelConfig.level]);
+    // Note: Boss defeat detection and fireworks now handled by useAdventureBoss hook
 
     // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
@@ -672,29 +618,7 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [isPlaying, startGame, showBossIntro, bossConfig, startAIDirector, entryPhaseManager]);
 
-    // Handle boss intro start (player ready to fight)
-    const handleBossIntroStart = useCallback(() => {
-      setShowBossIntro(false);
-      startBossBattle(); // Transition from intro → active phase
-      if (!isPlaying) {
-        startGame();
-        // Start AI Director session for boss battles (DDA-05 - gets neutral adjustments)
-        startAIDirector();
-      }
-      // Trigger start taunt after intro dismissal
-      triggerBossTaunt('onStart');
-    }, [isPlaying, startGame, triggerBossTaunt, startBossBattle, startAIDirector]);
-
-    // Handle boss intro skip
-    const handleBossIntroSkip = useCallback(() => {
-      setShowBossIntro(false);
-      startBossBattle(); // Transition from intro → active phase
-      if (!isPlaying) {
-        startGame();
-        // Start AI Director session for boss battles (DDA-05 - gets neutral adjustments)
-        startAIDirector();
-      }
-    }, [isPlaying, startGame, startBossBattle, startAIDirector]);
+    // Note: Boss intro handlers now provided by useAdventureBoss hook
 
     // Task 3: Award XP and gold on level complete
     useEffect(() => {
@@ -1518,7 +1442,7 @@ const AdventureGame = memo<AdventureGameProps>(
         {/* Boss Battle Overlay (all boss UI components with Phase 30 integration) */}
         <BossOverlay
           boss={bossConfig}
-          maxHP={bossMaxHP}
+          maxHP={isBossLevel ? 100 : 0}
           healthState={bossHealthState}
           currentTaunt={bossTaunt}
           showTaunt={showBossTaunt}
