@@ -259,7 +259,7 @@ describe('ResultsPage - WordFeedbackModal', () => {
     // should exist in ResultsPage.tsx, outside the conditional returns
   });
 
-  it('should render WordFeedbackModal in landscape mode (BUG FIX)', async () => {
+  it('should render ResultsModals (including WordFeedbackModal) in landscape mode (BUG FIX)', async () => {
     // BUG: WordFeedbackModal was NOT rendered in landscape mode because the
     // landscape return (early return at line ~830) exits before reaching the modal
     // at line ~1598. This caused:
@@ -268,14 +268,14 @@ describe('ResultsPage - WordFeedbackModal', () => {
     // 3. When user switches to portrait, modal suddenly appears
     // 4. Potentially appears "multiple times" due to orientation changes
     //
-    // FIX: Move WordFeedbackModal BEFORE the landscape conditional return
-    // so it renders in ALL orientations.
+    // FIX: ResultsModals component (which contains WordFeedbackModal) is rendered
+    // BEFORE the landscape conditional return so it renders in ALL orientations.
     //
     // This test verifies the structural fix by code inspection:
-    // The WordFeedbackModal should be rendered BEFORE line 830 (the landscape early return)
+    // The ResultsModals should be rendered BEFORE the landscape early return
     // so it appears in both landscape and portrait modes.
 
-    // Read the source file and verify WordFeedbackModal position
+    // Read the source file and verify ResultsModals position
     const fs = require('fs');
     const path = require('path');
     const sourceFile = path.join(__dirname, '../views/ResultsPage.tsx');
@@ -292,8 +292,8 @@ describe('ResultsPage - WordFeedbackModal', () => {
       if (line.includes('if (isLandscape)') && lines[i + 1]?.includes('return (')) {
         landscapeReturnLine = i + 1; // The return line
       }
-      // Find the WordFeedbackModal render
-      if (line.includes('<WordFeedbackModal') && !line.includes('mock') && !line.includes('import')) {
+      // Find the ResultsModals render (which contains WordFeedbackModal)
+      if (line.includes('<ResultsModals') && !line.includes('mock') && !line.includes('import')) {
         wordFeedbackModalLine = i;
       }
     }
@@ -317,12 +317,11 @@ describe('ResultsPage - WordFeedbackModal', () => {
     expect(landscapeReturnLine).toBeGreaterThan(0);
     expect(wordFeedbackModalLine).toBeGreaterThan(0);
 
-    // After the fix, WordFeedbackModal should be BEFORE landscapeReturnLine
-    // For now, this test documents that it's currently AFTER (the bug)
-    // When fixed, change this assertion to: expect(wordFeedbackModalLine).toBeLessThan(landscapeReturnLine);
+    // After the fix, ResultsModals should be BEFORE landscapeReturnLine
+    // This ensures WordFeedbackModal and all other modals render in both landscape and portrait modes
 
-    // FIX APPLIED: Modal should be BEFORE landscape return so it renders in both modes
-    // If this test fails, the modal was moved after the landscape return (regression)
+    // FIX APPLIED: Modals component should be BEFORE landscape return so it renders in both modes
+    // If this test fails, the modals were moved after the landscape return (regression)
     expect(wordFeedbackModalLine).toBeLessThan(landscapeReturnLine);
   });
 });

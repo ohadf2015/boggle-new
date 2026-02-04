@@ -27,17 +27,11 @@ const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWi
 const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
 const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
 const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
-const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
-const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
-const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
 const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
 const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
-const MysteryRewardPopup = dynamic(() => import('@/components/engagement/MysteryRewardPopup'), { ssr: false });
-const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/ReferralMilestonePopup'), { ssr: false });
-const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUpCelebration'), { ssr: false });
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
@@ -52,6 +46,7 @@ import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { shouldHideExternalLogin } from '@/components/CrazyGamesSDK';
 // Shared result components
 import { ResultsActionButtons } from '@/components/results/ResultsActionButtons';
+import { ResultsModals } from '@/components/results/ResultsModals';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -632,69 +627,39 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // These are rendered BEFORE the conditional returns to ensure they appear in both landscape and portrait modes
   // This fixes the bug where modals would only appear after switching from landscape to portrait
   const overlayModals = (
-    <>
-      {/* Word Feedback Modal - Self-healing dictionary validation */}
-      <WordFeedbackModal
-        isOpen={showWordFeedback && wordToVote !== null}
-        word={wordToVote?.word || ''}
-        submittedBy={wordToVote?.submittedBy || ''}
-        submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
-        voteInfo={wordToVote?.voteInfo}
-        wordQueue={wordQueue.map(w => ({
-          ...w,
-          submitterAvatar: w.submitterAvatar ?? undefined
-        }))}
-        timeoutSeconds={wordToVote?.timeoutSeconds || 15}
-        onVote={handleVote}
-        onSkip={handleFeedbackSkip}
-        onTimeout={handleFeedbackSkip}
-      />
-
-      {/* Mystery Reward Popup - Variable ratio reward system */}
-      <MysteryRewardPopup
-        reward={mysteryReward}
-        isOpen={showMysteryReward}
-        onClose={handleMysteryRewardClose}
-        t={t}
-      />
-
-      {/* Referral Milestone Popup - Notify when friend hits milestone */}
-      <ReferralMilestonePopup
-        milestone={referralMilestone}
-        isOpen={showReferralMilestone}
-        onClose={handleReferralMilestoneClose}
-      />
-
-      {/* Epic Level Up Celebration - Full-screen GSAP animation */}
-      {levelUpData && (
-        <LevelUpCelebration
-          level={levelUpData.newLevel}
-          show={showLevelUpCelebration}
-          onDismiss={() => setShowLevelUpCelebration(false)}
-          autoDismissAfter={5000}
-          rewards={{
-            unlocks: levelUpData.newTitles,
-          }}
-        />
-      )}
-
-      {/* Sign Up Prompt for Guests (non-winners) - Hidden on CrazyGames */}
-      {!shouldHideExternalLogin() && (
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          showGuestStats={true}
-        />
-      )}
-
-      {/* Celebratory First Win Signup Prompt - Hidden on CrazyGames */}
-      {!shouldHideExternalLogin() && (
-        <FirstWinSignupModal
-          isOpen={showFirstWinModal}
-          onClose={() => setShowFirstWinModal(false)}
-        />
-      )}
-    </>
+    <ResultsModals
+      wordFeedback={{
+        showWordFeedback,
+        wordToVote,
+        wordQueue,
+        onVote: handleVote,
+        onSkip: handleFeedbackSkip,
+      }}
+      mysteryReward={{
+        reward: mysteryReward,
+        showMysteryReward,
+        onClose: handleMysteryRewardClose,
+      }}
+      referralMilestone={{
+        milestone: referralMilestone,
+        showReferralMilestone,
+        onClose: handleReferralMilestoneClose,
+      }}
+      levelUp={{
+        levelUpData,
+        showLevelUpCelebration,
+        setShowLevelUpCelebration,
+      }}
+      authModal={{
+        showAuthModal,
+        setShowAuthModal,
+      }}
+      firstWinModal={{
+        showFirstWinModal,
+        setShowFirstWinModal,
+      }}
+      t={t}
+    />
   );
 
   // Landscape mode layout - 2-column: winner/actions left, player cards right
