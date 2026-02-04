@@ -63,6 +63,12 @@ export interface ResultsLandscapeLayoutProps {
   // Rules
   duplicateRuleDisabled?: boolean;
 
+  // Utilities
+  normalizeUsername: (name: string | undefined | null) => string;
+
+  // Overlay modals (rendered outside layout but need to be passed through)
+  overlayModals: React.ReactNode;
+
   // Translation
   t: (key: string) => string;
 }
@@ -93,16 +99,20 @@ export function ResultsLandscapeLayout({
   xpGainedData,
   levelUpData,
   duplicateRuleDisabled,
+  normalizeUsername,
+  overlayModals,
   t,
 }: ResultsLandscapeLayoutProps) {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3 landscape-full-height">
+    <>
+      {overlayModals}
+      <div className="flex h-screen w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3 landscape-full-height">
       {/* Left column: Winner Banner + Action Buttons (Hero Area) */}
       <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
         {/* Winner Banner - prominent */}
         {winner && (
           <div className="w-full max-w-sm">
-            <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />
+            <ResultsWinnerBanner winner={winner} isCurrentUserWinner={normalizeUsername(winner.username) === normalizeUsername(username)} />
           </div>
         )}
 
@@ -221,8 +231,8 @@ export function ResultsLandscapeLayout({
               allPlayerWords={allPlayerWords}
               currentUsername={currentUsername}
               isWinner={index === 0}
-              xpGainedData={player.username === username ? xpGainedData : null}
-              levelUpData={player.username === username ? levelUpData : null}
+              xpGainedData={normalizeUsername(player.username) === normalizeUsername(username) ? xpGainedData : null}
+              levelUpData={normalizeUsername(player.username) === normalizeUsername(username) ? levelUpData : null}
               duplicateRuleDisabled={duplicateRuleDisabled}
               archetype={playerArchetypes.get(player.username) || null}
             />
@@ -253,7 +263,8 @@ export function ResultsLandscapeLayout({
         onConfirm={onConfirmExit}
         variant="default"
       />
-    </div>
+      </div>
+    </>
   );
 }
 

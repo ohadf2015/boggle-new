@@ -232,7 +232,7 @@ const SinglePlayerView: React.FC = () => {
         setPhase('playing');
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [autoStart, uiLanguage]);
 
   // Auto-start bot game when autoStart=bots (direct from landing page)
@@ -264,7 +264,7 @@ const SinglePlayerView: React.FC = () => {
         setPhase('playing');
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [autoStart, uiLanguage]);
 
   // Auto-start with preset when preset param is provided (e.g., preset=bots from NextStepPrompt)

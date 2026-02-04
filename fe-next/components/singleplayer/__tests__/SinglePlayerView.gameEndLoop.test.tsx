@@ -21,7 +21,7 @@ const mockRouterPush = jest.fn();
 
 // Use global for callback storage to avoid module-level reassignment issues
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __testCallbackStore__: { onGameEnd: ((results: unknown) => void) | null };
 }
 global.__testCallbackStore__ = { onGameEnd: null };
