@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link2, Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ interface ChainChallengeProps {
   challenge: {
     prompt: string;
     answer: string;
+    options?: string[];
     hint?: string;
     trendingContext?: string;
   };
@@ -21,6 +22,7 @@ interface ChainChallengeProps {
 /**
  * ChainChallenge - Word chain challenge
  * User completes a word chain by guessing the final word
+ * Supports both multiple-choice (when options provided) and free-text input
  * Features animated typing and visual chain representation
  */
 export default function ChainChallenge({
@@ -30,9 +32,32 @@ export default function ChainChallenge({
 }: ChainChallengeProps) {
   const { t, language } = useLanguage();
   const [userAnswer, setUserAnswer] = useState('');
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [charCount, setCharCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const isRTL = language === 'he';
+
+  // Check if we should use multiple-choice mode
+  const hasOptions = challenge.options && challenge.options.length > 0;
+
+  // Shuffle options using a deterministic seed based on answer for consistency
+  const shuffledOptions = useMemo(() => {
+    if (!challenge.options) return [];
+    // Use answer as seed for deterministic shuffle (same challenge = same order)
+    const seed = challenge.answer.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const arr = [...challenge.options];
+    // Seeded Fisher-Yates shuffle
+    let seedValue = seed;
+    const seededRandom = () => {
+      seedValue = (seedValue * 1103515245 + 12345) & 0x7fffffff;
+      return seedValue / 0x7fffffff;
+    };
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(seededRandom() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [challenge.options, challenge.answer]);
 
   // Parse chain words from prompt (format: "WORD1 → ??? → WORD2")
   // Backend sends: "WORD1 → ??? → WORD2" where ??? is the mystery word
@@ -40,20 +65,36 @@ export default function ChainChallenge({
   const chainParts = challenge.prompt.split(/\s*[→➜>]\s*/);
   const chainWords = chainParts.filter(part => part.trim() && !part.match(/^\?+$/)); // Filter out empty and ??? parts
 
-  // Focus input on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      inputRef.current?.focus();
-      scrollInputIntoView(inputRef.current);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+  // Display value for the mystery word slot
+  const displayAnswer = hasOptions ? selectedOption : userAnswer;
 
-  // Animate character count
+  // Focus input on mount (only for text input mode)
   useEffect(() => {
-    setCharCount(userAnswer.length);
-  }, [userAnswer]);
+    if (!hasOptions) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        scrollInputIntoView(inputRef.current);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [hasOptions]);
 
+  // Animate character count (only for text input mode)
+  useEffect(() => {
+    if (!hasOptions) {
+      setCharCount(userAnswer.length);
+    }
+  }, [userAnswer, hasOptions]);
+
+  // Handle option selection (multiple-choice mode)
+  const handleOptionSelect = useCallback((option: string) => {
+    setSelectedOption(option);
+    // Auto-submit on selection for faster gameplay
+    onAnswer(option);
+  }, [onAnswer]);
+
+  // Handle text input submission
   const handleSubmit = useCallback(() => {
     if (userAnswer.trim()) {
       onAnswer(userAnswer.trim());
@@ -118,7 +159,7 @@ export default function ChainChallenge({
             className="px-4 py-2 bg-slate-800 border-2 border-dashed border-neo-pink/50 rounded-lg min-w-[80px]"
           >
             <AnimatePresence mode="wait">
-              {userAnswer ? (
+              {displayAnswer ? (
                 <motion.span
                   key="answer"
                   initial={{ opacity: 0, y: 10 }}
@@ -126,7 +167,7 @@ export default function ChainChallenge({
                   exit={{ opacity: 0, y: -10 }}
                   className="text-lg sm:text-xl font-black text-neo-lime"
                 >
-                  {userAnswer}
+                  {displayAnswer}
                 </motion.span>
               ) : (
                 <motion.span
@@ -197,82 +238,120 @@ export default function ChainChallenge({
         </motion.div>
       )}
 
-      {/* Input with character animation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="relative"
-      >
-        <input
-          ref={inputRef}
-          type="text"
-          value={userAnswer}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder={t('buzz.yourAnswer')}
-          className={`
-            w-full px-6 py-4 text-2xl font-black text-center text-white
-            bg-slate-800 border-3 rounded-xl outline-none
-            transition-all duration-200 uppercase tracking-wider
-            ${userAnswer
-              ? 'border-neo-pink shadow-hard-lg'
-              : 'border-slate-600 shadow-hard focus:border-neo-pink focus:shadow-hard-lg'
-            }
-          `}
-        />
-
-        {/* Character count badge */}
+      {/* Multiple Choice Options */}
+      {hasOptions ? (
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: charCount > 0 ? 1 : 0 }}
-          className="absolute -top-2 -right-2 px-2 py-1 bg-neo-pink text-neo-black text-xs font-black rounded-full border-2 border-neo-black"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-2 gap-3"
         >
-          {charCount}
+          {shuffledOptions.map((option, index) => (
+            <motion.button
+              key={option}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.35 + index * 0.05 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleOptionSelect(option)}
+              disabled={selectedOption !== null}
+              className={`
+                px-4 py-4 text-lg font-black uppercase
+                border-3 border-neo-black rounded-xl
+                transition-all duration-200
+                ${selectedOption === option
+                  ? 'bg-neo-lime text-neo-black shadow-hard-lg'
+                  : selectedOption !== null
+                    ? 'bg-slate-700 text-slate-400 opacity-50'
+                    : 'bg-slate-800 text-white shadow-hard hover:shadow-hard-lg hover:border-neo-pink hover:-translate-y-0.5'
+                }
+              `}
+            >
+              {option}
+            </motion.button>
+          ))}
         </motion.div>
-
-        {/* Typing indicator dots */}
-        {userAnswer && (
+      ) : (
+        /* Text Input Mode (fallback when no options) */
+        <>
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 flex gap-1"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative"
           >
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 0.5, delay: i * 0.1, repeat: Infinity }}
-                className="w-1.5 h-1.5 bg-neo-pink/50 rounded-full"
-              />
-            ))}
-          </motion.div>
-        )}
-      </motion.div>
+            <input
+              ref={inputRef}
+              type="text"
+              value={userAnswer}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              placeholder={t('buzz.yourAnswer')}
+              className={`
+                w-full px-6 py-4 text-2xl font-black text-center text-white
+                bg-slate-800 border-3 rounded-xl outline-none
+                transition-all duration-200 uppercase tracking-wider
+                ${userAnswer
+                  ? 'border-neo-pink shadow-hard-lg'
+                  : 'border-slate-600 shadow-hard focus:border-neo-pink focus:shadow-hard-lg'
+                }
+              `}
+            />
 
-      {/* Submit Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-      >
-        <Button
-          onClick={handleSubmit}
-          disabled={!userAnswer.trim()}
-          className={`
-            w-full py-6 text-xl font-black uppercase
-            border-3 border-neo-black rounded-xl
-            transition-all duration-200
-            ${userAnswer.trim()
-              ? 'bg-neo-pink text-neo-white shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5'
-              : 'bg-slate-700 text-slate-400 opacity-50 cursor-not-allowed'
-            }
-          `}
-        >
-          <Check className="w-6 h-6 me-2" />
-          {t('buzz.submit')}
-        </Button>
-      </motion.div>
+            {/* Character count badge */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: charCount > 0 ? 1 : 0 }}
+              className="absolute -top-2 -right-2 px-2 py-1 bg-neo-pink text-neo-black text-xs font-black rounded-full border-2 border-neo-black"
+            >
+              {charCount}
+            </motion.div>
+
+            {/* Typing indicator dots */}
+            {userAnswer && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 flex gap-1"
+              >
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 0.5, delay: i * 0.1, repeat: Infinity }}
+                    className="w-1.5 h-1.5 bg-neo-pink/50 rounded-full"
+                  />
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Submit Button (only for text input mode) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <Button
+              onClick={handleSubmit}
+              disabled={!userAnswer.trim()}
+              className={`
+                w-full py-6 text-xl font-black uppercase
+                border-3 border-neo-black rounded-xl
+                transition-all duration-200
+                ${userAnswer.trim()
+                  ? 'bg-neo-pink text-neo-white shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5'
+                  : 'bg-slate-700 text-slate-400 opacity-50 cursor-not-allowed'
+                }
+              `}
+            >
+              <Check className="w-6 h-6 me-2" />
+              {t('buzz.submit')}
+            </Button>
+          </motion.div>
+        </>
+      )}
 
       {/* Trending Context */}
       {challenge.trendingContext && (

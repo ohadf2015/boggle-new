@@ -169,11 +169,14 @@ export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER
    - The prompt field MUST contain EXACTLY this format with the two context words visible
    - Player sees both context words and must guess the middle word that links them
    - CRITICAL: The answer MUST create valid compound words on BOTH sides
+   - **MULTIPLE CHOICE OPTIONS REQUIRED**: Include exactly 4 options (the correct answer + 3 plausible distractors)
+     - Distractors should be words that could plausibly fit but DON'T form valid compounds on BOTH sides
+     - Example distractors: related words, similar-length words, words from the same semantic field
    - **VERIFIED COMPOUND CHAINS (use these patterns)**:
-     - Prompt: "SUN → ??? → POT" Answer: FLOWER (SUNflower + FLOWERpot) ✅
-     - Prompt: "FIRE → ??? → SHOP" Answer: WORK (FIREwork + WORKshop) ✅
-     - Prompt: "BACK → ??? → AGE" Answer: PACK (BACKpack + PACKage) ✅
-     - Prompt: "DOOR → ??? → CHILD" Answer: STEP (DOORstep + STEPchild) ✅
+     - Prompt: "SUN → ??? → POT" Answer: FLOWER Options: ["FLOWER", "LIGHT", "BURN", "PLANT"] ✅
+     - Prompt: "FIRE → ??? → SHOP" Answer: WORK Options: ["WORK", "WOOD", "PLACE", "SIDE"] ✅
+     - Prompt: "BACK → ??? → AGE" Answer: PACK Options: ["PACK", "YARD", "BONE", "DOOR"] ✅
+     - Prompt: "DOOR → ??? → CHILD" Answer: STEP Options: ["STEP", "BELL", "KNOB", "FRAME"] ✅
 
 2. **wordle_guess**: 🚨⭐ MANDATORY ⭐🚨 - {{wordleLength}}-letter word with clever connection to trend
    - 🚨 WITHOUT THIS TYPE, YOUR ENTIRE OUTPUT WILL BE REJECTED 🚨
@@ -224,6 +227,7 @@ export const OUTPUT_FORMAT_TEMPLATE = `## 📤 OUTPUT FORMAT (JSON only, no mark
       "trend_topic": "[Actual trending topic used]",
       "prompt": "[The creative, witty clue - conversational, not robotic]",
       "answer": "[COMMON DICTIONARY WORD - all caps]",
+      "options": "[FOR word_chain ONLY: array of exactly 4 options including the answer, e.g. ['FLOWER', 'LIGHT', 'BURN', 'PLANT']]",
       "hint": "[Brief, friendly hint - like a friend giving you a nudge]",
       "difficulty": "easy|medium|hard",
       "trending_context": "[1 punchy sentence: why this matters TODAY - be human about it]"
@@ -294,6 +298,7 @@ Before outputting, verify each challenge:
 - [ ] **🚨 WORDLE MANDATORY 🚨**: Is there EXACTLY ONE wordle_guess challenge with a {{wordleLength}}-letter answer? (WITHOUT THIS = REJECTED!)
 - [ ] **🚨 NO SPOILERS**: Does the answer appear in trend_topic or trending_context? If YES, CHANGE THE ANSWER!
 - [ ] **Chain Format**: Does every word_chain use the format "WORD1 → ??? → WORD2"?
+- [ ] **Chain Options**: Does every word_chain include exactly 4 options (answer + 3 distractors)?
 - [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
 - [ ] **Common Word Test**: Would your grandma know this word?
 - [ ] **Aha Test**: Does the clue make players go "Ohhh, nice!"?

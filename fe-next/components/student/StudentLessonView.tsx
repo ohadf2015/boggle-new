@@ -15,7 +15,9 @@ import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
+import { BookOpen } from 'lucide-react';
+import type { PracticeType } from '@/hooks/usePracticeSession';
 
 export default function StudentLessonView() {
   const { t, language } = useLanguage();
@@ -86,38 +88,6 @@ export default function StudentLessonView() {
         // Get lesson name
         const lessonName = lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
 
-        // Determine button text and style
-        const getButtonProps = () => {
-          switch (status) {
-            case 'assigned':
-              return {
-                text: t('student.lessons.start'),
-                className: 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
-                icon: <Sparkles className="w-5 h-5" />,
-              };
-            case 'started':
-              return {
-                text: t('student.lessons.continue'),
-                className: 'bg-neo-pink hover:bg-neo-pink/90 text-neo-black',
-                icon: <ArrowRight className={cn('w-5 h-5', isRTL && 'rotate-180')} />,
-              };
-            case 'completed':
-              return {
-                text: t('student.lessons.review'),
-                className: 'bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black',
-                icon: <CheckCircle2 className="w-5 h-5" />,
-              };
-            default:
-              return {
-                text: t('student.lessons.start'),
-                className: 'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
-                icon: null,
-              };
-          }
-        };
-
-        const buttonProps = getButtonProps();
-
         return (
           <div
             key={studentLesson.lessonId}
@@ -182,26 +152,15 @@ export default function StudentLessonView() {
                 )}
               </div>
 
-              {/* Right: Single primary action */}
+              {/* Right: Quick practice button with mode dropdown */}
               <div>
-                <Button
-                  onClick={() => router.push(`/${language}/student/lessons/${studentLesson.lessonId}`)}
+                <QuickPracticeButton
+                  lessonId={studentLesson.lessonId}
+                  onPractice={(mode: PracticeType) => {
+                    router.push(`/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`);
+                  }}
                   size="lg"
-                  className={cn(
-                    'font-neo-display text-base px-8',
-                    buttonProps.className,
-                    'shadow-hard hover:shadow-hard-lg',
-                    'border-neo border-neo-black',
-                    'transition-all'
-                  )}
-                >
-                  {buttonProps.icon && (
-                    <span className={cn(isRTL ? 'ml-2' : 'mr-2')}>
-                      {buttonProps.icon}
-                    </span>
-                  )}
-                  {buttonProps.text}
-                </Button>
+                />
               </div>
             </div>
           </div>

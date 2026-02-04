@@ -19,8 +19,21 @@ interface WordleChallengeProps {
   showHint: boolean;
 }
 
-const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 6;
+
+/**
+ * Word length varies by language to match typical word lengths
+ * Hebrew: 4 letters (typical Hebrew word length)
+ * English/Swedish/Spanish: 5 letters (standard Wordle)
+ * Japanese: 4 characters (kanji/kana compounds)
+ */
+const WORDLE_WORD_LENGTH: Record<string, number> = {
+  en: 5,
+  he: 4,
+  sv: 5,
+  ja: 4,
+  es: 5,
+};
 
 /**
  * Language-specific keyboard layouts
@@ -30,7 +43,7 @@ const KEYBOARD_LAYOUTS: Record<string, string[][]> = {
   en: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
   ],
   // Hebrew keyboard follows standard Israeli keyboard layout (no final letters)
   // Final letters (sofit) are excluded - they appear automatically at word end in typing
@@ -38,23 +51,23 @@ const KEYBOARD_LAYOUTS: Record<string, string[][]> = {
   he: [
     ['ק', 'ר', 'א', 'ט', 'ו', 'נ', 'מ', 'פ'],
     ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל'],
-    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'צ', 'ת'],
+    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'צ', 'ת', 'BACKSPACE'],
   ],
   sv: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'Å'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
   ],
   ja: [
-    // Japanese uses hiragana - simplified layout for 5-letter words
+    // Japanese uses hiragana - simplified layout for 4-character words
     ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ'],
     ['さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と'],
-    ['ENTER', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ'],
+    ['ENTER', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'BACKSPACE'],
   ],
   es: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
-    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
   ],
 };
 
@@ -101,8 +114,8 @@ function normalizeLetterForComparison(letter: string, language: string): string 
  * Handles duplicate letters correctly using two-pass algorithm
  * For Hebrew: normalizes final form letters (ם,ן,ך,ף,ץ) to regular form for comparison
  */
-function getLetterStates(guess: string, answer: string, language: string): LetterState[] {
-  const result: LetterState[] = new Array(WORD_LENGTH).fill('absent');
+function getLetterStates(guess: string, answer: string, language: string, wordLength: number): LetterState[] {
+  const result: LetterState[] = new Array(wordLength).fill('absent');
 
   // Normalize both guess and answer for comparison
   const answerChars = answer.split('').map(c => normalizeLetterForComparison(c, language));
@@ -110,7 +123,7 @@ function getLetterStates(guess: string, answer: string, language: string): Lette
   const remaining: (string | null)[] = [...answerChars];
 
   // First pass: mark correct positions (green)
-  for (let i = 0; i < WORD_LENGTH; i++) {
+  for (let i = 0; i < wordLength; i++) {
     if (guessChars[i] === answerChars[i]) {
       result[i] = 'correct';
       remaining[i] = null; // Mark as used
@@ -118,7 +131,7 @@ function getLetterStates(guess: string, answer: string, language: string): Lette
   }
 
   // Second pass: mark present letters (yellow)
-  for (let i = 0; i < WORD_LENGTH; i++) {
+  for (let i = 0; i < wordLength; i++) {
     if (result[i] === 'correct') continue;
     const idx = remaining.indexOf(guessChars[i]);
     if (idx !== -1) {
@@ -132,7 +145,8 @@ function getLetterStates(guess: string, answer: string, language: string): Lette
 
 /**
  * WordleChallenge - Wordle-style word guessing game
- * Player has 6 attempts to guess a 5-letter word related to a trending topic
+ * Player has 6 attempts to guess a word related to a trending topic
+ * Word length varies by language (4 for Hebrew/Japanese, 5 for English/Swedish/Spanish)
  */
 export default function WordleChallenge({
   challenge,
@@ -150,6 +164,9 @@ export default function WordleChallenge({
   >({});
   const nativeInputRef = useRef<HTMLInputElement>(null);
 
+  // Dynamic word length based on language
+  const wordLength = WORDLE_WORD_LENGTH[language] || 5;
+
   const attemptsLeft = MAX_ATTEMPTS - guesses.length;
   const currentRow = guesses.length;
   const keyboardRows = getKeyboardLayout(language);
@@ -160,12 +177,12 @@ export default function WordleChallenge({
       if (gameStatus !== 'playing') return;
 
       if (key === 'ENTER') {
-        if (currentGuess.length === WORD_LENGTH) {
+        if (currentGuess.length === wordLength) {
           const newGuesses = [...guesses, currentGuess];
           setGuesses(newGuesses);
 
           // Calculate letter states for keyboard (normalize Hebrew final forms)
-          const states = getLetterStates(currentGuess, challenge.answer, language);
+          const states = getLetterStates(currentGuess, challenge.answer, language, wordLength);
           const newKeyboardStates = { ...keyboardStates };
           currentGuess.split('').forEach((letter, i) => {
             const currentState = newKeyboardStates[letter];
@@ -200,7 +217,7 @@ export default function WordleChallenge({
         }
       } else if (key === 'BACKSPACE') {
         setCurrentGuess((prev) => prev.slice(0, -1));
-      } else if (isValidLetter(key, language) && currentGuess.length < WORD_LENGTH) {
+      } else if (isValidLetter(key, language) && currentGuess.length < wordLength) {
         // Uppercase for Latin scripts, keep as-is for others (Hebrew, Japanese)
         const normalizedKey = /^[a-zA-ZÅÄÖåäöÑñ]$/.test(key) ? key.toUpperCase() : key;
         setCurrentGuess((prev) => prev + normalizedKey);
@@ -214,6 +231,7 @@ export default function WordleChallenge({
       keyboardStates,
       onAnswer,
       language,
+      wordLength,
     ]
   );
 
@@ -276,8 +294,8 @@ export default function WordleChallenge({
     const isSubmittedRow = rowIndex < currentRow;
     const guess = isSubmittedRow ? guesses[rowIndex] : isCurrentRow ? currentGuess : '';
     const states: LetterState[] = isSubmittedRow
-      ? getLetterStates(guess, challenge.answer, language)
-      : new Array(WORD_LENGTH).fill(isCurrentRow ? 'tbd' : 'empty');
+      ? getLetterStates(guess, challenge.answer, language, wordLength)
+      : new Array(wordLength).fill(isCurrentRow ? 'tbd' : 'empty');
 
     return (
       <div
@@ -285,7 +303,7 @@ export default function WordleChallenge({
         data-testid={`wordle-row-${rowIndex}`}
         className="flex gap-1.5 justify-center"
       >
-        {Array.from({ length: WORD_LENGTH }).map((_, colIndex) => {
+        {Array.from({ length: wordLength }).map((_, colIndex) => {
           const letter = guess[colIndex] || '';
           const state = letter ? states[colIndex] : isCurrentRow ? 'tbd' : 'empty';
           return renderCell(rowIndex, colIndex, letter, state);
@@ -297,7 +315,7 @@ export default function WordleChallenge({
   // Render keyboard key
   const renderKey = (key: string) => {
     const state = keyboardStates[key] || 'empty';
-    const isWide = key === 'ENTER';
+    const isWide = key === 'ENTER' || key === 'BACKSPACE';
 
     const stateStyles: Record<LetterState, string> = {
       correct: 'bg-green-500 text-white border-green-500',
@@ -307,6 +325,9 @@ export default function WordleChallenge({
       tbd: 'bg-slate-600 text-white border-slate-500 hover:bg-slate-500',
     };
 
+    // Display backspace icon instead of text
+    const keyDisplay = key === 'BACKSPACE' ? '⌫' : key;
+
     return (
       <motion.button
         key={key}
@@ -315,9 +336,9 @@ export default function WordleChallenge({
         whileTap={{ scale: 0.95 }}
         onClick={() => handleKeyPress(key)}
         disabled={gameStatus !== 'playing'}
-        className={`${isWide ? 'px-3 sm:px-4' : 'w-8 sm:w-10'} h-12 sm:h-14 flex items-center justify-center text-xs sm:text-sm font-bold rounded-md border-2 transition-colors disabled:opacity-50 ${stateStyles[state]}`}
+        className={`${isWide ? 'px-2 sm:px-3' : 'w-8 sm:w-10'} h-12 sm:h-14 flex items-center justify-center text-xs sm:text-sm font-bold rounded-md border-2 transition-colors disabled:opacity-50 ${stateStyles[state]}`}
       >
-        {key}
+        {keyDisplay}
       </motion.button>
     );
   };
@@ -409,7 +430,7 @@ export default function WordleChallenge({
             // New character(s) added
             const newChars = newValue.slice(currentGuess.length);
             for (const char of newChars) {
-              if (isValidLetter(char, language) && currentGuess.length < WORD_LENGTH) {
+              if (isValidLetter(char, language) && currentGuess.length < wordLength) {
                 handleKeyPress(char);
               }
             }

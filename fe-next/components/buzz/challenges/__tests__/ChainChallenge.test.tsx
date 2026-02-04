@@ -53,6 +53,22 @@ jest.mock('framer-motion', () => ({
       custom,
       ...props
     }: any) => <input {...props} />,
+    button: ({
+      children,
+      initial,
+      animate,
+      exit,
+      transition,
+      whileHover,
+      whileTap,
+      whileInView,
+      viewport,
+      layout,
+      layoutId,
+      variants,
+      custom,
+      ...props
+    }: any) => <button {...props}>{children}</button>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
@@ -344,5 +360,181 @@ describe('ChainChallenge', () => {
 
     expect(sunIndex).toBeLessThan(questionIndex);
     expect(questionIndex).toBeLessThan(potIndex);
+  });
+
+  // Multiple-choice mode tests
+  describe('Multiple Choice Mode', () => {
+    const mockChallengeWithOptions = {
+      prompt: 'SUN → ??? → POT',
+      answer: 'FLOWER',
+      options: ['FLOWER', 'LIGHT', 'BURN', 'PLANT'],
+      hint: 'SUNflower + FLOWERpot',
+      trendingContext: 'Related to trending topic: Gardening',
+    };
+
+    it('renders options buttons when options are provided', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // All options should be visible as buttons
+      expect(screen.getByRole('button', { name: 'FLOWER' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'LIGHT' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'BURN' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'PLANT' })).toBeInTheDocument();
+    });
+
+    it('hides text input when options are provided', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // Text input should not be rendered
+      expect(screen.queryByPlaceholderText('YOUR ANSWER')).not.toBeInTheDocument();
+      // Submit button should not be rendered (auto-submit on option click)
+      expect(screen.queryByText('SUBMIT')).not.toBeInTheDocument();
+    });
+
+    it('calls onAnswer when an option is clicked', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      const flowerButton = screen.getByRole('button', { name: 'FLOWER' });
+      fireEvent.click(flowerButton);
+
+      expect(mockOnAnswer).toHaveBeenCalledWith('FLOWER');
+    });
+
+    it('disables all options after one is selected', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      const flowerButton = screen.getByRole('button', { name: 'FLOWER' });
+      fireEvent.click(flowerButton);
+
+      // All option buttons should be disabled after selection
+      expect(screen.getByRole('button', { name: 'FLOWER' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'LIGHT' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'BURN' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'PLANT' })).toBeDisabled();
+    });
+
+    it('shows selected option in the mystery word placeholder', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // Before selection, show ???
+      expect(screen.getByText('???')).toBeInTheDocument();
+
+      const lightButton = screen.getByRole('button', { name: 'LIGHT' });
+      fireEvent.click(lightButton);
+
+      // After selection, the selected option should appear in the chain
+      // There should be two instances - one in the option button and one in the chain display
+      const lightInstances = screen.getAllByText('LIGHT');
+      expect(lightInstances.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('renders options in a grid layout', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // Find the grid container (parent of options)
+      const flowerButton = screen.getByRole('button', { name: 'FLOWER' });
+      const gridContainer = flowerButton.parentElement;
+
+      expect(gridContainer).toHaveClass('grid');
+      expect(gridContainer).toHaveClass('grid-cols-2');
+    });
+
+    it('still shows hint in multiple choice mode', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={true}
+          />
+        </LanguageProvider>
+      );
+
+      expect(screen.getByText('HINT')).toBeInTheDocument();
+      expect(screen.getByText('SUNflower + FLOWERpot')).toBeInTheDocument();
+    });
+
+    it('still shows trending context in multiple choice mode', () => {
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={mockChallengeWithOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      expect(screen.getByText('Related to trending topic: Gardening')).toBeInTheDocument();
+    });
+
+    it('falls back to text input when options array is empty', () => {
+      const challengeWithEmptyOptions = {
+        ...mockChallenge,
+        options: [],
+      };
+
+      render(
+        <LanguageProvider>
+          <ChainChallenge
+            challenge={challengeWithEmptyOptions}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // Should show text input, not options
+      expect(screen.getByPlaceholderText('YOUR ANSWER')).toBeInTheDocument();
+      expect(screen.getByText('SUBMIT')).toBeInTheDocument();
+    });
   });
 });

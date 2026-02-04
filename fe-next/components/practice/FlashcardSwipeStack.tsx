@@ -7,6 +7,11 @@ import { cn } from '@/lib/utils';
 import { useSwipeGesture, SwipeDirection } from '@/hooks/useSwipeGesture';
 import { VocabularyCardEnriched } from './VocabularyCardEnriched';
 import { SwipeFeedbackOverlay } from './SwipeFeedbackOverlay';
+import {
+  FlashcardOnboarding,
+  hasSeenFlashcardOnboarding,
+  markFlashcardOnboardingComplete,
+} from './FlashcardOnboarding';
 import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 
 interface FlashcardSwipeStackProps {
@@ -42,6 +47,17 @@ export function FlashcardSwipeStack({
   const [showDefinition, setShowDefinition] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
+
+  // Onboarding state - show for first-time users
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    // Only show onboarding if user hasn't seen it and there are words to review
+    return words.length > 0 && !hasSeenFlashcardOnboarding();
+  });
+
+  const handleDismissOnboarding = useCallback(() => {
+    markFlashcardOnboardingComplete();
+    setShowOnboarding(false);
+  }, []);
 
   const currentWord = words[currentIndex];
   const hasMoreCards = currentIndex < words.length;
@@ -120,6 +136,12 @@ export function FlashcardSwipeStack({
         className
       )}
     >
+      {/* Onboarding overlay for first-time users */}
+      <FlashcardOnboarding
+        isVisible={showOnboarding}
+        onDismiss={handleDismissOnboarding}
+      />
+
       {/* Stack of cards (show 2 behind current) */}
       <div className="relative h-full">
         {/* Background cards (visual stack effect) */}

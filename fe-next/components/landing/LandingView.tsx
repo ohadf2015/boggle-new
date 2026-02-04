@@ -483,8 +483,8 @@ const LandingView: React.FC = () => {
           /* Desktop: Centered grid layout with visual hierarchy */
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
             {/* Cards container - Daily Challenge Banner + Mode Cards in single grid */}
-            {/* max-w-5xl (1024px) constrains overall width, individual cards have max-w-md (448px) */}
-            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 justify-items-center items-stretch px-4 lg:px-6">
+            {/* max-w-4xl (896px) constrains overall width, cards stretch to fill columns */}
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 items-stretch px-4 lg:px-6">
               {/* Daily Challenge Banner - spans full width with its own max-width */}
               <div className="col-span-1 sm:col-span-2 w-full max-w-4xl mx-auto">
                 <Suspense fallback={
@@ -506,14 +506,14 @@ const LandingView: React.FC = () => {
               </div>
 
               {/* Primary cards - Multiplayer and Single Player */}
-              {/* max-w-md (448px) prevents cards from stretching too wide */}
+              {/* Cards stretch to fill their grid cells, container max-w-4xl constrains overall width */}
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
                 href={`/${language}/multiplayer`}
                 icon={<Users className="w-6 h-6" />}
                 variant="pink"
-                className="w-full max-w-md"
+                className="w-full"
                 liveBadge={{
                   openRooms: liveRoomStats.openRooms,
                   totalPlayers: liveRoomStats.totalPlayers,
@@ -531,7 +531,7 @@ const LandingView: React.FC = () => {
                 href={`/${language}/singleplayer`}
                 icon={<User className="w-6 h-6" />}
                 variant="cyan"
-                className="w-full max-w-md"
+                className="w-full"
               />
 
               {/* Secondary card - Adventure Mode (only visible to admins) */}

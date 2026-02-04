@@ -808,11 +808,26 @@ body {
       /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
       /* FIX: Use CSS variable to GUARANTEE width === height for perfectly square grid */
       /* This prevents cells from being stretched when flex containers affect dimensions */
-      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px), 500px);
+      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px), 420px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
       padding: 14px;
+    }
+  }
+
+  /* Medium-large desktop screens (1024-1279px) - transition zone */
+  /* Sidebars are ~240px each, need proper spacing for this intermediate range */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .game-board-frame {
+      /* Intermediate screens: balanced grid that accounts for narrower sidebars */
+      /* At 1024px: calc(100vw - 520px) = 504px, but capped at 440px */
+      /* At 1200px: calc(100vw - 520px) = 680px, but capped at 440px */
+      --board-size: min(42vmin, calc(100vw - 520px), calc(100dvh - 260px), 440px);
+      width: var(--board-size);
+      height: var(--board-size);
+      max-height: var(--board-size);
+      padding: 12px;
     }
   }
 
@@ -821,19 +836,31 @@ body {
     .game-board-frame {
       /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
       /* FIX: Single variable ensures square container */
-      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - 250px), 500px);
+      --board-size: min(40vmin, calc(100vw - 620px), calc(100dvh - 250px), 480px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);
     }
   }
 
-  /* Extra large desktop screens - maximize grid utilization */
+  /* Extra large desktop screens - maximize grid utilization but cap size */
   @media (min-width: 1536px) {
     .game-board-frame {
-      /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
+      /* 2xl desktops: sidebars are widest (320px each = ~680px), cap at 520px max */
       /* FIX: Single variable ensures square container */
-      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - 240px), 500px);
+      --board-size: min(38vmin, calc(100vw - 700px), calc(100dvh - 240px), 520px);
+      width: var(--board-size);
+      height: var(--board-size);
+      max-height: var(--board-size);
+    }
+  }
+
+  /* Ultra-wide and 4K screens - prevent oversized grid */
+  @media (min-width: 1920px) {
+    .game-board-frame {
+      /* Large monitors: prevent grid from becoming too large */
+      /* Cap at 540px to maintain visual comfort and game playability */
+      --board-size: min(32vmin, calc(100vw - 800px), calc(100dvh - 240px), 540px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: var(--board-size);

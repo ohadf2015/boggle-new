@@ -8,7 +8,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLesson } from '@/hooks/useVocabularyLesson';
@@ -34,6 +34,8 @@ import { cn } from '@/lib/utils';
 /**
  * Inner practice content component that uses XP session context
  */
+const VALID_PRACTICE_TYPES: PracticeType[] = ['flashcard', 'solo_board', 'word_list', 'warmup'];
+
 function PracticeContent({
   lesson,
   user,
@@ -43,6 +45,7 @@ function PracticeContent({
   mastery,
   startSession,
   router,
+  initialMode,
 }: {
   lesson: NonNullable<ReturnType<typeof useLesson>['lesson']>;
   user: NonNullable<ReturnType<typeof useAuth>['user']>;
@@ -52,9 +55,19 @@ function PracticeContent({
   mastery: ReturnType<typeof usePracticeProgress>['mastery'];
   startSession: ReturnType<typeof usePracticeProgress>['startSession'];
   router: ReturnType<typeof useRouter>;
+  initialMode: PracticeType | null;
 }) {
   const { t } = useLanguage();
-  const [selectedMode, setSelectedMode] = useState<PracticeType | null>(null);
+  const [selectedMode, setSelectedMode] = useState<PracticeType | null>(initialMode);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  // Auto-start session if we have an initial mode from URL
+  useEffect(() => {
+    if (initialMode && !hasInitialized) {
+      setHasInitialized(true);
+      startSession(initialMode);
+    }
+  }, [initialMode, hasInitialized, startSession]);
 
   // Access XP context
   const {
@@ -221,10 +234,18 @@ export default function LessonPracticePageClient() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const isRTL = language === 'he';
   const [isChecking, setIsChecking] = useState(true);
 
   const lessonId = params?.id as string;
+
+  // Read mode from URL query parameter and validate it
+  const modeParam = searchParams?.get('mode');
+  const initialMode: PracticeType | null =
+    modeParam && VALID_PRACTICE_TYPES.includes(modeParam as PracticeType)
+      ? (modeParam as PracticeType)
+      : null;
   const { lesson, isLoading: isLoadingLesson } = useLesson(lessonId);
   const { progress, mastery, startSession, isLoading: isLoadingProgress } = usePracticeProgress(lessonId, user?.id);
 
@@ -276,6 +297,7 @@ export default function LessonPracticePageClient() {
         mastery={mastery}
         startSession={startSession}
         router={router}
+        initialMode={initialMode}
       />
     </PracticeSessionProvider>
   );

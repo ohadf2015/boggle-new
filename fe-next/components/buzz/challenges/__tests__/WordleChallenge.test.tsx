@@ -719,10 +719,10 @@ describe('WordleChallenge', () => {
       setMockLanguage('he');
 
       // Answer ends with final mem (ם), but keyboard only has regular mem (מ)
-      // Must be 5 letters to work with WORD_LENGTH = 5
+      // Hebrew Wordle uses 4 letters
       const hebrewChallenge = {
         prompt: 'נושא טרנדי',
-        answer: 'אשלום', // 5 letters: א-ש-ל-ו-ם (ends with final mem ם)
+        answer: 'שלום', // 4 letters: ש-ל-ו-ם (ends with final mem ם)
         hint: 'ברכה',
       };
 
@@ -736,9 +736,8 @@ describe('WordleChallenge', () => {
         </LanguageProvider>
       );
 
-      // User types אשלומ using regular mem (מ) - the keyboard only has regular forms
+      // User types שלומ using regular mem (מ) - the keyboard only has regular forms
       // Click Hebrew keys to simulate user input
-      await userEvent.click(screen.getByTestId('key-א'));
       await userEvent.click(screen.getByTestId('key-ש'));
       await userEvent.click(screen.getByTestId('key-ל'));
       await userEvent.click(screen.getByTestId('key-ו'));
@@ -750,7 +749,7 @@ describe('WordleChallenge', () => {
         const cells = screen.getAllByTestId(/^wordle-cell-0-/);
         // The last letter (מ regular) should match ם (final) in the answer
         // It should be 'correct' because it's the same letter just different form
-        expect(cells[4]).toHaveAttribute('data-state', 'correct');
+        expect(cells[3]).toHaveAttribute('data-state', 'correct');
       });
 
       unmount();
@@ -759,11 +758,11 @@ describe('WordleChallenge', () => {
     it('should mark regular form as present when final form exists elsewhere in answer', async () => {
       setMockLanguage('he');
 
-      // Answer has final nun (ן) at position 2 (middle of word)
-      // Actually Hebrew finals only appear at end, so let's use a word ending with ן
+      // Answer has final nun (ן) at the end
+      // Hebrew Wordle uses 4 letters
       const hebrewChallenge = {
         prompt: 'נושא טרנדי',
-        answer: 'אבגדן', // 5 letters ending with final nun ן
+        answer: 'אבדן', // 4 letters ending with final nun ן (loss/ruin)
         hint: 'מילה',
       };
 
@@ -777,17 +776,16 @@ describe('WordleChallenge', () => {
         </LanguageProvider>
       );
 
-      // User types נאבגד - regular nun (נ) at position 0, but answer has final nun (ן) at position 4
+      // User types נאבד - regular nun (נ) at position 0, but answer has final nun (ן) at position 3
       await userEvent.click(screen.getByTestId('key-נ')); // Regular nun at position 0
       await userEvent.click(screen.getByTestId('key-א'));
       await userEvent.click(screen.getByTestId('key-ב'));
-      await userEvent.click(screen.getByTestId('key-ג'));
       await userEvent.click(screen.getByTestId('key-ד'));
       await userEvent.click(screen.getByTestId('key-ENTER'));
 
       await waitFor(() => {
         const cells = screen.getAllByTestId(/^wordle-cell-0-/);
-        // Position 0: נ (regular nun) should be 'present' because ן (final nun) is in answer at position 4
+        // Position 0: נ (regular nun) should be 'present' because ן (final nun) is in answer at position 3
         expect(cells[0]).toHaveAttribute('data-state', 'present');
       });
 

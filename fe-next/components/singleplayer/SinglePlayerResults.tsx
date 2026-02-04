@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, BarChart3, TrendingUp } from 'lucide-react';
@@ -9,6 +9,7 @@ import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import Top3Leaderboard, { type LeaderboardParticipant } from '@/components/results/Top3Leaderboard';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import MissedWords from '@/components/results/MissedWords';
 import CompactResultsStats from '@/components/results/CompactResultsStats';
@@ -22,7 +23,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
-import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
+import type { SinglePlayerResultsData, SinglePlayerMode, SinglePlayerAchievement } from './SinglePlayerView';
+import type { AchievementPayload } from '@/shared/types/socket';
 import {
   useResultsData,
   useGuestStatsSync,
@@ -87,6 +89,64 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [mobileActiveTab, setMobileActiveTab] = useState<MobileTab>('results');
   const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
   const actionButtonsRef = useRef<HTMLDivElement>(null);
+
+  // Achievement notification queue (same pattern as multiplayer AchievementQueue)
+  const [achievementQueue, setAchievementQueue] = useState<AchievementPayload[]>([]);
+  const [currentAchievement, setCurrentAchievement] = useState<AchievementPayload | null>(null);
+  const achievementQueueRef = useRef<AchievementPayload[]>([]);
+  const isDisplayingAchievementRef = useRef<boolean>(false);
+
+  // Convert single player achievements to AchievementPayload format for UnifiedAchievementModal
+  const convertToPayload = useCallback((achievement: SinglePlayerAchievement): AchievementPayload => ({
+    key: achievement.key,
+    icon: achievement.icon,
+  }), []);
+
+  // Process next achievement from queue
+  const processNextAchievement = useCallback(() => {
+    if (achievementQueueRef.current.length === 0) {
+      isDisplayingAchievementRef.current = false;
+      setCurrentAchievement(null);
+      return;
+    }
+
+    isDisplayingAchievementRef.current = true;
+    const [next, ...rest] = achievementQueueRef.current;
+    setAchievementQueue(rest);
+    setCurrentAchievement(next ?? null);
+  }, []);
+
+  // Handle achievement popup complete
+  const handleAchievementComplete = useCallback(() => {
+    // Small delay between achievements (same as multiplayer)
+    setTimeout(() => {
+      processNextAchievement();
+    }, 500);
+  }, [processNextAchievement]);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    achievementQueueRef.current = achievementQueue;
+  }, [achievementQueue]);
+
+  // Initialize achievement queue from results on mount
+  useEffect(() => {
+    if (results.achievements && results.achievements.length > 0) {
+      const payloads = results.achievements.map(convertToPayload);
+      setAchievementQueue(payloads);
+
+      // Start displaying if not already
+      if (!isDisplayingAchievementRef.current && payloads.length > 0) {
+        setTimeout(() => {
+          if (!isDisplayingAchievementRef.current && achievementQueueRef.current.length > 0) {
+            processNextAchievement();
+          }
+        }, 100);
+      }
+    }
+  // Only run on mount with initial achievements
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const playerAvatar = useMemo(() => {
     if (!profile) return undefined;
@@ -276,6 +336,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" className="mt-auto" />
         </div>
+        {/* Achievement notification modal - same as multiplayer */}
+        {currentAchievement && (
+          <UnifiedAchievementModal
+            type="socket"
+            achievement={currentAchievement}
+            onClose={handleAchievementComplete}
+          />
+        )}
         <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
         <TrainingAnalysisModal isOpen={showTrainingAnalysis} onClose={() => setShowTrainingAnalysis(false)} returnTo={null} />
       </div>
@@ -484,6 +552,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           onVote={handleWordVote}
           onSkip={() => setShowWordValidation(false)}
           onTimeout={() => setShowWordValidation(false)}
+        />
+      )}
+      {/* Achievement notification modal - same as multiplayer */}
+      {currentAchievement && (
+        <UnifiedAchievementModal
+          type="socket"
+          achievement={currentAchievement}
+          onClose={handleAchievementComplete}
         />
       )}
       <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
