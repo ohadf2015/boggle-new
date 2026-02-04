@@ -51,7 +51,7 @@ import RoomChat from '@/components/RoomChat';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { shouldHideExternalLogin } from '@/components/CrazyGamesSDK';
 // Shared result components
-import { MultiplayerActions } from '@/components/results/ResultsActionButtons';
+import { ResultsActionButtons } from '@/components/results/ResultsActionButtons';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -723,81 +723,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 className="w-full max-w-xs"
               />
             ) : (
-              <div className="flex flex-col gap-2 w-full max-w-xs mt-2">
-                {isHost ? (
-                  /* HOST: Start Game button */
-                  <>
-                    <button
-                      onClick={handleStartGame}
-                      className="w-full bg-neo-green text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
-                    >
-                      <Play className="w-5 h-5" />
-                      {t('hostView.startGame') || 'Start Game'}
-                    </button>
-                    <button
-                      onClick={handleExitRoom}
-                      className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
-                    >
-                      <DoorOpen className="w-4 h-4" />
-                      {t('results.leaveRoom')}
-                    </button>
-                  </>
-                ) : isCurrentPlayerReady ? (
-                  /* PLAYER: Ready state */
-                  <>
-                    <button
-                      onClick={onReturnToRoom}
-                      disabled
-                      className="w-full bg-neo-green/80 text-neo-black font-bold text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 cursor-default"
-                    >
-                      <Check className="w-5 h-5" />
-                      {t('results.ready')}
-                    </button>
-                    <button
-                      onClick={handleExitRoom}
-                      className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
-                    >
-                      <DoorOpen className="w-4 h-4" />
-                      {t('results.leaveRoom')}
-                    </button>
-                  </>
-                ) : (
-                  /* PLAYER: Not ready state */
-                  <>
-                    <div className="space-y-1">
-                      <button
-                        onClick={handleMarkReady}
-                        className="w-full bg-neo-lime text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 animate-pulse"
-                      >
-                        <Star className="w-5 h-5" />
-                        {t('results.imReady')}
-                      </button>
-                      <p className="text-center text-[10px] text-neo-cream/50">
-                        {t('results.readyExplanation') || 'Tap to let the host know you want to play again'}
-                      </p>
-                    </div>
-                    <button
-                      onClick={handleExitRoom}
-                      className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
-                    >
-                      <DoorOpen className="w-4 h-4" />
-                      {t('results.leaveRoom')}
-                    </button>
-                  </>
-                )}
-              </div>
+              <ResultsActionButtons
+                isHost={isHost}
+                isMultiplayer={!!gameCode}
+                isCurrentPlayerReady={isCurrentPlayerReady}
+                onStartGame={handleStartGame}
+                onMarkReady={handleMarkReady}
+                onExit={handleExitRoom}
+              />
             )
           )}
 
-          {/* Single player exit button */}
+          {/* Single player action button */}
           {!gameCode && (
-            <button
-              onClick={handleExitRoom}
-              className="w-full max-w-xs bg-neo-blue text-white font-bold text-sm py-3 px-4 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
-            >
-              <DoorOpen className="w-4 h-4" />
-              {t('results.playAgain') || 'Play Again'}
-            </button>
+            <ResultsActionButtons
+              isHost={false}
+              isMultiplayer={false}
+              isCurrentPlayerReady={false}
+              onStartGame={() => {}}
+              onMarkReady={() => {}}
+              onExit={handleExitRoom}
+            />
           )}
         </div>
 
