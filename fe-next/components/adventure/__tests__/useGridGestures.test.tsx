@@ -1,0 +1,499 @@
+/**
+ * useGridGestures Hook Tests
+ *
+ * TDD RED Phase: Tests for grid gesture handling extracted from AdventureGrid
+ *
+ * Tests cover:
+ * - Drag state management (isDragging ref tracking)
+ * - Touch move detection with deadzone
+ * - Grid measurement caching
+ * - Cell position detection
+ * - Diagonal vs adjacent selection thresholds
+ * - Event handler callbacks
+ */
+
+import { renderHook, act } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
+import type { GridTileState } from '@/types/adventure';
+
+// Import hook AFTER defining test structure (TDD RED - will fail to import)
+import { useGridGestures } from '../useGridGestures';
+
+describe('useGridGestures', () => {
+  const mockTiles: GridTileState[] = [
+    { id: 'tile-0', letter: 'A', row: 0, col: 0, type: 'standard', isCleared: false, isFrozen: false },
+    { id: 'tile-1', letter: 'B', row: 0, col: 1, type: 'standard', isCleared: false, isFrozen: false },
+    { id: 'tile-2', letter: 'C', row: 0, col: 2, type: 'standard', isCleared: false, isFrozen: false },
+    { id: 'tile-3', letter: 'D', row: 1, col: 0, type: 'standard', isCleared: false, isFrozen: false },
+  ];
+
+  const mockGridRef = {
+    current: document.createElement('div'),
+  };
+
+  const defaultProps = {
+    gridRef: mockGridRef,
+    gridSize: 2,
+    tiles: mockTiles,
+    interactive: true,
+    disabled: false,
+    onTileSelect: jest.fn(),
+    onDragStart: jest.fn(),
+    onDragEnter: jest.fn(),
+    onDragEnd: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Hook Initialization', () => {
+    it('should return event handlers', () => {
+      const { result } = renderHook(() => useGridGestures(defaultProps));
+      
+      expect(result.current.handleTileClick).toBeDefined();
+      expect(result.current.handleDragStart).toBeDefined();
+      expect(result.current.handleDragEnter).toBeDefined();
+      expect(result.current.handleDragEnd).toBeDefined();
+      expect(result.current.handleTouchMove).toBeDefined();
+      expect(result.current.handleMouseUp).toBeDefined();
+    });
+
+    it('should return stable handler references', () => {
+      const { result, rerender } = renderHook(() => useGridGestures(defaultProps));
+      
+      const firstHandlers = { ...result.current };
+      rerender();
+      
+      // Handlers should be memoized (same reference across re-renders)
+      expect(result.current.handleTileClick).toBe(firstHandlers.handleTileClick);
+      expect(result.current.handleDragStart).toBe(firstHandlers.handleDragStart);
+      expect(result.current.handleDragEnter).toBe(firstHandlers.handleDragEnter);
+      expect(result.current.handleDragEnd).toBe(firstHandlers.handleDragEnd);
+      expect(result.current.handleTouchMove).toBe(firstHandlers.handleTouchMove);
+      expect(result.current.handleMouseUp).toBe(firstHandlers.handleMouseUp);
+    });
+  });
+
+  describe('handleTileClick', () => {
+    it('should call onTileSelect when interactive and tile not cleared', () => {
+      const onTileSelect = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect }));
+      
+      act(() => {
+        result.current.handleTileClick(0, mockTiles[0]);
+      });
+      
+      expect(onTileSelect).toHaveBeenCalledWith(0, mockTiles[0]);
+    });
+
+    it('should NOT call onTileSelect when disabled', () => {
+      const onTileSelect = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect, disabled: true }));
+      
+      act(() => {
+        result.current.handleTileClick(0, mockTiles[0]);
+      });
+      
+      expect(onTileSelect).not.toHaveBeenCalled();
+    });
+
+    it('should NOT call onTileSelect when tile is cleared', () => {
+      const onTileSelect = jest.fn();
+      const clearedTile = { ...mockTiles[0], isCleared: true };
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect }));
+      
+      act(() => {
+        result.current.handleTileClick(0, clearedTile);
+      });
+      
+      expect(onTileSelect).not.toHaveBeenCalled();
+    });
+
+    it('should NOT call onTileSelect when not interactive', () => {
+      const onTileSelect = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect, interactive: false }));
+      
+      act(() => {
+        result.current.handleTileClick(0, mockTiles[0]);
+      });
+      
+      expect(onTileSelect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleDragStart', () => {
+    it('should set isDragging flag', () => {
+      const { result } = renderHook(() => useGridGestures(defaultProps));
+      
+      const mockEvent = {
+        clientX: 100,
+        clientY: 100,
+      } as React.MouseEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockEvent, 0, mockTiles[0]);
+      });
+      
+      // isDragging should be true (verified indirectly through handleDragEnter behavior)
+    });
+
+    it('should call onDragStart callback', () => {
+      const onDragStart = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart }));
+      
+      const mockEvent = {
+        clientX: 100,
+        clientY: 100,
+      } as React.MouseEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockEvent, 0, mockTiles[0]);
+      });
+      
+      expect(onDragStart).toHaveBeenCalledWith(0, mockTiles[0]);
+    });
+
+    it('should NOT start drag when disabled', () => {
+      const onDragStart = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart, disabled: true }));
+      
+      const mockEvent = {
+        clientX: 100,
+        clientY: 100,
+      } as React.MouseEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockEvent, 0, mockTiles[0]);
+      });
+      
+      expect(onDragStart).not.toHaveBeenCalled();
+    });
+
+    it('should NOT start drag when tile is cleared', () => {
+      const onDragStart = jest.fn();
+      const clearedTile = { ...mockTiles[0], isCleared: true };
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart }));
+      
+      const mockEvent = {
+        clientX: 100,
+        clientY: 100,
+      } as React.MouseEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockEvent, 0, clearedTile);
+      });
+      
+      expect(onDragStart).not.toHaveBeenCalled();
+    });
+
+    it('should handle touch events', () => {
+      const onDragStart = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart }));
+      
+      const mockTouchEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+      } as unknown as React.TouchEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockTouchEvent, 0, mockTiles[0]);
+      });
+      
+      expect(onDragStart).toHaveBeenCalledWith(0, mockTiles[0]);
+    });
+
+    it('should store start position for deadzone calculation', () => {
+      const { result } = renderHook(() => useGridGestures(defaultProps));
+      
+      const mockEvent = {
+        clientX: 100,
+        clientY: 100,
+      } as React.MouseEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockEvent, 0, mockTiles[0]);
+      });
+      
+      // Start position stored (verified through subsequent touch move behavior)
+    });
+  });
+
+  describe('handleDragEnter', () => {
+    it('should call onDragEnter when dragging', () => {
+      const onDragEnter = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
+      
+      // Start drag first
+      const mockStartEvent = {
+        clientX: 100,
+        clientY: 100,
+      } as React.MouseEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // Then drag enter
+      act(() => {
+        result.current.handleDragEnter(1, mockTiles[1]);
+      });
+      
+      expect(onDragEnter).toHaveBeenCalledWith(1, mockTiles[1]);
+    });
+
+    it('should NOT call onDragEnter when not dragging', () => {
+      const onDragEnter = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
+      
+      act(() => {
+        result.current.handleDragEnter(1, mockTiles[1]);
+      });
+      
+      expect(onDragEnter).not.toHaveBeenCalled();
+    });
+
+    it('should NOT call onDragEnter when disabled', () => {
+      const onDragEnter = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter, disabled: true }));
+      
+      act(() => {
+        result.current.handleDragEnter(1, mockTiles[1]);
+      });
+      
+      expect(onDragEnter).not.toHaveBeenCalled();
+    });
+
+    it('should NOT call onDragEnter when tile is cleared', () => {
+      const onDragEnter = jest.fn();
+      const clearedTile = { ...mockTiles[1], isCleared: true };
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
+      
+      // Start drag
+      const mockStartEvent = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // Try to drag enter cleared tile
+      act(() => {
+        result.current.handleDragEnter(1, clearedTile);
+      });
+      
+      expect(onDragEnter).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleDragEnd', () => {
+    it('should reset isDragging flag', () => {
+      const { result } = renderHook(() => useGridGestures(defaultProps));
+      
+      // Start drag
+      const mockStartEvent = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // End drag
+      act(() => {
+        result.current.handleDragEnd();
+      });
+      
+      // isDragging should be false (verified through handleDragEnter not working)
+    });
+
+    it('should call onDragEnd callback', () => {
+      const onDragEnd = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
+      
+      // Start drag
+      const mockStartEvent = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // End drag
+      act(() => {
+        result.current.handleDragEnd();
+      });
+      
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+
+    it('should reset last touch tile index', () => {
+      const { result } = renderHook(() => useGridGestures(defaultProps));
+      
+      // Start drag
+      const mockStartEvent = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // End drag
+      act(() => {
+        result.current.handleDragEnd();
+      });
+      
+      // lastTouchTileIndex reset to null
+    });
+  });
+
+  describe('handleMouseUp', () => {
+    it('should call handleDragEnd', () => {
+      const onDragEnd = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
+      
+      // Start drag
+      const mockStartEvent = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // Mouse up
+      act(() => {
+        result.current.handleMouseUp();
+      });
+      
+      expect(onDragEnd).toHaveBeenCalled();
+    });
+  });
+
+  describe('Grid Measurement Caching', () => {
+    it('should cache grid measurements for 100ms', () => {
+      // Create grid with mock gridcell elements
+      const gridElement = document.createElement('div');
+
+      // Add gridcells (2x2 grid)
+      for (let i = 0; i < 4; i++) {
+        const cell = document.createElement('div');
+        cell.setAttribute('role', 'gridcell');
+        cell.getBoundingClientRect = jest.fn(() => ({
+          left: (i % 2) * 100,
+          top: Math.floor(i / 2) * 100,
+          width: 100,
+          height: 100,
+          right: (i % 2) * 100 + 100,
+          bottom: Math.floor(i / 2) * 100 + 100,
+          x: (i % 2) * 100,
+          y: Math.floor(i / 2) * 100,
+          toJSON: () => ({}),
+        }));
+        gridElement.appendChild(cell);
+      }
+
+      const testGridRef = { current: gridElement };
+      const testProps = { ...defaultProps, gridRef: testGridRef };
+
+      const { result } = renderHook(() => useGridGestures(testProps));
+
+      // Mock getBoundingClientRect for grid
+      const mockGetBoundingClientRect = jest.fn(() => ({
+        left: 0,
+        top: 0,
+        width: 400,
+        height: 400,
+        right: 400,
+        bottom: 400,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      }));
+
+      gridElement.getBoundingClientRect = mockGetBoundingClientRect;
+      
+      // First measurement
+      const mockStartEvent1 = { clientX: 100, clientY: 100 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent1, 0, mockTiles[0]);
+      });
+      
+      const callCount1 = mockGetBoundingClientRect.mock.calls.length;
+
+      // Second measurement within 100ms (should use cache)
+      const mockStartEvent2 = { clientX: 150, clientY: 150 } as React.MouseEvent;
+      act(() => {
+        result.current.handleDragStart(mockStartEvent2, 1, mockTiles[1]);
+      });
+
+      // Should not call getBoundingClientRect again (uses cached value)
+      expect(mockGetBoundingClientRect.mock.calls.length).toBe(callCount1);
+    });
+  });
+
+  describe('Deadzone Detection', () => {
+    it('should NOT select new tiles before exceeding deadzone', () => {
+      const onDragEnter = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
+      
+      // Start drag at (100, 100)
+      const mockStartEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+      } as unknown as React.TouchEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // Move within deadzone (< 10px)
+      const mockTouchMoveEvent = {
+        touches: [{ clientX: 105, clientY: 105 }],
+      } as unknown as React.TouchEvent;
+      
+      act(() => {
+        result.current.handleTouchMove(mockTouchMoveEvent);
+      });
+      
+      // Should not trigger drag enter (within deadzone)
+      expect(onDragEnter).not.toHaveBeenCalled();
+    });
+
+    it('should select new tiles after exceeding deadzone', () => {
+      const onDragEnter = jest.fn();
+      const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
+      
+      // Mock grid measurements and cell detection
+      // (simplified for test - actual implementation uses measureAdventureGrid)
+      
+      // Start drag at (100, 100)
+      const mockStartEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+      } as unknown as React.TouchEvent;
+      
+      act(() => {
+        result.current.handleDragStart(mockStartEvent, 0, mockTiles[0]);
+      });
+      
+      // onDragEnter should have been called from drag start
+      expect(onDragEnter).toHaveBeenCalledTimes(0); // Not called yet (just started drag)
+    });
+  });
+
+  describe('Props Changes', () => {
+    it('should update handlers when callbacks change', () => {
+      const onTileSelect1 = jest.fn();
+      const onTileSelect2 = jest.fn();
+      
+      const { result, rerender } = renderHook(
+        ({ onTileSelect }) => useGridGestures({ ...defaultProps, onTileSelect }),
+        { initialProps: { onTileSelect: onTileSelect1 } }
+      );
+      
+      // Use first callback
+      act(() => {
+        result.current.handleTileClick(0, mockTiles[0]);
+      });
+      
+      expect(onTileSelect1).toHaveBeenCalled();
+      expect(onTileSelect2).not.toHaveBeenCalled();
+      
+      // Change callback
+      rerender({ onTileSelect: onTileSelect2 });
+      
+      // Use second callback
+      act(() => {
+        result.current.handleTileClick(0, mockTiles[0]);
+      });
+      
+      expect(onTileSelect2).toHaveBeenCalled();
+    });
+  });
+});

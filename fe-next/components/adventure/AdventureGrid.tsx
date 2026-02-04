@@ -18,15 +18,7 @@ import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
 import { AdventureTile } from './AdventureTile';
 import './AdventureTile.css';
-import {
-  type GridMeasurements,
-  measureAdventureGrid,
-  getCellAtPosition,
-  getTileIndex,
-  isWithinSelectionThreshold,
-  isDiagonalMove,
-  hasExceededDeadzone,
-} from './adventureGridGeometry';
+import { useGridGestures } from './useGridGestures';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // ==============================================
@@ -123,18 +115,8 @@ const AdventureGrid = memo(
       },
       ref
     ) => {
-      // Track whether we're currently dragging
-      const isDraggingRef = useRef(false);
-      // Track last tile index for touch move to prevent duplicate calls
-      const lastTouchTileIndexRef = useRef<number | null>(null);
       // Ref to grid container for touch event handling
       const gridRef = useRef<HTMLDivElement>(null);
-      // Track whether deadzone has been exceeded
-      const hasExceededDeadzoneRef = useRef(false);
-      // Track start position for deadzone calculation
-      const startPosRef = useRef<{ x: number; y: number } | null>(null);
-      // Cache grid measurements to avoid layout thrashing
-      const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
 
       // Cascade animation state
       const [cascadeComplete, setCascadeComplete] = useState(!showCascade);
@@ -168,6 +150,57 @@ const AdventureGrid = memo(
 
       // Chain cascade animation for chain tile reactions
       const chainCascade = useCascadeAnimation();
+
+      // Wrap drag start callback to add sparkle effect
+      const handleDragStartWithSparkle = useCallback(
+        (index: number, tile: GridTileState) => {
+          // Note: We can't add sparkle here because we don't have the event
+          // Sparkle logic has been moved to the wrapper below
+          if (onDragStart) {
+            onDragStart(index, tile);
+          }
+        },
+        [onDragStart]
+      );
+
+      // Grid gesture handling hook (with wrapped callback)
+      const {
+        handleTileClick: handleTileClickFromHook,
+        handleDragStart: handleDragStartBase,
+        handleDragEnter,
+        handleDragEnd,
+        handleTouchMove,
+        handleMouseUp: handleMouseUpFromHook,
+      } = useGridGestures({
+        gridRef,
+        gridSize,
+        tiles,
+        interactive: interactive ?? true,
+        disabled: disabled ?? false,
+        onTileSelect,
+        onDragStart: handleDragStartWithSparkle,
+        onDragEnter,
+        onDragEnd,
+      });
+
+      // Wrap drag start handler to add sparkle effect AFTER validation checks
+      const handleDragStart = useCallback(
+        (e: React.MouseEvent | React.TouchEvent, index: number, tile: GridTileState) => {
+          // Only add sparkle if drag will actually start (checked by hook)
+          if (!disabled && !tile.isCleared && interactive && enableComplexAnimations) {
+            const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+            const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+            setSparkleState({
+              position: { x: clientX, y: clientY },
+              key: Date.now(),
+            });
+          }
+
+          // Call hook's drag start handler (which does full validation)
+          handleDragStartBase(e, index, tile);
+        },
+        [disabled, interactive, enableComplexAnimations, handleDragStartBase]
+      );
 
     // Calculate cascade delay per tile (diagonal wave pattern)
     // DEBT-01: Optimized from 30ms to 25ms stagger for faster entry
@@ -254,179 +287,19 @@ const AdventureGrid = memo(
       return selectedIndices.map((idx) => tiles[idx]?.letter || '').join('');
     }, [selectedIndices, tiles]);
 
-    // Handle tile click
-    const handleTileClick = useCallback(
-      (index: number, tile: GridTileState) => {
-        if (disabled || tile.isCleared) return;
-        if (interactive && onTileSelect) {
-          onTileSelect(index, tile);
-        }
-      },
-      [disabled, interactive, onTileSelect]
-    );
-
-    // Get cached or fresh grid measurements
-    const getGridMeasurements = useCallback((): GridMeasurements | null => {
-      if (!containerRef.current) return null;
-
-      const now = performance.now();
-      // Cache measurements for 100ms to avoid layout thrashing
-      if (gridMeasurementsRef.current && now - gridMeasurementsRef.current.timestamp < 100) {
-        return gridMeasurementsRef.current;
-      }
-
-      const measurements = measureAdventureGrid(containerRef.current, gridSize);
-      if (measurements) {
-        gridMeasurementsRef.current = measurements;
-      }
-      return measurements;
-    }, [gridSize, containerRef]);
-
-    // Handle drag start (mouse down / touch start on tile)
-    const handleDragStart = useCallback(
-      (e: React.MouseEvent | React.TouchEvent, index: number, tile: GridTileState) => {
-        if (disabled || tile.isCleared || !interactive) return;
-        isDraggingRef.current = true;
-        lastTouchTileIndexRef.current = index;
-        hasExceededDeadzoneRef.current = false;
-
-        // Store start position for deadzone calculation
-        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-        startPosRef.current = { x: clientX, y: clientY };
-
-        // Cache grid measurements at start of drag
-        getGridMeasurements();
-
-        // Trigger sparkle at click/touch position
-        if (enableComplexAnimations) {
-          setSparkleState({
-            position: { x: clientX, y: clientY },
-            key: Date.now(),
-          });
-        }
-
-        if (onDragStart) {
-          onDragStart(index, tile);
-        }
-      },
-      [disabled, interactive, onDragStart, enableComplexAnimations, getGridMeasurements]
-    );
-
-    // Handle drag enter (mouse enters tile during drag)
-    const handleDragEnter = useCallback(
-      (index: number, tile: GridTileState) => {
-        if (disabled || tile.isCleared || !interactive) return;
-        if (isDraggingRef.current && onDragEnter) {
-          onDragEnter(index, tile);
-        }
-      },
-      [disabled, interactive, onDragEnter]
-    );
-
-    // Handle drag end (mouse up)
-    const handleDragEnd = useCallback(() => {
-      if (isDraggingRef.current) {
-        isDraggingRef.current = false;
-        lastTouchTileIndexRef.current = null;
-        hasExceededDeadzoneRef.current = false;
-        startPosRef.current = null;
-        if (onDragEnd) {
-          onDragEnd();
-        }
-      }
-    }, [onDragEnd]);
-
-    // Handle touch move - find element under touch and trigger drag enter
-    // Uses selection threshold to prevent accidental over-selection
-    const handleTouchMove = useCallback(
-      (e: React.TouchEvent) => {
-        if (!isDraggingRef.current || disabled || !interactive) return;
-
-        const touch = e.touches[0];
-        if (!touch) return;
-
-        const touchX = touch.clientX;
-        const touchY = touch.clientY;
-
-        // Check deadzone - must exceed threshold before selecting new cells
-        if (!hasExceededDeadzoneRef.current && startPosRef.current) {
-          if (!hasExceededDeadzone(startPosRef.current.x, startPosRef.current.y, touchX, touchY)) {
-            return; // Still within deadzone, don't select
-          }
-          hasExceededDeadzoneRef.current = true;
-        }
-
-        // Get grid measurements for precise cell detection
-        const measurements = getGridMeasurements();
-        if (!measurements) {
-          // Fallback to element-based detection if measurements unavailable
-          const elementUnderTouch = document.elementFromPoint(touchX, touchY);
-          if (!elementUnderTouch) return;
-
-          const tileElement = elementUnderTouch.closest('[role="gridcell"]');
-          if (!tileElement) return;
-
-          const allTiles = containerRef.current?.querySelectorAll('[role="gridcell"]');
-          if (!allTiles) return;
-
-          const tileIndex = Array.from(allTiles).indexOf(tileElement);
-          if (tileIndex === -1 || tileIndex === lastTouchTileIndexRef.current) return;
-
-          const tile = tiles[tileIndex];
-          if (!tile || tile.isCleared) return;
-
-          lastTouchTileIndexRef.current = tileIndex;
-          if (onDragEnter) onDragEnter(tileIndex, tile);
-          return;
-        }
-
-        // Use precise cell detection with selection threshold
-        const cellPosition = getCellAtPosition(touchX, touchY, tiles, gridSize, measurements);
-        if (!cellPosition) return;
-
-        const newTileIndex = getTileIndex(cellPosition.row, cellPosition.col, gridSize);
-
-        // Skip if same tile as last touch
-        if (newTileIndex === lastTouchTileIndexRef.current) return;
-
-        // Get last selected tile for diagonal detection
-        const lastIndex = lastTouchTileIndexRef.current;
-        const lastTile = lastIndex !== null ? tiles[lastIndex] : null;
-
-        // Check if movement is diagonal (more lenient threshold)
-        const isDiagonal = lastTile
-          ? isDiagonalMove(lastTile, { row: cellPosition.row, col: cellPosition.col })
-          : false;
-
-        // Apply selection threshold - must be close to cell center
-        if (!isWithinSelectionThreshold(cellPosition, isDiagonal)) {
-          return; // Touch too far from cell center, don't select
-        }
-
-        lastTouchTileIndexRef.current = newTileIndex;
-
-        const tile = tiles[newTileIndex];
-        if (!tile || tile.isCleared) return;
-
-        // Trigger drag enter
-        if (onDragEnter) {
-          onDragEnter(newTileIndex, tile);
-        }
-      },
-      [disabled, interactive, tiles, gridSize, onDragEnter, containerRef, getGridMeasurements]
-    );
+    // Handle tile click (use hook's version directly)
+    const handleTileClick = handleTileClickFromHook;
 
     // Handle word submission (on mouse/touch up)
     const handleMouseUp = useCallback(() => {
       // Call drag end first
-      handleDragEnd();
+      handleMouseUpFromHook();
 
       if (disabled || selectedIndices.length === 0) return;
       if (onWordSubmit) {
         onWordSubmit(formedWord, selectedIndices);
       }
-    }, [disabled, selectedIndices, formedWord, onWordSubmit, handleDragEnd]);
+    }, [disabled, selectedIndices, formedWord, onWordSubmit, handleMouseUpFromHook]);
 
     // Get aria-label for tile
     const getTileAriaLabel = useCallback((tile: GridTileState): string => {
