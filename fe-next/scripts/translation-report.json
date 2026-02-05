@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 3082,
     "keyCountByLanguage": {
-      "en": 4384,
-      "he": 4383,
-      "sv": 4358,
-      "ja": 4344,
-      "es": 4300
+      "en": 4386,
+      "he": 4385,
+      "sv": 4360,
+      "ja": 4346,
+      "es": 4302
     },
-    "missingFromEnglish": 2,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,26 +167,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "common.more",
-      "usages": [
-        {
-          "file": "components/teacher/BulkWordImporter.tsx",
-          "line": 178
-        }
-      ]
-    },
-    {
-      "key": "education.template.settings",
-      "usages": [
-        {
-          "file": "components/teacher/LessonBuilder.tsx",
-          "line": 357
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "accessibility.skipToMain"
