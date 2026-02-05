@@ -85,7 +85,7 @@ export function UpgradeShop({
         key={upgradeId}
         data-testid="upgrade-card"
         className="
-          bg-white border-3 border-black rounded-neo
+          bg-neo-navy border-3 border-black rounded-neo
           shadow-hard p-4
           flex flex-col gap-3
         "
@@ -103,7 +103,7 @@ export function UpgradeShop({
         </div>
 
         {/* Description */}
-        <p className="font-neo-body text-sm text-gray-700">
+        <p className="font-neo-body text-sm text-neo-white/70">
           {t(descKey)}
         </p>
 
@@ -127,7 +127,7 @@ export function UpgradeShop({
           {/* Purchase button or status */}
           {isMaxed ? (
             <div className="
-              bg-gray-400 text-white
+              bg-neo-navy/80 text-neo-white/50
               px-4 py-2 rounded-neo
               border-2 border-black
               font-neo-display font-bold text-sm
@@ -146,7 +146,7 @@ export function UpgradeShop({
                 ${
                   canAfford
                     ? 'bg-neo-lime hover:bg-neo-lime/90 shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-neo-navy/60 text-neo-white/40 cursor-not-allowed'
                 }
               `}
               whileHover={canAfford ? { scale: 1.05 } : {}}
@@ -159,7 +159,7 @@ export function UpgradeShop({
 
         {/* Insufficient gold message */}
         {!isMaxed && !canAfford && goldNeeded > 0 && (
-          <div className="text-xs text-red-600 font-neo-body">
+          <div className="text-xs text-neo-orange font-neo-body">
             {t('adventure.upgrades.needMore').replace('{amount}', goldNeeded.toString())}
           </div>
         )}
@@ -174,8 +174,8 @@ export function UpgradeShop({
               text-center text-sm font-neo-display font-bold py-1 rounded
               ${
                 purchaseStatus.success
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
+                  ? 'bg-neo-lime/20 text-neo-lime'
+                  : 'bg-neo-orange/20 text-neo-orange'
               }
             `}
           >
