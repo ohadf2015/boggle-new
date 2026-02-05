@@ -6,8 +6,7 @@
 
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { io as Client } from 'socket.io-client';
-import type { Socket as ClientSocket } from 'socket.io-client';
+import { io as Client, type Socket as ClientSocket } from 'socket.io-client';
 
 describe('vocabularyEnrichmentHandler registration', () => {
   let io: Server;
