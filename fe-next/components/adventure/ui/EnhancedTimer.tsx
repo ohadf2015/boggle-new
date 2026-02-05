@@ -3,6 +3,8 @@
  *
  * Animated countdown timer with urgency states, flip animation, and visual warnings.
  * Creates tension as time runs out.
+ *
+ * Respects prefers-reduced-motion for accessibility.
  */
 
 'use client';
@@ -11,6 +13,7 @@ import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // ==============================================
 // TYPES
@@ -27,6 +30,7 @@ interface EnhancedTimerProps {
 interface FlipDigitProps {
   digit: string;
   className?: string;
+  prefersReducedMotion?: boolean;
 }
 
 // ==============================================
@@ -41,7 +45,18 @@ const CRITICAL_THRESHOLD = 5;
 // FLIP DIGIT COMPONENT
 // ==============================================
 
-const FlipDigit = memo(function FlipDigit({ digit, className }: FlipDigitProps) {
+const FlipDigit = memo(function FlipDigit({ digit, className, prefersReducedMotion }: FlipDigitProps) {
+  // If reduced motion is preferred, just show the digit without animation
+  if (prefersReducedMotion) {
+    return (
+      <div className={cn('relative w-[0.6em] h-[1.2em]', className)}>
+        <span className="absolute inset-0 flex items-center justify-center font-mono">
+          {digit}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className={cn('relative w-[0.6em] h-[1.2em] overflow-hidden', className)}>
       <AnimatePresence mode="popLayout">
@@ -71,6 +86,8 @@ export const EnhancedTimer = memo(function EnhancedTimer({
   className,
   showIcon = true,
 }: EnhancedTimerProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   // Format time
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
@@ -98,7 +115,7 @@ export const EnhancedTimer = memo(function EnhancedTimer({
     lg: 'text-4xl px-4 py-3',
   };
 
-  // Urgency styles
+  // Urgency styles - using hard shadows (no glow) per neo-brutalist design
   const urgencyStyles = {
     normal: {
       bg: 'bg-neo-navy/80',
@@ -111,43 +128,51 @@ export const EnhancedTimer = memo(function EnhancedTimer({
       bg: 'bg-neo-orange/20',
       border: 'border-2 border-neo-orange/60',
       text: 'text-neo-orange',
-      shadow: 'shadow-[0_0_20px_rgba(255,107,53,0.3)]',
+      shadow: 'shadow-hard-sm',
       progressColor: '#ff6b35',
     },
     danger: {
       bg: 'bg-neo-red/20',
       border: 'border-2 border-neo-red/60',
       text: 'text-neo-red',
-      shadow: 'shadow-[0_0_30px_rgba(255,0,0,0.4)]',
+      shadow: 'shadow-hard',
       progressColor: '#ff0000',
     },
     critical: {
       bg: 'bg-neo-red/30',
-      border: 'border-3 border-neo-red animate-pulse-border',
+      border: 'border-3 border-neo-red',
       text: 'text-neo-red',
-      shadow: 'shadow-[0_0_40px_rgba(255,0,0,0.6)]',
+      shadow: 'shadow-hard',
       progressColor: '#ff0000',
     },
   };
 
   const styles = urgencyStyles[urgencyState];
 
+  // Critical state: simple pulsing background color (opacity change only)
+  // Respects prefers-reduced-motion
+  const isCriticalAnimating = urgencyState === 'critical' && !prefersReducedMotion;
+  const criticalAnimation = isCriticalAnimating
+    ? { opacity: [1, 0.7, 1] }
+    : {};
+  const criticalTransition = isCriticalAnimating
+    ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' as const }
+    : undefined;
+
   return (
     <motion.div
       className={cn(
         'relative rounded-neo flex items-center gap-2 font-black',
-        'backdrop-blur-sm transition-all duration-300',
+        'transition-colors duration-300',
         sizeClasses[size],
         styles.bg,
         styles.border,
         styles.text,
+        styles.shadow,
         className
       )}
-      style={{ boxShadow: styles.shadow }}
-      animate={urgencyState === 'critical' ? {
-        scale: [1, 1.02, 1],
-      } : {}}
-      transition={{ duration: 0.5, repeat: urgencyState === 'critical' ? Infinity : 0 }}
+      animate={criticalAnimation}
+      transition={criticalTransition}
     >
       {/* Progress ring SVG */}
       <svg 
@@ -170,66 +195,50 @@ export const EnhancedTimer = memo(function EnhancedTimer({
         />
       </svg>
 
-      {/* Icon */}
+      {/* Icon - switches to AlertTriangle in critical state, no animation */}
       {showIcon && (
-        <div className="relative">
-          {(() => {
-            const iconClasses = cn(
-              'flex-shrink-0',
-              size === 'sm' && 'w-4 h-4',
-              size === 'md' && 'w-5 h-5',
-              size === 'lg' && 'w-8 h-8'
-            );
-
-            if (urgencyState === 'critical') {
-              return (
-                <motion.div
-                  animate={{ rotate: [0, 15, -15, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                >
-                  <AlertTriangle className={iconClasses} />
-                </motion.div>
-              );
-            }
-            return <Clock className={iconClasses} />;
-          })()}
+        <div className="relative flex-shrink-0">
+          {urgencyState === 'critical' ? (
+            <AlertTriangle
+              className={cn(
+                size === 'sm' && 'w-4 h-4',
+                size === 'md' && 'w-5 h-5',
+                size === 'lg' && 'w-8 h-8'
+              )}
+            />
+          ) : (
+            <Clock
+              className={cn(
+                size === 'sm' && 'w-4 h-4',
+                size === 'md' && 'w-5 h-5',
+                size === 'lg' && 'w-8 h-8'
+              )}
+            />
+          )}
         </div>
       )}
 
       {/* Time display with flip animation */}
       <div className="flex items-center font-mono tabular-nums">
         {/* Minutes */}
-        <FlipDigit digit={minTens} />
-        <FlipDigit digit={minOnes} />
-        
-        {/* Separator */}
-        <motion.span 
+        <FlipDigit digit={minTens} prefersReducedMotion={prefersReducedMotion} />
+        <FlipDigit digit={minOnes} prefersReducedMotion={prefersReducedMotion} />
+
+        {/* Separator - blinking colon respects reduced motion */}
+        <motion.span
           className="mx-0.5"
-          animate={{ opacity: [1, 0.3, 1] }}
-          transition={{ duration: 1, repeat: Infinity }}
+          animate={prefersReducedMotion ? {} : { opacity: [1, 0.3, 1] }}
+          transition={prefersReducedMotion ? {} : { duration: 1, repeat: Infinity }}
         >
           :
         </motion.span>
-        
+
         {/* Seconds */}
-        <FlipDigit digit={secTens} />
-        <FlipDigit digit={secOnes} />
+        <FlipDigit digit={secTens} prefersReducedMotion={prefersReducedMotion} />
+        <FlipDigit digit={secOnes} prefersReducedMotion={prefersReducedMotion} />
       </div>
 
-      {/* Urgency glow effect */}
-      {urgencyState !== 'normal' && (
-        <motion.div
-          className="absolute inset-0 rounded-neo pointer-events-none"
-          animate={{
-            boxShadow: [
-              `0 0 10px ${styles.progressColor}40`,
-              `0 0 30px ${styles.progressColor}60`,
-              `0 0 10px ${styles.progressColor}40`,
-            ],
-          }}
-          transition={{ duration: 1, repeat: Infinity }}
-        />
-      )}
+      {/* No glow effect - using hard shadows per neo-brutalist design */}
     </motion.div>
   );
 });
