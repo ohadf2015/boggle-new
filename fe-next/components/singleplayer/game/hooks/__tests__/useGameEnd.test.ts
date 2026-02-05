@@ -359,7 +359,7 @@ describe('useGameEnd', () => {
       // Include a pending word (isValid: null)
       refs.foundWordsRef.current = [
         { word: 'valid', score: 3, timestamp: Date.now(), timeSinceStart: 5, isValid: true, comboBonus: 0 },
-        { word: 'pending', score: 4, timestamp: Date.now(), timeSinceStart: 7, isValid: null, comboBonus: 0 },
+        { word: 'pending', score: 4, timestamp: Date.now(), timeSinceStart: 7, isValid: null },
       ];
 
       const { rerender } = renderHook(

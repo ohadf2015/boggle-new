@@ -1,6 +1,7 @@
 import cron, { ScheduledTask } from 'node-cron';
 import { generateDailyBuzz } from './buzzGenerator';
 import { populateWikipediaWords } from './wikipediaWordPopulator';
+import { runDictionaryEnrichment } from '../modules/dictionaryEnrichment';
 import type { Language } from '@/shared/types/game';
 
 /**
@@ -353,6 +354,79 @@ export async function triggerBotDifficultyCalculation(): Promise<{
 }
 
 /**
+ * Start Hebrew Dictionary Enrichment cron
+ * Runs at 04:00 UTC daily to:
+ * 1. Verify pending Hebrew words against milog.co.il
+ * 2. Promote verified words to the dictionary
+ */
+export function startDictionaryEnrichmentCron() {
+  const task = cron.schedule('0 4 * * *', async () => {
+    console.log('📚 [CRON] Starting Hebrew dictionary enrichment...');
+    const startTime = Date.now();
+
+    try {
+      const result = await runDictionaryEnrichment();
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ [CRON] Dictionary enrichment complete in ${duration}ms`);
+      console.log(`📊 [CRON] Verification: ${result.verification.verified} verified out of ${result.verification.processed} processed`);
+      console.log(`📊 [CRON] Promotion: ${result.promotion.promoted} promoted, ${result.promotion.failed} failed`);
+      if (result.promotion.words.length > 0) {
+        console.log(`📚 [CRON] New words: ${result.promotion.words.join(', ')}`);
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`❌ [CRON] Dictionary enrichment failed:`, errorMsg);
+    }
+  }, {
+    timezone: 'UTC',
+  });
+
+  console.log('✅ Dictionary enrichment cron started (runs daily at 04:00 UTC)');
+  return task;
+}
+
+/**
+ * Manual trigger for Dictionary Enrichment
+ * Used by admin dashboard
+ */
+export async function triggerDictionaryEnrichment(): Promise<{
+  success: boolean;
+  verification: { processed: number; verified: number };
+  promotion: { promoted: number; failed: number; words: string[] };
+  duration: number;
+  error?: string;
+}> {
+  console.log('📚 [MANUAL] Starting manual dictionary enrichment...');
+  const startTime = Date.now();
+
+  try {
+    const result = await runDictionaryEnrichment();
+    const duration = Date.now() - startTime;
+
+    console.log(`✅ [MANUAL] Dictionary enrichment complete in ${duration}ms`);
+
+    return {
+      success: true,
+      verification: result.verification,
+      promotion: result.promotion,
+      duration,
+    };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`❌ [MANUAL] Dictionary enrichment failed:`, errorMsg);
+
+    return {
+      success: false,
+      verification: { processed: 0, verified: 0 },
+      promotion: { promoted: 0, failed: 0, words: [] },
+      duration: Date.now() - startTime,
+      error: errorMsg,
+    };
+  }
+}
+
+/**
  * Start all cron jobs
  * Called from server startup
  */
@@ -370,6 +444,9 @@ export function startAllCronJobs(): ScheduledTask[] {
 
   // Bot difficulty calculator (03:00 UTC on Sundays)
   tasks.push(startBotDifficultyCalculatorCron());
+
+  // Hebrew dictionary enrichment (04:00 UTC)
+  tasks.push(startDictionaryEnrichmentCron());
 
   console.log(`✅ All ${tasks.length} cron jobs started`);
   return tasks;
