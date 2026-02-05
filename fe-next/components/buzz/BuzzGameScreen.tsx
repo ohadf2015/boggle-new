@@ -15,6 +15,7 @@ import TrioChallenge from './challenges/TrioChallenge';
 import WordleChallenge from './challenges/WordleChallenge';
 import AnswerFeedbackModal from './AnswerFeedbackModal';
 import CompletedChallengeOverlay from './challenges/CompletedChallengeOverlay';
+import ComboIndicator from './ui/ComboIndicator';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/shared/types/game';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -83,6 +84,10 @@ export default function BuzzGameScreen({
   // Track answered challenges
   const answeredChallenges = useMemo(() => new Set(answers.map(a => a.challengeIndex)), [answers]);
 
+  // Streak tracking for combo system
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [showComboAnimation, setShowComboAnimation] = useState(false);
+
   // Feedback modal state
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<{
@@ -92,7 +97,42 @@ export default function BuzzGameScreen({
     userAnswer: string;
     points: number;
     trendingContext?: string;
+    streak?: number;
+    isPerfect?: boolean;
   } | null>(null);
+
+  /**
+   * Calculate dynamic points based on time, streak, and hint usage
+   */
+  const calculatePoints = useCallback(
+    (timeTakenSeconds: number, streak: number, usedHint: boolean): number => {
+      let points = 20; // Base points
+
+      // Speed bonus
+      if (timeTakenSeconds < 10) points += 10;
+      else if (timeTakenSeconds < 20) points += 5;
+      else if (timeTakenSeconds < 30) points += 2;
+
+      // Streak multiplier
+      const multiplier =
+        streak >= 5
+          ? 2.0
+          : streak >= 4
+            ? 1.5
+            : streak >= 3
+              ? 1.25
+              : streak >= 2
+                ? 1.1
+                : 1.0;
+      points = Math.round(points * multiplier);
+
+      // Hint penalty
+      if (usedHint) points -= 5;
+
+      return Math.max(0, points);
+    },
+    []
+  );
 
   // Store pending completion data to avoid stale state issues
   const [pendingCompletionData, setPendingCompletionData] = useState<{
@@ -150,10 +190,20 @@ export default function BuzzGameScreen({
         playErrorSound?.();
       }
 
-      // Calculate points: Base 20 points, -5 for hint used
-      const basePoints = 20;
-      const hintPenalty = showHint ? 5 : 0;
-      const points = correct ? basePoints - hintPenalty : 0;
+      // Update streak
+      const newStreak = correct ? currentStreak + 1 : 0;
+      setCurrentStreak(newStreak);
+
+      // Trigger combo animation if streak increased to 2+
+      if (correct && newStreak >= 2) {
+        setShowComboAnimation(true);
+        setTimeout(() => setShowComboAnimation(false), 1500);
+      }
+
+      // Calculate dynamic points with speed bonus and streak multiplier
+      const points = correct
+        ? calculatePoints(timeTaken, newStreak, showHint)
+        : 0;
 
       setScore((prev) => Math.min(MAX_SCORE, prev + points));
 
@@ -173,6 +223,11 @@ export default function BuzzGameScreen({
         return next;
       });
 
+      // Check if this completes a perfect game (all correct)
+      const allAnswered = answers.length + 1 === challengeData.challenges.length;
+      const correctCount = answers.filter(a => a.correct).length + (correct ? 1 : 0);
+      const isPerfect = allAnswered && correctCount === challengeData.challenges.length;
+
       // Show feedback modal
       setFeedbackData({
         isCorrect: correct,
@@ -181,11 +236,12 @@ export default function BuzzGameScreen({
         userAnswer: userAnswer,
         points: points,
         trendingContext: currentChallenge.trendingContext,
+        streak: newStreak,
+        isPerfect,
       });
       setShowFeedback(true);
 
       // Check if all challenges are answered - store completion data to avoid stale state
-      const allAnswered = answers.length + 1 === challengeData.challenges.length;
       if (allAnswered) {
         // Store the complete answers array AND the updated score now while we have accurate values
         const updatedAnswers = [...answers, answerRecord];
@@ -205,6 +261,8 @@ export default function BuzzGameScreen({
       answeredChallenges,
       answers,
       score,
+      currentStreak,
+      calculatePoints,
     ]
   );
 
@@ -378,7 +436,7 @@ export default function BuzzGameScreen({
         />
       </div>
 
-      {/* Top bar - Score and Quit */}
+      {/* Top bar - Score, Combo, and Quit */}
       <div className="flex items-center justify-between mb-3 relative z-10">
         <Button
           variant="destructive"
@@ -389,6 +447,12 @@ export default function BuzzGameScreen({
           <X className="w-4 h-4 me-1" />
           {t('common.quit')}
         </Button>
+
+        {/* Combo/Streak Indicator */}
+        <ComboIndicator
+          streak={currentStreak}
+          showComboAnimation={showComboAnimation}
+        />
 
         {/* Animated Score Display */}
         <motion.div
@@ -624,6 +688,8 @@ export default function BuzzGameScreen({
           userAnswer={feedbackData.userAnswer}
           points={feedbackData.points}
           trendingContext={feedbackData.trendingContext}
+          streak={feedbackData.streak}
+          isPerfect={feedbackData.isPerfect}
           onClose={handleFeedbackClose}
         />
       )}

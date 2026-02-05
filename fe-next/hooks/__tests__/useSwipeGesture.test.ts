@@ -460,6 +460,216 @@ describe('useSwipeGesture', () => {
     });
   });
 
+  describe('Native Touch Events (Mobile)', () => {
+    // Helper to create mock TouchEvent
+    const createTouchEvent = (clientX: number, clientY: number) => ({
+      touches: [{ clientX, clientY }],
+      changedTouches: [{ clientX, clientY }],
+    });
+
+    it('should return onTouchStart and onTouchEnd handlers', () => {
+      // GIVEN/WHEN
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+
+      // THEN
+      expect(result.current.onTouchStart).toBeDefined();
+      expect(typeof result.current.onTouchStart).toBe('function');
+      expect(result.current.onTouchEnd).toBeDefined();
+      expect(typeof result.current.onTouchEnd).toBe('function');
+    });
+
+    it('should detect swipe right on horizontal touch gesture', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() =>
+        useSwipeGesture({ onSwipe, threshold: 75 })
+      );
+
+      // Mock Date.now for timing check
+      const originalDateNow = Date.now;
+      let mockTime = 1000;
+      Date.now = jest.fn(() => mockTime);
+
+      // WHEN - start touch at x=100
+      act(() => {
+        result.current.onTouchStart(createTouchEvent(100, 200) as any);
+      });
+
+      // Advance time by 150ms (within 300ms limit)
+      mockTime = 1150;
+
+      // End touch at x=200 (100px to the right, exceeds threshold of 75)
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(200, 200) as any);
+      });
+
+      // THEN
+      expect(onSwipe).toHaveBeenCalledWith('right');
+
+      // Restore
+      Date.now = originalDateNow;
+    });
+
+    it('should detect swipe left on horizontal touch gesture', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() =>
+        useSwipeGesture({ onSwipe, threshold: 75 })
+      );
+
+      const originalDateNow = Date.now;
+      let mockTime = 1000;
+      Date.now = jest.fn(() => mockTime);
+
+      // WHEN - start touch at x=200
+      act(() => {
+        result.current.onTouchStart(createTouchEvent(200, 200) as any);
+      });
+
+      mockTime = 1150;
+
+      // End touch at x=100 (100px to the left, exceeds threshold)
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(100, 200) as any);
+      });
+
+      // THEN
+      expect(onSwipe).toHaveBeenCalledWith('left');
+
+      Date.now = originalDateNow;
+    });
+
+    it('should not trigger swipe when horizontal movement is less than threshold', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() =>
+        useSwipeGesture({ onSwipe, threshold: 75 })
+      );
+
+      const originalDateNow = Date.now;
+      let mockTime = 1000;
+      Date.now = jest.fn(() => mockTime);
+
+      // WHEN - start touch at x=100
+      act(() => {
+        result.current.onTouchStart(createTouchEvent(100, 200) as any);
+      });
+
+      mockTime = 1150;
+
+      // End touch at x=150 (only 50px, below threshold of 75)
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(150, 200) as any);
+      });
+
+      // THEN
+      expect(onSwipe).not.toHaveBeenCalled();
+
+      Date.now = originalDateNow;
+    });
+
+    it('should not trigger swipe when vertical movement exceeds horizontal', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() =>
+        useSwipeGesture({ onSwipe, threshold: 75 })
+      );
+
+      const originalDateNow = Date.now;
+      let mockTime = 1000;
+      Date.now = jest.fn(() => mockTime);
+
+      // WHEN - start touch
+      act(() => {
+        result.current.onTouchStart(createTouchEvent(100, 100) as any);
+      });
+
+      mockTime = 1150;
+
+      // End touch - horizontal=100px, vertical=150px (vertical > horizontal)
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(200, 250) as any);
+      });
+
+      // THEN - should not trigger because it's more vertical than horizontal
+      expect(onSwipe).not.toHaveBeenCalled();
+
+      Date.now = originalDateNow;
+    });
+
+    it('should not trigger swipe when gesture is too slow (> 300ms)', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() =>
+        useSwipeGesture({ onSwipe, threshold: 75 })
+      );
+
+      const originalDateNow = Date.now;
+      let mockTime = 1000;
+      Date.now = jest.fn(() => mockTime);
+
+      // WHEN - start touch
+      act(() => {
+        result.current.onTouchStart(createTouchEvent(100, 200) as any);
+      });
+
+      // Advance time by 400ms (exceeds 300ms limit)
+      mockTime = 1400;
+
+      // End touch with sufficient distance
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(250, 200) as any);
+      });
+
+      // THEN
+      expect(onSwipe).not.toHaveBeenCalled();
+
+      Date.now = originalDateNow;
+    });
+
+    it('should not trigger swipe when disabled', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() =>
+        useSwipeGesture({ onSwipe, threshold: 75, disabled: true })
+      );
+
+      const originalDateNow = Date.now;
+      let mockTime = 1000;
+      Date.now = jest.fn(() => mockTime);
+
+      // WHEN
+      act(() => {
+        result.current.onTouchStart(createTouchEvent(100, 200) as any);
+      });
+
+      mockTime = 1150;
+
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(250, 200) as any);
+      });
+
+      // THEN
+      expect(onSwipe).not.toHaveBeenCalled();
+
+      Date.now = originalDateNow;
+    });
+
+    it('should handle touch end without touch start gracefully', () => {
+      // GIVEN
+      const onSwipe = jest.fn();
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
+
+      // WHEN - touch end without start
+      act(() => {
+        result.current.onTouchEnd(createTouchEvent(200, 200) as any);
+      });
+
+      // THEN - should not crash or trigger swipe
+      expect(onSwipe).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Edge Cases', () => {
     it('should handle exactly threshold value as swipe', () => {
       // GIVEN

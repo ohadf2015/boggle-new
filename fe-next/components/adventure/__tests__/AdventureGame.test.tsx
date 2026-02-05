@@ -601,15 +601,8 @@ describe('AdventureGame', () => {
     });
   });
 
-  describe('Combo System', () => {
-    it('should display combo counter when combo is active', () => {
-      // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
-
-      // THEN - combo starts at 0, not displayed until active
-      expect(screen.getByTestId('combo-display')).toBeInTheDocument();
-    });
-  });
+  // Note: Combo display UI has been removed per user request to reduce visual clutter
+  // Combo mechanics still function internally for scoring but are no longer displayed
 
   describe('Accessibility', () => {
     it('should have accessible game region', () => {

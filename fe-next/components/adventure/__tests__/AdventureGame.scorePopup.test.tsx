@@ -380,56 +380,6 @@ describe('AdventureGame - Score Popup Animation', () => {
 
 
 
-  test('component renders with combo display', () => {
-    const { useAdventureGame } = require('@/hooks/useAdventureGame');
-
-    // Mock with combo count
-    useAdventureGame.mockReturnValue({
-      gameState: {
-        score: 30,
-        wordsFound: ['WORD'],
-        comboCount: 3,
-        stars: 1,
-        isComplete: false,
-        levelConfig: mockLevelConfig,
-        tiles: [],
-        objectives: mockLevelConfig.objectives,
-        cascadeActive: false,
-      },
-      tiles: [
-        [{ letter: 'H', type: 'normal' }, { letter: 'E', type: 'normal' }, { letter: 'L', type: 'normal' }, { letter: 'L', type: 'normal' }],
-        [{ letter: 'O', type: 'normal' }, { letter: 'W', type: 'normal' }, { letter: 'O', type: 'normal' }, { letter: 'R', type: 'normal' }],
-        [{ letter: 'L', type: 'normal' }, { letter: 'D', type: 'normal' }, { letter: 'T', type: 'normal' }, { letter: 'E', type: 'normal' }],
-        [{ letter: 'S', type: 'normal' }, { letter: 'T', type: 'normal' }, { letter: 'A', type: 'normal' }, { letter: 'R', type: 'normal' }],
-      ],
-      tilesVersion: 1,
-      objectives: mockLevelConfig.objectives,
-      timeRemaining: 120,
-      canComplete: false,
-      isPlaying: true,
-      cascadeComplete: true,
-      submitWordWithPath: jest.fn(),
-      startGame: jest.fn(),
-      pauseGame: jest.fn(),
-      completeLevel: jest.fn(),
-      resetGame: jest.fn(),
-      markCascadeComplete: jest.fn(),
-      isCascading: false,
-      cascadePhase: 'none',
-      addTime: jest.fn(),
-    });
-
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
-
-    const comboDisplay = screen.getByTestId('combo-display');
-    expect(comboDisplay).toBeInTheDocument();
-    expect(comboDisplay).toHaveTextContent('x3');
-  });
+  // Note: Combo display UI has been removed per user request to reduce visual clutter
+  // Combo mechanics still function internally but are no longer displayed
 });

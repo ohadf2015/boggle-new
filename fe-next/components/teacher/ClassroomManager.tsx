@@ -14,6 +14,7 @@ import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } fr
 import toast from 'react-hot-toast';
 import type { Language } from '@/lib/supabase/teacher';
 import ClassroomStudentList from './ClassroomStudentList';
+import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 
 export default function ClassroomManager() {
   const { t, language } = useLanguage();
@@ -99,8 +100,11 @@ export default function ClassroomManager() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="h-10 w-40 bg-neo-white/10 rounded animate-pulse" />
+        </div>
+        <SkeletonGrid count={3} skeleton={ClassroomCardSkeleton} />
       </div>
     );
   }
@@ -130,10 +134,10 @@ export default function ClassroomManager() {
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
             <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-            <h3 className="text-xl font-neo-display text-neo-white mb-2">
+            <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.classroom.noClassrooms')}
             </h3>
-            <p className="text-slate-400 mb-6">{t('teacher.classroom.createFirst')}</p>
+            <p className="text-slate-400 mb-6 text-pretty">{t('teacher.classroom.createFirst')}</p>
             <Button
               onClick={() => {
                 setFormData({ name: '', language: language as Language });
@@ -154,7 +158,7 @@ export default function ClassroomManager() {
               className="border-neo border-neo-black shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all"
             >
               <CardHeader className="pb-3">
-                <CardTitle className="text-xl font-neo-display text-neo-white">
+                <CardTitle className="text-xl font-neo-display text-neo-white text-balance">
                   {classroom.name}
                 </CardTitle>
                 <p className="text-sm text-slate-400 mt-1">
@@ -178,7 +182,7 @@ export default function ClassroomManager() {
                         variant="ghost"
                         onClick={() => copyJoinCode(classroom.join_code)}
                         className="text-neo-yellow hover:bg-neo-yellow/20"
-                        title={t('teacher.classroom.copyCode')}
+                        aria-label={t('teacher.classroom.copyCode')}
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -187,7 +191,7 @@ export default function ClassroomManager() {
                         variant="ghost"
                         onClick={() => copyInviteLink(classroom.join_code)}
                         className="text-neo-cyan hover:bg-neo-cyan/20"
-                        title={t('teacher.classroom.copyLink')}
+                        aria-label={t('teacher.classroom.copyLink')}
                       >
                         <Link2 className="w-4 h-4" />
                       </Button>
@@ -246,6 +250,7 @@ export default function ClassroomManager() {
                       setIsDeleteDialogOpen(true);
                     }}
                     className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
+                    aria-label={t('teacher.classroom.delete')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -273,7 +278,7 @@ export default function ClassroomManager() {
               'rounded-neo'
             )}
           >
-            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4">
+            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
               {isCreateDialogOpen ? t('teacher.classroom.create') : t('teacher.classroom.edit')}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
@@ -360,10 +365,10 @@ export default function ClassroomManager() {
               'rounded-neo'
             )}
           >
-            <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2">
+            <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.classroom.delete')}
             </AlertDialog.Title>
-            <AlertDialog.Description className="text-slate-400 mb-6">
+            <AlertDialog.Description className="text-slate-400 mb-6 text-pretty">
               {t('teacher.classroom.confirmDelete')}
             </AlertDialog.Description>
 

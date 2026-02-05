@@ -146,6 +146,7 @@ const he = {
     "days": "ימים",
     "step": "שלב",
     "of": "מתוך",
+    "more": "עוד",
     "finish": "סיים",
     "showAdvanced": "הצג מתקדם",
     "hideAdvanced": "הסתר מתקדם",
@@ -2975,7 +2976,12 @@ const he = {
     "feedback": {
       "correct": "נכון!",
       "incorrect": "לא נכון",
-      "answerWas": "התשובה הייתה:"
+      "answerWas": "התשובה הייתה:",
+      "nice": "יפה!",
+      "streak": "{count} ברצף!",
+      "onFire": "בוער!",
+      "perfect": "מושלם!",
+      "allCorrect": "5 מ-5 - מדהים!"
     },
     "fillBlank": {
       "firstLetterHint": "האות הראשונה נחשפת כרמז",
@@ -4284,14 +4290,6 @@ const he = {
       "chain": "שרשרת (קומבו)",
       "time": "זמן (+5 שניות)"
     },
-    "objectives": {
-      "wordCount": "מצאו מילים",
-      "scoreTarget": "הגיעו לניקוד",
-      "longWords": "מילים ארוכות (5+)",
-      "clearIce": "נקו אריחי קרח",
-      "timeBonus": "בונוס זמן",
-      "collectGems": "אספו יהלומים"
-    },
     "cutscene": {
       "skip": "דלג"
     },
@@ -4856,6 +4854,18 @@ const he = {
       "incorrect": "נסו שוב",
       "hint": "רמז",
       "skip": "דלג",
+      "settings": "הגדרות תרגול",
+      "settingsDescription": "התאם את חווית התרגול שלך",
+      "autoAdvance": "התקדמות אוטומטית למילה הבאה",
+      "correctTiming": "השהיה לאחר תשובה נכונה",
+      "incorrectTiming": "השהיה לאחר תשובה שגויה",
+      "requireTypeCorrect": "הקלד את התשובה הנכונה כדי להמשיך",
+      "correctAnswer": "התשובה הנכונה",
+      "typeCorrectAnswer": "הקלד את התשובה הנכונה כדי להמשיך",
+      "tryAgain": "לא בדיוק, נסה שוב",
+      "nextIn": "הבא בעוד {{seconds}} שניות",
+      "continue": "המשך",
+      "streakMilestone": "אתה בוער! {{count}} ברצף!",
       "complete": {
         "title": "סיימת!",
         "subtitle": "שלטת בכל המילים",
@@ -4883,7 +4893,20 @@ const he = {
       "createLesson": "צור שיעור חדש",
       "createLessonDescription": "בנה שיעורי אוצר מילים והקצה אותם לכיתות שלך",
       "quickTip": "טיפ מהיר",
-      "quickTipDescription": "התחל משחק כיתתי כדי למשוך את התלמידים עם תרגול אוצר מילים רב משתתפים. התלמידים יכולים להצטרף עם קוד משחק פשוט!"
+      "quickTipDescription": "התחל משחק כיתתי כדי למשוך את התלמידים עם תרגול אוצר מילים רב משתתפים. התלמידים יכולים להצטרף עם קוד משחק פשוט!",
+      "quickStart": "התחלה מהירה",
+      "repeatLastGame": "חזור על המשחק האחרון",
+      "lastPlayed": "שוחק לאחרונה",
+      "noRecentGames": "אין משחקים אחרונים"
+    },
+    "game": {
+      "qrCode": "הצג קוד QR",
+      "hideQrCode": "הסתר קוד QR",
+      "projectMode": "הקרן על המסך",
+      "exitProject": "יציאה מהקרנה",
+      "copyLink": "העתק קישור",
+      "linkCopied": "קישור המשחק הועתק!",
+      "scanToJoin": "סרקו להצטרפות"
     },
     "classroom": {
       "create": "צור כיתה",
@@ -4973,7 +4996,18 @@ const he = {
       "dialog": {
         "createDescription": "צור שיעור אוצר מילים חדש עם מילים והגדרות"
       },
-      "moreWords": "+{{count}} מילים נוספות"
+      "moreWords": "+{{count}} מילים נוספות",
+      "bulkImport": "ייבוא מרוכז",
+      "bulkImportTitle": "ייבוא מילים מרובות",
+      "bulkImportDescription": "הדבק רשימת מילים מופרדות בשורות חדשות, פסיקים או רווחים.",
+      "bulkImportLabel": "הדבק מילים כאן",
+      "bulkImportPlaceholder": "הדבק מילים, אחת בכל שורה או מופרדות בפסיקים",
+      "bulkImportDetected": "זוהו {{count}} מילים",
+      "bulkImportButton": "ייבא",
+      "resumeDraft": "לחזור לטיוטה?",
+      "draftFound": "יש לך טיוטת שיעור שלא נשמרה מ{{time}}",
+      "resumeDraftButton": "המשך",
+      "discardDraftButton": "מחק"
     },
     "lessons": {
       "assign": {
@@ -5124,6 +5158,7 @@ const he = {
       "signInRequired": "נדרשת כניסה"
     },
     "template": {
+      "settings": "הגדרות",
       "create": "צור תבנית",
       "edit": "עריכת תבנית",
       "description": "הגדר את הגדרות המשחק לשיעור זה",

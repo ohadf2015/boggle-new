@@ -46,7 +46,7 @@
  */
 
 import { useMotionValue, useTransform, MotionValue } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export type SwipeDirection = 'left' | 'right';
 
@@ -79,6 +79,10 @@ export interface UseSwipeGestureReturn {
   swipeDirection: SwipeDirection | null;
   /** Progress toward threshold (0-1) */
   swipeProgress: number;
+  /** Native touch start handler for mobile (works on any element) */
+  onTouchStart: (event: React.TouchEvent) => void;
+  /** Native touch end handler for mobile (works on any element) */
+  onTouchEnd: (event: React.TouchEvent) => void;
 }
 
 /**
@@ -101,6 +105,9 @@ export function useSwipeGesture({
 }: SwipeConfig): UseSwipeGestureReturn {
   // Motion value for horizontal drag position
   const x = useMotionValue(0);
+
+  // Ref to track touch start position and time for native touch events
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
   // Transform x position to rotation (-50deg at -300px, +50deg at +300px)
   const rotate = useTransform(x, [-300, 300], [-50, 50]);
@@ -172,6 +179,51 @@ export function useSwipeGesture({
     return unsubscribe;
   }, [x, threshold]);
 
+  /**
+   * Native touch start handler for mobile
+   * Records the initial touch position and time for swipe detection
+   */
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled) return;
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        time: Date.now(),
+      };
+    },
+    [disabled]
+  );
+
+  /**
+   * Native touch end handler for mobile
+   * Detects swipe based on distance, direction, and timing
+   */
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled || !touchStartRef.current) return;
+
+      const deltaX = e.changedTouches[0].clientX - touchStartRef.current.x;
+      const deltaY = e.changedTouches[0].clientY - touchStartRef.current.y;
+      const deltaTime = Date.now() - touchStartRef.current.time;
+
+      // Only trigger swipe if:
+      // 1. Horizontal movement > vertical (prevent scroll conflicts)
+      // 2. Distance exceeds threshold
+      // 3. Gesture was quick enough (< 300ms) to be intentional
+      if (
+        Math.abs(deltaX) > Math.abs(deltaY) &&
+        Math.abs(deltaX) >= threshold &&
+        deltaTime < 300
+      ) {
+        onSwipe(deltaX > 0 ? 'right' : 'left');
+      }
+
+      touchStartRef.current = null;
+    },
+    [disabled, threshold, onSwipe]
+  );
+
   return {
     x,
     rotate,
@@ -180,5 +232,7 @@ export function useSwipeGesture({
     handleKeyDown,
     swipeDirection,
     swipeProgress,
+    onTouchStart,
+    onTouchEnd,
   };
 }

@@ -36,11 +36,13 @@ export const GameLayout = memo(function GameLayout({
   return (
     <div
       className={cn(
-        // Full viewport height, no overflow
-        'h-[100dvh] w-full',
+        // Full viewport height with safe area insets for notched devices
+        'h-dvh w-full',
         'flex flex-col',
         'overflow-hidden',
         'relative',
+        // Safe area padding for header (notch) and bottom (home indicator)
+        'pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]',
         className
       )}
     >
@@ -49,21 +51,21 @@ export const GameLayout = memo(function GameLayout({
         {header}
       </div>
 
-      {/* Main Content Area - Takes remaining height */}
+      {/* Main Content Area - Takes remaining height, no scroll */}
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row relative">
-        {/* Grid Area - Main gameplay space */}
+        {/* Grid Area - Main gameplay space, takes priority */}
         <div className="flex-1 min-h-0 relative overflow-hidden">
           {gridArea}
         </div>
 
-        {/* Sidebar - Bottom on mobile, right on desktop */}
-        <div 
+        {/* Sidebar - Bottom on mobile (compact), right on desktop */}
+        <div
           className={cn(
             'flex-shrink-0',
-            // Mobile: horizontal scroll, fixed height
-            'h-auto max-h-[35vh] lg:max-h-none',
+            // Mobile: compact height to maximize grid space, no scroll
+            'max-h-[28vh] lg:max-h-none',
             'lg:h-full lg:w-64 xl:w-72',
-            'overflow-y-auto lg:overflow-y-auto',
+            'overflow-hidden lg:overflow-y-auto',
             'z-10'
           )}
         >

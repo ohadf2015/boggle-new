@@ -6,22 +6,25 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { useLesson } from '@/hooks/useVocabularyLesson';
+import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 import { cn } from '@/lib/utils';
 import { normalizeWord, normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, X, Star, Trophy, ArrowLeft, Flame } from 'lucide-react';
+import { Check, X, Star, Trophy, ArrowLeft, Flame, Settings } from 'lucide-react';
+import * as Dialog from '@radix-ui/react-dialog';
 import toast from 'react-hot-toast';
 import type { Language } from '@/shared/types/game';
+import { PracticeCardSkeleton } from '@/components/ui/EducationSkeletons';
 
 /**
  * Detect if a string contains Hebrew characters
@@ -56,6 +59,7 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
 
   const { lesson, isLoading: isLoadingLesson } = useLesson(lessonId);
   const { progress, recordAttempt, isLoading: isLoadingProgress } = useStudentProgress(lessonId);
+  const { settings, updateSettings } = usePracticeSettings();
 
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [answer, setAnswer] = useState('');
@@ -64,6 +68,12 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
   const [isCorrect, setIsCorrect] = useState(false);
   const [streak, setStreak] = useState(0);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [requireTypeCorrect, setRequireTypeCorrect] = useState(false);
+  const [typeCorrectAnswer, setTypeCorrectAnswer] = useState('');
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const autoAdvanceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get current progress for this lesson
   const currentProgress = progress.find((p) => p.lesson_id === lessonId);
@@ -126,10 +136,31 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
     }
   }, [totalWords, masteredCount, showCompletion]);
 
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+      if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
+    };
+  }, []);
+
   // Handle next word
   const handleNext = useCallback(() => {
+    // Clear any running timers
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    if (autoAdvanceRef.current) {
+      clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = null;
+    }
+
     setShowFeedback(false);
     setAnswer('');
+    setCountdown(null);
+    setRequireTypeCorrect(false);
+    setTypeCorrectAnswer('');
 
     if (currentWordIndex < practiceWords.length - 1) {
       setCurrentWordIndex((prev) => prev + 1);
@@ -138,6 +169,71 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
       setCurrentWordIndex(0);
     }
   }, [currentWordIndex, practiceWords.length]);
+
+  // Handle streak celebrations
+  const showStreakCelebration = useCallback((currentStreak: number) => {
+    if (currentStreak === 5) {
+      toast.success(t('student.practice.streakMilestone').replace('{{count}}', '5'), {
+        icon: '🔥',
+        duration: 2000,
+      });
+    } else if (currentStreak === 10) {
+      toast.success(t('student.practice.streakMilestone').replace('{{count}}', '10'), {
+        icon: '💎',
+        duration: 3000,
+      });
+    } else if (currentStreak === 15) {
+      toast.success(t('student.practice.streakMilestone').replace('{{count}}', '15'), {
+        icon: '👑',
+        duration: 3000,
+      });
+    }
+  }, [t]);
+
+  // Start auto-advance countdown
+  const startAutoAdvance = useCallback((delayMs: number) => {
+    if (!settings.autoAdvanceEnabled) return;
+
+    // Start countdown display
+    const totalSeconds = Math.ceil(delayMs / 1000);
+    setCountdown(totalSeconds);
+
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null || prev <= 1) {
+          if (countdownRef.current) clearInterval(countdownRef.current);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // Set auto-advance timer
+    autoAdvanceRef.current = setTimeout(() => {
+      handleNext();
+    }, delayMs);
+  }, [settings.autoAdvanceEnabled, handleNext]);
+
+  // Handle type-to-learn submission
+  const handleTypeCorrectSubmit = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!currentWord) return;
+
+    const lessonLanguage = lesson?.language || (containsHebrew(currentWord.word) ? 'he' : language || 'en') as Language;
+    const userTyped = normalizeForComparison(typeCorrectAnswer.trim(), lessonLanguage);
+    const correctAnswer = normalizeForComparison(currentWord.word.trim(), lessonLanguage);
+
+    if (userTyped === correctAnswer) {
+      setRequireTypeCorrect(false);
+      // Start auto-advance after typing correct answer
+      startAutoAdvance(settings.autoAdvanceIncorrect);
+    } else {
+      toast.error(t('student.practice.tryAgain'), {
+        icon: '✏️',
+        duration: 1000,
+      });
+    }
+  }, [currentWord, typeCorrectAnswer, lesson?.language, language, t, startAutoAdvance, settings.autoAdvanceIncorrect]);
 
   // Handle answer submission
   const handleSubmit = useCallback(
@@ -157,13 +253,16 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
       setIsCorrect(correct);
       setShowFeedback(true);
 
-      // Update streak
+      // Update streak and show celebrations
       if (correct) {
-        setStreak((prev) => prev + 1);
+        const newStreak = streak + 1;
+        setStreak(newStreak);
         toast.success(t('student.practice.correct'), {
           icon: '✓',
           duration: 1000,
         });
+        // Check for streak milestones
+        showStreakCelebration(newStreak);
       } else {
         setStreak(0);
         toast.error(t('student.practice.incorrect'), {
@@ -181,12 +280,21 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
 
       setIsChecking(false);
 
-      // Auto-advance after 1.5 seconds
-      setTimeout(() => {
-        handleNext();
-      }, 1500);
+      // Handle auto-advance based on settings
+      if (correct) {
+        // Correct answer: use shorter timing
+        startAutoAdvance(settings.autoAdvanceCorrect);
+      } else {
+        // Incorrect answer: require typing if enabled, otherwise use longer timing
+        if (settings.requireTypeOnIncorrect) {
+          setRequireTypeCorrect(true);
+          // Don't auto-advance until they type the correct answer
+        } else {
+          startAutoAdvance(settings.autoAdvanceIncorrect);
+        }
+      }
     },
-    [currentWord, answer, isChecking, lessonId, recordAttempt, t, handleNext, lesson?.language, language]
+    [currentWord, answer, isChecking, lessonId, recordAttempt, t, streak, showStreakCelebration, settings, startAutoAdvance, lesson?.language, language]
   );
 
   // Handle skip
@@ -202,8 +310,18 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
 
   if (isLoadingLesson || isLoadingProgress) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-20 bg-neo-white/10 rounded animate-pulse" />
+          <div className="h-5 w-32 bg-neo-white/10 rounded animate-pulse" />
+        </div>
+        {/* Progress bar skeleton */}
+        <div className="h-6 w-full bg-neo-white/10 rounded animate-pulse" />
+        {/* Practice card skeleton */}
+        <PracticeCardSkeleton />
+        {/* Word indicator skeleton */}
+        <div className="h-4 w-16 mx-auto bg-neo-white/10 rounded animate-pulse" />
       </div>
     );
   }
@@ -251,11 +369,11 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
           <CardContent className="p-6 space-y-3">
             <div className="flex items-center justify-between gap-8">
               <span className="text-neo-white/70 font-neo-body">{t('student.lessons.words')}</span>
-              <span className="text-neo-cyan font-neo-display text-2xl">{totalWords}</span>
+              <span className="text-neo-cyan font-neo-display text-2xl tabular-nums">{totalWords}</span>
             </div>
             <div className="flex items-center justify-between gap-8">
               <span className="text-neo-white/70 font-neo-body">{t('student.lessons.mastered')}</span>
-              <span className="text-neo-yellow font-neo-display text-2xl">{masteredCount}</span>
+              <span className="text-neo-yellow font-neo-display text-2xl tabular-nums">{masteredCount}</span>
             </div>
           </CardContent>
         </Card>
@@ -302,23 +420,33 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
           {streak > 0 && (
             <div className="flex items-center gap-1 text-neo-orange">
               <Flame className="w-4 h-4" />
-              <span className="font-bold">{streak}</span>
+              <span className="font-bold tabular-nums">{streak}</span>
             </div>
           )}
-          <div className="text-neo-white/70">
+          <div className="text-neo-white/70 tabular-nums">
             {masteredCount} / {totalWords} {t('student.lessons.mastered')}
           </div>
+          {/* Settings button */}
+          <Button
+            onClick={() => setIsSettingsOpen(true)}
+            variant="ghost"
+            size="sm"
+            className="text-neo-white/70 hover:text-neo-white p-1"
+            aria-label={t('student.practice.settings')}
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar - uses scaleX for compositor-only animation */}
       <div className="relative w-full h-6 bg-neo-black border-neo border-neo-black overflow-hidden">
         <div
-          className="h-full bg-neo-cyan transition-all duration-300"
-          style={{ width: `${masteryPercent}%` }}
+          className="absolute inset-y-0 left-0 w-full bg-neo-cyan origin-left transition-transform duration-300"
+          style={{ transform: `scaleX(${masteryPercent / 100})` }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-neo-body font-bold text-neo-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="text-sm font-neo-body font-bold text-neo-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tabular-nums">
             {masteryPercent}%
           </span>
         </div>
@@ -417,9 +545,66 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="text-center text-neo-cyan font-neo-body"
+                    className="space-y-3"
                   >
-                    {t('student.practice.correct')}: <span className="font-bold">{currentWord?.word}</span>
+                    <div className="text-center text-neo-cyan font-neo-body">
+                      {t('student.practice.correctAnswer')}: <span className="font-bold text-lg">{currentWord?.word}</span>
+                    </div>
+
+                    {/* Type-to-learn input */}
+                    {requireTypeCorrect && (
+                      <form onSubmit={handleTypeCorrectSubmit} className="space-y-2">
+                        <p className="text-center text-sm text-neo-white/70">
+                          {t('student.practice.typeCorrectAnswer')}
+                        </p>
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            value={typeCorrectAnswer}
+                            onChange={(e) => setTypeCorrectAnswer(e.target.value)}
+                            placeholder={currentWord?.word}
+                            className={cn(
+                              'text-center font-neo-body py-2',
+                              'bg-neo-black/50 border-neo border-neo-cyan/50',
+                              'text-neo-white placeholder:text-neo-white/30',
+                              'focus:border-neo-cyan focus:ring-neo-cyan'
+                            )}
+                            autoFocus
+                          />
+                          <Button
+                            type="submit"
+                            disabled={!typeCorrectAnswer.trim()}
+                            className="bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-neo-body"
+                          >
+                            {t('student.practice.submit')}
+                          </Button>
+                        </div>
+                      </form>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Countdown and Continue button */}
+              <AnimatePresence>
+                {showFeedback && countdown !== null && !requireTypeCorrect && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center gap-3"
+                  >
+                    <span className="text-sm text-neo-white/50 tabular-nums">
+                      {t('student.practice.nextIn').replace('{{seconds}}', String(countdown))}
+                    </span>
+                    <Button
+                      onClick={handleNext}
+                      variant="outline"
+                      size="sm"
+                      className="text-neo-cyan border-neo-cyan hover:bg-neo-cyan/20"
+                    >
+                      {t('student.practice.continue')}
+                    </Button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -445,9 +630,137 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
       </AnimatePresence>
 
       {/* Word indicator */}
-      <div className="text-center text-sm text-neo-white/50 font-neo-body">
+      <div className="text-center text-sm text-neo-white/50 font-neo-body tabular-nums">
         {currentWordIndex + 1} / {practiceWords.length}
       </div>
+
+      {/* Settings Modal */}
+      <Dialog.Root open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
+          <Dialog.Content
+            className={cn(
+              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+              'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50',
+              'rounded-neo'
+            )}
+          >
+            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
+              {t('student.practice.settings')}
+            </Dialog.Title>
+            <Dialog.Description className="sr-only">
+              {t('student.practice.settingsDescription')}
+            </Dialog.Description>
+
+            <div className="space-y-6">
+              {/* Auto-advance toggle */}
+              <div className="flex items-center justify-between">
+                <label className="text-neo-white font-neo-body">
+                  {t('student.practice.autoAdvance')}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => updateSettings({ autoAdvanceEnabled: !settings.autoAdvanceEnabled })}
+                  className={cn(
+                    'w-12 h-6 rounded-full transition-colors',
+                    settings.autoAdvanceEnabled ? 'bg-neo-cyan' : 'bg-neo-white/20'
+                  )}
+                  role="switch"
+                  aria-checked={settings.autoAdvanceEnabled}
+                >
+                  <span
+                    className={cn(
+                      'block w-5 h-5 rounded-full bg-neo-white transition-transform',
+                      settings.autoAdvanceEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                    )}
+                  />
+                </button>
+              </div>
+
+              {/* Correct answer timing */}
+              <div className="space-y-2">
+                <label className="text-neo-white font-neo-body text-sm">
+                  {t('student.practice.correctTiming')}
+                </label>
+                <div className="flex gap-2">
+                  {[1000, 1500, 2000, 3000].map((ms) => (
+                    <button
+                      key={ms}
+                      type="button"
+                      onClick={() => updateSettings({ autoAdvanceCorrect: ms })}
+                      className={cn(
+                        'flex-1 py-2 px-3 rounded-neo border-neo font-neo-body text-sm tabular-nums',
+                        settings.autoAdvanceCorrect === ms
+                          ? 'bg-neo-cyan text-neo-black border-neo-black'
+                          : 'bg-neo-black/30 text-neo-white/70 border-neo-white/20 hover:border-neo-cyan'
+                      )}
+                    >
+                      {ms / 1000}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Incorrect answer timing */}
+              <div className="space-y-2">
+                <label className="text-neo-white font-neo-body text-sm">
+                  {t('student.practice.incorrectTiming')}
+                </label>
+                <div className="flex gap-2">
+                  {[2000, 3000, 4000, 5000].map((ms) => (
+                    <button
+                      key={ms}
+                      type="button"
+                      onClick={() => updateSettings({ autoAdvanceIncorrect: ms })}
+                      className={cn(
+                        'flex-1 py-2 px-3 rounded-neo border-neo font-neo-body text-sm tabular-nums',
+                        settings.autoAdvanceIncorrect === ms
+                          ? 'bg-neo-pink text-neo-black border-neo-black'
+                          : 'bg-neo-black/30 text-neo-white/70 border-neo-white/20 hover:border-neo-pink'
+                      )}
+                    >
+                      {ms / 1000}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Type correct answer on incorrect */}
+              <div className="flex items-center justify-between">
+                <label className="text-neo-white font-neo-body text-sm">
+                  {t('student.practice.requireTypeCorrect')}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => updateSettings({ requireTypeOnIncorrect: !settings.requireTypeOnIncorrect })}
+                  className={cn(
+                    'w-12 h-6 rounded-full transition-colors',
+                    settings.requireTypeOnIncorrect ? 'bg-neo-cyan' : 'bg-neo-white/20'
+                  )}
+                  role="switch"
+                  aria-checked={settings.requireTypeOnIncorrect}
+                >
+                  <span
+                    className={cn(
+                      'block w-5 h-5 rounded-full bg-neo-white transition-transform',
+                      settings.requireTypeOnIncorrect ? 'translate-x-6' : 'translate-x-0.5'
+                    )}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <Dialog.Close asChild>
+              <button
+                className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+                aria-label={t('common.close')}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

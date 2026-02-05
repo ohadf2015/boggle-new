@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Check, X, Flame, Trophy, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatValidAnswers } from '@/utils/buzz/answerValidation';
 
@@ -14,6 +14,8 @@ interface AnswerFeedbackModalProps {
   userAnswer: string;
   points: number;
   trendingContext?: string;
+  streak?: number;
+  isPerfect?: boolean;
   onClose: () => void;
   autoCloseMs?: number;
 }
@@ -33,6 +35,8 @@ export default function AnswerFeedbackModal({
   userAnswer,
   points,
   trendingContext,
+  streak = 0,
+  isPerfect = false,
   onClose,
   autoCloseMs = AUTO_CLOSE_DELAY,
 }: AnswerFeedbackModalProps) {
@@ -110,15 +114,56 @@ export default function AnswerFeedbackModal({
                   : t('buzz.feedback.incorrect')}
               </h3>
 
-              {/* Points */}
-              <div
-                className={`
-                  text-xl font-bold
-                  ${isCorrect ? 'text-neo-yellow' : 'text-slate-400'}
-                `}
-              >
-                +{points} {t('common.pts')}
+              {/* Points with streak info */}
+              <div className="flex flex-col items-center gap-1">
+                <div
+                  className={`
+                    text-xl font-bold
+                    ${isCorrect ? 'text-neo-yellow' : 'text-slate-400'}
+                  `}
+                >
+                  +{points} {t('common.pts')}
+                </div>
+
+                {/* Streak indicator for correct answers */}
+                {isCorrect && streak >= 2 && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-1 text-neo-orange"
+                  >
+                    <Flame className="w-4 h-4" />
+                    <span className="text-sm font-bold">
+                      {streak >= 5
+                        ? t('buzz.feedback.onFire')
+                        : streak >= 3
+                          ? t('buzz.feedback.streak', { count: streak })
+                          : t('buzz.feedback.nice')}
+                    </span>
+                  </motion.div>
+                )}
               </div>
+
+              {/* Perfect game celebration */}
+              {isPerfect && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.2, type: 'spring' }}
+                  className="flex flex-col items-center gap-2 p-3 bg-gradient-to-r from-neo-yellow/20 to-neo-pink/20 rounded-lg border border-neo-yellow"
+                >
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-6 h-6 text-neo-yellow" />
+                    <span className="text-lg font-black text-neo-yellow uppercase">
+                      {t('buzz.feedback.perfect')}
+                    </span>
+                    <Sparkles className="w-5 h-5 text-neo-pink" />
+                  </div>
+                  <span className="text-xs text-slate-300">
+                    {t('buzz.feedback.allCorrect')}
+                  </span>
+                </motion.div>
+              )}
 
               {/* Correct Answer (always show for incorrect, show for correct too) */}
               {!isCorrect && (

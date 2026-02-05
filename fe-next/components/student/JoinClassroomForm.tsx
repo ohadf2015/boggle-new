@@ -101,7 +101,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   };
 
   return (
-    <div dir={dir} className="min-h-screen bg-neo-navy flex flex-col">
+    <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col">
       <Header />
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <motion.div

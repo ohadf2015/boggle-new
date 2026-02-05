@@ -7,15 +7,16 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { TeacherOnboarding } from '@/components/education/TeacherOnboarding';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
+import QuickStartButton from './QuickStartButton';
+import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecentGameSettings';
 import { Gamepad2, BookPlus, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function TeacherDashboard() {
@@ -24,6 +25,17 @@ export default function TeacherDashboard() {
   const isRTL = language === 'he';
   const [showClassrooms, setShowClassrooms] = useState(true);
   const [showLessons, setShowLessons] = useState(false);
+  const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
+
+  // Handle quick start - navigate to classroom game with pre-selected lessons
+  const handleQuickStart = useCallback(
+    (config: GameConfiguration) => {
+      // Navigate to classroom game with the first lesson pre-selected
+      const lessonParam = config.lessonIds[0] || '';
+      router.push(`/${language}/education/classroom-game?lessonId=${lessonParam}`);
+    },
+    [router, language]
+  );
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
@@ -35,10 +47,10 @@ export default function TeacherDashboard() {
       <div className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-neo-display text-neo-white mb-2">
+          <h1 className="text-3xl font-neo-display text-neo-white mb-2 text-balance">
             {t('teacher.dashboard.title')}
           </h1>
-          <p className="text-neo-white/70 font-neo-body">
+          <p className="text-neo-white/70 font-neo-body text-pretty">
             {t('teacher.dashboard.subtitle')}
           </p>
         </div>
@@ -50,7 +62,7 @@ export default function TeacherDashboard() {
             onClick={() => router.push(`/${language}/education/classroom-game`)}
             className={cn(
               'group p-6 rounded-neo border-neo border-neo-black',
-              'bg-gradient-to-br from-neo-cyan to-neo-cyan/80',
+              'bg-neo-cyan',
               'shadow-hard hover:shadow-hard-lg transition-all',
               'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
@@ -67,10 +79,10 @@ export default function TeacherDashboard() {
                 →
               </div>
             </div>
-            <h3 className="text-xl font-neo-display text-neo-black mb-1">
+            <h3 className="text-xl font-neo-display text-neo-black mb-1 text-balance">
               {t('education.classroomGame.startGame')}
             </h3>
-            <p className="text-sm text-neo-black/80 font-neo-body">
+            <p className="text-sm text-neo-black/80 font-neo-body text-pretty">
               {t('education.classroomGame.startGameDescription')}
             </p>
           </button>
@@ -80,7 +92,7 @@ export default function TeacherDashboard() {
             onClick={() => setShowLessons(true)}
             className={cn(
               'group p-6 rounded-neo border-neo border-neo-black',
-              'bg-gradient-to-br from-neo-pink to-neo-pink/80',
+              'bg-neo-pink',
               'shadow-hard hover:shadow-hard-lg transition-all',
               'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
@@ -97,19 +109,30 @@ export default function TeacherDashboard() {
                 →
               </div>
             </div>
-            <h3 className="text-xl font-neo-display text-neo-black mb-1">
+            <h3 className="text-xl font-neo-display text-neo-black mb-1 text-balance">
               {t('teacher.dashboard.createLesson')}
             </h3>
-            <p className="text-sm text-neo-black/80 font-neo-body">
+            <p className="text-sm text-neo-black/80 font-neo-body text-pretty">
               {t('teacher.dashboard.createLessonDescription')}
             </p>
           </button>
         </div>
 
+        {/* Quick Start - Show only when there's a recent game */}
+        {hasRecentConfig && (
+          <div className="mb-8">
+            <QuickStartButton
+              config={getMostRecent()}
+              onClick={handleQuickStart}
+            />
+          </div>
+        )}
+
         {/* Classrooms Section - Collapsible */}
         <section className="mb-8">
           <button
             onClick={() => setShowClassrooms(!showClassrooms)}
+            aria-expanded={showClassrooms}
             className={cn(
               'w-full flex items-center justify-between p-4',
               'rounded-neo border-neo border-neo-black',
@@ -119,7 +142,7 @@ export default function TeacherDashboard() {
             )}
           >
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-neo-display text-neo-white">
+              <h2 className="text-2xl font-neo-display text-neo-white text-balance">
                 {t('teacher.dashboard.classrooms')}
               </h2>
               <span className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-xs font-bold rounded-neo border border-neo-cyan/50">
@@ -127,9 +150,9 @@ export default function TeacherDashboard() {
               </span>
             </div>
             {showClassrooms ? (
-              <ChevronUp className="w-6 h-6 text-neo-white" />
+              <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-neo-white" />
+              <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
             )}
           </button>
 
@@ -144,6 +167,7 @@ export default function TeacherDashboard() {
         <section className="mb-8">
           <button
             onClick={() => setShowLessons(!showLessons)}
+            aria-expanded={showLessons}
             className={cn(
               'w-full flex items-center justify-between p-4',
               'rounded-neo border-neo border-neo-black',
@@ -153,7 +177,7 @@ export default function TeacherDashboard() {
             )}
           >
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-neo-display text-neo-white">
+              <h2 className="text-2xl font-neo-display text-neo-white text-balance">
                 {t('teacher.dashboard.lessons')}
               </h2>
               <span className="px-2 py-1 bg-neo-pink/20 text-neo-pink text-xs font-bold rounded-neo border border-neo-pink/50">
@@ -161,9 +185,9 @@ export default function TeacherDashboard() {
               </span>
             </div>
             {showLessons ? (
-              <ChevronUp className="w-6 h-6 text-neo-white" />
+              <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-neo-white" />
+              <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
             )}
           </button>
 

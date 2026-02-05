@@ -13,7 +13,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureGrid from '../AdventureGrid';
-import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import type { GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -48,10 +47,6 @@ interface GameGridAreaProps {
   selectedLength: number;
   minWordLength: number;
   
-  // Combo
-  comboCount: number;
-  onComboTierChange: (tier: ComboTier) => void;
-  
   // Hint
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
   
@@ -84,8 +79,6 @@ export const GameGridArea = memo(function GameGridArea({
   wasWordSubmitted,
   selectedLength,
   minWordLength,
-  comboCount,
-  onComboTierChange,
   hintLevel,
   className,
 }: GameGridAreaProps) {
@@ -103,14 +96,6 @@ export const GameGridArea = memo(function GameGridArea({
         className
       )}
     >
-      {/* Combo Tier Badge - Floating at top */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-        <ComboTierBadge
-          comboCount={comboCount}
-          onTierChange={onComboTierChange}
-        />
-      </div>
-
       {/* Main Content - Centered vertically and horizontally */}
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-2">
         

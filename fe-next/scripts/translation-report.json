@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3044,
+    "totalKeysInCode": 3082,
     "keyCountByLanguage": {
-      "en": 4345,
-      "he": 4340,
-      "sv": 4315,
-      "ja": 4301,
-      "es": 4252
+      "en": 4384,
+      "he": 4383,
+      "sv": 4358,
+      "ja": 4344,
+      "es": 4300
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 2,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -167,21 +167,32 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "common.more",
+      "usages": [
+        {
+          "file": "components/teacher/BulkWordImporter.tsx",
+          "line": 178
+        }
+      ]
+    },
+    {
+      "key": "education.template.settings",
+      "usages": [
+        {
+          "file": "components/teacher/LessonBuilder.tsx",
+          "line": 357
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
-      "accessibility.skipToMain",
-      "adventure.objectives.defeatBoss",
-      "adventure.objectives.surviveBattle",
-      "adventure.objectives.mechanicTrigger",
-      "adventure.objectives.noDamage"
+      "accessibility.skipToMain"
     ],
     "sv": [
       "accessibility.skipToMain",
-      "adventure.objectives.defeatBoss",
-      "adventure.objectives.surviveBattle",
-      "adventure.objectives.mechanicTrigger",
-      "adventure.objectives.noDamage",
       "teacher.curriculum.title",
       "teacher.curriculum.description",
       "teacher.curriculum.browse",
@@ -242,10 +253,6 @@
       "adventure.score",
       "adventure.victory",
       "adventure.hint.title",
-      "adventure.objectives.defeatBoss",
-      "adventure.objectives.surviveBattle",
-      "adventure.objectives.mechanicTrigger",
-      "adventure.objectives.noDamage",
       "adventure.game.selectWord",
       "adventure.achievements.progress",
       "teacher.curriculum.title",
@@ -295,10 +302,6 @@
     "es": [
       "share.share",
       "accessibility.skipToMain",
-      "adventure.objectives.defeatBoss",
-      "adventure.objectives.surviveBattle",
-      "adventure.objectives.mechanicTrigger",
-      "adventure.objectives.noDamage",
       "adventure.bosses.phases.phase1",
       "adventure.bosses.phases.phase2",
       "adventure.bosses.telegraph.incoming",
@@ -367,11 +370,6 @@
       "adventure.player.health",
       "adventure.player.danger",
       "adventure.player.healthLabel",
-      "teacher.lesson.validation.nameRequired",
-      "teacher.lesson.validation.wordsRequired",
-      "teacher.lesson.error.createFailed",
-      "teacher.lesson.dialog.createDescription",
-      "teacher.lesson.moreWords",
       "teacher.progress.noProgressYet",
       "teacher.progress.selectFilters",
       "teacher.curriculum.title",

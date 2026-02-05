@@ -145,6 +145,7 @@ const ja = {
     "days": "日",
     "step": "ステップ",
     "of": "/",
+    "more": "もっと見る",
     "finish": "完了",
     "showAdvanced": "詳細設定を表示",
     "hideAdvanced": "詳細設定を非表示",
@@ -2991,7 +2992,12 @@ const ja = {
     "feedback": {
       "correct": "正解！",
       "incorrect": "不正解",
-      "answerWas": "正解は:"
+      "answerWas": "正解は:",
+      "nice": "ナイス!",
+      "streak": "{count}連続!",
+      "onFire": "絶好調!",
+      "perfect": "パーフェクト!",
+      "allCorrect": "5問全問正解 - すごい!"
     },
     "fillBlank": {
       "firstLetterHint": "最初の文字がヒントとして表示されます",
@@ -4287,14 +4293,6 @@ const ja = {
       "chain": "チェーン (コンボ)",
       "time": "タイム (+5秒)"
     },
-    "objectives": {
-      "wordCount": "単語を見つける",
-      "scoreTarget": "スコア達成",
-      "longWords": "長い単語 (5+)",
-      "clearIce": "アイスタイルをクリア",
-      "timeBonus": "タイムボーナス",
-      "collectGems": "ジェムを集める"
-    },
     "cutscene": {
       "skip": "スキップ"
     },
@@ -4858,6 +4856,18 @@ const ja = {
       "incorrect": "もう一度",
       "hint": "ヒント",
       "skip": "スキップ",
+      "settings": "練習設定",
+      "settingsDescription": "練習体験をカスタマイズ",
+      "autoAdvance": "次の単語へ自動移動",
+      "correctTiming": "正解時の遅延",
+      "incorrectTiming": "不正解時の遅延",
+      "requireTypeCorrect": "正解を入力して続行",
+      "correctAnswer": "正解",
+      "typeCorrectAnswer": "続けるには正解を入力してください",
+      "tryAgain": "もう一度やってみて",
+      "nextIn": "{{seconds}}秒後に次へ",
+      "continue": "続ける",
+      "streakMilestone": "絶好調！{{count}}連続正解！",
       "complete": {
         "title": "レッスン完了！",
         "subtitle": "全単語を習得しました",
@@ -4885,7 +4895,20 @@ const ja = {
       "createLesson": "新しいレッスンを作成",
       "createLessonDescription": "語彙レッスンを作成してクラスに割り当てる",
       "quickTip": "クイックヒント",
-      "quickTipDescription": "クラスルームゲームを開始して、マルチプレイヤーの語彙練習で生徒を引き付けましょう。生徒は簡単なゲームコードで参加できます！"
+      "quickTipDescription": "クラスルームゲームを開始して、マルチプレイヤーの語彙練習で生徒を引き付けましょう。生徒は簡単なゲームコードで参加できます！",
+      "quickStart": "クイックスタート",
+      "repeatLastGame": "前回のゲームを繰り返す",
+      "lastPlayed": "最後にプレイ",
+      "noRecentGames": "最近のゲームはありません"
+    },
+    "game": {
+      "qrCode": "QRコードを表示",
+      "hideQrCode": "QRコードを非表示",
+      "projectMode": "画面に投影",
+      "exitProject": "投影を終了",
+      "copyLink": "リンクをコピー",
+      "linkCopied": "ゲームリンクをコピーしました！",
+      "scanToJoin": "スキャンして参加"
     },
     "classroom": {
       "create": "クラス作成",
@@ -4975,7 +4998,18 @@ const ja = {
       "dialog": {
         "createDescription": "単語と定義を含む新しい語彙レッスンを作成"
       },
-      "moreWords": "+{{count}}個の単語"
+      "moreWords": "+{{count}}個の単語",
+      "bulkImport": "一括インポート",
+      "bulkImportTitle": "複数の単語をインポート",
+      "bulkImportDescription": "改行、カンマ、またはスペースで区切った単語のリストを貼り付けてください。",
+      "bulkImportLabel": "ここに単語を貼り付け",
+      "bulkImportPlaceholder": "単語を貼り付け（1行に1つ、またはカンマ区切り）",
+      "bulkImportDetected": "{{count}}個の単語を検出",
+      "bulkImportButton": "インポート",
+      "resumeDraft": "下書きを再開しますか？",
+      "draftFound": "{{time}}からの未保存のレッスン下書きがあります",
+      "resumeDraftButton": "再開",
+      "discardDraftButton": "破棄"
     },
     "lessons": {
       "assign": {
@@ -5073,6 +5107,7 @@ const ja = {
       "signInRequired": "サインインが必要です"
     },
     "template": {
+      "settings": "設定",
       "create": "テンプレート作成",
       "edit": "テンプレート編集",
       "description": "このレッスンのゲーム設定を構成",

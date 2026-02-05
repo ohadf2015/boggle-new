@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
 import { useTemplates, type CreateTemplateData, type UpdateTemplateData } from '@/hooks/useLessonTemplate';
+import { useLessonDraft } from '@/hooks/useLessonDraft';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,10 +15,13 @@ import { Input } from '@/components/ui/input';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import LessonTemplateEditor from './LessonTemplateEditor';
 import LessonAssignmentDialog from './LessonAssignmentDialog';
+import BulkWordImporter from './BulkWordImporter';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Plus, CheckCircle, AlertCircle, X, Trash2, Play, Settings, Clock, Share2 } from 'lucide-react';
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import { Plus, CheckCircle, AlertCircle, X, Trash2, Play, Settings, Clock, Share2, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/teacher';
+import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 
 export default function LessonBuilder() {
   const { t, language } = useLanguage();
@@ -26,6 +30,9 @@ export default function LessonBuilder() {
   const { lessons, isLoading, createLesson } = useLessons();
   const { classrooms } = useClassrooms();
   const { checkWordIntegration } = useWordIntegration();
+
+  // Lesson draft hook
+  const { draft, hasDraft, saveDraft, clearDraft, restoreDraft, draftAge } = useLessonDraft();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -38,6 +45,8 @@ export default function LessonBuilder() {
   const [words, setWords] = useState<VocabularyWord[]>([]);
   const [currentWord, setCurrentWord] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
 
   // Template editor state
   const [selectedLesson, setSelectedLesson] = useState<VocabularyLesson | null>(null);
@@ -49,6 +58,73 @@ export default function LessonBuilder() {
 
   // Template hook for the selected lesson
   const { templates, createTemplate, updateTemplate, getDefaultTemplate } = useTemplates(selectedLesson?.id);
+
+  // Check for draft on dialog open
+  useEffect(() => {
+    if (isCreateDialogOpen && hasDraft) {
+      setShowDraftPrompt(true);
+    }
+  }, [isCreateDialogOpen, hasDraft]);
+
+  // Auto-save draft every 30 seconds when editing
+  useEffect(() => {
+    if (!isCreateDialogOpen) return;
+
+    // Only save if there's content
+    if (!formData.name && words.length === 0) return;
+
+    const interval = setInterval(() => {
+      saveDraft({
+        name: formData.name,
+        description: formData.description,
+        language: formData.language,
+        classroomId: formData.classroomId,
+        words,
+      });
+    }, 30000); // Every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [isCreateDialogOpen, formData, words, saveDraft]);
+
+  // Handle bulk import
+  const handleBulkImport = useCallback((importedWords: VocabularyWord[]) => {
+    setWords((prev) => [...prev, ...importedWords]);
+    toast.success(
+      t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(importedWords.length))
+    );
+  }, [t]);
+
+  // Handle draft restore
+  const handleRestoreDraft = useCallback(() => {
+    const draftData = restoreDraft();
+    if (draftData) {
+      setFormData({
+        name: draftData.name,
+        description: draftData.description,
+        language: draftData.language,
+        classroomId: draftData.classroomId,
+        isPublic: false,
+      });
+      setWords(draftData.words);
+      toast.success(t('teacher.lesson.resumeDraft'));
+    }
+    setShowDraftPrompt(false);
+  }, [restoreDraft, t]);
+
+  // Handle draft discard
+  const handleDiscardDraft = useCallback(() => {
+    clearDraft();
+    setShowDraftPrompt(false);
+  }, [clearDraft]);
+
+  // Format draft age for display
+  const formatDraftAge = useCallback((ageMs: number | null): string => {
+    if (!ageMs) return '';
+    const minutes = Math.floor(ageMs / 60000);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    return `${hours}h ago`;
+  }, []);
 
   const handleOpenTemplateEditor = (lesson: VocabularyLesson) => {
     setSelectedLesson(lesson);
@@ -120,6 +196,7 @@ export default function LessonBuilder() {
 
     if (result.success) {
       toast.success(t('teacher.lesson.saved'));
+      clearDraft(); // Clear draft on successful save
       setIsCreateDialogOpen(false);
       setFormData({
         name: '',
@@ -136,8 +213,11 @@ export default function LessonBuilder() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="h-10 w-40 bg-neo-white/10 rounded animate-pulse" />
+        </div>
+        <SkeletonGrid count={3} skeleton={LessonCardSkeleton} />
       </div>
     );
   }
@@ -173,10 +253,10 @@ export default function LessonBuilder() {
       {lessons.length === 0 ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
-            <h3 className="text-xl font-neo-display text-neo-white mb-2">
+            <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.lesson.noLessons')}
             </h3>
-            <p className="text-slate-400 mb-6">{t('teacher.lesson.createFirst')}</p>
+            <p className="text-slate-400 mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
             <Button
               onClick={() => setIsCreateDialogOpen(true)}
               className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
@@ -196,7 +276,7 @@ export default function LessonBuilder() {
                 className="border-neo border-neo-black shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all flex flex-col"
               >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-xl font-neo-display text-neo-white">
+                  <CardTitle className="text-xl font-neo-display text-neo-white text-balance">
                     {lesson.name}
                   </CardTitle>
                   {lesson.description && (
@@ -261,7 +341,7 @@ export default function LessonBuilder() {
                         'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
                         'transition-all'
                       )}
-                      title={t('teacher.lessons.assign.trigger')}
+                      aria-label={t('teacher.lessons.assign.trigger')}
                     >
                       <Share2 className="w-4 h-4" />
                     </Button>
@@ -274,6 +354,7 @@ export default function LessonBuilder() {
                         'bg-neo-navy/50 text-neo-white hover:bg-neo-navy',
                         'transition-all'
                       )}
+                      aria-label={t('education.template.settings')}
                     >
                       <Settings className="w-4 h-4" />
                     </Button>
@@ -296,7 +377,7 @@ export default function LessonBuilder() {
               'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
             )}
           >
-            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4">
+            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
               {t('teacher.lesson.create')}
             </Dialog.Title>
             <Dialog.Description className="sr-only">
@@ -376,9 +457,21 @@ export default function LessonBuilder() {
 
               {/* Words List */}
               <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
-                  {t('teacher.lesson.words')} ({words.length})
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-neo-body text-neo-white">
+                    {t('teacher.lesson.words')} ({words.length})
+                  </label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsBulkImportOpen(true)}
+                    className="text-neo-cyan border-neo-cyan hover:bg-neo-cyan/20 text-xs"
+                  >
+                    <Upload className="w-3 h-3 mr-1" />
+                    {t('teacher.lesson.bulkImport')}
+                  </Button>
+                </div>
 
                 {/* Add Word Input */}
                 <div className="flex gap-2 mb-3">
@@ -431,6 +524,7 @@ export default function LessonBuilder() {
                             variant="ghost"
                             onClick={() => handleRemoveWord(idx)}
                             className="text-neo-pink hover:bg-neo-pink/20"
+                            aria-label={t('teacher.lesson.removeWord')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -503,6 +597,55 @@ export default function LessonBuilder() {
           lessonName={assigningLesson.name}
         />
       )}
+
+      {/* Bulk Word Importer */}
+      <BulkWordImporter
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImport={handleBulkImport}
+        language={formData.language}
+      />
+
+      {/* Draft Resume Prompt */}
+      <AlertDialog.Root open={showDraftPrompt} onOpenChange={setShowDraftPrompt}>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay className="fixed inset-0 bg-neo-black/80 z-[60]" />
+          <AlertDialog.Content
+            className={cn(
+              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+              'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-[60]',
+              'rounded-neo'
+            )}
+          >
+            <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
+              {t('teacher.lesson.resumeDraft')}
+            </AlertDialog.Title>
+            <AlertDialog.Description className="text-slate-400 mb-6 text-pretty">
+              {t('teacher.lesson.draftFound').replace('{{time}}', formatDraftAge(draftAge))}
+            </AlertDialog.Description>
+
+            <div className="flex gap-3">
+              <AlertDialog.Action asChild>
+                <Button
+                  onClick={handleRestoreDraft}
+                  className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
+                >
+                  {t('teacher.lesson.resumeDraftButton')}
+                </Button>
+              </AlertDialog.Action>
+              <AlertDialog.Cancel asChild>
+                <Button
+                  onClick={handleDiscardDraft}
+                  variant="outline"
+                  className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
+                >
+                  {t('teacher.lesson.discardDraftButton')}
+                </Button>
+              </AlertDialog.Cancel>
+            </div>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   );
 }

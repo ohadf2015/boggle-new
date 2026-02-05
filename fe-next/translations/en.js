@@ -148,6 +148,7 @@ const en = {
     "days": "days",
     "step": "Step",
     "of": "of",
+    "more": "More",
     "finish": "Finish",
     "showAdvanced": "Show Advanced",
     "hideAdvanced": "Hide Advanced",
@@ -2995,7 +2996,12 @@ const en = {
     "feedback": {
       "correct": "CORRECT!",
       "incorrect": "INCORRECT",
-      "answerWas": "The answer was:"
+      "answerWas": "The answer was:",
+      "nice": "Nice!",
+      "streak": "{count} in a row!",
+      "onFire": "ON FIRE!",
+      "perfect": "PERFECT!",
+      "allCorrect": "All 5 correct - amazing!"
     },
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | Beat this? 🔥"
@@ -4851,6 +4857,18 @@ const en = {
       "incorrect": "Try again",
       "hint": "Hint",
       "skip": "Skip",
+      "settings": "Practice Settings",
+      "settingsDescription": "Customize your practice experience",
+      "autoAdvance": "Auto-advance to next word",
+      "correctTiming": "Correct answer delay",
+      "incorrectTiming": "Incorrect answer delay",
+      "requireTypeCorrect": "Type correct answer to continue",
+      "correctAnswer": "Correct answer",
+      "typeCorrectAnswer": "Type the correct answer to continue",
+      "tryAgain": "Not quite, try again",
+      "nextIn": "Next in {{seconds}}s",
+      "continue": "Continue",
+      "streakMilestone": "You're on fire! {{count}} in a row!",
       "complete": {
         "title": "Lesson Complete!",
         "subtitle": "You've mastered all words",
@@ -4878,7 +4896,20 @@ const en = {
       "createLesson": "Create New Lesson",
       "createLessonDescription": "Build vocabulary lessons and assign them to your classrooms",
       "quickTip": "Quick Tip",
-      "quickTipDescription": "Start a classroom game to engage students with multiplayer vocabulary practice. Students can join with a simple game code!"
+      "quickTipDescription": "Start a classroom game to engage students with multiplayer vocabulary practice. Students can join with a simple game code!",
+      "quickStart": "Quick Start",
+      "repeatLastGame": "Repeat Last Game",
+      "lastPlayed": "Last played",
+      "noRecentGames": "No recent games"
+    },
+    "game": {
+      "qrCode": "Show QR Code",
+      "hideQrCode": "Hide QR Code",
+      "projectMode": "Project on Screen",
+      "exitProject": "Exit Projection",
+      "copyLink": "Copy Link",
+      "linkCopied": "Game link copied!",
+      "scanToJoin": "Scan to join"
     },
     "classroom": {
       "create": "Create Classroom",
@@ -4968,7 +4999,18 @@ const en = {
       "dialog": {
         "createDescription": "Create a new vocabulary lesson with words and definitions"
       },
-      "moreWords": "+{{count}} more words"
+      "moreWords": "+{{count}} more words",
+      "bulkImport": "Bulk Import",
+      "bulkImportTitle": "Import Multiple Words",
+      "bulkImportDescription": "Paste a list of words separated by newlines, commas, or spaces.",
+      "bulkImportLabel": "Paste words here",
+      "bulkImportPlaceholder": "Paste words, one per line or comma-separated",
+      "bulkImportDetected": "{{count}} words detected",
+      "bulkImportButton": "Import",
+      "resumeDraft": "Resume Draft?",
+      "draftFound": "You have an unsaved lesson draft from {{time}}",
+      "resumeDraftButton": "Resume",
+      "discardDraftButton": "Discard"
     },
     "lessons": {
       "assign": {
@@ -5135,6 +5177,7 @@ const en = {
       "signInRequired": "Sign in first"
     },
     "template": {
+      "settings": "Settings",
       "create": "Create Template",
       "edit": "Edit Template",
       "description": "Configure game settings for this lesson",

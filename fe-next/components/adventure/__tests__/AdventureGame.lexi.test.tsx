@@ -427,9 +427,6 @@ describe('AdventureGame Lexi Integration', () => {
 
     // Score display should work (hook doesn't interfere)
     expect(screen.getByTestId('score-display')).toBeInTheDocument();
-
-    // Combo display should work (hook reads this state)
-    expect(screen.getByTestId('combo-display')).toBeInTheDocument();
   });
 });
 

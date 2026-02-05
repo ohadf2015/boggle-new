@@ -138,15 +138,15 @@ export default function StudentLessonView() {
                   )}
                 </div>
 
-                {/* Progress bar for started/completed - compact */}
+                {/* Progress bar for started/completed - uses scaleX for compositor-only animation */}
                 {status !== 'assigned' && progress && (
                   <div className="mt-3 w-full h-2 bg-neo-black border border-neo-black overflow-hidden rounded">
                     <div
                       className={cn(
-                        'h-full transition-all duration-300',
+                        'h-full w-full origin-left transition-transform duration-300',
                         status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan'
                       )}
-                      style={{ width: `${masteryPercent}%` }}
+                      style={{ transform: `scaleX(${masteryPercent / 100})` }}
                     />
                   </div>
                 )}

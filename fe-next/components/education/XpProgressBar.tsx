@@ -91,11 +91,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
 
   const sizeConfig = SIZE_CONFIG[size];
 
-  // Animation variants
-  const progressAnimation = prefersReducedMotion
-    ? { width: `${progress.progressPercent}%` }
-    : { width: `${progress.progressPercent}%` };
-
+  // Animation transition
   const progressTransition = prefersReducedMotion
     ? { duration: 0 }
     : { duration: 0.8, ease: 'easeOut' as const };
@@ -128,7 +124,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           {!progress.isMaxLevel && (
             <div className="flex items-center gap-1">
               <span className={cn(
-                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70',
+                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70 tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpInCurrentLevel}
@@ -140,7 +136,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
                 /
               </span>
               <span className={cn(
-                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70',
+                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70 tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpNeededForNextLevel}
@@ -161,7 +157,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
               animate={{ opacity: 0, scale: 1 }}
               transition={{ duration: 1.2 }}
               className={cn(
-                'font-neo-body font-black text-neo-lime',
+                'font-neo-body font-black text-neo-lime tabular-nums',
                 sizeConfig.xpText
               )}
             >
@@ -182,27 +178,37 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           isRTL && 'rtl:shadow-hard-rtl'
         )}
       >
-        {/* Progress fill */}
+        {/* Progress fill - uses scaleX for compositor-only animation */}
         <motion.div
           data-testid="xp-progress-fill"
-          initial={{ width: 0 }}
-          animate={progressAnimation}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: progress.progressPercent / 100 }}
           transition={progressTransition}
           className={cn(
-            'absolute inset-y-0',
+            'absolute inset-y-0 w-full',
             'bg-neo-yellow',
-            // Border on the right edge of fill (left for RTL)
-            !progress.isMaxLevel && (isRTL ? 'border-l-neo border-neo-black' : 'border-r-neo border-neo-black'),
-            // RTL: Start from right
-            isRTL ? 'right-0' : 'left-0'
+            // RTL: transform origin on right side
+            isRTL ? 'origin-right' : 'origin-left'
           )}
-          style={{ width: `${progress.progressPercent}%` }}
         />
+        {/* Border overlay for fill edge */}
+        {!progress.isMaxLevel && progress.progressPercent > 0 && (
+          <div
+            className={cn(
+              'absolute inset-y-0 w-[3px] bg-neo-black',
+              isRTL ? 'right-0' : 'left-0'
+            )}
+            style={{
+              [isRTL ? 'right' : 'left']: `${progress.progressPercent}%`,
+              transform: isRTL ? 'translateX(50%)' : 'translateX(-50%)'
+            }}
+          />
+        )}
 
         {/* Progress percentage text (centered) */}
         <div className="absolute inset-0 flex items-center justify-center">
           <span className={cn(
-            'font-neo-body font-black text-neo-black mix-blend-difference',
+            'font-neo-body font-black text-neo-black mix-blend-difference tabular-nums',
             size === 'sm' ? 'text-xs' : 'text-sm'
           )}>
             {progress.progressPercent}%

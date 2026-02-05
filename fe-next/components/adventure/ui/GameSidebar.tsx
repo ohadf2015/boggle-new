@@ -9,7 +9,7 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lightbulb, Zap, Target } from 'lucide-react';
+import { Lightbulb, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureObjectives from '../AdventureObjectives';
@@ -21,7 +21,6 @@ import type { LevelObjective } from '@/types/adventure';
 
 interface GameSidebarProps {
   objectives: LevelObjective[];
-  comboCount: number;
   showSlideIn?: boolean;
   onSlideInComplete?: () => void;
   hasHintsAvailable: boolean;
@@ -38,7 +37,6 @@ interface GameSidebarProps {
 
 export const GameSidebar = memo(function GameSidebar({
   objectives,
-  comboCount,
   showSlideIn,
   onSlideInComplete,
   hasHintsAvailable,
@@ -75,29 +73,6 @@ export const GameSidebar = memo(function GameSidebar({
               showSlideIn={showSlideIn}
               onSlideInComplete={onSlideInComplete}
             />
-          </div>
-        </div>
-
-        {/* Combo - Compact */}
-        <div data-testid="combo-display" className="flex-shrink-0 w-28 sm:w-32">
-          <div className={cn(
-            'bg-neo-black/40 rounded-neo-lg p-2 border-2',
-            comboCount > 1 ? 'border-neo-cyan' : 'border-neo-cyan/30'
-          )}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Zap className="w-3 h-3 text-neo-cyan" />
-                <span className="text-[10px] font-bold text-neo-white/70 uppercase">
-                  Combo
-                </span>
-              </div>
-              <span className={cn(
-                'text-xl font-black',
-                comboCount > 1 ? 'text-neo-cyan' : 'text-neo-white/40'
-              )}>
-                x{comboCount}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -172,62 +147,6 @@ export const GameSidebar = memo(function GameSidebar({
             showSlideIn={showSlideIn}
             onSlideInComplete={onSlideInComplete}
           />
-        </motion.div>
-
-        {/* Combo Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className={cn(
-            'bg-neo-black/40 backdrop-blur-sm',
-            'border-3 border-neo-cyan/30',
-            'rounded-neo-lg p-3',
-            'shadow-hard',
-            comboCount > 1 && 'border-neo-cyan shadow-[0_0_20px_rgba(0,255,255,0.15)]'
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <motion.div 
-                className="w-7 h-7 rounded-neo bg-neo-cyan/20 border-2 border-neo-cyan/40 flex items-center justify-center"
-                animate={comboCount > 1 ? {
-                  scale: [1, 1.1, 1],
-                  boxShadow: ['0 0 0 rgba(0,255,255,0)', '0 0 10px rgba(0,255,255,0.3)', '0 0 0 rgba(0,255,255,0)']
-                } : {}}
-                transition={{ duration: 0.5 }}
-              >
-                <Zap className="w-3.5 h-3.5 text-neo-cyan" />
-              </motion.div>
-              <span className="text-xs font-bold text-neo-white/70 uppercase">
-                {t('adventure.game.combo')}
-              </span>
-            </div>
-            <motion.span 
-              className={cn(
-                'text-2xl font-black tabular-nums',
-                comboCount > 1 ? 'text-neo-cyan' : 'text-neo-white/40'
-              )}
-              key={comboCount}
-              initial={{ scale: 1.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-            >
-              x{comboCount}
-            </motion.span>
-          </div>
-          
-          {/* Combo progress bar */}
-          {comboCount > 0 && (
-            <div className="mt-2 h-1 bg-neo-black/50 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-neo-cyan to-neo-cyan-light rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.min((comboCount / 10) * 100, 100)}%` }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
-          )}
         </motion.div>
 
         {/* Hint Section */}

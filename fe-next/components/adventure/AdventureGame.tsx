@@ -32,7 +32,6 @@ import { neoInfoToast } from '@/components/NeoToast';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { useAIDirector } from '@/hooks/useAIDirector';
 import { type BossTier } from '@/components/celebration/BossDefeatFireworks';
-import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTierBadge';
 import { type LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
@@ -1025,23 +1024,6 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [effects]);
 
-    const handleComboTierChange = useCallback((tier: ComboTier) => {
-      const shakeIntensityMap: Record<number, number> = {
-        2: 2,
-        4: 4,
-        7: 6,
-        10: 8,
-      };
-      const intensity = shakeIntensityMap[tier.threshold] || 2;
-      effects.shake(intensity);
-
-      const particleIntensity = Math.ceil(tier.threshold / 3);
-      effects.setParticleConfig({
-        intensity: particleIntensity as 1 | 2 | 3 | 4 | 5,
-        origin: { x: 0.5, y: 0.4 },
-      });
-    }, [effects]);
-
     const starsEarned = gameState.stars;
 
     if (!isValidConfig) {
@@ -1102,15 +1084,12 @@ const AdventureGame = memo<AdventureGameProps>(
               wasWordSubmitted={validationFeedback.wasSubmitted}
               selectedLength={selectedIndices.length}
               minWordLength={minWordLength}
-              comboCount={gameState.comboCount}
-              onComboTierChange={handleComboTierChange}
               hintLevel={hintData.level}
             />
           }
           sidebar={
             <GameSidebar
               objectives={objectives}
-              comboCount={gameState.comboCount}
               showSlideIn={entryPhase === 'objectives'}
               onSlideInComplete={handleObjectivesComplete}
               hasHintsAvailable={hasHintsAvailable}

@@ -187,6 +187,7 @@ const es = {
     "days": "días",
     "step": "Paso",
     "of": "de",
+    "more": "Más",
     "finish": "Terminar",
     "showAdvanced": "Ver opciones",
     "hideAdvanced": "Ocultar opciones",
@@ -2945,7 +2946,12 @@ const es = {
     "feedback": {
       "correct": "¡CORRECTO!",
       "incorrect": "INCORRECTO",
-      "answerWas": "La respuesta era:"
+      "answerWas": "La respuesta era:",
+      "nice": "¡Bien!",
+      "streak": "¡{count} seguidas!",
+      "onFire": "¡EN LLAMAS!",
+      "perfect": "¡PERFECTO!",
+      "allCorrect": "5 de 5 - ¡impresionante!"
     },
     "fillBlank": {
       "firstLetterHint": "Primera letra revelada como pista",
@@ -4416,14 +4422,6 @@ const es = {
       "chain": "Cadena (combo)",
       "time": "Tiempo (+5 seg)"
     },
-    "objectives": {
-      "wordCount": "Encontrar palabras",
-      "scoreTarget": "Alcanzar puntuación",
-      "longWords": "Palabras largas (5+)",
-      "clearIce": "Limpiar fichas de hielo",
-      "timeBonus": "Bonificación de tiempo",
-      "collectGems": "Recolectar gemas"
-    },
     "cutscene": {
       "skip": "Omitir"
     },
@@ -4912,6 +4910,18 @@ const es = {
       "incorrect": "Inténtalo de nuevo",
       "hint": "Pista",
       "skip": "Saltar",
+      "settings": "Configuración de Práctica",
+      "settingsDescription": "Personaliza tu experiencia de práctica",
+      "autoAdvance": "Avanzar automáticamente",
+      "correctTiming": "Tiempo para respuesta correcta",
+      "incorrectTiming": "Tiempo para respuesta incorrecta",
+      "requireTypeCorrect": "Escribir respuesta correcta para continuar",
+      "correctAnswer": "Respuesta correcta",
+      "typeCorrectAnswer": "Escribe la respuesta correcta para continuar",
+      "tryAgain": "Casi, inténtalo de nuevo",
+      "nextIn": "Siguiente en {{seconds}}s",
+      "continue": "Continuar",
+      "streakMilestone": "¡Estás en llamas! ¡{{count}} seguidas!",
       "complete": {
         "title": "¡Lección Completa!",
         "subtitle": "Dominaste todas las palabras",
@@ -4939,7 +4949,20 @@ const es = {
       "createLesson": "Crear Nueva Lección",
       "createLessonDescription": "Crea lecciones de vocabulario y asígnalas a tus aulas",
       "quickTip": "Consejo Rápido",
-      "quickTipDescription": "¡Inicia un juego de aula para involucrar a los estudiantes con práctica de vocabulario multijugador. Los estudiantes pueden unirse con un código de juego simple!"
+      "quickTipDescription": "¡Inicia un juego de aula para involucrar a los estudiantes con práctica de vocabulario multijugador. Los estudiantes pueden unirse con un código de juego simple!",
+      "quickStart": "Inicio Rápido",
+      "repeatLastGame": "Repetir Último Juego",
+      "lastPlayed": "Último jugado",
+      "noRecentGames": "Sin juegos recientes"
+    },
+    "game": {
+      "qrCode": "Mostrar Código QR",
+      "hideQrCode": "Ocultar Código QR",
+      "projectMode": "Proyectar en Pantalla",
+      "exitProject": "Salir de Proyección",
+      "copyLink": "Copiar Enlace",
+      "linkCopied": "¡Enlace del juego copiado!",
+      "scanToJoin": "Escanea para unirte"
     },
     "classroom": {
       "create": "Crear Aula",
@@ -5018,7 +5041,29 @@ const es = {
       "contextualExamples": "En Contexto",
       "pronounce": "Escuchar pronunciación",
       "speaking": "Reproduciendo...",
-      "pronunciationFallback": "Pronunciación"
+      "pronunciationFallback": "Pronunciación",
+      "validation": {
+        "nameRequired": "El nombre de la lección es requerido",
+        "wordsRequired": "Agrega al menos una palabra"
+      },
+      "error": {
+        "createFailed": "Error al crear la lección"
+      },
+      "dialog": {
+        "createDescription": "Crea una nueva lección de vocabulario con palabras y definiciones"
+      },
+      "moreWords": "+{{count}} palabras más",
+      "bulkImport": "Importar en Lote",
+      "bulkImportTitle": "Importar Múltiples Palabras",
+      "bulkImportDescription": "Pega una lista de palabras separadas por líneas, comas o espacios.",
+      "bulkImportLabel": "Pega las palabras aquí",
+      "bulkImportPlaceholder": "Pega palabras, una por línea o separadas por comas",
+      "bulkImportDetected": "{{count}} palabras detectadas",
+      "bulkImportButton": "Importar",
+      "resumeDraft": "¿Continuar Borrador?",
+      "draftFound": "Tienes un borrador de lección sin guardar de {{time}}",
+      "resumeDraftButton": "Continuar",
+      "discardDraftButton": "Descartar"
     },
     "lessons": {
       "assign": {
@@ -5118,6 +5163,7 @@ const es = {
       "signInRequired": "Requiere iniciar sesión"
     },
     "template": {
+      "settings": "Ajustes",
       "create": "Crear Plantilla",
       "edit": "Editar Plantilla",
       "description": "Configura los ajustes del juego para esta lección",

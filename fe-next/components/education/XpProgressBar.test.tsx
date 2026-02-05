@@ -31,10 +31,10 @@ jest.mock('@/contexts/LanguageContext', () => ({
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, initial, animate, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      // For the progress bar fill, compute width from animate prop
+      // For the progress bar fill, compute transform from animate prop (uses scaleX)
       const computedStyle = { ...style } as React.CSSProperties;
-      if (animate && typeof animate === 'object' && 'width' in animate) {
-        computedStyle.width = (animate as { width: string }).width;
+      if (animate && typeof animate === 'object' && 'scaleX' in animate) {
+        computedStyle.transform = `scaleX(${(animate as { scaleX: number }).scaleX})`;
       }
       return <div className={className} style={computedStyle} data-testid="motion-div" {...props}>{children}</div>;
     },
@@ -84,7 +84,8 @@ describe('XpProgressBar', () => {
 
       // 150 XP: Level 2, 50 XP into level = 50%
       const progressBar = screen.getByTestId('xp-progress-fill');
-      expect(progressBar).toHaveStyle({ width: '50%' });
+      // Uses scaleX for compositor-only animation
+      expect(progressBar).toHaveStyle({ transform: 'scaleX(0.5)' });
     });
 
     it('shows XP values when showLevel is true (default)', () => {
@@ -117,9 +118,9 @@ describe('XpProgressBar', () => {
       render(<XpProgressBar totalXp={10000} />);
 
       expect(screen.getByText('100')).toBeInTheDocument();
-      // Progress should be 100%
+      // Progress should be 100% (scaleX(1))
       const progressBar = screen.getByTestId('xp-progress-fill');
-      expect(progressBar).toHaveStyle({ width: '100%' });
+      expect(progressBar).toHaveStyle({ transform: 'scaleX(1)' });
     });
   });
 

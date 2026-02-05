@@ -129,6 +129,10 @@ export function validateChallenges(
   const rejectionReasons: Record<string, string[]> = {
     'invalid_length': [],
     'answer_spoiled': [],
+    'duplicate_answer': [],
+    'options_missing_answer': [],
+    'options_not_unique': [],
+    'insufficient_options': [],
   };
 
   // NOTE: Brand name filtering disabled - we now allow brand/company names as answers
@@ -158,15 +162,57 @@ export function validateChallenges(
       return false;
     }
 
+    // Options quality checks (only for challenges with options)
+    if (challenge.options && Array.isArray(challenge.options)) {
+      // Check 1: Options must include the answer (case-insensitive)
+      const normalizedOptions = challenge.options.map(opt => opt.toLowerCase());
+      const normalizedAnswer = answer.toLowerCase();
+      if (!normalizedOptions.includes(normalizedAnswer)) {
+        rejectionReasons['options_missing_answer'].push(`${answer} (not in options: ${challenge.options.join(', ')})`);
+        console.warn(`[BUZZ] Options don't include answer: ${answer} not in [${challenge.options.join(', ')}]`);
+        return false;
+      }
+
+      // Check 2: Options must be unique (case-insensitive)
+      const uniqueOptions = new Set(normalizedOptions);
+      if (uniqueOptions.size !== challenge.options.length) {
+        rejectionReasons['options_not_unique'].push(`${answer} (duplicate options: ${challenge.options.join(', ')})`);
+        console.warn(`[BUZZ] Options contain duplicates: [${challenge.options.join(', ')}]`);
+        return false;
+      }
+
+      // Check 3: Must have at least 3 options
+      if (challenge.options.length < 3) {
+        rejectionReasons['insufficient_options'].push(`${answer} (only ${challenge.options.length} options, need 3+)`);
+        console.warn(`[BUZZ] Insufficient options: ${challenge.options.length} < 3`);
+        return false;
+      }
+    }
+
     return true;
   });
 
-  if (validatedChallenges.length < 5) {
+  // Remove challenges with duplicate answers (case-insensitive)
+  // Keeps the first occurrence and removes subsequent duplicates
+  const seenAnswers = new Set<string>();
+  const deduplicatedChallenges = validatedChallenges.filter(challenge => {
+    const normalizedAnswer = challenge.answer.toLowerCase();
+    if (seenAnswers.has(normalizedAnswer)) {
+      rejectionReasons['duplicate_answer'].push(`${challenge.answer} (duplicate)`);
+      console.warn(`[BUZZ] Removing duplicate answer: ${challenge.answer}`);
+      return false;
+    }
+    seenAnswers.add(normalizedAnswer);
+    return true;
+  });
+
+  if (deduplicatedChallenges.length < 5) {
     // Log detailed rejection summary
     console.error(`[BUZZ] Validation failed for ${language}:`);
     console.error(`  Total challenges: ${challenges.length}`);
-    console.error(`  Passed: ${validatedChallenges.length}`);
-    console.error(`  Rejected: ${challenges.length - validatedChallenges.length}`);
+    console.error(`  After validation: ${validatedChallenges.length}`);
+    console.error(`  After deduplication: ${deduplicatedChallenges.length}`);
+    console.error(`  Rejected: ${challenges.length - deduplicatedChallenges.length}`);
 
     if (rejectionReasons['invalid_length'].length > 0) {
       console.error(`  Invalid length (${rejectionReasons['invalid_length'].length}):`, rejectionReasons['invalid_length']);
@@ -174,26 +220,38 @@ export function validateChallenges(
     if (rejectionReasons['answer_spoiled'].length > 0) {
       console.error(`  Answer spoiled (${rejectionReasons['answer_spoiled'].length}):`, rejectionReasons['answer_spoiled']);
     }
+    if (rejectionReasons['duplicate_answer'].length > 0) {
+      console.error(`  Duplicate answers (${rejectionReasons['duplicate_answer'].length}):`, rejectionReasons['duplicate_answer']);
+    }
+    if (rejectionReasons['options_missing_answer'].length > 0) {
+      console.error(`  Options missing answer (${rejectionReasons['options_missing_answer'].length}):`, rejectionReasons['options_missing_answer']);
+    }
+    if (rejectionReasons['options_not_unique'].length > 0) {
+      console.error(`  Options not unique (${rejectionReasons['options_not_unique'].length}):`, rejectionReasons['options_not_unique']);
+    }
+    if (rejectionReasons['insufficient_options'].length > 0) {
+      console.error(`  Insufficient options (${rejectionReasons['insufficient_options'].length}):`, rejectionReasons['insufficient_options']);
+    }
 
-    throw new Error(`Insufficient validated challenges: got ${validatedChallenges.length}, need 5`);
+    throw new Error(`Insufficient validated challenges: got ${deduplicatedChallenges.length}, need 5`);
   }
 
   // Enforce at least one wordle_guess challenge requirement
-  const hasWordleGuess = validatedChallenges.some(c => c.type === 'wordle_guess');
+  const hasWordleGuess = deduplicatedChallenges.some(c => c.type === 'wordle_guess');
   if (!hasWordleGuess) {
     console.error(`[BUZZ] Missing wordle_guess challenge - Daily Buzz requires at least one`);
     throw new Error('Daily Buzz must include at least one wordle_guess challenge');
   }
 
   // Enforce max 1 sport riddle constraint
-  const sportsRiddles = validatedChallenges.filter(
+  const sportsRiddles = deduplicatedChallenges.filter(
     c => c.type === 'riddle' && isSportsRelatedChallenge(c)
   );
-  let finalChallenges = validatedChallenges;
+  let finalChallenges = deduplicatedChallenges;
   if (sportsRiddles.length > 1) {
     console.warn(`[BUZZ] Too many sports riddles (${sportsRiddles.length}), keeping only the first one`);
     let foundFirst = false;
-    finalChallenges = validatedChallenges.filter(c => {
+    finalChallenges = deduplicatedChallenges.filter(c => {
       if (c.type === 'riddle' && isSportsRelatedChallenge(c)) {
         if (foundFirst) return false;
         foundFirst = true;

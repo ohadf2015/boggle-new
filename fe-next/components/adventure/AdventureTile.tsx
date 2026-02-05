@@ -194,9 +194,9 @@ export const AdventureTile = memo(({
           : undefined,
       }}
       className={cn(
-        // Base tile styles
+        // Base tile styles - overflow-hidden ensures effects stay within cell bounds
         'relative aspect-square flex items-center justify-center',
-        'font-black text-xl cursor-pointer',
+        'font-black text-xl cursor-pointer overflow-hidden',
         'border-2 border-neo-black/30 rounded-neo',
 
         // World-specific theming
@@ -235,7 +235,7 @@ export const AdventureTile = memo(({
 
         // Standard tile background
         tile.type === 'standard' &&
-          'bg-gradient-to-br from-neo-white via-gray-100 to-gray-200 text-neo-black overflow-hidden',
+          'bg-gradient-to-br from-neo-white via-gray-100 to-gray-200 text-neo-black',
 
         // Gold tile - golden glow
         tile.type === 'gold' && [
@@ -399,33 +399,17 @@ export const AdventureTile = memo(({
       )}
 
       {/* ========== SELECTION RIPPLE EFFECT ========== */}
-      {/* Matches main game mode's satisfying ripple feedback */}
+      {/* Contained ripple that stays within cell bounds - no blur, no overflow */}
       {isSelected && enableComplexAnimations && !prefersReducedMotion && (
-        <>
-          {/* Primary ripple - radial gradient expanding outward */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              borderRadius: '6px',
-              background: 'radial-gradient(circle, rgba(255, 200, 100, 0.7), rgba(255, 150, 50, 0.4) 50%, transparent 75%)',
-            }}
-            initial={{ scale: 0.3, opacity: 1 }}
-            animate={{ scale: 2.5, opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          />
-          {/* Secondary glow pulse */}
-          <motion.div
-            className="absolute inset-[-4px] pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(255, 200, 100, 0.9), transparent 60%)',
-              filter: 'blur(4px)',
-              borderRadius: '10px',
-            }}
-            initial={{ scale: 0, opacity: 1 }}
-            animate={{ scale: [0, 1.5, 1.8], opacity: [1, 0.7, 0] }}
-            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          />
-        </>
+        <motion.div
+          className="absolute inset-0 pointer-events-none rounded-neo"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(255, 200, 100, 0.6) 0%, rgba(255, 200, 100, 0.2) 50%, transparent 70%)',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 0.6] }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+        />
       )}
 
       {/* Letter */}

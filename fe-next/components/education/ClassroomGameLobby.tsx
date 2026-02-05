@@ -350,7 +350,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     >
       <div className="space-y-6">
         {/* Game Code */}
-        <div className="p-6 rounded-neo border-neo border-neo-cyan bg-gradient-to-br from-neo-cyan/20 to-neo-cyan/10 shadow-hard-lg">
+        <div className="p-6 rounded-neo border-neo border-neo-cyan bg-neo-cyan/20 shadow-hard-lg">
           <p className="text-sm text-neo-white/70 font-neo-body mb-2 text-center">
             {t('education.classroomGame.shareCode')}
           </p>

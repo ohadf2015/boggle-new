@@ -143,6 +143,7 @@ const sv = {
     "days": "dagar",
     "step": "Steg",
     "of": "av",
+    "more": "Mer",
     "finish": "Klart",
     "showAdvanced": "Visa avancerat",
     "hideAdvanced": "Dölj avancerat",
@@ -3002,7 +3003,12 @@ const sv = {
     "feedback": {
       "correct": "RÄTT!",
       "incorrect": "FEL",
-      "answerWas": "Svaret var:"
+      "answerWas": "Svaret var:",
+      "nice": "Snyggt!",
+      "streak": "{count} i rad!",
+      "onFire": "PÅ ELD!",
+      "perfect": "PERFEKT!",
+      "allCorrect": "Alla 5 rätt - grymma grejer!"
     },
     "fillBlank": {
       "firstLetterHint": "Första bokstaven visas som ledtråd",
@@ -4309,14 +4315,6 @@ const sv = {
       "chain": "Kedja (kombo)",
       "time": "Tid (+5 sek)"
     },
-    "objectives": {
-      "wordCount": "Hitta ord",
-      "scoreTarget": "Nå poäng",
-      "longWords": "Långa ord (5+)",
-      "clearIce": "Rensa isbrickor",
-      "timeBonus": "Tidsbonus",
-      "collectGems": "Samla juveler"
-    },
     "cutscene": {
       "skip": "Hoppa över"
     },
@@ -4881,6 +4879,18 @@ const sv = {
       "incorrect": "Försök igen",
       "hint": "Ledtråd",
       "skip": "Hoppa över",
+      "settings": "Övningsinställningar",
+      "settingsDescription": "Anpassa din övningsupplevelse",
+      "autoAdvance": "Gå automatiskt vidare till nästa ord",
+      "correctTiming": "Fördröjning vid rätt svar",
+      "incorrectTiming": "Fördröjning vid fel svar",
+      "requireTypeCorrect": "Skriv rätt svar för att fortsätta",
+      "correctAnswer": "Rätt svar",
+      "typeCorrectAnswer": "Skriv rätt svar för att fortsätta",
+      "tryAgain": "Inte riktigt, försök igen",
+      "nextIn": "Nästa om {{seconds}}s",
+      "continue": "Fortsätt",
+      "streakMilestone": "Du är på eld! {{count}} i rad!",
       "complete": {
         "title": "Lektion klar!",
         "subtitle": "Du har bemästrat alla ord",
@@ -4908,7 +4918,20 @@ const sv = {
       "createLesson": "Skapa ny lektion",
       "createLessonDescription": "Bygg gloslektioner och tilldela dem till dina klassrum",
       "quickTip": "Snabbtips",
-      "quickTipDescription": "Starta ett klassrumsspel för att engagera elever med flerspelar glosövning. Elever kan gå med med en enkel spelkod!"
+      "quickTipDescription": "Starta ett klassrumsspel för att engagera elever med flerspelar glosövning. Elever kan gå med med en enkel spelkod!",
+      "quickStart": "Snabbstart",
+      "repeatLastGame": "Upprepa senaste spel",
+      "lastPlayed": "Senast spelat",
+      "noRecentGames": "Inga senaste spel"
+    },
+    "game": {
+      "qrCode": "Visa QR-kod",
+      "hideQrCode": "Dölj QR-kod",
+      "projectMode": "Visa på skärm",
+      "exitProject": "Avsluta projektion",
+      "copyLink": "Kopiera länk",
+      "linkCopied": "Spellänk kopierad!",
+      "scanToJoin": "Skanna för att gå med"
     },
     "classroom": {
       "create": "Skapa klassrum",
@@ -4998,7 +5021,18 @@ const sv = {
       "dialog": {
         "createDescription": "Skapa en ny vokabulärlektion med ord och definitioner"
       },
-      "moreWords": "+{{count}} fler ord"
+      "moreWords": "+{{count}} fler ord",
+      "bulkImport": "Massimport",
+      "bulkImportTitle": "Importera Flera Ord",
+      "bulkImportDescription": "Klistra in en lista med ord separerade med radbrytningar, kommatecken eller mellanslag.",
+      "bulkImportLabel": "Klistra in ord här",
+      "bulkImportPlaceholder": "Klistra in ord, ett per rad eller kommaseparerade",
+      "bulkImportDetected": "{{count}} ord upptäckta",
+      "bulkImportButton": "Importera",
+      "resumeDraft": "Återuppta utkast?",
+      "draftFound": "Du har ett osparat lektionsutkast från {{time}}",
+      "resumeDraftButton": "Återuppta",
+      "discardDraftButton": "Kasta"
     },
     "lessons": {
       "assign": {
@@ -5096,6 +5130,7 @@ const sv = {
       "signInRequired": "Inloggning krävs"
     },
     "template": {
+      "settings": "Inställningar",
       "create": "Skapa mall",
       "edit": "Redigera mall",
       "description": "Konfigurera spelinställningar för denna lektion",

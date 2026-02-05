@@ -113,11 +113,28 @@ export const CHALLENGE_REQUIREMENTS_TEMPLATE = `## 📋 CHALLENGE REQUIREMENTS
 
 **Your Task**: Create 10-15 word mini-challenges using the rising trends above. PRIORITIZE the 🔥 rising trends - they're what's exploding RIGHT NOW.
 
+**🎯 THE GOLDEN RULE: TRENDS ARE FLAVOR, NOT ANSWERS**
+
+CRITICAL: Players should be able to solve EVERY challenge knowing ZERO about current events!
+
+The trending topic provides:
+✅ Visual theming (displayed as a badge)
+✅ Fun context ("Today's puzzle inspired by...")
+✅ Category hints (tech trend → tech-related words)
+
+The trending topic should NEVER be:
+❌ Required knowledge to solve the puzzle
+❌ The answer itself or part of the answer
+❌ Necessary context to understand the clue
+
+**Test**: Show the challenge to someone who hasn't read news in a month.
+If they can't solve it using only WORD SKILLS, REWRITE IT.
+
 **Word Selection Rules**:
 1. NEVER use brand names, celebrity names, or country names AS ANSWERS
 2. Answers must be COMMON DICTIONARY WORDS that 90% of people know
 3. Words should be 3-12 letters (EXACTLY 5 letters for wordle_guess)
-4. The answer must be GUESSABLE - when players see the clue + trend context, the word should "click"
+4. The answer must be GUESSABLE through WORD SKILLS (vocabulary, patterns, compounds) - NOT news knowledge
 5. You CAN reference proper nouns in CLUES, just not as answers
 {{langExamples}}
 
@@ -186,10 +203,15 @@ export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER
    - Trend "Marathon" → "What winners break at the end ({{wordleLength}} letters)" → Answer must be {{wordleLength}} letters
    - Trend "Concert" → "What you lose after the show ({{wordleLength}} letters)" → Answer must be {{wordleLength}} letters
 
-3. **trending_trio**: Three related words connected to a trend
-   - Format: "Find the 3 words that connect: [CLUE about the trend]"
-   - Trend "Olympics" → "Events where you need balance" → BEAM, RINGS, VAULT
-   - Trend "Coffee" → "Morning ritual essentials" → BREW, GRIND, ROAST
+3. **trending_trio**: THREE ITEMS → player guesses the CATEGORY word that connects them
+   - The trend INSPIRES which DOMAIN to pick items from, but players guess the CATEGORY
+   - Show 3 related items (not trend names!) and player identifies what connects them
+   - Format: "What category connects: [ITEM1], [ITEM2], [ITEM3]?"
+   - Trend "Technology" → "KEYBOARD, MOUSE, SCREEN" → COMPUTER ✅
+   - Trend "Sports" → "BAT, GLOVE, DIAMOND" → BASEBALL ✅
+   - Trend "Food" → "FLOUR, EGGS, SUGAR" → BAKING ✅
+   - ❌ BAD: "Beyoncé, Grammys, 2024" → ??? (requires knowing Grammy winner!)
+   - The answer should be a common CATEGORY word any player could guess from the items
 
 **📝 ADDITIONAL TYPES (fill remaining slots with these):**
 
@@ -197,13 +219,22 @@ export const CHALLENGE_TYPES_TEMPLATE = `## 🎮 CHALLENGE TYPES (PRIORITY ORDER
    - Format: "[Clever angle on trend] | Letters: XXXXX"
    - Trend "Olympics" → "Where fans crush together | Letters: DOWCR" → CROWD
 
-5. **fill_blank**: Phrase with clever angle on trend
+5. **fill_blank**: Common English PHRASES/IDIOMS with blank - trend provides category inspiration
+   - The trend INSPIRES the category, but the phrase is UNIVERSAL (any English speaker knows it)
    - Format: "Phrase with _ _ _ _ _ (N letters)" - USE SPACED UNDERSCORES matching exact word length!
    - CRITICAL: Count of underscores MUST EQUAL the answer length.
-   - Trend "Heat Wave" → "Everyone searching for _ _ _ _ _ (5 letters)" → SHADE
+   - Trend "Olympics" → "Go for the _ _ _ _ (4 letters)" → GOLD ✅
+   - Trend "Stock Market" → "High _ _ _ _ _ _ (6 letters)" → STAKES ✅
+   - Trend "Weather" → "Under the _ _ _ _ _ _ _ (7 letters)" → WEATHER ✅
+   - ❌ BAD: "Taylor Swift's album is called ___" (requires news knowledge!)
 
-6. **definition_match**: Word from unexpected angle, 4 options
-   - Trend "Wildfire" → "People who leave their homes": EVACUEE, REFUGEE, MIGRANT, NOMAD
+6. **definition_match**: Dictionary definition matching - trend picks the CATEGORY of words
+   - Show a standard dictionary definition, player picks from 4 word options
+   - Trend picks the DOMAIN, definition is from dictionary (no news knowledge needed)
+   - Trend "Technology" → "A device that stores data": DRIVE, CHIP, CABLE, PORT ✅
+   - Trend "Sports" → "The final game in a competition": FINAL, MATCH, ROUND, BOUT ✅
+   - Trend "Weather" → "Rain falling in frozen drops": SLEET, HAIL, FROST, SNOW ✅
+   - ❌ BAD: Definition of a trending proper noun or current event
 
 7. **riddle**: Clever wordplay with wit where it flows naturally
    - Use puns, double meanings, and playful misdirection when it works
@@ -297,13 +328,16 @@ export const FINAL_CHECKLIST_TEMPLATE = `## ⚠️ FINAL CHECKLIST
 Before outputting, verify each challenge:
 - [ ] **🚨 WORDLE MANDATORY 🚨**: Is there EXACTLY ONE wordle_guess challenge with a {{wordleLength}}-letter answer? (WITHOUT THIS = REJECTED!)
 - [ ] **🚨 NO SPOILERS**: Does the answer appear in trend_topic or trending_context? If YES, CHANGE THE ANSWER!
+- [ ] **🚨 NEWS-FREE TEST**: Could someone who hasn't read news in a MONTH solve this using ONLY word skills? If NO, REWRITE IT!
 - [ ] **Chain Format**: Does every word_chain use the format "WORD1 → ??? → WORD2"?
 - [ ] **Chain Options**: Does every word_chain include exactly 4 options (answer + 3 distractors)?
+- [ ] **Trio Format**: Does trending_trio show 3 ITEMS and ask for the CATEGORY word?
+- [ ] **Fill Blank Format**: Is fill_blank using a COMMON PHRASE/IDIOM that any English speaker knows?
 - [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
 - [ ] **Common Word Test**: Would your grandma know this word?
 - [ ] **Aha Test**: Does the clue make players go "Ohhh, nice!"?
 - [ ] **Riddle Depth**: Do riddles work on multiple levels (literal + metaphorical)?
-- [ ] **Freshness Test**: Have I prioritized the 🔥 RISING trends?
+- [ ] **Freshness Test**: Have I prioritized the 🔥 RISING trends for theming?
 - [ ] **Riddle Count**: Are there at least 3-4 sophisticated riddles in the set?
 - [ ] **Share Test**: Would someone screenshot this to send to a friend?
 - [ ] **Cringe Test**: Read each prompt aloud—does it sound natural or robotic?
