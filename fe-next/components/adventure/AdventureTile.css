@@ -419,16 +419,6 @@
    Neo-brutalist style: static gradient + hard shadow
    ============================================== */
 
-/* Simplified rainbow flow - background position only, no filter */
-@keyframes rainbow-flow {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
-}
-
 /* Star burst for wildcard */
 @keyframes rainbow-star {
   0%, 100% {
@@ -459,16 +449,14 @@
 .tile-rainbow-enhanced {
   position: relative;
   overflow: visible;
-  /* Static rainbow gradient - no animated hue-rotate */
+  /* Static rainbow gradient - neo-brutalist style */
   background: linear-gradient(
     90deg,
-    #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b
+    #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd
   );
-  background-size: 300% 100%;
   /* Hard shadow instead of glow - neo-brutalist style */
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
-  /* Subtle background animation only - compositor-friendly */
-  animation: rainbow-flow 6s linear infinite;
+  /* No animation - static gradient per spec (compositor-only constraint) */
 }
 
 /* Shimmer overlay */
@@ -974,9 +962,8 @@
       0 0 40px rgba(255, 215, 0, 0.4);
   }
 
-  /* Static visual feedback for rainbow tiles - hard shadow, static gradient */
+  /* Static visual feedback for rainbow tiles - hard shadow (already static by default) */
   .tile-rainbow-enhanced {
-    background-position: 50% 50%;
     box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
   }
 }
