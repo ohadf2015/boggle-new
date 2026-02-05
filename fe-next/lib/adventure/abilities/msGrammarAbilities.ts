@@ -36,6 +36,10 @@ export const msGrammarAbilities: BossAbility[] = [
         params: { requirementType: 'minLength', minLength: 5 },
         duration: 15000,
       },
+      {
+        type: 'player_damage',
+        params: { amount: 10 },
+      },
     ],
     telegraph: {
       duration: 2000,
@@ -60,6 +64,10 @@ export const msGrammarAbilities: BossAbility[] = [
         target: { type: 'random', count: 4 },
         duration: 10000,
       },
+      {
+        type: 'player_damage',
+        params: { amount: 15 },
+      },
     ],
     telegraph: {
       duration: 2000,
@@ -82,6 +90,10 @@ export const msGrammarAbilities: BossAbility[] = [
       {
         type: 'timer_penalty',
         params: { penaltySeconds: 5 },
+      },
+      {
+        type: 'player_damage',
+        params: { amount: 20 },
       },
     ],
     telegraph: {

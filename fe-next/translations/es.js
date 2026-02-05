@@ -191,11 +191,13 @@ const es = {
     "showAdvanced": "Ver opciones",
     "hideAdvanced": "Ocultar opciones",
     "continue": "Continuar",
+    "press": "Presiona",
+    "toResume": "para continuar",
     "aria": {
       "levelProgress": "Progreso del nivel: {percent}%",
       "overallProgress": "Progreso total: {percent}%",
       "navigation": "Navegación"
-    },
+    }
   },
   "nav": {
     "bottomNavigation": "Navegación inferior",
@@ -423,7 +425,90 @@ const es = {
     "scanQrCode": "Escanea para unirte al instante",
     "orShareVia": "O comparte por",
     "telegram": "Telegram",
-    "moreWays": "Más formas de compartir"
+    "moreWays": "Más formas de compartir",
+    "saveImage": "Guardar imagen",
+    "generating": "Generando...",
+    "subtitle": "Reta a tus amigos a superar tu puntuación",
+    "playAt": "Juega en",
+    "beatMyScore": "¿Puedes superarme?"
+  },
+  "consent": {
+    "title": "Consentimiento de Padres",
+    "description": "Este juego educativo guarda tu progreso para que profes y padres puedan ver cómo vas. Los menores de 14 necesitan permiso de un adulto.",
+    "parentEmail": "Correo del padre/tutor",
+    "parentEmailHint": "Enviaremos una confirmación a este correo",
+    "childAge": "Edad del niño",
+    "childAgeHint": "Selecciona tu edad",
+    "agreeTerms": "Acepto la recopilación de datos para fines educativos",
+    "agreeTermsHint": "Obligatorio para usar funciones educativas",
+    "submit": "Enviar Consentimiento",
+    "submitting": "Enviando...",
+    "privacyLink": "Lee nuestra Política de Privacidad",
+    "termsLink": "Lee nuestros Términos de Servicio",
+    "minorNotice": "Los menores de 14 necesitan consentimiento de los padres para usar funciones educativas",
+    "banner": {
+      "title": "Consentimiento Requerido",
+      "message": "Para usar funciones educativas, necesitamos permiso de los padres para menores de 14.",
+      "action": "Dar Consentimiento",
+      "dismiss": "Después"
+    },
+    "modal": {
+      "title": "Formulario de Consentimiento",
+      "subtitle": "Para Funciones Educativas",
+      "intro": "Completa este formulario para activar funciones educativas. Se enviará un correo de confirmación al padre/tutor.",
+      "ageOptions": {
+        "6": "6 años",
+        "7": "7 años",
+        "8": "8 años",
+        "9": "9 años",
+        "10": "10 años",
+        "11": "11 años",
+        "12": "12 años",
+        "13": "13 años",
+        "14": "14 años o más"
+      },
+      "dataCollected": {
+        "title": "Qué Datos Guardamos",
+        "items": [
+          "Progreso de aprendizaje y puntuaciones",
+          "Palabras practicadas y dominadas",
+          "Tiempo dedicado al aprendizaje",
+          "Insignias y logros ganados"
+        ]
+      },
+      "howWeUse": {
+        "title": "Cómo Usamos Esta Info",
+        "items": [
+          "Seguir el progreso educativo",
+          "Generar reportes para profes",
+          "Personalizar la experiencia de aprendizaje",
+          "Nunca se comparte con terceros para publicidad"
+        ]
+      },
+      "success": {
+        "title": "¡Consentimiento Enviado!",
+        "message": "¡Gracias! Las funciones educativas están activas. Se envió un correo de confirmación al padre/tutor.",
+        "action": "Continuar"
+      },
+      "error": {
+        "invalidEmail": "Ingresa un correo válido",
+        "selectAge": "Selecciona la edad del niño",
+        "acceptTerms": "Debes aceptar los términos para continuar",
+        "submitFailed": "Error al enviar. Intenta de nuevo."
+      }
+    },
+    "status": {
+      "active": "Consentimiento Activo",
+      "pending": "Consentimiento Pendiente",
+      "revoked": "Consentimiento Revocado",
+      "notRequired": "Consentimiento No Requerido"
+    },
+    "revoke": {
+      "title": "Revocar Consentimiento",
+      "message": "¿Seguro que quieres revocar el consentimiento? Esto desactivará las funciones educativas.",
+      "confirm": "Sí, Revocar",
+      "cancel": "Mantener Activo"
+    }
   },
   "errors": {
     "unstableConnection": "La conexión tambalea - te reconectamos...",
@@ -2436,7 +2521,8 @@ const es = {
     "openRooms": "salas abiertas",
     "playersLive": "jugando ahora",
     "playingNow": "jugando",
-    "tutorial": "Tutorial"
+    "tutorial": "Tutorial",
+    "personalBest": "mejor marca personal"
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",
@@ -3236,6 +3322,11 @@ const es = {
     "earthquakeEffects": {
       "title": "Sin temblores",
       "description": "Desactiva las sacudidas y efectos intensos - experiencia suave"
+    },
+    "skipLinks": {
+      "skipToMain": "Saltar al contenido",
+      "skipToNav": "Saltar a navegación",
+      "skipToSearch": "Saltar a búsqueda"
     }
   },
   "peerValidation": {
@@ -4030,6 +4121,16 @@ const es = {
     "retryLevel": "Reintentar",
     "loadError": "Error al cargar el progreso",
     "boss": "Jefe",
+    "allStars": "Todas las Estrellas",
+    "continue": "Continuar",
+    "perfect": "¡Perfecto!",
+    "restart": "Reiniciar",
+    "score": "Puntuación",
+    "victory": "¡Victoria!",
+    "world": "Mundo",
+    "hint": {
+      "title": "Pista"
+    },
     "combo": {
       "nice": "¡Bien!",
       "great": "¡Genial!",
@@ -4208,7 +4309,8 @@ const es = {
           "name": "Palabra Suprema",
           "desc": "¡{damage} de daño devastador!"
         }
-      },
+      }
+    },
     "themes": {
       "sunny-pastoral": "Pastoral Soleado",
       "waterfalls": "Cascadas",
@@ -4238,7 +4340,11 @@ const es = {
       "clearIce": "Despeja hielo",
       "longWords": "Palabras largas (5+)",
       "timeBonus": "Tiempo restante",
-      "collectGems": "Colecciona gemas"
+      "collectGems": "Colecciona gemas",
+      "defeatBoss": "Derrota al Jefe",
+      "surviveBattle": "Sobrevive con {{target}}% de Salud",
+      "mechanicTrigger": "Activa Mecánica",
+      "noDamage": "Sin Recibir Daño"
     },
     "tiles": {
       "gold": "Oro (3x puntos)",
@@ -4270,7 +4376,8 @@ const es = {
       "hint": "Pista",
       "hintAvailable": "¿Necesitas una pista?",
       "hintUsed": "¡Prueba esta palabra!",
-      "noHints": "No hay más pistas disponibles"
+      "noHints": "No hay más pistas disponibles",
+      "selectWord": "Selecciona una palabra"
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -4579,6 +4686,7 @@ const es = {
       "hidden": "Oculto",
       "unlocked": "¡Logro Desbloqueado!",
       "upgraded": "¡Logro Mejorado!",
+      "progress": "Progreso de Logros",
       "categories": {
         "gameplay": "Juego",
         "bosses": "Jefes",
@@ -4957,6 +5065,43 @@ const es = {
       "lessonNamePlaceholder": "Nombre de la lección...",
       "noClassroom": "Sin aula (lección personal)",
       "selectWords": "Selecciona palabras para crear una lección"
+    },
+    "reports": {
+      "title": "Reporte de Progreso",
+      "studentReport": "Reporte del Estudiante",
+      "classReport": "Reporte de Clase",
+      "backToClass": "Volver al Aula",
+      "selectClassroom": "Seleccionar Aula",
+      "loading": "Cargando reporte...",
+      "error": "Error al cargar reporte",
+      "noData": "Sin datos disponibles",
+      "metrics": {
+        "wordsLearned": "Palabras Aprendidas",
+        "accuracy": "Precisión",
+        "practiceTime": "Tiempo de Práctica",
+        "currentStreak": "Racha Actual",
+        "longestStreak": "Racha Más Larga",
+        "sessionsCompleted": "Sesiones Completadas",
+        "averageScore": "Puntaje Promedio",
+        "masteryLevel": "Nivel de Dominio",
+        "activeStudents": "Estudiantes Activos",
+        "classAverageAccuracy": "Precisión Promedio",
+        "completionRate": "Tasa de Completado",
+        "totalStudents": "Total de Estudiantes"
+      },
+      "sections": {
+        "summary": "Resumen",
+        "wordMastery": "Dominio de Palabras",
+        "practiceHistory": "Historial de Práctica",
+        "recommendations": "Recomendaciones",
+        "needsAttention": "Necesita Atención",
+        "studentRankings": "Ranking de Estudiantes",
+        "topPerformers": "Mejores Estudiantes"
+      },
+      "export": {
+        "pdf": "Exportar PDF",
+        "downloading": "Descargando..."
+      }
     }
   },
     "progress": {
@@ -5024,6 +5169,17 @@ const es = {
       "noResults": "Sin resultados",
       "noWords": "Sin palabras disponibles",
       "noDefinition": "Sin definición disponible",
+      "quickPractice": "Practicar",
+      "moreOptions": "Más opciones",
+      "tryAgain": "Intentar de Nuevo",
+      "back": "Volver",
+      "correctCount": "correctas",
+      "encouragement0": "¡Sigue intentando! La práctica hace al maestro.",
+      "encouragement50": "¡Buen esfuerzo! Sigue practicando.",
+      "encouragement80": "¡Muy bien! Ya casi llegas.",
+      "encouragement100": "¡Perfecto! Dominaste estas palabras.",
+      "swipeHint": "Desliza para responder",
+      "swipeExplain": "Desliza derecha para 'Lo sé', izquierda para 'No lo sé'",
       "mastery": {
         "not_started": "Sin Empezar",
         "started": "Empezando",
@@ -5248,6 +5404,66 @@ const es = {
       "viewVocabulary": "Vocabulario",
       "backToClassroom": "Volver al Aula"
     },
+    "reports": {
+      "title": "Reportes de Progreso",
+      "subtitle": "Genera reportes detallados para estudiantes y padres",
+      "classReport": "Reporte de la Clase",
+      "studentReport": "Reporte del Estudiante",
+      "exportPDF": "Exportar PDF",
+      "exportCSV": "Exportar CSV",
+      "generateReport": "Generar Reporte",
+      "generating": "Generando...",
+      "dateRange": "Rango de Fechas",
+      "allTime": "Todo el Tiempo",
+      "lastWeek": "Últimos 7 Días",
+      "lastMonth": "Últimos 30 Días",
+      "custom": "Rango Personalizado",
+      "from": "Desde",
+      "to": "Hasta",
+      "selectStudent": "Seleccionar Estudiante",
+      "allStudents": "Todos los Estudiantes",
+      "noDataAvailable": "No hay datos para este período",
+      "reportGenerated": "Reporte generado exitosamente",
+      "downloadReady": "Tu reporte está listo para descargar",
+      "metrics": {
+        "wordsLearned": "Palabras Aprendidas",
+        "totalWords": "Total de Palabras",
+        "accuracy": "Precisión",
+        "practiceTime": "Tiempo de Práctica",
+        "currentStreak": "Racha Actual",
+        "longestStreak": "Racha Más Larga",
+        "sessionsCompleted": "Sesiones Completadas",
+        "averageScore": "Puntuación Promedio",
+        "masteryLevel": "Nivel de Dominio",
+        "improvement": "Mejora"
+      },
+      "classMetrics": {
+        "classAverage": "Promedio de la Clase",
+        "topPerformer": "Mejor Desempeño",
+        "mostImproved": "Mayor Mejora",
+        "needsAttention": "Necesita Atención",
+        "participationRate": "Tasa de Participación",
+        "completionRate": "Tasa de Finalización"
+      },
+      "sections": {
+        "summary": "Resumen",
+        "wordMastery": "Dominio de Palabras",
+        "practiceHistory": "Historial de Práctica",
+        "recommendations": "Recomendaciones"
+      },
+      "studentRanking": "Ranking de Estudiantes",
+      "rank": "Puesto",
+      "student": "Estudiante",
+      "score": "Puntuación",
+      "noStudents": "No se encontraron estudiantes",
+      "printReport": "Imprimir Reporte",
+      "emailReport": "Enviar Reporte por Email",
+      "error": {
+        "generateFailed": "Error al generar el reporte",
+        "exportFailed": "Error al exportar el reporte",
+        "noData": "No hay datos disponibles para el reporte"
+      }
+    },
     "achievements": {
       "title": "Logros",
       "completion": "{percent}% Completado - {earned}/{total} insignias",
@@ -5370,7 +5586,6 @@ const es = {
         "description": "Descubre muchas palabras de vocabulario únicas",
         "hint": "Oculto hasta descubrirlo..."
       }
-    }
     },
     "lessonWords": {
       "title": "Vocabulario de la Lección",

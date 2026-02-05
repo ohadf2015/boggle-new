@@ -276,6 +276,18 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
+// Mock SoundEffectsContext for UnifiedAchievementModal
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playAchievementSound: jest.fn(),
+    playSound: jest.fn(),
+    playWordSound: jest.fn(),
+    playGameStartSound: jest.fn(),
+    playGameEndSound: jest.fn(),
+    playSoloGameSound: jest.fn(),
+  }),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================

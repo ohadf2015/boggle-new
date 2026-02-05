@@ -6,7 +6,8 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
-import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManager';
+import { getHighScore, getAllTimeBest } from './highScoreManager';
+import { recordGameResult, getConfigRecord } from '@/utils/playerStats';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useMusic } from '@/contexts/MusicContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -407,43 +408,40 @@ const SinglePlayerView: React.FC = () => {
     // Count all single player modes as "training" games
     incrementTrainingGames();
 
-    // Record high score for challenge mode
-    if (gameState.mode === 'challenge') {
-      const longestWord = results.playerWords.reduce(
-        (longest, word) => word.length > longest.length ? word : longest,
-        ''
-      );
+    // Record high score for ALL modes (solo-bots, practice, challenge)
+    const longestWord = results.playerWords.reduce(
+      (longest, word) => word.length > longest.length ? word : longest,
+      ''
+    );
 
-      // Calculate additional stats for high score tracking
-      const validWords = results.playerWordData?.filter(w => w.isValid) || [];
-      const totalAttempts = results.playerWordData?.length || 0;
-      const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
-      const avgWordLength = validWords.length > 0
-        ? validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length
-        : 0;
-      const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
-      const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
+    // Calculate additional stats for high score tracking
+    const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+    const totalAttempts = results.playerWordData?.length || 0;
+    const accuracy = totalAttempts > 0 ? Math.round((validWords.length / totalAttempts) * 100) : 0;
+    const avgWordLength = validWords.length > 0
+      ? validWords.reduce((sum, w) => sum + w.word.length, 0) / validWords.length
+      : 0;
+    const totalComboBonus = validWords.reduce((sum, w) => sum + (w.comboBonus || 0), 0);
+    const totalFireRoundBonus = validWords.reduce((sum, w) => sum + (w.fireRoundBonus || 0), 0);
 
-      const highScoreResult = recordGameResult(
-        results.playerScore,
-        results.playerWords.length,
-        longestWord,
-        gameState.difficulty,
-        gameState.timerSeconds,
-        {
-          accuracy,
-          comboBonus: totalComboBonus,
-          fireRoundBonus: totalFireRoundBonus,
-          averageWordLength: avgWordLength,
-          achievementCount: results.achievements?.length || 0,
-        }
-      );
+    const highScoreResult = recordGameResult({
+      mode: gameState.mode,
+      score: results.playerScore,
+      wordCount: results.playerWords.length,
+      longestWord,
+      difficulty: gameState.difficulty,
+      durationSeconds: gameState.timerSeconds,
+      accuracy,
+      comboBonus: totalComboBonus,
+      fireRoundBonus: totalFireRoundBonus,
+      averageWordLength: avgWordLength,
+      achievementCount: results.achievements?.length || 0,
+    });
 
-      // Update results with high score info
-      results.isNewHighScore = highScoreResult.isNewHighScore;
-      results.previousHighScore = highScoreResult.previousBest;
-      results.isNewAllTimeBest = highScoreResult.isNewAllTimeBest;
-    }
+    // Update results with high score info
+    results.isNewHighScore = highScoreResult.isNewHighScore;
+    results.previousHighScore = highScoreResult.previousBest;
+    results.isNewAllTimeBest = highScoreResult.isNewAllTimeBest;
 
     setResultsData(results);
     setPhase('results');

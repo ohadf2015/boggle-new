@@ -191,6 +191,8 @@ const he = {
     "player": "שחקן",
     "clearSearch": "נקה חיפוש",
     "opensInNewTab": "נפתח בלשונית חדשה",
+    "press": "לחץ",
+    "toResume": "להמשיך",
     "aria": {
       "levelProgress": "התקדמות ברמה",
       "overallProgress": "התקדמות כללית",
@@ -400,11 +402,17 @@ const he = {
     "buttonLabel": "הזמן",
     "modalTitle": "כנסו את החבורה",
     "copyLink": "העתק",
+    "saveImage": "שמור תמונה",
+    "share": "שתף",
     "copy": "העתק",
     "copied": "הועתק!",
+    "generating": "יוצר...",
     "whatsapp": "וואטסאפ",
     "more": "עוד",
     "title": "הצטרפו למשחק LexiClash שלי!",
+    "subtitle": "אתגרו חברים להכות את הניקוד שלכם",
+    "playAt": "שחקו ב",
+    "beatMyScore": "תצליחו לנצח אותי?",
     "text": "הצטרפו למשחק עם הקוד: {{code}}",
     "inviteTitle": "מלחמת מילים ON! 🎮",
     "shareVictory": "תתגאו!",
@@ -2104,6 +2112,84 @@ const he = {
       }
     }
   },
+  "consent": {
+    "title": "נדרשת הסכמת הורים",
+    "description": "משחק חינוכי זה אוסף נתוני התקדמות כדי לעזור למורים ולהורים לעקוב אחר הלמידה. על פי חוקי הפרטיות, משתמשים מתחת לגיל 14 זקוקים להסכמת הורים.",
+    "parentEmail": "דוא\"ל הורה/אפוטרופוס",
+    "parentEmailHint": "נשלח אישור לכתובת זו",
+    "childAge": "גיל הילד/ה",
+    "childAgeHint": "בחר/י את הגיל",
+    "agreeTerms": "אני מסכים/ה לאיסוף נתונים למטרות חינוכיות",
+    "agreeTermsHint": "נדרש לשימוש בתכונות החינוכיות",
+    "submit": "שלח הסכמה",
+    "submitting": "שולח...",
+    "privacyLink": "קרא/י את מדיניות הפרטיות",
+    "termsLink": "קרא/י את תנאי השימוש",
+    "minorNotice": "משתמשים מתחת לגיל 14 זקוקים להסכמת הורים לשימוש בתכונות החינוכיות",
+    "banner": {
+      "title": "נדרשת הסכמה",
+      "message": "כדי לגשת לתכונות החינוכיות, אנו זקוקים להסכמת הורים למשתמשים מתחת לגיל 14.",
+      "action": "מתן הסכמה",
+      "dismiss": "אולי מאוחר יותר"
+    },
+    "modal": {
+      "title": "טופס הסכמת הורים",
+      "subtitle": "עבור תכונות חינוכיות",
+      "intro": "אנא מלא/י טופס זה כדי לאפשר תכונות חינוכיות עבור ילדך. דוא\"ל אישור יישלח להורה/אפוטרופוס.",
+      "ageOptions": {
+        "6": "בן/בת 6",
+        "7": "בן/בת 7",
+        "8": "בן/בת 8",
+        "9": "בן/בת 9",
+        "10": "בן/בת 10",
+        "11": "בן/בת 11",
+        "12": "בן/בת 12",
+        "13": "בן/בת 13",
+        "14": "בן/בת 14 ומעלה"
+      },
+      "dataCollected": {
+        "title": "אילו נתונים אנו אוספים",
+        "items": [
+          "התקדמות וציונים בלמידה",
+          "מילים שתורגלו ונרכשו",
+          "זמן שהוקדש ללמידה",
+          "תגי הישגים שהושגו"
+        ]
+      },
+      "howWeUse": {
+        "title": "כיצד אנו משתמשים בנתונים",
+        "items": [
+          "מעקב אחר התקדמות חינוכית",
+          "יצירת דוחות למורים",
+          "התאמה אישית של חוויית הלמידה",
+          "לעולם לא משותף עם צדדים שלישיים לפרסום"
+        ]
+      },
+      "success": {
+        "title": "ההסכמה נשלחה!",
+        "message": "תודה! התכונות החינוכיות מופעלות כעת. דוא\"ל אישור נשלח להורה/אפוטרופוס.",
+        "action": "המשך"
+      },
+      "error": {
+        "invalidEmail": "אנא הזן/י כתובת דוא\"ל תקינה",
+        "selectAge": "אנא בחר/י את גיל הילד/ה",
+        "acceptTerms": "יש לאשר את התנאים כדי להמשיך",
+        "submitFailed": "שליחת ההסכמה נכשלה. אנא נסה/י שוב."
+      }
+    },
+    "status": {
+      "active": "הסכמה פעילה",
+      "pending": "הסכמה ממתינה",
+      "revoked": "הסכמה בוטלה",
+      "notRequired": "לא נדרשת הסכמה"
+    },
+    "revoke": {
+      "title": "ביטול הסכמה",
+      "message": "האם את/ה בטוח/ה שברצונך לבטל את ההסכמה? פעולה זו תשבית את התכונות החינוכיות.",
+      "confirm": "כן, בטל הסכמה",
+      "cancel": "השאר הסכמה פעילה"
+    }
+  },
   "profile": {
     "title": "פרופיל",
     "coins": "מטבעות",
@@ -2448,7 +2534,8 @@ const he = {
     "openRooms": "חדרים פתוחים",
     "playersLive": "משחקים עכשיו",
     "playingNow": "משחקים",
-    "tutorial": "מדריך"
+    "tutorial": "מדריך",
+    "personalBest": "שיא אישי"
   },
   "modeDiscovery": {
     "title": "מוכנים לעוד? 🚀",
@@ -3227,6 +3314,11 @@ const he = {
     "earthquakeEffects": {
       "title": "בלי רעידות",
       "description": "מכבה רעידות מסך ואפקטים אינטנסיביים - חוויה נעימה יותר"
+    },
+    "skipLinks": {
+      "skipToMain": "דלג לתוכן הראשי",
+      "skipToNav": "דלג לניווט",
+      "skipToSearch": "דלג לחיפוש"
     }
   },
   "peerValidation": {
@@ -4007,6 +4099,16 @@ const he = {
       "achievements": "הישגים"
     },
     "worldLabel": "עולם",
+    "world": "עולם",
+    "allStars": "כל הכוכבים נאספו!",
+    "continue": "המשך",
+    "perfect": "מושלם!",
+    "restart": "מחדש",
+    "score": "ניקוד",
+    "victory": "ניצחון!",
+    "hint": {
+      "title": "רמז"
+    },
     "hiddenWord": "מילה נסתרת",
     "devPreview": "תצוגה מקדימה",
     "devPreviewDesc": "מצב הרפתקה בפיתוח. תצוגה מקדימה זו מציגה את מפת העולם ותצורת השלבים.",
@@ -4106,7 +4208,11 @@ const he = {
       "clearIce": "הפשירו קרח",
       "longWords": "מילים ארוכות (5+)",
       "timeBonus": "זמן שנותר",
-      "collectGems": "אספו אבני חן"
+      "collectGems": "אספו אבני חן",
+      "defeatBoss": "הביסו את הבוס",
+      "surviveBattle": "שרדו עם {{target}}% בריאות",
+      "mechanicTrigger": "הפעילו מכניקה",
+      "noDamage": "ללא נזק"
     },
     "tiles": {
       "gold": "זהב (x3 נקודות)",
@@ -4138,7 +4244,8 @@ const he = {
       "hint": "רמז",
       "hintAvailable": "צריכים רמז?",
       "hintUsed": "נסו את המילה הזו!",
-      "noHints": "אין עוד רמזים זמינים"
+      "noHints": "אין עוד רמזים זמינים",
+      "selectWord": "החליקו על אותיות למציאת מילים"
     },
     "hints": {
       "minLetters2": "2+ אותיות",
@@ -4550,8 +4657,14 @@ const he = {
         }
       }
     },
+    "player": {
+      "health": "בריאות",
+      "danger": "סכנה!",
+      "healthLabel": "בריאות השחקן: {{current}} / {{max}} ({{percentage}}%)"
+    },
     "achievements": {
       "title": "הישגים",
+      "progress": "{{current}}/{{total}}",
       "earned": "נצברו",
       "hidden": "נסתר",
       "unlocked": "הישג נפתח!",
@@ -4909,6 +5022,96 @@ const he = {
       "lessonNamePlaceholder": "הקלידו שם שיעור...",
       "noClassroom": "ללא כיתה (שיעור אישי)",
       "selectWords": "בחרו מילים ליצירת שיעור"
+    },
+    "reports": {
+      "title": "דוח התקדמות",
+      "studentReport": "דוח תלמיד",
+      "classReport": "דוח כיתה",
+      "backToClass": "חזרה לכיתה",
+      "selectClassroom": "בחר כיתה",
+      "loading": "טוען דוח...",
+      "error": "שגיאה בטעינת הדוח",
+      "noData": "אין נתונים",
+      "metrics": {
+        "wordsLearned": "מילים שנלמדו",
+        "accuracy": "דיוק",
+        "practiceTime": "זמן תרגול",
+        "currentStreak": "רצף נוכחי",
+        "longestStreak": "הרצף הארוך ביותר",
+        "sessionsCompleted": "פעילויות שהושלמו",
+        "averageScore": "ציון ממוצע",
+        "masteryLevel": "רמת שליטה",
+        "activeStudents": "תלמידים פעילים",
+        "classAverageAccuracy": "דיוק ממוצע בכיתה",
+        "completionRate": "אחוז השלמה",
+        "totalStudents": "סה״כ תלמידים"
+      },
+      "sections": {
+        "summary": "סיכום",
+        "wordMastery": "שליטה במילים",
+        "practiceHistory": "היסטוריית תרגול",
+        "recommendations": "המלצות",
+        "needsAttention": "דורש תשומת לב",
+        "studentRankings": "דירוג תלמידים",
+        "topPerformers": "מצטיינים"
+      },
+      "export": {
+        "pdf": "ייצוא PDF",
+        "downloading": "מוריד..."
+      }
+    },
+    "curriculum": {
+      "title": "רשימות מילים לפי תכנית לימודים",
+      "description": "רשימות מילים מובנות בהתאם לתקני משרד החינוך הישראלי",
+      "browse": "עיין ברשימות",
+      "import": "ייבוא לשיעור",
+      "importing": "מייבא...",
+      "imported": "יובא בהצלחה!",
+      "importError": "ייבוא רשימת המילים נכשל",
+      "preview": "תצוגה מקדימה",
+      "wordCount": "{{count}} מילים",
+      "noResults": "לא נמצאו רשימות התואמות לסינון שלך",
+      "selectGrade": "בחר שכבת גיל",
+      "selectSubject": "בחר מקצוע",
+      "allGrades": "כל השכבות",
+      "allSubjects": "כל המקצועות",
+      "filters": {
+        "title": "סנן רשימות",
+        "grade": "שכבת גיל",
+        "subject": "תחום דעת",
+        "language": "שפה",
+        "clear": "נקה סינון"
+      },
+      "grades": {
+        "grade_1": "כיתה א׳",
+        "grade_2": "כיתה ב׳",
+        "grade_3": "כיתה ג׳",
+        "grade_4": "כיתה ד׳",
+        "grade_5": "כיתה ה׳",
+        "grade_6": "כיתה ו׳",
+        "grade_7": "כיתה ז׳",
+        "grade_8": "כיתה ח׳",
+        "grade_9": "כיתה ט׳",
+        "grade_10": "כיתה י׳",
+        "grade_11": "כיתה י״א",
+        "grade_12": "כיתה י״ב"
+      },
+      "gradeGroups": {
+        "elementary": "יסודי",
+        "middle": "חטיבת ביניים",
+        "high": "תיכון"
+      },
+      "subjects": {
+        "english": "אנגלית",
+        "hebrew": "עברית",
+        "science": "מדעים",
+        "math": "מתמטיקה",
+        "history": "היסטוריה",
+        "geography": "גאוגרפיה",
+        "general": "אוצר מילים כללי"
+      },
+      "standard": "תקן תכנית לימודים",
+      "lastUpdated": "עדכון אחרון"
     }
   },
   "education": {
@@ -4972,6 +5175,17 @@ const he = {
       "noResults": "לא נמצאו מילים תואמות",
       "noWords": "אין מילים זמינות",
       "noDefinition": "אין הגדרה זמינה",
+      "quickPractice": "תרגול",
+      "moreOptions": "אפשרויות נוספות",
+      "tryAgain": "נסו שוב",
+      "back": "חזרה",
+      "correctCount": "נכון",
+      "encouragement0": "ממשיכים! תרגול עושה את ההבדל",
+      "encouragement50": "יפה! עוד קצת",
+      "encouragement80": "מעולה! כמעט שם",
+      "encouragement100": "מושלם! שלטת בכל המילים",
+      "swipeHint": "החליקו לענות",
+      "swipeExplain": "ימינה = ידעתי, שמאלה = לא ידעתי",
       "mastery": {
         "not_started": "לא התחיל",
         "started": "מתחיל",
@@ -5209,6 +5423,66 @@ const he = {
       "activeNow": "{{count}} פעילים כעת",
       "noActivity": "אין פעילות",
       "updatedAgo": "עודכן לפני {{time}}"
+    },
+    "reports": {
+      "title": "דוחות התקדמות",
+      "subtitle": "צור דוחות מפורטים לתלמידים והורים",
+      "classReport": "דוח התקדמות כיתתי",
+      "studentReport": "דוח התקדמות תלמיד",
+      "exportPDF": "ייצוא PDF",
+      "exportCSV": "ייצוא CSV",
+      "generateReport": "צור דוח",
+      "generating": "מייצר...",
+      "dateRange": "טווח תאריכים",
+      "allTime": "כל הזמנים",
+      "lastWeek": "7 ימים אחרונים",
+      "lastMonth": "30 ימים אחרונים",
+      "custom": "טווח מותאם",
+      "from": "מתאריך",
+      "to": "עד תאריך",
+      "selectStudent": "בחר תלמיד",
+      "allStudents": "כל התלמידים",
+      "noDataAvailable": "אין נתונים זמינים לתקופה זו",
+      "reportGenerated": "הדוח נוצר בהצלחה",
+      "downloadReady": "הדוח שלך מוכן להורדה",
+      "metrics": {
+        "wordsLearned": "מילים שנלמדו",
+        "totalWords": "סה\"כ מילים",
+        "accuracy": "דיוק",
+        "practiceTime": "זמן תרגול",
+        "currentStreak": "רצף נוכחי",
+        "longestStreak": "רצף הכי ארוך",
+        "sessionsCompleted": "מפגשים שהושלמו",
+        "averageScore": "ציון ממוצע",
+        "masteryLevel": "רמת שליטה",
+        "improvement": "שיפור"
+      },
+      "classMetrics": {
+        "classAverage": "ממוצע כיתתי",
+        "topPerformer": "המצטיין",
+        "mostImproved": "השתפר ביותר",
+        "needsAttention": "דורש תשומת לב",
+        "participationRate": "שיעור השתתפות",
+        "completionRate": "שיעור השלמה"
+      },
+      "sections": {
+        "summary": "סיכום",
+        "wordMastery": "שליטה במילים",
+        "practiceHistory": "היסטוריית תרגול",
+        "recommendations": "המלצות"
+      },
+      "studentRanking": "דירוג תלמידים",
+      "rank": "דירוג",
+      "student": "תלמיד",
+      "score": "ציון",
+      "noStudents": "לא נמצאו תלמידים",
+      "printReport": "הדפס דוח",
+      "emailReport": "שלח דוח במייל",
+      "error": {
+        "generateFailed": "יצירת הדוח נכשלה",
+        "exportFailed": "ייצוא הדוח נכשל",
+        "noData": "אין נתונים זמינים לדוח"
+      }
     },
     "achievements": {
       "title": "הישגים",

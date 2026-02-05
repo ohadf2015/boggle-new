@@ -19,6 +19,7 @@ import {
   interpolate,
   spring,
 } from 'remotion';
+import { fredokaFamily, rubikFamily } from '../../../lib/remotion/fonts';
 
 // ==============================================
 // CONSTANTS
@@ -141,7 +142,7 @@ const StatItem: React.FC<StatItemProps> = ({
     >
       <span
         style={{
-          fontFamily: 'Rubik, sans-serif',
+          fontFamily: rubikFamily,
           fontSize: 24,
           color: '#FFE135',
         }}
@@ -150,7 +151,7 @@ const StatItem: React.FC<StatItemProps> = ({
       </span>
       <span
         style={{
-          fontFamily: 'Fredoka, sans-serif',
+          fontFamily: fredokaFamily,
           fontSize: 28,
           fontWeight: 700,
           color: 'white',
@@ -237,7 +238,7 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
         >
           <h1
             style={{
-              fontFamily: 'Fredoka, sans-serif',
+              fontFamily: fredokaFamily,
               fontSize: 96,
               fontWeight: 700,
               color: '#FFE135',
@@ -273,7 +274,7 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
           <div style={{ marginBottom: '20px' }}>
             <span
               style={{
-                fontFamily: 'Fredoka, sans-serif',
+                fontFamily: fredokaFamily,
                 fontSize: 48,
                 fontWeight: 700,
                 color: '#FFE135',

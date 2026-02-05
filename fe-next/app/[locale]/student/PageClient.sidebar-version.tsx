@@ -74,7 +74,7 @@ export default function StudentPageClient() {
   }
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
+    <div className={cn('h-full flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
       <EducationHeader />
 
       {/* Reduced padding: mobile 12px, sm 16px (was 24px) */}

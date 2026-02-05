@@ -1,19 +1,18 @@
 /**
  * WorldBackground Component
  *
- * Renders a multi-layered parallax background based on the current world theme.
+ * Renders a layered background based on the current world theme.
  * Includes texture overlays and particle effects for immersive visuals.
  */
 
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAdventureTheme } from '@/contexts/AdventureThemeContext';
-import { useParallax } from '@/hooks/useParallax';
 import WorldParticles from './WorldParticles';
-import type { ParallaxLayer, TextureConfig, ParticleConfig } from '@/lib/adventure/themes/types';
+import type { ParallaxLayer, TextureConfig } from '@/lib/adventure/themes/types';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // ==============================================
@@ -25,29 +24,19 @@ interface WorldBackgroundProps {
   className?: string;
   /** Children to render on top of background */
   children?: React.ReactNode;
-  /** Parallax intensity multiplier (0 = disabled, 1 = normal, default: 0.8) */
-  parallaxIntensity?: number;
-  /** Enable ambient drift animation (default: true) */
-  enableAmbient?: boolean;
 }
 
 // ==============================================
 // SUB-COMPONENTS
 // ==============================================
 
-interface ParallaxLayerComponentProps {
+interface BackgroundLayerProps {
   layer: ParallaxLayer;
   index: number;
-  parallaxX: number;
-  parallaxY: number;
 }
 
-const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index, parallaxX, parallaxY }) => {
+const BackgroundLayer = memo<BackgroundLayerProps>(({ layer, index }) => {
   const isGradient = layer.source.startsWith('bg-');
-
-  // Calculate transform based on layer depth and parallax offset
-  const transformX = parallaxX * layer.depth;
-  const transformY = parallaxY * layer.depth;
 
   return (
     <motion.div
@@ -59,8 +48,6 @@ const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index
       style={{
         opacity: layer.opacity,
         zIndex: index,
-        transform: `translate(${transformX}px, ${transformY}px)`,
-        transition: 'transform 0.3s ease-out',
         ...(isGradient ? {} : {
           backgroundImage: `url(${layer.source})`,
           backgroundSize: 'cover',
@@ -69,13 +56,12 @@ const ParallaxLayerComponent = memo<ParallaxLayerComponentProps>(({ layer, index
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: layer.opacity }}
-      // DEBT-01: Reduced stagger for faster parallel entry
       transition={{ duration: 0.3, delay: index * (OPTIMIZED_TIMING.parallel.parallaxLayerStaggerMs / 1000) }}
     />
   );
 });
 
-ParallaxLayerComponent.displayName = 'ParallaxLayerComponent';
+BackgroundLayer.displayName = 'BackgroundLayer';
 
 interface TextureOverlayProps {
   texture: TextureConfig;
@@ -120,21 +106,9 @@ TextureOverlay.displayName = 'TextureOverlay';
 const WorldBackground = memo<WorldBackgroundProps>(({
   className,
   children,
-  parallaxIntensity = 0.8,
-  enableAmbient = true,
 }) => {
   const { theme, isTransitioning } = useAdventureTheme();
   const { background, containerClass } = theme;
-
-  // Use parallax hook for interactive motion
-  // Intensity can be reduced/disabled for gameplay focus
-  const { x: parallaxX, y: parallaxY } = useParallax({
-    intensity: parallaxIntensity,
-    enableGyroscope: parallaxIntensity > 0,
-    enableGesture: parallaxIntensity > 0,
-    enableAmbient: enableAmbient && parallaxIntensity > 0,
-    ambientSpeed: 0.5,
-  });
 
   return (
     <div
@@ -153,14 +127,12 @@ const WorldBackground = memo<WorldBackgroundProps>(({
         )}
       />
 
-      {/* Parallax layers */}
+      {/* Background layers */}
       {background.layers.map((layer, index) => (
-        <ParallaxLayerComponent
+        <BackgroundLayer
           key={layer.id}
           layer={layer}
           index={index + 1}
-          parallaxX={parallaxX}
-          parallaxY={parallaxY}
         />
       ))}
 

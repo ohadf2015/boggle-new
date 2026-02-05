@@ -19,6 +19,7 @@ import {
   interpolate,
   spring,
 } from 'remotion';
+import { fredokaFamily, rubikFamily } from '../../../lib/remotion/fonts';
 
 // ==============================================
 // CONSTANTS
@@ -91,7 +92,7 @@ const StatItem: React.FC<StatItemProps> = ({
     >
       <span
         style={{
-          fontFamily: 'Rubik, sans-serif',
+          fontFamily: rubikFamily,
           fontSize: 24,
           color: '#FF6B35',
         }}
@@ -100,7 +101,7 @@ const StatItem: React.FC<StatItemProps> = ({
       </span>
       <span
         style={{
-          fontFamily: 'Fredoka, sans-serif',
+          fontFamily: fredokaFamily,
           fontSize: 28,
           fontWeight: 700,
           color: 'white',
@@ -167,7 +168,7 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
       />
 
       {/* "Time's Up!" title (0-1.5s) */}
-      <Sequence from={PHASE_FRAMES.TITLE_START} durationInFrames={45}>
+      <Sequence from={PHASE_FRAMES.TITLE_START} durationInFrames={45} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -181,7 +182,7 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
         >
           <h1
             style={{
-              fontFamily: 'Fredoka, sans-serif',
+              fontFamily: fredokaFamily,
               fontSize: 72,
               fontWeight: 700,
               color: '#FF6B35',
@@ -200,7 +201,7 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
       </Sequence>
 
       {/* Encouraging message (1-3s) */}
-      <Sequence from={PHASE_FRAMES.MESSAGE_START} durationInFrames={60}>
+      <Sequence from={PHASE_FRAMES.MESSAGE_START} durationInFrames={60} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -214,7 +215,7 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
         >
           <p
             style={{
-              fontFamily: 'Rubik, sans-serif',
+              fontFamily: rubikFamily,
               fontSize: 32,
               color: '#00FFFF',
               textShadow: '2px 2px 0 black',
@@ -232,7 +233,7 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
       </Sequence>
 
       {/* Progress summary (2-5s) */}
-      <Sequence from={PHASE_FRAMES.STATS_START}>
+      <Sequence from={PHASE_FRAMES.STATS_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -271,7 +272,7 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
       </Sequence>
 
       {/* Soft sparkles (encouraging, not celebratory) */}
-      <Sequence from={30}>
+      <Sequence from={30} premountFor={15}>
         <div
           style={{
             position: 'absolute',

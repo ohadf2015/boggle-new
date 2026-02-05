@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -22,6 +22,11 @@ interface PlayerCountProps {
   label: string;
 }
 
+interface PersonalBestProps {
+  score: number;
+  label: string;
+}
+
 interface ModeCardProps {
   title: string;
   description: string;
@@ -32,6 +37,8 @@ interface ModeCardProps {
   liveBadge?: LiveBadgeProps;
   /** Simple player count indicator - shows "X playing now" style badge */
   playerCount?: PlayerCountProps;
+  /** Personal best indicator - shows "X personal best" style badge with trophy */
+  personalBest?: PersonalBestProps;
   /** Secondary cards are smaller and less prominent */
   secondary?: boolean;
   /** Shows lock icon and prevents navigation - for features requiring auth */
@@ -59,6 +66,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   className,
   liveBadge,
   playerCount,
+  personalBest,
   secondary = false,
   locked = false,
   loading = false,
@@ -326,6 +334,21 @@ const ModeCard: React.FC<ModeCardProps> = ({
           </span>
           <Users style={{ width: 'clamp(0.75rem, 3cqw, 1rem)', height: 'clamp(0.75rem, 3cqw, 1rem)' }} />
           {playerCount.count} {playerCount.label}
+        </div>
+      )}
+
+      {/* Personal Best Badge - shows user's all-time best score with trophy icon */}
+      {personalBest && personalBest.score > 0 && !locked && (
+        <div
+          className="inline-flex items-center bg-neo-orange text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm"
+          style={{
+            gap: 'clamp(0.25rem, 1cqw, 0.5rem)',
+            padding: 'clamp(0.25rem, 1cqw, 0.375rem) clamp(0.5rem, 2cqw, 0.75rem)',
+            fontSize: secondary ? 'clamp(0.625rem, 2.5cqw, 0.75rem)' : 'clamp(0.75rem, 3cqw, 0.875rem)',
+          }}
+        >
+          <Trophy style={{ width: 'clamp(0.75rem, 3cqw, 1rem)', height: 'clamp(0.75rem, 3cqw, 1rem)' }} />
+          {personalBest.score.toLocaleString()} {personalBest.label}
         </div>
       )}
       {/* Premium animated effects */}

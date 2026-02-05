@@ -10,6 +10,11 @@
  * - SPAWNING: 250ms (new tiles spawn and fall in)
  * - CHECKING: instant (check for matches, loop or return to idle)
  *
+ * PERFORMANCE NOTE:
+ * Uses requestAnimationFrame with timestamp-based transitions instead of setTimeout.
+ * This prevents timer drift during heavy touch interactions on mobile devices,
+ * matching the approach used in useGameTimer for accuracy under load.
+ *
  * MVP Limitation (BOARD-05):
  * checkForMatches always returns false (single cascade only).
  * Future enhancement: Implement match detection for continuous cascades.
@@ -258,6 +263,9 @@ function getRandomLetter(): string {
  * Provides functions to trigger cascades and manages phase transitions.
  * Blocks input during cascade via isProcessing flag.
  *
+ * Uses requestAnimationFrame with timestamp-based transitions for accuracy
+ * during heavy touch interactions (prevents drift that setTimeout can cause).
+ *
  * @param options - Configuration options
  * @returns Cascade controls and state
  */
@@ -273,7 +281,9 @@ export function useCascadeLoop(options: CascadeLoopOptions = {}) {
     spawningTiles: [],
   });
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Refs for timestamp-based transitions
+  const animationFrameRef = useRef<number | null>(null);
+  const phaseStartTimeRef = useRef<number | null>(null);
   const tilesRef = useRef<TileState[][]>([]);
 
   // Check for reduced motion preference
@@ -298,52 +308,65 @@ export function useCascadeLoop(options: CascadeLoopOptions = {}) {
    * Reset cascade state immediately
    */
   const reset = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
+    phaseStartTimeRef.current = null;
     dispatch({ type: 'RESET' });
   }, []);
 
-  // Phase transition effects
+  // Phase transition effects using requestAnimationFrame for accuracy
   useEffect(() => {
     if (onPhaseChange) {
       onPhaseChange(state.phase);
     }
 
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    // Cancel any existing animation frame
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
 
-    // Set up next phase transition
+    // Handle phase-specific transitions
     switch (state.phase) {
       case 'removing':
-        // After removing phase, transition to falling
-        timeoutRef.current = setTimeout(() => {
-          const fallingTiles = applyGravity(tilesRef.current);
-          dispatch({ type: 'TRANSITION_FALLING', payload: fallingTiles });
-        }, phaseDuration);
-        break;
-
       case 'falling':
-        // After falling phase, transition to spawning
-        timeoutRef.current = setTimeout(() => {
-          const gridSize = tilesRef.current.length;
-          const spawningTiles = spawnNewTiles(tilesRef.current, gridSize);
-          dispatch({ type: 'TRANSITION_SPAWNING', payload: spawningTiles });
-        }, phaseDuration);
-        break;
+      case 'spawning': {
+        // Start timestamp-based transition
+        phaseStartTimeRef.current = performance.now();
 
-      case 'spawning':
-        // After spawning phase, transition to checking
-        timeoutRef.current = setTimeout(() => {
-          dispatch({ type: 'TRANSITION_CHECKING' });
-        }, phaseDuration);
-        break;
+        const tick = () => {
+          if (phaseStartTimeRef.current === null) return;
 
-      case 'checking':
+          const elapsed = performance.now() - phaseStartTimeRef.current;
+
+          if (elapsed >= phaseDuration) {
+            // Phase duration complete - transition to next phase
+            phaseStartTimeRef.current = null;
+
+            if (state.phase === 'removing') {
+              const fallingTiles = applyGravity(tilesRef.current);
+              dispatch({ type: 'TRANSITION_FALLING', payload: fallingTiles });
+            } else if (state.phase === 'falling') {
+              const gridSize = tilesRef.current.length;
+              const spawningTiles = spawnNewTiles(tilesRef.current, gridSize);
+              dispatch({ type: 'TRANSITION_SPAWNING', payload: spawningTiles });
+            } else if (state.phase === 'spawning') {
+              dispatch({ type: 'TRANSITION_CHECKING' });
+            }
+          } else {
+            // Continue waiting
+            animationFrameRef.current = requestAnimationFrame(tick);
+          }
+        };
+
+        // Start the animation loop
+        animationFrameRef.current = requestAnimationFrame(tick);
+        break;
+      }
+
+      case 'checking': {
         // Check for matches (MVP: always false)
         const hasMatches = checkForMatches(tilesRef.current);
         if (hasMatches && state.iteration < MAX_CASCADE_ITERATIONS) {
@@ -355,6 +378,7 @@ export function useCascadeLoop(options: CascadeLoopOptions = {}) {
           dispatch({ type: 'TRANSITION_IDLE' });
         }
         break;
+      }
 
       default:
         // idle phase, no transition needed
@@ -363,9 +387,9 @@ export function useCascadeLoop(options: CascadeLoopOptions = {}) {
 
     // Cleanup on unmount or phase change
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
   }, [state.phase, state.iteration, onPhaseChange, phaseDuration]);

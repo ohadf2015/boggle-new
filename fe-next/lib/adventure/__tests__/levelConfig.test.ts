@@ -214,7 +214,88 @@ describe('Level Configuration', () => {
 });
 
 describe('Objective Generation', () => {
-  describe('generateObjectives', () => {
+  describe('generateObjectives - Boss Levels', () => {
+    // Boss levels are level 7 of each world
+    const BOSS_LEVEL = 7;
+
+    it('should generate defeatBoss as primary objective for boss levels', () => {
+      // GIVEN: A boss level (level 7)
+      const world = 1;
+      const level = BOSS_LEVEL;
+
+      // WHEN: Generating objectives
+      const objectives = generateObjectives(world, level);
+
+      // THEN: Primary objective should be defeatBoss
+      const primary = objectives.find((o) => o.isPrimary);
+      expect(primary).toBeDefined();
+      expect(primary!.type).toBe('defeatBoss');
+    });
+
+    it('should NOT generate wordCount or scoreTarget for boss levels', () => {
+      // GIVEN: Boss levels across all worlds
+      for (let world = 1; world <= 10; world++) {
+        // WHEN: Generating objectives for boss level
+        const objectives = generateObjectives(world, BOSS_LEVEL);
+
+        // THEN: Should not have wordCount or scoreTarget
+        const hasGenericObjective = objectives.some(
+          (o) => o.type === 'wordCount' || o.type === 'scoreTarget'
+        );
+        expect(hasGenericObjective).toBe(false);
+      }
+    });
+
+    it('should generate mechanicTrigger as secondary objective for boss levels', () => {
+      // GIVEN: A boss level
+      const objectives = generateObjectives(3, BOSS_LEVEL);
+
+      // THEN: Should have mechanicTrigger objective
+      const mechanicObj = objectives.find((o) => o.type === 'mechanicTrigger');
+      expect(mechanicObj).toBeDefined();
+      expect(mechanicObj!.isPrimary).toBe(false);
+    });
+
+    it('should generate surviveBattle as secondary objective for boss levels', () => {
+      // GIVEN: A boss level
+      const objectives = generateObjectives(5, BOSS_LEVEL);
+
+      // THEN: Should have surviveBattle objective
+      const surviveObj = objectives.find((o) => o.type === 'surviveBattle');
+      expect(surviveObj).toBeDefined();
+      expect(surviveObj!.isPrimary).toBe(false);
+    });
+
+    it('should scale mechanicTrigger target with world number', () => {
+      // GIVEN: Boss levels from different worlds
+      const world1Objectives = generateObjectives(1, BOSS_LEVEL);
+      const world10Objectives = generateObjectives(10, BOSS_LEVEL);
+
+      const world1Mechanic = world1Objectives.find((o) => o.type === 'mechanicTrigger');
+      const world10Mechanic = world10Objectives.find((o) => o.type === 'mechanicTrigger');
+
+      // THEN: Later worlds should have higher targets
+      expect(world10Mechanic!.target).toBeGreaterThan(world1Mechanic!.target);
+    });
+
+    it('should still generate normal objectives for non-boss levels', () => {
+      // GIVEN: A non-boss level (level 5)
+      const objectives = generateObjectives(3, 5);
+
+      // THEN: Should have wordCount or scoreTarget as primary
+      const primary = objectives.find((o) => o.isPrimary);
+      expect(primary).toBeDefined();
+      expect(['wordCount', 'scoreTarget']).toContain(primary!.type);
+
+      // THEN: Should NOT have boss-specific objectives
+      const hasBossObjective = objectives.some(
+        (o) => o.type === 'defeatBoss' || o.type === 'surviveBattle' || o.type === 'mechanicTrigger'
+      );
+      expect(hasBossObjective).toBe(false);
+    });
+  });
+
+  describe('generateObjectives - Regular Levels', () => {
     it('should generate at least one primary objective', () => {
       const objectives = generateObjectives(1, 1);
 

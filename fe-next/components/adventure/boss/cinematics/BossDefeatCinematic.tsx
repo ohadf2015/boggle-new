@@ -23,6 +23,7 @@ import {
   Img,
   staticFile,
 } from 'remotion';
+import { fredokaFamily, rubikFamily } from '../../../../lib/remotion/fonts';
 
 // ==============================================
 // SEEDED RANDOM (for pure render functions)
@@ -353,6 +354,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       <Sequence
         from={PHASE_FRAMES.STAGGER_START}
         durationInFrames={PHASE_FRAMES.SHATTER_START - PHASE_FRAMES.STAGGER_START}
+        premountFor={15}
       >
         <div
           style={{
@@ -378,6 +380,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       <Sequence
         from={PHASE_FRAMES.SHATTER_START}
         durationInFrames={PHASE_FRAMES.EXPLOSION_END - PHASE_FRAMES.SHATTER_START}
+        premountFor={15}
       >
         {fragments.map((f, i) => (
           <ShatterFragment
@@ -396,6 +399,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       <Sequence
         from={PHASE_FRAMES.EXPLOSION_START}
         durationInFrames={60}
+        premountFor={15}
       >
         <ExplosionRing
           frame={frame - PHASE_FRAMES.EXPLOSION_START}
@@ -418,7 +422,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       </Sequence>
 
       {/* Flash effect on explosion */}
-      <Sequence from={PHASE_FRAMES.EXPLOSION_START} durationInFrames={5}>
+      <Sequence from={PHASE_FRAMES.EXPLOSION_START} durationInFrames={5} premountFor={15}>
         <AbsoluteFill
           style={{
             backgroundColor: 'white',
@@ -428,7 +432,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       </Sequence>
 
       {/* Victory text */}
-      <Sequence from={PHASE_FRAMES.VICTORY_TEXT_START}>
+      <Sequence from={PHASE_FRAMES.VICTORY_TEXT_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -442,7 +446,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
         >
           <h1
             style={{
-              fontFamily: 'Fredoka, sans-serif',
+              fontFamily: fredokaFamily,
               fontSize: 96,
               fontWeight: 700,
               color: primaryColor,
@@ -459,7 +463,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
           </h1>
           <p
             style={{
-              fontFamily: 'Rubik, sans-serif',
+              fontFamily: rubikFamily,
               fontSize: 32,
               color: 'white',
               textShadow: '2px 2px 0 black',
@@ -471,7 +475,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
           {perfectVictory && (
             <p
               style={{
-                fontFamily: 'Fredoka, sans-serif',
+                fontFamily: fredokaFamily,
                 fontSize: 24,
                 color: secondaryColor,
                 textShadow: '2px 2px 0 black',
@@ -485,7 +489,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       </Sequence>
 
       {/* Rewards display */}
-      <Sequence from={PHASE_FRAMES.REWARDS_START}>
+      <Sequence from={PHASE_FRAMES.REWARDS_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -507,7 +511,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
           >
             <div
               style={{
-                fontFamily: 'Fredoka, sans-serif',
+                fontFamily: fredokaFamily,
                 fontSize: 48,
                 fontWeight: 700,
                 color: '#FFD700',
@@ -518,7 +522,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
             </div>
             <div
               style={{
-                fontFamily: 'Rubik, sans-serif',
+                fontFamily: rubikFamily,
                 fontSize: 20,
                 color: 'white',
                 textShadow: '2px 2px 0 black',
@@ -536,7 +540,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
           >
             <div
               style={{
-                fontFamily: 'Fredoka, sans-serif',
+                fontFamily: fredokaFamily,
                 fontSize: 48,
                 fontWeight: 700,
                 color: '#00FF88',
@@ -547,7 +551,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
             </div>
             <div
               style={{
-                fontFamily: 'Rubik, sans-serif',
+                fontFamily: rubikFamily,
                 fontSize: 20,
                 color: 'white',
                 textShadow: '2px 2px 0 black',
@@ -560,7 +564,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       </Sequence>
 
       {/* Confetti celebration */}
-      <Sequence from={PHASE_FRAMES.VICTORY_TEXT_START}>
+      <Sequence from={PHASE_FRAMES.VICTORY_TEXT_START} premountFor={15}>
         <Confetti
           particles={confetti}
           frame={frame - PHASE_FRAMES.VICTORY_TEXT_START}

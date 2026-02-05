@@ -33,6 +33,15 @@ jest.mock('@/hooks/useLexiReactions');
 jest.mock('@/contexts/LanguageContext');
 jest.mock('@/contexts/ProgressionContext');
 jest.mock('@/contexts/AdventureThemeContext');
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playAchievementSound: jest.fn(),
+    playSound: jest.fn(),
+    playWordSound: jest.fn(),
+    playGameStartSound: jest.fn(),
+    playGameEndSound: jest.fn(),
+  }),
+}));
 jest.mock('@/utils/confettiUtils');
 
 // Mock child components to focus on meta-progression integration

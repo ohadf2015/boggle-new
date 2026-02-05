@@ -5,6 +5,7 @@
  */
 
 export { default as BossOverlay } from './BossOverlay';
+export { default as PlayerHealthBar } from './PlayerHealthBar';
 export { default as PhaseIndicator } from './PhaseIndicator';
 export { default as SegmentedHPBar } from './SegmentedHPBar';
 export { AttackTelegraph } from './AttackTelegraph';

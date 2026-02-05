@@ -7,9 +7,9 @@
 
 'use client';
 
-import React, { memo, useMemo, useEffect } from 'react';
+import React, { memo, useMemo, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Check, X, Trophy, RotateCcw, LogOut } from 'lucide-react';
+import { Star, Check, X, Trophy, RotateCcw, LogOut, Sparkles, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParallax } from '@/hooks/useParallax';
@@ -18,6 +18,7 @@ import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
+import { RollingNumber } from './ui/RollingNumber';
 import type { LevelObjective, ObjectiveType, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
@@ -346,22 +347,45 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               'p-6 md:p-8'
             )}
           >
-            {/* Title */}
-            <h2
-              id="level-complete-title"
-              className={cn(
-                'text-center text-2xl md:text-3xl font-black',
-                'mb-2',
-                isFailed ? 'text-neo-red' : 'text-neo-white'
-              )}
+            {/* Enhanced Title */}
+            <motion.div
+              initial={{ y: -30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="mb-2"
             >
-              {isFailed ? t('adventure.game.tryAgain') : t('adventure.levelComplete')}
-            </h2>
+              <h2
+                id="level-complete-title"
+                className={cn(
+                  'text-center text-3xl md:text-4xl font-black uppercase tracking-tight',
+                  isFailed ? 'text-neo-red' : isPerfect 
+                    ? 'text-transparent bg-clip-text bg-gradient-to-r from-neo-yellow via-neo-pink to-neo-cyan'
+                    : 'text-neo-white'
+                )}
+              >
+                {isFailed ? t('adventure.game.tryAgain') : isPerfect 
+                  ? t('adventure.perfect') || 'PERFECT!' 
+                  : t('adventure.levelComplete')}
+              </h2>
+            </motion.div>
 
-            {/* Level Number */}
-            <p className="text-center text-neo-white/70 font-bold mb-4">
-              {t('adventure.level')} {levelNumber}
-            </p>
+            {/* Level Number with badge */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex justify-center mb-4"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
+                <span className="text-neo-white/60 text-sm font-bold uppercase">
+                  {t('adventure.world')} {worldNumber}
+                </span>
+                <span className="text-neo-white/30">|</span>
+                <span className="text-neo-white/80 text-sm font-bold">
+                  {t('adventure.level')} {levelNumber}
+                </span>
+              </div>
+            </motion.div>
 
             {/* Lexi Celebration - celebrates alongside existing star animation */}
             <motion.div
@@ -399,33 +423,109 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               </motion.p>
             )}
 
-            {/* Stars */}
-            <div className="flex justify-center gap-2 mb-6">
+            {/* Stars with enhanced animation */}
+            <div className="flex justify-center gap-3 mb-6">
               {[0, 1, 2].map((i) => (
-                <StarDisplay key={i} filled={i < stars} index={i} />
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ 
+                    scale: i < stars ? 1 : 0.6, 
+                    rotate: 0,
+                    opacity: i < stars ? 1 : 0.3,
+                  }}
+                  transition={{ 
+                    delay: 0.4 + i * 0.15, 
+                    type: 'spring', 
+                    stiffness: 200,
+                    damping: 15,
+                  }}
+                  className="relative"
+                >
+                  <Star
+                    className={cn(
+                      'w-14 h-14 md:w-18 md:h-18 transition-all duration-300',
+                      i < stars
+                        ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_20px_rgba(255,225,53,0.8)]'
+                        : 'text-neo-white/30 fill-transparent'
+                    )}
+                  />
+                  {/* Sparkle effect for earned stars */}
+                  {i < stars && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 1 }}
+                      animate={{ scale: [0, 2, 2], opacity: [1, 1, 0] }}
+                      transition={{ delay: 0.6 + i * 0.15, duration: 0.6 }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <Sparkles className="w-8 h-8 text-neo-yellow" />
+                    </motion.div>
+                  )}
+                </motion.div>
               ))}
             </div>
 
-            {/* Score */}
-            <div className="text-center mb-6">
-              <p className="text-neo-white/60 text-sm font-bold uppercase tracking-wide">
-                {t('common.score')}
-              </p>
-              <p className="text-3xl md:text-4xl font-black text-neo-white">
-                {formattedScore}
-              </p>
-              {isHighScore && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-neo-lime font-bold mt-1 flex items-center justify-center gap-1"
-                >
-                  <Trophy className="w-4 h-4" />
-                  {t('adventure.game.newHighScore')}
-                </motion.p>
-              )}
-            </div>
+            {/* Score & Rewards Grid */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="grid grid-cols-3 gap-3 mb-6"
+            >
+              {/* Score */}
+              <div className="bg-neo-black/60 backdrop-blur-sm border-3 border-neo-white/20 rounded-neo p-3">
+                <div className="text-neo-white/60 text-xs font-bold mb-1 uppercase">{t('common.score')}</div>
+                <RollingNumber 
+                  value={score} 
+                  variant="white"
+                  className="text-xl md:text-2xl"
+                />
+              </div>
+
+              {/* XP */}
+              <div className="bg-neo-purple/20 backdrop-blur-sm border-3 border-neo-purple rounded-neo p-3">
+                <div className="text-neo-purple text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
+                  <Zap className="w-3 h-3" />
+                  +XP
+                </div>
+                <RollingNumber 
+                  value={Math.floor(score / 100)} 
+                  variant="default"
+                  className="text-xl md:text-2xl text-neo-purple"
+                />
+              </div>
+
+              {/* Gold (only show if stars > 0) */}
+              <div className={cn(
+                'bg-neo-yellow/20 backdrop-blur-sm border-3 border-neo-yellow rounded-neo p-3',
+                stars === 0 && 'opacity-50'
+              )}>
+                <div className="text-neo-yellow text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
+                  <Coins className="w-3 h-3" />
+                  Gold
+                </div>
+                <RollingNumber 
+                  value={stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0} 
+                  variant="gold"
+                  className="text-xl md:text-2xl"
+                />
+              </div>
+            </motion.div>
+
+            {/* High Score Badge */}
+            {isHighScore && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.8, type: 'spring' }}
+                className="flex justify-center mb-4"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-neo-lime/20 border-2 border-neo-lime rounded-neo">
+                  <Trophy className="w-5 h-5 text-neo-lime" />
+                  <span className="text-neo-lime font-bold">{t('adventure.game.newHighScore')}</span>
+                </div>
+              </motion.div>
+            )}
 
             {/* Objectives Summary */}
             <div className="mb-6">

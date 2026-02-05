@@ -191,6 +191,8 @@ const ja = {
     "player": "プレイヤー",
     "clearSearch": "検索をクリア",
     "opensInNewTab": "新しいタブで開きます",
+    "press": "押す",
+    "toResume": "再開する",
     "aria": {
       "levelProgress": "レベル進捗",
       "overallProgress": "全体の進捗",
@@ -400,11 +402,16 @@ const ja = {
     "buttonLabel": "招待",
     "modalTitle": "仲間を集めろ",
     "copyLink": "コピー",
+    "saveImage": "画像を保存",
     "copy": "コピー",
     "copied": "コピー完了！",
+    "generating": "作成中...",
     "whatsapp": "WhatsApp",
     "more": "その他",
-    "title": "私のLexiClashゲームに参加して！",
+    "title": "結果をシェアしよう！",
+    "subtitle": "友達にスコアを見せつけよう",
+    "playAt": "プレイはこちら",
+    "beatMyScore": "このスコアを超えられる？",
     "text": "コード {{code}} でゲームに参加しよう",
     "inviteTitle": "ワード戦争開始！🎮",
     "shareVictory": "自慢しよう！",
@@ -1899,6 +1906,74 @@ const ja = {
       "tryAgain": "もう一度試す"
     }
   },
+  "consent": {
+    "title": "保護者の同意が必要です",
+    "description": "この教育ゲームは、先生と保護者が学習を追跡できるように進捗データを収集します。プライバシー法により、14歳未満のユーザーには保護者の同意が必要です。",
+    "parentEmail": "保護者のメールアドレス",
+    "parentEmailHint": "このメールアドレスに確認を送信します",
+    "childAge": "お子様の年齢",
+    "childAgeHint": "年齢を選択してください",
+    "agreeTerms": "教育目的のデータ収集に同意します",
+    "agreeTermsHint": "教育機能を使用するために必要です",
+    "submit": "同意を送信",
+    "submitting": "送信中...",
+    "privacyLink": "プライバシーポリシーを読む",
+    "termsLink": "利用規約を読む",
+    "minorNotice": "14歳未満のユーザーが教育機能を使用するには保護者の同意が必要です",
+    "banner": {
+      "title": "同意が必要です",
+      "message": "14歳未満のユーザーが教育機能にアクセスするには、保護者の同意が必要です。",
+      "action": "同意を提供",
+      "dismiss": "また後で"
+    },
+    "modal": {
+      "title": "保護者同意フォーム",
+      "subtitle": "教育機能用",
+      "intro": "お子様の教育機能を有効にするには、このフォームにご記入ください。保護者に確認メールが送信されます。",
+      "ageOptions": {
+        "6": "6歳",
+        "7": "7歳",
+        "8": "8歳",
+        "9": "9歳",
+        "10": "10歳",
+        "11": "11歳",
+        "12": "12歳",
+        "13": "13歳"
+      },
+      "dataUsage": {
+        "title": "データの使用方法",
+        "items": [
+          "語彙学習の進捗を追跡",
+          "先生用のレポートを生成",
+          "学習体験をパーソナライズ",
+          "広告目的で第三者と共有されることはありません"
+        ]
+      },
+      "success": {
+        "title": "同意が送信されました！",
+        "message": "ありがとうございます！教育機能が有効になりました。保護者に確認メールが送信されました。",
+        "action": "続ける"
+      },
+      "error": {
+        "invalidEmail": "有効なメールアドレスを入力してください",
+        "selectAge": "お子様の年齢を選択してください",
+        "acceptTerms": "続行するには規約に同意する必要があります",
+        "submitFailed": "同意の送信に失敗しました。もう一度お試しください。"
+      }
+    },
+    "status": {
+      "active": "同意済み",
+      "pending": "同意待ち",
+      "revoked": "同意取り消し",
+      "notRequired": "同意不要"
+    },
+    "revoke": {
+      "title": "同意を取り消す",
+      "message": "同意を取り消しますか？教育機能が無効になります。",
+      "confirm": "はい、同意を取り消す",
+      "cancel": "同意を維持"
+    }
+  },
   "profile": {
     "title": "プロフィール",
     "coins": "コイン",
@@ -2437,7 +2512,8 @@ const ja = {
     "openRooms": "部屋が開放中",
     "playersLive": "プレイ中",
     "playingNow": "プレイ中",
-    "tutorial": "チュートリアル"
+    "tutorial": "チュートリアル",
+    "personalBest": "自己ベスト"
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",
@@ -3234,6 +3310,11 @@ const ja = {
     "earthquakeEffects": {
       "title": "揺れをオフ",
       "description": "画面の揺れや激しいエフェクトをオフにして穏やかに"
+    },
+    "skipLinks": {
+      "skipToMain": "メインコンテンツへスキップ",
+      "skipToNav": "ナビゲーションへスキップ",
+      "skipToSearch": "検索へスキップ"
     }
   },
   "peerValidation": {
@@ -4131,7 +4212,11 @@ const ja = {
       "clearIce": "氷をクリア",
       "longWords": "長い単語（5文字以上）",
       "timeBonus": "残り時間",
-      "collectGems": "宝石を集める"
+      "collectGems": "宝石を集める",
+      "defeatBoss": "ボスを倒す",
+      "surviveBattle": "{{target}}%のHPで生き残る",
+      "mechanicTrigger": "メカニクスを発動",
+      "noDamage": "ダメージを受けない"
     },
     "tiles": {
       "gold": "ゴールド（3倍ポイント）",
@@ -4575,6 +4660,11 @@ const ja = {
         }
       }
     },
+    "player": {
+      "health": "体力",
+      "danger": "危険！",
+      "healthLabel": "プレイヤーの体力: {{current}} / {{max}} ({{percentage}}%)"
+    },
     "achievements": {
       "title": "実績",
       "earned": "獲得済み",
@@ -4934,6 +5024,43 @@ const ja = {
       "lessonNamePlaceholder": "レッスン名を入力...",
       "noClassroom": "クラスなし（個人レッスン）",
       "selectWords": "単語を選んで語彙レッスンを作成"
+    },
+    "reports": {
+      "title": "進捗レポート",
+      "studentReport": "生徒進捗レポート",
+      "classReport": "クラス進捗レポート",
+      "backToClass": "クラスに戻る",
+      "selectClassroom": "クラスルームを選択",
+      "loading": "レポート読み込み中...",
+      "error": "レポートの読み込みエラー",
+      "noData": "データがありません",
+      "metrics": {
+        "wordsLearned": "習得単語数",
+        "accuracy": "正答率",
+        "practiceTime": "練習時間",
+        "currentStreak": "現在の連続記録",
+        "longestStreak": "最長連続記録",
+        "sessionsCompleted": "完了セッション",
+        "averageScore": "平均スコア",
+        "masteryLevel": "習熟度",
+        "activeStudents": "アクティブな生徒",
+        "classAverageAccuracy": "クラス平均正答率",
+        "completionRate": "完了率",
+        "totalStudents": "生徒総数"
+      },
+      "sections": {
+        "summary": "概要",
+        "wordMastery": "単語習熟度",
+        "practiceHistory": "練習履歴",
+        "recommendations": "おすすめ",
+        "needsAttention": "要注意",
+        "studentRankings": "生徒ランキング",
+        "topPerformers": "トップ成績者"
+      },
+      "export": {
+        "pdf": "PDF出力",
+        "downloading": "ダウンロード中..."
+      }
     }
   },
   "education": {
@@ -4997,6 +5124,17 @@ const ja = {
       "noResults": "一致する単語が見つかりません",
       "noWords": "単語がありません",
       "noDefinition": "定義がありません",
+      "quickPractice": "クイック練習",
+      "moreOptions": "その他のオプション",
+      "tryAgain": "もう一度",
+      "back": "戻る",
+      "correctCount": "正解",
+      "encouragement0": "頑張って！練習で上達するよ。",
+      "encouragement50": "いい調子！練習を続けよう。",
+      "encouragement80": "すごい！もう少しで完璧！",
+      "encouragement100": "完璧！この単語をマスターしたね。",
+      "swipeHint": "スワイプで回答",
+      "swipeExplain": "右にスワイプで「わかった」、左にスワイプで「わからない」",
       "mastery": {
         "not_started": "未開始",
         "started": "開始済み",
@@ -5234,6 +5372,66 @@ const ja = {
       "activeNow": "{{count}}人がアクティブ",
       "noActivity": "アクティビティなし",
       "updatedAgo": "{{time}}前に更新"
+    },
+    "reports": {
+      "title": "進捗レポート",
+      "subtitle": "生徒と保護者向けの詳細レポートを生成",
+      "classReport": "クラス進捗レポート",
+      "studentReport": "生徒進捗レポート",
+      "exportPDF": "PDF出力",
+      "exportCSV": "CSV出力",
+      "generateReport": "レポートを生成",
+      "generating": "生成中...",
+      "dateRange": "期間",
+      "allTime": "全期間",
+      "lastWeek": "過去7日間",
+      "lastMonth": "過去30日間",
+      "custom": "カスタム期間",
+      "from": "開始日",
+      "to": "終了日",
+      "selectStudent": "生徒を選択",
+      "allStudents": "全生徒",
+      "noDataAvailable": "この期間のデータはありません",
+      "reportGenerated": "レポートが生成されました",
+      "downloadReady": "レポートのダウンロード準備ができました",
+      "metrics": {
+        "wordsLearned": "学習した単語",
+        "totalWords": "合計単語数",
+        "accuracy": "正確度",
+        "practiceTime": "練習時間",
+        "currentStreak": "現在の連続記録",
+        "longestStreak": "最長連続記録",
+        "sessionsCompleted": "完了したセッション",
+        "averageScore": "平均スコア",
+        "masteryLevel": "習熟レベル",
+        "improvement": "上達度"
+      },
+      "classMetrics": {
+        "classAverage": "クラス平均",
+        "topPerformer": "トップパフォーマー",
+        "mostImproved": "最も上達した生徒",
+        "needsAttention": "サポートが必要",
+        "participationRate": "参加率",
+        "completionRate": "完了率"
+      },
+      "sections": {
+        "summary": "サマリー",
+        "wordMastery": "単語習熟度",
+        "practiceHistory": "練習履歴",
+        "recommendations": "おすすめ"
+      },
+      "studentRanking": "生徒ランキング",
+      "rank": "順位",
+      "student": "生徒",
+      "score": "スコア",
+      "noStudents": "生徒が見つかりません",
+      "printReport": "レポートを印刷",
+      "emailReport": "レポートをメール送信",
+      "error": {
+        "generateFailed": "レポートの生成に失敗しました",
+        "exportFailed": "レポートの出力に失敗しました",
+        "noData": "レポートに使用できるデータがありません"
+      }
     },
     "achievements": {
       "title": "実績",

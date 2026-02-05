@@ -98,1390 +98,261 @@
   --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='1.5' fill='%23FFFFFF' fill-opacity='0.015'/%3E%3C/svg%3E");
 
   /* Retro Grid Pattern for backgrounds - very subtle */
-  --retro-grid-pattern:
-    linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
-
-  /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
-  --background: var(--neo-navy);
-  --foreground: rgb(var(--neo-white));
-  --card: var(--neo-gray);
-  --card-foreground: rgb(var(--neo-white));
-  --popover: var(--neo-gray);
-  --popover-foreground: rgb(var(--neo-white));
-  --primary: var(--neo-yellow);
-  --primary-foreground: rgb(var(--neo-black));
-  --secondary: var(--neo-pink);
-  --secondary-foreground: rgb(var(--neo-white));
-  --muted: var(--neo-navy-light);
-  --muted-foreground: #d4d4e8;
-  --accent: var(--neo-pink);
-  --accent-foreground: rgb(var(--neo-white));
-  --destructive: var(--neo-red);
-  --destructive-foreground: rgb(var(--neo-white));
-  --border: rgb(var(--neo-black));
-  --input: var(--neo-navy-light);
-  --ring: var(--neo-cyan);
-
-  /* Border Radius - Chunky Neo-Brutalist */
-  --radius: 4px;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
-
-  /* Avatar Color Palette */
-  --avatar-1: #FF6B6B;
-  --avatar-2: #4ECDC4;
-  --avatar-3: #45B7D1;
-  --avatar-4: #FFA07A;
-  --avatar-5: #98D8C8;
-  --avatar-6: #F7DC6F;
-  --avatar-7: #BB8FCE;
-  --avatar-8: #85C1E2;
-  --avatar-9: #F8B739;
-  --avatar-10: #52B788;
-  --avatar-11: #FF8FAB;
-  --avatar-12: #6BCF7F;
-  --avatar-13: #FFB347;
-  --avatar-14: #9D84B7;
-  --avatar-15: #FF6F61;
-
-  /* ========================================
-     BRAND COLORS - Social OAuth & Sharing
-     ======================================== */
-
-  /* OAuth Providers */
-  --brand-google: #4285F4;
-  --brand-google-hover: #3367D6;
-  --brand-google-dark: #1e4a8f;
-
-  --brand-discord: #5865F2;
-  --brand-discord-hover: #4752C4;
-  --brand-discord-dark: #3c45a5;
-
-  --brand-apple: #000000;
-  --brand-apple-hover: #333333;
-  --brand-apple-light: #f5f5f7;
-
-  /* Social Sharing Platforms */
-  --brand-whatsapp: #25D366;
-  --brand-whatsapp-hover: #1ebe5d;
-  --brand-whatsapp-dark: #128C7E;
-
-  --brand-facebook: #1877F2;
-  --brand-facebook-hover: #166FE5;
-  --brand-facebook-dark: #144a9e;
-
-  --brand-twitter: #1DA1F2;
-  --brand-twitter-hover: #1A91DA;
-  --brand-twitter-dark: #0d7ac2;
-
-  --brand-linkedin: #0A66C2;
-  --brand-linkedin-hover: #094F9B;
-  --brand-linkedin-dark: #073d74;
-
-  /* ========================================
-     AVATAR COLORS - Character-Specific
-     ======================================== */
-
-  /* Semantic character names referencing numeric avatars */
-  --avatar-broccoli-bob: var(--avatar-10);
-  --avatar-drippy-drop: var(--avatar-2);
-  --avatar-sunny-steve: var(--avatar-9);
-  --avatar-cloudy-carl: var(--avatar-8);
-  --avatar-octo-otto: var(--avatar-7);
-  --avatar-pizza-pete: var(--avatar-1);
-  --avatar-prickly-pat: var(--avatar-12);
-  --avatar-melon-molly: var(--avatar-11);
-  --avatar-avo-alex: var(--avatar-10);
-  --avatar-frosty-frank: var(--avatar-3);
-  --avatar-flaky-fred: var(--avatar-8);
-  --avatar-eggy-ed: var(--avatar-6);
-  --avatar-slimy-sam: var(--avatar-12);
-  --avatar-starry-stella: var(--avatar-9);
-  --avatar-shroom-shelly: var(--avatar-15);
-
-  /* ========================================
-     GRADIENT PRESETS - Rank & Stats
-     ======================================== */
-
-  /* First Place Gradients */
-  --gradient-rank-first-from: var(--neo-yellow);
-  --gradient-rank-first-via: #FFD000;
-  --gradient-rank-first-to: var(--neo-yellow);
-
-  /* Second Place Gradients */
-  --gradient-rank-second-from: #cbd5e1;
-  --gradient-rank-second-via: #e2e8f0;
-  --gradient-rank-second-to: #cbd5e1;
-
-  /* Third Place Gradients */
-  --gradient-rank-third-from: #f59e0b;
-  --gradient-rank-third-via: #fbbf24;
-  --gradient-rank-third-to: #f59e0b;
-
-  /* Performance Stats Gradients */
-  --gradient-stat-positive-from: var(--neo-lime);
-  --gradient-stat-positive-to: #84cc16;
-
-  --gradient-stat-negative-from: var(--neo-red);
-  --gradient-stat-negative-to: #dc2626;
-
-  --gradient-stat-neutral-from: #94a3b8;
-  --gradient-stat-neutral-to: #64748b;
-
-  /* Background Decoration Gradients */
-  --gradient-bg-navy-from: var(--neo-navy);
-  --gradient-bg-navy-to: var(--neo-navy-light);
-
-  --gradient-bg-accent-from: var(--neo-pink);
-  --gradient-bg-accent-to: var(--neo-cyan);
-
-  /* ========================================
-     SEMANTIC COMPONENT TOKENS
-     ======================================== */
-
-  /* Button Semantic Mappings */
-  --button-primary: var(--neo-yellow);
-  --button-primary-hover: var(--neo-yellow-hover);
-  --button-primary-text: rgb(var(--neo-black));
-
-  --button-secondary: var(--neo-pink);
-  --button-secondary-hover: var(--neo-pink-light);
-  --button-secondary-text: rgb(var(--neo-black));
-
-  --button-destructive: var(--neo-red);
-  --button-destructive-hover: #dc2626;
-  --button-destructive-text: rgb(var(--neo-black));
-
-  --button-success: var(--neo-lime);
-  --button-success-hover: #84cc16;
-  --button-success-text: rgb(var(--neo-black));
-
-  /* Badge/Tag Semantic Mappings */
-  --badge-info: var(--neo-cyan);
-  --badge-info-text: rgb(var(--neo-black));
-
-  --badge-warning: var(--neo-yellow);
-  --badge-warning-text: rgb(var(--neo-black));
-
-  --badge-error: var(--neo-red);
-  --badge-error-text: rgb(var(--neo-black));
-
-  --badge-success: var(--neo-lime);
-  --badge-success-text: rgb(var(--neo-black));
-
-  /* Status Indicator Mappings */
-  --status-active: var(--neo-lime);
-  --status-inactive: var(--neo-gray);
-  --status-error: var(--neo-red);
-  --status-pending: var(--neo-yellow);
+  --grid-pattern: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 0h1v40H0zM0 0h40v1H0z' fill='%23FFFFFF' fill-opacity='0.02'/%3E%3C/svg%3E");
 }
 
-/* Light Mode Variables */
-.light {
-  /* Inverted semantic color mappings for light mode */
-  --background: #f8fafc;
-  --foreground: rgb(var(--neo-black));
-  --card: #ffffff;
-  --card-foreground: rgb(var(--neo-black));
-  --popover: #ffffff;
-  --popover-foreground: rgb(var(--neo-black));
-  --primary: var(--neo-yellow);
-  --primary-foreground: rgb(var(--neo-black));
-  --secondary: var(--neo-pink);
-  --secondary-foreground: rgb(var(--neo-black));
-  --muted: #e2e8f0;
-  --muted-foreground: #475569;
-  --accent: var(--neo-pink);
-  --accent-foreground: rgb(var(--neo-black));
-  --destructive: var(--neo-red);
-  --destructive-foreground: rgb(var(--neo-black));
-  --border: rgb(var(--neo-black));
-  --input: #e2e8f0;
-  --ring: var(--neo-cyan);
+/* ====================================
+   KEYFRAME ANIMATIONS
+   ==================================== */
 
-  /* Light mode specific overrides */
-  --neo-navy: #f1f5f9;
-  --neo-navy-light: #e2e8f0;
-  --neo-gray: #f8fafc;
-
-  /* Black dots for light mode backgrounds - very subtle */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23000000' fill-opacity='0.02'/%3E%3C/svg%3E");
-  --retro-grid-pattern:
-    linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px);
+/* Shimmer animation for premium card effects */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-/* Light mode body background */
-.light body,
-html.light body {
-  background-color: #f8fafc;
-  color: rgb(var(--neo-black));
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
 }
+
+/* Pulse border for critical states */
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(255, 0, 0, 0.6);
+  }
+  50% {
+    border-color: rgba(255, 0, 0, 1);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 0.5s ease-in-out infinite;
+}
+
+/* ====================================
+   BASE STYLES
+   ==================================== */
 
 html {
-  overflow: visible !important; /* Prevent html from becoming a scroll container */
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
-  /* Note: overflow-x and viewport height handled by .screen-fit class */
-  /* Neo-brutalist background with halftone dots and retro grid - consistent across entire app */
+  font-family: var(--font-rubik);
   background-color: var(--neo-navy);
-  background-image:
-    var(--halftone-pattern),
-    var(--retro-grid-pattern);
-  background-size: 20px 20px, 60px 60px;
+  color: rgba(var(--neo-white), 1);
+  overflow-x: hidden;
 }
 
+/* Heading Typography - Fredoka for display text */
+h1, h2, h3, h4, h5, h6,
+.font-display,
+.font-neo-display {
+  font-family: var(--font-fredoka);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--neo-lime);
+  color: rgb(var(--neo-black));
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--neo-lime);
+  outline-offset: 2px;
+}
+
+/* ====================================
+   CUSTOM SCROLLBAR
+   ==================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(var(--neo-white), 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--neo-white), 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--neo-white), 0.3);
+}
+
+/* Firefox scrollbar */
 * {
-  box-sizing: border-box;
-}
-
-@layer base {
-
-  /* Default to dark mode - Neo-Brutalism works best dark */
-  html {
-    color-scheme: dark;
-  }
-
-  /* Light mode color scheme */
-  html.light {
-    color-scheme: light;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* ====================================
-     PERFORMANCE UTILITIES
-     ==================================== */
-
-  /* Content visibility for below-the-fold content - improves LCP */
-  /* Browser can skip rendering until content is near viewport */
-  .content-visibility-auto {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
-  }
-
-  /* Smaller intrinsic size for compact components */
-  .content-visibility-auto-sm {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 200px;
-  }
-
-  /* Large intrinsic size for full-page sections */
-  .content-visibility-auto-lg {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 800px;
-  }
-
-  /* GPU-accelerated transforms for animated elements */
-  .gpu-accelerated {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    will-change: transform;
-  }
-
-  /* Remove will-change after animation completes to free GPU memory */
-  .will-change-off {
-    will-change: auto;
-  }
-
-  /* Optimize paint for frequently changing elements */
-  .paint-optimized {
-    isolation: isolate;
-    contain: layout style paint;
-  }
-
-  /* Screen reader only utility class */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-
-  /* BiDi text isolation - prevents punctuation from appearing at wrong position
-     when LTR text is displayed in an RTL context (or vice versa) */
-  .text-bidi-isolate {
-    unicode-bidi: isolate;
-  }
-
-  /* Auto-detect text direction based on content */
-  .text-dir-auto {
-    direction: inherit;
-    unicode-bidi: plaintext;
-  }
-
-  /* Focus visible styles for keyboard navigation - Neo-Brutalist style */
-  /* Using black outline with white inner ring for contrast on any background */
-  .focus-visible-ring:focus-visible {
-    outline: 3px solid rgb(var(--neo-black));
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--background), 0 0 0 5px rgb(var(--neo-black));
-  }
-
-  /* Alternative focus style for dark backgrounds */
-  .dark .focus-visible-ring:focus-visible,
-  [data-theme="dark"] .focus-visible-ring:focus-visible {
-    outline: 3px solid var(--neo-cyan);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--neo-navy), 0 0 0 5px var(--neo-cyan);
-  }
-
-  /* Focus ring override for colored backgrounds (cyan, pink, etc.) */
-  /* Ensures visibility when focus ring would otherwise blend with background */
-  .bg-neo-cyan :focus-visible,
-  [class*="from-neo-cyan"] :focus-visible,
-  .bg-neo-pink :focus-visible,
-  [class*="from-neo-pink"] :focus-visible {
-    outline: 3px solid rgb(var(--neo-black)) !important;
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px rgb(var(--neo-black)) !important;
-  }
-
-  /* ====================================
-     NEO-BRUTALIST UTILITY CLASSES
-     ==================================== */
-
-  /* Hard Shadow Utilities */
-  .shadow-hard-sm {
-    box-shadow: var(--shadow-sm);
-  }
-
-  .shadow-hard {
-    box-shadow: var(--shadow-md);
-  }
-
-  .shadow-hard-md {
-    box-shadow: var(--shadow-md);
-  }
-
-  .shadow-hard-lg {
-    box-shadow: var(--shadow-lg);
-  }
-
-  .shadow-hard-xl {
-    box-shadow: var(--shadow-xl);
-  }
-
-  .shadow-hard-pressed {
-    box-shadow: var(--shadow-pressed);
-  }
-
-  /* RTL-aware hard shadows */
-  [dir="rtl"] .shadow-hard-sm {
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard,
-  [dir="rtl"] .shadow-hard-md {
-    box-shadow: -4px 4px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard-lg {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard-xl {
-    box-shadow: -8px 8px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .shadow-hard-pressed {
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
-  }
-
-  /* Neo-Brutalist Border */
-  .border-neo {
-    border: var(--border-neo) solid rgb(var(--neo-black));
-  }
-
-  .border-neo-thick {
-    border: var(--border-neo-thick) solid rgb(var(--neo-black));
-  }
-
-  /* ====================================
-     ACTION BUTTON MAX-WIDTH UTILITIES
-     Prevents full-width buttons from becoming
-     oversized on desktop viewports
-     ==================================== */
-
-  /* Standard action button max-width (320px) - ideal for primary CTAs */
-  .max-w-btn {
-    max-width: 320px;
-    margin-inline: auto;
-  }
-
-  /* Large action button max-width (400px) - for prominent actions */
-  .max-w-btn-lg {
-    max-width: 400px;
-    margin-inline: auto;
-  }
-
-  /* Extra large action button max-width (480px) - for full-width sections */
-  .max-w-btn-xl {
-    max-width: 480px;
-    margin-inline: auto;
-  }
-
-  /* Fire Glow Utility - Applied to grid cells during fire round */
-  .fire-glow {
-    animation: fire-glow 0.8s ease-in-out infinite !important;
-    background: linear-gradient(135deg, #FF6B35, #FF3366) !important;
-    will-change: transform, opacity;
-    transform: translateZ(0);
-    /* Force GPU acceleration */
-  }
-
-  /* Earthquake Shake Utility - Applied to grid container */
-  .earthquake-shake {
-    animation: earthquake-shake 0.6s ease-in-out;
-  }
-
-  /* Letter Tile Gradient - Clean minimal design with subtle depth */
-  .letter-tile-gradient {
-    background: linear-gradient(165deg,
-      #ffffff 0%,
-      #fafaf9 40%,
-      #f5f5f3 100%);
-  }
-
-  /* Letter Tile Gradient (Cream variant) - For onboarding grids */
-  .letter-tile-gradient-cream {
-    background:
-      /* Subtle inner glow for depth */
-      radial-gradient(ellipse 70% 50% at 35% 30%,
-        rgba(255, 255, 253, 0.9) 0%,
-        rgba(255, 255, 253, 0.35) 35%,
-        transparent 60%),
-      /* Soft edge highlight */
-      linear-gradient(145deg,
-        rgba(255, 255, 255, 0.5) 0%,
-        transparent 25%),
-      /* Main gradient - warm cream with subtle depth */
-      linear-gradient(165deg,
-        #fffef8 0%,
-        #fcfbf4 25%,
-        #f8f7f0 50%,
-        #f4f2ea 75%,
-        #f0ede4 100%);
-  }
-
-  /* Texture Overlays */
-  .texture-halftone {
-    position: relative;
-  }
-
-  .texture-halftone::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--halftone-pattern);
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  .texture-halftone-lg {
-    position: relative;
-  }
-
-  .texture-halftone-lg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--halftone-pattern-lg);
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Comic-style halftone - subtle dots like in comic books */
-  .texture-halftone-comic {
-    position: relative;
-  }
-
-  .texture-halftone-comic::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
-    background-size: 12px 12px;
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Comic halftone variant for light backgrounds */
-  .texture-halftone-comic-light {
-    position: relative;
-  }
-
-  .texture-halftone-comic-light::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
-    background-size: 12px 12px;
-    opacity: 0.025;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Dense comic halftone for featured/hero sections */
-  .texture-halftone-comic-dense {
-    position: relative;
-  }
-
-  .texture-halftone-comic-dense::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgb(var(--neo-black)) 1.5px, transparent 1.5px);
-    background-size: 10px 10px;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 1;
-    border-radius: inherit;
-  }
-
-  /* Neo-Brutalist Tilt Classes */
-  .neo-tilt-left {
-    transform: rotate(-2deg);
-  }
-
-  .neo-tilt-right {
-    transform: rotate(2deg);
-  }
-
-  .neo-tilt-slight-left {
-    transform: rotate(-1deg);
-  }
-
-  .neo-tilt-slight-right {
-    transform: rotate(1deg);
-  }
-
-  /* Neo-Brutalist Typography */
-  .neo-title {
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    -webkit-text-stroke: 2px rgb(var(--neo-black));
-    text-shadow: 4px 4px 0px rgb(var(--neo-black));
-  }
-
-  .neo-title-sm {
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    -webkit-text-stroke: 1px rgb(var(--neo-black));
-    text-shadow: 2px 2px 0px rgb(var(--neo-black));
-  }
-
-  /* Neo-Brutalist Button Base */
-  .btn-neo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    border: var(--border-neo) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-md);
-    transition: transform var(--duration-snap) var(--ease-snap),
-      box-shadow var(--duration-snap) var(--ease-snap);
-    cursor: pointer;
-  }
-
-  .btn-neo:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0px rgb(var(--neo-black));
-  }
-
-  .btn-neo:active {
-    transform: translate(2px, 2px);
-    box-shadow: var(--shadow-pressed);
-  }
-
-  /* RTL Button Press */
-  [dir="rtl"] .btn-neo:hover {
-    transform: translate(1px, -1px);
-    box-shadow: -5px 5px 0px rgb(var(--neo-black));
-  }
-
-  [dir="rtl"] .btn-neo:active {
-    transform: translate(-2px, 2px);
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
-  }
-
-  /* Neo-Brutalist Card */
-  .card-neo {
-    background: var(--neo-cream);
-    color: rgb(var(--neo-black));
-    border: var(--border-neo-thick) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-lg);
-    border-radius: var(--radius-lg);
-  }
-
-  /* Speech Bubble Styling */
-  .speech-bubble {
-    position: relative;
-    background: var(--neo-cream);
-    color: rgb(var(--neo-black));
-    border: var(--border-neo) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-md);
-    border-radius: var(--radius-lg);
-  }
-
-  .speech-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -16px;
-    left: 24px;
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 16px solid rgb(var(--neo-black));
-  }
-
-  .speech-bubble::before {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 27px;
-    width: 0;
-    height: 0;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-top: 12px solid var(--neo-cream);
-    z-index: 1;
-  }
-
-  /* Game Board Frame (Neo-Brutalist design with hard shadows) */
-  .game-board-frame {
-    position: relative;
-    background: var(--neo-cream);
-    /* Neo-Brutalist: thick black border */
-    border: 4px solid rgb(var(--neo-black));
-    /* Neo-Brutalist: hard shadow (NO blur) */
-    box-shadow: 6px 6px 0px rgb(var(--neo-black));
-    border-radius: var(--radius-lg);
-    /* No rotation - keep grid perfectly straight */
-    /* Padding for breathing room around the grid */
-    padding: 12px;
-    /* Simplified sizing using vmin to prevent layout shift on orientation change */
-    /* Max height leaves room for timer, stats, and word forming area above grid */
-    /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */
-    /* This ensures cells maintain 1:1 aspect ratio regardless of flex container constraints */
-    --board-size: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
-    width: var(--board-size);
-    height: var(--board-size);
-    max-height: var(--board-size);
-    aspect-ratio: 1 / 1;
-    /* Center within parent */
-    margin: 0 auto;
-  }
-
-  /* On desktop screens, size grid to fill available space between sidebars */
-  /* Each sidebar is ~256-320px, so we subtract ~550px total for both sidebars + gaps */
-  /* Vertical space reserved for: timer (~100px), stats/combo (~60px), word area (~40px), gaps (~50px) = ~250px */
-  @media (min-width: 769px) {
-    .game-board-frame {
-      /* Desktop: larger grid that fills available space between sidebars */
-      /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
-      /* FIX: Use CSS variable to GUARANTEE width === height for perfectly square grid */
-      /* This prevents cells from being stretched when flex containers affect dimensions */
-      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - 260px), 420px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: var(--board-size);
-      padding: 14px;
-    }
-  }
-
-  /* Medium-large desktop screens (1024-1279px) - transition zone */
-  /* Sidebars are ~240px each, need proper spacing for this intermediate range */
-  @media (min-width: 1024px) and (max-width: 1279px) {
-    .game-board-frame {
-      /* Intermediate screens: balanced grid that accounts for narrower sidebars */
-      /* At 1024px: calc(100vw - 520px) = 504px, but capped at 440px */
-      /* At 1200px: calc(100vw - 520px) = 680px, but capped at 440px */
-      --board-size: min(42vmin, calc(100vw - 520px), calc(100dvh - 260px), 440px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: var(--board-size);
-      padding: 12px;
-    }
-  }
-
-  /* Large desktop screens - more room, larger grid */
-  @media (min-width: 1280px) {
-    .game-board-frame {
-      /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
-      /* FIX: Single variable ensures square container */
-      --board-size: min(40vmin, calc(100vw - 620px), calc(100dvh - 250px), 480px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: var(--board-size);
-    }
-  }
-
-  /* Extra large desktop screens - maximize grid utilization but cap size */
-  @media (min-width: 1536px) {
-    .game-board-frame {
-      /* 2xl desktops: sidebars are widest (320px each = ~680px), cap at 520px max */
-      /* FIX: Single variable ensures square container */
-      --board-size: min(38vmin, calc(100vw - 700px), calc(100dvh - 240px), 520px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: var(--board-size);
-    }
-  }
-
-  /* Ultra-wide and 4K screens - prevent oversized grid */
-  @media (min-width: 1920px) {
-    .game-board-frame {
-      /* Large monitors: prevent grid from becoming too large */
-      /* Cap at 540px to maintain visual comfort and game playability */
-      --board-size: min(32vmin, calc(100vw - 800px), calc(100dvh - 240px), 540px);
-      width: var(--board-size);
-      height: var(--board-size);
-      max-height: var(--board-size);
-    }
-  }
-
-  /* On smaller screens, maximize board size with minimal margins */
-  @media (max-width: 768px) {
-    .game-board-frame {
-      /* Some padding for breathing room on mobile */
-      padding: 8px;
-      /* Leave room for hard shadow/borders to avoid horizontal overflow */
-      width: min(calc(100dvw - 32px), 100%);
-      /* Height: square but capped to leave room for header/UI and safe area (home indicator) */
-      height: min(calc(100dvw - 32px), calc(100dvh - 190px - env(safe-area-inset-bottom, 0px)));
-      max-width: calc(100dvw - 32px);
-      /* Ensure board shrinks properly in flex containers on very short phones */
-      max-height: 100%;
-    }
-  }
-
-  /* Note: Removed position: relative override that was breaking absolute-positioned grid children */
-  .game-board-frame>* {
-    z-index: 10;
-  }
-
-  /* RTL-aware hard shadow for game board frame */
-  [dir="rtl"] .game-board-frame {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
-  }
-
-  /* Clipboard clip at top */
-  .clipboard-clip {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 64px;
-    height: 24px;
-    background: linear-gradient(to bottom, #c0c0c0, #a0a0a0);
-    border: 3px solid rgb(var(--neo-black));
-    border-radius: 4px 4px 0 0;
-    box-shadow: 2px 2px 0px rgb(var(--neo-black));
-    z-index: 20;
-  }
-
-  .clipboard-clip::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 44px;
-    height: 6px;
-    background: #909090;
-    border: 2px solid rgb(var(--neo-black));
-    border-top: none;
-    border-radius: 0 0 2px 2px;
-  }
-
-  /* ====================================
-     NEO-BRUTALIST DROP SHADOW UTILITIES
-     ==================================== */
-
-  /* Drop shadow filters for icons and elements */
-  .drop-shadow-neo {
-    filter: drop-shadow(2px 2px 0px rgb(var(--neo-black)));
-  }
-
-  .drop-shadow-neo-sm {
-    filter: drop-shadow(1px 1px 0px rgb(var(--neo-black)));
-  }
-
-  .drop-shadow-neo-lg {
-    filter: drop-shadow(3px 3px 0px rgb(var(--neo-black)));
-  }
-
-  /* Combo glow effects */
-  .combo-glow-rainbow {
-    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1));
-  }
-
-  .combo-glow-normal {
-    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-  }
-
-  .combo-glow-subtle {
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
-  }
-
-  /* RTL-aware drop shadows */
-  [dir="rtl"] .drop-shadow-neo {
-    filter: drop-shadow(-2px 2px 0px rgb(var(--neo-black)));
-  }
-
-  [dir="rtl"] .drop-shadow-neo-sm {
-    filter: drop-shadow(-1px 1px 0px rgb(var(--neo-black)));
-  }
-
-  [dir="rtl"] .drop-shadow-neo-lg {
-    filter: drop-shadow(-3px 3px 0px rgb(var(--neo-black)));
-  }
-
-  /* ====================================
-     CONTAINER QUERY UTILITIES
-     ==================================== */
-
-  /* Container type setup */
-  .cq-container {
-    container-type: inline-size;
-  }
-
-  .cq-container-size {
-    container-type: size;
-  }
-
-  /* Container-relative responsive padding - scales with container width */
-  .cq-p-responsive {
-    padding: clamp(0.75rem, 4cqw, 2rem);
-  }
-
-  /* Larger container-relative padding for desktop emphasis */
-  .cq-p-responsive-lg {
-    padding: clamp(1rem, 5cqw, 2.5rem);
-  }
-
-  /* Container-relative responsive gap */
-  .cq-gap-responsive {
-    gap: clamp(0.5rem, 2.5cqw, 1.5rem);
-  }
-
-  /* Container-relative responsive text */
-  .cq-text-responsive {
-    font-size: clamp(0.875rem, 4cqw, 1.25rem);
-  }
-
-  /* Container-relative responsive text - larger variant */
-  .cq-text-lg-responsive {
-    font-size: clamp(1.125rem, 5cqw, 1.875rem);
-  }
-
-  /* Container-relative responsive icon sizing */
-  .cq-icon-responsive {
-    width: clamp(2rem, 10cqw, 4rem);
-    height: clamp(2rem, 10cqw, 4rem);
-  }
-
-  /* Additional container query padding utilities for component consolidation */
-  .cq-p-tight {
-    padding: clamp(0.5rem, 2cqw, 1rem);
-  }
-
-  .cq-p-generous {
-    padding: clamp(1.5rem, 6cqw, 3rem);
-  }
-
-  /* Directional container padding for complex layouts */
-  .cq-px-responsive {
-    padding-left: clamp(0.75rem, 4cqw, 2rem);
-    padding-right: clamp(0.75rem, 4cqw, 2rem);
-  }
-
-  .cq-py-responsive {
-    padding-top: clamp(0.75rem, 4cqw, 2rem);
-    padding-bottom: clamp(0.75rem, 4cqw, 2rem);
-  }
-
-  /* ====================================
-     TOUCH SCROLL UTILITIES
-     ==================================== */
-
-  /* Touch-optimized vertical scrolling */
-  .scrollable-area {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior: contain;
-  }
-
-  /* Conditional scrolling with touch optimization */
-  .scroll-if-needed {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-}
-
-@layer components {
-  /* ====================================
-     NEO-BRUTALIST COMPONENT CLASSES
-     ==================================== */
-
-  /* Neo-Brutalist Card - use instead of repeated border patterns */
-  .neo-card {
-    @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg;
-  }
-
-  .neo-card-sm {
-    @apply bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard;
-  }
-
-  .neo-card-dark {
-    @apply bg-neo-gray border-4 border-neo-black rounded-neo-lg shadow-hard-lg text-neo-white;
-  }
-
-  .neo-card-hover {
-    @apply neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl transition-all duration-200;
-  }
-
-  /* Neo-Brutalist Button Variants */
-  .btn-neo-primary {
-    @apply bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  .btn-neo-secondary {
-    @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  .btn-neo-accent {
-    @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  .btn-neo-ghost {
-    @apply bg-transparent text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
-    @apply hover:bg-neo-navy-light hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-    @apply transition-all duration-100;
-  }
-
-  /* Neo-Brutalist Badge */
-  .badge-neo {
-    @apply px-3 py-1 text-sm font-black uppercase tracking-wide border-3 border-neo-black rounded-md shadow-hard-sm;
-    @apply transition-all duration-100;
-  }
-
-  .badge-neo-yellow {
-    @apply badge-neo bg-neo-yellow text-neo-black;
-  }
-
-  .badge-neo-pink {
-    @apply badge-neo bg-neo-pink text-neo-white;
-  }
-
-  .badge-neo-cyan {
-    @apply badge-neo bg-neo-cyan text-neo-black;
-  }
-
-  .badge-neo-lime {
-    @apply badge-neo bg-neo-lime text-neo-black;
-  }
-
-  /* Neo-Brutalist Panel with tilt */
-  .neo-panel {
-    @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg p-4;
-  }
-
-  .neo-panel-tilt-left {
-    @apply neo-panel rotate-[-2deg];
-  }
-
-  .neo-panel-tilt-right {
-    @apply neo-panel rotate-[2deg];
-  }
-
-  .neo-panel-tilt-slight-left {
-    @apply neo-panel rotate-[-1deg];
-  }
-
-  .neo-panel-tilt-slight-right {
-    @apply neo-panel rotate-[1deg];
-  }
-
-  /* Leaderboard styling */
-  .leaderboard-row {
-    @apply py-3 px-4 border-b-4 border-neo-black bg-neo-pink;
-  }
-
-  .leaderboard-title {
-    @apply flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black;
-  }
-
-  /* Input field styling */
-  .input-neo {
-    @apply w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm;
-    @apply placeholder:text-neo-gray focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
-    @apply transition-all duration-100;
-  }
-
-  .input-neo:focus {
-    @apply translate-x-[-1px] translate-y-[-1px] shadow-hard;
-  }
-
-  /* Global placeholder styling for WCAG AA compliance */
-  /* Using opacity 1 with explicit color for consistent contrast */
-  input::placeholder,
-  textarea::placeholder {
-    opacity: 1;
-    color: var(--muted-foreground);
-  }
-
-  /* Custom scrollbar styling - consistent across browsers */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  /* Dark mode scrollbar */
-  .dark .custom-scrollbar {
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-
-  /* Particle effects for combo animations */
-  .particle-yellow {
-    background: radial-gradient(circle, #ffff00, #ff6b00);
-  }
-
-  .particle-cyan {
-    background: radial-gradient(circle, #00ffff, #0088ff);
-  }
-
-  .particle-pink {
-    background: radial-gradient(circle, #ff00ff, #ff0088);
-  }
-
-  .particle-rainbow {
-    background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-    background-size: 200% 200%;
-    animation: rainbow-shift 2s ease infinite;
-  }
-}
-
-/* Slot Machine Text Animations */
-.slot-machine-text {
-  display: inline-block;
-  position: relative;
-  transition: all 0.3s ease-out;
-}
-
-.slot-machine-text.animating {
-  animation: pulse-glow 0.5s ease-in-out infinite alternate;
-}
-
-.slot-machine-text.complete {
-  animation: final-shine 1s ease-out;
-}
-
-/* Respect prefers-reduced-motion */
-@media (prefers-reduced-motion: reduce) {
-  .slot-machine-text {
-    transition: none;
-  }
-
-  .slot-machine-text.animating,
-  .slot-machine-text.complete {
-    animation: none;
-  }
-}
-
-
-/* ====================================
-   ANIMATIONS - Loaded asynchronously
-   See app/animations.css
-   ==================================== */
-
-
-.animate-sparkle-left {
-  animation: sparkle-twinkle 2.5s ease-in-out infinite;
-  animation-delay: 0.3s;
-}
-
-.animate-sparkle-right {
-  animation: sparkle-twinkle 2.5s ease-in-out infinite;
-  animation-delay: 1.5s;
-}
-
-/* Reduced motion: disable lightning and sparkle animations */
-@media (prefers-reduced-motion: reduce) {
-  .animate-lightning-left,
-  .animate-lightning-right {
-    animation: none;
-    filter: drop-shadow(0 0 4px currentColor);
-  }
-  .animate-sparkle-left,
-  .animate-sparkle-right {
-    animation: none;
-    opacity: 0.8;
-  }
-}
-
-/* Low-end device fallback */
-.low-end-device .animate-lightning-left,
-.low-end-device .animate-lightning-right {
-  animation: none;
-  filter: drop-shadow(0 0 3px currentColor);
-}
-
-.low-end-device .animate-sparkle-left,
-.low-end-device .animate-sparkle-right {
-  animation: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--neo-white), 0.2) rgba(var(--neo-white), 0.05);
 }
 
 /* ====================================
-   ADVENTURE MODE - WORLD THEMING
-   Board frames & tile styling for Worlds 1-3
+   UTILITY CLASSES
    ==================================== */
 
-/* ==================== TILE TEXTURES ==================== */
-/* Use ::after pseudo-element for textures to avoid overriding Tailwind gradient backgrounds */
-/* The texture layers ON TOP of the background, preserving contrast */
-
-.tile-texture-meadows,
-.tile-texture-springs,
-.tile-texture-caverns {
-  position: relative;
+/* Text shadow for readability on busy backgrounds */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.tile-texture-meadows::after,
-.tile-texture-springs::after,
-.tile-texture-caverns::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  z-index: 1;
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-.tile-texture-meadows::after {
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(139, 69, 19, 0.06) 0px,
-    transparent 1px,
-    transparent 2px,
-    rgba(139, 69, 19, 0.06) 3px
-  );
+/* Neo-brutalist border */
+.border-neo {
+  border-width: var(--border-neo);
+  border-color: rgb(var(--neo-black));
 }
 
-.tile-texture-springs::after {
-  background-image: radial-gradient(
-    circle,
-    rgba(0, 255, 255, 0.08) 0%,
-    transparent 2px,
-    transparent 4px,
-    rgba(0, 255, 255, 0.08) 6px
-  );
-  background-size: 12px 12px;
+.border-neo-thick {
+  border-width: var(--border-neo-thick);
+  border-color: rgb(var(--neo-black));
 }
 
-.tile-texture-caverns::after {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(139, 92, 246, 0.07) 0px,
-    transparent 2px,
-    transparent 4px,
-    rgba(139, 92, 246, 0.07) 6px
-  );
+/* Hard shadows (no blur) */
+.shadow-hard {
+  box-shadow: var(--shadow-md);
 }
 
-/* ==================== TILE BORDERS ==================== */
-
-.tile-border-meadows {
-  border: 2px solid rgba(190, 255, 0, 0.5);
-  box-shadow: inset 0 0 8px rgba(190, 255, 0, 0.1);
+.shadow-hard-sm {
+  box-shadow: var(--shadow-sm);
 }
 
-.tile-border-springs {
-  border: 2px solid rgba(0, 255, 255, 0.5);
-  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.1);
+.shadow-hard-lg {
+  box-shadow: var(--shadow-lg);
 }
 
-.tile-border-caverns {
-  border: 2px solid rgba(139, 92, 246, 0.5);
-  box-shadow: inset 0 0 8px rgba(139, 92, 246, 0.15);
+.shadow-hard-xl {
+  box-shadow: var(--shadow-xl);
 }
 
-/* ==================== LETTER GLOW EFFECTS ==================== */
-
-.letter-glow-meadows {
-  text-shadow: 0 0 4px rgba(190, 255, 0, 0.3);
+.shadow-hard-pressed {
+  box-shadow: var(--shadow-pressed);
+  transform: translate(2px, 2px);
 }
 
-.letter-glow-springs {
-  text-shadow: 0 0 4px rgba(0, 255, 255, 0.3);
+/* Hover shadow transition */
+.hover\:shadow-hard-lg:hover {
+  box-shadow: var(--shadow-lg);
 }
 
-.letter-glow-caverns {
-  text-shadow: 0 0 4px rgba(139, 92, 246, 0.3);
+/* Neo-brutalist button base */
+.btn-neo {
+  @apply px-4 py-2 font-bold border-3 border-neo-black rounded-neo;
+  @apply transition-all duration-200;
+  box-shadow: var(--shadow-md);
 }
 
-/* ==================== BOARD FRAME DECORATIONS ==================== */
-
-/* Base frame styling */
-.board-frame {
-  position: relative;
-  padding: 16px;
-  border-radius: 8px;
+.btn-neo:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translate(-1px, -1px);
 }
 
-/* World 1: Meadows - Vine corners */
-.board-frame-meadows {
-  background: linear-gradient(
-    135deg,
-    rgba(34, 139, 34, 0.1) 0%,
-    transparent 15%,
-    transparent 85%,
-    rgba(34, 139, 34, 0.1) 100%
-  );
+.btn-neo:active {
+  box-shadow: var(--shadow-pressed);
+  transform: translate(2px, 2px);
 }
 
-/* World 2: Springs - Water splash effects */
-.board-frame-springs {
-  background: radial-gradient(
-    ellipse at top left,
-    rgba(0, 255, 255, 0.08) 0%,
-    transparent 25%
-  ),
-  radial-gradient(
-    ellipse at bottom right,
-    rgba(0, 255, 255, 0.08) 0%,
-    transparent 25%
-  );
+/* Neo-brutalist card */
+.card-neo {
+  @apply bg-neo-black/50 backdrop-blur-md border-4 border-neo-black rounded-neo-lg;
+  box-shadow: var(--shadow-lg);
 }
 
-/* World 3: Caverns - Crystal clusters */
-.board-frame-caverns {
-  background: linear-gradient(
-    135deg,
-    rgba(139, 92, 246, 0.12) 0%,
-    transparent 15%,
-    transparent 85%,
-    rgba(139, 92, 246, 0.12) 100%
-  );
+/* Neo-brutalist input */
+.input-neo {
+  @apply px-3 py-2 bg-neo-white text-neo-black font-bold;
+  @apply border-3 border-neo-black rounded-neo;
+  @apply placeholder:text-gray-400;
+  @apply focus:outline-none focus:ring-4 focus:ring-neo-lime;
 }
 
-/* ==================== RTL SUPPORT ==================== */
+/* ====================================
+   ANIMATION UTILITIES
+   ==================================== */
 
-/*
- * NOTE: Board frame and grid content should NOT be mirrored for RTL.
- *
- * The corner decorations in BoardFrame.tsx are already symmetric (they use
- * rotation transforms for each corner position), so no RTL flipping is needed.
- *
- * Previously, the board-frame was flipped with scaleX(-1) and grid cells were
- * counter-flipped to "fix" the content. This caused:
- * 1. Hebrew letters to appear mirrored (scaleX on gridcell affects text)
- * 2. Trail SVG coordinates to be mirrored (wrong visual position)
- * 3. Particle effects to render incorrectly (transformed coordinate space)
- *
- * The grid uses CSS Grid which naturally handles RTL via the document direction.
- * Hard shadows for RTL are handled separately in the shadow-hard-* classes.
- */
+/* Neo-press animation */
+@keyframes neo-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
 
-/* ==================== REDUCED MOTION ==================== */
+.animate-neo-press {
+  animation: neo-press 0.15s ease-out;
+}
+
+/* Neo-pop animation */
+@keyframes neo-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-neo-pop {
+  animation: neo-pop 0.3s var(--ease-bounce);
+}
+
+/* Neo-wobble animation */
+@keyframes neo-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+.animate-neo-wobble {
+  animation: neo-wobble 0.5s ease-in-out;
+}
+
+/* Neo-shake animation */
+@keyframes neo-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.animate-neo-shake {
+  animation: neo-shake 0.4s ease-in-out;
+}
+
+/* Pulse subtle */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* ====================================
+   REDUCED MOTION
+   ==================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  .tile-texture-meadows,
-  .tile-texture-springs,
-  .tile-texture-caverns,
-  .letter-glow-meadows,
-  .letter-glow-springs,
-  .letter-glow-caverns {
-    animation: none !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
-
-/* ==================== LOW-END DEVICE OPTIMIZATION ==================== */
-
-.low-end-device .tile-texture-meadows::after,
-.low-end-device .tile-texture-springs::after,
-.low-end-device .tile-texture-caverns::after {
-  display: none !important;
-}
-
-.low-end-device .letter-glow-meadows,
-.low-end-device .letter-glow-springs,
-.low-end-device .letter-glow-caverns {
-  text-shadow: none !important;
-
-}
-
 
 /* ====================================
    HEADER & FOOTER SAFE AREA UTILITIES
-   Prevents content from being hidden
-   behind sticky headers or fixed footers
    ==================================== */
 
 /* Scroll padding for anchor links to account for sticky header */

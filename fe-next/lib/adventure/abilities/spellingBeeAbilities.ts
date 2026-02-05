@@ -35,6 +35,10 @@ export const spellingBeeAbilities: BossAbility[] = [
         params: { specialType: 'sticky' },
         duration: 12000,
       },
+      {
+        type: 'player_damage',
+        params: { amount: 12 },
+      },
     ],
     telegraph: {
       duration: 2000,
@@ -58,6 +62,10 @@ export const spellingBeeAbilities: BossAbility[] = [
         type: 'change_tiles',
         target: { type: 'random', count: 3 },
         params: { changeType: 'randomLetter' },
+      },
+      {
+        type: 'player_damage',
+        params: { amount: 18 },
       },
     ],
     telegraph: {

@@ -49,6 +49,7 @@ import {
 import { useBossStateMachine } from '../../../hooks/useBossStateMachine';
 import { useBossAbilities } from '../../../hooks/useBossAbilities';
 import { useAttackTelegraph } from '../../../hooks/useAttackTelegraph';
+import { useBossEffectExecutor, type EffectCallbacks } from '../../../hooks/useBossEffectExecutor';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import type { BossConfig } from '@/types/boss';
 import type { AdventureGameState } from '@/types/adventure';
@@ -99,6 +100,8 @@ interface BossOverlayProps {
     totalDamageDealt: number;
     isActive: boolean;
   };
+  /** Effect callbacks for boss abilities */
+  effectCallbacks?: EffectCallbacks;
 }
 
 /**
@@ -158,6 +161,7 @@ const BossOverlay = memo<BossOverlayProps>(
     onRetry,
     worldNumber,
     healthState: legacyHealthState,
+    effectCallbacks,
   }) => {
     const { t } = useLanguage();
 
@@ -200,18 +204,23 @@ const BossOverlay = memo<BossOverlayProps>(
     } = useBossAbilities(effectiveBossId);
 
     // ==============================================
+    // EFFECT EXECUTOR
+    // ==============================================
+
+    const { applyEffects, clearEffects } = useBossEffectExecutor(effectCallbacks ?? {});
+
+    // ==============================================
     // ATTACK TELEGRAPH
     // ==============================================
 
     /**
-     * Handle telegraph completion - execute the ability
+     * Handle telegraph completion - execute the ability and apply effects
      */
     const handleTelegraphComplete = useCallback((abilityId: string, targetTiles: number[]) => {
       const effects = executeAbility(abilityId);
-      // Effects would be applied to game state here
-      // For now, effects are available for the game to consume
-      console.log('Ability executed:', abilityId, 'Effects:', effects);
-    }, [executeAbility]);
+      // Apply effects to game state via callbacks
+      applyEffects(effects);
+    }, [executeAbility, applyEffects]);
 
     const {
       state: telegraphState,

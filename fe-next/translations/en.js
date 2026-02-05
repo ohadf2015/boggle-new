@@ -191,6 +191,8 @@ const en = {
     "player": "Player",
     "clearSearch": "Clear search",
     "opensInNewTab": "opens in new tab",
+    "press": "Press",
+    "toResume": "to resume",
     "aria": {
       "levelProgress": "Level progress",
       "overallProgress": "Overall progress",
@@ -2102,6 +2104,84 @@ const en = {
       }
     }
   },
+  "consent": {
+    "title": "Parental Consent Required",
+    "description": "This educational game collects progress data to help teachers and parents track learning. Under privacy laws, users under 14 require parental consent.",
+    "parentEmail": "Parent/Guardian Email",
+    "parentEmailHint": "We'll send a confirmation to this email",
+    "childAge": "Child's Age",
+    "childAgeHint": "Select your age",
+    "agreeTerms": "I consent to data collection for educational purposes",
+    "agreeTermsHint": "Required to use educational features",
+    "submit": "Submit Consent",
+    "submitting": "Submitting...",
+    "privacyLink": "Read our Privacy Policy",
+    "termsLink": "Read our Terms of Service",
+    "minorNotice": "Users under 14 require parental consent to use educational features",
+    "banner": {
+      "title": "Consent Required",
+      "message": "To access educational features, we need parental consent for users under 14.",
+      "action": "Provide Consent",
+      "dismiss": "Maybe Later"
+    },
+    "modal": {
+      "title": "Parental Consent Form",
+      "subtitle": "For Educational Features",
+      "intro": "Please fill out this form to enable educational features for your child. A confirmation email will be sent to the parent/guardian.",
+      "ageOptions": {
+        "6": "6 years old",
+        "7": "7 years old",
+        "8": "8 years old",
+        "9": "9 years old",
+        "10": "10 years old",
+        "11": "11 years old",
+        "12": "12 years old",
+        "13": "13 years old",
+        "14": "14 years old or older"
+      },
+      "dataCollected": {
+        "title": "What Data We Collect",
+        "items": [
+          "Learning progress and scores",
+          "Words practiced and mastered",
+          "Time spent learning",
+          "Achievement badges earned"
+        ]
+      },
+      "howWeUse": {
+        "title": "How We Use This Data",
+        "items": [
+          "Track educational progress",
+          "Generate reports for teachers",
+          "Personalize learning experience",
+          "Never shared with third parties for advertising"
+        ]
+      },
+      "success": {
+        "title": "Consent Submitted!",
+        "message": "Thank you! Educational features are now enabled. A confirmation email has been sent to the parent/guardian.",
+        "action": "Continue"
+      },
+      "error": {
+        "invalidEmail": "Please enter a valid email address",
+        "selectAge": "Please select the child's age",
+        "acceptTerms": "You must accept the terms to continue",
+        "submitFailed": "Failed to submit consent. Please try again."
+      }
+    },
+    "status": {
+      "active": "Consent Active",
+      "pending": "Consent Pending",
+      "revoked": "Consent Revoked",
+      "notRequired": "Consent Not Required"
+    },
+    "revoke": {
+      "title": "Revoke Consent",
+      "message": "Are you sure you want to revoke consent? This will disable educational features.",
+      "confirm": "Yes, Revoke Consent",
+      "cancel": "Keep Consent Active"
+    }
+  },
   "profile": {
     "title": "Your HQ",
     "coins": "Coins",
@@ -2446,7 +2526,8 @@ const en = {
     "openRooms": "rooms",
     "playersLive": "live",
     "playingNow": "playing",
-    "tutorial": "Tutorial"
+    "tutorial": "Tutorial",
+    "personalBest": "personal best"
   },
   "modeDiscovery": {
     "title": "Want More?",
@@ -3260,6 +3341,7 @@ const en = {
     "title": "Your Way",
     "subtitle": "Make it comfy. These save automatically.",
     "footer": "Settings stay on this device. Check your system settings for more options.",
+    "skipToMain": "Skip to main content",
     "fireRoundLights": {
       "title": "Chill Fire Rounds",
       "description": "Skip the rainbow glow - keep it calm during fire rounds"
@@ -3283,6 +3365,11 @@ const en = {
     "earthquakeEffects": {
       "title": "Skip the Shake",
       "description": "No screen shake, no debris - just smooth vibes"
+    },
+    "skipLinks": {
+      "skipToMain": "Skip to main content",
+      "skipToNav": "Skip to navigation",
+      "skipToSearch": "Skip to search"
     }
   },
   "peerValidation": {
@@ -4015,10 +4102,20 @@ const en = {
       "achievements": "Achievements"
     },
     "worldLabel": "World",
+    "world": "World",
     "hiddenWord": "Hidden Word",
     "devPreview": "Development Preview",
     "devPreviewDesc": "Adventure Mode is under development. This preview shows the world map and level configuration.",
     "boss": "Boss",
+    "allStars": "All stars collected!",
+    "continue": "Continue",
+    "perfect": "Perfect!",
+    "restart": "Restart",
+    "score": "Score",
+    "victory": "Victory!",
+    "hint": {
+      "title": "Hint"
+    },
     "combo": {
       "nice": "Nice!",
       "great": "Great!",
@@ -4095,7 +4192,11 @@ const en = {
       "clearIce": "Clear ice",
       "longWords": "Long words (5+)",
       "timeBonus": "Time remaining",
-      "collectGems": "Collect gems"
+      "collectGems": "Collect gems",
+      "defeatBoss": "Defeat the Boss",
+      "surviveBattle": "Survive with {{target}}% Health",
+      "mechanicTrigger": "Trigger Mechanic",
+      "noDamage": "Take No Damage"
     },
     "tiles": {
       "gold": "Gold (3x points)",
@@ -4146,7 +4247,8 @@ const en = {
       "hint": "Hint",
       "hintAvailable": "Need a hint?",
       "hintUsed": "Try this word!",
-      "noHints": "No more hints available"
+      "noHints": "No more hints available",
+      "selectWord": "Swipe letters to find words"
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -4550,8 +4652,14 @@ const en = {
         }
       }
     },
+    "player": {
+      "health": "Health",
+      "danger": "DANGER!",
+      "healthLabel": "Player health: {{current}} / {{max}} ({{percentage}}%)"
+    },
     "achievements": {
       "title": "Achievements",
+      "progress": "{{current}}/{{total}}",
       "earned": "earned",
       "hidden": "Hidden",
       "unlocked": "Achievement Unlocked!",
@@ -4925,6 +5033,96 @@ const en = {
       "lessonNamePlaceholder": "Enter lesson name...",
       "noClassroom": "No classroom (personal lesson)",
       "selectWords": "Select words to create a vocabulary lesson"
+    },
+    "reports": {
+      "title": "Progress Report",
+      "studentReport": "Student Progress Report",
+      "classReport": "Class Progress Report",
+      "backToClass": "Back to Classroom",
+      "selectClassroom": "Select Classroom",
+      "loading": "Loading report...",
+      "error": "Error loading report",
+      "noData": "No data available",
+      "metrics": {
+        "wordsLearned": "Words Learned",
+        "accuracy": "Accuracy",
+        "practiceTime": "Practice Time",
+        "currentStreak": "Current Streak",
+        "longestStreak": "Longest Streak",
+        "sessionsCompleted": "Sessions Completed",
+        "averageScore": "Average Score",
+        "masteryLevel": "Mastery Level",
+        "activeStudents": "Active Students",
+        "classAverageAccuracy": "Class Average Accuracy",
+        "completionRate": "Completion Rate",
+        "totalStudents": "Total Students"
+      },
+      "sections": {
+        "summary": "Summary",
+        "wordMastery": "Word Mastery",
+        "practiceHistory": "Practice History",
+        "recommendations": "Recommendations",
+        "needsAttention": "Needs Attention",
+        "studentRankings": "Student Rankings",
+        "topPerformers": "Top Performers"
+      },
+      "export": {
+        "pdf": "Export PDF",
+        "downloading": "Downloading..."
+      }
+    },
+    "curriculum": {
+      "title": "Curriculum Word Lists",
+      "description": "Pre-built word lists aligned with Israeli educational standards",
+      "browse": "Browse Curriculum Lists",
+      "import": "Import to Lesson",
+      "importing": "Importing...",
+      "imported": "Successfully imported!",
+      "importError": "Failed to import word list",
+      "preview": "Preview Words",
+      "wordCount": "{{count}} words",
+      "noResults": "No curriculum lists found matching your filters",
+      "selectGrade": "Select Grade Level",
+      "selectSubject": "Select Subject",
+      "allGrades": "All Grades",
+      "allSubjects": "All Subjects",
+      "filters": {
+        "title": "Filter Lists",
+        "grade": "Grade Level",
+        "subject": "Subject Area",
+        "language": "Language",
+        "clear": "Clear Filters"
+      },
+      "grades": {
+        "grade_1": "Grade 1",
+        "grade_2": "Grade 2",
+        "grade_3": "Grade 3",
+        "grade_4": "Grade 4",
+        "grade_5": "Grade 5",
+        "grade_6": "Grade 6",
+        "grade_7": "Grade 7",
+        "grade_8": "Grade 8",
+        "grade_9": "Grade 9",
+        "grade_10": "Grade 10",
+        "grade_11": "Grade 11",
+        "grade_12": "Grade 12"
+      },
+      "gradeGroups": {
+        "elementary": "Elementary School",
+        "middle": "Middle School",
+        "high": "High School"
+      },
+      "subjects": {
+        "english": "English",
+        "hebrew": "Hebrew",
+        "science": "Science",
+        "math": "Mathematics",
+        "history": "History",
+        "geography": "Geography",
+        "general": "General Vocabulary"
+      },
+      "standard": "Curriculum Standard",
+      "lastUpdated": "Last Updated"
     }
   },
   "education": {
@@ -5236,6 +5434,66 @@ const en = {
       "viewLessons": "Lessons",
       "viewVocabulary": "Vocabulary",
       "backToClassroom": "Back to Classroom"
+    },
+    "reports": {
+      "title": "Progress Reports",
+      "subtitle": "Generate detailed reports for students and parents",
+      "classReport": "Class Progress Report",
+      "studentReport": "Student Progress Report",
+      "exportPDF": "Export PDF",
+      "exportCSV": "Export CSV",
+      "generateReport": "Generate Report",
+      "generating": "Generating...",
+      "dateRange": "Date Range",
+      "allTime": "All Time",
+      "lastWeek": "Last 7 Days",
+      "lastMonth": "Last 30 Days",
+      "custom": "Custom Range",
+      "from": "From",
+      "to": "To",
+      "selectStudent": "Select Student",
+      "allStudents": "All Students",
+      "noDataAvailable": "No data available for this period",
+      "reportGenerated": "Report generated successfully",
+      "downloadReady": "Your report is ready to download",
+      "metrics": {
+        "wordsLearned": "Words Learned",
+        "totalWords": "Total Words",
+        "accuracy": "Accuracy",
+        "practiceTime": "Practice Time",
+        "currentStreak": "Current Streak",
+        "longestStreak": "Longest Streak",
+        "sessionsCompleted": "Sessions Completed",
+        "averageScore": "Average Score",
+        "masteryLevel": "Mastery Level",
+        "improvement": "Improvement"
+      },
+      "classMetrics": {
+        "classAverage": "Class Average",
+        "topPerformer": "Top Performer",
+        "mostImproved": "Most Improved",
+        "needsAttention": "Needs Attention",
+        "participationRate": "Participation Rate",
+        "completionRate": "Completion Rate"
+      },
+      "sections": {
+        "summary": "Summary",
+        "wordMastery": "Word Mastery",
+        "practiceHistory": "Practice History",
+        "recommendations": "Recommendations"
+      },
+      "studentRanking": "Student Ranking",
+      "rank": "Rank",
+      "student": "Student",
+      "score": "Score",
+      "noStudents": "No students found",
+      "printReport": "Print Report",
+      "emailReport": "Email Report",
+      "error": {
+        "generateFailed": "Failed to generate report",
+        "exportFailed": "Failed to export report",
+        "noData": "No data available for report"
+      }
     },
     "achievements": {
       "title": "Achievements",

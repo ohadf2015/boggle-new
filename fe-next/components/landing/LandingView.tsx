@@ -15,6 +15,8 @@ import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
+import { usePlayerStats } from '@/hooks/usePlayerStats';
+import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
@@ -137,6 +139,12 @@ const LandingView: React.FC = () => {
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
+
+  // Player stats for single player personal best display
+  const { allTimeBest: playerAllTimeBest } = usePlayerStats();
+
+  // Daily challenge pre-fetch for streak and completion status
+  const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
 
   // Mouse-based parallax for hero section
   const mouseParallax = useMouseParallax(15);
@@ -369,7 +377,13 @@ const LandingView: React.FC = () => {
                 </div>
               </div>
             }>
-              <DailyChallengeBanner compact />
+              <DailyChallengeBanner compact preloadedStats={{
+                hasPlayed: dailyChallengeStatus.hasPlayed,
+                hasSolved: dailyChallengeStatus.hasSolved,
+                currentStreak: dailyChallengeStatus.currentStreak,
+                puzzleNumber: dailyChallengeStatus.puzzleNumber,
+                loading: dailyChallengeStatus.loading,
+              }} />
             </Suspense>
           </div>
           {/* Landscape/Mobile Portrait: 2-column grid layout */}
@@ -501,7 +515,13 @@ const LandingView: React.FC = () => {
                     </div>
                   </div>
                 }>
-                  <DailyChallengeBanner />
+                  <DailyChallengeBanner preloadedStats={{
+                    hasPlayed: dailyChallengeStatus.hasPlayed,
+                    hasSolved: dailyChallengeStatus.hasSolved,
+                    currentStreak: dailyChallengeStatus.currentStreak,
+                    puzzleNumber: dailyChallengeStatus.puzzleNumber,
+                    loading: dailyChallengeStatus.loading,
+                  }} />
                 </Suspense>
               </div>
 
@@ -532,6 +552,10 @@ const LandingView: React.FC = () => {
                 icon={<User className="w-6 h-6" />}
                 variant="cyan"
                 className="w-full"
+                personalBest={playerAllTimeBest ? {
+                  score: playerAllTimeBest.score,
+                  label: t('landing.personalBest') || 'personal best',
+                } : undefined}
               />
 
               {/* Secondary card - Adventure Mode (only visible to admins) */}

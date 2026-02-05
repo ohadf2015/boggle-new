@@ -13,6 +13,7 @@ import { MultiLessonSelector } from './MultiLessonSelector';
 import { getLessons, getClassrooms, type VocabularyLesson, type Classroom } from '@/lib/supabase/teacher';
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
+import { getSocketURL } from '@/utils/SocketContext';
 
 export interface ClassroomGameLobbyProps {
   /** Initial lesson ID to pre-select (optional) */
@@ -99,9 +100,12 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   }, [user, language, router, fetchTeacherData]);
 
   // Initialize Socket.IO connection
+  // Use shared socket URL to ensure production compatibility
+  // (production uses NEXT_PUBLIC_WS_URL, not /api/socket)
   useEffect(() => {
-    const socketInstance = io({
-      path: '/api/socket',
+    const socketUrl = getSocketURL();
+    const socketInstance = io(socketUrl, {
+      transports: ['websocket', 'polling'],
     });
 
     socketInstance.on('connect', () => {

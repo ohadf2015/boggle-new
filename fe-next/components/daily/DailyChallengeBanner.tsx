@@ -18,12 +18,22 @@ import {
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
+interface PreloadedDailyStats {
+  hasPlayed: boolean;
+  hasSolved: boolean | null;
+  currentStreak: number;
+  puzzleNumber?: number;
+  loading?: boolean;
+}
+
 interface DailyChallengeBannerProps {
   className?: string;
   /** Compact mode for smaller displays */
   compact?: boolean;
   /** Optional mascot element to replace the icon (for mobile portrait) */
   mascot?: React.ReactNode;
+  /** Pre-loaded stats from parent to avoid duplicate fetching */
+  preloadedStats?: PreloadedDailyStats;
 }
 
 /**
@@ -34,13 +44,15 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   className = '',
   compact = false,
   mascot,
+  preloadedStats,
 }) => {
   const { t, language, dir } = useLanguage();
   const [countdown, setCountdown] = useState<string>('');
-  const [hasPlayed, setHasPlayed] = useState<boolean>(false);
-  const [hasSolved, setHasSolved] = useState<boolean>(false);
-  const [streak, setStreak] = useState<number>(0);
-  const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
+  // Use preloaded stats if available, otherwise default to false/0
+  const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
+  const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
+  const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
+  const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber ?? 0);
   const [isClient, setIsClient] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
@@ -65,10 +77,25 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     },
   };
 
-  // Initialize state on client
+  // Initialize state on client - use preloaded stats if available
   useEffect(() => {
     setIsClient(true);
     const date = getDailyChallengeDate();
+
+    // If we have preloaded stats and they're not loading, use them
+    if (preloadedStats && !preloadedStats.loading) {
+      setHasPlayed(preloadedStats.hasPlayed);
+      setHasSolved(preloadedStats.hasSolved ?? false);
+      setStreak(preloadedStats.currentStreak);
+      if (preloadedStats.puzzleNumber) {
+        setPuzzleNumber(preloadedStats.puzzleNumber);
+      } else {
+        setPuzzleNumber(getPuzzleNumber(date));
+      }
+      return;
+    }
+
+    // Fallback to localStorage if no preloaded stats
     setPuzzleNumber(getPuzzleNumber(date));
 
     // Get full status including win/loss
@@ -77,7 +104,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     setHasSolved(status?.solved ?? false);
 
     setStreak(getDailyStreak().currentStreak);
-  }, [language]);
+  }, [language, preloadedStats]);
 
   // Update countdown timer
   // Performance: Skip updates when tab is hidden to reduce CPU usage

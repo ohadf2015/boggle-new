@@ -53,57 +53,83 @@ function buildModerationPrompt(trends: TrendingTopic[], language: string): strin
     .map((t, i) => `${i + 1}. "${t.query}" (context: ${t.trend_breakdown?.slice(0, 3).join(', ') || 'none'})`)
     .join('\n');
 
-  return `You are a content moderator for a CHILDREN'S word game called LexiClash.
-Your job is to filter trending topics to ensure they are SAFE and APPROPRIATE for players of ALL ages (including children ages 6+).
+  return `You are a STRICT content moderator for a CHILDREN'S word game called LexiClash.
+Your job is to filter trending topics to ensure they are SAFE and APPROPRIATE for players of ALL ages, including children as young as 6 years old.
 
-## STRICT REJECTION CRITERIA - REJECT if topic involves ANY of:
+🚨 CRITICAL: This content will be used to generate RIDDLES and WORD PUZZLES for children. Be EXTREMELY conservative.
 
-### 1. POLITICAL CONTENT (ALWAYS REJECT)
-- Elections, voting, campaigns, political parties
-- Politicians, presidents, prime ministers, political figures
-- Political movements, protests, rallies
-- Government controversies, scandals, impeachment
-- Political ideologies (left/right wing, liberal, conservative)
-- Geopolitical conflicts, wars, military operations
-- Controversial political policies (abortion, gun control, immigration debates)
+## ABSOLUTE REJECTION CRITERIA - REJECT if topic involves ANY of:
 
-### 2. VIOLENCE & CONFLICT (ALWAYS REJECT)
-- Wars, military operations, attacks, invasions
-- Terrorism, bombings, shootings
-- Crime news, murders, accidents with casualties
-- Natural disasters with death tolls
-- Violent protests or riots
+### 1. POLITICAL CONTENT (ALWAYS REJECT - ZERO TOLERANCE)
+- Elections, voting, campaigns, political parties, primaries, caucuses
+- ANY politician by name (presidents, prime ministers, senators, etc.)
+- Political movements, protests, rallies, demonstrations
+- Government controversies, scandals, impeachment, investigations
+- Political ideologies (left/right wing, liberal, conservative, socialist, etc.)
+- Geopolitical conflicts, wars, military operations, peace negotiations
+- Controversial policies (abortion, gun control, immigration, climate policy)
+- Political commentary, opinion pieces, debates
+- Anything that could be seen as "taking a side" on any issue
+
+### 2. VIOLENCE & CONFLICT (ALWAYS REJECT - ZERO TOLERANCE)
+- Wars, military operations, attacks, invasions, airstrikes
+- Terrorism, bombings, shootings, hostage situations
+- Crime news, murders, assaults, robberies, kidnappings
+- Accidents with casualties or injuries
+- Natural disasters with death tolls or victims
+- Violent protests, riots, civil unrest
+- School violence, mass shootings
+- ANY topic involving death or serious injury
 
 ### 3. ADULT/MATURE CONTENT (ALWAYS REJECT)
-- Dating, relationships, divorces of celebrities
+- Dating, relationships, divorces, affairs of any public figures
 - Scandals, affairs, controversial personal matters
-- Drugs, alcohol, substance abuse
-- Gambling (unless clearly family-friendly game context)
+- Drugs, alcohol, substance abuse, addiction
+- Gambling (all forms)
 - Any sexual or suggestive content
+- Nightlife, bars, clubs, adult entertainment
+- True crime stories, criminal trials, court cases
 
 ### 4. CONTROVERSIAL/DIVISIVE TOPICS (ALWAYS REJECT)
 - Religious conflicts or controversial religious topics
-- Racial or ethnic tensions
-- LGBTQ+ controversies (not LGBTQ+ itself, but divisive debates)
-- Social justice controversies
-- Conspiracy theories
-- Misinformation/fake news topics
+- Racial or ethnic tensions, discrimination stories
+- LGBTQ+ controversies or debates (not LGBTQ+ itself)
+- Social justice controversies, "culture war" topics
+- Conspiracy theories, misinformation topics
+- Labor disputes, strikes, union conflicts
+- Celebrity "cancellations" or controversy
+- ANY topic that reasonable parents might object to
 
-## APPROVAL CRITERIA - APPROVE if topic is:
-✅ Entertainment (movies, TV shows, music - if not controversial)
-✅ Technology (gadgets, apps, games - if family-friendly)
-✅ Science & nature (discoveries, animals, weather - if not disasters)
-✅ Food & cooking
-✅ Arts & culture
-✅ Sports (general sports, not player controversies)
-✅ Travel & geography
-✅ Education & learning
-✅ Holidays & celebrations
-✅ Pop culture (if appropriate for all ages)
+### 5. SENSITIVE CURRENT EVENTS (ALWAYS REJECT)
+- Ongoing wars or conflicts (Ukraine, Gaza, etc.)
+- Refugee crises, humanitarian disasters
+- Pandemic-related controversies
+- Economic crises, inflation debates
+- Any "breaking news" about tragedies
+
+## APPROVAL CRITERIA - ONLY APPROVE if topic is CLEARLY:
+✅ Entertainment (movies, TV shows, music) - ONLY if family-friendly
+✅ Technology (gadgets, apps, games) - ONLY if appropriate for kids
+✅ Science & nature (discoveries, animals, space) - ONLY if positive/educational
+✅ Food & cooking - general food topics
+✅ Arts & culture - museums, art, performances
+✅ Sports - game results, achievements (NOT player controversies or injuries)
+✅ Travel & geography - destinations, landmarks
+✅ Education & learning - academic achievements, discoveries
+✅ Holidays & celebrations - cultural celebrations
+✅ Pop culture - ONLY if 100% family-appropriate
+
+## SPECIAL GUIDANCE FOR RIDDLE CONTENT
+These topics will be turned into RIDDLES for children. Ask yourself:
+- "Would I be comfortable if my 6-year-old asked me about this topic?"
+- "Could this topic lead to a conversation about something inappropriate?"
+- "Is there ANY angle of this topic that could be problematic?"
+
+If the answer to ANY of these is uncertain, REJECT the topic.
 
 ## LANGUAGE CONTEXT
 These trends are in ${language === 'he' ? 'Hebrew' : language === 'sv' ? 'Swedish' : language === 'ja' ? 'Japanese' : language === 'es' ? 'Spanish' : 'English'}.
-Consider cultural context but apply the same safety standards.
+Apply the SAME strict safety standards regardless of language.
 
 ## TRENDING TOPICS TO EVALUATE:
 ${trendsList}
@@ -122,7 +148,8 @@ Example response:
   {"index": 3, "approved": false, "category": "violent", "reason": "War-related content"}
 ]
 
-IMPORTANT: Be CONSERVATIVE. When in doubt, REJECT. This is a children's game.
+🚨 FINAL REMINDER: When in ANY doubt, REJECT. Better to reject a safe topic than approve an inappropriate one.
+This is content for CHILDREN. Be STRICT.
 Return ONLY the JSON array, no other text.`;
 }
 

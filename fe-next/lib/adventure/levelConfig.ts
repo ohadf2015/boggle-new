@@ -337,6 +337,13 @@ export function getAllLevelConfigs(): LevelConfig[] {
 /**
  * Generate objectives for a level
  *
+ * Boss levels (level 7) have battle-focused objectives:
+ * - defeatBoss (primary): Reduce boss HP to 0
+ * - mechanicTrigger (secondary): Trigger boss twist mechanic N times
+ * - surviveBattle (secondary): Finish with X% health remaining
+ *
+ * Regular levels have standard objectives (wordCount, scoreTarget, etc.)
+ *
  * @param world - World number
  * @param level - Level within world
  * @returns Array of level objectives
@@ -346,6 +353,43 @@ export function generateObjectives(
   level: number
 ): LevelObjective[] {
   const objectives: LevelObjective[] = [];
+  const isBossLevel = level === LEVELS_PER_WORLD; // Level 7 is boss
+
+  // =============================================
+  // BOSS LEVELS: Battle-focused objectives
+  // =============================================
+  if (isBossLevel) {
+    // Primary: Defeat the boss (reduce HP to 0)
+    // Target represents boss max HP percentage to deplete (always 100)
+    objectives.push({
+      type: OBJECTIVE_TYPES.DEFEAT_BOSS as ObjectiveType,
+      target: 100,
+      isPrimary: true,
+    });
+
+    // Secondary: Trigger boss twist mechanic N times
+    // Scales with world: 3 triggers in World 1, up to 8 in World 10
+    const mechanicTarget = Math.min(3 + Math.floor(world / 3), 8);
+    objectives.push({
+      type: OBJECTIVE_TYPES.MECHANIC_TRIGGER as ObjectiveType,
+      target: mechanicTarget,
+      isPrimary: false,
+    });
+
+    // Secondary: Survive with health remaining (for bonus stars)
+    // 50% health remaining target
+    objectives.push({
+      type: OBJECTIVE_TYPES.SURVIVE_BATTLE as ObjectiveType,
+      target: 50,
+      isPrimary: false,
+    });
+
+    return objectives;
+  }
+
+  // =============================================
+  // REGULAR LEVELS: Standard objectives
+  // =============================================
   const globalLevel = (world - 1) * LEVELS_PER_WORLD + level;
 
   // Primary objective: Alternate between wordCount and scoreTarget

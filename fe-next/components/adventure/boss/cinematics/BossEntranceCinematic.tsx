@@ -23,6 +23,7 @@ import {
   Img,
   staticFile,
 } from 'remotion';
+import { fredokaFamily, rubikFamily } from '../../../../lib/remotion/fonts';
 
 // ==============================================
 // SEEDED RANDOM (for pure render functions)
@@ -234,7 +235,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
       />
 
       {/* Lightning flash effects */}
-      <Sequence from={15} durationInFrames={5}>
+      <Sequence from={15} durationInFrames={5} premountFor={15}>
         <AbsoluteFill
           style={{
             backgroundColor: 'white',
@@ -242,7 +243,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
           }}
         />
       </Sequence>
-      <Sequence from={45} durationInFrames={3}>
+      <Sequence from={45} durationInFrames={3} premountFor={15}>
         <AbsoluteFill
           style={{
             backgroundColor: 'white',
@@ -255,6 +256,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
       <Sequence
         from={PHASE_FRAMES.SILHOUETTE_START}
         durationInFrames={PHASE_FRAMES.SILHOUETTE_END - PHASE_FRAMES.SILHOUETTE_START}
+        premountFor={15}
       >
         <div
           style={{
@@ -278,7 +280,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
       </Sequence>
 
       {/* Boss full reveal with glow */}
-      <Sequence from={PHASE_FRAMES.REVEAL_START}>
+      <Sequence from={PHASE_FRAMES.REVEAL_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -301,7 +303,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
       </Sequence>
 
       {/* Boss name title */}
-      <Sequence from={PHASE_FRAMES.TITLE_START}>
+      <Sequence from={PHASE_FRAMES.TITLE_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -315,7 +317,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
         >
           <h1
             style={{
-              fontFamily: 'Fredoka, sans-serif',
+              fontFamily: fredokaFamily,
               fontSize: 72,
               fontWeight: 700,
               color: 'white',
@@ -333,7 +335,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
           {bossTitle && (
             <p
               style={{
-                fontFamily: 'Rubik, sans-serif',
+                fontFamily: rubikFamily,
                 fontSize: 28,
                 color: primaryColor,
                 textShadow: '2px 2px 0 black',
@@ -347,7 +349,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
       </Sequence>
 
       {/* World indicator badge */}
-      <Sequence from={PHASE_FRAMES.TITLE_START}>
+      <Sequence from={PHASE_FRAMES.TITLE_START} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -358,7 +360,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
         >
           <span
             style={{
-              fontFamily: 'Fredoka, sans-serif',
+              fontFamily: fredokaFamily,
               fontSize: 24,
               color: 'white',
               padding: '8px 16px',
@@ -372,7 +374,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
       </Sequence>
 
       {/* Decorative particles during reveal */}
-      <Sequence from={PHASE_FRAMES.REVEAL_START}>
+      <Sequence from={PHASE_FRAMES.REVEAL_START} premountFor={15}>
         <ParticleLayer
           count={20}
           color={primaryColor}

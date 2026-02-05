@@ -128,6 +128,7 @@ export const TILE_TYPES = {
  * All objective types available in Adventure Mode
  */
 export const OBJECTIVE_TYPES = {
+  // Regular level objectives
   /** Find N words */
   WORD_COUNT: 'wordCount',
   /** Achieve N points */
@@ -140,6 +141,16 @@ export const OBJECTIVE_TYPES = {
   TIME_BONUS: 'timeBonus',
   /** Collect N special gems */
   COLLECT_GEMS: 'collectGems',
+
+  // Boss level objectives (level 7 of each world)
+  /** Primary: Reduce boss HP to 0 */
+  DEFEAT_BOSS: 'defeatBoss',
+  /** Secondary: Finish with X% player health remaining */
+  SURVIVE_BATTLE: 'surviveBattle',
+  /** Secondary: Trigger boss twist mechanic N times */
+  MECHANIC_TRIGGER: 'mechanicTrigger',
+  /** Bonus: Complete without taking any damage */
+  NO_DAMAGE: 'noDamage',
 } as const;
 
 // ==============================================
@@ -151,12 +162,18 @@ export const OBJECTIVE_TYPES = {
  * Shared across components that render objective labels.
  */
 export const OBJECTIVE_TRANSLATION_KEYS: Record<string, string> = {
+  // Regular level objectives
   wordCount: 'adventure.objectives.wordCount',
   scoreTarget: 'adventure.objectives.scoreTarget',
   longWords: 'adventure.objectives.longWords',
   clearIce: 'adventure.objectives.clearIce',
   timeBonus: 'adventure.objectives.timeBonus',
   collectGems: 'adventure.objectives.collectGems',
+  // Boss level objectives
+  defeatBoss: 'adventure.objectives.defeatBoss',
+  surviveBattle: 'adventure.objectives.surviveBattle',
+  mechanicTrigger: 'adventure.objectives.mechanicTrigger',
+  noDamage: 'adventure.objectives.noDamage',
 };
 
 // ==============================================

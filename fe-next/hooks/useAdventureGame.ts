@@ -34,6 +34,8 @@ interface UseAdventureGameReturn {
   gameState: AdventureGameState;
   /** 2D array of tile states */
   tiles: TileState[][];
+  /** Version counter for tiles - use for O(1) change detection in memoization */
+  tilesVersion: number;
   /** Current objective progress */
   objectives: LevelObjective[];
   /** Time remaining in seconds */
@@ -100,6 +102,8 @@ type GameAction =
 interface GameState {
   gameState: AdventureGameState;
   tiles: TileState[][];
+  /** Version counter for tiles - incremented on every tile mutation for O(1) change detection */
+  tilesVersion: number;
   objectives: LevelObjective[];
   timeRemaining: number;
   isPlaying: boolean;
@@ -193,6 +197,7 @@ function createInitialState(
       stars: 0,
     },
     tiles: initializeTiles(grid, levelConfig),
+    tilesVersion: 0,
     objectives: initializeObjectives(levelConfig),
     timeRemaining: levelConfig.timerSeconds,
     isPlaying: false,
@@ -586,6 +591,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         return {
           ...state,
           tiles: newTiles,
+          tilesVersion: state.tilesVersion + 1,
           objectives: finalObjectives,
           isPlaying: false,
           timeRemaining: newTimeRemaining,
@@ -604,6 +610,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         tiles: newTiles,
+        tilesVersion: state.tilesVersion + 1,
         objectives: newObjectives,
         timeRemaining: newTimeRemaining,
         gameState: {
@@ -642,6 +649,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         tiles: clearedTiles,
+        tilesVersion: state.tilesVersion + 1,
       };
     }
 
@@ -837,6 +845,7 @@ export function useAdventureGame({
   return {
     gameState: state.gameState,
     tiles: state.tiles,
+    tilesVersion: state.tilesVersion,
     objectives: state.objectives,
     timeRemaining: state.timeRemaining,
     canComplete,

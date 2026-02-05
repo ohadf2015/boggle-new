@@ -96,12 +96,20 @@ export interface SpecialTile {
 
 /**
  * Types of objectives that can be assigned to levels
+ *
+ * Regular Level Objectives:
  * - wordCount: Find N words
  * - scoreTarget: Achieve N points
  * - clearIce: Clear N ice tiles
  * - longWords: Find N words with 5+ letters
  * - timeBonus: Complete with N seconds remaining
  * - collectGems: Collect N gems (special words)
+ *
+ * Boss Level Objectives (level 7 of each world):
+ * - defeatBoss: Primary - reduce boss HP to 0
+ * - surviveBattle: Secondary - finish with X% player health
+ * - mechanicTrigger: Secondary - trigger boss twist mechanic N times
+ * - noDamage: Bonus - complete without taking damage
  */
 export type ObjectiveType =
   | 'wordCount'
@@ -109,7 +117,12 @@ export type ObjectiveType =
   | 'clearIce'
   | 'longWords'
   | 'timeBonus'
-  | 'collectGems';
+  | 'collectGems'
+  // Boss-specific objectives
+  | 'defeatBoss'
+  | 'surviveBattle'
+  | 'mechanicTrigger'
+  | 'noDamage';
 
 /**
  * An objective to complete within a level

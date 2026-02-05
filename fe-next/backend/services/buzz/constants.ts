@@ -189,44 +189,117 @@ export const BANNED_KEYWORDS = [
  */
 export const POLITICAL_KEYWORDS_BY_LANGUAGE: Record<string, string[]> = {
   en: [
+    // Elections & Voting
     'election', 'elections', 'vote', 'voting', 'ballot', 'campaign', 'candidate',
-    'republican', 'democrat', 'liberal', 'conservative', 'congress', 'senate',
-    'parliament', 'president', 'prime minister', 'politician', 'politics', 'political',
-    'trump', 'biden', 'obama', 'clinton', 'maga', 'gop', 'dnc', 'rnc',
-    'impeach', 'scandal', 'corruption', 'protest', 'rally', 'riot',
-    'abortion', 'gun control', 'immigration', 'border', 'refugee',
-    'left wing', 'right wing', 'extremist', 'radical', 'activist',
+    'primary', 'caucus', 'electoral', 'polling', 'runoff', 'recount',
+    // Political parties & ideologies
+    'republican', 'democrat', 'liberal', 'conservative', 'libertarian', 'socialist',
+    'communist', 'fascist', 'marxist', 'progressive', 'nationalist', 'populist',
+    'gop', 'dnc', 'rnc', 'maga', 'woke', 'antifa',
+    // Government bodies
+    'congress', 'senate', 'parliament', 'legislature', 'supreme court', 'cabinet',
+    'white house', 'capitol', 'ministry', 'lawmaker', 'senator', 'representative',
+    // Political figures (general terms)
+    'president', 'prime minister', 'politician', 'politics', 'political',
+    'governor', 'mayor', 'dictator', 'regime', 'administration',
+    // Current political figures
+    'trump', 'biden', 'obama', 'clinton', 'desantis', 'pence', 'pelosi',
+    'netanyahu', 'putin', 'zelensky', 'xi jinping', 'kim jong',
+    // Controversies & conflicts
+    'impeach', 'scandal', 'corruption', 'protest', 'rally', 'riot', 'uprising',
+    'insurrection', 'coup', 'martial law', 'curfew', 'lockdown',
+    // Sensitive policy topics
+    'abortion', 'pro-life', 'pro-choice', 'roe v wade',
+    'gun control', 'second amendment', 'firearms', 'nra',
+    'immigration', 'border', 'refugee', 'asylum', 'deportation', 'migrant',
+    'climate change', 'global warming', // when used politically
+    // Political spectrum
+    'left wing', 'right wing', 'extremist', 'radical', 'activist', 'partisan',
+    'bipartisan', 'moderate', 'centrist',
+    // War & Military
     'war', 'military', 'army', 'weapon', 'missile', 'bomb', 'attack', 'invasion',
-    'sanctions', 'treaty', 'diplomacy', 'nato', 'un ',
+    'sanctions', 'treaty', 'diplomacy', 'nato', 'un ', 'ceasefire', 'airstrike',
+    'troops', 'deployment', 'occupation', 'siege', 'blockade',
+    // Terrorism
+    'terrorist', 'terrorism', 'hamas', 'hezbollah', 'isis', 'al qaeda', 'taliban',
+    // Sensitive regions
+    'gaza', 'west bank', 'ukraine', 'crimea', 'taiwan strait',
   ],
   he: [
-    'בחירות', 'הצבעה', 'קלפי', 'קמפיין', 'מועמד', 'מפלגה',
-    'ליכוד', 'עבודה', 'ימין', 'שמאל', 'כנסת', 'ממשלה',
-    'ראש ממשלה', 'נתניהו', 'ביבי', 'פוליטיקה', 'פוליטי',
-    'הפגנה', 'מחאה', 'שחיתות', 'פרשה',
-    'מלחמה', 'צבא', 'צה"ל', 'טיל', 'פצצה', 'התקפה', 'פלישה',
-    'פלסטין', 'עזה', 'חמאס', 'חיזבאללה', 'טרור',
+    // בחירות והצבעה
+    'בחירות', 'הצבעה', 'קלפי', 'קמפיין', 'מועמד', 'מפלגה', 'קואליציה', 'אופוזיציה',
+    // מפלגות
+    'ליכוד', 'עבודה', 'ימין', 'שמאל', 'מרכז', 'חרדי', 'דתי', 'חילוני',
+    'יש עתיד', 'כחול לבן', 'הציונות הדתית', 'עוצמה יהודית',
+    // גופי ממשל
+    'כנסת', 'ממשלה', 'בית המשפט העליון', 'בג"ץ', 'משרד',
+    // דמויות פוליטיות
+    'ראש ממשלה', 'נתניהו', 'ביבי', 'לפיד', 'גנץ', 'בן גביר', 'סמוטריץ',
+    'פוליטיקה', 'פוליטי', 'פוליטיקאי',
+    // מחאות ושחיתות
+    'הפגנה', 'מחאה', 'שחיתות', 'פרשה', 'הדחה', 'כתב אישום',
+    // מלחמה וצבא
+    'מלחמה', 'צבא', 'צה"ל', 'טיל', 'פצצה', 'התקפה', 'פלישה', 'מבצע',
+    'גיוס', 'מילואים', 'הפצצה', 'תקיפה',
+    // טרור וסכסוך
+    'פלסטין', 'עזה', 'חמאס', 'חיזבאללה', 'טרור', 'פיגוע', 'חטיפה',
+    'יהודה ושומרון', 'התנחלות', 'גדר ההפרדה',
+    // נושאים רגישים
+    'רפורמה משפטית', 'דמוקרטיה', 'דיקטטורה',
   ],
   sv: [
-    'val', 'rösta', 'röstning', 'kampanj', 'kandidat', 'parti',
+    // Val och röstning
+    'val', 'rösta', 'röstning', 'kampanj', 'kandidat', 'parti', 'koalition',
+    // Partier
     'riksdag', 'regering', 'statsminister', 'politiker', 'politik', 'politisk',
-    'vänster', 'höger', 'socialdemokrat', 'moderat',
-    'protest', 'demonstration', 'korruption', 'skandal',
+    'socialdemokrat', 'moderat', 'sverigedemokrat', 'vänsterparti', 'miljöparti',
+    'vänster', 'höger', 'center',
+    // Protester
+    'protest', 'demonstration', 'korruption', 'skandal', 'uppror',
+    // Krig och militär
     'krig', 'militär', 'armé', 'vapen', 'missil', 'bomb', 'attack', 'invasion',
+    'trupper', 'ockupation',
+    // Känsliga ämnen
+    'invandring', 'flykting', 'gräns', 'asyl', 'deportation',
   ],
   ja: [
-    '選挙', '投票', 'キャンペーン', '候補者', '政党',
+    // 選挙
+    '選挙', '投票', 'キャンペーン', '候補者', '政党', '連立',
+    // 政府
     '国会', '政府', '首相', '総理', '政治家', '政治', '政治的',
-    '左翼', '右翼', '自民党', '民主党',
-    'デモ', '抗議', '汚職', 'スキャンダル',
+    '内閣', '与党', '野党', '議員',
+    // 政党
+    '自民党', '民主党', '共産党', '公明党',
+    '左翼', '右翼', '保守', 'リベラル',
+    // 抗議
+    'デモ', '抗議', '汚職', 'スキャンダル', '暴動',
+    // 戦争
     '戦争', '軍', '軍事', '武器', 'ミサイル', '爆弾', '攻撃', '侵攻',
+    '自衛隊', '徴兵', '空爆',
+    // テロ
+    'テロ', 'テロリスト', '過激派',
   ],
   es: [
+    // Elecciones
     'elección', 'elecciones', 'votar', 'votación', 'campaña', 'candidato',
+    'primarias', 'coalición', 'oposición',
+    // Gobierno
     'congreso', 'parlamento', 'gobierno', 'presidente', 'político', 'política',
-    'izquierda', 'derecha', 'liberal', 'conservador',
-    'protesta', 'manifestación', 'corrupción', 'escándalo',
+    'senado', 'ministro', 'legislador', 'gobernador',
+    // Ideologías
+    'izquierda', 'derecha', 'liberal', 'conservador', 'socialista', 'comunista',
+    'populista', 'nacionalista',
+    // Protestas
+    'protesta', 'manifestación', 'corrupción', 'escándalo', 'golpe de estado',
+    'disturbios', 'revuelta',
+    // Guerra
     'guerra', 'militar', 'ejército', 'arma', 'misil', 'bomba', 'ataque', 'invasión',
+    'tropas', 'ocupación', 'bombardeo',
+    // Temas sensibles
+    'inmigración', 'refugiado', 'frontera', 'deportación', 'asilo',
+    'aborto', 'control de armas',
+    // Terrorismo
+    'terrorista', 'terrorismo', 'extremista',
   ],
 };
 

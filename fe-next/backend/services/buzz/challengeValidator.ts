@@ -254,10 +254,25 @@ export function normalizeBlankSizes(challenges: BuzzChallenge[]): BuzzChallenge[
     const remainingBlanks = Array(answerLength - 1).fill('_').join(' ');
     const blanksWithFirstLetter = `${firstLetter} ${remainingBlanks}`;
 
-    // Check if first letter is already present in the prompt
-    const hasFirstLetterHint = new RegExp(`${escapeRegex(firstLetter)}\\s+(_\\s*)+`, 'i').test(challenge.prompt);
-
     let normalizedPrompt = challenge.prompt;
+
+    // Check if there's a WRONG first letter in the prompt (AI generated different letter than answer)
+    // Pattern: single letter followed by spaced underscores (e.g., "G _ _ _ _" or "X _ _")
+    const wrongLetterRegex = /\b([A-Za-z])\s+(_\s*)+/g;
+    let wrongLetterMatch;
+    while ((wrongLetterMatch = wrongLetterRegex.exec(challenge.prompt)) !== null) {
+      const existingLetter = wrongLetterMatch[1].toUpperCase();
+      if (existingLetter !== firstLetter) {
+        console.warn(
+          `[BUZZ] First letter mismatch in fill_blank: prompt shows "${existingLetter}" but answer "${challenge.answer}" starts with "${firstLetter}". Correcting.`
+        );
+        // Replace the wrong letter pattern with the correct one
+        normalizedPrompt = normalizedPrompt.replace(wrongLetterMatch[0], ` ${blanksWithFirstLetter} `);
+      }
+    }
+
+    // Check if (correct) first letter is already present in the prompt
+    const hasFirstLetterHint = new RegExp(`${escapeRegex(firstLetter)}\\s+(_\\s*)+`, 'i').test(normalizedPrompt);
 
     if (hasFirstLetterHint) {
       // First letter already present, just normalize underscore count
@@ -272,9 +287,9 @@ export function normalizeBlankSizes(challenges: BuzzChallenge[]): BuzzChallenge[
         .replace(/\*{3,}/g, blanksWithFirstLetter)
         .replace(/\.{3,}/g, blanksWithFirstLetter)
         .replace(/(\s*_\s*)+/g, (match) => {
-          const existingCount = (match.match(/_/g) || []).length;
+          const underscoreCount = (match.match(/_/g) || []).length;
           // Only replace if count doesn't match or count is exact but no first letter
-          if (existingCount !== answerLength - 1) {
+          if (underscoreCount !== answerLength - 1) {
             return ` ${blanksWithFirstLetter} `;
           }
           // If existing underscores equal remaining blanks (answerLength - 1), just add first letter

@@ -191,6 +191,8 @@ const sv = {
     "player": "Spelare",
     "clearSearch": "Rensa sökning",
     "opensInNewTab": "öppnas i ny flik",
+    "press": "Tryck",
+    "toResume": "för att fortsätta",
     "aria": {
       "levelProgress": "Nivåprogression",
       "overallProgress": "Övergripande progression",
@@ -399,12 +401,18 @@ const sv = {
     "codeCopyError": "Kunde inte kopiera",
     "buttonLabel": "Bjud in",
     "modalTitle": "Samla Gänget",
-    "copyLink": "Kopiera",
+    "copyLink": "Kopiera länk",
+    "saveImage": "Spara bild",
+    "share": "Dela",
     "copy": "Kopiera",
     "copied": "Kopierat!",
+    "generating": "Skapar...",
     "whatsapp": "WhatsApp",
     "more": "Mer",
-    "title": "Gå med i mitt LexiClash-spel!",
+    "title": "Dela ditt resultat!",
+    "subtitle": "Utmana vännerna att slå ditt rekord",
+    "playAt": "Spela på",
+    "beatMyScore": "Kan du slå mitt resultat?",
     "text": "Gå med i mitt spel med kod: {{code}}",
     "inviteTitle": "Ordkrig pågår! 🎮",
     "shareVictory": "Skryt!",
@@ -1960,6 +1968,84 @@ const sv = {
     "countrySaved": "Land uppdaterat!",
     "countryError": "Kunde inte uppdatera land"
   },
+  "consent": {
+    "title": "Samtycke krävs",
+    "description": "Detta utbildningsspel samlar in framstegsdata för att hjälpa lärare och föräldrar. Enligt integritetslagar krävs förälders samtycke för barn under 14.",
+    "parentEmail": "Förälders e-post",
+    "parentEmailHint": "Vi skickar bekräftelse hit",
+    "childAge": "Barnets ålder",
+    "childAgeHint": "Välj ålder",
+    "agreeTerms": "Jag godkänner datainsamling för utbildning",
+    "agreeTermsHint": "Krävs för utbildningsfunktioner",
+    "submit": "Skicka samtycke",
+    "submitting": "Skickar...",
+    "privacyLink": "Läs vår integritetspolicy",
+    "termsLink": "Läs våra användarvillkor",
+    "minorNotice": "Barn under 14 behöver förälders samtycke för utbildningsfunktioner",
+    "banner": {
+      "title": "Samtycke krävs",
+      "message": "För utbildningsfunktioner behöver vi förälders samtycke för barn under 14.",
+      "action": "Ge samtycke",
+      "dismiss": "Kanske senare"
+    },
+    "modal": {
+      "title": "Samtycke för föräldrar",
+      "subtitle": "För utbildningsfunktioner",
+      "intro": "Fyll i detta formulär för att aktivera utbildningsfunktioner. En bekräftelse skickas till föräldern.",
+      "ageOptions": {
+        "6": "6 år",
+        "7": "7 år",
+        "8": "8 år",
+        "9": "9 år",
+        "10": "10 år",
+        "11": "11 år",
+        "12": "12 år",
+        "13": "13 år",
+        "14": "14 år eller äldre"
+      },
+      "dataCollected": {
+        "title": "Data vi samlar in",
+        "items": [
+          "Inlärningsframsteg och poäng",
+          "Ord som övats och bemästrats",
+          "Tid spenderad på lärande",
+          "Intjänade prestationer"
+        ]
+      },
+      "howWeUse": {
+        "title": "Hur vi använder datan",
+        "items": [
+          "Följa utbildningsframsteg",
+          "Skapa rapporter för lärare",
+          "Anpassa inlärningen",
+          "Delas aldrig för reklam"
+        ]
+      },
+      "success": {
+        "title": "Samtycke skickat!",
+        "message": "Tack! Utbildningsfunktioner är nu aktiverade. Bekräftelse har skickats.",
+        "action": "Fortsätt"
+      },
+      "error": {
+        "invalidEmail": "Ange en giltig e-postadress",
+        "selectAge": "Välj barnets ålder",
+        "acceptTerms": "Du måste godkänna villkoren",
+        "submitFailed": "Kunde inte skicka samtycke. Försök igen."
+      }
+    },
+    "status": {
+      "active": "Samtycke aktivt",
+      "pending": "Väntar på samtycke",
+      "revoked": "Samtycke återkallat",
+      "notRequired": "Samtycke krävs ej"
+    },
+    "revoke": {
+      "title": "Återkalla samtycke",
+      "message": "Vill du återkalla samtycket? Utbildningsfunktioner inaktiveras.",
+      "confirm": "Ja, återkalla",
+      "cancel": "Behåll aktivt"
+    }
+  },
   "calendar": {
     "title": "Dagliga Belöningar",
     "description": "Hämta dagliga belöningar för att tjäna mynt, XP och speciella föremål!",
@@ -2437,7 +2523,8 @@ const sv = {
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
     "playingNow": "spelar",
-    "tutorial": "Handledning"
+    "tutorial": "Handledning",
+    "personalBest": "personligt bästa"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",
@@ -3234,6 +3321,11 @@ const sv = {
     "earthquakeEffects": {
       "title": "Inga skakningar",
       "description": "Stänger av skakningar och intensiva effekter - mjukare upplevelse"
+    },
+    "skipLinks": {
+      "skipToMain": "Hoppa till huvudinnehåll",
+      "skipToNav": "Hoppa till navigering",
+      "skipToSearch": "Hoppa till sök"
     }
   },
   "peerValidation": {
@@ -4042,6 +4134,16 @@ const sv = {
     "continueToNext": "Fortsätt",
     "retryLevel": "Försök igen",
     "loadError": "Kunde inte ladda framsteg",
+    "allStars": "Alla stjärnor",
+    "continue": "Fortsätt",
+    "perfect": "Perfekt!",
+    "restart": "Börja om",
+    "score": "Poäng",
+    "victory": "Seger!",
+    "world": "Värld",
+    "hint": {
+      "title": "Ledtråd"
+    },
     "cinematics": {
       "victory": "SEGER!",
       "timesUp": "Tiden Är Slut!",
@@ -4131,7 +4233,11 @@ const sv = {
       "clearIce": "Rensa is",
       "longWords": "Långa ord (5+)",
       "timeBonus": "Tid kvar",
-      "collectGems": "Samla juveler"
+      "collectGems": "Samla juveler",
+      "defeatBoss": "Besegra Bossen",
+      "surviveBattle": "Överlev med {{target}}% Hälsa",
+      "mechanicTrigger": "Utlös Mekanism",
+      "noDamage": "Ta Ingen Skada"
     },
     "tiles": {
       "gold": "Guld (3x poäng)",
@@ -4150,6 +4256,7 @@ const sv = {
       "validationFailed": "Kunde inte validera ordet"
     },
 "game": {
+      "selectWord": "Välj ett ord",
       "objectives": "Mål",
       "combo": "Kombo",
       "wordsFound": "Hittade ord",
@@ -4575,8 +4682,14 @@ const sv = {
         }
       }
     },
+    "player": {
+      "health": "Hälsa",
+      "danger": "FARA!",
+      "healthLabel": "Spelarens hälsa: {{current}} / {{max}} ({{percentage}}%)"
+    },
     "achievements": {
       "title": "Prestationer",
+      "progress": "{current}/{next}",
       "earned": "intjänade",
       "hidden": "Dold",
       "unlocked": "Prestation upplåst!",
@@ -4934,6 +5047,43 @@ const sv = {
       "lessonNamePlaceholder": "Ange lektionsnamn...",
       "noClassroom": "Inget klassrum (privat lektion)",
       "selectWords": "Välj ord för att skapa en gloslektion"
+    },
+    "reports": {
+      "title": "Framstegsrapport",
+      "studentReport": "Elevrapport",
+      "classReport": "Klassrapport",
+      "backToClass": "Tillbaka till klassrum",
+      "selectClassroom": "Välj klassrum",
+      "loading": "Laddar rapport...",
+      "error": "Fel vid laddning av rapport",
+      "noData": "Ingen data tillgänglig",
+      "metrics": {
+        "wordsLearned": "Inlärda ord",
+        "accuracy": "Träffsäkerhet",
+        "practiceTime": "Övningstid",
+        "currentStreak": "Nuvarande svit",
+        "longestStreak": "Längsta svit",
+        "sessionsCompleted": "Genomförda sessioner",
+        "averageScore": "Snittpoäng",
+        "masteryLevel": "Behärskningsnivå",
+        "activeStudents": "Aktiva elever",
+        "classAverageAccuracy": "Klassens genomsnitt",
+        "completionRate": "Genomförandegrad",
+        "totalStudents": "Totalt antal elever"
+      },
+      "sections": {
+        "summary": "Sammanfattning",
+        "wordMastery": "Ordbehärskning",
+        "practiceHistory": "Övningshistorik",
+        "recommendations": "Rekommendationer",
+        "needsAttention": "Behöver uppmärksamhet",
+        "studentRankings": "Elevranking",
+        "topPerformers": "Topppresterare"
+      },
+      "export": {
+        "pdf": "Exportera PDF",
+        "downloading": "Laddar ner..."
+      }
     }
   },
   "education": {
@@ -4997,6 +5147,17 @@ const sv = {
       "noResults": "Inga matchande ord hittades",
       "noWords": "Inga ord tillgängliga",
       "noDefinition": "Ingen definition tillgänglig",
+      "quickPractice": "Snabböva",
+      "moreOptions": "Fler alternativ",
+      "tryAgain": "Försök igen",
+      "back": "Tillbaka",
+      "correctCount": "rätt",
+      "encouragement0": "Fortsätt försöka! Övning ger färdighet.",
+      "encouragement50": "Bra jobbat! Fortsätt öva.",
+      "encouragement80": "Snyggt! Nästan där.",
+      "encouragement100": "Perfekt! Du kan dessa ord nu.",
+      "swipeHint": "Svep för att svara",
+      "swipeExplain": "Svep höger för 'Kunde', vänster för 'Kunde inte'",
       "mastery": {
         "not_started": "Ej påbörjad",
         "started": "Påbörjad",
@@ -5234,6 +5395,66 @@ const sv = {
       "activeNow": "{{count}} aktiva nu",
       "noActivity": "Ingen aktivitet",
       "updatedAgo": "Uppdaterad {{time}} sedan"
+    },
+    "reports": {
+      "title": "Framstegsrapporter",
+      "subtitle": "Skapa rapporter för elever och föräldrar",
+      "classReport": "Klassrapport",
+      "studentReport": "Elevrapport",
+      "exportPDF": "Exportera PDF",
+      "exportCSV": "Exportera CSV",
+      "generateReport": "Skapa rapport",
+      "generating": "Skapar...",
+      "dateRange": "Datumintervall",
+      "allTime": "All tid",
+      "lastWeek": "Senaste 7 dagarna",
+      "lastMonth": "Senaste 30 dagarna",
+      "custom": "Anpassat",
+      "from": "Från",
+      "to": "Till",
+      "selectStudent": "Välj elev",
+      "allStudents": "Alla elever",
+      "noDataAvailable": "Ingen data för denna period",
+      "reportGenerated": "Rapport skapad",
+      "downloadReady": "Din rapport är redo att ladda ner",
+      "metrics": {
+        "wordsLearned": "Inlärda ord",
+        "totalWords": "Totalt antal ord",
+        "accuracy": "Precision",
+        "practiceTime": "Övningstid",
+        "currentStreak": "Nuvarande svit",
+        "longestStreak": "Längsta svit",
+        "sessionsCompleted": "Slutförda sessioner",
+        "averageScore": "Genomsnittspoäng",
+        "masteryLevel": "Behärskningsnivå",
+        "improvement": "Förbättring"
+      },
+      "classMetrics": {
+        "classAverage": "Klassgenomsnitt",
+        "topPerformer": "Bäst i klassen",
+        "mostImproved": "Mest förbättrad",
+        "needsAttention": "Behöver extra stöd",
+        "participationRate": "Deltagande",
+        "completionRate": "Slutförande"
+      },
+      "sections": {
+        "summary": "Sammanfattning",
+        "wordMastery": "Ordbehärskning",
+        "practiceHistory": "Övningshistorik",
+        "recommendations": "Rekommendationer"
+      },
+      "studentRanking": "Elevranking",
+      "rank": "Rank",
+      "student": "Elev",
+      "score": "Poäng",
+      "noStudents": "Inga elever hittades",
+      "printReport": "Skriv ut rapport",
+      "emailReport": "Mejla rapport",
+      "error": {
+        "generateFailed": "Kunde inte skapa rapport",
+        "exportFailed": "Kunde inte exportera rapport",
+        "noData": "Ingen data för rapport"
+      }
     },
     "achievements": {
       "title": "Prestationer",

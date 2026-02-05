@@ -18,6 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParallax } from '@/hooks/useParallax';
+import { PremiumCard } from './ui/PremiumCard';
 import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
@@ -704,7 +705,7 @@ export default function LevelGrid({
           </div>
         </motion.div>
 
-        {/* Level Grid - Staggered glass cards */}
+        {/* Level Grid - Premium 3D cards */}
         {/* Desktop: max 5 columns for better card sizing, centered with auto margins */}
         <motion.div
           variants={containerVariants}
@@ -712,151 +713,145 @@ export default function LevelGrid({
           animate="visible"
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 lg:max-w-5xl lg:mx-auto"
         >
-          {levels.map(({ levelNum, config, isUnlocked, stars, isPerfect }) => (
-            <motion.button
-              key={levelNum}
-              variants={cardVariants}
-              disabled={!isUnlocked}
-              onClick={() => isUnlocked && onLevelSelect(world.id, levelNum)}
-              data-testid={`level-button-${levelNum}`}
-              whileHover={isUnlocked ? { scale: 1.05, y: -4, rotate: 1 } : undefined}
-              whileTap={isUnlocked ? { scale: 0.97, rotate: -0.5 } : undefined}
-              className={cn(
-                'group relative p-4 sm:p-5 rounded-neo-lg transition-all duration-200',
-                'border-4 border-neo-black',
-                // Focus states for accessibility (keyboard navigation)
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                isUnlocked
-                  ? cn(
-                      'bg-neo-black/50 backdrop-blur-md',
-                      'shadow-hard hover:shadow-hard-lg cursor-pointer',
-                      // Active/pressed state for better feedback
-                      'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
-                      stars > 0 && 'ring-2 ring-inset',
-                      isPerfect && 'ring-neo-yellow'
-                    )
-                  : 'bg-neo-black/20 cursor-not-allowed opacity-40'
-              )}
-              style={
-                isUnlocked
-                  ? {
-                      boxShadow:
-                        stars > 0
-                          ? `0 0 25px ${glowColor}50, 6px 6px 0px black`
-                          : `6px 6px 0px black`,
-                      ...(stars > 0 && !isPerfect
-                        ? ({ '--tw-ring-color': glowColor } as React.CSSProperties)
-                        : {}),
-                    }
-                  : undefined
-              }
-            >
-              {/* Level Number - Large and prominent */}
-              <div className="flex items-center justify-between mb-4">
-                <span
-                  className={cn(
-                    'text-3xl sm:text-4xl font-black',
-                    isUnlocked ? 'text-neo-white' : 'text-neo-white/40'
-                  )}
+          {levels.map(({ levelNum, config, isUnlocked, stars, isPerfect }) => {
+            // Determine card variant based on state
+            const cardVariant = !isUnlocked 
+              ? 'locked' 
+              : isPerfect 
+                ? 'perfect' 
+                : stars > 0 
+                  ? 'gold' 
+                  : 'default';
+
+            return (
+              <motion.div
+                key={levelNum}
+                variants={cardVariants}
+              >
+                <PremiumCard
+                  disabled={!isUnlocked}
+                  onClick={() => isUnlocked && onLevelSelect(world.id, levelNum)}
+                  data-testid={`level-button-${levelNum}`}
+                  variant={cardVariant}
+                  glowColor={glowColor}
+                  tiltIntensity={0.3}
+                  enableTilt={isUnlocked}
+                  className="p-4 sm:p-5 h-full"
                 >
-                  {levelNum}
-                </span>
-                {!isUnlocked ? (
-                  <Lock className="w-6 h-6 text-neo-white/40" />
-                ) : stars === 0 ? (
-                  <Play className={cn('w-5 h-5', worldColors.text)} />
-                ) : isPerfect ? (
-                  <CheckCircle2 className="w-5 h-5 text-neo-yellow fill-neo-yellow" />
-                ) : (
-                  <CheckCircle2 className={cn('w-5 h-5', worldColors.text)} />
-                )}
-              </div>
-
-              {/* Stars Display - shimmer on hover */}
-              <div className="flex items-center gap-1.5 mb-3 group-hover:animate-pulse-subtle">
-                {Array.from({ length: MAX_STARS_PER_LEVEL }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      'w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300',
-                      i < stars
-                        ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.7)] group-hover:drop-shadow-[0_0_10px_rgba(255,225,53,0.9)]'
-                        : 'text-neo-white/20 group-hover:text-neo-white/30'
+                  {/* Level Number - Large and prominent */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span
+                      className={cn(
+                        'text-3xl sm:text-4xl font-black',
+                        isUnlocked ? 'text-neo-white' : 'text-neo-white/40'
+                      )}
+                    >
+                      {levelNum}
+                    </span>
+                    {!isUnlocked ? (
+                      <Lock className="w-6 h-6 text-neo-white/40" />
+                    ) : stars === 0 ? (
+                      <Play className={cn('w-5 h-5', worldColors.text)} />
+                    ) : isPerfect ? (
+                      <CheckCircle2 className="w-5 h-5 text-neo-yellow fill-neo-yellow" />
+                    ) : (
+                      <CheckCircle2 className={cn('w-5 h-5', worldColors.text)} />
                     )}
-                    style={i < stars ? { transitionDelay: `${i * 50}ms` } : undefined}
-                  />
-                ))}
-              </div>
+                  </div>
 
-              {/* Level Info - Only show when unlocked */}
-              {isUnlocked && (
-                <div className="space-y-2">
-                  {/* Primary Objective */}
-                  {config.objectives
-                    .filter((o) => o.isPrimary)
-                    .slice(0, 1)
-                    .map((obj, i) => (
-                      <div
+                  {/* Stars Display - shimmer on hover */}
+                  <div className="flex items-center gap-1.5 mb-3 group-hover:animate-pulse-subtle">
+                    {Array.from({ length: MAX_STARS_PER_LEVEL }).map((_, i) => (
+                      <motion.div
                         key={i}
-                        className="text-xs text-neo-white/60 flex items-center gap-1.5"
+                        initial={stars > i ? { scale: 0, rotate: -180 } : { scale: 0.5 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: levelNum * 0.05 + i * 0.1, type: 'spring' }}
                       >
-                        <Target className="w-3 h-3 flex-shrink-0" />
-                        <span className="truncate">
-                          {t(`adventure.objectives.${obj.type}`) || obj.type}:{' '}
-                          {obj.target}
-                        </span>
-                      </div>
+                        <Star
+                          className={cn(
+                            'w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300',
+                            i < stars
+                              ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_6px_rgba(255,225,53,0.7)] group-hover:drop-shadow-[0_0_10px_rgba(255,225,53,0.9)]'
+                              : 'text-neo-white/20 group-hover:text-neo-white/30'
+                          )}
+                        />
+                      </motion.div>
                     ))}
+                  </div>
 
-                  {/* Special Tiles - Compact badges */}
-                  {config.specialTiles.length > 0 && (
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {Object.entries(
-                        config.specialTiles.reduce(
-                          (acc, tile) => {
-                            acc[tile.type] = (acc[tile.type] || 0) + 1;
-                            return acc;
-                          },
-                          {} as Record<string, number>
-                        )
-                      )
-                        .slice(0, 3)
-                        .map(([type, count]) => (
-                          <span
-                            key={type}
-                            className={cn(
-                              'inline-flex items-center gap-0.5 px-1.5 py-0.5',
-                              'text-[10px] font-bold rounded-sm',
-                              type === 'gold' && 'bg-neo-yellow/20 text-neo-yellow',
-                              type === 'ice' && 'bg-neo-cyan/20 text-neo-cyan',
-                              type === 'bomb' && 'bg-neo-red/20 text-neo-red',
-                              type === 'rainbow' && 'bg-neo-pink/20 text-neo-pink'
-                            )}
+                  {/* Level Info - Only show when unlocked */}
+                  {isUnlocked && (
+                    <div className="space-y-2">
+                      {/* Primary Objective */}
+                      {config.objectives
+                        .filter((o) => o.isPrimary)
+                        .slice(0, 1)
+                        .map((obj, i) => (
+                          <div
+                            key={i}
+                            className="text-xs text-neo-white/60 flex items-center gap-1.5"
                           >
-                            {TILE_ICONS[type]}
-                            <span>{count}</span>
-                          </span>
+                            <Target className="w-3 h-3 flex-shrink-0" />
+                            <span className="truncate">
+                              {t(`adventure.objectives.${obj.type}`) || obj.type}:{' '}
+                              {obj.target}
+                            </span>
+                          </div>
                         ))}
+
+                      {/* Special Tiles - Compact badges */}
+                      {config.specialTiles.length > 0 && (
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {Object.entries(
+                            config.specialTiles.reduce(
+                              (acc, tile) => {
+                                acc[tile.type] = (acc[tile.type] || 0) + 1;
+                                return acc;
+                              },
+                              {} as Record<string, number>
+                            )
+                          )
+                            .slice(0, 3)
+                            .map(([type, count]) => (
+                              <span
+                                key={type}
+                                className={cn(
+                                  'inline-flex items-center gap-0.5 px-1.5 py-0.5',
+                                  'text-[10px] font-bold rounded-sm',
+                                  type === 'gold' && 'bg-neo-yellow/20 text-neo-yellow',
+                                  type === 'ice' && 'bg-neo-cyan/20 text-neo-cyan',
+                                  type === 'bomb' && 'bg-neo-red/20 text-neo-red',
+                                  type === 'rainbow' && 'bg-neo-pink/20 text-neo-pink'
+                                )}
+                              >
+                                {TILE_ICONS[type]}
+                                <span>{count}</span>
+                              </span>
+                            ))}
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
-              )}
 
-              {/* Difficulty Indicator - Visual bars instead of cryptic letters */}
-              <DifficultyIndicator difficulty={config.difficulty} />
+                  {/* Difficulty Indicator - Visual bars instead of cryptic letters */}
+                  <DifficultyIndicator difficulty={config.difficulty} />
 
-              {/* Perfect completion indicator */}
-              {isPerfect && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-neo-yellow rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard-sm"
-                >
-                  <span className="text-neo-black font-black text-xs">★</span>
-                </motion.div>
-              )}
-            </motion.button>
-          ))}
+                  {/* Perfect completion indicator */}
+                  {isPerfect && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                      className="absolute -top-2 -right-2 w-8 h-8 bg-neo-yellow rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard"
+                    >
+                      <span className="text-neo-black font-black text-sm">★</span>
+                    </motion.div>
+                  )}
+                </PremiumCard>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </div>

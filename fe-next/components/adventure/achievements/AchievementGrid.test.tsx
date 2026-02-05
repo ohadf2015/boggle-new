@@ -1,14 +1,14 @@
 /**
  * Achievement Components Tests
  *
- * Tests for AchievementCard, AchievementGrid, and AchievementUnlockModal.
+ * Tests for AchievementCard and AchievementGrid components.
+ * Note: AchievementUnlockModal was replaced by AchievementToast (see components/achievements/)
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { AchievementGrid } from './AchievementGrid';
 import { AchievementCard } from './AchievementCard';
-import { AchievementUnlockModal } from './AchievementUnlockModal';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 
 // Mock hooks
@@ -200,168 +200,5 @@ describe('AchievementGrid', () => {
   });
 });
 
-describe('AchievementUnlockModal', () => {
-  const mockAchievement = ADVENTURE_ACHIEVEMENTS.BOSS_SLAYER;
-
-  it('renders nothing when achievement is null', () => {
-    const { container } = render(
-      <AchievementUnlockModal
-        achievement={null}
-        count={0}
-        isNew={true}
-        onClose={jest.fn()}
-      />
-    );
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders modal when achievement provided', () => {
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByTestId('achievement-unlock-modal')).toBeInTheDocument();
-  });
-
-  it('shows "Achievement Unlocked!" for new achievements', () => {
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText('Achievement Unlocked!')).toBeInTheDocument();
-  });
-
-  it('shows "Tier Upgraded!" for tier upgrades', () => {
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={15}
-        isNew={false}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText('Tier Upgraded!')).toBeInTheDocument();
-  });
-
-  it('shows achievement icon', () => {
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText(mockAchievement.icon)).toBeInTheDocument();
-  });
-
-  it('calls onClose when continue button clicked', () => {
-    const onClose = jest.fn();
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={onClose}
-      />
-    );
-
-    fireEvent.click(screen.getByText('Continue'));
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  it('calls onClose when backdrop clicked', () => {
-    const onClose = jest.fn();
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={onClose}
-      />
-    );
-
-    fireEvent.click(screen.getByTestId('achievement-unlock-modal'));
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  it('auto-closes after 3 seconds', async () => {
-    jest.useFakeTimers();
-    const onClose = jest.fn();
-
-    render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={onClose}
-      />
-    );
-
-    expect(onClose).not.toHaveBeenCalled();
-
-    jest.advanceTimersByTime(3000);
-
-    expect(onClose).toHaveBeenCalled();
-
-    jest.useRealTimers();
-  });
-
-  it('displays correct tier for different counts', () => {
-    const { rerender } = render(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={1}
-        isNew={true}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText('BRONZE')).toBeInTheDocument();
-
-    rerender(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={15}
-        isNew={false}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText('SILVER')).toBeInTheDocument();
-
-    rerender(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={75}
-        isNew={false}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText('GOLD')).toBeInTheDocument();
-
-    rerender(
-      <AchievementUnlockModal
-        achievement={mockAchievement}
-        count={300}
-        isNew={false}
-        onClose={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText('PLATINUM')).toBeInTheDocument();
-  });
-});
+// Note: AchievementUnlockModal tests removed - component replaced by AchievementToast
+// See fe-next/components/achievements/AchievementToast.tsx for the new implementation

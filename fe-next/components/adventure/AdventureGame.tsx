@@ -2,13 +2,12 @@
  * AdventureGame Component
  *
  * Main orchestrator for adventure mode gameplay.
- * Combines grid, objectives, timer, and level completion flow.
+ * Uses organized layout components for clean structure.
  */
 
 'use client';
 
 import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
-import { Pause, Play, LogOut, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
@@ -23,7 +22,6 @@ import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
 import { useSkillPoints } from '@/hooks/useSkillPoints';
 import { useSkillEffects } from '@/hooks/useSkillEffects';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
-// Power-ups removed from adventure mode
 import { useAdventureEffects } from './effects/hooks/useAdventureEffects';
 import { useAdventureCinematics } from './hooks/useAdventureCinematics';
 import { useAdventureEntryPhase } from './hooks/useAdventureEntryPhase';
@@ -38,26 +36,36 @@ import { ComboTierBadge, type ComboTier } from '@/components/animations/ComboTie
 import { type LevelUpPayload } from '@/components/education/LevelUpCelebration';
 import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
-import AdventureGrid from './AdventureGrid';
-import AdventureObjectives from './AdventureObjectives';
-import AdventureTimer from './AdventureTimer';
 import LevelCompleteModal from './LevelCompleteModal';
 import LevelEntryOverlay from './LevelEntryOverlay';
-import LexiReaction from './LexiReaction';
-import { BossOverlay } from './boss';
-import { ComboMilestoneOverlay } from './ComboMilestoneOverlay';
-import { VictoryCinematic, VICTORY_DURATION_FRAMES, DefeatCinematic, DEFEAT_DURATION_FRAMES } from './cinematics';
+import { BossOverlay, PlayerHealthBar } from './boss';
+import { usePlayerHealth } from '@/hooks/usePlayerHealth';
+import type { EffectCallbacks } from '@/hooks/useBossEffectExecutor';
+import dynamic from 'next/dynamic';
+// Constants are imported statically (small), components dynamically (large Remotion bundles)
+import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES } from './cinematics';
+
+// Dynamic imports for cinematics - reduces initial bundle by ~200KB
+// These Remotion compositions are only needed when level completes
+const VictoryCinematic = dynamic(
+  () => import('./cinematics/VictoryCinematic').then(mod => mod.VictoryCinematic),
+  { ssr: false }
+);
+const DefeatCinematic = dynamic(
+  () => import('./cinematics/DefeatCinematic').then(mod => mod.DefeatCinematic),
+  { ssr: false }
+);
 import { CinematicPlayer } from './boss/cinematics/CinematicPlayer';
 import GameplayBackground from './themed/GameplayBackground';
-// Power-ups removed from adventure mode
-import { HintMessage } from './HintMessage';
+import { showAchievementToast } from '@/components/achievements/AchievementToast';
+import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
+import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 // ==============================================
 // TYPES
 // ==============================================
 
-/** Timer state for parent coordination with music hook */
 export interface GameTimerState {
   timeRemaining: number;
   totalTime: number;
@@ -66,17 +74,11 @@ export interface GameTimerState {
 }
 
 interface AdventureGameProps {
-  /** Level configuration */
   levelConfig: LevelConfig;
-  /** Initial grid letters (2D array) */
   initialGrid: string[][];
-  /** Callback when level is completed */
   onLevelComplete: (stars: number, score: number) => void;
-  /** Callback to exit the game */
   onExit: () => void;
-  /** Callback to report timer state to parent (for music coordination) */
   onTimerStateChange?: (timerState: GameTimerState) => void;
-  /** Total stars accumulated across all levels */
   totalStars?: number;
 }
 
@@ -112,9 +114,6 @@ interface ValidationFeedback {
 // HELPER FUNCTIONS
 // ==============================================
 
-/**
- * Flatten 2D TileState array and add id/row/col
- */
 function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
   const flat: GridTileState[] = [];
   for (let row = 0; row < tiles2D.length; row++) {
@@ -131,46 +130,12 @@ function flattenTiles(tiles2D: TileState[][]): GridTileState[] {
 }
 
 /**
- * Compare 2D tile arrays for equality (avoiding new references)
- * Returns true if tiles are structurally identical
+ * Memoize flat tiles using version counter for O(1) change detection.
+ * Previously used O(n²) deep comparison which was expensive for 7x7 grids.
  */
-function tilesEqual(a: TileState[][], b: TileState[][]): boolean {
-  if (a.length !== b.length) return false;
-  for (let row = 0; row < a.length; row++) {
-    if (a[row].length !== b[row].length) return false;
-    for (let col = 0; col < a[row].length; col++) {
-      const tileA = a[row][col];
-      const tileB = b[row][col];
-      // Compare relevant tile properties from TileState interface
-      if (
-        tileA.letter !== tileB.letter ||
-        tileA.type !== tileB.type ||
-        tileA.isCleared !== tileB.isCleared ||
-        tileA.isFrozen !== tileB.isFrozen ||
-        tileA.isChained !== tileB.isChained
-      ) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-/**
- * Hook to memoize flattened tiles with structural equality check
- * Prevents unnecessary re-renders when tiles2D reference changes but content is same
- */
-function useMemoizedFlatTiles(tiles2D: TileState[][]): GridTileState[] {
-  const prevTilesRef = useRef<TileState[][] | null>(null);
-  const flatTilesRef = useRef<GridTileState[]>([]);
-
-  // Only recompute if tiles actually changed
-  if (!prevTilesRef.current || !tilesEqual(prevTilesRef.current, tiles2D)) {
-    prevTilesRef.current = tiles2D;
-    flatTilesRef.current = flattenTiles(tiles2D);
-  }
-
-  return flatTilesRef.current;
+function useMemoizedFlatTiles(tiles2D: TileState[][], tilesVersion: number): GridTileState[] {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => flattenTiles(tiles2D), [tilesVersion]);
 }
 
 // ==============================================
@@ -179,10 +144,8 @@ function useMemoizedFlatTiles(tiles2D: TileState[][]): GridTileState[] {
 
 const AdventureGame = memo<AdventureGameProps>(
   ({ levelConfig, initialGrid, onLevelComplete, onExit, onTimerStateChange, totalStars }) => {
-    // Validate config
     const isValidConfig = levelConfig.gridSize > 0 && levelConfig.objectives.length > 0;
 
-    // Adaptive difficulty system (affects timer, score targets, power-up cooldowns, and hints)
     const {
       tier,
       adjustedConfig,
@@ -194,63 +157,13 @@ const AdventureGame = memo<AdventureGameProps>(
       level: levelConfig.level,
     });
 
-    // Meta-progression hooks
-    // TODO: Replace 'temp-user-id' with actual user ID from auth context in future phase
-    const {
-      totalXp,
-      currentLevel,
-      xpProgress,
-      awardXp,
-      pendingUpdate: xpPendingUpdate,
-      acknowledgePersistence: acknowledgeXpPersistence,
-    } = useAdventureXp({
-      userId: 'temp-user-id',
-      initialXp: 0, // TODO: Load from user profile
-    });
-
-    const {
-      gold,
-      upgrades,
-      addGold,
-      purchase,
-      getUpgradeEffect,
-      pendingUpdate: currencyPendingUpdate,
-      acknowledgePersistence: acknowledgeCurrencyPersistence,
-    } = useAdventureCurrency({
-      userId: 'temp-user-id',
-      initialGold: 0, // TODO: Load from user profile
-      initialUpgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 }, // TODO: Load from user profile
-    });
-
-    // Note: useScreenShake and useParticleBudget now managed by useAdventureEffects hook (called later)
-
-    // Skill point awarding on level up (SKILL-02 requirement)
-    useSkillPoints({
-      currentLevel,
-      onLevelUp: ({ pointsAwarded }) => {
-        // Skill point notification handled by LevelUpCelebration
-        console.log(`Earned ${pointsAwarded} skill point(s)!`);
-      },
-    });
-
-    // Skill effects for gameplay modifiers (SKILL-04 requirement)
-    const skillEffects = useSkillEffects();
-
-    // Adventure achievements tracking (ACHIEVE-01 requirement)
-    const { earnAchievement } = useAdventureAchievements();
-
-    // Combo milestone tracking (POLISH-03 requirement)
-    const { currentMilestone, checkMilestone } = useComboMilestone();
-
-    // AI Director for dynamic difficulty tuning (DDA-01 through DDA-05)
-    // Tracks player performance and provides invisible pacing adjustments
-    // Generate stable session ID for uniqueness (fallback for Jest environment)
     const [aiDirectorSessionId] = useState(() => {
       const randomPart = typeof crypto !== 'undefined' && crypto.randomUUID
         ? crypto.randomUUID().slice(0, 8)
         : Math.random().toString(36).slice(2, 10);
       return `session-${levelConfig.world}-${levelConfig.level}-${randomPart}`;
     });
+
     const {
       intensityAdjustments,
       flowState,
@@ -266,21 +179,72 @@ const AdventureGame = memo<AdventureGameProps>(
       enableAnalytics: true,
     });
 
-    // Track previous combo count for detecting combo breaks
     const prevComboCountRef = useRef(0);
 
-    // Register all boss abilities on mount (required for Phase 30 integration)
     useEffect(() => {
       registerAllAbilities();
     }, []);
 
-    // Task 3: Level-up modal state
-    // NOTE: Must be declared BEFORE any hooks that reference them (including upgradeBonuses useMemo)
     const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
     const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
 
-    // Task 4: Get upgrade multipliers (memoized to avoid recalculating every render)
-    // NOTE: Must be declared BEFORE adjustedLevelConfig which uses upgradeBonuses.timeBonus
+    const {
+      totalXp,
+      currentLevel,
+      xpProgress,
+      awardXp,
+      pendingUpdate: xpPendingUpdate,
+      acknowledgePersistence: acknowledgeXpPersistence,
+    } = useAdventureXp({
+      userId: 'temp-user-id',
+      initialXp: 0,
+    });
+
+    const {
+      gold,
+      upgrades,
+      addGold,
+      purchase,
+      getUpgradeEffect,
+      pendingUpdate: currencyPendingUpdate,
+      acknowledgePersistence: acknowledgeCurrencyPersistence,
+    } = useAdventureCurrency({
+      userId: 'temp-user-id',
+      initialGold: 0,
+      initialUpgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 },
+    });
+
+    useSkillPoints({
+      currentLevel,
+      onLevelUp: ({ pointsAwarded }) => {
+        console.log(`Earned ${pointsAwarded} skill point(s)!`);
+      },
+    });
+
+    const skillEffects = useSkillEffects();
+
+    const { earnAchievement, getCount } = useAdventureAchievements();
+
+    // Helper to earn achievement and show toast notification
+    const handleEarnAchievement = useCallback(
+      (achievementId: keyof typeof ADVENTURE_ACHIEVEMENTS) => {
+        const isNewOrUpgraded = earnAchievement(achievementId);
+        if (isNewOrUpgraded) {
+          const achievement = ADVENTURE_ACHIEVEMENTS[achievementId];
+          const count = getCount(achievementId) + 1; // +1 because getCount returns previous value
+          showAchievementToast({
+            achievement,
+            count,
+            isNew: count === 1,
+          });
+        }
+        return isNewOrUpgraded;
+      },
+      [earnAchievement, getCount]
+    );
+
+    const { currentMilestone, checkMilestone } = useComboMilestone();
+
     const upgradeBonuses = useMemo(() => {
       return {
         timeBonus: getUpgradeEffect('timeBonus').multiplier,
@@ -289,10 +253,7 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [getUpgradeEffect]);
 
-    // Apply time bonus to level config (create modified config with bonus time)
-    // NOTE: adjustedConfig already has tier-based timer adjustments from useAdaptiveDifficulty
     const adjustedLevelConfig = useMemo(() => {
-      // Time bonus multiplier increases starting time
       const bonusTime = Math.floor(adjustedConfig.timerSeconds * (upgradeBonuses.timeBonus - 1));
       return {
         ...adjustedConfig,
@@ -300,10 +261,10 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [adjustedConfig, upgradeBonuses.timeBonus]);
 
-    // Game state from hook
     const {
       gameState,
       tiles: tiles2D,
+      tilesVersion,
       objectives,
       timeRemaining,
       canComplete,
@@ -323,72 +284,41 @@ const AdventureGame = memo<AdventureGameProps>(
       initialGrid,
     });
 
-    // Flatten tiles for AdventureGrid component (uses structural equality)
-    const tiles = useMemoizedFlatTiles(tiles2D);
-
-    // Language context for translations
+    // O(1) change detection using version counter instead of O(n²) deep comparison
+    const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
     const { t, language } = useLanguage();
-
-    // Progression context for recording attempts
     const { recordAttempt, getLevelAttempt } = useProgression();
-
-    // Get best attempt for this level (for partial progress display)
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
       [getLevelAttempt, levelConfig.world, levelConfig.level]
     );
 
-    // Local UI state
     const [isPaused, setIsPaused] = useState(false);
     const [showLevelComplete, setShowLevelComplete] = useState(false);
-    // Note: popupQueue and pendingExplosions now managed by useAdventureEffects hook
-
-    // Note: chainBurstConfig now managed by useAdventureEffects hook
-
-    // Consolidated validation feedback state
     const [validationFeedback, setValidationFeedback] = useState<ValidationFeedback>({
       error: null,
       wasSubmitted: false,
       isValid: false,
     });
 
-    // Victory/defeat cinematic management
     const cinematics = useAdventureCinematics();
 
-    // Refs for timeout cleanup
     const validationErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const wordSubmittedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // Track last word for explosion calculation
     const lastSubmittedWordRef = useRef<{ word: string; path: Array<{ row: number; col: number }> } | null>(null);
 
-    // Entry phase state machine (cascade → objectives → title → playing)
     const entryPhaseManager = useAdventureEntryPhase();
     const { entryPhase } = entryPhaseManager;
 
-    // Note: scoreDisplayRef now managed by useAdventureEffects hook
-
-    // Cleanup all timeouts on unmount
     useEffect(() => {
       return () => {
-        if (validationErrorTimeoutRef.current) {
-          clearTimeout(validationErrorTimeoutRef.current);
-        }
-        if (wordSubmittedTimeoutRef.current) {
-          clearTimeout(wordSubmittedTimeoutRef.current);
-        }
-        if (popupQueueTimeoutRef.current) {
-          clearTimeout(popupQueueTimeoutRef.current);
-        }
+        if (validationErrorTimeoutRef.current) clearTimeout(validationErrorTimeoutRef.current);
+        if (wordSubmittedTimeoutRef.current) clearTimeout(wordSubmittedTimeoutRef.current);
+        if (popupQueueTimeoutRef.current) clearTimeout(popupQueueTimeoutRef.current);
       };
     }, []);
 
-    // Note: currentPopup now managed by useAdventureEffects hook
-
-    // Word validation hook (must come before selection hook which depends on isValidating)
-    // Pass tiles for score calculation with special tile multipliers (gold 3x, rainbow 1.25x)
-    // minWordLength comes from levelConfig (World 1 uses 2, others default to 3)
     const minWordLength = levelConfig.minWordLength ?? 3;
     const { validateWord, isValidating } = useAdventureWordValidation({
       grid: initialGrid,
@@ -398,10 +328,8 @@ const AdventureGame = memo<AdventureGameProps>(
       tiles: tiles2D,
     });
 
-    // Ref to grid for coordinate calculation
     const gridRef = useRef<HTMLDivElement>(null);
 
-    // Selection hook with adjacency validation
     const {
       selectedIndices,
       currentWord,
@@ -416,13 +344,8 @@ const AdventureGame = memo<AdventureGameProps>(
       gridRef,
     });
 
-    // Hint system hook with AI Director pacing adjustments (DDA-02)
-    // Apply hintEscalationRate to make hints appear faster when player is frustrated
-    // or slower when player is bored (to maintain challenge)
     const adjustedInactivityThresholdMs = useMemo(() => {
-      const baseThreshold = 15000; // 15 seconds base
-      // Higher escalation rate = faster hints (lower threshold)
-      // hintEscalationRate: 0.5x (slower) to 2.0x (faster)
+      const baseThreshold = 15000;
       return Math.floor(baseThreshold / intensityAdjustments.hintEscalationRate);
     }, [intensityAdjustments.hintEscalationRate]);
 
@@ -442,7 +365,6 @@ const AdventureGame = memo<AdventureGameProps>(
       inactivityThresholdMs: adjustedInactivityThresholdMs,
     });
 
-    // Boss gameplay hook (consolidates mechanics, health, intro, defeat detection)
     const isBossLevel = levelConfig.isBossLevel;
     const boss = useAdventureBoss({
       isBossLevel,
@@ -455,7 +377,6 @@ const AdventureGame = memo<AdventureGameProps>(
       onStartAIDirector: startAIDirector,
     });
 
-    // Destructure boss state for easier access
     const {
       isBossActive,
       bossConfig,
@@ -478,12 +399,19 @@ const AdventureGame = memo<AdventureGameProps>(
       handleBossIntroSkip,
     } = boss;
 
-    // Lexi stuck detection (DEBT-03 + DEBT-04 integration)
-    // Detects when player hasn't made progress and shows helpful hint
+    // ==============================================
+    // PLAYER HEALTH (Boss battles only)
+    // ==============================================
+    const playerHealth = usePlayerHealth(isBossLevel ? 100 : 0);
+    const {
+      healthState: playerHealthState,
+      takeDamage: takePlayerDamage,
+      resetHealth: resetPlayerHealth,
+    } = playerHealth;
+
     const isModalOpen = showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic || showBossIntro || showBossFireworks;
     const { resetOnGameAction } = useLexiStuckDetection({
       onStuck: () => {
-        // Show Lexi hint when player is stuck
         neoInfoToast(t('adventure.lexi.stuckHint') || 'Need a hint? Try looking for shorter words first!', {
           icon: '💡',
           duration: 5000,
@@ -495,8 +423,6 @@ const AdventureGame = memo<AdventureGameProps>(
       isBossLevel,
     });
 
-    // Lexi reaction state - transform game state to reaction format
-    // Using ref + effect to avoid recreating object on every timer tick (60 runs/minute → ~6 runs/minute)
     const lexiGameStateRef = useRef<GameStateForReactions>({
       wordsFound: [],
       comboCount: 0,
@@ -506,21 +432,17 @@ const AdventureGame = memo<AdventureGameProps>(
       worldId: 1,
     });
 
-    // Update ref only when significant values change (not timer ticks)
-    // This prevents useLexiReactions from re-running every second
     useEffect(() => {
       lexiGameStateRef.current = {
         wordsFound: gameState.wordsFound,
         comboCount: gameState.comboCount,
-        timeRemaining, // Include current time for completeness
+        timeRemaining,
         isComplete: gameState.isComplete,
         stars: gameState.stars,
         worldId: levelConfig.world,
       };
     }, [gameState.wordsFound, gameState.comboCount, gameState.isComplete, gameState.stars, levelConfig.world, timeRemaining]);
 
-    // Memoize based only on significant changes (not timeRemaining)
-    // The ref is updated by the effect above, this just provides stable object identity
     const lexiGameState = useMemo(() => {
       return {
         wordsFound: gameState.wordsFound,
@@ -532,7 +454,6 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [gameState.wordsFound, gameState.comboCount, gameState.isComplete, gameState.stars, levelConfig.world]);
 
-    // All visual effects managed by composite hook
     const effects = useAdventureEffects({
       gameStateForReactions: {
         gameState: lexiGameState,
@@ -540,22 +461,45 @@ const AdventureGame = memo<AdventureGameProps>(
       },
     });
 
-    // Report timer state to parent for music coordination
-    // Parent (AdventureView) owns the useAdventureMusic hook to play music on all screens
-    // Performance: Only report on significant changes (not every second tick)
+    // ==============================================
+    // BOSS EFFECT CALLBACKS (uses effects, must come after)
+    // ==============================================
+    const bossEffectCallbacks: EffectCallbacks = useMemo(() => ({
+      onPlayerDamage: (amount: number) => {
+        if (isBossLevel) {
+          takePlayerDamage(amount);
+        }
+      },
+      onTimerPenalty: (seconds: number) => {
+        // Timer penalty - reduce remaining time
+        // Note: addTime with negative value not yet implemented
+        // For now, log the penalty (will be implemented in Phase 4)
+        console.log(`[Boss Effect] Timer penalty: ${seconds}s`);
+      },
+      onScreenShake: (intensity?: number) => {
+        effects.shake(intensity ?? 4);
+      },
+      onDamageFlash: () => {
+        // Flash effect handled by AdventureEffectsLayer
+        // Could add a red flash overlay here
+      },
+      onScramble: () => {
+        // Board scramble handled by game state
+        console.log('[Boss Effect] Scramble triggered');
+      },
+    }), [isBossLevel, takePlayerDamage, effects]);
+
     const lastReportedStateRef = useRef<LastReportedTimerState | null>(null);
 
     useEffect(() => {
       const actuallyPlaying = isPlaying && entryPhase === 'playing';
       const lastState = lastReportedStateRef.current;
 
-      // Determine if this is a significant change worth reporting
       const isSignificantChange =
         !lastState ||
         lastState.isPlaying !== actuallyPlaying ||
         lastState.isPaused !== isPaused ||
         lastState.phase !== entryPhase ||
-        // Report every 5 seconds during gameplay, or when time is critical (<10s)
         Math.floor(lastState.timeRemaining / 5) !== Math.floor(timeRemaining / 5) ||
         timeRemaining <= 10;
 
@@ -575,56 +519,35 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [timeRemaining, isPlaying, isPaused, entryPhase, onTimerStateChange, adjustedLevelConfig.timerSeconds]);
 
-    // Note: Boss low-time taunt now handled by useAdventureBoss hook
-
-    // Check combo milestone when combo count changes
+    // Consolidated combo tracking effect - handles milestone check + prev tracking
     useEffect(() => {
+      // Check milestone only when actively playing
       if (isPlaying && entryPhase === 'playing' && !isPaused) {
         checkMilestone(gameState.comboCount);
       }
+      // Always track previous combo count for change detection
+      prevComboCountRef.current = gameState.comboCount;
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, checkMilestone]);
 
-    // Track combo count for detecting combo breaks (DDA-03)
-    // Updates AFTER handleWordSubmit reads prevComboCountRef
-    useEffect(() => {
-      prevComboCountRef.current = gameState.comboCount;
-    }, [gameState.comboCount]);
-
-    // Note: Boss defeat detection and fireworks now handled by useAdventureBoss hook
-
-    // Handle cascade completion to advance to objectives phase
     const handleCascadeComplete = useCallback(() => {
       markCascadeComplete();
       entryPhaseManager.advanceToObjectives();
     }, [markCascadeComplete, entryPhaseManager]);
 
-    // Handle objectives slide-in completion to advance to title phase
     const handleObjectivesComplete = useCallback(() => {
       entryPhaseManager.advanceToTitle();
     }, [entryPhaseManager]);
 
-    // Handle title animation completion to start gameplay (or show boss intro)
     const handleTitleComplete = useCallback(() => {
-      if (showBossIntro && bossConfig) {
-        // Boss levels: show intro cutscene before starting gameplay
-        entryPhaseManager.advanceToPlaying();
-      } else {
-        entryPhaseManager.advanceToPlaying();
-        if (!isPlaying) {
-          startGame();
-          // Start AI Director session when gameplay begins (DDA-01)
-          startAIDirector();
-        }
+      entryPhaseManager.advanceToPlaying();
+      if (!isPlaying) {
+        startGame();
+        startAIDirector();
       }
-    }, [isPlaying, startGame, showBossIntro, bossConfig, startAIDirector, entryPhaseManager]);
+    }, [isPlaying, startGame, startAIDirector, entryPhaseManager]);
 
-    // Note: Boss intro handlers now provided by useAdventureBoss hook
-
-    // Task 3: Award XP and gold on level complete
     useEffect(() => {
-      // Only award once per level attempt
       if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars > 0) {
-        // Calculate XP based on level difficulty and performance
         const difficultyMap: Record<number, 'easy' | 'medium' | 'hard'> = {
           1: 'easy',
           2: 'easy',
@@ -633,20 +556,15 @@ const AdventureGame = memo<AdventureGameProps>(
           5: 'hard',
         };
         const difficulty = difficultyMap[levelConfig.level] || 'medium';
-
-        // Perfect clear bonus if all objectives met with stars
         const isPerfectClear = gameState.stars === 3;
-
-        // Time bonus if completed quickly (more than 50% time remaining)
         const hasTimeBonus = timeRemaining > (adjustedLevelConfig.timerSeconds * 0.5);
 
-        // Calculate XP (apply XP bonus multiplier from upgrades)
         const baseXp = calculateAdventureXp(
           difficulty,
           Math.max(1, gameState.comboCount),
           {
             perfectClear: isPerfectClear,
-            timeBonus: hasTimeBonus ? 0.1 : 0, // +10% for quick completion
+            timeBonus: hasTimeBonus ? 0.1 : 0,
           }
         );
         const earnedXp = Math.floor(baseXp * upgradeBonuses.xpBonus);
@@ -654,18 +572,16 @@ const AdventureGame = memo<AdventureGameProps>(
         const oldLevel = currentLevel;
         const levelUpResult = awardXp(earnedXp);
 
-        // Award gold (10-30 gold based on stars, + 50 bonus for perfect clear)
         const baseGold = 10 * gameState.stars;
         const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
         const totalGold = baseGold + perfectClearGoldBonus;
         addGold(totalGold);
 
-        // Check if player leveled up
         if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
           setLevelUpData({
             oldLevel,
             newLevel: levelUpResult.newLevel,
-            newTitles: [], // TODO: Add title system in future phase
+            newTitles: [],
           });
         }
 
@@ -673,111 +589,153 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [gameState.isComplete, gameState.stars, gameState.comboCount, timeRemaining, hasAwardedLevelRewards, levelConfig.level, adjustedLevelConfig.timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus]);
 
-    // Check for level completion and record attempt
-    useEffect(() => {
-      // Guard against running multiple times - completion is already handled
-      if (showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic) return;
+    // ==============================================
+    // LEVEL COMPLETION EFFECTS (Split for performance)
+    // Previously a single effect with 23 dependencies
+    // Now split into focused effects for better memoization
+    // ==============================================
 
-      // For boss levels: Only complete when boss HP = 0 (victory) or time runs out (defeat)
-      // For regular levels: Complete when objectives met or time runs out
+    // Track if completion has been processed to prevent double-processing
+    const completionProcessedRef = useRef(false);
+
+    // Store callbacks in refs for stable references (reduces effect dependencies)
+    const recordAttemptRef = useRef(recordAttempt);
+    const recordCompletionRef = useRef(recordCompletion);
+    const endAIDirectorRef = useRef(endAIDirector);
+    const handleEarnAchievementRef = useRef(handleEarnAchievement);
+
+    // Consolidated ref sync effect - keeps callback refs current and resets completion flag
+    useEffect(() => {
+      // Keep callback refs in sync for stable effect dependencies
+      recordAttemptRef.current = recordAttempt;
+      recordCompletionRef.current = recordCompletion;
+      endAIDirectorRef.current = endAIDirector;
+      handleEarnAchievementRef.current = handleEarnAchievement;
+      // Reset completion flag when level changes (part of same lifecycle)
+      completionProcessedRef.current = false;
+    }, [recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
+
+    // EFFECT 1: Victory/Defeat Detection & Cinematic Trigger
+    // Focused on: detecting completion state and triggering cinematics
+    useEffect(() => {
+      // Skip if already showing completion UI or already processed
+      if (showLevelComplete || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic) return;
+      if (completionProcessedRef.current) return;
+
+      // Player death triggers immediate defeat for boss levels
+      const playerDied = isBossLevel && playerHealthState.isDead;
+
       const shouldComplete = isBossLevel
-        ? bossHealthState.phase === 'victory' || bossHealthState.phase === 'defeat' || timeRemaining === 0
+        ? bossHealthState.phase === 'victory' || bossHealthState.phase === 'defeat' || timeRemaining === 0 || playerDied
         : gameState.isComplete || timeRemaining === 0;
 
-      if (shouldComplete) {
-        // Determine if victory or defeat
-        const isVictory = isBossLevel
-          ? bossHealthState.phase === 'victory'
-          : gameState.stars > 0;
+      if (!shouldComplete) return;
 
-        // Show appropriate cinematic first (before level complete modal)
-        if (isVictory) {
-          cinematics.showVictory();
-        } else {
-          cinematics.showDefeat();
-        }
-        pauseGame();
+      // Mark as processed to prevent double-processing
+      completionProcessedRef.current = true;
 
-        // Handle boss battle completion
-        if (isBossActive && isBossLevel) {
-          // End boss battle (only if not already in victory/defeat phase)
-          if (bossHealthState.phase !== 'victory' && bossHealthState.phase !== 'defeat') {
-            endBossBattle(isVictory);
-          }
+      // Player death = defeat, boss defeated = victory
+      const isVictory = isBossLevel
+        ? bossHealthState.phase === 'victory' && !playerDied
+        : gameState.stars > 0;
 
-          // Trigger boss victory/defeat taunt
-          triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
-
-          // Earn boss slayer achievement on victory (ACHIEVE-01 requirement)
-          if (isVictory) {
-            earnAchievement('BOSS_SLAYER');
-          }
-        }
-
-        // Perfect level achievement for 3-star completion (ACHIEVE-01 requirement)
-        if (gameState.stars === 3) {
-          earnAchievement('PERFECT_LEVEL');
-        }
-
-        // Record attempt (including failures) for partial progress tracking
-        // Build objective progress map from current objectives
-        const objectiveProgress: Record<string, number> = {};
-        for (const obj of objectives) {
-          objectiveProgress[obj.type] = obj.current ?? 0;
-        }
-
-        // Record the attempt (stars > 0 means completion)
-        recordAttempt(
-          levelConfig.world,
-          levelConfig.level,
-          gameState.wordsFound.length,
-          gameState.score,
-          timeRemaining,
-          objectiveProgress,
-          gameState.stars > 0
-        );
-
-        // Record completion for adaptive difficulty tier updates
-        recordCompletion({
-          isCompletion: gameState.stars > 0,
-          timeRemaining,
-          timerSeconds: adjustedLevelConfig.timerSeconds,
-          score: gameState.score,
-          words: gameState.wordsFound.length,
-        });
-
-        // End AI Director session on level complete/fail (DDA-01)
-        endAIDirector();
+      // Trigger cinematic
+      if (isVictory) {
+        cinematics.showVictory();
+      } else {
+        cinematics.showDefeat();
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      pauseGame();
+
     }, [
-      showLevelComplete, // Guard dependency - must be first to prevent infinite loops
+      showLevelComplete,
       cinematics.showVictoryCinematic,
       cinematics.showDefeatCinematic,
+      cinematics.showVictory,
+      cinematics.showDefeat,
       gameState.isComplete,
+      gameState.stars,
       timeRemaining,
       pauseGame,
-      recordAttempt,
-      recordCompletion,
-      levelConfig.world,
-      levelConfig.level,
-      gameState.wordsFound.length,
-      gameState.score,
-      gameState.stars,
-      objectives,
-      isBossActive,
       isBossLevel,
       bossHealthState.phase,
-      endBossBattle,
-      triggerBossTaunt,
-      adjustedLevelConfig.timerSeconds,
-      earnAchievement,
-      endAIDirector,
+      playerHealthState.isDead,
     ]);
 
-    // Helper to calculate popup start position from last selected tile
+    // EFFECT 2: Boss Battle Completion
+    // Focused on: boss-specific completion logic
+    useEffect(() => {
+      if (!completionProcessedRef.current) return;
+      if (!isBossActive || !isBossLevel) return;
+
+      const playerDied = playerHealthState.isDead;
+      const isVictory = bossHealthState.phase === 'victory' && !playerDied;
+
+      // End boss battle if not already ended
+      if (bossHealthState.phase !== 'victory' && bossHealthState.phase !== 'defeat') {
+        endBossBattle(isVictory);
+      }
+
+      triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
+
+      if (isVictory) {
+        handleEarnAchievementRef.current('BOSS_SLAYER');
+      }
+    }, [isBossActive, isBossLevel, bossHealthState.phase, playerHealthState.isDead, endBossBattle, triggerBossTaunt]);
+
+    // EFFECT 3: Achievement & Progress Recording
+    // Focused on: recording completion data and achievements
+    useEffect(() => {
+      if (!completionProcessedRef.current) return;
+      // Only run once per completion
+      if (!gameState.isComplete && timeRemaining > 0) return;
+
+      // Award perfect level achievement
+      if (gameState.stars === 3) {
+        handleEarnAchievementRef.current('PERFECT_LEVEL');
+      }
+
+      // Build objective progress
+      const objectiveProgress: Record<string, number> = {};
+      for (const obj of objectives) {
+        objectiveProgress[obj.type] = obj.current ?? 0;
+      }
+
+      // Record attempt
+      recordAttemptRef.current(
+        levelConfig.world,
+        levelConfig.level,
+        gameState.wordsFound.length,
+        gameState.score,
+        timeRemaining,
+        objectiveProgress,
+        gameState.stars > 0
+      );
+
+      // Record completion
+      recordCompletionRef.current({
+        isCompletion: gameState.stars > 0,
+        timeRemaining,
+        timerSeconds: adjustedLevelConfig.timerSeconds,
+        score: gameState.score,
+        words: gameState.wordsFound.length,
+      });
+
+      // End AI director
+      endAIDirectorRef.current();
+    }, [
+      gameState.isComplete,
+      gameState.stars,
+      gameState.wordsFound.length,
+      gameState.score,
+      timeRemaining,
+      objectives,
+      levelConfig.world,
+      levelConfig.level,
+      adjustedLevelConfig.timerSeconds,
+    ]);
+
     const getPopupStartPosition = useCallback(() => {
-      // Get position of last selected tile (center of word)
       if (selectedIndices.length === 0) {
         return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
       }
@@ -797,7 +755,6 @@ const AdventureGame = memo<AdventureGameProps>(
       return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     }, [selectedIndices]);
 
-    // Helper to calculate tile center position for chain particle burst
     const calculateTileCenter = useCallback((row: number, col: number) => {
       if (!gridRef.current) return { x: 0, y: 0 };
       const gridRect = gridRef.current.getBoundingClientRect();
@@ -808,34 +765,27 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [levelConfig.gridSize]);
 
-    // Detect chain tile activation and trigger particle burst
     useEffect(() => {
-      // Find tiles with 'link' activation effect
       const chainActivatedTiles = tiles.filter(
         tile => tile.activationEffect === 'link' && tile.activationTimestamp
       );
 
-      if (chainActivatedTiles.length > 0) {
-        // Use the first chain tile (in case multiple activate simultaneously)
-        const chainTile = chainActivatedTiles[0];
-        const position = calculateTileCenter(chainTile.row, chainTile.col);
+      if (chainActivatedTiles.length === 0) return;
 
-        effects.setChainBurstConfig({
-          trigger: true,
-          position,
-        });
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
-    }, [tiles, calculateTileCenter]);
+      const chainTile = chainActivatedTiles[0];
+      const position = calculateTileCenter(chainTile.row, chainTile.col);
 
-    // Trigger explosion at REMOVING phase start for 3+ tile words
+      effects.setChainBurstConfig({
+        trigger: true,
+        position,
+      });
+    }, [tiles, calculateTileCenter, effects]);
+
     useEffect(() => {
       if (cascadePhase === 'removing' && lastSubmittedWordRef.current) {
         const { word, path } = lastSubmittedWordRef.current;
 
-        // Only explode for 3+ tile words
         if (path.length >= 3) {
-          // Calculate center position of cleared tiles
           let centerX = 0;
           let centerY = 0;
 
@@ -848,17 +798,11 @@ const AdventureGame = memo<AdventureGameProps>(
           centerX /= path.length;
           centerY /= path.length;
 
-          // Calculate intensity from word length (3-4=1, 5-6=2, 7-9=3, 10+=4)
           let intensity: 1 | 2 | 3 | 4 = 1;
-          if (word.length >= 10) {
-            intensity = 4;
-          } else if (word.length >= 7) {
-            intensity = 3;
-          } else if (word.length >= 5) {
-            intensity = 2;
-          }
+          if (word.length >= 10) intensity = 4;
+          else if (word.length >= 7) intensity = 3;
+          else if (word.length >= 5) intensity = 2;
 
-          // Add explosion to pending list
           effects.addExplosion({
             id: Date.now(),
             position: { x: centerX, y: centerY },
@@ -866,13 +810,10 @@ const AdventureGame = memo<AdventureGameProps>(
           });
         }
 
-        // Clear ref after processing
         lastSubmittedWordRef.current = null;
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
-    }, [cascadePhase, calculateTileCenter]);
+    }, [cascadePhase, calculateTileCenter, effects]);
 
-    // Handle pause toggle
     const handlePauseToggle = useCallback(() => {
       if (isPaused) {
         startGame();
@@ -883,28 +824,24 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [isPaused, startGame, pauseGame]);
 
-    // Handle tile selection (for click)
     const handleTileSelect = useCallback(
       (index: number, _tile: GridTileState) => {
         if (!isPlaying || isPaused || isValidating || isCascading) return;
         selectTile(index);
-        resetOnGameAction(); // DEBT-04: Reset Lexi stuck detection timer on tile click
+        resetOnGameAction();
       },
       [isPlaying, isPaused, isValidating, isCascading, selectTile, resetOnGameAction]
     );
 
-    // Handle drag start
     const handleDragStart = useCallback(
       (index: number, _tile: GridTileState) => {
         if (!isPlaying || isPaused || isValidating || isCascading) return;
-        // Clear previous selection and start new one
         clearSelection();
         selectTile(index);
       },
       [isPlaying, isPaused, isValidating, isCascading, clearSelection, selectTile]
     );
 
-    // Handle drag enter (when dragging over tiles)
     const handleDragEnter = useCallback(
       (index: number, _tile: GridTileState) => {
         if (!isPlaying || isPaused || isValidating || isCascading) return;
@@ -913,14 +850,10 @@ const AdventureGame = memo<AdventureGameProps>(
       [isPlaying, isPaused, isValidating, isCascading, selectTile]
     );
 
-    // Handle word submission with validation
     const handleWordSubmit = useCallback(
       async (_word: string, _indices: number[]) => {
-        // Use currentWord and getPath() from selection hook for validated path
-        // minWordLength from levelConfig (World 1 = 2, others = 3)
         if (!isPlaying || isPaused || currentWord.length < minWordLength || isValidating || isCascading) return;
 
-        // Clear previous timeouts to prevent stale state updates
         if (validationErrorTimeoutRef.current) {
           clearTimeout(validationErrorTimeoutRef.current);
           validationErrorTimeoutRef.current = null;
@@ -930,39 +863,27 @@ const AdventureGame = memo<AdventureGameProps>(
           wordSubmittedTimeoutRef.current = null;
         }
 
-        // Clear any previous error
         setValidationFeedback(prev => ({ ...prev, error: null }));
 
-        // Get validated path from selection hook
         const path = getPath();
-
-        // Validate word
         const result = await validateWord(currentWord, path);
 
         if (result.isValid && result.score) {
-          // Get position BEFORE clearing selection
           const startPos = getPopupStartPosition();
-          // Task 4: Apply score bonus multiplier from upgrades
           let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus);
 
-          // Apply boss mechanic multiplier on boss levels
           let bossBonus: string | undefined;
           if (isBossActive && bossConfig) {
             const mechResult = checkBossWord(currentWord);
             scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
 
-            // Deal damage to boss with skill effects applied
-            // Base damage = word score / 10 (scaled to reasonable HP pool)
             let baseDamage = Math.floor(scoreValue / 10);
-
-            // Apply skill effects: boss damage multiplier and long word bonus
             baseDamage = Math.floor(baseDamage * skillEffects.bossDamageMultiplier);
             baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(currentWord.length));
 
             const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
             const damageDealt = dealBossDamage(baseDamage, gameState.comboCount, mechanicMultiplier, skillEffects.comboMultiplierBonus);
 
-            // Trigger taunt based on mechanic result
             if (mechResult.triggerTaunt) {
               triggerBossTaunt(mechResult.triggerTaunt);
             } else if (scoreValue >= 50) {
@@ -976,7 +897,6 @@ const AdventureGame = memo<AdventureGameProps>(
 
           const comboBonus = gameState.comboCount > 1 ? `${gameState.comboCount}x` : undefined;
 
-          // Add score popup to queue
           effects.addScorePopup({
             id: Date.now(),
             value: scoreValue,
@@ -986,106 +906,83 @@ const AdventureGame = memo<AdventureGameProps>(
             bonus: bossBonus || comboBonus,
           });
 
-          // Valid word - submit with calculated score and path for special tile effects
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
-
-          // Store word for explosion calculation at REMOVING phase
           lastSubmittedWordRef.current = { word: currentWord, path };
 
           submitWordWithPath(currentWord, scoreValue, path);
           clearSelection();
-          // Clear any hint and reset inactivity timer
           clearCurrentHint();
           recordActivity();
-          resetOnGameAction(); // DEBT-04: Reset Lexi stuck detection timer
-
-          // Record valid word for AI Director performance tracking (DDA-01)
+          resetOnGameAction();
           recordAIWord(true, gameState.comboCount);
 
-          // Track achievements (ACHIEVE-01 requirement)
-          // First word achievement
           if (gameState.wordsFound.length === 0) {
-            earnAchievement('FIRST_WORD');
+            handleEarnAchievement('FIRST_WORD');
           }
-          // Long word achievements
           if (currentWord.length >= 6) {
-            earnAchievement('LONG_WORD_6');
+            handleEarnAchievement('LONG_WORD_6');
           }
           if (currentWord.length >= 8) {
-            earnAchievement('LONG_WORD_8');
+            handleEarnAchievement('LONG_WORD_8');
           }
-          // Combo streak achievements
           if (gameState.comboCount >= 5) {
-            earnAchievement('WORD_STREAK_5');
+            handleEarnAchievement('WORD_STREAK_5');
           }
           if (gameState.comboCount >= 10) {
-            earnAchievement('WORD_STREAK_10');
+            handleEarnAchievement('WORD_STREAK_10');
           }
 
-          // Reset after animation duration with proper cleanup
           wordSubmittedTimeoutRef.current = setTimeout(() => {
             setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
           }, 400);
         } else if (result.errorKey) {
-          // Invalid word - show error
           const errorMessage = t(result.errorKey) || result.errorKey;
           setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
           clearSelection();
 
-          // Record invalid word for AI Director performance tracking (DDA-01)
           recordAIWord(false, 0);
 
-          // Detect combo break and trigger AI Director transition (DDA-03)
-          // Combo breaks when player had an active combo and submitted invalid word
           if (prevComboCountRef.current > 0) {
             handleAITransition();
           }
 
-          // Trigger boss bad word taunt on boss levels
           if (isBossActive) {
             triggerBossTaunt('onBadWord');
           }
 
-          // Clear error after 2 seconds with proper cleanup
           validationErrorTimeoutRef.current = setTimeout(() => {
             setValidationFeedback(prev => ({ ...prev, error: null }));
           }, 2000);
         }
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, earnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
     );
 
-    // Handle level-up modal dismiss
     const handleLevelUpClose = useCallback(() => {
       setLevelUpData(null);
     }, []);
 
-    // Handle cinematic completion (victory/defeat)
     const handleCinematicComplete = useCallback(() => {
       cinematics.handleCinematicComplete();
       setShowLevelComplete(true);
     }, [cinematics]);
 
-    // Handle level complete continue
     const handleContinue = useCallback(() => {
       setShowLevelComplete(false);
       onLevelComplete(gameState.stars, gameState.score);
     }, [gameState.stars, gameState.score, onLevelComplete]);
 
-    // Handle retry
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
-      setHasAwardedLevelRewards(false); // Reset reward flag for retry
+      setHasAwardedLevelRewards(false);
       clearSelection();
       resetGame();
+      resetPlayerHealth();
       startGame();
-    }, [resetGame, startGame, clearSelection]);
+    }, [resetGame, startGame, clearSelection, resetPlayerHealth]);
 
-    // Handle exit - directly use onExit since no additional logic needed
     const handleExit = onExit;
 
-    // Handle hint button click
     const handleHintClick = useCallback(() => {
       if (hasHintsAvailable) {
         getHint();
@@ -1093,21 +990,15 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [hasHintsAvailable, getHint, dismissAutoHint]);
 
-    // Convert hint path to indices for grid highlighting
-    // Combines adaptive difficulty hints and manual hints
     const hintHighlightIndices = useMemo(() => {
-      // Adaptive difficulty hint takes precedence (appears after multiple failures)
       if (hintData.level !== 'none' && hintData.highlightTiles && hintData.highlightTiles.length > 0) {
         return hintData.highlightTiles.map(pos => pos.row * levelConfig.gridSize + pos.col);
       }
-      // Otherwise use manual hint from hint button
       if (!currentHint?.path) return [];
       return currentHint.path.map(pos => pos.row * levelConfig.gridSize + pos.col);
     }, [hintData, currentHint, levelConfig.gridSize]);
 
-    // Handle score popup completion with safety timeout fallback
     const handlePopupComplete = useCallback(() => {
-      // Clear safety timeout when popup completes normally
       if (popupQueueTimeoutRef.current) {
         clearTimeout(popupQueueTimeoutRef.current);
         popupQueueTimeoutRef.current = null;
@@ -1115,60 +1006,47 @@ const AdventureGame = memo<AdventureGameProps>(
       effects.handlePopupComplete();
     }, [effects]);
 
-    // Safety mechanism: clear stuck popups after max duration
     useEffect(() => {
-      // Clear any existing timeout when popup changes (prevents stale timeout accumulation)
       if (popupQueueTimeoutRef.current) {
         clearTimeout(popupQueueTimeoutRef.current);
         popupQueueTimeoutRef.current = null;
       }
 
       if (effects.currentPopup) {
-        const POPUP_MAX_DURATION_MS = 3000; // Max 3 seconds per popup
+        const POPUP_MAX_DURATION_MS = 3000;
         popupQueueTimeoutRef.current = setTimeout(() => {
           effects.handlePopupComplete();
           popupQueueTimeoutRef.current = null;
         }, POPUP_MAX_DURATION_MS);
       }
 
-      // Cleanup on unmount or when popup changes
       return () => {
         if (popupQueueTimeoutRef.current) {
           clearTimeout(popupQueueTimeoutRef.current);
           popupQueueTimeoutRef.current = null;
         }
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effects.currentPopup, effects.handlePopupComplete]);
 
-    // Task 2: Wire screen shake and adaptive particles on combos
-    // Note: particleConfig now managed by useAdventureEffects hook
-
-    // Handle combo tier changes - trigger screen shake and particles
     const handleComboTierChange = useCallback((tier: ComboTier) => {
-      // Map combo tier thresholds to shake intensity (pixels)
       const shakeIntensityMap: Record<number, number> = {
-        2: 2,  // Nice! - subtle shake
-        4: 4,  // Great! - moderate shake
-        7: 6,  // Amazing! - strong shake
-        10: 8, // Legendary! - intense shake
+        2: 2,
+        4: 4,
+        7: 6,
+        10: 8,
       };
       const intensity = shakeIntensityMap[tier.threshold] || 2;
       effects.shake(intensity);
 
-      // Trigger adaptive particles (intensity 1-4 based on tier)
-      const particleIntensity = Math.ceil(tier.threshold / 3); // 2→1, 4→2, 7→3, 10→4
+      const particleIntensity = Math.ceil(tier.threshold / 3);
       effects.setParticleConfig({
         intensity: particleIntensity as 1 | 2 | 3 | 4 | 5,
-        origin: { x: 0.5, y: 0.4 }, // Center-top for combo celebrations
+        origin: { x: 0.5, y: 0.4 },
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- effects methods are stable
-    }, []);
+    }, [effects]);
 
-    // Calculate star count for display
     const starsEarned = gameState.stars;
 
-    // Render error state for invalid config
     if (!isValidConfig) {
       return (
         <div
@@ -1187,134 +1065,25 @@ const AdventureGame = memo<AdventureGameProps>(
         data-testid="adventure-game"
         role="main"
         aria-label="Adventure Mode Game"
-        className={cn(
-          'relative flex flex-col h-full',
-          'text-neo-white'
-        )}
+        className="h-[100dvh] w-full overflow-hidden relative"
       >
-        {/* Simplified ambient background for gameplay - less distracting than full WorldBackground */}
+        {/* Background */}
         <GameplayBackground className="absolute inset-0 -z-10" />
 
-        {/* Header - Mobile-optimized compact layout */}
-        <header
-          className={cn(
-            'flex items-center justify-between',
-            'px-2 sm:px-3 py-1',
-            'bg-neo-navy/80 border-b-2 border-neo-black/30',
-            'flex-shrink-0' // Prevent header from shrinking
-          )}
-        >
-          {/* Level Info - Compact on mobile */}
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <h1 className="text-sm sm:text-lg font-black whitespace-nowrap">
-              <span className="hidden sm:inline">{t('adventure.level')} </span>
-              <span className="sm:hidden">L</span>
-              {levelConfig.level}
-            </h1>
-            <div
-              ref={effects.scoreDisplayRef}
-              data-testid="score-display"
-              className="font-mono font-bold text-xs sm:text-sm"
-            >
-              {gameState.score}
-            </div>
-          </div>
-
-          {/* Timer and Pause - Always visible */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            <AdventureTimer timeRemaining={timeRemaining} size="compact" />
-            <button
-              onClick={handlePauseToggle}
-              aria-label={isPaused ? 'Resume' : 'Pause'}
-              className={cn(
-                'p-1 sm:p-1.5 rounded-neo',
-                'bg-neo-white/10 hover:bg-neo-white/20',
-                'transition-colors duration-200'
-              )}
-            >
-              {isPaused ? (
-                <Play className="w-3 h-3 sm:w-4 sm:h-4" />
-              ) : (
-                <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
-              )}
-            </button>
-          </div>
-        </header>
-
-        {/* Main Game Area - Compact layout, minimal spacing on mobile, expanded on desktop */}
-        <main className="flex-1 flex flex-col lg:flex-row lg:items-center lg:justify-center gap-0.5 sm:gap-2 lg:gap-6 p-0.5 sm:p-2 lg:p-4 overflow-y-auto min-h-0">
-          {/* Grid Section - Centered, minimal top spacing on mobile, larger on desktop */}
-          <div className="flex-shrink-0 flex flex-col items-center justify-center gap-0.5 sm:gap-1 lg:gap-2 min-h-0 relative mt-0 sm:mt-2 lg:mt-0">
-            {/* Combo Tier Badge - Positioned above grid */}
-            <ComboTierBadge
-              comboCount={gameState.comboCount}
-              className="absolute top-0 sm:top-[10%] left-1/2 -translate-x-1/2 z-50"
-              onTierChange={handleComboTierChange}
+        <GameLayout
+          header={
+            <GameHeader
+              worldNumber={levelConfig.world}
+              levelNumber={levelConfig.level}
+              score={gameState.score}
+              timeRemaining={timeRemaining}
+              isPaused={isPaused}
+              onPauseToggle={handlePauseToggle}
+              onExit={handleExit}
             />
-
-            {/* Feedback Container - Compact on mobile, fixed height prevents layout shift */}
-            <div
-              data-testid="feedback-container"
-              className="h-[28px] sm:h-[36px] flex items-center justify-center relative"
-            >
-              {/* Minimum Word Length Hint - Shows when selecting but not yet meeting minimum */}
-              {selectedIndices.length > 0 && selectedIndices.length < minWordLength && (
-                <div
-                  data-testid="min-word-hint"
-                  className={cn(
-                    'px-3 py-1 rounded-full',
-                    'bg-neo-white/10 border border-neo-white/20',
-                    'text-neo-white/70 text-xs font-medium',
-                    'flex items-center gap-1.5',
-                    'animate-in fade-in duration-150'
-                  )}
-                >
-                  <span>
-                    {minWordLength === 2
-                      ? t('adventure.hints.minLetters2') || '2+ letters'
-                      : t('adventure.hints.minLetters3') || '3+ letters'}
-                  </span>
-                  <span className="font-bold text-neo-lime">
-                    {selectedIndices.length}/{minWordLength}
-                  </span>
-                </div>
-              )}
-
-              {/* Validation Feedback */}
-              {validationFeedback.error && (
-                <div
-                  data-testid="validation-error"
-                  className={cn(
-                    'px-4 py-1.5 rounded-neo',
-                    'bg-neo-red/20 border-2 border-neo-red',
-                    'text-neo-red font-bold text-sm',
-                    'animate-neo-shake'
-                  )}
-                >
-                  {validationFeedback.error}
-                </div>
-              )}
-
-              {/* Loading Indicator */}
-              {isValidating && (
-                <div
-                  data-testid="validation-loading"
-                  className="text-neo-cyan font-bold text-sm animate-pulse"
-                >
-                  {t('common.validating') || 'Validating...'}
-                </div>
-              )}
-            </div>
-
-            {/* Adaptive Difficulty Hint Message */}
-            {hintData.level !== 'none' && (
-              <div className="flex items-center justify-center">
-                <HintMessage hintData={hintData} />
-              </div>
-            )}
-
-            <AdventureGrid
-              ref={gridRef}
+          }
+          gridArea={
+            <GameGridArea
               tiles={tiles}
               gridSize={levelConfig.gridSize}
               selectedIndices={selectedIndices}
@@ -1322,269 +1091,157 @@ const AdventureGame = memo<AdventureGameProps>(
               onWordSubmit={handleWordSubmit}
               onDragStart={handleDragStart}
               onDragEnter={handleDragEnter}
-              interactive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating && !isCascading}
-              disabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating || isCascading}
-              showWordPreview
-              className="max-w-md w-full lg:max-w-lg xl:max-w-xl"
-              pathPoints={pathPoints}
-              isWordValid={validationFeedback.isValid}
-              wasWordSubmitted={validationFeedback.wasSubmitted}
+              gridRef={gridRef}
+              isInteractive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating && !isCascading}
+              isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating || isCascading}
+              entryPhase={entryPhase}
               showCascade={entryPhase === 'cascade'}
               onCascadeComplete={handleCascadeComplete}
               hintHighlightIndices={hintHighlightIndices}
+              pathPoints={pathPoints}
+              validationError={validationFeedback.error}
+              isValidating={isValidating}
+              isWordValid={validationFeedback.isValid}
+              wasWordSubmitted={validationFeedback.wasSubmitted}
+              selectedLength={selectedIndices.length}
+              minWordLength={minWordLength}
+              comboCount={gameState.comboCount}
+              onComboTierChange={handleComboTierChange}
+              hintLevel={hintData.level}
             />
-          </div>
-
-          {/* Sidebar - Objectives & Info - Mobile-optimized, expanded on desktop */}
-          <aside
-            className={cn(
-              // Mobile: horizontal scroll, Desktop: wider sidebar for better readability
-              'flex-shrink-0 w-full lg:w-56 xl:w-64 2xl:w-72',
-              'flex flex-row lg:flex-col gap-1.5 sm:gap-2 lg:gap-3',
-              'overflow-x-auto lg:overflow-visible',
-              'lg:border-l-2 lg:border-neo-black/20 lg:pl-3',
-              // Compact padding
-              'p-1.5 sm:p-2 rounded-neo',
-              'bg-neo-navy/95 backdrop-blur-lg',
-              'border-2 border-neo-white/20',
-              'shadow-hard',
-              // Safe area for notched mobile devices
-              'mb-4 sm:mb-6 lg:mb-0'
-            )}
-          >
-            {/* Objectives - Takes more space on mobile */}
-            <div className="flex-shrink-0 min-w-[140px] lg:min-w-0">
-              <h2 className="text-[10px] sm:text-xs font-bold text-neo-white/80 uppercase tracking-wide mb-0.5 sm:mb-1">
-                {t('adventure.game.objectives')}
-              </h2>
-              <AdventureObjectives
-                objectives={objectives}
-                showSlideIn={entryPhase === 'objectives'}
-                onSlideInComplete={handleObjectivesComplete}
+          }
+          sidebar={
+            <GameSidebar
+              objectives={objectives}
+              comboCount={gameState.comboCount}
+              showSlideIn={entryPhase === 'objectives'}
+              onSlideInComplete={handleObjectivesComplete}
+              hasHintsAvailable={hasHintsAvailable}
+              onHintClick={handleHintClick}
+              showAutoHint={showAutoHint}
+              currentHint={currentHint}
+              hintLevel={hintData.level}
+              className="border-t-2 lg:border-t-0 lg:border-l-2 border-neo-black/30"
+            />
+          }
+          overlays={
+            <>
+              {/* Boss Battle Overlay */}
+              <BossOverlay
+                boss={bossConfig}
+                maxHP={isBossLevel ? 100 : 0}
+                healthState={bossHealthState}
+                currentTaunt={bossTaunt}
+                showTaunt={showBossTaunt}
+                showIntro={showBossIntro}
+                onStartBattle={handleBossIntroStart}
+                onSkipIntro={handleBossIntroSkip}
+                showVictory={showLevelComplete && bossHealthState.phase === 'victory'}
+                showDefeat={showLevelComplete && (bossHealthState.phase === 'defeat' || playerHealthState.isDead)}
+                stars={starsEarned}
+                score={gameState.score}
+                wordsFound={gameState.wordsFound}
+                gameState={gameState}
+                onContinue={handleContinue}
+                onRetry={handleRetry}
+                worldNumber={levelConfig.world}
+                effectCallbacks={bossEffectCallbacks}
               />
-            </div>
 
-            {/* Combo Display - Compact on mobile */}
-            <div
-              data-testid="combo-display"
-              className={cn(
-                'flex-shrink-0 min-w-[80px] lg:min-w-0',
-                'p-1.5 sm:p-2 rounded-neo',
-                'bg-neo-black/30 border-2 border-neo-cyan/30'
+              {/* Player Health Bar (Boss levels only) */}
+              {isBossLevel && isBossActive && !showBossIntro && !showLevelComplete && !playerHealthState.isDead && (
+                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">
+                  <PlayerHealthBar healthState={playerHealthState} />
+                </div>
               )}
-            >
-              <p className="text-[10px] sm:text-xs font-bold text-neo-white/70 uppercase tracking-wide">
-                {t('adventure.game.combo')}
-              </p>
-              <p className="text-lg sm:text-xl font-black text-neo-cyan drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]">
-                x{gameState.comboCount}
-              </p>
-            </div>
 
-            {/* Hint Button - Compact on mobile */}
-            <button
-              onClick={handleHintClick}
-              disabled={!hasHintsAvailable}
-              data-testid="hint-button"
-              aria-label={t('adventure.game.hint')}
-              className={cn(
-                'flex-shrink-0 flex items-center justify-center gap-1',
-                'p-1.5 sm:p-2 rounded-neo',
-                'text-xs sm:text-sm font-bold transition-all duration-200',
-                'min-w-[70px] lg:min-w-0',
-                hasHintsAvailable
-                  ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
-                  : 'bg-neo-black/30 text-neo-white/40 border-2 border-neo-white/10 cursor-not-allowed'
+              {/* Pause Overlay */}
+              <PauseOverlay
+                isOpen={isPaused && !showLevelComplete}
+                onResume={handlePauseToggle}
+                onRestart={handleRetry}
+                onExit={handleExit}
+              />
+
+              {/* Level Entry Overlay */}
+              <LevelEntryOverlay
+                levelNumber={levelConfig.level}
+                worldNumber={levelConfig.world}
+                isVisible={entryPhase === 'title'}
+                onComplete={handleTitleComplete}
+              />
+
+              {/* Victory Cinematic */}
+              {cinematics.showVictoryCinematic && (
+                <CinematicPlayer
+                  composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
+                  compositionProps={{
+                    starsEarned: gameState.stars,
+                    wordsFound: gameState.wordsFound.length,
+                    finalScore: gameState.score,
+                    timeRemaining: timeRemaining,
+                  }}
+                  durationSeconds={VICTORY_DURATION_FRAMES / 30}
+                  onComplete={handleCinematicComplete}
+                />
               )}
-            >
-              <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('adventure.game.hint')}</span>
-            </button>
 
-            {/* Auto-Hint Prompt - Hidden on mobile to save space */}
-            {showAutoHint && (
-              <div
-                data-testid="auto-hint-prompt"
-                className={cn(
-                  'hidden sm:block flex-shrink-0',
-                  'p-1.5 sm:p-2 rounded-neo',
-                  'bg-neo-yellow/20 border-2 border-neo-yellow/50',
-                  'animate-neo-pop'
-                )}
-              >
-                <p className="text-[10px] sm:text-xs font-bold text-neo-yellow text-center">
-                  {t('adventure.game.hintAvailable')}
-                </p>
-              </div>
-            )}
+              {/* Defeat Cinematic */}
+              {cinematics.showDefeatCinematic && (
+                <CinematicPlayer
+                  composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
+                  compositionProps={{
+                    wordsFound: gameState.wordsFound.length,
+                    bestWord: gameState.wordsFound.reduce((best, word) =>
+                      word.length > best.length ? word : best, ''
+                    ),
+                    finalScore: gameState.score,
+                  }}
+                  durationSeconds={DEFEAT_DURATION_FRAMES / 30}
+                  onComplete={handleCinematicComplete}
+                />
+              )}
 
-            {/* Current Hint Display - More compact on mobile */}
-            {currentHint && (
-              <div
-                data-testid="current-hint-display"
-                className={cn(
-                  'flex-shrink-0 min-w-[90px] lg:min-w-0',
-                  'p-1.5 sm:p-2 rounded-neo',
-                  'bg-neo-lime/20 border-2 border-neo-lime/50'
-                )}
-              >
-                <p className="text-[10px] sm:text-xs font-bold text-neo-lime text-center">
-                  {t('adventure.game.hintUsed')}
-                </p>
-                <p className="text-sm sm:text-base font-black text-neo-white text-center">
-                  {currentHint.word}
-                </p>
-              </div>
-            )}
-          </aside>
-        </main>
+              {/* Level Complete Modal */}
+              {!isBossLevel && (
+                <LevelCompleteModal
+                  isOpen={showLevelComplete && cinematics.cinematicComplete}
+                  stars={starsEarned}
+                  score={gameState.score}
+                  objectives={objectives}
+                  levelNumber={levelConfig.level}
+                  worldNumber={levelConfig.world}
+                  onContinue={handleContinue}
+                  onRetry={handleRetry}
+                  onExit={handleExit}
+                  totalStars={totalStars}
+                  bestAttempt={bestAttempt}
+                />
+              )}
 
-        {/* Boss Battle Overlay (all boss UI components with Phase 30 integration) */}
-        <BossOverlay
-          boss={bossConfig}
-          maxHP={isBossLevel ? 100 : 0}
-          healthState={bossHealthState}
-          currentTaunt={bossTaunt}
-          showTaunt={showBossTaunt}
-          showIntro={showBossIntro}
-          onStartBattle={handleBossIntroStart}
-          onSkipIntro={handleBossIntroSkip}
-          showVictory={showLevelComplete && bossHealthState.phase === 'victory'}
-          showDefeat={showLevelComplete && bossHealthState.phase === 'defeat'}
-          stars={starsEarned}
-          score={gameState.score}
-          wordsFound={gameState.wordsFound}
-          gameState={gameState}
-          onContinue={handleContinue}
-          onRetry={handleRetry}
-          worldNumber={levelConfig.world}
-        />
-
-        {/* Pause Overlay */}
-        {isPaused && !showLevelComplete && (
-          <div
-            data-testid="pause-overlay"
-            className={cn(
-              'absolute inset-0 z-40',
-              'flex flex-col items-center justify-center',
-              'bg-neo-black/80 backdrop-blur-sm'
-            )}
-          >
-            <h2 className="text-3xl font-black mb-8">{t('adventure.game.paused')}</h2>
-            <div className="flex flex-col gap-4 w-48">
-              <button
-                onClick={handlePauseToggle}
-                aria-label={t('common.resume')}
-                className={cn(
-                  'py-3 px-6',
-                  'bg-neo-lime text-neo-black',
-                  'font-black text-lg',
-                  'border-3 border-neo-black rounded-neo',
-                  'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
-                  'active:translate-y-0.5 active:shadow-hard-pressed',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                  'transition-all duration-200'
-                )}
-              >
-                {t('common.resume')}
-              </button>
-              <button
-                onClick={handleExit}
-                aria-label={t('common.exit')}
-                className={cn(
-                  'py-3 px-6',
-                  'flex items-center justify-center gap-2',
-                  'bg-neo-white/10 text-neo-white',
-                  'font-bold',
-                  'border-2 border-neo-white/20 rounded-neo',
-                  'hover:bg-neo-white/20 hover:border-neo-white/30',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
-                  'transition-all duration-200'
-                )}
-              >
-                <LogOut className="w-5 h-5" />
-                {t('common.exit')}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Level Entry Overlay - shows during title phase */}
-        <LevelEntryOverlay
-          levelNumber={levelConfig.level}
-          worldNumber={levelConfig.world}
-          isVisible={entryPhase === 'title'}
-          onComplete={handleTitleComplete}
-        />
-
-        {/* Victory Cinematic */}
-        {cinematics.showVictoryCinematic && (
-          <CinematicPlayer
-            composition={VictoryCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-            compositionProps={{
-              starsEarned: gameState.stars,
-              wordsFound: gameState.wordsFound.length,
-              finalScore: gameState.score,
-              timeRemaining: timeRemaining,
-            }}
-            durationSeconds={VICTORY_DURATION_FRAMES / 30}
-            onComplete={handleCinematicComplete}
-          />
-        )}
-
-        {/* Defeat Cinematic */}
-        {cinematics.showDefeatCinematic && (
-          <CinematicPlayer
-            composition={DefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
-            compositionProps={{
-              wordsFound: gameState.wordsFound.length,
-              bestWord: gameState.wordsFound.reduce((best, word) =>
-                word.length > best.length ? word : best, ''
-              ),
-              finalScore: gameState.score,
-            }}
-            durationSeconds={DEFEAT_DURATION_FRAMES / 30}
-            onComplete={handleCinematicComplete}
-          />
-        )}
-
-        {/* Level Complete: Standard Modal (boss levels use BossOverlay) */}
-        {!isBossLevel && (
-          <LevelCompleteModal
-            isOpen={showLevelComplete && cinematics.cinematicComplete}
-            stars={starsEarned}
-            score={gameState.score}
-            objectives={objectives}
-            levelNumber={levelConfig.level}
-            worldNumber={levelConfig.world}
-            onContinue={handleContinue}
-            onRetry={handleRetry}
-            onExit={handleExit}
-            totalStars={totalStars}
-            bestAttempt={bestAttempt}
-          />
-        )}
-
-        {/* All visual effects managed by AdventureEffectsLayer */}
-        <AdventureEffectsLayer
-          currentPopup={effects.currentPopup}
-          onPopupComplete={effects.handlePopupComplete}
-          scoreDisplayRef={effects.scoreDisplayRef}
-          reaction={effects.reaction}
-          onDismissReaction={effects.dismissReaction}
-          chainBurstConfig={effects.chainBurstConfig}
-          onChainBurstComplete={() => effects.setChainBurstConfig(null)}
-          world={levelConfig.world}
-          particleConfig={effects.particleConfig}
-          onParticleComplete={() => effects.setParticleConfig(null)}
-          pendingExplosions={effects.pendingExplosions}
-          onExplosionComplete={effects.removeExplosion}
-          levelUpData={levelUpData}
-          onLevelUpClose={handleLevelUpClose}
-          currentMilestone={currentMilestone}
-          isBossLevel={isBossLevel}
-          showBossFireworks={showBossFireworks}
-          defeatedBossTier={defeatedBossTier}
+              {/* Visual Effects */}
+              <AdventureEffectsLayer
+                currentPopup={effects.currentPopup}
+                onPopupComplete={handlePopupComplete}
+                scoreDisplayRef={effects.scoreDisplayRef}
+                reaction={effects.reaction}
+                onDismissReaction={effects.dismissReaction}
+                chainBurstConfig={effects.chainBurstConfig}
+                onChainBurstComplete={() => effects.setChainBurstConfig(null)}
+                world={levelConfig.world}
+                particleConfig={effects.particleConfig}
+                onParticleComplete={() => effects.setParticleConfig(null)}
+                pendingExplosions={effects.pendingExplosions}
+                onExplosionComplete={effects.removeExplosion}
+                levelUpData={levelUpData}
+                onLevelUpClose={handleLevelUpClose}
+                currentMilestone={currentMilestone}
+                isBossLevel={isBossLevel}
+                showBossFireworks={showBossFireworks}
+                defeatedBossTier={defeatedBossTier}
+              />
+            </>
+          }
         />
       </div>
     );

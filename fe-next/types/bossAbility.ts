@@ -59,7 +59,8 @@ export interface AbilityEffect {
     | 'timer_penalty'     // Reduce timer
     | 'score_modifier'    // Change scoring
     | 'spawn_special'     // Add special tiles
-    | 'requirement';      // Force word requirement
+    | 'requirement'       // Force word requirement
+    | 'player_damage';    // Deal damage to player health
 
   /** Target tiles (for tile-affecting effects) */
   target?: AbilityTarget;

@@ -2,6 +2,7 @@
  * AdventureObjectives Component
  *
  * Displays objective progress with icons, progress bars, and completion states.
+ * Enhanced with animated progress bars and satisfying completion effects.
  */
 
 'use client';
@@ -15,8 +16,13 @@ import {
   Clock,
   Gem,
   FileText,
+  Trophy,
+  Swords,
+  Heart,
+  Zap,
+  Shield,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -44,12 +50,33 @@ interface AdventureObjectivesProps {
 // ==============================================
 
 const OBJECTIVE_ICONS: Record<ObjectiveType, React.ComponentType<{ className?: string }>> = {
+  // Regular level objectives
   wordCount: FileText,
   scoreTarget: Target,
   longWords: Star,
   clearIce: Snowflake,
   timeBonus: Clock,
   collectGems: Gem,
+  // Boss level objectives
+  defeatBoss: Swords,
+  surviveBattle: Heart,
+  mechanicTrigger: Zap,
+  noDamage: Shield,
+};
+
+const OBJECTIVE_COLORS: Record<ObjectiveType, string> = {
+  // Regular level objectives
+  wordCount: 'text-neo-cyan',
+  scoreTarget: 'text-neo-yellow',
+  longWords: 'text-neo-purple',
+  clearIce: 'text-neo-cyan',
+  timeBonus: 'text-neo-lime',
+  collectGems: 'text-neo-pink',
+  // Boss level objectives - red/orange theme for battle
+  defeatBoss: 'text-neo-red',
+  surviveBattle: 'text-neo-pink',
+  mechanicTrigger: 'text-neo-orange',
+  noDamage: 'text-neo-lime',
 };
 
 // ==============================================
@@ -66,8 +93,6 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
     const [animationComplete, setAnimationComplete] = useState(!showSlideIn);
 
     // Reset animation state when showSlideIn transitions to true
-    // This handles the case where component renders first with showSlideIn=false
-    // (during cascade phase), then showSlideIn becomes true (objectives phase)
     useEffect(() => {
       if (showSlideIn && animationComplete) {
         setAnimationComplete(false);
@@ -76,11 +101,9 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
     }, [showSlideIn]);
 
     // Calculate total animation time and call completion callback
-    // DEBT-01: Uses optimized timing constants for faster entry
     useEffect(() => {
       if (!showSlideIn || animationComplete) return;
 
-      // Calculate total animation time using optimized constants
       const totalTime = OPTIMIZED_TIMING.getObjectivesDuration(objectives.length);
 
       const timer = setTimeout(() => {
@@ -126,6 +149,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
           const label = t(translationKey);
           const current = objective.current ?? 0;
           const progress = Math.min((current / objective.target) * 100, 100);
+          const colorClass = OBJECTIVE_COLORS[objective.type];
 
           // Skip animation if not showing or reduced motion
           const shouldAnimate = showSlideIn && !prefersReducedMotion && !animationComplete;
@@ -141,7 +165,6 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
               transition={
                 shouldAnimate
                   ? {
-                      // DEBT-01: Optimized spring config for faster entry
                       type: 'spring',
                       stiffness: OPTIMIZED_TIMING.objectives.spring.stiffness,
                       damping: OPTIMIZED_TIMING.objectives.spring.damping,
@@ -150,35 +173,35 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                   : { duration: 0 }
               }
               className={cn(
-                'flex items-center gap-2 p-2 rounded-neo',
-                'border-2 border-neo-black/20',
-                'transition-all duration-300',
+                'flex items-center gap-3 p-2.5 rounded-neo',
+                'border-3 transition-all duration-300',
+                'shadow-hard-sm',
                 objective.isPrimary && 'objective-primary',
                 !objective.isPrimary && 'objective-secondary',
                 objective.isComplete && 'objective-complete',
                 // Background based on state
                 objective.isComplete
-                  ? 'bg-neo-lime/20 border-neo-lime/40'
+                  ? 'bg-neo-lime/20 border-neo-lime'
                   : objective.isPrimary
-                    ? 'bg-neo-yellow/10 border-neo-yellow/30'
-                    : 'bg-neo-white/5 border-neo-white/10'
+                    ? 'bg-neo-yellow/10 border-neo-yellow/40'
+                    : 'bg-neo-black/40 border-neo-white/10'
               )}
             >
-              {/* Icon */}
-              <div
-                data-testid={`icon-${objective.type}`}
+              {/* Icon with background */}
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
                 className={cn(
-                  'flex-shrink-0 w-8 h-8 flex items-center justify-center',
-                  'rounded-neo border-2 border-neo-black/30',
+                  'flex-shrink-0 w-9 h-9 flex items-center justify-center',
+                  'rounded-neo border-2',
                   objective.isComplete
-                    ? 'bg-neo-lime text-neo-black'
+                    ? 'bg-neo-lime border-neo-black text-neo-black'
                     : objective.isPrimary
-                      ? 'bg-neo-yellow/20 text-neo-yellow'
-                      : 'bg-neo-white/10 text-neo-white/60'
+                      ? `bg-neo-black/50 border-neo-yellow/40 ${colorClass}`
+                      : 'bg-neo-black/30 border-neo-white/20 text-neo-white/60'
                 )}
               >
                 <Icon className="w-4 h-4" />
-              </div>
+              </motion.div>
 
               {/* Label and Progress */}
               <div className="flex-1 min-w-0">
@@ -197,7 +220,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                   </span>
                   <span
                     className={cn(
-                      'text-sm font-mono font-bold',
+                      'text-sm font-mono font-black tabular-nums',
                       objective.isComplete
                         ? 'text-neo-lime'
                         : 'text-neo-white/80'
@@ -207,44 +230,60 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                   </span>
                 </div>
 
-                {/* Progress Bar */}
+                {/* Enhanced Progress Bar */}
                 <div
                   role="progressbar"
                   aria-valuenow={current}
                   aria-valuemax={objective.target}
                   aria-label={`${label} progress`}
                   className={cn(
-                    'mt-1 h-1.5 rounded-full',
-                    'bg-neo-black/30 overflow-hidden'
+                    'mt-1.5 h-2 rounded-full',
+                    'bg-neo-black/50 overflow-hidden border border-neo-white/10'
                   )}
                 >
-                  <div
+                  <motion.div
                     data-testid={`progress-bar-${objective.type}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.8, delay: index * 0.1, ease: 'easeOut' }}
                     className={cn(
-                      'h-full rounded-full transition-all duration-500',
+                      'h-full rounded-full relative',
                       objective.isComplete
                         ? 'bg-neo-lime'
                         : objective.isPrimary
-                          ? 'bg-neo-yellow'
+                          ? 'bg-gradient-to-r from-neo-yellow to-neo-orange'
                           : 'bg-neo-white/50'
                     )}
-                    style={{ width: `${progress}%` }}
-                  />
+                  >
+                    {/* Shimmer effect on progress */}
+                    {!objective.isComplete && progress > 0 && (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                        animate={{ x: ['-100%', '100%'] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                      />
+                    )}
+                  </motion.div>
                 </div>
               </div>
 
-              {/* Checkmark for completed */}
-              {objective.isComplete && (
-                <div
-                  data-testid={`checkmark-${objective.type}`}
-                  className={cn(
-                    'flex-shrink-0 w-6 h-6 flex items-center justify-center',
-                    'rounded-full bg-neo-lime text-neo-black'
-                  )}
-                >
-                  <Check className="w-4 h-4" strokeWidth={3} />
-                </div>
-              )}
+              {/* Completion badge */}
+              <AnimatePresence>
+                {objective.isComplete && (
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    exit={{ scale: 0, rotate: 180 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                    className={cn(
+                      'flex-shrink-0 w-7 h-7 flex items-center justify-center',
+                      'rounded-full bg-neo-lime border-2 border-neo-black shadow-hard-sm'
+                    )}
+                  >
+                    <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.li>
           );
         })}
