@@ -10,6 +10,7 @@
 import React, { useRef, useState, useCallback, memo } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // ==============================================
 // TYPES
@@ -26,7 +27,7 @@ interface PremiumCardProps {
    * - default: Standard glass card
    * - gold: Gold-accented for premium/reward
    * - locked: Grayscale with chain effect
-   * - perfect: Rainbow shimmer for perfect completion
+   * - perfect: Subtle gold highlight for perfect completion
    */
   variant?: 'default' | 'gold' | 'locked' | 'perfect';
   /**
@@ -60,6 +61,10 @@ export const PremiumCard = memo(function PremiumCard({
 }: PremiumCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Disable tilt when user prefers reduced motion (accessibility)
+  const effectiveTiltEnabled = enableTilt && !prefersReducedMotion;
 
   // Motion values for 3D tilt
   const x = useMotionValue(0);
@@ -75,7 +80,7 @@ export const PremiumCard = memo(function PremiumCard({
   const glareY = useTransform(rotateX, [-10, 10], [0, 100]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!enableTilt || disabled || !cardRef.current) return;
+    if (!effectiveTiltEnabled || disabled || !cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -87,7 +92,7 @@ export const PremiumCard = memo(function PremiumCard({
 
     x.set(normalizedX);
     y.set(normalizedY);
-  }, [enableTilt, disabled, x, y]);
+  }, [effectiveTiltEnabled, disabled, x, y]);
 
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
@@ -105,19 +110,19 @@ export const PremiumCard = memo(function PremiumCard({
     }
   }, [disabled, onClick]);
 
-  // Variant-specific styles
+  // Variant-specific styles - neo-brutalist: hard shadows, no blur glow
   const variantStyles = {
     default: {
       border: 'border-4 border-neo-black',
       bg: 'bg-neo-black/50 backdrop-blur-md',
-      shadow: `0 0 30px ${glowColor}30, 6px 6px 0px black`,
-      hoverShadow: `0 0 50px ${glowColor}50, 8px 8px 0px black`,
+      shadow: '6px 6px 0px black',
+      hoverShadow: '8px 8px 0px black',
     },
     gold: {
       border: 'border-4 border-neo-yellow',
-      bg: 'bg-gradient-to-br from-neo-yellow/20 to-amber-500/20 backdrop-blur-md',
-      shadow: `0 0 40px ${glowColor}60, 6px 6px 0px black, inset 0 0 20px ${glowColor}20`,
-      hoverShadow: `0 0 60px ${glowColor}80, 8px 8px 0px black, inset 0 0 30px ${glowColor}30`,
+      bg: 'bg-neo-yellow/10 backdrop-blur-md',
+      shadow: '6px 6px 0px black',
+      hoverShadow: '8px 8px 0px black',
     },
     locked: {
       border: 'border-4 border-neo-white/20',
@@ -127,9 +132,9 @@ export const PremiumCard = memo(function PremiumCard({
     },
     perfect: {
       border: 'border-4 border-neo-yellow',
-      bg: 'bg-neo-black/60 backdrop-blur-md',
-      shadow: `0 0 50px ${glowColor}70, 6px 6px 0px black`,
-      hoverShadow: `0 0 80px ${glowColor}90, 8px 8px 0px black`,
+      bg: 'bg-neo-yellow/15 backdrop-blur-md',
+      shadow: '6px 6px 0px black',
+      hoverShadow: '8px 8px 0px black',
     },
   };
 
@@ -144,8 +149,8 @@ export const PremiumCard = memo(function PremiumCard({
       onMouseLeave={handleMouseLeave}
       onMouseEnter={handleMouseEnter}
       style={{
-        rotateX: enableTilt ? rotateX : 0,
-        rotateY: enableTilt ? rotateY : 0,
+        rotateX: effectiveTiltEnabled ? rotateX : 0,
+        rotateY: effectiveTiltEnabled ? rotateY : 0,
         transformStyle: 'preserve-3d',
         boxShadow: isHovered && !disabled ? styles.hoverShadow : styles.shadow,
       }}
@@ -161,31 +166,18 @@ export const PremiumCard = memo(function PremiumCard({
         className
       )}
     >
-      {/* Glare effect - always render but control opacity */}
+      {/* Subtle glare effect on hover - no animated gradients */}
       <motion.div
         className="absolute inset-0 pointer-events-none z-10"
         style={{
           background: useTransform(
             [glareX, glareY],
-            ([latestX, latestY]) => 
-              `radial-gradient(circle at ${latestX}% ${latestY}%, rgba(255,255,255,0.25) 0%, transparent 60%)`
+            ([latestX, latestY]) =>
+              `radial-gradient(circle at ${latestX}% ${latestY}%, rgba(255,255,255,0.12) 0%, transparent 50%)`
           ),
-          opacity: enableTilt && variant !== 'locked' && isHovered ? 1 : 0,
+          opacity: effectiveTiltEnabled && variant !== 'locked' && isHovered ? 1 : 0,
         }}
       />
-
-      {/* Perfect variant rainbow shimmer */}
-      {variant === 'perfect' && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div 
-            className="absolute inset-0 animate-shimmer"
-            style={{
-              background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.3), rgba(255,105,180,0.3), rgba(0,255,255,0.3), transparent)',
-              backgroundSize: '200% 100%',
-            }}
-          />
-        </div>
-      )}
 
       {/* Locked variant chain overlay */}
       {variant === 'locked' && (
