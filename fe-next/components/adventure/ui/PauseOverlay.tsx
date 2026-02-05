@@ -2,7 +2,7 @@
  * PauseOverlay Component
  *
  * Clean pause menu with resume, restart, and exit options.
- * Blurred background with centered card layout.
+ * Solid dark overlay with centered card layout.
  */
 
 'use client';
@@ -49,7 +49,7 @@ export const PauseOverlay = memo(function PauseOverlay({
       className={cn(
         'fixed inset-0 z-50',
         'flex items-center justify-center',
-        'bg-neo-black/80 backdrop-blur-md',
+        'bg-neo-navy/90',
         className
       )}
     >
