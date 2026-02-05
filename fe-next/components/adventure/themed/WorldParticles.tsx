@@ -284,17 +284,18 @@ const WorldParticles = memo<WorldParticlesProps>(({ particles, className }) => {
 
   return (
     <>
+      {/* Animation keyframes with viewport-optimized ranges (visible area only) */}
       <style jsx global>{`
         @keyframes flutter {
           from { transform: translateY(0) rotateZ(0deg); opacity: 0.8; }
-          to { transform: translateY(-100vh) rotateZ(360deg); opacity: 0; }
+          to { transform: translateY(-120%) rotateZ(360deg); opacity: 0; }
         }
 
         @keyframes fall-splash {
-          0% { transform: translateY(-10vh) scale(1); opacity: 0; }
+          0% { transform: translateY(-20%) scale(1); opacity: 0; }
           10% { opacity: 0.7; }
           90% { opacity: 0.7; }
-          100% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+          100% { transform: translateY(120%) scale(0.5); opacity: 0; }
         }
 
         @keyframes sparkle-drift {
