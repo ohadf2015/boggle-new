@@ -64,7 +64,6 @@ interface ParallaxLayerConfig {
   opacity: number;
   scale?: number;
   position?: 'top' | 'bottom' | 'center';
-  blur?: number;
 }
 
 interface WorldParallaxConfig {
@@ -111,7 +110,6 @@ const WORLD_PARALLAX_LAYERS: Record<number, WorldParallaxConfig> = {
       opacity: 0.5,
       scale: 1.4,
       position: 'bottom',
-      blur: 2,
     },
   },
   3: { // Caverns - crystals and stalactites
@@ -309,7 +307,6 @@ const ParallaxImageLayer = memo(({
   opacity,
   scale = 1.2,
   position = 'center',
-  blur = 0,
   parallaxX,
   parallaxY,
 }: ParallaxLayerConfig & {
@@ -335,7 +332,6 @@ const ParallaxImageLayer = memo(({
         alt=""
         fill
         className={cn('object-cover', positionClass)}
-        style={blur > 0 ? { filter: `blur(${blur}px)` } : undefined}
       />
     </div>
   );
@@ -362,15 +358,16 @@ const ForegroundFrame = memo(({
       className="level-grid-foreground-edge level-grid-foreground-edge--top"
       style={{
         transform: `translateY(${parallaxY * 0.6}px)`,
-        background: `linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)`,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
       }}
     />
-    {/* Bottom edge with world color glow */}
+    {/* Bottom edge with world color accent */}
     <div
       className="level-grid-foreground-edge level-grid-foreground-edge--bottom"
       style={{
         transform: `translateY(${-parallaxY * 0.6}px)`,
-        background: `linear-gradient(0deg, ${glowColor}30 0%, transparent 100%)`,
+        backgroundColor: glowColor,
+        opacity: 0.2,
       }}
     />
     {/* Side vignettes */}
@@ -518,13 +515,12 @@ export default function LevelGrid({
     <div data-testid="level-grid" className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent">
       {/* Simplified parallax container - cleaner, less distracting */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Layer 1: Base gradient with world accent */}
+        {/* Layer 1: Solid dark base with world accent */}
         <div
           className="absolute inset-0"
           style={{
             transform: `translate(${parallaxX * 0.05}px, ${parallaxY * 0.05}px)`,
-            background: `radial-gradient(ellipse at 50% 30%, ${glowColor}10 0%, transparent 50%),
-                         linear-gradient(180deg, rgba(10,10,30,0.95) 0%, rgba(15,15,40,1) 100%)`,
+            backgroundColor: 'rgb(12, 12, 35)',
           }}
         />
 
@@ -542,16 +538,16 @@ export default function LevelGrid({
             className="object-cover opacity-50"
             priority
           />
-          {/* Overlay to darken and add world color tint */}
+          {/* Overlay to darken image */}
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(180deg, rgba(10,10,30,0.4) 0%, ${glowColor}15 50%, rgba(10,10,30,0.6) 100%)`,
+              backgroundColor: 'rgba(10, 10, 30, 0.5)',
             }}
           />
         </div>
 
-        {/* Layer 3: Subtle accent glow */}
+        {/* Layer 3: Subtle accent highlight - solid color with opacity */}
         <div
           className="absolute inset-0"
           style={{
@@ -559,9 +555,10 @@ export default function LevelGrid({
           }}
         >
           <div
-            className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[400px] h-[300px] rounded-full"
+            className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[300px] h-[200px] rounded-full"
             style={{
-              background: `radial-gradient(ellipse, ${glowColor}25 0%, transparent 60%)`,
+              backgroundColor: glowColor,
+              opacity: 0.15,
             }}
           />
         </div>
@@ -600,18 +597,18 @@ export default function LevelGrid({
           className={cn(
             'relative overflow-hidden',
             'p-5 sm:p-8 rounded-neo-lg',
-            'bg-neo-black/60 backdrop-blur-xl',
+            'bg-neo-black/90',
             'border-4 border-neo-black shadow-hard-lg'
           )}
           style={{
             boxShadow: `0 0 60px ${glowColor}50, 8px 8px 0px black`,
           }}
         >
-          {/* Animated gradient accent overlay */}
+          {/* Animated accent overlay - solid color sweep */}
           <div
-            className="absolute inset-0 opacity-30 level-grid-gradient-sweep"
+            className="absolute inset-0 opacity-20 level-grid-gradient-sweep"
             style={{
-              background: `linear-gradient(135deg, ${glowColor}40 0%, transparent 40%, transparent 60%, ${glowColor}30 100%)`,
+              backgroundColor: glowColor,
             }}
           />
 

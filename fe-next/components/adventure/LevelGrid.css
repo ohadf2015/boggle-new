@@ -19,22 +19,21 @@
 }
 
 /* Glow orb breathing animation - subtle pulsing for atmosphere */
+/* Neo-brutalist: no blur filters, solid colors with opacity changes */
 @keyframes glow-orb-breathe {
   0%, 100% {
-    opacity: 0.8;
+    opacity: 0.6;
     transform: scale(1);
-    filter: blur(60px);
   }
   50% {
-    opacity: 1;
+    opacity: 0.8;
     transform: scale(1.1);
-    filter: blur(70px);
   }
 }
 
 .level-grid-glow-orb {
   pointer-events: none;
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
   animation: glow-orb-breathe 8s ease-in-out infinite;
 }
 
@@ -62,19 +61,16 @@
   height: 150px;
 }
 
-/* Vignette overlay for "looking through window" effect */
+/* Vignette overlay for depth effect */
+/* Neo-brutalist: replaced radial gradient with solid edge borders */
 .level-grid-foreground-vignette {
   position: absolute;
   inset: 0;
   pointer-events: none;
   will-change: transform;
   transition: transform 0.2s ease-out;
-  background: radial-gradient(
-    ellipse 80% 70% at 50% 50%,
-    transparent 50%,
-    rgba(0, 0, 0, 0.15) 80%,
-    rgba(0, 0, 0, 0.3) 100%
-  );
+  /* Use box-shadow for vignette instead of gradient */
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.25);
 }
 
 /* =============================================================================
