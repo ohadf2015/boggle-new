@@ -49,6 +49,16 @@ export {
 } from './EnhancedEmptyState';
 export type { EnhancedEmptyStateProps } from './EnhancedEmptyState';
 
+// New Enhanced Components v2
+export { DecorativeCard } from './DecorativeCard';
+export type { DecorativeCardProps } from './DecorativeCard';
+
+export { GameModeIcon } from './GameModeIcon';
+export type { GameModeIconProps } from './GameModeIcon';
+
+export { TactileButton } from './TactileButton';
+export type { TactileButtonProps } from './TactileButton';
+
 // Legacy exports for backward compatibility
 export { Button } from './button';
 export { Card, CardContent as LegacyCardContent } from './card';

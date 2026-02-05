@@ -256,3 +256,82 @@ export const useLanguage = (): LanguageContextValue => {
     }
     return context;
 };
+
+/**
+ * Default translation function for use outside of LanguageContext
+ * Falls back to English translations with basic key lookup
+ */
+const createFallbackT = (lang: Language = 'en') => (
+    path: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    paramsWhenFallback?: Record<string, string | number>
+): string => {
+    const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
+    const params: Record<string, string | number> = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
+        ? fallbackOrParams
+        : (paramsWhenFallback || {});
+
+    try {
+        const keys = path.split('.');
+        let current: unknown = (translations as Record<string, unknown>)[lang] || translations['en'];
+
+        for (const key of keys) {
+            if (typeof current !== 'object' || current === null || !(key in current)) {
+                return fallback || path;
+            }
+            current = (current as Record<string, unknown>)[key];
+        }
+
+        if (typeof current === 'string' && Object.keys(params).length > 0) {
+            let result = current.replace(/\$\{(\w+)\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            result = result.replace(/\{(\w+)\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            return result;
+        }
+
+        return typeof current === 'string' ? current : (fallback || path);
+    } catch {
+        return fallback || path;
+    }
+};
+
+/**
+ * Fallback values used when LanguageProvider is not available
+ * Useful for error boundaries and components that may render before provider mounts
+ */
+export const LANGUAGE_FALLBACK: LanguageContextValue = {
+    language: 'en',
+    setLanguage: () => {
+        logger.warn('setLanguage called outside of LanguageProvider');
+    },
+    t: createFallbackT('en'),
+    dir: 'ltr',
+    currentFlag: '🇺🇸'
+};
+
+/**
+ * Safe version of useLanguage that returns fallback values instead of throwing
+ * when used outside of LanguageProvider. Useful for:
+ * - Dynamically imported components that may load before provider mounts
+ * - Components used in ErrorBoundary fallback UI
+ * - Server-side rendering edge cases
+ *
+ * @returns LanguageContextValue - either from context or fallback defaults
+ */
+export const useLanguageSafe = (): LanguageContextValue => {
+    const context = useContext(LanguageContext);
+    if (!context) {
+        // Log warning in development only to help identify missing providers
+        if (process.env.NODE_ENV === 'development') {
+            logger.warn('useLanguageSafe: LanguageProvider not found, using fallback values');
+        }
+        return LANGUAGE_FALLBACK;
+    }
+    return context;
+};

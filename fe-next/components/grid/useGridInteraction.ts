@@ -538,7 +538,9 @@ export function useGridInteraction({
     const cols = grid[0]?.length || 4;
 
     // Initialize focused cell
-    if (focusedCell === null && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(e.key)) {
+    // NOTE: Space is NOT included here - Space is reserved for game pause/resume
+    // Users can use Enter or arrow keys to enter keyboard navigation mode
+    if (focusedCell === null && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) {
       setFocusedCell({ row: 0, col: 0 });
       setIsKeyboardMode(true);
       e.preventDefault();
@@ -567,13 +569,15 @@ export function useGridInteraction({
         newCol = Math.min(cols - 1, focusedCell.col + 1);
         e.preventDefault();
         break;
-      case ' ':
+      // NOTE: Space is NOT handled here - Space is reserved for game pause/resume
+      // Enter handles both cell selection and word submission
       case 'Enter': {
         e.preventDefault();
         const letter = grid[focusedCell.row]?.[focusedCell.col];
         if (!letter) return;
 
-        if (e.key === 'Enter' && selectedCells.length > 0) {
+        // Submit word if cells are selected
+        if (selectedCells.length > 0) {
           const formedWord = selectedCells.map(c => c.letter).join('');
           if (onPathSubmit) onPathSubmit([...selectedCells]);
           if (onWordSubmit) onWordSubmit(formedWord);
@@ -586,6 +590,7 @@ export function useGridInteraction({
           return;
         }
 
+        // Otherwise toggle cell selection
         const existingIndex = selectedCells.findIndex(c => c.row === focusedCell.row && c.col === focusedCell.col);
 
         if (existingIndex !== -1) {

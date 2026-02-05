@@ -387,7 +387,11 @@ const ja = {
     "support": "サポート＆フィードバック",
     "contactDescription": "質問、フィードバック、またはご挨拶!",
     "changeLanguage": "言語を変更",
-    "moreSettings": "その他の設定"
+    "moreSettings": "その他の設定",
+    "mute": "ミュート",
+    "unmute": "ミュート解除",
+    "enabled": "有効",
+    "disabled": "無効"
   },
   "share": {
     "button": "シェア",
@@ -2936,6 +2940,12 @@ const ja = {
     "challengeTrend": "今日のパズルに登場",
     "finish": "完了",
     "quitConfirmTitle": "デイリーバズを終了？",
+    "error": {
+      "title": "おっと！",
+      "description": "チャレンジの読み込み中に問題が発生しました。",
+      "helpText": "接続を確認してもう一度お試しください。",
+      "noOptions": "このチャレンジには選択肢がありません"
+    },
     "quitConfirm": "本当に終了しますか？",
     "fillTheBlank": "空欄を埋める",
     "connectingWord": "つなぐ単語",
@@ -4119,6 +4129,12 @@ const ja = {
       "achievements": "実績"
     },
     "worldLabel": "ワールド",
+    "world": "ワールド",
+    "stars": "スター",
+    "levelsCompleted": "レベルクリア",
+    "locked": "ロック中",
+    "playWorld": "プレイ",
+    "requires": "必要",
     "hiddenWord": "隠しワード",
     "devPreview": "開発プレビュー",
     "devPreviewDesc": "アドベンチャーモードは開発中です。このプレビューではワールドマップとレベル設定を表示しています。",

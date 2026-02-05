@@ -173,7 +173,7 @@ describe('BuzzChallenge', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/buzz.error|Oops!/i)).toBeInTheDocument();
+      expect(screen.getByText(/buzz\.error\.title|Oops!/i)).toBeInTheDocument();
     });
   });
 
@@ -189,7 +189,7 @@ describe('BuzzChallenge', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/buzz.error|Oops!/i)).toBeInTheDocument();
+      expect(screen.getByText(/buzz\.error\.title|Oops!/i)).toBeInTheDocument();
     });
 
     const backButton = screen.getByText(/common.back|Go Back/i);

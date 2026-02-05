@@ -1,21 +1,15 @@
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useGameEnd } from '../useGameEnd';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BotOpponent } from '../../../SinglePlayerView';
 
 // Mock external dependencies
-jest.mock('@/utils/wordValidationAPI', () => ({
-  finalizeWordValidation: jest.fn(),
-}));
-
 jest.mock('@/utils/singlePlayerAchievements', () => ({
   calculateFinalAchievements: jest.fn(),
 }));
 
-import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import { calculateFinalAchievements } from '@/utils/singlePlayerAchievements';
 
-const mockFinalizeWordValidation = finalizeWordValidation as jest.Mock;
 const mockCalculateFinalAchievements = calculateFinalAchievements as jest.Mock;
 
 describe('useGameEnd', () => {
@@ -78,19 +72,13 @@ describe('useGameEnd', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Mock crypto.randomUUID
+    // Mock crypto.randomUUID for gameSessionId generation
     Object.defineProperty(global, 'crypto', {
       value: {
         randomUUID: () => 'test-uuid-123',
       },
       writable: true,
     });
-
-    mockFinalizeWordValidation.mockResolvedValue([
-      { word: 'test', score: 3, timestamp: Date.now() - 5000, timeSinceStart: 5, isValid: true, comboBonus: 0 },
-      { word: 'word', score: 3, timestamp: Date.now() - 3000, timeSinceStart: 7, isValid: true, comboBonus: 1 },
-      { word: 'invalid', score: 5, timestamp: Date.now() - 1000, timeSinceStart: 9, isValid: false },
-    ]);
 
     mockCalculateFinalAchievements.mockReturnValue(mockAchievements);
   });
@@ -124,7 +112,7 @@ describe('useGameEnd', () => {
       expect(onGameEnd).not.toHaveBeenCalled();
     });
 
-    it('should validate words and call onGameEnd when game ends', async () => {
+    it('should process words and call onGameEnd when game ends', async () => {
       const onGameEnd = jest.fn();
 
       const { result, rerender } = renderHook(
@@ -140,7 +128,6 @@ describe('useGameEnd', () => {
         expect(onGameEnd).toHaveBeenCalled();
       });
 
-      expect(mockFinalizeWordValidation).toHaveBeenCalled();
       expect(result.current.gameOverCalledRef.current).toBe(true);
     });
 
@@ -225,24 +212,6 @@ describe('useGameEnd', () => {
 
       const results = onGameEnd.mock.calls[0][0];
       expect(results.achievements).toEqual(mockAchievements);
-    });
-
-    it('should include game session ID', async () => {
-      const onGameEnd = jest.fn();
-
-      const { rerender } = renderHook(
-        (props) => useGameEnd(props),
-        { initialProps: createDefaultOptions({ isGameOver: false, onGameEnd }) }
-      );
-
-      rerender(createDefaultOptions({ isGameOver: true, onGameEnd }));
-
-      await waitFor(() => {
-        expect(onGameEnd).toHaveBeenCalled();
-      });
-
-      const results = onGameEnd.mock.calls[0][0];
-      expect(results.gameSessionId).toBe('test-uuid-123');
     });
   });
 
@@ -329,45 +298,25 @@ describe('useGameEnd', () => {
     });
   });
 
-  describe('validating words state', () => {
-    it('should set validating state during validation', async () => {
+  describe('game session and validation', () => {
+    it('should include game session ID', async () => {
       const onGameEnd = jest.fn();
 
-      // Create a delayed mock to test loading state
-      let resolveValidation: (value: unknown) => void;
-      mockFinalizeWordValidation.mockReturnValue(
-        new Promise((resolve) => {
-          resolveValidation = resolve;
-        })
-      );
-
-      const { result, rerender } = renderHook(
+      const { rerender } = renderHook(
         (props) => useGameEnd(props),
         { initialProps: createDefaultOptions({ isGameOver: false, onGameEnd }) }
       );
 
       rerender(createDefaultOptions({ isGameOver: true, onGameEnd }));
 
-      // Should be validating
       await waitFor(() => {
-        expect(result.current.isValidatingWords).toBe(true);
+        expect(onGameEnd).toHaveBeenCalled();
       });
 
-      // Resolve validation
-      act(() => {
-        resolveValidation!([
-          { word: 'test', score: 3, isValid: true },
-        ]);
-      });
-
-      // Should not be validating anymore
-      await waitFor(() => {
-        expect(result.current.isValidatingWords).toBe(false);
-      });
+      const results = onGameEnd.mock.calls[0][0];
+      expect(results.gameSessionId).toBe('test-uuid-123');
     });
-  });
 
-  describe('bot words for validation', () => {
     it('should filter out fallback format bot words', async () => {
       const onGameEnd = jest.fn();
       const refs = createRefs();
@@ -402,6 +351,45 @@ describe('useGameEnd', () => {
       expect(results.botWordsForValidation).not.toContain('word1');
       expect(results.botWordsForValidation).not.toContain('word2');
       expect(results.botWordsForValidation).not.toContain('word3');
+    });
+
+    it('should treat pending words as invalid', async () => {
+      const onGameEnd = jest.fn();
+      const refs = createRefs();
+      // Include a pending word (isValid: null)
+      refs.foundWordsRef.current = [
+        { word: 'valid', score: 3, timestamp: Date.now(), timeSinceStart: 5, isValid: true, comboBonus: 0 },
+        { word: 'pending', score: 4, timestamp: Date.now(), timeSinceStart: 7, isValid: null, comboBonus: 0 },
+      ];
+
+      const { rerender } = renderHook(
+        (props) => useGameEnd(props),
+        {
+          initialProps: createDefaultOptions({
+            isGameOver: false,
+            onGameEnd,
+            foundWordsRef: refs.foundWordsRef,
+          }),
+        }
+      );
+
+      rerender(createDefaultOptions({
+        isGameOver: true,
+        onGameEnd,
+        foundWordsRef: refs.foundWordsRef,
+      }));
+
+      await waitFor(() => {
+        expect(onGameEnd).toHaveBeenCalled();
+      });
+
+      const results = onGameEnd.mock.calls[0][0];
+      // Only the valid word should count towards score
+      expect(results.playerScore).toBe(3);
+      // Pending word should be marked as invalid in playerWordData
+      const pendingWord = results.playerWordData.find((w: { word: string }) => w.word === 'pending');
+      expect(pendingWord.isValid).toBe(false);
+      expect(pendingWord.score).toBe(0);
     });
   });
 });

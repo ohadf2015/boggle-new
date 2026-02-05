@@ -387,7 +387,11 @@ const es = {
     "support": "Soporte y Feedback",
     "contactDescription": "Preguntas, sugerencias, o solo saludar!",
     "changeLanguage": "Cambiar idioma",
-    "moreSettings": "Más ajustes"
+    "moreSettings": "Más ajustes",
+    "mute": "Silenciar",
+    "unmute": "Activar sonido",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado"
   },
   "share": {
     "button": "Compartir",
@@ -2992,6 +2996,12 @@ const es = {
     },
     "quitConfirm": "¿Seguro que quieres salir? Perderás tu progreso.",
     "quitConfirmTitle": "¿Abandonar Daily Buzz?",
+    "error": {
+      "title": "¡Ups!",
+      "description": "Algo salió mal al cargar el desafío.",
+      "helpText": "Verifica tu conexión e inténtalo de nuevo.",
+      "noOptions": "No hay opciones disponibles para este desafío"
+    },
     "searches": "búsquedas",
     "challengeTrend": "En los retos de hoy",
     "topicIs": "El topic es: {topic}",
@@ -4116,6 +4126,12 @@ const es = {
     "level": "Nivel",
     "backToMap": "Volver al mapa del mundo",
     "worldLabel": "Mundo",
+    "world": "Mundo",
+    "stars": "estrellas",
+    "levelsCompleted": "niveles completados",
+    "locked": "Bloqueado",
+    "playWorld": "Jugar",
+    "requires": "requiere",
     "hiddenWord": "Palabra oculta",
     "devPreview": "Vista previa de desarrollo",
     "devPreviewDesc": "El Modo Aventura está en desarrollo. Esta vista previa muestra el mapa del mundo y la configuración de niveles.",

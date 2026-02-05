@@ -850,6 +850,10 @@ body {
       /* Height: square but capped to leave room for header/UI and safe area (home indicator) */
       height: min(calc(100dvw - 32px), calc(100dvh - 190px - env(safe-area-inset-bottom, 0px)));
       max-width: calc(100dvw - 32px);
+      /* CRITICAL: Minimum height prevents grid collapse in flex containers */
+      /* 180px ensures grid is always playable even on very cramped screens */
+      min-height: 180px;
+      min-width: 180px;
       /* Ensure board shrinks properly in flex containers on very short phones */
       max-height: 100%;
     }
@@ -1478,7 +1482,6 @@ html {
 .main-content-safe {
   /* Default padding for mobile (sticky header) */
   padding-top: 0;
-  padding-bottom: var(--mobile-bottom-safe);
 }
 
 /* On desktop (lg+), header is static so no top padding needed */

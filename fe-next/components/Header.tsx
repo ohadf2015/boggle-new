@@ -310,7 +310,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         />
                     </svg>
 
-                    <h1
+                    <span
                         className="font-black uppercase tracking-tight flex items-center gap-0.5 whitespace-nowrap"
                         style={{ fontFamily }}
                     >
@@ -336,7 +336,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         >
                             {t('logo.clash')}
                         </span>
-                    </h1>
+                    </span>
 
                     {/* Cyan lightning bolt - right */}
                     <svg

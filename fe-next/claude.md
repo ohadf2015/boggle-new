@@ -1,5 +1,7 @@
 # LexiClash - Project Guide
 
+> **Be extremely concise. Sacrifice grammar for brevity.**
+
 ## Tech Stack
 - **Framework**: Next.js 16.0.7 with App Router
 - **Language**: TypeScript 5.9.3 (mixed JS/TS codebase)

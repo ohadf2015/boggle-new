@@ -1,5 +1,7 @@
 # LexiClash - Project Overview
 
+> **Be extremely concise. Sacrifice grammar for brevity.**
+
 > **Primary codebase is `fe-next/`** - See [fe-next/CLAUDE.md](fe-next/CLAUDE.md) for all standards.
 
 ## Quick Start

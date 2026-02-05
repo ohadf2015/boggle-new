@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -209,19 +209,37 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="flex-1 flex items-center justify-center p-4"
+            role="alert"
+            aria-live="polite"
           >
             <div className="text-center space-y-4 max-w-md">
-              <div className="text-6xl">😞</div>
-              <h2 className="text-2xl font-black text-neo-red">
-                {t('buzz.error.title')}
-              </h2>
-              <p className="text-slate-400">{errorMessage}</p>
-              <button
-                onClick={onBack}
-                className="px-6 py-3 bg-neo-yellow text-neo-black font-bold rounded-xl border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all"
-              >
-                {t('common.back')}
-              </button>
+              <div className="text-6xl" aria-hidden="true">😞</div>
+              <h1 className="text-2xl font-black text-neo-red">
+                {t('buzz.error.title') || 'Failed to Load Challenge'}
+              </h1>
+              <p className="text-slate-400">
+                {errorMessage || t('buzz.error.description') || 'Something went wrong while loading the challenge.'}
+              </p>
+              <p className="text-sm text-slate-500">
+                {t('buzz.error.helpText') || 'Please check your connection and try again.'}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={() => {
+                    setErrorMessage(null);
+                    setPhase('loading');
+                  }}
+                  className="px-6 py-3 bg-neo-cyan text-neo-black font-bold rounded-xl border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-y-[-2px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  {t('common.retry') || 'Try Again'}
+                </button>
+                <button
+                  onClick={onBack}
+                  className="px-6 py-3 bg-neo-yellow text-neo-black font-bold rounded-xl border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-y-[-2px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  {t('common.back') || 'Back'}
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

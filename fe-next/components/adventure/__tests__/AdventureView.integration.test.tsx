@@ -109,7 +109,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     dir: 'ltr',
-    locale: 'en',
+    language: 'en',
+  }),
+  useLanguageSafe: () => ({
+    t: mockT,
+    dir: 'ltr',
+    language: 'en',
   }),
 }));
 

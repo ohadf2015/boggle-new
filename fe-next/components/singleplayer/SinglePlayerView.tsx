@@ -68,7 +68,7 @@ export interface SinglePlayerResultsData {
   achievements?: SinglePlayerAchievement[]; // Achievements earned (not saved to profile)
   botWordsForValidation?: string[]; // Bot words to show in validation modal
   gameSessionId?: string; // Unique session ID for vote tracking
-  language?: Language; // Game language for vote recording
+  language?: Language; // Game language
 }
 
 /**
@@ -152,11 +152,11 @@ const SinglePlayerView: React.FC = () => {
   }, []); // Empty deps: only run on mount/unmount, setIsInGame is stable
 
   // Check for returnTo param (e.g., returnTo=daily from training suggestion)
-  const returnTo = searchParams.get('returnTo');
+  const returnTo = searchParams?.get('returnTo') || null;
   // Check for autoStart param (e.g., autoStart=practice from onboarding)
-  const autoStart = searchParams.get('autoStart');
+  const autoStart = searchParams?.get('autoStart') || null;
   // Check for preset param (e.g., preset=bots from NextStepPrompt after practice)
-  const presetParam = searchParams.get('preset');
+  const presetParam = searchParams?.get('preset') || null;
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',
@@ -226,14 +226,14 @@ const SinglePlayerView: React.FC = () => {
           difficulty: practicePreset.settings.difficulty,
           timerSeconds: practicePreset.settings.timerSeconds,
           bots: [],
-          language: uiLanguage as Language,
+          language: (uiLanguage as Language) || 'en',
           grid: null,
           minWordLength,
         }));
         setPhase('playing');
       }
     }
-     
+
   }, [autoStart, uiLanguage]);
 
   // Auto-start bot game when autoStart=bots (direct from landing page)
@@ -257,7 +257,7 @@ const SinglePlayerView: React.FC = () => {
           difficulty: botsPreset.settings.difficulty,
           timerSeconds: botsPreset.settings.timerSeconds,
           bots,
-          language: uiLanguage as Language,
+          language: (uiLanguage as Language) || 'en',
           grid: null,
           minWordLength,
         });
@@ -265,7 +265,7 @@ const SinglePlayerView: React.FC = () => {
         setPhase('playing');
       }
     }
-     
+
   }, [autoStart, uiLanguage]);
 
   // Auto-start with preset when preset param is provided (e.g., preset=bots from NextStepPrompt)
@@ -294,7 +294,7 @@ const SinglePlayerView: React.FC = () => {
           difficulty: botsPreset.settings.difficulty,
           timerSeconds: botsPreset.settings.timerSeconds,
           bots,
-          language: uiLanguage as Language,
+          language: (uiLanguage as Language) || 'en',
           grid: null,
           minWordLength,
         }));
@@ -325,7 +325,7 @@ const SinglePlayerView: React.FC = () => {
         difficulty: preset.settings.difficulty,
         timerSeconds: preset.settings.timerSeconds,
         bots,
-        language: uiLanguage as Language,
+        language: (uiLanguage as Language) || 'en',
         grid: null,
         minWordLength,
       }));
@@ -388,7 +388,7 @@ const SinglePlayerView: React.FC = () => {
       difficulty: preset.settings.difficulty,
       timerSeconds: preset.settings.timerSeconds,
       bots,
-      language: uiLanguage as Language,
+      language: (uiLanguage as Language) || 'en',
       grid: null,
       minWordLength,
     }));
@@ -409,8 +409,8 @@ const SinglePlayerView: React.FC = () => {
     incrementTrainingGames();
 
     // Record high score for ALL modes (solo-bots, practice, challenge)
-    const longestWord = results.playerWords.reduce(
-      (longest, word) => word.length > longest.length ? word : longest,
+    const longestWord = (results.playerWords || []).reduce(
+      (longest, word) => word.length > (longest?.length || 0) ? word : longest,
       ''
     );
 
@@ -427,7 +427,7 @@ const SinglePlayerView: React.FC = () => {
     const highScoreResult = recordGameResult({
       mode: gameState.mode,
       score: results.playerScore,
-      wordCount: results.playerWords.length,
+      wordCount: (results.playerWords || []).length,
       longestWord,
       difficulty: gameState.difficulty,
       durationSeconds: gameState.timerSeconds,
@@ -498,7 +498,7 @@ const SinglePlayerView: React.FC = () => {
           />
         )}
 
-        {phase === 'results' && resultsData && (
+        {phase === 'results' && resultsData && resultsData.playerWordData && (
           <>
             <SinglePlayerResults
               key={resultsData.gameSessionId || `results-${Date.now()}`}

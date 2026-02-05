@@ -144,8 +144,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         }, 100);
       }
     }
-  // Only run on mount with initial achievements
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only run on mount with initial achievements
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const playerAvatar = useMemo(() => {
@@ -223,6 +223,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     isAuthenticated,
     hasUser: !!user,
     authLoading,
+    disabled: !!currentAchievement,
   });
 
   useAchievementsSave({
@@ -241,6 +242,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     botWordsForValidation: results.botWordsForValidation,
     gameSessionId: results.gameSessionId,
     language: results.language,
+    disabled: showSignupModal || !!currentAchievement
   });
 
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
@@ -536,17 +538,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Word validation modal for community dictionary building */}
       {showWordValidation && wordValidationQueue.length > 0 && (
         <WordFeedbackModal
           isOpen={showWordValidation}
           word={wordValidationQueue[0] || ''}
           submittedBy="Bot"
-          submitterAvatar={{ emoji: '?', color: '#6366f1' }}
+          submitterAvatar={{ emoji: '🤖', color: '#6366f1' }}
           wordQueue={wordValidationQueue.map(w => ({
             word: w,
             submittedBy: 'Bot',
-            submitterAvatar: { emoji: '?', color: '#6366f1' }
+            submitterAvatar: { emoji: '🤖', color: '#6366f1' }
           }))}
           timeoutSeconds={15}
           onVote={handleWordVote}

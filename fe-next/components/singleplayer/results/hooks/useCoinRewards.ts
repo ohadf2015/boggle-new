@@ -36,7 +36,7 @@ export function useCoinRewards({
     if (hasAwardedCoinsRef.current) return;
     hasAwardedCoinsRef.current = true;
 
-    // Generate a unique session ID for this game if not already present
+    // Use the game session ID for deduplication
     const sessionId = results.gameSessionId || `sp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     async function awardCoins(): Promise<void> {

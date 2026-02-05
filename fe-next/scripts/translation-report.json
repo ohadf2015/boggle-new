@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 3082,
+    "totalKeysInCode": 3093,
     "keyCountByLanguage": {
-      "en": 4386,
-      "he": 4385,
-      "sv": 4360,
-      "ja": 4346,
-      "es": 4302
+      "en": 4397,
+      "he": 4393,
+      "sv": 4368,
+      "ja": 4355,
+      "es": 4310
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 7,
+      "templateLiterals": 6,
       "fallbackUsages": 0,
       "variableKeys": 11
     }
@@ -44,13 +44,6 @@
         "file": "components/adventure/SkillTree/SkillPath.tsx",
         "line": 116,
         "context": "{t(`adventure.skills.paths.${path}`) || path}",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "adventure.worlds.${world.name}",
-        "file": "components/adventure/WorldMap.tsx",
-        "line": 267,
-        "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;",
         "type": "template_literal"
       },
       {
@@ -170,9 +163,15 @@
   "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
+      "buzz.error.loading",
+      "buzz.error.failed",
+      "buzz.error.noInternet",
       "accessibility.skipToMain"
     ],
     "sv": [
+      "buzz.error.loading",
+      "buzz.error.failed",
+      "buzz.error.noInternet",
       "accessibility.skipToMain",
       "teacher.curriculum.title",
       "teacher.curriculum.description",
@@ -225,8 +224,10 @@
       "consent.modal.dataCollected.items",
       "consent.modal.howWeUse.title",
       "consent.modal.howWeUse.items",
+      "buzz.error.loading",
+      "buzz.error.failed",
+      "buzz.error.noInternet",
       "accessibility.skipToMain",
-      "adventure.world",
       "adventure.allStars",
       "adventure.continue",
       "adventure.perfect",
@@ -282,6 +283,9 @@
     ],
     "es": [
       "share.share",
+      "buzz.error.loading",
+      "buzz.error.failed",
+      "buzz.error.noInternet",
       "accessibility.skipToMain",
       "adventure.bosses.phases.phase1",
       "adventure.bosses.phases.phase2",

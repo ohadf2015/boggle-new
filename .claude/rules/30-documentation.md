@@ -2,6 +2,8 @@
 
 **Guidelines for writing and maintaining documentation**
 
+> **Be extremely concise. Sacrifice grammar for brevity.**
+
 ---
 
 ## Documentation Philosophy

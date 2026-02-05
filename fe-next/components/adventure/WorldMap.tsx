@@ -299,6 +299,10 @@ const WorldNode = ({
             onClick={onClick}
             disabled={!isUnlocked}
             data-testid={`world-${world.id}`}
+            aria-label={isUnlocked
+              ? `${t('adventure.playWorld') || 'Play'} ${worldName} - ${currentStars}/${totalWorldStars} ${t('adventure.stars') || 'stars'}, ${completedLevels}/${LEVELS_PER_WORLD} ${t('adventure.levelsCompleted') || 'levels completed'}`
+              : `${worldName} - ${t('adventure.locked') || 'Locked'}, ${t('adventure.requires') || 'requires'} ${unlockRequirement} ${t('adventure.stars') || 'stars'}`
+            }
             whileHover={isUnlocked ? WORLD_HOVER_VARIANT : undefined}
             whileTap={isUnlocked ? WORLD_TAP_VARIANT : undefined}
             className={cn(

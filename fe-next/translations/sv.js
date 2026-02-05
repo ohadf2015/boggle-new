@@ -387,7 +387,11 @@ const sv = {
     "support": "Support & Feedback",
     "contactDescription": "Frågor, feedback, eller bara säg hej!",
     "changeLanguage": "Byt språk",
-    "moreSettings": "Fler inställningar"
+    "moreSettings": "Fler inställningar",
+    "mute": "Tysta",
+    "unmute": "Slå på ljud",
+    "enabled": "Aktiverad",
+    "disabled": "Inaktiverad"
   },
   "share": {
     "button": "Dela",
@@ -2942,6 +2946,12 @@ const sv = {
     },
     "quitConfirm": "Dina framsteg sparas, men ofullständiga utmaningar räknas inte i din poäng.",
     "quitConfirmTitle": "Avsluta Daily Buzz?",
+    "error": {
+      "title": "Hoppsan!",
+      "description": "Något gick fel när utmaningen laddades.",
+      "helpText": "Kontrollera din anslutning och försök igen.",
+      "noOptions": "Inga alternativ tillgängliga för denna utmaning"
+    },
     "searches": "sökningar",
     "challengeTrend": "I dagens pussel",
     "topicIs": "Ämne: {topic}",
@@ -4130,6 +4140,12 @@ const sv = {
       "achievements": "Prestationer"
     },
     "worldLabel": "Värld",
+    "world": "Värld",
+    "stars": "stjärnor",
+    "levelsCompleted": "nivåer klara",
+    "locked": "Låst",
+    "playWorld": "Spela",
+    "requires": "kräver",
     "hiddenWord": "Dolt ord",
     "devPreview": "Utvecklingsförhandsgranskning",
     "devPreviewDesc": "Äventyrsläge är under utveckling. Denna förhandsgranskning visar världskartan och nivåkonfiguration.",

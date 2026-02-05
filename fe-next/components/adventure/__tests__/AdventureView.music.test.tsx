@@ -107,6 +107,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
     locale: 'en',
     language: 'en',
   }),
+  useLanguageSafe: () => ({
+    t: (key: string) => key,
+    dir: 'ltr',
+    locale: 'en',
+    language: 'en',
+  }),
 }));
 
 // Mock MusicContext

@@ -2,6 +2,8 @@
 
 **Universal rules applicable to all projects and technologies**
 
+> **Be extremely concise. Sacrifice grammar for brevity.**
+
 ---
 
 ## Core Principles

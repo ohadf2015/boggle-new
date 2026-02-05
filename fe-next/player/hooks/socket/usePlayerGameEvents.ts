@@ -14,7 +14,7 @@ import {
   sendStartGameAck,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
-import { useLetterGrid, useGameLanguage, useGameActions } from '@/hooks/gameState';
+import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions } from '@/hooks/gameState';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { StartGameBroadcast } from '@/shared/types/socket';
@@ -85,18 +85,24 @@ export function usePlayerGameEvents({
   // Get state values from Zustand store (selective subscriptions for performance)
   const letterGrid = useLetterGrid();
   const gameLanguage = useGameLanguage();
+  const showStartAnimation = useShowStartAnimation();
 
   // Refs to access current values without causing useEffect re-registration
   // CRITICAL: letterGrid and gameLanguage are used inside socket handlers
   // but should NOT be in useEffect deps - changing them would clear fire round countdown
   const letterGridRef = useRef(letterGrid);
   const gameLanguageRef = useRef(gameLanguage);
+  // Track showStartAnimation to prevent activating game during countdown
+  const showStartAnimationRef = useRef(showStartAnimation);
   useEffect(() => {
     letterGridRef.current = letterGrid;
   }, [letterGrid]);
   useEffect(() => {
     gameLanguageRef.current = gameLanguage;
   }, [gameLanguage]);
+  useEffect(() => {
+    showStartAnimationRef.current = showStartAnimation;
+  }, [showStartAnimation]);
 
   // Get all setters from Zustand store (actions never trigger re-renders)
   const {
@@ -258,8 +264,15 @@ export function usePlayerGameEvents({
 
       const isGameActive = gameActiveRef.current;
       const hasGrid = letterGridRef.current || data.letterGrid;
-      if (!isGameActive && data.remainingTime > 0 && hasGrid) {
-        logger.log('[PLAYER] Timer started on server, activating game via timeUpdate');
+      const isCountdownShowing = showStartAnimationRef.current;
+      // Only activate game if:
+      // 1. Game is not already active
+      // 2. There's remaining time
+      // 3. We have the grid
+      // 4. Countdown animation has completed (not showing)
+      // This prevents the timer from starting before the 3-2-1-GO countdown completes
+      if (!isGameActive && data.remainingTime > 0 && hasGrid && !isCountdownShowing) {
+        logger.log('[PLAYER] Timer started on server, activating game via timeUpdate (countdown complete)');
         setGameActive(true);
         gameActiveRef.current = true;
       }

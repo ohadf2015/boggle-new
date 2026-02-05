@@ -91,42 +91,24 @@ interface AchievementQueueProviderProps {
   children: ReactNode;
 }
 
+/**
+ * AchievementQueueProvider - Global provider for socket-based achievements
+ *
+ * Used for multiplayer achievements where showing a full-screen modal
+ * would disrupt gameplay. Only shows toast notifications.
+ *
+ * For contexts where modals ARE appropriate (education mode, adventure mode,
+ * single-player results), use UnifiedAchievementModal directly.
+ */
 export const AchievementQueueProvider = ({ children }: AchievementQueueProviderProps): React.ReactElement => {
-  const [queue, setQueue] = useState<AchievementPayload[]>([]);
-  const [currentAchievement, setCurrentAchievement] = useState<AchievementPayload | null>(null);
-  const isDisplayingRef = useRef<boolean>(false);
-  const queueRef = useRef<AchievementPayload[]>([]);
   const { t } = useLanguage();
 
-  useEffect(() => {
-    queueRef.current = queue;
-  }, [queue]);
-
-  const processNext = useCallback(() => {
-    if (queueRef.current.length === 0) {
-      isDisplayingRef.current = false;
-      setCurrentAchievement(null);
-      return;
-    }
-
-    isDisplayingRef.current = true;
-    const [next, ...rest] = queueRef.current;
-    setQueue(rest);
-    setCurrentAchievement(next ?? null);
-  }, []);
-
-  const handlePopupComplete = useCallback(() => {
-    setTimeout(() => {
-      processNext();
-    }, 500);
-  }, [processNext]);
-
+  // Queue achievement with toast notification only (no modal)
+  // Modals disrupt multiplayer gameplay - use toast for non-intrusive notifications
   const queueAchievement = useCallback((achievement: AchievementPayload) => {
     if (!achievement) return;
 
-    setQueue(prev => [...prev, achievement].slice(-5));
-
-    // Show toast notification for achievement
+    // Show toast notification for achievement (non-intrusive)
     const achievementName = t(`achievements.${achievement.key}.name`) || achievement.key;
     toast.success(
       t('achievements.unlocked') || '🏆 Achievement Unlocked!',
@@ -134,30 +116,15 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
       {
         label: t('common.share') || 'Share',
         onClick: () => {
-          // Share functionality will be handled by the popup
+          // Share functionality - toast has built-in share action
         },
       }
     );
-
-    if (!isDisplayingRef.current) {
-      setTimeout(() => {
-        if (!isDisplayingRef.current && queueRef.current.length > 0) {
-          processNext();
-        }
-      }, 100);
-    }
-  }, [processNext, t]);
+  }, [t]);
 
   return (
     <AchievementQueueContext.Provider value={{ queueAchievement }}>
       {children}
-      {currentAchievement && (
-        <UnifiedAchievementModal
-          type="socket"
-          achievement={currentAchievement}
-          onClose={handlePopupComplete}
-        />
-      )}
     </AchievementQueueContext.Provider>
   );
 };

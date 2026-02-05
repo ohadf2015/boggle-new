@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star, Sparkles, Map, Zap, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
@@ -46,7 +46,7 @@ interface GameTimerState {
  * Shows all 10 worlds with visual progression and level selection
  */
 export default function AdventureView(): React.JSX.Element {
-  const { t, dir, language } = useLanguage();
+  const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
 
   // Get progression data from context

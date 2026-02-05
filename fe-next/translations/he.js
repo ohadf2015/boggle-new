@@ -387,7 +387,11 @@ const he = {
     "support": "תמיכה ומשוב",
     "contactDescription": "שאלות, משוב, או סתם להגיד שלום!",
     "changeLanguage": "החלף שפה",
-    "moreSettings": "הגדרות נוספות"
+    "moreSettings": "הגדרות נוספות",
+    "mute": "השתק",
+    "unmute": "בטל השתקה",
+    "enabled": "מופעל",
+    "disabled": "מושבת"
   },
   "share": {
     "button": "שתף",
@@ -3017,6 +3021,12 @@ const he = {
     "noTimeLimit": "ללא טיימר",
     "quitConfirm": "ההתקדמות שלך תישמר, אבל אתגרים לא גמורים לא ייספרו בניקוד.",
     "quitConfirmTitle": "לצאת מהבאזז?",
+    "error": {
+      "title": "אופס!",
+      "description": "משהו השתבש בטעינת האתגר.",
+      "helpText": "בדקו את החיבור ונסו שוב.",
+      "noOptions": "אין אפשרויות זמינות לאתגר זה"
+    },
     "searches": "חיפושים",
     "challengeTrend": "מופיע בחידות",
     "topicIs": "הנושא: {topic}",
@@ -4106,6 +4116,11 @@ const he = {
     },
     "worldLabel": "עולם",
     "world": "עולם",
+    "stars": "כוכבים",
+    "levelsCompleted": "שלבים הושלמו",
+    "locked": "נעול",
+    "playWorld": "שחק",
+    "requires": "דרוש",
     "allStars": "כל הכוכבים נאספו!",
     "continue": "המשך",
     "perfect": "מושלם!",

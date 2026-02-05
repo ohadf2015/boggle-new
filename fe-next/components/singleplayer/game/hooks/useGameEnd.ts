@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -87,17 +86,15 @@ export function useGameEnd({
 
     gameOverCalledRef.current = true;
 
-    const finalizeAndEndGame = async (): Promise<void> => {
+    const finalizeAndEndGame = (): void => {
       const currentWords = foundWordsRef.current;
 
-      // Show loading indicator while validating
-      setIsValidatingWords(true);
-
-      // Use shared utility for batch word validation
-      const finalWords = await finalizeWordValidation(currentWords, settings.language, 3);
-
-      // Validation complete
-      setIsValidatingWords(false);
+      // No AI validation - treat pending words (isValid: null) as invalid
+      // Words are already validated during gameplay, pending ones are uncertain
+      const finalWords = currentWords.map(w => ({
+        ...w,
+        isValid: w.isValid === true, // null or false becomes false
+      }));
 
       // Calculate final score from validated words only
       const validWords = finalWords.filter(w => w.isValid === true);
@@ -138,14 +135,14 @@ export function useGameEnd({
       // Generate unique session ID for vote tracking
       const gameSessionId = crypto.randomUUID();
 
-      // Collect words for validation modal
+      // Collect words for validation modal (community dictionary building)
       const allBotWords = settings.bots.flatMap(bot => {
         const words = botWordsRef.current[bot.id] || [];
         return words.filter(word => !word.match(/^word\d+$/));
       });
 
-      const playerPendingWords = finalWords
-        .filter(w => !w.isValid)
+      const playerPendingWords = currentWords
+        .filter(w => w.isValid === null)
         .map(w => w.word);
 
       const combinedWordsForValidation = [...new Set([...allBotWords, ...playerPendingWords])];

@@ -15,6 +15,7 @@ interface UseSignupPromptParams {
   isAuthenticated: boolean;
   hasUser: boolean;
   authLoading: boolean;
+  disabled?: boolean;
 }
 
 interface SignupPromptResult {
@@ -30,12 +31,13 @@ export function useSignupPrompt({
   isAuthenticated,
   hasUser,
   authLoading,
+  disabled = false,
 }: UseSignupPromptParams): SignupPromptResult {
   const [showSignupModal, setShowSignupModal] = useState(false);
 
   useEffect(() => {
-    // Skip if authenticated, has a user session (profile may still be loading), or auth is still loading
-    if (isAuthenticated || hasUser || authLoading) return;
+    // Skip if disabled, authenticated, has a user session (profile may still be loading), or auth is still loading
+    if (disabled || isAuthenticated || hasUser || authLoading) return;
     if (typeof window === 'undefined') return;
 
     // Check if already shown this session
@@ -53,7 +55,7 @@ export function useSignupPrompt({
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, hasUser, authLoading]);
+  }, [isAuthenticated, hasUser, authLoading, disabled]);
 
   return { showSignupModal, setShowSignupModal };
 }

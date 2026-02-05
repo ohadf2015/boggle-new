@@ -33,7 +33,6 @@ import {
   type WordData as AchievementWordData,
   type SinglePlayerAchievement,
 } from '@/utils/singlePlayerAchievements';
-import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
@@ -176,7 +175,7 @@ export function useSinglePlayerCore({
 
   // Training analysis (practice mode)
   const trainingGridSize = useMemo(() => ({ rows: 5, cols: 5 }), []);
-  const handleTrainingAnalysisComplete = useCallback(() => {}, []);
+  const handleTrainingAnalysisComplete = useCallback(() => { }, []);
 
   // CRITICAL: Destructure to get stable function references for dependency arrays.
   // Using the entire hook object in dependencies causes infinite re-render loops
@@ -488,7 +487,7 @@ export function useSinglePlayerCore({
 
   // Heartbeat for admin visibility
   useEffect(() => {
-    const sessionId = crypto.randomUUID();
+    const sessionId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
     const sendHeartbeat = async () => {
       try {
         await fetch('/api/single-player/heartbeat', {
@@ -506,7 +505,7 @@ export function useSinglePlayerCore({
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId }),
-      }).catch(() => {});
+      }).catch(() => { });
     };
   }, [settings.language, settings.mode]);
 
@@ -633,22 +632,13 @@ export function useSinglePlayerCore({
     if (!isGameOver || gameOverCalledRef.current || !grid) return;
     gameOverCalledRef.current = true;
 
-    const finalizeAndEndGame = async () => {
+    const finalizeAndEndGame = () => {
       try {
-        setIsValidatingWords(true);
-
-        // Add timeout to prevent hanging - max 5 seconds for word validation
-        const validationPromise = finalizeWordValidation(foundWordsRef.current, settings.language, 3);
-        const timeoutPromise = new Promise<typeof foundWordsRef.current>((_, reject) =>
-          setTimeout(() => reject(new Error('Validation timeout')), 5000)
-        );
-
-        const finalWords = await Promise.race([validationPromise, timeoutPromise]).catch(() => {
-          // On timeout, use current words with pending marked as invalid
-          console.warn('Word validation timed out, using current state');
-          return foundWordsRef.current.map(w => w.isValid === null ? { ...w, isValid: false } : w);
-        });
-        setIsValidatingWords(false);
+        // No AI validation - treat pending words (isValid: null) as invalid
+        const finalWords = foundWordsRef.current.map(w => ({
+          ...w,
+          isValid: w.isValid === true, // null or false becomes false
+        }));
 
         const validWords = finalWords.filter(w => w.isValid === true);
         const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
@@ -667,15 +657,23 @@ export function useSinglePlayerCore({
         }));
 
         const finalAchievements = calculateFinalAchievements(validWordData, allWordData, actualGameDuration, combo.maxCombo);
+
+        // Generate unique session ID for vote tracking
         const gameSessionId = crypto.randomUUID();
 
+        // Collect words for validation modal (community dictionary building)
         const allBotWords = settings.bots.flatMap(bot => {
           const words = botWordsRef.current[bot.id] || [];
           return words.filter(word => !word.match(/^word\d+$/));
         });
-        const playerPendingWords = finalWords.filter(w => !w.isValid).map(w => w.word);
-        const combinedWords = [...new Set([...allBotWords, ...playerPendingWords])];
-        const botWordsForValidation = combinedWords.sort(() => Math.random() - 0.5).slice(0, 5);
+
+        const playerPendingWords = foundWordsRef.current
+          .filter(w => w.isValid === null)
+          .map(w => w.word);
+
+        const combinedWordsForValidation = [...new Set([...allBotWords, ...playerPendingWords])];
+        const shuffledWords = combinedWordsForValidation.sort(() => Math.random() - 0.5);
+        const botWordsForValidation = shuffledWords.slice(0, 5);
 
         const results: SinglePlayerResultsData = {
           playerScore: finalScore,
@@ -714,6 +712,13 @@ export function useSinglePlayerCore({
           ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
           : settings.timerSeconds;
 
+        // Generate fallback session ID and validation words
+        const fallbackSessionId = crypto.randomUUID();
+        const fallbackBotWords = settings.bots.flatMap(bot => {
+          const words = botWordsRef.current[bot.id] || [];
+          return words.filter(word => !word.match(/^word\d+$/));
+        }).slice(0, 5);
+
         const fallbackResults: SinglePlayerResultsData = {
           playerScore: fallbackScore,
           playerWords: validWords.map(w => w.word),
@@ -736,8 +741,8 @@ export function useSinglePlayerCore({
           allPossibleWords: [],
           isNewHighScore: false,
           achievements: [],
-          botWordsForValidation: [],
-          gameSessionId: crypto.randomUUID(),
+          botWordsForValidation: fallbackBotWords,
+          gameSessionId: fallbackSessionId,
           language: settings.language,
         };
 

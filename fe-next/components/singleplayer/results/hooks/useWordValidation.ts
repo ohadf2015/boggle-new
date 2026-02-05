@@ -9,6 +9,7 @@ interface UseWordValidationParams {
   botWordsForValidation?: string[];
   gameSessionId?: string;
   language?: string;
+  disabled?: boolean;
 }
 
 interface UseWordValidationReturn {
@@ -22,6 +23,7 @@ export function useWordValidation({
   botWordsForValidation,
   gameSessionId,
   language,
+  disabled = false,
 }: UseWordValidationParams): UseWordValidationReturn {
   const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
   const [showWordValidation, setShowWordValidation] = useState(false);
@@ -34,7 +36,7 @@ export function useWordValidation({
 
   // Auto-show validation modal after interaction delay
   useAutoShowWithInteraction({
-    enabled: wordValidationQueue.length > 0 && !showWordValidation,
+    enabled: !disabled && wordValidationQueue.length > 0 && !showWordValidation,
     delayMs: 5000,
     onTrigger: () => setShowWordValidation(true),
   });

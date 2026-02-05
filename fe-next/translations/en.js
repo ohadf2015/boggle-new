@@ -387,7 +387,11 @@ const en = {
     "support": "Support & Feedback",
     "contactDescription": "Questions, feedback, or just say hi!",
     "changeLanguage": "Change Language",
-    "moreSettings": "More Settings"
+    "moreSettings": "More Settings",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "share": {
     "button": "Share",
@@ -3008,6 +3012,8 @@ const en = {
     },
     "error": {
       "title": "Oops!",
+      "description": "Something went wrong while loading the challenge.",
+      "helpText": "Please check your connection and try again.",
       "loading": "Loading today's buzz...",
       "failed": "Couldn't load buzz. Try again?",
       "noInternet": "No connection. Check your internet.",
@@ -4109,6 +4115,11 @@ const en = {
     },
     "worldLabel": "World",
     "world": "World",
+    "stars": "stars",
+    "levelsCompleted": "levels completed",
+    "locked": "Locked",
+    "playWorld": "Play",
+    "requires": "requires",
     "hiddenWord": "Hidden Word",
     "devPreview": "Development Preview",
     "devPreviewDesc": "Adventure Mode is under development. This preview shows the world map and level configuration.",

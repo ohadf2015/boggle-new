@@ -67,14 +67,18 @@ interface ToggleButtonProps {
   isOn: boolean;
   onToggle: () => void;
   isDarkMode: boolean;
+  label: string;
   onLabel?: string;
   offLabel?: string;
 }
 
-function ToggleButton({ isOn, onToggle, isDarkMode, onLabel = 'On', offLabel = 'Off' }: ToggleButtonProps) {
+function ToggleButton({ isOn, onToggle, isDarkMode, label, onLabel = 'On', offLabel = 'Off' }: ToggleButtonProps) {
   return (
     <button
       onClick={onToggle}
+      role="switch"
+      aria-checked={isOn}
+      aria-label={`${label}: ${isOn ? onLabel : offLabel}`}
       className={cn(
         'relative w-16 h-11 min-h-[44px] rounded-full border-3 border-neo-black transition-colors',
         isOn
@@ -98,13 +102,18 @@ interface VolumeSliderProps {
   isMuted: boolean;
   onToggleMute: () => void;
   isDarkMode: boolean;
+  label: string;
+  muteLabel?: string;
+  unmuteLabel?: string;
 }
 
-function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode }: VolumeSliderProps) {
+function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode, label, muteLabel = 'Mute', unmuteLabel = 'Unmute' }: VolumeSliderProps) {
   return (
     <div className="flex items-center gap-2">
       <button
         onClick={onToggleMute}
+        aria-label={isMuted ? `${unmuteLabel} ${label}` : `${muteLabel} ${label}`}
+        aria-pressed={isMuted}
         className={cn(
           'w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center border-2 border-neo-black transition-colors',
           isMuted
@@ -112,7 +121,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode }: Vo
             : isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-neo-cream text-neo-black'
         )}
       >
-        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        {isMuted ? <VolumeX className="w-5 h-5" aria-hidden="true" /> : <Volume2 className="w-5 h-5" aria-hidden="true" />}
       </button>
       <input
         type="range"
@@ -122,6 +131,10 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode }: Vo
         value={isMuted ? 0 : value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         disabled={isMuted}
+        aria-label={`${label} volume`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round((isMuted ? 0 : value) * 100)}
         className={cn(
           'w-24 h-2 rounded-full appearance-none cursor-pointer',
           isMuted ? 'opacity-50' : '',
@@ -218,6 +231,9 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isOn={isDarkMode}
                   onToggle={toggleTheme}
                   isDarkMode={isDarkMode}
+                  label={t('settings.theme') || 'Theme'}
+                  onLabel={t('settings.dark') || 'Dark'}
+                  offLabel={t('settings.light') || 'Light'}
                 />
               </SettingRow>
 
@@ -269,6 +285,9 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isMuted={musicMuted}
                   onToggleMute={toggleMusicMute}
                   isDarkMode={isDarkMode}
+                  label={t('settings.music') || 'Music'}
+                  muteLabel={t('settings.mute') || 'Mute'}
+                  unmuteLabel={t('settings.unmute') || 'Unmute'}
                 />
               </SettingRow>
 
@@ -283,6 +302,9 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isMuted={sfxMuted}
                   onToggleMute={toggleSfxMute}
                   isDarkMode={isDarkMode}
+                  label={t('settings.soundEffects') || 'Sound Effects'}
+                  muteLabel={t('settings.mute') || 'Mute'}
+                  unmuteLabel={t('settings.unmute') || 'Unmute'}
                 />
               </SettingRow>
             </div>
@@ -311,6 +333,7 @@ export default function SettingsPageClient(): React.JSX.Element {
               >
                 <button
                   onClick={cycleReduceMotion}
+                  aria-label={`${t('settings.reduceMotion') || 'Reduce Motion'}: ${getReduceMotionLabel()}`}
                   className={cn(
                     'px-4 py-2 rounded-neo border-3 border-neo-black font-bold min-w-[80px] text-center',
                     settings.reduceMotion === true
@@ -334,6 +357,9 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isOn={!settings.disableFireRoundLights}
                   onToggle={toggleFireRoundLights}
                   isDarkMode={isDarkMode}
+                  label={t('settings.fireRoundLights') || 'Fire Round Lights'}
+                  onLabel={t('settings.enabled') || 'Enabled'}
+                  offLabel={t('settings.disabled') || 'Disabled'}
                 />
               </SettingRow>
 
@@ -347,6 +373,9 @@ export default function SettingsPageClient(): React.JSX.Element {
                   isOn={!settings.disableEarthquakeEffects}
                   onToggle={toggleEarthquakeEffects}
                   isDarkMode={isDarkMode}
+                  label={t('settings.earthquakeEffects') || 'Earthquake Effects'}
+                  onLabel={t('settings.enabled') || 'Enabled'}
+                  offLabel={t('settings.disabled') || 'Disabled'}
                 />
               </SettingRow>
             </div>

@@ -71,7 +71,9 @@ export function getGuestSessionId(): string | null {
 
   let sessionId = getFromStorage(GUEST_SESSION_KEY);
   if (!sessionId) {
-    sessionId = crypto.randomUUID();
+    sessionId = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2) + Date.now().toString(36);
     saveToStorage(GUEST_SESSION_KEY, sessionId);
   }
   return sessionId;

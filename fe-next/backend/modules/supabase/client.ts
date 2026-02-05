@@ -59,7 +59,17 @@ export function getSupabase(): SupabaseClient | null {
  * Check if Supabase is configured
  */
 export function isSupabaseConfigured(): boolean {
-  return !!(supabaseUrl && supabaseServiceKey);
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return false;
+  }
+
+  const trimmedKey = supabaseServiceKey.trim();
+  return (
+    trimmedKey !== '' &&
+    trimmedKey !== 'YOUR_SERVICE_ROLE_KEY_HERE' &&
+    trimmedKey !== 'placeholder' &&
+    !trimmedKey.includes('SERVICE_ROLE_KEY')
+  );
 }
 
 // Type definitions shared across modules

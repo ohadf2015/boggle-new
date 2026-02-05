@@ -399,7 +399,9 @@ export function PortraitGameLayout({
       />
 
       {/* Game grid */}
-      <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden">
+      {/* CRITICAL: min-h-[200px] prevents grid collapse on mobile when flex container has min-h-0 */}
+      {/* The 200px minimum ensures grid is always visible regardless of other content height */}
+      <div className="flex-1 flex items-center justify-center min-h-[200px] overflow-hidden">
         <GridComponent
           grid={grid}
           interactive={!isPaused}

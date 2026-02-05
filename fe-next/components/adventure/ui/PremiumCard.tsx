@@ -1,16 +1,18 @@
 /**
  * PremiumCard Component
  *
- * 3D tilt card with glare effect, hover animations, and premium glass-morphism.
- * Used for level cards, world selectors, and achievement displays.
+ * 3D tilt card with glare effect, shimmer animations, corner decorations,
+ * and premium glass-morphism. Used for level cards, world selectors,
+ * and achievement displays.
  */
 
 'use client';
 
 import React, { useRef, useState, useCallback, memo } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // ==============================================
 // TYPES
@@ -25,11 +27,12 @@ interface PremiumCardProps {
   /**
    * Card variant determines the visual style
    * - default: Standard glass card
-   * - gold: Gold-accented for premium/reward
+   * - gold: Gold-accented for premium/reward with animated shimmer
    * - locked: Grayscale with chain effect
    * - perfect: Subtle gold highlight for perfect completion
+   * - mythic: Rainbow border with animated glow
    */
-  variant?: 'default' | 'gold' | 'locked' | 'perfect';
+  variant?: 'default' | 'gold' | 'locked' | 'perfect' | 'mythic';
   /**
    * Rotation intensity (0-1, default: 0.5)
    */
@@ -38,6 +41,18 @@ interface PremiumCardProps {
    * Enable/disable 3D tilt effect
    */
   enableTilt?: boolean;
+  /**
+   * Enable decorative corners
+   */
+  decorative?: boolean;
+  /**
+   * Corner style
+   */
+  cornerStyle?: 'star' | 'diamond' | 'rounded';
+  /**
+   * Enable continuous shimmer animation (for gold/mythic variants)
+   */
+  autoShimmer?: boolean;
   /**
    * Data attribute for testing
    */
@@ -57,14 +72,19 @@ export const PremiumCard = memo(function PremiumCard({
   variant = 'default',
   tiltIntensity = 0.5,
   enableTilt = true,
+  decorative = true,
+  cornerStyle = 'star',
+  autoShimmer = false,
   'data-testid': dataTestId,
 }: PremiumCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { enableComplexAnimations } = useDevicePerformance();
 
   // Disable tilt when user prefers reduced motion (accessibility)
   const effectiveTiltEnabled = enableTilt && !prefersReducedMotion;
+  const shouldAnimate = enableComplexAnimations && !prefersReducedMotion;
 
   // Motion values for 3D tilt
   const x = useMotionValue(0);
@@ -117,28 +137,51 @@ export const PremiumCard = memo(function PremiumCard({
       bg: 'bg-neo-black/50 backdrop-blur-md',
       shadow: '6px 6px 0px black',
       hoverShadow: '8px 8px 0px black',
+      glowColor: 'rgba(0,0,0,0)',
+      cornerColor: '#FFE135',
     },
     gold: {
       border: 'border-4 border-neo-yellow',
-      bg: 'bg-neo-yellow/10 backdrop-blur-md',
-      shadow: '6px 6px 0px black',
-      hoverShadow: '8px 8px 0px black',
+      bg: 'bg-gradient-to-br from-neo-yellow/20 via-neo-yellow/10 to-transparent backdrop-blur-md',
+      shadow: '6px 6px 0px #8B7508',
+      hoverShadow: '8px 8px 0px #8B7508',
+      glowColor: 'rgba(255, 225, 53, 0.4)',
+      cornerColor: '#FFE135',
     },
     locked: {
       border: 'border-4 border-neo-white/20',
       bg: 'bg-neo-black/30 backdrop-blur-sm',
       shadow: '6px 6px 0px rgba(0,0,0,0.5)',
       hoverShadow: '6px 6px 0px rgba(0,0,0,0.5)',
+      glowColor: 'rgba(0,0,0,0)',
+      cornerColor: '#666666',
     },
     perfect: {
       border: 'border-4 border-neo-yellow',
-      bg: 'bg-neo-yellow/15 backdrop-blur-md',
-      shadow: '6px 6px 0px black',
-      hoverShadow: '8px 8px 0px black',
+      bg: 'bg-gradient-to-br from-neo-yellow/15 via-white/5 to-transparent backdrop-blur-md',
+      shadow: '6px 6px 0px #8B7508',
+      hoverShadow: '8px 8px 0px #8B7508',
+      glowColor: 'rgba(255, 225, 53, 0.3)',
+      cornerColor: '#FFE135',
+    },
+    mythic: {
+      border: 'border-4 border-transparent',
+      bg: 'bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-cyan-500/20 backdrop-blur-md',
+      shadow: '6px 6px 0px #4B0082',
+      hoverShadow: '8px 8px 0px #4B0082',
+      glowColor: 'rgba(255, 0, 255, 0.4)',
+      cornerColor: '#FF00FF',
     },
   };
 
   const styles = variantStyles[variant];
+
+  // Corner SVG paths
+  const cornerPaths = {
+    star: 'M8,0 L10,6 L16,8 L10,10 L8,16 L6,10 L0,8 L6,6 Z',
+    diamond: 'M8,0 L16,8 L8,16 L0,8 Z',
+    rounded: 'M0,0 Q8,0 8,8 Q8,16 0,16 Z',
+  };
 
   return (
     <motion.div
@@ -152,7 +195,9 @@ export const PremiumCard = memo(function PremiumCard({
         rotateX: effectiveTiltEnabled ? rotateX : 0,
         rotateY: effectiveTiltEnabled ? rotateY : 0,
         transformStyle: 'preserve-3d',
-        boxShadow: isHovered && !disabled ? styles.hoverShadow : styles.shadow,
+        boxShadow: isHovered && !disabled 
+          ? `${styles.hoverShadow}, 0 0 30px ${styles.glowColor}` 
+          : styles.shadow,
       }}
       whileHover={!disabled ? { scale: 1.02, y: -4 } : {}}
       whileTap={!disabled ? { scale: 0.98 } : {}}
@@ -163,25 +208,83 @@ export const PremiumCard = memo(function PremiumCard({
         styles.border,
         styles.bg,
         disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+        variant === 'mythic' && shouldAnimate && 'animate-rainbow-border',
         className
       )}
     >
-      {/* Subtle glare effect on hover - no animated gradients */}
+      {/* Decorative corners */}
+      {decorative && variant !== 'locked' && (
+        <>
+          <svg className="absolute top-2 left-2 w-4 h-4 pointer-events-none z-20" viewBox="0 0 16 16" fill="none">
+            <path d={cornerPaths[cornerStyle]} fill={styles.cornerColor} stroke="#1a1a2e" strokeWidth="1" />
+          </svg>
+          <svg className="absolute top-2 right-2 w-4 h-4 pointer-events-none z-20" viewBox="0 0 16 16" fill="none" style={{ transform: 'scaleX(-1)' }}>
+            <path d={cornerPaths[cornerStyle]} fill={styles.cornerColor} stroke="#1a1a2e" strokeWidth="1" />
+          </svg>
+          <svg className="absolute bottom-2 left-2 w-4 h-4 pointer-events-none z-20" viewBox="0 0 16 16" fill="none" style={{ transform: 'scaleY(-1)' }}>
+            <path d={cornerPaths[cornerStyle]} fill={styles.cornerColor} stroke="#1a1a2e" strokeWidth="1" />
+          </svg>
+          <svg className="absolute bottom-2 right-2 w-4 h-4 pointer-events-none z-20" viewBox="0 0 16 16" fill="none" style={{ transform: 'scale(-1, -1)' }}>
+            <path d={cornerPaths[cornerStyle]} fill={styles.cornerColor} stroke="#1a1a2e" strokeWidth="1" />
+          </svg>
+        </>
+      )}
+
+      {/* Inner glow effect */}
+      <div
+        className="absolute inset-0 pointer-events-none rounded-neo-lg z-10"
+        style={{
+          background: `radial-gradient(ellipse at 30% 30%, ${styles.glowColor} 0%, transparent 60%)`,
+        }}
+      />
+
+      {/* Subtle glare effect on hover */}
       <motion.div
         className="absolute inset-0 pointer-events-none z-10"
         style={{
           background: useTransform(
             [glareX, glareY],
             ([latestX, latestY]) =>
-              `radial-gradient(circle at ${latestX}% ${latestY}%, rgba(255,255,255,0.12) 0%, transparent 50%)`
+              `radial-gradient(circle at ${latestX}% ${latestY}%, rgba(255,255,255,0.15) 0%, transparent 50%)`
           ),
           opacity: effectiveTiltEnabled && variant !== 'locked' && isHovered ? 1 : 0,
         }}
       />
 
+      {/* Shimmer effect on hover */}
+      {shouldAnimate && (
+        <AnimatePresence>
+          {(isHovered || (autoShimmer && (variant === 'gold' || variant === 'mythic'))) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg z-15"
+            >
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: variant === 'mythic'
+                    ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)'
+                    : 'linear-gradient(90deg, transparent, rgba(255,225,53,0.4), transparent)',
+                }}
+                initial={{ x: '-100%' }}
+                animate={{ x: '200%' }}
+                transition={{ 
+                  duration: autoShimmer ? 2 : 0.8, 
+                  ease: 'easeInOut',
+                  repeat: autoShimmer ? Infinity : 0,
+                  repeatDelay: autoShimmer ? 1 : 0,
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+
       {/* Locked variant chain overlay */}
       {variant === 'locked' && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50 z-10">
           <div 
             className="absolute inset-0"
             style={{
@@ -195,6 +298,22 @@ export const PremiumCard = memo(function PremiumCard({
             }}
           />
         </div>
+      )}
+
+      {/* Mythic variant animated border */}
+      {variant === 'mythic' && shouldAnimate && (
+        <div 
+          className="absolute inset-0 pointer-events-none rounded-neo-lg z-20"
+          style={{
+            background: 'linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000)',
+            backgroundSize: '200% 100%',
+            animation: 'rainbow-shift 3s linear infinite',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+            padding: '2px',
+          }}
+        />
       )}
 
       {/* Content */}
