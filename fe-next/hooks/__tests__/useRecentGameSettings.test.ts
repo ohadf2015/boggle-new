@@ -89,12 +89,11 @@ describe('useRecentGameSettings', () => {
       const { result } = renderHook(() => useRecentGameSettings());
       const configWithoutTimestamp = {
         ...createConfig(),
-        savedAt: undefined,
       };
       delete (configWithoutTimestamp as Partial<GameConfiguration>).savedAt;
 
       act(() => {
-        result.current.saveConfig(configWithoutTimestamp as GameConfiguration);
+        result.current.saveConfig(configWithoutTimestamp as unknown as GameConfiguration);
       });
 
       expect(result.current.recentConfigs[0].savedAt).toBeDefined();
