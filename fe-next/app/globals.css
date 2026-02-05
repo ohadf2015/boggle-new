@@ -99,6 +99,167 @@
 
   /* Retro Grid Pattern for backgrounds - very subtle */
   --grid-pattern: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 0h1v40H0zM0 0h40v1H0z' fill='%23FFFFFF' fill-opacity='0.02'/%3E%3C/svg%3E");
+
+  /* ====================================
+     BRAND COLORS (21 variables)
+     OAuth providers & social sharing
+     ==================================== */
+
+  /* Google */
+  --brand-google: #4285F4;
+  --brand-google-hover: #3367D6;
+  --brand-google-dark: #1e4a8f;
+
+  /* Discord */
+  --brand-discord: #5865F2;
+  --brand-discord-hover: #4752C4;
+  --brand-discord-dark: #3c45a5;
+
+  /* Apple */
+  --brand-apple: #000000;
+  --brand-apple-hover: #333333;
+  --brand-apple-light: #f5f5f7;
+
+  /* WhatsApp */
+  --brand-whatsapp: #25D366;
+  --brand-whatsapp-hover: #1ebe5d;
+  --brand-whatsapp-dark: #128C7E;
+
+  /* Facebook */
+  --brand-facebook: #1877F2;
+  --brand-facebook-hover: #166FE5;
+  --brand-facebook-dark: #144a9e;
+
+  /* Twitter */
+  --brand-twitter: #1DA1F2;
+  --brand-twitter-hover: #1A91DA;
+  --brand-twitter-dark: #0d7ac2;
+
+  /* LinkedIn */
+  --brand-linkedin: #0A66C2;
+  --brand-linkedin-hover: #094F9B;
+  --brand-linkedin-dark: #073d74;
+
+  /* ====================================
+     AVATAR COLORS (15 numeric + 15 semantic)
+     Character avatar backgrounds
+     ==================================== */
+
+  /* Numeric Avatar Colors (backward compatibility) */
+  --avatar-1: #FF6B6B;
+  --avatar-2: #4ECDC4;
+  --avatar-3: #45B7D1;
+  --avatar-4: #FFA07A;
+  --avatar-5: #98D8C8;
+  --avatar-6: #F7DC6F;
+  --avatar-7: #BB8FCE;
+  --avatar-8: #85C1E2;
+  --avatar-9: #F8B739;
+  --avatar-10: #52B788;
+  --avatar-11: #FF8FAB;
+  --avatar-12: #6BCF7F;
+  --avatar-13: #FFB347;
+  --avatar-14: #9D84B7;
+  --avatar-15: #FF6F61;
+
+  /* Semantic Avatar Colors (character names) */
+  --avatar-broccoli-bob: var(--avatar-10);
+  --avatar-drippy-drop: var(--avatar-2);
+  --avatar-sunny-steve: var(--avatar-9);
+  --avatar-pizza-pete: var(--avatar-1);
+  --avatar-cloudy-carl: var(--avatar-8);
+  --avatar-octo-otto: var(--avatar-7);
+  --avatar-prickly-pat: var(--avatar-12);
+  --avatar-melon-molly: var(--avatar-11);
+  --avatar-avo-alex: var(--avatar-10);
+  --avatar-frosty-frank: var(--avatar-3);
+  --avatar-flaky-fred: var(--avatar-8);
+  --avatar-eggy-ed: var(--avatar-6);
+  --avatar-slimy-sam: var(--avatar-12);
+  --avatar-starry-stella: var(--avatar-9);
+  --avatar-shroom-shelly: var(--avatar-15);
+
+  /* ====================================
+     GRADIENT PRESETS (18 variables)
+     Rank displays, stats, backgrounds
+     ==================================== */
+
+  /* Rank Gradients - First Place (Gold) */
+  --gradient-rank-first-from: var(--neo-yellow);
+  --gradient-rank-first-via: #FFD000;
+  --gradient-rank-first-to: var(--neo-yellow);
+
+  /* Rank Gradients - Second Place (Silver) */
+  --gradient-rank-second-from: #cbd5e1;
+  --gradient-rank-second-via: #e2e8f0;
+  --gradient-rank-second-to: #cbd5e1;
+
+  /* Rank Gradients - Third Place (Bronze) */
+  --gradient-rank-third-from: #f59e0b;
+  --gradient-rank-third-via: #fbbf24;
+  --gradient-rank-third-to: #f59e0b;
+
+  /* Performance Stats - Positive */
+  --gradient-stat-positive-from: var(--neo-lime);
+  --gradient-stat-positive-to: #84cc16;
+
+  /* Performance Stats - Negative */
+  --gradient-stat-negative-from: var(--neo-red);
+  --gradient-stat-negative-to: #dc2626;
+
+  /* Performance Stats - Neutral */
+  --gradient-stat-neutral-from: #94a3b8;
+  --gradient-stat-neutral-to: #64748b;
+
+  /* Background Gradients - Navy */
+  --gradient-bg-navy-from: var(--neo-navy);
+  --gradient-bg-navy-to: var(--neo-navy-light);
+
+  /* Background Gradients - Accent */
+  --gradient-bg-accent-from: var(--neo-pink);
+  --gradient-bg-accent-via: var(--neo-purple);
+  --gradient-bg-accent-to: var(--neo-cyan);
+
+  /* ====================================
+     SEMANTIC COMPONENT TOKENS (20 variables)
+     Buttons, badges, status indicators
+     ==================================== */
+
+  /* Button Tokens - Primary */
+  --button-primary: var(--neo-yellow);
+  --button-primary-hover: var(--neo-yellow-hover);
+  --button-primary-text: rgb(var(--neo-black));
+
+  /* Button Tokens - Secondary */
+  --button-secondary: var(--neo-pink);
+  --button-secondary-hover: var(--neo-pink-light);
+  --button-secondary-text: rgb(var(--neo-white));
+
+  /* Button Tokens - Destructive */
+  --button-destructive: var(--neo-red);
+  --button-destructive-hover: #dc2626;
+  --button-destructive-text: rgb(var(--neo-white));
+
+  /* Button Tokens - Success */
+  --button-success: var(--neo-lime);
+  --button-success-hover: #84cc16;
+  --button-success-text: rgb(var(--neo-black));
+
+  /* Badge Tokens - Info */
+  --badge-info: var(--neo-cyan);
+  --badge-info-text: rgb(var(--neo-black));
+
+  /* Badge Tokens - Warning */
+  --badge-warning: var(--neo-yellow);
+  --badge-warning-text: rgb(var(--neo-black));
+
+  /* Badge Tokens - Error */
+  --badge-error: var(--neo-red);
+  --badge-error-text: rgb(var(--neo-white));
+
+  /* Badge Tokens - Success */
+  --badge-success: var(--neo-lime);
+  --badge-success-text: rgb(var(--neo-black));
 }
 
 /* ====================================

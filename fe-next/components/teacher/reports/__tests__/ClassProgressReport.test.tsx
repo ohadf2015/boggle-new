@@ -270,14 +270,14 @@ describe('ClassProgressReport', () => {
       });
 
       const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation((node) => {
-        if (node === mockAnchor) {
+        if (node === (mockAnchor as unknown as Node)) {
           return mockAnchor as unknown as HTMLElement;
         }
         return originalAppendChild(node);
       });
 
       const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation((node) => {
-        if (node === mockAnchor) {
+        if (node === (mockAnchor as unknown as Node)) {
           return mockAnchor as unknown as HTMLElement;
         }
         return originalRemoveChild(node);

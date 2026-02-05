@@ -22,8 +22,71 @@ jest.mock('@/contexts/LanguageContext', () => ({
       return key;
     },
     language: 'en',
+    dir: 'ltr',
+    setLanguage: jest.fn(),
   }),
 }));
+
+// Mock framer-motion
+jest.mock('framer-motion', () => {
+  const React = require('react');
+
+  const createMockMotion = (element: string) => {
+    const MockComponent = React.forwardRef(
+      ({ children, ...props }: any, ref: any) =>
+        React.createElement(element, { ...props, ref }, children)
+    );
+    MockComponent.displayName = `MockMotion${element.charAt(0).toUpperCase() + element.slice(1)}`;
+    return MockComponent;
+  };
+
+  // Mock MotionValue for useSpring/useTransform
+  const createMotionValue = (initial: any) => {
+    let currentValue = initial;
+    const listeners: ((v: any) => void)[] = [];
+    return {
+      get: () => currentValue,
+      set: (v: any) => {
+        currentValue = v;
+        listeners.forEach(l => l(v));
+      },
+      on: (_event: string, callback: (v: any) => void) => {
+        listeners.push(callback);
+        return () => {
+          const idx = listeners.indexOf(callback);
+          if (idx !== -1) listeners.splice(idx, 1);
+        };
+      },
+      onChange: (callback: (v: any) => void) => {
+        listeners.push(callback);
+        return () => {
+          const idx = listeners.indexOf(callback);
+          if (idx !== -1) listeners.splice(idx, 1);
+        };
+      },
+      current: initial,
+    };
+  };
+
+  const useSpring = (initial: any) => createMotionValue(typeof initial === 'object' ? 0 : initial);
+  const useTransform = (motionValue: any, transformer: (v: any) => any) => {
+    const result = createMotionValue(transformer(motionValue.get()));
+    return result;
+  };
+
+  return {
+    motion: {
+      div: createMockMotion('div'),
+      button: createMockMotion('button'),
+      ul: createMockMotion('ul'),
+      li: createMockMotion('li'),
+      span: createMockMotion('span'),
+    },
+    AnimatePresence: ({ children }: any) => children,
+    useSpring,
+    useTransform,
+  };
+});
 
 jest.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');
@@ -75,6 +138,30 @@ jest.mock('@/contexts/ProgressionContext', () => ({
   }),
 }));
 
+// Mock MusicContext
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    stopMusic: jest.fn(),
+    playMusic: jest.fn(),
+    pauseMusic: jest.fn(),
+    resumeMusic: jest.fn(),
+    isPlaying: false,
+    currentTrack: null,
+  }),
+}));
+
+// Mock SoundEffectsContext
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playAchievementSound: jest.fn(),
+    playSound: jest.fn(),
+    playWordSound: jest.fn(),
+    playGameStartSound: jest.fn(),
+    playGameEndSound: jest.fn(),
+    playSoloGameSound: jest.fn(),
+  }),
+}));
+
 jest.mock('@/hooks/useAdventureGame', () => ({
   useAdventureGame: () => ({
     gameState: {
@@ -93,6 +180,7 @@ jest.mock('@/hooks/useAdventureGame', () => ({
         isChained: false,
       }))
     ),
+    tilesVersion: 1,
     objectives: [{ type: 'scoreTarget', target: 100, current: 0 }],
     timeRemaining: 60,
     canComplete: false,
@@ -414,7 +502,10 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
       render(<AdventureGame {...defaultProps} />);
 
-      expect(screen.getByText(/Hint:/)).toBeInTheDocument();
+      // When hintLevel is 'length', the hint text "Keep trying! Look for common patterns." is shown
+      // Multiple elements due to responsive design (mobile + desktop)
+      const hints = screen.getAllByText(/Keep trying/);
+      expect(hints.length).toBeGreaterThan(0);
     });
 
     it('should render HintMessage for lengthAndStart level', () => {
@@ -436,7 +527,10 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
       render(<AdventureGame {...defaultProps} />);
 
-      expect(screen.getByText(/Hint:/)).toBeInTheDocument();
+      // When hintLevel is 'lengthAndStart', the hint text about starting letters is shown
+      // Multiple elements due to responsive design (mobile + desktop)
+      const hints = screen.getAllByText(/Look for words starting with specific letters/);
+      expect(hints.length).toBeGreaterThan(0);
     });
 
     it('should render HintMessage for fullReveal level', () => {
@@ -460,7 +554,10 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
       render(<AdventureGame {...defaultProps} />);
 
-      expect(screen.getByText(/Hint:/)).toBeInTheDocument();
+      // When hintLevel is 'fullReveal', the hint text about shorter words is shown
+      // Multiple elements due to responsive design (mobile + desktop)
+      const hints = screen.getAllByText(/Try looking for shorter words first/);
+      expect(hints.length).toBeGreaterThan(0);
     });
   });
 

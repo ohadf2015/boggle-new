@@ -649,10 +649,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
     }, [
       showLevelComplete,
-      cinematics.showVictoryCinematic,
-      cinematics.showDefeatCinematic,
-      cinematics.showVictory,
-      cinematics.showDefeat,
+      cinematics,
       gameState.isComplete,
       gameState.stars,
       timeRemaining,
@@ -955,7 +952,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, prevComboCountRef, handleAITransition]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, prevComboCountRef, handleAITransition, effects]
     );
 
     const handleLevelUpClose = useCallback(() => {
@@ -1026,7 +1023,7 @@ const AdventureGame = memo<AdventureGameProps>(
           popupQueueTimeoutRef.current = null;
         }
       };
-    }, [effects.currentPopup, effects.handlePopupComplete]);
+    }, [effects]);
 
     const handleComboTierChange = useCallback((tier: ComboTier) => {
       const shakeIntensityMap: Record<number, number> = {

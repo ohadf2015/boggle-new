@@ -191,6 +191,28 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
+// Mock useAdaptiveDifficulty hook
+jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+  useAdaptiveDifficulty: () => ({
+    tier: 'normal',
+    adjustedConfig: {
+      world: 1,
+      level: 1,
+      gridSize: 4,
+      timerSeconds: 120,
+      objectives: [{ type: 'wordCount', target: 5, isPrimary: true }],
+      specialTiles: [],
+      difficulty: 'EASY',
+      chapterNumber: 1,
+      levelInChapter: 1,
+      isBossLevel: false,
+    },
+    hintData: { level: 'none' },
+    powerUpCooldownMultiplier: 1.0,
+    recordCompletion: jest.fn(),
+  }),
+}));
+
 // Mock framer-motion for simpler testing
 jest.mock('framer-motion', () => {
   const React = require('react');
@@ -212,6 +234,43 @@ jest.mock('framer-motion', () => {
     return MockComponent;
   };
 
+  // Mock MotionValue for useSpring/useTransform
+  const createMotionValue = (initial: any) => {
+    let currentValue = initial;
+    const listeners: ((v: any) => void)[] = [];
+    return {
+      get: () => currentValue,
+      set: (v: any) => {
+        currentValue = v;
+        listeners.forEach(l => l(v));
+      },
+      on: (_event: string, callback: (v: any) => void) => {
+        listeners.push(callback);
+        return () => {
+          const idx = listeners.indexOf(callback);
+          if (idx !== -1) listeners.splice(idx, 1);
+        };
+      },
+      onChange: (callback: (v: any) => void) => {
+        listeners.push(callback);
+        return () => {
+          const idx = listeners.indexOf(callback);
+          if (idx !== -1) listeners.splice(idx, 1);
+        };
+      },
+      current: initial,
+    };
+  };
+
+  // Mock useSpring (used by RollingNumber and ComboTierBadge)
+  const useSpring = (initial: any) => createMotionValue(typeof initial === 'object' ? 0 : initial);
+
+  // Mock useTransform (used by RollingNumber)
+  const useTransform = (motionValue: any, transformer: (v: any) => any) => {
+    const result = createMotionValue(transformer(motionValue.get()));
+    return result;
+  };
+
   return {
     motion: {
       div: createMockMotion('div'),
@@ -221,6 +280,8 @@ jest.mock('framer-motion', () => {
       li: createMockMotion('li'),
     },
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    useSpring,
+    useTransform,
   };
 });
 

@@ -39,6 +39,14 @@ jest.mock('framer-motion', () => {
     return MockComponent;
   };
 
+  const mockMotionValue = {
+    get: () => 0,
+    set: jest.fn(),
+    onChange: jest.fn(),
+    on: jest.fn(() => jest.fn()),
+    current: 0,
+  };
+
   return {
     motion: {
       div: createMockMotion('div'),
@@ -50,18 +58,9 @@ jest.mock('framer-motion', () => {
       p: createMockMotion('p'),
     },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
-    useMotionValue: (initial: number) => ({
-      get: () => initial,
-      set: jest.fn(),
-      onChange: jest.fn(),
-      current: initial,
-    }),
-    useTransform: () => ({
-      get: () => 0,
-      set: jest.fn(),
-      onChange: jest.fn(),
-      current: 0,
-    }),
+    useMotionValue: () => mockMotionValue,
+    useTransform: () => mockMotionValue,
+    useSpring: () => mockMotionValue,
   };
 });
 

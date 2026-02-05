@@ -29,6 +29,30 @@ jest.mock('framer-motion', () => {
     return MockComponent;
   };
 
+  // Mock useMotionValue with get/set methods
+  const useMotionValue = (initial: any) => ({
+    get: () => initial,
+    set: jest.fn(),
+    onChange: jest.fn(),
+    current: initial,
+  });
+
+  // Mock useTransform
+  const useTransform = (...args: any[]) => ({
+    get: () => 0,
+    set: jest.fn(),
+    onChange: jest.fn(),
+    current: 0,
+  });
+
+  // Mock useSpring
+  const useSpring = (initial: any) => ({
+    get: () => initial,
+    set: jest.fn(),
+    onChange: jest.fn(),
+    current: initial,
+  });
+
   return {
     motion: {
       div: createMockMotion('div'),
@@ -37,6 +61,9 @@ jest.mock('framer-motion', () => {
       p: createMockMotion('p'),
     },
     AnimatePresence: ({ children }: any) => children,
+    useMotionValue,
+    useTransform,
+    useSpring,
   };
 });
 

@@ -83,11 +83,11 @@ export const GameHeader = memo(function GameHeader({
         </motion.div>
 
         {/* Score Display */}
-        <div className="hidden sm:flex items-center gap-2">
+        <div data-testid="score-display" className="hidden sm:flex items-center gap-2">
           <span className="text-xs text-neo-white/50 uppercase tracking-wide">
             {t('common.score')}
           </span>
-          <RollingNumber 
+          <RollingNumber
             value={score}
             variant="white"
             className="text-lg font-black"

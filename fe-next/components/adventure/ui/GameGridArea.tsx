@@ -117,7 +117,7 @@ export const GameGridArea = memo(function GameGridArea({
         {/* Top Section: Feedback & Word Preview */}
         <div className="flex flex-col items-center gap-2 mb-2 sm:mb-4 shrink-0">
           {/* Feedback Area */}
-          <div className="h-8 sm:h-10 flex items-center justify-center">
+          <div data-testid="feedback-container" className="h-8 sm:h-10 flex items-center justify-center">
             <AnimatePresence mode="wait">
               {/* Validation Error */}
               {validationError && (

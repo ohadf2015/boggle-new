@@ -21,36 +21,29 @@ jest.mock('framer-motion', () => {
   // Create mock motion component factory
   const createMockMotion = (element: string) => {
     const MockComponent = React.forwardRef(
-      ({ children, ...props }: any, ref: any) =>
-        React.createElement(element, { ...props, ref }, children)
+      ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }, ref: unknown) => {
+        // Filter out framer-motion specific props
+        const filteredProps: Record<string, unknown> = {};
+        Object.keys(props).forEach(key => {
+          if (!['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'variants', 'custom', 'onAnimationComplete'].includes(key)) {
+            filteredProps[key] = props[key];
+          }
+        });
+        return React.createElement(element, { ...filteredProps, ref }, children);
+      }
     );
     MockComponent.displayName = `MockMotion${element.charAt(0).toUpperCase() + element.slice(1)}`;
     return MockComponent;
   };
 
-  // Mock useMotionValue with get/set methods
-  const useMotionValue = (initial: any) => ({
-    get: () => initial,
-    set: jest.fn(),
-    onChange: jest.fn(),
-    current: initial,
-  });
-
-  // Mock useTransform
-  const useTransform = () => ({
+  // Mock motion value with on() method for subscriptions
+  const mockMotionValue = {
     get: () => 0,
     set: jest.fn(),
     onChange: jest.fn(),
+    on: jest.fn(() => jest.fn()), // Return unsubscribe function
     current: 0,
-  });
-
-  // Mock useSpring (used by ComboTierBadge)
-  const useSpring = (initial: any) => ({
-    get: () => initial,
-    set: jest.fn(),
-    onChange: jest.fn(),
-    current: initial,
-  });
+  };
 
   return {
     motion: {
@@ -62,10 +55,10 @@ jest.mock('framer-motion', () => {
       h2: createMockMotion('h2'),
       p: createMockMotion('p'),
     },
-    AnimatePresence: ({ children }: any) => children,
-    useMotionValue,
-    useTransform,
-    useSpring,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+    useMotionValue: () => mockMotionValue,
+    useTransform: () => mockMotionValue,
+    useSpring: () => mockMotionValue,
   };
 });
 

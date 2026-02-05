@@ -79,7 +79,7 @@ export const GameSidebar = memo(function GameSidebar({
         </div>
 
         {/* Combo - Compact */}
-        <div className="flex-shrink-0 w-28 sm:w-32">
+        <div data-testid="combo-display" className="flex-shrink-0 w-28 sm:w-32">
           <div className={cn(
             'bg-neo-black/40 rounded-neo-lg p-2 border-2',
             comboCount > 1 ? 'border-neo-cyan' : 'border-neo-cyan/30'
