@@ -416,45 +416,16 @@
 
 /* ==============================================
    RAINBOW TILE EFFECTS
+   Neo-brutalist style: static gradient + hard shadow
    ============================================== */
 
-/* Continuous rainbow flow */
+/* Simplified rainbow flow - background position only, no filter */
 @keyframes rainbow-flow {
   0% {
     background-position: 0% 50%;
-    filter: hue-rotate(0deg) saturate(1.5) brightness(1.1);
   }
-  50% {
+  100% {
     background-position: 100% 50%;
-    filter: hue-rotate(180deg) saturate(2) brightness(1.2);
-  }
-  100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(360deg) saturate(1.5) brightness(1.1);
-  }
-}
-
-/* Prismatic glow */
-@keyframes rainbow-glow {
-  0% {
-    box-shadow:
-      0 0 15px rgba(255, 0, 128, 0.5),
-      0 0 30px rgba(255, 100, 0, 0.3);
-  }
-  33% {
-    box-shadow:
-      0 0 15px rgba(0, 255, 128, 0.5),
-      0 0 30px rgba(0, 255, 255, 0.3);
-  }
-  66% {
-    box-shadow:
-      0 0 15px rgba(128, 0, 255, 0.5),
-      0 0 30px rgba(255, 0, 255, 0.3);
-  }
-  100% {
-    box-shadow:
-      0 0 15px rgba(255, 0, 128, 0.5),
-      0 0 30px rgba(255, 100, 0, 0.3);
   }
 }
 
@@ -488,14 +459,16 @@
 .tile-rainbow-enhanced {
   position: relative;
   overflow: visible;
+  /* Static rainbow gradient - no animated hue-rotate */
   background: linear-gradient(
     90deg,
     #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b
   );
   background-size: 300% 100%;
-  animation:
-    rainbow-flow 3s linear infinite,
-    rainbow-glow 4s ease-in-out infinite;
+  /* Hard shadow instead of glow - neo-brutalist style */
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
+  /* Subtle background animation only - compositor-friendly */
+  animation: rainbow-flow 6s linear infinite;
 }
 
 /* Shimmer overlay */
@@ -1000,6 +973,12 @@
       0 0 20px rgba(190, 255, 0, 0.7),
       0 0 40px rgba(255, 215, 0, 0.4);
   }
+
+  /* Static visual feedback for rainbow tiles - hard shadow, static gradient */
+  .tile-rainbow-enhanced {
+    background-position: 50% 50%;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
+  }
 }
 
 /* ========== SELECTED STATE ENHANCEMENT ========== */
@@ -1386,26 +1365,27 @@
 }
 
 /* ========== RAINBOW WILDCARD EFFECT ========== */
+/* Simplified: transform + opacity only (compositor-friendly), no hue-rotate */
 @keyframes rainbow-wildcard {
   0% {
     transform: scale(1);
-    filter: hue-rotate(0deg) brightness(1.2);
+    opacity: 1;
   }
   25% {
     transform: scale(1.15);
-    filter: hue-rotate(90deg) brightness(1.5);
+    opacity: 0.95;
   }
   50% {
     transform: scale(1.2);
-    filter: hue-rotate(180deg) brightness(2);
+    opacity: 1;
   }
   75% {
     transform: scale(1.15);
-    filter: hue-rotate(270deg) brightness(1.5);
+    opacity: 0.95;
   }
   100% {
     transform: scale(1);
-    filter: hue-rotate(360deg) brightness(1.2);
+    opacity: 1;
   }
 }
 
