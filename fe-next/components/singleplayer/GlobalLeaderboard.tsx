@@ -6,7 +6,7 @@ import { Trophy, Medal, Crown, Star, RefreshCw, AlertCircle, User } from 'lucide
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { getGuestFingerprint } from '@/utils/guestManager';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 export interface LeaderboardEntry {
   guest_fingerprint: string;
@@ -122,7 +122,7 @@ export function GlobalLeaderboard({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <NeoLoader variant="dots" size="lg" />
+        <Loader size="lg" />
         <p className="text-sm font-bold text-neo-white/70">
           {t('leaderboard.loading') || 'Loading leaderboard...'}
         </p>

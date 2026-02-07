@@ -17,11 +17,6 @@
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
     },
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    },
     "sequential-thinking": {
       "type": "stdio",
       "command": "npx",

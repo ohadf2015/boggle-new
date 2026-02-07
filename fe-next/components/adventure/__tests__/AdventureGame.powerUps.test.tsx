@@ -4,9 +4,7 @@
  * Tests for power-up system integration with AdventureGame component.
  */
 
-import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
 
@@ -489,33 +487,8 @@ describe('AdventureGame - Power-Up Integration', () => {
     // This test verifies the wiring exists in AdventureGame
   });
 
-  it.skip('should handle Hint power-up activation', async () => {
-    // SKIPPED: PowerUpBar only renders after entry sequence completes
-    // Entry sequence requires advancing through multiple animation phases
-    // This test is preserved for when full E2E or integration testing is available
-    const user = userEvent.setup();
-
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('hint-button')).toBeInTheDocument();
-    });
-
-    // Click Hint button
-    const hintButton = screen.getByTestId('hint-button');
-    await user.click(hintButton);
-
-    // Hint should highlight tiles for 5 seconds
-    // Grid should receive hintHighlightIndices prop
-    // Note: Visual verification would require more complex grid rendering
-  });
+  // Hint power-up activation test removed: PowerUpBar is not yet integrated
+  // into AdventureGame component (no PowerUpBar import or rendering)
 
   it('should handle Score Multiplier power-up activation', async () => {
     // Test verifies Score Multiplier handler integration
@@ -564,39 +537,8 @@ describe('AdventureGame - Power-Up Integration', () => {
     expect(baseScore * goldMultiplier * powerUpMultiplier).toBe(60);
   });
 
-  it.skip('should clear hint after 5 seconds', async () => {
-    // SKIPPED: PowerUpBar only renders after entry sequence completes
-    // Entry sequence requires advancing through multiple animation phases
-    // This test is preserved for when full E2E or integration testing is available
-    jest.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
-
-    render(
-      <AdventureGame
-        levelConfig={mockLevelConfig}
-        initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
-      />
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('hint-button')).toBeInTheDocument();
-    });
-
-    // Activate hint
-    const hintButton = screen.getByTestId('hint-button');
-    await user.click(hintButton);
-
-    // Hint should be active (tiles highlighted)
-    // Fast-forward 5 seconds
-    jest.advanceTimersByTime(5000);
-
-    // Hint should be cleared
-    // State verification would require exposing hint state or checking grid props
-
-    jest.useRealTimers();
-  });
+  // Hint clearing test removed: PowerUpBar is not yet integrated
+  // into AdventureGame component (no PowerUpBar import or rendering)
 
   it('should reset score multiplier after 30 seconds', async () => {
     // Test verifies multiplier timeout logic
@@ -647,40 +589,8 @@ describe('AdventureGame - Power-Up Integration', () => {
       mockInventoryResetCooldowns.mockClear();
     });
 
-    it.skip('should reset cooldowns when level changes', async () => {
-      // SKIPPED: Power-up system not yet integrated into AdventureGame
-      // AdventureGame currently doesn't use usePowerUpInventory or render PowerUpBar
-      // This test is preserved for when power-up integration is implemented
-
-      // Don't use fake timers for this test to avoid animation conflicts
-      const { rerender } = render(
-        <AdventureGame
-          levelConfig={{ ...mockLevelConfig, level: 1 }}
-          initialGrid={mockInitialGrid}
-          onLevelComplete={jest.fn()}
-          onExit={jest.fn()}
-        />
-      );
-
-      // Clear call count from mount (in case there were any initialization calls)
-      mockInventoryResetCooldowns.mockClear();
-
-      // Change level (simulating level completion and next level load)
-      rerender(
-        <AdventureGame
-          levelConfig={{ ...mockLevelConfig, level: 2 }}
-          initialGrid={mockInitialGrid}
-          onLevelComplete={jest.fn()}
-          onExit={jest.fn()}
-        />
-      );
-
-      // resetCooldowns should be called when level changes
-      // Implementation detail: AdventureGame detects level change via useEffect
-      await waitFor(() => {
-        expect(mockInventoryResetCooldowns).toHaveBeenCalled();
-      }, { timeout: 1000 });
-    });
+    // Cooldown reset test removed: Power-up system not yet integrated into AdventureGame
+    // AdventureGame does not use usePowerUpInventory or render PowerUpBar
 
     it('should not reset cooldowns on initial mount', () => {
       render(

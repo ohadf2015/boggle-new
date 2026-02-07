@@ -12,7 +12,7 @@ import Link from 'next/link';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
 import { buildPuzzleShareUrl, type LeaderboardEntry } from '@/utils/customPuzzle';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import {
   useCustomPuzzlePhase,
   useCustomPuzzlePuzzle,
@@ -202,7 +202,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             </Link>
           </div>
         ) : (
-          <NeoLoader text={t('customPuzzle.loading') || 'Loading puzzle...'} />
+          <PageLoader text={t('customPuzzle.loading') || 'Loading puzzle...'} />
         )}
       </div>
     );

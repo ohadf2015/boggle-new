@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Check, X, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import type { GenerationResult } from '../hooks/useBuzzGeneration';
 
 const LANGUAGES = [
@@ -95,7 +95,7 @@ export function GenerationControls({
         >
           {isGenerating ? (
             <>
-              <NeoLoader variant="dots" size="sm" className="me-2" />
+              <Loader size="sm" className="me-2" />
               Generating... {elapsedTime > 0 && `(${elapsedTime}s)`}
             </>
           ) : (

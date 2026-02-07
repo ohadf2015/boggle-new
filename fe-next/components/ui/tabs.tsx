@@ -7,14 +7,28 @@ import { cn } from "../../lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
+/**
+ * TabsList variants:
+ * - 'pill': Default pill-style background tabs
+ * - 'underline': Border-bottom style with active indicator (SuperDesign style)
+ */
+interface TabsListProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> {
+  variant?: 'pill' | 'underline';
+}
+
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
+  TabsListProps
+>(({ className, variant = 'pill', ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-neo-navy/50 p-1 text-neo-white/70",
+      variant === 'pill' && [
+        "inline-flex h-10 items-center justify-center rounded-md bg-neo-navy/50 p-1 text-neo-white/70",
+      ],
+      variant === 'underline' && [
+        "flex border-b-4 border-neo-black",
+      ],
       className
     )}
     {...props}
@@ -22,19 +36,54 @@ const TabsList = React.forwardRef<
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 
+/**
+ * TabsTrigger variants:
+ * - 'pill': Default pill-style with background on active
+ * - 'underline': Text-only with bottom border indicator on active (SuperDesign style)
+ */
+interface TabsTriggerProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> {
+  variant?: 'pill' | 'underline';
+  /** Active color for underline variant */
+  activeColor?: 'lime' | 'pink' | 'cyan' | 'purple';
+}
+
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-neo-navy data-[state=active]:text-neo-white data-[state=active]:shadow-sm",
-      className
-    )}
-    {...props}
-  />
-))
+  TabsTriggerProps
+>(({ className, variant = 'pill', activeColor = 'lime', ...props }, ref) => {
+  // Active color classes for underline variant
+  const activeColors = {
+    lime: 'data-[state=active]:text-neo-lime data-[state=active]:border-neo-lime',
+    pink: 'data-[state=active]:text-neo-pink data-[state=active]:border-neo-pink',
+    cyan: 'data-[state=active]:text-neo-cyan data-[state=active]:border-neo-cyan',
+    purple: 'data-[state=active]:text-neo-purple data-[state=active]:border-neo-purple',
+  };
+
+  return (
+    <TabsPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        // Common styles
+        "inline-flex items-center justify-center whitespace-nowrap transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
+        "disabled:pointer-events-none disabled:opacity-50",
+        // Variant-specific styles
+        variant === 'pill' && [
+          "rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background",
+          "data-[state=active]:bg-neo-navy data-[state=active]:text-neo-white data-[state=active]:shadow-sm",
+        ],
+        variant === 'underline' && [
+          "px-4 py-2 text-sm font-black uppercase",
+          "text-gray-500 hover:text-neo-white",
+          "border-b-4 border-transparent -mb-1",
+          activeColors[activeColor],
+        ],
+        className
+      )}
+      {...props}
+    />
+  );
+})
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
 const TabsContent = React.forwardRef<

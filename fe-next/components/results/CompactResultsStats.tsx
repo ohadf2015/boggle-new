@@ -1,14 +1,20 @@
 'use client';
 
-import React, { memo, useEffect, useState, useMemo } from 'react';
-import { Coins, Brain, TrendingUp, TrendingDown, Minus, Hash, Target, Lock } from 'lucide-react';
+import React, { memo } from 'react';
+import { Coins, Brain, TrendingUp, TrendingDown, Minus, Hash, Target, Lock, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
+import { AchievementBadge } from '@/components/AchievementBadge';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
-import { getChartData, type GameHistoryEntry, type PerformanceTrend } from '@/utils/gameHistoryManager';
+import type { GameAchievement } from '@/components/results/types';
+import { MiniSparkline } from '@/components/charts/MiniSparkline';
+import { useSparklineTrend } from '@/hooks/useSparklineTrend';
 import type { CoinReward, CoinRewardMode } from './CoinRewardDisplay';
 import type { BrainPointsReward } from './BrainPointsDisplay';
+
+/** Max achievement badges to show inline */
+const MAX_VISIBLE_ACHIEVEMENTS = 3;
 
 interface CompactResultsStatsProps {
   /** Number of valid words found */
@@ -17,6 +23,8 @@ interface CompactResultsStatsProps {
   accuracy: number;
   /** Optional player archetype to display */
   archetype?: PlayerArchetype | null;
+  /** Game achievements earned (optional) */
+  achievements?: GameAchievement[];
   /** Optional coin reward to display inline */
   coinReward?: CoinReward | null;
   /** Coin reward mode: 'earned' for authenticated users, 'teasing' for guests */
@@ -28,78 +36,6 @@ interface CompactResultsStatsProps {
   /** Additional className for the container */
   className?: string;
 }
-
-/**
- * MiniSparkline - Tiny SVG sparkline for performance history
- * Shows last few game scores as a simple line chart
- */
-const MiniSparkline: React.FC<{
-  data: number[];
-  currentScore?: number;
-  trend?: PerformanceTrend | null;
-  width?: number;
-  height?: number;
-}> = memo(({ data, currentScore, trend, width = 60, height = 28 }) => {
-  if (data.length < 2) return null;
-
-  const padding = 2;
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
-
-  const minVal = Math.min(...data) * 0.9;
-  const maxVal = Math.max(...data) * 1.1;
-  const range = maxVal - minVal || 1;
-
-  // Create points for the polyline
-  const points = data.map((val, i) => {
-    const x = padding + (i / (data.length - 1)) * chartWidth;
-    const y = padding + chartHeight - ((val - minVal) / range) * chartHeight;
-    return `${x},${y}`;
-  }).join(' ');
-
-  // Last point for the highlight dot
-  const lastX = padding + chartWidth;
-  const lastY = padding + chartHeight - ((data[data.length - 1] - minVal) / range) * chartHeight;
-
-  // Determine line color based on trend
-  const strokeColor = trend?.direction === 'up' ? '#a3e635' : // neo-lime
-                      trend?.direction === 'down' ? '#f87171' : // neo-red
-                      '#22d3ee'; // neo-cyan
-
-  return (
-    <svg width={width} height={height} className="overflow-visible">
-      {/* Background line (subtle) */}
-      <polyline
-        points={points}
-        fill="none"
-        stroke="rgba(255,255,255,0.1)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Main line */}
-      <polyline
-        points={points}
-        fill="none"
-        stroke={strokeColor}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Current game dot */}
-      <circle
-        cx={lastX}
-        cy={lastY}
-        r="3"
-        fill={strokeColor}
-        stroke="white"
-        strokeWidth="1.5"
-      />
-    </svg>
-  );
-});
-
-MiniSparkline.displayName = 'MiniSparkline';
 
 /**
  * CompactResultsStats - Shared stats card for results pages
@@ -116,6 +52,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
   wordCount,
   accuracy,
   archetype,
+  achievements,
   coinReward,
   coinRewardMode = 'earned',
   brainPointsReward,
@@ -123,71 +60,12 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
   className,
 }) => {
   const { t } = useLanguage();
-  const [chartData, setChartData] = useState<GameHistoryEntry[]>([]);
-  const [isClient, setIsClient] = useState(false);
-
-  // Load chart data on client side
-  useEffect(() => {
-    setIsClient(true);
-    const data = getChartData(8); // Get last 8 games for sparkline
-    setChartData(data);
-  }, []);
-
-  // Extract scores for sparkline, ensuring currentScore is always included as the last point.
-  // This fixes a race condition where the current game may not be in history yet
-  // when this component mounts.
-  const sparklineScores = useMemo(() => {
-    const historicalScores = chartData.map(d => d.score);
-
-    // If no current score provided, just use historical data
-    if (currentScore === undefined) {
-      return historicalScores;
-    }
-
-    // If current score already matches the last historical score, don't duplicate
-    const lastHistoricalScore = historicalScores[historicalScores.length - 1];
-    if (lastHistoricalScore === currentScore) {
-      return historicalScores;
-    }
-
-    // Append current score to ensure sparkline ends with the current game
-    return [...historicalScores, currentScore];
-  }, [chartData, currentScore]);
-
-  // Calculate visual trend based on actual sparkline data (not storage)
-  // This ensures the trend indicator matches what the user sees in the sparkline
-  const visualTrend = useMemo((): PerformanceTrend | null => {
-    if (sparklineScores.length < 2) return null;
-
-    // Compare last score (current game) to average of previous scores
-    const lastScore = sparklineScores[sparklineScores.length - 1];
-    const previousScores = sparklineScores.slice(0, -1);
-    const previousAvg = previousScores.reduce((a, b) => a + b, 0) / previousScores.length;
-
-    // Determine direction based on current vs previous average
-    let direction: 'up' | 'down' | 'stable' = 'stable';
-    const percentChange = previousAvg > 0
-      ? ((lastScore - previousAvg) / previousAvg) * 100
-      : 0;
-
-    if (percentChange > 10) direction = 'up';
-    else if (percentChange < -10) direction = 'down';
-
-    return {
-      direction,
-      percentChange: Math.round(percentChange),
-      averageScore: Math.round(previousAvg),
-      bestScore: Math.max(...sparklineScores),
-      totalGames: sparklineScores.length,
-      recentAverage: lastScore,
-    };
-  }, [sparklineScores]);
+  const { sparklineScores, trend: visualTrend, hasSparkline } = useSparklineTrend(currentScore);
 
   // Check if we have coin/brain rewards to show
   const hasCoinReward = coinReward && coinReward.awarded > 0;
   const isTeasing = coinRewardMode === 'teasing';
   const hasBrainReward = brainPointsReward && brainPointsReward.scoreDelta !== 0;
-  const hasSparkline = isClient && sparklineScores.length >= 2;
 
   return (
     <div className={cn(
@@ -301,10 +179,10 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             <div className="flex items-center gap-2">
               <MiniSparkline
                 data={sparklineScores}
-                currentScore={currentScore}
                 trend={visualTrend}
                 width={70}
                 height={32}
+                variant="dark"
               />
               {visualTrend && (
                 <div className="flex items-center gap-1">
@@ -338,6 +216,21 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
           {/* Archetype Badge */}
           {archetype && (
             <PlayerArchetypeBadge archetype={archetype} size="sm" showTooltip={true} />
+          )}
+        </div>
+      )}
+
+      {/* Row 3: Achievement badges (if any) */}
+      {achievements && achievements.length > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-white/10">
+          <Award className="w-4 h-4 text-neo-lime flex-shrink-0" />
+          {achievements.slice(0, MAX_VISIBLE_ACHIEVEMENTS).map((ach, i) => (
+            <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
+          ))}
+          {achievements.length > MAX_VISIBLE_ACHIEVEMENTS && (
+            <span className="text-xs font-bold text-white/60 px-1.5 py-0.5 bg-white/10 rounded-neo border border-white/20">
+              +{achievements.length - MAX_VISIBLE_ACHIEVEMENTS}
+            </span>
           )}
         </div>
       )}

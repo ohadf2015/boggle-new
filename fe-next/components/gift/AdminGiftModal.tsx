@@ -10,7 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 interface BadgeInfo {
   id: string;
@@ -504,7 +504,7 @@ export function AdminGiftModal({
                 )}
               >
                 {claiming ? (
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                 ) : phase === 'done' ? (
                   <>
                     <Gift className="w-5 h-5 mr-2" />

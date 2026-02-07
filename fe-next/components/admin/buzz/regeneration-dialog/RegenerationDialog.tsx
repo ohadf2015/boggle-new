@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { RefreshCw, MessageSquare, Eye } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import {
   Dialog,
   DialogContent,
@@ -145,7 +145,7 @@ export default function RegenerationDialog({
             >
               {wizard.isRegenerating ? (
                 <>
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                   Regenerating...
                 </>
               ) : (

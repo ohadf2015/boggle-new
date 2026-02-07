@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
 
 export interface SurvivalHeaderProps {
@@ -32,15 +31,13 @@ export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
 }) => {
   return (
     <div className="flex items-center justify-between mb-1 px-2 max-w-3xl mx-auto w-full">
-      <Button
-        variant="ghost"
-        size="default"
+      <button
         onClick={onQuitClick}
-        className="text-gray-600 hover:text-red-500"
+        className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
       >
-        <X className="w-4 h-4 mr-1" />
+        <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
         {t('common.quit') || 'Quit'}
-      </Button>
+      </button>
 
       <AccumulatedScoreDisplay
         currentScore={liveScore}

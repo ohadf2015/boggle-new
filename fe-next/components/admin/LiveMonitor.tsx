@@ -6,7 +6,8 @@ import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucid
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 // Types matching backend DetailedGame and DetailedGamePlayer
 interface LivePlayer {
@@ -161,7 +162,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-64">
-        <NeoLoader variant="mascot-letters" size="md" />
+        <PageLoader size="md" />
       </div>
     );
   }
@@ -203,7 +204,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               disabled={loading}
             >
               {loading ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : (
                 <RefreshCw className="w-3 h-3" />
               )}
@@ -243,7 +244,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           disabled={loading}
         >
           {loading ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}

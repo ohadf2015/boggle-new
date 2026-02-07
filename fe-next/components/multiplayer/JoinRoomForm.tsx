@@ -6,7 +6,7 @@ import { ArrowLeft, LogIn, ClipboardPaste, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -245,14 +245,14 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                         className="p-1.5 rounded-full hover:bg-neo-cyan/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:bg-neo-cyan/30 transition-colors disabled:opacity-50"
                         aria-label={t('multiplayerFlow.joinForm.refreshButton') || 'Refresh'}
                       >
-                        {roomsLoading ? <NeoLoader variant="dots" size="sm" /> : <RefreshCw className="w-3 h-3 text-neo-cyan" />}
+                        {roomsLoading ? <Loader size="sm" /> : <RefreshCw className="w-3 h-3 text-neo-cyan" />}
                       </button>
                     </div>
 
                     <div className="max-h-[180px] overflow-y-auto rounded-neo border-2 border-neo-cream/30 dark:border-neo-black/50 bg-neo-navy/20 dark:bg-neo-navy/50">
                       {roomsLoading ? (
                         <div className="p-4 text-center">
-                          <NeoLoader variant="dots" size="sm" className="mx-auto" />
+                          <Loader size="sm" className="mx-auto" />
                         </div>
                       ) : activeRooms.length > 0 ? (
                         <div className="divide-y divide-neo-cream/20 dark:divide-slate-600">

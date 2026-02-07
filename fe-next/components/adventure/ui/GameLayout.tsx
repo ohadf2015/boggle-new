@@ -63,7 +63,7 @@ export const GameLayout = memo(function GameLayout({
           className={cn(
             'flex-shrink-0',
             // Mobile: compact height to maximize grid space, no scroll
-            'max-h-[28vh] lg:max-h-none',
+            'max-h-[20vh] lg:max-h-none',
             'lg:h-full lg:w-64 xl:w-72',
             'overflow-hidden lg:overflow-y-auto',
             'z-10'

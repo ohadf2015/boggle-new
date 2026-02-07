@@ -31,7 +31,7 @@ function applyHebrewFinalLetter(word: string): string {
 
 export interface WordFeedback {
   id: string;
-  type: 'accepted' | 'rejected' | 'pending' | 'duplicate' | 'foundByOther' | 'checking';
+  type: 'accepted' | 'rejected' | 'duplicate' | 'foundByOther';
   word: string;
   score?: number;
   message?: string;
@@ -142,8 +142,6 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
         case 'rejected': return 'bg-neo-red';
         case 'duplicate': return 'bg-neo-pink';
         case 'foundByOther': return 'bg-neo-pink';
-        case 'pending': return 'bg-neo-yellow';
-        case 'checking': return 'bg-neo-cyan/80';
         default: return 'bg-neo-cyan';
       }
     }
@@ -249,22 +247,6 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   {visibleFeedback?.type === 'foundByOther' && (
                     // Show the first finder's avatar emoji or a default icon
                     visibleFeedback?.foundByAvatar?.emoji || '👤'
-                  )}
-                  {visibleFeedback?.type === 'pending' && (
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    >
-                      ⏳
-                    </motion.span>
-                  )}
-                  {visibleFeedback?.type === 'checking' && (
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 0.5, repeat: Infinity, ease: 'linear' }}
-                    >
-                      ⚡
-                    </motion.span>
                   )}
                 </motion.span>
               )}
@@ -421,35 +403,6 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               />
             )}
 
-            {/* Pulsing glow - for pending */}
-            {showFeedback && visibleFeedback?.type === 'pending' && (
-              <motion.div
-                className="absolute inset-0 rounded-neo pointer-events-none"
-                animate={{
-                  boxShadow: [
-                    '0 0 8px rgba(255, 225, 53, 0.4)',
-                    '0 0 16px rgba(255, 225, 53, 0.6)',
-                    '0 0 8px rgba(255, 225, 53, 0.4)',
-                  ],
-                }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
-
-            {/* Fast pulse - for checking (instant feedback while verifying) */}
-            {showFeedback && visibleFeedback?.type === 'checking' && (
-              <motion.div
-                className="absolute inset-0 rounded-neo pointer-events-none"
-                animate={{
-                  boxShadow: [
-                    '0 0 4px rgba(0, 255, 255, 0.3)',
-                    '0 0 12px rgba(0, 255, 255, 0.5)',
-                    '0 0 4px rgba(0, 255, 255, 0.3)',
-                  ],
-                }}
-                transition={{ duration: 0.4, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
           </motion.div>
         )}
       </AnimatePresence>

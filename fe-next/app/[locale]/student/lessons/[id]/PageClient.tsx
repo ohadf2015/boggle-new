@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useLesson } from '@/hooks/useVocabularyLesson';
 import { usePracticeProgress, type PracticeType } from '@/hooks/usePracticeSession';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import {
   PracticeModeSelector,
   FlashcardReview,
@@ -273,7 +273,7 @@ export default function LessonPracticePageClient() {
   if (isChecking || loading || isLoadingLesson || isLoadingProgress) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }

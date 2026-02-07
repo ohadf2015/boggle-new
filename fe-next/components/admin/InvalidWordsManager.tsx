@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, AlertTriangle, Check, X, ChevronLeft, ChevronRight, Filter
 } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -391,7 +391,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       {/* Words List */}
       {loading && words.length === 0 ? (
         <div className="flex justify-center py-12">
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       ) : words.length === 0 ? (
         <div className="text-center py-12 text-slate-400">

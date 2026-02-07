@@ -16,7 +16,7 @@ import {
   initCrossTabAuthSync,
   type AuthSyncMessage,
 } from '@/utils/crossTabAuthSync';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Cookies from 'js-cookie';
 
@@ -74,7 +74,7 @@ function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIPr
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy" dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="flex flex-col items-center gap-6">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('auth.callback.completingSignIn')} />
+        <PageLoader size="lg" text={t('auth.callback.completingSignIn')} />
 
         {!showRetry && secondsRemaining > 0 && (
           <p className="text-neo-white/60 text-sm">
@@ -502,7 +502,7 @@ function AuthCallbackContent(): React.JSX.Element {
 function SuspenseFallback(): React.JSX.Element {
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
+      <PageLoader size="lg" text="Loading..." />
     </div>
   );
 }

@@ -127,8 +127,8 @@ jest.mock('@/components/AutoHideHeader', () => ({
   default: () => <div data-testid="auto-hide-header">Header</div>,
 }));
 
-jest.mock('@/components/ui/NeoLoader', () => ({
-  NeoLoader: () => <div data-testid="neo-loader">Loading...</div>,
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
 jest.mock('@/components/EmojiAvatarPicker', () => ({

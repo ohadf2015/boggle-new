@@ -57,11 +57,17 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen && badgeRef.current) {
+    if (!isOpen || !badgeRef.current) {
+      if (!isOpen) setTooltipPosition(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      if (!badgeRef.current) return;
       const rect = badgeRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      const tooltipEstimatedHeight = 120; // Increased for new layout
+      const tooltipEstimatedHeight = 140;
       const tooltipEstimatedWidth = 256; // w-64 = 16rem = 256px
 
       // Check if tooltip would go below viewport
@@ -78,11 +84,9 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       const maxLeft = viewportWidth - tooltipEstimatedWidth / 2 - 16;
       leftPos = Math.max(minLeft, Math.min(maxLeft, leftPos));
 
-      // Calculate arrow offset when tooltip is clamped
-      // Arrow should still point at the badge center
-      // arrowOffset is the position of badge center relative to tooltip left edge, as percentage
+      // Calculate arrow offset - arrow should point at badge center
       const tooltipLeft = leftPos - tooltipEstimatedWidth / 2;
-      const arrowOffset = ((badgeCenter - tooltipLeft) / tooltipEstimatedWidth) * 100;
+      const arrowOffset = Math.max(10, Math.min(90, ((badgeCenter - tooltipLeft) / tooltipEstimatedWidth) * 100));
 
       setTooltipPosition({
         top: showAbove ? rect.top - 8 : rect.bottom + 8,
@@ -90,9 +94,17 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
         showAbove,
         arrowOffset,
       });
-    } else if (!isOpen) {
-      setTooltipPosition(null);
-    }
+    };
+
+    updatePosition();
+
+    // Recalculate on scroll to keep tooltip aligned
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
   }, [isOpen]);
 
   // Touch/click handlers for mobile support

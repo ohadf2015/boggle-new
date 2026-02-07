@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Search, X, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import type { GiftRecipient } from './types';
 
@@ -160,7 +160,7 @@ export function PlayerSelector({
           <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {loading ? (
               <div className="flex justify-center py-4">
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               </div>
             ) : searchResults.length === 0 ? (
               <div className="p-4 text-center text-slate-500">

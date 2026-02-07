@@ -4,7 +4,7 @@ import React from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { TrainingHints, SkillUnlockToast } from '@/components/training';
@@ -91,8 +91,7 @@ export function GameOverlays({
             className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
           >
             <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
-              <NeoLoader
-                variant="dots"
+              <Loader
                 size="md"
                 className='text-neo-black'
                 text={t('singlePlayer.verifyingWords') || 'Verifying words...'}

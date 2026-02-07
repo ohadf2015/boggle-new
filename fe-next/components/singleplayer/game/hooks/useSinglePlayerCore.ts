@@ -19,6 +19,7 @@ import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator'
 import { wordErrorToast } from '@/components/NeoToast';
 import { awardComboCoins } from '@/utils/coinManager';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
+import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
@@ -101,6 +102,7 @@ export function useSinglePlayerCore({
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
+  const feedbackClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
   const [progressBarExpanded, setProgressBarExpanded] = useState(false);
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
@@ -137,6 +139,25 @@ export function useSinglePlayerCore({
   const showHintPromptRef = useRef(showHintPrompt);
   const isTypingModeRef = useRef(false);
   const gameStatsRef = useRef<HTMLDivElement>(null);
+
+  // Auto-clear feedback after 1.5s for terminal states (accepted/rejected/duplicate)
+  useEffect(() => {
+    if (feedbackClearTimerRef.current) {
+      clearTimeout(feedbackClearTimerRef.current);
+      feedbackClearTimerRef.current = null;
+    }
+    if (currentFeedback && ['accepted', 'rejected', 'duplicate'].includes(currentFeedback.type)) {
+      feedbackClearTimerRef.current = setTimeout(() => {
+        setCurrentFeedback(null);
+        feedbackClearTimerRef.current = null;
+      }, 1500);
+    }
+    return () => {
+      if (feedbackClearTimerRef.current) {
+        clearTimeout(feedbackClearTimerRef.current);
+      }
+    };
+  }, [currentFeedback]);
 
   // Bot simulation
   const { botScores, botWords, resetBots, initializeBotUsedWords } = useBotSimulation({
@@ -315,7 +336,7 @@ export function useSinglePlayerCore({
   // Word submission handler - defined before keyboardInput
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
-    const minWordLength = settings.minWordLength ?? 3;
+    const minWordLength = settings.minWordLength ?? 2;
     const now = Date.now();
 
     const spamResult = checkSubmission();
@@ -384,7 +405,7 @@ export function useSinglePlayerCore({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word: normalizedWord, language: settings.language }),
     })
-      .then(res => res.ok ? res.json() : { isValid: false, source: 'pending' })
+      .then(res => res.ok ? res.json() : { isValid: false, source: 'error' })
       .then(result => {
         if (result.isValid) {
           const wordLenScore = Math.max(normalizedWord.length - 1, 1);
@@ -442,12 +463,30 @@ export function useSinglePlayerCore({
           }
         } else {
           combo.resetCombo();
-          setCurrentFeedback({ id: `pending-${now}`, type: 'pending', word: normalizedWord.toUpperCase(), timestamp: now });
+          foundWordsRef.current = foundWordsRef.current.map(fw =>
+            fw.word === normalizedWord && fw.timestamp === now
+              ? { ...fw, isValid: false, score: 0 }
+              : fw
+          );
+          setFoundWords(foundWordsRef.current);
+          const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+          setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
+          hapticError();
+          announceWordResult(normalizedWord, false, undefined, invalidMsg);
+          recordNotInDictionary(normalizedWord, settings.language, 'single_player');
         }
       })
       .catch(() => {
         combo.resetCombo();
-        setCurrentFeedback({ id: `pending-${Date.now()}`, type: 'pending', word: normalizedWord.toUpperCase(), timestamp: Date.now() });
+        foundWordsRef.current = foundWordsRef.current.map(fw =>
+          fw.word === normalizedWord && fw.timestamp === now
+            ? { ...fw, isValid: false, score: 0 }
+            : fw
+        );
+        setFoundWords(foundWordsRef.current);
+        const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+        setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
+        hapticError();
       });
   }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission]);
 
@@ -458,7 +497,7 @@ export function useSinglePlayerCore({
     gameLanguage: settings.language,
     enabled: !!grid && !isPaused && !isGameOver,
     onWordSubmit: handleWordSubmit,
-    minWordLength: settings.minWordLength ?? 3,
+    minWordLength: settings.minWordLength ?? 2,
   });
 
   // Keep refs in sync

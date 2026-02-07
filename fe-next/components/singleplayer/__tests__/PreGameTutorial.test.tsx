@@ -1,0 +1,212 @@
+/**
+ * PreGameTutorial Tests
+ *
+ * Tests for the 3-step mascot-guided pre-game tutorial
+ * TDD: Written FIRST (RED phase), then implementation (GREEN phase)
+ */
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+
+// Mock framer-motion to avoid animation issues in tests
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  return {
+    motion: new Proxy({}, {
+      get: (_target: unknown, prop: string) => {
+        const MotionComponent = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+          const { children, initial, animate, exit, transition, variants, whileHover, whileTap, ...rest } = props;
+          return React.createElement(prop, { ...rest, ref }, children);
+        });
+        MotionComponent.displayName = `motion.${prop}`;
+        return MotionComponent;
+      },
+    }),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+  };
+});
+
+// Mock LanguageContext
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+// Mock Mascot components
+jest.mock('@/components/ui/Mascot', () => ({
+  Mascot: ({ variant }: { variant: string }) => (
+    <div data-testid={`mascot-${variant}`} />
+  ),
+  MascotWithEntrance: ({ variant }: { variant: string }) => (
+    <div data-testid={`mascot-entrance-${variant}`} />
+  ),
+}));
+
+// Mock MiniGrid
+const mockOnDemoComplete = jest.fn();
+jest.mock('@/components/onboarding/MiniGrid', () => {
+  return function MockMiniGrid({ onDemoComplete }: { onDemoComplete: () => void }) {
+    mockOnDemoComplete.mockImplementation(onDemoComplete);
+    return <div data-testid="mini-grid" onClick={onDemoComplete} />;
+  };
+});
+
+// Mock useDevicePerformance (used by Mascot)
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    prefersReducedMotion: false,
+    enableComplexAnimations: true,
+    tier: 'high',
+  }),
+}));
+
+import PreGameTutorial from '../PreGameTutorial';
+
+describe('PreGameTutorial', () => {
+  const mockOnComplete = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // GIVEN: PreGameTutorial renders
+  // WHEN: Initial render
+  // THEN: Shows step 1 (welcome) with mascot
+  it('renders step 1 (welcome) with mascot and speech bubble', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    // Should show the welcome mascot
+    expect(screen.getByTestId('mascot-entrance-happy')).toBeInTheDocument();
+
+    // Should show welcome text (translation keys)
+    expect(screen.getByText('preGameTutorial.welcome.title')).toBeInTheDocument();
+    expect(screen.getByText('preGameTutorial.welcome.subtitle')).toBeInTheDocument();
+
+    // Should show Next button
+    expect(screen.getByText('preGameTutorial.next')).toBeInTheDocument();
+  });
+
+  // GIVEN: User is on step 1
+  // WHEN: Click "Next" button
+  // THEN: Advances to step 2 (practice)
+  it('"Next" button advances to step 2 (practice)', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    fireEvent.click(screen.getByText('preGameTutorial.next'));
+
+    // Should show practice instruction
+    expect(screen.getByText('preGameTutorial.practice.instruction')).toBeInTheDocument();
+
+    // Should show MiniGrid
+    expect(screen.getByTestId('mini-grid')).toBeInTheDocument();
+
+    // Should show gaming mascot
+    expect(screen.getByTestId('mascot-gaming')).toBeInTheDocument();
+  });
+
+  // GIVEN: User is on any step
+  // WHEN: Click "Skip" button
+  // THEN: Calls onComplete
+  it('"Skip" button calls onComplete', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    fireEvent.click(screen.getByText('preGameTutorial.skip'));
+
+    expect(mockOnComplete).toHaveBeenCalledTimes(1);
+  });
+
+  // GIVEN: User is on step 2 (practice)
+  // WHEN: MiniGrid demo completes
+  // THEN: Auto-advances to step 3
+  it('MiniGrid demo completion advances to step 3', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    // Advance to step 2
+    fireEvent.click(screen.getByText('preGameTutorial.next'));
+
+    // Simulate demo completion
+    fireEvent.click(screen.getByTestId('mini-grid'));
+
+    // Should show tips (step 3)
+    expect(screen.getByText('preGameTutorial.tips.title')).toBeInTheDocument();
+    expect(screen.getByText('preGameTutorial.letsPlay')).toBeInTheDocument();
+  });
+
+  // GIVEN: User is on step 3 (tips)
+  // WHEN: Click "Let's Play!" button
+  // THEN: Calls onComplete
+  it('"Let\'s Play!" button on step 3 calls onComplete', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    // Advance to step 2, then step 3
+    fireEvent.click(screen.getByText('preGameTutorial.next'));
+    fireEvent.click(screen.getByTestId('mini-grid')); // demo complete -> step 3
+
+    fireEvent.click(screen.getByText('preGameTutorial.letsPlay'));
+
+    expect(mockOnComplete).toHaveBeenCalledTimes(1);
+  });
+
+  // GIVEN: PreGameTutorial renders at various steps
+  // WHEN: Checking progress dots
+  // THEN: Correct dot is highlighted
+  it('progress dots show correct active state', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    const dots = screen.getAllByTestId(/^progress-dot-/);
+    expect(dots).toHaveLength(3);
+
+    // Step 0 is active
+    expect(dots[0]).toHaveClass('bg-neo-yellow');
+    expect(dots[1]).not.toHaveClass('bg-neo-yellow');
+    expect(dots[2]).not.toHaveClass('bg-neo-yellow');
+
+    // Advance to step 2
+    fireEvent.click(screen.getByText('preGameTutorial.next'));
+
+    const dotsStep2 = screen.getAllByTestId(/^progress-dot-/);
+    expect(dotsStep2[0]).not.toHaveClass('bg-neo-yellow');
+    expect(dotsStep2[1]).toHaveClass('bg-neo-yellow');
+    expect(dotsStep2[2]).not.toHaveClass('bg-neo-yellow');
+  });
+
+  // GIVEN: All text in PreGameTutorial
+  // WHEN: Checking for hardcoded strings
+  // THEN: All text uses t() translation keys
+  it('all text uses translation keys (no hardcoded strings)', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    // Welcome step should use translation keys
+    const welcomeTitle = screen.getByText('preGameTutorial.welcome.title');
+    expect(welcomeTitle).toBeInTheDocument();
+
+    // Skip button should use translation key
+    const skipButton = screen.getByText('preGameTutorial.skip');
+    expect(skipButton).toBeInTheDocument();
+
+    // Next button should use translation key
+    const nextButton = screen.getByText('preGameTutorial.next');
+    expect(nextButton).toBeInTheDocument();
+  });
+
+  // GIVEN: User is on step 2 (practice) and hasn't done demo
+  // WHEN: Click "Next" manually
+  // THEN: Can still advance to step 3
+  it('allows manual "Next" on step 2 even without demo completion', () => {
+    render(<PreGameTutorial onComplete={mockOnComplete} />);
+
+    // Advance to step 2
+    fireEvent.click(screen.getByText('preGameTutorial.next'));
+
+    // Should show Next button on step 2
+    const nextButton = screen.getByText('preGameTutorial.next');
+    fireEvent.click(nextButton);
+
+    // Should be on step 3
+    expect(screen.getByText('preGameTutorial.tips.title')).toBeInTheDocument();
+  });
+});

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Edit2 } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import type { PromptExample } from '../../types';
 
 interface PreviewStepProps {
@@ -49,7 +49,7 @@ export function PreviewStep({
       {/* Prompt textarea */}
       {loadingPreview ? (
         <div className="flex justify-center py-8">
-          <NeoLoader variant="dots" size="lg" />
+          <Loader size="lg" />
         </div>
       ) : (
         <textarea

@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import {
   generateDailyPuzzle,
   getDailyChallengeDate,
@@ -710,7 +710,7 @@ const DailyChallenge: React.FC = () => {
   // The parent screen-fit-content has flex: 1, so flex-1 here inherits the constrained height.
   return (
     <div
-      className="flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip]"
+      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : 'overflow-y-auto'}`}
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show when not playing */}
@@ -733,7 +733,7 @@ const DailyChallenge: React.FC = () => {
             exit={{ opacity: 0 }}
             className="flex-1 flex items-center justify-center"
           >
-            <NeoLoader variant="mascot-letters" size="lg" text={t('daily.loading')} />
+            <PageLoader size="lg" text={t('daily.loading')} />
           </motion.div>
         )}
 
@@ -765,6 +765,9 @@ const DailyChallenge: React.FC = () => {
             targetWord={targetWord}
             onComplete={handleGameComplete}
             onQuit={handleBack}
+            puzzleDate={puzzleDate}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
           />
         )}
 

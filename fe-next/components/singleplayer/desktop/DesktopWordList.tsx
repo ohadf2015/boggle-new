@@ -55,7 +55,6 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
   }, [sortedWords.length]);
 
   // Calculate stats
-  const totalScore = displayWords.reduce((sum, w) => sum + w.score + (w.comboBonus || 0) + (w.fireRoundBonus || 0), 0);
   const longestWord = displayWords.reduce((max, w) => w.word.length > max.length ? w.word : max, '');
   const totalBonusPoints = displayWords.reduce((sum, w) => sum + (w.comboBonus || 0) + (w.fireRoundBonus || 0), 0);
 
@@ -73,15 +72,15 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
   return (
     <div className="h-full flex flex-col bg-neo-navy/50 rounded-neo border-2 border-neo-black/30 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neo-cream/10 bg-neo-black/20 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-neo-cream/15 bg-neo-black/20 flex-shrink-0">
         <div className="flex items-center gap-2">
           <List className="w-4 h-4 text-neo-cyan" />
-          <span className="font-bold text-neo-cream text-sm">
+          <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
             {t('singlePlayer.wordsFound')}
           </span>
         </div>
-        <div className="flex items-center gap-1 bg-neo-cyan/20 px-2 py-0.5 rounded-neo">
-          <span className="font-black text-neo-cyan text-lg tabular-nums tracking-normal">{displayWords.length}</span>
+        <div className="bg-neo-cyan/20 border border-neo-cyan/30 px-2.5 py-0.5 rounded-neo">
+          <span className="font-black text-neo-cyan text-lg tabular-nums">{displayWords.length}</span>
         </div>
       </div>
 
@@ -177,9 +176,10 @@ interface WordItemProps {
 }
 
 const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
-  const hasComboBonus = word.comboBonus && word.comboBonus > 0;
-  const hasFireBonus = word.fireRoundBonus && word.fireRoundBonus > 0;
-  const totalScore = word.score + (word.comboBonus || 0) + (word.fireRoundBonus || 0);
+  const hasComboBonus = (word.comboBonus ?? 0) > 0;
+  const hasFireBonus = (word.fireRoundBonus ?? 0) > 0;
+  // word.score already includes combo + fire bonuses from calculateWordScore
+  const totalScore = word.score;
 
   // Word length color coding
   const lengthColor = word.word.length >= 7

@@ -369,9 +369,9 @@ describe('AdventureGame Layout Stability', () => {
         />
       );
 
-      // THEN - feedback container should have fixed height (responsive: h-8 mobile, sm:h-10 desktop)
+      // THEN - feedback container should have fixed height (responsive: h-6 mobile, sm:h-8 desktop)
       const feedbackContainer = container.querySelector('[data-testid="feedback-container"]');
-      expect(feedbackContainer).toHaveClass('h-8');
+      expect(feedbackContainer).toHaveClass('h-6');
     });
   });
 });

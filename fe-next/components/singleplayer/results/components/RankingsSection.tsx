@@ -7,7 +7,6 @@
  */
 
 import React from 'react';
-import { Trophy, Medal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getRankBgColor } from '@/utils/rankingStyles';
 
@@ -23,10 +22,23 @@ interface RankingsSectionProps {
   title: string;
 }
 
+const RANK_COLORS = [
+  'bg-amber-400 text-neo-black border-amber-600',   // 1st - gold
+  'bg-slate-300 text-neo-black border-slate-500',    // 2nd - silver
+  'bg-orange-300 text-neo-black border-orange-500',  // 3rd - bronze
+];
+
 function getRankIcon(rank: number): React.ReactNode {
-  if (rank === 1) return <Trophy className="text-tier-gold text-xl" />;
-  if (rank === 2) return <Medal className="text-slate-500 dark:text-slate-300 text-xl" />;
-  if (rank === 3) return <Medal className="text-amber-600 text-xl" />;
+  if (rank <= 3) {
+    return (
+      <span className={cn(
+        'inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black border-2',
+        RANK_COLORS[rank - 1],
+      )}>
+        {rank}
+      </span>
+    );
+  }
   return <span className="text-neo-black/70 dark:text-white/70 font-bold">#{rank}</span>;
 }
 

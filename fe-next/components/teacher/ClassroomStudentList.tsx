@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomStudents, type ClassroomStudent } from '@/lib/supabase/teacher';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { Users, Mail, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -44,7 +44,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <NeoLoader variant="mascot-letters" size="sm" text={t('common.loading')} />
+        <PageLoader size="sm" text={t('common.loading')} />
       </div>
     );
   }

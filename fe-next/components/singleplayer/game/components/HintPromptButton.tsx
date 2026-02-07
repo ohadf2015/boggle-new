@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Eye } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 
 interface HintPromptButtonProps {
@@ -17,7 +17,7 @@ interface HintPromptButtonProps {
 
 /**
  * Animated hint prompt button that appears when player is stuck
- * Pulsates to draw attention
+ * Refined UI design with lightning bolt and cyan gradient
  */
 export function HintPromptButton({
   onReveal,
@@ -42,22 +42,21 @@ export function HintPromptButton({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         animate={{
-          scale: [1, 1.02, 1],
-          boxShadow: [
-            '6px 6px 0px rgb(var(--neo-black))',
-            '8px 8px 0px rgb(var(--neo-black))',
-            '6px 6px 0px rgb(var(--neo-black))',
-          ],
+          scale: [1, 1.03, 1],
         }}
         transition={{
           duration: 2,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
-        className="flex items-center gap-2 px-4 py-2 bg-neo-pink border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
+        className="flex items-center gap-2 px-6 py-3 border-3 border-neo-black text-neo-black hover:brightness-110 rounded-full font-black text-sm uppercase tracking-wide shadow-hard"
+        style={{
+          background: 'linear-gradient(135deg, #00FFFF 0%, #40E0D0 50%, #00CED1 100%)',
+          boxShadow: '4px 4px 0px rgb(0,0,0), 0 0 20px rgba(0, 255, 255, 0.4)',
+        }}
       >
-        <Eye className="w-4 h-4" />
-        <span>{t('singlePlayer.needHint')}</span>
+        <Zap className="w-5 h-5" />
+        <span>{t('singlePlayer.getHint') || 'GET HINT'}</span>
       </AdaptiveMotion.button>
     </AdaptiveMotion.div>
   );

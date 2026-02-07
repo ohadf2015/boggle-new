@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, Sparkles, Edit2, Grid, List, Check, AlertCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/types';
 import {
@@ -237,7 +237,7 @@ export function DailyWordSchedule(): React.ReactElement {
             className="bg-neo-pink hover:bg-neo-pink/90 text-white"
           >
             {triggerLoading ? (
-              <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
+              <Loader size="sm" className="sm:mr-2" />
             ) : (
               <Sparkles className="w-4 h-4 sm:mr-2" />
             )}
@@ -286,7 +286,7 @@ export function DailyWordSchedule(): React.ReactElement {
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       ) : viewMode === 'grid' ? (
         <ScheduleCalendar

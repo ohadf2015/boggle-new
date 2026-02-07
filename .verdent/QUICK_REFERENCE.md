@@ -13,7 +13,7 @@
 
 | Command | Use For |
 |---------|---------|
-| **e2e-test** | End-to-end testing with Playwright |
+| **e2e-test** | End-to-end testing with Playwriter |
 | **complete-translation** | Translation management (4 languages) |
 | **ui** | UI component work (Neo-Brutalist compliance) |
 
@@ -380,7 +380,7 @@ console.timeEnd('Operation');
 
 ### Inspect Network
 - Browser DevTools → Network tab
-- Or: `curl -v http://localhost:3000/api/endpoint`
+- Or: `curl -v http://localhost:3001/api/endpoint`
 
 ## Performance
 

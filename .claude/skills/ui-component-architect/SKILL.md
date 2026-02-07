@@ -1,7 +1,7 @@
 ---
 name: ui-component-architect
 description: UI implementation specialist for decomposing designs into reusable components. This skill should be used when implementing new UI features, screens, or components. It ensures maximum reuse of existing components, handles all UI states (loading, error, empty, no-data), and creates pixel-perfect implementations following the project's design system. Use when building new UI, refactoring existing UI, or ensuring consistent component usage across the app.
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), mcp__memory__*, mcp__playwright__*
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), Bash(playwriter *), Bash(npx playwriter*), mcp__memory__*
 ---
 
 # UI Component Architect
@@ -344,43 +344,40 @@ grep -rn "isLoading\|loading\|pending" --include="*.tsx" src/components/ | head 
 grep -rn "isError\|error\|catch" --include="*.tsx" src/components/ | head -20
 ```
 
-## Playwright Visual Testing
+## Playwriter Visual Testing
 
-After implementing UI components, use Playwright MCP to verify visual correctness.
+After implementing UI components, use Playwriter CLI to verify visual correctness.
 
-### Navigate to Component
-```
-mcp__playwright__browser_navigate(url="http://localhost:3000/[page]")
+### Start Session and Navigate
+```bash
+playwriter session new
+playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3001/[page]', { waitUntil: 'domcontentloaded' })"
 ```
 
 ### Take Screenshots at Different Viewports
-```
+```bash
 # Mobile
-mcp__playwright__browser_resize(width=375, height=667)
-mcp__playwright__browser_screenshot()
+playwriter -s 1 -e "await state.page.setViewportSize({ width: 375, height: 667 }); await state.page.screenshot({ path: 'mobile.png', scale: 'css' })"
 
 # Desktop
-mcp__playwright__browser_resize(width=1920, height=1080)
-mcp__playwright__browser_screenshot()
+playwriter -s 1 -e "await state.page.setViewportSize({ width: 1920, height: 1080 }); await state.page.screenshot({ path: 'desktop.png', scale: 'css' })"
 ```
 
 ### Get Accessibility Snapshot
-```
-mcp__playwright__browser_snapshot()
+```bash
+playwriter -s 1 -e "console.log(await accessibilitySnapshot({ page: state.page }))"
 ```
 
 ### Test Interactive States
-```
+```bash
 # Hover state
-mcp__playwright__browser_hover(selector="[data-testid='button']")
-mcp__playwright__browser_screenshot()
+playwriter -s 1 -e "await state.page.hover('[data-testid=\"button\"]'); await state.page.screenshot({ path: 'hover.png', scale: 'css' })"
 
 # Focus state
-mcp__playwright__browser_click(selector="input[name='field']")
-mcp__playwright__browser_screenshot()
+playwriter -s 1 -e "await state.page.click('input[name=\"field\"]'); await state.page.screenshot({ path: 'focus.png', scale: 'css' })"
 
 # Active/pressed state
-mcp__playwright__browser_click(selector="[data-testid='button']")
+playwriter -s 1 -e "await state.page.click('[data-testid=\"button\"]')"
 ```
 
 ### Visual Verification Checklist
@@ -399,5 +396,5 @@ When implementing UI with this skill:
 2. **Decomposition Plan** - Hierarchy of components needed
 3. **State Matrix** - All states each component must handle
 4. **Implementation** - Pixel-perfect code following conventions
-5. **Visual Verification** - Screenshots from Playwright testing
+5. **Visual Verification** - Screenshots from Playwriter testing
 6. **Reusability Report** - New components created for future reuse

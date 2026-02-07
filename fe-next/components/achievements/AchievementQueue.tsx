@@ -5,6 +5,10 @@ import { UnifiedAchievementModal } from './UnifiedAchievementModal';
 import { toast } from '@/components/ui/EnhancedToast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { AchievementPayload } from '@/shared/types/socket';
+// NOTE: AchievementCinematic is available at ../cinematics/AchievementCinematic
+// for GOLD/PLATINUM tiers. To integrate, extend AchievementPayload with `count`
+// field, then use calculateTier() from @/utils/achievementTiers to determine
+// whether to show CinematicPlayer vs UnifiedAchievementModal in processNext().
 
 interface AchievementQueueProps {
   children: ReactNode | ((props: { queueAchievement: (achievement: AchievementPayload) => void }) => ReactNode);
@@ -108,17 +112,11 @@ export const AchievementQueueProvider = ({ children }: AchievementQueueProviderP
   const queueAchievement = useCallback((achievement: AchievementPayload) => {
     if (!achievement) return;
 
-    // Show toast notification for achievement (non-intrusive)
+    // Show toast notification for achievement (non-intrusive, no share button during gameplay)
     const achievementName = t(`achievements.${achievement.key}.name`) || achievement.key;
     toast.success(
       t('achievements.unlocked') || '🏆 Achievement Unlocked!',
-      achievementName,
-      {
-        label: t('common.share') || 'Share',
-        onClick: () => {
-          // Share functionality - toast has built-in share action
-        },
-      }
+      achievementName
     );
   }, [t]);
 

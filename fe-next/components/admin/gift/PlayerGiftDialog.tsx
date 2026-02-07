@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import toast from 'react-hot-toast';
 
 import { PlayerSelector } from './PlayerSelector';
@@ -395,7 +395,7 @@ export function PlayerGiftDialog({
               className="bg-neo-lime text-black hover:bg-neo-lime/90 shadow-hard-sm"
             >
               {sending ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-1" />

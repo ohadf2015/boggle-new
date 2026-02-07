@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Edit2, AlertTriangle, Users, Copy, Shuffle, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import {
   formatDate,
   getEffectiveWord,
@@ -150,7 +150,7 @@ export function ScheduleCalendar({
                 title="Shuffle board (regenerate with new letters)"
               >
                 {regeneratingBoard === dateStr ? (
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                 ) : (
                   <Shuffle className="w-4 h-4" />
                 )}

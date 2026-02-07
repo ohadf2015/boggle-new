@@ -3,7 +3,7 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 interface BulkActionsProps {
   totalWords: number;
@@ -46,7 +46,7 @@ export function BulkActions({
             disabled={bulkProcessing}
           >
             {bulkProcessing ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : (
               <>
                 <Check className="w-4 h-4 mr-2" /> Approve Selected
@@ -61,7 +61,7 @@ export function BulkActions({
             disabled={bulkProcessing}
           >
             {bulkProcessing ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : (
               <>
                 <X className="w-4 h-4 mr-2" /> Reject Selected

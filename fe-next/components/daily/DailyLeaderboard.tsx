@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { getRankDisplay, getRankRowClasses, getRankBadgeClasses } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
@@ -521,7 +521,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       {/* Loading state */}
       {loading && participants.length === 0 && (
         <div className="flex items-center justify-center py-8">
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       )}
 

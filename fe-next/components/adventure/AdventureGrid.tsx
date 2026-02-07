@@ -350,11 +350,11 @@ const AdventureGrid = memo(
           onTouchEnd={interactive ? handleMouseUp : undefined}
           className={cn(
             'adventure-grid',
-            'relative grid gap-1 p-2',
-            'bg-neo-navy/40 rounded-neo',
+            'relative grid gap-1 p-1.5',
+            'bg-[#FFFEF0]/60 rounded-neo',
             'select-none touch-none',
             GRID_COLS_CLASSES[gridSize] || 'grid-cols-4',
-            disabled && 'adventure-grid-disabled opacity-60 pointer-events-none'
+            disabled && 'adventure-grid-disabled pointer-events-none'
           )}
         >
           <AnimatePresence mode="popLayout">

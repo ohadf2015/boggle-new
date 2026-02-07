@@ -19,7 +19,7 @@ import {
   getLifeBonusForWord,
 } from './constants';
 import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
-import { getMinAnswerLength } from '@/shared/constants/gameConstants';
+import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -416,9 +416,8 @@ export function useSurvivalGameLogic({
   // Handle discovery feedback (for different-length words)
   // This shows feedback overlay and persists yellow/green letters without counting as a "try"
   const handleDiscoveryFeedback = useCallback((word: string, target: string) => {
-    // Skip if word is too short for meaningful feedback
-    const minLength = getMinAnswerLength(language);
-    if (word.length < minLength) return;
+    // Skip if word is too short for meaningful feedback (2+ letters for all languages)
+    if (word.length < MIN_DISCOVERY_WORD_LENGTH) return;
 
     // Pass language to enable Hebrew final letter normalization
     const feedback = getLetterFeedback(word, target, language);
@@ -454,11 +453,10 @@ export function useSurvivalGameLogic({
     // No max attempts check (discoveries don't count as tries)
   }, [state.attempts, clueActions, language, feedbackTimeout]);
 
-  // Handle word discovery
+  // Handle word discovery - accepts 2+ letter words (target word min is enforced separately)
   const handleWordDiscovery = useCallback(async (word: string) => {
-    const minLength = getMinAnswerLength(language);
-    if (word.length < minLength) {
-      showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${minLength} letters`);
+    if (word.length < MIN_DISCOVERY_WORD_LENGTH) {
+      showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`);
       return;
     }
 

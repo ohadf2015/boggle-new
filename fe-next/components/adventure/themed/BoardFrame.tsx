@@ -110,7 +110,7 @@ const CornerDecor = memo<CornerDecorProps>(({ worldId, position }) => {
     <div
       className={cn(
         'absolute pointer-events-none',
-        'w-8 h-8',
+        'w-10 h-10',
         positionClasses
       )}
       style={{ transform: `rotate(${rotation}deg)` }}
@@ -141,6 +141,7 @@ const BoardFrame = memo<BoardFrameProps>(({ children, className }) => {
         'board-frame',
         frameClass,
         'relative',
+        'bg-[#FFFEF0] border-4 border-neo-black shadow-hard-lg rounded-neo-lg p-2',
         className
       )}
       data-world={worldId}

@@ -18,7 +18,6 @@
   "devDependencies": {
     "baseline-browser-mapping": "^2.9.19",
     "husky": "^9.1.7",
-    "playwright": "^1.57.0",
     "puppeteer": "^24.31.0"
   },
   "dependencies": {

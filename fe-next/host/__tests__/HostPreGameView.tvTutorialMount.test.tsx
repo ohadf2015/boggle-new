@@ -51,6 +51,9 @@ jest.mock('lucide-react', () => ({
   Trophy: () => null,
   Timer: () => null,
   HelpCircle: () => null,
+  Copy: () => null,
+  Plus: () => null,
+  Swords: () => null,
 }));
 
 jest.mock('../../components/ui/button', () => ({
@@ -91,7 +94,9 @@ jest.mock('../../components/BotControls', () => ({
 jest.mock('../components/pre-game/PresetSelector', () => ({
   PresetSelector: () => null,
   GAME_PRESETS: {
-    party: { timer: 3, difficulty: 'EASY' },
+    fast: { timer: 1, difficulty: 'EASY', nameKey: 'hostView.presetQuick' },
+    party: { timer: 3, difficulty: 'EASY', nameKey: 'hostView.presetParty' },
+    challenge: { timer: 5, difficulty: 'HARD', nameKey: 'hostView.presetPro' },
   },
 }));
 

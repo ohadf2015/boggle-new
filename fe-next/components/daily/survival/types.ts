@@ -15,6 +15,12 @@ export interface DailyWordHuntSurvivalProps {
   targetWord: string;
   onComplete: (result: SurvivalGameResult) => void;
   onQuit: () => void;
+  /** Puzzle date string for desktop leaderboard sidebar (e.g. '2026-02-07') */
+  puzzleDate?: string;
+  /** Authenticated player ID for highlighting in leaderboard */
+  currentPlayerId?: string | null;
+  /** Guest fingerprint for highlighting in leaderboard */
+  currentGuestFingerprint?: string | null;
 }
 
 /**

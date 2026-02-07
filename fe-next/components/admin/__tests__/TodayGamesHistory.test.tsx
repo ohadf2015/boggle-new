@@ -24,7 +24,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-// Mock useDevicePerformance hook to allow NeoLoader to render properly
+// Mock useDevicePerformance hook to allow PageLoader to render properly
 jest.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: true,
@@ -158,7 +158,7 @@ describe('TodayGamesHistory', () => {
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
-    // Should show loading indicator (NeoLoader dots variant)
+    // Should show loading indicator (Loader dots variant)
     const loadingElement = document.querySelector('.bg-neo-cyan.rounded-full');
     expect(loadingElement).toBeInTheDocument();
   });

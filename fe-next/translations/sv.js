@@ -617,7 +617,15 @@ const sv = {
       "createButton": "Starta en strid",
       "refreshed": "Uppdaterat!",
       "quickPlay": "Snabbmatch",
-      "orJoinRoom": "eller hoppa in"
+      "orJoinRoom": "eller hoppa in",
+      "activeBattles": "Aktiva strider",
+      "instantMatch": "Direkt matchning",
+      "orCreateCustom": "eller skapa ett anpassat rum",
+      "socialHub": "Social hubb",
+      "friendActivity": "Vänners aktivitet",
+      "noFriendsOnline": "Inga vänner online ännu",
+      "invitePrompt": "Starta en fest genom att skicka en inbjudan",
+      "inviteFriends": "Bjud in vänner"
     },
     "joinModal": {
       "title": "Gå med i striden",
@@ -681,9 +689,17 @@ const sv = {
     "lobby": "Lobby",
     "waitingForPlayers": "Väntar...",
     "startGame": "Starta",
+    "startBattle": "Starta strid!",
+    "commandersJoined": "Befälhavare anslutna",
+    "battleMode": "Stridsläge",
+    "preset": "Förinställning",
+    "ofMaxWarriors": "av {{max}} krigare redo",
     "roomCode": "Kod",
     "host": "Värd",
     "inviteFriends": "Bjud in vänner att spela!",
+    "inviteWarriors": "Bjud in krigare",
+    "battleFeed": "Stridsflöde",
+    "hostIs": "Värd är",
     "playersJoined": "Spelare",
     "gameSettings": "Inställningar",
     "quickSetup": "Förval",
@@ -767,6 +783,8 @@ const sv = {
     "lessonModeActive": "Använder ordförråd från lektion",
     "noPlayers": "Inga spelare i lobbyn",
     "connectionLost": "Anslutningen förlorades. Uppdatera för att återansluta!",
+    "presetQuick": "Snabb",
+    "presetPro": "Proffs",
     "presetFast": "Snabb",
     "presetFastDesc": "1 min snabbt spel",
     "presetEasy": "Lätt",
@@ -913,6 +931,7 @@ const sv = {
     "noWordsYet": "Inga ord hittade ännu",
     "swipeHintShort": "Svep över bokstäver för att hitta ord!",
     "waitingForHostToStart": "Väntar på att värden ska starta spelet...",
+    "hostWillStart": "Värden startar spelet när alla är redo",
     "hostDisconnected": "Värden kopplades bort. Väntar på återanslutning...",
     "isNowHost": "är nu värd",
     "disconnected": "kopplades bort. Väntar på återanslutning...",
@@ -962,6 +981,7 @@ const sv = {
     "copied": "Koden kopierad!",
     "linkCopied": "Länken kopierad!",
     "copyLink": "Kopiera länk",
+    "copy": "Kopiera kod",
     "code": "Kod:"
   },
   "onboarding": {
@@ -1018,6 +1038,24 @@ const sv = {
       "description": "Lär dig spela LexiClash"
     },
     "swipeHint": "← Svep för att navigera →"
+  },
+  "preGameTutorial": {
+    "welcome": {
+      "title": "Hej!",
+      "subtitle": "Jag heter Lexi! Jag visar dig hur man spelar"
+    },
+    "practice": {
+      "instruction": "Svep över bokstäverna för att stava:",
+      "success": "Perfekt! Du förstår det!"
+    },
+    "tips": {
+      "title": "Du är en naturtalang!",
+      "subtitle": "Några tips innan vi börjar"
+    },
+    "letsPlay": "Nu kör vi!",
+    "skip": "Hoppa över guide",
+    "next": "Nästa",
+    "step": "Steg {current} av {total}"
   },
   "tips": {
     "header": "Pro Tips",
@@ -1118,6 +1156,22 @@ const sv = {
     "rankings": "Rankningar",
     "yourWords": "Dina ord",
     "fireRoundBonus": "Eldrunda",
+    "bonuses": "Bonusar",
+    "comboBonus": "Kombobonus",
+    "winStreak": "Svit",
+    "finalScore": "Slutpoäng",
+    "coinsEarned": "Mynt intjänade",
+    "detailedAnalysis": "Detaljerad analys",
+    "yourPerformance": "Din prestation",
+    "rewards": "Belöningar",
+    "standings": "Ställning",
+    "guestSavePrompt": "Logga in för att spara belöningar",
+    "keepItUp": "Fortsätt så!",
+    "dailyPlayBonus": "Daglig spelbonus",
+    "best": "Bäst",
+    "avg": "Snitt",
+    "games": "Spel",
+    "noRewards": "Spela mer för att tjäna belöningar!",
     "time": "Tid",
     "place": "Plats",
     "words": "Ord",
@@ -1184,7 +1238,8 @@ const sv = {
     },
     "improving": "Förbättras",
     "declining": "Sjunker",
-    "stable": "Stabil"
+    "stable": "Stabil",
+    "noHistory": "Spela fler spel för att se trender"
   },
   "archetypes": {
     "hint": "Baserat på din spelstil",
@@ -1273,6 +1328,16 @@ const sv = {
     "pts": "poäng"
   },
   "howToPlay": {
+    "missionBriefing": "Uppdragsbriefing",
+    "masterTheArena": "Bemästra LexiClash-arenan",
+    "connectingDots": "Koppla ihop bokstäverna",
+    "levelUpGame": "Höj ditt poängspel",
+    "nextStep": "Nästa",
+    "done": "Klar",
+    "back": "Tillbaka",
+    "scoreMultipliers": "Poängmultiplikatorer",
+    "comboBonus": "Kombobonus!",
+    "proTipsTitle": "Proffstips",
     "description": "LexiClash är ett snabbt ordspel där du tävlar mot klockan för att hitta så många ord som möjligt på ett bokstavsrutnät. Ju längre ord, desto fler poäng!",
     "createOrJoinTitle": "Skapa eller gå med i ett spel",
     "createOrJoinDesc": "Värden skapar ett rum och delar koden. Spelare går med med koden.",
@@ -1474,6 +1539,11 @@ const sv = {
   "achievements": {
     "unlocked": "Prestation Upplåst!",
     "upgraded": "Prestation Uppgraderad!",
+    "cinematic": {
+      "unlocked": "PRESTATION UPPLÅST!",
+      "gold": "GULD",
+      "platinum": "PLATINA"
+    },
     "FIRST_BLOOD": {
       "name": "Första Blodet",
       "description": "Först att hitta ett ord"
@@ -2590,6 +2660,8 @@ const sv = {
     "imSure": "Jag är säker",
     "gamePaused": "Spelet pausat",
     "needHint": "Behöver du en ledtråd?",
+    "getHint": "FÅ LEDTRÅD",
+    "dragInstruction": "Dra över bokstäver för att bilda ord!",
     "botWords": "Hittade ord",
     "beatYourRecord": "Du slog ditt rekord!",
     "soloVsBots": "Solo mot Bottar",
@@ -2743,6 +2815,22 @@ const sv = {
     "alreadyPlayed": "Redan spelat idag",
     "completed": "Klart!",
     "chooseQuest": "Välj Din Dagliga Quest",
+    "dailyMissions": "Dagliga Uppdrag",
+    "journeyProgress": "Reseframsteg",
+    "completedCount": "Klart",
+    "nextQuestsIn": "Nästa Uppdrag Om",
+    "timedQuest": "Tidsbegränsat",
+    "untimedQuest": "Utan Timer",
+    "startQuest": "STARTA QUEST",
+    "replay": "Spela Igen",
+    "cleared": "Klarat!",
+    "keepFireBurning": "Håll Flamman Vid Liv",
+    "todaysTopPlayers": "Dagens Toppspelare",
+    "fullStandings": "Hela Listan",
+    "dailyDouble": "Daglig Dubbel",
+    "dailyDoubleBonus": "Klara båda uppdragen för bonus-XP",
+    "browseArchive": "Arkiv: Tidigare Utmaningar",
+    "bonusXP": "Bonus-XP",
     "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
     "timed90Seconds": "Snabbt Tempo",
     "takeYourTime": "Ingen Timer",
@@ -2764,6 +2852,11 @@ const sv = {
     "wordsFound": "{count} ord hittade",
     "streak": "Streak",
     "streakDays": "{count} dagars streak!",
+    "streakCinematic": {
+      "streakDays": "{count} dagars svit!",
+      "milestone": "MILSTOLPE!",
+      "keepGoing": "Fortsätt så!"
+    },
     "shareScore": "Dela din poäng",
     "copyToClipboard": "Kopiera till urklipp",
     "copyLink": "Kopiera länk",
@@ -3096,6 +3189,14 @@ const sv = {
       "clueExampleSentence": "Exempelmening upplåst!",
       "clueAutoMessage": "Auto-upplåst vid {cost} poletter",
       "scoreBreakdownTooltip": "Tryck för detaljer"
+    },
+    "desktop": {
+      "liveRanks": "Live Ranking",
+      "lootCollected": "Insamlat Byte",
+      "powerUps": "Power-ups",
+      "hintsUnlocked": "Upplåsta Ledtrådar",
+      "triesRemaining": "Försök Kvar",
+      "noWordsYet": "Hitta ord för att samla byte!"
     },
     "results": {
       "tapToCelebrate": "Tryck för att fira!",
@@ -3785,7 +3886,8 @@ const sv = {
       "wordBank": "Ordbank",
       "dailyBuzz": "Dagligt Buzz",
       "webVitals": "Webbprestanda",
-      "email": "E-post"
+      "email": "E-post",
+      "milogWords": "Milog-ord"
     },
     "invalidWords": {
       "title": "Granskning av Ogiltiga Ord",
@@ -3991,6 +4093,10 @@ const sv = {
         "noFilesFound": "Inga Wikipedia-filer hittades för detta språk",
         "lastSynced": "Senast synkroniserad"
       }
+    },
+    "milogWords": {
+      "title": "Milog-ordboksanrikning",
+      "subtitle": "Hebreiska ord verifierade mot milog.co.il"
     }
   },
   "tvTutorial": {
@@ -4176,7 +4282,12 @@ const sv = {
       "finalScore": "Slutpoäng",
       "score": "Poäng",
       "timeRemaining": "Tid Kvar",
-      "stars": "Stjärnor"
+      "stars": "Stjärnor",
+      "worldUnlock": {
+        "newWorld": "NY VÄRLD UPPLÅST!",
+        "chapters": "Kapitel",
+        "prepare": "Förbered dig för nya utmaningar!"
+      }
     },
     "boss": "Boss",
     "combo": {

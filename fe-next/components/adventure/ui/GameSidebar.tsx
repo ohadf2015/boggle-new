@@ -60,7 +60,7 @@ export const GameSidebar = memo(function GameSidebar({
       {/* Mobile: Horizontal scroll layout */}
       <div className="lg:hidden flex flex-row gap-2 p-2 overflow-x-auto">
         {/* Objectives - Compact */}
-        <div className="flex-shrink-0 w-40 sm:w-48">
+        <div className="flex-shrink-0 w-48 sm:w-56">
           <div className="bg-neo-black/40 rounded-neo-lg p-2 border-2 border-neo-black/50">
             <div className="flex items-center gap-1.5 mb-1.5">
               <Target className="w-3 h-3 text-neo-yellow" />

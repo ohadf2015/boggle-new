@@ -173,54 +173,6 @@ describe('CrazyGames Bundle Size Verification', () => {
     });
   });
 
-  describe('Bundle Size Manual Verification Instructions', () => {
-    it.skip('should remind to run bundle analyzer for size verification', () => {
-      /**
-       * MANUAL VERIFICATION REQUIRED
-       *
-       * This test is skipped because bundle analysis requires a production build.
-       *
-       * TO VERIFY BUNDLE SIZE:
-       * 1. Run: ANALYZE=true npm run build
-       * 2. Open: .next/analyze/client.html
-       * 3. Check:
-       *    - Initial JS bundle < 500KB (gzipped)
-       *    - No .mp3/.wav/.ogg files in initial chunks
-       *    - Total first load < 2MB
-       *
-       * CrazyGames Requirements:
-       * - Initial download < 50MB (hard limit)
-       * - Ideally < 20MB for mobile homepage placement
-       * - No large assets (music, videos) in initial load
-       */
-      console.log('Run: ANALYZE=true npm run build');
-      console.log('Check: .next/analyze/client.html for bundle size breakdown');
-      console.log('Verify: No audio files in initial bundle');
-      console.log('Verify: Initial JS bundle < 500KB (gzipped)');
-    });
-
-    it.skip('should verify network tab shows no audio on initial load', () => {
-      /**
-       * MANUAL VERIFICATION REQUIRED
-       *
-       * TO VERIFY NETWORK BEHAVIOR:
-       * 1. Run: npm run dev
-       * 2. Open browser DevTools → Network tab
-       * 3. Filter by: .mp3, .wav, .ogg
-       * 4. Reload page
-       * 5. Verify: NO audio files loaded automatically
-       * 6. Click play button / start game
-       * 7. Verify: Audio loads ONLY after user interaction
-       */
-      console.log('1. Open DevTools → Network');
-      console.log('2. Filter: .mp3, .wav, .ogg');
-      console.log('3. Reload page');
-      console.log('4. Verify: No audio on initial load');
-      console.log('5. Interact with game');
-      console.log('6. Verify: Audio loads on-demand');
-    });
-  });
-
   describe('Real-World Audio Size Verification', () => {
     it('should calculate expected audio sizes', () => {
       /**

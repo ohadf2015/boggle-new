@@ -6,7 +6,7 @@ import { Gift } from 'lucide-react';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Skeleton } from '@/components/ui/EnhancedLoading';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { PlayerCollectible } from '@/contexts/auth/authTypes';

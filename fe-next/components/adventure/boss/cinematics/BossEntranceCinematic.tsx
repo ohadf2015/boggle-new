@@ -12,7 +12,7 @@
  * Uses Remotion primitives for timing and animation.
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   AbsoluteFill,
   Sequence,
@@ -21,33 +21,14 @@ import {
   interpolate,
   spring,
   Img,
-  staticFile,
 } from 'remotion';
 import { fredokaFamily, rubikFamily } from '../../../../lib/remotion/fonts';
-
-// ==============================================
-// SEEDED RANDOM (for pure render functions)
-// ==============================================
-
-/**
- * Simple seeded PRNG using mulberry32 algorithm.
- * Ensures particles are deterministic across renders.
- */
-function createSeededRandom(seed: number): () => number {
-  let t = seed + 0x6d2b79f5;
-  return () => {
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+import { normalizeImagePath } from '../../../../lib/remotion/utils';
+import { BackgroundGlow, ParticleLayer, FlashEffect } from '../../../../lib/remotion/primitives';
 
 // ==============================================
 // CONSTANTS
 // ==============================================
-
-/** Frame rate for all cinematics */
-const FPS = 30;
 
 /** Total duration in frames (8 seconds) */
 export const ENTRANCE_DURATION_FRAMES = 240;
@@ -83,76 +64,6 @@ export interface BossEntranceCinematicProps {
 }
 
 // ==============================================
-// PARTICLE LAYER COMPONENT
-// ==============================================
-
-interface ParticleLayerProps {
-  count: number;
-  color: string;
-  frame: number;
-  width: number;
-  height: number;
-}
-
-/**
- * Decorative particle layer for boss reveal
- */
-const ParticleLayer: React.FC<ParticleLayerProps> = ({
-  count,
-  color,
-  frame,
-  width,
-  height,
-}) => {
-  // Generate stable particles with useMemo (deterministic using seeded random)
-  const particles = useMemo(() => {
-    const rand = createSeededRandom(42); // Fixed seed for consistent particles
-    return Array.from({ length: count }, (_, i) => ({
-      id: i,
-      x: rand() * width,
-      y: rand() * height,
-      size: 4 + rand() * 8,
-      speed: 0.5 + rand() * 1.5,
-      delay: rand() * 30,
-    }));
-  }, [count, width, height]);
-
-  return (
-    <>
-      {particles.map((p) => {
-        const adjustedFrame = Math.max(0, frame - p.delay);
-        const opacity = interpolate(adjustedFrame, [0, 30], [0, 0.8], {
-          extrapolateRight: 'clamp',
-        });
-        const yOffset = adjustedFrame * p.speed;
-        const fadeOut = 1 - yOffset / height;
-
-        // Don't render if particle has moved off screen
-        if (fadeOut <= 0) return null;
-
-        return (
-          <div
-            key={p.id}
-            style={{
-              position: 'absolute',
-              left: p.x,
-              top: p.y - yOffset,
-              width: p.size,
-              height: p.size,
-              borderRadius: '50%',
-              backgroundColor: color,
-              opacity: opacity * Math.max(0, fadeOut),
-              boxShadow: `0 0 ${p.size}px ${color}`,
-              pointerEvents: 'none',
-            }}
-          />
-        );
-      })}
-    </>
-  );
-};
-
-// ==============================================
 // MAIN COMPONENT
 // ==============================================
 
@@ -166,16 +77,12 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
-  // ==============================================
-  // ANIMATION VALUES
-  // ==============================================
-
   // Initial fade in (0-30 frames / 0-1s)
   const fadeIn = interpolate(
     frame,
     [PHASE_FRAMES.FADE_IN_START, PHASE_FRAMES.FADE_IN_END],
     [0, 1],
-    { extrapolateRight: 'clamp' }
+    { extrapolateRight: 'clamp' },
   );
 
   // Silhouette reveal (30-90 frames / 1-3s)
@@ -183,7 +90,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
     frame,
     [PHASE_FRAMES.SILHOUETTE_START, PHASE_FRAMES.SILHOUETTE_END],
     [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
 
   // Boss reveal with spring physics (90+ frames / 3s+)
@@ -198,7 +105,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
     frame,
     [PHASE_FRAMES.TITLE_START, PHASE_FRAMES.TITLE_START + 30],
     [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
 
   // Zoom pulse for impact (180-240 frames / 6-8s)
@@ -206,50 +113,21 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
     frame,
     [PHASE_FRAMES.TITLE_START + 30, PHASE_FRAMES.OUTRO_START, PHASE_FRAMES.OUTRO_END],
     [1, 1.05, 1],
-    { extrapolateRight: 'clamp' }
+    { extrapolateRight: 'clamp' },
   );
 
-  // Resolve image path for Remotion Player
-  // For client-side rendering, use the direct path (Remotion Player handles public folder)
-  // For server-side rendering (video export), use staticFile()
-  const imageSrc = typeof window !== 'undefined'
-    ? bossImagePath // Client-side: use direct path
-    : (bossImagePath.startsWith('/')
-        ? staticFile(bossImagePath.slice(1))
-        : staticFile(bossImagePath));
-
-  // ==============================================
-  // RENDER
-  // ==============================================
+  const imageSrc = normalizeImagePath(bossImagePath);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0a0a1a' }}>
-      {/* Background gradient glow */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: `radial-gradient(circle at 50% 50%, ${primaryColor}22, transparent 70%)`,
-          opacity: fadeIn,
-        }}
-      />
+      <BackgroundGlow color={primaryColor} opacity={fadeIn} />
 
       {/* Lightning flash effects */}
       <Sequence from={15} durationInFrames={5} premountFor={15}>
-        <AbsoluteFill
-          style={{
-            backgroundColor: 'white',
-            opacity: 0.3,
-          }}
-        />
+        <FlashEffect intensity={0.3} />
       </Sequence>
       <Sequence from={45} durationInFrames={3} premountFor={15}>
-        <AbsoluteFill
-          style={{
-            backgroundColor: 'white',
-            opacity: 0.2,
-          }}
-        />
+        <FlashEffect intensity={0.2} />
       </Sequence>
 
       {/* Boss silhouette (dark shadow) */}
@@ -270,11 +148,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
         >
           <Img
             src={imageSrc}
-            style={{
-              maxWidth: 500,
-              maxHeight: 500,
-              objectFit: 'contain',
-            }}
+            style={{ maxWidth: 500, maxHeight: 500, objectFit: 'contain' }}
           />
         </div>
       </Sequence>
@@ -321,11 +195,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
               fontSize: 72,
               fontWeight: 700,
               color: 'white',
-              textShadow: `
-                4px 4px 0 black,
-                -2px -2px 0 black,
-                0 0 30px ${primaryColor}
-              `,
+              textShadow: `4px 4px 0 black, -2px -2px 0 black, 0 0 30px ${primaryColor}`,
               letterSpacing: '0.05em',
               margin: 0,
             }}
@@ -350,14 +220,7 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
 
       {/* World indicator badge */}
       <Sequence from={PHASE_FRAMES.TITLE_START} premountFor={15}>
-        <div
-          style={{
-            position: 'absolute',
-            top: 40,
-            left: 40,
-            opacity: titleReveal,
-          }}
-        >
+        <div style={{ position: 'absolute', top: 40, left: 40, opacity: titleReveal }}>
           <span
             style={{
               fontFamily: fredokaFamily,
@@ -386,10 +249,6 @@ export const BossEntranceCinematic: React.FC<BossEntranceCinematicProps> = ({
     </AbsoluteFill>
   );
 };
-
-// ==============================================
-// DISPLAY NAME & DEFAULT EXPORT
-// ==============================================
 
 BossEntranceCinematic.displayName = 'BossEntranceCinematic';
 

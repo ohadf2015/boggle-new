@@ -12,7 +12,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 
 interface GamesDiagnosticProps {
@@ -62,7 +62,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
           className="gap-2"
         >
           {loading ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}

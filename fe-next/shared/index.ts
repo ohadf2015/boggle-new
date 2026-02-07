@@ -31,6 +31,7 @@ export {
   MAX_WORD_LENGTH,
   MIN_ANSWER_LENGTH,
   getMinAnswerLength,
+  MIN_DISCOVERY_WORD_LENGTH,
 
   // Room settings
   MAX_PLAYERS_PER_ROOM,

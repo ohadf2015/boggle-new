@@ -22,10 +22,9 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-// Mock NeoLoader
-jest.mock('@/components/ui/NeoLoader', () => ({
-  __esModule: true,
-  default: () => <div data-testid="neo-loader">Loading...</div>,
+// Mock PageLoader
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
 describe('StudentProgressTable', () => {
@@ -91,7 +90,7 @@ describe('StudentProgressTable', () => {
     render(<StudentProgressTable classroomId="classroom-1" />);
 
     // THEN
-    expect(screen.getByTestId('neo-loader')).toBeInTheDocument();
+    expect(screen.getByTestId('page-loader')).toBeInTheDocument();
   });
 
   it('should render table with student rows', () => {

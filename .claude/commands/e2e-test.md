@@ -19,7 +19,7 @@ Run interactive end-to-end tests using Playwriter to control user's Chrome brows
 1. **Recall test patterns** - Search memory for similar test scenarios
 2. **Create session** - `playwriter session new` to get isolated session
 3. **Start browser** - Navigate to target URL
-4. **Execute test flow** - Interact with UI elements using Playwright code
+4. **Execute test flow** - Interact with UI elements using Playwriter commands
 5. **Capture evidence** - Screenshots, accessibility snapshots
 6. **Validate results** - Check expected outcomes
 7. **Report findings** - Document pass/fail with evidence
@@ -40,7 +40,7 @@ Use `-s <sessionId>` in all subsequent commands.
 
 ### Browser Navigation
 ```bash
-playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' })"
+playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3001', { waitUntil: 'domcontentloaded' })"
 ```
 
 ### Take Screenshot
@@ -110,7 +110,7 @@ playwriter -s 1 -e "console.log('url:', page.url()); console.log(await accessibi
 playwriter session new  # Get session ID (e.g., 1)
 
 # 2. Navigate and create page
-playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' })"
+playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3001', { waitUntil: 'domcontentloaded' })"
 
 # 3. Get accessibility snapshot to understand page
 playwriter -s 1 --timeout 20000 -e "await screenshotWithAccessibilityLabels({ page: state.page })"
@@ -129,7 +129,7 @@ playwriter -s 1 --timeout 20000 -e "await screenshotWithAccessibilityLabels({ pa
 ```bash
 # 1. Create session and navigate
 playwriter session new
-playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3000/join', { waitUntil: 'domcontentloaded' })"
+playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3001/join', { waitUntil: 'domcontentloaded' })"
 
 # 2. Fill form
 playwriter -s 1 -e "await state.page.locator('input[name=\"code\"]').fill('ABC123')"
@@ -148,7 +148,7 @@ playwriter -s 1 --timeout 20000 -e "await screenshotWithAccessibilityLabels({ pa
 playwriter session new
 
 # Mobile
-playwriter -s 1 -e "state.page = await context.newPage(); await state.page.setViewportSize({ width: 375, height: 667 }); await state.page.goto('http://localhost:3000', { waitUntil: 'domcontentloaded' })"
+playwriter -s 1 -e "state.page = await context.newPage(); await state.page.setViewportSize({ width: 375, height: 667 }); await state.page.goto('http://localhost:3001', { waitUntil: 'domcontentloaded' })"
 playwriter -s 1 -e "await state.page.screenshot({ path: 'mobile.png', scale: 'css' })"
 
 # Tablet
@@ -227,23 +227,6 @@ mcp__memory__memory_store(
   tags=["e2e", "test", "[page]"],
   importance=5
 )
-```
-
-## Integration with Existing Tests
-
-Run full Playwright test suite:
-```bash
-npm run test:e2e
-```
-
-Run specific test:
-```bash
-npm run test:e2e -- --grep "[test name]"
-```
-
-Run in headed mode:
-```bash
-npm run test:e2e:headed
 ```
 
 ## Output Format

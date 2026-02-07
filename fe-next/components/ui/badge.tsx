@@ -8,8 +8,7 @@ const badgeVariants = cva(
   // Base styles
   [
     "inline-flex items-center justify-center",
-    "rounded-neo-pill border-2 border-neo-black",
-    "px-3 py-1 text-xs font-black uppercase tracking-wide",
+    "font-black uppercase tracking-wide",
     "transition-all duration-100",
   ].join(" "),
   {
@@ -41,9 +40,19 @@ const badgeVariants = cva(
         "display-purple": "bg-neo-purple/80 text-neo-cream border-neo-black/50 shadow-none cursor-default",
         "display-muted": "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-400/50 shadow-none cursor-default",
       },
+      /**
+       * Size variants:
+       * - 'default': Standard badge size
+       * - 'status': Compact status badge (SuperDesign style) - smaller text, tighter padding
+       */
+      size: {
+        default: "rounded-neo-pill border-2 border-neo-black px-3 py-1 text-xs",
+        status: "border-2 border-neo-black px-3 py-1 text-[10px] shadow-[2px_2px_0px_black]",
+      },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   }
 );
@@ -52,9 +61,9 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+function Badge({ className, variant, size, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div className={cn(badgeVariants({ variant, size }), className)} {...props} />
   );
 }
 

@@ -5,7 +5,7 @@
  * Follows TDD: These tests are written FIRST (RED phase), then implementation (GREEN phase)
  */
 
-import React, { act } from 'react';
+import { act } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock search params - will be set per test
@@ -61,6 +61,23 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
   }),
 }));
 
+// Mock contextual guidance storage - skip pre-game tutorial
+jest.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: jest.fn().mockReturnValue(false),
+  markGuidanceShown: jest.fn(),
+}));
+
+// Mock feature unlock notifications
+jest.mock('@/hooks/useFeatureUnlockNotifications', () => ({
+  useFeatureUnlockNotifications: jest.fn(),
+}));
+
+// Mock playerStats
+jest.mock('@/utils/playerStats', () => ({
+  recordGameResult: jest.fn().mockReturnValue({ isNewHighScore: false, previousBest: null, isNewAllTimeBest: false }),
+  getConfigRecord: jest.fn().mockReturnValue(null),
+}));
+
 // Mock child components
 jest.mock('../SinglePlayerGame', () => {
   const MockSinglePlayerGame = () => <div data-testid="game">Game</div>;
@@ -72,6 +89,12 @@ jest.mock('../SinglePlayerResults', () => {
   const MockSinglePlayerResults = () => <div data-testid="results">Results</div>;
   MockSinglePlayerResults.displayName = 'MockSinglePlayerResults';
   return MockSinglePlayerResults;
+});
+
+jest.mock('../PreGameTutorial', () => {
+  const MockPreGameTutorial = () => <div data-testid="pre-game-tutorial">Tutorial</div>;
+  MockPreGameTutorial.displayName = 'MockPreGameTutorial';
+  return MockPreGameTutorial;
 });
 
 jest.mock('@/components/AutoHideHeader', () => {
@@ -87,7 +110,6 @@ jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
 // Mock high score manager
 jest.mock('../highScoreManager', () => ({
   getHighScore: jest.fn().mockReturnValue(null),
-  recordGameResult: jest.fn(),
   getAllTimeBest: jest.fn().mockReturnValue(null),
 }));
 

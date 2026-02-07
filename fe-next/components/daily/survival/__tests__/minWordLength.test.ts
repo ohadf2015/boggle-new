@@ -1,18 +1,18 @@
 /**
  * Tests for Word Hunt minimum word length enforcement
  *
- * Bug Report:
- * 1. Word Hunt allows 2-letter words for non-Japanese languages
- * 2. Minimum word length should be 4 for en/he/sv/es, and 2 for Japanese
+ * Two distinct minimums:
+ * 1. Target word: 4+ letters (except Japanese 2+) - enforced during puzzle generation
+ * 2. Discovery words: 2+ letters for ALL languages - players can find short words
  *
  * Expected Behavior:
- * - For English/Hebrew/Swedish/Spanish: Reject words < 4 letters
- * - For Japanese: Allow 2+ letter words (kanji compounds are shorter)
+ * - For all languages: Accept 2+ letter discovered words
+ * - Target word generation enforces 4+ (except Japanese) separately
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSurvivalGameLogic } from '../useSurvivalGameLogic';
-import { MIN_ANSWER_LENGTH } from '@/shared/constants/gameConstants';
+import { MIN_ANSWER_LENGTH, MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 // Mock contexts and hooks
 jest.mock('@/contexts/AuthContext', () => ({
@@ -66,7 +66,7 @@ global.fetch = jest.fn(() =>
 ) as jest.Mock;
 
 describe('Word Hunt Minimum Word Length', () => {
-  // Grid where "AB" can be formed but "ABCD" can too
+  // Grid where short words can be formed
   const testGrid = [
     ['A', 'B', 'C', 'D'],
     ['E', 'F', 'G', 'H'],
@@ -87,86 +87,87 @@ describe('Word Hunt Minimum Word Length', () => {
     jest.clearAllMocks();
   });
 
-  describe('MIN_ANSWER_LENGTH constants', () => {
-    it('should require 4+ letters for English', () => {
+  describe('Constants', () => {
+    it('should have target word minimum of 4 for non-Japanese', () => {
       expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(4);
-    });
-
-    it('should require 4+ letters for Hebrew', () => {
       expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(4);
-    });
-
-    it('should require 4+ letters for Swedish', () => {
       expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(4);
-    });
-
-    it('should require 4+ letters for Spanish', () => {
       expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(4);
     });
 
-    it('should allow 2+ letters for Japanese', () => {
+    it('should have target word minimum of 2 for Japanese', () => {
       expect(MIN_ANSWER_LENGTH.ja).toBe(2);
+    });
+
+    it('should have discovery word minimum of 2', () => {
+      expect(MIN_DISCOVERY_WORD_LENGTH).toBe(2);
     });
   });
 
-  describe('handleWordDiscovery minimum length enforcement', () => {
-    it('should reject 2-letter English words with too-short toast', async () => {
+  describe('Discovery word minimum enforcement', () => {
+    it('should reject 1-letter words with too-short toast', async () => {
       const { result } = renderHook(() =>
         useSurvivalGameLogic(createProps('en'))
       );
 
       act(() => {
-        // Try to submit a 2-letter word
-        result.current[1].handleWordSubmit('AB');
+        result.current[1].handleWordSubmit('A');
       });
 
-      // Wait for async operations
       await waitFor(() => {
-        // Should show too-short toast (not valid-word)
         expect(result.current[0].feedbackType).toBe('too-short');
       });
 
-      // Word should NOT be in discovered words
       expect(result.current[0].discoveredWords).toHaveLength(0);
     });
 
-    it('should reject 3-letter English words with too-short toast', async () => {
+    it('should NOT reject 2-letter English words as too-short', async () => {
       const { result } = renderHook(() =>
         useSurvivalGameLogic(createProps('en'))
       );
 
       act(() => {
-        // Try to submit a 3-letter word
+        // Submit a 2-letter word - should NOT be rejected as too-short
+        // (may be rejected for other reasons like not-on-board or not-in-dictionary)
+        result.current[1].handleWordSubmit('AB');
+      });
+
+      await waitFor(() => {
+        // Should NOT show too-short toast for 2-letter words
+        expect(result.current[0].feedbackType).not.toBe('too-short');
+      });
+    });
+
+    it('should NOT reject 3-letter English words as too-short', async () => {
+      const { result } = renderHook(() =>
+        useSurvivalGameLogic(createProps('en'))
+      );
+
+      act(() => {
         result.current[1].handleWordSubmit('ABC');
       });
 
       await waitFor(() => {
-        // Should show too-short toast for 3-letter words in English
-        expect(result.current[0].feedbackType).toBe('too-short');
+        // Should NOT show too-short toast for 3-letter words
+        expect(result.current[0].feedbackType).not.toBe('too-short');
       });
-
-      expect(result.current[0].discoveredWords).toHaveLength(0);
     });
 
-    it('should accept 4-letter English words', async () => {
+    it('should accept 4-letter English words (not too-short)', async () => {
       const { result } = renderHook(() =>
         useSurvivalGameLogic(createProps('en'))
       );
 
       act(() => {
-        // Submit a 4-letter word that's on the board
         result.current[1].handleWordSubmit('ABCD');
       });
 
       await waitFor(() => {
-        // Should accept the word (if it's in dictionary and on board)
-        // The word might be rejected for "not in dictionary" but NOT for "too-short"
         expect(result.current[0].feedbackType).not.toBe('too-short');
       });
     });
 
     it('should accept 2-letter Japanese words', async () => {
-      // Create a grid with Japanese characters
       const japaneseGrid = [
         ['ゆ', 'れ', 'あ', 'い'],
         ['う', 'え', 'お', 'か'],
@@ -183,12 +184,10 @@ describe('Word Hunt Minimum Word Length', () => {
       const { result } = renderHook(() => useSurvivalGameLogic(props));
 
       act(() => {
-        // Submit a 2-letter Japanese word
         result.current[1].handleWordSubmit('ゆれ');
       });
 
       await waitFor(() => {
-        // Should NOT show too-short for Japanese 2-letter words
         expect(result.current[0].feedbackType).not.toBe('too-short');
       });
     });

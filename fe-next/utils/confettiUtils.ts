@@ -479,5 +479,84 @@ export function fireLayeredCelebration(duration: number, budget: { combo: number
   }, 200);
 }
 
+/**
+ * Fire firework burst celebration - dramatic upward explosion effect
+ * Creates multiple bursts at different positions for stadium-like celebration
+ *
+ * @param count - Number of firework bursts (default: 3)
+ * @param duration - Total duration in ms (default: 2000)
+ * @returns Cancel function to stop the animation
+ */
+export function fireFireworks(count: number = 3, durationMs: number = 2000): () => void {
+  const colors = NEO_BRUTALIST_COLORS;
+  let cancelled = false;
+  const timeouts: NodeJS.Timeout[] = [];
+
+  // Fire multiple bursts at staggered intervals
+  for (let i = 0; i < count; i++) {
+    const delay = (i * durationMs) / count;
+    const timeout = setTimeout(() => {
+      if (cancelled) return;
+
+      // Random horizontal position
+      const xPos = 0.2 + Math.random() * 0.6;
+
+      // Initial upward trail
+      fireConfetti({
+        particleCount: 8,
+        angle: 90,
+        spread: 15,
+        origin: { x: xPos, y: 1 },
+        colors: [colors[i % colors.length] || '#FFE135'],
+        startVelocity: 80,
+        gravity: 1.5,
+        ticks: 100,
+        scalar: 0.8,
+      });
+
+      // Delayed burst at peak
+      const burstTimeout = setTimeout(() => {
+        if (cancelled) return;
+
+        // Main burst
+        fireConfetti({
+          particleCount: 40,
+          spread: 360,
+          origin: { x: xPos, y: 0.3 },
+          colors,
+          startVelocity: 30,
+          gravity: 0.8,
+          ticks: 150,
+          scalar: 1.2,
+          flat: true,
+          shapes: NEO_BRUTALIST_SHAPES,
+        });
+
+        // Sparkle follow-up
+        fireConfetti({
+          particleCount: 20,
+          spread: 180,
+          origin: { x: xPos, y: 0.35 },
+          colors,
+          startVelocity: 20,
+          gravity: 0.6,
+          ticks: 100,
+          scalar: 0.8,
+        });
+      }, 400);
+
+      timeouts.push(burstTimeout);
+    }, delay);
+
+    timeouts.push(timeout);
+  }
+
+  // Return cleanup function
+  return () => {
+    cancelled = true;
+    timeouts.forEach(t => clearTimeout(t));
+  };
+}
+
 // Export types for consumers
 export type { Options as ConfettiOptions };

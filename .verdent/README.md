@@ -30,7 +30,7 @@ Core development commands (use as workflow guides):
 - **fix** - Bug fixing workflow (reproduce → test → fix → verify)
 - **investigate** - Deep investigation (NO fixes until root cause understood)
 - **refactor** - Code quality improvement (preserve behavior, keep tests green)
-- **e2e-test** - End-to-end testing with Playwright
+- **e2e-test** - End-to-end testing with Playwriter
 - **complete-translation** - Translation management (4 languages)
 - **ui** - UI component improvement (Neo-Brutalist compliance)
 
@@ -147,13 +147,13 @@ Check `.verdent/config.json` for currently configured MCP servers.
 ### Recommended MCP Servers
 1. **Memory MCP** - Store/recall project decisions, patterns, bug fixes
 2. **GitHub MCP** - Create PRs, manage issues, link commits
-3. **Playwright MCP** - Interactive E2E testing
+3. **Playwriter CLI** - Interactive E2E testing via Chrome extension
 
 ### Fallback Strategies
 If MCP servers unavailable:
 - Memory → Store in `.verdent/memory/` markdown files
 - GitHub → Use `gh` CLI via bash tool
-- Playwright → Use bash with `npx playwright` commands
+- Playwriter → Use bash with `playwriter` commands (see `/e2e-test`)
 
 ## Task Patterns
 

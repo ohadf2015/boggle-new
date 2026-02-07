@@ -147,12 +147,6 @@ export function useHostWordEvents({
       }
     };
 
-    const handleWordNeedsValidation = () => {
-      if (hostPlaying) {
-        resetCombo();
-      }
-    };
-
     const handleWordTooShort = (data: any) => {
       if (hostPlaying) {
         if (data?.word) {
@@ -178,7 +172,6 @@ export function useHostWordEvents({
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordRejected', handleWordRejected);
-    socket.on('wordNeedsValidation', handleWordNeedsValidation);
     socket.on('wordTooShort', handleWordTooShort);
     socket.on('wordsForBoard', handleWordsForBoard);
 
@@ -187,7 +180,6 @@ export function useHostWordEvents({
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordRejected', handleWordRejected);
-      socket.off('wordNeedsValidation', handleWordNeedsValidation);
       socket.off('wordTooShort', handleWordTooShort);
       socket.off('wordsForBoard', handleWordsForBoard);
     };

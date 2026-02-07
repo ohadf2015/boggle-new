@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, BellOff, Clock, AlertTriangle, Check, Settings } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { cn } from '@/lib/utils';
@@ -51,7 +51,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
         data-testid="push-notifications-loading"
       >
         <div className="flex items-center justify-center py-4">
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       </motion.div>
     );
@@ -207,7 +207,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
             )}
           >
             {isSaving ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : preferences.enabled ? (
               <Check className="w-3 h-3 text-neo-lime" />
             ) : null}

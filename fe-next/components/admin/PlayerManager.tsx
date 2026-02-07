@@ -5,7 +5,7 @@ import {
   Search, User, Calendar, Trophy, Gamepad2,
   MoreVertical, ChevronLeft, ChevronRight, Gift
 } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -144,7 +144,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       {/* Players List */}
       {loading && players.length === 0 ? (
         <div className="flex justify-center py-12">
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       ) : players.length === 0 ? (
         <div className="text-center py-12 text-slate-500">

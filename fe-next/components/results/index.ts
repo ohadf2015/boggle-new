@@ -17,6 +17,11 @@ export type { StatItem, GameStatsConfig } from './StatsGrid';
 
 export { default as CompactResultsStats } from './CompactResultsStats';
 
+// Mobile compact components
+export { default as MobileCompactStats } from './MobileCompactStats';
+export { default as MobileCompactRewards } from './MobileCompactRewards';
+export { default as MobileCompactLeaderboard } from './MobileCompactLeaderboard';
+
 export { default as BonusBadgesRow } from './BonusBadgesRow';
 
 export { default as CoinRewardDisplay } from './CoinRewardDisplay';
@@ -75,13 +80,13 @@ export { default as YourQuickStats } from './YourQuickStats';
 // HOOKS
 // ============================================================
 
-export { default as useWordCategories, useWordCategories as useWordCategoriesHook } from './useWordCategories';
+export { default as useWordCategories } from './useWordCategories';
 export type { UseWordCategoriesResult } from './useWordCategories';
 
-export { default as useGameResults, useGameResults as useGameResultsHook } from './useGameResults';
+export { default as useGameResults } from './useGameResults';
 export type { GameResultsConfig, GameResultsData } from './useGameResults';
 
-export { default as useResultsSocketEvents, useResultsSocketEvents as useResultsSocketEventsHook } from './useResultsSocketEvents';
+export { default as useResultsSocketEvents } from './useResultsSocketEvents';
 export type { ResultsSocketEventsState, ResultsSocketEventsActions, UseResultsSocketEventsProps } from './useResultsSocketEvents';
 
 // ============================================================

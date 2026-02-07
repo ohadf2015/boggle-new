@@ -230,7 +230,9 @@ export function useResultsData({
     currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
   const totalPlayers = sortedScores.length;
   const bannerRank =
-    hasZeroScore && totalPlayers > 1 ? 4 : currentPlayerRank >= 1 ? currentPlayerRank : 1;
+    hasZeroScore && totalPlayers > 1
+      ? Math.min(Math.max(currentPlayerRank, 4), totalPlayers)
+      : currentPlayerRank >= 1 ? currentPlayerRank : 1;
 
   const isCurrentUserInBanner =
     normalizeUsername(bannerPlayer?.username) === normalizeUsername(username);

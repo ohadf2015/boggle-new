@@ -616,7 +616,15 @@ const ja = {
       "createButton": "バトル開始",
       "refreshed": "更新完了！",
       "quickPlay": "クイックマッチ",
-      "orJoinRoom": "またはアクションに参加"
+      "orJoinRoom": "またはアクションに参加",
+      "activeBattles": "アクティブバトル",
+      "instantMatch": "即座マッチング",
+      "orCreateCustom": "またはカスタムルームを作成",
+      "socialHub": "ソーシャルハブ",
+      "friendActivity": "フレンドアクティビティ",
+      "noFriendsOnline": "オンラインの友達がいません",
+      "invitePrompt": "招待リンクを送ってパーティーを始めよう",
+      "inviteFriends": "友達を招待"
     },
     "joinModal": {
       "title": "バトルに参戦",
@@ -680,9 +688,17 @@ const ja = {
     "lobby": "ロビー",
     "waitingForPlayers": "待機中...",
     "startGame": "開始",
+    "startBattle": "バトル開始！",
+    "commandersJoined": "参加中の司令官",
+    "battleMode": "バトルモード",
+    "preset": "プリセット",
+    "ofMaxWarriors": "{{max}}人中準備完了",
     "roomCode": "コード",
     "host": "ホスト",
     "inviteFriends": "友達を招待してプレイ！",
+    "inviteWarriors": "戦士を招待",
+    "battleFeed": "バトルフィード",
+    "hostIs": "ホストは",
     "playersJoined": "プレイヤー",
     "gameSettings": "設定",
     "quickSetup": "プリセット",
@@ -766,6 +782,8 @@ const ja = {
     "lessonModeActive": "レッスンの単語を使用中",
     "noPlayers": "ロビーにプレイヤーがいません",
     "connectionLost": "接続切れ。更新して復帰！",
+    "presetQuick": "クイック",
+    "presetPro": "プロ",
     "presetFast": "クイック",
     "presetFastDesc": "1分スピードゲーム",
     "presetEasy": "イージー",
@@ -912,6 +930,7 @@ const ja = {
     "swipeHintShort": "文字をスワイプして単語を見つけよう！",
     "getReadyHint": "下のコツを読んで遊び方をマスターしよう！",
     "waitingForHostToStart": "ホストがゲームを開始するのを待っています...",
+    "hostWillStart": "全員の準備ができたらホストがゲームを開始します",
     "hostDisconnected": "ホストが切断されました。再接続を待っています...",
     "isNowHost": "が新しいホストになりました",
     "disconnected": "が切断されました。再接続を待っています...",
@@ -961,6 +980,7 @@ const ja = {
     "copied": "コードをコピーしました！",
     "linkCopied": "リンクをコピーしました！",
     "copyLink": "リンクをコピー",
+    "copy": "コードをコピー",
     "code": "コード:"
   },
   "onboarding": {
@@ -1018,6 +1038,25 @@ const ja = {
     "swipeHint": "← スワイプで移動 →",
     "timingHint": "ゲーム開始を待ちながら遊び方を覚えよう！"
   },
+  "preGameTutorial": {
+    "welcome": {
+      "title": "やあ！",
+      "subtitle": "僕はレクシー！遊び方を教えるよ"
+    },
+    "practice": {
+      "instruction": "文字をなぞって単語を作ろう：",
+      "success": "完璧！いい感じ！"
+    },
+    "tips": {
+      "title": "天性だね！",
+      "subtitle": "始める前にちょっとコツ"
+    },
+    "letsPlay": "さあ遊ぼう！",
+    "skip": "チュートリアルをスキップ",
+    "next": "次へ",
+    "step": "ステップ {current} / {total}"
+  },
+
   "tips": {
     "header": "プロのコツ",
     "tryIt": "やってみよう！"
@@ -1117,6 +1156,22 @@ const ja = {
     "rankings": "ランキング",
     "yourWords": "あなたの単語",
     "fireRoundBonus": "ファイアラウンド",
+    "bonuses": "ボーナス",
+    "comboBonus": "コンボボーナス",
+    "winStreak": "連勝",
+    "finalScore": "最終スコア",
+    "coinsEarned": "獲得コイン",
+    "detailedAnalysis": "詳細分析",
+    "yourPerformance": "あなたの成績",
+    "rewards": "報酬",
+    "standings": "順位",
+    "guestSavePrompt": "報酬を保存するにはログインしてください",
+    "keepItUp": "その調子！",
+    "dailyPlayBonus": "デイリーボーナス",
+    "best": "最高",
+    "avg": "平均",
+    "games": "回数",
+    "noRewards": "もっとプレイして報酬を獲得しよう！",
     "time": "時間",
     "place": "位",
     "words": "単語",
@@ -1183,7 +1238,8 @@ const ja = {
     },
     "improving": "上昇中",
     "declining": "下降中",
-    "stable": "安定"
+    "stable": "安定",
+    "noHistory": "もっとプレイしてトレンドを確認しよう"
   },
   "archetypes": {
     "hint": "あなたのプレイスタイルに基づく",
@@ -1272,6 +1328,16 @@ const ja = {
     "pts": "pts"
   },
   "howToPlay": {
+    "missionBriefing": "ミッションブリーフィング",
+    "masterTheArena": "LexiClashアリーナをマスター",
+    "connectingDots": "文字をつなげよう",
+    "levelUpGame": "スコアをレベルアップ",
+    "nextStep": "次へ",
+    "done": "完了",
+    "back": "戻る",
+    "scoreMultipliers": "スコア倍率",
+    "comboBonus": "コンボボーナス！",
+    "proTipsTitle": "チャンピオンのコツ",
     "description": "LexiClashは、文字のグリッド上でできるだけ多くの単語を見つけるために時間と競う、速いペースのワードゲームです。単語が長いほど、獲得できるポイントが多くなります！",
     "createOrJoinTitle": "ゲームを作成または参加",
     "createOrJoinDesc": "ホストがルームを作成してコードを共有します。プレイヤーはコードを使用して参加します。",
@@ -1473,6 +1539,11 @@ const ja = {
   "achievements": {
     "unlocked": "実績解除！",
     "upgraded": "実績アップグレード！",
+    "cinematic": {
+      "unlocked": "実績解除！",
+      "gold": "ゴールド",
+      "platinum": "プラチナ"
+    },
     "FIRST_BLOOD": {
       "name": "ファーストブラッド",
       "description": "最初に単語を見つける"
@@ -2579,6 +2650,8 @@ const ja = {
     "imSure": "終了する",
     "gamePaused": "ゲーム一時停止中",
     "needHint": "ヒントが必要?",
+    "getHint": "ヒントを見る",
+    "dragInstruction": "文字をなぞって単語を作ろう！",
     "botWords": "発見した単語",
     "beatYourRecord": "記録を更新しました！",
     "soloVsBots": "ソロ vs ボット",
@@ -2725,6 +2798,22 @@ const ja = {
   "daily": {
     "title": "デイリーチャレンジ",
     "chooseQuest": "今日のクエストを選ぼう",
+    "dailyMissions": "デイリーミッション",
+    "journeyProgress": "冒険の進捗",
+    "completedCount": "完了",
+    "nextQuestsIn": "次のクエストまで",
+    "timedQuest": "タイムクエスト",
+    "untimedQuest": "フリークエスト",
+    "startQuest": "クエスト開始",
+    "replay": "もう一度",
+    "cleared": "クリア！",
+    "keepFireBurning": "連続記録を維持しよう",
+    "todaysTopPlayers": "今日のトッププレイヤー",
+    "fullStandings": "全ランキング",
+    "dailyDouble": "デイリーダブル",
+    "dailyDoubleBonus": "両方クリアでボーナスXP獲得",
+    "browseArchive": "アーカイブ：過去のチャレンジ",
+    "bonusXP": "ボーナスXP",
     "chooseChallengeHint": "挑戦を選んで！両方クリアでボーナスXP獲得！",
     "timed90Seconds": "スピード勝負",
     "takeYourTime": "時間無制限",
@@ -2753,6 +2842,11 @@ const ja = {
     "wordsFound": "{count}語発見",
     "streak": "ストリーク",
     "streakDays": "{count}日連続！",
+    "streakCinematic": {
+      "streakDays": "{count}日連続！",
+      "milestone": "マイルストーン！",
+      "keepGoing": "この調子で続けよう！"
+    },
     "shareScore": "スコアをシェア",
     "copyToClipboard": "クリップボードにコピー",
     "copyLink": "リンクをコピー",
@@ -3085,6 +3179,14 @@ const ja = {
       "clueExampleSentence": "例文解放！",
       "clueAutoMessage": "{cost}トークンで自動解放",
       "scoreBreakdownTooltip": "詳細はタップ"
+    },
+    "desktop": {
+      "liveRanks": "ライブランキング",
+      "lootCollected": "獲得した戦利品",
+      "powerUps": "パワーアップ",
+      "hintsUnlocked": "解放されたヒント",
+      "triesRemaining": "残りの試行回数",
+      "noWordsYet": "単語を見つけて戦利品を集めよう！"
     },
     "results": {
       "tapToCelebrate": "タップしてお祝い！",
@@ -3841,7 +3943,8 @@ const ja = {
       "wordBank": "単語バンク",
       "dailyBuzz": "デイリーバズ",
       "webVitals": "Webパフォーマンス",
-      "email": "メール"
+      "email": "メール",
+      "milogWords": "Milog辞書"
     },
     "invalidWords": {
       "title": "無効な単語の確認",
@@ -4047,6 +4150,10 @@ const ja = {
         "noFilesFound": "この言語のWikipediaファイルが見つかりません",
         "lastSynced": "最終同期"
       }
+    },
+    "milogWords": {
+      "title": "Milog辞書エンリッチメント",
+      "subtitle": "milog.co.ilで検証されたヘブライ語単語"
     }
   },
   "gift": {
@@ -4155,7 +4262,12 @@ const ja = {
       "finalScore": "最終スコア",
       "score": "スコア",
       "timeRemaining": "残り時間",
-      "stars": "星"
+      "stars": "星",
+      "worldUnlock": {
+        "newWorld": "新しいワールド解放！",
+        "chapters": "チャプター",
+        "prepare": "新たな挑戦に備えよう！"
+      }
     },
     "boss": "ボス",
     "combo": {

@@ -107,9 +107,10 @@ describe('RoomListView - Tutorial Persistence', () => {
     // Verify tutorial was marked as shown on mount
     expect(mockMarkGuidanceShown).toHaveBeenCalledWith('multiplayerTutorialShown');
 
-    // User closes modal (click outside or close button)
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    await user.click(closeButton);
+    // User closes modal - multiple close buttons exist (Dialog's built-in + HowToPlay's own)
+    // Use getAllByRole and click the first one to dismiss
+    const closeButtons = screen.getAllByRole('button', { name: /close/i });
+    await user.click(closeButtons[0]);
 
     // Mark as shown (simulating the actual storage update)
     mockShouldShowGuidance.mockReturnValue(false);

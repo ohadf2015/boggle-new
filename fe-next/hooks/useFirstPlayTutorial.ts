@@ -26,13 +26,13 @@ import {
 } from '@/utils/contextualGuidanceStorage';
 
 /** Delay before showing the first tutorial hint (give players time to explore) */
-const INITIAL_DELAY_MS = 8000; // 8 seconds
+const INITIAL_DELAY_MS = 5000; // 5 seconds
 
 /** How long to display the hint before auto-hiding */
 const DISPLAY_DURATION_MS = 4000; // 4 seconds (includes blink + fade animation)
 
 /** Time of inactivity before re-showing hint for confused players */
-const INACTIVITY_THRESHOLD_MS = 15000; // 15 seconds
+const INACTIVITY_THRESHOLD_MS = 5000; // 5 seconds
 
 export interface UseFirstPlayTutorialProps {
   /** Current letter grid */

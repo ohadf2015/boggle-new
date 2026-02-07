@@ -19,14 +19,18 @@ import {
   interpolate,
   spring,
 } from 'remotion';
-import { fredokaFamily, rubikFamily } from '../../../lib/remotion/fonts';
+import { fredokaFamily } from '../../../lib/remotion/fonts';
+import {
+  BackgroundGlow,
+  TitleReveal,
+  StatItem,
+  StatsPanel,
+  SparkleField,
+} from '../../../lib/remotion/primitives';
 
 // ==============================================
 // CONSTANTS
 // ==============================================
-
-/** Frame rate for all cinematics */
-const FPS = 30;
 
 /** Total duration in frames (6 seconds) */
 export const VICTORY_DURATION_FRAMES = 180;
@@ -54,6 +58,16 @@ export interface VictoryCinematicProps {
   finalScore: number;
   /** Time remaining in seconds */
   timeRemaining: number;
+  /** Translated title text (default: "VICTORY!") */
+  titleText?: string;
+  /** Translated stat labels */
+  statLabels?: {
+    wordsFound?: string;
+    finalScore?: string;
+    timeRemaining?: string;
+  };
+  /** Translated stars label (default: "{count} / 3 Stars") */
+  starsLabel?: string;
 }
 
 // ==============================================
@@ -68,7 +82,6 @@ interface StarProps {
 }
 
 const Star: React.FC<StarProps> = ({ index, isEarned, frame, fps }) => {
-  // Stagger star reveals
   const delay = index * 10;
   const revealProgress = spring({
     frame: frame - delay,
@@ -105,65 +118,6 @@ const Star: React.FC<StarProps> = ({ index, isEarned, frame, fps }) => {
 };
 
 // ==============================================
-// STAT ITEM COMPONENT
-// ==============================================
-
-interface StatItemProps {
-  label: string;
-  value: number | string;
-  delay: number;
-  frame: number;
-  fps: number;
-}
-
-const StatItem: React.FC<StatItemProps> = ({
-  label,
-  value,
-  delay,
-  frame,
-  fps,
-}) => {
-  const reveal = spring({
-    frame: frame - delay,
-    fps,
-    config: { damping: 15, stiffness: 100 },
-  });
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '12px 0',
-        borderBottom: '2px solid #333',
-        opacity: reveal,
-        transform: `translateX(${(1 - reveal) * 30}px)`,
-      }}
-    >
-      <span
-        style={{
-          fontFamily: rubikFamily,
-          fontSize: 24,
-          color: '#FFE135',
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          fontFamily: fredokaFamily,
-          fontSize: 28,
-          fontWeight: 700,
-          color: 'white',
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-};
-
-// ==============================================
 // MAIN COMPONENT
 // ==============================================
 
@@ -172,96 +126,37 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
   wordsFound,
   finalScore,
   timeRemaining,
+  titleText = 'VICTORY!',
+  statLabels = {},
+  starsLabel,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // ==============================================
-  // ANIMATION VALUES
-  // ==============================================
-
   // Title burst animation (0-60 frames / 0-2s)
-  const titleScale = spring({
-    frame,
-    fps,
-    config: { damping: 10, stiffness: 100 },
+  const titleOpacity = interpolate(frame, [0, 15], [0, 1], {
+    extrapolateRight: 'clamp',
   });
-
-  const titleOpacity = interpolate(
-    frame,
-    [0, 15],
-    [0, 1],
-    { extrapolateRight: 'clamp' }
-  );
-
-  // Pulse effect for title
-  const pulse = interpolate(
-    frame,
-    [0, 30, 60],
-    [1, 1.1, 1],
-    { extrapolateRight: 'clamp' }
-  );
-
-  // ==============================================
-  // RENDER
-  // ==============================================
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0a0a1a' }}>
-      {/* Background gradient glow */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at 50% 50%, #FFE13522, transparent 70%)',
-          opacity: titleOpacity,
-        }}
-      />
+      <BackgroundGlow color="#FFE135" opacity={titleOpacity} />
 
       {/* Victory title burst (0-2s) */}
-      <Sequence
-        from={PHASE_FRAMES.TITLE_START}
-        durationInFrames={60}
-        premountFor={15} // Pre-mount 0.5s before to prevent black frames
-      >
-        <div
-          style={{
-            position: 'absolute',
-            top: '25%',
-            left: 0,
-            right: 0,
-            textAlign: 'center',
-            transform: `scale(${titleScale * pulse})`,
-            opacity: titleOpacity,
-          }}
-        >
-          <h1
-            style={{
-              fontFamily: fredokaFamily,
-              fontSize: 96,
-              fontWeight: 700,
-              color: '#FFE135',
-              textShadow: `
-                4px 4px 0 black,
-                -2px -2px 0 black,
-                0 0 30px #FFE135
-              `,
-              letterSpacing: '0.1em',
-              margin: 0,
-            }}
-          >
-            VICTORY!
-          </h1>
+      <Sequence from={PHASE_FRAMES.TITLE_START} durationInFrames={60} premountFor={15}>
+        <div style={{ position: 'absolute', top: '25%', left: 0, right: 0 }}>
+          <TitleReveal
+            text={titleText}
+            color="#FFE135"
+            fontSize={96}
+            frame={frame}
+            fps={fps}
+          />
         </div>
       </Sequence>
 
       {/* Star reveal (2-4s) */}
-      <Sequence
-        from={PHASE_FRAMES.STARS_START}
-        durationInFrames={60}
-        premountFor={15}
-      >
+      <Sequence from={PHASE_FRAMES.STARS_START} durationInFrames={60} premountFor={15}>
         <div
           style={{
             position: 'absolute',
@@ -281,115 +176,58 @@ export const VictoryCinematic: React.FC<VictoryCinematicProps> = ({
                 textShadow: '3px 3px 0 black',
               }}
             >
-              {starsEarned} / 3 Stars
+              {starsLabel ?? `${starsEarned} / 3 Stars`}
             </span>
           </div>
-          <Star
-            index={0}
-            isEarned={starsEarned >= 1}
-            frame={frame - PHASE_FRAMES.STARS_START}
-            fps={fps}
-          />
-          <Star
-            index={1}
-            isEarned={starsEarned >= 2}
-            frame={frame - PHASE_FRAMES.STARS_START}
-            fps={fps}
-          />
-          <Star
-            index={2}
-            isEarned={starsEarned >= 3}
-            frame={frame - PHASE_FRAMES.STARS_START}
-            fps={fps}
-          />
+          <Star index={0} isEarned={starsEarned >= 1} frame={frame - PHASE_FRAMES.STARS_START} fps={fps} />
+          <Star index={1} isEarned={starsEarned >= 2} frame={frame - PHASE_FRAMES.STARS_START} fps={fps} />
+          <Star index={2} isEarned={starsEarned >= 3} frame={frame - PHASE_FRAMES.STARS_START} fps={fps} />
         </div>
       </Sequence>
 
       {/* Stats display (3-6s) */}
       <Sequence from={PHASE_FRAMES.STATS_START} premountFor={15}>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '15%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '500px',
-            padding: '30px',
-            backgroundColor: '#00000088',
-            border: '3px solid #FFE135',
-            borderRadius: '4px',
-          }}
+        <StatsPanel
+          borderColor="#FFE135"
+          frame={frame - PHASE_FRAMES.STATS_START}
+          fps={fps}
         >
           <StatItem
-            label="Words Found"
+            label={statLabels.wordsFound ?? 'Words Found'}
             value={wordsFound}
             delay={0}
             frame={frame - PHASE_FRAMES.STATS_START}
             fps={fps}
           />
           <StatItem
-            label="Final Score"
+            label={statLabels.finalScore ?? 'Final Score'}
             value={finalScore}
             delay={10}
             frame={frame - PHASE_FRAMES.STATS_START}
             fps={fps}
           />
           <StatItem
-            label="Time Remaining"
+            label={statLabels.timeRemaining ?? 'Time Remaining'}
             value={`${timeRemaining}s`}
             delay={20}
             frame={frame - PHASE_FRAMES.STATS_START}
             fps={fps}
           />
-        </div>
+        </StatsPanel>
       </Sequence>
 
       {/* Sparkle particles (throughout) */}
       <Sequence from={30} premountFor={10}>
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-          }}
-        >
-          {Array.from({ length: 20 }, (_, i) => {
-            const x = (i * 123456) % 100;
-            const y = (i * 789012) % 100;
-            const delay = i * 5;
-            const opacity = interpolate(
-              frame - 30 - delay,
-              [0, 30],
-              [0, 0.8],
-              { extrapolateRight: 'clamp' }
-            );
-
-            return (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  width: 4,
-                  height: 4,
-                  borderRadius: '50%',
-                  backgroundColor: '#FFE135',
-                  opacity,
-                  boxShadow: '0 0 10px #FFE135',
-                }}
-              />
-            );
-          })}
-        </div>
+        <SparkleField
+          count={20}
+          color="#FFE135"
+          seed={456}
+          frame={frame - 30}
+        />
       </Sequence>
     </AbsoluteFill>
   );
 };
-
-// ==============================================
-// DISPLAY NAME & DEFAULT EXPORT
-// ==============================================
 
 VictoryCinematic.displayName = 'VictoryCinematic';
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { RefreshCw, Trash2, ImageOff } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import {
   Dialog,
   DialogContent,
@@ -67,7 +67,7 @@ export function ImageManagement({
             >
               {isRegeneratingImage ? (
                 <>
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                   Generating...
                 </>
               ) : (
@@ -211,7 +211,7 @@ function RemoveImageDialog({
           >
             {isRemovingImage ? (
               <>
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
                 Removing...
               </>
             ) : (

@@ -28,9 +28,7 @@ This file provides guidance to Verdent when working with code in this repository
 - `npm run test:frontend` - Jest frontend tests only
 - `npm run test:watch` - Interactive watch mode
 - `npm run test:coverage` - Coverage report
-- `npm run test:e2e` - Playwright E2E tests
-- `npm run test:e2e:ui` - Playwright UI mode
-- `npm run test:e2e:headed` - Playwright headed browser mode
+- `npm run test:e2e` - E2E tests (use Playwriter CLI, see `/e2e-test` command)
 - `npm run stress` - Load test (100 clients, 30s duration)
 
 ### Quality & Validation
@@ -135,7 +133,7 @@ fe-next/
 ├── translations/         # i18n (he, en, sv, ja)
 ├── lib/                  # Library utilities
 ├── utils/                # Frontend utilities
-├── e2e/                  # 42 Playwright test files
+├── (E2E tests via Playwriter CLI)
 └── __tests__/            # Jest unit tests
 ```
 

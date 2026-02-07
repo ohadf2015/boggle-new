@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import StudentLessonView from '@/components/student/StudentLessonView';
 import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
 import { cn } from '@/lib/utils';
@@ -64,7 +64,7 @@ export default function StudentPageClient() {
   if (isChecking || loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }

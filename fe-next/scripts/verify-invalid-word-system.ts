@@ -148,7 +148,7 @@ async function verifyCriterion3_SingleApproval(): Promise<void> {
   // We can't actually test without admin auth, but we verify the route exists
 
   try {
-    const response = await fetch('http://localhost:3000/api/admin/invalid-words/approve', {
+    const response = await fetch('http://localhost:3001/api/admin/invalid-words/approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word: 'test', language: 'en' })
@@ -172,7 +172,7 @@ async function verifyCriterion3_SingleApproval(): Promise<void> {
 
 async function verifyCriterion3_BulkApproval(): Promise<void> {
   try {
-    const response = await fetch('http://localhost:3000/api/admin/invalid-words/bulk-approve', {
+    const response = await fetch('http://localhost:3001/api/admin/invalid-words/bulk-approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ wordIds: [] })

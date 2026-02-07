@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Button as ButtonComponent } from '../ui/button';
 import {
   Dialog,
@@ -113,7 +113,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               asChild={false}
             >
               {isLoading === 'google' ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : (
                 <GoogleIcon className="w-5 h-5" />
               )}
@@ -127,7 +127,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               asChild={false}
             >
               {isLoading === 'discord' ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : (
                 <DiscordIcon className="w-5 h-5" />
               )}

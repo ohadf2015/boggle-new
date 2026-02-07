@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Medal, Star, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -111,8 +111,8 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
     });
   }, [players, displayedScores]);
 
-  // Track previous positions for swap detection
-  const [prevPositions, setPrevPositions] = useState<Record<string, number>>({});
+  // Track previous positions for swap detection (ref to avoid re-render loops)
+  const prevPositionsRef = useRef<Record<string, number>>({});
 
   // Detect position swaps and play sounds
   useEffect(() => {
@@ -122,6 +122,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
     );
 
     // Check for position changes
+    const prevPositions = prevPositionsRef.current;
     Object.keys(currentPositions).forEach(username => {
       const prev = prevPositions[username];
       const curr = currentPositions[username];
@@ -137,8 +138,8 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
       }
     });
 
-    setPrevPositions(currentPositions);
-  }, [sortedByDisplayed, prevPositions, isRevealing, playSound, isLowEnd]);
+    prevPositionsRef.current = currentPositions;
+  }, [sortedByDisplayed, isRevealing, playSound, isLowEnd]);
 
   // Animate scores counting up
   useEffect(() => {

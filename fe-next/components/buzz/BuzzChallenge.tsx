@@ -9,7 +9,7 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import BuzzReadyScreen from './BuzzReadyScreen';
 import BuzzGameScreen from './BuzzGameScreen';
 import BuzzResultsScreen from './BuzzResultsScreen';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import type { Language } from '@/types';
 
 interface BuzzChallengeProps {
@@ -169,7 +169,7 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
             exit={{ opacity: 0 }}
             className="flex-1 flex items-center justify-center"
           >
-            <NeoLoader variant="mascot-letters" size="lg" text={t('buzz.loading')} />
+            <PageLoader size="lg" text={t('buzz.loading')} />
           </motion.div>
         )}
 

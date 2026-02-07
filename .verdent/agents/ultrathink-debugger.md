@@ -301,7 +301,7 @@ describe('Bug fix: [description]', () => {
 ```bash
 # Check API in browser DevTools → Network tab
 # Or test with curl
-curl -X POST http://localhost:3000/api/endpoint \
+curl -X POST http://localhost:3001/api/endpoint \
   -H "Content-Type: application/json" \
   -d '{"test": "data"}' \
   -v

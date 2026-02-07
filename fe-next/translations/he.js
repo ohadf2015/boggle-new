@@ -618,7 +618,15 @@ const he = {
       "createButton": "פתח קרב",
       "refreshed": "רשימה עודכנה!",
       "quickPlay": "משחק מהיר",
-      "orJoinRoom": "או תצטרף לפעולה"
+      "orJoinRoom": "או תצטרף לפעולה",
+      "activeBattles": "קרבות פעילים",
+      "instantMatch": "שידוך מיידי",
+      "orCreateCustom": "או צור חדר מותאם",
+      "socialHub": "מרכז חברתי",
+      "friendActivity": "פעילות חברים",
+      "noFriendsOnline": "אין חברים מחוברים",
+      "invitePrompt": "התחל מסיבה על ידי שליחת קישור",
+      "inviteFriends": "הזמן חברים"
     },
     "joinModal": {
       "title": "הצטרף לקרב",
@@ -692,9 +700,17 @@ const he = {
     "lobby": "חדר מלחמה",
     "waitingForPlayers": "אוספים לוחמים...",
     "startGame": "GO!",
+    "startBattle": "!התחל קרב",
+    "commandersJoined": "לוחמים שהצטרפו",
+    "battleMode": "מצב קרב",
+    "preset": "הגדרה",
+    "ofMaxWarriors": "מתוך {{max}} לוחמים מוכנים",
     "roomCode": "קוד",
     "host": "מארח",
     "inviteFriends": "גייס את החבר'ה!",
+    "inviteWarriors": "הזמן לוחמים",
+    "battleFeed": "עדכוני קרב",
+    "hostIs": "המארח הוא",
     "playersJoined": "לוחמים",
     "gameSettings": "הגדרות קרב",
     "quickSetup": "הגדרה מהירה",
@@ -778,6 +794,8 @@ const he = {
     "lessonModeActive": "משתמש במילון מהשיעור",
     "noPlayers": "אין שחקנים בלובי",
     "connectionLost": "החיבור נותק. רענן כדי לחזור!",
+    "presetQuick": "מהיר",
+    "presetPro": "מקצועי",
     "presetFast": "מהיר",
     "presetFastDesc": "משחק של דקה",
     "presetEasy": "קל",
@@ -925,6 +943,7 @@ const he = {
     "noWordsYet": "לא נמצאו מילים עדיין",
     "swipeHintShort": "החליקו על אותיות למצוא מילים!",
     "waitingForHostToStart": "ממתינים למארח שיתחיל את המשחק...",
+    "hostWillStart": "המארח יתחיל את המשחק כשכולם מוכנים",
     "hostDisconnected": "המארח התנתק. ממתין לחיבור מחדש...",
     "isNowHost": "הוא עכשיו המארח",
     "disconnected": "התנתק. ממתין לחיבור מחדש...",
@@ -973,7 +992,8 @@ const he = {
     "tapToCopy": "לחצו להעתקה",
     "copied": "הקוד הועתק!",
     "linkCopied": "הקישור הועתק!",
-    "copyLink": "העתק קישור"
+    "copyLink": "העתק קישור",
+    "copy": "העתק קוד"
   },
   "onboarding": {
     "header": "מדריך מהיר",
@@ -1030,6 +1050,26 @@ const he = {
     },
     "swipeHint": "החלק לניווט → ←"
   },
+
+  "preGameTutorial": {
+    "welcome": {
+      "title": "!היי",
+      "subtitle": "!אני לקסי! בואו אראה לכם איך לשחק"
+    },
+    "practice": {
+      "instruction": ":החליקו על האותיות כדי לאיית",
+      "success": "!מושלם! אתם תופסים את זה"
+    },
+    "tips": {
+      "title": "!אתם טבעיים",
+      "subtitle": "כמה טיפים לפני שנתחיל"
+    },
+    "letsPlay": "!בואו נשחק",
+    "skip": "דלג על ההדרכה",
+    "next": "הבא",
+    "step": "שלב {current} מתוך {total}"
+  },
+
   "tips": {
     "header": "טיפים מקצועיים",
     "tryIt": "נסו בעצמכם! 🎮"
@@ -1129,6 +1169,22 @@ const he = {
     "rankings": "דירוגים",
     "yourWords": "המילים שלך",
     "fireRoundBonus": "סיבוב אש",
+    "bonuses": "בונוסים",
+    "comboBonus": "בונוס קומבו",
+    "winStreak": "רצף",
+    "finalScore": "תוצאה סופית",
+    "coinsEarned": "מטבעות שנצברו",
+    "detailedAnalysis": "ניתוח מפורט",
+    "yourPerformance": "הביצועים שלך",
+    "rewards": "פרסים",
+    "standings": "דירוג",
+    "guestSavePrompt": "התחבר כדי לשמור פרסים",
+    "keepItUp": "המשך ככה!",
+    "dailyPlayBonus": "בונוס משחק יומי",
+    "best": "שיא",
+    "avg": "ממוצע",
+    "games": "משחקים",
+    "noRewards": "שחק עוד כדי להרוויח פרסים!",
     "time": "זמן",
     "place": "מקום",
     "words": "מילים",
@@ -1195,7 +1251,8 @@ const he = {
     },
     "improving": "משתפר",
     "declining": "יורד",
-    "stable": "יציב"
+    "stable": "יציב",
+    "noHistory": "שחקו עוד משחקים כדי לראות מגמות"
   },
   "archetypes": {
     "hint": "לפי סגנון המשחק שלך 🎮",
@@ -1284,6 +1341,16 @@ const he = {
     "pts": "נק׳"
   },
   "howToPlay": {
+    "missionBriefing": "תדריך משימה",
+    "masterTheArena": "שלטו בזירת LexiClash",
+    "connectingDots": "מחברים את הנקודות",
+    "levelUpGame": "שדרגו את הניקוד שלכם",
+    "nextStep": "הבא",
+    "done": "סיום",
+    "back": "חזרה",
+    "scoreMultipliers": "מכפילי ניקוד",
+    "comboBonus": "בונוס קומבו!",
+    "proTipsTitle": "טיפים לאלופים",
     "description": "מצאו מילים על הלוח. מילים ארוכות = יותר נקודות. נצחו את החברים!",
     "createOrJoinTitle": "צרו או הצטרפו",
     "createOrJoinDesc": "המארח יוצר חדר. שתפו קוד. קפצו פנימה!",
@@ -1485,6 +1552,11 @@ const he = {
   "achievements": {
     "unlocked": "הישג נפתח!",
     "upgraded": "הישג שודרג!",
+    "cinematic": {
+      "unlocked": "!הישג נפתח",
+      "gold": "זהב",
+      "platinum": "פלטינום"
+    },
     "FIRST_BLOOD": {
       "name": "דם ראשון",
       "description": "ראשון למצוא מילה"
@@ -2601,6 +2673,8 @@ const he = {
     "imSure": "אני בטוח/ה",
     "gamePaused": "המשחק מושהה",
     "needHint": "צריכ/ה רמז?",
+    "getHint": "קבל רמז",
+    "dragInstruction": "גרור/גררי על אותיות כדי ליצור מילים!",
     "botWords": "מילים שנמצאו",
     "beatYourRecord": "שברת את השיא שלך!",
     "soloVsBots": "יחיד נגד בוטים",
@@ -2759,6 +2833,11 @@ const he = {
     "wordsFound": "נמצאו {count} מילים",
     "streak": "רצף",
     "streakDays": "רצף של {count} ימים!",
+    "streakCinematic": {
+      "streakDays": "!רצף של {count} ימים",
+      "milestone": "!אבן דרך",
+      "keepGoing": "!המשיכו כך"
+    },
     "shareScore": "שתפו את הניקוד",
     "copyToClipboard": "העתק ללוח",
     "copyLink": "העתק קישור",
@@ -2889,6 +2968,22 @@ const he = {
       "redirecting": "בדרך לאתגר היומי..."
     },
     "chooseQuest": "בחרו את המשימה היומית שלכם",
+    "dailyMissions": "משימות יומיות",
+    "journeyProgress": "התקדמות המסע",
+    "completedCount": "הושלמו",
+    "nextQuestsIn": "משימות חדשות בעוד",
+    "timedQuest": "משימה בזמן",
+    "untimedQuest": "משימה חופשית",
+    "startQuest": "התחילו משימה",
+    "replay": "שחקו שוב",
+    "cleared": "הושלם!",
+    "keepFireBurning": "שמרו על הרצף",
+    "todaysTopPlayers": "השחקנים המובילים היום",
+    "fullStandings": "טבלה מלאה",
+    "dailyDouble": "דאבל יומי",
+    "dailyDoubleBonus": "השלימו את שני האתגרים לבונוס XP",
+    "browseArchive": "ארכיון: אתגרים קודמים",
+    "bonusXP": "בונוס XP",
     "chooseChallengeHint": "בחרו את האתגר להיום. השלימו את שניהם לבונוס XP! 🎯",
     "timed90Seconds": "קצב מהיר",
     "takeYourTime": "ללא הגבלת זמן",
@@ -3099,6 +3194,14 @@ const he = {
       "clueExampleSentence": "!משפט לדוגמה נפתח",
       "clueAutoMessage": "נפתח אוטומטית ב-{cost} אסימונים",
       "scoreBreakdownTooltip": "לחץ לפרטים"
+    },
+    "desktop": {
+      "liveRanks": "דירוג חי",
+      "lootCollected": "שלל שנאסף",
+      "powerUps": "כוחות מיוחדים",
+      "hintsUnlocked": "רמזים שנפתחו",
+      "triesRemaining": "ניסיונות נותרים",
+      "noWordsYet": "מצא מילים כדי לאסוף שלל!"
     },
     "results": {
       "tapToCelebrate": "לחץ לחגוג!",
@@ -3778,7 +3881,8 @@ const he = {
       "wordBank": "בנק מילים",
       "dailyBuzz": "באזז יומי",
       "webVitals": "ביצועי אתר",
-      "email": "אימייל"
+      "email": "אימייל",
+      "milogWords": "מילים ממילוג"
     },
     "invalidWords": {
       "title": "בדיקת מילים לא תקינות",
@@ -3966,6 +4070,10 @@ const he = {
         "syncing": "מסנכרן...",
         "success": "סונכרנו {{files}} קבצים, יובאו {{words}} מילים"
       }
+    },
+    "milogWords": {
+      "title": "העשרת מילון מילוג",
+      "subtitle": "מילים בעברית שאומתו מול milog.co.il"
     }
   },
   "tvTutorial": {
@@ -4150,7 +4258,12 @@ const he = {
       "finalScore": "ציון סופי",
       "score": "ציון",
       "timeRemaining": "זמן שנותר",
-      "stars": "כוכבים"
+      "stars": "כוכבים",
+      "worldUnlock": {
+        "newWorld": "!עולם חדש נפתח",
+        "chapters": "פרקים",
+        "prepare": "!התכוננו לאתגרים חדשים"
+      }
     },
     "boss": "בוס",
     "combo": {

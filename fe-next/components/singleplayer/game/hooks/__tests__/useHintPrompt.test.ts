@@ -42,7 +42,7 @@ describe('useHintPrompt', () => {
   });
 
   describe('hint prompt timing', () => {
-    it('should show hint prompt after 15 seconds of inactivity', () => {
+    it('should show hint prompt after 5 seconds of inactivity', () => {
       const { result } = renderHook(() =>
         useHintPrompt({
           isPaused: false,
@@ -53,9 +53,9 @@ describe('useHintPrompt', () => {
 
       expect(result.current.showHintPrompt).toBe(false);
 
-      // Advance time past the 15 second threshold
+      // Advance time past the 5 second threshold
       act(() => {
-        jest.advanceTimersByTime(20000);
+        jest.advanceTimersByTime(6000);
       });
 
       expect(result.current.showHintPrompt).toBe(true);
@@ -170,7 +170,7 @@ describe('useHintPrompt', () => {
 
       // Wait some time
       act(() => {
-        jest.advanceTimersByTime(10000);
+        jest.advanceTimersByTime(3000);
       });
 
       // Reset (player found a word)
@@ -178,16 +178,16 @@ describe('useHintPrompt', () => {
         result.current.resetInactivityTimer();
       });
 
-      // Wait less than 15 seconds
+      // Wait less than 5 seconds
       act(() => {
-        jest.advanceTimersByTime(10000);
+        jest.advanceTimersByTime(3000);
       });
 
       expect(result.current.showHintPrompt).toBe(false);
 
-      // Wait past the threshold
+      // Wait past the 5 second threshold
       act(() => {
-        jest.advanceTimersByTime(10000);
+        jest.advanceTimersByTime(4000);
       });
 
       expect(result.current.showHintPrompt).toBe(true);

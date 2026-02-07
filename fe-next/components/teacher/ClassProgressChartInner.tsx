@@ -7,7 +7,7 @@ import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Users } from 'lucide-react';
 
@@ -120,7 +120,7 @@ export default function ClassProgressChart() {
   if (loadingClassrooms || loadingLessons) {
     return (
       <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }
@@ -189,7 +189,7 @@ export default function ClassProgressChart() {
         </Card>
       ) : loadingProgress ? (
         <div className="flex justify-center items-center py-12">
-          <NeoLoader variant="mascot-letters" size="md" text={t('common.loading')} />
+          <PageLoader size="md" text={t('common.loading')} />
         </div>
       ) : chartData.length === 0 ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">

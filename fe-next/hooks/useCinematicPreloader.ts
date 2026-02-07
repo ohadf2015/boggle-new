@@ -22,7 +22,13 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 // TYPES
 // ============================================
 
-export type CinematicType = 'VictoryCinematic' | 'DefeatCinematic' | 'BossEntranceCinematic';
+export type CinematicType =
+  | 'VictoryCinematic'
+  | 'DefeatCinematic'
+  | 'BossEntranceCinematic'
+  | 'WorldUnlockCinematic'
+  | 'StreakMilestoneCinematic'
+  | 'AchievementCinematic';
 
 interface PreloadState {
   /** Whether cinematics have been preloaded */
@@ -44,6 +50,9 @@ const CINEMATIC_MODULES: Record<CinematicType, () => Promise<unknown>> = {
   VictoryCinematic: () => import('@/components/adventure/cinematics/VictoryCinematic'),
   DefeatCinematic: () => import('@/components/adventure/cinematics/DefeatCinematic'),
   BossEntranceCinematic: () => import('@/components/adventure/boss/cinematics/BossEntranceCinematic'),
+  WorldUnlockCinematic: () => import('@/components/adventure/cinematics/WorldUnlockCinematic'),
+  StreakMilestoneCinematic: () => import('@/components/daily/cinematics/StreakMilestoneCinematic'),
+  AchievementCinematic: () => import('@/components/achievements/cinematics/AchievementCinematic'),
 };
 
 /** Delay before starting preload (ms) */

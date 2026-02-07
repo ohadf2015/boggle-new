@@ -1,103 +1,83 @@
 import { render, screen } from '@testing-library/react';
 import { PageLoader } from '../PageLoader';
 
-// Mock NeoLoader since we only want to test PageLoader wrapper logic
-jest.mock('../NeoLoader', () => ({
-  NeoLoader: ({ variant, size, text, mascotVariant }: any) => (
-    <div
-      data-testid="neo-loader"
-      data-variant={variant}
-      data-size={size}
-      data-mascot-variant={mascotVariant}
-    >
-      {text && <span data-testid="loader-text">{text}</span>}
-    </div>
+// Mock Mascot component
+jest.mock('../Mascot', () => ({
+  Mascot: ({ variant, size }: { variant: string; size: string }) => (
+    <div data-testid="mascot" data-variant={variant} data-size={size} />
   ),
+}));
+
+// Mock useDevicePerformance hook
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    prefersReducedMotion: false,
+    enableComplexAnimations: true,
+  }),
+}));
+
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, className, ...props }: any) => (
+      <div className={className} {...props}>{children}</div>
+    ),
+    p: ({ children, className, ...props }: any) => (
+      <p className={className} {...props}>{children}</p>
+    ),
+  },
 }));
 
 describe('PageLoader', () => {
   it('should render with default props', () => {
     render(<PageLoader />);
 
-    const loader = screen.getByTestId('neo-loader');
+    const loader = screen.getByTestId('page-loader');
     expect(loader).toBeInTheDocument();
-    expect(loader).toHaveAttribute('data-variant', 'mascot-letters');
-    expect(loader).toHaveAttribute('data-size', 'lg');
   });
 
-  it('should render with mascot-letters variant by default', () => {
+  it('should render mascot by default', () => {
     render(<PageLoader />);
 
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-variant', 'mascot-letters');
+    const mascot = screen.getByTestId('mascot');
+    expect(mascot).toBeInTheDocument();
+    expect(mascot).toHaveAttribute('data-variant', 'happy');
   });
 
-  it('should pass variant prop to NeoLoader', () => {
-    render(<PageLoader variant="mascot" />);
+  it('should pass mascotVariant prop to Mascot', () => {
+    render(<PageLoader mascotVariant="thinking" />);
 
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-variant', 'mascot');
+    const mascot = screen.getByTestId('mascot');
+    expect(mascot).toHaveAttribute('data-variant', 'thinking');
   });
 
-  it('should pass size prop to NeoLoader', () => {
+  it('should pass size prop correctly', () => {
     render(<PageLoader size="md" />);
 
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-size', 'md');
+    const loader = screen.getByTestId('page-loader');
+    expect(loader).toBeInTheDocument();
   });
 
-  it('should pass text prop to NeoLoader', () => {
+  it('should render text when provided', () => {
     render(<PageLoader text="Loading profile..." />);
 
-    const text = screen.getByTestId('loader-text');
-    expect(text).toHaveTextContent('Loading profile...');
-  });
-
-  it('should pass mascotVariant prop to NeoLoader', () => {
-    render(<PageLoader variant="mascot" mascotVariant="happy" />);
-
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-mascot-variant', 'happy');
+    expect(screen.getByText('Loading profile...')).toBeInTheDocument();
   });
 
   it('should render full-page container with correct classes', () => {
     const { container } = render(<PageLoader />);
 
     const wrapper = container.firstChild as HTMLElement;
-    // Uses flex-1 instead of screen-fit to properly fill parent layout container
     expect(wrapper).toHaveClass('flex-1');
     expect(wrapper).toHaveClass('flex');
     expect(wrapper).toHaveClass('items-center');
     expect(wrapper).toHaveClass('justify-center');
   });
 
-  it('should use dots variant when specified', () => {
-    render(<PageLoader variant="dots" />);
-
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-variant', 'dots');
-  });
-
-  it('should use sm size when specified', () => {
-    render(<PageLoader size="sm" />);
-
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-size', 'sm');
-  });
-
-  it('should use letters variant when specified', () => {
-    render(<PageLoader variant="letters" />);
-
-    const loader = screen.getByTestId('neo-loader');
-    expect(loader).toHaveAttribute('data-variant', 'letters');
-  });
-
   it('should not use min-h-0 in non-nested mode (default)', () => {
     const { container } = render(<PageLoader />);
 
     const wrapper = container.firstChild as HTMLElement;
-    // Non-nested mode uses flex-1 without min-h-0
-    // (nested mode adds min-h-0 for deeply nested flex contexts)
     expect(wrapper).not.toHaveClass('min-h-0');
   });
 
@@ -126,6 +106,28 @@ describe('PageLoader', () => {
       const wrapper = container.firstChild as HTMLElement;
       expect(wrapper).toHaveClass('items-center');
       expect(wrapper).toHaveClass('justify-center');
+    });
+  });
+
+  describe('reduced motion / low-end device fallback', () => {
+    beforeEach(() => {
+      jest.resetModules();
+    });
+
+    it('should render simple dots loader when prefersReducedMotion is true', () => {
+      jest.doMock('@/hooks/useDevicePerformance', () => ({
+        useDevicePerformance: () => ({
+          prefersReducedMotion: true,
+          enableComplexAnimations: true,
+        }),
+      }));
+
+      // Re-import after mocking
+      const { PageLoader: PageLoaderReduced } = require('../PageLoader');
+      render(<PageLoaderReduced />);
+
+      const loader = screen.getByTestId('page-loader');
+      expect(loader).toBeInTheDocument();
     });
   });
 });

@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 
@@ -68,7 +68,7 @@ jest.mock('canvas-confetti', () => ({
 // Mock next/dynamic - needs to handle ResultsWinnerBanner specially
 jest.mock('next/dynamic', () => ({
   __esModule: true,
-  default: (importFn: () => Promise<{ default: React.ComponentType<any> }>, options?: { ssr?: boolean }) => {
+  default: (importFn: () => Promise<{ default: React.ComponentType<any> }>) => {
     // Check if this is ResultsWinnerBanner based on the import function string
     const importStr = importFn.toString();
     if (importStr.includes('ResultsWinnerBanner')) {
@@ -335,9 +335,12 @@ describe('ResultsPage Ranking', () => {
       expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(1);
     });
 
-    it('should NOT show rank 4 for first place winner with zero score (expected behavior)', () => {
-      // This is the CORRECT behavior - when a player has zero score,
-      // they should show rank 4+ (better luck next time) even if "first"
+    it('should show capped rank for zero-score player in multiplayer (encouraging banner)', () => {
+      // When a player has zero score in multiplayer, bannerRank is capped at totalPlayers.
+      // Formula: Math.min(Math.max(currentPlayerRank, 4), totalPlayers)
+      // With 2 players: Math.min(Math.max(1, 4), 2) = Math.min(4, 2) = 2
+      // The rank is capped at totalPlayers to avoid showing a rank higher than the
+      // number of participants, while still triggering the "encouraging" banner style.
       const finalScores = [
         { username: 'ZeroScorePlayer', score: 0, allWords: [] },
         { username: 'OtherPlayer', score: 0, allWords: [] },
@@ -348,8 +351,8 @@ describe('ResultsPage Ranking', () => {
         username: 'ZeroScorePlayer',
       });
 
-      // Zero score players should show rank 4 (encouraging purple banner)
-      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(4);
+      // With only 2 players, rank is capped at totalPlayers (2), not 4
+      expect(globalThis.__TEST_BANNER_PROPS__?.rank).toBe(2);
     });
   });
 });

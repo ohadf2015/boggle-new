@@ -248,18 +248,21 @@ export class WordValidatorPool {
   ): Promise<boolean> {
     await this.initialize();
 
+    // Defensive: ensure positions is a proper Map before using Map methods
+    const safePositions = positions instanceof Map ? positions : undefined;
+
     try {
       return await this._submitTask('isWordOnBoard', {
         word,
         board,
-        positions: positions ? Array.from(positions.entries()) : null
+        positions: safePositions ? Array.from(safePositions.entries()) : null
       }) as boolean;
     } catch (error) {
       // Fall back to sync on error
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
       const validator = await import('./wordValidator');
-      return validator.isWordOnBoard(word, board, positions);
+      return validator.isWordOnBoard(word, board, safePositions);
     }
   }
 
@@ -273,17 +276,19 @@ export class WordValidatorPool {
   ): Promise<GridPosition[] | null> {
     await this.initialize();
 
+    const safePositions = positions instanceof Map ? positions : undefined;
+
     try {
       return await this._submitTask('getWordPath', {
         word,
         board,
-        positions: positions ? Array.from(positions.entries()) : null
+        positions: safePositions ? Array.from(safePositions.entries()) : null
       }) as GridPosition[] | null;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
       const validator = await import('./wordValidator');
-      return validator.getWordPath(word, board, positions);
+      return validator.getWordPath(word, board, safePositions);
     }
   }
 

@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useMemo, memo, useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
-import ExitRoomButton from '../../components/ExitRoomButton';
-import HintButton from '../../components/HintButton';
 import TournamentStandings from '../../components/TournamentStandings';
 import InGameScreen from '../../components/game/InGameScreen';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
@@ -206,30 +204,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   return (
     <div className="h-dvh overflow-hidden bg-neo-cream dark:bg-neo-navy p-0 md:p-4 flex flex-col transition-colors duration-300">
-
-      {/* Top Bar - Desktop only */}
-      <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1 pt-2">
-        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-[60]" />
-
-        {/* Hint Button - Single Player Mode Only */}
-        {hints && hints.isSinglePlayer && (
-          <HintButton
-            hint={hints.hint}
-            hintType={hints.hintType}
-            hintsRemaining={hints.hintsRemaining}
-            wordLength={hints.wordLength}
-            firstLetter={hints.firstLetter}
-            isLoading={hints.isLoading}
-            error={hints.error}
-            isAvailable={hints.isAvailable}
-            isSinglePlayer={hints.isSinglePlayer}
-            gameActive={gameActive}
-            onRequestHint={hints.requestHint}
-            onClearHint={hints.clearHint}
-            t={t}
-          />
-        )}
-      </div>
 
       {/* Main Game Content */}
       <InGameScreen

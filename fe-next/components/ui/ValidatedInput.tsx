@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useMemo } from 'react';
 import { Check, AlertCircle } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Input, type InputProps } from './input';
 import {
   useDebouncedValidation,
@@ -102,10 +102,8 @@ export const ValidatedInput = forwardRef<HTMLInputElement, ValidatedInputProps>(
       switch (state) {
         case 'validating':
           return (
-            <NeoLoader
-              variant="dots"
+            <Loader
               size="sm"
-              aria-label={t('common.validating') || 'Validating...'}
             />
           );
         case 'valid':

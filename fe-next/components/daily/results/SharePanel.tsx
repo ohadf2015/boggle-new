@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { XTwitterIcon, WhatsAppIcon, LinkedInIcon, FacebookIcon } from './icons';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 interface SharePanelProps {
   isOpen: boolean;
@@ -78,7 +78,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-gray-800">
                   {!imageLoaded && (
                     <div className="aspect-[1200/630] flex items-center justify-center">
-                      <NeoLoader variant="dots" size="sm" />
+                      <Loader size="sm" />
                     </div>
                   )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -212,7 +212,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 >
                   {isGeneratingImage ? (
                     <>
-                      <NeoLoader variant="dots" size="sm" className="mr-2" />
+                      <Loader size="sm" className="mr-2" />
                       {t('wordHunt.results.generating') || 'Generating...'}
                     </>
                   ) : (

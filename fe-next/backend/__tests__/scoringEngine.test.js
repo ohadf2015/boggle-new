@@ -107,9 +107,9 @@ describe('Scoring Engine', () => {
       expect(getComboBonus(10, 7)).toBe(20);
     });
 
-    test('combo caps at 10 for base bonus', () => {
-      // combo 15 capped to 10, then floor(10 * 2.0) = 20
-      expect(getComboBonus(15, 7)).toBe(20);
+    test('combo scales without cap at high levels', () => {
+      // combo 15 uncapped: floor(15 * 2.0) = 30
+      expect(getComboBonus(15, 7)).toBe(30);
     });
 
   });
@@ -167,11 +167,10 @@ describe('Scoring Edge Cases', () => {
     expect(calculateWordScore("it's")).toBe(3);
   });
 
-  test('maximum reasonable combo level', () => {
-    // Even at combo 100, bonus caps at combo 10 base
+  test('very high combo level scales without cap', () => {
     const score = calculateWordScore('testing', 100);
-    // baseScore(7) = 6, comboBonus(100, 7) = floor(10 * 2.0) = 20
-    expect(score).toBe(26);
+    // baseScore(7) = 6, comboBonus(100, 7) = floor(100 * 2.0) = 200
+    expect(score).toBe(206);
   });
 
 });

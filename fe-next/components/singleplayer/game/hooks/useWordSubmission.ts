@@ -96,6 +96,26 @@ export function useWordSubmission({
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
+  const feedbackClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-clear feedback after 1.5s for terminal states (accepted/rejected/duplicate)
+  useEffect(() => {
+    if (feedbackClearTimerRef.current) {
+      clearTimeout(feedbackClearTimerRef.current);
+      feedbackClearTimerRef.current = null;
+    }
+    if (currentFeedback && ['accepted', 'rejected', 'duplicate'].includes(currentFeedback.type)) {
+      feedbackClearTimerRef.current = setTimeout(() => {
+        setCurrentFeedback(null);
+        feedbackClearTimerRef.current = null;
+      }, 1500);
+    }
+    return () => {
+      if (feedbackClearTimerRef.current) {
+        clearTimeout(feedbackClearTimerRef.current);
+      }
+    };
+  }, [currentFeedback]);
 
   // Client-side dictionary cache for instant validation
   const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(language);
@@ -283,15 +303,28 @@ export function useWordSubmission({
       announceCombo(currentCombo + 1);
     };
 
-    // Helper function to handle pending word
-    const handlePendingWord = () => {
+    // Helper function to handle invalid word (not in dictionary)
+    const handleInvalidWord = () => {
       combo.resetCombo();
+
+      // Mark the word as invalid in found words
+      foundWordsRef.current = foundWordsRef.current.map(fw =>
+        fw.word === normalizedWord && fw.timestamp === now
+          ? { ...fw, isValid: false, score: 0 }
+          : fw
+      );
+      setFoundWords(foundWordsRef.current);
+
+      const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
       setCurrentFeedback({
-        id: `pending-${now}`,
-        type: 'pending',
+        id: `reject-${now}`,
+        type: 'rejected',
         word: normalizedWord.toUpperCase(),
+        message: invalidMsg,
         timestamp: now,
       });
+      hapticError();
+      announceWordResult(normalizedWord, false, undefined, invalidMsg);
       recordNotInDictionary(normalizedWord, language, 'single_player');
     };
 
@@ -309,18 +342,10 @@ export function useWordSubmission({
       handleValidWord();
       return;
     } else if (prevalidated === false) {
-      // Word was prevalidated as invalid - instant pending!
-      handlePendingWord();
+      // Word was prevalidated as invalid - instant rejection!
+      handleInvalidWord();
       return;
     }
-
-    // Step 4.7: Show immediate 'checking' feedback while API is in flight
-    setCurrentFeedback({
-      id: `checking-${now}`,
-      type: 'checking',
-      word: normalizedWord.toUpperCase(),
-      timestamp: now,
-    });
 
     // Step 5: Check dictionary via backend API (fallback for words not in cache)
     fetch('/api/dictionary/check', {
@@ -330,7 +355,7 @@ export function useWordSubmission({
     })
       .then(res => {
         if (!res.ok) {
-          return { isValid: false, source: 'pending' };
+          return { isValid: false, source: 'error' };
         }
         return res.json();
       })
@@ -338,18 +363,30 @@ export function useWordSubmission({
         if (result.isValid) {
           handleValidWord();
         } else {
-          handlePendingWord();
+          handleInvalidWord();
         }
       })
       .catch(() => {
-        // On API error, treat as pending
+        // On API error, treat as invalid
+        const errorNow = Date.now();
         combo.resetCombo();
+
+        foundWordsRef.current = foundWordsRef.current.map(fw =>
+          fw.word === normalizedWord && fw.timestamp === now
+            ? { ...fw, isValid: false, score: 0 }
+            : fw
+        );
+        setFoundWords(foundWordsRef.current);
+
+        const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
         setCurrentFeedback({
-          id: `pending-${Date.now()}`,
-          type: 'pending',
+          id: `reject-${errorNow}`,
+          type: 'rejected',
           word: normalizedWord.toUpperCase(),
-          timestamp: Date.now(),
+          message: invalidMsg,
+          timestamp: errorNow,
         });
+        hapticError();
       });
   }, [
     language,

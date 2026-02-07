@@ -1,8 +1,8 @@
 /**
- * Tests for enhanced completion indicator on Daily Challenge cards
+ * Tests for completion indicator on Daily Challenge cards
  *
  * Requirements:
- * 1. When a challenge is completed, show a prominent overlay/banner - not just a small checkmark
+ * 1. When a challenge is completed, show a won/lost badge on the card icon
  * 2. Status should refresh when page becomes visible (user returns from challenge)
  * 3. Clear visual distinction between "not played" and "completed" states
  */
@@ -84,7 +84,7 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
+describe('DailyChallengeLanding Completion Indicator', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Default mock responses for API calls
@@ -107,12 +107,24 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
           json: () => Promise.resolve({ success: false }),
         });
       }
+      if (url.includes('daily-streak')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ streak: 0 }),
+        });
+      }
+      if (url.includes('daily-leaderboard')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [] }),
+        });
+      }
       return Promise.reject(new Error('Unknown URL'));
     });
   });
 
-  describe('Prominent completion overlay', () => {
-    test('completed Word Hunt card should show completion overlay banner', async () => {
+  describe('Completion badge on card icon', () => {
+    test('completed Word Hunt card should show won badge', async () => {
       const storage = require('@/utils/dailyChallenge/storage');
       storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
 
@@ -125,17 +137,16 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
       renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
       await waitFor(() => {
-        // Should have a prominent completion overlay element
-        const completionOverlay = screen.getByTestId('completion-overlay-wordHunt');
-        expect(completionOverlay).toBeInTheDocument();
+        const wonBadge = screen.getByTestId('won-badge');
+        expect(wonBadge).toBeInTheDocument();
       }, { timeout: 2000 });
 
       storage.getWordHuntStatusToday.mockReturnValue(null);
     });
 
-    test('completion overlay should contain clear "COMPLETED" message', async () => {
+    test('lost Word Hunt card should show lost badge with pink styling', async () => {
       const storage = require('@/utils/dailyChallenge/storage');
-      storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
+      storage.getWordHuntStatusToday.mockReturnValue({ solved: false });
 
       const mockProps = {
         onSelectWordHunt: jest.fn(),
@@ -146,52 +157,9 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
       renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
       await waitFor(() => {
-        // Should display "Complete!" text prominently
-        expect(screen.getByText(/complete!/i)).toBeInTheDocument();
-      }, { timeout: 2000 });
-
-      storage.getWordHuntStatusToday.mockReturnValue(null);
-    });
-
-    test('completion overlay should have trophy icon for won state', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
-      storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
-
-      const mockProps = {
-        onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
-        currentLanguage: 'en' as const,
-      };
-
-      const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-      await waitFor(() => {
-        const completionOverlay = screen.getByTestId('completion-overlay-wordHunt');
-        // Should contain a trophy SVG icon
-        const trophyIcon = completionOverlay.querySelector('svg');
-        expect(trophyIcon).toBeInTheDocument();
-      }, { timeout: 2000 });
-
-      storage.getWordHuntStatusToday.mockReturnValue(null);
-    });
-
-    test('lost state should show different styling than won state', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
-      storage.getWordHuntStatusToday.mockReturnValue({ solved: false }); // Lost
-
-      const mockProps = {
-        onSelectWordHunt: jest.fn(),
-        onSelectBuzz: jest.fn(),
-        currentLanguage: 'en' as const,
-      };
-
-      renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-      await waitFor(() => {
-        const completionOverlay = screen.getByTestId('completion-overlay-wordHunt');
-        // Lost state should have different styling (pink instead of lime)
-        // Class includes opacity modifier: bg-neo-pink/90
-        expect(completionOverlay.className).toContain('bg-neo-pink');
+        const lostBadge = screen.getByTestId('lost-badge');
+        expect(lostBadge).toBeInTheDocument();
+        expect(lostBadge.className).toContain('bg-neo-pink');
       }, { timeout: 2000 });
 
       storage.getWordHuntStatusToday.mockReturnValue(null);
@@ -212,9 +180,9 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
 
       renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
-      // Wait for initial render
+      // Wait for initial render - no won badge yet
       await waitFor(() => {
-        expect(screen.queryByTestId('completion-overlay-wordHunt')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('won-badge')).not.toBeInTheDocument();
       });
 
       // Simulate user completing challenge and coming back
@@ -222,7 +190,6 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
 
       // Simulate visibility change (user returns to tab)
       await act(async () => {
-        // Create a mock visibilitychange event
         Object.defineProperty(document, 'visibilityState', {
           value: 'visible',
           writable: true,
@@ -232,8 +199,8 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
 
       // Status should now be refreshed
       await waitFor(() => {
-        const completionOverlay = screen.getByTestId('completion-overlay-wordHunt');
-        expect(completionOverlay).toBeInTheDocument();
+        const wonBadge = screen.getByTestId('won-badge');
+        expect(wonBadge).toBeInTheDocument();
       }, { timeout: 2000 });
 
       storage.getWordHuntStatusToday.mockReturnValue(null);
@@ -241,7 +208,7 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
   });
 
   describe('Visual hierarchy', () => {
-    test('completion overlay should cover most of the card preview area', async () => {
+    test('completed card should have reduced opacity', async () => {
       const storage = require('@/utils/dailyChallenge/storage');
       storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
 
@@ -251,14 +218,12 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
         currentLanguage: 'en' as const,
       };
 
-      const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
+      renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
       await waitFor(() => {
-        const completionOverlay = screen.getByTestId('completion-overlay-wordHunt');
-        // Overlay should have absolute positioning to cover the card
-        expect(completionOverlay).toHaveClass('absolute');
-        // Should have a high z-index to be on top
-        expect(completionOverlay.className).toMatch(/z-\d+/);
+        const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
+        const cardInner = wordHuntCard.querySelector('[role="button"]');
+        expect(cardInner?.className).toContain('opacity-85');
       }, { timeout: 2000 });
 
       storage.getWordHuntStatusToday.mockReturnValue(null);
@@ -277,7 +242,6 @@ describe('DailyChallengeLanding Enhanced Completion Indicator', () => {
       renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
       await waitFor(() => {
-        // The button text should change to "VIEW RESULTS"
         expect(screen.getByText(/view results/i)).toBeInTheDocument();
       }, { timeout: 2000 });
 

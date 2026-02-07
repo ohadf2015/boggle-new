@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -252,7 +252,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           }}
         >
           {loading ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : locked ? (
             <Lock style={{ fontSize: secondary ? 'clamp(0.625rem, 3cqw, 0.875rem)' : 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
           ) : (

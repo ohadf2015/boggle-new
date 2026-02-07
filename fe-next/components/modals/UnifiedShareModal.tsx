@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, MessageCircle, Trophy, Flame, Check, Target, Mail, MessageSquare } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTwitter, shareViaDiscord, shareViaEmail, shareViaSms, canShareViaSms, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
@@ -450,7 +450,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               )}
             >
               {isLoading ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : copied ? (
                 <Check className="w-5 h-5" />
               ) : (
@@ -627,7 +627,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 )}
               >
                 {isCreatingChallenge ? (
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                 ) : challengeCreated ? (
                   <Check className="w-5 h-5" />
                 ) : (

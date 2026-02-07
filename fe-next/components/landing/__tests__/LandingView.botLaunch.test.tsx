@@ -248,8 +248,8 @@ jest.mock('@/components/auth/AuthModal', () => ({
   default: () => null,
 }));
 
-jest.mock('@/components/ui/NeoLoader', () => ({
-  NeoLoader: () => <div data-testid="neo-loader">Loading...</div>,
+jest.mock('@/components/ui/Loader', () => ({
+  Loader: () => <div data-testid="loader">Loading...</div>,
 }));
 
 import React from 'react';

@@ -73,7 +73,7 @@ export const MIN_WORD_LENGTH = 2;
 export const MAX_WORD_LENGTH = 50;
 
 /**
- * Minimum answer length by language for Daily Challenge word hunt
+ * Minimum TARGET word length by language for Daily Challenge word hunt
  * Most languages: 4 letters minimum for adequate challenge difficulty
  * Japanese kanji compounds: 2 characters minimum (kanji are complex)
  */
@@ -86,13 +86,20 @@ export const MIN_ANSWER_LENGTH: Record<string, number> = {
 };
 
 /**
- * Get minimum word length for a language in Daily Word Hunt
+ * Get minimum TARGET word length for a language in Daily Word Hunt
  * @param language - Language code (en, he, sv, ja, es)
- * @returns Minimum word length (4 for most languages, 2 for Japanese)
+ * @returns Minimum target word length (4 for most languages, 2 for Japanese)
  */
 export function getMinAnswerLength(language: string): number {
   return MIN_ANSWER_LENGTH[language] ?? 4;
 }
+
+/**
+ * Minimum length for NON-TARGET discovered words in Word Hunt survival mode
+ * Players can find any valid 2+ letter word on the board for life/tokens,
+ * even though the target word itself must be 4+ letters (except Japanese).
+ */
+export const MIN_DISCOVERY_WORD_LENGTH = 2;
 
 // ==================== Room Settings ====================
 

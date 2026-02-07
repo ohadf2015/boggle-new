@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, WifiOff, RefreshCw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InteractiveMascot, ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 export type ErrorType = 'network' | 'serverBusy' | 'timeout' | 'sessionExpired' | 'generic';
 
@@ -138,7 +138,7 @@ export function ErrorBanner({
                   isRetrying && 'animate-pulse'
                 )}>
                   {isRetrying ? (
-                    <NeoLoader variant="dots" size="sm" />
+                    <Loader size="sm" />
                   ) : (
                     config.icon
                   )}

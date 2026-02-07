@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Lock, Trophy, Users, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -276,7 +276,7 @@ const ModeCardV2: React.FC<ModeCardV2Props> = ({
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
             {loading ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : locked ? (
               <Lock className="w-5 h-5 sm:w-6 sm:h-6" />
             ) : (

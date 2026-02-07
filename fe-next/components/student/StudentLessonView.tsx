@@ -12,7 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
@@ -29,7 +29,7 @@ export default function StudentLessonView() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }

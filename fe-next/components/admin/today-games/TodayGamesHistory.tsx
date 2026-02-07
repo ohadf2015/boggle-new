@@ -3,7 +3,8 @@
 import React from 'react';
 import { RefreshCw, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Types
@@ -45,7 +46,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-48">
-        <NeoLoader variant="mascot-letters" size="md" />
+        <PageLoader size="md" />
       </div>
     );
   }
@@ -80,7 +81,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
           disabled={loading}
         >
           {loading ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}

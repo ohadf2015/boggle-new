@@ -84,7 +84,6 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
   const isAiVerified = wordObj.isAiVerified;
-  const isPending = wordObj.isPendingValidation;
   const invalidReason = wordObj.invalidReason;
   const aiReason = wordObj.aiReason;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
@@ -100,7 +99,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     : rawReason;
 
   // Check if this word should have a touchable tooltip
-  const hasInvalidReason = !isValid && !isDuplicate && !isPending && displayReason;
+  const hasInvalidReason = !isValid && !isDuplicate && displayReason;
 
   const handleTouchStart = () => {
     isTouchDevice.current = true;
@@ -129,7 +128,6 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
     if (isDuplicate) return 'var(--neo-pink)';
-    if (isPending) return 'var(--neo-cyan)';
     if (!isValid) return '#DC2626'; // Darker red for 4.6:1 contrast with cream text
     return getPointColor(wordObj.score);
   };
@@ -137,7 +135,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get text color based on background - ensure WCAG AA contrast (4.5:1)
   // Colors: 1=gray (dark), 2-3=cyan, 4=orange, 5-6=purple, 7-8=pink
   const getTextColor = (): string => {
-    if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
+    if (isDuplicate || !isValid) return 'var(--neo-cream)';
     // 1-point words have dark gray background (#2d2d44), need light text
     if (wordObj.score === 1) return 'var(--neo-cream)';
     // Other point colors need dark text for proper contrast:
@@ -213,8 +211,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
           "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
           isDuplicate && "line-through opacity-80",
-          !isDuplicate && !isValid && !isPending && "opacity-70",
-          isPending && "animate-pulse",
+          !isDuplicate && !isValid && "opacity-70",
           hasInvalidReason && "cursor-pointer active:scale-95"
         )}
         style={{
@@ -256,31 +253,6 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                   <span className="block text-neo-red mt-1 font-black">
                     2x {t('results.points') || 'points'} (+{wordObj.fireRoundBonus})
                   </span>
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        {/* Show pending validation indicator */}
-        {isPending && !isDuplicate && (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-neo-lime text-neo-black rounded border border-neo-black font-black cursor-help">
-                  ?
-                </span>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
-              >
-                <p className="text-xs font-bold text-neo-cream">
-                  {t('results.pendingValidation') || 'Pending community validation'}
-                  {wordObj.potentialScore && (
-                    <span className="block text-neo-lime mt-1">
-                      {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
-                    </span>
-                  )}
                 </p>
               </TooltipContent>
             </Tooltip>

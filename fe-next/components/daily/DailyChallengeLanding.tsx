@@ -1,18 +1,21 @@
 'use client';
 
-import { useEffect, useState, useMemo, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Trophy, Timer, Hourglass, Bell, Check, Loader2, X, Frown } from 'lucide-react';
+import { Timer, Hourglass, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
-import { useTiltEffect } from '@/hooks/useTiltEffect';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { Language } from '@/types';
-import { cn } from '@/lib/utils';
+
+import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
+import { QuestCard } from './landing/QuestCard';
+import { StreakCounter } from './landing/StreakCounter';
+import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
+import { ConfettiBackground } from './landing/ConfettiBackground';
+import { FloatingDecorations } from './landing/FloatingDecorations';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -26,7 +29,6 @@ interface ChallengeStatus {
   buzz: 'new' | 'won' | 'lost' | 'unavailable';
 }
 
-// Separate loading states for status checks (shouldn't block card rendering)
 interface LoadingState {
   wordHunt: boolean;
   buzz: boolean;
@@ -39,8 +41,8 @@ interface BuzzPreviewData {
 }
 
 /**
- * DailyChallengeLanding - Compact dual challenge selection screen
- * Mobile-first design with clear differentiation between timed and relaxed modes
+ * DailyChallengeLanding - Arcade Quest Enhanced layout
+ * Vertical quest path with XP header, streak counter, and leaderboard teaser.
  */
 export function DailyChallengeLanding({
   onSelectWordHunt,
@@ -51,20 +53,20 @@ export function DailyChallengeLanding({
   const { t } = useLanguage();
   const { user } = useAuth();
   const pathname = usePathname();
-  // Status is set once API calls complete - cards render immediately without waiting
+
   const [status, setStatus] = useState<ChallengeStatus>({
     wordHunt: 'new',
     buzz: 'new',
   });
-  // Separate loading state for status checks - only affects status badge, not whole card
   const [loadingStatus, setLoadingStatus] = useState<LoadingState>({
     wordHunt: true,
     buzz: true,
   });
   const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
   const [requestState, setRequestState] = useState<'idle' | 'loading' | 'sent'>('idle');
+  const [streak, setStreak] = useState(0);
 
-  // Word Hunt status check - synchronous local storage check with win/loss
+  // Word Hunt status check - synchronous local storage check
   const checkWordHunt = () => {
     const wordHuntStatus = getWordHuntStatusToday(currentLanguage);
     if (!wordHuntStatus) {
@@ -82,7 +84,7 @@ export function DailyChallengeLanding({
   const checkBuzzStatus = async () => {
     const today = new Date().toISOString().split('T')[0];
 
-    // First check if buzz challenge is available for this language
+    // Check buzz availability
     let buzzAvailable = true;
     try {
       const availabilityResponse = await fetch(
@@ -93,12 +95,10 @@ export function DailyChallengeLanding({
         buzzAvailable = availabilityData.available;
       }
     } catch (err) {
-      // Serialize error properly - Error objects don't stringify well
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error('Failed to check buzz availability:', errorMessage);
     }
 
-    // If not available, set status and skip further checks
     if (!buzzAvailable) {
       setStatus(prev => ({ ...prev, buzz: 'unavailable' }));
       setBuzzPreview({ available: false });
@@ -109,7 +109,6 @@ export function DailyChallengeLanding({
     let buzzPlayed = false;
     let buzzCompleted = false;
     try {
-      // Build query params for user identification
       const checkParams = new URLSearchParams();
       if (user?.id) {
         checkParams.set('player_id', user.id);
@@ -131,12 +130,11 @@ export function DailyChallengeLanding({
         }
       }
     } catch (err) {
-      // Serialize error properly - Error objects don't stringify well
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error('Failed to check buzz status:', errorMessage);
     }
 
-    // Fetch buzz preview data for image display (separate from status)
+    // Fetch buzz preview data
     try {
       const buzzResponse = await fetch(`/api/buzz/${today}/${currentLanguage}`);
       if (buzzResponse.ok) {
@@ -150,12 +148,10 @@ export function DailyChallengeLanding({
         }
       }
     } catch (err) {
-      // Serialize error properly - Error objects don't stringify well
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error('Failed to fetch buzz preview:', errorMessage);
     }
 
-    // Set buzz status based on played and completed flags
     if (!buzzPlayed) {
       setStatus(prev => ({ ...prev, buzz: 'new' }));
     } else {
@@ -167,58 +163,65 @@ export function DailyChallengeLanding({
     setLoadingStatus(prev => ({ ...prev, buzz: false }));
   };
 
-  // Check completion status for both challenges and fetch buzz preview
-  // Status checks happen in the background - cards render immediately
-  useEffect(() => {
-    // Reset loading states when language changes
-    setLoadingStatus({ wordHunt: true, buzz: true });
+  // Fetch streak data
+  const fetchStreak = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (user?.id) {
+        params.set('player_id', user.id);
+      } else {
+        const fingerprint = getGuestFingerprint();
+        if (fingerprint) params.set('guest_fingerprint', fingerprint);
+      }
+      if (params.toString()) {
+        const res = await fetch(`/api/daily-streak?${params.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          setStreak(data.streak || 0);
+        }
+      }
+    } catch {
+      // Streak is optional — fail silently
+    }
+  };
 
-    // Check Word Hunt immediately (local storage is sync)
+  // Initial status check
+  useEffect(() => {
+    setLoadingStatus({ wordHunt: true, buzz: true });
     checkWordHunt();
-    // Check Buzz status in background
     checkBuzzStatus();
-    // Reset request state when language changes
+    fetchStreak();
     setRequestState('idle');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
-  // Refresh status when page becomes visible (user returns from playing)
+  // Refresh on visibility change (user returns from playing)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        // Re-check status when returning to page
         checkWordHunt();
         checkBuzzStatus();
+        fetchStreak();
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
-  // Refresh status when user navigates back (browser back/forward button)
+  // Refresh on popstate (browser back/forward)
   useEffect(() => {
     const handlePopState = () => {
-      // Re-check status when user navigates back to this page
       checkWordHunt();
       checkBuzzStatus();
     };
-
     window.addEventListener('popstate', handlePopState);
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
+    return () => window.removeEventListener('popstate', handlePopState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
-  // Refresh status when pathname changes (Next.js router.push navigation)
-  // This handles the case where user completes challenge and navigates back via router.push()
-  // which doesn't fire popstate event but does change the pathname
+  // Refresh on pathname change (Next.js router.push)
   useEffect(() => {
-    // Only refresh if we're actually on the daily challenges page
     if (pathname && pathname.endsWith('/daily')) {
       checkWordHunt();
       checkBuzzStatus();
@@ -229,7 +232,6 @@ export function DailyChallengeLanding({
   // Handle requesting a buzz challenge
   const handleRequestChallenge = async () => {
     if (requestState !== 'idle') return;
-
     setRequestState('loading');
     try {
       const response = await fetch('/api/buzz/request-challenge', {
@@ -241,7 +243,6 @@ export function DailyChallengeLanding({
           guest_fingerprint: !user?.id ? getGuestFingerprint() : null,
         }),
       });
-
       if (response.ok) {
         setRequestState('sent');
       } else {
@@ -254,90 +255,91 @@ export function DailyChallengeLanding({
     }
   };
 
-  // "Daily Double" badge only shows if BOTH challenges were won
+  // Completion count for progress bar
+  const completedCount =
+    (status.wordHunt === 'won' ? 1 : 0) +
+    (status.buzz === 'won' ? 1 : 0);
+
   const bothWon = status.wordHunt === 'won' && status.buzz === 'won';
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-1 flex flex-col items-center justify-center px-2 py-2 sm:px-4 sm:py-4 max-w-2xl mx-auto w-full"
+      className="flex-1 flex flex-col items-center px-3 py-3 sm:px-4 sm:py-4 max-w-3xl mx-auto w-full relative"
     >
-      {/* Enhanced Header with gradient - more compact on mobile */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="text-center mb-3 sm:mb-6"
-      >
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-neo-display font-black text-neo-lime">
-          {t('daily.chooseQuest')}
-        </h1>
-      </motion.div>
+      {/* Ambient effects */}
+      <ConfettiBackground />
+      <FloatingDecorations />
 
-      {/* Challenge Cards - Premium Grid - tighter on mobile */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.15 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full"
-      >
-        {/* Word Hunt Card - TIMED */}
-        <CompactChallengeCard
-          challengeId="wordHunt"
-          icon={<Timer className="w-7 h-7 sm:w-10 sm:h-10" />}
-          title={t('daily.wordHunt.title')}
-          tagline={t('daily.wordHunt.desc')}
-          details={t('daily.wordHunt.details')}
-          color="orange"
-          status={status.wordHunt}
-          isLoadingStatus={loadingStatus.wordHunt}
-          onPlay={onSelectWordHunt}
-          timeMode="timed"
-          timeModeLabel={t('daily.timed90Seconds')}
-          customPreview="word-hunt-grid"
-          currentLanguage={currentLanguage}
-          buttonText={
-            (status.wordHunt === 'won' || status.wordHunt === 'lost')
-              ? t('daily.viewResults')
-              : t('daily.play')
-          }
-          delay={0.2}
-        />
+      {/* Missions Header: XP bar + countdown */}
+      <DailyMissionsHeader completedCount={completedCount} />
 
-        {/* Daily Buzz Card - NO TIMER */}
-        <CompactChallengeCard
-          challengeId="buzz"
-          icon={<Hourglass className="w-8 h-8 sm:w-10 sm:h-10" />}
-          title={t('buzz.title')}
-          tagline={status.buzz === 'unavailable'
+      {/* Quest 1: Word Hunt */}
+      <QuestCard
+        challengeId="wordHunt"
+        icon={<Timer className="w-8 h-8" />}
+        title={t('daily.wordHunt.title')}
+        tagline={t('daily.wordHunt.desc')}
+        details={t('daily.wordHunt.details')}
+        color="orange"
+        status={status.wordHunt}
+        isLoadingStatus={loadingStatus.wordHunt}
+        onPlay={onSelectWordHunt}
+        timeMode="timed"
+        timeModeLabel={t('daily.timedQuest')}
+        customPreview="word-hunt-grid"
+        currentLanguage={currentLanguage}
+        buttonText={
+          (status.wordHunt === 'won' || status.wordHunt === 'lost')
+            ? t('daily.viewResults')
+            : t('daily.startQuest')
+        }
+        delay={0.15}
+      />
+
+      {/* Quest path connector */}
+      <QuestPathLine />
+
+      {/* Streak counter between quests */}
+      <StreakCounter streak={streak} />
+
+      {/* Quest path connector */}
+      <QuestPathLine />
+
+      {/* Quest 2: Daily Buzz */}
+      <QuestCard
+        challengeId="buzz"
+        icon={<Hourglass className="w-8 h-8" />}
+        title={t('buzz.title')}
+        tagline={
+          status.buzz === 'unavailable'
             ? t('buzz.unavailableTagline')
             : t('buzz.tagline')
-          }
-          details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
-          color="yellow"
-          status={status.buzz}
-          isLoadingStatus={loadingStatus.buzz}
-          onPlay={onSelectBuzz}
-          timeMode="relaxed"
-          timeModeLabel={t('daily.takeYourTime')}
-          badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
-          buttonText={
-            (status.buzz === 'won' || status.buzz === 'lost')
-              ? t('daily.viewResults')
-              : status.buzz === 'unavailable'
-                ? t('buzz.requestChallenge')
-                : t('daily.play')
-          }
-          delay={0.3}
-          previewImageUrl={buzzPreview.imageUrl}
-          previewImageAlt={buzzPreview.trendingSummary}
-          onRequestChallenge={handleRequestChallenge}
-          requestState={requestState}
-        />
-      </motion.div>
+        }
+        details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
+        color="yellow"
+        status={status.buzz}
+        isLoadingStatus={loadingStatus.buzz}
+        onPlay={onSelectBuzz}
+        timeMode="relaxed"
+        timeModeLabel={t('daily.untimedQuest')}
+        badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
+        buttonText={
+          (status.buzz === 'won' || status.buzz === 'lost')
+            ? t('daily.viewResults')
+            : status.buzz === 'unavailable'
+              ? t('buzz.requestChallenge')
+              : t('daily.startQuest')
+        }
+        delay={0.3}
+        previewImageUrl={buzzPreview.imageUrl}
+        previewImageAlt={buzzPreview.trendingSummary}
+        onRequestChallenge={handleRequestChallenge}
+        requestState={requestState}
+      />
 
-      {/* Browse Past Buzz Challenges */}
+      {/* Browse Past Challenges */}
       {onShowBuzzHistory && (
         <motion.button
           initial={{ opacity: 0, y: 10 }}
@@ -347,474 +349,55 @@ export function DailyChallengeLanding({
           onClick={onShowBuzzHistory}
           className="mt-4 text-sm text-slate-400 hover:text-neo-pink transition-colors underline underline-offset-4 decoration-slate-600 hover:decoration-neo-pink"
         >
-          {t('buzz.history.browse')}
+          {t('daily.browseArchive')}
         </motion.button>
       )}
 
-      {/* Daily Double Achievement - Premium Badge */}
+      {/* Daily Double Achievement */}
       {bothWon && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut', delay: 0.4 }}
-          className="mt-5"
+          className="mt-5 w-full"
         >
           <div className="px-5 py-3 bg-neo-navy-light border-3 border-neo-lime rounded-xl shadow-hard">
             <div className="flex items-center gap-3">
               <Trophy className="w-6 h-6 text-neo-lime" />
-              <span className="font-black text-neo-lime text-base tracking-wide uppercase">
-                {t('achievement.dailyDouble.name')}
-              </span>
+              <div>
+                <span className="font-black text-neo-lime text-base tracking-wide uppercase block">
+                  {t('daily.dailyDouble')}
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  {t('daily.dailyDoubleBonus')}
+                </span>
+              </div>
             </div>
           </div>
         </motion.div>
       )}
+
+      {/* Leaderboard Teaser */}
+      <div className="mt-5 w-full">
+        <LeaderboardTeaser currentLanguage={currentLanguage} />
+      </div>
     </motion.div>
   );
 }
 
-// Language-specific preview letters for Word Hunt mini grid
-// Each forms a meaningful word path when swiped in the preview
-const PREVIEW_LETTERS_BY_LANG: Record<Language, string[]> = {
-  en: ['W', 'O', 'R', 'D', 'H', 'U', 'N', 'T', '!'], // WORD swipe
-  he: ['מ', 'י', 'ל', 'ה', 'ש', 'ח', 'ק', '!', '★'], // מילה (word) swipe
-  sv: ['O', 'R', 'D', 'J', 'A', 'K', 'T', '!', '★'], // ORD (word) swipe
-  ja: ['言', '葉', '探', '索', 'ゲ', 'ー', 'ム', '!', '★'], // 言葉 (word) swipe
-  es: ['P', 'A', 'L', 'A', 'B', 'R', 'A', 'S', '!'], // PALA swipe (from PALABRAS)
-  fr: ['M', 'O', 'T', 'S', 'J', 'E', 'U', '!', '★'], // MOTS (words) swipe
-  de: ['W', 'O', 'R', 'T', 'S', 'P', 'I', 'E', 'L'], // WORT (word) swipe
-};
-const HIGHLIGHT_PATH = [0, 1, 2, 3]; // First 4 letters form the word
-
-function WordHuntMiniGrid({ isHovered, language }: { isHovered: boolean; language: Language }) {
-  const letters = PREVIEW_LETTERS_BY_LANG[language] || PREVIEW_LETTERS_BY_LANG.en;
-
+/** SVG quest path connecting line between quest nodes */
+function QuestPathLine() {
   return (
-    <div className="relative w-full h-full rounded-xl overflow-hidden border-3 border-neo-black shadow-hard bg-neo-cream">
-      {/* Animated swipe line - renders BEHIND the grid (z-0) */}
-      {isHovered && (
-        <svg
-          className="absolute inset-1.5 sm:inset-2 w-[calc(100%-12px)] sm:w-[calc(100%-16px)] h-[calc(100%-12px)] sm:h-[calc(100%-16px)] pointer-events-none z-0"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* Path connects centers of tiles: (17,17) → (50,17) → (83,17) → (83,50) */}
-          <motion.path
-            d="M 17,17 L 50,17 L 83,17 L 83,50"
-            fill="none"
-            stroke="rgba(255,107,53,0.9)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-          />
-        </svg>
-      )}
-
-      {/* Grid container - renders ON TOP of the swipe line (z-10) */}
-      <div className="absolute inset-1.5 sm:inset-2 grid grid-cols-3 gap-1 sm:gap-1.5 z-10">
-        {letters.map((letter, idx) => {
-          const isInPath = HIGHLIGHT_PATH.includes(idx);
-          const pathIndex = HIGHLIGHT_PATH.indexOf(idx);
-
-          return (
-            <motion.div
-              key={idx}
-              className={cn(
-                'flex items-center justify-center rounded-md sm:rounded-lg border-2 border-neo-black/30 font-neo-display font-black',
-                'text-sm sm:text-xl shadow-sm transition-colors duration-200',
-                isInPath && isHovered
-                  ? 'bg-neo-orange text-neo-black border-neo-orange'
-                  : 'letter-tile-gradient text-neo-black'
-              )}
-              initial={false}
-              animate={
-                isInPath && isHovered
-                  ? {
-                      scale: [1, 1.1, 1],
-                      transition: { delay: pathIndex * 0.1, duration: 0.3 },
-                    }
-                  : { scale: 1 }
-              }
-            >
-              {letter}
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Neo-brutalist corner accents - highest z-index */}
-      <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-orange border-e-2 border-b-2 border-neo-black z-20" />
-      <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-yellow border-s-2 border-t-2 border-neo-black z-20" />
+    <div className="flex justify-center py-1" aria-hidden="true">
+      <svg width="4" height="32" viewBox="0 0 4 32" className="overflow-visible">
+        <line
+          x1="2" y1="0" x2="2" y2="32"
+          stroke="currentColor"
+          className="text-slate-600 animate-quest-path"
+          strokeWidth="2"
+          strokeDasharray="8 6"
+        />
+      </svg>
     </div>
-  );
-}
-
-// Compact Challenge Card Component
-interface CompactChallengeCardProps {
-  /** Unique identifier for the challenge (used for test IDs) */
-  challengeId: 'wordHunt' | 'buzz';
-  icon: ReactNode;
-  title: string;
-  tagline: string;
-  /** Additional details text to clarify what the challenge is about */
-  details?: string;
-  color: 'orange' | 'yellow';
-  status: 'new' | 'won' | 'lost' | 'unavailable';
-  /** Whether status is still being determined (only affects status badge) */
-  isLoadingStatus?: boolean;
-  onPlay: () => void;
-  buttonText: string;
-  timeMode: 'timed' | 'relaxed';
-  timeModeLabel: string;
-  badge?: string;
-  delay?: number;
-  /** Custom preview element (e.g., mini letter grid) */
-  customPreview?: 'word-hunt-grid';
-  /** Current language for language-aware previews */
-  currentLanguage?: Language;
-  /** AI-generated preview image URL for visual appeal */
-  previewImageUrl?: string;
-  /** Alt text for the preview image */
-  previewImageAlt?: string;
-  /** Handler for requesting a challenge when unavailable */
-  onRequestChallenge?: () => void;
-  /** State of the request (for UI feedback) */
-  requestState?: 'idle' | 'loading' | 'sent';
-}
-
-function CompactChallengeCard({
-  challengeId,
-  icon,
-  title,
-  tagline,
-  details,
-  color,
-  status,
-  isLoadingStatus = false,
-  onPlay,
-  buttonText,
-  timeMode,
-  timeModeLabel,
-  badge,
-  delay = 0,
-  customPreview,
-  currentLanguage = 'en',
-  previewImageUrl,
-  previewImageAlt,
-  onRequestChallenge,
-  requestState = 'idle',
-}: CompactChallengeCardProps) {
-  const { t } = useLanguage();
-  const [imageError, setImageError] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
-
-  // 3D tilt effect for premium game feel
-  const { ref, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
-    maxTilt: 12,
-    hoverScale: 1.04,
-    perspective: 800,
-  });
-
-  // Combined hover handlers
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    tiltHandlers.onMouseEnter();
-  };
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    tiltHandlers.onMouseLeave();
-  };
-
-  // Show image only if URL exists and hasn't errored
-  const showImage = previewImageUrl && !imageError;
-  const isUnavailable = status === 'unavailable';
-
-  // Memoize image element to prevent flashing on parent re-renders
-  const imageElement = useMemo(() => {
-    if (!showImage) return null;
-
-    return (
-      <div
-        key={previewImageUrl}
-        className="relative w-full h-full rounded-xl overflow-hidden border-3 border-neo-black shadow-hard"
-      >
-        <Image
-          src={previewImageUrl}
-          alt={previewImageAlt || title}
-          fill
-          sizes="(max-width: 640px) 100vw, 50vw"
-          className="object-cover"
-          onError={() => setImageError(true)}
-          priority
-          unoptimized
-        />
-        {/* Neo-brutalist corner accents */}
-        <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-cyan border-e-2 border-b-2 border-neo-black" />
-        <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
-        {/* Subtle gradient for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
-      </div>
-    );
-  }, [previewImageUrl, previewImageAlt, title, showImage]);
-
-  const colorStyles = {
-    orange: {
-      bg: 'bg-neo-orange',
-      text: 'text-neo-orange',
-      iconBg: 'bg-neo-orange/20',
-      glowColor: 'rgba(255, 107, 53, 0.4)',
-      borderGlow: 'neo-orange',
-    },
-    yellow: {
-      bg: 'bg-neo-cyan',
-      text: 'text-neo-cyan',
-      iconBg: 'bg-neo-cyan/20',
-      glowColor: 'rgba(0, 255, 255, 0.4)',
-      borderGlow: 'neo-cyan',
-    },
-  };
-
-  const styles = colorStyles[color];
-
-  // Handle click based on status
-  const handleClick = () => {
-    if (isUnavailable && onRequestChallenge) {
-      onRequestChallenge();
-    } else if (!isUnavailable) {
-      onPlay();
-    }
-  };
-
-  const showEffects = enableComplexAnimations && !prefersReducedMotion;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
-      className="relative"
-    >
-      {/* Subtle border highlight for new challenges */}
-      {status === 'new' && (
-        <div
-          className={cn(
-            'absolute -inset-0.5 rounded-2xl -z-10',
-            color === 'orange' ? 'bg-neo-orange/30' : 'bg-neo-cyan/30'
-          )}
-        />
-      )}
-
-      <div
-        ref={ref}
-        onClick={handleClick}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onMouseMove={tiltHandlers.onMouseMove}
-        onTouchStart={tiltHandlers.onTouchStart}
-        onTouchMove={tiltHandlers.onTouchMove}
-        onTouchEnd={tiltHandlers.onTouchEnd}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
-        className={cn(
-          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
-          'shadow-hard transition-shadow duration-200',
-          'flex flex-col items-center text-center cursor-pointer',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
-          'h-full', // Fill grid cell height for equal heights on desktop
-          requestState === 'loading' && 'opacity-50 cursor-not-allowed',
-          (status === 'won' || status === 'lost') && 'opacity-85',
-          isUnavailable && 'opacity-60'
-        )}
-        style={tiltStyle}
-      >
-        {/* Decorative corner accents - static for performance */}
-        <div className="absolute top-0 end-0 w-10 h-10 pointer-events-none overflow-hidden rounded-tr-xl opacity-10">
-          <div className="absolute -top-5 -end-5 w-10 h-10 bg-white rotate-45" />
-        </div>
-        <div className="absolute bottom-0 start-0 w-8 h-8 pointer-events-none overflow-hidden rounded-bl-xl opacity-5">
-          <div className="absolute -bottom-4 -start-4 w-8 h-8 bg-white rotate-45" />
-        </div>
-
-        {/* Status Badge - Top Right */}
-        <div className="absolute top-2 end-2 z-10">
-          {isLoadingStatus ? (
-            // Show subtle loading indicator while checking status
-            <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
-              <Loader2 className="w-3 h-3 animate-spin inline" />
-            </span>
-          ) : (status === 'won' || status === 'lost') ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
-            >
-              <span
-                className={cn(
-                  "flex items-center gap-1 text-xs sm:text-sm font-bold px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border-2 border-neo-black shadow-hard-sm",
-                  status === 'won'
-                    ? "bg-neo-lime text-neo-black"
-                    : "bg-neo-pink text-neo-black"
-                )}
-                data-testid={status === 'won' ? "won-badge" : "lost-badge"}
-              >
-                {status === 'won' ? (
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={3} />
-                ) : (
-                  <X className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={3} />
-                )}
-                <span className="hidden xs:inline">
-                  {status === 'won' ? t('daily.solved') : t('daily.failed')}
-                </span>
-              </span>
-            </motion.div>
-          ) : isUnavailable ? (
-            <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
-              {t('buzz.notAvailable')}
-            </span>
-          ) : badge ? (
-            <span className="text-xs font-bold bg-neo-pink/20 text-neo-pink px-2 py-0.5 rounded-full border border-neo-pink/30">
-              {badge}
-            </span>
-          ) : null}
-        </div>
-
-        {/* Time Mode Badge - Prominent at top, compact on mobile */}
-        <div
-          className={cn(
-            'flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full mb-2 sm:mb-3',
-            'border-2 font-bold text-xs sm:text-sm uppercase tracking-wide',
-            timeMode === 'timed'
-              ? 'bg-neo-orange/20 border-neo-orange text-neo-orange'
-              : 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
-          )}
-        >
-          {timeMode === 'timed' ? (
-            <Timer className="w-3 h-3 sm:w-4 sm:h-4" />
-          ) : (
-            <Hourglass className="w-3 h-3 sm:w-4 sm:h-4" />
-          )}
-          <span>{timeModeLabel}</span>
-        </div>
-
-        {/* Preview: Custom Grid, Image, or Icon - responsive height that fits content */}
-        <div className="relative w-full h-28 sm:h-40 flex items-center justify-center mb-2 sm:mb-3">
-          {customPreview === 'word-hunt-grid' ? (
-            <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
-          ) : imageElement ? (
-            imageElement
-          ) : (
-            <motion.div
-              whileHover={showEffects ? { scale: 1.1, rotate: 5 } : {}}
-              transition={{ type: 'spring', stiffness: 400 }}
-              className={cn(
-                'flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl',
-                'border-2 border-neo-black shadow-hard-sm',
-                styles.iconBg,
-                styles.text
-              )}
-            >
-              {icon}
-            </motion.div>
-          )}
-
-          {/* Prominent Completion Overlay - Shows when challenge is completed */}
-          {(status === 'won' || status === 'lost') && !isLoadingStatus && (
-            <motion.div
-              data-testid={`completion-overlay-${challengeId}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
-              className={cn(
-                'absolute inset-0 z-30 flex flex-col items-center justify-center',
-                'rounded-xl border-3 border-neo-black',
-                status === 'won'
-                  ? 'bg-neo-lime'
-                  : 'bg-neo-pink'
-              )}
-            >
-              {/* Icon */}
-              <div className="mb-1 sm:mb-2">
-                {status === 'won' ? (
-                  <Trophy className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black" strokeWidth={2.5} />
-                ) : (
-                  <Frown className="w-10 h-10 sm:w-14 sm:h-14 text-neo-black" strokeWidth={2.5} />
-                )}
-              </div>
-
-              {/* Completion Text */}
-              <span className="font-neo-display font-black text-lg sm:text-2xl text-neo-black uppercase tracking-wide">
-                {status === 'won' ? t('daily.completed') : t('daily.failed')}
-              </span>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Content container - grows to push button to bottom */}
-        <div className="flex-1 flex flex-col items-center w-full">
-          {/* Title */}
-          <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-1 sm:mb-1.5', styles.text)}>
-            {title}
-          </h2>
-
-          {/* Tagline */}
-          <p className="text-[11px] sm:text-sm text-slate-400 mb-1 sm:mb-1.5 line-clamp-2 px-1 sm:px-2">
-            {tagline}
-          </p>
-
-          {/* Details - Additional description */}
-          {details && (
-            <p className="text-[10px] sm:text-xs text-slate-500 mb-2 sm:mb-3 line-clamp-2 px-1 sm:px-2 italic">
-              {details}
-            </p>
-          )}
-        </div>
-
-        {/* Play/Request Button with shine effect - aligned to bottom */}
-        {isUnavailable ? (
-          <div
-            className={cn(
-              'w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg',
-              'flex items-center justify-center gap-2',
-              requestState === 'sent'
-                ? 'bg-neo-lime/20 text-neo-lime border-2 border-neo-lime'
-                : 'bg-slate-700 text-slate-200 border-2 border-slate-600',
-              'shadow-hard-sm transition-all'
-            )}
-          >
-            {requestState === 'loading' ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t('common.loading')}
-              </>
-            ) : requestState === 'sent' ? (
-              <>
-                <Check className="w-4 h-4" />
-                {t('buzz.requestSent')}
-              </>
-            ) : (
-              <>
-                <Bell className="w-4 h-4" />
-                {t('buzz.requestChallenge')}
-              </>
-            )}
-          </div>
-        ) : (
-          <div
-            className={cn(
-              'w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg',
-              styles.bg,
-              'text-neo-black border-2 border-neo-black shadow-hard-sm'
-            )}
-          >
-            {buttonText}
-          </div>
-        )}
-      </div>
-    </motion.div>
   );
 }

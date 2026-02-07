@@ -17,47 +17,37 @@ jest.mock('framer-motion', () => ({
 describe('DesktopLobbyLayout', () => {
   const defaultProps = {
     leftContent: <div data-testid="left-column">Left Content</div>,
-    centerContent: <div data-testid="center-column">Center Content</div>,
     rightContent: <div data-testid="right-column">Right Content</div>,
   };
 
-  it('should render all three columns', () => {
+  it('should render both columns', () => {
     render(<DesktopLobbyLayout {...defaultProps} />);
 
     expect(screen.getByTestId('left-column')).toBeInTheDocument();
-    expect(screen.getByTestId('center-column')).toBeInTheDocument();
     expect(screen.getByTestId('right-column')).toBeInTheDocument();
   });
 
-  it('should have a three-column grid layout class', () => {
+  it('should have a grid layout class', () => {
     render(<DesktopLobbyLayout {...defaultProps} />);
 
     const layout = screen.getByTestId('desktop-lobby-layout');
     expect(layout).toHaveClass('grid');
   });
 
-  it('should render left column in left aside element', () => {
+  it('should render left column content', () => {
     render(<DesktopLobbyLayout {...defaultProps} />);
 
-    const leftAside = screen.getByTestId('desktop-left-column');
-    expect(leftAside).toBeInTheDocument();
-    expect(leftAside).toContainElement(screen.getByTestId('left-column'));
+    const leftCol = screen.getByTestId('desktop-left-column');
+    expect(leftCol).toBeInTheDocument();
+    expect(leftCol).toContainElement(screen.getByTestId('left-column'));
   });
 
-  it('should render center column in main element', () => {
+  it('should render right column content', () => {
     render(<DesktopLobbyLayout {...defaultProps} />);
 
-    const centerMain = screen.getByTestId('desktop-center-column');
-    expect(centerMain).toBeInTheDocument();
-    expect(centerMain).toContainElement(screen.getByTestId('center-column'));
-  });
-
-  it('should render right column in right aside element', () => {
-    render(<DesktopLobbyLayout {...defaultProps} />);
-
-    const rightAside = screen.getByTestId('desktop-right-column');
-    expect(rightAside).toBeInTheDocument();
-    expect(rightAside).toContainElement(screen.getByTestId('right-column'));
+    const rightCol = screen.getByTestId('desktop-right-column');
+    expect(rightCol).toBeInTheDocument();
+    expect(rightCol).toContainElement(screen.getByTestId('right-column'));
   });
 
   it('should apply custom className when provided', () => {
@@ -71,7 +61,27 @@ describe('DesktopLobbyLayout', () => {
     render(<DesktopLobbyLayout {...defaultProps} />);
 
     const layout = screen.getByTestId('desktop-lobby-layout');
-    // Check for gap class (gap-4 or gap-6)
     expect(layout.className).toMatch(/gap-/);
+  });
+
+  it('should use 12-column grid', () => {
+    render(<DesktopLobbyLayout {...defaultProps} />);
+
+    const layout = screen.getByTestId('desktop-lobby-layout');
+    expect(layout).toHaveClass('grid-cols-12');
+  });
+
+  it('left column should span 7 columns', () => {
+    render(<DesktopLobbyLayout {...defaultProps} />);
+
+    const leftCol = screen.getByTestId('desktop-left-column');
+    expect(leftCol).toHaveClass('col-span-7');
+  });
+
+  it('right column should span 5 columns', () => {
+    render(<DesktopLobbyLayout {...defaultProps} />);
+
+    const rightCol = screen.getByTestId('desktop-right-column');
+    expect(rightCol).toHaveClass('col-span-5');
   });
 });

@@ -11,7 +11,7 @@ import {
   MessageCircle,
   UserMinus,
 } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useFriends } from '@/hooks/useFriends';
@@ -527,7 +527,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 )}
               />
               {isSearching && (
-                <NeoLoader variant="dots" size="sm" className="absolute right-3 top-1/2 -translate-y-1/2" />
+                <Loader size="sm" className="absolute right-3 top-1/2 -translate-y-1/2" />
               )}
             </div>
 
@@ -581,7 +581,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       )}
                     >
                       {actionLoading === searchUser.odUserId ? (
-                        <NeoLoader variant="dots" size="sm" />
+                        <Loader size="sm" />
                       ) : (
                         <>
                           <UserPlus className="w-3 h-3 mr-1" />
@@ -700,7 +700,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                     )}
                   >
                     {actionLoading === selectedFriend.odUserId ? (
-                      <NeoLoader variant="dots" size="sm" />
+                      <Loader size="sm" />
                     ) : (
                       <>
                         <UserMinus className="w-4 h-4" />

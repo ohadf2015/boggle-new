@@ -219,7 +219,8 @@ export const SubmitWordSchema = z.object({
   username: UsernameSchema.optional(),
   word: WordSchema,
   path: z.array(GridPositionSchema).optional(),
-  comboLevel: z.number().int().min(0).max(10).optional(),
+  comboLevel: z.number().int().min(0).max(100).optional(),
+  fireRoundActive: z.boolean().optional().default(false),
 });
 
 /**

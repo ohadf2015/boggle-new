@@ -29,7 +29,6 @@ import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import { useCoinContext } from '@/contexts/CoinContext';
 import type { LetterGrid, Language } from '@/types';
 
@@ -225,9 +224,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     onWordRejected: () => {
       combo.resetCombo();
     },
-    onWordPending: () => {
-      combo.resetCombo();
-    },
     onComboReset: () => {
       combo.resetCombo();
     },
@@ -272,19 +268,19 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     };
   }, [stopMusic]);
 
-  // Game end handler - validates pending words with AI before completing
-  const handleGameEnd = useCallback(async () => {
+  // Game end handler - no AI validation, treat pending as invalid
+  const handleGameEnd = useCallback(() => {
     if (gameOverCalledRef.current) return;
     gameOverCalledRef.current = true;
     setIsGameOver(true);
 
     const currentWords = wordSubmission.foundWords;
 
-    // Use shared utility for batch word validation
-    const finalWords = await finalizeWordValidation(currentWords, language, 3);
-
-    // Check if component unmounted during async validation
-    if (!isMountedRef.current) return;
+    // No AI validation - treat pending words (isValid: null) as invalid
+    const finalWords = currentWords.map(w => ({
+      ...w,
+      isValid: w.isValid === true, // null or false becomes false
+    }));
 
     // Calculate final score from validated words only
     const validWords = finalWords.filter(w => w.isValid === true);
@@ -519,11 +515,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       <div className="text-center mt-2 sm:mt-4">
         <span className="text-sm text-gray-600">
           {t('daily.wordsFound').replace('{count}', String(wordSubmission.validWordCount))}
-          {wordSubmission.foundWords.filter(w => w.isValid === null).length > 0 && (
-            <span className="text-neo-lime ml-1">
-              (+{wordSubmission.foundWords.filter(w => w.isValid === null).length} {t('common.pending') || 'pending'})
-            </span>
-          )}
         </span>
       </div>
 

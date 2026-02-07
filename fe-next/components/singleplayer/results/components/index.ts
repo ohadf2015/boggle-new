@@ -15,3 +15,5 @@ export { BotWordsSection } from './BotWordsSection';
 export { MobileResultsTab } from './MobileResultsTab';
 export { MobileDetailsTab } from './MobileDetailsTab';
 export { default as ChallengeButton } from './ChallengeButton';
+export { CelebrationHero } from './CelebrationHero';
+export { ResultsInfoCards } from './ResultsInfoCards';

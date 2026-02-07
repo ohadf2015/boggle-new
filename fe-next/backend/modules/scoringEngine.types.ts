@@ -125,8 +125,7 @@ export function getComboBonus(comboLevel: number, wordLength: number = 4): numbe
     wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
   }
 
-  // Base bonus caps at 10 points
-  const baseBonus = Math.min(comboLevel, 10);
+  const baseBonus = comboLevel;
 
   return Math.floor(baseBonus * wordLengthFactor);
 }

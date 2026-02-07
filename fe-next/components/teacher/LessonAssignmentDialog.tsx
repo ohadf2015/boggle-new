@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import toast from 'react-hot-toast';
 
 interface LessonAssignmentDialogProps {
@@ -85,7 +85,7 @@ export default function LessonAssignmentDialog({
 
               {isLoadingClassrooms ? (
                 <div className="flex justify-center py-4">
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                 </div>
               ) : classrooms.length === 0 ? (
                 <div className="bg-neo-black/30 border-2 border-neo-yellow p-4 rounded-neo">

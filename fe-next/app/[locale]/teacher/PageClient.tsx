@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,8 +29,7 @@ export default function TeacherPageClient() {
   if (authLoading || isProfileLoading) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
-        <NeoLoader
-          variant="mascot-letters"
+        <PageLoader
           size="lg"
           text={t('common.loading') || 'Loading...'}
         />

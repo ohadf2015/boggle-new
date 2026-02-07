@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Trophy, ChevronDown, Users, Settings, Calendar, Gift, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../lib/supabase';
@@ -255,7 +255,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             )}
           >
             {isSigningOut ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : (
               <LogOut size={14} aria-hidden="true" />
             )}
@@ -546,7 +546,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 {isSigningOut ? (
-                  <NeoLoader variant="dots" size="sm" aria-label={t('common.loading') || 'Loading'} />
+                  <Loader size="sm" />
                 ) : (
                   <LogOut size={14} aria-hidden="true" />
                 )}
@@ -608,7 +608,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   )}
                 >
                   {isCrazyGamesLoggingIn ? (
-                    <NeoLoader variant="dots" size="sm" />
+                    <Loader size="sm" />
                   ) : (
                     <User size={14} className="text-neo-black" />
                   )}
@@ -700,7 +700,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           )}
         >
           {isCrazyGamesLoggingIn ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <User size={14} />
           )}

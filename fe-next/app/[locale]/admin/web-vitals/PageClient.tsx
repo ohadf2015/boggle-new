@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 interface WebVital {
   id: string;
@@ -237,7 +237,7 @@ export default function WebVitalsPageClient() {
   if (authLoading || loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text="Loading Web Vitals..." />
+        <PageLoader size="lg" text="Loading Web Vitals..." />
       </div>
     );
   }

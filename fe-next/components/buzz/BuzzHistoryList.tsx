@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, ChevronLeft, ChevronRight, Clock, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import type { Language } from '@/types';
 
 interface PastChallenge {
@@ -146,7 +146,7 @@ export default function BuzzHistoryList({
         <div className="overflow-y-auto max-h-[50vh]">
           {loading ? (
             <div className="p-8 flex justify-center">
-              <NeoLoader variant="dots" size="md" />
+              <Loader size="md" />
             </div>
           ) : error ? (
             <div className="p-8 text-center">

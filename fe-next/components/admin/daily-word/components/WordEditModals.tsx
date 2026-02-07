@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, Edit2, Check, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import type { Language } from '@/types';
 import {
   formatDate,
@@ -118,7 +118,7 @@ export function ReplaceWordModal({
             className="flex-1 bg-red-500 hover:bg-red-600 text-white sm:text-base"
           >
             {saving ? (
-              <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
+              <Loader size="sm" className="sm:mr-2" />
             ) : (
               <RotateCcw className="w-4 h-4 sm:mr-2" />
             )}
@@ -216,7 +216,7 @@ export function AddWordModal({
             className="flex-1 bg-green-500 hover:bg-green-600 text-white sm:text-base"
           >
             {saving ? (
-              <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
+              <Loader size="sm" className="sm:mr-2" />
             ) : (
               <Check className="w-4 h-4 sm:mr-2" />
             )}
@@ -364,7 +364,7 @@ export function SetTodayModal({
                   className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold sm:text-lg py-2 sm:py-3"
                 >
                   {saving ? (
-                    <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
+                    <Loader size="sm" className="sm:mr-2" />
                   ) : (
                     <Check className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
                   )}

@@ -5,9 +5,12 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 /**
- * Enhanced Card Component - Neo-Brutalist with improved UX
- * 
+ * Enhanced Card Component - Neo-Brutalist with Glassy Modern UI
+ *
  * Features:
+ * - Backdrop blur effect (glassy appearance)
+ * - Smooth cubic-bezier transitions
+ * - Glow effects on hover
  * - Hover lift effect with shadow enhancement
  * - Press feedback animation
  * - Optional interactive states
@@ -27,13 +30,15 @@ export interface EnhancedCardProps extends React.HTMLAttributes<HTMLDivElement> 
   /** Border color variant */
   borderColor?: 'default' | 'primary' | 'secondary' | 'accent' | 'none';
   /** Background variant */
-  bgVariant?: 'default' | 'gradient' | 'transparent';
+  bgVariant?: 'default' | 'gradient' | 'transparent' | 'glassy';
   /** Click handler for interactive cards */
   onCardClick?: () => void;
   /** Haptic feedback on tap (mobile) */
   haptic?: boolean;
   /** Reduce motion for accessibility */
   reduceMotion?: boolean;
+  /** Glow color on hover (for interactive cards) */
+  glowColor?: 'lime' | 'pink' | 'cyan' | 'purple' | 'none';
 }
 
 const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
@@ -50,18 +55,28 @@ const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
       onCardClick,
       haptic = false,
       reduceMotion = false,
+      glowColor = 'none',
       ...props
     },
     ref
   ) => {
     const [isPressed, setIsPressed] = React.useState(false);
 
-    // Elevation styles
+    // Elevation styles with glow support
     const elevationStyles = {
       flat: 'shadow-none',
       default: 'shadow-hard',
       raised: 'shadow-hard-lg',
       floating: 'shadow-hard-xl',
+    };
+
+    // Glow color CSS values
+    const glowColors = {
+      lime: 'rgba(191, 255, 0, 0.4)',
+      pink: 'rgba(255, 20, 147, 0.4)',
+      cyan: 'rgba(0, 255, 255, 0.4)',
+      purple: 'rgba(139, 92, 246, 0.4)',
+      none: 'transparent',
     };
 
     // Border color styles
@@ -73,11 +88,12 @@ const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
       none: 'border-transparent',
     };
 
-    // Background styles
+    // Background styles - added glassy variant
     const bgStyles = {
       default: 'bg-neo-white dark:bg-neo-navy',
       gradient: 'bg-gradient-to-br from-neo-white to-neo-cream dark:from-neo-navy dark:to-neo-navy-light',
       transparent: 'bg-transparent',
+      glassy: 'bg-neo-cream/95 dark:bg-neo-navy/95 backdrop-blur-md',
     };
 
     // Handle click with haptic feedback
@@ -93,11 +109,19 @@ const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
       [isDisabled, isLoading, haptic, onCardClick]
     );
 
-    // Animation variants
+    // Animation variants with glow support
+    const hoverShadow = glowColor !== 'none'
+      ? `12px 12px 0px black, 0 0 25px ${glowColors[glowColor]}`
+      : undefined;
+
     const cardVariants = {
-      initial: { scale: 1 },
+      initial: { scale: 1, y: 0 },
       hover: isInteractive && !reduceMotion
-        ? { y: -4, scale: 1.02 }
+        ? {
+            y: -4,
+            scale: 1.02,
+            boxShadow: hoverShadow,
+          }
         : {},
       tap: isInteractive && !reduceMotion
         ? { scale: 0.98, y: 0 }
@@ -108,9 +132,11 @@ const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
     const baseClassName = cn(
       // Base styles
       'relative overflow-hidden rounded-neo-lg border-4',
+      // Smooth transition for all properties (matches SuperDesign)
+      'transition-all duration-400 ease-[cubic-bezier(0.23,1,0.32,1)]',
       elevationStyles[elevation],
       borderStyles[borderColor],
-      bgStyles[bgVariant],
+      bgStyles[bgVariant as keyof typeof bgStyles],
       // Interactive styles
       isInteractive && !isDisabled && 'cursor-pointer',
       isInteractive && isDisabled && 'cursor-not-allowed opacity-60',
@@ -133,9 +159,9 @@ const EnhancedCard = React.forwardRef<HTMLDivElement, EnhancedCardProps>(
           whileHover={!isDisabled ? 'hover' : undefined}
           whileTap={!isDisabled ? 'tap' : undefined}
           transition={{
-            type: 'spring',
-            stiffness: 400,
-            damping: 25,
+            type: 'tween',
+            duration: 0.4,
+            ease: [0.23, 1, 0.32, 1], // Smooth cubic-bezier from SuperDesign
           }}
           onClick={handleClick}
           onMouseDown={() => setIsPressed(true)}

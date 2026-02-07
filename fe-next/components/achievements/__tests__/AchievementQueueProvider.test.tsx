@@ -144,15 +144,11 @@ describe('AchievementQueueProvider', () => {
       button.click();
     });
 
-    // THEN: Toast notification should be shown
+    // THEN: Toast notification should be shown (no share action during gameplay)
     expect(toast.success).toHaveBeenCalledTimes(1);
     expect(toast.success).toHaveBeenCalledWith(
       expect.stringContaining('Achievement'),
-      expect.any(String),
-      expect.objectContaining({
-        label: expect.any(String),
-        onClick: expect.any(Function),
-      })
+      expect.any(String)
     );
   });
 

@@ -1,20 +1,21 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, Pause, Play } from 'lucide-react';
-import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
-import { Button } from '@/components/ui/button';
+import { ArrowLeft, Pause, Play, Coins } from 'lucide-react';
+import { type WordFeedback } from '@/components/game/WordFormingArea';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import GridComponent from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
+import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
+import { DynamicEnergyBackground } from './DynamicEnergyBackground';
+import { LetterTileWord } from './LetterTileWord';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { DesktopStatsPanel, DesktopWordList } from '../../desktop';
-import AchievementDock from '@/components/achievements/AchievementDock';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { SinglePlayerAchievement } from '@/utils/singlePlayerAchievements';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
 
@@ -85,8 +86,6 @@ export interface DesktopGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
-  // Achievements
-  liveAchievements: SinglePlayerAchievement[];
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -114,7 +113,6 @@ export function DesktopGameLayout({
   onCoinAnimationComplete,
   totalBoardWords,
   formedWord,
-  letterCount,
   currentFeedback,
   keyboardInput,
   tutorialPath,
@@ -143,7 +141,6 @@ export function DesktopGameLayout({
   onConfirmQuit,
   showQuitConfirm,
   setShowQuitConfirm,
-  liveAchievements,
   t,
 }: DesktopGameLayoutProps): React.ReactElement {
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
@@ -158,6 +155,9 @@ export function DesktopGameLayout({
 
   return (
     <div className="game-view-container relative flex h-full w-full bg-neo-navy">
+      {/* Dynamic Energy Background */}
+      <DynamicEnergyBackground />
+
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
@@ -180,12 +180,6 @@ export function DesktopGameLayout({
         trainingJustUnlocked={training?.justUnlocked}
         onClearTrainingUnlock={training?.clearJustUnlocked}
         t={(key) => t(key) || key}
-      />
-
-      {/* Achievement Dock - top right */}
-      <AchievementDock
-        achievements={liveAchievements}
-        className="absolute top-4 right-4 z-50"
       />
 
       {/* 3-Column Desktop Layout */}
@@ -218,35 +212,51 @@ export function DesktopGameLayout({
         </div>
 
         {/* Center - Game Area */}
-        <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-3">
-          {/* Header with Quit Button */}
+        <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-3 relative z-10">
+          {/* Header: Quit + Coins + Pause */}
           <div className="flex items-center justify-between w-full px-2">
-            <Button
-              variant="destructive"
-              size="sm"
+            {/* Quit - btn-neo red */}
+            <button
               onClick={onQuitRequest}
-              className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
+              className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
             >
-              <ArrowLeft className="me-2 rtl:rotate-180" />
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               {t('common.quit') || 'Quit'}
-            </Button>
+            </button>
 
+            {/* Coins display - center, yellow tilted badge */}
+            <AdaptiveMotion.div
+              data-coin-target
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex items-center gap-1.5 bg-yellow-400 border-3 border-neo-black rounded-lg px-2 py-1 shadow-hard-sm transform -rotate-1 hover:scale-105 transition-transform"
+            >
+              <div className="bg-black/10 rounded-full p-1">
+                <Coins className="w-4 h-4 text-neo-black" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-black text-base text-neo-black">
+                  {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
+                </span>
+                <span className="text-[8px] font-bold text-neo-black/60 uppercase">{t('common.coins') || 'coins'}</span>
+              </div>
+            </AdaptiveMotion.div>
+
+            {/* Pause/Finish - btn-neo pink */}
             {isPracticeMode ? (
-              <Button
-                variant="accent"
+              <button
                 onClick={onFinishPractice}
-                className="min-h-[44px] min-w-[80px] text-sm font-bold"
+                className="flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >
                 {t('singlePlayer.finish') || 'Finish'}
-              </Button>
+              </button>
             ) : (
-              <Button
-                variant="secondary"
-                size="sm"
+              <button
                 onClick={onPauseToggle}
+                className="flex items-center justify-center bg-pink-500 text-white p-2 border-3 border-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >
-                {isPaused ? <Play /> : <Pause />}
-              </Button>
+                {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+              </button>
             )}
           </div>
 
@@ -267,13 +277,11 @@ export function DesktopGameLayout({
             </div>
           )}
 
-          {/* Word Forming Area */}
+          {/* Word Forming Area - Letter Tiles */}
           <div className="flex items-center justify-center">
-            <WordFormingArea
+            <LetterTileWord
               word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-              letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
               feedback={currentFeedback}
-              compact={false}
             />
           </div>
 
@@ -285,11 +293,27 @@ export function DesktopGameLayout({
           />
 
           {/* Game Grid - centered with aspect ratio maintained */}
-          {/* Parent container uses container-type: size for responsive grid sizing */}
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full" style={{ containerType: 'size' }}>
-            {/* FIX: Use min(100cqw, 100cqh) for both dimensions to GUARANTEE square container */}
-            {/* Previous h-full + aspect-square + max-w-full failed when parent was taller than wide */}
-            <div className="desktop-grid-container" style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}>
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full relative" style={{ containerType: 'size' }}>
+            {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
+            <AdaptiveAnimatePresence>
+              {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
+                <AdaptiveMotion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-2 left-4 right-4 z-40"
+                >
+                  <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-6 rounded-lg border-3 border-neo-black shadow-hard-sm">
+                    <span className="font-bold text-sm uppercase tracking-wide">
+                      {t('singlePlayer.dragInstruction') || 'Drag across letters to form words!'}
+                    </span>
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-neo-pink border-b-3 border-r-3 border-neo-black rotate-45" />
+                  </div>
+                </AdaptiveMotion.div>
+              )}
+            </AdaptiveAnimatePresence>
+
+            <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}>
               <GridComponent
                 grid={grid}
                 interactive={!isPaused}

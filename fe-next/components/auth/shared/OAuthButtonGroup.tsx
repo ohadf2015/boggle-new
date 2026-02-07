@@ -3,7 +3,7 @@
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { GoogleIcon, DiscordIcon } from './icons/BrandIcons';
 import { cn } from '@/lib/utils';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -63,7 +63,7 @@ export function OAuthButtonGroup({
           )}
         >
           {loadingProvider === 'crazygames' ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <span>{t('auth.loginCrazyGames')}</span>
           )}
@@ -85,7 +85,7 @@ export function OAuthButtonGroup({
           )}
         >
           {loadingProvider === provider.id ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <provider.icon className="w-5 h-5" />
           )}

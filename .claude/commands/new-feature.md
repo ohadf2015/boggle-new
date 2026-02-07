@@ -24,7 +24,7 @@ LexiClash is a multiplayer word game built with:
 - **Database:** Supabase (PostgreSQL + Auth)
 - **Styling:** Tailwind CSS, Radix UI components
 - **State:** XState for game state machines
-- **Testing:** Jest (unit), Playwright (e2e)
+- **Testing:** Jest (unit), Playwriter (e2e)
 
 ### Project Structure
 ```

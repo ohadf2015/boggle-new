@@ -18,7 +18,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import {
   formatDate,
@@ -331,7 +331,7 @@ export function ScheduleList({
                         title="Regenerate board with new letter arrangement (keeps same target word)"
                       >
                         {regeneratingBoard === dateStr ? (
-                          <NeoLoader variant="dots" size="sm" className="sm:mr-1" />
+                          <Loader size="sm" className="sm:mr-1" />
                         ) : (
                           <Shuffle className="w-4 h-4 sm:mr-1" />
                         )}

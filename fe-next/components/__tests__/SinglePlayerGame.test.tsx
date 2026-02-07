@@ -125,6 +125,13 @@ jest.mock('@/hooks/useAutoScrollOnGameStart', () => ({
   useAutoScrollOnGameStart: jest.fn(),
 }));
 
+// Mock useAchievementQueue to avoid needing AchievementQueueProvider
+jest.mock('@/components/achievements', () => ({
+  useAchievementQueue: () => ({
+    queueAchievement: jest.fn(),
+  }),
+}));
+
 jest.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 0,

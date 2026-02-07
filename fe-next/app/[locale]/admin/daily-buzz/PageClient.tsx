@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 // Dynamic import for admin panel (client component)
 const DailyBuzzAdminPanel = dynamic(
@@ -11,7 +11,7 @@ const DailyBuzzAdminPanel = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text="Loading admin panel..." />
+        <PageLoader size="lg" text="Loading admin panel..." />
       </div>
     ),
   }
@@ -33,7 +33,7 @@ export default function DailyBuzzAdminPageClient() {
       <Suspense
         fallback={
           <div className="flex-1 flex items-center justify-center bg-neo-navy">
-            <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
+            <PageLoader size="lg" text="Loading..." />
           </div>
         }
       >

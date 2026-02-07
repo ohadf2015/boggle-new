@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import React, { useMemo, useEffect, useRef } from 'react';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { useAchievementQueue } from '@/components/achievements';
 import {
   useSinglePlayerCore,
   LandscapeGameLayout,
@@ -34,6 +35,23 @@ function SinglePlayerGame({
     onGameEnd,
     onQuit,
   });
+
+  // Show toast notifications for achievements (same as multiplayer)
+  const { queueAchievement } = useAchievementQueue();
+  const prevAchievementCountRef = useRef(0);
+
+  useEffect(() => {
+    const achievements = core.liveAchievements;
+    // Only trigger for NEW achievements (not on initial render)
+    if (achievements.length > prevAchievementCountRef.current) {
+      // Queue the new achievements for toast notification
+      const newAchievements = achievements.slice(prevAchievementCountRef.current);
+      newAchievements.forEach((achievement) => {
+        queueAchievement(achievement);
+      });
+    }
+    prevAchievementCountRef.current = achievements.length;
+  }, [core.liveAchievements, queueAchievement]);
 
   // Common props for all layouts - memoized to prevent unnecessary re-renders
   // Must be called before any conditional returns to follow React hooks rules
@@ -86,7 +104,6 @@ function SinglePlayerGame({
       onConfirmQuit: core.onQuit,
       showQuitConfirm: core.showQuitConfirm,
       setShowQuitConfirm: core.setShowQuitConfirm,
-      liveAchievements: core.liveAchievements,
       t: core.t,
     };
   }, [
@@ -132,7 +149,6 @@ function SinglePlayerGame({
     core.onQuit,
     core.showQuitConfirm,
     core.setShowQuitConfirm,
-    core.liveAchievements,
     core.t,
   ]);
 
@@ -140,7 +156,7 @@ function SinglePlayerGame({
   if (!commonProps) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <NeoLoader variant="mascot-letters" size="lg" text={core.t('common.loading') || 'Loading...'} />
+        <PageLoader size="lg" text={core.t('common.loading') || 'Loading...'} />
       </div>
     );
   }
@@ -177,6 +193,7 @@ function SinglePlayerGame({
     <PortraitGameLayout
       {...commonProps}
       targetHighScore={core.targetHighScore}
+      totalBoardWords={core.totalBoardWords}
       progressBarExpanded={core.progressBarExpanded}
       onToggleProgressBar={core.handleToggleProgressBar}
       showCompletionPopup={core.showCompletionPopup}

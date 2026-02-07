@@ -23,7 +23,7 @@ import { StudentProgressTable } from '@/components/teacher/analytics/StudentProg
 import LessonEffectivenessChart from '@/components/teacher/analytics/LessonEffectivenessChart';
 import { VocabularyHeatmap } from '@/components/teacher/analytics/VocabularyHeatmap';
 import { LiveActivityIndicator } from '@/components/teacher/analytics/LiveActivityIndicator';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -76,7 +76,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
   if (authLoading) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }

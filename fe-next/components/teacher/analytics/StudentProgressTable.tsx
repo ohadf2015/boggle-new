@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
 import { useLanguage } from '@/contexts/LanguageContext';
-import NeoLoader from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import type { StudentProgressSummary } from '@/lib/supabase/analytics';
 
 interface StudentProgressTableProps {
@@ -81,7 +81,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
-        <NeoLoader />
+        <PageLoader />
       </div>
     );
   }

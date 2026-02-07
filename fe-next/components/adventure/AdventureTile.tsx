@@ -98,6 +98,13 @@ const LETTER_GLOW_CLASSES: Record<number, string> = {
   3: 'letter-glow-caverns',
 };
 
+// World-specific standard tile background classes
+const STANDARD_TILE_BG_CLASSES: Record<number, string> = {
+  1: 'bg-gradient-to-br from-[#fdfcf0] via-[#f5f0e0] to-[#ede8d4]',
+  2: 'bg-gradient-to-br from-[#f0f8ff] via-[#e6f2fa] to-[#daedf7]',
+  3: 'bg-gradient-to-br from-[#f5f0ff] via-[#ede6fa] to-[#e5dcf5]',
+};
+
 // Tile types that should NOT receive texture/border theming
 const SPECIAL_TILE_TYPES: Set<TileType> = new Set([
   'gold',
@@ -233,9 +240,8 @@ export const AdventureTile = memo(({
           'animate-pulse',
         ],
 
-        // Standard tile background
-        tile.type === 'standard' &&
-          'bg-gradient-to-br from-neo-white via-gray-100 to-gray-200 text-neo-black',
+        // Standard tile background - world-specific tint
+        tile.type === 'standard' && (STANDARD_TILE_BG_CLASSES[worldId] || STANDARD_TILE_BG_CLASSES[1]),
 
         // Gold tile - golden glow
         tile.type === 'gold' && [

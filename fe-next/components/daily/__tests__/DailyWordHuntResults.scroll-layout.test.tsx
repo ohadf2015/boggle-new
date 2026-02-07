@@ -143,12 +143,13 @@ describe('DailyChallenge Container Layout', () => {
       // overflow-y-auto can't scroll because the parent grows to fit all content.
 
       // Find the root container div in DailyChallenge render
-      const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className="([^"]+)"/;
+      // Match both double-quoted className="..." and template literal className={`...`}
+      const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className=(?:"([^"]+)"|{`([^`]+)`})/;
       const match = source.match(rootContainerPattern);
 
       expect(match).toBeTruthy();
       if (match) {
-        const className = match[1];
+        const className = match[1] || match[2] || '';
         // Should NOT use min-h-full alone (breaks child scroll)
         const hasMinHFull = /\bmin-h-full\b/.test(className);
         // Must either use h-full OR flex-1 with min-h-0 to properly constrain height
@@ -168,12 +169,13 @@ describe('DailyChallenge Container Layout', () => {
 
     it('should NOT use min-h-full without height constraints', () => {
       // min-h-full alone is a known bug pattern that prevents child scroll
-      const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className="([^"]+)"/;
+      // Match both double-quoted className="..." and template literal className={`...`}
+      const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className=(?:"([^"]+)"|{`([^`]+)`})/;
       const match = source.match(rootContainerPattern);
 
       expect(match).toBeTruthy();
       if (match) {
-        const className = match[1];
+        const className = match[1] || match[2] || '';
         const hasMinHFullAlone =
           /\bmin-h-full\b/.test(className) &&
           !/\bflex-1\b/.test(className) &&
@@ -390,7 +392,6 @@ describe('BuzzChallenge Container Layout - Mobile Scroll Fix', () => {
         // 3. min-h-0 without overflow-hidden
 
         const hasOverflowHidden = /\boverflow-hidden\b/.test(className);
-        const hasOverflowVisible = /\boverflow-visible\b/.test(className);
         const hasMinH0 = /\bmin-h-0\b/.test(className);
 
         // ASSERTION: Either no overflow-hidden, or explicit overflow-visible, or min-h-0

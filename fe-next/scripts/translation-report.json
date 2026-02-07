@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3093,
+    "totalKeysInCode": 3140,
     "keyCountByLanguage": {
-      "en": 4397,
-      "he": 4393,
-      "sv": 4368,
-      "ja": 4355,
-      "es": 4310
+      "en": 4490,
+      "he": 4485,
+      "sv": 4460,
+      "ja": 4447,
+      "es": 4402
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -163,12 +163,14 @@
   "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
+      "share.qrCode",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
       "accessibility.skipToMain"
     ],
     "sv": [
+      "share.qrCode",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -219,6 +221,7 @@
     ],
     "ja": [
       "share.share",
+      "share.qrCode",
       "consent.modal.ageOptions.14",
       "consent.modal.dataCollected.title",
       "consent.modal.dataCollected.items",
@@ -283,6 +286,10 @@
     ],
     "es": [
       "share.share",
+      "share.qrCode",
+      "achievements.cinematic.unlocked",
+      "achievements.cinematic.gold",
+      "achievements.cinematic.platinum",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -468,6 +475,9 @@
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "adventure.achievements.cinematic.unlocked",
+      "adventure.achievements.cinematic.gold",
+      "adventure.achievements.cinematic.platinum",
       "adventure.skills.available",
       "adventure.skills.powerStrike.name",
       "adventure.skills.longWordMastery.name",

@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
 /** Delay in ms before showing hint prompt after last word found */
-const HINT_PROMPT_DELAY_MS = 15000; // 15 seconds
+const HINT_PROMPT_DELAY_MS = 5000; // 5 seconds
 
 /** Interval in ms to check for inactivity */
-const CHECK_INTERVAL_MS = 5000; // 5 seconds
+const CHECK_INTERVAL_MS = 2000; // 2 seconds (check more frequently)
 
 interface UseHintPromptOptions {
   /** Whether the game is paused */

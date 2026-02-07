@@ -3,7 +3,7 @@
 import React from 'react';
 import { Sparkles, Calendar, AlertTriangle, Save, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/types';
 import type { BulkGenerateState } from '../types';
@@ -85,7 +85,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                 {bulkState.isLoading ? (
                   <>
                     <span className="mr-2">
-                      <NeoLoader variant="dots" size="sm" />
+                      <Loader size="sm" />
                     </span>
                     Generating...
                   </>
@@ -204,7 +204,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                   {isSaving ? (
                     <>
                       <span className="mr-2">
-                        <NeoLoader variant="dots" size="sm" />
+                        <Loader size="sm" />
                       </span>
                       Saving...
                     </>

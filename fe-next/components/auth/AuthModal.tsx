@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Eye, EyeOff, type LucideIcon } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { Button as ButtonComponent } from '../ui/button';
 
@@ -380,7 +380,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     asChild={false}
                   >
                     {isLoading === 'crazygames' ? (
-                      <NeoLoader variant="dots" size="sm" />
+                      <Loader size="sm" />
                     ) : (
                       <span>{t('auth.loginCrazyGames')}</span>
                     )}
@@ -400,7 +400,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       asChild={false}
                     >
                       {isLoading === provider.id ? (
-                        <NeoLoader variant="dots" size="sm" />
+                        <Loader size="sm" />
                       ) : (
                         <provider.icon className="w-5 h-5" />
                       )}
@@ -504,7 +504,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     asChild={false}
                   >
                     {isLoading === 'email' ? (
-                      <NeoLoader variant="dots" size="sm" />
+                      <Loader size="sm" />
                     ) : (
                       authMode === 'signup'
                         ? (t('auth.inlineSignup.signUpButton') || 'Create Account')

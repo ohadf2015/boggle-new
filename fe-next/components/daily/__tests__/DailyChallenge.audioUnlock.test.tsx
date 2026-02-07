@@ -109,9 +109,9 @@ jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
-// Mock NeoLoader
-jest.mock('@/components/ui/NeoLoader', () => ({
-  NeoLoader: () => <div data-testid="loading">Loading...</div>,
+// Mock PageLoader
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: () => <div data-testid="loading">Loading...</div>,
 }));
 
 // Mock hooks

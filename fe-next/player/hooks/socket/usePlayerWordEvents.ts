@@ -9,7 +9,6 @@ import { useCallback, MutableRefObject, RefObject, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import {
-  wordAIValidatingToast,
   wordErrorToast,
   neoSuccessToast,
   neoInfoToast,
@@ -184,19 +183,6 @@ export function usePlayerWordEvents({
       // Toast removed to avoid duplicate notifications
     }, [inputRef, setFoundWords, comboLevelRef, lastWordTimeRef, setComboLevel, setLastWordTime, comboTimeoutRef, playComboSound, resetCombo, customHaptic]);
 
-  const handleWordNeedsValidation = useCallback((data: any) => {
-    // Note: WordFormingArea now handles pending feedback visually
-    resetCombo();
-  }, [resetCombo]);
-
-  const handleWordValidatingWithAI = useCallback((data: any) => {
-    wordAIValidatingToast(data.word, {
-      aiValidatingLabel: t('playerView.aiValidating') || 'AI checking...',
-      duration: 15000
-    });
-    logger.log('[PLAYER] AI is validating word:', data.word);
-  }, [t]);
-
   const handleWordAlreadyFound = useCallback((data: any) => {
     // Haptic feedback for duplicate word (warning pattern)
     customHaptic(GAME_HAPTICS.invalidWord);
@@ -346,8 +332,6 @@ export function usePlayerWordEvents({
   // Use useSafeSocketEvents to register all events automatically
   const events = useMemo(() => [
     { event: 'wordAccepted', handler: handleWordAccepted as (data: unknown) => void },
-    { event: 'wordNeedsValidation', handler: handleWordNeedsValidation as (data: unknown) => void },
-    { event: 'wordValidatingWithAI', handler: handleWordValidatingWithAI as (data: unknown) => void },
     { event: 'wordAlreadyFound', handler: handleWordAlreadyFound as (data: unknown) => void },
     { event: 'wordAlreadyFoundByOther', handler: handleWordAlreadyFoundByOther as (data: unknown) => void },
     { event: 'wordNotOnBoard', handler: handleWordNotOnBoard as (data: unknown) => void },
@@ -364,8 +348,6 @@ export function usePlayerWordEvents({
     { event: 'wordBlockedByCooldown', handler: handleWordBlockedByCooldown as (data: unknown) => void },
   ], [
     handleWordAccepted,
-    handleWordNeedsValidation,
-    handleWordValidatingWithAI,
     handleWordAlreadyFound,
     handleWordAlreadyFoundByOther,
     handleWordNotOnBoard,

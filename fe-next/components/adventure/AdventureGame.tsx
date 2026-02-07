@@ -40,20 +40,12 @@ import LevelEntryOverlay from './LevelEntryOverlay';
 import { BossOverlay, PlayerHealthBar } from './boss';
 import { usePlayerHealth } from '@/hooks/usePlayerHealth';
 import type { EffectCallbacks } from '@/hooks/useBossEffectExecutor';
-import dynamic from 'next/dynamic';
-// Constants are imported statically (small), components dynamically (large Remotion bundles)
-import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES } from './cinematics';
-
-// Dynamic imports for cinematics - reduces initial bundle by ~200KB
-// These Remotion compositions are only needed when level completes
-const VictoryCinematic = dynamic(
-  () => import('./cinematics/VictoryCinematic').then(mod => mod.VictoryCinematic),
-  { ssr: false }
-);
-const DefeatCinematic = dynamic(
-  () => import('./cinematics/DefeatCinematic').then(mod => mod.DefeatCinematic),
-  { ssr: false }
-);
+import {
+  VictoryCinematic,
+  VICTORY_DURATION_FRAMES,
+  DefeatCinematic,
+  DEFEAT_DURATION_FRAMES,
+} from './cinematics';
 import { CinematicPlayer } from './boss/cinematics/CinematicPlayer';
 import GameplayBackground from './themed/GameplayBackground';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
@@ -299,6 +291,7 @@ const AdventureGame = memo<AdventureGameProps>(
       wasSubmitted: false,
       isValid: false,
     });
+    const [lastAccepted, setLastAccepted] = useState<{ word: string; score: number } | null>(null);
 
     const cinematics = useAdventureCinematics();
 
@@ -339,7 +332,7 @@ const AdventureGame = memo<AdventureGameProps>(
     } = useAdventureSelection({
       tiles,
       gridSize: levelConfig.gridSize,
-      disabled: !isPlaying || isPaused || isValidating || isCascading,
+      disabled: !isPlaying || isPaused || isValidating,
       gridRef,
     });
 
@@ -822,28 +815,28 @@ const AdventureGame = memo<AdventureGameProps>(
 
     const handleTileSelect = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating || isCascading) return;
+        if (!isPlaying || isPaused || isValidating) return;
         selectTile(index);
         resetOnGameAction();
       },
-      [isPlaying, isPaused, isValidating, isCascading, selectTile, resetOnGameAction]
+      [isPlaying, isPaused, isValidating, selectTile, resetOnGameAction]
     );
 
     const handleDragStart = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating || isCascading) return;
+        if (!isPlaying || isPaused || isValidating) return;
         clearSelection();
         selectTile(index);
       },
-      [isPlaying, isPaused, isValidating, isCascading, clearSelection, selectTile]
+      [isPlaying, isPaused, isValidating, clearSelection, selectTile]
     );
 
     const handleDragEnter = useCallback(
       (index: number, _tile: GridTileState) => {
-        if (!isPlaying || isPaused || isValidating || isCascading) return;
+        if (!isPlaying || isPaused || isValidating) return;
         selectTile(index);
       },
-      [isPlaying, isPaused, isValidating, isCascading, selectTile]
+      [isPlaying, isPaused, isValidating, selectTile]
     );
 
     const handleWordSubmit = useCallback(
@@ -903,6 +896,7 @@ const AdventureGame = memo<AdventureGameProps>(
           });
 
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
+          setLastAccepted({ word: currentWord, score: scoreValue });
           lastSubmittedWordRef.current = { word: currentWord, path };
 
           submitWordWithPath(currentWord, scoreValue, path);
@@ -930,7 +924,8 @@ const AdventureGame = memo<AdventureGameProps>(
 
           wordSubmittedTimeoutRef.current = setTimeout(() => {
             setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
-          }, 400);
+            setLastAccepted(null);
+          }, 1200);
         } else if (result.errorKey) {
           const errorMessage = t(result.errorKey) || result.errorKey;
           setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
@@ -1071,8 +1066,8 @@ const AdventureGame = memo<AdventureGameProps>(
               onDragStart={handleDragStart}
               onDragEnter={handleDragEnter}
               gridRef={gridRef}
-              isInteractive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating && !isCascading}
-              isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating || isCascading}
+              isInteractive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating}
+              isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
               entryPhase={entryPhase}
               showCascade={entryPhase === 'cascade'}
               onCascadeComplete={handleCascadeComplete}
@@ -1082,6 +1077,7 @@ const AdventureGame = memo<AdventureGameProps>(
               isValidating={isValidating}
               isWordValid={validationFeedback.isValid}
               wasWordSubmitted={validationFeedback.wasSubmitted}
+              lastAccepted={lastAccepted}
               selectedLength={selectedIndices.length}
               minWordLength={minWordLength}
               hintLevel={hintData.level}

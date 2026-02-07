@@ -3,7 +3,7 @@
 import React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -78,8 +78,7 @@ export function PageStateHandler({
 
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <NeoLoader
-          variant="mascot-letters"
+        <PageLoader
           size="md"
           text={loadingText || t('common.loading') || 'Loading...'}
         />

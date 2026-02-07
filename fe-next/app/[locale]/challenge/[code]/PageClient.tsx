@@ -2,13 +2,13 @@
 
 import nextDynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 // Dynamic import for code splitting
 const ChallengeView = nextDynamic(() => import('@/components/challenge/ChallengeView'), {
   loading: () => (
     <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <NeoLoader variant="mascot-letters" size="lg" text="Loading challenge..." />
+      <PageLoader size="lg" text="Loading challenge..." />
     </div>
   ),
   ssr: false,

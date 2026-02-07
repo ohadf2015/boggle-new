@@ -26,11 +26,11 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
   skipAnimations,
   onLifeGainComplete,
 }) => {
-  // Life bar color based on remaining life
-  const getLifeColor = () => {
-    if (lifePoints > 66) return 'bg-green-500';
-    if (lifePoints > 33) return 'bg-yellow-500';
-    return 'bg-red-500';
+  // Life bar gradient based on remaining life
+  const getLifeGradient = () => {
+    if (lifePoints > 66) return 'bg-gradient-to-r from-green-400 to-emerald-500';
+    if (lifePoints > 33) return 'bg-gradient-to-r from-yellow-400 to-orange-400';
+    return 'bg-gradient-to-r from-red-500 to-orange-400';
   };
 
   return (
@@ -81,16 +81,19 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
       >
         <motion.div
           className={cn(
-            "h-full flex items-center justify-center text-sm sm:text-base font-black text-white",
-            getLifeColor(),
+            "h-full flex items-center justify-center text-sm sm:text-base font-black text-white relative overflow-hidden",
+            getLifeGradient(),
             lifePoints <= 20 && !isLifeGaining && "animate-pulse"
           )}
+          style={{ width: `${Math.max(lifePoints, 15)}%` }}
           animate={{
             width: `${Math.max(lifePoints, 15)}%`,
           }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+          {/* Shimmer overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
+          <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] relative z-10">
             {Math.floor(lifePoints)}/100
           </span>
         </motion.div>

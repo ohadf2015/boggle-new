@@ -8,7 +8,7 @@ import { useClassProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { ChevronDown, ChevronRight, Users, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -104,7 +104,7 @@ export default function StudentProgressView() {
   if (loadingClassrooms || loadingLessons) {
     return (
       <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }
@@ -191,7 +191,7 @@ export default function StudentProgressView() {
         </Card>
       ) : loadingProgress ? (
         <div className="flex justify-center items-center py-12">
-          <NeoLoader variant="mascot-letters" size="md" text={t('common.loading')} />
+          <PageLoader size="md" text={t('common.loading')} />
         </div>
       ) : studentStats.length === 0 ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">

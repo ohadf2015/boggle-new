@@ -10,6 +10,7 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureGrid from '../AdventureGrid';
@@ -44,6 +45,7 @@ interface GameGridAreaProps {
   isValidating: boolean;
   isWordValid: boolean;
   wasWordSubmitted: boolean;
+  lastAccepted: { word: string; score: number } | null;
   selectedLength: number;
   minWordLength: number;
   
@@ -77,6 +79,7 @@ export const GameGridArea = memo(function GameGridArea({
   isValidating,
   isWordValid,
   wasWordSubmitted,
+  lastAccepted,
   selectedLength,
   minWordLength,
   hintLevel,
@@ -97,12 +100,12 @@ export const GameGridArea = memo(function GameGridArea({
       )}
     >
       {/* Main Content - Centered vertically and horizontally */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-2">
-        
+      <div className="flex-1 flex flex-col items-center justify-center min-h-0 px-2 sm:px-4 py-1 sm:py-2">
+
         {/* Top Section: Feedback & Word Preview */}
-        <div className="flex flex-col items-center gap-2 mb-2 sm:mb-4 shrink-0">
+        <div className="flex flex-col items-center gap-1 mb-1 sm:mb-2 shrink-0">
           {/* Feedback Area */}
-          <div data-testid="feedback-container" className="h-8 sm:h-10 flex items-center justify-center">
+          <div data-testid="feedback-container" className="h-6 sm:h-8 flex items-center justify-center">
             <AnimatePresence mode="wait">
               {/* Validation Error */}
               {validationError && (
@@ -169,35 +172,45 @@ export const GameGridArea = memo(function GameGridArea({
           </div>
 
           {/* Word Preview */}
-          <div className="h-10 sm:h-12 flex items-center justify-center">
+          <div className="h-8 sm:h-10 flex items-center justify-center">
             <AnimatePresence mode="wait">
-              {currentWord.length > 0 ? (
+              {/* Accepted word celebration */}
+              {wasWordSubmitted && lastAccepted ? (
+                <motion.div
+                  key="accepted"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: [0.6, 1.15, 1] }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.4, times: [0, 0.5, 1] }}
+                  className={cn(
+                    'px-4 sm:px-6 py-1 sm:py-1.5 rounded-neo-lg',
+                    'font-black text-xl sm:text-2xl tracking-wider uppercase',
+                    'border-3 shadow-hard',
+                    'bg-neo-lime/20 border-neo-lime text-neo-lime',
+                    'flex items-center gap-2'
+                  )}
+                >
+                  <Check className="w-5 h-5" />
+                  <span>{lastAccepted.word}</span>
+                  <span className="text-base font-bold text-neo-lime/80">+{lastAccepted.score}</span>
+                </motion.div>
+              ) : currentWord.length > 0 ? (
                 <motion.div
                   key="word"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   className={cn(
-                    'px-4 sm:px-6 py-1.5 sm:py-2 rounded-neo-lg',
+                    'px-4 sm:px-6 py-1 sm:py-1.5 rounded-neo-lg',
                     'font-black text-xl sm:text-2xl tracking-wider uppercase',
                     'border-3 shadow-hard',
-                    isWordValid 
-                      ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
-                      : 'bg-neo-white/10 border-neo-white/30 text-neo-white'
+                    'bg-neo-white/10 border-neo-white/30 text-neo-white'
                   )}
                 >
                   {currentWord}
                 </motion.div>
               ) : (
-                <motion.div
-                  key="placeholder"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-neo-white/30 text-sm font-medium text-center"
-                >
-                  {t('adventure.game.selectWord') || 'Select letters to form a word'}
-                </motion.div>
+                <div key="empty" className="h-full" />
               )}
             </AnimatePresence>
           </div>
@@ -206,7 +219,10 @@ export const GameGridArea = memo(function GameGridArea({
         {/* Grid Container - Takes available space but doesn't overflow */}
         <div className="flex-1 flex items-center justify-center min-h-0 w-full max-w-md lg:max-w-lg">
           <motion.div
-            className="w-full aspect-square max-h-full"
+            className={cn(
+              'w-full aspect-square max-h-full rounded-neo-lg',
+              wasWordSubmitted && lastAccepted && 'ring-2 ring-neo-lime/60'
+            )}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
@@ -235,7 +251,7 @@ export const GameGridArea = memo(function GameGridArea({
         </div>
 
         {/* Hint Message - Bottom of grid area */}
-        <div className="h-8 shrink-0 flex items-center justify-center mt-2">
+        <div className="h-6 shrink-0 flex items-center justify-center mt-1">
           <AnimatePresence>
             {hintLevel !== 'none' && (
               <motion.div

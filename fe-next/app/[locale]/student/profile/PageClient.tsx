@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import Header from '@/components/Header';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { EducationBadgeGrid, type StudentAchievement } from '@/components/education';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -126,7 +126,7 @@ export default function StudentProfilePageClient() {
   if (isChecking || loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }
@@ -258,7 +258,7 @@ export default function StudentProfilePageClient() {
         {/* Achievement Grid */}
         {isLoadingAchievements ? (
           <div className="flex items-center justify-center p-12">
-            <NeoLoader variant="mascot-letters" size="md" text={t('common.loading')} />
+            <PageLoader size="md" text={t('common.loading')} />
           </div>
         ) : (
           <EducationBadgeGrid

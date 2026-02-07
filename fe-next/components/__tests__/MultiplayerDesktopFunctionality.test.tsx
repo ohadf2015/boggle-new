@@ -1,13 +1,14 @@
 /**
  * Test: Multiplayer Desktop Functionality Access
  *
- * BUG: Bottom tabs (players/chat navigation) are hidden on desktop with lg:hidden,
- * which means desktop users cannot access chat or switch between tabs.
+ * The desktop layout uses a two-column DesktopLobbyLayout:
+ * - Left column: Start button (host) or waiting status (player), player roster, settings
+ * - Right column: QR/share invite, chat (desktop-chat-area)
  *
  * Requirements:
  * 1. Desktop users must have access to all functionality (players list, chat)
- * 2. Either show content side-by-side OR provide alternative navigation on desktop
- * 3. Mobile keeps bottom tab navigation
+ * 2. Content is shown side-by-side via DesktopLobbyLayout
+ * 3. Mobile uses single-scroll layout
  */
 
 import React from 'react';
@@ -116,42 +117,31 @@ describe('Multiplayer Desktop Functionality Access', () => {
     it('should show chat content on desktop (not hidden behind tabs)', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // On desktop, the RoomChat component should be rendered and visible
-      // It should NOT require clicking a mobile tab to access
-      // The chat should either be:
-      // 1. Rendered alongside the lobby content (side-by-side)
-      // 2. Or have desktop-specific navigation
-
-      // Find the desktop layout container that shows both lobby and chat
+      // Desktop two-column layout renders chat in right column with data-testid="desktop-chat-area"
       const desktopChatArea = screen.queryByTestId('desktop-chat-area');
-
-      // On desktop, chat should be accessible without needing the mobile tab bar
-      // This test will FAIL with current implementation because chat is only
-      // accessible via the mobile tab bar which has lg:hidden
       expect(desktopChatArea).toBeInTheDocument();
     });
 
     it('should have a visible start game button on desktop', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // Desktop should have a start button that is visible
-      // Now we have TWO start buttons: one in desktop layout, one in mobile layout
-      const startButtons = screen.getAllByRole('button', { name: /startGame/i });
+      // StartButton renders with text from t('hostView.startBattle')
+      // mockT returns the key itself, so button text is 'hostView.startBattle'
+      const startButtons = screen.getAllByRole('button', { name: /startBattle/i });
 
       // Verify at least one start button exists
       expect(startButtons.length).toBeGreaterThanOrEqual(1);
 
       // Find the desktop start button (one that is NOT inside lg:hidden container)
       const desktopStartButton = startButtons.find((btn) => {
-        // Walk up the DOM to check if any ancestor has lg:hidden
         let parent = btn.parentElement;
         while (parent) {
           if (parent.className?.includes('lg:hidden')) {
-            return false; // This button is hidden on desktop
+            return false;
           }
           parent = parent.parentElement;
         }
-        return true; // This button is visible on desktop
+        return true;
       });
 
       // There must be at least one button visible on desktop
@@ -180,21 +170,18 @@ describe('Multiplayer Desktop Functionality Access', () => {
     it('should show chat content on desktop (not hidden behind tabs)', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      // On desktop, the RoomChat component should be rendered and visible
-      // without requiring the mobile tab bar
+      // Desktop two-column layout renders chat in right column with data-testid="desktop-chat-area"
       const desktopChatArea = screen.queryByTestId('desktop-chat-area');
-
-      // This test will FAIL because chat is currently only accessible
-      // via the mobile tab bar which is hidden on desktop (lg:hidden)
       expect(desktopChatArea).toBeInTheDocument();
     });
 
     it('should show both players list and chat simultaneously on desktop', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      // On desktop, both players list and chat should be visible at the same time
-      // They should be rendered side-by-side, not behind tabs
-      const playersSection = screen.queryByTestId('desktop-players-section');
+      // Desktop layout uses DesktopLobbyLayout with left/right columns
+      // Left column has data-testid="desktop-left-column" (players + waiting status)
+      // Right column has data-testid="desktop-chat-area" (chat)
+      const playersSection = screen.queryByTestId('desktop-left-column');
       const chatSection = screen.queryByTestId('desktop-chat-area');
 
       // Both should be present in the DOM for desktop layout

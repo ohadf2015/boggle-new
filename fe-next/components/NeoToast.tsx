@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Bot } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/utils/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 /**
  * Neo-Brutalist Toast Component
@@ -244,7 +244,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
               transition={{ duration: 0.6, repeat: Infinity }}
               className="ml-auto"
             >
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             </motion.div>
           </motion.div>
         )}

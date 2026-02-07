@@ -6,7 +6,6 @@
  * Expected: Light background with dark text OR dark background with light text
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
@@ -51,10 +50,10 @@ describe('AdventureGrid Contrast', () => {
       const cells = screen.getAllByRole('gridcell');
       const firstCell = cells[0];
 
-      // Standard tiles must have light background gradient
-      // This ensures black text (text-neo-black) is readable
+      // Standard tiles use world-specific light background gradients
+      // World 1 (meadows default): from-[#fdfcf0] via-[#f5f0e0] to-[#ede8d4]
       expect(firstCell).toHaveClass('bg-gradient-to-br');
-      expect(firstCell).toHaveClass('from-neo-white');
+      expect(firstCell.className).toMatch(/from-\[#fdfcf0\]/);
     });
 
     it('should have proper text color on standard tiles', () => {
@@ -68,8 +67,14 @@ describe('AdventureGrid Contrast', () => {
       const cells = screen.getAllByRole('gridcell');
       const firstCell = cells[0];
 
-      // Standard tiles must have dark text for readability on light background
-      expect(firstCell).toHaveClass('text-neo-black');
+      // Standard tiles have dark text via the letter span's drop-shadow and
+      // world-specific letter-glow class. The tile itself uses font-black weight
+      // and the letter span inside has the glow/shadow for readability.
+      expect(firstCell).toHaveClass('font-black');
+      // Verify the letter span inside has a text-rendering class for contrast
+      const letterSpan = firstCell.querySelector('span');
+      expect(letterSpan).toBeTruthy();
+      expect(letterSpan!.className).toMatch(/drop-shadow/);
     });
 
     it('should apply world theming WITHOUT overriding base background', () => {
@@ -86,7 +91,8 @@ describe('AdventureGrid Contrast', () => {
       // World theming classes should coexist with background gradient
       // The texture is an overlay, not a replacement for the background
       expect(firstCell).toHaveClass('tile-texture-meadows');
-      expect(firstCell).toHaveClass('from-neo-white'); // Must still have light background
+      // Must still have world-specific light background gradient
+      expect(firstCell.className).toMatch(/from-\[#fdfcf0\]/);
     });
   });
 

@@ -127,7 +127,7 @@ export function useWordSubmission(
     if (!socket || !gameActive) return;
     socket.emit('submitWord', {
       word: formedWord.toLowerCase(),
-      comboLevel: Math.min(comboLevelRef.current, 10),
+      comboLevel: comboLevelRef.current,
       fireRoundActive: fireRoundActiveRef.current,
     });
 

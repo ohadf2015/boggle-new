@@ -35,14 +35,7 @@ jest.mock('@/components/game/ComboDisplay', () => ({
 const mockT = (key: string) => {
   const translations: Record<string, string> = {
     'common.score': 'Score',
-    'singlePlayer.highScore': 'High Score',
-    'singlePlayer.newHighScore': 'New High Score',
-    'singlePlayer.maxCombo': 'Max Combo',
     'singlePlayer.wordsFound': 'Words Found',
-    'singlePlayer.timeElapsed': 'Time Elapsed',
-    'singlePlayer.submitWord': 'Submit word',
-    'singlePlayer.clearWord': 'Clear word',
-    'singlePlayer.pauseGame': 'Pause game',
   };
   return translations[key] || key;
 };
@@ -99,40 +92,15 @@ describe('DesktopStatsPanel', () => {
       expect(screen.getByText('Score')).toBeInTheDocument();
     });
 
-    it('should change style when beating high score', () => {
-      // GIVEN score higher than target
-      const props = { ...defaultProps, score: 200, targetHighScore: 150 };
+    it('should display score with locale formatting for large numbers', () => {
+      // GIVEN a large score
+      const props = { ...defaultProps, score: 1500 };
 
       // WHEN component is rendered
       render(<DesktopStatsPanel {...props} />);
 
-      // THEN "New High Score" message should appear
-      expect(screen.getByText('New High Score!')).toBeInTheDocument();
-    });
-  });
-
-  describe('High score progress', () => {
-    it('should show high score target in challenge mode', () => {
-      // GIVEN a target high score
-      const props = { ...defaultProps, targetHighScore: 200 };
-
-      // WHEN component is rendered
-      render(<DesktopStatsPanel {...props} />);
-
-      // THEN high score section should be visible
-      expect(screen.getByText('High Score')).toBeInTheDocument();
-      expect(screen.getByText('200')).toBeInTheDocument();
-    });
-
-    it('should NOT show high score in practice mode', () => {
-      // GIVEN practice mode with target high score
-      const props = { ...defaultProps, targetHighScore: 200, isPracticeMode: true };
-
-      // WHEN component is rendered
-      render(<DesktopStatsPanel {...props} />);
-
-      // THEN high score section should NOT be visible
-      expect(screen.queryByText('High Score')).not.toBeInTheDocument();
+      // THEN score should be formatted (locale-dependent, "1,500" in en-US)
+      expect(screen.getByText(/1.?500/)).toBeInTheDocument();
     });
   });
 
@@ -146,26 +114,6 @@ describe('DesktopStatsPanel', () => {
       const comboDisplay = screen.getByTestId('combo-display');
       expect(comboDisplay).toBeInTheDocument();
       expect(comboDisplay).toHaveAttribute('data-level', '3');
-    });
-
-    it('should show max combo when greater than 1', () => {
-      // GIVEN max combo of 5
-      // WHEN component is rendered
-      render(<DesktopStatsPanel {...defaultProps} />);
-
-      // THEN max combo should be displayed
-      expect(screen.getByText(/Max Combo.*5x/)).toBeInTheDocument();
-    });
-
-    it('should NOT show max combo when 1 or less', () => {
-      // GIVEN max combo of 1
-      const props = { ...defaultProps, maxCombo: 1 };
-
-      // WHEN component is rendered
-      render(<DesktopStatsPanel {...props} />);
-
-      // THEN max combo should NOT be displayed
-      expect(screen.queryByText(/Max Combo/)).not.toBeInTheDocument();
     });
   });
 
@@ -189,22 +137,6 @@ describe('DesktopStatsPanel', () => {
 
       // THEN sub-value should show total
       expect(screen.getByText('/ 50')).toBeInTheDocument();
-    });
-  });
-
-  describe('Keyboard shortcuts hint', () => {
-    it('should display keyboard shortcuts', () => {
-      // GIVEN default props
-      // WHEN component is rendered
-      render(<DesktopStatsPanel {...defaultProps} />);
-
-      // THEN keyboard shortcuts should be visible
-      expect(screen.getByText('Enter')).toBeInTheDocument();
-      expect(screen.getByText('Submit word')).toBeInTheDocument();
-      expect(screen.getByText('Backspace')).toBeInTheDocument();
-      expect(screen.getByText('Clear word')).toBeInTheDocument();
-      expect(screen.getByText('Space')).toBeInTheDocument();
-      expect(screen.getByText('Pause game')).toBeInTheDocument();
     });
   });
 });

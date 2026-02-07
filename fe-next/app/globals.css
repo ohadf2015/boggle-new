@@ -1302,65 +1302,70 @@ body {
 }
 
 .tile-texture-meadows::after {
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(139, 69, 19, 0.06) 0px,
-    transparent 1px,
-    transparent 2px,
-    rgba(139, 69, 19, 0.06) 3px
+  background: linear-gradient(
+    180deg,
+    rgba(190, 255, 0, 0.04) 0%,
+    rgba(139, 90, 43, 0.03) 100%
   );
 }
 
 .tile-texture-springs::after {
-  background-image: radial-gradient(
-    circle,
-    rgba(0, 255, 255, 0.08) 0%,
-    transparent 2px,
-    transparent 4px,
-    rgba(0, 255, 255, 0.08) 6px
+  background: linear-gradient(
+    180deg,
+    rgba(200, 230, 255, 0.08) 0%,
+    rgba(0, 200, 220, 0.04) 100%
   );
-  background-size: 12px 12px;
 }
 
 .tile-texture-caverns::after {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(139, 92, 246, 0.07) 0px,
-    transparent 2px,
-    transparent 4px,
-    rgba(139, 92, 246, 0.07) 6px
+  background: linear-gradient(
+    180deg,
+    rgba(200, 180, 255, 0.06) 0%,
+    rgba(139, 92, 246, 0.04) 100%
   );
 }
 
 /* ==================== TILE BORDERS ==================== */
 
 .tile-border-meadows {
-  border: 2px solid rgba(190, 255, 0, 0.5);
-  box-shadow: inset 0 0 8px rgba(190, 255, 0, 0.1);
+  border: 2px solid rgba(139, 90, 43, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(139, 90, 43, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .tile-border-springs {
-  border: 2px solid rgba(0, 255, 255, 0.5);
-  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.1);
+  border: 2px solid rgba(0, 150, 170, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 150, 170, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .tile-border-caverns {
-  border: 2px solid rgba(139, 92, 246, 0.5);
-  box-shadow: inset 0 0 8px rgba(139, 92, 246, 0.15);
+  border: 2px solid rgba(100, 60, 180, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(100, 60, 180, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* ==================== LETTER GLOW EFFECTS ==================== */
 
 .letter-glow-meadows {
-  text-shadow: 0 0 4px rgba(190, 255, 0, 0.3);
+  color: #1a3a1a;
+  text-shadow: 0 0 4px rgba(34, 80, 34, 0.2);
 }
 
 .letter-glow-springs {
-  text-shadow: 0 0 4px rgba(0, 255, 255, 0.3);
+  color: #0d3d4a;
+  text-shadow: 0 0 4px rgba(0, 120, 140, 0.2);
 }
 
 .letter-glow-caverns {
-  text-shadow: 0 0 4px rgba(139, 92, 246, 0.3);
+  color: #3b1a6e;
+  text-shadow: 0 0 4px rgba(80, 40, 140, 0.2);
 }
 
 /* ==================== BOARD FRAME DECORATIONS ==================== */
@@ -1370,42 +1375,58 @@ body {
   position: relative;
   padding: 16px;
   border-radius: 8px;
+  border: 3px solid transparent;
 }
 
-/* World 1: Meadows - Vine corners */
+/* World 1: Meadows - Golden-brown premium frame */
 .board-frame-meadows {
+  border-color: rgba(139, 90, 43, 0.7);
   background: linear-gradient(
     135deg,
-    rgba(34, 139, 34, 0.1) 0%,
+    rgba(34, 139, 34, 0.08) 0%,
     transparent 15%,
     transparent 85%,
-    rgba(34, 139, 34, 0.1) 100%
+    rgba(34, 139, 34, 0.08) 100%
   );
+  box-shadow:
+    inset 0 0 0 1px rgba(190, 255, 0, 0.15),
+    0 0 20px rgba(139, 90, 43, 0.3),
+    0 0 40px rgba(34, 139, 34, 0.1);
 }
 
-/* World 2: Springs - Water splash effects */
+/* World 2: Springs - Glowing cyan frame */
 .board-frame-springs {
+  border-color: rgba(0, 200, 220, 0.6);
   background: radial-gradient(
     ellipse at top left,
-    rgba(0, 255, 255, 0.08) 0%,
+    rgba(0, 255, 255, 0.06) 0%,
     transparent 25%
   ),
   radial-gradient(
     ellipse at bottom right,
-    rgba(0, 255, 255, 0.08) 0%,
+    rgba(0, 255, 255, 0.06) 0%,
     transparent 25%
   );
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 255, 255, 0.1),
+    0 0 20px rgba(0, 200, 220, 0.25),
+    0 0 40px rgba(0, 255, 255, 0.1);
 }
 
-/* World 3: Caverns - Crystal clusters */
+/* World 3: Caverns - Purple amethyst frame */
 .board-frame-caverns {
+  border-color: rgba(139, 92, 246, 0.6);
   background: linear-gradient(
     135deg,
-    rgba(139, 92, 246, 0.12) 0%,
+    rgba(139, 92, 246, 0.1) 0%,
     transparent 15%,
     transparent 85%,
-    rgba(139, 92, 246, 0.12) 100%
+    rgba(139, 92, 246, 0.1) 100%
   );
+  box-shadow:
+    inset 0 0 0 1px rgba(139, 92, 246, 0.15),
+    0 0 20px rgba(139, 92, 246, 0.3),
+    0 0 40px rgba(139, 92, 246, 0.1);
 }
 
 /* ==================== RTL SUPPORT ==================== */

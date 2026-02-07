@@ -3,7 +3,7 @@
 import React from 'react';
 import { Calendar, RefreshCw, Edit, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import type { DailyTargetWord } from '../types';
 import { formatDateDisplay } from '../constants';
@@ -42,7 +42,7 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
         </div>
         <Button size="sm" variant="outline" onClick={onRefresh} disabled={isLoading}>
           {isLoading ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <RefreshCw className="w-4 h-4" />
           )}

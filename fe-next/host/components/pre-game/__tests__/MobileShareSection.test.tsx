@@ -1,7 +1,8 @@
 /**
  * MobileShareSection Component Tests
  *
- * Tests for the compact share UI used in the mobile host lobby
+ * Tests for the compact horizontal pill share strip in the mobile host lobby.
+ * Layout: Copy Link | WhatsApp | Telegram (inline pills)
  */
 
 import React from 'react';
@@ -21,18 +22,7 @@ jest.mock('framer-motion', () => ({
     button: ({ children, whileTap, animate, transition, ...props }: React.ComponentProps<'button'> & { whileTap?: unknown; animate?: unknown; transition?: unknown }) => (
       <button {...props}>{children}</button>
     ),
-    div: ({ children, initial, animate, exit, transition, ...props }: React.ComponentProps<'div'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }) => (
-      <div {...props}>{children}</div>
-    ),
   },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
-// Mock qrcode.react
-jest.mock('qrcode.react', () => ({
-  QRCodeSVG: ({ value, size, ...props }: { value: string; size: number }) => (
-    <svg data-testid="qr-code-svg" data-value={value} width={size} height={size} {...props} />
-  ),
 }));
 
 // Mock social icons
@@ -41,14 +31,7 @@ jest.mock('../../../../components/icons/SocialIcons', () => ({
   TelegramIcon: ({ size }: { size?: number }) => <svg data-testid="telegram-icon" width={size} height={size} />,
 }));
 
-// Mock getJoinUrl
-// Mock window.open for social sharing
-const mockWindowOpen = jest.fn();
-Object.defineProperty(window, 'open', {
-  value: mockWindowOpen,
-  writable: true,
-});
-
+// Mock share utils
 jest.mock('../../../../utils/share', () => ({
   getJoinUrl: jest.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
   shareViaWhatsApp: jest.fn(),
@@ -58,75 +41,61 @@ jest.mock('../../../../utils/share', () => ({
 // Translation mock
 const mockT = (key: string) => {
   const translations: Record<string, string> = {
-    'roomCode.title': 'Room Code',
     'roomCode.linkCopied': 'Link copied!',
     'roomCode.copyLink': 'Copy Link',
-    'share.title': 'Join my LexiClash game!',
-    'share.text': 'Join my game!',
-    'share.buttonLabel': 'Share',
-    'share.joinInstructions': 'Go to lexiclash.com and enter code',
-    'share.showQrCode': 'Show QR Code',
-    'share.hideQrCode': 'Hide QR Code',
-    'share.scanQrCode': 'Scan to join instantly',
-    'share.orShareVia': 'Or share via',
+    'share.copyLink': 'Copy Link',
     'share.telegram': 'Telegram',
-    'share.moreWays': 'More ways to share',
+    'share.inviteMessage': 'Join my LexiClash game!',
+    'share.code': 'Code',
     'common.error': 'Failed to copy',
     'common.copied': 'Copied!',
+    'hostView.inviteWarriors': 'Invite Warriors',
   };
   return translations[key] || key;
 };
 
 describe('MobileShareSection', () => {
-  // Store original navigator methods
   const originalClipboard = navigator.clipboard;
-  const originalShare = navigator.share;
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    // Default: clipboard available, no native share
     Object.defineProperty(navigator, 'clipboard', {
       value: {
         writeText: jest.fn().mockResolvedValue(undefined),
       },
       configurable: true,
     });
-    Object.defineProperty(navigator, 'share', {
-      value: undefined,
-      configurable: true,
-    });
   });
 
   afterEach(() => {
     jest.useRealTimers();
-    // Restore original navigator methods
     Object.defineProperty(navigator, 'clipboard', {
       value: originalClipboard,
-      configurable: true,
-    });
-    Object.defineProperty(navigator, 'share', {
-      value: originalShare,
       configurable: true,
     });
   });
 
   describe('rendering', () => {
-    it('renders with room code displayed prominently', () => {
-      render(<MobileShareSection gameCode="ABCD1234" t={mockT} />);
-
-      expect(screen.getByText('ABCD1234')).toBeInTheDocument();
-    });
-
     it('renders with data-testid for integration testing', () => {
       render(<MobileShareSection gameCode="TEST123" t={mockT} />);
-
       expect(screen.getByTestId('mobile-share-section')).toBeInTheDocument();
+    });
+
+    it('renders section title', () => {
+      render(<MobileShareSection gameCode="TEST123" t={mockT} />);
+      expect(screen.getByText('Invite Warriors')).toBeInTheDocument();
+    });
+
+    it('renders all three share buttons', () => {
+      render(<MobileShareSection gameCode="TEST123" t={mockT} />);
+      expect(screen.getByTestId('mobile-copy-link-button')).toBeInTheDocument();
+      expect(screen.getByTestId('mobile-whatsapp-button')).toBeInTheDocument();
+      expect(screen.getByTestId('mobile-telegram-button')).toBeInTheDocument();
     });
 
     it('applies custom className when provided', () => {
       render(<MobileShareSection gameCode="TEST123" t={mockT} className="custom-class" />);
-
       const section = screen.getByTestId('mobile-share-section');
       expect(section.className).toContain('custom-class');
     });
@@ -147,7 +116,7 @@ describe('MobileShareSection', () => {
       expect(toast.success).toHaveBeenCalledWith('Link copied!', { duration: 1500, icon: '🔗' });
     });
 
-    it('shows check icon after successful copy', async () => {
+    it('shows Copied! text after successful copy', async () => {
       render(<MobileShareSection gameCode="COPY123" t={mockT} />);
 
       const copyButton = screen.getByTestId('mobile-copy-link-button');
@@ -155,9 +124,7 @@ describe('MobileShareSection', () => {
         fireEvent.click(copyButton);
       });
 
-      // Check icon should appear (button content changes)
-      const buttonSvg = copyButton.querySelector('svg');
-      expect(buttonSvg).toBeInTheDocument();
+      expect(screen.getByText('Copied!')).toBeInTheDocument();
     });
 
     it('resets copied state after 2 seconds', async () => {
@@ -168,13 +135,11 @@ describe('MobileShareSection', () => {
         fireEvent.click(copyButton);
       });
 
-      // Advance timers to reset copied state
       await act(async () => {
         jest.advanceTimersByTime(2000);
       });
 
-      // State should reset (visual change, can verify component doesn't crash)
-      expect(copyButton).toBeInTheDocument();
+      expect(screen.getByText('Copy Link')).toBeInTheDocument();
     });
 
     it('shows error toast when clipboard fails', async () => {
@@ -193,139 +158,69 @@ describe('MobileShareSection', () => {
     });
   });
 
-  describe('native share functionality', () => {
-    it('shows share button when native share is available', () => {
-      Object.defineProperty(navigator, 'share', {
-        value: jest.fn().mockResolvedValue(undefined),
-        configurable: true,
+  describe('social share buttons', () => {
+    it('calls shareViaWhatsApp when WhatsApp button clicked', async () => {
+      const { shareViaWhatsApp } = require('../../../../utils/share');
+
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
+
+      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
+      await act(async () => {
+        fireEvent.click(whatsappBtn);
       });
 
-      render(<MobileShareSection gameCode="SHARE123" t={mockT} />);
-
-      expect(screen.getByTestId('mobile-native-share-button')).toBeInTheDocument();
+      expect(shareViaWhatsApp).toHaveBeenCalledWith('SOCIAL123', '', mockT);
     });
 
-    it('calls native share with correct parameters', async () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, 'share', {
-        value: mockShare,
-        configurable: true,
-      });
+    it('calls shareViaTelegram when Telegram button clicked', async () => {
+      const { shareViaTelegram } = require('../../../../utils/share');
 
-      render(<MobileShareSection gameCode="SHARE123" t={mockT} />);
+      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
 
-      const shareButton = screen.getByTestId('mobile-native-share-button');
+      const telegramBtn = screen.getByTestId('mobile-telegram-button');
       await act(async () => {
-        fireEvent.click(shareButton);
+        fireEvent.click(telegramBtn);
       });
 
-      expect(mockShare).toHaveBeenCalledWith({
-        title: 'Join my LexiClash game!',
-        text: 'Join my game!',
-        url: 'https://lexiclash.com?room=SHARE123&utm_source=mobile-lobby&utm_medium=share',
-      });
+      expect(shareViaTelegram).toHaveBeenCalled();
     });
 
-    it('falls back to copy when native share is cancelled', async () => {
-      const abortError = new Error('User cancelled');
-      abortError.name = 'AbortError';
-      const mockShare = jest.fn().mockRejectedValue(abortError);
-      Object.defineProperty(navigator, 'share', {
-        value: mockShare,
-        configurable: true,
-      });
+    it('WhatsApp button has brand-whatsapp background color', () => {
+      render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
 
-      render(<MobileShareSection gameCode="CANCEL123" t={mockT} />);
-
-      const shareButton = screen.getByTestId('mobile-native-share-button');
-      await act(async () => {
-        fireEvent.click(shareButton);
-      });
-
-      // Should NOT fallback to copy when user cancelled (AbortError)
-      expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
-    });
-
-    it('falls back to copy when native share fails (non-abort)', async () => {
-      const genericError = new Error('Share failed');
-      genericError.name = 'NotAllowedError';
-      const mockShare = jest.fn().mockRejectedValue(genericError);
-      Object.defineProperty(navigator, 'share', {
-        value: mockShare,
-        configurable: true,
-      });
-
-      render(<MobileShareSection gameCode="ERROR123" t={mockT} />);
-
-      const shareButton = screen.getByTestId('mobile-native-share-button');
-      await act(async () => {
-        fireEvent.click(shareButton);
-      });
-
-      // Should fallback to copy when share fails (non-abort error)
-      expect(navigator.clipboard.writeText).toHaveBeenCalled();
+      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
+      expect(whatsappBtn.className).toContain('bg-brand-whatsapp');
     });
   });
 
-  describe('fallback behavior (no native share)', () => {
-    it('shows fallback button when native share is unavailable', () => {
-      Object.defineProperty(navigator, 'share', {
-        value: undefined,
-        configurable: true,
-      });
-
-      render(<MobileShareSection gameCode="FALLBACK123" t={mockT} />);
-
-      expect(screen.getByTestId('mobile-share-fallback-button')).toBeInTheDocument();
-      expect(screen.queryByTestId('mobile-native-share-button')).not.toBeInTheDocument();
-    });
-
-    it('fallback button copies link', async () => {
-      Object.defineProperty(navigator, 'share', {
-        value: undefined,
-        configurable: true,
-      });
-
-      render(<MobileShareSection gameCode="FALLBACK123" t={mockT} />);
-
-      const fallbackButton = screen.getByTestId('mobile-share-fallback-button');
-      await act(async () => {
-        fireEvent.click(fallbackButton);
-      });
-
-      expect(navigator.clipboard.writeText).toHaveBeenCalled();
-      expect(toast.success).toHaveBeenCalled();
-    });
-  });
-
-  describe('neo-brutalist styling', () => {
-    it('has hard shadow styling', () => {
+  describe('compact pill styling', () => {
+    it('buttons use rounded-full pill shape', () => {
       render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
 
-      const section = screen.getByTestId('mobile-share-section');
-      expect(section.className).toContain('shadow-hard-sm');
+      const copyBtn = screen.getByTestId('mobile-copy-link-button');
+      expect(copyBtn.className).toContain('rounded-full');
     });
 
-    it('has chunky border styling', () => {
+    it('buttons have fixed height h-11', () => {
       render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
 
-      const section = screen.getByTestId('mobile-share-section');
-      expect(section.className).toContain('border-2');
-      expect(section.className).toContain('border-neo-black');
+      const copyBtn = screen.getByTestId('mobile-copy-link-button');
+      expect(copyBtn.className).toContain('h-11');
     });
 
-    it('has rounded-neo styling', () => {
+    it('buttons have shadow-hard-sm styling', () => {
       render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
 
-      const section = screen.getByTestId('mobile-share-section');
-      expect(section.className).toContain('rounded-neo');
+      const copyBtn = screen.getByTestId('mobile-copy-link-button');
+      expect(copyBtn.className).toContain('shadow-hard-sm');
     });
 
-    it('displays room code in neo-lime color', () => {
-      render(<MobileShareSection gameCode="COLOR123" t={mockT} />);
+    it('buttons have border-2 border-neo-black styling', () => {
+      render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
 
-      const roomCode = screen.getByText('COLOR123');
-      expect(roomCode.className).toContain('text-neo-lime');
+      const copyBtn = screen.getByTestId('mobile-copy-link-button');
+      expect(copyBtn.className).toContain('border-2');
+      expect(copyBtn.className).toContain('border-neo-black');
     });
   });
 
@@ -337,216 +232,18 @@ describe('MobileShareSection', () => {
       expect(copyButton).toHaveAttribute('aria-label', 'Copy Link');
     });
 
-    it('has proper aria-label on share button when available', () => {
-      Object.defineProperty(navigator, 'share', {
-        value: jest.fn().mockResolvedValue(undefined),
-        configurable: true,
-      });
-
+    it('has proper aria-label on WhatsApp button', () => {
       render(<MobileShareSection gameCode="A11Y123" t={mockT} />);
 
-      const shareButton = screen.getByTestId('mobile-native-share-button');
-      expect(shareButton).toHaveAttribute('aria-label', 'Share');
-    });
-
-    it('buttons have adequate padding for touch targets', () => {
-      Object.defineProperty(navigator, 'share', {
-        value: jest.fn().mockResolvedValue(undefined),
-        configurable: true,
-      });
-
-      render(<MobileShareSection gameCode="TOUCH123" t={mockT} />);
-
-      const copyButton = screen.getByTestId('mobile-copy-link-button');
-      const shareButton = screen.getByTestId('mobile-native-share-button');
-
-      // Check buttons have proper padding classes for touch targets
-      expect(copyButton.className).toContain('p-2');
-      expect(shareButton.className).toContain('py-2');
-    });
-  });
-
-  describe('instructions text', () => {
-    it('renders join instructions text when expanded', async () => {
-      render(<MobileShareSection gameCode="INST123" t={mockT} />);
-
-      // Expand to show instructions
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-
-      expect(screen.getByText(/lexiclash\.com/i)).toBeInTheDocument();
-    });
-
-    it('displays instructions banner when expanded', async () => {
-      render(<MobileShareSection gameCode="INST123" t={mockT} />);
-
-      // Expand to show instructions
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-
-      const instructionsBanner = screen.getByTestId('mobile-share-instructions');
-      expect(instructionsBanner).toBeInTheDocument();
-    });
-  });
-
-  describe('social share buttons', () => {
-    // Helper to expand the share section
-    const expandShareSection = async () => {
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-    };
-
-    it('renders WhatsApp share button when expanded', async () => {
-      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
-
-      await expandShareSection();
-
-      expect(screen.getByTestId('mobile-whatsapp-button')).toBeInTheDocument();
-    });
-
-    it('calls shareViaWhatsApp when WhatsApp button clicked', async () => {
-      const { shareViaWhatsApp } = require('../../../../utils/share');
-
-      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
-
-      await expandShareSection();
-
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
-      await act(async () => {
-        fireEvent.click(whatsappBtn);
-      });
-
-      expect(shareViaWhatsApp).toHaveBeenCalledWith('SOCIAL123', '', mockT);
+      expect(whatsappBtn).toHaveAttribute('aria-label', 'Share via WhatsApp');
     });
 
-    it('renders Telegram share button when expanded', async () => {
-      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
-
-      await expandShareSection();
-
-      expect(screen.getByTestId('mobile-telegram-button')).toBeInTheDocument();
-    });
-
-    it('calls shareViaTelegram when Telegram button clicked', async () => {
-      const { shareViaTelegram } = require('../../../../utils/share');
-
-      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
-
-      await expandShareSection();
+    it('has proper aria-label on Telegram button', () => {
+      render(<MobileShareSection gameCode="A11Y123" t={mockT} />);
 
       const telegramBtn = screen.getByTestId('mobile-telegram-button');
-      await act(async () => {
-        fireEvent.click(telegramBtn);
-      });
-
-      expect(shareViaTelegram).toHaveBeenCalled();
-    });
-
-    it('renders more options button when expanded', async () => {
-      render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
-
-      await expandShareSection();
-
-      expect(screen.getByTestId('mobile-more-share-button')).toBeInTheDocument();
-    });
-
-    it('WhatsApp button has brand-whatsapp background color', async () => {
-      render(<MobileShareSection gameCode="STYLE123" t={mockT} />);
-
-      await expandShareSection();
-
-      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
-      expect(whatsappBtn.className).toContain('bg-brand-whatsapp');
-    });
-
-    it('social buttons are flex-1 to share space equally', async () => {
-      render(<MobileShareSection gameCode="TOUCH123" t={mockT} />);
-
-      await expandShareSection();
-
-      const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
-      const telegramBtn = screen.getByTestId('mobile-telegram-button');
-
-      expect(whatsappBtn.className).toContain('flex-1');
-      expect(telegramBtn.className).toContain('flex-1');
-    });
-  });
-
-  describe('QR code section', () => {
-    it('renders QR code toggle button', () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      expect(screen.getByTestId('mobile-qr-toggle')).toBeInTheDocument();
-    });
-
-    it('does not render QR code by default', () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      expect(screen.queryByTestId('mobile-qr-code')).not.toBeInTheDocument();
-    });
-
-    it('shows QR code when toggle is clicked', async () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-
-      expect(screen.getByTestId('mobile-qr-code')).toBeInTheDocument();
-    });
-
-    it('hides QR code when toggle is clicked again', async () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-
-      // Show QR
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-      expect(screen.getByTestId('mobile-qr-code')).toBeInTheDocument();
-
-      // Hide QR
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-      expect(screen.queryByTestId('mobile-qr-code')).not.toBeInTheDocument();
-    });
-
-    it('QR toggle has aria-expanded attribute', () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    });
-
-    it('QR toggle aria-expanded is true when QR is visible', async () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-
-      expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    });
-
-    it('displays scan instruction text when QR is visible', async () => {
-      render(<MobileShareSection gameCode="QR123" t={mockT} />);
-
-      const toggle = screen.getByTestId('mobile-qr-toggle');
-      await act(async () => {
-        fireEvent.click(toggle);
-      });
-
-      expect(screen.getByText(/scan to join/i)).toBeInTheDocument();
+      expect(telegramBtn).toHaveAttribute('aria-label', 'Share via Telegram');
     });
   });
 
@@ -559,7 +256,6 @@ describe('MobileShareSection', () => {
       );
 
       expect(screen.getByTestId('mobile-share-section')).toBeInTheDocument();
-      expect(screen.getByText('RTL123')).toBeInTheDocument();
     });
   });
 });

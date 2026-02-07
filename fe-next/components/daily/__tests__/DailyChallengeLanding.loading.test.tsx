@@ -97,6 +97,18 @@ describe('DailyChallengeLanding Loading State', () => {
           }),
         }), 100));
       }
+      if (url.includes('daily-streak')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ streak: 0 }),
+        });
+      }
+      if (url.includes('daily-leaderboard')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [] }),
+        });
+      }
       return Promise.reject(new Error('Unknown URL'));
     });
   });
@@ -119,7 +131,7 @@ describe('DailyChallengeLanding Loading State', () => {
     expect(buzzElements.length).toBeGreaterThan(0);
 
     // Play buttons should be visible immediately (not showing "Loading...")
-    const playButtons = screen.getAllByText(/play/i);
+    const playButtons = screen.getAllByText(/start quest/i);
     expect(playButtons.length).toBeGreaterThan(0);
   });
 
@@ -191,10 +203,10 @@ describe('DailyChallengeLanding Loading State', () => {
     expect(wordHuntElements.length).toBeGreaterThan(0);
 
     // Time mode badges should be visible (uses translation keys)
-    const fastPaceElements = screen.getAllByText(/fast pace/i);
-    expect(fastPaceElements.length).toBeGreaterThan(0);
+    const timedElements = screen.getAllByText(/timed quest/i);
+    expect(timedElements.length).toBeGreaterThan(0);
 
-    const noTimerElements = screen.getAllByText(/no timer/i);
-    expect(noTimerElements.length).toBeGreaterThan(0);
+    const untimedElements = screen.getAllByText(/untimed quest/i);
+    expect(untimedElements.length).toBeGreaterThan(0);
   });
 });

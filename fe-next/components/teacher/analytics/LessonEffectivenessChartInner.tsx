@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useLessonEffectiveness } from '@/hooks/useLessonEffectiveness';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
@@ -65,7 +65,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <NeoLoader variant="mascot-letters" size="md" text={t('common.loading')} />
+        <PageLoader size="md" text={t('common.loading')} />
       </div>
     );
   }

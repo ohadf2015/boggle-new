@@ -86,56 +86,46 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'BREW', 'STEW', 'BAKE', 'ROAM', 'SOAR', 'DIVE', 'LEAP', 'SPIN',
   ],
   he: [
-    // Hebrew 4-letter words (for daily challenge - replaced obvious ones)
-    'בית', 'מים', 'עולם', 'אדם', 'דבר',
-    'עין', 'ראש', 'ילד', 'ספר', 'חבר',
-    'דלת', 'חלון', 'שמש', 'ירח', 'כוכב',
-    'פרח', 'סוס', 'כלב', 'ציפור', 'דגים',
-    'ארנב', 'נמר', 'זאב', 'דוב', 'אריה',
-    'עוגה', 'לחם', 'חלב', 'מים', 'מרק',
-    'זהב', 'כסף', 'נחושת', 'ברזל', 'עץ',
-    'הר', 'נהר', 'ים', 'אגם', 'גבעה',
-    'שיר', 'ספר', 'מכתב', 'סיפור', 'חלום',
-    'מלך', 'גיבור', 'חכם', 'אמן', 'רופא',
-    'אש', 'מים', 'רוח', 'אדמה', 'שמים',
-    'אור', 'צל', 'לילה', 'יום', 'בוקר',
+    // Hebrew target words - minimum 4 characters for adequate challenge
+    // (2-3 char words like הר, ים, אש, בית, מים, זאב, נהר, אגם moved to SAME_LENGTH_HELPER_WORDS)
+    'עולם', 'חלון', 'כוכב', 'ציפור', 'דגים',
+    'ארנב', 'אריה', 'עוגה', 'נחושת', 'ברזל',
+    'גבעה', 'מכתב', 'סיפור', 'חלום', 'גיבור',
+    'אדמה', 'שמים', 'לילה', 'בוקר', 'שולחן',
+    'מחשב', 'טלפון', 'חיוך', 'משפחה', 'חברים',
+    'אהבה', 'שמחה', 'בריאות', 'תפוח', 'ילדים',
+    'מורה', 'תלמיד', 'כיסא', 'מנורה', 'חתול',
   ],
   sv: [
-    // Swedish 3-4 letter words
-    'HUS', 'DAG', 'ÖGA', 'ÖRA', 'ARM', 'BEN', 'BOK', 'BIL', 'SOL', 'VÄG',
-    // Swedish 5-letter words
+    // Swedish target words - minimum 4 letters
+    // (3-letter words like HUS, DAG, ÖGA moved to SAME_LENGTH_HELPER_WORDS)
+    'HUND', 'KATT', 'STEN', 'FÅGEL', 'BLOM',
     'VATTEN', 'VÄRLD', 'PLATS', 'LJUD', 'KRAFT',
     'BÄSTA', 'FÖRSTA', 'SISTA', 'RUNDA', 'KLAR',
-    'STEN', 'HUND', 'KATT', 'FÅGEL', 'BLOM',
-    // Swedish 6-letter words
     'SLOTT', 'TRÄDGÅRD', 'MARKNAD', 'FÖNSTER',
     'NATUR', 'HIMMEL', 'VINTER', 'SOMMAR',
-    // Swedish 7-letter words
-    'MORGON', 'KVÄLL', 'PERFEKT', 'FANTASTISK'
+    'MORGON', 'KVÄLL', 'PERFEKT', 'FANTASTISK',
   ],
   ja: [
-    // Japanese 2-3 character words
+    // Japanese target words - minimum 2 characters (kanji compounds)
+    // (1-char kanji like 本, 犬, 猫, 花, 山 moved to SAME_LENGTH_HELPER_WORDS)
     '日本', '東京', '学校', '先生', '学生',
     '友達', '家族', '会社', '仕事', '時間',
     '天気', '音楽', '映画', '料理', '旅行',
-    '電車', '新聞', '本', '犬', '猫',
-    '花', '木', '山', '川', '海',
-    // Japanese 3-4 character compound words
-    '日本語', '図書館', '大学', '病院', '空港',
-    '公園', '駅', '銀行', '郵便局', '美術館'
+    '電車', '新聞', '大学', '病院', '空港',
+    '公園', '銀行', '美術館',
+    // 3-4 character compound words
+    '日本語', '図書館', '郵便局',
   ],
   es: [
-    // Spanish 3-4 letter words
-    'SOL', 'MAR', 'PAN', 'SAL', 'LUZ', 'VOZ', 'PAZ', 'REY', 'LEY', 'RÍO',
+    // Spanish target words - minimum 4 letters
+    // (3-letter words like SOL, MAR, PAN moved to SAME_LENGTH_HELPER_WORDS)
     'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LIBRO', 'PERRO', 'GATO',
-    // Spanish 5-letter words
     'MUNDO', 'LUGAR', 'TIEMPO', 'GENTE', 'NOCHE',
     'PLANTA', 'TIERRA', 'CIELO', 'FIESTA', 'AMIGO',
-    // Spanish 6-letter words
     'CASTILLO', 'JARDÍN', 'MERCADO', 'PUENTE',
     'VENTANA', 'SIMPLE', 'MODERNO', 'DORADO',
-    // Spanish 7-letter words
-    'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL', 'FANTÁSTICO'
+    'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL', 'FANTÁSTICO',
   ],
   fr: [
     // French 3-4 letter words

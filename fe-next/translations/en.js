@@ -432,6 +432,7 @@ const en = {
     "hideShareOptions": "Hide share options",
     "joinInstructions": "Go to lexiclash.com and enter code",
     "showQrCode": "Show QR Code",
+    "qrCode": "QR Code",
     "hideQrCode": "Hide QR Code",
     "scanQrCode": "Scan to join instantly",
     "orShareVia": "Or share via",
@@ -614,13 +615,21 @@ const en = {
   "multiplayerFlow": {
     "roomList": {
       "activeRooms": "Jump In!",
+      "activeBattles": "Active Battles",
       "online": "battling",
       "noRooms": "No battles happening",
       "beFirst": "Start the party!",
       "createButton": "Host a Battle",
       "refreshed": "List updated!",
-      "quickPlay": "Quick Match",
-      "orJoinRoom": "or join the action"
+      "quickPlay": "Quick Play",
+      "instantMatch": "Instant Matchmaking",
+      "orJoinRoom": "or join the action",
+      "orCreateCustom": "or create a custom room",
+      "socialHub": "Social Hub",
+      "friendActivity": "Friend Activity",
+      "noFriendsOnline": "No friends online yet",
+      "invitePrompt": "Start a party by sending an invite link",
+      "inviteFriends": "Invite Friends"
     },
     "joinModal": {
       "title": "Join the Fight",
@@ -684,6 +693,14 @@ const en = {
     "lobby": "War Room",
     "waitingForPlayers": "Gathering warriors...",
     "startGame": "GO!",
+    "startBattle": "Start Battle!",
+    "commandersJoined": "Commanders Joined",
+    "battleMode": "Battle Mode",
+    "preset": "Preset",
+    "ofMaxWarriors": "of {{max}} warriors ready",
+    "inviteWarriors": "Invite Warriors",
+    "battleFeed": "Battle Feed",
+    "hostIs": "Host is",
     "roomCode": "Code",
     "host": "Host",
     "inviteFriends": "Rally your squad!",
@@ -770,6 +787,8 @@ const en = {
     "lessonModeActive": "Using vocabulary from lesson",
     "noPlayers": "No players in lobby",
     "connectionLost": "Connection lost. Refresh to reconnect!",
+    "presetQuick": "Quick",
+    "presetPro": "Pro",
     "presetFast": "Quick",
     "presetFastDesc": "1 min fast game",
     "presetEasy": "Easy",
@@ -922,6 +941,7 @@ const en = {
     "longWordsOnBoard": "{count} long words on board",
     "longWordsRemaining": "{found}/{total} found",
     "waitingForHostToStart": "Waiting for host to start the game...",
+    "hostWillStart": "The host will start the game when everyone is ready",
     "hostDisconnected": "Host disconnected. Waiting for reconnection...",
     "isNowHost": "is now the host",
     "disconnected": "disconnected. Waiting for reconnection...",
@@ -965,7 +985,8 @@ const en = {
     "tapToCopy": "Tap to copy",
     "copied": "Code copied!",
     "linkCopied": "Link copied!",
-    "copyLink": "Copy link"
+    "copyLink": "Copy link",
+    "copy": "Copy code"
   },
   "onboarding": {
     "header": "Quick Start",
@@ -1021,6 +1042,24 @@ const en = {
       "description": "Learn the basics"
     },
     "swipeHint": "← Swipe →"
+  },
+  "preGameTutorial": {
+    "welcome": {
+      "title": "Hey there!",
+      "subtitle": "I'm Lexi! Let me show you how to play"
+    },
+    "practice": {
+      "instruction": "Swipe across the letters to spell:",
+      "success": "Perfect! You're getting it!"
+    },
+    "tips": {
+      "title": "You're a natural!",
+      "subtitle": "A few tips before we start"
+    },
+    "letsPlay": "Let's Play!",
+    "skip": "Skip Tutorial",
+    "next": "Next",
+    "step": "Step {current} of {total}"
   },
   "tips": {
     "header": "Pro Tips",
@@ -1121,6 +1160,22 @@ const en = {
     "rankings": "Rankings",
     "yourWords": "Your Words",
     "fireRoundBonus": "Fire Bonus",
+    "bonuses": "Bonuses",
+    "comboBonus": "Combo Bonus",
+    "winStreak": "Streak",
+    "finalScore": "Final Score",
+    "coinsEarned": "Coins Earned",
+    "detailedAnalysis": "Detailed Analysis",
+    "yourPerformance": "Your Performance",
+    "rewards": "Rewards",
+    "standings": "Standings",
+    "guestSavePrompt": "Sign in to save rewards",
+    "keepItUp": "Keep it up!",
+    "dailyPlayBonus": "Daily Play Bonus",
+    "best": "Best",
+    "avg": "Avg",
+    "games": "Games",
+    "noRewards": "Play more to earn rewards!",
     "time": "Time",
     "place": "Place",
     "words": "Words",
@@ -1187,7 +1242,8 @@ const en = {
     },
     "improving": "Improving",
     "declining": "Declining",
-    "stable": "Stable"
+    "stable": "Stable",
+    "noHistory": "Play more games to see trends"
   },
   "archetypes": {
     "hint": "Based on your play style",
@@ -1276,6 +1332,16 @@ const en = {
     "pts": "pts"
   },
   "howToPlay": {
+    "missionBriefing": "Mission Briefing",
+    "masterTheArena": "Master the LexiClash arena",
+    "connectingDots": "Connecting the dots",
+    "levelUpGame": "Level up your point game",
+    "nextStep": "Next",
+    "done": "Done",
+    "back": "Back",
+    "scoreMultipliers": "Score Multipliers",
+    "comboBonus": "Combo Bonus!",
+    "proTipsTitle": "Pro Tips for Champions",
     "description": "Find words on the grid. Longer words = more points. Beat your friends!",
     "createOrJoinTitle": "Create or Join",
     "createOrJoinDesc": "Host creates a room. Share the code. Jump in!",
@@ -1477,6 +1543,11 @@ const en = {
   "achievements": {
     "unlocked": "Achievement Unlocked!",
     "upgraded": "Achievement Upgraded!",
+    "cinematic": {
+      "unlocked": "ACHIEVEMENT UNLOCKED!",
+      "gold": "GOLD",
+      "platinum": "PLATINUM"
+    },
     "FIRST_BLOOD": {
       "name": "First Blood",
       "description": "Drew first word"
@@ -2593,6 +2664,8 @@ const en = {
     "imSure": "Quit",
     "gamePaused": "Paused",
     "needHint": "Need a hint?",
+    "getHint": "GET HINT",
+    "dragInstruction": "Drag across letters to form words!",
     "botWords": "Words",
     "beatYourRecord": "New record!",
     "soloVsBots": "Solo vs Bots",
@@ -2741,6 +2814,22 @@ const en = {
     "badge": "DAILY",
     "chooseChallengeHint": "Pick your quest",
     "chooseQuest": "Choose Your Quest",
+    "dailyMissions": "Daily Missions",
+    "journeyProgress": "Journey Progress",
+    "completedCount": "Completed",
+    "nextQuestsIn": "Next Quests In",
+    "timedQuest": "Timed Quest",
+    "untimedQuest": "Untimed Quest",
+    "startQuest": "START QUEST",
+    "replay": "Replay",
+    "cleared": "Cleared!",
+    "keepFireBurning": "Keep the Fire Burning",
+    "todaysTopPlayers": "Today's Top Players",
+    "fullStandings": "Full Standings",
+    "dailyDouble": "Daily Double",
+    "dailyDoubleBonus": "Complete both quests for bonus XP",
+    "browseArchive": "Archive: View Past Challenges",
+    "bonusXP": "Bonus XP",
     "timed90Seconds": "Fast Pace",
     "takeYourTime": "No Timer",
     "play": "PLAY",
@@ -2759,6 +2848,11 @@ const en = {
     "wordsFound": "{count} words",
     "streak": "Streak",
     "streakDays": "{count} Days!",
+    "streakCinematic": {
+      "streakDays": "{count} Day Streak!",
+      "milestone": "MILESTONE!",
+      "keepGoing": "Keep going!"
+    },
     "shareScore": "Share",
     "copyToClipboard": "Copy",
     "copyLink": "Copy Link",
@@ -3087,6 +3181,14 @@ const en = {
       "clueExampleSentence": "Example sentence unlocked!",
       "clueAutoMessage": "Auto-unlocked at {cost} tokens",
       "scoreBreakdownTooltip": "Tap for details"
+    },
+    "desktop": {
+      "liveRanks": "Live Ranks",
+      "lootCollected": "Loot Collected",
+      "powerUps": "Power-ups",
+      "hintsUnlocked": "Hints Unlocked",
+      "triesRemaining": "Tries Remaining",
+      "noWordsYet": "Find words to collect loot!"
     },
     "results": {
       "tapToCelebrate": "Tap to celebrate!",
@@ -3777,7 +3879,8 @@ const en = {
       "wordBank": "Word Bank",
       "dailyBuzz": "Daily Buzz",
       "webVitals": "Web Vitals",
-      "email": "Email"
+      "email": "Email",
+      "milogWords": "Milog Words"
     },
     "invalidWords": {
       "title": "Invalid Words Review",
@@ -3965,6 +4068,10 @@ const en = {
         "syncing": "Syncing...",
         "success": "Synced {{files}} files, imported {{words}} words"
       }
+    },
+    "milogWords": {
+      "title": "Milog Dictionary Enrichment",
+      "subtitle": "Hebrew words verified against milog.co.il"
     }
   },
   "tvTutorial": {
@@ -4240,7 +4347,12 @@ const en = {
       "finalScore": "Final Score",
       "score": "Score",
       "timeRemaining": "Time Remaining",
-      "stars": "Stars"
+      "stars": "Stars",
+      "worldUnlock": {
+        "newWorld": "NEW WORLD UNLOCKED!",
+        "chapters": "Chapters",
+        "prepare": "Prepare for new challenges!"
+      }
     },
     "errors": {
       "tooShort": "Word is too short",

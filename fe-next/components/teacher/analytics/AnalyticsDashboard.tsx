@@ -4,7 +4,7 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomAnalytics } from '@/hooks/useClassroomAnalytics';
 import { MetricCard } from './MetricCard';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { AlertTriangle, TrendingUp, Users, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -57,7 +57,7 @@ export function AnalyticsDashboard({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('education.analytics.loading')} />
+        <PageLoader size="lg" text={t('education.analytics.loading')} />
       </div>
     );
   }

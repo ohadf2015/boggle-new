@@ -260,8 +260,14 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                 podium.podiumHeight,
                 config.bg
               )}>
-                <span className={cn('font-black', compact ? 'text-lg' : 'text-xl', config.text)}>
-                  {rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}
+                <span className={cn(
+                  'inline-flex items-center justify-center rounded-full border-2 font-black',
+                  compact ? 'w-6 h-6 text-xs' : 'w-7 h-7 text-sm',
+                  rank === 1 ? 'bg-amber-400 border-amber-600 text-neo-black' :
+                  rank === 2 ? 'bg-slate-300 border-slate-500 text-neo-black' :
+                  'bg-orange-300 border-orange-500 text-neo-black',
+                )}>
+                  {rank}
                 </span>
               </div>
             </motion.div>

@@ -39,15 +39,26 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
   const [displayAmount, setDisplayAmount] = useState<number | null>(null);
   const [particles, setParticles] = useState<CoinParticle[]>([]);
 
-  // Pre-compute target position to avoid calc() in animation (causes jank)
+  // Find coin counter element and compute target position for fly-to animation
   const targetPosition = useMemo(() => {
     if (typeof window === 'undefined') return { x: 0, y: 0 };
     const startX = typeof startPosition?.x === 'number' ? startPosition.x : window.innerWidth / 2;
     const startY = typeof startPosition?.y === 'number' ? startPosition.y : window.innerHeight * 0.35;
+
+    // Try to find the coin counter badge via data attribute
+    const coinTarget = document.querySelector('[data-coin-target]');
+    if (coinTarget) {
+      const rect = coinTarget.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2 - startX,
+        y: rect.top + rect.height / 2 - startY,
+      };
+    }
+
+    // Fallback: top-left area where coin badge typically is
     return {
-      // Target: top-right corner (coin display area)
-      x: window.innerWidth - 80 - startX,
-      y: 40 - startY,
+      x: 60 - startX,
+      y: 100 - startY,
     };
   }, [startPosition]);
 
@@ -65,6 +76,23 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
     }));
   }, []);
 
+  // Pulse the coin counter badge when coins land
+  const pulseCoinTarget = useCallback(() => {
+    const coinTarget = document.querySelector('[data-coin-target]');
+    if (coinTarget instanceof HTMLElement) {
+      coinTarget.style.transition = 'transform 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+      coinTarget.style.transform = 'scale(1.2) rotate(-1deg)';
+      coinTarget.style.boxShadow = '0 0 12px rgba(251, 191, 36, 0.6), 4px 4px 0px black';
+      setTimeout(() => {
+        coinTarget.style.transform = '';
+        coinTarget.style.boxShadow = '';
+        setTimeout(() => {
+          coinTarget.style.transition = '';
+        }, 150);
+      }, 300);
+    }
+  }, []);
+
   // Trigger animation when coinAmount changes to a positive value
   useEffect(() => {
     if (coinAmount !== null && coinAmount > 0) {
@@ -72,16 +100,22 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
       setParticles(generateParticles(coinAmount));
       setShowAnimation(true);
 
+      // Pulse the coin counter when coins land (timed with particle arrival)
+      const pulseTimer = setTimeout(pulseCoinTarget, 900);
+
       // Auto-dismiss after animation completes
       const timer = setTimeout(() => {
         setShowAnimation(false);
         onAnimationComplete?.();
       }, 1500);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(pulseTimer);
+      };
     }
     return undefined;
-  }, [coinAmount, generateParticles, onAnimationComplete]);
+  }, [coinAmount, generateParticles, onAnimationComplete, pulseCoinTarget]);
 
   if (!showAnimation || displayAmount === null || displayAmount <= 0) {
     return null;

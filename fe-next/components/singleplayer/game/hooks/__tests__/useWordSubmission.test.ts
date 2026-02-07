@@ -233,22 +233,14 @@ describe('useWordSubmission', () => {
     });
   });
 
-  describe('immediate optimistic feedback', () => {
-    it('should show checking feedback immediately before API responds', async () => {
+  describe('API-based validation feedback', () => {
+    it('should show accepted feedback when API confirms word is valid', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-
-      // Create a delayed promise to simulate network latency
-      let resolveApi: (value: unknown) => void;
-      const apiPromise = new Promise((resolve) => {
-        resolveApi = resolve;
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ isValid: true }),
       });
-      (global.fetch as jest.Mock).mockReturnValue(
-        apiPromise.then(() => ({
-          ok: true,
-          json: () => Promise.resolve({ isValid: true }),
-        }))
-      );
 
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions())
@@ -258,36 +250,19 @@ describe('useWordSubmission', () => {
         result.current.handleWordSubmit('test');
       });
 
-      // Immediately after submit, feedback should be 'checking'
-      expect(result.current.currentFeedback?.type).toBe('checking');
-      expect(result.current.currentFeedback?.word).toBe('TEST');
-
-      // Now resolve the API
-      await act(async () => {
-        resolveApi!(undefined);
-        await apiPromise;
-      });
-
-      // After API responds, feedback should be 'accepted'
       await waitFor(() => {
         expect(result.current.currentFeedback?.type).toBe('accepted');
+        expect(result.current.currentFeedback?.word).toBe('TEST');
       });
     });
 
-    it('should transition from checking to pending when word not in dictionary', async () => {
+    it('should show rejected feedback when word not in dictionary', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-
-      let resolveApi: (value: unknown) => void;
-      const apiPromise = new Promise((resolve) => {
-        resolveApi = resolve;
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ isValid: false }),
       });
-      (global.fetch as jest.Mock).mockReturnValue(
-        apiPromise.then(() => ({
-          ok: true,
-          json: () => Promise.resolve({ isValid: false }),
-        }))
-      );
 
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions())
@@ -297,18 +272,8 @@ describe('useWordSubmission', () => {
         result.current.handleWordSubmit('xyz');
       });
 
-      // Immediately shows checking
-      expect(result.current.currentFeedback?.type).toBe('checking');
-
-      // Resolve API with invalid result
-      await act(async () => {
-        resolveApi!(undefined);
-        await apiPromise;
-      });
-
-      // Should transition to pending
       await waitFor(() => {
-        expect(result.current.currentFeedback?.type).toBe('pending');
+        expect(result.current.currentFeedback?.type).toBe('rejected');
       });
     });
   });
@@ -368,10 +333,7 @@ describe('useWordSubmission', () => {
         result.current.handleWordSubmit('test');
       });
 
-      // Should show checking first (API in flight)
-      expect(result.current.currentFeedback?.type).toBe('checking');
-
-      // Wait for API
+      // Wait for API to respond with accepted
       await waitFor(() => {
         expect(result.current.currentFeedback?.type).toBe('accepted');
       });
@@ -418,7 +380,7 @@ describe('useWordSubmission', () => {
       mockGetCached.mockReturnValue(undefined);
     });
 
-    it('should mark pending instantly when prevalidation returned invalid', async () => {
+    it('should reject instantly when prevalidation returned invalid', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
 
@@ -436,8 +398,8 @@ describe('useWordSubmission', () => {
         result.current.handleWordSubmit('xyz');
       });
 
-      // Should be pending IMMEDIATELY without API call
-      expect(result.current.currentFeedback?.type).toBe('pending');
+      // Should be rejected IMMEDIATELY without API call
+      expect(result.current.currentFeedback?.type).toBe('rejected');
       expect(mockCombo.resetCombo).toHaveBeenCalled();
 
       // API should NOT have been called
@@ -536,8 +498,8 @@ describe('useWordSubmission', () => {
     });
   });
 
-  describe('pending word handling', () => {
-    it('should mark word as pending when API returns invalid', async () => {
+  describe('rejected word handling', () => {
+    it('should reject word when API returns invalid', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
       (global.fetch as jest.Mock).mockResolvedValue({
@@ -555,13 +517,13 @@ describe('useWordSubmission', () => {
       });
 
       await waitFor(() => {
-        expect(result.current.currentFeedback?.type).toBe('pending');
+        expect(result.current.currentFeedback?.type).toBe('rejected');
       });
 
       expect(mockCombo.resetCombo).toHaveBeenCalled();
     });
 
-    it('should mark word as pending when API call fails', async () => {
+    it('should reject word when API call fails', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
@@ -576,7 +538,7 @@ describe('useWordSubmission', () => {
       });
 
       await waitFor(() => {
-        expect(result.current.currentFeedback?.type).toBe('pending');
+        expect(result.current.currentFeedback?.type).toBe('rejected');
       });
 
       expect(mockCombo.resetCombo).toHaveBeenCalled();

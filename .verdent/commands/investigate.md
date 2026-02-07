@@ -158,7 +158,7 @@ function processData(data) {
 **Verify API responses:**
 ```bash
 # Check what API actually returns
-curl http://localhost:3000/api/endpoint
+curl http://localhost:3001/api/endpoint
 ```
 
 ### 5. Investigate Timing & State
@@ -385,7 +385,7 @@ console.trace('[INVESTIGATION] Call stack at this point:');
 ```bash
 # Check API calls in browser DevTools → Network tab
 # Or use curl to test endpoints directly
-curl -X POST http://localhost:3000/api/test \
+curl -X POST http://localhost:3001/api/test \
   -H "Content-Type: application/json" \
   -d '{"test": "data"}'
 ```

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Bug, Send, CheckCircle, Globe, Monitor, User } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -135,7 +135,7 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
 
               {isLoadingContext ? (
                 <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                   {t('common.loading') || 'Loading...'}
                 </div>
               ) : context ? (
@@ -210,7 +210,7 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
               >
                 {isSubmitting ? (
                   <>
-                    <NeoLoader variant="dots" size="sm" />
+                    <Loader size="sm" />
                     {t('bugReport.submitting') || 'Submitting...'}
                   </>
                 ) : (

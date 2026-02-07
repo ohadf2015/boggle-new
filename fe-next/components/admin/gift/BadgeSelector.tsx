@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Award, Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import type { BadgeOption } from './types';
 
 interface BadgeSelectorProps {
@@ -66,7 +66,7 @@ export function BadgeSelector({ authToken, selectedBadgeId, onSelect }: BadgeSel
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <NeoLoader variant="dots" size="md" />
+        <Loader size="md" />
       </div>
     );
   }

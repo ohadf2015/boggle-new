@@ -11,7 +11,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
 
 export interface LeaderboardTeaserProps {
@@ -111,7 +111,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
           className="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 rounded-neo shadow-hard-sm"
         >
           {isLoading === 'google' ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <GoogleIcon className="w-4 h-4 me-2" />
           )}
@@ -123,7 +123,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
           className="w-full bg-brand-discord hover:bg-brand-discord-hover text-white border-2 border-brand-discord-hover rounded-neo shadow-hard-sm"
         >
           {isLoading === 'discord' ? (
-            <NeoLoader variant="dots" size="sm" />
+            <Loader size="sm" />
           ) : (
             <DiscordIcon className="w-4 h-4 me-2" />
           )}

@@ -285,7 +285,7 @@ export const submitWordSchema = compiledSchemas?.submitWordSchema || z.object({
   username: usernameSchema.optional(),
   word: wordSchema,
   path: z.array(gridPositionSchema).optional(),
-  comboLevel: z.number().int().min(0).max(10).optional(),
+  comboLevel: z.number().int().min(0).max(100).optional(),
   fireRoundActive: z.boolean().optional().default(false),
 });
 

@@ -1,35 +1,67 @@
 /**
  * Test: Daily Challenge Word Hunt minimum length validation
  *
- * User Request: "make sure all the daily challenge word hunt will be only 4 letters at least.
- * right now it let it take 3 letters (except japanese)"
+ * Two distinct minimums:
+ * 1. Target word: 4+ letters for non-Japanese, 2+ for Japanese
+ * 2. Discovery words: 2+ letters for ALL languages
  *
- * Expected Behavior:
- * - Word hunt answers must be 4+ letters for en/he/sv/es
- * - Japanese (ja) remains at 2+ letters (kanji compounds are shorter)
+ * TARGET_WORD_LISTS should not contain words shorter than the target minimum.
  */
 
-import { MIN_ANSWER_LENGTH } from '../buzz/constants';
+import { MIN_ANSWER_LENGTH, MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
+import { TARGET_WORD_LISTS } from '@/utils/dailyChallenge/wordLists';
 
 describe('Word Hunt Minimum Length Requirements', () => {
-  it('should require 4+ letters for English word hunt', () => {
-    expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(4);
+  describe('Target word minimums (MIN_ANSWER_LENGTH)', () => {
+    it('should require 4+ letters for English target words', () => {
+      expect(MIN_ANSWER_LENGTH.en).toBeGreaterThanOrEqual(4);
+    });
+
+    it('should require 4+ letters for Hebrew target words', () => {
+      expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(4);
+    });
+
+    it('should require 4+ letters for Swedish target words', () => {
+      expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(4);
+    });
+
+    it('should require 4+ letters for Spanish target words', () => {
+      expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(4);
+    });
+
+    it('should allow 2+ letters for Japanese target words (kanji exception)', () => {
+      expect(MIN_ANSWER_LENGTH.ja).toBe(2);
+    });
   });
 
-  it('should require 4+ letters for Hebrew word hunt', () => {
-    expect(MIN_ANSWER_LENGTH.he).toBeGreaterThanOrEqual(4);
+  describe('Discovery word minimum (MIN_DISCOVERY_WORD_LENGTH)', () => {
+    it('should be 2 letters for all languages', () => {
+      expect(MIN_DISCOVERY_WORD_LENGTH).toBe(2);
+    });
+
+    it('should be less than or equal to target minimum for all languages', () => {
+      for (const [, minLen] of Object.entries(MIN_ANSWER_LENGTH)) {
+        expect(MIN_DISCOVERY_WORD_LENGTH).toBeLessThanOrEqual(minLen);
+      }
+    });
   });
 
-  it('should require 4+ letters for Swedish word hunt', () => {
-    expect(MIN_ANSWER_LENGTH.sv).toBeGreaterThanOrEqual(4);
-  });
+  describe('TARGET_WORD_LISTS respect minimum lengths', () => {
+    const nonJapaneseLanguages = ['en', 'sv', 'es', 'he'] as const;
 
-  it('should require 4+ letters for Spanish word hunt', () => {
-    expect(MIN_ANSWER_LENGTH.es).toBeGreaterThanOrEqual(4);
-  });
+    it.each(nonJapaneseLanguages)(
+      'should not contain words shorter than 4 letters for %s',
+      (lang) => {
+        const words = TARGET_WORD_LISTS[lang] || [];
+        const tooShort = words.filter(w => w.length < 4);
+        expect(tooShort).toEqual([]);
+      }
+    );
 
-  it('should allow 2+ letters for Japanese word hunt (kanji exception)', () => {
-    // Japanese kanji compounds are typically 2-4 characters, so 2 is acceptable
-    expect(MIN_ANSWER_LENGTH.ja).toBe(2);
+    it('should allow 2+ letter words for Japanese', () => {
+      const words = TARGET_WORD_LISTS['ja'] || [];
+      const tooShort = words.filter(w => w.length < 2);
+      expect(tooShort).toEqual([]);
+    });
   });
 });

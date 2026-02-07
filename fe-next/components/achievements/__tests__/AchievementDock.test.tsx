@@ -192,10 +192,11 @@ describe('AchievementDock', () => {
         // Panel uses fixed positioning via inline styles for Portal
         const panel = document.body.querySelector('.bg-neo-cream') as HTMLElement;
         expect(panel).toBeInTheDocument();
-        // In RTL, should have left position in style
+        // RTL should also use right positioning since the button is always
+        // positioned on the right side of the screen (via className="right-4")
         expect(panel?.style.position).toBe('fixed');
-        // Left position should be set (button.left = 300)
-        expect(panel?.style.left).toBeTruthy();
+        // Right position should be set (window.innerWidth - button.right = 400 - 356 = 44)
+        expect(panel?.style.right).toBeTruthy();
       });
     });
   });

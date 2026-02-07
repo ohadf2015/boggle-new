@@ -22,7 +22,7 @@ import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaul
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { sanitizeRoomName } from '@/utils/consts';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useConnectionToasts } from '@/hooks/useConnectionToasts';
 import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
@@ -80,7 +80,7 @@ function ViewLoadingSkeleton(): React.JSX.Element {
     <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
       <div className="relative z-10">
-        <NeoLoader variant="mascot-letters" size="md" text="Loading game..." />
+        <PageLoader size="md" text="Loading game..." />
       </div>
     </div>
   );

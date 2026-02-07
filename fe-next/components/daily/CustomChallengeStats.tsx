@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Trophy, Users, Target, TrendingUp, Crown, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 interface CustomChallengeStatsProps {
   puzzleCode: string;
@@ -88,7 +88,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <NeoLoader variant="mascot" size="md" />
+        <PageLoader size="md" />
       </div>
     );
   }

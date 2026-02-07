@@ -120,7 +120,7 @@ describe('PushNotificationPreferences', () => {
       // WHEN - Component is rendered
       render(<PushNotificationPreferences isDarkMode={false} />);
 
-      // THEN - Should show loading indicator (NeoLoader renders an element)
+      // THEN - Should show loading indicator (Loader renders an element)
       expect(screen.getByTestId('push-notifications-loading')).toBeInTheDocument();
     });
   });

@@ -107,11 +107,11 @@ describe('Scoring Utilities', () => {
       });
     });
 
-    describe('combo cap at 10', () => {
-      it('should cap base bonus at 10 even for high combos', () => {
-        expect(getComboBonus(15, 5)).toBe(10); // floor(10 * 1.0) = 10, not 15
-        expect(getComboBonus(20, 5)).toBe(10); // floor(10 * 1.0) = 10, not 20
-        expect(getComboBonus(100, 5)).toBe(10); // floor(10 * 1.0) = 10, not 100
+    describe('high combo levels (no cap)', () => {
+      it('should scale linearly with no cap for high combos', () => {
+        expect(getComboBonus(15, 5)).toBe(15); // floor(15 * 1.0) = 15
+        expect(getComboBonus(20, 5)).toBe(20); // floor(20 * 1.0) = 20
+        expect(getComboBonus(100, 5)).toBe(100); // floor(100 * 1.0) = 100
       });
     });
 
@@ -217,8 +217,8 @@ describe('Scoring Utilities', () => {
     });
 
     describe('complex scenarios', () => {
-      it('should calculate maximum possible score correctly', () => {
-        // Long word (10 letters) + max combo (10) + fire round (2x)
+      it('should calculate high combo score correctly', () => {
+        // Long word (10 letters) + combo 10 + fire round (2x)
         const maxScore = calculateWordScore('ABCDEFGHIJ', 10, 2);
         // base = 9, combo = 20 (10 * 2.0), fire = 2x
         // (9 + 20) * 2 = 58
@@ -245,8 +245,8 @@ describe('Scoring Utilities', () => {
         expect(calculateWordScore('TEST', -5)).toBe(3);
       });
 
-      it('should handle very high combo levels (capped at 10)', () => {
-        expect(calculateWordScore('HOUSE', 100)).toBe(14); // base 4 + combo 10 (capped) = 14
+      it('should handle very high combo levels (no cap)', () => {
+        expect(calculateWordScore('HOUSE', 100)).toBe(104); // base 4 + combo 100 (uncapped) = 104
       });
 
       it('should handle zero multiplier', () => {

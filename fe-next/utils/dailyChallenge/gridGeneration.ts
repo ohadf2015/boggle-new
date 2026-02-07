@@ -24,6 +24,7 @@ import {
   getSameLengthWords,
   calculateLetterOverlapScore,
 } from './wordLists';
+import { getMinAnswerLength } from '@/shared/constants/gameConstants';
 
 // ==========================================
 // Basic Grid Generation
@@ -671,15 +672,17 @@ export function generateDailyPuzzle(
 
   // STEP 1: Select target word - use pre-selected if provided, otherwise deterministic
   let targetWord: string;
+  const minTargetLength = getMinAnswerLength(language);
 
   if (preSelectedWord) {
     targetWord = preSelectedWord.toUpperCase();
   } else {
-    // Deterministic fallback - use words of varying lengths (3-8 letters)
+    // Deterministic fallback - filter by min target length (4+ except Japanese 2+)
     const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
+    const filtered = wordList.filter(w => w.length >= minTargetLength);
 
     // Shuffle word list using seeded random (Fisher-Yates)
-    const shuffled = [...wordList];
+    const shuffled = [...filtered];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -977,8 +980,10 @@ export function selectDailyTargetWord(
   const seed = hashString(seedString);
   const random = mulberry32(seed);
 
-  // Get word list for this language
-  const wordList = TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'];
+  // Get word list for this language, filtered by min target length
+  const minTargetLen = getMinAnswerLength(language);
+  const wordList = (TARGET_WORD_LISTS[language] || TARGET_WORD_LISTS['en'])
+    .filter(w => w.length >= minTargetLen);
 
   // Shuffle word list using seeded random (Fisher-Yates)
   const shuffled = [...wordList];

@@ -46,12 +46,31 @@ interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof Dialo
    * Pass a translated string for i18n support.
    */
   closeButtonLabel?: string;
+  /**
+   * Use thicker 6px border for modal emphasis (matches SuperDesign modal architecture)
+   */
+  thickBorder?: boolean;
+  /**
+   * Close button style variant
+   * - 'default': Red background with X (current style)
+   * - 'minimal': Black square with white X (SuperDesign style)
+   */
+  closeButtonVariant?: 'default' | 'minimal';
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, hideCloseButton, noDescription, closeButtonLabel = "Close", ...props }, ref) => (
+>(({
+  className,
+  children,
+  hideCloseButton,
+  noDescription,
+  closeButtonLabel = "Close",
+  thickBorder = false,
+  closeButtonVariant = 'default',
+  ...props
+}, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -68,7 +87,10 @@ const DialogContent = React.forwardRef<
         "max-h-[90vh] sm:max-h-[85vh]",
         // Neo-Brutalist styling
         "bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-neo-white",
-        "border-3 sm:border-4 border-neo-black dark:border-slate-600",
+        // Border - supports thick variant for modal emphasis
+        thickBorder
+          ? "border-[6px] border-neo-black dark:border-slate-600"
+          : "border-3 sm:border-4 border-neo-black dark:border-slate-600",
         "rounded-neo sm:rounded-neo-lg",
         "shadow-hard sm:shadow-hard-xl",
         // Spacing
@@ -90,28 +112,49 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      {/* Neo-Brutalist Close Button - adjusted for mobile and RTL */}
+      {/* Neo-Brutalist Close Button - supports two variants */}
       {!hideCloseButton && (
         <DialogPrimitive.Close
-          className="
-            absolute top-2 sm:top-3
-            right-2 sm:right-3
-            rtl:right-auto rtl:left-2 rtl:sm:left-3
-            w-11 h-11 sm:w-12 sm:h-12
-            min-w-[44px] min-h-[44px]
-            flex items-center justify-center
-            bg-neo-red text-neo-black
-            border-2 sm:border-3 border-neo-black
-            rounded-neo
-            shadow-hard-sm
-            transition-all duration-100
-            hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-            active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-            focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
-            z-10
-          "
+          className={cn(
+            "absolute top-2 sm:top-3",
+            "right-2 sm:right-3",
+            "rtl:right-auto rtl:left-2 rtl:sm:left-3",
+            "flex items-center justify-center",
+            "transition-all duration-100",
+            "focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+            "z-10",
+            // Variant-specific styles
+            closeButtonVariant === 'minimal' ? [
+              // SuperDesign minimal style: black square with white X
+              "w-8 h-8",
+              "min-w-[32px] min-h-[32px]",
+              "bg-neo-black text-neo-white",
+              "border-0",
+              "rounded-none",
+              "hover:bg-neo-black/80",
+              "active:bg-neo-black",
+            ] : [
+              // Default style: red background
+              "w-11 h-11 sm:w-12 sm:h-12",
+              "min-w-[44px] min-h-[44px]",
+              "bg-neo-red text-neo-black",
+              "border-2 sm:border-3 border-neo-black",
+              "rounded-neo",
+              "shadow-hard-sm",
+              "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+              "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+            ]
+          )}
         >
-          <X className="h-5 w-5 sm:h-6 sm:w-6 stroke-[3]" aria-hidden="true" />
+          <X
+            className={cn(
+              "stroke-[3]",
+              closeButtonVariant === 'minimal'
+                ? "h-4 w-4"
+                : "h-5 w-5 sm:h-6 sm:w-6"
+            )}
+            aria-hidden="true"
+          />
           <span className="sr-only">{closeButtonLabel}</span>
         </DialogPrimitive.Close>
       )}

@@ -15,6 +15,10 @@ const PlayersReadyIndicator = dynamic(() => import('@/components/results/Players
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
 const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
 const RewardsSummary = dynamic(() => import('@/components/results/RewardsSummary'), { ssr: false });
+// Mobile compact components
+const MobileCompactStats = dynamic(() => import('@/components/results/MobileCompactStats'), { ssr: false });
+const MobileCompactRewards = dynamic(() => import('@/components/results/MobileCompactRewards'), { ssr: false });
+const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
@@ -104,6 +108,8 @@ export interface ResultsMainContentProps {
   showBanner?: boolean;
   /** Banner size for CrazyGames */
   bannerSize?: '320x50' | '300x250';
+  /** Use compact mobile layout */
+  isMobile?: boolean;
 }
 
 // ==============================================
@@ -148,6 +154,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   t,
   showBanner = true,
   bannerSize = '320x50',
+  isMobile = false,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -168,6 +175,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           isCurrentUserWinner={isCurrentUserInBanner}
           rank={bannerRank}
           totalPlayers={sortedScores.length}
+          compact={isMobile}
         />
       )}
 
@@ -183,23 +191,41 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
 
       {/* Rewards Summary - Shows win streak prominently for winners */}
       {winStreakData && winStreakData.currentStreak > 0 && (
-        <RewardsSummary
-          coinReward={null}
-          isAuthenticated={isAuthenticated}
-          winStreak={winStreakData}
-          achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
-          isWinner={isCurrentUserWinner}
-          onAchievementsClick={onShowDetails}
-        />
+        isMobile ? (
+          <MobileCompactRewards
+            winStreak={winStreakData.currentStreak}
+            coins={0}
+            isAuthenticated={isAuthenticated}
+          />
+        ) : (
+          <RewardsSummary
+            coinReward={null}
+            isAuthenticated={isAuthenticated}
+            winStreak={winStreakData}
+            achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
+            isWinner={isCurrentUserWinner}
+            onAchievementsClick={onShowDetails}
+          />
+        )
       )}
 
       {/* Compact Stats Row */}
       {currentPlayerData && currentPlayerRank > 0 && (
-        <CompactResultsStats
-          wordCount={currentPlayerValidWords.length}
-          accuracy={accuracy}
-          archetype={currentPlayerArchetype}
-        />
+        isMobile ? (
+          <MobileCompactStats
+            wordCount={currentPlayerValidWords.length}
+            accuracy={accuracy}
+            archetype={currentPlayerArchetype}
+            achievements={currentPlayerData?.achievements}
+          />
+        ) : (
+          <CompactResultsStats
+            wordCount={currentPlayerValidWords.length}
+            accuracy={accuracy}
+            archetype={currentPlayerArchetype}
+            achievements={currentPlayerData?.achievements}
+          />
+        )
       )}
 
       {/* Brain Points Feedback */}
@@ -208,7 +234,17 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
       {/* Compact Top 3 Leaderboard with Score Reveal Animation */}
       {sortedScores.length > 1 && (
         scoreRevealComplete ? (
-          <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+          isMobile ? (
+            <MobileCompactLeaderboard
+              participants={sortedScores.map(p => ({
+                name: p.username,
+                score: p.score,
+                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+              }))}
+            />
+          ) : (
+            <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+          )
         ) : (
           <ScoreRevealAnimation
             players={sortedScores.map(p => ({

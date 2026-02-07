@@ -691,7 +691,15 @@ const es = {
       "createButton": "Crear batalla",
       "refreshed": "¡Listo!",
       "quickPlay": "Partida rápida",
-      "orJoinRoom": "o únete a la acción"
+      "orJoinRoom": "o únete a la acción",
+      "activeBattles": "Batallas activas",
+      "instantMatch": "Emparejamiento instantáneo",
+      "orCreateCustom": "o crea una sala personalizada",
+      "socialHub": "Centro social",
+      "friendActivity": "Actividad de amigos",
+      "noFriendsOnline": "No hay amigos en línea",
+      "invitePrompt": "Inicia una fiesta enviando un enlace",
+      "inviteFriends": "Invitar amigos"
     },
     "joinModal": {
       "title": "Únete al combate",
@@ -755,9 +763,17 @@ const es = {
     "lobby": "Cuartel",
     "waitingForPlayers": "Reuniendo guerreros...",
     "startGame": "¡GO!",
+    "startBattle": "¡Iniciar batalla!",
+    "commandersJoined": "Comandantes unidos",
+    "battleMode": "Modo de batalla",
+    "preset": "Configuración",
+    "ofMaxWarriors": "de {{max}} guerreros listos",
     "roomCode": "Código",
     "host": "Anfitrión",
     "inviteFriends": "¡Junta a tu crew!",
+    "inviteWarriors": "Invitar guerreros",
+    "battleFeed": "Feed de batalla",
+    "hostIs": "Anfitrión es",
     "playersJoined": "Guerreros",
     "gameSettings": "Config. de batalla",
     "quickSetup": "Rápido",
@@ -841,6 +857,8 @@ const es = {
     "lessonModeActive": "Usando vocabulario de la lección",
     "noPlayers": "No hay jugadores en la sala",
     "connectionLost": "Conexión perdida. ¡Refresca para volver!",
+    "presetQuick": "Rápido",
+    "presetPro": "Pro",
     "presetFast": "Rápido",
     "presetFastDesc": "Partida de 1 min",
     "presetEasy": "Fácil",
@@ -987,6 +1005,7 @@ const es = {
     "swipeHintShort": "¡Desliza para formar palabras!",
     "getReadyHint": "¡Prepárate para la batalla!",
     "waitingForHostToStart": "Esperando que el anfitrión inicie el juego...",
+    "hostWillStart": "El anfitrión iniciará el juego cuando todos estén listos",
     "hostDisconnected": "Anfitrión desconectado. Esperando reconexión...",
     "isNowHost": "ahora es el anfitrión",
     "disconnected": "desconectado. Esperando reconexión...",
@@ -1038,7 +1057,8 @@ const es = {
     "tapToCopy": "Toca para copiar",
     "copied": "¡Código copiado!",
     "linkCopied": "¡Enlace copiado!",
-    "copyLink": "Copiar enlace"
+    "copyLink": "Copiar enlace",
+    "copy": "Copiar código"
   },
   "tips": {
     "header": "Tips Pro",
@@ -1139,6 +1159,22 @@ const es = {
     "rankings": "Clasificaciones",
     "yourWords": "Tus palabras",
     "fireRoundBonus": "Ronda de Fuego",
+    "bonuses": "Bonificaciones",
+    "comboBonus": "Bonus de Combo",
+    "winStreak": "Racha",
+    "finalScore": "Puntuación Final",
+    "coinsEarned": "Monedas Ganadas",
+    "detailedAnalysis": "Análisis Detallado",
+    "yourPerformance": "Tu Rendimiento",
+    "rewards": "Recompensas",
+    "standings": "Clasificación",
+    "guestSavePrompt": "Inicia sesión para guardar recompensas",
+    "keepItUp": "¡Sigue así!",
+    "dailyPlayBonus": "Bonus Diario",
+    "best": "Mejor",
+    "avg": "Media",
+    "games": "Partidas",
+    "noRewards": "¡Juega más para ganar recompensas!",
     "time": "Tiempo",
     "place": "Lugar",
     "words": "Palabras",
@@ -1205,7 +1241,8 @@ const es = {
     },
     "improving": "Mejorando",
     "declining": "Bajando",
-    "stable": "Estable"
+    "stable": "Estable",
+    "noHistory": "Juega más partidas para ver tendencias"
   },
   "archetypes": {
     "hint": "Basado en tu estilo de juego",
@@ -1294,6 +1331,16 @@ const es = {
     "pts": "pts"
   },
   "howToPlay": {
+    "missionBriefing": "Informe de Misión",
+    "masterTheArena": "Domina la arena de LexiClash",
+    "connectingDots": "Conectando las letras",
+    "levelUpGame": "Sube tu nivel de puntuación",
+    "nextStep": "Siguiente",
+    "done": "Listo",
+    "back": "Atrás",
+    "scoreMultipliers": "Multiplicadores de Puntuación",
+    "comboBonus": "¡Bono Combo!",
+    "proTipsTitle": "Consejos Pro",
     "description": "LexiClash es un juego de palabras rápido donde compites contra el tiempo para encontrar tantas palabras como sea posible en un tablero de letras. ¡Cuanto más larga la palabra, más puntos ganas!",
     "createOrJoinTitle": "Crear o Unirse a un Juego",
     "createOrJoinDesc": "El anfitrión crea una sala y comparte el código. Los jugadores se unen usando el código.",
@@ -2273,6 +2320,24 @@ const es = {
     },
     "swipeHint": "← Desliza para navegar →"
   },
+  "preGameTutorial": {
+    "welcome": {
+      "title": "¡Hola!",
+      "subtitle": "¡Soy Lexi! Te enseño cómo jugar"
+    },
+    "practice": {
+      "instruction": "Desliza sobre las letras para deletrear:",
+      "success": "¡Perfecto! ¡Lo estás pillando!"
+    },
+    "tips": {
+      "title": "¡Eres un natural!",
+      "subtitle": "Unos tips antes de empezar"
+    },
+    "letsPlay": "¡A jugar!",
+    "skip": "Saltar tutorial",
+    "next": "Siguiente",
+    "step": "Paso {current} de {total}"
+  },
   "tutorialPrompt": {
     "title": "¿Primera vez aquí?",
     "subtitle": "Aprende lo básico en 30 segundos",
@@ -2588,6 +2653,8 @@ const es = {
     "imSure": "Estoy seguro",
     "gamePaused": "Juego pausado",
     "needHint": "¿Necesitas una pista?",
+    "getHint": "OBTENER PISTA",
+    "dragInstruction": "¡Arrastra sobre las letras para formar palabras!",
     "botWords": "Palabras encontradas",
     "beatYourRecord": "¡Superaste tu récord!",
     "soloVsBots": "Solo vs Bots",
@@ -2746,6 +2813,11 @@ const es = {
     "wordsFound": "{count} palabras encontradas",
     "streak": "Racha",
     "streakDays": "¡Racha de {count} días!",
+    "streakCinematic": {
+      "streakDays": "¡{count} días de racha!",
+      "milestone": "¡HITO!",
+      "keepGoing": "¡Sigue así!"
+    },
     "shareScore": "Comparte tu Puntuación",
     "copyToClipboard": "Copiar al portapapeles",
     "copyLink": "Copiar enlace",
@@ -2873,6 +2945,22 @@ const es = {
       "redirecting": "Yendo al Desafío Diario..."
     },
     "chooseQuest": "Elige Tu Reto Diario",
+    "dailyMissions": "Misiones Diarias",
+    "journeyProgress": "Progreso del Viaje",
+    "completedCount": "Completadas",
+    "nextQuestsIn": "Próximas Misiones En",
+    "timedQuest": "Misión con Tiempo",
+    "untimedQuest": "Misión Libre",
+    "startQuest": "INICIAR MISIÓN",
+    "replay": "Repetir",
+    "cleared": "¡Completado!",
+    "keepFireBurning": "¡Mantén la Racha!",
+    "todaysTopPlayers": "Mejores Jugadores de Hoy",
+    "fullStandings": "Clasificación Completa",
+    "dailyDouble": "Doble Diario",
+    "dailyDoubleBonus": "Completa ambas misiones para XP extra",
+    "browseArchive": "Archivo: Desafíos Anteriores",
+    "bonusXP": "XP Extra",
     "chooseChallengeHint": "¡Escoge tu desafío de hoy. Completa ambos para XP extra!",
     "timed90Seconds": "Ritmo Rápido",
     "takeYourTime": "Sin Límite",
@@ -3086,6 +3174,14 @@ const es = {
       "clueExampleSentence": "¡Ejemplo desbloqueado!",
       "clueAutoMessage": "Auto-desbloqueado a {cost} fichas",
       "scoreBreakdownTooltip": "Toca para detalles"
+    },
+    "desktop": {
+      "liveRanks": "Clasificación en Vivo",
+      "lootCollected": "Botín Recolectado",
+      "powerUps": "Mejoras",
+      "hintsUnlocked": "Pistas Desbloqueadas",
+      "triesRemaining": "Intentos Restantes",
+      "noWordsYet": "¡Encuentra palabras para recolectar botín!"
     },
     "results": {
       "tapToCelebrate": "¡Toca para celebrar!",
@@ -3775,7 +3871,8 @@ const es = {
       "wordBank": "Banco de Palabras",
       "dailyBuzz": "Buzz Diario",
       "webVitals": "Rendimiento Web",
-      "email": "Correo"
+      "email": "Correo",
+      "milogWords": "Palabras Milog"
     },
     "invalidWords": {
       "title": "Revisión de Palabras Inválidas",
@@ -3981,6 +4078,10 @@ const es = {
         "noFilesFound": "No se encontraron archivos de Wikipedia para este idioma",
         "lastSynced": "Última sincronización"
       }
+    },
+    "milogWords": {
+      "title": "Enriquecimiento del Diccionario Milog",
+      "subtitle": "Palabras en hebreo verificadas contra milog.co.il"
     }
   },
   "tvTutorial": {
@@ -4692,7 +4793,12 @@ const es = {
       "finalScore": "Puntaje Final",
       "score": "Puntaje",
       "timeRemaining": "Tiempo restante",
-      "stars": "estrellas"
+      "stars": "estrellas",
+      "worldUnlock": {
+        "newWorld": "¡NUEVO MUNDO DESBLOQUEADO!",
+        "chapters": "Capítulos",
+        "prepare": "¡Prepárate para nuevos desafíos!"
+      }
     },
     "achievements": {
       "title": "Logros",
@@ -4700,6 +4806,11 @@ const es = {
       "hidden": "Oculto",
       "unlocked": "¡Logro Desbloqueado!",
       "upgraded": "¡Logro Mejorado!",
+      "cinematic": {
+        "unlocked": "¡LOGRO DESBLOQUEADO!",
+        "gold": "ORO",
+        "platinum": "PLATINO"
+      },
       "progress": "Progreso de Logros",
       "categories": {
         "gameplay": "Juego",

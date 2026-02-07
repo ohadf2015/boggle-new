@@ -66,16 +66,6 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       });
     };
 
-    const handleWordNeedsValidation = (data: { word: string; message?: string }): void => {
-      setCurrentFeedback({
-        id: `pending-${Date.now()}`,
-        type: 'pending',
-        word: data.word,
-        message: data.message || t('playerView.pendingValidation') || 'Pending validation',
-        timestamp: Date.now(),
-      });
-    };
-
     const handleWordRejected = (data: { word: string; reason?: string }): void => {
       setCurrentFeedback({
         id: `rejected-${Date.now()}`,
@@ -127,7 +117,6 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
     socket.on('wordAlreadyFoundByOther', handleWordAlreadyFoundByOther);
-    socket.on('wordNeedsValidation', handleWordNeedsValidation);
     socket.on('wordRejected', handleWordRejected);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
     socket.on('wordTooShort', handleWordTooShort);
@@ -136,7 +125,6 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
       socket.off('wordAlreadyFoundByOther', handleWordAlreadyFoundByOther);
-      socket.off('wordNeedsValidation', handleWordNeedsValidation);
       socket.off('wordRejected', handleWordRejected);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);

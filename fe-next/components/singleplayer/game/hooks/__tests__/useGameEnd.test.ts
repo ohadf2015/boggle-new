@@ -353,13 +353,13 @@ describe('useGameEnd', () => {
       expect(results.botWordsForValidation).not.toContain('word3');
     });
 
-    it('should treat pending words as invalid', async () => {
+    it('should treat unvalidated words as invalid', async () => {
       const onGameEnd = jest.fn();
       const refs = createRefs();
-      // Include a pending word (isValid: null)
+      // Include an unvalidated word (isValid: null)
       refs.foundWordsRef.current = [
         { word: 'valid', score: 3, timestamp: Date.now(), timeSinceStart: 5, isValid: true, comboBonus: 0 },
-        { word: 'pending', score: 4, timestamp: Date.now(), timeSinceStart: 7, isValid: null },
+        { word: 'unvalidated', score: 4, timestamp: Date.now(), timeSinceStart: 7, isValid: null },
       ];
 
       const { rerender } = renderHook(
@@ -386,10 +386,10 @@ describe('useGameEnd', () => {
       const results = onGameEnd.mock.calls[0][0];
       // Only the valid word should count towards score
       expect(results.playerScore).toBe(3);
-      // Pending word should be marked as invalid in playerWordData
-      const pendingWord = results.playerWordData.find((w: { word: string }) => w.word === 'pending');
-      expect(pendingWord.isValid).toBe(false);
-      expect(pendingWord.score).toBe(0);
+      // Unvalidated word should be marked as invalid in playerWordData
+      const unvalidatedWord = results.playerWordData.find((w: { word: string }) => w.word === 'unvalidated');
+      expect(unvalidatedWord.isValid).toBe(false);
+      expect(unvalidatedWord.score).toBe(0);
     });
   });
 });

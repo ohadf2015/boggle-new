@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLesson } from '@/hooks/useVocabularyLesson';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { cn } from '@/lib/utils';
 
@@ -64,8 +64,7 @@ export default function ClassroomGamePageClient() {
   if (isChecking || authLoading || lessonLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
-        <NeoLoader
-          variant="mascot-letters"
+        <PageLoader
           size="lg"
           text={t('common.loading') || 'Loading...'}
         />

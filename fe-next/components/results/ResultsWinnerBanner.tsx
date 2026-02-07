@@ -30,6 +30,8 @@ interface ResultsWinnerBannerProps {
   customMessage?: string; // Override the rank message
   customAnnouncement?: string; // Override the announcement text
   showConfetti?: boolean; // Control confetti independently (default: true for top 3)
+  /** Compact mode - reduced height for mobile above-fold (default: false) */
+  compact?: boolean;
 }
 
 // Styling configuration for each rank
@@ -95,6 +97,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   customMessage,
   customAnnouncement,
   showConfetti: showConfettiProp,
+  compact = false,
 }) => {
   const { t } = useLanguage();
 
@@ -238,7 +241,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
         />
 
         {/* Content - Compact layout */}
-        <div className="relative z-10 p-3 sm:p-4 md:p-5 text-center">
+        <div className={`relative z-10 text-center ${compact ? 'p-2 sm:p-3' : 'p-3 sm:p-4 md:p-5'}`}>
           {/* Compact horizontal layout: Icon + Content */}
           <div className="flex items-center justify-center gap-3 sm:gap-4">
             {/* Animated Icon + Placement Badge - Smaller */}
@@ -249,9 +252,9 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
               whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
               className="flex-shrink-0 relative"
             >
-              <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo p-2 shadow-hard inline-block`}>
+              <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo shadow-hard inline-block ${compact ? 'p-1.5' : 'p-2'}`}>
                 <RankIcon
-                  className={`text-2xl sm:text-3xl md:text-4xl ${styles.iconTextClass}`}
+                  className={`${styles.iconTextClass} ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'}`}
                   style={{
                     filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))',
                   }}
@@ -306,7 +309,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                 </motion.span>
                 {/* Username - Smaller */}
                 <h1
-                  className={`text-xl sm:text-2xl md:text-3xl font-black ${styles.textClass} uppercase leading-tight`}
+                  className={`font-black ${styles.textClass} uppercase leading-tight ${compact ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'}`}
                   style={{
                     textShadow: `2px 2px 0px ${styles.nameShadowColor}`,
                   }}
@@ -331,33 +334,35 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                 className={`text-xl sm:text-2xl ${styles.textClass} hidden sm:block`}
                 style={{ filter: `drop-shadow(1px 1px 0px ${styles.trophyShadowColor})` }}
               />
-              <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-3 py-1.5 sm:px-4 sm:py-2 shadow-hard">
-                <p className="text-lg sm:text-xl md:text-2xl font-black text-neo-black">
-                  {winner.score} <span className="text-xs sm:text-sm">{t('results.points')}</span>
+              <div className={`bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard ${compact ? 'px-2 py-1' : 'px-3 py-1.5 sm:px-4 sm:py-2'}`}>
+                <p className={`font-black text-neo-black ${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'}`}>
+                  {winner.score} <span className={compact ? 'text-[10px]' : 'text-xs sm:text-sm'}>{t('results.points')}</span>
                 </p>
               </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Mascot - Trophy for winners, regular mascot for others */}
-        <div className="absolute -bottom-2 -right-2 sm:bottom-0 sm:right-0 z-20 pointer-events-none">
-          {(rank <= 3 || variant === 'highScore' || variant === 'newRecord') && winner?.score !== 0 ? (
-            <CelebrationMascotWithEntrance
-              variant="trophy"
-              size="sm"
-              delay={0.6}
-              className="drop-shadow-lg"
-            />
-          ) : (
-            <MascotWithEntrance
-              variant={mascotVariant}
-              size="sm"
-              delay={0.6}
-              className="drop-shadow-lg"
-            />
-          )}
-        </div>
+        {/* Mascot - Trophy for winners, regular mascot for others - Hidden in compact mode */}
+        {!compact && (
+          <div className="absolute -bottom-2 -right-2 sm:bottom-0 sm:right-0 z-20 pointer-events-none">
+            {(rank <= 3 || variant === 'highScore' || variant === 'newRecord') && winner?.score !== 0 ? (
+              <CelebrationMascotWithEntrance
+                variant="trophy"
+                size="sm"
+                delay={0.6}
+                className="drop-shadow-lg"
+              />
+            ) : (
+              <MascotWithEntrance
+                variant={mascotVariant}
+                size="sm"
+                delay={0.6}
+                className="drop-shadow-lg"
+              />
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );

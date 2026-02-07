@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import {
   Dialog,
   DialogContent,
@@ -217,7 +217,7 @@ export function ChallengeViewer({
                 title="Refresh challenges"
               >
                 {loadingChallenges ? (
-                  <NeoLoader variant="dots" size="sm" />
+                  <Loader size="sm" />
                 ) : (
                   <RefreshCw className="w-4 h-4" />
                 )}
@@ -238,7 +238,7 @@ export function ChallengeViewer({
             {/* Challenges list */}
             {loadingChallenges ? (
               <div className="flex justify-center py-8">
-                <NeoLoader variant="dots" size="lg" />
+                <Loader size="lg" />
               </div>
             ) : challengeData ? (
               <div className="space-y-3">
@@ -425,7 +425,7 @@ function RegenerateByTypeDialog({
           >
             {isRegeneratingType ? (
               <>
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
                 Regenerating...
               </>
             ) : (

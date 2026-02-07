@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, Check, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import {
   getGuestDailyPlayer,
   updateGuestDailyPlayer,
@@ -76,7 +76,7 @@ const GuestNameEditor: React.FC<GuestNameEditorProps> = ({
   if (loading || !guestPlayer) {
     return (
       <div className="flex items-center justify-center gap-2 py-2">
-        <NeoLoader variant="dots" size="sm" />
+        <Loader size="sm" />
       </div>
     );
   }

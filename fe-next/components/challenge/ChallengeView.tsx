@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { getGuestSessionId } from '@/utils/guestManager';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from '@/components/singleplayer/SinglePlayerView';
 import type { LetterGrid, Language, DifficultyLevel } from '@/shared/types/game';
 
@@ -140,7 +140,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   if (phase === 'loading') {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text="Loading challenge..." />
+        <PageLoader size="lg" text="Loading challenge..." />
       </div>
     );
   }

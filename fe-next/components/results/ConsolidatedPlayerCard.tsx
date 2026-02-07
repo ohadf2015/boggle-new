@@ -55,7 +55,10 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   const [showDetails, setShowDetails] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const [showXp, setShowXp] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
+  // Default-expand achievements when player earned some this game
+  const [showAchievements, setShowAchievements] = useState(
+    () => (player.achievements?.length ?? 0) > 0
+  );
 
   const isWinner = rank === 1;
   const pointsFromWinner = winnerScore - player.score;

@@ -1,13 +1,13 @@
 /**
- * Tests for DailyChallengeLanding solved badge visibility and Word Hunt animation
+ * Tests for DailyChallengeLanding solved badge visibility
  *
  * Features tested:
- * 1. Enhanced solved badge with glow effect and Check icon
- * 2. Word Hunt mini grid SVG line renders behind letters
+ * 1. Won/lost badge on card icon with neo-brutalist styling
+ * 2. Badge contains appropriate icon (Check/X)
  */
 
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -63,7 +63,7 @@ jest.mock('framer-motion', () => ({
       <button {...props}>{children}</button>
     ),
     path: ({ d, stroke, strokeWidth, ...props }: React.SVGProps<SVGPathElement>) => (
-      <path d={d} stroke={stroke} strokeWidth={strokeWidth} {...props} data-testid="swipe-line" />
+      <path d={d} stroke={stroke} strokeWidth={strokeWidth} {...props} />
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -175,28 +175,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
       // Should have border (border-2)
       expect(wonBadge).toHaveClass('border-2');
       // Should have hard shadow
-      expect(wonBadge).toHaveClass('shadow-hard-sm');
-    }, { timeout: 2000 });
-
-    storage.getWordHuntStatusToday.mockReturnValue(null);
-  });
-
-  test('won badge should show translated text on larger screens', async () => {
-    const storage = require('@/utils/dailyChallenge/storage');
-    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
-
-    const mockProps = {
-      onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
-      currentLanguage: 'en' as const,
-    };
-
-    renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-    await waitFor(() => {
-      const wonBadge = screen.getByTestId('won-badge');
-      // Should contain "Solved" text (hidden on mobile via hidden xs:inline)
-      expect(wonBadge).toHaveTextContent('Solved');
+      expect(wonBadge).toHaveClass('shadow-hard-xs');
     }, { timeout: 2000 });
 
     storage.getWordHuntStatusToday.mockReturnValue(null);
@@ -225,123 +204,5 @@ describe('DailyChallengeLanding Solved Badge', () => {
     }, { timeout: 2000 });
 
     storage.getWordHuntStatusToday.mockReturnValue(null);
-  });
-});
-
-describe('WordHuntMiniGrid SVG Animation', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('check-availability')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ available: true }),
-        });
-      }
-      if (url.includes('check-played')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ data: { played: false } }),
-        });
-      }
-      if (url.includes('/api/buzz/')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: false }),
-        });
-      }
-      return Promise.reject(new Error('Unknown URL'));
-    });
-  });
-
-  test('grid container should have z-10 to render above SVG line', () => {
-    const mockProps = {
-      onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
-      currentLanguage: 'en' as const,
-    };
-
-    const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-    // Find the grid container (has grid-cols-3)
-    const gridContainer = container.querySelector('.grid-cols-3');
-    expect(gridContainer).toBeInTheDocument();
-    expect(gridContainer).toHaveClass('z-10');
-  });
-
-  test('corner accents should have z-20 to render above grid', () => {
-    const mockProps = {
-      onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
-      currentLanguage: 'en' as const,
-    };
-
-    const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-    // Find corner accent elements (bg-neo-orange at top-start, bg-neo-yellow at bottom-end)
-    const topCorner = container.querySelector('.bg-neo-orange.z-20');
-    const bottomCorner = container.querySelector('.bg-neo-yellow.z-20');
-
-    expect(topCorner).toBeInTheDocument();
-    expect(bottomCorner).toBeInTheDocument();
-  });
-
-  test('letters should be visible in the mini grid', () => {
-    const mockProps = {
-      onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
-      currentLanguage: 'en' as const,
-    };
-
-    renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-    // Check that English letters are present (W-O-R-D-H-U-N-T-!)
-    expect(screen.getByText('W')).toBeInTheDocument();
-    expect(screen.getByText('O')).toBeInTheDocument();
-    expect(screen.getByText('R')).toBeInTheDocument();
-    expect(screen.getByText('D')).toBeInTheDocument();
-  });
-
-  test('SVG line should appear on hover with z-0', () => {
-    const mockProps = {
-      onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
-      currentLanguage: 'en' as const,
-    };
-
-    const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-    // Find the Word Hunt card (has the grid)
-    const wordHuntCard = container.querySelector('[role="button"]');
-    expect(wordHuntCard).toBeInTheDocument();
-
-    // Trigger hover
-    fireEvent.mouseEnter(wordHuntCard!);
-
-    // After hover, SVG should appear with z-0 class
-    const svg = container.querySelector('svg.z-0');
-    expect(svg).toBeInTheDocument();
-
-    // The SVG path should have our test id
-    const swipeLine = screen.getByTestId('swipe-line');
-    expect(swipeLine).toBeInTheDocument();
-  });
-
-  test('SVG line should have proper path for 4 letters', () => {
-    const mockProps = {
-      onSelectWordHunt: jest.fn(),
-      onSelectBuzz: jest.fn(),
-      currentLanguage: 'en' as const,
-    };
-
-    const { container } = renderWithProviders(<DailyChallengeLanding {...mockProps} />);
-
-    // Trigger hover
-    const wordHuntCard = container.querySelector('[role="button"]');
-    fireEvent.mouseEnter(wordHuntCard!);
-
-    // Check the path connects 4 points: M 17,17 L 50,17 L 83,17 L 83,50
-    const swipeLine = screen.getByTestId('swipe-line');
-    expect(swipeLine).toHaveAttribute('d', 'M 17,17 L 50,17 L 83,17 L 83,50');
   });
 });

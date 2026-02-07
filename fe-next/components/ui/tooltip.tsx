@@ -11,21 +11,44 @@ const TooltipTrigger = TooltipPrimitive.Trigger;
 
 const TooltipPortal = TooltipPrimitive.Portal;
 
+// Neo-Brutalist Tooltip Arrow
+const TooltipArrow = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Arrow>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Arrow>
+>(({ className, ...props }, ref) => (
+  <TooltipPrimitive.Arrow
+    ref={ref}
+    className={cn(
+      "fill-neo-black",
+      className
+    )}
+    width={20}
+    height={10}
+    {...props}
+  />
+));
+TooltipArrow.displayName = "TooltipArrow";
+
+interface TooltipContentProps extends React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> {
+  /** Show arrow pointer (SuperDesign style) */
+  showArrow?: boolean;
+}
+
 // Neo-Brutalist Tooltip: Thick borders, hard shadow, cream background
 // Uses explicit Portal to render outside transformed containers
 // Uses collision detection to prevent rendering outside viewport
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 6, collisionPadding = 16, ...props }, ref) => (
+  TooltipContentProps
+>(({ className, sideOffset = 6, collisionPadding = 16, showArrow = true, children, ...props }, ref) => (
   <TooltipPortal>
     <TooltipPrimitive.Content
       ref={ref}
-      sideOffset={sideOffset}
+      sideOffset={showArrow ? sideOffset + 4 : sideOffset}
       collisionPadding={collisionPadding}
       avoidCollisions={true}
       className={cn(
-        "z-[100] overflow-hidden",
+        "z-[100] overflow-visible",
         // Neo-Brutalist styling
         "bg-neo-cream text-neo-black",
         "border-3 border-neo-black",
@@ -45,9 +68,12 @@ const TooltipContent = React.forwardRef<
         className
       )}
       {...props}
-    />
+    >
+      {children}
+      {showArrow && <TooltipArrow />}
+    </TooltipPrimitive.Content>
   </TooltipPortal>
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, TooltipArrow };

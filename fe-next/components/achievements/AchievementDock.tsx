@@ -71,18 +71,12 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
       // Position panel below the button
       const top = rect.bottom + 12; // mt-3 = 12px
 
-      // In RTL, align to left edge of button; in LTR, align to right edge
-      if (dir === 'rtl') {
-        // Left edge of panel aligns with left edge of button
-        const left = rect.left;
-        setPanelPosition({ top, left, right: 0 });
-      } else {
-        // Right edge of panel aligns with right edge of button
-        const right = window.innerWidth - rect.right;
-        setPanelPosition({ top, left: 0, right });
-      }
+      // Always anchor panel's right edge to button's right edge
+      // (button is positioned at right-4, so it's always on the right side of the screen)
+      const right = window.innerWidth - rect.right;
+      setPanelPosition({ top, left: 0, right });
     }
-  }, [isExpanded, dir]);
+  }, [isExpanded]);
 
   // Update position when expanded state or direction changes
   useEffect(() => {
@@ -211,9 +205,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
               style={{
                 position: 'fixed',
                 top: panelPosition.top,
-                ...(dir === 'rtl'
-                  ? { left: panelPosition.left }
-                  : { right: panelPosition.right }),
+                right: panelPosition.right,
                 zIndex: 9999,
               }}
               className={cn(

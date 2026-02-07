@@ -6,6 +6,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
+import PreGameTutorial from './PreGameTutorial';
 import { getHighScore, getAllTimeBest } from './highScoreManager';
 import { recordGameResult, getConfigRecord } from '@/utils/playerStats';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
@@ -17,9 +18,13 @@ import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import {
+  shouldShowGuidance,
+  markGuidanceShown,
+} from '@/utils/contextualGuidanceStorage';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
-export type SinglePlayerPhase = 'playing' | 'results';
+export type SinglePlayerPhase = 'pre-game' | 'playing' | 'results';
 
 export interface BotOpponent {
   id: string;
@@ -117,7 +122,13 @@ const SinglePlayerView: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [phase, setPhase] = useState<SinglePlayerPhase>('playing');
+  // Show pre-game tutorial for first-time players (unless auto-starting from URL)
+  const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
+    const hasAutoStart = searchParams?.get('autoStart');
+    const hasPreset = searchParams?.get('preset');
+    if (hasAutoStart || hasPreset) return 'playing';
+    return shouldShowGuidance('firstPlayTutorialCompleted') ? 'pre-game' : 'playing';
+  });
   const setIsInGame = useHideNavigation();
 
   // Show feature unlock notifications when user reaches milestones
@@ -128,11 +139,11 @@ const SinglePlayerView: React.FC = () => {
   // Track if component is mounted to prevent updates after unmount
   const isMountedRef = useRef(true);
 
-  // Hide bottom navigation during gameplay
+  // Hide bottom navigation during gameplay and pre-game tutorial
   // Note: Using useEffect instead of useLayoutEffect to avoid infinite loop on iOS Chrome
   // Split into two effects to prevent re-render loops from cleanup cascading
   useEffect(() => {
-    const shouldBeInGame = phase === 'playing' || phase === 'results';
+    const shouldBeInGame = phase === 'pre-game' || phase === 'playing' || phase === 'results';
     // Only update if state actually changed and component is still mounted
     if (isMountedRef.current && isInGameRef.current !== shouldBeInGame) {
       isInGameRef.current = shouldBeInGame;
@@ -165,7 +176,7 @@ const SinglePlayerView: React.FC = () => {
     grid: null,
     timerSeconds: 120, // 2 minutes default (standard preset)
     bots: [DEFAULT_MEDIUM_BOT],
-    minWordLength: 3, // Default to 3 letters minimum
+    minWordLength: 2, // Default to 2 letters minimum
   }));
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
 
@@ -174,7 +185,8 @@ const SinglePlayerView: React.FC = () => {
 
   // Map SinglePlayerPhase to GamePhase for the music hook
   // 'playing' phase music is handled by SinglePlayerGame component
-  const musicPhase: GamePhase = phase === 'playing' ? 'waiting' : phase;
+  // 'pre-game' maps to 'waiting' (no music during tutorial)
+  const musicPhase: GamePhase = (phase === 'playing' || phase === 'pre-game') ? 'waiting' : phase;
 
   // Use shared music hook for lobby and results phases
   // Playing phase is handled by SinglePlayerGame for timer-based transitions
@@ -467,6 +479,12 @@ const SinglePlayerView: React.FC = () => {
     setPhase('playing');
   }, [unlockAudio]);
 
+  // Handle pre-game tutorial completion
+  const handleTutorialComplete = useCallback(() => {
+    markGuidanceShown('firstPlayTutorialCompleted');
+    setPhase('playing');
+  }, []);
+
   const handleBackToLobby = () => {
     // Navigate back to landing page
     router.push(`/${uiLanguage}/`);
@@ -477,8 +495,8 @@ const SinglePlayerView: React.FC = () => {
       className="flex flex-col min-h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
       {...pullToRefreshHandlers}
     >
-      {/* Pull-to-refresh indicator - only show when not playing */}
-      {phase !== 'playing' && (
+      {/* Pull-to-refresh indicator - only show during results */}
+      {phase === 'results' && (
         <PullToRefreshIndicator
           pullDistance={pullState.pullDistance}
           isRefreshing={pullState.isRefreshing}
@@ -488,7 +506,11 @@ const SinglePlayerView: React.FC = () => {
 
       <AutoHideHeader />
 
-      <main className="w-full px-2 sm:px-3 lg:px-4 py-4 sm:py-4 lg:py-6 landscape-content overflow-x-hidden">
+      {phase === 'pre-game' && (
+        <PreGameTutorial onComplete={handleTutorialComplete} />
+      )}
+
+      <main className="w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden">
         {phase === 'playing' && (
           <SinglePlayerGame
             settings={gameState}

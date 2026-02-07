@@ -349,7 +349,14 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       if (shouldAutoValidate) {
         handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, comboLevel, isInDictionary === true, fireRoundActive === true);
       } else {
-        handlePendingWord(socket, game, gameCode, username, normalizedWord, comboLevel, fireRoundActive === true);
+        // Word not in dictionary - reject immediately (no pending/AI validation)
+        inc('wordNeedsValidation');
+        incPerGame(gameCode, 'wordNeedsValidation');
+        socket.emit('wordRejected', {
+          word: normalizedWord,
+          reason: 'Not in dictionary'
+        });
+        handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.REJECTED, game);
       }
 
       // Update leaderboard - reduced throttle for more responsive score updates
@@ -376,6 +383,8 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       });
       emitError(socket, ErrorCodes.WORD_PROCESSING_ERROR, {
         correlationId: `${catchGameCode}-${Date.now()}`,
+        // Include actual error for debugging (server-side details visible in client logs)
+        details: { error: err.message, stack: err.stack?.split('\n').slice(0, 3).join('\n') },
       });
       // Note: gracePeriodLockId is out of scope in catch block, but the lock has a short TTL (2s)
       // so it will auto-expire if we can't release it here. This is acceptable for error cases.
@@ -502,7 +511,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 // Helper functions
 
 function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, comboLevel: number, isInDictionary: boolean, fireRoundActive: boolean = false): void {
-  const safeComboLevel = Math.max(0, Math.min(10, parseInt(String(comboLevel), 10) || 0));
+  const safeComboLevel = Math.max(0, parseInt(String(comboLevel), 10) || 0);
   const fireRoundMultiplier = fireRoundActive ? 2 : 1;
   const baseScore = normalizedWord.length - 1;
   const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
@@ -590,46 +599,6 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         .catch((err: Error) => logger.debug('ENGAGEMENT', `Long word engagement error: ${err.message}`));
     }
   }
-}
-
-function handlePendingWord(socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, comboLevel: number, fireRoundActive: boolean = false): void {
-  const safeComboLevel = Math.max(0, Math.min(10, parseInt(String(comboLevel), 10) || 0));
-  const fireRoundMultiplier = fireRoundActive ? 2 : 1;
-  const baseScore = normalizedWord.length - 1;
-  // Calculate potential score with fire round multiplier
-  const potentialScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier);
-  const scoreWithoutMultiplier = calculateWordScore(normalizedWord, safeComboLevel, 1);
-  const comboBonus = scoreWithoutMultiplier - baseScore;
-  const fireRoundBonus = fireRoundActive ? scoreWithoutMultiplier : 0;
-
-  if (!game.playerCombos) game.playerCombos = {};
-  game.playerCombos[username] = safeComboLevel;
-
-  // Check if word is from lesson vocabulary (classroom games)
-  const fromLesson = game.lessonVocabulary?.has(normalizedWord.toUpperCase()) || false;
-
-  // Record this player as the first finder of this word (even for pending words)
-  const userData = game.users?.[username];
-  recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
-
-  addPlayerWord(gameCode, username, normalizedWord, {
-    autoValidated: false,
-    score: 0,
-    potentialScore: potentialScore,
-    comboBonus: comboBonus,
-    comboLevel: safeComboLevel,
-    fireRoundMultiplier: fireRoundMultiplier,
-    fireRoundBonus: fireRoundBonus,
-    fromLesson: fromLesson
-  });
-
-  inc('wordNeedsValidation');
-  incPerGame(gameCode, 'wordNeedsValidation');
-
-  socket.emit('wordNeedsValidation', {
-    word: normalizedWord,
-    message: 'Word will be validated at game end'
-  });
 }
 
 function handleWordBecameValid(io: Server, socket: Socket, game: GameState, gameCode: string, word: string, submitter?: string): void {

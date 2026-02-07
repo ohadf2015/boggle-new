@@ -20,13 +20,11 @@ import {
   spring,
 } from 'remotion';
 import { fredokaFamily, rubikFamily } from '../../../lib/remotion/fonts';
+import { BackgroundGlow, StatItem, StatsPanel, SparkleField } from '../../../lib/remotion/primitives';
 
 // ==============================================
 // CONSTANTS
 // ==============================================
-
-/** Frame rate for all cinematics */
-const FPS = 30;
 
 /** Total duration in frames (5 seconds) */
 export const DEFEAT_DURATION_FRAMES = 150;
@@ -52,66 +50,19 @@ export interface DefeatCinematicProps {
   bestWord: string;
   /** Final score achieved */
   finalScore: number;
+  /** Translated stat labels */
+  statLabels?: {
+    wordsFound?: string;
+    bestWord?: string;
+    score?: string;
+  };
+  /** Translated title text (default: "Time's Up!") */
+  titleText?: string;
+  /** Translated encouragement line 1 */
+  encourageText?: string;
+  /** Translated encouragement line 2 */
+  encourageSubtext?: string;
 }
-
-// ==============================================
-// STAT ITEM COMPONENT
-// ==============================================
-
-interface StatItemProps {
-  label: string;
-  value: number | string;
-  delay: number;
-  frame: number;
-  fps: number;
-}
-
-const StatItem: React.FC<StatItemProps> = ({
-  label,
-  value,
-  delay,
-  frame,
-  fps,
-}) => {
-  const reveal = spring({
-    frame: frame - delay,
-    fps,
-    config: { damping: 15, stiffness: 100 },
-  });
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '12px 0',
-        borderBottom: '2px solid #333',
-        opacity: reveal,
-        transform: `translateX(${(1 - reveal) * 30}px)`,
-      }}
-    >
-      <span
-        style={{
-          fontFamily: rubikFamily,
-          fontSize: 24,
-          color: '#FF6B35',
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          fontFamily: fredokaFamily,
-          fontSize: 28,
-          fontWeight: 700,
-          color: 'white',
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-};
 
 // ==============================================
 // MAIN COMPONENT
@@ -121,13 +72,13 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
   wordsFound,
   bestWord,
   finalScore,
+  statLabels = {},
+  titleText = "Time's Up!",
+  encourageText = 'Nice try! You almost had it!',
+  encourageSubtext = 'Check out what you achieved:',
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-
-  // ==============================================
-  // ANIMATION VALUES
-  // ==============================================
 
   // Title animation (0-45 frames / 0-1.5s)
   const titleScale = spring({
@@ -136,12 +87,9 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
     config: { damping: 12, stiffness: 100 },
   });
 
-  const titleOpacity = interpolate(
-    frame,
-    [0, 15],
-    [0, 1],
-    { extrapolateRight: 'clamp' }
-  );
+  const titleOpacity = interpolate(frame, [0, 15], [0, 1], {
+    extrapolateRight: 'clamp',
+  });
 
   // Encouraging message reveal (30-90 frames / 1-3s)
   const messageReveal = spring({
@@ -150,24 +98,11 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
     config: { damping: 15, stiffness: 80 },
   });
 
-  // ==============================================
-  // RENDER
-  // ==============================================
-
   return (
     <AbsoluteFill style={{ backgroundColor: '#0a0a1a' }}>
-      {/* Background gradient glow (softer than victory) */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at 50% 50%, #FF6B3522, transparent 70%)',
-          opacity: titleOpacity,
-        }}
-      />
+      <BackgroundGlow color="#FF6B35" opacity={titleOpacity} />
 
-      {/* "Time's Up!" title (0-1.5s) */}
+      {/* Title (0-1.5s) */}
       <Sequence from={PHASE_FRAMES.TITLE_START} durationInFrames={45} premountFor={15}>
         <div
           style={{
@@ -186,16 +121,12 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
               fontSize: 72,
               fontWeight: 700,
               color: '#FF6B35',
-              textShadow: `
-                4px 4px 0 black,
-                -2px -2px 0 black,
-                0 0 20px #FF6B35
-              `,
+              textShadow: '4px 4px 0 black, -2px -2px 0 black, 0 0 20px #FF6B35',
               letterSpacing: '0.05em',
               margin: 0,
             }}
           >
-            Time&apos;s Up!
+            {titleText}
           </h1>
         </div>
       </Sequence>
@@ -223,10 +154,10 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
               lineHeight: 1.4,
             }}
           >
-            Nice try! You almost had it!
+            {encourageText}
             <br />
             <span style={{ fontSize: 24, color: '#FFE135' }}>
-              Check out what you achieved:
+              {encourageSubtext}
             </span>
           </p>
         </div>
@@ -234,89 +165,53 @@ export const DefeatCinematic: React.FC<DefeatCinematicProps> = ({
 
       {/* Progress summary (2-5s) */}
       <Sequence from={PHASE_FRAMES.STATS_START} premountFor={15}>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '15%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '500px',
-            padding: '30px',
-            backgroundColor: '#00000088',
-            border: '3px solid #FF6B35',
-            borderRadius: '4px',
-          }}
+        <StatsPanel
+          borderColor="#FF6B35"
+          frame={frame - PHASE_FRAMES.STATS_START}
+          fps={fps}
         >
           <StatItem
-            label="Words Found"
+            label={statLabels.wordsFound ?? 'Words Found'}
             value={wordsFound}
             delay={0}
             frame={frame - PHASE_FRAMES.STATS_START}
             fps={fps}
+            labelColor="#FF6B35"
           />
           <StatItem
-            label="Best Word"
+            label={statLabels.bestWord ?? 'Best Word'}
             value={bestWord.toUpperCase()}
             delay={10}
             frame={frame - PHASE_FRAMES.STATS_START}
             fps={fps}
+            labelColor="#FF6B35"
           />
           <StatItem
-            label="Score"
+            label={statLabels.score ?? 'Score'}
             value={finalScore}
             delay={20}
             frame={frame - PHASE_FRAMES.STATS_START}
             fps={fps}
+            labelColor="#FF6B35"
           />
-        </div>
+        </StatsPanel>
       </Sequence>
 
       {/* Soft sparkles (encouraging, not celebratory) */}
       <Sequence from={30} premountFor={15}>
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-          }}
-        >
-          {Array.from({ length: 10 }, (_, i) => {
-            const x = (i * 234567) % 100;
-            const y = (i * 890123) % 100;
-            const delay = i * 8;
-            const opacity = interpolate(
-              frame - 30 - delay,
-              [0, 40],
-              [0, 0.4],
-              { extrapolateRight: 'clamp' }
-            );
-
-            return (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  width: 3,
-                  height: 3,
-                  borderRadius: '50%',
-                  backgroundColor: '#00FFFF',
-                  opacity,
-                  boxShadow: '0 0 8px #00FFFF',
-                }}
-              />
-            );
-          })}
-        </div>
+        <SparkleField
+          count={10}
+          color="#00FFFF"
+          seed={567}
+          frame={frame - 30}
+          size={3}
+          maxOpacity={0.4}
+          fadeInFrames={40}
+        />
       </Sequence>
     </AbsoluteFill>
   );
 };
-
-// ==============================================
-// DISPLAY NAME & DEFAULT EXPORT
-// ==============================================
 
 DefeatCinematic.displayName = 'DefeatCinematic';
 

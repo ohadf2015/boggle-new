@@ -15,6 +15,7 @@ yarn-error.log*
 # Test artifacts and reports
 test-results/
 playwright-report/
+playwriter-report/
 coverage/
 .nyc_output/
 *.lcov
@@ -39,3 +40,7 @@ coverage/
 /test-screenshots
 /screenshots
 fe-next/app-debug.apk
+
+# Temporary files
+tmp/
+fe-next/tmp/

@@ -1,12 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { PageStateHandler } from '../PageStateHandler';
 
-// Mock NeoLoader to capture passed props
-jest.mock('@/components/ui/NeoLoader', () => ({
-  NeoLoader: ({ variant, size, text }: { variant: string; size: string; text?: string }) => (
+// Mock PageLoader to capture passed props
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: ({ size, text }: { size?: string; text?: string }) => (
     <div
-      data-testid="neo-loader"
-      data-variant={variant}
+      data-testid="page-loader"
       data-size={size}
     >
       {text && <span data-testid="loader-text">{text}</span>}
@@ -43,10 +42,8 @@ describe('PageStateHandler', () => {
       </PageStateHandler>
     );
 
-    const loader = screen.getByTestId('neo-loader');
+    const loader = screen.getByTestId('page-loader');
     expect(loader).toBeInTheDocument();
-    // Page loaders should always use mascot-letters variant for consistent branding
-    expect(loader).toHaveAttribute('data-variant', 'mascot-letters');
   });
 
   it('should render loading state with medium size by default', () => {
@@ -56,7 +53,7 @@ describe('PageStateHandler', () => {
       </PageStateHandler>
     );
 
-    const loader = screen.getByTestId('neo-loader');
+    const loader = screen.getByTestId('page-loader');
     expect(loader).toHaveAttribute('data-size', 'md');
   });
 
@@ -91,6 +88,6 @@ describe('PageStateHandler', () => {
     );
 
     expect(screen.getByTestId('custom-loader')).toBeInTheDocument();
-    expect(screen.queryByTestId('neo-loader')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('page-loader')).not.toBeInTheDocument();
   });
 });

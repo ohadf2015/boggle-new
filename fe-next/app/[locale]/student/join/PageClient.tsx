@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import JoinClassroomForm from '@/components/student/JoinClassroomForm';
 
 export default function StudentJoinPageClient() {
@@ -39,7 +39,7 @@ export default function StudentJoinPageClient() {
   if (isChecking || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neo-navy">
-        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading')} />
+        <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
   }

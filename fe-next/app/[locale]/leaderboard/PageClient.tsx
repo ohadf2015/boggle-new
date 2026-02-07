@@ -4,7 +4,7 @@
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { ErrorState, EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useRouter } from 'next/navigation';
@@ -147,7 +147,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               haptic
             >
               {loading ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : (
                 <RefreshCw
                   className={cn(

@@ -21,33 +21,23 @@ import {
   interpolate,
   spring,
   Img,
-  staticFile,
 } from 'remotion';
 import { fredokaFamily, rubikFamily } from '../../../../lib/remotion/fonts';
-
-// ==============================================
-// SEEDED RANDOM (for pure render functions)
-// ==============================================
-
-/**
- * Simple seeded PRNG using mulberry32 algorithm.
- * Ensures fragments/confetti are deterministic across renders.
- */
-function createSeededRandom(seed: number): () => number {
-  let t = seed + 0x6d2b79f5;
-  return () => {
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+import { createSeededRandom, normalizeImagePath } from '../../../../lib/remotion/utils';
+import {
+  BackgroundGlow,
+  ShatterFragment,
+  ExplosionRing,
+  Confetti,
+  FlashEffect,
+  RewardDisplay,
+  type ConfettiParticle,
+  type RewardItem,
+} from '../../../../lib/remotion/primitives';
 
 // ==============================================
 // CONSTANTS
 // ==============================================
-
-/** Frame rate for all cinematics */
-const FPS = 30;
 
 /** Total duration in frames (8 seconds) */
 export const DEFEAT_DURATION_FRAMES = 240;
@@ -85,165 +75,15 @@ export interface BossDefeatCinematicProps {
   xpEarned?: number;
   /** Whether this was a perfect victory (no damage taken) */
   perfectVictory?: boolean;
+  /** Translated title text (default: "VICTORY!") */
+  victoryText?: string;
+  /** Translated "{bossName} defeated!" text */
+  defeatedText?: string;
+  /** Translated "PERFECT VICTORY" text */
+  perfectText?: string;
+  /** Translated reward labels */
+  rewardLabels?: { gold?: string; xp?: string };
 }
-
-// ==============================================
-// SHATTER FRAGMENT COMPONENT
-// ==============================================
-
-interface ShatterFragmentProps {
-  x: number;
-  y: number;
-  size: number;
-  rotation: number;
-  frame: number;
-  color: string;
-}
-
-/**
- * Individual shatter fragment for defeat effect
- */
-const ShatterFragment: React.FC<ShatterFragmentProps> = ({
-  x,
-  y,
-  size,
-  rotation,
-  frame,
-  color,
-}) => {
-  // Animate outward explosion
-  const progress = interpolate(frame, [0, 60], [0, 1], {
-    extrapolateRight: 'clamp',
-  });
-
-  const xOffset = Math.cos(rotation) * progress * 400;
-  const yOffset = Math.sin(rotation) * progress * 400 + progress * progress * 300;
-  const scale = interpolate(progress, [0, 0.5, 1], [1, 1.2, 0]);
-  const opacity = interpolate(progress, [0, 0.7, 1], [1, 0.8, 0]);
-  const spin = rotation + progress * 720;
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: x + xOffset,
-        top: y + yOffset,
-        width: size,
-        height: size,
-        transform: `scale(${scale}) rotate(${spin}deg)`,
-        opacity,
-        backgroundColor: color,
-        boxShadow: `0 0 ${size}px ${color}`,
-        clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-        pointerEvents: 'none',
-      }}
-    />
-  );
-};
-
-// ==============================================
-// EXPLOSION RING COMPONENT
-// ==============================================
-
-interface ExplosionRingProps {
-  frame: number;
-  color: string;
-  delay: number;
-  size: number;
-}
-
-/**
- * Expanding ring for victory explosion effect
- */
-const ExplosionRing: React.FC<ExplosionRingProps> = ({
-  frame,
-  color,
-  delay,
-  size,
-}) => {
-  const adjustedFrame = Math.max(0, frame - delay);
-  const progress = interpolate(adjustedFrame, [0, 30], [0, 1], {
-    extrapolateRight: 'clamp',
-  });
-
-  const scale = 1 + progress * 3;
-  const opacity = 1 - progress;
-  const ringSize = size * scale;
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        width: ringSize,
-        height: ringSize,
-        marginLeft: -ringSize / 2,
-        marginTop: -ringSize / 2,
-        borderRadius: '50%',
-        border: `6px solid ${color}`,
-        opacity,
-        boxShadow: `
-          0 0 20px ${color},
-          inset 0 0 20px ${color}44
-        `,
-        pointerEvents: 'none',
-      }}
-    />
-  );
-};
-
-// ==============================================
-// CONFETTI PARTICLE COMPONENT
-// ==============================================
-
-interface ConfettiProps {
-  particles: Array<{
-    x: number;
-    y: number;
-    color: string;
-    speed: number;
-    wobble: number;
-    delay: number;
-  }>;
-  frame: number;
-}
-
-/**
- * Victory confetti celebration
- */
-const Confetti: React.FC<ConfettiProps> = ({ particles, frame }) => {
-  return (
-    <>
-      {particles.map((p, i) => {
-        const adjustedFrame = Math.max(0, frame - p.delay);
-        const yOffset = adjustedFrame * p.speed;
-        const xWobble = Math.sin(adjustedFrame * 0.1 + p.wobble) * 30;
-        const rotation = adjustedFrame * 5;
-        const opacity = interpolate(yOffset, [0, 500], [1, 0], {
-          extrapolateRight: 'clamp',
-        });
-
-        return (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              left: p.x + xWobble,
-              top: p.y + yOffset,
-              width: 10,
-              height: 6,
-              backgroundColor: p.color,
-              transform: `rotate(${rotation}deg)`,
-              opacity,
-              pointerEvents: 'none',
-            }}
-          />
-        );
-      })}
-    </>
-  );
-};
 
 // ==============================================
 // MAIN COMPONENT
@@ -257,28 +97,20 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
   goldEarned = 100,
   xpEarned = 50,
   perfectVictory = false,
+  victoryText = 'VICTORY!',
+  defeatedText,
+  perfectText = 'PERFECT VICTORY',
+  rewardLabels = {},
 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
-
-  // ==============================================
-  // ANIMATION VALUES
-  // ==============================================
 
   // Stagger effect (0-30 frames / 0-1s)
   const staggerShake = interpolate(
     frame,
     [PHASE_FRAMES.STAGGER_START, PHASE_FRAMES.STAGGER_END],
     [0, 1],
-    { extrapolateRight: 'clamp' }
-  );
-
-  // Shatter explosion (30-90 frames / 1-3s)
-  const shatterProgress = interpolate(
-    frame,
-    [PHASE_FRAMES.SHATTER_START, PHASE_FRAMES.SHATTER_END],
-    [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+    { extrapolateRight: 'clamp' },
   );
 
   // Victory text reveal (120+ frames / 4s+)
@@ -288,16 +120,9 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
     config: { damping: 12, stiffness: 150 },
   });
 
-  // Rewards reveal (180+ frames / 6s+)
-  const rewardsReveal = spring({
-    frame: frame - PHASE_FRAMES.REWARDS_START,
-    fps,
-    config: { damping: 15, stiffness: 100 },
-  });
-
-  // Generate shatter fragments (deterministic using seeded random)
+  // Generate shatter fragments (deterministic)
   const fragments = useMemo(() => {
-    const rand = createSeededRandom(42); // Seed for fragments
+    const rand = createSeededRandom(42);
     return Array.from({ length: 30 }, (_, i) => ({
       x: width / 2 + (rand() - 0.5) * 100,
       y: height / 2 + (rand() - 0.5) * 100,
@@ -307,9 +132,9 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
     }));
   }, [width, height, primaryColor, secondaryColor]);
 
-  // Generate confetti particles (deterministic using seeded random)
-  const confetti = useMemo(() => {
-    const rand = createSeededRandom(123); // Different seed for confetti
+  // Generate confetti particles (deterministic)
+  const confetti = useMemo<ConfettiParticle[]>(() => {
+    const rand = createSeededRandom(123);
     const colors = [primaryColor, secondaryColor, '#FF6B35', '#FF1493', '#FFFFFF'];
     return Array.from({ length: 50 }, (_, i) => ({
       x: rand() * width,
@@ -321,36 +146,23 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
     }));
   }, [width, primaryColor, secondaryColor]);
 
-  // Resolve image path
-  // Resolve image path for Remotion Player
-  // For client-side rendering, use the direct path (Remotion Player handles public folder)
-  // For server-side rendering (video export), use staticFile()
-  const imageSrc = typeof window !== 'undefined'
-    ? bossImagePath // Client-side: use direct path
-    : (bossImagePath.startsWith('/')
-        ? staticFile(bossImagePath.slice(1))
-        : staticFile(bossImagePath));
+  const imageSrc = normalizeImagePath(bossImagePath);
 
-  // Calculate stagger shake offset
+  // Stagger shake offset
   const shakeX = staggerShake * Math.sin(frame * 2) * 15;
   const shakeY = staggerShake * Math.cos(frame * 3) * 10;
 
-  // ==============================================
-  // RENDER
-  // ==============================================
+  // Rewards array
+  const rewards: RewardItem[] = [
+    { label: rewardLabels.gold ?? 'GOLD', value: goldEarned, color: '#FFD700' },
+    { label: rewardLabels.xp ?? 'XP', value: xpEarned, color: '#00FF88' },
+  ];
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0a0a1a' }}>
-      {/* Background radial glow */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: `radial-gradient(circle at 50% 50%, ${primaryColor}33, transparent 60%)`,
-        }}
-      />
+      <BackgroundGlow color={primaryColor} opacity={1} intensity="33" spread="60%" />
 
-      {/* Boss stagger phase - show boss shaking */}
+      {/* Boss stagger phase */}
       <Sequence
         from={PHASE_FRAMES.STAGGER_START}
         durationInFrames={PHASE_FRAMES.SHATTER_START - PHASE_FRAMES.STAGGER_START}
@@ -396,39 +208,15 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
       </Sequence>
 
       {/* Victory explosion rings */}
-      <Sequence
-        from={PHASE_FRAMES.EXPLOSION_START}
-        durationInFrames={60}
-        premountFor={15}
-      >
-        <ExplosionRing
-          frame={frame - PHASE_FRAMES.EXPLOSION_START}
-          color={primaryColor}
-          delay={0}
-          size={100}
-        />
-        <ExplosionRing
-          frame={frame - PHASE_FRAMES.EXPLOSION_START}
-          color={secondaryColor}
-          delay={10}
-          size={80}
-        />
-        <ExplosionRing
-          frame={frame - PHASE_FRAMES.EXPLOSION_START}
-          color="#FFFFFF"
-          delay={20}
-          size={60}
-        />
+      <Sequence from={PHASE_FRAMES.EXPLOSION_START} durationInFrames={60} premountFor={15}>
+        <ExplosionRing frame={frame - PHASE_FRAMES.EXPLOSION_START} color={primaryColor} delay={0} size={100} />
+        <ExplosionRing frame={frame - PHASE_FRAMES.EXPLOSION_START} color={secondaryColor} delay={10} size={80} />
+        <ExplosionRing frame={frame - PHASE_FRAMES.EXPLOSION_START} color="#FFFFFF" delay={20} size={60} />
       </Sequence>
 
       {/* Flash effect on explosion */}
       <Sequence from={PHASE_FRAMES.EXPLOSION_START} durationInFrames={5} premountFor={15}>
-        <AbsoluteFill
-          style={{
-            backgroundColor: 'white',
-            opacity: 0.6,
-          }}
-        />
+        <FlashEffect intensity={0.6} />
       </Sequence>
 
       {/* Victory text */}
@@ -450,16 +238,12 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
               fontSize: 96,
               fontWeight: 700,
               color: primaryColor,
-              textShadow: `
-                6px 6px 0 black,
-                -3px -3px 0 black,
-                0 0 40px ${primaryColor}
-              `,
+              textShadow: `6px 6px 0 black, -3px -3px 0 black, 0 0 40px ${primaryColor}`,
               letterSpacing: '0.1em',
               margin: 0,
             }}
           >
-            VICTORY!
+            {victoryText}
           </h1>
           <p
             style={{
@@ -470,7 +254,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
               marginTop: 20,
             }}
           >
-            {bossName} defeated!
+            {defeatedText ?? `${bossName} defeated!`}
           </p>
           {perfectVictory && (
             <p
@@ -482,7 +266,7 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
                 marginTop: 10,
               }}
             >
-              PERFECT VICTORY
+              {perfectText}
             </p>
           )}
         </div>
@@ -490,93 +274,20 @@ export const BossDefeatCinematic: React.FC<BossDefeatCinematicProps> = ({
 
       {/* Rewards display */}
       <Sequence from={PHASE_FRAMES.REWARDS_START} premountFor={15}>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '15%',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 60,
-            opacity: rewardsReveal,
-            transform: `translateY(${(1 - rewardsReveal) * 30}px)`,
-          }}
-        >
-          {/* Gold reward */}
-          <div
-            style={{
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: fredokaFamily,
-                fontSize: 48,
-                fontWeight: 700,
-                color: '#FFD700',
-                textShadow: '3px 3px 0 black',
-              }}
-            >
-              +{goldEarned}
-            </div>
-            <div
-              style={{
-                fontFamily: rubikFamily,
-                fontSize: 20,
-                color: 'white',
-                textShadow: '2px 2px 0 black',
-              }}
-            >
-              GOLD
-            </div>
-          </div>
-
-          {/* XP reward */}
-          <div
-            style={{
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: fredokaFamily,
-                fontSize: 48,
-                fontWeight: 700,
-                color: '#00FF88',
-                textShadow: '3px 3px 0 black',
-              }}
-            >
-              +{xpEarned}
-            </div>
-            <div
-              style={{
-                fontFamily: rubikFamily,
-                fontSize: 20,
-                color: 'white',
-                textShadow: '2px 2px 0 black',
-              }}
-            >
-              XP
-            </div>
-          </div>
-        </div>
+        <RewardDisplay
+          rewards={rewards}
+          frame={frame - PHASE_FRAMES.REWARDS_START}
+          fps={fps}
+        />
       </Sequence>
 
       {/* Confetti celebration */}
       <Sequence from={PHASE_FRAMES.VICTORY_TEXT_START} premountFor={15}>
-        <Confetti
-          particles={confetti}
-          frame={frame - PHASE_FRAMES.VICTORY_TEXT_START}
-        />
+        <Confetti particles={confetti} frame={frame - PHASE_FRAMES.VICTORY_TEXT_START} />
       </Sequence>
     </AbsoluteFill>
   );
 };
-
-// ==============================================
-// DISPLAY NAME & DEFAULT EXPORT
-// ==============================================
 
 BossDefeatCinematic.displayName = 'BossDefeatCinematic';
 

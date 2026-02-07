@@ -1,8 +1,8 @@
 /**
- * Test: Challenge card heights should fit content on mobile and match on desktop
+ * Test: Challenge quest cards should render properly with vertical layout
  *
- * Issue: Cards have fixed min-height of 420px on mobile which is too tall
- * Expected: Cards should fit content on mobile, match height on desktop (flex)
+ * Updated for new vertical quest path layout (was grid-based).
+ * Cards are now QuestCard components in a vertical stack.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -61,13 +61,50 @@ jest.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: jest.fn(() => 'test-fingerprint'),
 }));
 
+jest.mock('@/hooks/useTiltEffect', () => ({
+  useTiltEffect: () => ({
+    ref: { current: null },
+    style: {},
+    handlers: {
+      onMouseEnter: jest.fn(),
+      onMouseLeave: jest.fn(),
+      onMouseMove: jest.fn(),
+      onTouchStart: jest.fn(),
+      onTouchMove: jest.fn(),
+      onTouchEnd: jest.fn(),
+    },
+  }),
+}));
+
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    enableComplexAnimations: false,
+    prefersReducedMotion: true,
+  }),
+}));
+
 // Mock framer-motion to avoid animation delays
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
     path: 'path',
   },
 }));
+
+// Mock fetch for API calls
+global.fetch = jest.fn((url: string) => {
+  if (typeof url === 'string' && url.includes('daily-streak')) {
+    return Promise.resolve({ ok: true, json: () => Promise.resolve({ streak: 0 }) });
+  }
+  if (typeof url === 'string' && url.includes('daily-leaderboard')) {
+    return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) });
+  }
+  return Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ available: true, data: { played: false } }),
+  });
+}) as jest.Mock;
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <AuthProvider>
@@ -75,109 +112,58 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
   </AuthProvider>
 );
 
-describe('DailyChallengeLanding - Card Height', () => {
+describe('DailyChallengeLanding - Quest Card Layout', () => {
   const mockProps = {
     onSelectWordHunt: jest.fn(),
     onSelectBuzz: jest.fn(),
     currentLanguage: 'en' as const,
   };
 
-  beforeEach(() => {
-    // Mock window.matchMedia for responsive tests
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: jest.fn().mockImplementation(query => ({
-        matches: query === '(min-width: 640px)', // Default to desktop
-        media: query,
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-      })),
-    });
-  });
-
-  it('should NOT have fixed min-height on mobile (should fit content)', () => {
-    // Mock mobile viewport
-    (window.matchMedia as jest.Mock).mockImplementation(query => ({
-      matches: query !== '(min-width: 640px)',
-      media: query,
-      onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    }));
-
+  it('should render both quest cards in vertical layout', () => {
     render(
       <Wrapper>
         <DailyChallengeLanding {...mockProps} />
       </Wrapper>
     );
 
-    const cards = screen.getAllByRole('button');
-
-    // Cards should exist
-    expect(cards.length).toBeGreaterThan(0);
-
-    // Check that cards don't have fixed min-height on mobile
-    // The bug is: min-h-[420px] on mobile is too tall
-    cards.forEach(card => {
-      const className = card.className;
-      // Should NOT have min-h-[420px] without responsive prefix
-      // If it has min-h-[420px], it should only be for sm: or larger
-      if (className.includes('min-h-')) {
-        // If min-h is present, it should be responsive (sm:min-h-) not base
-        expect(className).not.toMatch(/\bmin-h-\[420px\]/);
-      }
-    });
+    // Both quest cards should exist
+    expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-card-buzz')).toBeInTheDocument();
   });
 
-  it('should use flex layout on desktop for equal heights', () => {
-    // Mock desktop viewport
-    (window.matchMedia as jest.Mock).mockImplementation(query => ({
-      matches: query === '(min-width: 640px)',
-      media: query,
-      onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    }));
-
-    const { container } = render(
-      <Wrapper>
-        <DailyChallengeLanding {...mockProps} />
-      </Wrapper>
-    );
-
-    // Find the grid container
-    const gridContainer = container.querySelector('.grid');
-    expect(gridContainer).toBeInTheDocument();
-
-    // Grid should have sm:grid-cols-2 for side-by-side layout
-    expect(gridContainer?.className).toMatch(/sm:grid-cols-2/);
-  });
-
-  it('should maintain consistent card structure without forced height', () => {
+  it('should NOT have fixed min-height on quest cards', () => {
     render(
       <Wrapper>
         <DailyChallengeLanding {...mockProps} />
       </Wrapper>
     );
 
-    const cards = screen.getAllByRole('button');
+    const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
+    const buzzCard = screen.getByTestId('quest-card-buzz');
 
-    // Both cards should exist
-    expect(cards.length).toBe(2);
+    // Cards should not have fixed min-height
+    expect(wordHuntCard.className).not.toMatch(/\bmin-h-\[420px\]/);
+    expect(buzzCard.className).not.toMatch(/\bmin-h-\[420px\]/);
+  });
 
-    // Cards should have flex-col layout to push button to bottom
-    cards.forEach(card => {
-      expect(card.className).toMatch(/flex-col/);
-    });
+  it('should use vertical stack layout for quest cards (not grid)', () => {
+    render(
+      <Wrapper>
+        <DailyChallengeLanding {...mockProps} />
+      </Wrapper>
+    );
+
+    // Both quest cards should be rendered vertically, not in a side-by-side grid
+    const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
+    const buzzCard = screen.getByTestId('quest-card-buzz');
+
+    // Cards should NOT share a parent with grid-cols-2
+    const wordHuntParent = wordHuntCard.parentElement;
+    const buzzParent = buzzCard.parentElement;
+
+    // If both share the same parent, that parent shouldn't have grid-cols-2
+    if (wordHuntParent === buzzParent && wordHuntParent) {
+      expect(wordHuntParent.className).not.toContain('grid-cols-2');
+    }
   });
 });

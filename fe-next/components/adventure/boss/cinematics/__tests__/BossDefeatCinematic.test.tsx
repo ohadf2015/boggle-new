@@ -145,6 +145,27 @@ describe('BossDefeatCinematic', () => {
       const images = screen.getAllByTestId('remotion-img');
       expect(images.length).toBeGreaterThan(0);
     });
+
+    it('should always use staticFile for image paths (prevents black screen)', () => {
+      // This test ensures images always go through staticFile() which triggers
+      // Remotion's delayRender mechanism for proper loading synchronization
+      render(
+        <BossDefeatCinematic
+          {...defaultProps}
+          bossImagePath="/images/bosses/boss-ms-grammar.webp"
+        />
+      );
+
+      const images = screen.getAllByTestId('remotion-img');
+      expect(images.length).toBeGreaterThan(0);
+
+      // All images should have paths processed through staticFile (which adds /static/ prefix in mock)
+      const allUseStaticFile = images.every((img) => {
+        const src = img.getAttribute('src');
+        return src?.startsWith('/static/');
+      });
+      expect(allUseStaticFile).toBe(true);
+    });
   });
 
   describe('sequences', () => {

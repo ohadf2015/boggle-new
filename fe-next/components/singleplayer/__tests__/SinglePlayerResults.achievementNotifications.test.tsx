@@ -189,6 +189,14 @@ jest.mock('@/components/training', () => ({
   TrainingAnalysisModal: () => null,
 }));
 
+// Mock new components
+jest.mock('../results/components/CelebrationHero', () => ({
+  CelebrationHero: () => <div data-testid="celebration-hero">Hero</div>,
+}));
+jest.mock('../results/components/ResultsInfoCards', () => ({
+  ResultsInfoCards: () => <div data-testid="results-info-cards">Cards</div>,
+}));
+
 // Mock useResultsData and extracted hooks
 jest.mock('../results', () => ({
   useResultsData: () => ({

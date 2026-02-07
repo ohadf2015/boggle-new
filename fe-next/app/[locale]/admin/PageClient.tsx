@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle, Database, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe, AlertTriangle, Database, RefreshCw, BookCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,8 @@ import { GamesDiagnostic } from '@/components/admin/GamesDiagnostic';
 import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export default function AdminPageClient() {
@@ -62,7 +63,7 @@ export default function AdminPageClient() {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
-          <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
+          <PageLoader size="lg" text={t('common.loading') || 'Loading...'} />
           {tokenLoading && !authLoading && (
             <p className="text-slate-400 mt-4 text-sm">
               {t('admin.loadingSession') || 'Establishing secure session...'}
@@ -164,6 +165,16 @@ export default function AdminPageClient() {
 
           <Card
             className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/milog-words`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <BookCheck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.milogWords') || 'Milog Words'}</span>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             onClick={() => router.push(`/${language}/admin/words`)}
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
@@ -250,7 +261,7 @@ export default function AdminPageClient() {
           </>
         ) : (
           <div className="bg-slate-800/50 rounded-neo border-neo border-black p-12 text-center">
-            <NeoLoader variant="dots" size="md" text={t('admin.loadingDashboard') || 'Loading dashboard...'} />
+            <Loader size="md" text={t('admin.loadingDashboard') || 'Loading dashboard...'} />
             <p className="text-slate-400 mt-4 text-sm">
               {t('admin.preparingTools') || 'Preparing admin tools...'}
             </p>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 interface PrestigeReward {
   type: 'title' | 'multiplier' | 'border' | 'icon';
@@ -220,7 +220,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     )}
                   >
                     {isLoading ? (
-                      <NeoLoader variant="dots" size="sm" className="mx-auto" />
+                      <Loader size="sm" className="mx-auto" />
                     ) : (
                       <>
                         <Check className="w-4 h-4 inline mr-1" />

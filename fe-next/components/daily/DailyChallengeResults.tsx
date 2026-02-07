@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 
 // X/Twitter icon (no lucide equivalent)
@@ -562,7 +562,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all disabled:opacity-50"
             >
               {isGeneratingImage ? (
-                <NeoLoader variant="dots" size="sm" />
+                <Loader size="sm" />
               ) : (
                 <ImageIcon className="w-4 h-4" />
               )}

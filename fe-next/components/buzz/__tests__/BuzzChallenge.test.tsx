@@ -11,7 +11,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 // Mock fetch
 global.fetch = jest.fn();
 
-// Mock framer-motion with all elements used by NeoLoader
+// Mock framer-motion with all elements used by PageLoader
 jest.mock('framer-motion', () => {
   const stripFramerProps = (props: Record<string, unknown>) => {
     const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;

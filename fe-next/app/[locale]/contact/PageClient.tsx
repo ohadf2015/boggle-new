@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Send, Mail, MessageSquare, User, CheckCircle, AlertCircle } from 'lucide-react';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
@@ -318,7 +318,7 @@ export default function ContactPageClient(): React.JSX.Element {
               >
                 {status === 'submitting' ? (
                   <>
-                    <NeoLoader variant="dots" size="sm" />
+                    <Loader size="sm" />
                     <span className="ms-2">{t('contact.sending') || 'Sending...'}</span>
                   </>
                 ) : (

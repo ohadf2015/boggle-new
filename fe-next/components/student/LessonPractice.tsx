@@ -16,7 +16,7 @@ import { useLesson } from '@/hooks/useVocabularyLesson';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 import { cn } from '@/lib/utils';
 import { normalizeWord, normalizeHebrewWord } from '@/shared/utils/wordNormalization';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';

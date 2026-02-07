@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap } from 'lucide-react';
+import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Coins } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
+import { type WordFeedback } from '@/components/game/WordFormingArea';
+import { LetterTileWord } from './LetterTileWord';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
@@ -13,12 +14,12 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
+import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
+import { DynamicEnergyBackground } from './DynamicEnergyBackground';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
-import AchievementDock from '@/components/achievements/AchievementDock';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { SinglePlayerAchievement } from '@/utils/singlePlayerAchievements';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { FoundWord, KeyboardInputState, TrainingState, DirectionGuidanceState } from '../types';
 
@@ -88,10 +89,10 @@ export interface PortraitGameLayoutProps {
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
+  // Words
+  totalBoardWords: number | null;
   // Ref for auto-scroll
   gameStatsRef: React.RefObject<HTMLDivElement | null>;
-  // Achievements
-  liveAchievements: SinglePlayerAchievement[];
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -146,10 +147,10 @@ export function PortraitGameLayout({
   onFinishPractice,
   onQuitRequest,
   onConfirmQuit,
+  totalBoardWords,
   showQuitConfirm,
   setShowQuitConfirm,
   gameStatsRef,
-  liveAchievements,
   t,
 }: PortraitGameLayoutProps): React.ReactElement {
   const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
@@ -164,7 +165,10 @@ export function PortraitGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden">
+    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
+      {/* Dynamic Energy Background */}
+      <DynamicEnergyBackground />
+
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
@@ -189,30 +193,26 @@ export function PortraitGameLayout({
         t={(key) => t(key) || key}
       />
 
-      {/* Achievement Dock - top right */}
-      <AchievementDock
-        achievements={liveAchievements}
-        className="absolute top-4 right-4 z-50"
-      />
-
       {/* Header with controls */}
-      <div className="flex items-center justify-between px-2 md:px-4 py-0.5 md:py-1 flex-shrink-0">
+      <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pt-4 pb-2">
         <Button
           variant="destructive"
           size="sm"
           onClick={onQuitRequest}
-          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
+          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold text-xs tracking-widest"
         >
-          <ArrowLeft className="me-2 rtl:rotate-180" />
-          {t('common.quit') || 'Quit'}
+          <ArrowLeft className="me-1.5 h-4 w-4 rtl:rotate-180" />
+          {t('common.quit') || 'QUIT'}
         </Button>
+
         {!isPracticeMode ? (
           <Button
             variant="secondary"
             size="sm"
             onClick={onPauseToggle}
+            className="p-1.5 min-w-[36px] min-h-[36px]"
           >
-            {isPaused ? <Play /> : <Pause />}
+            {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
           </Button>
         ) : (
           <Button
@@ -223,7 +223,21 @@ export function PortraitGameLayout({
             {t('singlePlayer.finish') || 'Finish'}
           </Button>
         )}
-      </div>
+      </header>
+
+      {/* Combo Display Row - Below header, centered */}
+      {!isPracticeMode && comboLevel >= 1 && (
+        <div className="flex flex-col items-center justify-center my-1 shrink-0 relative z-30">
+          <ComboDisplay
+            comboLevel={comboLevel}
+            compact
+            timeRemaining={comboTimeRemaining}
+            isDanger={comboDanger}
+            coinReward={comboCoinReward}
+            onCoinAnimationComplete={onCoinAnimationComplete}
+          />
+        </div>
+      )}
 
       {/* Training Progress Bar - shown in practice mode (portrait) */}
       {isPracticeMode && training && (
@@ -242,144 +256,134 @@ export function PortraitGameLayout({
         </div>
       )}
 
-      {/* Stats section with vertical stacking on mobile */}
-      <div ref={gameStatsRef} className="flex flex-col gap-1 w-full px-1 md:px-2" role="status" aria-label="Game status">
-        {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
-        {!isPracticeMode && (
-          <div
-            className="flex lg:hidden justify-center items-center h-[40px]"
-            data-testid="combo-row-mobile"
+      {/* Stats section - Gemini Pro: Coins (left), Timer (center), Score (right) */}
+      <div ref={gameStatsRef} className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-3 max-w-md mx-auto w-full" role="status" aria-label="Game status">
+        {/* Left: Coins badge */}
+        <div className="flex-1 flex justify-start">
+          <AdaptiveMotion.div
+            data-coin-target
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="flex items-center gap-1.5 bg-yellow-400 border-3 border-neo-black rounded-lg px-2 py-1 shadow-hard-sm transform -rotate-1"
           >
-            <ComboDisplay
-              comboLevel={comboLevel}
-              compact
-              timeRemaining={comboTimeRemaining}
-              isDanger={comboDanger}
-              coinReward={comboCoinReward}
-              onCoinAnimationComplete={onCoinAnimationComplete}
-            />
-          </div>
-        )}
-
-        {/* Stats row - Timer + Score (or Score centered in practice mode) */}
-        <div className="flex w-full items-center justify-between">
-          {/* Left Side: Placeholder or empty in normal mode, empty in practice mode */}
-          {!isPracticeMode && (
-            <div className="flex-1 lg:hidden" aria-hidden="true" />
-          )}
-
-          {/* Center: Timer (Normal) or Score (Practice) */}
-          <div className="flex items-center justify-center shrink-0">
-            {!isPracticeMode ? (
-              <AdaptiveMotion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative z-20"
-              >
-                <div className="hidden lg:block">
-                  <CircularTimer
-                    remainingTime={remainingTime}
-                    totalTime={totalTime}
-                    size="lg"
-                  />
-                </div>
-                <div className="hidden md:block lg:hidden">
-                  <CircularTimer
-                    remainingTime={remainingTime}
-                    totalTime={totalTime}
-                    size="md"
-                  />
-                </div>
-                <div className="md:hidden">
-                  <CircularTimer
-                    remainingTime={remainingTime}
-                    totalTime={totalTime}
-                    size="xs"
-                  />
-                </div>
-              </AdaptiveMotion.div>
-            ) : (
-              /* Score - Centered in practice mode */
-              <AdaptiveMotion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-4 sm:px-6 md:px-10 py-1.5 sm:py-2 md:py-4 min-w-[80px] sm:min-w-[120px] md:min-w-[180px]"
-                style={{
-                  background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-                }}
-              >
-                <div className="text-center">
-                  <AdaptiveMotion.div
-                    key={score}
-                    initial={{ scale: 1.3 }}
-                    animate={{ scale: 1 }}
-                    className="font-black text-neo-black leading-tight text-2xl sm:text-3xl md:text-4xl"
-                    style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
-                  >
-                    {score}
-                  </AdaptiveMotion.div>
-                  <div className="font-bold uppercase tracking-wider text-neo-black/80 text-xs sm:text-sm md:text-base">
-                    {t('common.score') || 'Score'}
-                  </div>
-                </div>
-              </AdaptiveMotion.div>
-            )}
-          </div>
-
-          {/* Right Side: Score (Normal) or Combo (Practice) */}
-          <div className="flex-1 flex justify-start pl-2 md:pl-6 pointer-events-none lg:hidden">
-            <div className="pointer-events-auto">
-              {!isPracticeMode ? (
-                /* Score - Right side in normal mode */
-                <AdaptiveMotion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-                  }}
-                >
-                  <div className="text-center">
-                    <AdaptiveMotion.div
-                      key={score}
-                      initial={{ scale: 1.3 }}
-                      animate={{ scale: 1 }}
-                      className="font-black text-neo-black leading-tight text-lg md:text-2xl"
-                      style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
-                    >
-                      {score}
-                    </AdaptiveMotion.div>
-                    <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px] md:text-xs">
-                      {t('common.score') || 'Score'}
-                    </div>
-                  </div>
-                </AdaptiveMotion.div>
-              ) : (
-                <div className="min-w-[50px] md:min-w-[90px] flex justify-start">
-                  <ComboDisplay
-                    comboLevel={comboLevel}
-                    compact
-                    timeRemaining={comboTimeRemaining}
-                    isDanger={comboDanger}
-                    coinReward={comboCoinReward}
-                    onCoinAnimationComplete={onCoinAnimationComplete}
-                  />
-                </div>
-              )}
+            <div className="bg-black/10 rounded-full p-0.5">
+              <Coins className="w-4 h-4 text-neo-black" />
             </div>
-          </div>
+            <div className="flex flex-col leading-none">
+              <span className="font-black text-neo-black text-sm">
+                {score > 0 ? COIN_EARNING_OTHER.SINGLEPLAYER_BASE + Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR) : 0}
+              </span>
+              <span className="font-bold text-neo-black/60 text-[8px] uppercase">{t('common.coins') || 'coins'}</span>
+            </div>
+          </AdaptiveMotion.div>
+        </div>
+
+        {/* Center: Timer */}
+        <div className="relative flex items-center justify-center mx-2">
+          {!isPracticeMode ? (
+            <AdaptiveMotion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative z-20"
+              style={{ filter: 'drop-shadow(4px 4px 0px rgba(0,0,0,1))' }}
+            >
+              <CircularTimer
+                remainingTime={remainingTime}
+                totalTime={totalTime}
+                size="sm"
+              />
+            </AdaptiveMotion.div>
+          ) : (
+            /* Score - Centered in practice mode */
+            <AdaptiveMotion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative border-3 border-neo-black rounded-lg shadow-hard px-4 py-1.5 min-w-[80px]"
+              style={{
+                background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+              }}
+            >
+              <div className="text-center relative z-10">
+                <AdaptiveMotion.div
+                  key={score}
+                  initial={{ scale: 1.3 }}
+                  animate={{ scale: 1 }}
+                  className="font-black text-neo-black leading-tight text-xl"
+                >
+                  {score.toLocaleString()}
+                </AdaptiveMotion.div>
+                <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px]">
+                  {t('common.score') || 'Score'}
+                </div>
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </div>
+
+        {/* Right: Score badge */}
+        <div className="flex-1 flex justify-end">
+          {!isPracticeMode ? (
+            <AdaptiveMotion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative border-3 border-neo-black rounded-lg shadow-hard px-2 py-1 min-w-[80px] transform rotate-1"
+              style={{
+                background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+              }}
+            >
+              <div className="text-end relative z-10">
+                <div className="font-bold uppercase tracking-widest text-neo-black/60 text-[8px] mb-0.5">
+                  {t('common.score') || 'SCORE'}
+                </div>
+                <AdaptiveMotion.div
+                  key={score}
+                  initial={{ scale: 1.3 }}
+                  animate={{ scale: 1 }}
+                  className="font-black text-neo-black leading-none text-xl tracking-tighter"
+                >
+                  {score.toLocaleString()}
+                </AdaptiveMotion.div>
+              </div>
+            </AdaptiveMotion.div>
+          ) : (
+            <div className="min-w-[50px] flex justify-end">
+              <ComboDisplay
+                comboLevel={comboLevel}
+                compact
+                timeRemaining={comboTimeRemaining}
+                isDanger={comboDanger}
+                coinReward={comboCoinReward}
+                onCoinAnimationComplete={onCoinAnimationComplete}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Word Forming Area */}
-      <div className="flex items-center justify-center flex-shrink-0">
-        <WordFormingArea
+      {/* Word Forming Area - Letter Tiles */}
+      <div className="h-12 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2 max-w-[360px] mx-auto w-full">
+        <LetterTileWord
           word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-          letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
           feedback={currentFeedback}
-          compact
         />
       </div>
+
+      {/* Words Progress - subtle indicator */}
+      {totalBoardWords != null && totalBoardWords > 0 && (
+        <div className="flex items-center justify-center gap-2 px-8 mb-1 shrink-0 relative z-30">
+          <div className="h-[3px] flex-1 bg-white/10 rounded-full overflow-hidden max-w-[160px]">
+            <AdaptiveMotion.div
+              className="h-full bg-neo-cyan/50 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min((validWordCount / totalBoardWords) * 100, 100)}%` }}
+              transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+            />
+          </div>
+          <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider tabular-nums">
+            {validWordCount}/{totalBoardWords}
+          </span>
+        </div>
+      )}
 
       {/* Challenge Mode Progress Tracker */}
       {isChallengeMode && (
@@ -398,26 +402,45 @@ export function PortraitGameLayout({
         compact
       />
 
-      {/* Game grid */}
-      {/* CRITICAL: min-h-[200px] prevents grid collapse on mobile when flex container has min-h-0 */}
-      {/* The 200px minimum ensures grid is always visible regardless of other content height */}
-      <div className="flex-1 flex items-center justify-center min-h-[200px] overflow-hidden">
-        <GridComponent
-          grid={grid}
-          interactive={!isPaused}
-          onWordSubmit={onWordSubmit}
-          onPathSubmit={onPathSubmit}
-          onWordChange={onWordChange}
-          hideWordPreview
-          hideComboIndicator={true}
-          comboLevel={comboLevel}
-          largeText
-          fireRoundActive={fireRoundActive}
-          earthquakeShaking={earthquakeState === 'shaking'}
-          highlightedPath={gridHighlightedPath}
-          language={language}
-        />
-      </div>
+      {/* Game grid - Takes remaining space */}
+      <main className="flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-[200px]">
+        {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
+        <AdaptiveAnimatePresence>
+          {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-2 left-4 right-4 z-40"
+            >
+              <div className="relative bg-gradient-to-r from-neo-pink to-pink-400 text-white text-center py-2 px-4 rounded-lg border-3 border-neo-black shadow-hard-sm">
+                <span className="font-bold text-xs uppercase tracking-wide">
+                  {t('singlePlayer.dragInstruction') || 'Drag across letters to form words!'}
+                </span>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-neo-pink border-b-3 border-r-3 border-neo-black rotate-45" />
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
+        <div className="game-board-container relative w-full max-w-[360px] aspect-square">
+          <GridComponent
+            grid={grid}
+            interactive={!isPaused}
+            onWordSubmit={onWordSubmit}
+            onPathSubmit={onPathSubmit}
+            onWordChange={onWordChange}
+            hideWordPreview
+            hideComboIndicator={true}
+            comboLevel={comboLevel}
+            largeText
+            fireRoundActive={fireRoundActive}
+            earthquakeShaking={earthquakeState === 'shaking'}
+            highlightedPath={gridHighlightedPath}
+            language={language}
+          />
+        </div>
+      </main>
 
       {/* Hint Prompt */}
       <AdaptiveAnimatePresence>

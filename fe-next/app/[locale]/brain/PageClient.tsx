@@ -166,7 +166,6 @@ export default function BrainTrainingPageClient() {
   if (authLoading || isLoading) {
     return (
       <PageLoader
-        variant="mascot-letters"
         size="lg"
         text={t('brain.loading')}
         mascotVariant="thinking"

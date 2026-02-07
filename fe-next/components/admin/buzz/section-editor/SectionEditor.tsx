@@ -9,7 +9,7 @@ import { SectionCard } from './SectionCard';
 import { SectionForm } from './SectionForm';
 import { PromptPreviewDialog } from './PromptPreviewDialog';
 import { SECTION_METADATA } from './constants';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 export interface SectionEditorProps {
   authToken: string;
@@ -179,7 +179,7 @@ export function SectionEditor({
             {/* Loading state */}
             {isLoading && sections.length === 0 && (
               <div className="p-8 flex justify-center">
-                <NeoLoader variant="dots" size="md" text="Loading sections..." />
+                <Loader size="md" text="Loading sections..." />
               </div>
             )}
 
@@ -196,7 +196,7 @@ export function SectionEditor({
                 />
               ) : isLoadingSection ? (
                 <div className="p-8 flex justify-center">
-                  <NeoLoader variant="dots" size="md" text="Loading section..." />
+                  <Loader size="md" text="Loading section..." />
                 </div>
               ) : (
                 sections.map((section) => (

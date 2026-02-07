@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Trash2, Link, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import type { PlayerAttempt } from '../types';
 
@@ -90,7 +90,7 @@ export function AttemptsList({
             {/* Attempts List */}
             {attemptsLoading ? (
               <div className="flex justify-center py-6 sm:py-8">
-                <NeoLoader variant="dots" size="md" />
+                <Loader size="md" />
               </div>
             ) : filteredAttempts.length === 0 ? (
               <div className="text-center py-6 sm:py-8 text-gray-500">

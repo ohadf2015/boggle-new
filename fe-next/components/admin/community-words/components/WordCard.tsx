@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import type { CommunityWord } from '../types';
 import { LANGUAGES, createWordKey } from '../constants';
@@ -108,7 +108,7 @@ export function WordCard({
             disabled={isProcessing}
           >
             {isProcessing ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : (
               <>
                 <X className="w-4 h-4 mr-2" /> Reject
@@ -124,7 +124,7 @@ export function WordCard({
             disabled={isProcessing}
           >
             {isProcessing ? (
-              <NeoLoader variant="dots" size="sm" />
+              <Loader size="sm" />
             ) : (
               <>
                 <Check className="w-4 h-4 mr-2" /> Approve

@@ -1,15 +1,3 @@
-@keyframes pulse-glow {
-  0% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-
-  100% {
-    transform: scale(1.02);
-    filter: brightness(1.2);
-  }
-}
-
 @keyframes final-shine {
   0% {
     filter: brightness(1.5) saturate(1.5);
@@ -1114,17 +1102,12 @@ textarea {
 }
 
 /* Game grid cells: enforce minimum touch target size for accessibility */
+/* IMPORTANT: Never set min-width/min-height larger than what the grid track provides,
+   or cells will overflow and overlap. The grid uses minmax(0, 1fr) so cells
+   naturally shrink to fit. Only set a small floor for extreme edge cases. */
 .game-board-frame [role="gridcell"] {
-  min-width: 30px;
-  min-height: 30px;
-}
-
-/* On mobile, enforce stricter minimum for better touch accuracy */
-@media (max-width: 768px) {
-  .game-board-frame [role="gridcell"] {
-    min-width: 30px;
-    min-height: 30px;
-  }
+  min-width: 0;
+  min-height: 0;
 }
 
 /* Touch action utilities for game interactions */
@@ -1741,12 +1724,9 @@ body.crazygames-embed {
     padding: 6px;
   }
 
-  /* Ensure grid cells have adequate minimum size in landscape - WCAG 2.1 AA compliant */
-  /* Use max() to enforce 44px minimum while allowing growth on larger screens */
-  .game-board-frame [role="gridcell"] {
-    min-width: max(44px, calc((100vw - 320px) / 8));
-    min-height: max(44px, calc((100vw - 320px) / 8));
-  }
+  /* Grid cells: let CSS grid handle sizing via minmax(0, 1fr).
+     Setting min-width/min-height here caused cells to overflow the grid
+     and overlap each other on tablet-sized screens. */
 
   /* Stack game UI vertically in landscape */
   .game-layout-landscape {
@@ -1955,12 +1935,8 @@ body.crazygames-embed {
     min-height: 48px !important;
   }
 
-  /* Grid cells - use max() to ensure WCAG 44px minimum while scaling up */
-  /* This only applies to mobile/tablet landscape, not desktop */
-  .game-board-frame [role="gridcell"] {
-    min-width: max(44px, calc((100vw - 300px) / 8));
-    min-height: max(44px, calc((100vw - 300px) / 8));
-  }
+  /* Grid cells: removed min-width/min-height that caused overlap on tablets.
+     CSS grid minmax(0, 1fr) handles proper sizing. */
 }
 
 /* Custom scrollbar styling for game panels */
@@ -2087,11 +2063,9 @@ body.crazygames-embed {
     padding: 4px;
   }
 
-  /* Ensure grid cells are still readable on very short screens */
-  /* Use max() to enforce WCAG minimum while preventing overflow */
+  /* Grid cells: removed min-width/min-height that caused overlap.
+     Keep font-size clamp for readability on very short screens. */
   .game-board-frame [role="gridcell"] {
-    min-width: max(44px, calc((100vw - 260px) / 8));
-    min-height: max(44px, calc((100vw - 260px) / 8));
     font-size: clamp(0.75rem, 2vw, 0.875rem);
   }
 
@@ -2151,10 +2125,7 @@ body.crazygames-embed {
     min-width: 48px;
   }
 
-  .game-board-frame [role="gridcell"] {
-    min-width: max(44px, calc((100vw - 260px) / 8));
-    min-height: max(44px, calc((100vw - 260px) / 8));
-  }
+  /* Grid cells: removed min-width/min-height that caused overlap on tablets. */
 }
 
 /* Landscape tablets (larger screens in landscape, but NOT desktop) */
@@ -2789,5 +2760,246 @@ html.reduce-motion *::after {
   75% {
     opacity: 1;
     transform: scale(1.1) rotate(-15deg);
+  }
+}
+
+/* ====================================
+   KEYBOARD FOCUS ANIMATION
+   Enhanced focus ring for grid navigation
+   ==================================== */
+
+@keyframes keyboard-focus {
+  0%, 100% {
+    box-shadow: 0 0 0 3px var(--neo-cyan), 0 0 8px var(--neo-cyan);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--neo-cyan), 0 0 16px var(--neo-cyan);
+  }
+}
+
+.animate-keyboard-focus {
+  animation: keyboard-focus 1s ease-in-out infinite;
+}
+
+/* ====================================
+   HINT BLINK AND FADEOUT ANIMATIONS
+   For revealed word path highlighting
+   ==================================== */
+
+@keyframes hint-blink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(255, 225, 53, 0.5);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 20px rgba(255, 225, 53, 0.8);
+  }
+}
+
+@keyframes hint-fadeout {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(255, 225, 53, 0.5);
+  }
+  100% {
+    opacity: 0.3;
+    box-shadow: 0 0 0 rgba(255, 225, 53, 0);
+  }
+}
+
+.animate-hint-blink {
+  animation: hint-blink 0.5s ease-in-out infinite;
+}
+
+.animate-hint-fadeout {
+  animation: hint-fadeout 1s ease-out forwards;
+}
+
+/* ====================================
+   DYNAMIC ENERGY UI ANIMATIONS
+   Single Player Enhanced Theme
+   ==================================== */
+
+/* Vortex Background Rotation */
+@keyframes vortex-rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Aurora Wave Effect */
+@keyframes aurora-wave {
+  0% {
+    transform: translateY(-20%) skewY(-5deg);
+  }
+  100% {
+    transform: translateY(20%) skewY(5deg);
+  }
+}
+
+/* Floating Particle Animation */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translate(15px, -30px) rotate(180deg);
+    opacity: 0.4;
+  }
+}
+
+/* Energy UI Utility Classes */
+.animate-particle-float {
+  animation: particle-float 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Energy Background Layers */
+.energy-vortex-layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(rgba(0, 255, 255, 0.08) 0%, rgba(255, 20, 147, 0.04) 40%, transparent 70%);
+  animation: vortex-rotate 25s linear infinite;
+  pointer-events: none;
+}
+
+.energy-aurora-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 0%, rgba(0, 255, 255, 0.05) 50%, transparent 100%);
+  animation: aurora-wave 10s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.energy-scanline-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.08) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-particle-float,
+  .energy-vortex-layer,
+  .energy-aurora-layer {
+    animation: none !important;
+  }
+}
+
+/* ====================================
+   DAILY CHALLENGE LANDING - QUEST UI
+   ==================================== */
+
+/* Holographic shimmer sweep across cards on hover */
+@keyframes hologram-shimmer {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* Gentle breathing pulse for unplayed quest cards */
+@keyframes breathing {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Animated dashed path between quest nodes */
+@keyframes quest-path-dash {
+  0% {
+    stroke-dashoffset: 20;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Streak flame pulse animation */
+@keyframes flame-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(255, 107, 53, 0.6));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.9));
+  }
+}
+
+/* Calendar date flip entrance */
+@keyframes date-flip {
+  0% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+  60% {
+    transform: rotateX(10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+/* Utility classes for daily quest animations */
+.animate-hologram-shimmer {
+  animation: hologram-shimmer 0.8s ease-in-out;
+}
+
+.animate-breathing {
+  animation: breathing 3s ease-in-out infinite;
+}
+
+.animate-quest-path {
+  stroke-dasharray: 8 6;
+  animation: quest-path-dash 1.5s linear infinite;
+}
+
+.animate-flame-pulse {
+  animation: flame-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-date-flip {
+  animation: date-flip 0.5s ease-out;
+  transform-origin: center top;
+}
+
+/* Low-end device fallback */
+.low-end-device .animate-breathing,
+.low-end-device .animate-hologram-shimmer,
+.low-end-device .animate-flame-pulse,
+.low-end-device .animate-quest-path {
+  animation: none !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-breathing,
+  .animate-hologram-shimmer,
+  .animate-flame-pulse,
+  .animate-quest-path,
+  .animate-date-flip {
+    animation: none !important;
   }
 }

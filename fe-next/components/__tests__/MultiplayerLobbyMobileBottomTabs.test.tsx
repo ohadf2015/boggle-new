@@ -1,10 +1,14 @@
 /**
- * Test: Multiplayer Lobby Mobile Bottom Tabs
+ * Test: Multiplayer Lobby Mobile/Desktop Layout Split
+ *
+ * The lobby was redesigned from tab-based navigation to:
+ * - Mobile: single-scroll vertical flow (lg:hidden)
+ * - Desktop: two-column DesktopLobbyLayout (hidden lg:block)
  *
  * Requirements:
- * 1. Bottom tabs should only show on mobile view (not desktop)
- * 2. Start button and tabs should stick to the bottom of the screen
- * 3. Both HostPreGameView and PlayerWaitingView should follow this pattern
+ * 1. Mobile layout is hidden on desktop (lg:hidden)
+ * 2. Desktop layout is hidden on mobile (hidden lg:block)
+ * 3. Both HostPreGameView and PlayerWaitingView follow this pattern
  */
 
 import React from 'react';
@@ -75,7 +79,7 @@ import PlayerWaitingView from '../../player/components/PlayerWaitingView';
 
 const mockT = (key: string) => key;
 
-describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
+describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
   describe('HostPreGameView', () => {
     const defaultHostProps = {
       gameCode: 'ABC123',
@@ -110,27 +114,31 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
       tournamentCreating: false,
     };
 
-    it('should have bottom tabs hidden on desktop (lg screens)', () => {
+    it('should have mobile layout hidden on desktop (lg screens)', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // Find the bottom navigation (tab bar)
-      const bottomNav = screen.getByRole('navigation');
+      // The mobile single-scroll container has lg:hidden class
+      const desktopLayout = screen.getByTestId('desktop-lobby-layout');
+      const mobileContainer = desktopLayout.parentElement?.nextElementSibling;
 
-      // Check that the nav has lg:hidden class to hide on desktop
-      expect(bottomNav.className).toContain('lg:hidden');
+      // Mobile container uses lg:hidden
+      expect(mobileContainer?.className).toContain('lg:hidden');
     });
 
-    it('should have start button section visible on mobile and sticky', () => {
+    it('should have start button in both desktop and mobile layouts', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // Find all start buttons (now there are two: desktop and mobile)
-      const startButtons = screen.getAllByRole('button', { name: /startGame/i });
+      // StartButton renders t('hostView.startBattle') which returns 'hostView.startBattle' via mockT
+      const startButtons = screen.getAllByRole('button', { name: /startBattle/i });
 
-      // Find the mobile start button (the one inside lg:hidden container)
-      const mobileStartButton = startButtons.find((btn) => {
+      // Two start buttons: one in desktop layout, one in mobile layout
+      expect(startButtons.length).toBe(2);
+
+      // Find the desktop start button (inside hidden lg:block container)
+      const desktopStartButton = startButtons.find((btn) => {
         let parent = btn.parentElement;
         while (parent) {
-          if (parent.className?.includes('lg:hidden')) {
+          if (parent.className?.includes('lg:block')) {
             return true;
           }
           parent = parent.parentElement;
@@ -138,38 +146,22 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
         return false;
       });
 
-      expect(mobileStartButton).toBeTruthy();
-      const mobileStartButtonContainer = mobileStartButton?.parentElement;
-
-      // Check container has classes for sticky positioning
-      expect(mobileStartButtonContainer).toHaveClass('flex-shrink-0');
-
-      // The mobile start button container should have lg:hidden
-      expect(mobileStartButtonContainer?.className).toContain('lg:hidden');
+      expect(desktopStartButton).toBeTruthy();
     });
 
-    it('should have start button sticky at bottom with tabs', () => {
+    it('should have desktop layout with two-column grid', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // Find all start buttons and get the mobile one
-      const startButtons = screen.getAllByRole('button', { name: /startGame/i });
-      const mobileStartButton = startButtons.find((btn) => {
-        let parent = btn.parentElement;
-        while (parent) {
-          if (parent.className?.includes('lg:hidden')) {
-            return true;
-          }
-          parent = parent.parentElement;
-        }
-        return false;
-      });
+      const desktopLayout = screen.getByTestId('desktop-lobby-layout');
 
-      const startButtonContainer = mobileStartButton?.parentElement;
-      const nav = screen.getByRole('navigation');
+      // DesktopLobbyLayout uses a 12-column grid
+      expect(desktopLayout.className).toContain('grid-cols-12');
 
-      // Both should have flex-shrink-0 to prevent compression
-      expect(startButtonContainer).toHaveClass('flex-shrink-0');
-      expect(nav).toHaveClass('flex-shrink-0');
+      // Left column (7/12) and right column (5/12)
+      const leftColumn = screen.getByTestId('desktop-left-column');
+      const rightColumn = screen.getByTestId('desktop-right-column');
+      expect(leftColumn.className).toContain('col-span-7');
+      expect(rightColumn.className).toContain('col-span-5');
     });
   });
 
@@ -191,24 +183,27 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
       onConfirmExit: jest.fn(),
     };
 
-    it('should have bottom tabs hidden on desktop (lg screens)', () => {
+    it('should have mobile layout hidden on desktop (lg screens)', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      // Find the bottom tab bar (uses role="tablist" which overrides nav's implicit navigation role)
-      const bottomNav = screen.getByRole('tablist');
+      // The mobile single-scroll container has lg:hidden class
+      const desktopLayout = screen.getByTestId('desktop-lobby-layout');
+      const mobileContainer = desktopLayout.parentElement?.nextElementSibling;
 
-      // Check that the nav has lg:hidden class to hide on desktop
-      expect(bottomNav.className).toContain('lg:hidden');
+      // Mobile container uses lg:hidden
+      expect(mobileContainer?.className).toContain('lg:hidden');
     });
 
-    it('should have bottom tabs sticky at the bottom', () => {
+    it('should have desktop two-column layout with chat', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      // Find the bottom tab bar by role="tablist"
-      const nav = screen.getByRole('tablist');
+      // Desktop layout renders chat area
+      const chatArea = screen.queryByTestId('desktop-chat-area');
+      expect(chatArea).toBeInTheDocument();
 
-      // Check that nav has flex-shrink-0 to prevent compression
-      expect(nav).toHaveClass('flex-shrink-0');
+      // Desktop layout uses grid columns
+      const desktopLayout = screen.getByTestId('desktop-lobby-layout');
+      expect(desktopLayout.className).toContain('grid-cols-12');
     });
   });
 });

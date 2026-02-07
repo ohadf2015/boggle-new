@@ -41,15 +41,14 @@ function getComboBonus(comboLevel: number, wordLength: number): number {
     wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
   }
 
-  const baseBonus = Math.min(comboLevel, 10);
-  return Math.floor(baseBonus * wordLengthFactor);
+  return Math.floor(comboLevel * wordLengthFactor);
 }
 
 // ==================== Types ====================
 
 export interface WordFeedback {
   id: string;
-  type: 'accepted' | 'rejected' | 'pending' | 'duplicate' | 'checking';
+  type: 'accepted' | 'rejected' | 'duplicate';
   word: string;
   score?: number;
   message?: string;
@@ -87,8 +86,6 @@ export interface UseWordSubmissionOptions {
   onWordAccepted?: (word: string, score: number, comboBonus: number, fireRoundBonus: number) => void;
   /** Called when word is rejected */
   onWordRejected?: (word: string, reason: string) => void;
-  /** Called when word needs AI validation */
-  onWordPending?: (word: string) => void;
   /** Called when combo should reset */
   onComboReset?: () => void;
   /** Called when combo should increment */
@@ -134,7 +131,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     t = (key: string) => key,
     onWordAccepted,
     onWordRejected,
-    onWordPending,
     onComboReset,
     onComboIncrement,
   } = options;
@@ -320,16 +316,8 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       score: baseScore,
       timestamp: now,
       timeSinceStart,
-      isValid: null, // Pending validation
+      isValid: null, // Awaiting dictionary API response
     }]);
-
-    // Step 4.5: Show immediate 'checking' feedback for instant user response
-    setCurrentFeedback({
-      id: `checking-${now}`,
-      type: 'checking',
-      word: normalizedWord.toUpperCase(),
-      timestamp: now,
-    });
 
     // Step 5: Validate with dictionary API
     fetch('/api/dictionary/check', {
@@ -339,7 +327,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     })
       .then(res => {
         if (!res.ok) {
-          return { isValid: false, source: 'pending' };
+          return { isValid: false, source: 'error' };
         }
         return res.json();
       })
@@ -370,26 +358,40 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
           onWordAccepted?.(normalizedWord, fullScore, comboBonus, fireRoundBonus);
           onComboIncrement?.(true);
         } else {
-          // Word not in dictionary - stays pending for AI validation
+          // Word not in dictionary - reject immediately
+          setFoundWords(prev => prev.map(fw =>
+            fw.word === normalizedWord && fw.timestamp === now
+              ? { ...fw, isValid: false, score: 0 }
+              : fw
+          ));
+          const msg = t('playerView.invalidWord') || 'Not a valid word';
           setCurrentFeedback({
-            id: `pending-${now}`,
-            type: 'pending',
+            id: `reject-${now}`,
+            type: 'rejected',
             word: normalizedWord.toUpperCase(),
+            message: msg,
             timestamp: now,
           });
-          onWordPending?.(normalizedWord);
-          onComboReset?.(); // Break combo on pending word
+          onWordRejected?.(normalizedWord, msg);
+          onComboReset?.();
         }
       })
       .catch(() => {
-        // On API error, treat as pending
+        // On API error, treat as rejected
+        setFoundWords(prev => prev.map(fw =>
+          fw.word === normalizedWord && fw.timestamp === now
+            ? { ...fw, isValid: false, score: 0 }
+            : fw
+        ));
+        const msg = t('playerView.invalidWord') || 'Not a valid word';
         setCurrentFeedback({
-          id: `pending-${Date.now()}`,
-          type: 'pending',
+          id: `reject-${Date.now()}`,
+          type: 'rejected',
           word: normalizedWord.toUpperCase(),
+          message: msg,
           timestamp: Date.now(),
         });
-        onWordPending?.(normalizedWord);
+        onWordRejected?.(normalizedWord, msg);
         onComboReset?.();
       });
   }, [
@@ -403,7 +405,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     calculateScore,
     onWordAccepted,
     onWordRejected,
-    onWordPending,
     onComboReset,
     onComboIncrement,
   ]);

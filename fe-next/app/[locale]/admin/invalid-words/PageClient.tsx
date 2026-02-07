@@ -11,7 +11,7 @@ import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { InvalidWordsManager } from '@/components/admin/InvalidWordsManager';
 import { useTheme } from '@/utils/ThemeContext';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 export default function InvalidWordsPageClient() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function InvalidWordsPageClient() {
   if (authLoading || isProfileLoading || !authToken) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
-        <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
+        <PageLoader size="lg" text="Loading..." />
       </div>
     );
   }

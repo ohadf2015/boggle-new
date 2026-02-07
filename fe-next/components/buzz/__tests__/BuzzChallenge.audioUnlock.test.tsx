@@ -94,8 +94,8 @@ jest.mock('../BuzzResultsScreen', () => ({
   default: () => <div data-testid="results-screen">Results</div>,
 }));
 
-jest.mock('@/components/ui/NeoLoader', () => ({
-  NeoLoader: () => <div data-testid="loading">Loading...</div>,
+jest.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: () => <div data-testid="loading">Loading...</div>,
 }));
 
 // Mock fetch for challenge data

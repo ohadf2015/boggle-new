@@ -21,7 +21,7 @@ import { Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { cn } from '@/lib/utils';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 // ============================================
@@ -183,7 +183,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
     if (isLoading) {
       return (
         <div data-testid="leaderboard-skeleton" className={cn('w-full flex justify-center py-8', className)}>
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       );
     }

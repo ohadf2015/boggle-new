@@ -39,7 +39,7 @@
       "backend": "Express 5, Socket.IO, Node.js",
       "database": "Supabase, Redis",
       "styling": "Tailwind CSS, SCSS",
-      "testing": "Jest, Playwright"
+      "testing": "Jest, Playwriter"
     },
     "languages": ["Hebrew (RTL)", "English", "Swedish", "Japanese"],
     "designSystem": "Neo-Brutalist (dark-only, hard shadows, chunky borders)"
@@ -68,7 +68,7 @@
     "recommended": [
       "memory - Project knowledge base",
       "github - PR and issue management",
-      "playwright - E2E testing automation"
+      "playwriter - E2E testing via Chrome extension"
     ]
   }
 }

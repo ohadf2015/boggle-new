@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 
 // Types
 import type { CommunityWordsManagerProps } from './types';
@@ -67,7 +67,7 @@ export function CommunityWordsManager({ authToken }: CommunityWordsManagerProps)
       {/* Words List */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <NeoLoader variant="dots" size="md" />
+          <Loader size="md" />
         </div>
       ) : words.length === 0 ? (
         <div className="text-center py-12 text-slate-500">

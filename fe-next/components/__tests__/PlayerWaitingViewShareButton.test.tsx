@@ -1,25 +1,19 @@
 /**
- * Test: PlayerWaitingView Share Button
+ * Test: PlayerWaitingView - Command Center Style
  *
  * Requirements:
- * 1. Mobile view should show a share button instead of copy-only room code
- * 2. Share button should use native share API when available
- * 3. Room code should still be visible
+ * 1. Room code visible with glow effect in header
+ * 2. Player count badge and exit button in header
+ * 3. Waiting status banner displayed
+ * 4. Player roster with circular avatars
+ * 5. Desktop uses DesktopLobbyLayout, mobile uses scrollable layout
+ * 6. Share section available on mobile (MobileShareSection)
+ * 7. Chat visible on both layouts
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
-// Mock useNativeShare hook
-const mockNativeShare = jest.fn();
-jest.mock('../../hooks/useNativeShare', () => ({
-  useNativeShare: () => ({
-    canNativeShare: true,
-    nativeShare: mockNativeShare,
-    tryNativeShare: mockNativeShare,
-  }),
-}));
 
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
@@ -37,16 +31,31 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-// Mock qrcode.react
-jest.mock('qrcode.react', () => ({
-  QRCodeSVG: () => <div data-testid="qr-code">QR Code</div>,
-}));
-
 // Mock RoomChat component
 jest.mock('../../components/RoomChat', () => ({
   __esModule: true,
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
+  ),
+}));
+
+// Mock MobileShareSection
+jest.mock('../../host/components/pre-game/MobileShareSection', () => ({
+  MobileShareSection: ({ gameCode }: { gameCode: string }) => (
+    <div data-testid="mobile-share-section">Share: {gameCode}</div>
+  ),
+}));
+
+// Mock DesktopLobbyLayout
+jest.mock('../../host/components/pre-game/desktop', () => ({
+  DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (
+    <div data-testid="desktop-lobby-layout">
+      <div data-testid="desktop-left-column">{leftContent}</div>
+      <div data-testid="desktop-right-column">{rightContent}</div>
+    </div>
+  ),
+  InviteCard: ({ gameCode }: { gameCode: string }) => (
+    <div data-testid="invite-card">Invite: {gameCode}</div>
   ),
 }));
 
@@ -65,7 +74,7 @@ import PlayerWaitingView from '../../player/components/PlayerWaitingView';
 
 const mockT = (key: string) => key;
 
-describe('PlayerWaitingView Share Button', () => {
+describe('PlayerWaitingView - Command Center Style', () => {
   const defaultProps = {
     gameCode: 'ABC123',
     gameLanguage: 'en' as const,
@@ -85,108 +94,114 @@ describe('PlayerWaitingView Share Button', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockNativeShare.mockResolvedValue(true);
-  });
-
-  it('should display the room code in the header', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
-
-    // Room code should be visible
-    expect(screen.getByText('ABC123')).toBeInTheDocument();
-  });
-
-  it('should have a share button in the header', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
-
-    // Find the share button by aria-label
-    const shareButton = screen.getByRole('button', { name: /share/i });
-    expect(shareButton).toBeInTheDocument();
-  });
-
-  it('should trigger native share when share button is clicked', async () => {
-    render(<PlayerWaitingView {...defaultProps} />);
-
-    const shareButton = screen.getByRole('button', { name: /share/i });
-    fireEvent.click(shareButton);
-
-    await waitFor(() => {
-      expect(mockNativeShare).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('ABC123'),
-        })
-      );
+    // Mock navigator.clipboard
+    Object.assign(navigator, {
+      clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
     });
   });
 
-  it('should include room code and invite message in share data', async () => {
-    render(<PlayerWaitingView {...defaultProps} />);
+  describe('Header', () => {
+    it('should display the room code with glow styling', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      const roomCode = screen.getByTestId('room-code');
+      expect(roomCode).toHaveTextContent('ABC123');
+      expect(roomCode.className).toContain('text-neo-cyan');
+    });
 
-    const shareButton = screen.getByRole('button', { name: /share/i });
-    fireEvent.click(shareButton);
+    it('should display player count badge', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getByText('2/8')).toBeInTheDocument();
+    });
 
-    await waitFor(() => {
-      expect(mockNativeShare).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: expect.any(String),
-          text: expect.any(String),
-          url: expect.stringContaining('ABC123'),
-        })
-      );
+    it('should have an exit button', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      const exitBtn = screen.getByRole('button', { name: /exit/i });
+      expect(exitBtn).toBeInTheDocument();
+    });
+
+    it('should call onExitRoom when exit button is clicked', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      const exitBtn = screen.getByRole('button', { name: /exit/i });
+      fireEvent.click(exitBtn);
+      expect(defaultProps.onExitRoom).toHaveBeenCalledTimes(1);
+    });
+
+    it('should have a copy code button', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      const copyBtn = screen.getByRole('button', { name: /copy/i });
+      expect(copyBtn).toBeInTheDocument();
     });
   });
 
-  it('should show share icon instead of copy icon', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
+  describe('Waiting Status', () => {
+    it('should display waiting status banner', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      const status = screen.getAllByTestId('waiting-status');
+      expect(status.length).toBeGreaterThan(0);
+    });
 
-    // Share button should exist
-    const shareButton = screen.getByRole('button', { name: /share/i });
-    expect(shareButton).toBeInTheDocument();
-
-    // The share button should contain a Share2 icon (rendered by lucide-react)
-    // We check that the button exists and has the share-related aria-label
-    expect(shareButton).toHaveAttribute('aria-label', expect.stringMatching(/share/i));
-  });
-});
-
-describe('PlayerWaitingView Mobile Bottom Tabs Sticky', () => {
-  const defaultProps = {
-    gameCode: 'ABC123',
-    gameLanguage: 'en' as const,
-    username: 'TestPlayer',
-    t: mockT,
-    playersReady: [
-      { username: 'TestHost', isHost: true },
-      { username: 'TestPlayer', isHost: false },
-    ],
-    showQR: false,
-    setShowQR: jest.fn(),
-    showExitConfirm: false,
-    setShowExitConfirm: jest.fn(),
-    onExitRoom: jest.fn(),
-    onConfirmExit: jest.fn(),
-  };
-
-  it('should have bottom tabs with fixed positioning classes', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
-
-    // Nav now uses role="tablist" for proper tab navigation semantics
-    const bottomNav = screen.getByRole('tablist');
-
-    // Check for sticky/fixed positioning classes
-    // The nav should have flex-shrink-0 to prevent compression
-    expect(bottomNav).toHaveClass('flex-shrink-0');
-
-    // Check for mobile-only visibility (hidden on lg screens)
-    expect(bottomNav.className).toContain('lg:hidden');
+    it('should show waiting message text', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getAllByText('playerView.waitingForHostToStart').length).toBeGreaterThan(0);
+    });
   });
 
-  it('should have safe area padding for bottom tabs', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
+  describe('Player Roster', () => {
+    it('should display player names', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      // Players appear in both mobile and desktop layouts
+      expect(screen.getAllByText('TestHost').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('TestPlayer').length).toBeGreaterThan(0);
+    });
 
-    // Nav now uses role="tablist" for proper tab navigation semantics
-    const bottomNav = screen.getByRole('tablist');
+    it('should show empty slots when fewer than max players', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      // With 2 players, should show 3 empty slots (min(5, 8) - 2 = 3)
+      const joinTexts = screen.getAllByText('common.join');
+      expect(joinTexts.length).toBeGreaterThan(0);
+    });
+  });
 
-    // Check for safe-area-inset padding (for notched devices)
-    expect(bottomNav.className).toContain('pb-[env(safe-area-inset-bottom)]');
+  describe('Desktop Layout', () => {
+    it('should render DesktopLobbyLayout', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getByTestId('desktop-lobby-layout')).toBeInTheDocument();
+    });
+
+    it('should render InviteCard in desktop right column', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getByTestId('invite-card')).toBeInTheDocument();
+    });
+
+    it('should render chat in desktop layout', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getByTestId('desktop-chat-area')).toBeInTheDocument();
+    });
+  });
+
+  describe('Mobile Layout', () => {
+    it('should render MobileShareSection', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getByTestId('mobile-share-section')).toBeInTheDocument();
+    });
+  });
+
+  describe('Exit Confirmation', () => {
+    it('should not show exit dialog when showExitConfirm is false', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.queryByText('playerView.exitConfirmation')).not.toBeInTheDocument();
+    });
+
+    it('should show exit dialog when showExitConfirm is true', () => {
+      render(<PlayerWaitingView {...defaultProps} showExitConfirm={true} />);
+      expect(screen.getByText('playerView.exitConfirmation')).toBeInTheDocument();
+    });
+
+    it('should call onConfirmExit when confirm is clicked in exit dialog', () => {
+      render(<PlayerWaitingView {...defaultProps} showExitConfirm={true} />);
+      const confirmBtn = screen.getByText('common.confirm');
+      fireEvent.click(confirmBtn);
+      expect(defaultProps.onConfirmExit).toHaveBeenCalledTimes(1);
+    });
   });
 });

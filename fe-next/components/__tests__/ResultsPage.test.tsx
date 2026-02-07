@@ -431,15 +431,49 @@ describe('ResultsPage - Player Ranking (bannerRank)', () => {
       const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
       const totalPlayers = sortedScores.length;
 
-      // With the fix: Show 4th place styling when there are other players
+      // With the fix: Show encouraging styling, capped to totalPlayers
       const bannerRank = hasZeroScore && totalPlayers > 1
-        ? 4
+        ? Math.min(Math.max(currentPlayerRank, 4), totalPlayers)
         : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
 
       // THEN: Player with no valid words in multiplayer should get 4th place styling
       expect(currentPlayerRank).toBe(4);  // Actually 4th place
       expect(totalPlayers).toBe(4);
       expect(bannerRank).toBe(4);  // 4th place styling (purple/encouraging)
+    });
+
+    it('should never show rank exceeding totalPlayers (e.g. "4 of 2" is impossible)', () => {
+      // BUG: In a 2-player game, zero-score player gets bannerRank=4 hardcoded,
+      // resulting in "4 מתוך 2" (4 out of 2) which is nonsensical.
+      // The rank should never exceed the total number of players.
+
+      // GIVEN: A 2-player game where one player has zero score
+      const twoPlayerScores = [
+        { username: 'Winner', score: 50, wordsFound: 5, allWords: [{ word: 'cat', score: 2, validated: true }] },
+        { username: 'ZeroPlayer', score: 0, wordsFound: 0, allWords: [] },
+      ];
+
+      const sortedScores = [...twoPlayerScores].sort((a, b) => (b.score || 0) - (a.score || 0));
+      const username = 'ZeroPlayer';
+      const currentPlayerData = twoPlayerScores.find(p => p.username === username);
+      const currentPlayerRank = sortedScores.findIndex(p => p.username === username) + 1;
+      const currentPlayerValidWords = currentPlayerData?.allWords?.filter(
+        (w: { validated?: boolean; score?: number }) => w.validated && (w.score || 0) > 0
+      ) || [];
+
+      const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
+      const totalPlayers = sortedScores.length;
+
+      // Apply the FIXED logic from useResultsData.ts (capped to totalPlayers)
+      const bannerRank =
+        hasZeroScore && totalPlayers > 1
+          ? Math.min(Math.max(currentPlayerRank, 4), totalPlayers)
+          : currentPlayerRank >= 1 ? currentPlayerRank : 1;
+
+      // THEN: Rank must never exceed total players
+      expect(totalPlayers).toBe(2);
+      expect(currentPlayerRank).toBe(2);
+      expect(bannerRank).toBeLessThanOrEqual(totalPlayers);
     });
   });
 });

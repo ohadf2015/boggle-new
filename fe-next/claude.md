@@ -34,7 +34,7 @@
 - `npm run test:frontend`: Jest frontend tests
 - `npm run test:watch`: Watch mode
 - `npm run test:coverage`: Coverage report
-- `npm run test:e2e`: Playwright E2E tests
+- `npm run test:e2e`: E2E tests (use Playwriter CLI)
 - `npm run db:migrate`: Run Supabase migrations
 
 ## Code Style

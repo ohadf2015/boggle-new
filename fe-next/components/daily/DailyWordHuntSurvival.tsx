@@ -4,6 +4,7 @@ import React, { useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
@@ -16,7 +17,7 @@ import { WordFeedbackToast } from './WordFeedbackToast';
 
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './survival/types';
-import { getMinAnswerLength } from '@/shared/constants/gameConstants';
+import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 import {
   useSurvivalGameLogic,
@@ -27,6 +28,7 @@ import {
   SurvivalLandscapeLayout,
   AutoClueNotification,
 } from './survival';
+import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
 
 // Re-export types for backwards compatibility
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
@@ -38,6 +40,12 @@ interface DailyWordHuntSurvivalProps {
   targetWord: string;
   onComplete: (result: SurvivalGameResult) => void;
   onQuit: () => void;
+  /** Puzzle date string for desktop leaderboard sidebar */
+  puzzleDate?: string;
+  /** Authenticated player ID for highlighting in leaderboard */
+  currentPlayerId?: string | null;
+  /** Guest fingerprint for highlighting in leaderboard */
+  currentGuestFingerprint?: string | null;
 }
 
 /**
@@ -53,9 +61,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   targetWord,
   onComplete,
   onQuit,
+  puzzleDate,
+  currentPlayerId,
+  currentGuestFingerprint,
 }) => {
   const { t } = useLanguage();
   const isLandscape = useMobileLandscape();
+  const { isDesktop, isTv } = useDesktopLayout();
   const setIsInGame = useHideNavigation();
 
   // Performance optimization for low-end devices
@@ -103,7 +115,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     gameLanguage: language,
     enabled: !state.isGameOver,
     onWordSubmit: actions.handleWordSubmit,
-    minWordLength: getMinAnswerLength(language), // Language-specific minimum (4 for most, 2 for Japanese)
+    minWordLength: MIN_DISCOVERY_WORD_LENGTH, // Accept 2+ letter words for discovery (target word min enforced separately)
   });
 
   // Hide bottom navigation during active gameplay
@@ -117,6 +129,94 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     actions.setShowQuitConfirm(false);
     onQuit();
   };
+
+  // Desktop/TV layout (3-column with sidebars)
+  if ((isDesktop || isTv) && puzzleDate) {
+    return (
+      <>
+        <SurvivalDesktopLayout
+          isTv={isTv}
+          grid={grid}
+          isGameOver={state.isGameOver}
+          eliminatedLetters={state.eliminatedLetters}
+          onWordSubmit={actions.handleWordSubmit}
+          onWordChange={actions.handleWordChange}
+          highlightedPath={keyboardInput.highlightedCells}
+          lifePoints={state.lifePoints}
+          isLifeGaining={state.isLifeGaining}
+          lifeGainAmount={state.lifeGainAmount}
+          skipAnimations={skipAnimations}
+          onLifeGainComplete={() => actions.setLifeGainAmount(null)}
+          liveScore={state.liveScore}
+          lastScoreIncrement={state.lastScoreIncrement}
+          isScoreAnimating={state.isScoreAnimating}
+          currentHint={state.currentHint}
+          targetWord={targetWord}
+          attempts={state.attempts}
+          accumulatedClues={state.accumulatedClues}
+          revealedLetters={state.revealedLetters}
+          knownLetters={state.knownLetters}
+          latestAttemptFeedback={state.latestAttemptFeedback}
+          showFeedbackOverlay={state.showFeedbackOverlay}
+          isClueGaining={state.isClueGaining}
+          clueContainerRef={actions.clueContainerRef}
+          gameDir={actions.gameDir}
+          discoveredWords={state.discoveredWords}
+          hintStage={state.hintStage}
+          puzzleDate={puzzleDate}
+          language={language}
+          currentPlayerId={currentPlayerId ?? null}
+          currentGuestFingerprint={currentGuestFingerprint ?? null}
+          onQuitClick={() => actions.setShowQuitConfirm(true)}
+          t={t}
+        />
+
+        {/* Keyboard Input Hint */}
+        {!state.isGameOver && (
+          <KeyboardHintTooltip
+            delaySeconds={10}
+            desktopOnly={true}
+            t={t}
+          />
+        )}
+
+        {/* Word Feedback Toast */}
+        <WordFeedbackToast
+          type={state.feedbackType}
+          message={state.feedbackMessage}
+          onClose={actions.closeToast}
+        />
+
+        {/* Auto-Clue Notifications */}
+        <AnimatePresence>
+          {state.activeNotifications.map((notification) => (
+            <AutoClueNotification
+              key={notification.id}
+              clueType={notification.clueType}
+              onDismiss={() => actions.dismissNotification(notification.id)}
+              direction={actions.gameDir}
+              t={t}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Quit Confirmation Dialog */}
+        <ConfirmationDialog
+          open={state.showQuitConfirm}
+          onOpenChange={(open) => actions.setShowQuitConfirm(open)}
+          title={t('daily.quitConfirmTitle') || 'Quit Challenge?'}
+          description={
+            t('daily.quitConfirm') ||
+            "If you quit, this will count as your attempt for today. You won't be able to try again until tomorrow."
+          }
+          confirmText={t('daily.imSure') || "I'm Sure"}
+          cancelText={t('common.cancel') || 'Cancel'}
+          onConfirm={handleQuitConfirm}
+          variant="danger"
+        />
+      </>
+    );
+  }
 
   // Landscape layout
   if (isLandscape) {

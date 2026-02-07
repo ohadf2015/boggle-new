@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogBody,
 } from '@/components/ui/dialog';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { Loader } from '@/components/ui/Loader';
 import type { PromptPreviewData, SectionType } from '../types';
 import { SECTION_METADATA } from './constants';
 
@@ -72,7 +72,7 @@ export function PromptPreviewDialog({
         <DialogBody className="space-y-4">
           {isLoading ? (
             <div className="py-12 flex justify-center">
-              <NeoLoader variant="dots" size="md" text="Assembling prompt..." />
+              <Loader size="md" text="Assembling prompt..." />
             </div>
           ) : preview ? (
             <>

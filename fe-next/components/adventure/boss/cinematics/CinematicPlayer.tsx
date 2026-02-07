@@ -16,7 +16,7 @@
 
 'use client';
 
-import React, { useEffect, useRef, ComponentType, useState, useCallback } from 'react';
+import React, { useEffect, useRef, ComponentType, useCallback } from 'react';
 import { Player, PlayerRef } from '@remotion/player';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -104,8 +104,6 @@ function CinematicPlayerInner({
   const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
   const playerRef = useRef<PlayerRef>(null);
-  const [isReady, setIsReady] = useState(false);
-  const [hasError, setHasError] = useState(false);
 
   // Debug logging - must be defined before use
   const logDebug = useCallback((message: string, data?: unknown) => {
@@ -119,26 +117,16 @@ function CinematicPlayerInner({
 
   // Use cinematic hook for state management
   const {
-    isPlaying,
     canSkip,
     progress,
     skip,
-    play,
     handleFrameUpdate,
   } = useCinematic({
     durationFrames,
     fps,
     onComplete,
-    autoPlay: false, // We'll manually control play state
+    autoPlay, // Let Remotion Player handle autoplay natively
   });
-
-  // Start playing when ready and autoPlay is enabled
-  useEffect(() => {
-    if (isReady && autoPlay && !isPlaying) {
-      logDebug('Auto-starting playback');
-      play();
-    }
-  }, [isReady, autoPlay, isPlaying, play, logDebug]);
 
   // ==============================================
   // KEYBOARD CONTROLS
@@ -155,41 +143,6 @@ function CinematicPlayerInner({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [canSkip, skip]);
-
-  // ==============================================
-  // PLAYER SYNC & READY STATE
-  // ==============================================
-
-  useEffect(() => {
-    const player = playerRef.current;
-    if (!player) return;
-
-    logDebug('Player sync', { isPlaying, isReady });
-
-    if (isPlaying && isReady) {
-      try {
-        player.play();
-      } catch (err) {
-        logDebug('Play error', err);
-        setHasError(true);
-      }
-    } else {
-      player.pause();
-    }
-  }, [isPlaying, isReady, logDebug]);
-
-  // Handle player ready state - use a timeout-based approach instead of 'ready' event
-  // which may not be available in all Remotion versions
-  useEffect(() => {
-    // Set ready after a short delay to ensure Player has mounted
-    const timer = setTimeout(() => {
-      logDebug('Marking player as ready');
-      setIsReady(true);
-      setHasError(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [logDebug]);
 
   // ==============================================
   // FRAME UPDATE LISTENER
@@ -250,30 +203,6 @@ function CinematicPlayerInner({
     );
   }
 
-  // Show loading state while waiting for player to be ready
-  if (!isReady && !hasError) {
-    return (
-      <div
-        className={fullscreen
-          ? 'fixed inset-0 z-50 bg-neo-navy flex items-center justify-center'
-          : 'relative bg-neo-navy flex items-center justify-center'
-        }
-        data-testid={`${testId}-loading`}
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-neo-yellow border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-neo-yellow font-neo-display text-lg">
-            {t('adventure.bosses.cinematics.loading')}
-          </p>
-        </motion.div>
-      </div>
-    );
-  }
-
   // ==============================================
   // RENDER
   // ==============================================
@@ -299,7 +228,7 @@ function CinematicPlayerInner({
           maxWidth: '100%',
           maxHeight: '100%',
         }}
-        autoPlay={false} // We control playback manually after ready
+        autoPlay={autoPlay}
         loop={false}
         showVolumeControls={false}
         controls={false}
