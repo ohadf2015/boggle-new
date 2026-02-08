@@ -68,8 +68,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         >
           {player.isHost && (
             <Crown
-              className="w-4 h-4 text-neo-lime flex-shrink-0"
-              style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }}
+              className="w-4 h-4 text-neo-lime flex-shrink-0 drop-shadow-[1px_1px_0px_rgb(var(--neo-black))]"
             />
           )}
           <span className="truncate" title={player.username}>
@@ -133,8 +132,7 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
 
   return (
     <motion.div
-      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow relative"
-      style={{ transform: 'rotate(-1deg)' }}
+      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow relative -rotate-1"
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ delay: 0.2 }}

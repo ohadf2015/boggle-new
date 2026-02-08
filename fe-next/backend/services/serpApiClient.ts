@@ -77,6 +77,17 @@ export async function fetchGoogleTrends(
         console.log(`[SERP] Using cached trends for ${region} from ${todayDate}${enrichWithNews ? ' (enriched)' : ''}`);
         return JSON.parse(cached);
       }
+
+      // When enrichment is off, also check the enriched cache key
+      // This avoids a redundant SERP call when enriched data was already cached
+      if (!enrichWithNews) {
+        const enrichedCacheKey = `${REDIS_PREFIX}${region}:${todayDate}:enriched`;
+        const enrichedCached = await redis.get(enrichedCacheKey);
+        if (enrichedCached) {
+          console.log(`[SERP] Reusing enriched cache for ${region} (enrichment off but enriched data available)`);
+          return JSON.parse(enrichedCached);
+        }
+      }
     }
 
     // Fetch from SERP API
@@ -397,6 +408,49 @@ function getYesterdayDate(): string {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   return yesterday.toISOString().split('T')[0];
+}
+
+/**
+ * Count SERP API calls for the current month from the logs table
+ * Used for budget monitoring and auto-throttle decisions
+ */
+export async function getMonthlyApiCallCount(): Promise<number> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const firstOfMonth = new Date();
+    firstOfMonth.setDate(1);
+    const monthStart = firstOfMonth.toISOString().split('T')[0];
+
+    const { count, error } = await supabase
+      .from('serp_api_logs')
+      .select('*', { count: 'exact', head: true })
+      .gte('request_date', monthStart);
+
+    if (error || count === null) {
+      return 0;
+    }
+
+    return count;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[SERP] Failed to get monthly API call count:', errorMessage);
+    return 0;
+  }
+}
+
+/**
+ * Get remaining monthly budget for SERP API calls
+ * Budget defaults to 100 (free tier) unless SERP_MONTHLY_BUDGET is set
+ */
+export async function getRemainingMonthlyBudget(): Promise<number> {
+  const budget = parseInt(process.env.SERP_MONTHLY_BUDGET || '100', 10);
+  const used = await getMonthlyApiCallCount();
+  return Math.max(0, budget - used);
 }
 
 /**

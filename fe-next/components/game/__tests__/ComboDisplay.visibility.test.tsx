@@ -94,8 +94,8 @@ describe('ComboDisplay Visibility Bug', () => {
     it('renders glow effect behind text for combo level 3+', () => {
       const { container } = render(<ComboDisplay comboLevel={3} />);
 
-      // Find the glow div (has blur filter and scale transform)
-      const glowElement = container.querySelector('[style*="blur"]');
+      // Find the glow div (has blur Tailwind class and scale transform)
+      const glowElement = container.querySelector('.blur-\\[12px\\]');
 
       // Should exist for combo >= 3 (when not in skipSparkles mode)
       expect(glowElement).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('ComboDisplay Visibility Bug', () => {
     it('applies correct z-index stacking for glow behind text', () => {
       const { container } = render(<ComboDisplay comboLevel={5} />);
 
-      const glowElement = container.querySelector('[style*="blur"]');
+      const glowElement = container.querySelector('.blur-\\[12px\\]');
 
       if (glowElement) {
         // Glow should have negative z-index to stay behind text

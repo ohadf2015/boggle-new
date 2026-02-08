@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
+import { useMemo, useRef, useEffect, useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Zap, TrendingUp, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -45,12 +45,12 @@ const VISUAL_UPDATE_DEBOUNCE = 100;
  * - Pulse animations when opponents score
  * - Rank change indicators (up/down arrows)
  */
-export function CompactLeaderboard({
+export const CompactLeaderboard = memo<CompactLeaderboardProps>(function CompactLeaderboard({
   players,
   currentUsername,
   className,
   t,
-}: CompactLeaderboardProps) {
+}) {
   // Track previous scores and ranks for animations
   const prevScoresRef = useRef<Map<string, number>>(new Map());
   const prevRanksRef = useRef<Map<string, number>>(new Map());
@@ -428,6 +428,8 @@ export function CompactLeaderboard({
       </div>
     </div>
   );
-}
+});
+
+CompactLeaderboard.displayName = 'CompactLeaderboard';
 
 export default CompactLeaderboard;

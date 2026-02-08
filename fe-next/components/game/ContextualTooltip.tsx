@@ -92,15 +92,13 @@ const ContextualTooltip = memo<ContextualTooltipProps>(
             >
               {/* Shimmer effect */}
               <motion.div
-                className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none"
-                style={{ zIndex: 0 }}
+                className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none z-0"
               >
                 <motion.div
-                  className="absolute inset-0"
+                  className="absolute inset-0 w-[200%]"
                   style={{
                     background:
                       'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-                    width: '200%',
                     marginLeft: '-100%',
                   }}
                   animate={{ marginLeft: ['-100%', '100%'] }}

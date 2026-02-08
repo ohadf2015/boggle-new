@@ -147,8 +147,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
               ? { duration: 0.25, ease: [0.36, 1.2, 0.5, 1] }
               : { type: 'spring', stiffness: 300, damping: 25 }
             }
-            className="fixed bottom-24 left-1/2 z-50 pointer-events-auto safe-area-bottom"
-            style={{ transform: 'translateX(-50%)' }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-auto safe-area-bottom"
           >
             <div
               className="

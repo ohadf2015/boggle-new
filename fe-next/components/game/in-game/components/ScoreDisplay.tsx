@@ -56,9 +56,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-4 py-1.5 min-w-[90px] overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, #BFFF00 0%, #9AFF00 50%, #FFE135 100%)',
-        }}
+        style={{ background: 'linear-gradient(135deg, #BFFF00 0%, #9AFF00 50%, #FFE135 100%)' }}
         whileHover={{ scale: 1.05 }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
@@ -68,7 +66,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}
             className="text-3xl font-black text-neo-black leading-tight"
-            style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+            style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5)' }}
           >
             {score}
           </motion.div>

@@ -262,8 +262,8 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // This should NOT throw an error - it should fetch from SERP API
     await expect(generateDailyBuzz(today, language)).resolves.toBeDefined();
 
-    // Verify fetchGoogleTrends was called with correct region and enrichment flag
-    expect(serpApiClient.fetchGoogleTrends).toHaveBeenCalledWith('IL', expect.anything(), true);
+    // Verify fetchGoogleTrends was called with correct region (enrichment defaults to OFF)
+    expect(serpApiClient.fetchGoogleTrends).toHaveBeenCalledWith('IL', expect.anything(), false);
   });
 
   it('should use fallback topics when SERP API returns no trends', async () => {

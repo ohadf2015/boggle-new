@@ -193,10 +193,6 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             "absolute inset-0 pointer-events-none",
             "opacity-0" // Texture disabled - only appears on body background
           )}
-          style={{
-            backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
-            backgroundSize: '6px 6px',
-          }}
         />
         {/* Header: Rank, Name, Score - Neo-Brutalist - Organized */}
         <div className="relative z-10">

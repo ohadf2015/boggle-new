@@ -198,7 +198,7 @@ function resetGameForNewRound(gameCode: string): boolean {
   } else if (currentState === 'waiting') {
     transitionSuccess = true;
   } else {
-    logger.warn('GAME_STATE', `Reset called in unexpected state: ${currentState}`);
+    logger.info('GAME_STATE', `Reset called in unexpected state: ${currentState}`);
     game.gameState = 'waiting';
     transitionSuccess = true;
   }

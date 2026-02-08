@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Trophy, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -88,7 +88,7 @@ const RANK_STYLES: Record<number, {
   },
 };
 
-const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
+const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
   winner,
   isCurrentUserWinner,
   rank = 1,
@@ -227,17 +227,12 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     >
       {/* Neo-Brutalist Main Container - Clickable for confetti */}
       <div
-        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]`}
-        style={{ transform: 'rotate(-1deg)' }}
+        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] -rotate-1`}
         onClick={handleConfetti}
       >
         {/* Comic-style halftone texture pattern - subtle for winner banner */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.06]"
-          style={{
-            backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
-            backgroundSize: '12px 12px',
-          }}
+          className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,rgb(var(--neo-black))_1px,transparent_1px)] bg-[length:12px_12px]"
         />
 
         {/* Content - Compact layout */}
@@ -254,10 +249,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
             >
               <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo shadow-hard inline-block ${compact ? 'p-1.5' : 'p-2'}`}>
                 <RankIcon
-                  className={`${styles.iconTextClass} ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'}`}
-                  style={{
-                    filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))',
-                  }}
+                  className={`${styles.iconTextClass} ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl'} drop-shadow-[2px_2px_0px_rgb(var(--neo-black))]`}
                 />
               </div>
               {/* Prominent Placement Badge - Only for multiplayer ranking */}
@@ -366,6 +358,8 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
       </div>
     </motion.div>
   );
-};
+});
+
+ResultsWinnerBanner.displayName = 'ResultsWinnerBanner';
 
 export default ResultsWinnerBanner;

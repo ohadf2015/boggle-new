@@ -1,44 +1,30 @@
 /**
- * Remotion Font Loading
+ * Remotion Font Configuration
  *
- * Centralized font loading for all Remotion cinematics.
- * Uses @remotion/google-fonts to ensure fonts are loaded before rendering.
+ * Fonts are already loaded globally by Next.js via next/font/local (app/fonts.ts).
+ * This module exports the font family names for use in Remotion cinematic styles.
  *
- * IMPORTANT: In Remotion, fonts must be loaded synchronously before any frame renders.
- * Using CSS font-family fallbacks doesn't work because Remotion needs fonts available
- * during the render phase - otherwise text appears invisible (black screen).
+ * Previously used @remotion/google-fonts which bundled the entire fontkit engine (~1.6MB).
+ * Replaced with direct font family references since fonts are already available in the browser.
  */
 
-import { loadFont as loadFredoka } from '@remotion/google-fonts/Fredoka';
-import { loadFont as loadRubik } from '@remotion/google-fonts/Rubik';
-
 // ==============================================
-// FONT LOADING
+// FONT FAMILIES
 // ==============================================
 
 /**
- * Load Fredoka font (display/heading font)
+ * Fredoka font family (display/heading font)
  * Used for: Victory text, boss names, titles, scores
+ * Loaded globally via --font-fredoka CSS variable
  */
-export const {
-  fontFamily: fredokaFamily,
-  waitUntilDone: waitForFredoka,
-} = loadFredoka('normal', {
-  weights: ['400', '700'],
-  subsets: ['latin', 'hebrew'],
-});
+export const fredokaFamily = 'var(--font-fredoka), Fredoka, sans-serif';
 
 /**
- * Load Rubik font (body font)
+ * Rubik font family (body font)
  * Used for: Stats labels, messages, body text
+ * Loaded globally via --font-rubik CSS variable
  */
-export const {
-  fontFamily: rubikFamily,
-  waitUntilDone: waitForRubik,
-} = loadRubik('normal', {
-  weights: ['400', '500', '700'],
-  subsets: ['latin', 'hebrew'],
-});
+export const rubikFamily = 'var(--font-rubik), Rubik, sans-serif';
 
 // ==============================================
 // UTILITY FUNCTIONS
@@ -46,7 +32,9 @@ export const {
 
 /**
  * Wait for all cinematic fonts to be loaded.
- * Use this in delayRender pattern if needed.
+ * Uses the document.fonts API to check font availability.
+ *
+ * Since fonts are preloaded by Next.js, this typically resolves immediately.
  *
  * @example
  * const handle = delayRender("Loading fonts");
@@ -54,5 +42,10 @@ export const {
  * continueRender(handle);
  */
 export async function waitForAllFonts(): Promise<void> {
-  await Promise.all([waitForFredoka(), waitForRubik()]);
+  if (typeof document !== 'undefined' && document.fonts) {
+    await document.fonts.ready;
+  }
 }
+
+export const waitForFredoka = waitForAllFonts;
+export const waitForRubik = waitForAllFonts;

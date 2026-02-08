@@ -239,8 +239,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
               />
             )}
             <div
-              className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0"
-              style={{ aspectRatio: '1/1' }}
+              className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0 aspect-square"
             >
               <GridComponent
                 key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}

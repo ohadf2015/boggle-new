@@ -11,6 +11,7 @@ import logger from '../utils/logger';
 import { generateDailyPuzzle, getPuzzleNumber } from '../../utils/dailyChallenge';
 import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
 import type { Language } from '../../types';
+import { ensureLanguageLoaded } from '../dictionary';
 
 // Import types and utilities from extracted modules
 import {
@@ -493,31 +494,25 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
         }
       }
 
-      // Validate target word is in dictionary or community-validated
+      // Dictionary validation is ADVISORY only - log warnings but never block submission.
+      // The dictionary may be unloaded (isDictionaryWord returns null) under memory pressure,
+      // and blocking here would silently prevent ALL submissions for that language.
+      await ensureLanguageLoaded(language as Language);
+
       if (!isWordValidForDailyChallenge(expectedTargetWord, language as Language)) {
-        logger.info('API', `Word Hunt validation failed: target word "${expectedTargetWord}" is not valid for language ${language}`);
-        res.status(400).json({ error: 'Invalid target word - not in dictionary' });
-        return;
+        logger.warn('API', `[WordHunt Advisory] Target word "${expectedTargetWord}" not found in dictionary for language ${language} - allowing submission`);
       }
 
-      // Validate all attempt words are in dictionary or community-validated
-      // Pending words (awaiting validation) are rejected
       if (attemptWords && attemptWords.length > 0) {
         const invalidWords: string[] = [];
         for (const attempt of attemptWords) {
-          // Normalize word for comparison (handles Hebrew final letters)
           const normalizedWord = normalizeWordForComparison(attempt.word, language as Language);
           if (!isWordValidForDailyChallenge(normalizedWord, language as Language)) {
             invalidWords.push(normalizedWord);
           }
         }
         if (invalidWords.length > 0) {
-          logger.info('API', `Word Hunt validation failed: invalid words submitted: ${invalidWords.join(', ')} for language ${language}`);
-          res.status(400).json({
-            error: 'Invalid words submitted - not in dictionary',
-            invalidWords
-          });
-          return;
+          logger.warn('API', `[WordHunt Advisory] Invalid words in submission: ${invalidWords.join(', ')} for language ${language} - allowing submission`);
         }
       }
     } catch (validationError) {

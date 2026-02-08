@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -19,13 +19,13 @@ interface RoomCodeDisplayProps {
  * RoomCodeDisplay - Prominent room code display with one-tap copy functionality
  * Designed for maximum visibility and ease of sharing
  */
-export function RoomCodeDisplay({
+export const RoomCodeDisplay = memo<RoomCodeDisplayProps>(function RoomCodeDisplay({
   gameCode,
   t,
   className,
   size = 'md',
   onShare,
-}: RoomCodeDisplayProps) {
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -181,6 +181,8 @@ export function RoomCodeDisplay({
       </div>
     </div>
   );
-}
+});
+
+RoomCodeDisplay.displayName = 'RoomCodeDisplay';
 
 export default RoomCodeDisplay;

@@ -359,7 +359,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
             {showFeedback && visibleFeedback?.type === 'accepted' && sparklePositions.map((pos, i) => (
               <motion.div
                 key={`sparkle-${i}`}
-                className="absolute w-2 h-2 bg-neo-lime rounded-full"
+                className="absolute w-2 h-2 bg-neo-lime rounded-full left-1/2 top-1/2"
                 initial={{ scale: 0, x: 0, y: 0 }}
                 animate={{
                   scale: [0, 1.2, 0],
@@ -368,7 +368,6 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   opacity: [1, 1, 0],
                 }}
                 transition={{ duration: 0.5, delay: pos.delay }}
-                style={{ left: '50%', top: '50%' }}
               />
             ))}
 

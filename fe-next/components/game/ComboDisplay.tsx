@@ -388,7 +388,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             {/* Glow effect behind text - extends beyond container for full visibility */}
             {!skipSparkles && (
               <motion.div
-                className="absolute inset-0 pointer-events-none -z-10"
+                className="absolute inset-0 pointer-events-none -z-10 blur-[12px] scale-[1.3] rounded-full"
                 animate={{
                   opacity: [0.3, 0.5, 0.3],
                 }}
@@ -399,10 +399,6 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 }}
                 style={{
                   background: rarityColors.glow,
-                  filter: 'blur(12px)',
-                  // Reduced scale to 1.3x to prevent excessive glow clipping at edges
-                  transform: 'scale(1.3)',
-                  borderRadius: '50%',
                 }}
               />
             )}

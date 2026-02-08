@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Zap, TrendingUp, BarChart3, Award, Sparkles, LucideIcon } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -223,7 +223,7 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
  * Neo-Brutalist Player Insights Component
  * Displays post-game statistics with data storytelling and witty commentary
  */
-const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
+const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
   const { t } = useLanguage();
 
   // Generate personalized story based on performance
@@ -316,11 +316,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
         >
           {/* Comic-style halftone pattern - subtle for featured card */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.08]"
-            style={{
-              backgroundImage: `radial-gradient(circle, var(--neo-cream) 1px, transparent 1px)`,
-              backgroundSize: '12px 12px',
-            }}
+            className="absolute inset-0 pointer-events-none opacity-[0.08] bg-[radial-gradient(circle,var(--neo-cream)_1px,transparent_1px)] bg-[length:12px_12px]"
           />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
@@ -454,6 +450,8 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       )}
     </motion.div>
   );
-};
+});
+
+PlayerInsights.displayName = 'PlayerInsights';
 
 export default PlayerInsights;

@@ -229,10 +229,10 @@ export async function initRedis(): Promise<boolean> {
       _isRedisAvailable = true;
     });
 
-    _redisClient.on('ready', () => {
+    _redisClient.on('ready', async () => {
       logger.info('REDIS', 'Redis client ready');
       _isRedisAvailable = true;
-      loadLuaScripts();
+      await loadLuaScripts();
     });
 
     _redisClient.on('error', (err: Error) => {

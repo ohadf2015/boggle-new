@@ -83,8 +83,7 @@ describe('GET /api/admin/milog-words', () => {
         milog_url: 'https://milog.co.il/שלום',
         milog_attempts: 1,
         submission_count: 5,
-        promoted_to_dictionary: true,
-        promoted_at: '2026-02-05T12:00:00Z',
+        approved_at: '2026-02-05T12:00:00Z',
       },
       {
         id: 'uuid-2',
@@ -94,15 +93,14 @@ describe('GET /api/admin/milog-words', () => {
         milog_url: 'https://milog.co.il/בוקר',
         milog_attempts: 1,
         submission_count: 3,
-        promoted_to_dictionary: false,
-        promoted_at: null,
+        approved_at: null,
       },
     ];
 
     const mockStatsData = [
-      { milog_status: 'verified', promoted_to_dictionary: true },
-      { milog_status: 'verified', promoted_to_dictionary: false },
-      { milog_status: 'not_found', promoted_to_dictionary: false },
+      { milog_status: 'verified', approved_at: '2026-02-05T12:00:00Z' },
+      { milog_status: 'verified', approved_at: null },
+      { milog_status: 'not_found', approved_at: null },
     ];
 
     const mockSupabase = {
@@ -141,6 +139,7 @@ describe('GET /api/admin/milog-words', () => {
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       neq: jest.fn().mockReturnThis(),
+      not: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
       range: jest.fn().mockResolvedValue({
         data: [],
@@ -155,7 +154,7 @@ describe('GET /api/admin/milog-words', () => {
     const response = await GET(request as unknown as import('next/server').NextRequest);
 
     expect(response.status).toBe(200);
-    expect(mockSupabase.eq).toHaveBeenCalledWith('promoted_to_dictionary', true);
+    expect(mockSupabase.not).toHaveBeenCalledWith('approved_at', 'is', null);
   });
 
   it('should filter by search term when provided', async () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -24,7 +24,7 @@ interface FloatingScoreAnimationProps {
  * FloatingScoreAnimation - Animated score flying from word area to score display
  * Used to show points being earned with satisfying visual feedback
  */
-const FloatingScoreAnimation: React.FC<FloatingScoreAnimationProps> = ({
+const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
   score,
   startPosition,
   endPosition,
@@ -244,6 +244,8 @@ const FloatingScoreAnimation: React.FC<FloatingScoreAnimationProps> = ({
       </div>
     </AnimatePresence>
   );
-};
+});
+
+FloatingScoreAnimation.displayName = 'FloatingScoreAnimation';
 
 export default FloatingScoreAnimation;

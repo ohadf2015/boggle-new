@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 /**
  * VersionChecker Component
@@ -16,7 +16,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
  */
 export function VersionChecker() {
   const [newVersionAvailable, setNewVersionAvailable] = useState(false);
-  const { t } = useLanguage();
+  const { t } = useLanguageSafe();
 
   // Get build time from environment (set at build in next.config.mjs)
   const currentBuildTime = process.env.NEXT_PUBLIC_BUILD_TIME;

@@ -287,7 +287,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     // Self-healing: if not in 'waiting' state, force a reset first
     // This handles race conditions between async endGame and rapid reset/start clicks
     if (!canTransitionGameState(gameCode, 'START')) {
-      logger.warn('SOCKET', `Game ${gameCode} in unexpected state ${currentGameState}, auto-resetting before start`);
+      logger.info('SOCKET', `Game ${gameCode} in unexpected state ${currentGameState}, auto-resetting before start`);
 
       // Clear any lingering timers/state from previous game
       clearGameTimer(gameCode);

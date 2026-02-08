@@ -28,8 +28,7 @@ interface MilogWord {
   milog_url: string | null;
   milog_attempts: number;
   submission_count: number;
-  promoted_to_dictionary: boolean;
-  promoted_at: string | null;
+  approved_at: string | null;
 }
 
 interface Stats {
@@ -266,7 +265,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               >
                 <Card className={cn(
                   "bg-slate-800 border-slate-700 transition-all",
-                  word.promoted_to_dictionary && "ring-2 ring-neo-yellow"
+                  word.approved_at && "ring-2 ring-neo-yellow"
                 )}>
                   <CardContent className="p-4 space-y-3">
                     {/* Word Header */}
@@ -277,7 +276,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                           <Badge className={cn("text-xs text-white", getStatusColor(word.milog_status))}>
                             {getStatusLabel(word.milog_status)}
                           </Badge>
-                          {word.promoted_to_dictionary && (
+                          {word.approved_at && (
                             <Badge className="text-xs bg-neo-yellow text-black">
                               In Dictionary
                             </Badge>
@@ -295,8 +294,8 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                     {/* Details */}
                     <div className="text-xs text-slate-400 space-y-1">
                       <p>Verified: {formatDate(word.milog_verified_at)}</p>
-                      {word.promoted_to_dictionary && (
-                        <p className="text-neo-yellow">Promoted: {formatDate(word.promoted_at)}</p>
+                      {word.approved_at && (
+                        <p className="text-neo-yellow">Promoted: {formatDate(word.approved_at)}</p>
                       )}
                       <p>Attempts: {word.milog_attempts}</p>
                     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -20,7 +20,7 @@ interface PlayerArchetypeBadgeProps {
  * Neo-Brutalist Player Archetype Badge
  * Displays a player's personality archetype with icon and name
  */
-const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
+const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
   archetype,
   size = 'md',
   showTooltip = true,
@@ -336,6 +336,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       {showTooltip && isMounted && createPortal(tooltipContent, document.body)}
     </div>
   );
-};
+});
+
+PlayerArchetypeBadge.displayName = 'PlayerArchetypeBadge';
 
 export default PlayerArchetypeBadge;

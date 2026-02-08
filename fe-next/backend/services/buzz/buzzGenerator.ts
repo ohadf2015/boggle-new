@@ -4,7 +4,7 @@
  * Uses Google Vertex AI Gemini for puzzle generation + Imagen for images
  */
 
-import { getTrendsFromDbCache, fetchGoogleTrends, storeTrendsInDbCache } from '../serpApiClient';
+import { getTrendsFromDbCache, fetchGoogleTrends, storeTrendsInDbCache, getRemainingMonthlyBudget } from '../serpApiClient';
 import {
   generateChallengeImage,
   checkImageCache,
@@ -205,8 +205,19 @@ export async function generateDailyBuzz(
     if (!trends || trends.length === 0) {
       console.log('[BUZZ] No cached trends, fetching fresh from SERP API...');
       try {
-        // Enrich trends with news articles for better context (only for top 5 trends to save API quota)
-        const enrichWithNews = true;
+        // Determine enrichment: env var OR feature flag, auto-disabled by budget monitor
+        const enrichFlag = await isFeatureFlagEnabled('daily_buzz_enrichment');
+        let enrichWithNews = enrichFlag || process.env.BUZZ_ENRICH_NEWS === 'true';
+
+        // Auto-disable enrichment if nearing monthly budget (enrichment adds ~10 calls)
+        if (enrichWithNews) {
+          const remaining = await getRemainingMonthlyBudget();
+          if (remaining < 11) {
+            console.warn(`[BUZZ] Auto-disabling enrichment: only ${remaining} SERP calls remaining this month`);
+            enrichWithNews = false;
+          }
+        }
+
         trends = await fetchGoogleTrends(region, language, enrichWithNews);
         if (!trends || trends.length === 0) {
           console.warn('[BUZZ] No trends returned from SERP API, will use fallback topics');

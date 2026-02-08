@@ -138,17 +138,13 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
       <div
         className={cn(
           'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
-          'bg-neo-navy'
+          'bg-neo-navy',
+          '-rotate-[0.5deg]'
         )}
-        style={{ transform: 'rotate(-0.5deg)' }}
       >
         {/* Halftone texture */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-            backgroundSize: '8px 8px',
-          }}
+          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]"
         />
 
         <div className="relative z-10 p-4 sm:p-5">

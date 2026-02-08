@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -27,7 +27,7 @@ interface FloatingCoinAnimationProps {
  * FloatingCoinAnimation - Animated coins flying from source to top-right corner
  * Used for combo milestone rewards to show coins being earned
  */
-const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
+const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
   coinAmount,
   startPosition,
   onAnimationComplete,
@@ -264,6 +264,8 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
       </div>
     </AnimatePresence>
   );
-};
+});
+
+FloatingCoinAnimation.displayName = 'FloatingCoinAnimation';
 
 export default FloatingCoinAnimation;

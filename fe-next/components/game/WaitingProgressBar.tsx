@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, CheckCircle2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,7 @@ const DEFAULT_MILESTONES: Milestone[] = [
   { count: 5, label: 'Full house!' },
 ];
 
-export function WaitingProgressBar({ currentPlayers, t, className }: WaitingProgressBarProps) {
+export const WaitingProgressBar = memo<WaitingProgressBarProps>(function WaitingProgressBar({ currentPlayers, t, className }) {
   const milestones = useMemo(() => [
     { count: 1, label: t('waiting.milestoneFirst') || 'First player!' },
     { count: 3, label: t('waiting.milestoneParty') || 'Party starting!' },
@@ -144,6 +144,8 @@ export function WaitingProgressBar({ currentPlayers, t, className }: WaitingProg
       </AnimatePresence>
     </div>
   );
-}
+});
+
+WaitingProgressBar.displayName = 'WaitingProgressBar';
 
 export default WaitingProgressBar;

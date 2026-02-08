@@ -8,6 +8,7 @@
  * Uses gradients, glow effects, and neo-brutalist styling.
  */
 
+import { memo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -296,7 +297,7 @@ function getThemeColors(nameKey: string, isHoliday: boolean): ThemeColors {
   return THEME_COLORS[nameKey] || (isHoliday ? DEFAULT_HOLIDAY_COLORS : DEFAULT_REGULAR_COLORS);
 }
 
-export function ThemeIndicator({ theme, className = '' }: ThemeIndicatorProps) {
+export const ThemeIndicator = memo<ThemeIndicatorProps>(function ThemeIndicator({ theme, className = '' }) {
   const { t } = useLanguage();
 
   if (!theme) return null;
@@ -325,14 +326,12 @@ export function ThemeIndicator({ theme, className = '' }: ThemeIndicatorProps) {
       {/* Shimmer overlay for holidays */}
       {isHoliday && (
         <motion.div
-          className="absolute inset-0 rounded-[5px] pointer-events-none overflow-hidden"
-          style={{ opacity: 0.15 }}
+          className="absolute inset-0 rounded-[5px] pointer-events-none overflow-hidden opacity-[0.15]"
         >
           <motion.div
-            className="absolute inset-0"
+            className="absolute inset-0 w-[200%]"
             style={{
               background: `linear-gradient(90deg, transparent 0%, ${colors.accent} 50%, transparent 100%)`,
-              width: '200%',
             }}
             animate={{ x: ['-100%', '100%'] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
@@ -379,6 +378,8 @@ export function ThemeIndicator({ theme, className = '' }: ThemeIndicatorProps) {
       `}</style>
     </motion.div>
   );
-}
+});
+
+ThemeIndicator.displayName = 'ThemeIndicator';
 
 export default ThemeIndicator;

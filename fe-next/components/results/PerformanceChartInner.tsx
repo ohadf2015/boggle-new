@@ -357,17 +357,13 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
         className={cn(
           'bg-neo-navy',
           'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
+          '-rotate-[0.5deg]',
           className
         )}
-        style={{ transform: 'rotate(-0.5deg)' }}
       >
         {/* Halftone texture overlay - matching the main chart */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-            backgroundSize: '8px 8px',
-          }}
+          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]"
         />
 
         <div className="relative z-10 p-4">
@@ -478,17 +474,13 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
       className={cn(
         'bg-neo-navy',
         'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
+        '-rotate-[0.5deg]',
         className
       )}
-      style={{ transform: 'rotate(-0.5deg)' }}
     >
       {/* Halftone texture overlay */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.04]"
-        style={{
-          backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-          backgroundSize: '8px 8px',
-        }}
+        className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]"
       />
 
       <div className="relative z-10 p-4">

@@ -4,6 +4,7 @@ import React, { memo, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { cn } from '@/lib/utils';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
 import Avatar from '../../../components/Avatar';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -99,17 +100,19 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
 
   return (
     <div
-      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden"
-      style={{ transform: compact ? 'none' : 'rotate(-1deg)' }}
+      className={cn(
+        'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden',
+        !compact && '-rotate-1'
+      )}
       data-tutorial="leaderboard"
     >
       <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
         <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-          <Trophy className="text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+          <Trophy className="text-neo-yellow drop-shadow-[2px_2px_0px_rgb(var(--neo-black))]" />
           {t('playerView.leaderboard')}
         </h3>
       </div>
-      <div ref={parentRef} className="overflow-y-auto overscroll-contain scrollable-area flex-1 p-3" style={{ maxHeight: compact ? '300px' : '400px' }}>
+      <div ref={parentRef} className={cn('overflow-y-auto overscroll-contain scrollable-area flex-1 p-3', compact ? 'max-h-[300px]' : 'max-h-[400px]')}>
         {useVirtual ? (
           // Virtual scrolling for large lists
           <div

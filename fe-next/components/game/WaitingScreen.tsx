@@ -248,11 +248,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
         <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg relative overflow-hidden">
           {/* Comic-style halftone dots */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03]"
-            style={{
-              backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-              backgroundSize: '12px 12px',
-            }}
+            className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,rgba(255,255,255,0.3)_1px,transparent_1px)] bg-[length:12px_12px]"
           />
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
             {/* Room Name, Code and Language */}
@@ -377,11 +373,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg relative overflow-hidden">
             {/* Comic-style halftone dots */}
             <div
-              className="absolute inset-0 pointer-events-none opacity-[0.025]"
-              style={{
-                backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-                backgroundSize: '12px 12px',
-              }}
+              className="absolute inset-0 pointer-events-none opacity-[0.025] bg-[radial-gradient(circle,rgba(255,255,255,0.3)_1px,transparent_1px)] bg-[length:12px_12px]"
             />
             <h3 className="text-lg font-black uppercase text-neo-cream mb-4 flex items-center gap-2 flex-shrink-0 relative z-10">
               <Users className="w-4 h-4 text-neo-pink" />

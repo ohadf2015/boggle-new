@@ -20,8 +20,7 @@ interface MilogWord {
   milog_url: string | null;
   milog_attempts: number;
   submission_count: number;
-  promoted_to_dictionary: boolean;
-  promoted_at: string | null;
+  approved_at: string | null;
 }
 
 /**
@@ -49,7 +48,7 @@ export async function GET(request: NextRequest) {
     // Build query - only fetch Hebrew words that have been processed by milog
     let query = supabase
       .from('invalid_word_submissions')
-      .select('id, word, milog_status, milog_verified_at, milog_url, milog_attempts, submission_count, promoted_to_dictionary, promoted_at', { count: 'exact' })
+      .select('id, word, milog_status, milog_verified_at, milog_url, milog_attempts, submission_count, approved_at', { count: 'exact' })
       .eq('language', 'he')
       .neq('milog_status', null); // Only words that have been verified
 
@@ -59,7 +58,7 @@ export async function GET(request: NextRequest) {
     } else if (status === 'not_found') {
       query = query.eq('milog_status', 'not_found');
     } else if (status === 'promoted') {
-      query = query.eq('promoted_to_dictionary', true);
+      query = query.not('approved_at', 'is', null);
     } else if (status === 'pending') {
       query = query.eq('milog_status', 'pending');
     }
@@ -90,7 +89,7 @@ export async function GET(request: NextRequest) {
     // Calculate stats
     const { data: statsData } = await supabase
       .from('invalid_word_submissions')
-      .select('milog_status, promoted_to_dictionary')
+      .select('milog_status, approved_at')
       .eq('language', 'he')
       .neq('milog_status', null);
 
@@ -98,7 +97,7 @@ export async function GET(request: NextRequest) {
       total: statsData?.length || 0,
       verified: statsData?.filter((w: { milog_status: MilogStatus }) => w.milog_status === 'verified').length || 0,
       notFound: statsData?.filter((w: { milog_status: MilogStatus }) => w.milog_status === 'not_found').length || 0,
-      promoted: statsData?.filter((w: { promoted_to_dictionary: boolean }) => w.promoted_to_dictionary === true).length || 0,
+      promoted: statsData?.filter((w: { approved_at: string | null }) => w.approved_at !== null).length || 0,
       pending: statsData?.filter((w: { milog_status: MilogStatus }) => w.milog_status === 'pending').length || 0,
     };
 

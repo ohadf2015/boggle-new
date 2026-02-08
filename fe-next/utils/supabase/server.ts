@@ -26,6 +26,14 @@ export async function createClient(): Promise<SupabaseClient> {
     },
     auth: {
       flowType: 'pkce'
-    }
+    },
+    global: {
+      fetch: (url, options = {}) => {
+        return fetch(url, {
+          ...options,
+          signal: options.signal ?? AbortSignal.timeout(10000),
+        })
+      },
+    },
   })
 }

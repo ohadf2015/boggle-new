@@ -7,7 +7,7 @@
  * ONLY include providers that are needed on EVERY page
  */
 
-import React, { useEffect, ReactNode } from 'react';
+import React, { useEffect, useMemo, ReactNode } from 'react';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -134,24 +134,31 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
         };
     }, []);
 
+    // Memoize children so that when active providers (Music, SoundEffects, Haptics)
+    // change state, the children tree reference stays stable and React.memo'd
+    // components below don't re-render unnecessarily.
+    const memoizedChildren = useMemo(() => children, [children]);
+
     return (
         <ErrorBoundary>
+            {/* Stable tier: rarely changes */}
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang}>
                     <AuthProvider>
-                        <MusicProvider>
-                            <SoundEffectsProvider>
-                                <HapticsProvider>
-                                    <AccessibilityProvider>
-                                        <MotionConfigProvider>
+                        <AccessibilityProvider>
+                            <MotionConfigProvider>
+                                {/* Active tier: changes during gameplay */}
+                                <MusicProvider>
+                                    <SoundEffectsProvider>
+                                        <HapticsProvider>
                                             <NavigationProvider>
-                                                {children}
+                                                {memoizedChildren}
                                             </NavigationProvider>
-                                        </MotionConfigProvider>
-                                    </AccessibilityProvider>
-                                </HapticsProvider>
-                            </SoundEffectsProvider>
-                        </MusicProvider>
+                                        </HapticsProvider>
+                                    </SoundEffectsProvider>
+                                </MusicProvider>
+                            </MotionConfigProvider>
+                        </AccessibilityProvider>
                     </AuthProvider>
                 </LanguageProvider>
             </ThemeProvider>

@@ -95,18 +95,22 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     const supabase = await createClient();
 
-    // Get authenticated user if available
-    const { data: { user } } = await supabase.auth.getUser();
+    // Fetch user auth and puzzle in parallel
+    const [authResult, puzzleResult] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase
+        .from('custom_puzzles')
+        .select('id, puzzle_code, target_word, creator_id, creator_guest_fingerprint, creator_efficiency_score')
+        .eq('puzzle_code', puzzleCode.toLowerCase())
+        .single(),
+    ]);
+
+    const user = authResult.data?.user;
     const { data: profileData } = user
       ? await supabase.from('profiles').select('avatar_emoji, avatar_color, avatar_image, profile_picture_url').eq('id', user.id).single()
       : { data: null };
 
-    // Fetch the puzzle to verify it exists
-    const { data: puzzle, error: puzzleError } = await supabase
-      .from('custom_puzzles')
-      .select('id, puzzle_code, target_word, creator_id, creator_guest_fingerprint, creator_efficiency_score')
-      .eq('puzzle_code', puzzleCode.toLowerCase())
-      .single();
+    const { data: puzzle, error: puzzleError } = puzzleResult;
 
     if (puzzleError || !puzzle) {
       return NextResponse.json(
