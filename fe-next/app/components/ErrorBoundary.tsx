@@ -44,6 +44,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    // Skip Sentry capture for chunk load errors (stale deployment)
+    // These are already filtered in ignoreErrors but bypass it via captureMessage
+    if (this.isChunkLoadError(error)) {
+      this.setState({ error, errorInfo });
+      return;
+    }
+
     logger.error('ErrorBoundary caught an error:', error, errorInfo);
 
     captureError(error, {
@@ -59,6 +66,19 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       error,
       errorInfo
     });
+  }
+
+  isChunkLoadError(error: Error | null): boolean {
+    if (!error) return false;
+    const message = error.message?.toLowerCase() || '';
+    const name = error.name?.toLowerCase() || '';
+    if (name === 'chunkloaderror') return true;
+    return (
+      message.includes('loading chunk') ||
+      message.includes('loading css chunk') ||
+      message.includes('failed to load chunk') ||
+      (message.includes('failed to fetch dynamically imported module') && message.includes('_next/'))
+    );
   }
 
   handleReset = (): void => {

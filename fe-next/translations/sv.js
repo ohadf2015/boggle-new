@@ -436,7 +436,8 @@ const sv = {
     "scanQrCode": "Skanna för att gå med direkt",
     "orShareVia": "Eller dela via",
     "telegram": "Telegram",
-    "moreWays": "Fler sätt att dela"
+    "moreWays": "Fler sätt att dela",
+    "invite": "Bjud in"
   },
   "errors": {
     "unstableConnection": "Anslutningen vinglar - kopplar upp dig...",
@@ -698,6 +699,7 @@ const sv = {
     "host": "Värd",
     "inviteFriends": "Bjud in vänner att spela!",
     "inviteWarriors": "Bjud in krigare",
+    "invitePlayer": "Bjud in spelare",
     "battleFeed": "Stridsflöde",
     "hostIs": "Värd är",
     "playersJoined": "Spelare",

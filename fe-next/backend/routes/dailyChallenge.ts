@@ -734,7 +734,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       .not('player_id', 'is', null);
 
     if (countError) {
-      logger.warn('API', `Word Hunt leaderboard count error: ${countError.message}`);
+      logger.warn('API', `Word Hunt leaderboard count error: ${countError.message || countError.code || 'Unknown'}`, { code: countError.code, details: countError.details, hint: countError.hint });
     }
 
     // Get total players count (ALL players who attempted - authenticated + guests)
@@ -745,7 +745,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       .eq('language', language);
 
     if (totalPlayersError) {
-      logger.warn('API', `Word Hunt total players count error: ${totalPlayersError.message}`);
+      logger.warn('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`, { code: totalPlayersError.code, details: totalPlayersError.details });
     }
 
     // Get total solved count (ALL players who solved - authenticated + guests)
@@ -757,7 +757,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       .eq('solved', true);
 
     if (totalSolvedError) {
-      logger.warn('API', `Word Hunt total solved count error: ${totalSolvedError.message}`);
+      logger.warn('API', `Word Hunt total solved count error: ${totalSolvedError.message || totalSolvedError.code || 'Unknown'}`, { code: totalSolvedError.code, details: totalSolvedError.details });
     }
 
     // Get guest player count (players who solved but are not authenticated)
@@ -771,7 +771,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       .not('guest_fingerprint', 'is', null);
 
     if (guestSolvedError) {
-      logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message}`);
+      logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message || guestSolvedError.code || 'Unknown'}`, { code: guestSolvedError.code, details: guestSolvedError.details });
     }
 
     // Calculate participant count - ensure we show at least as many as we have data rows

@@ -8,7 +8,9 @@ import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import BotControls from '../../components/BotControls';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
+import { useNativeShare } from '../../hooks/useNativeShare';
 import { cn } from '../../lib/utils';
+import { getJoinUrl, copyJoinUrl } from '../../utils/share';
 import { useSocket } from '../../utils/SocketContext';
 
 import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
@@ -212,6 +214,20 @@ function HostPreGameView({
 
   const isStartDisabled = !timerValue || filteredPlayersForDisplay.length === 0 || tournamentCreating;
 
+  // Share handler for empty player slots
+  const { tryNativeShare } = useNativeShare();
+  const handleEmptySlotClick = useCallback(async () => {
+    const joinUrl = getJoinUrl(gameCode, 'lobby-slot');
+    const shared = await tryNativeShare({
+      title: t('share.inviteTitle') || 'Join my LexiClash game!',
+      text: `${t('share.inviteMessage') || 'Join my LexiClash game!'}\n${t('share.code') || 'Code'}: ${gameCode}`,
+      url: joinUrl,
+    });
+    if (!shared) {
+      copyJoinUrl(gameCode, t, 'lobby-slot');
+    }
+  }, [gameCode, t, tryNativeShare]);
+
   // Avatar color palette for players without custom avatars
   const avatarColors = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
   const emptySlots = Math.max(0, Math.min(5, maxPlayers) - filteredPlayersForDisplay.length);
@@ -291,16 +307,21 @@ function HostPreGameView({
           })}
         </AnimatePresence>
 
-        {/* Empty Slots */}
+        {/* Empty Slots - click to share invite */}
         {Array.from({ length: emptySlots }).map((_, i) => (
-          <div key={`empty-${i}`} className="flex-shrink-0 flex flex-col items-center gap-2 pt-2">
-            <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center">
-              <Plus className="w-5 h-5 text-neo-cyan/50" />
+          <button
+            key={`empty-${i}`}
+            onClick={handleEmptySlotClick}
+            className="flex-shrink-0 flex flex-col items-center gap-2 pt-2 cursor-pointer group"
+            aria-label={t('hostView.invitePlayer') || 'Invite player'}
+          >
+            <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center group-hover:border-neo-cyan/60 group-hover:bg-white/10 transition-colors">
+              <Plus className="w-5 h-5 text-neo-cyan/50 group-hover:text-neo-cyan transition-colors" />
             </div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase">
-              {t('common.join') || 'Join'}
+            <span className="text-[10px] font-bold text-slate-600 uppercase group-hover:text-slate-400 transition-colors">
+              {t('share.invite') || 'Invite'}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </section>
@@ -509,9 +530,9 @@ function HostPreGameView({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95">
+      <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95 flex flex-col">
         {/* Desktop Layout: Two-column layout */}
-        <div className="hidden lg:block h-full">
+        <div className="hidden lg:flex lg:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
             leftContent={
               <>
@@ -559,7 +580,7 @@ function HostPreGameView({
         </div>
 
         {/* Mobile Layout: Single-scroll Command Center */}
-        <div className="lg:hidden h-full">
+        <div className="lg:hidden flex flex-col flex-1 min-h-0">
           {renderLobbyContent()}
         </div>
       </main>

@@ -436,7 +436,8 @@ const he = {
     "scanQrCode": "סרקו להצטרפות מיידית",
     "orShareVia": "או שתפו דרך",
     "telegram": "טלגרם",
-    "moreWays": "עוד דרכים לשתף"
+    "moreWays": "עוד דרכים לשתף",
+    "invite": "הזמנה"
   },
   "errors": {
     "unstableConnection": "החיבור מתנדנד - מחזירים אותך...",
@@ -709,6 +710,7 @@ const he = {
     "host": "מארח",
     "inviteFriends": "גייס את החבר'ה!",
     "inviteWarriors": "הזמן לוחמים",
+    "invitePlayer": "הזמן שחקן",
     "battleFeed": "עדכוני קרב",
     "hostIs": "המארח הוא",
     "playersJoined": "לוחמים",

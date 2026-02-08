@@ -435,7 +435,8 @@ const ja = {
     "scanQrCode": "スキャンして即参加",
     "orShareVia": "または共有",
     "telegram": "Telegram",
-    "moreWays": "他の共有方法"
+    "moreWays": "他の共有方法",
+    "invite": "招待"
   },
   "errors": {
     "unstableConnection": "接続がふらついてる - 戻すね...",
@@ -697,6 +698,7 @@ const ja = {
     "host": "ホスト",
     "inviteFriends": "友達を招待してプレイ！",
     "inviteWarriors": "戦士を招待",
+    "invitePlayer": "プレイヤーを招待",
     "battleFeed": "バトルフィード",
     "hostIs": "ホストは",
     "playersJoined": "プレイヤー",

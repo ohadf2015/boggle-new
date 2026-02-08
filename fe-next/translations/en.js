@@ -437,7 +437,8 @@ const en = {
     "scanQrCode": "Scan to join instantly",
     "orShareVia": "Or share via",
     "telegram": "Telegram",
-    "moreWays": "More ways to share"
+    "moreWays": "More ways to share",
+    "invite": "Invite"
   },
   "errors": {
     "unstableConnection": "Connection's wobbling - getting you back in...",
@@ -699,6 +700,7 @@ const en = {
     "preset": "Preset",
     "ofMaxWarriors": "of {{max}} warriors ready",
     "inviteWarriors": "Invite Warriors",
+    "invitePlayer": "Invite player",
     "battleFeed": "Battle Feed",
     "hostIs": "Host is",
     "roomCode": "Code",

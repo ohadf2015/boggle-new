@@ -435,7 +435,8 @@ const es = {
     "generating": "Generando...",
     "subtitle": "Reta a tus amigos a superar tu puntuación",
     "playAt": "Juega en",
-    "beatMyScore": "¿Puedes superarme?"
+    "beatMyScore": "¿Puedes superarme?",
+    "invite": "Invitar"
   },
   "consent": {
     "title": "Consentimiento de Padres",
@@ -772,6 +773,7 @@ const es = {
     "host": "Anfitrión",
     "inviteFriends": "¡Junta a tu crew!",
     "inviteWarriors": "Invitar guerreros",
+    "invitePlayer": "Invitar jugador",
     "battleFeed": "Feed de batalla",
     "hostIs": "Anfitrión es",
     "playersJoined": "Guerreros",
