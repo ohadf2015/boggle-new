@@ -427,6 +427,77 @@ export async function triggerDictionaryEnrichment(): Promise<{
 }
 
 /**
+ * Start Auto-Promotion cron
+ * Runs every 4 hours to promote words that meet confidence thresholds
+ * Uses dynamic import to avoid pulling backend-only deps into Next.js build
+ */
+export function startAutoPromotionCron() {
+  const task = cron.schedule('0 */4 * * *', async () => {
+    console.log('[CRON] Starting auto-promotion pipeline...');
+    const startTime = Date.now();
+
+    try {
+      const { runAutoPromotion } = await import('../modules/autoPromotion');
+      const result = await runAutoPromotion();
+      const duration = Date.now() - startTime;
+
+      if (result.skipped) {
+        console.log(`[CRON] Auto-promotion skipped (already running)`);
+      } else {
+        console.log(`[CRON] Auto-promotion complete in ${duration}ms: ${result.promoted} promoted, ${result.failed} failed`);
+        if (result.words.submissionBased.length > 0) {
+          console.log(`[CRON] Submission-based: ${result.words.submissionBased.join(', ')}`);
+        }
+        if (result.words.milogBased.length > 0) {
+          console.log(`[CRON] Milog-based: ${result.words.milogBased.join(', ')}`);
+        }
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`[CRON] Auto-promotion failed: ${errorMsg}`);
+    }
+  }, {
+    timezone: 'UTC',
+  });
+
+  console.log('Auto-promotion cron started (runs every 4 hours)');
+  return task;
+}
+
+/**
+ * Manual trigger for Auto-Promotion
+ * Used by admin dashboard
+ */
+export async function triggerAutoPromotion(): Promise<{
+  success: boolean;
+  result: { promoted: number; failed: number; skipped?: boolean; words: { submissionBased: string[]; milogBased: string[] } };
+  duration: number;
+  error?: string;
+}> {
+  console.log('[MANUAL] Starting manual auto-promotion...');
+  const startTime = Date.now();
+
+  try {
+    const { runAutoPromotion } = await import('../modules/autoPromotion');
+    const result = await runAutoPromotion();
+    const duration = Date.now() - startTime;
+    console.log(`[MANUAL] Auto-promotion complete in ${duration}ms`);
+
+    return { success: true, result, duration };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[MANUAL] Auto-promotion failed: ${errorMsg}`);
+
+    return {
+      success: false,
+      result: { promoted: 0, failed: 0, words: { submissionBased: [], milogBased: [] } },
+      duration: Date.now() - startTime,
+      error: errorMsg,
+    };
+  }
+}
+
+/**
  * Start all cron jobs
  * Called from server startup
  */
@@ -447,6 +518,9 @@ export function startAllCronJobs(): ScheduledTask[] {
 
   // Hebrew dictionary enrichment (04:00 UTC)
   tasks.push(startDictionaryEnrichmentCron());
+
+  // Auto-promotion pipeline (every 4 hours)
+  tasks.push(startAutoPromotionCron());
 
   console.log(`✅ All ${tasks.length} cron jobs started`);
   return tasks;

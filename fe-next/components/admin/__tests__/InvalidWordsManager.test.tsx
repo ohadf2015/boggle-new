@@ -144,9 +144,14 @@ import toast from 'react-hot-toast';
 describe('InvalidWordsManager', () => {
   const mockAuthToken = 'test-auth-token';
 
+  const mockAutoPromoteStatsResponse = {
+    autoPromoted: 5,
+    candidates: 3,
+    bySource: { submission_threshold: 3, milog_verified: 2 },
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset fetch mock before each test
     mockFetch.mockReset();
   });
 
@@ -269,6 +274,7 @@ describe('InvalidWordsManager', () => {
 
   it('calls approve API when approve button is clicked', async () => {
     mockFetch
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
       .mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockInvalidWordsResponse),
@@ -304,6 +310,7 @@ describe('InvalidWordsManager', () => {
 
   it('calls dismiss API when dismiss button is clicked', async () => {
     mockFetch
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
       .mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockInvalidWordsResponse),
@@ -413,6 +420,7 @@ describe('InvalidWordsManager', () => {
 
   it('removes word from list after successful approval', async () => {
     mockFetch
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
       .mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockInvalidWordsResponse),
@@ -525,6 +533,7 @@ describe('InvalidWordsManager', () => {
 
     it('removes word from selection after approval', async () => {
       mockFetch
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockAutoPromoteStatsResponse) })
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(mockInvalidWordsResponse),

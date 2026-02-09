@@ -5,3 +5,4 @@
  */
 
 export { BulkApproveButton } from './BulkApproveButton';
+export { AutoPromoteButton } from './AutoPromoteButton';

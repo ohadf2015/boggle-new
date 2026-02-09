@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Search, AlertTriangle, Check, X, ChevronLeft, ChevronRight, Filter
+  Search, AlertTriangle, Check, X, ChevronLeft, ChevronRight, Filter, Zap
 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BulkApproveButton } from './invalid-words';
+import { BulkApproveButton, AutoPromoteButton } from './invalid-words';
 
 interface InvalidWord {
   id: string;
@@ -64,6 +64,12 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
   const [total, setTotal] = useState(0);
   const [stats, setStats] = useState<Stats | null>(null);
   const [processing, setProcessing] = useState<string | null>(null);
+
+  // Auto-promote stats
+  const [autoPromoteStats, setAutoPromoteStats] = useState<{
+    autoPromoted: number;
+    candidates: number;
+  } | null>(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -133,6 +139,25 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
     }, 300);
     return () => clearTimeout(timer);
   }, [fetchWords]);
+
+  // Fetch auto-promote stats
+  const fetchAutoPromoteStats = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/invalid-words/auto-promote-stats', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAutoPromoteStats({ autoPromoted: data.autoPromoted, candidates: data.candidates });
+      }
+    } catch {
+      // Stats are non-critical
+    }
+  }, [authToken]);
+
+  useEffect(() => {
+    fetchAutoPromoteStats();
+  }, [fetchAutoPromoteStats]);
 
   // Clear selection when filters or pagination change
   useEffect(() => {
@@ -260,7 +285,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
     <div className="space-y-6">
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-slate-800 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -300,6 +325,24 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
+          {autoPromoteStats && (
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-500/20 rounded-lg">
+                    <Zap className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-400">Auto-Promoted / Candidates</p>
+                    <p className="text-2xl font-bold text-white">
+                      {autoPromoteStats.autoPromoted}
+                      <span className="text-base text-slate-400 ml-1">/ {autoPromoteStats.candidates}</span>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
@@ -383,6 +426,11 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               authToken={authToken}
               onComplete={() => { clearSelection(); fetchWords(); }}
               disabled={selectedIds.size === 0}
+            />
+            <AutoPromoteButton
+              candidateCount={autoPromoteStats?.candidates ?? 0}
+              authToken={authToken}
+              onComplete={() => { fetchWords(); fetchAutoPromoteStats(); }}
             />
           </div>
         </div>

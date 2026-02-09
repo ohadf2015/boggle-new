@@ -887,4 +887,91 @@ router.post('/invalid-words/dismiss', async (req: AdminRequest, res: Response): 
   }
 });
 
+/**
+ * POST /api/admin/invalid-words/auto-promote
+ * Trigger the auto-promotion pipeline manually
+ */
+router.post('/invalid-words/auto-promote', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const { triggerAutoPromotion } = await import('../../services/cronScheduler');
+    const { success, result, duration, error } = await triggerAutoPromotion();
+
+    auditLog(req.adminUser, 'AUTO_PROMOTE_TRIGGERED', {
+      promoted: result.promoted,
+      failed: result.failed,
+      submissionBased: result.words.submissionBased.length,
+      milogBased: result.words.milogBased.length,
+    });
+
+    if (!success) {
+      res.status(500).json({ error: error || 'Auto-promotion failed' });
+      return;
+    }
+
+    res.json({
+      promoted: result.promoted,
+      failed: result.failed,
+      words: result.words,
+      duration,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Auto-promote error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to run auto-promotion' });
+  }
+});
+
+/**
+ * GET /api/admin/invalid-words/auto-promote-stats
+ * Get auto-promotion statistics for the dashboard
+ */
+router.get('/invalid-words/auto-promote-stats', async (_req: AdminRequest, res: Response): Promise<void> => {
+  const supabase = getSupabase();
+
+  try {
+    // Count auto-promoted words
+    const { count: autoPromotedCount, error: countError } = await supabase
+      .from('invalid_word_submissions')
+      .select('*', { count: 'exact', head: true })
+      .not('auto_promoted_at', 'is', null);
+
+    if (countError) throw countError;
+
+    // Count by source
+    const { data: bySource, error: sourceError } = await supabase
+      .from('invalid_word_submissions')
+      .select('auto_promoted_by')
+      .not('auto_promoted_at', 'is', null);
+
+    if (sourceError) throw sourceError;
+
+    const sourceCounts: Record<string, number> = {};
+    for (const row of bySource || []) {
+      const source = row.auto_promoted_by || 'unknown';
+      sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+    }
+
+    // Count current candidates (eligible for auto-promotion)
+    const { count: candidateCount, error: candidateError } = await supabase
+      .from('invalid_word_submissions')
+      .select('*', { count: 'exact', head: true })
+      .eq('reason', 'not_in_dictionary')
+      .is('approved_at', null)
+      .is('auto_promoted_at', null)
+      .gte('submission_count', 10);
+
+    if (candidateError) throw candidateError;
+
+    res.json({
+      autoPromoted: autoPromotedCount || 0,
+      candidates: candidateCount || 0,
+      bySource: sourceCounts,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Auto-promote stats error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch auto-promote stats' });
+  }
+});
+
 export default router;
