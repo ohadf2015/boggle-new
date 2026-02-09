@@ -483,12 +483,16 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
         return;
       }
 
-      // If solved, verify the last attempt matches the target word
+      // If solved, verify that at least one attempt matches the target word.
+      // We check ANY attempt (not just the last) because Survival mode appends
+      // discovery attempts after the winning guess.
       if (solved && attemptWords && attemptWords.length > 0) {
-        const lastAttempt = attemptWords[attemptWords.length - 1];
-        const normalizedLastAttempt = normalizeWordForComparison(lastAttempt.word, language as Language);
-        if (normalizedLastAttempt !== expectedTargetWord) {
-          logger.info('API', `Word Hunt validation failed: solved=true but last attempt "${lastAttempt.word}" doesn't match target "${expectedTargetWord}"`);
+        const hasMatchingAttempt = attemptWords.some((a) => {
+          const normalized = normalizeWordForComparison(a.word, language as Language);
+          return normalized === expectedTargetWord;
+        });
+        if (!hasMatchingAttempt) {
+          logger.info('API', `Word Hunt validation failed: solved=true but no attempt matches target "${expectedTargetWord}"`);
           res.status(400).json({ error: 'Invalid solve claim' });
           return;
         }
@@ -500,7 +504,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       await ensureLanguageLoaded(language as Language);
 
       if (!isWordValidForDailyChallenge(expectedTargetWord, language as Language)) {
-        logger.warn('API', `[WordHunt Advisory] Target word "${expectedTargetWord}" not found in dictionary for language ${language} - allowing submission`);
+        logger.info('API', `[WordHunt Advisory] Target word "${expectedTargetWord}" not found in dictionary for language ${language} - allowing submission`);
       }
 
       if (attemptWords && attemptWords.length > 0) {
@@ -512,7 +516,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
           }
         }
         if (invalidWords.length > 0) {
-          logger.warn('API', `[WordHunt Advisory] Invalid words in submission: ${invalidWords.join(', ')} for language ${language} - allowing submission`);
+          logger.info('API', `[WordHunt Advisory] Invalid words in submission: ${invalidWords.join(', ')} for language ${language} - allowing submission`);
         }
       }
     } catch (validationError) {

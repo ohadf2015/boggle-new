@@ -44,3 +44,4 @@ fe-next/app-debug.apk
 # Temporary files
 tmp/
 fe-next/tmp/
+.vercel

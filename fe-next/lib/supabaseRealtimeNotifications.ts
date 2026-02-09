@@ -107,8 +107,8 @@ export async function markNotificationRead(notificationId: string): Promise<bool
       method: 'POST',
     });
     return response.ok;
-  } catch (error) {
-    console.error('Error marking notification as read:', error);
+  } catch {
+    // Network failures (e.g. "Failed to fetch") are transient and non-critical
     return false;
   }
 }
@@ -128,8 +128,8 @@ export async function markAllNotificationsRead(): Promise<{ success: boolean; co
 
     const data = await response.json();
     return { success: true, count: data.count || 0 };
-  } catch (error) {
-    console.error('Error marking all notifications as read:', error);
+  } catch {
+    // Network failures are transient and non-critical
     return { success: false, count: 0 };
   }
 }
