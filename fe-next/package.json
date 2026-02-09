@@ -136,7 +136,9 @@
     "ws": "^8.18.3",
     "xstate": "^5.24.0",
     "zod": "^4.1.13",
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.10",
+    "cross-env": "^10.1.0",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.1",
@@ -160,7 +162,6 @@
     "@types/supertest": "^6.0.3",
     "baseline-browser-mapping": "^2.9.19",
     "bundlewatch": "^0.4.1",
-    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "husky": "^9.1.7",
@@ -171,7 +172,6 @@
     "rimraf": "^6.1.2",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
-    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-language-server": "^5.1.3"
   },
