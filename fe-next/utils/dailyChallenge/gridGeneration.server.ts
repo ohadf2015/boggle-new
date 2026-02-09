@@ -33,7 +33,7 @@ async function fetchDailyPuzzleData(
 ): Promise<DailyPuzzleData | null> {
   try {
     // Dynamic import to prevent bundling server-only code
-    const { getSupabase, isSupabaseConfigured } = await import('@/backend/modules/supabaseServer');
+    const { getSupabase, isSupabaseConfigured } = await import('@/backend/modules/supabase/client');
 
     if (!isSupabaseConfigured()) {
       return null;
@@ -77,7 +77,7 @@ async function saveGridToDatabase(
 ): Promise<boolean> {
   try {
     // Dynamic import to prevent bundling server-only code
-    const { getSupabase, isSupabaseConfigured } = await import('@/backend/modules/supabaseServer');
+    const { getSupabase, isSupabaseConfigured } = await import('@/backend/modules/supabase/client');
 
     if (!isSupabaseConfigured()) {
       return false;

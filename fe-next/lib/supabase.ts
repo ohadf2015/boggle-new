@@ -322,37 +322,31 @@ export interface CoinSyncResult {
 
 /**
  * Sync coins to the database (add coins to user's balance)
- * This should be called after awarding coins locally to persist them
- * Uses RPC for atomic operation (single query instead of 3)
+ * Proxied through /api/coins for server-side validation and audit trail.
+ * Server determines userId from session cookie - no client-side userId needed.
  */
 export async function syncCoinsToDatabase(
-  userId: string,
+  _userId: string,
   amount: number,
   reason: string,
   metadata?: Record<string, string | number>
 ): Promise<CoinSyncResult> {
-  if (!supabase) return { success: false, error: 'Supabase not configured' };
   if (amount <= 0) return { success: false, error: 'Amount must be positive' };
 
   try {
-    const { data, error } = await supabase.rpc('sync_coins', {
-      p_user_id: userId,
-      p_amount: amount,
-      p_reason: reason,
-      p_metadata: metadata || {}
+    const res = await fetch('/api/coins', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, reason, metadata }),
     });
 
-    if (error) {
-      logger.error('Coin sync RPC error:', error);
-      return { success: false, error: error.message };
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      logger.error('Coin sync API error:', data.error);
+      return { success: false, error: data.error || 'Failed to sync coins' };
     }
 
-    const result = data?.[0];
-    if (!result?.success) {
-      return { success: false, error: result?.error_message || 'Unknown error' };
-    }
-
-    return { success: true, newBalance: result.new_balance };
+    return { success: true, newBalance: data.newBalance };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Coin sync error:', error);
@@ -362,38 +356,31 @@ export async function syncCoinsToDatabase(
 
 /**
  * Spend coins from user's balance (deduct coins)
- * Returns success if user has enough coins, false otherwise
- * Uses RPC for atomic operation (single query instead of 3)
+ * Proxied through /api/coins for server-side validation and audit trail.
+ * Server determines userId from session cookie - no client-side userId needed.
  */
 export async function spendCoinsFromDatabase(
-  userId: string,
+  _userId: string,
   amount: number,
   reason: string,
   metadata?: Record<string, string | number>
 ): Promise<CoinSyncResult> {
-  if (!supabase) return { success: false, error: 'Supabase not configured' };
   if (amount <= 0) return { success: false, error: 'Amount must be positive' };
 
   try {
-    // Use negative amount for spending
-    const { data, error } = await supabase.rpc('sync_coins', {
-      p_user_id: userId,
-      p_amount: -amount,
-      p_reason: reason,
-      p_metadata: metadata || {}
+    const res = await fetch('/api/coins', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: -amount, reason, metadata }),
     });
 
-    if (error) {
-      logger.error('Coin spend RPC error:', error);
-      return { success: false, error: error.message };
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      logger.error('Coin spend API error:', data.error);
+      return { success: false, error: data.error || 'Failed to spend coins' };
     }
 
-    const result = data?.[0];
-    if (!result?.success) {
-      return { success: false, error: result?.error_message || 'Unknown error' };
-    }
-
-    return { success: true, newBalance: result.new_balance };
+    return { success: true, newBalance: data.newBalance };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     return { success: false, error };
@@ -402,22 +389,17 @@ export async function spendCoinsFromDatabase(
 
 /**
  * Get user's coin balance from database
+ * Proxied through /api/coins for server-side auth.
  */
-export async function getDatabaseCoinBalance(userId: string): Promise<{ coins: number; lifetime: number } | null> {
-  if (!supabase) return null;
-
+export async function getDatabaseCoinBalance(_userId: string): Promise<{ coins: number; lifetime: number } | null> {
   try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('total_coins, lifetime_coins_earned')
-      .eq('id', userId)
-      .single();
+    const res = await fetch('/api/coins');
+    if (!res.ok) return null;
 
-    if (error || !data) return null;
-
+    const data = await res.json();
     return {
-      coins: data.total_coins || 0,
-      lifetime: data.lifetime_coins_earned || 0
+      coins: data.coins || 0,
+      lifetime: data.lifetime || 0,
     };
   } catch {
     return null;
