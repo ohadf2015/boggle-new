@@ -510,7 +510,7 @@ const SinglePlayerView: React.FC = () => {
         <PreGameTutorial onComplete={handleTutorialComplete} />
       )}
 
-      <main className="w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden">
+      <div className="w-full px-2 sm:px-3 lg:px-4 landscape-content overflow-x-hidden">
         {phase === 'playing' && (
           <SinglePlayerGame
             settings={gameState}
@@ -540,7 +540,7 @@ const SinglePlayerView: React.FC = () => {
             )}
           </>
         )}
-      </main>
+      </div>
     </div>
   );
 };

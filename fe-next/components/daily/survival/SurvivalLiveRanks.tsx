@@ -42,18 +42,24 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
 }) => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [totalPlayers, setTotalPlayers] = useState(0);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const fetchLeaderboard = useCallback(async () => {
     try {
       const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=10`;
       const response = await fetch(url);
-      if (!response.ok) return;
+      if (!response.ok) {
+        setHasLoaded(true);
+        return;
+      }
 
       const data = await response.json();
       setEntries(data.data || []);
       setTotalPlayers(data.totalPlayers || data.totalParticipants || 0);
     } catch {
       // Silently fail - leaderboard is non-critical during gameplay
+    } finally {
+      setHasLoaded(true);
     }
   }, [puzzleDate, language]);
 
@@ -144,7 +150,11 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
         {entries.length === 0 && (
           <div className="flex flex-col items-center justify-center py-8 text-neo-cream/40">
             <Trophy className="w-8 h-8 mb-2 opacity-50" />
-            <span className="text-sm">Loading...</span>
+            <span className="text-sm">
+              {hasLoaded
+                ? (t('wordHunt.desktop.beFirst') || 'Be the first to rank!')
+                : (t('common.loading') || 'Loading...')}
+            </span>
           </div>
         )}
       </div>

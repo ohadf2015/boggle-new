@@ -388,6 +388,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 "transition-all duration-100"
                             )}
                             aria-label={t('gift.youHaveGifts') || `You have ${unclaimedCount} unclaimed gift${unclaimedCount !== 1 ? 's' : ''}`}
+                            title={t('gift.gifts') || 'Gifts'}
                         >
                             <Gift size={20} />
                             <GiftNotificationBadge count={unclaimedCount} />
@@ -429,6 +430,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "transition-all duration-100"
                         )}
                         aria-label={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
+                        title={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
                         aria-expanded={showMobileMenu}
                     >
                         {showMobileMenu ? (

@@ -36,7 +36,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
 
           {/* Site Links - min-h-[44px] for touch targets */}
           <nav
-            className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center sm:justify-start"
+            className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center sm:justify-start"
             role="navigation"
             aria-label="Footer navigation"
           >

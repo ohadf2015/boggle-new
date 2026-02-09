@@ -1,10 +1,83 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+/**
+ * Fallback text input mode when SPOT ON puzzle has no multiple-choice options.
+ * Lets the user type the answer instead of picking from a list.
+ */
+function SpotOnTextFallback({
+  prompt,
+  hint,
+  showHint,
+  onAnswer,
+  t,
+}: {
+  prompt: string;
+  hint?: string;
+  showHint: boolean;
+  onAnswer: (answer: string) => void;
+  t: (key: string) => string;
+}) {
+  const [input, setInput] = useState('');
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <motion.h2
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-2xl md:text-3xl font-black text-white mb-2 leading-relaxed"
+        >
+          {prompt}
+        </motion.h2>
+      </div>
+
+      {showHint && hint && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
+        >
+          <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
+            {t('buzz.hint')}
+          </div>
+          <p className="text-white text-sm">{hint}</p>
+        </motion.div>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="space-y-3"
+      >
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && input.trim()) onAnswer(input.trim());
+          }}
+          placeholder={t('buzz.typeYourAnswer') || 'Type your answer...'}
+          className="w-full py-4 px-5 text-lg font-bold bg-slate-800 border-2 border-slate-600 focus:border-neo-cyan rounded-xl text-white placeholder:text-slate-500 outline-none transition-colors"
+          autoFocus
+        />
+        <Button
+          onClick={() => input.trim() && onAnswer(input.trim())}
+          disabled={!input.trim()}
+          className="w-full py-6 text-lg font-black uppercase bg-neo-yellow text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {t('buzz.submit')}
+        </Button>
+      </motion.div>
+    </div>
+  );
+}
 
 interface SpotOnChallengeProps {
   challenge: {
@@ -38,25 +111,16 @@ export default function SpotOnChallenge({
 
   const options = challenge.options || [];
 
-  // Defensive check: If no options provided, show error state
+  // Fallback: If no options provided, show text input mode instead of error
   if (options.length === 0) {
     return (
-      <div className="space-y-6 text-center">
-        <div className="text-4xl mb-4">⚠️</div>
-        <h2 className="text-2xl font-black text-neo-red">
-          {t('buzz.error.noOptions')}
-        </h2>
-        <p className="text-slate-400">
-          {challenge.prompt}
-        </p>
-        <Button
-          onClick={() => onAnswer('')}
-          variant="outline"
-          className="mt-4"
-        >
-          {t('buzz.skip')}
-        </Button>
-      </div>
+      <SpotOnTextFallback
+        prompt={challenge.prompt}
+        hint={challenge.hint}
+        showHint={showHint}
+        onAnswer={onAnswer}
+        t={t}
+      />
     );
   }
 

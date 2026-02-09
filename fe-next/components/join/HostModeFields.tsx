@@ -277,7 +277,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                     if (hostUsernameError) setHostUsernameError(false);
                     hostUsernameInputRef.current?.focus();
                   }}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   aria-label={t('common.clear') || 'Clear'}
                 >
                   <X className="h-4 w-4" />
@@ -329,7 +329,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                   onClick={generateRoomCode}
                   size="icon"
                   aria-label={t('joinView.generateNewCode') || 'Generate new room code'}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400"
                 >
                   <Dices className="text-sm" />
                 </Button>

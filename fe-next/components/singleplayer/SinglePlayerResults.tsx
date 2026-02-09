@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { AchievementBadge } from '@/components/AchievementBadge';
-import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
+
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import MissedWords from '@/components/results/MissedWords';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
@@ -18,8 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { Button } from '@/components/ui/button';
-import type { SinglePlayerResultsData, SinglePlayerMode, SinglePlayerAchievement } from './SinglePlayerView';
-import type { AchievementPayload } from '@/shared/types/socket';
+import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
   useResultsData,
   useGuestStatsSync,
@@ -82,52 +81,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';
   const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
 
-  // Achievement notification queue
-  const [achievementQueue, setAchievementQueue] = useState<AchievementPayload[]>([]);
-  const [currentAchievement, setCurrentAchievement] = useState<AchievementPayload | null>(null);
-  const achievementQueueRef = useRef<AchievementPayload[]>([]);
-  const isDisplayingAchievementRef = useRef<boolean>(false);
-
-  const convertToPayload = useCallback((achievement: SinglePlayerAchievement): AchievementPayload => ({
-    key: achievement.key,
-    icon: achievement.icon,
-  }), []);
-
-  const processNextAchievement = useCallback(() => {
-    if (achievementQueueRef.current.length === 0) {
-      isDisplayingAchievementRef.current = false;
-      setCurrentAchievement(null);
-      return;
-    }
-    isDisplayingAchievementRef.current = true;
-    const [next, ...rest] = achievementQueueRef.current;
-    setAchievementQueue(rest);
-    setCurrentAchievement(next ?? null);
-  }, []);
-
-  const handleAchievementComplete = useCallback(() => {
-    setTimeout(() => processNextAchievement(), 500);
-  }, [processNextAchievement]);
-
-  useEffect(() => {
-    achievementQueueRef.current = achievementQueue;
-  }, [achievementQueue]);
-
-  useEffect(() => {
-    if (results.achievements && results.achievements.length > 0) {
-      const payloads = results.achievements.map(convertToPayload);
-      setAchievementQueue(payloads);
-      if (!isDisplayingAchievementRef.current && payloads.length > 0) {
-        setTimeout(() => {
-          if (!isDisplayingAchievementRef.current && achievementQueueRef.current.length > 0) {
-            processNextAchievement();
-          }
-        }, 100);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const playerAvatar = useMemo(() => {
     if (!profile) return undefined;
     return {
@@ -167,7 +120,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { brainPointsReward } = useCognitiveScoring({ userId: user?.id, mode, results });
 
   const { showSignupModal, setShowSignupModal } = useSignupPrompt({
-    isAuthenticated, hasUser: !!user, authLoading, disabled: !!currentAchievement,
+    isAuthenticated, hasUser: !!user, authLoading,
   });
 
   useAchievementsSave({ isAuthenticated, profile, results, updateProfile });
@@ -178,7 +131,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     botWordsForValidation: results.botWordsForValidation,
     gameSessionId: results.gameSessionId,
     language: results.language,
-    disabled: showSignupModal || !!currentAchievement,
+    disabled: showSignupModal,
   });
 
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
@@ -255,9 +208,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" className="mt-auto" />
         </div>
-        {currentAchievement && (
-          <UnifiedAchievementModal type="socket" achievement={currentAchievement} onClose={handleAchievementComplete} />
-        )}
         <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
         <TrainingAnalysisModal isOpen={showTrainingAnalysis} onClose={() => setShowTrainingAnalysis(false)} returnTo={null} />
       </div>
@@ -277,6 +227,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             score={results.playerScore}
             wordCount={validWordCount}
             accuracy={accuracy}
+            totalWords={totalAttempts}
             coinReward={coinReward}
             isAuthenticated={isAuthenticated}
             variant={bannerConfig.variant}
@@ -444,9 +395,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           onSkip={() => setShowWordValidation(false)}
           onTimeout={() => setShowWordValidation(false)}
         />
-      )}
-      {currentAchievement && (
-        <UnifiedAchievementModal type="socket" achievement={currentAchievement} onClose={handleAchievementComplete} />
       )}
       <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
       <TrainingAnalysisModal isOpen={showTrainingAnalysis} onClose={() => setShowTrainingAnalysis(false)} returnTo={null} />

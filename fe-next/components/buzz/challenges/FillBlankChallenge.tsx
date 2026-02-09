@@ -184,9 +184,9 @@ export default function FillBlankChallenge({
               <span className="text-slate-500"> + </span>
             </>
           )}
-          <span className="font-bold text-neo-yellow">{filledCount}</span>
+          <span className="font-bold text-neo-yellow">{showFirstLetterHint ? filledCount + 1 : filledCount}</span>
           <span className="text-slate-500"> / </span>
-          <span className="font-bold text-neo-yellow">{remainingLength}</span>
+          <span className="font-bold text-neo-yellow">{answerLength}</span>
           {' '}{t('buzz.letters')}
         </motion.div>
       </div>
@@ -223,7 +223,7 @@ export default function FillBlankChallenge({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
-        className="flex flex-wrap justify-center gap-2 sm:gap-3 py-4"
+        className={`flex flex-wrap justify-center py-4 ${answerLength > 8 ? 'gap-1 sm:gap-1.5' : 'gap-2 sm:gap-3'}`}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         {/* First Letter (revealed as hint) - only show when first letter hint is enabled */}
@@ -235,13 +235,12 @@ export default function FillBlankChallenge({
             className="relative"
           >
             <motion.div
-              className="
-                relative w-12 h-14 sm:w-14 sm:h-16
-                flex items-center justify-center
-                text-2xl sm:text-3xl font-black
-                border-3 rounded-lg
+              className={`
+                relative flex items-center justify-center
+                font-black border-3 rounded-lg
                 border-neo-cyan bg-neo-cyan/20 shadow-hard-lg text-neo-cyan
-              "
+                ${answerLength > 8 ? 'w-9 h-11 sm:w-11 sm:h-13 text-xl sm:text-2xl' : 'w-12 h-14 sm:w-14 sm:h-16 text-2xl sm:text-3xl'}
+              `}
             >
               <motion.span
                 initial={{ scale: 0, rotate: -180 }}
@@ -293,11 +292,10 @@ export default function FillBlankChallenge({
                 transition={{ duration: 0.2 }}
                 onClick={() => handleBoxClick(index)}
                 className={`
-                  relative w-12 h-14 sm:w-14 sm:h-16
-                  flex items-center justify-center
-                  text-2xl sm:text-3xl font-black
-                  border-3 rounded-lg cursor-pointer
+                  relative flex items-center justify-center
+                  font-black border-3 rounded-lg cursor-pointer
                   transition-all duration-150
+                  ${answerLength > 8 ? 'w-9 h-11 sm:w-11 sm:h-13 text-xl sm:text-2xl' : 'w-12 h-14 sm:w-14 sm:h-16 text-2xl sm:text-3xl'}
                   ${isActive
                     ? 'border-neo-yellow bg-neo-yellow/20 shadow-hard-lg scale-105'
                     : isFilled

@@ -14,6 +14,7 @@ import {
   ClassReportData,
   DateRange,
 } from '@/lib/supabase/analytics';
+import logger from '@/utils/logger';
 
 // =============================================
 // TYPE DEFINITIONS
@@ -121,7 +122,7 @@ export function ClassProgressReport({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Error generating PDF:', err);
+      logger.error('Error generating PDF:', err);
     } finally {
       setExporting(false);
     }

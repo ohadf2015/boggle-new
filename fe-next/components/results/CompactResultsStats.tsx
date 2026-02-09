@@ -21,6 +21,8 @@ interface CompactResultsStatsProps {
   wordCount: number;
   /** Accuracy percentage (0-100) */
   accuracy: number;
+  /** Total words submitted (valid + invalid) for fraction display */
+  totalWords?: number;
   /** Optional player archetype to display */
   archetype?: PlayerArchetype | null;
   /** Game achievements earned (optional) */
@@ -57,6 +59,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
   coinRewardMode = 'earned',
   brainPointsReward,
   currentScore,
+  totalWords,
   className,
 }) => {
   const { t } = useLanguage();
@@ -93,7 +96,9 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             <div className="w-6 h-6 rounded-neo bg-neo-pink text-neo-white flex items-center justify-center border border-neo-black">
               <Target className="w-3.5 h-3.5" />
             </div>
-            <span className="text-xl sm:text-2xl font-black text-white">{accuracy}%</span>
+            <span className="text-xl sm:text-2xl font-black text-white">
+              {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
+            </span>
           </div>
           <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
             {t('results.accuracy') || 'Accuracy'}

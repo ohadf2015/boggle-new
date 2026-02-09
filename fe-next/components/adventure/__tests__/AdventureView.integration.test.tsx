@@ -101,6 +101,9 @@ const mockT = (key: string) => {
     'adventure.worlds.alphabetMeadows': 'Alphabet Meadows',
     'common.back': 'Back',
     'common.loading': 'Loading...',
+    'common.exit': 'Exit',
+    'common.pause': 'Pause',
+    'common.resume': 'Resume',
   };
   return translations[key] || key;
 };
@@ -541,8 +544,8 @@ describe('AdventureView Integration', () => {
       fireEvent.click(screen.getByTestId('world-1'));
       fireEvent.click(screen.getByTestId('level-button-1'));
 
-      // THEN
-      expect(screen.getByRole('button', { name: /exit to map/i })).toBeInTheDocument();
+      // THEN - outer header hidden during gameplay, GameHeader's exit button visible
+      expect(screen.getByRole('button', { name: /^exit$/i })).toBeInTheDocument();
     });
   });
 
@@ -566,8 +569,8 @@ describe('AdventureView Integration', () => {
       fireEvent.click(screen.getByTestId('level-button-1'));
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
 
-      // WHEN - click the header exit button
-      fireEvent.click(screen.getByRole('button', { name: /exit to map/i }));
+      // WHEN - click the GameHeader exit button (outer header hidden during gameplay)
+      fireEvent.click(screen.getByRole('button', { name: /^exit$/i }));
 
       // THEN
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
@@ -624,8 +627,8 @@ describe('AdventureView Integration', () => {
       fireEvent.click(screen.getByTestId('level-button-1'));
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
 
-      // WHEN - exit game
-      fireEvent.click(screen.getByRole('button', { name: /exit to map/i }));
+      // WHEN - exit game (GameHeader's exit button, outer header hidden during gameplay)
+      fireEvent.click(screen.getByRole('button', { name: /^exit$/i }));
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
 
       // WHEN - go back to world map

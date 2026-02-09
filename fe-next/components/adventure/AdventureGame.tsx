@@ -1039,7 +1039,7 @@ const AdventureGame = memo<AdventureGameProps>(
         data-testid="adventure-game"
         role="main"
         aria-label="Adventure Mode Game"
-        className="h-[100dvh] w-full overflow-hidden relative"
+        className="h-full w-full overflow-hidden relative"
       >
         {/* Background */}
         <GameplayBackground className="absolute inset-0 -z-10" />

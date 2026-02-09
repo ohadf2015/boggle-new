@@ -27,12 +27,12 @@ interface ResultsInfoCardsProps {
   achievementCount: number;
 }
 
-// ─── Card wrapper - cream neo-card style ───
+// ─── Card wrapper - dark glass card ───
 
 function InfoCard({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={cn(
-      'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg p-4',
+      'bg-white/[0.06] text-white border-2 border-white/10 rounded-neo-lg p-4 backdrop-blur-sm',
       className,
     )}>
       {children}
@@ -42,7 +42,7 @@ function InfoCard({ children, className }: { children: React.ReactNode; classNam
 
 function CardTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 mb-3">
+    <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-white/40 mb-3">
       {children}
     </h4>
   );
@@ -78,14 +78,14 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
 
         {hasSparkline && (
           <div className="flex items-center gap-3 mb-3">
-            <MiniSparkline data={sparklineScores} trend={trend} width={100} height={44} variant="light" />
+            <MiniSparkline data={sparklineScores} trend={trend} width={100} height={44} variant="dark" />
             {trend && (
               <div className="flex items-center gap-1.5">
                 <div className={cn(
                   'w-5 h-5',
-                  trend.direction === 'up' && 'text-green-700',
-                  trend.direction === 'down' && 'text-red-600',
-                  trend.direction === 'stable' && 'text-cyan-700',
+                  trend.direction === 'up' && 'text-green-400',
+                  trend.direction === 'down' && 'text-red-400',
+                  trend.direction === 'stable' && 'text-cyan-400',
                 )}>
                   {trend.direction === 'up' && <TrendingUp className="w-5 h-5" />}
                   {trend.direction === 'down' && <TrendingDown className="w-5 h-5" />}
@@ -93,9 +93,9 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                 </div>
                 <span className={cn(
                   'text-xs font-bold',
-                  trend.direction === 'up' && 'text-green-700',
-                  trend.direction === 'down' && 'text-red-600',
-                  trend.direction === 'stable' && 'text-black/50',
+                  trend.direction === 'up' && 'text-green-400',
+                  trend.direction === 'down' && 'text-red-400',
+                  trend.direction === 'stable' && 'text-white/50',
                 )}>
                   {trend.direction === 'up' && `+${Math.min(Math.abs(trend.percentChange), 999)}%`}
                   {trend.direction === 'down' && `${Math.max(trend.percentChange, -999)}%`}
@@ -116,24 +116,24 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
         {trend && (
           <div className="flex items-center gap-4 mb-3">
             <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-amber-600" />
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
               <div>
-                <span className="text-sm font-black text-neo-black">{trend.bestScore}</span>
-                <span className="text-[9px] text-black/40 block font-bold uppercase">{t('results.best') || 'Best'}</span>
+                <span className="text-sm font-black text-white">{trend.bestScore}</span>
+                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.best') || 'Best'}</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              <BarChart3 className="w-3.5 h-3.5 text-cyan-700" />
+              <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
               <div>
-                <span className="text-sm font-black text-neo-black">{trend.averageScore}</span>
-                <span className="text-[9px] text-black/40 block font-bold uppercase">{t('results.avg') || 'Avg'}</span>
+                <span className="text-sm font-black text-white">{trend.averageScore}</span>
+                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.avg') || 'Avg'}</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px]">🎮</span>
               <div>
-                <span className="text-sm font-black text-neo-black">{trend.totalGames}</span>
-                <span className="text-[9px] text-black/40 block font-bold uppercase">{t('results.games') || 'Games'}</span>
+                <span className="text-sm font-black text-white">{trend.totalGames}</span>
+                <span className="text-[9px] text-white/40 block font-bold uppercase">{t('results.games') || 'Games'}</span>
               </div>
             </div>
           </div>
@@ -141,10 +141,10 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
 
         {!hasSparkline && !trend && (
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-neo border-2 border-black/10 bg-black/5 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-black/30" />
+            <div className="w-10 h-10 rounded-neo border-2 border-white/10 bg-white/5 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-white/30" />
             </div>
-            <p className="text-black/40 text-xs">{t('chart.noHistory') || 'Play more games to see trends'}</p>
+            <p className="text-white/40 text-xs">{t('chart.noHistory') || 'Play more games to see trends'}</p>
             {/* Archetype shown here when no sparkline */}
             {archetype && (
               <div className="ms-auto">
@@ -165,22 +165,22 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                 key={p.name}
                 className={cn(
                   'flex items-center justify-between py-1.5',
-                  i < top5.length - 1 && 'border-b border-black/10',
-                  p.isPlayer && 'bg-neo-lime/50 -mx-2 px-2 rounded border-2 border-neo-black/20',
+                  i < top5.length - 1 && 'border-b border-white/10',
+                  p.isPlayer && 'bg-neo-lime/15 -mx-2 px-2 rounded border-2 border-neo-lime/30',
                 )}
               >
                 <div className="flex items-center gap-2">
                   <RankBadge rank={i + 1} />
                   <span className={cn(
                     'text-sm font-bold truncate max-w-[120px]',
-                    p.isPlayer ? 'text-neo-black' : 'text-black/70',
+                    p.isPlayer ? 'text-white' : 'text-white/70',
                   )}>
                     {p.name}
                   </span>
                 </div>
                 <span className={cn(
                   'text-sm font-black',
-                  p.isPlayer ? 'text-neo-black' : 'text-black/50',
+                  p.isPlayer ? 'text-white' : 'text-white/50',
                 )}>
                   {p.score}
                 </span>
@@ -198,19 +198,19 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
           {coins > 0 && (
             <div className="flex items-center gap-3">
               <div className={cn(
-                'w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-3 border-neo-black flex items-center justify-center shadow-hard-sm',
-                isAuthenticated ? 'bg-neo-lime text-neo-black' : 'bg-slate-400 text-amber-600',
+                'w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-2 flex items-center justify-center',
+                isAuthenticated ? 'bg-neo-lime/20 border-neo-lime/30 text-neo-lime' : 'bg-white/10 border-white/10 text-amber-400',
               )}>
                 {isAuthenticated ? <Coins className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
               </div>
               <div>
                 <span className={cn(
                   'font-black text-lg',
-                  isAuthenticated ? 'text-green-800' : 'text-amber-700',
+                  isAuthenticated ? 'text-neo-lime' : 'text-amber-400',
                 )}>
                   +{coins}
                 </span>
-                <span className="text-[10px] text-black/40 block font-bold uppercase">
+                <span className="text-[10px] text-white/40 block font-bold uppercase">
                   {t('results.dailyPlayBonus') || 'Daily Play Bonus'}
                 </span>
               </div>
@@ -220,12 +220,12 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
           {/* Win Streak */}
           {streak > 0 && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-3 border-neo-black bg-neo-orange text-neo-black flex items-center justify-center shadow-hard-sm">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-2 border-neo-orange/30 bg-neo-orange/20 text-neo-orange flex items-center justify-center">
                 <Flame className="w-5 h-5" />
               </div>
               <div>
-                <span className="font-black text-lg text-orange-800">{streak}</span>
-                <span className="text-[10px] text-black/40 block font-bold uppercase">
+                <span className="font-black text-lg text-neo-orange">{streak}</span>
+                <span className="text-[10px] text-white/40 block font-bold uppercase">
                   {t('results.keepItUp') || 'Keep it up!'}
                 </span>
               </div>
@@ -235,12 +235,12 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
           {/* Achievements count */}
           {achievementCount > 0 && (
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-3 border-neo-black bg-neo-purple text-white flex items-center justify-center shadow-hard-sm">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-2 border-purple-400/30 bg-purple-400/20 text-purple-400 flex items-center justify-center">
                 <Trophy className="w-5 h-5" />
               </div>
               <div>
-                <span className="font-black text-lg text-purple-800">{achievementCount}</span>
-                <span className="text-[10px] text-black/40 block font-bold uppercase">
+                <span className="font-black text-lg text-purple-400">{achievementCount}</span>
+                <span className="text-[10px] text-white/40 block font-bold uppercase">
                   {t('results.achievementsUnlocked') || 'Trophies'}
                 </span>
               </div>
@@ -249,8 +249,8 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
 
           {/* Guest CTA */}
           {!isAuthenticated && coins > 0 && (
-            <div className="bg-neo-navy rounded-neo border-2 border-neo-black p-3 mt-2">
-              <p className="text-xs font-bold text-neo-cream">
+            <div className="bg-white/5 rounded-neo border border-white/10 p-3 mt-2">
+              <p className="text-xs font-bold text-white/60">
                 {t('results.guestSavePrompt') || 'Sign in to save rewards'}
               </p>
             </div>
@@ -258,7 +258,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
 
           {/* No rewards fallback */}
           {coins === 0 && streak === 0 && achievementCount === 0 && (
-            <p className="text-black/40 text-xs">{t('results.noRewards') || 'Play more to earn rewards!'}</p>
+            <p className="text-white/40 text-xs">{t('results.noRewards') || 'Play more to earn rewards!'}</p>
           )}
         </div>
       </InfoCard>

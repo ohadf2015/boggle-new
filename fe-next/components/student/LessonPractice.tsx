@@ -16,6 +16,7 @@ import { useLesson } from '@/hooks/useVocabularyLesson';
 import { usePracticeSettings } from '@/hooks/usePracticeSettings';
 import { cn } from '@/lib/utils';
 import { normalizeWord, normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import logger from '@/utils/logger';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -275,7 +276,7 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
       try {
         await recordAttempt(lessonId, currentWord.word, correct);
       } catch (error) {
-        console.error('Failed to record attempt:', error);
+        logger.error('Failed to record attempt:', error);
       }
 
       setIsChecking(false);

@@ -29,6 +29,7 @@ interface MobileResultsTabProps {
   playerRank: number;
   validWordCount: number;
   accuracy: number;
+  totalWords?: number;
   isWinner: boolean;
   isAuthenticated: boolean;
   coinReward: CoinReward | null;
@@ -52,6 +53,7 @@ export function MobileResultsTab({
   playerRank,
   validWordCount,
   accuracy,
+  totalWords,
   isWinner,
   isAuthenticated,
   coinReward,
@@ -92,6 +94,7 @@ export function MobileResultsTab({
       <MobileCompactStats
         wordCount={validWordCount}
         accuracy={accuracy}
+        totalWords={totalWords}
       />
 
       {/* Play Again - Primary CTA */}

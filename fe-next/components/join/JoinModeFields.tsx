@@ -193,7 +193,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                       // Clipboard API not available or permission denied
                     }
                   }}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 bg-neo-cream text-neo-black"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] bg-neo-cream text-neo-black"
                   aria-label={t('joinView.pasteCode') || 'Paste room code'}
                 >
                   <ClipboardPaste className="text-sm" />
@@ -321,7 +321,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                     if (usernameError) setUsernameError(false);
                     usernameInputRef.current?.focus();
                   }}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 min-w-[40px] min-h-[40px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   aria-label={t('common.clear') || 'Clear'}
                 >
                   <X className="h-4 w-4" />

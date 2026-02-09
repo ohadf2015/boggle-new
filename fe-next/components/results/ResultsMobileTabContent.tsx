@@ -184,6 +184,7 @@ export function ResultsTabContent({
             const valid = currentPlayerValidWords.length;
             return total > 0 ? Math.round((valid / total) * 100) : 0;
           })()}
+          totalWords={currentPlayerData.allWords?.length || 0}
           archetype={currentPlayerArchetype}
         />
       )}

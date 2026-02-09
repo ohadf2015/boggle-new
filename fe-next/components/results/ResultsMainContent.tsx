@@ -215,6 +215,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           <MobileCompactStats
             wordCount={currentPlayerValidWords.length}
             accuracy={accuracy}
+            totalWords={currentPlayerData?.allWords?.length || 0}
             archetype={currentPlayerArchetype}
             achievements={currentPlayerData?.achievements}
           />
@@ -222,6 +223,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           <CompactResultsStats
             wordCount={currentPlayerValidWords.length}
             accuracy={accuracy}
+            totalWords={currentPlayerData?.allWords?.length || 0}
             archetype={currentPlayerArchetype}
             achievements={currentPlayerData?.achievements}
           />

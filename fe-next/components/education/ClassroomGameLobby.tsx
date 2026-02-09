@@ -16,6 +16,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import logger from '@/utils/logger';
 import { Play, Users, Copy, Check, BookOpen, School, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -87,7 +88,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
         }
       }
     } catch (error) {
-      console.error('Failed to fetch teacher data:', error);
+      logger.error('Failed to fetch teacher data:', error);
       toast.error(t('errors.loadFailed'));
     } finally {
       setIsLoading(false);
@@ -112,7 +113,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     });
 
     socketInstance.on('connect', () => {
-      console.log('Connected to Socket.IO');
+      logger.info('Connected to Socket.IO');
     });
 
     socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {

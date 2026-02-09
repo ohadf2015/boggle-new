@@ -167,7 +167,7 @@ export default function StudentPageClient() {
             <ClassroomGameBanner
               classroomId={classroomId}
               userId={user.id}
-              username={user.email || 'Student'}
+              username={user.email || t('student.dashboard.defaultName')}
             />
           </div>
         )}

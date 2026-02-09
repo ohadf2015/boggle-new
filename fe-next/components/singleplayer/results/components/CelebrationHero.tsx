@@ -16,6 +16,7 @@ interface CelebrationHeroProps {
   score: number;
   wordCount: number;
   accuracy: number;
+  totalWords?: number;
   coinReward: CoinReward | null;
   isAuthenticated: boolean;
   variant: HeroVariant;
@@ -57,8 +58,8 @@ export const CelebrationHero = memo(function CelebrationHero({
   score,
   wordCount,
   accuracy,
+  totalWords,
   coinReward,
-  isAuthenticated,
   variant,
   rank,
   message,
@@ -210,7 +211,9 @@ export const CelebrationHero = memo(function CelebrationHero({
                 <Target className="w-4 h-4 text-white" />
               </div>
               <div className="text-start">
-                <span className="text-sm sm:text-base font-black text-white block leading-tight">{accuracy}%</span>
+                <span className="text-sm sm:text-base font-black text-white block leading-tight">
+                  {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
+                </span>
                 <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/50 hidden sm:block">
                   {t('results.accuracy') || 'Accuracy'}
                 </span>
@@ -225,7 +228,7 @@ export const CelebrationHero = memo(function CelebrationHero({
                 </div>
                 <div className="text-start">
                   <span className="text-sm sm:text-base font-black text-white block leading-tight">
-                    {isAuthenticated ? `+${coinReward.awarded}` : `(${coinReward.awarded})`}
+                    +{coinReward.awarded}
                   </span>
                   <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/50 hidden sm:block">
                     {t('results.coinsEarned') || 'Coins'}
@@ -242,7 +245,7 @@ export const CelebrationHero = memo(function CelebrationHero({
             'absolute z-20 pointer-events-none',
             compact
               ? 'hidden md:block -bottom-2 -right-2 sm:bottom-2 sm:right-2'
-              : '-bottom-2 -right-2 sm:bottom-4 sm:right-4',
+              : 'hidden sm:block -bottom-2 -right-2 sm:bottom-4 sm:right-4',
           )}>
             {/* Cream circle container */}
             <div className="relative">

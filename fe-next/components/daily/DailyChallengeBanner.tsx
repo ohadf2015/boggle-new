@@ -47,7 +47,9 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   preloadedStats,
 }) => {
   const { t, language, dir } = useLanguage();
-  const [countdown, setCountdown] = useState<string>('');
+  // Initialize with a placeholder that won't cause hydration mismatch
+  // The actual value is set in useEffect once isClient is true
+  const [countdown, setCountdown] = useState<string>('--:--:--');
   // Use preloaded stats if available, otherwise default to false/0
   const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
   const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);

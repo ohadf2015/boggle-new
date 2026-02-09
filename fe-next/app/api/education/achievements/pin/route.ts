@@ -6,25 +6,21 @@
  * - Max 3 pins per student
  *
  * GET /api/education/achievements/pin
- * - Get all pinned achievements for a student
+ * - Get all pinned achievements for the authenticated user
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
+import logger from '@/utils/logger';
 
 // ============================================
 // VALIDATION SCHEMAS
 // ============================================
 
 const pinToggleSchema = z.object({
-  studentId: z.string().uuid(),
   achievementKey: z.string().min(1),
   isPinned: z.boolean(),
-});
-
-const getPinsSchema = z.object({
-  studentId: z.string().uuid(),
 });
 
 // ============================================
@@ -32,19 +28,12 @@ const getPinsSchema = z.object({
 // ============================================
 
 function handleError(error: unknown): NextResponse {
-  console.error('Achievement pin API error:', error);
+  logger.error('Achievement pin API error:', error);
 
   if (error instanceof z.ZodError) {
     return NextResponse.json(
       { error: 'Invalid request data', details: error.issues },
       { status: 400 }
-    );
-  }
-
-  if (error instanceof Error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
     );
   }
 
@@ -60,21 +49,16 @@ function handleError(error: unknown): NextResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const body = await request.json();
-    const { studentId, achievementKey, isPinned } = pinToggleSchema.parse(body);
+    const supabase = await createClient();
 
-    // Initialize Supabase client
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      );
+    // Authenticate user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const body = await request.json();
+    const { achievementKey, isPinned } = pinToggleSchema.parse(body);
 
     // Look up the achievement_id from the key
     const { data: achievementDef, error: lookupError } = await supabase
@@ -97,7 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const { data: existingPins, error: countError } = await supabase
         .from('student_achievements')
         .select('id')
-        .eq('student_id', studentId)
+        .eq('student_id', user.id)
         .eq('is_pinned', true);
 
       if (countError) {
@@ -116,7 +100,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data, error } = await supabase
       .from('student_achievements')
       .update({ is_pinned: isPinned })
-      .eq('student_id', studentId)
+      .eq('student_id', user.id)
       .eq('achievement_id', achievementId)
       .select()
       .single();
@@ -148,25 +132,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 // GET - Get Pinned Achievements
 // ============================================
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
-    const { searchParams } = new URL(request.url);
-    const studentId = searchParams.get('studentId');
+    const supabase = await createClient();
 
-    const { studentId: validStudentId } = getPinsSchema.parse({ studentId });
-
-    // Initialize Supabase client
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      );
+    // Authenticate user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Join with achievement_definitions to get the key
     const { data, error } = await supabase
@@ -177,7 +151,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           key
         )
       `)
-      .eq('student_id', validStudentId)
+      .eq('student_id', user.id)
       .eq('is_pinned', true);
 
     if (error) {

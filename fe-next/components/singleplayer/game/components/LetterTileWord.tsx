@@ -66,42 +66,44 @@ export function LetterTileWord({
     <div
       data-testid="tile-container"
       className={cn(
-        'flex items-center justify-center gap-1',
+        'relative flex items-center justify-center',
         shouldShake && 'animate-neo-shake'
       )}
     >
-      {/* Letter tiles */}
-      {letters.map((letter, index) => (
-        <AdaptiveMotion.div
-          key={`${letter}-${index}`}
-          initial={{ scale: 0, y: -20 }}
-          animate={{ scale: 1, y: 0 }}
-          transition={{
-            type: 'spring',
-            stiffness: 500,
-            damping: 25,
-            delay: index * 0.03,
-          }}
-          className={cn(
-            'w-10 h-12 flex items-center justify-center',
-            'rounded-neo border-3 shadow-hard-sm',
-            'font-black text-xl uppercase',
-            getTileStyle()
-          )}
-        >
-          {letter}
-        </AdaptiveMotion.div>
-      ))}
+      {/* Letter tiles - always centered */}
+      <div className="flex items-center gap-1">
+        {letters.map((letter, index) => (
+          <AdaptiveMotion.div
+            key={`${letter}-${index}`}
+            initial={{ scale: 0, y: -20 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{
+              type: 'spring',
+              stiffness: 500,
+              damping: 25,
+              delay: index * 0.03,
+            }}
+            className={cn(
+              'w-10 h-12 flex items-center justify-center',
+              'rounded-neo border-3 shadow-hard-sm',
+              'font-black text-xl uppercase',
+              getTileStyle()
+            )}
+          >
+            {letter}
+          </AdaptiveMotion.div>
+        ))}
+      </div>
 
-      {/* Inline feedback - icon + score/message after last tile */}
+      {/* Feedback badge - absolutely positioned to the side, doesn't shift tiles */}
       <AdaptiveAnimatePresence>
         {feedback && (
           <AdaptiveMotion.div
             data-testid="feedback-row"
-            initial={{ opacity: 0, scale: 0.5, x: -10 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.5, x: -10 }}
-            className="flex items-center gap-1 ms-1"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            className="absolute top-1/2 -translate-y-1/2 start-full ms-2 flex items-center gap-1"
           >
             {/* Feedback icon */}
             {FEEDBACK_ICONS[feedback.type] && (() => {

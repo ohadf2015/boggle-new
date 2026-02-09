@@ -104,7 +104,7 @@ export default function BuzzReadyScreen({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.1 }}
+            transition={{ type: 'spring', delay: 0.05 }}
             className="inline-flex items-center gap-2 mb-4"
           >
             <span className="relative flex h-3 w-3">
@@ -120,7 +120,7 @@ export default function BuzzReadyScreen({
           <motion.h1
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.15, type: 'spring' }}
+            transition={{ delay: 0.08, type: 'spring' }}
             className="text-4xl sm:text-5xl md:text-6xl font-neo-display font-black text-neo-yellow leading-tight"
           >
             {t('buzz.title')}
@@ -129,7 +129,7 @@ export default function BuzzReadyScreen({
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
+            transition={{ delay: 0.1 }}
             className="text-slate-400 text-base sm:text-lg mt-2 font-medium"
           >
             {t('buzz.subtitle')}
@@ -141,7 +141,7 @@ export default function BuzzReadyScreen({
           <motion.div
             initial={{ opacity: 0, scale: 0.95, rotateX: 10 }}
             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-            transition={{ delay: 0.2, type: 'spring' }}
+            transition={{ delay: 0.1, type: 'spring' }}
             className="relative w-full max-w-md mx-auto aspect-square rounded-neo-lg overflow-hidden border-4 border-neo-black shadow-hard-lg"
           >
             <Image
@@ -170,7 +170,7 @@ export default function BuzzReadyScreen({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.12 }}
           className="relative bg-neo-navy-light rounded-neo-lg border-3 border-neo-black p-5 shadow-hard overflow-hidden"
         >
           {/* Decorative corner */}
@@ -193,7 +193,7 @@ export default function BuzzReadyScreen({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.15 }}
           className="space-y-3"
         >
           <div className="flex items-center gap-2 text-sm text-slate-400 font-bold uppercase tracking-wide">
@@ -207,7 +207,7 @@ export default function BuzzReadyScreen({
                 key={i}
                 initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.45 + i * 0.08, type: 'spring', stiffness: 200 }}
+                transition={{ delay: 0.18 + i * 0.04, type: 'spring', stiffness: 200 }}
                 className="group flex items-center gap-3 px-4 py-3 bg-slate-900/80 rounded-neo-lg border-2 border-slate-700 hover:border-neo-yellow/50 transition-colors"
               >
                 {/* Topic icon with glow effect */}
@@ -240,7 +240,7 @@ export default function BuzzReadyScreen({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.25 }}
           className="grid grid-cols-3 gap-2"
         >
           {/* Static color classes for Tailwind to detect at compile time */}
@@ -265,7 +265,7 @@ export default function BuzzReadyScreen({
               key={i}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.65 + i * 0.05 }}
+              transition={{ delay: 0.28 + i * 0.03 }}
               className="text-center p-3 sm:p-4 bg-slate-900/60 rounded-neo-lg border-2 border-slate-700"
             >
               <div className={`text-2xl sm:text-3xl font-black ${stat.colorClass}`}>
@@ -283,7 +283,7 @@ export default function BuzzReadyScreen({
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.3 }}
             className="px-4 py-3 bg-neo-cyan/10 border-3 border-neo-cyan rounded-neo-lg text-center"
           >
             <p className="text-sm text-neo-cyan font-bold">
@@ -296,7 +296,7 @@ export default function BuzzReadyScreen({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.75 }}
+          transition={{ delay: 0.3 }}
           className="space-y-3 pt-2"
         >
           {/* Primary CTA */}
@@ -343,7 +343,7 @@ export default function BuzzReadyScreen({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
+          transition={{ delay: 0.35 }}
           className="text-center text-xs text-slate-500 leading-relaxed pb-4"
         >
           {t('buzz.helpText')}

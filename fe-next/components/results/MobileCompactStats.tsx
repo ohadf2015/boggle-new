@@ -17,6 +17,8 @@ interface MobileCompactStatsProps {
   wordCount: number;
   /** Accuracy percentage (0-100) */
   accuracy: number;
+  /** Total words submitted (valid + invalid) for fraction display */
+  totalWords?: number;
   /** Player archetype (optional) */
   archetype?: PlayerArchetype | null;
   /** Game achievements earned (optional) */
@@ -36,6 +38,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
   accuracy,
   archetype,
   achievements,
+  totalWords,
   className,
 }) => {
   const { t } = useLanguage();
@@ -63,7 +66,9 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
           <div className="w-5 h-5 rounded bg-neo-pink text-white flex items-center justify-center">
             <Target className="w-3 h-3" />
           </div>
-          <span className="text-lg font-black text-white">{accuracy}%</span>
+          <span className="text-lg font-black text-white">
+            {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
+          </span>
           <span className="text-[10px] text-white/60 font-bold uppercase">
             {t('results.accuracy') || 'Acc'}
           </span>

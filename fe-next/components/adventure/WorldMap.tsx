@@ -250,6 +250,7 @@ const WorldNode = ({
   onClick,
   index,
   isLeft,
+  isNextWorld,
 }: {
   world: WorldConfig;
   isUnlocked: boolean;
@@ -260,6 +261,7 @@ const WorldNode = ({
   onClick: () => void;
   index: number;
   isLeft: boolean;
+  isNextWorld?: boolean;
 }) => {
   const { t } = useLanguage();
   const isFinalWorld = world.id === 10;
@@ -273,9 +275,9 @@ const WorldNode = ({
   return (
     <motion.div
       className={cn(
-        'relative w-full px-4 sm:px-8 lg:px-12',
+        'relative w-full px-4 sm:px-8 lg:px-12 overflow-hidden',
         // Flex layout with justify for proper centering on desktop
-        'flex items-center gap-4 sm:gap-6 lg:gap-8',
+        'flex items-center gap-3 sm:gap-6 lg:gap-8',
         isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
         isLeft ? 'flex-row' : 'flex-row-reverse'
       )}
@@ -360,6 +362,13 @@ const WorldNode = ({
             </div>
           )}
 
+          {/* "NEXT" badge for the next world to play */}
+          {isNextWorld && !isComplete && (
+            <div className="absolute -top-2 -left-2 z-10 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm">
+              {t('adventure.next') || 'NEXT'}
+            </div>
+          )}
+
           {/* Animated pulse ring for unlocked - thicker border */}
           {isUnlocked && !isComplete && (
             <motion.div
@@ -376,7 +385,7 @@ const WorldNode = ({
       <motion.div
         className={cn(
           'flex-shrink-0',
-          'w-[170px] sm:w-[200px] lg:w-[220px]',
+          'w-[140px] sm:w-[200px] lg:w-[220px]',
           'bg-neo-navy-light border-4 border-neo-black rounded-neo',
           'p-3 sm:p-4 shadow-hard',
           !isUnlocked && 'opacity-60'
@@ -551,6 +560,18 @@ export default function WorldMap({
     });
   }, [totalStars, completions]);
 
+  // Derive next world to play: first unlocked but not fully completed
+  const nextWorldId = useMemo(() => {
+    // worldsData is reversed (10→1), so iterate from end to find lowest-id incomplete world
+    for (let i = worldsData.length - 1; i >= 0; i--) {
+      const d = worldsData[i];
+      if (d.isUnlocked && d.completedLevels < LEVELS_PER_WORLD) {
+        return d.world.id;
+      }
+    }
+    return null;
+  }, [worldsData]);
+
   return (
     <div
       ref={containerRef}
@@ -701,6 +722,7 @@ export default function WorldMap({
                 onClick={() => data.isUnlocked && onWorldSelect(data.world.id)}
                 index={index}
                 isLeft={isLeft}
+                isNextWorld={data.world.id === nextWorldId}
               />
 
               {/* Dynamic trail connector - connects FROM this world TO the next */}
@@ -714,8 +736,8 @@ export default function WorldMap({
           );
         })}
 
-        {/* Bottom scroll anchor */}
-        <div ref={bottomRef} className="h-8" />
+        {/* Bottom scroll anchor - extra height ensures bottom world is fully visible */}
+        <div ref={bottomRef} className="h-24" />
       </div>
 
     </div>

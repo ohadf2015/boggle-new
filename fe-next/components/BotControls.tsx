@@ -225,10 +225,10 @@ const BotControls: React.FC<BotControlsProps> = ({
                 htmlFor="auto-fill-switch"
                 className="text-sm font-bold text-neo-cream block cursor-pointer"
               >
-                {t('bots.autoFill') || 'Auto-fill Room'}
+                {t('bots.autoFill') || 'Auto-fill with AI Rivals'}
               </label>
               <p className="text-xs text-neo-cream/60 truncate">
-                {t('bots.autoFillDesc') || 'Fills empty slots with AI bots'}
+                {t('bots.autoFillDesc') || 'Fills empty slots with AI opponents'}
               </p>
             </div>
           </div>

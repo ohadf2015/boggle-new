@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, Fragment } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useLessons } from '@/hooks/useVocabularyLesson';
@@ -13,8 +13,7 @@ import { ChevronDown, ChevronRight, Users, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function StudentProgressView() {
-  const { t, language } = useLanguage();
-  const isRTL = language === 'he';
+  const { t } = useLanguage();
   const { classrooms, isLoading: loadingClassrooms } = useClassrooms();
   const { lessons, isLoading: loadingLessons } = useLessons();
 
@@ -31,17 +30,12 @@ export default function StudentProgressView() {
   const selectedLesson = lessons.find((l) => l.id === selectedLessonId);
 
   // Calculate aggregated stats for each student
-  const studentStats = progress.map((p) => {
+  const studentStats = useMemo(() => progress.map((p) => {
     const wordsAttempted = Object.keys(p.words_attempted || {}).length;
     const wordsMastered = (p.words_mastered || []).length;
-    const totalAttempts = Object.values(p.words_attempted || {}).reduce(
-      (sum, attempt: any) => sum + attempt.attempts,
-      0
-    );
-    const totalCorrect = Object.values(p.words_attempted || {}).reduce(
-      (sum, attempt: any) => sum + attempt.correct,
-      0
-    );
+    const attempts = Object.values(p.words_attempted || {}) as { attempts: number; correct: number }[];
+    const totalAttempts = attempts.reduce((sum, a) => sum + a.attempts, 0);
+    const totalCorrect = attempts.reduce((sum, a) => sum + a.correct, 0);
     const accuracy = totalAttempts > 0 ? (totalCorrect / totalAttempts) * 100 : 0;
 
     return {
@@ -49,9 +43,9 @@ export default function StudentProgressView() {
       wordsAttempted,
       wordsMastered,
       accuracy,
-      lastActive: p.started_at, // TODO: use actual last_active from progress tracking
+      lastActive: p.started_at,
     };
-  });
+  }), [progress]);
 
   // Export progress data to CSV
   const handleExportCSV = useCallback(() => {
@@ -70,7 +64,7 @@ export default function StudentProgressView() {
     ];
 
     const rows = studentStats.map((student) => [
-      `Student ${student.student_id.slice(0, 8)}`,
+      t('teacher.progress.anonymousStudent', { id: student.student_id.slice(0, 8) }),
       student.wordsAttempted,
       student.wordsMastered,
       student.accuracy.toFixed(1),
@@ -128,7 +122,7 @@ export default function StudentProgressView() {
               'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
             )}
           >
-            <option value="">All Classrooms</option>
+            <option value="">{t('teacher.progress.allClassrooms')}</option>
             {classrooms.map((classroom) => (
               <option key={classroom.id} value={classroom.id}>
                 {classroom.name}
@@ -150,7 +144,7 @@ export default function StudentProgressView() {
               'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
             )}
           >
-            <option value="">All Lessons</option>
+            <option value="">{t('teacher.progress.allLessons')}</option>
             {lessons
               .filter((l) => !selectedClassroomId || l.classroom_id === selectedClassroomId)
               .map((lesson) => (
@@ -231,52 +225,129 @@ export default function StudentProgressView() {
                 <tbody>
                   {studentStats.map((student) => {
                     const isExpanded = expandedStudentId === student.student_id;
+                    const wordEntries = Object.entries(student.words_attempted || {});
+                    const masteredSet = new Set(student.words_mastered || []);
                     return (
-                      <tr
-                        key={student.id}
-                        className="border-b border-neo-black/30 hover:bg-neo-black/20 transition-colors"
-                      >
-                        <td className="px-4 py-3 text-neo-white font-neo-body">
-                          Student {student.student_id.slice(0, 8)}
-                        </td>
-                        <td className="px-4 py-3 text-center text-neo-white">
-                          {student.wordsAttempted}
-                        </td>
-                        <td className="px-4 py-3 text-center text-neo-white">
-                          {student.wordsMastered}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span
-                            className={cn(
-                              'px-2 py-1 rounded font-bold text-sm',
-                              student.accuracy >= 80
-                                ? 'bg-neo-cyan/20 text-neo-cyan'
-                                : student.accuracy >= 60
-                                ? 'bg-neo-yellow/20 text-neo-yellow'
-                                : 'bg-neo-pink/20 text-neo-pink'
-                            )}
-                          >
-                            {student.accuracy.toFixed(0)}%
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-slate-400 text-sm">
-                          {new Date(student.lastActive).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() =>
-                              setExpandedStudentId(isExpanded ? null : student.student_id)
-                            }
-                            className="text-neo-cyan hover:text-neo-white transition-colors"
-                          >
-                            {isExpanded ? (
-                              <ChevronDown className="w-5 h-5" />
-                            ) : (
-                              <ChevronRight className="w-5 h-5" />
-                            )}
-                          </button>
-                        </td>
-                      </tr>
+                      <Fragment key={student.id}>
+                        <tr
+                          className="border-b border-neo-black/30 hover:bg-neo-black/20 transition-colors cursor-pointer"
+                          onClick={() =>
+                            setExpandedStudentId(isExpanded ? null : student.student_id)
+                          }
+                        >
+                          <td className="px-4 py-3 text-neo-white font-neo-body">
+                            {t('teacher.progress.anonymousStudent', { id: student.student_id.slice(0, 8) })}
+                          </td>
+                          <td className="px-4 py-3 text-center text-neo-white">
+                            {student.wordsAttempted}
+                          </td>
+                          <td className="px-4 py-3 text-center text-neo-white">
+                            {student.wordsMastered}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span
+                              className={cn(
+                                'px-2 py-1 rounded font-bold text-sm',
+                                student.accuracy >= 80
+                                  ? 'bg-neo-cyan/20 text-neo-cyan'
+                                  : student.accuracy >= 60
+                                  ? 'bg-neo-yellow/20 text-neo-yellow'
+                                  : 'bg-neo-pink/20 text-neo-pink'
+                              )}
+                            >
+                              {student.accuracy.toFixed(0)}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-slate-400 text-sm">
+                            {new Date(student.lastActive).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="text-neo-cyan">
+                              {isExpanded ? (
+                                <ChevronDown className="w-5 h-5" />
+                              ) : (
+                                <ChevronRight className="w-5 h-5" />
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr className="bg-neo-black/30">
+                            <td colSpan={6} className="px-6 py-4">
+                              {wordEntries.length === 0 ? (
+                                <p className="text-slate-400 text-sm italic">
+                                  {t('teacher.progress.noWordsYet')}
+                                </p>
+                              ) : (
+                                <table className="w-full text-sm">
+                                  <thead>
+                                    <tr className="text-slate-400">
+                                      <th className="text-left pb-2 font-medium">
+                                        {t('teacher.progress.breakdownWord')}
+                                      </th>
+                                      <th className="text-center pb-2 font-medium">
+                                        {t('teacher.progress.breakdownAttempts')}
+                                      </th>
+                                      <th className="text-center pb-2 font-medium">
+                                        {t('teacher.progress.breakdownCorrect')}
+                                      </th>
+                                      <th className="text-center pb-2 font-medium">
+                                        {t('teacher.progress.accuracy')}
+                                      </th>
+                                      <th className="text-right pb-2 font-medium">
+                                        {t('teacher.progress.wordsMastered')}
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {wordEntries.map(([word, attempt]) => {
+                                      const data = attempt as { attempts: number; correct: number };
+                                      const wordAccuracy = data.attempts > 0
+                                        ? Math.round((data.correct / data.attempts) * 100)
+                                        : 0;
+                                      const isMastered = masteredSet.has(word);
+                                      return (
+                                        <tr key={word} className="border-t border-neo-black/20">
+                                          <td className="py-2 text-neo-white font-mono">
+                                            {word}
+                                          </td>
+                                          <td className="py-2 text-center text-neo-white">
+                                            {data.attempts}
+                                          </td>
+                                          <td className="py-2 text-center text-neo-white">
+                                            {data.correct}
+                                          </td>
+                                          <td className="py-2 text-center">
+                                            <span className={cn(
+                                              'text-sm',
+                                              wordAccuracy >= 80 ? 'text-neo-cyan' :
+                                              wordAccuracy >= 60 ? 'text-neo-yellow' : 'text-neo-pink'
+                                            )}>
+                                              {wordAccuracy}%
+                                            </span>
+                                          </td>
+                                          <td className="py-2 text-right">
+                                            <span className={cn(
+                                              'px-2 py-0.5 rounded text-xs font-bold',
+                                              isMastered
+                                                ? 'bg-neo-cyan/20 text-neo-cyan'
+                                                : 'bg-neo-yellow/20 text-neo-yellow'
+                                            )}>
+                                              {isMastered
+                                                ? t('teacher.progress.statusMastered')
+                                                : t('teacher.progress.statusLearning')}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
                     );
                   })}
                 </tbody>

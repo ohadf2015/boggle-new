@@ -120,10 +120,11 @@ export const GameHeader = memo(function GameHeader({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'p-1.5 sm:p-2 rounded-neo',
+              'p-2 sm:p-2.5 rounded-neo',
+              'min-w-[44px] min-h-[44px] flex items-center justify-center',
               'transition-colors duration-200',
-              isPaused 
-                ? 'bg-neo-lime text-neo-black' 
+              isPaused
+                ? 'bg-neo-lime text-neo-black'
                 : 'bg-neo-white/10 text-neo-white hover:bg-neo-white/20'
             )}
             aria-label={isPaused ? t('common.resume') : t('common.pause')}
@@ -141,7 +142,8 @@ export const GameHeader = memo(function GameHeader({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'p-1.5 sm:p-2 rounded-neo',
+              'p-2 sm:p-2.5 rounded-neo',
+              'min-w-[44px] min-h-[44px] flex items-center justify-center',
               'bg-neo-white/5 text-neo-white/60',
               'hover:bg-neo-red/20 hover:text-neo-red',
               'transition-colors duration-200'

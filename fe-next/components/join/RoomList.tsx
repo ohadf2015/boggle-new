@@ -94,7 +94,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                     e.stopPropagation();
                     onRefresh();
                   }}
-                  className="h-8 w-8 p-0"
+                  className="h-11 w-11 min-w-[44px] min-h-[44px] p-0"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>

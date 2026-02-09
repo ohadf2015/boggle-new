@@ -98,7 +98,7 @@ export function useWordSubmission({
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const feedbackClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-clear feedback after 1.5s for terminal states (accepted/rejected/duplicate)
+  // Auto-clear feedback after 3s for terminal states (accepted/rejected/duplicate)
   useEffect(() => {
     if (feedbackClearTimerRef.current) {
       clearTimeout(feedbackClearTimerRef.current);
@@ -108,7 +108,7 @@ export function useWordSubmission({
       feedbackClearTimerRef.current = setTimeout(() => {
         setCurrentFeedback(null);
         feedbackClearTimerRef.current = null;
-      }, 1500);
+      }, 3000);
     }
     return () => {
       if (feedbackClearTimerRef.current) {

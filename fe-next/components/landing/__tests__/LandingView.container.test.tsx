@@ -118,8 +118,8 @@ describe('LandingView - Daily Challenge Banner Container', () => {
   it('should render Daily Challenge Banner inside main-container on mobile landscape', () => {
     const { container } = render(<LandingView />);
 
-    // Find the main element (the main content container)
-    const mainContainer = container.querySelector('main');
+    // Find the section element (the main content container)
+    const mainContainer = container.querySelector('section');
     expect(mainContainer).toBeTruthy();
 
     // Find the Daily Challenge Banner wrapper (it's inside a div with w-full and mb-X classes)

@@ -155,6 +155,13 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     hasAnimatedRef.current = true;
   }, []);
 
+  // Clear stale feedback and formed word when grid changes (new round)
+  useEffect(() => {
+    setCurrentFeedback(null);
+    setFormedWord('');
+    setLetterCount(0);
+  }, [letterGrid]);
+
   // Reset lastWordFoundTime when game starts
   useEffect(() => {
     if (gameActive) {

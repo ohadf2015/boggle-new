@@ -310,39 +310,37 @@ export default function AdventureView(): React.JSX.Element {
       initialLevel={selectedLevel || 1}
     >
     <div className="min-h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
-      {/* Header - Fixed at top (not sticky) because child components have their own scroll containers */}
-      <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
+      {/* Header - Fixed at top, hidden during gameplay (game has its own GameHeader) */}
+      {viewState !== 'playing' && <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Back / World Map button */}
           {viewState !== 'worldMap' ? (
             <button
               onClick={handleBack}
               className={cn(
-                'flex items-center gap-2 px-4 py-2',
+                'flex items-center gap-2 px-4 py-2 whitespace-nowrap',
                 'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
                 'text-neo-white font-bold hover:bg-neo-navy-light',
                 'transition-colors shadow-hard-sm'
               )}
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
-              <span>
-                {viewState === 'playing'
-                  ? t('adventure.exitToMap') || 'Exit to Map'
-                  : t('adventure.backToMap') || 'World Map'}
+              <span className="hidden sm:inline">
+                {t('adventure.backToMap') || 'World Map'}
               </span>
             </button>
           ) : (
             <Link
               href="/"
               className={cn(
-                'flex items-center gap-2 px-4 py-2',
+                'flex items-center gap-2 px-4 py-2 whitespace-nowrap',
                 'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
                 'text-neo-white font-bold hover:bg-neo-navy-light',
                 'transition-colors shadow-hard-sm'
               )}
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
-              <span>{t('common.back') || 'Back'}</span>
+              <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
             </Link>
           )}
 
@@ -377,13 +375,13 @@ export default function AdventureView(): React.JSX.Element {
             <MusicControls />
           </div>
         </div>
-      </header>
+      </header>}
 
-      {/* Spacer for fixed header (approx 56px height) */}
-      <div className="h-14 flex-shrink-0" />
+      {/* Spacer for fixed header (approx 56px height), hidden during gameplay */}
+      {viewState !== 'playing' && <div className="h-14 flex-shrink-0" />}
 
       {/* Main Content - Takes remaining height, children handle their own scroll */}
-      <main className="relative z-10 flex-1 min-h-0">
+      <div className="relative z-10 flex-1 min-h-0">
         <AnimatePresence mode="wait">
           {viewState === 'worldMap' && (
             // World Map View
@@ -443,7 +441,7 @@ export default function AdventureView(): React.JSX.Element {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </div>
     </div>
     </AdventureThemeProvider>
   );

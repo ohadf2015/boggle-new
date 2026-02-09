@@ -3,7 +3,7 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Home, Brain, User } from 'lucide-react';
+import { Home, Swords, Brain, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -44,6 +44,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         const cleanPath = pathname.replace(`/${language}`, '');
 
         if (cleanPath === '' || cleanPath === '/') return 'home';
+        if (cleanPath.startsWith('/multiplayer')) return 'play';
         if (cleanPath.startsWith('/brain')) return 'brain';
         if (cleanPath.startsWith('/profile')) return 'profile';
 
@@ -53,6 +54,10 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // Navigation handlers
     const navigateToHome = useCallback(() => {
         router.push(`/${language}`);
+    }, [router, language]);
+
+    const navigateToPlay = useCallback(() => {
+        router.push(`/${language}/multiplayer`);
     }, [router, language]);
 
     const navigateToBrain = useCallback(() => {
@@ -79,10 +84,10 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
         // Hide on these specific paths that have their own bottom nav
         const pathsWithOwnNav = [
-            '/multiplayer',
             '/singleplayer',
             '/daily',
             '/adventure',
+            // REMOVED: '/multiplayer' - Keep bottom nav visible on multiplayer lobby
             // REMOVED: '/profile' - GlobalBottomNav should remain visible on profile
             // to avoid confusing tab switching UX
         ];
@@ -146,6 +151,43 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                     {activeTab === 'home' && (
                         <div
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-yellow rounded-b-full"
+                            aria-hidden="true"
+                        />
+                    )}
+                </button>
+
+                {/* Play/Multiplayer Tab */}
+                <button
+                    onClick={navigateToPlay}
+                    className={cn(
+                        "flex flex-col items-center justify-center",
+                        "min-w-[64px] min-h-[48px]",
+                        "px-3 py-2",
+                        "transition-all duration-100",
+                        "relative",
+                        activeTab === 'play'
+                            ? "text-neo-orange"
+                            : "text-neo-white/60 hover:text-neo-white/80"
+                    )}
+                    aria-label={t('nav.play') || 'Play'}
+                    aria-current={activeTab === 'play' ? 'page' : undefined}
+                >
+                    <Swords
+                        className={cn(
+                            "w-6 h-6 mb-1",
+                            activeTab === 'play' && "animate-neo-pop"
+                        )}
+                        aria-hidden="true"
+                    />
+                    <span className={cn(
+                        "text-[10px] font-bold uppercase tracking-wide",
+                        activeTab === 'play' && "text-neo-orange"
+                    )}>
+                        {t('nav.play') || 'Play'}
+                    </span>
+                    {activeTab === 'play' && (
+                        <div
+                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-orange rounded-b-full"
                             aria-hidden="true"
                         />
                     )}

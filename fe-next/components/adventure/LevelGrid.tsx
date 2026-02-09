@@ -790,7 +790,10 @@ export default function LevelGrid({
                             className="text-xs text-neo-white/60 flex items-center gap-1.5"
                           >
                             <Target className="w-3 h-3 flex-shrink-0" />
-                            <span className="truncate">
+                            <span
+                              className="truncate"
+                              title={`${t(`adventure.objectives.${obj.type}`) || obj.type}: ${obj.target}`}
+                            >
                               {t(`adventure.objectives.${obj.type}`) || obj.type}:{' '}
                               {obj.target}
                             </span>

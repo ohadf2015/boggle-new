@@ -225,9 +225,9 @@ export function PortraitGameLayout({
         )}
       </header>
 
-      {/* Combo Display Row - Below header, centered */}
-      {!isPracticeMode && comboLevel >= 1 && (
-        <div className="flex flex-col items-center justify-center my-1 shrink-0 relative z-30">
+      {/* Combo Display Row - Fixed height container to prevent layout shift */}
+      {!isPracticeMode && (
+        <div className="h-8 flex items-center justify-center shrink-0 relative z-30">
           <ComboDisplay
             comboLevel={comboLevel}
             compact
@@ -361,7 +361,7 @@ export function PortraitGameLayout({
       </div>
 
       {/* Word Forming Area - Letter Tiles */}
-      <div className="h-12 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2 max-w-[360px] mx-auto w-full">
+      <div className="h-12 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2 max-w-[360px] mx-auto w-full overflow-visible">
         <LetterTileWord
           word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
           feedback={currentFeedback}
@@ -403,7 +403,7 @@ export function PortraitGameLayout({
       />
 
       {/* Game grid - Takes remaining space */}
-      <main className="flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-[200px]">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-[200px]">
         {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
         <AdaptiveAnimatePresence>
           {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
@@ -440,7 +440,7 @@ export function PortraitGameLayout({
             language={language}
           />
         </div>
-      </main>
+      </div>
 
       {/* Hint Prompt */}
       <AdaptiveAnimatePresence>

@@ -203,7 +203,7 @@ describe('LandingView Loading State', () => {
   it('should render component without errors', () => {
     // Verify the component renders successfully
     const { container } = render(<LandingView />);
-    expect(container.querySelector('main')).toBeInTheDocument();
+    expect(container.querySelector('section')).toBeInTheDocument();
   });
 
   it('should center mode cards after loading', async () => {

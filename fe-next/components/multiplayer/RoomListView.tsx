@@ -108,7 +108,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </motion.header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 flex flex-col px-4 gap-8 overflow-y-auto pb-10">
+        <div className="flex-1 flex flex-col px-4 gap-8 overflow-y-auto pb-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-6">
 
           {/* Left Column: Quick Play CTA */}
@@ -266,7 +266,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           </motion.section>
           </div>
           </div>
-        </main>
+        </div>
 
         {/* How to Play Dialog */}
         <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>

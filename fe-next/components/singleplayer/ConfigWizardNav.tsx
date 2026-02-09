@@ -69,7 +69,7 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
                 disabled={step.number > currentStep}
                 className={cn(
                   "relative flex items-center justify-center rounded-full transition-all",
-                  "w-8 h-8 sm:w-10 sm:h-10",
+                  "w-10 h-10 sm:w-11 sm:h-11",
                   "border-3 font-black text-sm",
                   isActive && "bg-neo-lime border-neo-black shadow-hard-sm scale-110 text-neo-black",
                   isCompleted && "bg-neo-lime border-neo-black cursor-pointer hover:scale-105 text-neo-black",

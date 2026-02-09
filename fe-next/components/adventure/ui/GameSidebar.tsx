@@ -57,10 +57,10 @@ export const GameSidebar = memo(function GameSidebar({
         className
       )}
     >
-      {/* Mobile: Horizontal scroll layout */}
-      <div className="lg:hidden flex flex-row gap-2 p-2 overflow-x-auto">
-        {/* Objectives - Compact */}
-        <div className="flex-shrink-0 w-48 sm:w-56">
+      {/* Mobile: Objectives take most width, hint button compact on the side */}
+      <div className="lg:hidden flex flex-row gap-2 p-2">
+        {/* Objectives - Fill available width */}
+        <div className="flex-1 min-w-0">
           <div className="bg-neo-black/40 rounded-neo-lg p-2 border-2 border-neo-black/50">
             <div className="flex items-center gap-1.5 mb-1.5">
               <Target className="w-3 h-3 text-neo-yellow" />
@@ -77,7 +77,7 @@ export const GameSidebar = memo(function GameSidebar({
         </div>
 
         {/* Hint Button - Compact */}
-        <div className="flex-shrink-0 w-auto">
+        <div className="flex-shrink-0">
           <motion.button
             onClick={onHintClick}
             disabled={!hasHintsAvailable}
@@ -228,11 +228,11 @@ export const GameSidebar = memo(function GameSidebar({
                   {(() => {
                     switch (hintLevel) {
                       case 'fullReveal':
-                        return 'Try looking for shorter words first!';
+                        return t('adventure.game.hintFullReveal') || 'Try looking for shorter words first!';
                       case 'lengthAndStart':
-                        return 'Look for words starting with specific letters!';
+                        return t('adventure.game.hintLengthAndStart') || 'Look for words starting with specific letters!';
                       default:
-                        return 'Keep trying! Look for common patterns.';
+                        return t('adventure.game.hintGeneral') || 'Keep trying! Look for common patterns.';
                     }
                   })()}
                 </p>

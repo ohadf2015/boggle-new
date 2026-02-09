@@ -75,6 +75,7 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
           className
         )}
         aria-label={t('settings.changeLanguage') || 'Change Language'}
+        title={t('settings.changeLanguage') || 'Change Language'}
       >
         <SelectValue>
           <div className="flex items-center justify-center gap-1">

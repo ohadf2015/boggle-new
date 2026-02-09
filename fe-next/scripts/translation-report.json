@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3142,
+    "totalKeysInCode": 3150,
     "keyCountByLanguage": {
-      "en": 4492,
-      "he": 4487,
-      "sv": 4462,
-      "ja": 4449,
-      "es": 4404
+      "en": 4527,
+      "he": 4522,
+      "sv": 4497,
+      "ja": 4485,
+      "es": 4439
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -238,7 +238,6 @@
       "adventure.score",
       "adventure.victory",
       "adventure.hint.title",
-      "adventure.game.selectWord",
       "adventure.achievements.progress",
       "teacher.curriculum.title",
       "teacher.curriculum.description",

@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import type { StudentAchievement } from '@/types/education';
+import logger from '@/utils/logger';
 
 // ============================================
 // TYPES
@@ -55,9 +56,7 @@ export function useAchievementPin(studentId: string | undefined): UseAchievement
 
     const fetchPinned = async () => {
       try {
-        const response = await fetch(
-          `/api/education/achievements/pin?studentId=${encodeURIComponent(studentId)}`
-        );
+        const response = await fetch('/api/education/achievements/pin');
 
         if (!response.ok) {
           throw new Error('Failed to fetch pinned achievements');
@@ -70,7 +69,7 @@ export function useAchievementPin(studentId: string | undefined): UseAchievement
           setPinnedKeys(keys);
         }
       } catch (err) {
-        console.error('Error fetching pinned achievements:', err);
+        logger.error('Error fetching pinned achievements:', err);
         // Don't set error state for initial fetch - just fail silently
       }
     };
@@ -111,7 +110,6 @@ export function useAchievementPin(studentId: string | undefined): UseAchievement
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            studentId,
             achievementKey,
             isPinned: newPinnedState,
           }),
@@ -136,7 +134,7 @@ export function useAchievementPin(studentId: string | undefined): UseAchievement
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to update pin';
         setError(message);
-        console.error('Error toggling pin:', err);
+        logger.error('Error toggling pin:', err);
       } finally {
         setIsLoading(false);
       }

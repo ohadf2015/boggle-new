@@ -10,6 +10,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Download, Eye, EyeOff, Filter, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import logger from '@/utils/logger';
 import {
   getCurriculumWordLists,
   importCurriculumToLesson,
@@ -63,13 +64,13 @@ export function CurriculumWordListBrowser({
       const { data, error: fetchError } = await getCurriculumWordLists(filters);
       if (fetchError) {
         setError(t('common.error'));
-        console.error('Failed to fetch curriculum lists:', fetchError.message);
+        logger.error('Failed to fetch curriculum lists:', fetchError.message);
       } else {
         setLists(data);
       }
     } catch (err) {
       setError(t('common.error'));
-      console.error('Failed to fetch curriculum lists:', err);
+      logger.error('Failed to fetch curriculum lists:', err);
     } finally {
       setLoading(false);
     }
@@ -117,7 +118,7 @@ export function CurriculumWordListBrowser({
       const { data: lesson, error: importErr } = await importCurriculumToLesson(list.id, teacherId, classroomId);
       if (importErr || !lesson) {
         setImportError(list.id);
-        console.error('Failed to import curriculum list:', importErr?.message);
+        logger.error('Failed to import curriculum list:', importErr?.message);
       } else {
         setImportSuccess(list.id);
         if (onImportSuccess) {
@@ -126,7 +127,7 @@ export function CurriculumWordListBrowser({
       }
     } catch (err) {
       setImportError(list.id);
-      console.error('Failed to import curriculum list:', err);
+      logger.error('Failed to import curriculum list:', err);
     } finally {
       setImportingListId(null);
     }

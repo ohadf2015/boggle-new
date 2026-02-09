@@ -91,7 +91,7 @@ describe('FillBlankChallenge', () => {
       renderComponent(prompt, 'TEST');
 
       // The letter count should be shown in the separate indicator section
-      // The answer is 'TEST' which is 4 letters, so we should see "0 / 4"
+      // The answer is 'TEST' which is 4 letters, so we should see "1 / 4" (first letter counts)
       // Note: Multiple "4"s exist (one per letter box index), so we just check the pattern exists
       expect(screen.getByText('/', { exact: false })).toBeInTheDocument();
     });
@@ -153,13 +153,15 @@ describe('FillBlankChallenge', () => {
           </LanguageProvider>
         );
 
-        // Should show: A + 0 / 4 letters initially
+        // Should show: A + 1 / 5 letters initially (first letter counts toward total)
         const allAs = screen.getAllByText('A');
         expect(allAs.length).toBeGreaterThanOrEqual(2); // First letter appears twice
-        expect(screen.getByText('0')).toBeInTheDocument(); // Filled count
-        // "4" appears multiple times (letter count + box number indicator at position 4)
-        const all4s = screen.getAllByText('4');
-        expect(all4s.length).toBeGreaterThanOrEqual(2); // Remaining count + box indicator
+        // "1" appears as filled count and as box number indicator
+        const all1s = screen.getAllByText('1');
+        expect(all1s.length).toBeGreaterThanOrEqual(1); // Filled count
+        // "5" appears as total answer length
+        const all5s = screen.getAllByText('5');
+        expect(all5s.length).toBeGreaterThanOrEqual(1); // Total count
       });
 
       it('should update letter count as user fills boxes', async () => {
@@ -175,27 +177,29 @@ describe('FillBlankChallenge', () => {
 
         const inputs = screen.getAllByRole('textbox');
 
-        // Initially should show: A + 0 / 4
-        expect(screen.getByText('0')).toBeInTheDocument();
+        // Initially should show: 1 / 5 (first letter counts as 1 filled)
+        // "1" appears as filled count and box number indicator
+        const initial1s = screen.getAllByText('1');
+        expect(initial1s.length).toBeGreaterThanOrEqual(1);
 
         // Type "P" in first input box (use fireEvent for deterministic behavior)
         fireEvent.change(inputs[0], { target: { value: 'P' } });
 
-        // Should now show: A + 1 / 4
-        // Note: "1" appears multiple times (filled count + box number indicator)
+        // Should now show: 2 / 5
+        // Note: "2" appears multiple times (filled count + box number indicator)
         await waitFor(() => {
-          const all1s = screen.getAllByText('1');
-          expect(all1s.length).toBeGreaterThanOrEqual(2);
+          const all2s = screen.getAllByText('2');
+          expect(all2s.length).toBeGreaterThanOrEqual(2);
         });
 
         // Type "P" in second input box
         fireEvent.change(inputs[1], { target: { value: 'P' } });
 
-        // Should now show: A + 2 / 4
-        // Note: "2" appears multiple times (filled count + box number indicator)
+        // Should now show: 3 / 5
+        // Note: "3" appears multiple times (filled count + box number indicator)
         await waitFor(() => {
-          const all2s = screen.getAllByText('2');
-          expect(all2s.length).toBeGreaterThanOrEqual(2);
+          const all3s = screen.getAllByText('3');
+          expect(all3s.length).toBeGreaterThanOrEqual(2);
         });
       });
     });
@@ -446,16 +450,19 @@ describe('FillBlankChallenge', () => {
         );
 
         // First letter box should show "1" below it
-        expect(screen.getByText('1')).toBeInTheDocument();
+        // "1" appears multiple times (box indicator + filled count), so use getAllByText
+        const all1s = screen.getAllByText('1');
+        expect(all1s.length).toBeGreaterThanOrEqual(1);
 
         // Input boxes should show "2", "3", "4", "5"
-        // Note: Some numbers like "4" appear multiple times (box indicator + letter count)
         expect(screen.getByText('2')).toBeInTheDocument();
         expect(screen.getByText('3')).toBeInTheDocument();
-        // "4" appears in letter count ("A + 0 / 4") and as box indicator
+        // "4" appears as box indicator
         const all4s = screen.getAllByText('4');
         expect(all4s.length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText('5')).toBeInTheDocument();
+        // "5" appears as box indicator and total letter count
+        const all5s = screen.getAllByText('5');
+        expect(all5s.length).toBeGreaterThanOrEqual(1);
       });
     });
   });

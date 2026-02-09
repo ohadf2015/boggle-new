@@ -78,10 +78,11 @@ describe('GlobalBottomNav', () => {
     });
 
     describe('Rendering', () => {
-        it('should render all three navigation tabs', () => {
+        it('should render all four navigation tabs', () => {
             render(<GlobalBottomNav />);
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /brain/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
         });
@@ -212,11 +213,11 @@ describe('GlobalBottomNav', () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it('should hide on multiplayer path (has own nav)', () => {
+        it('should show on multiplayer lobby path (Play tab visible)', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/multiplayer');
 
             const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).toBeNull();
+            expect(container.firstChild).not.toBeNull();
         });
 
         it('should hide on singleplayer path (has own nav)', () => {

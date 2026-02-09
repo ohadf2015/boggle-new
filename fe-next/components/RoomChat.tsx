@@ -365,6 +365,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
             placeholder={t('chat.placeholder') || 'Type a message...'}
+            maxLength={200}
             className="flex-1 min-w-0 text-sm"
             dir="auto"
           />
