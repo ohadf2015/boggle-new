@@ -9,6 +9,7 @@ import { useState, useCallback } from 'react';
 import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { NotificationDropdown } from './NotificationDropdown';
 import { NotificationToast } from './NotificationToast';
@@ -16,6 +17,7 @@ import type { NotificationData, NotificationBellProps } from './types';
 
 export function NotificationBell({ className = '' }: NotificationBellProps) {
   const router = useRouter();
+  const { language } = useLanguage();
   const { user } = useAuth();
   const {
     notifications,
@@ -28,24 +30,30 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Handle notification click - navigate to action URL
+  // Handle notification click - navigate to action URL (prefixed with locale)
   const handleNotificationClick = useCallback(
     (notification: NotificationData) => {
       setIsDropdownOpen(false);
       if (notification.action_url) {
-        router.push(notification.action_url);
+        const url = notification.action_url.startsWith('/')
+          ? `/${language}${notification.action_url}`
+          : notification.action_url;
+        router.push(url);
       }
     },
-    [router]
+    [router, language]
   );
 
-  // Handle toast action
+  // Handle toast action (also needs locale prefix)
   const handleToastAction = useCallback(() => {
     if (latestNotification?.action_url) {
-      router.push(latestNotification.action_url);
+      const url = latestNotification.action_url.startsWith('/')
+        ? `/${language}${latestNotification.action_url}`
+        : latestNotification.action_url;
+      router.push(url);
     }
     clearLatestNotification();
-  }, [latestNotification, router, clearLatestNotification]);
+  }, [latestNotification, router, language, clearLatestNotification]);
 
   // Don't render if not logged in
   if (!user) {
