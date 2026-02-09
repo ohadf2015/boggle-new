@@ -1,16 +1,21 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { withSentryConfig } from '@sentry/nextjs';
-import bundleAnalyzer from '@next/bundle-analyzer';
 import million from 'million/compiler';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Bundle analyzer - run with ANALYZE=true
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-});
+// Bundle analyzer - only loaded when ANALYZE=true (devDependency, not available in production)
+let withBundleAnalyzer = (config) => config;
+if (process.env.ANALYZE === 'true') {
+  try {
+    const { default: bundleAnalyzer } = await import('@next/bundle-analyzer');
+    withBundleAnalyzer = bundleAnalyzer({ enabled: true });
+  } catch {
+    console.warn('Bundle analyzer not available - install @next/bundle-analyzer');
+  }
+}
 
 // Check if this is a preview/staging environment (explicitly set or PR preview)
 // Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
