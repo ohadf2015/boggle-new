@@ -88,6 +88,8 @@ const es = {
     "dismiss": "Cerrar",
     "info": "Info",
     "close": "Cerrar",
+    "home": "Inicio",
+    "playAgain": "Jugar de nuevo",
     "exit": "Salir",
     "adminDashboard": "Panel de administración",
     "awesome": "¡Genial!",
@@ -204,7 +206,8 @@ const es = {
     "bottomNavigation": "Navegación inferior",
     "home": "Inicio",
     "brain": "Cerebro",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "play": "Jugar"
   },
   "skills": {
     "title": "Árbol de Habilidades",
@@ -1140,6 +1143,7 @@ const es = {
     "exitRoom": "Salir",
     "exitWarning": "¿Te vas? Puedes quedarte para la próxima ronda.",
     "playAgain": "Otra vez",
+    "maxCombo": "Combo máximo",
     "celebrate": "Celebrar",
     "celebrateAgain": "¡Otra vez!",
     "finalScores": "Puntuaciones Finales",
@@ -2586,6 +2590,8 @@ const es = {
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
     "adventureModeDesc": "100 niveles en 10 mundos",
+    "blastMode": "Modo Blast",
+    "blastModeDesc": "¡Limpia el tablero!",
     "education": "Educación",
     "educationDesc": "Para profesores y estudiantes",
     "educationBadge": "PARA PROFESORES",
@@ -3110,6 +3116,7 @@ const es = {
     },
     "viewResults": "VER RESULTADOS",
     "yourAnswer": "TU RESPUESTA",
+    "typeYourAnswer": "Escribe tu respuesta...",
     "yourScore": "TU PUNTAJE",
     "noChallenge": "No hay desafío disponible",
     "notAvailable": "No Disponible",
@@ -3183,7 +3190,8 @@ const es = {
       "powerUps": "Mejoras",
       "hintsUnlocked": "Pistas Desbloqueadas",
       "triesRemaining": "Intentos Restantes",
-      "noWordsYet": "¡Encuentra palabras para recolectar botín!"
+      "noWordsYet": "¡Encuentra palabras para recolectar botín!",
+      "beFirst": "¡Sé el primero en el ranking!"
     },
     "results": {
       "tapToCelebrate": "¡Toca para celebrar!",
@@ -4155,6 +4163,7 @@ const es = {
   },
   "gift": {
     "rewards": "Recompensas",
+    "gifts": "Regalos",
     "youHaveGifts": "¡Tienes regalos esperando!",
     "youReceived": "¡Recibiste un regalo!",
     "from": "De",
@@ -4238,6 +4247,7 @@ const es = {
     "hiddenWord": "Palabra oculta",
     "devPreview": "Vista previa de desarrollo",
     "devPreviewDesc": "El Modo Aventura está en desarrollo. Esta vista previa muestra el mapa del mundo y la configuración de niveles.",
+    "next": "SIGUIENTE",
     "exitToMap": "Salir al mapa",
     "startLevel": "Iniciar nivel",
     "levelComplete": "¡Nivel completado!",
@@ -4502,7 +4512,10 @@ const es = {
       "hintAvailable": "¿Necesitas una pista?",
       "hintUsed": "¡Prueba esta palabra!",
       "noHints": "No hay más pistas disponibles",
-      "selectWord": "Selecciona una palabra"
+      "selectWord": "Selecciona una palabra",
+      "hintFullReveal": "¡Intenta buscar palabras más cortas primero!",
+      "hintLengthAndStart": "¡Busca palabras que empiecen con letras específicas!",
+      "hintGeneral": "¡Sigue intentando! Busca patrones comunes."
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -4995,10 +5008,25 @@ const es = {
       },
     }
   },
+  "blast": {
+    "title": "Modo Blast",
+    "description": "¡Limpia el tablero! Las palabras explotan fichas.",
+    "progress": "Limpiado",
+    "complete": "¡Tablero limpio!",
+    "noMoreWords": "No hay más palabras posibles",
+    "giveUp": "Terminar juego",
+    "goldTile": "¡3x puntos!",
+    "bombTile": "¡Limpia zona!",
+    "rainbowTile": "¡Bonus!",
+    "stars1": "Bien",
+    "stars2": "Genial",
+    "stars3": "¡Perfecto!"
+  },
   "student": {
     "dashboard": {
       "title": "Mis Lecciones",
-      "subtitle": "Practica vocabulario y sigue tu progreso"
+      "subtitle": "Practica vocabulario y sigue tu progreso",
+      "defaultName": "Estudiante"
     },
     "lessons": {
       "lesson": "Lección",
@@ -5223,7 +5251,16 @@ const es = {
       "expandDetails": "Ver detalles",
       "exportCSV": "Exportar CSV",
       "exportSuccess": "¡Progreso exportado!",
-      "noDataToExport": "Sin datos para exportar"
+      "noDataToExport": "Sin datos para exportar",
+      "allClassrooms": "Todas las aulas",
+      "allLessons": "Todas las lecciones",
+      "anonymousStudent": "Estudiante {{id}}",
+      "breakdownWord": "Palabra",
+      "breakdownAttempts": "Intentos",
+      "breakdownCorrect": "Correctos",
+      "statusMastered": "Dominado",
+      "statusLearning": "Aprendiendo",
+      "noWordsYet": "Aún no se han intentado palabras"
     },
     "stats": {
       "totalStudents": "Total Estudiantes",

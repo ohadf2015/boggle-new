@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Search, Check, X, ChevronLeft, ChevronRight, Filter, ExternalLink, BookCheck, Clock
+  Search, Check, X, ChevronLeft, ChevronRight, Filter, ExternalLink, BookCheck, Clock, Ban, Trash2, AlertTriangle
 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
@@ -23,12 +23,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface MilogWord {
   id: string;
   word: string;
-  milog_status: 'verified' | 'not_found' | 'error' | 'pending' | null;
+  milog_status: 'verified' | 'not_found' | 'error' | 'pending' | 'rejected_type' | null;
   milog_verified_at: string | null;
   milog_url: string | null;
   milog_attempts: number;
   submission_count: number;
   approved_at: string | null;
+  milog_word_type: string | null;
+  milog_rejected_reason: string | null;
 }
 
 interface Stats {
@@ -37,6 +39,7 @@ interface Stats {
   notFound: number;
   promoted: number;
   pending: number;
+  rejectedType: number;
 }
 
 interface Pagination {
@@ -54,6 +57,7 @@ const STATUS_LABELS: Record<string, string> = {
   not_found: 'Not Found',
   error: 'Error',
   pending: 'Pending',
+  rejected_type: 'Wrong Type',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -61,6 +65,16 @@ const STATUS_COLORS: Record<string, string> = {
   not_found: 'bg-red-500',
   error: 'bg-orange-500',
   pending: 'bg-slate-500',
+  rejected_type: 'bg-purple-500',
+};
+
+const WORD_TYPE_COLORS: Record<string, string> = {
+  noun: 'bg-blue-600',
+  verb: 'bg-emerald-600',
+  adjective: 'bg-amber-600',
+  adverb: 'bg-teal-600',
+  abbreviation: 'bg-red-600',
+  proper_name: 'bg-red-600',
 };
 
 export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
@@ -74,6 +88,12 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [limit] = useState(50);
   const [offset, setOffset] = useState(0);
+
+  // Revoke dialog
+  const [revokeWord, setRevokeWord] = useState<MilogWord | null>(null);
+  const [revokeBlacklist, setRevokeBlacklist] = useState(false);
+  const [revokeReason, setRevokeReason] = useState('');
+  const [revoking, setRevoking] = useState(false);
 
   const fetchWords = useCallback(async () => {
     try {
@@ -110,6 +130,40 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
     return () => clearTimeout(timer);
   }, [fetchWords]);
 
+  const handleRevoke = useCallback(async () => {
+    if (!revokeWord) return;
+    setRevoking(true);
+    try {
+      const response = await fetch('/api/admin/dictionary-revoke', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          word: revokeWord.word,
+          language: 'he',
+          addToBlacklist: revokeBlacklist,
+          reason: revokeReason || undefined,
+        }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to revoke word');
+      }
+      toast.success(`Revoked "${revokeWord.word}" from dictionary`);
+      setRevokeWord(null);
+      setRevokeBlacklist(false);
+      setRevokeReason('');
+      fetchWords();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Revoke failed: ${msg}`);
+    } finally {
+      setRevoking(false);
+    }
+  }, [revokeWord, revokeBlacklist, revokeReason, authToken, fetchWords]);
+
   const handlePageChange = (newOffset: number) => {
     setOffset(newOffset);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -126,21 +180,14 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
     });
   };
 
-  const getStatusLabel = (status: string | null) => {
-    if (!status) return 'Unknown';
-    return STATUS_LABELS[status] || status;
-  };
-
-  const getStatusColor = (status: string | null) => {
-    if (!status) return 'bg-slate-500';
-    return STATUS_COLORS[status] || 'bg-slate-500';
-  };
+  const getStatusLabel = (s: string | null) => s ? (STATUS_LABELS[s] || s) : 'Unknown';
+  const getStatusColor = (s: string | null) => s ? (STATUS_COLORS[s] || 'bg-slate-500') : 'bg-slate-500';
 
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <Card className="bg-slate-800 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -206,6 +253,19 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
+          <Card className="bg-slate-800 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-500/20 rounded-lg">
+                  <Ban className="w-5 h-5 text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Wrong Type</p>
+                  <p className="text-2xl font-bold text-white">{stats.rejectedType}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -236,6 +296,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               <SelectItem value="not_found">Not Found</SelectItem>
               <SelectItem value="promoted">In Dictionary</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="rejected_type">Wrong Type</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -272,10 +333,18 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="text-xl font-bold text-white" dir="rtl">{word.word}</h3>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <Badge className={cn("text-xs text-white", getStatusColor(word.milog_status))}>
                             {getStatusLabel(word.milog_status)}
                           </Badge>
+                          {word.milog_word_type && (
+                            <Badge className={cn(
+                              "text-xs text-white",
+                              WORD_TYPE_COLORS[word.milog_word_type] || 'bg-slate-600'
+                            )}>
+                              {word.milog_word_type}
+                            </Badge>
+                          )}
                           {word.approved_at && (
                             <Badge className="text-xs bg-neo-yellow text-black">
                               In Dictionary
@@ -298,11 +367,14 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                         <p className="text-neo-yellow">Promoted: {formatDate(word.approved_at)}</p>
                       )}
                       <p>Attempts: {word.milog_attempts}</p>
+                      {word.milog_rejected_reason && (
+                        <p className="text-purple-400">Rejected: {word.milog_rejected_reason}</p>
+                      )}
                     </div>
 
-                    {/* Milog Link */}
-                    {word.milog_url && (
-                      <div className="pt-2">
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 pt-2">
+                      {word.milog_url && (
                         <a
                           href={word.milog_url}
                           target="_blank"
@@ -312,8 +384,19 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                           <ExternalLink className="w-4 h-4" />
                           View on Milog
                         </a>
-                      </div>
-                    )}
+                      )}
+                      {word.approved_at && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="ml-auto border-red-600 text-red-400 hover:bg-red-600/20 hover:text-red-300"
+                          onClick={() => setRevokeWord(word)}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Revoke
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -348,6 +431,66 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
             Next
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
+        </div>
+      )}
+
+      {/* Revoke Confirmation Dialog */}
+      {revokeWord && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <Card className="bg-slate-800 border-slate-600 max-w-md w-full">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-500/20 rounded-lg">
+                  <AlertTriangle className="w-6 h-6 text-red-500" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Revoke Word</h3>
+                  <p className="text-sm text-slate-400">
+                    Remove <span className="font-bold text-white" dir="rtl">{revokeWord.word}</span> from dictionary
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={revokeBlacklist}
+                    onChange={(e) => setRevokeBlacklist(e.target.checked)}
+                    className="rounded border-slate-600"
+                  />
+                  <span className="text-sm text-slate-300">Also add to blacklist (prevent re-submission)</span>
+                </label>
+
+                <Input
+                  placeholder="Reason (optional)"
+                  value={revokeReason}
+                  onChange={(e) => setRevokeReason(e.target.value)}
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-slate-600"
+                  onClick={() => { setRevokeWord(null); setRevokeBlacklist(false); setRevokeReason(''); }}
+                  disabled={revoking}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={handleRevoke}
+                  disabled={revoking}
+                >
+                  {revoking ? 'Revoking...' : 'Revoke'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

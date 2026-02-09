@@ -88,6 +88,8 @@ const sv = {
     "dismiss": "Stäng",
     "info": "Info",
     "close": "Stäng",
+    "home": "Hem",
+    "playAgain": "Spela igen",
     "exit": "Avsluta",
     "adminDashboard": "Administratörspanel",
     "awesome": "Fantastiskt!",
@@ -204,7 +206,8 @@ const sv = {
     "bottomNavigation": "Nedre navigering",
     "home": "Hem",
     "brain": "Hjärna",
-    "profile": "Profil"
+    "profile": "Profil",
+    "play": "Spela"
   },
   "skills": {
     "title": "Färdighetsträd",
@@ -1137,6 +1140,7 @@ const sv = {
     "exitRoom": "Lämna",
     "exitWarning": "Gå nu? Du kan stanna för nästa runda.",
     "playAgain": "Igen",
+    "maxCombo": "Max kombo",
     "celebrate": "Fira",
     "celebrateAgain": "Igen!",
     "finalScores": "Slutresultat",
@@ -2593,6 +2597,8 @@ const sv = {
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
     "adventureModeDesc": "100 nivåer i 10 världar",
+    "blastMode": "Blast-läge",
+    "blastModeDesc": "Rensa brädet!",
     "education": "Utbildning",
     "educationDesc": "För lärare och elever",
     "educationBadge": "FÖR LÄRARE",
@@ -3065,6 +3071,7 @@ const sv = {
     },
     "viewResults": "VISA RESULTAT",
     "yourAnswer": "DITT SVAR",
+    "typeYourAnswer": "Skriv ditt svar...",
     "yourScore": "DIN POÄNG",
     "noChallenge": "Ingen utmaning tillgänglig",
     "type": {
@@ -3198,7 +3205,8 @@ const sv = {
       "powerUps": "Power-ups",
       "hintsUnlocked": "Upplåsta Ledtrådar",
       "triesRemaining": "Försök Kvar",
-      "noWordsYet": "Hitta ord för att samla byte!"
+      "noWordsYet": "Hitta ord för att samla byte!",
+      "beFirst": "Bli först på topplistan!"
     },
     "results": {
       "tapToCelebrate": "Tryck för att fira!",
@@ -4170,6 +4178,7 @@ const sv = {
   },
   "gift": {
     "rewards": "Belöningar",
+    "gifts": "Gåvor",
     "youHaveGifts": "Du har gåvor som väntar!",
     "youReceived": "Du fick en gåva!",
     "from": "Från",
@@ -4257,6 +4266,7 @@ const sv = {
     "hiddenWord": "Dolt ord",
     "devPreview": "Utvecklingsförhandsgranskning",
     "devPreviewDesc": "Äventyrsläge är under utveckling. Denna förhandsgranskning visar världskartan och nivåkonfiguration.",
+    "next": "NÄSTA",
     "exitToMap": "Avsluta till karta",
     "startLevel": "Starta nivå",
     "levelComplete": "Nivå klar!",
@@ -4392,6 +4402,9 @@ const sv = {
     },
 "game": {
       "selectWord": "Välj ett ord",
+      "hintFullReveal": "Prova att leta efter kortare ord först!",
+      "hintLengthAndStart": "Leta efter ord som börjar med specifika bokstäver!",
+      "hintGeneral": "Fortsätt försöka! Leta efter vanliga mönster.",
       "objectives": "Mål",
       "combo": "Kombo",
       "wordsFound": "Hittade ord",
@@ -4964,6 +4977,20 @@ const sv = {
       }
     }
   },
+  "blast": {
+    "title": "Blast-läge",
+    "description": "Rensa brädet! Ord spränger brickor.",
+    "progress": "Rensat",
+    "complete": "Brädet rensat!",
+    "noMoreWords": "Inga fler ord möjliga",
+    "giveUp": "Avsluta spel",
+    "goldTile": "3x poäng!",
+    "bombTile": "Rensar område!",
+    "rainbowTile": "Bonuspoäng!",
+    "stars1": "Bra",
+    "stars2": "Toppen",
+    "stars3": "Perfekt!"
+  },
   "student": {
     "activeGame": {
       "title": "Spel startar!",
@@ -4973,7 +5000,8 @@ const sv = {
     },
     "dashboard": {
       "title": "Mina lektioner",
-      "subtitle": "Öva glosor och följ dina framsteg"
+      "subtitle": "Öva glosor och följ dina framsteg",
+      "defaultName": "Elev"
     },
     "lessons": {
       "lesson": "Lektion",
@@ -5194,7 +5222,16 @@ const sv = {
       "exportSuccess": "Framsteg exporterade!",
       "noDataToExport": "Ingen data att exportera",
       "noProgressYet": "Ingen elevprogression för denna lektion ännu",
-      "selectFilters": "Välj ett klassrum och en lektion för att se progression"
+      "selectFilters": "Välj ett klassrum och en lektion för att se progression",
+      "allClassrooms": "Alla klassrum",
+      "allLessons": "Alla lektioner",
+      "anonymousStudent": "Elev {{id}}",
+      "breakdownWord": "Ord",
+      "breakdownAttempts": "Försök",
+      "breakdownCorrect": "Rätt",
+      "statusMastered": "Lärt sig",
+      "statusLearning": "Lär sig",
+      "noWordsYet": "Inga ord har provats ännu"
     },
     "stats": {
       "totalStudents": "Totalt elever",

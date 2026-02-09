@@ -8,6 +8,7 @@ import {
   verifyWordOnMilog,
   parseVerificationResult,
   processMilogVerificationQueue,
+  invalidateMilogCache,
 } from '../milogWordVerifier';
 
 // Mock axios
@@ -17,10 +18,12 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 // Mock Redis client - use a single instance for all tests
 const mockRedisGet = jest.fn();
 const mockRedisSetex = jest.fn();
+const mockRedisDel = jest.fn();
 jest.mock('../../redisClient', () => ({
   getRedisClient: jest.fn(() => ({
     get: mockRedisGet,
     setex: mockRedisSetex,
+    del: mockRedisDel,
   })),
 }));
 
@@ -103,6 +106,141 @@ describe('MilogWordVerifier', () => {
 
       expect(result.verified).toBe(true);
       expect(result.definitionCount).toBe(3);
+    });
+
+    it('should accept a noun (שם עצם)', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/שלום/e_2839">שָׁלוֹם - שם עצם, זכר</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'שלום');
+
+      expect(result.verified).toBe(true);
+      expect(result.status).toBe('verified');
+      expect(result.wordType).toBe('noun');
+      expect(result.wordTypeRaw).toBe('שם עצם');
+    });
+
+    it('should accept a verb (פועל)', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/רץ/e_5001">רָץ - פועל</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'רץ');
+
+      expect(result.verified).toBe(true);
+      expect(result.status).toBe('verified');
+      expect(result.wordType).toBe('verb');
+    });
+
+    it('should accept an adjective (שם תואר)', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/גדול/e_3001">גָּדוֹל - שם תואר</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'גדול');
+
+      expect(result.verified).toBe(true);
+      expect(result.wordType).toBe('adjective');
+    });
+
+    it('should reject an abbreviation (ראשי תיבות)', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/רמבם/e_8001">רַמְבָּ"ם - ראשי תיבות</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'רמבם');
+
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('rejected_type');
+      expect(result.wordType).toBe('abbreviation');
+      expect(result.rejectedReason).toContain('abbreviation');
+    });
+
+    it('should reject a proper name (שם פרטי)', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/דוד/e_9001">דָּוִד - שם פרטי</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'דוד');
+
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('rejected_type');
+      expect(result.wordType).toBe('proper_name');
+      expect(result.rejectedReason).toContain('proper_name');
+    });
+
+    it('should accept when mixed types include an accepted type', () => {
+      // Word with multiple definitions: one is noun, one is proper name
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/שרון/e_7001">שָׁרוֹן - שם פרטי</a>
+          </div>
+          <div class="sr_e">
+            <a href="https://milog.co.il/שרון/e_7002">שָׁרוֹן - שם עצם, זכר</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'שרון');
+
+      expect(result.verified).toBe(true);
+      expect(result.status).toBe('verified');
+      // Should pick the accepted type
+      expect(result.wordType).toBe('noun');
+    });
+
+    it('should fall back to verified when type is unparseable but links exist', () => {
+      // Links exist but no recognizable word type label
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/מילה/e_4001">מִילָה</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'מילה');
+
+      expect(result.verified).toBe(true);
+      expect(result.status).toBe('verified');
+      expect(result.wordType).toBe('unknown');
+    });
+
+    it('should accept an adverb (תואר הפועל)', () => {
+      const html = `
+        <html><body>
+          <div class="sr_e">
+            <a href="https://milog.co.il/מהר/e_6001">מַהֵר - תואר הפועל</a>
+          </div>
+        </body></html>
+      `;
+
+      const result = parseVerificationResult(html, 'מהר');
+
+      expect(result.verified).toBe(true);
+      expect(result.wordType).toBe('adverb');
     });
 
     it('should return not_found for gibberish Hebrew in HTML', () => {
@@ -326,6 +464,61 @@ describe('MilogWordVerifier', () => {
           p_status: 'verified',
         })
       );
+    });
+
+    it('should count rejected_type words in result', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: [
+          { id: 'uuid-1', word: 'רמבם', submission_count: 3, milog_attempts: 0 },
+        ],
+        error: null,
+      });
+
+      mockRpc.mockResolvedValue({ error: null });
+
+      // HTML with abbreviation type
+      const html = `
+        <div class="sr_e">
+          <a href="https://milog.co.il/רמבם/e_8001">רַמְבָּ"ם - ראשי תיבות</a>
+        </div>
+      `;
+      mockedAxios.get.mockResolvedValueOnce({ data: html, status: 200 });
+      mockRedisGet.mockResolvedValue(null);
+
+      const result = await processMilogVerificationQueue({ batchSize: 10 });
+
+      // rejected_type words are processed but not counted as verified
+      expect(result.processed).toBe(1);
+      expect(result.verified).toBe(0);
+      expect(result.rejectedType).toBe(1);
+
+      // RPC should be called with rejected_type status and word type info
+      expect(mockRpc).toHaveBeenCalledWith(
+        'update_milog_verification',
+        expect.objectContaining({
+          p_word_id: 'uuid-1',
+          p_status: 'rejected_type',
+          p_word_type: 'abbreviation',
+          p_rejected_reason: expect.stringContaining('abbreviation'),
+        })
+      );
+    });
+  });
+
+  describe('invalidateMilogCache', () => {
+    it('should delete the Redis cache key for a word', async () => {
+      mockRedisDel.mockResolvedValueOnce(1);
+
+      await invalidateMilogCache('שלום');
+
+      expect(mockRedisDel).toHaveBeenCalledWith('milog:שלום');
+    });
+
+    it('should handle Redis errors gracefully', async () => {
+      mockRedisDel.mockRejectedValueOnce(new Error('Redis down'));
+
+      // Should not throw
+      await expect(invalidateMilogCache('מילה')).resolves.toBeUndefined();
     });
   });
 });

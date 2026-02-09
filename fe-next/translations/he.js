@@ -88,6 +88,8 @@ const he = {
     "dismiss": "סגור",
     "info": "מידע",
     "close": "סגור",
+    "home": "בית",
+    "playAgain": "שחק שוב",
     "exit": "יציאה",
     "adminDashboard": "לוח בקרה",
     "awesome": "מדהים!",
@@ -204,7 +206,8 @@ const he = {
     "bottomNavigation": "ניווט תחתון",
     "home": "בית",
     "brain": "מוח",
-    "profile": "פרופיל"
+    "profile": "פרופיל",
+    "play": "שחק"
   },
   "skills": {
     "title": "עץ כישורים",
@@ -1150,6 +1153,7 @@ const he = {
     "exitRoom": "יציאה",
     "exitWarning": "יוצאים? אפשר להישאר לסיבוב הבא.",
     "playAgain": "עוד פעם",
+    "maxCombo": "קומבו מקסימלי",
     "celebrate": "חגיגה",
     "celebrateAgain": "עוד!",
     "finalScores": "תוצאות סופיות",
@@ -2606,6 +2610,8 @@ const he = {
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "adventureMode": "הרפתקה",
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
+    "blastMode": "מצב פיצוץ",
+    "blastModeDesc": "נקו את הלוח!",
     "education": "חינוך",
     "educationDesc": "למורים ותלמידים",
     "educationBadge": "למורים",
@@ -3130,6 +3136,7 @@ const he = {
     "total": "סה\"כ",
     "viewResults": "צפה בתוצאות",
     "yourAnswer": "התשובה שלך",
+    "typeYourAnswer": "הקלד את תשובתך...",
     "yourScore": "הניקוד שלך",
     "noChallenge": "אין אתגר זמין",
     "notAvailable": "לא זמין",
@@ -3203,7 +3210,8 @@ const he = {
       "powerUps": "כוחות מיוחדים",
       "hintsUnlocked": "רמזים שנפתחו",
       "triesRemaining": "ניסיונות נותרים",
-      "noWordsYet": "מצא מילים כדי לאסוף שלל!"
+      "noWordsYet": "מצא מילים כדי לאסוף שלל!",
+      "beFirst": "היה הראשון בדירוג!"
     },
     "results": {
       "tapToCelebrate": "לחץ לחגוג!",
@@ -4147,6 +4155,7 @@ const he = {
   },
   "gift": {
     "rewards": "פרסים",
+    "gifts": "מתנות",
     "youHaveGifts": "יש לך מתנות ממתינות!",
     "youReceived": "קיבלת מתנה!",
     "from": "מאת",
@@ -4243,6 +4252,7 @@ const he = {
     "hiddenWord": "מילה נסתרת",
     "devPreview": "תצוגה מקדימה",
     "devPreviewDesc": "מצב הרפתקה בפיתוח. תצוגה מקדימה זו מציגה את מפת העולם ותצורת השלבים.",
+    "next": "הבא",
     "exitToMap": "יציאה למפה",
     "startLevel": "התחל שלב",
     "levelComplete": "השלב הושלם!",
@@ -4381,7 +4391,10 @@ const he = {
       "hintAvailable": "צריכים רמז?",
       "hintUsed": "נסו את המילה הזו!",
       "noHints": "אין עוד רמזים זמינים",
-      "selectWord": "החליקו על אותיות למציאת מילים"
+      "selectWord": "החליקו על אותיות למציאת מילים",
+      "hintFullReveal": "נסה לחפש מילים קצרות יותר!",
+      "hintLengthAndStart": "חפש מילים שמתחילות באותיות ספציפיות!",
+      "hintGeneral": "המשך לנסות! חפש תבניות נפוצות."
     },
     "hints": {
       "minLetters2": "2+ אותיות",
@@ -4940,6 +4953,20 @@ const he = {
       }
     }
   },
+  "blast": {
+    "title": "מצב פיצוץ",
+    "description": "נקו את הלוח! מילים מפוצצות אריחים.",
+    "progress": "נוקה",
+    "complete": "הלוח נוקה!",
+    "noMoreWords": "אין עוד מילים אפשריות",
+    "giveUp": "סיום משחק",
+    "goldTile": "x3 ניקוד!",
+    "bombTile": "מנקה אזור!",
+    "rainbowTile": "בונוס!",
+    "stars1": "טוב",
+    "stars2": "מעולה",
+    "stars3": "מושלם!"
+  },
   "student": {
     "activeGame": {
       "title": "משחק מתחיל! 🎮",
@@ -4949,7 +4976,8 @@ const he = {
     },
     "dashboard": {
       "title": "השיעורים שלי",
-      "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות"
+      "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות",
+      "defaultName": "תלמיד"
     },
     "lessons": {
       "lesson": "שיעור",
@@ -5170,7 +5198,16 @@ const he = {
       "expandDetails": "הצג פירוט",
       "exportCSV": "ייצא CSV",
       "exportSuccess": "הייצוא הושלם בהצלחה!",
-      "noDataToExport": "אין נתונים לייצוא"
+      "noDataToExport": "אין נתונים לייצוא",
+      "allClassrooms": "כל הכיתות",
+      "allLessons": "כל השיעורים",
+      "anonymousStudent": "תלמיד {{id}}",
+      "breakdownWord": "מילה",
+      "breakdownAttempts": "ניסיונות",
+      "breakdownCorrect": "נכון",
+      "statusMastered": "נרכש",
+      "statusLearning": "בלמידה",
+      "noWordsYet": "עדיין לא נוסו מילים"
     },
     "stats": {
       "totalStudents": "סה״כ תלמידים",

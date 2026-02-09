@@ -93,6 +93,8 @@ const en = {
     "valid": "Valid",
     "invalid": "Invalid",
     "close": "Close",
+    "home": "Home",
+    "playAgain": "Play Again",
     "exit": "Exit",
     "adminDashboard": "Admin Dashboard",
     "awesome": "Awesome!",
@@ -204,7 +206,8 @@ const en = {
     "bottomNavigation": "Bottom navigation",
     "home": "Home",
     "brain": "Brain",
-    "profile": "Profile"
+    "profile": "Profile",
+    "play": "Play"
   },
   "skills": {
     "title": "Skill Tree",
@@ -1141,6 +1144,7 @@ const en = {
     "exitRoom": "Leave",
     "exitWarning": "Leave now? You'll miss the next round.",
     "playAgain": "Again!",
+    "maxCombo": "Max Combo",
     "celebrate": "Celebrate",
     "celebrateAgain": "More!",
     "finalScores": "Final Score",
@@ -2597,6 +2601,8 @@ const en = {
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
     "adventureModeDesc": "100 levels across 10 worlds",
+    "blastMode": "Blast Mode",
+    "blastModeDesc": "Clear the board!",
     "education": "Education",
     "educationDesc": "For teachers & students",
     "educationBadge": "FOR TEACHERS",
@@ -3026,6 +3032,7 @@ const en = {
     "topicIs": "Topic:",
     "total": "Total",
     "yourAnswer": "Your answer...",
+    "typeYourAnswer": "Type your answer...",
     "yourScore": "Your Score",
     "noChallenge": "No challenge available",
     "searches": "searches",
@@ -3190,7 +3197,8 @@ const en = {
       "powerUps": "Power-ups",
       "hintsUnlocked": "Hints Unlocked",
       "triesRemaining": "Tries Remaining",
-      "noWordsYet": "Find words to collect loot!"
+      "noWordsYet": "Find words to collect loot!",
+      "beFirst": "Be the first to rank!"
     },
     "results": {
       "tapToCelebrate": "Tap to celebrate!",
@@ -4145,6 +4153,7 @@ const en = {
   },
   "gift": {
     "rewards": "Rewards",
+    "gifts": "Gifts",
     "youHaveGifts": "You have gifts waiting!",
     "youReceived": "You received a gift!",
     "from": "From",
@@ -4332,6 +4341,7 @@ const en = {
       "chain": "Chain (link bonus)",
       "time": "Time (+5 seconds)"
     },
+    "next": "NEXT",
     "exitToMap": "Exit to Map",
     "startLevel": "Start Level",
     "levelComplete": "Level Complete!",
@@ -4379,7 +4389,10 @@ const en = {
       "hintAvailable": "Need a hint?",
       "hintUsed": "Try this word!",
       "noHints": "No more hints available",
-      "selectWord": "Swipe letters to find words"
+      "selectWord": "Swipe letters to find words",
+      "hintFullReveal": "Try looking for shorter words first!",
+      "hintLengthAndStart": "Look for words starting with specific letters!",
+      "hintGeneral": "Keep trying! Look for common patterns."
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -4938,6 +4951,20 @@ const en = {
       }
     }
   },
+  "blast": {
+    "title": "Blast Mode",
+    "description": "Clear the board! Words explode tiles.",
+    "progress": "Cleared",
+    "complete": "Board Cleared!",
+    "noMoreWords": "No more words possible",
+    "giveUp": "End Game",
+    "goldTile": "3x Score!",
+    "bombTile": "Clears area!",
+    "rainbowTile": "Wildcard bonus!",
+    "stars1": "Good",
+    "stars2": "Great",
+    "stars3": "Perfect!"
+  },
   "student": {
         "activeGame": {
       "title": "Game Starting!",
@@ -4947,7 +4974,8 @@ const en = {
     },
     "dashboard": {
       "title": "My Lessons",
-      "subtitle": "Practice vocabulary and track your progress"
+      "subtitle": "Practice vocabulary and track your progress",
+      "defaultName": "Student"
     },
     "lessons": {
       "lesson": "Lesson",
@@ -5184,7 +5212,16 @@ const en = {
       "expandDetails": "View word breakdown",
       "exportCSV": "Export CSV",
       "exportSuccess": "Progress exported successfully!",
-      "noDataToExport": "No data to export"
+      "noDataToExport": "No data to export",
+      "allClassrooms": "All Classrooms",
+      "allLessons": "All Lessons",
+      "anonymousStudent": "Student {{id}}",
+      "breakdownWord": "Word",
+      "breakdownAttempts": "Attempts",
+      "breakdownCorrect": "Correct",
+      "statusMastered": "Mastered",
+      "statusLearning": "Learning",
+      "noWordsYet": "No words attempted yet"
     },
     "stats": {
       "totalStudents": "Total Students",

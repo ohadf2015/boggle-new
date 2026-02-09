@@ -1052,6 +1052,48 @@ async function addApprovedWord(word: string, language: Language): Promise<boolea
   }
 }
 
+// Remove a community-approved word from the dictionary (both in-memory and file)
+async function removeApprovedWord(word: string, language: Language): Promise<boolean> {
+  const config = getLanguageConfig(language);
+  const normalizedWord = normalizeWord(word, language);
+
+  // Check if word exists in dictionary
+  if (!config.dictionary.has(normalizedWord)) {
+    return false;
+  }
+
+  // Remove from in-memory dictionary
+  config.dictionary.delete(normalizedWord);
+
+  // Rewrite approved file without the word (atomic: write tmp -> rename)
+  try {
+    const approvedFilePath = path.join(__dirname, config.approvedFile);
+
+    if (fs.existsSync(approvedFilePath)) {
+      const content = await fsp.readFile(approvedFilePath, 'utf-8');
+      const words = content.split('\n').filter(w => {
+        const trimmed = w.trim();
+        if (!trimmed) return false;
+        const normalizedLine = normalizeWord(trimmed, language);
+        return normalizedLine !== normalizedWord;
+      });
+
+      const tmpPath = approvedFilePath + '.tmp';
+      const newContent = words.length > 0 ? words.join('\n') + '\n' : '';
+      await fsp.writeFile(tmpPath, newContent, 'utf-8');
+      await fsp.rename(tmpPath, approvedFilePath);
+    }
+
+    logger.info('DICT', `Word "${word}" (${language}) removed from community-approved dictionary`);
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('DICT', `Error removing word from approved file: ${err.message}`);
+    // Word was still removed from memory
+  }
+
+  return true;
+}
+
 // Named exports for TypeScript compatibility
 export {
   dictionary,
@@ -1062,6 +1104,7 @@ export {
   normalizeSpanishWord,
   normalizeWord,
   addApprovedWord,
+  removeApprovedWord,
 };
 
 // Additional exported functions

@@ -10,7 +10,7 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
 
-type MilogStatus = 'verified' | 'not_found' | 'error' | 'pending' | null;
+type MilogStatus = 'verified' | 'not_found' | 'error' | 'pending' | 'rejected_type' | null;
 
 interface MilogWord {
   id: string;
@@ -21,6 +21,8 @@ interface MilogWord {
   milog_attempts: number;
   submission_count: number;
   approved_at: string | null;
+  milog_word_type: string | null;
+  milog_rejected_reason: string | null;
 }
 
 /**
@@ -48,7 +50,7 @@ export async function GET(request: NextRequest) {
     // Build query - only fetch Hebrew words that have been processed by milog
     let query = supabase
       .from('invalid_word_submissions')
-      .select('id, word, milog_status, milog_verified_at, milog_url, milog_attempts, submission_count, approved_at', { count: 'exact' })
+      .select('id, word, milog_status, milog_verified_at, milog_url, milog_attempts, submission_count, approved_at, milog_word_type, milog_rejected_reason', { count: 'exact' })
       .eq('language', 'he')
       .neq('milog_status', null); // Only words that have been verified
 
@@ -61,6 +63,8 @@ export async function GET(request: NextRequest) {
       query = query.not('approved_at', 'is', null);
     } else if (status === 'pending') {
       query = query.eq('milog_status', 'pending');
+    } else if (status === 'rejected_type') {
+      query = query.eq('milog_status', 'rejected_type');
     }
 
     // Apply search filter
@@ -99,6 +103,7 @@ export async function GET(request: NextRequest) {
       notFound: statsData?.filter((w: { milog_status: MilogStatus }) => w.milog_status === 'not_found').length || 0,
       promoted: statsData?.filter((w: { approved_at: string | null }) => w.approved_at !== null).length || 0,
       pending: statsData?.filter((w: { milog_status: MilogStatus }) => w.milog_status === 'pending').length || 0,
+      rejectedType: statsData?.filter((w: { milog_status: MilogStatus }) => w.milog_status === 'rejected_type').length || 0,
     };
 
     return NextResponse.json({

@@ -323,6 +323,27 @@ export async function addToCommunityCache(word: string, language: string): Promi
 }
 
 /**
+ * Remove a word from the community-valid and pending caches
+ * Used when admin revokes a word from the dictionary
+ */
+export function removeFromCommunityCache(word: string, language: string): void {
+  const lang = (language || 'en') as LanguageCode;
+  const normalized = normalizeWord(word, lang);
+
+  const validSet = communityValidWords[lang];
+  if (validSet) {
+    validSet.delete(normalized);
+  }
+
+  const pendingMap = wordsPendingVotes[lang];
+  if (pendingMap) {
+    pendingMap.delete(normalized);
+  }
+
+  logger.debug('CommunityWords', `Word "${word}" (${lang}) removed from community caches`);
+}
+
+/**
  * Record a vote on a word
  */
 export async function recordVote({
@@ -1074,6 +1095,7 @@ module.exports = {
   loadCommunityWords,
   isWordCommunityValid,
   addToCommunityCache,
+  removeFromCommunityCache,
   recordVote,
   recordAIVote,
   collectNonDictionaryWords,

@@ -88,6 +88,8 @@ const ja = {
     "dismiss": "閉じる",
     "info": "情報",
     "close": "閉じる",
+    "home": "ホーム",
+    "playAgain": "もう一度",
     "exit": "退出",
     "adminDashboard": "管理ダッシュボード",
     "awesome": "最高！",
@@ -204,7 +206,8 @@ const ja = {
     "bottomNavigation": "下部ナビゲーション",
     "home": "ホーム",
     "brain": "脳トレ",
-    "profile": "プロフィール"
+    "profile": "プロフィール",
+    "play": "プレイ"
   },
   "skills": {
     "title": "スキルツリー",
@@ -1136,6 +1139,7 @@ const ja = {
     "exitRoom": "退出",
     "exitWarning": "退出する？次のラウンドに残れるよ。",
     "playAgain": "もう一回",
+    "maxCombo": "最大コンボ",
     "celebrate": "祝う",
     "celebrateAgain": "もう一回！",
     "finalScores": "最終スコア",
@@ -2583,6 +2587,8 @@ const ja = {
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
     "adventureModeDesc": "10の世界で100レベル",
+    "blastMode": "ブラストモード",
+    "blastModeDesc": "ボードをクリアしよう！",
     "education": "教育",
     "educationDesc": "教師と生徒向け",
     "educationBadge": "教師向け",
@@ -3030,6 +3036,7 @@ const ja = {
     },
     "topicIs": "今日のトピック",
     "yourAnswer": "あなたの答え",
+    "typeYourAnswer": "答えを入力...",
     "yourScore": "あなたのスコア",
     "noChallenge": "利用可能なチャレンジがありません",
     "total": "合計",
@@ -3188,7 +3195,8 @@ const ja = {
       "powerUps": "パワーアップ",
       "hintsUnlocked": "解放されたヒント",
       "triesRemaining": "残りの試行回数",
-      "noWordsYet": "単語を見つけて戦利品を集めよう！"
+      "noWordsYet": "単語を見つけて戦利品を集めよう！",
+      "beFirst": "最初のランカーになろう!"
     },
     "results": {
       "tapToCelebrate": "タップしてお祝い！",
@@ -4160,6 +4168,7 @@ const ja = {
   },
   "gift": {
     "rewards": "報酬",
+    "gifts": "ギフト",
     "youHaveGifts": "ギフトが届いています！",
     "youReceived": "ギフトを受け取りました！",
     "from": "送信者",
@@ -4247,6 +4256,7 @@ const ja = {
     "hiddenWord": "隠しワード",
     "devPreview": "開発プレビュー",
     "devPreviewDesc": "アドベンチャーモードは開発中です。このプレビューではワールドマップとレベル設定を表示しています。",
+    "next": "次へ",
     "exitToMap": "マップに戻る",
     "startLevel": "レベル開始",
     "levelComplete": "レベルクリア！",
@@ -4384,7 +4394,11 @@ const ja = {
       "hint": "ヒント",
       "hintAvailable": "ヒントが必要？",
       "hintUsed": "この言葉を試してみて！",
-      "noHints": "ヒントはもうありません"
+      "noHints": "ヒントはもうありません",
+      "selectWord": "文字をなぞって単語を探す",
+      "hintFullReveal": "まず短い単語を探してみましょう！",
+      "hintLengthAndStart": "特定の文字で始まる単語を探しましょう！",
+      "hintGeneral": "頑張って！よくあるパターンを探しましょう。"
     },
     "hints": {
       "minLetters2": "2文字以上",
@@ -4942,6 +4956,20 @@ const ja = {
       }
     }
   },
+  "blast": {
+    "title": "ブラストモード",
+    "description": "ボードをクリア！単語でタイルを爆破。",
+    "progress": "クリア済み",
+    "complete": "ボードクリア！",
+    "noMoreWords": "もう単語がありません",
+    "giveUp": "ゲーム終了",
+    "goldTile": "3倍スコア！",
+    "bombTile": "周囲クリア！",
+    "rainbowTile": "ボーナス！",
+    "stars1": "グッド",
+    "stars2": "グレート",
+    "stars3": "パーフェクト！"
+  },
   "student": {
     "activeGame": {
       "title": "ゲーム開始！",
@@ -4951,7 +4979,8 @@ const ja = {
     },
     "dashboard": {
       "title": "マイレッスン",
-      "subtitle": "語彙を練習して上達しよう"
+      "subtitle": "語彙を練習して上達しよう",
+      "defaultName": "生徒"
     },
     "lessons": {
       "lesson": "レッスン",
@@ -5172,7 +5201,16 @@ const ja = {
       "exportSuccess": "エクスポート完了！",
       "noDataToExport": "エクスポートするデータがありません",
       "noProgressYet": "このレッスンの生徒の進捗はまだありません",
-      "selectFilters": "クラスとレッスンを選択して進捗を表示"
+      "selectFilters": "クラスとレッスンを選択して進捗を表示",
+      "allClassrooms": "全クラス",
+      "allLessons": "全レッスン",
+      "anonymousStudent": "生徒 {{id}}",
+      "breakdownWord": "単語",
+      "breakdownAttempts": "回数",
+      "breakdownCorrect": "正解",
+      "statusMastered": "習得済み",
+      "statusLearning": "学習中",
+      "noWordsYet": "まだ単語を試していません"
     },
     "stats": {
       "totalStudents": "生徒数",

@@ -24,44 +24,134 @@ const REDIS_PREFIX = 'milog:';
 const REDIS_TIMEOUT_MS = 2000;
 
 /**
+ * Word type classification from Milog HTML
+ */
+export type MilogWordType =
+  | 'noun'
+  | 'verb'
+  | 'adjective'
+  | 'adverb'
+  | 'preposition'
+  | 'conjunction'
+  | 'pronoun'
+  | 'numeral'
+  | 'interjection'
+  | 'abbreviation'
+  | 'proper_name'
+  | 'unknown';
+
+// Hebrew labels -> accepted word types (valid for gameplay)
+const ACCEPTED_WORD_TYPES: Record<string, MilogWordType> = {
+  'שם עצם': 'noun',
+  'פועל': 'verb',
+  'שם תואר': 'adjective',
+  'תואר הפועל': 'adverb',
+  'מילת יחס': 'preposition',
+  'מילת חיבור': 'conjunction',
+  'כינוי': 'pronoun',
+  'שם מספר': 'numeral',
+  'מילת קריאה': 'interjection',
+};
+
+// Hebrew labels -> rejected word types (not valid for gameplay)
+const REJECTED_WORD_TYPES: Record<string, MilogWordType> = {
+  'ראשי תיבות': 'abbreviation',
+  'שם פרטי': 'proper_name',
+};
+
+const ACCEPTED_TYPE_VALUES = new Set(Object.values(ACCEPTED_WORD_TYPES));
+const REJECTED_TYPE_VALUES = new Set(Object.values(REJECTED_WORD_TYPES));
+
+/**
  * Result of verifying a word on milog.co.il
  */
 export interface MilogVerificationResult {
   verified: boolean;
-  status: 'verified' | 'not_found' | 'error';
+  status: 'verified' | 'not_found' | 'error' | 'rejected_type';
   definitionCount: number;
   url?: string;
   error?: string;
+  wordType?: MilogWordType;
+  wordTypeRaw?: string;
+  rejectedReason?: string;
+}
+
+// All types sorted by label length descending (longer/more-specific labels match first)
+// This prevents "פועל" matching before "תואר הפועל"
+const ALL_TYPES_BY_LENGTH = [
+  ...Object.entries(REJECTED_WORD_TYPES),
+  ...Object.entries(ACCEPTED_WORD_TYPES),
+].sort((a, b) => b[0].length - a[0].length);
+
+/**
+ * Extract word type from text surrounding a definition link.
+ * Milog shows types like: "שָׁלוֹם - שם עצם, זכר"
+ */
+function extractWordType(text: string): { type: MilogWordType; raw: string } | null {
+  for (const [label, type] of ALL_TYPES_BY_LENGTH) {
+    if (text.includes(label)) return { type, raw: label };
+  }
+  return null;
 }
 
 /**
- * Parse milog.co.il HTML to determine if word has definitions
- * Word exists if page contains links with pattern /word/e_[id]
+ * Parse milog.co.il HTML to determine if word has definitions.
+ * Checks word type to reject abbreviations and proper names.
  */
 export function parseVerificationResult(html: string, word: string): MilogVerificationResult {
   if (!html) {
     return { verified: false, status: 'not_found', definitionCount: 0 };
   }
 
-  // Look for definition links: /word/e_[numeric_id]
-  // Pattern: milog.co.il/[any-chars]/e_[digits]
-  // We use a simple pattern that catches any link to milog with /e_[number]
-  const linkPattern = /milog\.co\.il\/[^\/]+\/e_\d+/gi;
-
+  const linkPattern = /milog\.co\.il\/[^/]+\/e_\d+/gi;
   const matches = html.match(linkPattern);
   const definitionCount = matches ? matches.length : 0;
 
-  if (definitionCount > 0) {
-    const encodedWord = encodeURIComponent(word);
+  if (definitionCount === 0) {
+    return { verified: false, status: 'not_found', definitionCount: 0 };
+  }
+
+  const encodedWord = encodeURIComponent(word);
+  const url = `https://milog.co.il/${encodedWord}`;
+
+  // Extract word types from <a> tags containing /e_\d+ links
+  const linkWithTextPattern = /<a[^>]*href="[^"]*\/e_\d+"[^>]*>([^<]*)<\/a>/gi;
+  const foundTypes: { type: MilogWordType; raw: string }[] = [];
+  let linkMatch: RegExpExecArray | null;
+
+  while ((linkMatch = linkWithTextPattern.exec(html)) !== null) {
+    const linkText = linkMatch[1];
+    const afterStart = linkMatch.index + linkMatch[0].length;
+    const afterText = html.substring(afterStart, afterStart + 100);
+    const combined = linkText + ' ' + afterText;
+
+    const typeInfo = extractWordType(combined);
+    if (typeInfo) foundTypes.push(typeInfo);
+  }
+
+  // Decision: accept if ANY accepted type found, reject only if ALL are rejected
+  const acceptedEntry = foundTypes.find(t => ACCEPTED_TYPE_VALUES.has(t.type));
+  const rejectedEntry = foundTypes.find(t => REJECTED_TYPE_VALUES.has(t.type));
+
+  if (acceptedEntry) {
     return {
-      verified: true,
-      status: 'verified',
-      definitionCount,
-      url: `https://milog.co.il/${encodedWord}`,
+      verified: true, status: 'verified', definitionCount, url,
+      wordType: acceptedEntry.type, wordTypeRaw: acceptedEntry.raw,
     };
   }
 
-  return { verified: false, status: 'not_found', definitionCount: 0 };
+  if (rejectedEntry) {
+    return {
+      verified: false, status: 'rejected_type', definitionCount, url,
+      wordType: rejectedEntry.type, wordTypeRaw: rejectedEntry.raw,
+      rejectedReason: `Word type '${rejectedEntry.type}' is not accepted for gameplay`,
+    };
+  }
+
+  // Permissive fallback: links exist but no type parsed
+  return {
+    verified: true, status: 'verified', definitionCount, url, wordType: 'unknown',
+  };
 }
 
 /**
@@ -220,6 +310,7 @@ export interface ProcessQueueResult {
   processed: number;
   verified: number;
   notFound: number;
+  rejectedType: number;
   errors: number;
 }
 
@@ -236,6 +327,7 @@ export async function processMilogVerificationQueue(
     processed: 0,
     verified: 0,
     notFound: 0,
+    rejectedType: 0,
     errors: 0,
   };
 
@@ -273,12 +365,14 @@ export async function processMilogVerificationQueue(
       try {
         const verificationResult = await verifyWordOnMilog(wordRecord.word);
 
-        // Update database with result
+        // Update database with result (including word type info)
         const { error: updateError } = await supabase.rpc('update_milog_verification', {
           p_word_id: wordRecord.id,
           p_status: verificationResult.status,
           p_url: verificationResult.url || null,
           p_error: verificationResult.error || null,
+          p_word_type: verificationResult.wordType || null,
+          p_rejected_reason: verificationResult.rejectedReason || null,
         });
 
         if (updateError) {
@@ -288,7 +382,10 @@ export async function processMilogVerificationQueue(
           result.processed++;
           if (verificationResult.verified) {
             result.verified++;
-            console.log(`[Milog] ✓ Verified: ${wordRecord.word}`);
+            console.log(`[Milog] ✓ Verified: ${wordRecord.word} (${verificationResult.wordType || 'unknown'})`);
+          } else if (verificationResult.status === 'rejected_type') {
+            result.rejectedType++;
+            console.log(`[Milog] ⊘ Rejected type: ${wordRecord.word} (${verificationResult.wordType})`);
           } else if (verificationResult.status === 'not_found') {
             result.notFound++;
             console.log(`[Milog] ✗ Not found: ${wordRecord.word}`);
@@ -302,7 +399,7 @@ export async function processMilogVerificationQueue(
       }
     }
 
-    console.log(`[Milog] Queue processing complete: ${result.verified} verified, ${result.notFound} not found, ${result.errors} errors`);
+    console.log(`[Milog] Queue processing complete: ${result.verified} verified, ${result.rejectedType} rejected_type, ${result.notFound} not found, ${result.errors} errors`);
     return result;
   } catch (error) {
     console.error('[Milog] Error processing verification queue:', error);
@@ -340,6 +437,21 @@ export async function getVerifiedWordsForPromotion(
   } catch (error) {
     console.error('[Milog] Error fetching verified words:', error);
     return [];
+  }
+}
+
+/**
+ * Invalidate the Redis cache for a specific word
+ * Used when admin revokes a word from the dictionary
+ */
+export async function invalidateMilogCache(word: string): Promise<void> {
+  const redis = getRedisClient();
+  if (!redis) return;
+
+  try {
+    await redis.del(`${REDIS_PREFIX}${word}`);
+  } catch (error) {
+    console.warn(`[Milog] Failed to invalidate cache for "${word}":`, error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
