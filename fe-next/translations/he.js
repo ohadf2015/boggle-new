@@ -4965,7 +4965,20 @@ const he = {
     "rainbowTile": "בונוס!",
     "stars1": "טוב",
     "stars2": "מעולה",
-    "stars3": "מושלם!"
+    "stars3": "מושלם!",
+    "endGameConfirmTitle": "לסיים משחק?",
+    "endGameConfirmMessage": "הניקוד הנוכחי שלך יישמר. בטוח שאתה רוצה לסיים?",
+    "gridLabel": "לוח אותיות",
+    "helpTitle": "איך לשחק",
+    "helpDrag": "גרור על אותיות כדי ליצור מילים. מילים חייבות להיות באורך 2 אותיות לפחות.",
+    "helpGold": "מכפיל ניקוד x3 למילה.",
+    "helpBomb": "מנקה את כל 8 האריחים הסמוכים.",
+    "helpRainbow": "+5 נקודות בונוס.",
+    "helpGoal": "נקו כמה שיותר אריחים לניקוד הגבוה ביותר!",
+    "helpGoldLabel": "זהב",
+    "helpBombLabel": "פצצה",
+    "helpRainbowLabel": "קשת",
+    "foundWords": "מילים שנמצאו"
   },
   "student": {
     "activeGame": {

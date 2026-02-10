@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTileOverlay } from './BlastTileOverlay';
 import { BlastExplosionLayer } from './BlastExplosionLayer';
+import { BlastCascadeOverlay } from './BlastCascadeOverlay';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastExplosion, BlastScorePopup } from './types';
+import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 
 interface BlastGridProps {
   /** Modified grid (cleared cells are empty strings) */
@@ -22,11 +24,17 @@ interface BlastGridProps {
   interactive: boolean;
   /** Combo level for grid visual effects */
   comboLevel: number;
+  /** Cascade animation state */
+  cascadePhase: BlastCascadePhase;
+  /** Cascade animation data */
+  cascadeAnimationData: CascadeAnimationData | null;
   /** Callbacks */
   onWordSubmit: (word: string) => void;
   onPathSubmit: (cells: Array<{ row: number; col: number }>) => void;
   onWordChange: (word: string, count: number) => void;
   onExplosionComplete: (id: string) => void;
+  /** Accessibility label for grid */
+  ariaLabel?: string;
   /** Optional highlighted path (for hints/tutorials) */
   highlightedPath?: Array<{ row: number; col: number }>;
 }
@@ -36,8 +44,9 @@ interface BlastGridProps {
  *
  * Layers (bottom to top):
  * 1. GridComponent — proven word input mechanics
- * 2. BlastTileOverlay — special tile badges + clear animations
- * 3. BlastExplosionLayer — particle effects
+ * 2. BlastTileOverlay — special tile full-cell backgrounds
+ * 3. BlastCascadeOverlay — gravity/refill animations (anime.js)
+ * 4. BlastExplosionLayer — particle effects
  */
 export function BlastGrid({
   grid,
@@ -47,10 +56,13 @@ export function BlastGrid({
   language,
   interactive,
   comboLevel,
+  cascadePhase,
+  cascadeAnimationData,
   onWordSubmit,
   onPathSubmit,
   onWordChange,
   onExplosionComplete,
+  ariaLabel,
   highlightedPath = [],
 }: BlastGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,7 +81,6 @@ export function BlastGrid({
     });
 
     observer.observe(el);
-    // Initial measurement
     setContainerWidth(el.getBoundingClientRect().width);
 
     return () => observer.disconnect();
@@ -81,12 +92,19 @@ export function BlastGrid({
 
   const cellSize = containerWidth / gridSize;
 
+  // Block interaction during cascade
+  const isInteractive = interactive && cascadePhase === 'idle';
+
   return (
-    <div ref={containerRef} className="relative w-full aspect-square max-w-[360px]">
+    <div
+      ref={containerRef}
+      className="blast-game relative w-full aspect-square max-w-[360px]"
+      aria-label={ariaLabel}
+    >
       {/* Base grid - proven word input */}
       <GridComponent
         grid={grid}
-        interactive={interactive}
+        interactive={isInteractive}
         onWordSubmit={onWordSubmit}
         onPathSubmit={onPathSubmit}
         onWordChange={onWordChange}
@@ -98,10 +116,20 @@ export function BlastGrid({
         language={language}
       />
 
-      {/* Special tile badges + cleared cell overlays */}
+      {/* Special tile full-cell backgrounds (below letters) */}
       {containerWidth > 0 && (
         <BlastTileOverlay
           tileStates={tileStates}
+          gridSize={gridSize}
+          containerWidth={containerWidth}
+        />
+      )}
+
+      {/* Cascade gravity/refill animations */}
+      {containerWidth > 0 && cascadePhase !== 'idle' && (
+        <BlastCascadeOverlay
+          phase={cascadePhase}
+          data={cascadeAnimationData}
           gridSize={gridSize}
           containerWidth={containerWidth}
         />

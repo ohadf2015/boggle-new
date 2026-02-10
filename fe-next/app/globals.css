@@ -864,6 +864,54 @@ body {
     z-index: 10;
   }
 
+  /* Blast mode: grid must respect parent container, not viewport */
+  .blast-game .game-board-frame {
+    --board-size: 100%;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 6px;
+  }
+
+  /* Blast special tile animations */
+  .blast-tile-gold {
+    animation: blast-shimmer 2.5s ease-in-out infinite;
+    background-size: 200% 200% !important;
+  }
+
+  .blast-tile-bomb {
+    animation: blast-pulse 1.8s ease-in-out infinite;
+  }
+
+  .blast-tile-rainbow {
+    animation: blast-rainbow 4s linear infinite;
+    background-size: 300% 300% !important;
+  }
+
+  @keyframes blast-shimmer {
+    0% { background-position: 0% 0%; opacity: 0.85; }
+    50% { background-position: 100% 100%; opacity: 1; }
+    100% { background-position: 0% 0%; opacity: 0.85; }
+  }
+
+  @keyframes blast-pulse {
+    0%, 100% {
+      box-shadow: inset 0 0 14px rgba(255,30,0,0.25), 0 0 8px rgba(255,50,20,0.2);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: inset 0 0 20px rgba(255,30,0,0.4), 0 0 14px rgba(255,50,20,0.3);
+      transform: scale(1.03);
+    }
+  }
+
+  @keyframes blast-rainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   /* RTL-aware hard shadow for game board frame */
   [dir="rtl"] .game-board-frame {
     box-shadow: -6px 6px 0px rgb(var(--neo-black));

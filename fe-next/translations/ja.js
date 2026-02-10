@@ -4968,7 +4968,20 @@ const ja = {
     "rainbowTile": "ボーナス！",
     "stars1": "グッド",
     "stars2": "グレート",
-    "stars3": "パーフェクト！"
+    "stars3": "パーフェクト！",
+    "endGameConfirmTitle": "ゲームを終了しますか？",
+    "endGameConfirmMessage": "現在のスコアは保存されます。本当に終了しますか？",
+    "gridLabel": "文字グリッド",
+    "helpTitle": "遊び方",
+    "helpDrag": "文字をなぞって単語を作ります。2文字以上の単語が必要です。",
+    "helpGold": "単語のスコアが3倍になります。",
+    "helpBomb": "周囲8マスをすべてクリアします。",
+    "helpRainbow": "+5ボーナスポイント。",
+    "helpGoal": "できるだけ多くのタイルをクリアして最高スコアを目指そう！",
+    "helpGoldLabel": "ゴールド",
+    "helpBombLabel": "ボム",
+    "helpRainbowLabel": "レインボー",
+    "foundWords": "見つけた単語"
   },
   "student": {
     "activeGame": {

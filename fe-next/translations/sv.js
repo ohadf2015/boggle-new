@@ -4989,7 +4989,20 @@ const sv = {
     "rainbowTile": "Bonuspoäng!",
     "stars1": "Bra",
     "stars2": "Toppen",
-    "stars3": "Perfekt!"
+    "stars3": "Perfekt!",
+    "endGameConfirmTitle": "Avsluta spelet?",
+    "endGameConfirmMessage": "Din nuvarande poäng sparas. Är du säker på att du vill avsluta?",
+    "gridLabel": "Bokstavsrutnät",
+    "helpTitle": "Hur man spelar",
+    "helpDrag": "Dra över bokstäver för att bilda ord. Ord måste vara minst 2 bokstäver.",
+    "helpGold": "3x poängmultiplikator för ordet.",
+    "helpBomb": "Rensar alla 8 omgivande rutor.",
+    "helpRainbow": "+5 bonuspoäng.",
+    "helpGoal": "Rensa så många rutor som möjligt för högsta poäng!",
+    "helpGoldLabel": "Guld",
+    "helpBombLabel": "Bomb",
+    "helpRainbowLabel": "Regnbåge",
+    "foundWords": "Hittade ord"
   },
   "student": {
     "activeGame": {

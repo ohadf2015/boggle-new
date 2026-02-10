@@ -276,15 +276,15 @@ describe('useBlastGame', () => {
     });
   });
 
-  describe('win detection', () => {
-    it('should detect game complete when all tiles cleared', () => {
+  describe('game completion', () => {
+    it('should not auto-complete when all tiles cleared (gravity refills board)', () => {
       const { result } = renderHook(() => useBlastGame({
         gridSize: 2,
         specialTileChance: 0,
         language: 'en',
       }));
 
-      // Clear all 4 tiles
+      // Clear all 4 tiles — with gravity, cascade will refill them
       act(() => {
         result.current.clearTilesForWord(
           [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
@@ -293,7 +293,8 @@ describe('useBlastGame', () => {
         );
       });
 
-      expect(result.current.gameState.isComplete).toBe(true);
+      // Game is open-ended — never auto-completes
+      expect(result.current.gameState.isComplete).toBe(false);
     });
 
     it('should not be complete when tiles remain', () => {
@@ -317,7 +318,6 @@ describe('useBlastGame', () => {
 
       // Wait for grid to be generated
       if (result.current.modifiedGrid) {
-        const originalLetter = result.current.modifiedGrid[0][0];
 
         act(() => {
           result.current.clearTilesForWord(

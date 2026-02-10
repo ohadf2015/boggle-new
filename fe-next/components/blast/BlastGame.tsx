@@ -53,6 +53,9 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   // Quit dialog
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
+  // End game confirmation dialog
+  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
+
   // Word submission hook - reuses proven validation pipeline
   const wordSubmission = useWordSubmission({
     language: config.language,
@@ -140,6 +143,7 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   }, [onQuit]);
 
   const handleEndGame = useCallback(() => {
+    setShowEndGameConfirm(false);
     blast.endGame();
   }, [blast]);
 
@@ -154,6 +158,8 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
       gridSize={config.gridSize}
       language={config.language}
       explosions={blast.explosions}
+      cascadePhase={blast.cascadePhase}
+      cascadeAnimationData={blast.cascadeAnimationData}
       gameState={blast.gameState}
       comboLevel={combo.comboLevel}
       comboTimeRemaining={combo.comboTimeRemaining}
@@ -169,6 +175,8 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
       onEndGame={handleEndGame}
       showQuitConfirm={showQuitConfirm}
       setShowQuitConfirm={setShowQuitConfirm}
+      showEndGameConfirm={showEndGameConfirm}
+      setShowEndGameConfirm={setShowEndGameConfirm}
       t={(key: string) => t(key) || undefined}
     />
   );

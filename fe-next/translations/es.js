@@ -5020,7 +5020,20 @@ const es = {
     "rainbowTile": "¡Bonus!",
     "stars1": "Bien",
     "stars2": "Genial",
-    "stars3": "¡Perfecto!"
+    "stars3": "¡Perfecto!",
+    "endGameConfirmTitle": "¿Terminar juego?",
+    "endGameConfirmMessage": "Tu puntuación actual se guardará. ¿Estás seguro de que quieres terminar?",
+    "gridLabel": "Cuadrícula de letras",
+    "helpTitle": "Cómo jugar",
+    "helpDrag": "Arrastra sobre las letras para formar palabras. Las palabras deben tener al menos 2 letras.",
+    "helpGold": "Multiplicador de puntuación x3 para la palabra.",
+    "helpBomb": "Limpia las 8 casillas circundantes.",
+    "helpRainbow": "+5 puntos de bonificación.",
+    "helpGoal": "¡Limpia tantas casillas como sea posible para la mayor puntuación!",
+    "helpGoldLabel": "Oro",
+    "helpBombLabel": "Bomba",
+    "helpRainbowLabel": "Arcoíris",
+    "foundWords": "Palabras encontradas"
   },
   "student": {
     "dashboard": {

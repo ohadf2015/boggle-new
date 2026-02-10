@@ -16,6 +16,7 @@ import {
   type BlastResultsData,
   type BlastExplosion,
 } from '../types';
+import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
 
 // ==================== Helpers ====================
 
@@ -43,7 +44,6 @@ function generateTileStates(
       let type: BlastTileType = 'standard';
 
       if (random() < specialTileChance) {
-        // Distribute among special types
         const roll = random();
         const { gold, bomb } = SPECIAL_TILE_DISTRIBUTION;
         if (roll < gold) {
@@ -80,8 +80,8 @@ function calculateStars(clearPercentage: number): 1 | 2 | 3 {
 export interface UseBlastGameReturn {
   /** The underlying letter grid (from useGridInit) */
   grid: LetterGrid | null;
-  /** Modified grid with cleared cells as empty strings */
-  modifiedGrid: LetterGrid | null;
+  /** Display grid: the current playable grid (updated after cascades) */
+  displayGrid: LetterGrid | null;
   /** Per-cell tile state (type, cleared status) */
   tileStates: BlastTileState[][];
   /** Aggregate game state */
@@ -102,6 +102,14 @@ export interface UseBlastGameReturn {
   getResultsData: (maxCombo: number) => BlastResultsData;
   /** Remove an explosion from the active list */
   dismissExplosion: (id: string) => void;
+  /** Cascade animation state */
+  cascadePhase: BlastCascadePhase;
+  /** Whether cascade is in progress (blocks grid input) */
+  isCascading: boolean;
+  /** Cascade animation data for overlay rendering */
+  cascadeAnimationData: CascadeAnimationData | null;
+  // Legacy alias
+  modifiedGrid: LetterGrid | null;
 }
 
 // ==================== Hook ====================
@@ -111,13 +119,16 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
 
   // Reuse grid generation from singleplayer
   const {
-    grid,
+    grid: initialGrid,
     availableWords,
   } = useGridInit({
     difficulty: 'MEDIUM',
     language,
     mode: 'blast',
   });
+
+  // Mutable grid state — updated after each cascade completes
+  const [currentGrid, setCurrentGrid] = useState<LetterGrid | null>(null);
 
   // Tile state management
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() =>
@@ -138,22 +149,47 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
   // Explosions for animation
   const [explosions, setExplosions] = useState<BlastExplosion[]>([]);
 
-  // Track best word for results
+  // Track best word and total words cleared for results
   const bestWordRef = useRef<string>('');
+  const totalWordsClearedRef = useRef(0);
 
-  // Modified grid: cleared cells become empty strings so GridComponent skips them
-  const modifiedGrid = useMemo<LetterGrid | null>(() => {
-    if (!grid) return null;
-    return grid.map((row, ri) =>
+  // Cascade hook
+  const cascade = useBlastCascade({
+    gridSize,
+    language,
+    specialTileChance,
+  });
+
+  // The effective grid = currentGrid (post-cascade) or initialGrid (pre-first-cascade)
+  const effectiveGrid = currentGrid || initialGrid;
+
+  // Display grid: show letters for non-cleared tiles, empty for cleared
+  const displayGrid = useMemo<LetterGrid | null>(() => {
+    if (!effectiveGrid) return null;
+    return effectiveGrid.map((row, ri) =>
       row.map((cell, ci) =>
         tileStates[ri]?.[ci]?.isCleared ? '' : cell
       )
     );
-  }, [grid, tileStates]);
+  }, [effectiveGrid, tileStates]);
+
+  /**
+   * Handle cascade completion: update grid and tile states with gravity results.
+   */
+  const handleCascadeComplete = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
+    setCurrentGrid(newGrid);
+    setTileStates(newTileStates);
+    // After cascade, no tiles are cleared (they've been replaced by new ones)
+    // Update game state to reflect this
+    setGameState(prev => ({
+      ...prev,
+      tilesCleared: 0, // Reset — all positions now filled
+    }));
+  }, []);
 
   /**
    * Clear tiles along a word path and apply special tile effects.
-   * This is the core game mechanic.
+   * After clearing, triggers cascade (gravity + refill).
    */
   const clearTilesForWord = useCallback((
     path: Array<{ row: number; col: number }>,
@@ -163,7 +199,6 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     setTileStates(prev => {
       const next = prev.map(row => row.map(tile => ({ ...tile })));
       let bonusScore = 0;
-      let extraCleared = 0;
       const newExplosions: BlastExplosion[] = [];
       const now = Date.now();
 
@@ -175,22 +210,16 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
         tile.isCleared = true;
         tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
 
-        // Apply special effects
         switch (tile.type) {
           case 'gold':
-            bonusScore += baseScore * (GOLD_MULTIPLIER - 1); // -1 because base already counted
+            bonusScore += baseScore * (GOLD_MULTIPLIER - 1);
             newExplosions.push({
               id: `gold-${now}-${cell.row}-${cell.col}`,
-              row: cell.row,
-              col: cell.col,
-              type: 'word',
-              intensity: 3,
-              timestamp: now,
+              row: cell.row, col: cell.col, type: 'word', intensity: 3, timestamp: now,
             });
             break;
 
           case 'bomb': {
-            // Clear all adjacent tiles in bomb radius
             for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
               for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
                 if (dr === 0 && dc === 0) continue;
@@ -199,18 +228,13 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
                 if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
                   if (!next[r][c].isCleared) {
                     next[r][c].isCleared = true;
-                    extraCleared++;
                   }
                 }
               }
             }
             newExplosions.push({
               id: `bomb-${now}-${cell.row}-${cell.col}`,
-              row: cell.row,
-              col: cell.col,
-              type: 'bomb',
-              intensity: 4,
-              timestamp: now,
+              row: cell.row, col: cell.col, type: 'bomb', intensity: 4, timestamp: now,
             });
             break;
           }
@@ -219,11 +243,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
             bonusScore += RAINBOW_BONUS;
             newExplosions.push({
               id: `rainbow-${now}-${cell.row}-${cell.col}`,
-              row: cell.row,
-              col: cell.col,
-              type: 'word',
-              intensity: 2,
-              timestamp: now,
+              row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
             });
             break;
         }
@@ -235,42 +255,43 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
         const intensity = path.length <= 3 ? 1 : path.length <= 5 ? 2 : path.length <= 7 ? 3 : 4;
         newExplosions.push({
           id: `word-${now}`,
-          row: path[midIdx].row,
-          col: path[midIdx].col,
-          type: 'word',
-          intensity: intensity as 1 | 2 | 3 | 4,
-          timestamp: now,
+          row: path[midIdx].row, col: path[midIdx].col,
+          type: 'word', intensity: intensity as 1 | 2 | 3 | 4, timestamp: now,
         });
       }
 
-      // Count cleared tiles
-      const totalCleared = next.flat().filter(t => t.isCleared).length;
-      const totalTiles = gridSize * gridSize;
-      const isComplete = totalCleared === totalTiles;
+      // Count cleared tiles for scoring
+      const clearedCount = next.flat().filter(t => t.isCleared).length;
+      totalWordsClearedRef.current += path.length;
       const totalScore = baseScore + bonusScore;
 
-      // Track best word
       if (word.length > bestWordRef.current.length) {
         bestWordRef.current = word;
       }
 
-      // Update game state
+      // Update game state with score (tilesCleared tracks running total for results)
       setGameState(prev => ({
         ...prev,
         score: prev.score + totalScore,
         wordsFound: [...prev.wordsFound, word],
-        tilesCleared: totalCleared,
-        isComplete,
+        tilesCleared: prev.tilesCleared + clearedCount,
       }));
 
-      // Queue explosions
       if (newExplosions.length > 0) {
         setExplosions(prev => [...prev, ...newExplosions]);
       }
 
+      // Trigger cascade after a short delay for explosions to play
+      const gridForCascade = effectiveGrid;
+      if (gridForCascade) {
+        setTimeout(() => {
+          cascade.startCascade(gridForCascade, next, handleCascadeComplete);
+        }, 200);
+      }
+
       return next;
     });
-  }, [gridSize]);
+  }, [gridSize, effectiveGrid, cascade, handleCascadeComplete]);
 
   /** End the game manually */
   const endGame = useCallback(() => {
@@ -280,7 +301,8 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
   /** Generate results data for the results screen */
   const getResultsData = useCallback((maxCombo: number): BlastResultsData => {
     const { score, wordsFound, tilesCleared, totalTiles } = gameState;
-    const clearPercentage = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
+    // In gravity mode, tilesCleared accumulates total cleared across all cascades
+    const clearPercentage = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
 
     return {
       finalScore: score,
@@ -294,14 +316,15 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     };
   }, [gameState]);
 
-  /** Remove explosion from active list (after animation completes) */
+  /** Remove explosion from active list */
   const dismissExplosion = useCallback((id: string) => {
     setExplosions(prev => prev.filter(e => e.id !== id));
   }, []);
 
   return {
-    grid,
-    modifiedGrid,
+    grid: initialGrid,
+    displayGrid,
+    modifiedGrid: displayGrid, // Legacy alias
     tileStates,
     gameState,
     explosions,
@@ -310,5 +333,8 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     endGame,
     getResultsData,
     dismissExplosion,
+    cascadePhase: cascade.cascadePhase,
+    isCascading: cascade.isAnimating,
+    cascadeAnimationData: cascade.animationData,
   };
 }

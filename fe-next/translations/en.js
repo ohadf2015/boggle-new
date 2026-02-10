@@ -4963,7 +4963,20 @@ const en = {
     "rainbowTile": "Wildcard bonus!",
     "stars1": "Good",
     "stars2": "Great",
-    "stars3": "Perfect!"
+    "stars3": "Perfect!",
+    "endGameConfirmTitle": "End Game?",
+    "endGameConfirmMessage": "Your current score will be saved. Are you sure you want to end this game?",
+    "gridLabel": "Letter grid",
+    "helpTitle": "How to Play",
+    "helpDrag": "Drag across letters to form words. Words must be at least 2 letters long.",
+    "helpGold": "3x score multiplier for the word.",
+    "helpBomb": "Clears all 8 surrounding tiles.",
+    "helpRainbow": "+5 bonus points.",
+    "helpGoal": "Clear as many tiles as possible for the highest score!",
+    "helpGoldLabel": "Gold",
+    "helpBombLabel": "Bomb",
+    "helpRainbowLabel": "Rainbow",
+    "foundWords": "Found Words"
   },
   "student": {
         "activeGame": {
