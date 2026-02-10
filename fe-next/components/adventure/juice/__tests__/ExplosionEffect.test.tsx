@@ -113,7 +113,7 @@ describe('ExplosionEffect', () => {
       mockFireConfetti.mockResolvedValue(null);
     });
 
-    it('should trigger ~15 particles for intensity 1', async () => {
+    it('should trigger ~8 particles for intensity 1', async () => {
       render(
         <ExplosionEffect
           position={{ x: 100, y: 200 }}
@@ -126,11 +126,11 @@ describe('ExplosionEffect', () => {
       });
 
       const callArgs = mockFireConfetti.mock.calls[0][0];
-      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(10);
-      expect(callArgs?.particleCount).toBeLessThanOrEqual(20);
+      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(6);
+      expect(callArgs?.particleCount).toBeLessThanOrEqual(12);
     });
 
-    it('should trigger ~30 particles for intensity 2', async () => {
+    it('should trigger ~16 particles for intensity 2', async () => {
       render(
         <ExplosionEffect
           position={{ x: 100, y: 200 }}
@@ -143,11 +143,11 @@ describe('ExplosionEffect', () => {
       });
 
       const callArgs = mockFireConfetti.mock.calls[0][0];
-      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(25);
-      expect(callArgs?.particleCount).toBeLessThanOrEqual(35);
+      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(13);
+      expect(callArgs?.particleCount).toBeLessThanOrEqual(20);
     });
 
-    it('should trigger ~45 particles for intensity 3', async () => {
+    it('should trigger ~24 particles for intensity 3', async () => {
       render(
         <ExplosionEffect
           position={{ x: 100, y: 200 }}
@@ -160,11 +160,11 @@ describe('ExplosionEffect', () => {
       });
 
       const callArgs = mockFireConfetti.mock.calls[0][0];
-      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(40);
-      expect(callArgs?.particleCount).toBeLessThanOrEqual(50);
+      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(20);
+      expect(callArgs?.particleCount).toBeLessThanOrEqual(28);
     });
 
-    it('should trigger ~60 particles for intensity 4', async () => {
+    it('should trigger ~32 particles for intensity 4', async () => {
       render(
         <ExplosionEffect
           position={{ x: 100, y: 200 }}
@@ -177,8 +177,8 @@ describe('ExplosionEffect', () => {
       });
 
       const callArgs = mockFireConfetti.mock.calls[0][0];
-      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(55);
-      expect(callArgs?.particleCount).toBeLessThanOrEqual(65);
+      expect(callArgs?.particleCount).toBeGreaterThanOrEqual(28);
+      expect(callArgs?.particleCount).toBeLessThanOrEqual(36);
     });
 
     it('should scale velocity with intensity', async () => {

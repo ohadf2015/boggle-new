@@ -5,17 +5,17 @@
  * Uses existing particle budget system to adapt to device performance.
  *
  * Intensity scales particle count and velocity based on word length:
- * - Intensity 1 (3-4 letters): 15 particles, velocity 20
- * - Intensity 2 (5-6 letters): 30 particles, velocity 30
- * - Intensity 3 (7-9 letters): 45 particles, velocity 40
- * - Intensity 4 (10+ letters): 60 particles, velocity 50
+ * - Intensity 1 (3-4 letters): 8 particles, velocity 20
+ * - Intensity 2 (5-6 letters): 16 particles, velocity 30
+ * - Intensity 3 (7-9 letters): 24 particles, velocity 40
+ * - Intensity 4 (10+ letters): 32 particles, velocity 50
  *
  * Reduced motion users: Zero particles, just fire onComplete callback
  */
 
 import React, { useEffect } from 'react';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
-import { fireConfetti } from '@/utils/confettiUtils';
+import { fireConfetti, NEO_BRUTALIST_COLORS } from '@/utils/confettiUtils';
 
 export interface ExplosionEffectProps {
   /** Position to render explosion (pixel coordinates) */
@@ -31,15 +31,25 @@ export interface ExplosionEffectProps {
 const NEO_ORANGE = '#FF6B35';
 
 /**
+ * Build a palette: primary color dominant + 2 accent colors from the neo palette.
+ * This prevents monochrome confetti while keeping the primary color prominent.
+ */
+function buildPalette(primary: string): string[] {
+  const accents = NEO_BRUTALIST_COLORS.filter(c => c !== primary).slice(0, 2);
+  // Primary appears twice for ~50% dominance
+  return [primary, primary, ...accents];
+}
+
+/**
  * Configuration for each intensity level:
- * - particleMultiplier: Base particles = 15, scales by this
+ * - particleMultiplier: Base particles = 8, scales by this
  * - velocity: Initial burst velocity
  */
 const INTENSITY_CONFIG = {
-  1: { particleMultiplier: 1, velocity: 20 },   // 15 particles
-  2: { particleMultiplier: 2, velocity: 30 },   // 30 particles
-  3: { particleMultiplier: 3, velocity: 40 },   // 45 particles
-  4: { particleMultiplier: 4, velocity: 50 },   // 60 particles
+  1: { particleMultiplier: 1, velocity: 20 },   // 8 particles
+  2: { particleMultiplier: 2, velocity: 30 },   // 16 particles
+  3: { particleMultiplier: 3, velocity: 40 },   // 24 particles
+  4: { particleMultiplier: 4, velocity: 50 },   // 32 particles
 };
 
 export function ExplosionEffect({
@@ -61,20 +71,20 @@ export function ExplosionEffect({
 
     // Get intensity config
     const config = INTENSITY_CONFIG[intensity];
-    const baseParticleCount = 15;
+    const baseParticleCount = 8;
     const particleCount = baseParticleCount * config.particleMultiplier;
 
     // Calculate normalized origin position (0-1 range)
     const originX = position.x / (typeof window !== 'undefined' ? window.innerWidth : 1000);
     const originY = position.y / (typeof window !== 'undefined' ? window.innerHeight : 1000);
 
-    // Fire radial burst
+    // Fire radial burst with multi-color palette
     fireConfetti({
       particleCount,
       startVelocity: config.velocity,
       spread: 360, // Full radial burst
       origin: { x: originX, y: originY },
-      colors: [color],
+      colors: buildPalette(color),
       gravity: 1.2,
       ticks: 150,
       scalar: 1.2,

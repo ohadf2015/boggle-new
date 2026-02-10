@@ -5,6 +5,13 @@ import { ExplosionEffect } from '@/components/adventure/juice/ExplosionEffect';
 import { ScorePopup } from '@/components/adventure/juice/ScorePopup';
 import type { BlastExplosion, BlastScorePopup } from './types';
 
+/** Varied colors per explosion type — avoids monotone orange */
+const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
+  bomb: '#FF4444',   // red
+  clear: '#FFD700',  // gold
+  word: '#00FFFF',   // cyan (was orange — now varied via palette in ExplosionEffect)
+};
+
 interface BlastExplosionLayerProps {
   explosions: BlastExplosion[];
   scorePopups: BlastScorePopup[];
@@ -41,7 +48,7 @@ export function BlastExplosionLayer({
             key={exp.id}
             position={{ x, y }}
             intensity={exp.intensity}
-            color={exp.type === 'bomb' ? '#FF4444' : exp.type === 'clear' ? '#FFD700' : '#FF6B35'}
+            color={EXPLOSION_COLORS[exp.type]}
             onComplete={() => onExplosionComplete(exp.id)}
           />
         );
