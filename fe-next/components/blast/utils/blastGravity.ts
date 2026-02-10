@@ -21,11 +21,21 @@ export interface NewTile {
   spawnOffset: number;
 }
 
+/** Tile that was cleared (for clearing animation) */
+export interface ClearedTile {
+  row: number;
+  col: number;
+  letter: string;
+  type: BlastTileType;
+}
+
 export interface GravityResult {
   /** Updated letter grid after gravity + refill */
   newGrid: LetterGrid;
   /** Updated tile states after gravity + refill */
   newTileStates: BlastTileState[][];
+  /** Tiles that were cleared (for clearing animation) */
+  clearedTiles: ClearedTile[];
   /** Tiles that need to animate falling down */
   fallingTiles: FallingTile[];
   /** New tiles that appear from top */
@@ -57,8 +67,23 @@ export function computeGravityResult(
       row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: false, activationEffect: null,
     }))
   );
+  const clearedTiles: ClearedTile[] = [];
   const fallingTiles: FallingTile[] = [];
   const newTiles: NewTile[] = [];
+
+  // Collect cleared tile positions for clearing animation
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      if (tileStates[row]?.[col]?.isCleared) {
+        clearedTiles.push({
+          row,
+          col,
+          letter: grid[row]?.[col] ?? '',
+          type: tileStates[row][col].type,
+        });
+      }
+    }
+  }
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
@@ -125,7 +150,7 @@ export function computeGravityResult(
     }
   }
 
-  return { newGrid, newTileStates, fallingTiles, newTiles };
+  return { newGrid, newTileStates, clearedTiles, fallingTiles, newTiles };
 }
 
 /** Count cleared tiles in the grid */

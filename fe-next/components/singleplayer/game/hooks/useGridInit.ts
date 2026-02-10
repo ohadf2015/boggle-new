@@ -20,6 +20,10 @@ interface UseGridInitOptions {
   mode: string;
   /** Callback to reset dependent state when grid changes */
   onGridChange?: () => void;
+  /** Override rows from difficulty config (e.g. blast mode custom grid size) */
+  rows?: number;
+  /** Override cols from difficulty config (e.g. blast mode custom grid size) */
+  cols?: number;
 }
 
 interface UseGridInitReturn {
@@ -51,6 +55,8 @@ export function useGridInit({
   language,
   mode,
   onGridChange,
+  rows: rowsOverride,
+  cols: colsOverride,
 }: UseGridInitOptions): UseGridInitReturn {
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [availableWords, setAvailableWords] = useState<AvailableWords | null>(null);
@@ -81,8 +87,8 @@ export function useGridInit({
   // Generate grid on mount
   useEffect(() => {
     const difficultyConfig = DIFFICULTIES[difficulty];
-    const rows = difficultyConfig.rows;
-    const cols = difficultyConfig.cols;
+    const rows = rowsOverride ?? difficultyConfig.rows;
+    const cols = colsOverride ?? difficultyConfig.cols;
     const totalCells = rows * cols;
     const baseWordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
     const wordCount = mode === 'practice' ? Math.min(50, baseWordCount * 2) : baseWordCount;
@@ -118,7 +124,7 @@ export function useGridInit({
     };
 
     initGrid();
-  }, [difficulty, language, mode]);
+  }, [difficulty, language, mode, rowsOverride, colsOverride]);
 
   // Fetch valid words from grid for bots and word progress tracking
   useEffect(() => {

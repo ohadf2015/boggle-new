@@ -117,7 +117,7 @@ export interface UseBlastGameReturn {
 export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): UseBlastGameReturn {
   const { gridSize, specialTileChance, language } = config;
 
-  // Reuse grid generation from singleplayer
+  // Reuse grid generation from singleplayer, with blast gridSize override
   const {
     grid: initialGrid,
     availableWords,
@@ -125,6 +125,8 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     difficulty: 'MEDIUM',
     language,
     mode: 'blast',
+    rows: gridSize,
+    cols: gridSize,
   });
 
   // Mutable grid state — updated after each cascade completes

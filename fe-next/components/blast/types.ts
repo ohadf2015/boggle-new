@@ -27,7 +27,7 @@ export interface BlastGameConfig {
 }
 
 export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
-  gridSize: 4,
+  gridSize: 6,
   specialTileChance: 0.15,
   language: 'en',
 };

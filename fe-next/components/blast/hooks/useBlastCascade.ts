@@ -3,13 +3,14 @@
 import { useState, useCallback, useRef } from 'react';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState } from '../types';
-import { computeGravityResult, type FallingTile, type NewTile } from '../utils/blastGravity';
+import { computeGravityResult, type ClearedTile, type FallingTile, type NewTile } from '../utils/blastGravity';
 
 // ==================== Types ====================
 
 export type BlastCascadePhase = 'idle' | 'clearing' | 'falling' | 'appearing';
 
 export interface CascadeAnimationData {
+  clearedTiles: ClearedTile[];
   fallingTiles: FallingTile[];
   newTiles: NewTile[];
 }
@@ -81,6 +82,7 @@ export function useBlastCascade({
     const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance);
 
     setAnimationData({
+      clearedTiles: result.clearedTiles,
       fallingTiles: result.fallingTiles,
       newTiles: result.newTiles,
     });

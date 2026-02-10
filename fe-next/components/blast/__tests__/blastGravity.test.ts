@@ -145,6 +145,37 @@ describe('computeGravityResult', () => {
     });
   });
 
+  it('should return clearedTiles with correct positions and letters', () => {
+    const grid = [
+      ['A', 'B'],
+      ['C', 'D'],
+    ];
+    const states = makeTileStates(2, [
+      { row: 0, col: 0 },
+      { row: 1, col: 1 },
+    ]);
+    states[0][0].type = 'gold';
+
+    const result = computeGravityResult(grid, states, 2, 'en', 0);
+
+    expect(result.clearedTiles).toHaveLength(2);
+    expect(result.clearedTiles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ row: 0, col: 0, letter: 'A', type: 'gold' }),
+        expect.objectContaining({ row: 1, col: 1, letter: 'D', type: 'standard' }),
+      ])
+    );
+  });
+
+  it('should return empty clearedTiles when no tiles cleared', () => {
+    const grid = [['A', 'B'], ['C', 'D']];
+    const states = makeTileStates(2);
+
+    const result = computeGravityResult(grid, states, 2, 'en', 0);
+
+    expect(result.clearedTiles).toHaveLength(0);
+  });
+
   it('should only affect the column where tiles are cleared', () => {
     const grid = [
       ['A', 'B'],
