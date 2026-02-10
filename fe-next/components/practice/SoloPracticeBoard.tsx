@@ -7,6 +7,8 @@ import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
+import WordFormingArea from '@/components/game/WordFormingArea';
+import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
@@ -66,57 +68,75 @@ export default function SoloPracticeBoard({
   }, [difficulty, language, vocabularyWords]);
 
   const [grid, setGrid] = useState<LetterGrid>(() => generateBoard());
-  const [foundWords, setFoundWords] = useState<string[]>([]);
   const [vocabularyFound, setVocabularyFound] = useState<string[]>([]);
-  const [score, setScore] = useState(0);
   const [showComplete, setShowComplete] = useState(false);
 
+  // Word forming state (tracked via GridComponent's onWordChange)
+  const [formingWord, setFormingWord] = useState('');
+  const [formingLetterCount, setFormingLetterCount] = useState(0);
+
   // Check if word is a vocabulary word (using language-aware normalization)
-  const isVocabularyWord = useCallback((word: string) => {
+  const isVocabularyWordCheck = useCallback((word: string) => {
     const normalizedWord = normalizeWord(word, language);
     return vocabularyWords.includes(normalizedWord);
   }, [vocabularyWords, language]);
 
-  // Handle word submission
-  const handleWordSubmit = useCallback((word: string) => {
-    // Use language-aware normalization (handles Hebrew final letters, etc.)
-    const normalizedWord = normalizeWord(word, language);
+  // Word submission with dictionary validation and feedback
+  const {
+    foundWords: hookFoundWords,
+    currentFeedback,
+    submitWord,
+    reset: resetSubmission,
+    validWordCount,
+  } = useWordSubmission({
+    grid,
+    language,
+    minWordLength: 2,
+    t,
+    onWordAccepted: (word) => {
+      const isVocab = isVocabularyWordCheck(word);
+      if (isVocab) {
+        setVocabularyFound((prev) => [...prev, word]);
+      }
+      onWordFound?.(word, isVocab);
+    },
+  });
 
-    // Skip if already found
-    if (foundWords.includes(normalizedWord)) return;
+  // Derive score and valid word list from hook
+  const score = useMemo(() =>
+    hookFoundWords.filter(w => w.isValid === true).reduce((sum, w) => sum + w.score, 0),
+    [hookFoundWords]
+  );
 
-    // Calculate score (longer words = more points)
-    const wordScore = word.length * 10 + (word.length > 4 ? (word.length - 4) * 5 : 0);
-    const isVocab = isVocabularyWord(normalizedWord);
-    const bonusScore = isVocab ? 25 : 0;
+  const validWords = useMemo(() =>
+    hookFoundWords.filter(w => w.isValid === true).map(w => w.word),
+    [hookFoundWords]
+  );
 
-    setFoundWords((prev) => [...prev, normalizedWord]);
-    setScore((prev) => prev + wordScore + bonusScore);
-
-    if (isVocab) {
-      setVocabularyFound((prev) => [...prev, normalizedWord]);
-    }
-
-    onWordFound?.(normalizedWord, isVocab);
-  }, [foundWords, isVocabularyWord, language, onWordFound]);
+  // Handle word forming change from GridComponent
+  const handleWordChange = useCallback((word: string, letterCount: number) => {
+    setFormingWord(word);
+    setFormingLetterCount(letterCount);
+  }, []);
 
   // Handle regenerate board
   const handleRegenerate = useCallback(() => {
     setGrid(generateBoard());
-    setFoundWords([]);
     setVocabularyFound([]);
-    setScore(0);
-  }, [generateBoard]);
+    resetSubmission();
+    setFormingWord('');
+    setFormingLetterCount(0);
+  }, [generateBoard, resetSubmission]);
 
   // Handle finish practice
   const handleFinish = useCallback(() => {
     setShowComplete(true);
     onComplete({
-      wordsFound: foundWords,
+      wordsFound: validWords,
       vocabularyWordsFound: vocabularyFound,
       score,
     });
-  }, [foundWords, vocabularyFound, score, onComplete]);
+  }, [validWords, vocabularyFound, score, onComplete]);
 
   // Completion screen
   if (showComplete) {
@@ -139,7 +159,7 @@ export default function SoloPracticeBoard({
 
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="p-3 bg-neo-black/30 rounded-neo">
-                  <p className="text-2xl font-neo-display text-neo-white">{foundWords.length}</p>
+                  <p className="text-2xl font-neo-display text-neo-white">{validWordCount}</p>
                   <p className="text-xs text-slate-400">
                     {t('education.practice.wordsFound') || 'Words Found'}
                   </p>
@@ -254,7 +274,7 @@ export default function SoloPracticeBoard({
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-neo-cyan" />
                   <span className="text-sm text-slate-400">
-                    {foundWords.length} words
+                    {validWordCount} words
                   </span>
                 </div>
               </div>
@@ -268,13 +288,24 @@ export default function SoloPracticeBoard({
           </CardContent>
         </Card>
 
+        {/* Word forming area with feedback */}
+        <WordFormingArea
+          word={formingWord}
+          letterCount={formingLetterCount}
+          feedback={currentFeedback}
+          compact
+          className="mb-3 justify-center"
+        />
+
         {/* Game grid - container needs proper dimensions for absolute-positioned inner grid */}
         <div className="mb-4 flex items-center justify-center">
-          <div className="w-full max-w-[min(100%,calc(100vh-350px))]" style={{ aspectRatio: '1/1' }}>
+          <div className="w-full max-w-[min(100%,calc(100vh-400px))]" style={{ aspectRatio: '1/1' }}>
             <GridComponent
               grid={grid}
               interactive
-              onWordSubmit={handleWordSubmit}
+              onWordSubmit={submitWord}
+              onWordChange={handleWordChange}
+              hideWordPreview
               language={language}
               animateOnMount
             />
@@ -282,17 +313,17 @@ export default function SoloPracticeBoard({
         </div>
 
         {/* Found words */}
-        {foundWords.length > 0 && (
+        {validWords.length > 0 && (
           <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80 mb-4">
             <CardContent className="py-3">
               <p className="text-xs text-slate-400 mb-2">Found words:</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
-                {foundWords.map((word) => (
+                {validWords.map((word) => (
                   <span
                     key={word}
                     className={cn(
                       'px-2 py-1 text-sm rounded font-neo-body',
-                      isVocabularyWord(word)
+                      isVocabularyWordCheck(word)
                         ? 'bg-neo-cyan/20 text-neo-cyan'
                         : 'bg-neo-black/30 text-slate-400'
                     )}
