@@ -179,12 +179,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
   const handleCascadeComplete = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
     setCurrentGrid(newGrid);
     setTileStates(newTileStates);
-    // After cascade, no tiles are cleared (they've been replaced by new ones)
-    // Update game state to reflect this
-    setGameState(prev => ({
-      ...prev,
-      tilesCleared: 0, // Reset — all positions now filled
-    }));
+    // tilesCleared is a cumulative metric for the results screen — do NOT reset it
   }, []);
 
   /**
@@ -203,11 +198,13 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
       const now = Date.now();
 
       // Clear path tiles and collect effects
+      let newlyClearedCount = 0;
       for (const cell of path) {
         const tile = next[cell.row]?.[cell.col];
         if (!tile || tile.isCleared) continue;
 
         tile.isCleared = true;
+        newlyClearedCount++;
         tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
 
         switch (tile.type) {
@@ -228,6 +225,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
                 if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
                   if (!next[r][c].isCleared) {
                     next[r][c].isCleared = true;
+                    newlyClearedCount++;
                   }
                 }
               }
@@ -260,8 +258,6 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
         });
       }
 
-      // Count cleared tiles for scoring
-      const clearedCount = next.flat().filter(t => t.isCleared).length;
       totalWordsClearedRef.current += path.length;
       const totalScore = baseScore + bonusScore;
 
@@ -274,7 +270,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
         ...prev,
         score: prev.score + totalScore,
         wordsFound: [...prev.wordsFound, word],
-        tilesCleared: prev.tilesCleared + clearedCount,
+        tilesCleared: prev.tilesCleared + newlyClearedCount,
       }));
 
       if (newExplosions.length > 0) {

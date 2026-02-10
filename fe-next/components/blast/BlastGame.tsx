@@ -76,21 +76,11 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   // Track last submitted path for tile clearing
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
 
-  // Handle word submission: validate via useWordSubmission, then clear tiles
+  // Handle word submission: validate via useWordSubmission, tile clearing
+  // happens reactively via the useEffect below when score changes
   const handleWordSubmit = useCallback((word: string) => {
-    const prevScore = wordSubmission.score;
     wordSubmission.handleWordSubmit(word);
-
-    // Check if score changed (word was accepted) after a tick
-    // This is async because dictionary validation may be async
-    setTimeout(() => {
-      const newScore = wordSubmission.score;
-      if (newScore > prevScore) {
-        const earnedScore = newScore - prevScore;
-        blast.clearTilesForWord(lastPathRef.current, word.toLowerCase(), earnedScore);
-      }
-    }, 50);
-  }, [wordSubmission, blast]);
+  }, [wordSubmission]);
 
   // Handle path submission (stores the path for tile clearing)
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {

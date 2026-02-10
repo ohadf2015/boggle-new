@@ -376,6 +376,63 @@ describe('useBlastGame', () => {
     });
   });
 
+  describe('cascade tilesCleared persistence', () => {
+    it('should NOT reset tilesCleared to 0 after cascade completes', () => {
+      jest.useFakeTimers();
+      const { result } = renderHook(() => useBlastGame(defaultConfig));
+
+      // Clear 3 tiles
+      act(() => {
+        result.current.clearTilesForWord(
+          [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+          'cat',
+          5
+        );
+      });
+
+      // tilesCleared should be 3 after clearing
+      expect(result.current.gameState.tilesCleared).toBe(3);
+
+      // Advance past cascade delay (200ms) + clearing (300ms) + falling (400ms) + appearing (300ms)
+      act(() => {
+        jest.advanceTimersByTime(1200);
+      });
+
+      // After cascade completes, tilesCleared should still be 3 (cumulative metric)
+      expect(result.current.gameState.tilesCleared).toBe(3);
+
+      jest.useRealTimers();
+    });
+
+    it('should count only newly-cleared tiles per word, not all cleared tiles', () => {
+      const { result } = renderHook(() => useBlastGame(defaultConfig));
+
+      // Clear first word (2 tiles)
+      act(() => {
+        result.current.clearTilesForWord(
+          [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+          'at',
+          2
+        );
+      });
+
+      // Only 2 tiles were cleared by this path
+      expect(result.current.gameState.tilesCleared).toBe(2);
+
+      // Clear second word (2 tiles) WITHOUT cascade completing
+      act(() => {
+        result.current.clearTilesForWord(
+          [{ row: 1, col: 0 }, { row: 1, col: 1 }],
+          'be',
+          2
+        );
+      });
+
+      // Should be 2 + 2 = 4, NOT 2 + 4 (counting all 4 cleared tiles again)
+      expect(result.current.gameState.tilesCleared).toBe(4);
+    });
+  });
+
   describe('give up / end game', () => {
     it('should mark game as dead end when endGame is called', () => {
       const { result } = renderHook(() => useBlastGame(defaultConfig));
