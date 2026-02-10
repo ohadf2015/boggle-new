@@ -1,30 +1,75 @@
 /**
- * StudentLessonView - Simplified Version
+ * StudentLessonView - Animated Accent-border Design
  *
- * Clean lesson cards with single primary action
- * Reduced visual clutter, focus on learning
+ * Glass-dark cards with staggered entrance animations,
+ * spring hover effects, pulsing NEW badges, and lucide icons.
  */
 
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Award, Activity } from 'lucide-react';
 import type { PracticeType } from '@/hooks/usePracticeSession';
+
+// --- Animation variants ---
+
+const listContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.15 },
+  },
+};
+
+const cardEntrance = {
+  hidden: { opacity: 0, y: 20, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
+  },
+};
+
+const headerEntrance = {
+  hidden: { opacity: 0, x: -12 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
+  },
+};
+
+const countBadgePop = {
+  hidden: { scale: 0 },
+  visible: {
+    scale: 1,
+    transition: { type: 'spring' as const, stiffness: 500, damping: 15, delay: 0.3 },
+  },
+};
+
+const progressBarFill = {
+  hidden: { width: 0 },
+  visible: (percent: number) => ({
+    width: `${percent}%`,
+    transition: { type: 'spring' as const, stiffness: 60, damping: 20, delay: 0.3 },
+  }),
+};
 
 export default function StudentLessonView() {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
   const router = useRouter();
-  const isRTL = language === 'he';
   const { lessons, isLoading, error } = useStudentProgress();
+
+  const activeLessonCount = lessons.filter((l) => l.status !== 'completed').length;
 
   if (isLoading) {
     return (
@@ -50,7 +95,8 @@ export default function StudentLessonView() {
           title={t('student.lessons.empty.title')}
           description={t('student.lessons.empty.subtitle')}
           icon={<BookOpen className="w-full h-full text-neo-cyan" />}
-          showMascot={false}
+          showMascot
+          mascotVariant="thinking"
           size="lg"
           action={
             <Button
@@ -72,12 +118,30 @@ export default function StudentLessonView() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Simplified: Show lessons sorted by status (assigned → started → completed) */}
+    <motion.div
+      className="space-y-4"
+      variants={listContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Section header */}
+      <motion.div variants={headerEntrance} className="flex items-center gap-3 mb-2">
+        <h2 className="text-2xl font-neo-display text-neo-white">
+          {t('student.dashboard.title')}
+        </h2>
+        {activeLessonCount > 0 && (
+          <motion.span
+            variants={countBadgePop}
+            className="px-2.5 py-0.5 bg-neo-cyan/20 text-neo-cyan text-sm font-bold rounded-full tabular-nums"
+          >
+            {activeLessonCount}
+          </motion.span>
+        )}
+      </motion.div>
+
       {lessons.map((studentLesson) => {
         const { status, lesson, progress } = studentLesson;
 
-        // Calculate progress stats
         const lessonWords = lesson?.words || [];
         const totalWords = lessonWords.length || 1;
         const masteredWords = (progress?.words_mastered || []).length;
@@ -85,87 +149,110 @@ export default function StudentLessonView() {
           ? Math.round((masteredWords / totalWords) * 100)
           : 0;
 
-        // Get lesson name
         const lessonName = lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
 
+        // Accent border color per status
+        const accentBorder =
+          status === 'assigned'
+            ? 'border-s-neo-cyan'
+            : status === 'completed'
+              ? 'border-s-neo-yellow'
+              : 'border-s-neo-white/20';
+
+        // Progress bar fill color
+        const fillColor = status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan';
+
         return (
-          <div
+          <motion.div
             key={studentLesson.lessonId}
+            variants={cardEntrance}
+            whileHover={{
+              x: 6,
+              boxShadow: '6px 6px 0px rgba(0,0,0,0.3)',
+              transition: { type: 'spring', stiffness: 400, damping: 25 },
+            }}
+            whileTap={{ scale: 0.99 }}
             className={cn(
-              'p-6 rounded-neo border-neo border-neo-black bg-neo-navy/80',
-              'shadow-hard hover:shadow-hard-lg transition-all',
-              // Subtle status indicators via border color
-              status === 'assigned' && 'border-neo-cyan',
-              status === 'completed' && 'border-neo-yellow'
+              'p-6 rounded-neo border border-neo-black/50',
+              'bg-neo-navy/40 backdrop-blur-sm',
+              'border-s-[6px]', accentBorder,
+              'cursor-default'
             )}
           >
-            <div className="flex items-center justify-between gap-4">
-              {/* Left: Lesson info */}
-              <div className="flex-1">
-                {/* Lesson name */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              {/* Lesson info */}
+              <div className="flex-1 min-w-0">
+                {/* Lesson name + badge */}
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xl font-neo-display text-neo-white">
+                  <h3 className="text-2xl font-neo-display text-neo-white truncate">
                     {lessonName}
                   </h3>
 
-                  {/* Status badge */}
                   {status === 'assigned' && (
-                    <span className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-xs font-bold rounded-neo border border-neo-cyan/50">
+                    <span className="flex-shrink-0 px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-xs font-bold rounded-neo border border-neo-cyan/50 animate-pulse-subtle">
                       NEW
                     </span>
                   )}
                   {status === 'completed' && (
-                    <span className="px-2 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-neo border border-neo-yellow/50">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                      className="flex-shrink-0 px-2 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-neo border border-neo-yellow/50"
+                    >
                       ✓ DONE
-                    </span>
+                    </motion.span>
                   )}
                 </div>
 
-                {/* Progress info - compact */}
-                <div className="flex items-center gap-6 text-sm text-neo-white/70">
-                  <span>{totalWords} {t('student.lessons.words')}</span>
+                {/* Stats row with icons */}
+                <div className="flex items-center gap-5 text-sm text-neo-white/60">
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4" />
+                    {totalWords} {t('student.lessons.words')}
+                  </span>
 
-                  {/* Show progress for started/completed */}
                   {status !== 'assigned' && progress && (
                     <>
-                      <span className="text-neo-cyan font-bold">
+                      <span className="flex items-center gap-1.5 text-neo-cyan font-bold">
+                        <Award className="w-4 h-4" />
                         {masteredWords} {t('student.lessons.mastered')}
                       </span>
-                      <span className="text-neo-yellow font-bold">
-                        {masteryPercent}% {t('student.lessons.complete')}
+                      <span className="flex items-center gap-1.5 text-neo-yellow font-bold">
+                        <Activity className="w-4 h-4" />
+                        {masteryPercent}%
                       </span>
                     </>
                   )}
                 </div>
 
-                {/* Progress bar for started/completed - uses scaleX for compositor-only animation */}
+                {/* Animated progress bar */}
                 {status !== 'assigned' && progress && (
-                  <div className="mt-3 w-full h-2 bg-neo-black border border-neo-black overflow-hidden rounded">
-                    <div
-                      className={cn(
-                        'h-full w-full origin-left transition-transform duration-300',
-                        status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan'
-                      )}
-                      style={{ transform: `scaleX(${masteryPercent / 100})` }}
+                  <div className="mt-3 w-full h-2 rounded-full bg-black/40 overflow-hidden">
+                    <motion.div
+                      className={cn('h-full rounded-full', fillColor)}
+                      variants={progressBarFill}
+                      custom={masteryPercent}
                     />
                   </div>
                 )}
               </div>
 
-              {/* Right: Quick practice button with mode dropdown */}
-              <div>
+              {/* Practice button */}
+              <div className="sm:flex-shrink-0 w-full sm:w-auto">
                 <QuickPracticeButton
                   lessonId={studentLesson.lessonId}
                   onPractice={(mode: PracticeType) => {
                     router.push(`/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`);
                   }}
                   size="lg"
+                  className="w-full sm:w-auto"
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }
