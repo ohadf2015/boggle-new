@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useGridInit } from '@/components/singleplayer/game/hooks/useGridInit';
 import type { LetterGrid } from '@/shared/types/game';
 import {
@@ -184,6 +184,14 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     // tilesCleared is a cumulative metric for the results screen — do NOT reset it
   }, []);
 
+  // Auto-complete when cumulative tilesCleared reaches the board size
+  useEffect(() => {
+    const { tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
+    if (!isComplete && !isDeadEnd && tilesCleared >= totalTiles && totalTiles > 0) {
+      setGameState(prev => ({ ...prev, isComplete: true }));
+    }
+  }, [gameState]);
+
   /**
    * Clear tiles along a word path and apply special tile effects.
    * After clearing, triggers cascade (gravity + refill).
@@ -279,12 +287,12 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
         setExplosions(prev => [...prev, ...newExplosions]);
       }
 
-      // Trigger cascade after a short delay for explosions to play
+      // Trigger cascade after a brief delay for gap cells to appear
       const gridForCascade = effectiveGrid;
       if (gridForCascade) {
         setTimeout(() => {
           cascade.startCascade(gridForCascade, next, handleCascadeComplete);
-        }, 200);
+        }, 80);
       }
 
       return next;

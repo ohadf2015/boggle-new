@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import { motion, useSpring, useTransform } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BlastProgressBarProps {
   cleared: number;
@@ -20,21 +19,35 @@ function getProgressColor(pct: number): string {
 
 const MILESTONES = [25, 50, 75, 100];
 
+/** Which milestone threshold was just crossed? */
+function getMilestoneCrossed(prev: number, curr: number): number | null {
+  for (const m of MILESTONES) {
+    if (prev < m && curr >= m) return m;
+  }
+  return null;
+}
+
 /**
  * BlastProgressBar - Shows board clear progress with milestone markers.
- * Uses spring physics for satisfying bounce when progress increases.
+ * Uses motion.div animate prop for reliable FM v12 spring animation.
  */
 export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
-  const percentage = total > 0 ? Math.round((cleared / total) * 100) : 0;
+  const percentage = total > 0 ? Math.min(Math.round((cleared / total) * 100), 100) : 0;
   const color = getProgressColor(percentage);
+  const prevPctRef = useRef(0);
+  const [milestonePulse, setMilestonePulse] = useState<number | null>(null);
 
-  // Spring-animated width for satisfying overshoot
-  const springValue = useSpring(percentage, {
-    stiffness: 120,
-    damping: 20,
-    mass: 0.8,
-  });
-  const width = useTransform(springValue, (v: number) => `${Math.min(v, 100)}%`);
+  // Detect milestone crossings for celebration pulse
+  useEffect(() => {
+    const milestone = getMilestoneCrossed(prevPctRef.current, percentage);
+    prevPctRef.current = percentage;
+    if (milestone) {
+      setMilestonePulse(milestone);
+      const timer = setTimeout(() => setMilestonePulse(null), 800);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [percentage]);
 
   return (
     <div className="w-full">
@@ -54,24 +67,47 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
         {MILESTONES.map(m => (
           <div
             key={m}
-            className="absolute top-0 bottom-0 w-px bg-white/20"
-            style={{ left: `${m}%` }}
+            className="absolute top-0 bottom-0 w-px"
+            style={{
+              left: `${m}%`,
+              backgroundColor: percentage >= m ? `${getProgressColor(m)}60` : 'rgba(255,255,255,0.2)',
+            }}
           />
         ))}
 
-        {/* Animated fill */}
+        {/* Animated fill — uses animate prop for reliable FM v12 updates */}
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
-          style={{
-            width,
+          initial={{ width: '0%' }}
+          animate={{
+            width: `${percentage}%`,
             backgroundColor: color,
-            boxShadow: `0 0 8px ${color}40`,
+            boxShadow: `0 0 ${milestonePulse ? '16px' : '8px'} ${color}${milestonePulse ? '80' : '40'}`,
           }}
-          transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+          transition={{
+            width: { type: 'spring', stiffness: 120, damping: 20, mass: 0.8 },
+            backgroundColor: { duration: 0.3 },
+            boxShadow: { duration: 0.3 },
+          }}
         />
 
         {/* Shine overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-full pointer-events-none" />
+
+        {/* Milestone pulse flash */}
+        <AnimatePresence>
+          {milestonePulse && (
+            <motion.div
+              key={`pulse-${milestonePulse}`}
+              initial={{ opacity: 0.8, scaleX: 0 }}
+              animate={{ opacity: 0, scaleX: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="absolute inset-0 rounded-full origin-left"
+              style={{ backgroundColor: `${getProgressColor(milestonePulse)}30` }}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Percentage badge */}

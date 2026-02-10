@@ -277,14 +277,14 @@ describe('useBlastGame', () => {
   });
 
   describe('game completion', () => {
-    it('should not auto-complete when all tiles cleared (gravity refills board)', () => {
+    it('should auto-complete when tilesCleared reaches totalTiles', () => {
       const { result } = renderHook(() => useBlastGame({
         gridSize: 2,
         specialTileChance: 0,
         language: 'en',
       }));
 
-      // Clear all 4 tiles — with gravity, cascade will refill them
+      // Clear all 4 tiles — tilesCleared (cumulative) reaches totalTiles (4)
       act(() => {
         result.current.clearTilesForWord(
           [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
@@ -293,7 +293,26 @@ describe('useBlastGame', () => {
         );
       });
 
-      // Game is open-ended — never auto-completes
+      // Auto-completes when cumulative tilesCleared >= totalTiles
+      expect(result.current.gameState.isComplete).toBe(true);
+    });
+
+    it('should not auto-complete when tilesCleared is below totalTiles', () => {
+      const { result } = renderHook(() => useBlastGame({
+        gridSize: 2,
+        specialTileChance: 0,
+        language: 'en',
+      }));
+
+      // Clear only 2 of 4 tiles
+      act(() => {
+        result.current.clearTilesForWord(
+          [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+          'at',
+          5
+        );
+      });
+
       expect(result.current.gameState.isComplete).toBe(false);
     });
 

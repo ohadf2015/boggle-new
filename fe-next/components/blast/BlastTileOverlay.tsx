@@ -41,8 +41,9 @@ const TILE_BACKGROUNDS: Record<string, {
 };
 
 /**
- * BlastTileOverlay - Full-cell background treatments for special tiles.
+ * BlastTileOverlay - Full-cell background treatments for special tiles + cleared gap cells.
  * Renders underneath the grid letters as colored overlays with animations.
+ * Cleared cells render as dark inset gaps so the board visually "breathes" during cascade.
  */
 export function BlastTileOverlay({
   tileStates,
@@ -56,13 +57,37 @@ export function BlastTileOverlay({
     <div className="absolute inset-0 pointer-events-none z-[5]">
       <AnimatePresence mode="sync">
         {tileStates.flat().map(tile => {
-          if (tile.isCleared || tile.type === 'standard') return null;
+          const x = tile.col * cellSize;
+          const y = tile.row * cellSize;
+
+          // Cleared tile → dark gap cell
+          if (tile.isCleared) {
+            return (
+              <motion.div
+                key={`gap-${tile.row}-${tile.col}`}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                className="absolute rounded-lg"
+                style={{
+                  left: x + inset,
+                  top: y + inset,
+                  width: cellSize - inset * 2,
+                  height: cellSize - inset * 2,
+                  background: 'rgba(10, 10, 30, 0.7)',
+                  border: '2px solid rgba(255,255,255,0.05)',
+                  boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6)',
+                }}
+              />
+            );
+          }
+
+          // Standard tile → no overlay
+          if (tile.type === 'standard') return null;
 
           const config = TILE_BACKGROUNDS[tile.type];
           if (!config) return null;
-
-          const x = tile.col * cellSize;
-          const y = tile.row * cellSize;
 
           return (
             <motion.div

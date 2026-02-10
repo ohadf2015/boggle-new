@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeft, Bomb, HelpCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Bomb, HelpCircle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LetterTileWord } from '@/components/singleplayer/game/components/LetterTileWord';
@@ -89,10 +89,37 @@ export function BlastGameLayout({
   const { score, tilesCleared, totalTiles, isComplete, wordsFound } = gameState;
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
+  const [screenFlash, setScreenFlash] = useState(false);
+  const prevWordsRef = useRef(wordsFound.length);
+
+  // Screen flash when a word is cleared (cascade starts)
+  useEffect(() => {
+    if (wordsFound.length > prevWordsRef.current) {
+      setScreenFlash(true);
+      const timer = setTimeout(() => setScreenFlash(false), 300);
+      prevWordsRef.current = wordsFound.length;
+      return () => clearTimeout(timer);
+    }
+    prevWordsRef.current = wordsFound.length;
+    return undefined;
+  }, [wordsFound.length]);
 
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
       <DynamicEnergyBackground />
+
+      {/* Screen flash on word clear */}
+      <AnimatePresence>
+        {screenFlash && (
+          <motion.div
+            initial={{ opacity: 0.25 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="absolute inset-0 z-40 pointer-events-none bg-white"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Header */}
       <header className="flex items-center justify-between px-4 shrink-0 relative z-30 pt-4 pb-2">
@@ -214,20 +241,54 @@ export function BlastGameLayout({
         <AnimatePresence>
           {isComplete && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 flex items-center justify-center"
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 z-50 flex items-center justify-center bg-neo-black/40 backdrop-blur-sm"
             >
-              <div className={cn(
-                'px-8 py-4 rounded-neo border-3 border-neo-black shadow-hard-lg',
-                'bg-gradient-to-br from-neo-lime via-yellow-300 to-neo-orange',
-                'text-center'
-              )}>
-                <div className="text-2xl font-black uppercase text-neo-black">
-                  {t('blast.complete') || 'Board Cleared!'}
+              <motion.div
+                initial={{ scale: 0.3, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
+                className={cn(
+                  'px-8 py-6 rounded-neo border-3 border-neo-black shadow-hard-lg',
+                  'bg-gradient-to-br from-neo-lime via-yellow-300 to-neo-orange',
+                  'text-center space-y-3'
+                )}
+              >
+                {/* Stars */}
+                <div className="flex justify-center gap-2">
+                  {[0, 1, 2].map(i => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.15 }}
+                    >
+                      <Star className="h-8 w-8 fill-neo-orange text-neo-black" />
+                    </motion.div>
+                  ))}
                 </div>
-              </div>
+
+                <motion.div
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-2xl font-black uppercase text-neo-black"
+                >
+                  {t('blast.complete') || 'Board Cleared!'}
+                </motion.div>
+
+                <motion.div
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.65 }}
+                  className="text-lg font-bold text-neo-black/70 tabular-nums"
+                >
+                  {score.toLocaleString()} {t('common.points') || 'pts'}
+                </motion.div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import anime from 'animejs';
-import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
+import { BLAST_ANIM, type BlastCascadePhase, type CascadeAnimationData } from './hooks/useBlastCascade';
 
 interface BlastCascadeOverlayProps {
   /** Current cascade phase */
@@ -20,11 +20,10 @@ interface BlastCascadeOverlayProps {
  *
  * During cascade phases, this overlay renders animated tile representations:
  * - clearing: cleared tiles scale up then shrink away with staggered rotation
- * - falling: surviving tiles slide down with smooth gravity easing
+ * - falling: surviving tiles slide down with gravity-proportional duration
  * - appearing: new tiles pop in from above with subtle overshoot
  *
- * Uses anime.js for choreographed multi-element animation
- * that would be awkward with Framer Motion's per-element approach.
+ * Animation parameters stay synchronized with useBlastCascade via BLAST_ANIM config.
  */
 export function BlastCascadeOverlay({
   phase,
@@ -46,12 +45,13 @@ export function BlastCascadeOverlay({
       if (clearTargets.length > 0) {
         anime({
           targets: clearTargets,
-          scale: [1, 1.15, 0],
-          opacity: [1, 0.9, 0],
-          rotate: anime.stagger([-8, 8]),
-          duration: 250,
-          easing: 'easeInQuart',
-          delay: anime.stagger(20, { from: 'center' }),
+          scale: [1, 1.2, 0],
+          opacity: [1, 1, 0],
+          rotate: anime.stagger([-12, 12]),
+          filter: ['brightness(1)', 'brightness(1.6)', 'brightness(0.5)'],
+          duration: BLAST_ANIM.clear.duration,
+          easing: BLAST_ANIM.clear.easing,
+          delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
         });
       }
     }
@@ -59,6 +59,7 @@ export function BlastCascadeOverlay({
     if (phase === 'falling') {
       const fallTargets = el.querySelectorAll('.blast-cascade-fall');
       if (fallTargets.length > 0) {
+        // Per-element duration proportional to fall distance (simulates gravity)
         anime({
           targets: fallTargets,
           translateY: [
@@ -68,9 +69,12 @@ export function BlastCascadeOverlay({
             },
             0,
           ],
-          duration: 320,
-          easing: 'easeOutQuart',
-          delay: anime.stagger(25, { from: 'last' }),
+          duration: function (el: Element) {
+            const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
+            return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
+          },
+          easing: BLAST_ANIM.fall.easing,
+          // No stagger — all tiles start falling at once (real gravity)
         });
       }
     }
@@ -89,9 +93,9 @@ export function BlastCascadeOverlay({
           ],
           scale: [0.5, 1],
           opacity: [0, 1],
-          duration: 260,
-          easing: 'easeOutBack',
-          delay: anime.stagger(30, { from: 'first' }),
+          duration: BLAST_ANIM.appear.duration,
+          easing: BLAST_ANIM.appear.easing,
+          delay: anime.stagger(BLAST_ANIM.appear.stagger, { from: 'first' }),
         });
       }
     }
@@ -122,7 +126,7 @@ export function BlastCascadeOverlay({
         </div>
       ))}
 
-      {/* Falling phase: render tiles at their final positions with translateY offset */}
+      {/* Falling phase: render tiles at final positions with translateY offset */}
       {phase === 'falling' && data.fallingTiles.map(tile => (
         <div
           key={`fall-${tile.row}-${tile.col}`}
@@ -135,7 +139,7 @@ export function BlastCascadeOverlay({
             height: cellSize - inset * 2,
             fontSize: cellSize * 0.45,
             border: '2px solid rgba(0,0,0,0.3)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            boxShadow: `0 ${Math.min(tile.fallDistance * 3, 12)}px ${Math.min(tile.fallDistance * 4, 16)}px rgba(0,0,0,0.2)`,
           }}
         >
           {tile.letter}
