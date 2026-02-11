@@ -234,9 +234,9 @@ export function useBlastGame(
    * Handle cascade completion: update grid, then scan for vertical cascade words.
    * Uses ref indirection to break circular dependency (cascade → handleComplete → cascade).
    */
-  const handleCascadeCompleteRef = useRef<(g: LetterGrid, ts: BlastTileState[][]) => void>(() => {});
+  const handleCascadeCompleteRef = useRef<(g: LetterGrid, ts: BlastTileState[][], cols: number[]) => void>(() => {});
 
-  const handleCascadeComplete = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
+  const handleCascadeComplete = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => {
     setCurrentGrid(newGrid);
     setTileStates(newTileStates);
 
@@ -254,7 +254,8 @@ export function useBlastGame(
 
       autoDetectTimerRef.current = setTimeout(() => {
         const foundSet = new Set(gameStateRef.current.wordsFound);
-        const verticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet);
+        const columnFilter = affectedColumns.length > 0 ? new Set(affectedColumns) : undefined;
+        const verticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet, 3, columnFilter);
 
         if (verticalWords.length > 0) {
           const chainLevel = cascadeChainLevelRef.current + 1;

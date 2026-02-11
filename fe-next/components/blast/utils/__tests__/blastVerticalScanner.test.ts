@@ -201,6 +201,40 @@ describe('blastVerticalScanner', () => {
       expect(result).toHaveLength(0);
     });
 
+    it('should only scan affectedColumns when provided', () => {
+      // Col 0: C-A-T, Col 2: D-O-G — but only col 2 is affected
+      const grid = makeGrid([
+        ['C', 'X', 'D'],
+        ['A', 'X', 'O'],
+        ['T', 'X', 'G'],
+      ]);
+      const tileStates = makeTileStates(grid);
+      const checkWord = (w: string) => ['cat', 'dog'].includes(w);
+
+      const result = detectVerticalWords(
+        grid, tileStates, checkWord, new Set(), 3, new Set([2])
+      );
+
+      // Should only find "dog" in col 2, not "cat" in col 0
+      expect(result).toHaveLength(1);
+      expect(result[0].word).toBe('dog');
+      expect(result[0].column).toBe(2);
+    });
+
+    it('should scan all columns when affectedColumns is undefined', () => {
+      const grid = makeGrid([
+        ['C', 'D'],
+        ['A', 'O'],
+        ['T', 'G'],
+      ]);
+      const tileStates = makeTileStates(grid);
+      const checkWord = (w: string) => ['cat', 'dog'].includes(w);
+
+      const result = detectVerticalWords(grid, tileStates, checkWord, new Set(), 3, undefined);
+
+      expect(result).toHaveLength(2);
+    });
+
     it('should return correct path coordinates', () => {
       const grid = makeGrid([
         ['X', 'D'],

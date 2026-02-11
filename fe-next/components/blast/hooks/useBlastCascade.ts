@@ -71,7 +71,7 @@ export interface UseBlastCascadeReturn {
   startCascade: (
     grid: LetterGrid,
     tileStates: BlastTileState[][],
-    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][]) => void
+    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void
   ) => void;
 }
 
@@ -109,7 +109,7 @@ export function useBlastCascade({
   const startCascade = useCallback((
     grid: LetterGrid,
     tileStates: BlastTileState[][],
-    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][]) => void
+    onComplete: (newGrid: LetterGrid, newTileStates: BlastTileState[][], affectedColumns: number[]) => void
   ) => {
     // Clear any in-flight timers from a previous cascade
     clearTimers();
@@ -117,9 +117,12 @@ export function useBlastCascade({
     // Compute gravity result upfront (pure function)
     const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance);
 
+    // Columns that received new tiles (these are the only ones worth scanning for cascade words)
+    const affectedColumns = [...new Set(result.newTiles.map(t => t.col))];
+
     // For reduced motion, skip animation entirely
     if (reducedMotion) {
-      onComplete(result.newGrid, result.newTileStates);
+      onComplete(result.newGrid, result.newTileStates, affectedColumns);
       return;
     }
 
@@ -152,7 +155,7 @@ export function useBlastCascade({
     const t3 = setTimeout(() => {
       setCascadePhase('idle');
       setAnimationData(null);
-      onComplete(result.newGrid, result.newTileStates);
+      onComplete(result.newGrid, result.newTileStates, affectedColumns);
     }, timing.clear + timing.fall + timing.appear);
 
     timersRef.current = [t1, t2, t3];

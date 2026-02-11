@@ -165,8 +165,9 @@ describe('Phase 4: Gradient Standardization', () => {
       // 5. Host pre-game UI enhancements (lobby, settings, player list)
       // 6. UI simplification & progressive onboarding features (lesson tracking, feature gates)
       // 7. Blast mode special tile full-cell backgrounds (gold shimmer, bomb glow, rainbow)
+      // 8. Blast mode cascade chain announcements (magenta/purple/cyan gradients)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThanOrEqual(380);
+      expect(totalGradients).toBeLessThanOrEqual(390);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients

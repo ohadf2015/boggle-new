@@ -32,6 +32,8 @@ export function detectVerticalWords(
   checkWord: (word: string) => boolean,
   foundWords: Set<string>,
   minLength: number = 3,
+  /** Only scan these columns (columns that received new tiles from gravity) */
+  affectedColumns?: Set<number>,
 ): VerticalWord[] {
   if (!grid.length || !grid[0]?.length) return [];
 
@@ -40,6 +42,8 @@ export function detectVerticalWords(
   const results: VerticalWord[] = [];
 
   for (let col = 0; col < cols; col++) {
+    // Skip columns that weren't affected by the cascade
+    if (affectedColumns && !affectedColumns.has(col)) continue;
     // Build contiguous runs of non-cleared cells in this column
     const runs: Array<{ startRow: number; letters: string[] }> = [];
     let currentRun: { startRow: number; letters: string[] } | null = null;
