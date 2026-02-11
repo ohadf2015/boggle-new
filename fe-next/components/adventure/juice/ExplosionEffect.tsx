@@ -5,10 +5,10 @@
  * Uses existing particle budget system to adapt to device performance.
  *
  * Intensity scales particle count and velocity based on word length:
- * - Intensity 1 (3-4 letters): 6 particles, velocity 15
- * - Intensity 2 (5-6 letters): 12 particles, velocity 22
- * - Intensity 3 (7-9 letters): 18 particles, velocity 30
- * - Intensity 4 (10+ letters): 24 particles, velocity 38
+ * - Intensity 1 (3-4 letters): 4 particles, velocity 15
+ * - Intensity 2 (5-6 letters): 8 particles, velocity 22
+ * - Intensity 3 (7-9 letters): 12 particles, velocity 30
+ * - Intensity 4 (10+ letters): 16 particles, velocity 38
  *
  * Reduced motion users: Zero particles, just fire onComplete callback
  */
@@ -46,10 +46,10 @@ function buildPalette(primary: string): string[] {
  * - velocity: Initial burst velocity
  */
 const INTENSITY_CONFIG = {
-  1: { particleMultiplier: 1, velocity: 15 },   // 6 particles
-  2: { particleMultiplier: 2, velocity: 22 },   // 12 particles
-  3: { particleMultiplier: 3, velocity: 30 },   // 18 particles
-  4: { particleMultiplier: 4, velocity: 38 },   // 24 particles
+  1: { particleMultiplier: 1, velocity: 15 },   // 4 particles
+  2: { particleMultiplier: 2, velocity: 22 },   // 8 particles
+  3: { particleMultiplier: 3, velocity: 30 },   // 12 particles
+  4: { particleMultiplier: 4, velocity: 38 },   // 16 particles
 };
 
 export function ExplosionEffect({
@@ -71,7 +71,7 @@ export function ExplosionEffect({
 
     // Get intensity config
     const config = INTENSITY_CONFIG[intensity];
-    const baseParticleCount = 6;
+    const baseParticleCount = 4;
     const particleCount = baseParticleCount * config.particleMultiplier;
 
     // Calculate normalized origin position (0-1 range)
@@ -85,9 +85,9 @@ export function ExplosionEffect({
       spread: 360, // Full radial burst
       origin: { x: originX, y: originY },
       colors: buildPalette(color),
-      gravity: 1.2,
-      ticks: 100,
-      scalar: 1.0,
+      gravity: 1.5,
+      ticks: 60,
+      scalar: 0.9,
     });
 
     // Fire onComplete after particle animation (150 ticks ~= 150ms)

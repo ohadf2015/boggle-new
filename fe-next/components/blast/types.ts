@@ -108,7 +108,11 @@ export const CHAIN_BOMB_STAGGER = 120;
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 5;
+export const MAX_CASCADE_CHAIN = 3;
+/** Maximum vertical words cleared per cascade level (limits simultaneous explosions) */
+export const MAX_CASCADE_WORDS_PER_LEVEL = 2;
+/** Minimum word length for cascade auto-detection (shorter words ignored) */
+export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles */
 export const CASCADE_DETECTION_DELAY = 400;
 /** Bonus multiplier per chain level: base * chainLevel * this */

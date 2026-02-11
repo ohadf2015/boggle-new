@@ -15,6 +15,8 @@ import {
   CHAIN_BOMB_STAGGER,
   SPECIAL_TILE_DISTRIBUTION,
   MAX_CASCADE_CHAIN,
+  MAX_CASCADE_WORDS_PER_LEVEL,
+  CASCADE_MIN_WORD_LENGTH,
   CASCADE_DETECTION_DELAY,
   CASCADE_CHAIN_BONUS_MULTIPLIER,
   type BlastGameConfig,
@@ -255,7 +257,9 @@ export function useBlastGame(
       autoDetectTimerRef.current = setTimeout(() => {
         const foundSet = new Set(gameStateRef.current.wordsFound);
         const columnFilter = affectedColumns.length > 0 ? new Set(affectedColumns) : undefined;
-        const verticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet, 3, columnFilter);
+        const allVerticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet, CASCADE_MIN_WORD_LENGTH, columnFilter);
+        // Cap words per cascade level to limit simultaneous explosions
+        const verticalWords = allVerticalWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
 
         if (verticalWords.length > 0) {
           const chainLevel = cascadeChainLevelRef.current + 1;
@@ -288,15 +292,15 @@ export function useBlastGame(
               allPaths.push(cell);
             }
 
-            // Cascade explosion at word midpoint
+            // Cascade explosion at word midpoint — capped at intensity 1
+            // to keep auto-detected cascades visually light (player words get full intensity)
             const midIdx = Math.floor(vw.path.length / 2);
-            const intensity = vw.word.length <= 3 ? 1 : vw.word.length <= 5 ? 2 : vw.word.length <= 7 ? 3 : 4;
             newExplosions.push({
               id: `cascade-${now}-${vw.column}-${vw.startRow}`,
               row: vw.path[midIdx].row,
               col: vw.path[midIdx].col,
               type: 'cascade',
-              intensity: intensity as 1 | 2 | 3 | 4,
+              intensity: 1,
               timestamp: now,
             });
 
