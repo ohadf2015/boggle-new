@@ -108,7 +108,7 @@ export function BlastGameLayout({
   useEffect(() => {
     if (wordsFound.length > prevWordsRef.current) {
       setScreenFlash(true);
-      const timer = setTimeout(() => setScreenFlash(false), 300);
+      const timer = setTimeout(() => setScreenFlash(false), 200);
       prevWordsRef.current = wordsFound.length;
       return () => clearTimeout(timer);
     }
@@ -120,9 +120,9 @@ export function BlastGameLayout({
   useEffect(() => {
     const bombCount = explosions.filter(e => e.type === 'bomb').length;
     if (bombCount > prevExplosionsRef.current) {
-      const intensity = bombCount >= 3 ? 'animate-neo-shake' : 'animate-neo-wobble';
+      const intensity = bombCount >= 4 ? 'animate-neo-shake' : 'animate-neo-wobble';
       setShakeClass(intensity);
-      const timer = setTimeout(() => setShakeClass(''), 500);
+      const timer = setTimeout(() => setShakeClass(''), 350);
       prevExplosionsRef.current = bombCount;
       return () => clearTimeout(timer);
     }
@@ -160,10 +160,10 @@ export function BlastGameLayout({
       <AnimatePresence>
         {screenFlash && (
           <motion.div
-            initial={{ opacity: 0.25 }}
+            initial={{ opacity: 0.1 }}
             animate={{ opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="absolute inset-0 z-40 pointer-events-none bg-white"
           />
         )}

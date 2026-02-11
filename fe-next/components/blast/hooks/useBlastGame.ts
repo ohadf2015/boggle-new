@@ -300,7 +300,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
             bonusScore += baseScore * (GOLD_MULTIPLIER - 1);
             newExplosions.push({
               id: `gold-${now}-${cell.row}-${cell.col}`,
-              row: cell.row, col: cell.col, type: 'word', intensity: 3, timestamp: now,
+              row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
             });
             break;
 
@@ -316,7 +316,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
               const staggeredTime = now + bomb.depth * CHAIN_BOMB_STAGGER;
               newExplosions.push({
                 id: `bomb-${staggeredTime}-${bomb.row}-${bomb.col}`,
-                row: bomb.row, col: bomb.col, type: 'bomb', intensity: 4, timestamp: staggeredTime,
+                row: bomb.row, col: bomb.col, type: 'bomb', intensity: 3, timestamp: staggeredTime,
               });
 
               for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
@@ -351,14 +351,14 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
             bonusScore += RAINBOW_BONUS;
             newExplosions.push({
               id: `rainbow-${now}-${cell.row}-${cell.col}`,
-              row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
+              row: cell.row, col: cell.col, type: 'word', intensity: 1, timestamp: now,
             });
             break;
 
           case 'wildcard':
             newExplosions.push({
               id: `wildcard-${now}-${cell.row}-${cell.col}`,
-              row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
+              row: cell.row, col: cell.col, type: 'word', intensity: 1, timestamp: now,
             });
             break;
 
@@ -368,8 +368,9 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
         }
       }
 
-      // Add word explosion
-      if (path.length > 0) {
+      // Add word explosion (skip when ≥2 special tile explosions to reduce visual overload)
+      const specialExplosionCount = newExplosions.length;
+      if (path.length > 0 && specialExplosionCount < 2) {
         const midIdx = Math.floor(path.length / 2);
         const intensity = path.length <= 3 ? 1 : path.length <= 5 ? 2 : path.length <= 7 ? 3 : 4;
         newExplosions.push({
