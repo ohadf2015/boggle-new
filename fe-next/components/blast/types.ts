@@ -76,6 +76,8 @@ export interface BlastGameState {
   isComplete: boolean;
   /** True when no more valid words can be formed from uncleared tiles */
   isDeadEnd: boolean;
+  /** Current cascade chain level (0 = no cascade active) */
+  cascadeChainLevel: number;
 }
 
 // ==================== Results ====================
@@ -103,6 +105,15 @@ export const RAINBOW_BONUS = 5;
 /** Stagger delay (ms) between chain bomb explosions for visual ripple */
 export const CHAIN_BOMB_STAGGER = 120;
 
+// ==================== Cascade Chain Constants ====================
+
+/** Maximum number of auto-cascade chain levels before stopping */
+export const MAX_CASCADE_CHAIN = 5;
+/** Delay (ms) before scanning for cascade words after grid settles */
+export const CASCADE_DETECTION_DELAY = 400;
+/** Bonus multiplier per chain level: base * chainLevel * this */
+export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.5;
+
 /** Distribution of special tiles (must sum to 1.0) */
 export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'>, number> = {
   gold: 0.22,
@@ -118,7 +129,7 @@ export interface BlastExplosion {
   id: string;
   row: number;
   col: number;
-  type: 'word' | 'bomb' | 'clear';
+  type: 'word' | 'bomb' | 'clear' | 'cascade';
   intensity: 1 | 2 | 3 | 4;
   timestamp: number;
 }

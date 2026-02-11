@@ -9,6 +9,7 @@ const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
   bomb: '#FF4444',   // red
   clear: '#FFD700',  // gold
   word: '#00FFFF',   // cyan (was orange — now varied via palette in ExplosionEffect)
+  cascade: '#FF00FF', // magenta — distinct from player word clears
 };
 
 interface BlastExplosionLayerProps {

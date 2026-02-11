@@ -5,6 +5,7 @@ import { useGridInit } from '@/components/singleplayer/game/hooks/useGridInit';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
+import { detectVerticalWords } from '../utils/blastVerticalScanner';
 import type { LetterGrid } from '@/shared/types/game';
 import {
   DEFAULT_BLAST_CONFIG,
@@ -13,6 +14,9 @@ import {
   RAINBOW_BONUS,
   CHAIN_BOMB_STAGGER,
   SPECIAL_TILE_DISTRIBUTION,
+  MAX_CASCADE_CHAIN,
+  CASCADE_DETECTION_DELAY,
+  CASCADE_CHAIN_BONUS_MULTIPLIER,
   type BlastGameConfig,
   type BlastGameState,
   type BlastTileState,
@@ -126,8 +130,15 @@ export interface UseBlastGameReturn {
   isCascading: boolean;
   /** Cascade animation data for overlay rendering */
   cascadeAnimationData: CascadeAnimationData | null;
+  /** Current cascade chain level (0 = no active chain) */
+  cascadeChainLevel: number;
   // Legacy alias
   modifiedGrid: LetterGrid | null;
+}
+
+export interface UseBlastGameOptions {
+  /** Called when an auto-cascade detects and clears a vertical word */
+  onAutoCascadeWord?: (word: string, score: number, chainLevel: number) => void;
 }
 
 // ==================== Hook ====================
@@ -139,7 +150,10 @@ const WORD_DIFFICULTY_MAP = {
   hard: 'HARD',
 } as const;
 
-export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): UseBlastGameReturn {
+export function useBlastGame(
+  config: BlastGameConfig = DEFAULT_BLAST_CONFIG,
+  options?: UseBlastGameOptions,
+): UseBlastGameReturn {
   const { gridSize, specialTileChance, language, difficulty = 'medium' } = config;
 
   // Reuse grid generation from singleplayer, with blast gridSize override
@@ -171,6 +185,7 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     comboCount: 0,
     isComplete: false,
     isDeadEnd: false,
+    cascadeChainLevel: 0,
   });
 
   // Explosions for animation
@@ -182,6 +197,15 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
   // Track best word and total words cleared for results
   const bestWordRef = useRef<string>('');
   const totalWordsClearedRef = useRef(0);
+
+  // Cascade chain refs (avoid re-renders + break circular useCallback dependency)
+  const cascadeChainLevelRef = useRef(0);
+  const gameStateRef = useRef(gameState);
+  gameStateRef.current = gameState;
+  const [isAutoDetecting, setIsAutoDetecting] = useState(false);
+  const autoDetectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onAutoCascadeWordRef = useRef(options?.onAutoCascadeWord);
+  onAutoCascadeWordRef.current = options?.onAutoCascadeWord;
 
   // Cascade hook
   const cascade = useBlastCascade({
@@ -203,20 +227,133 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     );
   }, [effectiveGrid, tileStates]);
 
+  // Dictionary cache (moved up — used by both cascade detection and dead-end detection)
+  const { checkWord: checkWordInDict, isLoaded: isDictLoaded } = useDictionaryCache(language);
+
   /**
-   * Handle cascade completion: update grid and tile states with gravity results.
+   * Handle cascade completion: update grid, then scan for vertical cascade words.
+   * Uses ref indirection to break circular dependency (cascade → handleComplete → cascade).
    */
+  const handleCascadeCompleteRef = useRef<(g: LetterGrid, ts: BlastTileState[][]) => void>(() => {});
+
   const handleCascadeComplete = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
     setCurrentGrid(newGrid);
     setTileStates(newTileStates);
-    // tilesCleared is a cumulative metric for the results screen — do NOT reset it
-  }, []);
 
-  // Dictionary cache for dead-end detection
-  const { checkWord: checkWordInDict, isLoaded: isDictLoaded } = useDictionaryCache(language);
+    // Auto-detect vertical cascade words
+    if (
+      cascadeChainLevelRef.current < MAX_CASCADE_CHAIN &&
+      isDictLoaded &&
+      !gameStateRef.current.isComplete &&
+      !gameStateRef.current.isDeadEnd
+    ) {
+      setIsAutoDetecting(true);
+
+      // Clear previous timer if any
+      if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
+
+      autoDetectTimerRef.current = setTimeout(() => {
+        const foundSet = new Set(gameStateRef.current.wordsFound);
+        const verticalWords = detectVerticalWords(newGrid, newTileStates, checkWordInDict, foundSet);
+
+        if (verticalWords.length > 0) {
+          const chainLevel = cascadeChainLevelRef.current + 1;
+          cascadeChainLevelRef.current = chainLevel;
+
+          // Collect all paths and calculate scores
+          const allPaths: Array<{ row: number; col: number }> = [];
+          const newExplosions: BlastExplosion[] = [];
+          const now = Date.now();
+          let totalCascadeScore = 0;
+          let newlyClearedCount = 0;
+          const cascadeWords: string[] = [];
+
+          // Deep-copy tile states for mutation
+          const nextTileStates = newTileStates.map(row => row.map(tile => ({ ...tile })));
+
+          for (const vw of verticalWords) {
+            const baseScore = vw.word.length - 1;
+            const chainBonus = Math.floor(baseScore * chainLevel * CASCADE_CHAIN_BONUS_MULTIPLIER);
+            const wordScore = baseScore + chainBonus;
+            totalCascadeScore += wordScore;
+            cascadeWords.push(vw.word);
+
+            // Clear tiles in the vertical word
+            for (const cell of vw.path) {
+              if (!nextTileStates[cell.row][cell.col].isCleared) {
+                nextTileStates[cell.row][cell.col].isCleared = true;
+                newlyClearedCount++;
+              }
+              allPaths.push(cell);
+            }
+
+            // Cascade explosion at word midpoint
+            const midIdx = Math.floor(vw.path.length / 2);
+            const intensity = vw.word.length <= 3 ? 1 : vw.word.length <= 5 ? 2 : vw.word.length <= 7 ? 3 : 4;
+            newExplosions.push({
+              id: `cascade-${now}-${vw.column}-${vw.startRow}`,
+              row: vw.path[midIdx].row,
+              col: vw.path[midIdx].col,
+              type: 'cascade',
+              intensity: intensity as 1 | 2 | 3 | 4,
+              timestamp: now,
+            });
+
+            // Score popup
+            setScorePopups(prev => [...prev, {
+              id: `cascade-score-${now}-${vw.column}-${vw.startRow}`,
+              score: wordScore,
+              row: vw.path[midIdx].row,
+              col: vw.path[midIdx].col,
+              isSpecial: true,
+              timestamp: now,
+            }]);
+
+            // Notify parent
+            onAutoCascadeWordRef.current?.(vw.word, wordScore, chainLevel);
+          }
+
+          // Update game state
+          setGameState(prev => ({
+            ...prev,
+            score: prev.score + totalCascadeScore,
+            wordsFound: [...prev.wordsFound, ...cascadeWords],
+            tilesCleared: prev.tilesCleared + newlyClearedCount,
+            cascadeChainLevel: chainLevel,
+          }));
+
+          setExplosions(prev => [...prev, ...newExplosions]);
+          setTileStates(nextTileStates);
+
+          // Trigger next cascade (gravity + refill) for the newly cleared tiles
+          setIsAutoDetecting(false);
+          setTimeout(() => {
+            cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current);
+          }, 80);
+        } else {
+          // No cascade words found — reset chain
+          cascadeChainLevelRef.current = 0;
+          setGameState(prev => ({ ...prev, cascadeChainLevel: 0 }));
+          setIsAutoDetecting(false);
+        }
+      }, CASCADE_DETECTION_DELAY);
+    } else {
+      // Max chain reached or dictionary not loaded — reset
+      cascadeChainLevelRef.current = 0;
+      setGameState(prev => ({ ...prev, cascadeChainLevel: 0 }));
+    }
+  }, [isDictLoaded, checkWordInDict, cascade]);
+
+  // Keep ref in sync with latest callback
+  handleCascadeCompleteRef.current = handleCascadeComplete;
 
   // Dead-end detection state
   const [noWordsRemaining, setNoWordsRemaining] = useState(false);
+
+  // Cleanup auto-detect timer on unmount
+  useEffect(() => () => {
+    if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
+  }, []);
 
   // Auto-complete when cumulative tilesCleared reaches the board size
   useEffect(() => {
@@ -272,6 +409,15 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     word: string,
     baseScore: number
   ) => {
+    // New player word = new cascade chain
+    cascadeChainLevelRef.current = 0;
+    // Cancel any pending auto-detection from a previous cascade
+    if (autoDetectTimerRef.current) {
+      clearTimeout(autoDetectTimerRef.current);
+      autoDetectTimerRef.current = null;
+    }
+    setIsAutoDetecting(false);
+
     setTileStates(prev => {
       const next = prev.map(row => row.map(tile => ({ ...tile })));
       let bonusScore = 0;
@@ -474,7 +620,8 @@ export function useBlastGame(config: BlastGameConfig = DEFAULT_BLAST_CONFIG): Us
     dismissExplosion,
     dismissScorePopup,
     cascadePhase: cascade.cascadePhase,
-    isCascading: cascade.isAnimating,
+    isCascading: cascade.isAnimating || isAutoDetecting,
     cascadeAnimationData: cascade.animationData,
+    cascadeChainLevel: gameState.cascadeChainLevel,
   };
 }

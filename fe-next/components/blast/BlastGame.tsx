@@ -27,14 +27,20 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
 
-  // Core blast game state
-  const blast = useBlastGame(config);
-
   // Combo system
   const combo = useComboSystem({
     trackMaxCombo: true,
     onComboSound: playComboSound,
   });
+
+  // Auto-cascade word callback: increment combo + play sound for each cascade word
+  const handleAutoCascadeWord = useCallback(() => {
+    combo.incrementCombo(true);
+    playWordAcceptedSound();
+  }, [combo, playWordAcceptedSound]);
+
+  // Core blast game state (with cascade callback)
+  const blast = useBlastGame(config, { onAutoCascadeWord: handleAutoCascadeWord });
 
   // Spam detection
   const spamDetection = useSpamDetection();
@@ -141,6 +147,7 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
       scorePopups={blast.scorePopups}
       cascadePhase={blast.cascadePhase}
       cascadeAnimationData={blast.cascadeAnimationData}
+      cascadeChainLevel={blast.cascadeChainLevel}
       gameState={blast.gameState}
       comboLevel={combo.comboLevel}
       comboTimeRemaining={combo.comboTimeRemaining}

@@ -29,6 +29,8 @@ interface BlastGameLayoutProps {
   // Cascade
   cascadePhase: BlastCascadePhase;
   cascadeAnimationData: CascadeAnimationData | null;
+  /** Current cascade chain level (0 = no active chain) */
+  cascadeChainLevel: number;
   // Game state
   gameState: BlastGameState;
   noWordsRemaining: boolean;
@@ -72,6 +74,7 @@ export function BlastGameLayout({
   scorePopups,
   cascadePhase,
   cascadeAnimationData,
+  cascadeChainLevel,
   gameState,
   noWordsRemaining,
   comboLevel,
@@ -100,9 +103,11 @@ export function BlastGameLayout({
   const [screenFlash, setScreenFlash] = useState(false);
   const [shakeClass, setShakeClass] = useState('');
   const [comboMilestone, setComboMilestone] = useState<string | null>(null);
+  const [cascadeAnnouncement, setCascadeAnnouncement] = useState<string | null>(null);
   const prevWordsRef = useRef(wordsFound.length);
   const prevExplosionsRef = useRef(0);
   const prevComboRef = useRef(comboLevel);
+  const prevCascadeRef = useRef(0);
 
   // Screen flash when a word is cleared (cascade starts)
   useEffect(() => {
@@ -142,6 +147,20 @@ export function BlastGameLayout({
     prevComboRef.current = comboLevel;
     return undefined;
   }, [comboLevel]);
+
+  // Cascade chain announcement
+  useEffect(() => {
+    if (cascadeChainLevel > prevCascadeRef.current && cascadeChainLevel >= 1) {
+      setCascadeAnnouncement(`CASCADE x${cascadeChainLevel}`);
+      const timer = setTimeout(() => setCascadeAnnouncement(null), 1500);
+      prevCascadeRef.current = cascadeChainLevel;
+      return () => clearTimeout(timer);
+    }
+    if (cascadeChainLevel === 0) {
+      prevCascadeRef.current = 0;
+    }
+    return undefined;
+  }, [cascadeChainLevel]);
 
   // Combo-based grid glow color
   const comboGlow = comboLevel >= 7
@@ -230,6 +249,28 @@ export function BlastGameLayout({
               'bg-neo-cyan text-neo-black'
             )}>
               {comboMilestone}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Cascade chain announcement */}
+      <AnimatePresence>
+        {cascadeAnnouncement && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.5, y: -10 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            className="absolute top-32 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <div className={cn(
+              'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-xl uppercase tracking-wider',
+              cascadeChainLevel >= 4 ? 'bg-gradient-to-r from-fuchsia-500 via-cyan-400 to-purple-500 text-white' :
+              cascadeChainLevel >= 2 ? 'bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white' :
+              'bg-gradient-to-r from-fuchsia-400 to-purple-500 text-white'
+            )}>
+              {cascadeAnnouncement}
             </div>
           </motion.div>
         )}
