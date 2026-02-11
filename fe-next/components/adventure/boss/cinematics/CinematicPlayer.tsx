@@ -112,6 +112,17 @@ function CinematicPlayerInner({
     }
   }, [debug]);
 
+  // Validate composition on mount (helps diagnose black screen issues)
+  useEffect(() => {
+    if (!composition) {
+      console.error('[CinematicPlayer] composition prop is undefined/null!');
+    } else if (typeof composition !== 'function') {
+      console.error('[CinematicPlayer] composition is not a function:', typeof composition);
+    } else {
+      logDebug('Composition mounted', { name: composition.displayName || composition.name, durationSeconds });
+    }
+  }, [composition, durationSeconds, logDebug]);
+
   // Calculate frames from seconds
   const durationFrames = secondsToFrames(durationSeconds, fps);
 
@@ -233,7 +244,44 @@ function CinematicPlayerInner({
         showVolumeControls={false}
         controls={false}
         acknowledgeRemotionLicense
-
+        renderLoading={({ height: h, width: w }) => (
+          <div
+            style={{
+              width: w,
+              height: h,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#0a0a1a',
+            }}
+          >
+            <div style={{ color: '#FFE135', fontSize: 24, fontFamily: 'sans-serif' }}>
+              Loading...
+            </div>
+          </div>
+        )}
+        errorFallback={({ error }) => {
+          console.error('[CinematicPlayer] Remotion render error:', error);
+          return (
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#0a0a1a',
+                color: '#FF6B35',
+                fontSize: 18,
+                fontFamily: 'sans-serif',
+                padding: 20,
+                textAlign: 'center',
+              }}
+            >
+              Cinematic failed to load. Press ESC or wait to skip.
+            </div>
+          );
+        }}
       />
 
       {/* Skip Button */}

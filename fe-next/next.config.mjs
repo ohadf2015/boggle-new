@@ -40,6 +40,7 @@ const nextConfig = {
   // - date-fns: Fix "module is not defined" on mobile browsers (JAVASCRIPT-NEXTJS-9S, 9Z, 19)
   // - framer-motion: Fix CommonJS/ESM interop issues on student pages
   // - react-hot-toast: Fix "module is not defined" in practice/education components (JAVASCRIPT-NEXTJS-9S, 9Z)
+  // - remotion/@remotion/player: Fix ESM interop for Remotion cinematics (black screen without transpilation)
   transpilePackages: [
     'three',
     '@react-three/fiber',
@@ -49,6 +50,8 @@ const nextConfig = {
     'date-fns',
     'framer-motion',
     'react-hot-toast',
+    'remotion',
+    '@remotion/player',
   ],
 
   // Compiler optimizations
@@ -291,7 +294,18 @@ const millionConfig = million.next(
   {
     auto: {
       // Skip components that use unsupported patterns
-      skip: ['Header', 'ModeCard', 'IdleMascotWithEntrance'],
+      // Remotion compositions use internal context hooks (useCurrentFrame, useVideoConfig)
+      // that Million.js optimization breaks
+      skip: [
+        'Header', 'ModeCard', 'IdleMascotWithEntrance',
+        'CinematicPlayer', 'CinematicPlayerInner',
+        'VictoryCinematic', 'DefeatCinematic',
+        'BossEntranceCinematic', 'BossDefeatCinematic',
+        'WorldUnlockCinematic', 'StreakMilestoneCinematic', 'AchievementCinematic',
+        'BackgroundGlow', 'ParticleLayer', 'FlashEffect',
+        'TitleReveal', 'SparkleField', 'StatsPanel', 'StatItem',
+        'Confetti', 'ExplosionRing', 'ShatterFragment', 'RewardDisplay',
+      ],
       rsc: true, // Enable React Server Components support
     },
     mute: true, // Suppress console warnings in production
