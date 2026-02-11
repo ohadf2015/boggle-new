@@ -56,6 +56,17 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   // End game confirmation dialog
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
 
+  // Track last submitted path for tile clearing
+  const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
+
+  // Direct callback when a word is accepted — replaces fragile useEffect-on-score chain
+  const handleWordAccepted = useCallback((data: { word: string; score: number }) => {
+    if (lastPathRef.current.length > 0) {
+      blast.clearTilesForWord(lastPathRef.current, data.word, data.score);
+      lastPathRef.current = [];
+    }
+  }, [blast]);
+
   // Word submission hook - reuses proven validation pipeline
   const wordSubmission = useWordSubmission({
     language: config.language,
@@ -71,13 +82,10 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
     playComboSound,
     announceWordResult: () => {},
     announceCombo: () => {},
+    onWordAccepted: handleWordAccepted,
   });
 
-  // Track last submitted path for tile clearing
-  const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
-
-  // Handle word submission: validate via useWordSubmission, tile clearing
-  // happens reactively via the useEffect below when score changes
+  // Handle word submission: validate via useWordSubmission
   const handleWordSubmit = useCallback((word: string) => {
     wordSubmission.handleWordSubmit(word);
   }, [wordSubmission]);
@@ -91,24 +99,6 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   const handleWordChange = useCallback((word: string) => {
     setFormedWord(word);
   }, []);
-
-  // Watch for score changes in wordSubmission and sync to blast
-  const prevScoreRef = useRef(0);
-  useEffect(() => {
-    const currentScore = wordSubmission.score;
-    if (currentScore > prevScoreRef.current) {
-      const diff = currentScore - prevScoreRef.current;
-      // If word was accepted, clear the tiles
-      if (lastPathRef.current.length > 0) {
-        const lastWord = wordSubmission.foundWords[wordSubmission.foundWords.length - 1];
-        if (lastWord && lastWord.isValid) {
-          blast.clearTilesForWord(lastPathRef.current, lastWord.word, diff);
-          lastPathRef.current = [];
-        }
-      }
-    }
-    prevScoreRef.current = currentScore;
-  }, [wordSubmission.score, wordSubmission.foundWords, blast]);
 
   // Detect game completion or dead end → show results
   useEffect(() => {
@@ -148,6 +138,7 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
       gridSize={config.gridSize}
       language={config.language}
       explosions={blast.explosions}
+      scorePopups={blast.scorePopups}
       cascadePhase={blast.cascadePhase}
       cascadeAnimationData={blast.cascadeAnimationData}
       gameState={blast.gameState}
@@ -159,7 +150,10 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
       onWordSubmit={handleWordSubmit}
       onPathSubmit={handlePathSubmit}
       onWordChange={handleWordChange}
+      noWordsRemaining={blast.noWordsRemaining}
       onExplosionComplete={blast.dismissExplosion}
+      onScorePopupComplete={blast.dismissScorePopup}
+      onShuffle={blast.shuffleRemainingTiles}
       onQuitRequest={handleQuitRequest}
       onConfirmQuit={handleConfirmQuit}
       onEndGame={handleEndGame}

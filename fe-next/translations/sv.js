@@ -5002,7 +5002,9 @@ const sv = {
     "helpGoldLabel": "Guld",
     "helpBombLabel": "Bomb",
     "helpRainbowLabel": "Regnbåge",
-    "foundWords": "Hittade ord"
+    "foundWords": "Hittade ord",
+    "noWordsLeft": "Inga ord kvar!",
+    "shuffle": "Blanda"
   },
   "student": {
     "activeGame": {

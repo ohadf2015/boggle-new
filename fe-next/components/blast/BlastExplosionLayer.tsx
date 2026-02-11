@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { ExplosionEffect } from '@/components/adventure/juice/ExplosionEffect';
 import { ScorePopup } from '@/components/adventure/juice/ScorePopup';
 import type { BlastExplosion, BlastScorePopup } from './types';
@@ -54,15 +53,20 @@ export function BlastExplosionLayer({
         );
       })}
 
-      {/* Score popups */}
-      {scorePopups.map(popup => (
-        <ScorePopup
-          key={popup.id}
-          score={popup.score}
-          position={popup.position}
-          onComplete={() => onScorePopupComplete(popup.id)}
-        />
-      ))}
+      {/* Score popups — convert grid coords to pixel positions */}
+      {scorePopups.map(popup => {
+        const x = containerOffset.x + popup.col * cellSize + cellSize / 2;
+        const y = containerOffset.y + popup.row * cellSize + cellSize / 2;
+
+        return (
+          <ScorePopup
+            key={popup.id}
+            score={popup.score}
+            position={{ x, y }}
+            onComplete={() => onScorePopupComplete(popup.id)}
+          />
+        );
+      })}
     </div>
   );
 }

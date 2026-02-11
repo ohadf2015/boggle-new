@@ -37,76 +37,27 @@ interface HeroMascotProps {
 /**
  * Interactive Mascot component for the hero section
  * Responds to hover and click with mood changes
- * Uses responsive sizing - md on mobile, lg on tablet, xl on desktop
+ * Single instance with responsive Tailwind sizing instead of 3 CSS-hidden copies
  */
 const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMascotProps) {
-  // Mobile portrait: use md size (96px) with tap interaction
-  if (isMobilePortrait) {
-    return (
-      <div className="relative mx-auto mb-0">
-        <IdleMascotWithEntrance
-          baseVariant="happy"
-          size="md"
-          enableHover={false}
-          enableClick
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          fetchPriority="high"
-          delay={0.1}
-        />
-      </div>
-    );
-  }
-
-  // Desktop/tablet: responsive sizes with hover+click
   return (
-    <div className="relative mx-auto mb-1">
-      {/* md (96px) on small screens */}
-      <div className="block sm:hidden">
-        <IdleMascotWithEntrance
-          baseVariant="happy"
-          size="md"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          fetchPriority="high"
-          delay={0.1}
-        />
-      </div>
-      {/* lg (128px) on tablet */}
-      <div className="hidden sm:block lg:hidden">
-        <IdleMascotWithEntrance
-          baseVariant="happy"
-          size="lg"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          fetchPriority="high"
-          delay={0.1}
-        />
-      </div>
-      {/* xl (160px) on desktop */}
-      <div className="hidden lg:block">
-        <IdleMascotWithEntrance
-          baseVariant="happy"
-          size="xl"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          fetchPriority="high"
-          delay={0.1}
-        />
-      </div>
+    <div className={`relative mx-auto ${isMobilePortrait ? 'mb-0' : 'mb-1'}`}>
+      <IdleMascotWithEntrance
+        baseVariant="happy"
+        size="xl"
+        sizeClassName={isMobilePortrait
+          ? 'w-24 h-24'
+          : 'w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40'
+        }
+        enableHover={!isMobilePortrait}
+        enableClick
+        hoverVariant="excited"
+        clickVariant="celebrating"
+        clickAnimation="bounce"
+        priority
+        fetchPriority="high"
+        delay={0.1}
+      />
     </div>
   );
 });

@@ -31,7 +31,7 @@ function applyHebrewFinalLetter(word: string): string {
 
 export interface WordFeedback {
   id: string;
-  type: 'accepted' | 'rejected' | 'pending' | 'duplicate' | 'foundByOther';
+  type: 'accepted' | 'rejected' | 'duplicate' | 'foundByOther';
   word: string;
   score?: number;
   message?: string;
@@ -58,10 +58,11 @@ interface WordFormingAreaProps {
 
 /**
  * WordFormingArea - Display area for word being formed with integrated validation feedback
- * Shows the word being formed, then smoothly transitions to show accept/reject/duplicate feedback
- * Feedback persists until replaced by new feedback or user starts forming a new word
+ * Shows the word being formed, then smoothly MORPHS to show accept/reject/duplicate feedback
+ * The element stays visible and transforms - no hide/show cycle
+ * Memoized to prevent unnecessary re-renders
  */
-const WordFormingArea: React.FC<WordFormingAreaProps> = ({
+const WordFormingArea = React.memo<WordFormingAreaProps>(({
   word,
   letterCount,
   className,
@@ -69,10 +70,27 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
   feedback,
 }) => {
   const [visibleFeedback, setVisibleFeedback] = useState<WordFeedback | null>(null);
+  const [lastWord, setLastWord] = useState<string>('');
+  const [lastLetterCount, setLastLetterCount] = useState<number>(0);
   const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isForming = word.length > 0;
 
-  // Handle feedback display - persists until replaced or user starts forming new word
+  // Track the last word being formed (so we can show it during feedback)
+  useEffect(() => {
+    if (word.length > 0) {
+      setLastWord(word);
+      setLastLetterCount(letterCount);
+    }
+  }, [word, letterCount]);
+
+  // Clear feedback when user starts forming a new word
+  const isFormingWord = word.length > 0;
+  useEffect(() => {
+    if (isFormingWord && visibleFeedback) {
+      setVisibleFeedback(null);
+    }
+  }, [isFormingWord]); // eslint-disable-line react-hooks/exhaustive-deps -- Only trigger on forming state change
+
+  // Handle feedback display - persists until new word is formed or timeout
   useEffect(() => {
     if (feedback) {
       setVisibleFeedback(feedback);
@@ -93,27 +111,26 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
     };
   }, [feedback]);
 
-  // Clear feedback when user starts forming a new word
-  useEffect(() => {
-    if (isForming && visibleFeedback) {
-      setVisibleFeedback(null);
-    }
-  }, [isForming]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Determine what to show: feedback takes priority over forming word
+  // Determine current state
+  const isForming = word.length > 0;
   const showFeedback = visibleFeedback !== null;
   const showForming = isForming && !showFeedback;
-  const showEmpty = !showFeedback && !showForming;
 
-  // Get display word - either forming or from feedback
+  // Show content if we're forming OR have feedback OR have a last word to show
+  const hasContent = showForming || showFeedback || lastWord.length > 0;
+
+  // Get display word - forming word, feedback word, or last word
   // Apply Hebrew final letters (sofit) transformation for proper display
-  const rawDisplayWord = showFeedback ? visibleFeedback?.word : word;
+  const rawDisplayWord = showForming ? word : (showFeedback ? visibleFeedback?.word : lastWord);
   const displayWord = rawDisplayWord ? applyHebrewFinalLetter(rawDisplayWord) : rawDisplayWord;
+  const displayLetterCount = showForming ? letterCount : lastLetterCount;
 
-  // Container size classes
+  // Container size classes - responsive min-width for small screens
   const containerClasses = cn(
     'flex items-center justify-center relative',
-    compact ? 'h-10 min-h-[40px] min-w-[100px]' : 'h-14 min-h-[56px] min-w-[140px]',
+    compact
+      ? 'h-10 min-h-[40px] min-w-[80px] xs:min-w-[100px]'
+      : 'h-14 min-h-[56px] min-w-[100px] xs:min-w-[140px]',
     className
   );
 
@@ -123,9 +140,8 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
       switch (visibleFeedback?.type) {
         case 'accepted': return 'bg-neo-lime';
         case 'rejected': return 'bg-neo-red';
-        case 'duplicate': return 'bg-neo-orange';
-        case 'foundByOther': return 'bg-neo-orange';
-        case 'pending': return 'bg-neo-yellow';
+        case 'duplicate': return 'bg-neo-pink';
+        case 'foundByOther': return 'bg-neo-pink';
         default: return 'bg-neo-cyan';
       }
     }
@@ -148,6 +164,9 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
     })), []
   );
 
+  // Show empty placeholder only if we have no content at all
+  const showEmpty = !hasContent;
+
   return (
     <div
       className={containerClasses}
@@ -155,23 +174,43 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
       aria-atomic="true"
     >
       <AnimatePresence mode="wait">
-        {/* Main content container - separate keys for forming vs feedback */}
-        {(showForming || showFeedback) && (
+        {showEmpty ? (
+          /* Empty state - subtle placeholder */
           <motion.div
-            key={showFeedback ? `feedback-${visibleFeedback?.id}` : 'forming'}
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.3 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              'border-2 border-dashed border-neo-black/20 rounded-neo flex items-center justify-center',
+              compact ? 'h-8 min-w-[80px] px-3' : 'h-10 min-w-[100px] px-4'
+            )}
+          >
+            <span className={cn(
+              'text-neo-black/30 font-medium',
+              compact ? 'text-xs' : 'text-sm'
+            )}>
+              ···
+            </span>
+          </motion.div>
+        ) : (
+          /* Main content - morphs between forming and feedback states */
+          <motion.div
+            key="content"
+            layout
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{
               opacity: 1,
               scale: 1,
               x: showFeedback && (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
-                ? [-4, 4, -4, 4, 0] : 0,
+                ? [0, -10, 10, 0] : 0,
             }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{
-              type: 'spring',
-              stiffness: 400,
-              damping: 25,
-              x: { duration: 0.4 }
+              layout: { type: 'spring', stiffness: 500, damping: 30 },
+              opacity: { duration: 0.15 },
+              scale: { type: 'spring', stiffness: 400, damping: 25 },
+              x: { duration: 0.5, ease: 'easeInOut' }
             }}
             className={cn(
               'relative border-3 border-neo-black rounded-neo shadow-hard flex items-center gap-2 whitespace-nowrap overflow-visible',
@@ -180,43 +219,40 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
             )}
           >
             {/* Status icon - only for feedback states */}
-            {showFeedback && (
-              <motion.span
-                initial={{ scale: 0, rotate: visibleFeedback?.type === 'accepted' ? -180 : 0 }}
-                animate={{
-                  scale: [0, 1.4, 1],
-                  rotate: (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
-                    ? [0, -15, 15, -15, 0] : 0
-                }}
-                transition={{ duration: 0.4, times: [0, 0.5, 1] }}
-                className={cn(
-                  'font-black',
-                  compact ? 'text-base' : 'text-lg',
-                  getTextColor()
-                )}
-              >
-                {visibleFeedback?.type === 'accepted' && '✓'}
-                {visibleFeedback?.type === 'rejected' && '✗'}
-                {visibleFeedback?.type === 'duplicate' && '⟳'}
-                {visibleFeedback?.type === 'foundByOther' && (
-                  visibleFeedback?.foundByAvatar?.emoji || '👤'
-                )}
-                {visibleFeedback?.type === 'pending' && (
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  >
-                    ⏳
-                  </motion.span>
-                )}
-              </motion.span>
-            )}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && (
+                <motion.span
+                  key={`icon-${visibleFeedback?.type}`}
+                  initial={{ scale: 0, rotate: visibleFeedback?.type === 'accepted' ? -180 : 0 }}
+                  animate={{
+                    scale: 1,
+                    rotate: (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
+                      ? [0, -15, 15, -15, 0] : 0
+                  }}
+                  exit={{ scale: 0 }}
+                  transition={{
+                    default: { type: 'tween' },
+                    scale: { type: 'spring', stiffness: 500, damping: 25 },
+                    rotate: { type: 'tween', duration: 0.4, ease: 'easeInOut' }
+                  }}
+                  className={cn(
+                    'font-black',
+                    compact ? 'text-base' : 'text-lg',
+                    getTextColor()
+                  )}
+                >
+                  {visibleFeedback?.type === 'accepted' && '✓'}
+                  {visibleFeedback?.type === 'rejected' && '✗'}
+                  {visibleFeedback?.type === 'duplicate' && '⟳'}
+                  {visibleFeedback?.type === 'foundByOther' && (
+                    visibleFeedback?.foundByAvatar?.emoji || '👤'
+                  )}
+                </motion.span>
+              )}
+            </AnimatePresence>
 
-            {/* Word display */}
-            <motion.span
-              key={displayWord}
-              initial={showFeedback ? { x: -5 } : { scale: 0.9 }}
-              animate={{ x: 0, scale: 1 }}
+            {/* Word display - no layout animation to prevent letter wrap during changes */}
+            <span
               className={cn(
                 'font-black uppercase tracking-wide',
                 compact ? 'text-base' : 'text-xl',
@@ -230,74 +266,99 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
                   : showFeedback && visibleFeedback?.type === 'foundByOther'
                     ? (visibleFeedback.message || `Found by ${visibleFeedback.foundBy || 'another player'}`)
                     : displayWord}
-            </motion.span>
+            </span>
 
             {/* Letter count - only when forming */}
-            {showForming && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className={cn(
-                  'font-bold bg-neo-black/15 rounded-md',
-                  compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1',
-                  getTextColor()
-                )}
-              >
-                {letterCount}
-              </motion.span>
-            )}
+            <AnimatePresence mode="popLayout">
+              {showForming && (
+                <motion.span
+                  key="letter-count"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                  className={cn(
+                    'font-bold bg-neo-black/15 rounded-md',
+                    compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1',
+                    getTextColor()
+                  )}
+                >
+                  {displayLetterCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
 
             {/* Score badge - for accepted feedback */}
-            {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.score !== undefined && (
-              <motion.span
-                initial={{ scale: 0, y: 8 }}
-                animate={{ scale: 1, y: 0 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 500 }}
-                className={cn(
-                  'bg-neo-cyan text-neo-black font-black rounded-neo border-2 border-neo-black',
-                  compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
-                )}
-              >
-                +{visibleFeedback.score}
-              </motion.span>
-            )}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.score !== undefined && (
+                <motion.span
+                  key="score"
+                  initial={{ scale: 0, y: 8 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0 }}
+                  transition={{ delay: 0.1, type: 'spring', stiffness: 500 }}
+                  className={cn(
+                    'bg-neo-cyan text-neo-black font-black rounded-neo border-2 border-neo-black',
+                    compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
+                  )}
+                >
+                  +{visibleFeedback.score}
+                </motion.span>
+              )}
+            </AnimatePresence>
 
             {/* Lesson word indicator */}
-            {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fromLesson && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.3, 1] }}
-                transition={{ delay: 0.15 }}
-                className={cn(
-                  'bg-gradient-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
-                  compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
-                )}
-                title="Lesson vocabulary word!"
-              >
-                📚
-              </motion.span>
-            )}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fromLesson && (
+                <motion.span
+                  key="lesson"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{
+                    scale: 1,
+                    rotate: 0,
+                    y: [0, -3, 0]
+                  }}
+                  exit={{ scale: 0 }}
+                  transition={{
+                    scale: { delay: 0.15, type: 'spring', stiffness: 600, damping: 20 },
+                    rotate: { delay: 0.15, type: 'spring', stiffness: 600, damping: 20 },
+                    y: { delay: 0.4, duration: 0.6, repeat: Infinity, repeatDelay: 1 }
+                  }}
+                  className={cn(
+                    'bg-gradient-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
+                    compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
+                  )}
+                  title="Lesson vocabulary word!"
+                >
+                  📚
+                </motion.span>
+              )}
+            </AnimatePresence>
 
-            {/* Fire round indicator */}
-            {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fireRoundActive && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.3, 1] }}
-                transition={{ delay: 0.2 }}
-                className={cn(
-                  'bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-md border-2 border-neo-black',
-                  compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'
-                )}
-              >
-                {visibleFeedback.fireRoundBonus ? `🔥+${visibleFeedback.fireRoundBonus}` : '🔥2x'}
-              </motion.span>
-            )}
+            {/* Fire round bonus indicator */}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.fireRoundActive && (
+                <motion.span
+                  key="fire"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 500 }}
+                  className={cn(
+                    'bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-md border-2 border-neo-black',
+                    compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'
+                  )}
+                >
+                  {visibleFeedback.fireRoundBonus ? `🔥+${visibleFeedback.fireRoundBonus}` : '🔥2x'}
+                </motion.span>
+              )}
+            </AnimatePresence>
 
             {/* Sparkle particles - for accepted */}
             {showFeedback && visibleFeedback?.type === 'accepted' && sparklePositions.map((pos, i) => (
               <motion.div
                 key={`sparkle-${i}`}
-                className="absolute w-2 h-2 bg-neo-yellow rounded-full"
+                className="absolute w-2 h-2 bg-neo-lime rounded-full left-1/2 top-1/2"
                 initial={{ scale: 0, x: 0, y: 0 }}
                 animate={{
                   scale: [0, 1.2, 0],
@@ -306,7 +367,6 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
                   opacity: [1, 1, 0],
                 }}
                 transition={{ duration: 0.5, delay: pos.delay }}
-                style={{ left: '50%', top: '50%' }}
               />
             ))}
 
@@ -331,56 +391,23 @@ const WordFormingArea: React.FC<WordFormingAreaProps> = ({
               />
             )}
 
-            {/* Orange pulse - for duplicate and foundByOther */}
+            {/* Pink pulse - for duplicate and foundByOther */}
             {showFeedback && (visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther') && (
               <motion.div
-                className="absolute inset-0 rounded-neo pointer-events-none bg-orange-500/40"
+                className="absolute inset-0 rounded-neo pointer-events-none bg-pink-500/40"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.5, 0.3] }}
                 transition={{ duration: 0.4 }}
               />
             )}
 
-            {/* Pulsing glow - for pending */}
-            {showFeedback && visibleFeedback?.type === 'pending' && (
-              <motion.div
-                className="absolute inset-0 rounded-neo pointer-events-none"
-                animate={{
-                  boxShadow: [
-                    '0 0 8px rgba(255, 225, 53, 0.4)',
-                    '0 0 16px rgba(255, 225, 53, 0.6)',
-                    '0 0 8px rgba(255, 225, 53, 0.4)',
-                  ],
-                }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
-          </motion.div>
-        )}
-
-        {/* Empty state - subtle placeholder */}
-        {showEmpty && (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            exit={{ opacity: 0 }}
-            className={cn(
-              'border-2 border-dashed border-neo-black/20 rounded-neo flex items-center justify-center',
-              compact ? 'h-8 min-w-[80px] px-3' : 'h-10 min-w-[100px] px-4'
-            )}
-          >
-            <span className={cn(
-              'text-neo-black/30 font-medium',
-              compact ? 'text-xs' : 'text-sm'
-            )}>
-              ···
-            </span>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-};
+});
+
+WordFormingArea.displayName = 'WordFormingArea';
 
 export default WordFormingArea;

@@ -2,8 +2,8 @@ import type { Language } from '@/shared/types/game';
 
 // ==================== Tile Types ====================
 
-/** Simplified tile types (from Adventure's 9 → 4) */
-export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow';
+/** Tile types for blast mode (standard + 5 special) */
+export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow' | 'ice' | 'wildcard';
 
 /** Per-cell state tracked alongside the LetterGrid */
 export interface BlastTileState {
@@ -13,6 +13,36 @@ export interface BlastTileState {
   isCleared: boolean;
   /** Effect triggered when this tile is cleared (for animation) */
   activationEffect: string | null;
+  /** Hits remaining before ice tile clears (2 → 1 → 0=cleared) */
+  hitsRemaining: number;
+}
+
+// ==================== Difficulty ====================
+
+export type BlastDifficulty = 'easy' | 'medium' | 'hard';
+
+/** Preset configs per difficulty level */
+export const BLAST_DIFFICULTY_PRESETS: Record<BlastDifficulty, {
+  specialTileChance: number;
+  gridSize: number;
+}> = {
+  easy:   { specialTileChance: 0.08, gridSize: 6 },
+  medium: { specialTileChance: 0.15, gridSize: 6 },
+  hard:   { specialTileChance: 0.25, gridSize: 6 },
+};
+
+/** Resolve a full BlastGameConfig from language + optional difficulty */
+export function resolveBlastConfig(
+  language: Language,
+  difficulty: BlastDifficulty = 'medium',
+): BlastGameConfig {
+  const preset = BLAST_DIFFICULTY_PRESETS[difficulty];
+  return {
+    gridSize: preset.gridSize,
+    specialTileChance: preset.specialTileChance,
+    language,
+    difficulty,
+  };
 }
 
 // ==================== Game State ====================
@@ -24,12 +54,15 @@ export interface BlastGameConfig {
   specialTileChance: number;
   /** Game language */
   language: Language;
+  /** Difficulty level */
+  difficulty?: BlastDifficulty;
 }
 
 export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
   gridSize: 6,
   specialTileChance: 0.15,
   language: 'en',
+  difficulty: 'medium',
 };
 
 export type BlastPhase = 'playing' | 'results';
@@ -67,12 +100,16 @@ export const GOLD_MULTIPLIER = 3;
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 /** Bonus score for rainbow tiles */
 export const RAINBOW_BONUS = 5;
+/** Stagger delay (ms) between chain bomb explosions for visual ripple */
+export const CHAIN_BOMB_STAGGER = 120;
 
 /** Distribution of special tiles (must sum to 1.0) */
 export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'>, number> = {
-  gold: 0.33,
-  bomb: 0.34,
-  rainbow: 0.33,
+  gold: 0.22,
+  bomb: 0.22,
+  rainbow: 0.22,
+  ice: 0.17,
+  wildcard: 0.17,
 };
 
 // ==================== Animation Events ====================
@@ -89,7 +126,10 @@ export interface BlastExplosion {
 export interface BlastScorePopup {
   id: string;
   score: number;
-  position: { x: number; y: number };
+  /** Grid row (converted to pixel position in BlastExplosionLayer) */
+  row: number;
+  /** Grid col (converted to pixel position in BlastExplosionLayer) */
+  col: number;
   isSpecial: boolean;
   timestamp: number;
 }

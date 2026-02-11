@@ -4981,7 +4981,9 @@ const ja = {
     "helpGoldLabel": "ゴールド",
     "helpBombLabel": "ボム",
     "helpRainbowLabel": "レインボー",
-    "foundWords": "見つけた単語"
+    "foundWords": "見つけた単語",
+    "noWordsLeft": "残りの単語はありません！",
+    "shuffle": "シャッフル"
   },
   "student": {
     "activeGame": {

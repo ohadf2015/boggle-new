@@ -65,8 +65,10 @@ export function rollSpecialType(specialTileChance: number): BlastTileType {
   if (Math.random() >= specialTileChance) return 'standard';
 
   const roll = Math.random();
-  const { gold, bomb } = SPECIAL_TILE_DISTRIBUTION;
+  const { gold, bomb, rainbow, ice } = SPECIAL_TILE_DISTRIBUTION;
   if (roll < gold) return 'gold';
   if (roll < gold + bomb) return 'bomb';
-  return 'rainbow';
+  if (roll < gold + bomb + rainbow) return 'rainbow';
+  if (roll < gold + bomb + rainbow + ice) return 'ice';
+  return 'wildcard';
 }

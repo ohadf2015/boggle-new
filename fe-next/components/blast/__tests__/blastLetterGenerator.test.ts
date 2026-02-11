@@ -51,7 +51,7 @@ describe('rollSpecialType', () => {
   });
 
   it('should return a valid tile type', () => {
-    const validTypes = ['standard', 'gold', 'bomb', 'rainbow'];
+    const validTypes = ['standard', 'gold', 'bomb', 'rainbow', 'ice', 'wildcard'];
     for (let i = 0; i < 100; i++) {
       const result = rollSpecialType(0.5);
       expect(validTypes).toContain(result);
@@ -59,7 +59,7 @@ describe('rollSpecialType', () => {
   });
 
   it('should always return special when chance is 1', () => {
-    const specialTypes = ['gold', 'bomb', 'rainbow'];
+    const specialTypes = ['gold', 'bomb', 'rainbow', 'ice', 'wildcard'];
     const results = new Set<string>();
     for (let i = 0; i < 100; i++) {
       results.add(rollSpecialType(1));
@@ -71,12 +71,12 @@ describe('rollSpecialType', () => {
   });
 
   it('should produce distribution matching SPECIAL_TILE_DISTRIBUTION', () => {
-    // With 100% special chance, verify gold/bomb/rainbow appear
-    const counts = { gold: 0, bomb: 0, rainbow: 0, standard: 0 };
+    // With 100% special chance, verify all special types appear
+    const counts: Record<string, number> = { gold: 0, bomb: 0, rainbow: 0, ice: 0, wildcard: 0, standard: 0 };
     const iterations = 1000;
     for (let i = 0; i < iterations; i++) {
       const type = rollSpecialType(1);
-      counts[type as keyof typeof counts]++;
+      counts[type]++;
     }
 
     // Gold should be roughly SPECIAL_TILE_DISTRIBUTION.gold of total

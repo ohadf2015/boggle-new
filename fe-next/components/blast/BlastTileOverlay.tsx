@@ -38,6 +38,18 @@ const TILE_BACKGROUNDS: Record<string, {
     shadow: 'inset 0 0 14px rgba(168,85,247,0.25), 0 0 10px rgba(168,85,247,0.2)',
     animationClass: 'blast-tile-rainbow',
   },
+  ice: {
+    background: 'linear-gradient(135deg, rgba(180,230,255,0.45) 0%, rgba(130,200,255,0.35) 50%, rgba(200,240,255,0.4) 100%)',
+    border: '2px solid rgba(150,220,255,0.6)',
+    shadow: 'inset 0 0 16px rgba(150,220,255,0.3), 0 0 8px rgba(180,230,255,0.25)',
+    animationClass: 'blast-tile-ice',
+  },
+  wildcard: {
+    background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.35) 0%, rgba(200,200,255,0.25) 60%, rgba(150,150,200,0.2) 100%)',
+    border: '2px dashed rgba(255,255,255,0.5)',
+    shadow: 'inset 0 0 12px rgba(255,255,255,0.2), 0 0 8px rgba(200,200,255,0.15)',
+    animationClass: 'blast-tile-wildcard',
+  },
 };
 
 /**
@@ -89,25 +101,29 @@ export function BlastTileOverlay({
           const config = TILE_BACKGROUNDS[tile.type];
           if (!config) return null;
 
+          // Cracked ice visual: add crack lines when hitsRemaining === 1
+          const isCrackedIce = tile.type === 'ice' && tile.hitsRemaining === 1;
+
           return (
             <motion.div
               key={`bg-${tile.row}-${tile.col}`}
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: isCrackedIce ? [1, 0.85, 1] : 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.3 }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 20,
-              }}
+              transition={isCrackedIce
+                ? { opacity: { duration: 1, repeat: Infinity, ease: 'easeInOut' }, type: 'spring', stiffness: 300, damping: 20 }
+                : { type: 'spring', stiffness: 300, damping: 20 }
+              }
               className={`absolute rounded-lg ${config.animationClass}`}
               style={{
                 left: x + inset,
                 top: y + inset,
                 width: cellSize - inset * 2,
                 height: cellSize - inset * 2,
-                background: config.background,
-                border: config.border,
+                background: isCrackedIce
+                  ? 'linear-gradient(135deg, rgba(180,230,255,0.3) 0%, rgba(100,180,220,0.2) 50%, rgba(180,230,255,0.3) 100%)'
+                  : config.background,
+                border: isCrackedIce ? '2px solid rgba(255,255,255,0.4)' : config.border,
                 boxShadow: config.shadow,
               }}
             />

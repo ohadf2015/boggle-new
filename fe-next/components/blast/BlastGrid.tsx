@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTileOverlay } from './BlastTileOverlay';
 import { BlastExplosionLayer } from './BlastExplosionLayer';
@@ -28,11 +28,14 @@ interface BlastGridProps {
   cascadePhase: BlastCascadePhase;
   /** Cascade animation data */
   cascadeAnimationData: CascadeAnimationData | null;
+  /** Score popups from useBlastGame */
+  scorePopups: BlastScorePopup[];
   /** Callbacks */
   onWordSubmit: (word: string) => void;
   onPathSubmit: (cells: Array<{ row: number; col: number }>) => void;
   onWordChange: (word: string, count: number) => void;
   onExplosionComplete: (id: string) => void;
+  onScorePopupComplete: (id: string) => void;
   /** Accessibility label for grid */
   ariaLabel?: string;
   /** Optional highlighted path (for hints/tutorials) */
@@ -58,16 +61,17 @@ export function BlastGrid({
   comboLevel,
   cascadePhase,
   cascadeAnimationData,
+  scorePopups,
   onWordSubmit,
   onPathSubmit,
   onWordChange,
   onExplosionComplete,
+  onScorePopupComplete,
   ariaLabel,
   highlightedPath = [],
 }: BlastGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [scorePopups, setScorePopups] = useState<BlastScorePopup[]>([]);
 
   // Measure container for overlay positioning
   useEffect(() => {
@@ -84,10 +88,6 @@ export function BlastGrid({
     setContainerWidth(el.getBoundingClientRect().width);
 
     return () => observer.disconnect();
-  }, []);
-
-  const handleScorePopupComplete = useCallback((id: string) => {
-    setScorePopups(prev => prev.filter(p => p.id !== id));
   }, []);
 
   const cellSize = containerWidth / gridSize;
@@ -141,7 +141,7 @@ export function BlastGrid({
           explosions={explosions}
           scorePopups={scorePopups}
           onExplosionComplete={onExplosionComplete}
-          onScorePopupComplete={handleScorePopupComplete}
+          onScorePopupComplete={onScorePopupComplete}
           cellSize={cellSize}
           containerOffset={{ x: 0, y: 0 }}
         />

@@ -273,6 +273,9 @@ const sentryConfig = withSentryConfig(nextConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: true,
   hideSourceMaps: true,
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
   webpack: {
     treeshake: {
       removeDebugLogging: true,

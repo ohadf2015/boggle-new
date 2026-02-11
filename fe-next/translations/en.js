@@ -4976,7 +4976,9 @@ const en = {
     "helpGoldLabel": "Gold",
     "helpBombLabel": "Bomb",
     "helpRainbowLabel": "Rainbow",
-    "foundWords": "Found Words"
+    "foundWords": "Found Words",
+    "noWordsLeft": "No words remaining!",
+    "shuffle": "Shuffle"
   },
   "student": {
         "activeGame": {

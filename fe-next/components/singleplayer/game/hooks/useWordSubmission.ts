@@ -51,6 +51,8 @@ interface UseWordSubmissionOptions {
   onTrainingTrackValidWord?: (wordLength: number) => void;
   /** Callback when hint timer should reset */
   onWordFound?: () => void;
+  /** Callback when a word is accepted with full context (word, score, bonuses) */
+  onWordAccepted?: (data: { word: string; score: number; comboBonus: number; fireRoundBonus: number }) => void;
 }
 
 interface UseWordSubmissionReturn {
@@ -92,6 +94,7 @@ export function useWordSubmission({
   announceCombo,
   onTrainingTrackValidWord,
   onWordFound,
+  onWordAccepted,
 }: UseWordSubmissionOptions): UseWordSubmissionReturn {
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
@@ -276,6 +279,9 @@ export function useWordSubmission({
       playWordAcceptedSound();
       hapticForWordScore(normalizedWord.length);
 
+      // Notify consumers with full context (used by Blast mode for tile clearing)
+      onWordAccepted?.({ word: normalizedWord, score: fullScore, comboBonus, fireRoundBonus });
+
       // Notify hint system
       onWordFound?.();
 
@@ -405,6 +411,7 @@ export function useWordSubmission({
     calculateWordScore,
     onTrainingTrackValidWord,
     onWordFound,
+    onWordAccepted,
     isDictionaryCacheLoaded,
     checkWordInCache,
     getPrevalidationCached,

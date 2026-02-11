@@ -5033,7 +5033,9 @@ const es = {
     "helpGoldLabel": "Oro",
     "helpBombLabel": "Bomba",
     "helpRainbowLabel": "Arcoíris",
-    "foundWords": "Palabras encontradas"
+    "foundWords": "Palabras encontradas",
+    "noWordsLeft": "¡No quedan palabras!",
+    "shuffle": "Mezclar"
   },
   "student": {
     "dashboard": {

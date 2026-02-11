@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Bomb, HelpCircle, Star } from 'lucide-react';
+import { ArrowLeft, Bomb, HelpCircle, Shuffle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LetterTileWord } from '@/components/singleplayer/game/components/LetterTileWord';
@@ -14,7 +14,7 @@ import { BlastFoundWords } from './BlastFoundWords';
 import { BlastHelpModal } from './BlastHelpModal';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { BlastTileState, BlastExplosion, BlastGameState } from './types';
+import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
 
@@ -25,11 +25,13 @@ interface BlastGameLayoutProps {
   gridSize: number;
   language: Language;
   explosions: BlastExplosion[];
+  scorePopups: BlastScorePopup[];
   // Cascade
   cascadePhase: BlastCascadePhase;
   cascadeAnimationData: CascadeAnimationData | null;
   // Game state
   gameState: BlastGameState;
+  noWordsRemaining: boolean;
   // Combo
   comboLevel: number;
   comboTimeRemaining: number | null;
@@ -42,6 +44,8 @@ interface BlastGameLayoutProps {
   onPathSubmit: (cells: Array<{ row: number; col: number }>) => void;
   onWordChange: (word: string, count: number) => void;
   onExplosionComplete: (id: string) => void;
+  onScorePopupComplete: (id: string) => void;
+  onShuffle: () => void;
   onQuitRequest: () => void;
   onConfirmQuit: () => void;
   onEndGame: () => void;
@@ -65,9 +69,11 @@ export function BlastGameLayout({
   gridSize,
   language,
   explosions,
+  scorePopups,
   cascadePhase,
   cascadeAnimationData,
   gameState,
+  noWordsRemaining,
   comboLevel,
   comboTimeRemaining,
   comboDanger,
@@ -77,6 +83,8 @@ export function BlastGameLayout({
   onPathSubmit,
   onWordChange,
   onExplosionComplete,
+  onScorePopupComplete,
+  onShuffle,
   onQuitRequest,
   onConfirmQuit,
   onEndGame,
@@ -90,7 +98,11 @@ export function BlastGameLayout({
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [screenFlash, setScreenFlash] = useState(false);
+  const [shakeClass, setShakeClass] = useState('');
+  const [comboMilestone, setComboMilestone] = useState<string | null>(null);
   const prevWordsRef = useRef(wordsFound.length);
+  const prevExplosionsRef = useRef(0);
+  const prevComboRef = useRef(comboLevel);
 
   // Screen flash when a word is cleared (cascade starts)
   useEffect(() => {
@@ -104,8 +116,44 @@ export function BlastGameLayout({
     return undefined;
   }, [wordsFound.length]);
 
+  // Screen shake on bomb explosions
+  useEffect(() => {
+    const bombCount = explosions.filter(e => e.type === 'bomb').length;
+    if (bombCount > prevExplosionsRef.current) {
+      const intensity = bombCount >= 3 ? 'animate-neo-shake' : 'animate-neo-wobble';
+      setShakeClass(intensity);
+      const timer = setTimeout(() => setShakeClass(''), 500);
+      prevExplosionsRef.current = bombCount;
+      return () => clearTimeout(timer);
+    }
+    prevExplosionsRef.current = bombCount;
+    return undefined;
+  }, [explosions]);
+
+  // Combo milestone announcements
+  useEffect(() => {
+    const milestones: Record<number, string> = { 3: 'NICE!', 5: 'FIRE!', 7: 'MYTHIC!', 10: 'GODLIKE!' };
+    if (comboLevel > prevComboRef.current && milestones[comboLevel]) {
+      setComboMilestone(milestones[comboLevel]);
+      const timer = setTimeout(() => setComboMilestone(null), 1200);
+      prevComboRef.current = comboLevel;
+      return () => clearTimeout(timer);
+    }
+    prevComboRef.current = comboLevel;
+    return undefined;
+  }, [comboLevel]);
+
+  // Combo-based grid glow color
+  const comboGlow = comboLevel >= 7
+    ? 'shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+    : comboLevel >= 5
+    ? 'shadow-[0_0_15px_rgba(255,225,53,0.4)]'
+    : comboLevel >= 3
+    ? 'shadow-[0_0_10px_rgba(0,255,255,0.3)]'
+    : '';
+
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
+    <div className={cn('relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy', shakeClass)}>
       <DynamicEnergyBackground />
 
       {/* Screen flash on word clear */}
@@ -163,6 +211,29 @@ export function BlastGameLayout({
           isDanger={comboDanger}
         />
       </div>
+
+      {/* Combo milestone announcement */}
+      <AnimatePresence>
+        {comboMilestone && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.5, y: -10 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            className="absolute top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <div className={cn(
+              'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-lg uppercase tracking-wider',
+              comboLevel >= 10 ? 'bg-gradient-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
+              comboLevel >= 7 ? 'bg-gradient-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white' :
+              comboLevel >= 5 ? 'bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black' :
+              'bg-neo-cyan text-neo-black'
+            )}>
+              {comboMilestone}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Stats row: Score (left), Words (center), Progress (right) */}
       <div className="px-4 flex items-center justify-between shrink-0 relative z-30 mb-2 max-w-md mx-auto w-full">
@@ -235,8 +306,49 @@ export function BlastGameLayout({
         )}
       </AnimatePresence>
 
+      {/* Dead-end notification */}
+      <AnimatePresence>
+        {noWordsRemaining && !isComplete && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="overflow-hidden relative z-30 px-4 max-w-[360px] mx-auto w-full"
+          >
+            <div className={cn(
+              'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
+              'bg-gradient-to-r from-neo-orange/90 to-neo-pink/90',
+              'flex items-center justify-between gap-2'
+            )}>
+              <span className="font-bold text-white text-xs sm:text-sm">
+                {t('blast.noWordsLeft') || 'No words left!'}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={onShuffle}
+                  className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none bg-neo-lime text-neo-black font-bold text-xs"
+                >
+                  <Shuffle className="h-3.5 w-3.5 me-1" />
+                  {t('blast.shuffle') || 'Shuffle'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setShowEndGameConfirm(true)}
+                  className="border-2 border-neo-black shadow-hard-sm font-bold text-xs"
+                >
+                  {t('blast.giveUp') || 'End Game'}
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Game grid with overlays */}
-      <div className="flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-0">
+      <div className={cn('flex-1 flex flex-col items-center justify-start px-4 pt-2 relative z-30 min-h-0 transition-shadow duration-500', comboGlow)}>
         {/* Board complete celebration overlay */}
         <AnimatePresence>
           {isComplete && (
@@ -303,10 +415,12 @@ export function BlastGameLayout({
           comboLevel={comboLevel}
           cascadePhase={cascadePhase}
           cascadeAnimationData={cascadeAnimationData}
+          scorePopups={scorePopups}
           onWordSubmit={onWordSubmit}
           onPathSubmit={onPathSubmit}
           onWordChange={onWordChange}
           onExplosionComplete={onExplosionComplete}
+          onScorePopupComplete={onScorePopupComplete}
           ariaLabel={t('blast.gridLabel') || 'Letter grid'}
         />
       </div>

@@ -64,7 +64,7 @@ export function computeGravityResult(
   );
   const newTileStates: BlastTileState[][] = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => ({
-      row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: false, activationEffect: null,
+      row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: false, activationEffect: null, hitsRemaining: 0,
     }))
   );
   const clearedTiles: ClearedTile[] = [];
@@ -87,13 +87,14 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    const survivors: Array<{ letter: string; type: BlastTileType; originalRow: number }> = [];
+    const survivors: Array<{ letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number }> = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       if (!tileStates[row][col].isCleared) {
         survivors.push({
           letter: grid[row][col],
           type: tileStates[row][col].type,
           originalRow: row,
+          hitsRemaining: tileStates[row][col].hitsRemaining,
         });
       }
     }
@@ -108,6 +109,7 @@ export function computeGravityResult(
         type: survivor.type,
         isCleared: false,
         activationEffect: null,
+        hitsRemaining: survivor.hitsRemaining,
       };
 
       const fallDist = bottomRow - survivor.originalRow;
@@ -138,6 +140,7 @@ export function computeGravityResult(
         type,
         isCleared: false,
         activationEffect: null,
+        hitsRemaining: type === 'ice' ? 2 : 0,
       };
 
       newTiles.push({

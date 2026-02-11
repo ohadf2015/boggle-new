@@ -5,10 +5,13 @@ import { Star, RotateCcw, Home, Trophy, Zap, Grid3X3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { BlastResultsData } from './types';
+import type { BlastResultsData, BlastDifficulty } from './types';
+import { useBlastResultSaver } from './hooks/useBlastResultSaver';
 
 interface BlastResultsProps {
   results: BlastResultsData;
+  difficulty?: BlastDifficulty;
+  language?: string;
   onPlayAgain: () => void;
   onBackToHome: () => void;
 }
@@ -81,8 +84,9 @@ function StatCard({
  * BlastResults - Results screen for Blast Mode.
  * Shows star rating, stats, and play again options.
  */
-export function BlastResults({ results, onPlayAgain, onBackToHome }: BlastResultsProps) {
+export function BlastResults({ results, difficulty = 'medium', language = 'en', onPlayAgain, onBackToHome }: BlastResultsProps) {
   const { t } = useLanguage();
+  const { isNewBestScore, isNewBestCombo } = useBlastResultSaver(results, difficulty, language);
 
   const starLabel = results.stars === 3
     ? (t('blast.stars3') || 'Perfect!')
@@ -121,7 +125,7 @@ export function BlastResults({ results, onPlayAgain, onBackToHome }: BlastResult
         <StatCard
           icon={<Trophy className="w-5 h-5" />}
           label={t('common.score') || 'Score'}
-          value={results.finalScore.toLocaleString()}
+          value={`${results.finalScore.toLocaleString()}${isNewBestScore ? ' ★' : ''}`}
           delay={0.5}
         />
         <StatCard
@@ -148,7 +152,7 @@ export function BlastResults({ results, onPlayAgain, onBackToHome }: BlastResult
           <StatCard
             icon={<Zap className="w-5 h-5 text-neo-orange" />}
             label={t('results.maxCombo') || 'Max Combo'}
-            value={`${results.maxCombo}x`}
+            value={`${results.maxCombo}x${isNewBestCombo ? ' ★' : ''}`}
             delay={0.9}
           />
         )}

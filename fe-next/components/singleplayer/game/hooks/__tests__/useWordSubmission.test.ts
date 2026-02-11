@@ -578,6 +578,82 @@ describe('useWordSubmission', () => {
     });
   });
 
+  describe('onWordAccepted callback', () => {
+    it('should call onWordAccepted with word data when word is validated', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ isValid: true }),
+      });
+
+      const onWordAccepted = jest.fn();
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions({ onWordAccepted }))
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('test');
+      });
+
+      await waitFor(() => {
+        expect(onWordAccepted).toHaveBeenCalledTimes(1);
+      });
+
+      const callArg = onWordAccepted.mock.calls[0][0];
+      expect(callArg.word).toBe('test');
+      expect(callArg.score).toBeGreaterThan(0);
+      expect(typeof callArg.comboBonus).toBe('number');
+    });
+
+    it('should call onWordAccepted instantly with dictionary cache hit', () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+      mockDictionaryCacheState.isLoaded = true;
+      mockCheckWord.mockImplementation((word: string) => word === 'hello');
+
+      const onWordAccepted = jest.fn();
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions({ onWordAccepted }))
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('hello');
+      });
+
+      // Should fire synchronously — no waiting
+      expect(onWordAccepted).toHaveBeenCalledTimes(1);
+      expect(onWordAccepted.mock.calls[0][0].word).toBe('hello');
+
+      mockDictionaryCacheState.isLoaded = false;
+      mockCheckWord.mockReturnValue(false);
+    });
+
+    it('should NOT call onWordAccepted when word is rejected', async () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ isValid: false }),
+      });
+
+      const onWordAccepted = jest.fn();
+      const { result } = renderHook(() =>
+        useWordSubmission(createDefaultOptions({ onWordAccepted }))
+      );
+
+      act(() => {
+        result.current.handleWordSubmit('xyz');
+      });
+
+      await waitFor(() => {
+        expect(result.current.currentFeedback?.type).toBe('rejected');
+      });
+
+      expect(onWordAccepted).not.toHaveBeenCalled();
+    });
+  });
+
   describe('training callbacks', () => {
     it('should call onTrainingTrackValidWord for valid words', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });

@@ -4978,7 +4978,9 @@ const he = {
     "helpGoldLabel": "זהב",
     "helpBombLabel": "פצצה",
     "helpRainbowLabel": "קשת",
-    "foundWords": "מילים שנמצאו"
+    "foundWords": "מילים שנמצאו",
+    "noWordsLeft": "!לא נשארו מילים",
+    "shuffle": "ערבב"
   },
   "student": {
     "activeGame": {

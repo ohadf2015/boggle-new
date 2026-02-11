@@ -109,6 +109,8 @@ export interface InteractiveMascotProps {
   priority?: boolean;
   /** Fetch priority hint for the browser (high = LCP optimization) */
   fetchPriority?: 'high' | 'low' | 'auto';
+  /** Override size classes with responsive Tailwind classes (e.g. "w-24 h-24 sm:w-32 sm:h-32") */
+  sizeClassName?: string;
   /** Alt text override */
   alt?: string;
   /** Enable hover interaction */
@@ -255,6 +257,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   className = '',
   priority = false,
   fetchPriority,
+  sizeClassName,
   alt,
   enableHover = true,
   enableClick = true,
@@ -355,7 +358,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
       <motion.div
         data-testid="interactive-mascot"
         data-variant={variant}
-        className={`relative ${SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''}`}
+        className={`relative ${sizeClassName || SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}

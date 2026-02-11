@@ -8,7 +8,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { BlastGame } from './BlastGame';
 import { BlastResults } from './BlastResults';
-import { DEFAULT_BLAST_CONFIG, type BlastPhase, type BlastResultsData, type BlastGameConfig } from './types';
+import { resolveBlastConfig, type BlastPhase, type BlastResultsData } from './types';
 import type { Language } from '@/shared/types/game';
 
 /**
@@ -26,11 +26,7 @@ const BlastView: React.FC = () => {
   // Monotonically increasing key to force remount on play again
   const gameKeyRef = useRef(0);
 
-  const config: BlastGameConfig = {
-    ...DEFAULT_BLAST_CONFIG,
-    language: (language as Language) || 'en',
-    specialTileChance: 0.15,
-  };
+  const config = resolveBlastConfig((language as Language) || 'en', 'medium');
 
   // Hide bottom navigation during gameplay
   useEffect(() => {
@@ -78,6 +74,8 @@ const BlastView: React.FC = () => {
       {phase === 'results' && results && (
         <BlastResults
           results={results}
+          difficulty={config.difficulty}
+          language={config.language}
           onPlayAgain={handlePlayAgain}
           onBackToHome={handleBackToHome}
         />

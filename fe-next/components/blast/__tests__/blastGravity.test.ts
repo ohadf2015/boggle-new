@@ -27,6 +27,7 @@ function makeTileStates(
         type: 'standard' as BlastTileType,
         isCleared: cleared.some(p => p.row === r && p.col === c),
         activationEffect: null,
+        hitsRemaining: 0,
       };
     }
   }

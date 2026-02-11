@@ -690,7 +690,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 {/* Preload hero mascot for faster LCP (200-300ms improvement) */}
-                <link rel="preload" as="image" href="/mascot/main-nobg.gif" type="image/gif" />
+                <link rel="preload" as="image" href="/mascot/main-nobg.gif" type="image/gif" fetchPriority="high" />
                 {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
                 <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
