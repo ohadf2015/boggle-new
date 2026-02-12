@@ -5172,17 +5172,23 @@ const ja = {
         "wordsRequired": "少なくとも1つの単語を追加してください"
       },
       "error": {
-        "createFailed": "レッスンの作成に失敗しました"
+        "createFailed": "レッスンの作成に失敗しました",
+        "updateFailed": "レッスンの更新に失敗しました"
       },
       "dialog": {
-        "createDescription": "単語と定義を含む新しい語彙レッスンを作成"
+        "createDescription": "単語と定義を含む新しい語彙レッスンを作成",
+        "editDescription": "このレッスンの単語と定義を編集"
       },
+      "definitionPlaceholder": "定義を追加（任意）...",
+      "definitionCoverage": "{{count}}/{{total}}の定義",
+      "saveChanges": "変更を保存",
+      "editLesson": "単語と定義を編集",
       "moreWords": "+{{count}}個の単語",
       "bulkImport": "一括インポート",
       "bulkImportTitle": "複数の単語をインポート",
-      "bulkImportDescription": "改行、カンマ、またはスペースで区切った単語のリストを貼り付けてください。",
+      "bulkImportDescription": "改行、カンマ、またはスペースで区切った単語のリストを貼り付けてください。「単語 - 定義」の形式で定義も含められます。",
       "bulkImportLabel": "ここに単語を貼り付け",
-      "bulkImportPlaceholder": "単語を貼り付け（1行に1つ、またはカンマ区切り）",
+      "bulkImportPlaceholder": "単語を貼り付け（1行に1つ）。「単語 - 定義」で定義も追加可能。",
       "bulkImportDetected": "{{count}}個の単語を検出",
       "bulkImportButton": "インポート",
       "resumeDraft": "下書きを再開しますか？",
@@ -5506,7 +5512,11 @@ const ja = {
       "selectClassroomAndLessons": "クラスとレッスンを選択",
       "selectClassroomAndLessonsDesc": "クラスと1つ以上のレッスンを選んで練習",
       "shareCodeWithStudents": "コードを生徒と共有",
-      "words": "単語"
+      "words": "単語",
+      "selectAllLessons": "すべて選択",
+      "deselectAll": "選択解除",
+      "createClassroom": "教室を作成",
+      "createLesson": "レッスンを作成"
     },
     "lessonWords": {
       "title": "レッスン語彙",

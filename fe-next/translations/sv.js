@@ -5193,17 +5193,23 @@ const sv = {
         "wordsRequired": "Lägg till minst ett ord"
       },
       "error": {
-        "createFailed": "Kunde inte skapa lektion"
+        "createFailed": "Kunde inte skapa lektion",
+        "updateFailed": "Kunde inte uppdatera lektion"
       },
       "dialog": {
-        "createDescription": "Skapa en ny vokabulärlektion med ord och definitioner"
+        "createDescription": "Skapa en ny vokabulärlektion med ord och definitioner",
+        "editDescription": "Redigera ord och definitioner för denna lektion"
       },
+      "definitionPlaceholder": "Lägg till definition (valfritt)...",
+      "definitionCoverage": "{{count}}/{{total}} definitioner",
+      "saveChanges": "Spara ändringar",
+      "editLesson": "Redigera ord & definitioner",
       "moreWords": "+{{count}} fler ord",
       "bulkImport": "Massimport",
       "bulkImportTitle": "Importera Flera Ord",
-      "bulkImportDescription": "Klistra in en lista med ord separerade med radbrytningar, kommatecken eller mellanslag.",
+      "bulkImportDescription": "Klistra in en lista med ord separerade med radbrytningar, kommatecken eller mellanslag. Du kan inkludera definitioner med 'ord - definition'.",
       "bulkImportLabel": "Klistra in ord här",
-      "bulkImportPlaceholder": "Klistra in ord, ett per rad eller kommaseparerade",
+      "bulkImportPlaceholder": "Klistra in ord, ett per rad. Använd 'ord - definition' för definitioner.",
       "bulkImportDetected": "{{count}} ord upptäckta",
       "bulkImportButton": "Importera",
       "resumeDraft": "Återuppta utkast?",
@@ -5527,7 +5533,11 @@ const sv = {
       "selectClassroomAndLessons": "Välj klassrum och lektioner",
       "selectClassroomAndLessonsDesc": "Välj ett klassrum och en eller flera lektioner att öva",
       "shareCodeWithStudents": "Dela kod med elever",
-      "words": "Ord"
+      "words": "Ord",
+      "selectAllLessons": "Välj alla",
+      "deselectAll": "Avmarkera alla",
+      "createClassroom": "Skapa klassrum",
+      "createLesson": "Skapa lektion"
     },
     "lessonWords": {
       "title": "Lektionsordförråd",

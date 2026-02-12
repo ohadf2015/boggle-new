@@ -5224,17 +5224,23 @@ const es = {
         "wordsRequired": "Agrega al menos una palabra"
       },
       "error": {
-        "createFailed": "Error al crear la lección"
+        "createFailed": "Error al crear la lección",
+        "updateFailed": "Error al actualizar la lección"
       },
       "dialog": {
-        "createDescription": "Crea una nueva lección de vocabulario con palabras y definiciones"
+        "createDescription": "Crea una nueva lección de vocabulario con palabras y definiciones",
+        "editDescription": "Edita las palabras y definiciones de esta lección"
       },
+      "definitionPlaceholder": "Agregar definición (opcional)...",
+      "definitionCoverage": "{{count}}/{{total}} definiciones",
+      "saveChanges": "Guardar Cambios",
+      "editLesson": "Editar Palabras y Definiciones",
       "moreWords": "+{{count}} palabras más",
       "bulkImport": "Importar en Lote",
       "bulkImportTitle": "Importar Múltiples Palabras",
-      "bulkImportDescription": "Pega una lista de palabras separadas por líneas, comas o espacios.",
+      "bulkImportDescription": "Pega una lista de palabras separadas por líneas, comas o espacios. Puedes incluir definiciones con el formato 'palabra - definición'.",
       "bulkImportLabel": "Pega las palabras aquí",
-      "bulkImportPlaceholder": "Pega palabras, una por línea o separadas por comas",
+      "bulkImportPlaceholder": "Pega palabras, una por línea. Usa 'palabra - definición' para definiciones.",
       "bulkImportDetected": "{{count}} palabras detectadas",
       "bulkImportButton": "Importar",
       "resumeDraft": "¿Continuar Borrador?",
@@ -5558,7 +5564,11 @@ const es = {
       "selectClassroomAndLessons": "Selecciona Clase y Lecciones",
       "selectClassroomAndLessonsDesc": "Elige una clase y una o más lecciones para practicar",
       "shareCodeWithStudents": "Comparte este código con los estudiantes",
-      "words": "palabras"
+      "words": "palabras",
+      "selectAllLessons": "Seleccionar todo",
+      "deselectAll": "Deseleccionar todo",
+      "createClassroom": "Crear aula",
+      "createLesson": "Crear lección"
     },
     "onboarding": {
       "step": "Paso",

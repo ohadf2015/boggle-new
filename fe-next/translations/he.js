@@ -5169,17 +5169,23 @@ const he = {
         "wordsRequired": "הוסיפו לפחות מילה אחת"
       },
       "error": {
-        "createFailed": "יצירת השיעור נכשלה"
+        "createFailed": "יצירת השיעור נכשלה",
+        "updateFailed": "עדכון השיעור נכשל"
       },
       "dialog": {
-        "createDescription": "צור שיעור אוצר מילים חדש עם מילים והגדרות"
+        "createDescription": "צור שיעור אוצר מילים חדש עם מילים והגדרות",
+        "editDescription": "ערוך מילים והגדרות לשיעור זה"
       },
+      "definitionPlaceholder": "הוסף הגדרה (אופציונלי)...",
+      "definitionCoverage": "{{count}}/{{total}} הגדרות",
+      "saveChanges": "שמור שינויים",
+      "editLesson": "ערוך מילים והגדרות",
       "moreWords": "+{{count}} מילים נוספות",
       "bulkImport": "ייבוא מרוכז",
       "bulkImportTitle": "ייבוא מילים מרובות",
-      "bulkImportDescription": "הדבק רשימת מילים מופרדות בשורות חדשות, פסיקים או רווחים.",
+      "bulkImportDescription": "הדבק רשימת מילים מופרדות בשורות חדשות, פסיקים או רווחים. ניתן לכלול הגדרות בפורמט 'מילה - הגדרה'.",
       "bulkImportLabel": "הדבק מילים כאן",
-      "bulkImportPlaceholder": "הדבק מילים, אחת בכל שורה או מופרדות בפסיקים",
+      "bulkImportPlaceholder": "הדבק מילים, אחת בכל שורה. השתמש ב'מילה - הגדרה' להוספת הגדרות.",
       "bulkImportDetected": "זוהו {{count}} מילים",
       "bulkImportButton": "ייבא",
       "resumeDraft": "לחזור לטיוטה?",
@@ -5556,7 +5562,11 @@ const he = {
       "selectClassroomAndLessons": "בחירת כיתה ושיעורים",
       "selectClassroomAndLessonsDesc": "בחרו כיתה ושיעור אחד או יותר לתרגול",
       "shareCodeWithStudents": "שיתוף קוד עם תלמידים",
-      "words": "מילים"
+      "words": "מילים",
+      "selectAllLessons": "בחר הכל",
+      "deselectAll": "בטל בחירה",
+      "createClassroom": "צור כיתה",
+      "createLesson": "צור שיעור"
     },
     "lessonWords": {
       "title": "אוצר מילים שיעורי",

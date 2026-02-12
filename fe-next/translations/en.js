@@ -5167,17 +5167,23 @@ const en = {
         "wordsRequired": "Add at least one word"
       },
       "error": {
-        "createFailed": "Failed to create lesson"
+        "createFailed": "Failed to create lesson",
+        "updateFailed": "Failed to update lesson"
       },
       "dialog": {
-        "createDescription": "Create a new vocabulary lesson with words and definitions"
+        "createDescription": "Create a new vocabulary lesson with words and definitions",
+        "editDescription": "Edit words and definitions for this lesson"
       },
+      "definitionPlaceholder": "Add definition (optional)...",
+      "definitionCoverage": "{{count}}/{{total}} definitions",
+      "saveChanges": "Save Changes",
+      "editLesson": "Edit Words & Definitions",
       "moreWords": "+{{count}} more words",
       "bulkImport": "Bulk Import",
       "bulkImportTitle": "Import Multiple Words",
-      "bulkImportDescription": "Paste a list of words separated by newlines, commas, or spaces.",
+      "bulkImportDescription": "Paste a list of words separated by newlines, commas, or spaces. You can include definitions with 'word - definition' format.",
       "bulkImportLabel": "Paste words here",
-      "bulkImportPlaceholder": "Paste words, one per line or comma-separated",
+      "bulkImportPlaceholder": "Paste words, one per line or comma-separated. Use 'word - definition' for definitions.",
       "bulkImportDetected": "{{count}} words detected",
       "bulkImportButton": "Import",
       "resumeDraft": "Resume Draft?",
@@ -5570,7 +5576,11 @@ const en = {
       "selectClassroomAndLessons": "Select Classroom and Lessons",
       "selectClassroomAndLessonsDesc": "Choose a classroom and one or more lessons to practice",
       "shareCodeWithStudents": "Share Code with Students",
-      "words": "Words"
+      "words": "Words",
+      "selectAllLessons": "Select All",
+      "deselectAll": "Deselect All",
+      "createClassroom": "Create Classroom",
+      "createLesson": "Create Lesson"
     },
     "lessonWords": {
       "title": "Lesson Vocabulary",

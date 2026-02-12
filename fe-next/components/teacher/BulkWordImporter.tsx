@@ -35,6 +35,9 @@ interface BulkWordImporterProps {
 // COMPONENT
 // ============================================
 
+// Delimiter pattern: requires spaces around - – — or : to avoid splitting hyphenated words
+const DEFINITION_DELIMITER = /^(.+?)\s+[-–—:]\s+(.+)$/;
+
 export default function BulkWordImporter({
   isOpen,
   onClose,
@@ -54,32 +57,44 @@ export default function BulkWordImporter({
     // 1. Newline separated
     // 2. Comma separated
     // 3. Space separated (if no commas or newlines)
-    let words: string[];
+    let lines: string[];
 
     if (inputText.includes('\n')) {
-      // Newline separated
-      words = inputText.split('\n');
+      lines = inputText.split('\n');
     } else if (inputText.includes(',')) {
-      // Comma separated
-      words = inputText.split(',');
+      lines = inputText.split(',');
     } else {
-      // Space separated (single line without commas)
-      words = inputText.split(/\s+/);
+      lines = inputText.split(/\s+/);
     }
 
-    // Clean up: trim, filter empty, dedupe
-    const cleanedWords = words
+    // Clean up: trim, filter empty, dedupe by raw line
+    const cleanedLines = lines
       .map((w) => w.trim())
       .filter((w) => w.length > 0)
-      .filter((w, i, arr) => arr.indexOf(w) === i); // dedupe
+      .filter((w, i, arr) => arr.indexOf(w) === i);
 
-    // Validate each word
-    return cleanedWords.map((word) => {
+    // Detect definition mode: if 50%+ lines match delimiter pattern
+    const matchCount = cleanedLines.filter((line) => DEFINITION_DELIMITER.test(line)).length;
+    const isDefinitionMode = cleanedLines.length > 0 && matchCount / cleanedLines.length >= 0.5;
+
+    // Parse each line, extracting definitions in definition mode
+    return cleanedLines.map((line) => {
+      let word = line;
+      let definition = '';
+
+      if (isDefinitionMode) {
+        const match = line.match(DEFINITION_DELIMITER);
+        if (match) {
+          word = match[1].trim();
+          definition = match[2].trim();
+        }
+      }
+
       const result = checkWordIntegration(word, language);
       return {
         word: result.word,
         canIntegrate: result.canIntegrate,
-        definition: '',
+        definition,
       } as VocabularyWord;
     });
   }, [inputText, language, checkWordIntegration]);
@@ -171,6 +186,9 @@ export default function BulkWordImporter({
                           <AlertCircle className="w-3 h-3" />
                         )}
                         <span>{word.word}</span>
+                        {word.definition && (
+                          <span className="text-xs opacity-70">— {word.definition}</span>
+                        )}
                       </div>
                     ))}
                     {parsedWords.length > 50 && (
