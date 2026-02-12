@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { WordFeedbackToast, type FeedbackType } from '../WordFeedbackToast';
+import type { FeedbackType } from '../WordFeedbackToast';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { AutoClueNotification } from './AutoClueNotification';
 import type { LetterGrid } from '@/types';
@@ -68,10 +69,15 @@ export interface SurvivalLandscapeLayoutProps {
   onQuitConfirm: () => void;
   onQuitCancel: () => void;
 
-  // Toast props
+  // Toast props (kept for backward compat)
   feedbackType: FeedbackType | null;
   feedbackMessage: string;
   onCloseToast: () => void;
+
+  // WordFormingArea props
+  wordFeedback?: WordFeedback | null;
+  formedWord?: string;
+  letterCount?: number;
 
   // Guidance props
   showSwipeTip: boolean;
@@ -129,6 +135,11 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   feedbackMessage,
   onCloseToast,
 
+  // WordFormingArea
+  wordFeedback,
+  formedWord = '',
+  letterCount = 0,
+
   // Guidance props
   showSwipeTip,
   onDismissSwipeTip,
@@ -141,12 +152,15 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
 }) => {
   return (
     <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white">
-      {/* Toast feedback */}
-      <WordFeedbackToast
-        type={feedbackType}
-        message={feedbackMessage}
-        onClose={onCloseToast}
-      />
+      {/* Word Feedback — inline WordFormingArea */}
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40">
+        <WordFormingArea
+          word={formedWord}
+          letterCount={letterCount}
+          feedback={wordFeedback}
+          compact
+        />
+      </div>
 
       {/* Swipe tip guidance */}
       <SwipeTipTooltip

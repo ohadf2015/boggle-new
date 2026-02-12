@@ -16,6 +16,7 @@ const logger = require('../utils/logger');
 // State Management
 let _redisClient: RedisClient | null = null;
 let _isRedisAvailable = false;
+let _errorReported = false; // Prevent repeated error events to Sentry
 let lastHealthCheck = Date.now();
 let healthCheckInterval: NodeJS.Timeout | null = null;
 let memoryCheckInterval: NodeJS.Timeout | null = null;
@@ -116,7 +117,13 @@ export async function healthCheck(): Promise<boolean> {
     return true;
   } catch (error: unknown) {
     const err = error as Error;
-    logger.error('REDIS', `Health check failed: ${err.message}`);
+    // Only log as error on state transition (available → unavailable)
+    // to avoid flooding Sentry with repeated alerts every 30s
+    if (_isRedisAvailable) {
+      logger.error('REDIS', `Health check failed: ${err.message}`);
+    } else {
+      logger.debug('REDIS', `Health check still failing: ${err.message}`);
+    }
     _isRedisAvailable = false;
     return false;
   }
@@ -227,16 +234,25 @@ export async function initRedis(): Promise<boolean> {
     _redisClient.on('connect', () => {
       logger.info('REDIS', 'Connected to Redis server');
       _isRedisAvailable = true;
+      _errorReported = false;
     });
 
     _redisClient.on('ready', async () => {
       logger.info('REDIS', 'Redis client ready');
       _isRedisAvailable = true;
+      _errorReported = false;
       await loadLuaScripts();
     });
 
     _redisClient.on('error', (err: Error) => {
-      logger.warn('REDIS', `Redis error: ${err.message}`);
+      // Only warn (→ Sentry) on first error or after recovery
+      // Subsequent errors during a known-down state use debug to avoid Sentry noise
+      if (!_errorReported) {
+        logger.warn('REDIS', `Redis error: ${err.message}`);
+        _errorReported = true;
+      } else {
+        logger.debug('REDIS', `Redis error (repeated): ${err.message}`);
+      }
       _isRedisAvailable = false;
     });
 
@@ -260,7 +276,7 @@ export async function initRedis(): Promise<boolean> {
   } catch (error: unknown) {
     const err = error as Error;
     logger.warn('REDIS', `Could not connect to Redis: ${err.message}`);
-    logger.warn('REDIS', 'Application will continue with in-memory storage');
+    logger.info('REDIS', 'Application will continue with in-memory storage');
     _isRedisAvailable = false;
     _redisClient = null;
     return false;
@@ -299,12 +315,14 @@ export function createPubSubClients(): { pubClient: RedisClient; subClient: Redi
     const pubClient = _redisClient.duplicate();
     const subClient = _redisClient.duplicate();
 
+    // Use debug for pub/sub errors since they cascade from the main
+    // connection error (already reported via _errorReported flag)
     pubClient.on('error', (err: Error) => {
-      logger.warn('REDIS', `Pub client error: ${err.message}`);
+      logger.debug('REDIS', `Pub client error: ${err.message}`);
     });
 
     subClient.on('error', (err: Error) => {
-      logger.warn('REDIS', `Sub client error: ${err.message}`);
+      logger.debug('REDIS', `Sub client error: ${err.message}`);
     });
 
     return { pubClient, subClient };

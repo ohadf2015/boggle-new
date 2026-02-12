@@ -24,9 +24,10 @@ jest.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
+const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -366,8 +367,6 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should stay in education section until game starts', async () => {
-      const mockRouter = require('next/navigation').useRouter();
-
       render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
 
       // Select lesson
@@ -383,12 +382,10 @@ describe('ClassroomGameLobby (Wizard)', () => {
       });
 
       // Router push should NOT be called yet (still in education section)
-      expect(mockRouter().push).not.toHaveBeenCalled();
+      expect(mockPush).not.toHaveBeenCalled();
     });
 
     it('should navigate to multiplayer after game created', async () => {
-      const mockRouter = require('next/navigation').useRouter();
-
       render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
 
       // Wait for socket to be set up
@@ -405,10 +402,84 @@ describe('ClassroomGameLobby (Wizard)', () => {
 
       // Should navigate to multiplayer (only time we leave education)
       await waitFor(() => {
-        expect(mockRouter().push).toHaveBeenCalledWith(
+        expect(mockPush).toHaveBeenCalledWith(
           expect.stringContaining('/multiplayer')
         );
       });
+    });
+
+    it('should navigate with room= param (not code=) for multiplayer compatibility', async () => {
+      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+
+      await waitFor(() => {
+        expect(mockSocket.on).toHaveBeenCalled();
+      });
+
+      const gameCreatedHandler = mockSocket.on.mock.calls.find(
+        (call) => call[0] === 'classroomGameCreated'
+      )[1];
+
+      gameCreatedHandler({ success: true, gameCode: 'ABC123' });
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          expect.stringContaining('room=ABC123')
+        );
+      });
+    });
+
+    it('should store lessonGameData in sessionStorage before emitting socket event', async () => {
+      const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+
+      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+
+      // Select lesson
+      await waitFor(() => {
+        const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
+        fireEvent.click(lesson1Button!);
+      });
+
+      // Go to step 2
+      await waitFor(() => {
+        const nextButton = screen.getByText('common.next');
+        fireEvent.click(nextButton);
+      });
+
+      // Start game
+      await waitFor(() => {
+        const startButton = screen.getByText('education.classroomGame.startGame');
+        fireEvent.click(startButton);
+      });
+
+      // Verify sessionStorage was set with lessonGameData
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'lessonGameData',
+        expect.any(String)
+      );
+
+      // Parse and verify the stored data structure
+      const storedCall = setItemSpy.mock.calls.find(
+        (call) => call[0] === 'lessonGameData'
+      );
+      expect(storedCall).toBeDefined();
+      const storedData = JSON.parse(storedCall![1]);
+
+      expect(storedData).toEqual(
+        expect.objectContaining({
+          lessonId: expect.any(String),
+          lessonName: expect.any(String),
+          vocabularyWords: expect.arrayContaining(['red', 'blue']),
+          language: 'en',
+          templateSettings: expect.objectContaining({
+            timerSeconds: expect.any(Number),
+            difficulty: expect.any(String),
+            minWordLength: 3,
+            allowLateJoin: true,
+          }),
+        })
+      );
+
+      setItemSpy.mockRestore();
     });
   });
 
@@ -425,6 +496,62 @@ describe('ClassroomGameLobby (Wizard)', () => {
           screen.getByText('education.classroomGame.noClassrooms')
         ).toBeInTheDocument();
       });
+    });
+
+    it('should show "Create Classroom" button when no classrooms', async () => {
+      (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({
+        data: [],
+      });
+
+      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('education.classroomGame.createClassroom')
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('should navigate to teacher dashboard when "Create Classroom" clicked', async () => {
+      (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({
+        data: [],
+      });
+
+      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('education.classroomGame.createClassroom'));
+      });
+
+      expect(mockPush).toHaveBeenCalledWith('/en/teacher');
+    });
+
+    it('should show "Create Lesson" button when no lessons available', async () => {
+      (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+        data: [],
+      });
+
+      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('education.classroomGame.createLesson')
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('should navigate to teacher dashboard when "Create Lesson" clicked', async () => {
+      (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+        data: [],
+      });
+
+      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('education.classroomGame.createLesson'));
+      });
+
+      expect(mockPush).toHaveBeenCalledWith('/en/teacher');
     });
 
     it('should show error toast on socket error', async () => {

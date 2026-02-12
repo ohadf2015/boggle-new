@@ -4,6 +4,7 @@
  */
 
 import type { FeedbackType } from '../WordFeedbackToast';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { WordDiscovery, TargetAttempt, AutoClueNotificationData } from './types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import { INITIAL_LIFE } from './constants';
@@ -38,6 +39,9 @@ export interface SurvivalReducerState {
   feedbackType: FeedbackType | null;
   feedbackMessage: string;
   activeNotifications: AutoClueNotificationData[];
+
+  // WordFormingArea feedback
+  wordFeedback: WordFeedback | null;
 
   // Session
   gameSessionId: string | null;
@@ -81,6 +85,10 @@ export type SurvivalAction =
   | { type: 'ADD_NOTIFICATION'; payload: AutoClueNotificationData }
   | { type: 'DISMISS_NOTIFICATION'; payload: { id: string } }
 
+  // WordFormingArea feedback
+  | { type: 'SET_WORD_FEEDBACK'; payload: WordFeedback }
+  | { type: 'CLEAR_WORD_FEEDBACK' }
+
   // Session
   | { type: 'SET_GAME_SESSION_ID'; payload: string | null };
 
@@ -115,6 +123,9 @@ export function createInitialState(): SurvivalReducerState {
     feedbackType: null,
     feedbackMessage: '',
     activeNotifications: [],
+
+    // WordFormingArea feedback
+    wordFeedback: null,
 
     // Session
     gameSessionId: null,
@@ -235,6 +246,13 @@ export function survivalGameReducer(
         ...state,
         activeNotifications: state.activeNotifications.filter(n => n.id !== action.payload.id),
       };
+
+    // WordFormingArea feedback
+    case 'SET_WORD_FEEDBACK':
+      return { ...state, wordFeedback: action.payload };
+
+    case 'CLEAR_WORD_FEEDBACK':
+      return { ...state, wordFeedback: null };
 
     // Session
     case 'SET_GAME_SESSION_ID':

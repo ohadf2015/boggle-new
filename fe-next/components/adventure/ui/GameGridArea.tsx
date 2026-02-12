@@ -10,10 +10,10 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureGrid from '../AdventureGrid';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import type { GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -48,10 +48,14 @@ interface GameGridAreaProps {
   lastAccepted: { word: string; score: number } | null;
   selectedLength: number;
   minWordLength: number;
-  
+
+  // WordFormingArea integration
+  wordFeedback?: WordFeedback | null;
+  currentWord?: string;
+
   // Hint
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
-  
+
   className?: string;
 }
 
@@ -82,13 +86,15 @@ export const GameGridArea = memo(function GameGridArea({
   lastAccepted,
   selectedLength,
   minWordLength,
+  wordFeedback,
+  currentWord: currentWordProp,
   hintLevel,
   className,
 }: GameGridAreaProps) {
   const { t } = useLanguage();
-  
-  // Build current word from selected indices
-  const currentWord = selectedIndices.map(i => tiles[i]?.letter || '').join('');
+
+  // Use prop if provided, otherwise build from selected indices (backward compat)
+  const currentWord = currentWordProp ?? selectedIndices.map(i => tiles[i]?.letter || '').join('');
 
   return (
     <div
@@ -171,48 +177,14 @@ export const GameGridArea = memo(function GameGridArea({
             </AnimatePresence>
           </div>
 
-          {/* Word Preview */}
+          {/* Word Preview — uses shared WordFormingArea for consistent feedback */}
           <div className="h-8 sm:h-10 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              {/* Accepted word celebration */}
-              {wasWordSubmitted && lastAccepted ? (
-                <motion.div
-                  key="accepted"
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, scale: [0.6, 1.15, 1] }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.4, times: [0, 0.5, 1] }}
-                  className={cn(
-                    'px-4 sm:px-6 py-1 sm:py-1.5 rounded-neo-lg',
-                    'font-black text-xl sm:text-2xl tracking-wider uppercase',
-                    'border-3 shadow-hard',
-                    'bg-neo-lime/20 border-neo-lime text-neo-lime',
-                    'flex items-center gap-2'
-                  )}
-                >
-                  <Check className="w-5 h-5" />
-                  <span>{lastAccepted.word}</span>
-                  <span className="text-base font-bold text-neo-lime/80">+{lastAccepted.score}</span>
-                </motion.div>
-              ) : currentWord.length > 0 ? (
-                <motion.div
-                  key="word"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className={cn(
-                    'px-4 sm:px-6 py-1 sm:py-1.5 rounded-neo-lg',
-                    'font-black text-xl sm:text-2xl tracking-wider uppercase',
-                    'border-3 shadow-hard',
-                    'bg-neo-white/10 border-neo-white/30 text-neo-white'
-                  )}
-                >
-                  {currentWord}
-                </motion.div>
-              ) : (
-                <div key="empty" className="h-full" />
-              )}
-            </AnimatePresence>
+            <WordFormingArea
+              word={currentWord}
+              letterCount={selectedLength}
+              feedback={wordFeedback}
+              compact
+            />
           </div>
         </div>
 

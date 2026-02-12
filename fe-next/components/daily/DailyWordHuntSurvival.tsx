@@ -13,7 +13,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
-import { WordFeedbackToast } from './WordFeedbackToast';
+import WordFormingArea from '@/components/game/WordFormingArea';
 
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './survival/types';
@@ -180,12 +180,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           />
         )}
 
-        {/* Word Feedback Toast */}
-        <WordFeedbackToast
-          type={state.feedbackType}
-          message={state.feedbackMessage}
-          onClose={actions.closeToast}
-        />
+        {/* Word Feedback — inline WordFormingArea */}
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+          <WordFormingArea
+            word={state.formedWord}
+            letterCount={state.letterCount}
+            feedback={state.wordFeedback}
+            compact
+          />
+        </div>
 
         {/* Auto-Clue Notifications */}
         <AnimatePresence>
@@ -250,6 +253,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         feedbackType={state.feedbackType}
         feedbackMessage={state.feedbackMessage}
         onCloseToast={actions.closeToast}
+        wordFeedback={state.wordFeedback}
+        formedWord={state.formedWord}
+        letterCount={state.letterCount}
         showSwipeTip={contextualGuidance.showSwipeTip}
         onDismissSwipeTip={contextualGuidance.dismissSwipeTip}
         activeNotifications={state.activeNotifications}
@@ -348,12 +354,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       )}
 
-      {/* Word Feedback Toast */}
-      <WordFeedbackToast
-        type={state.feedbackType}
-        message={state.feedbackMessage}
-        onClose={actions.closeToast}
-      />
+      {/* Word Feedback — inline WordFormingArea */}
+      <div className="flex justify-center py-1">
+        <WordFormingArea
+          word={state.formedWord}
+          letterCount={state.letterCount}
+          feedback={state.wordFeedback}
+          compact
+        />
+      </div>
 
       {/* Auto-Clue Notifications */}
       <AnimatePresence>

@@ -64,16 +64,41 @@ export function MultiLessonSelector({
     );
   }
 
+  const allSelected = lessons.length > 0 && selectedLessonIds.length === lessons.length;
+
+  const handleSelectAll = () => {
+    if (allSelected) {
+      onSelectChange([]);
+    } else {
+      onSelectChange(lessons.map((l) => l.id));
+    }
+  };
+
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Header with selection count */}
+      {/* Header with selection count and Select All */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-neo-display text-neo-white">
           {t('education.classroomGame.selectLessons')}
         </h3>
-        <span className="text-sm text-neo-cyan font-bold">
-          {t('education.classroomGame.lessonsSelected', { count: selectedLessonIds.length })}
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSelectAll}
+            className={cn(
+              'text-sm font-bold px-3 py-1 rounded-neo border-neo border-neo-black transition-all',
+              allSelected
+                ? 'bg-neo-white/20 text-neo-white hover:bg-neo-white/30'
+                : 'bg-neo-cyan/20 text-neo-cyan hover:bg-neo-cyan/30'
+            )}
+          >
+            {allSelected
+              ? t('education.classroomGame.deselectAll')
+              : t('education.classroomGame.selectAllLessons')}
+          </button>
+          <span className="text-sm text-neo-cyan font-bold">
+            {t('education.classroomGame.lessonsSelected', { count: selectedLessonIds.length })}
+          </span>
+        </div>
       </div>
 
       {/* Lesson options grid */}

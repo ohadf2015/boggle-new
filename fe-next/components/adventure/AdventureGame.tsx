@@ -51,6 +51,7 @@ import GameplayBackground from './themed/GameplayBackground';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -292,6 +293,7 @@ const AdventureGame = memo<AdventureGameProps>(
       isValid: false,
     });
     const [lastAccepted, setLastAccepted] = useState<{ word: string; score: number } | null>(null);
+    const [wordFeedback, setWordFeedback] = useState<WordFeedback | null>(null);
 
     const cinematics = useAdventureCinematics();
 
@@ -897,6 +899,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
           setLastAccepted({ word: currentWord, score: scoreValue });
+          setWordFeedback({ id: `${Date.now()}`, type: 'accepted', word: currentWord, score: scoreValue, timestamp: Date.now() });
           lastSubmittedWordRef.current = { word: currentWord, path };
 
           submitWordWithPath(currentWord, scoreValue, path);
@@ -925,10 +928,12 @@ const AdventureGame = memo<AdventureGameProps>(
           wordSubmittedTimeoutRef.current = setTimeout(() => {
             setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
             setLastAccepted(null);
+            setWordFeedback(null);
           }, 1200);
         } else if (result.errorKey) {
           const errorMessage = t(result.errorKey) || result.errorKey;
           setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
+          setWordFeedback({ id: `${Date.now()}`, type: 'rejected', word: currentWord, message: errorMessage, timestamp: Date.now() });
           clearSelection();
 
           recordAIWord(false, 0);
@@ -943,6 +948,7 @@ const AdventureGame = memo<AdventureGameProps>(
 
           validationErrorTimeoutRef.current = setTimeout(() => {
             setValidationFeedback(prev => ({ ...prev, error: null }));
+            setWordFeedback(null);
           }, 2000);
         }
       },
@@ -1080,6 +1086,8 @@ const AdventureGame = memo<AdventureGameProps>(
               lastAccepted={lastAccepted}
               selectedLength={selectedIndices.length}
               minWordLength={minWordLength}
+              wordFeedback={wordFeedback}
+              currentWord={currentWord}
               hintLevel={hintData.level}
             />
           }

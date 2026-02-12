@@ -17,7 +17,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
-import { Play, Users, Copy, Check, BookOpen, School, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, Copy, Check, BookOpen, School, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -39,7 +39,6 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
-  const isRTL = language === 'he';
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(1);
@@ -120,7 +119,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       if (data.success) {
         toast.success(t('education.classroomGame.gameCreated'));
         // Navigate to multiplayer (only time we leave education section)
-        router.push(`/${language}/multiplayer?fromLesson=true&classroom=true&code=${data.gameCode}`);
+        router.push(`/${language}/multiplayer?fromLesson=true&classroom=true&room=${data.gameCode}`);
       }
     });
 
@@ -187,6 +186,20 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       return;
     }
 
+    // Store lesson data in sessionStorage so the multiplayer page can read it
+    sessionStorage.setItem('lessonGameData', JSON.stringify({
+      lessonId: selectedLessonIds.join(','),
+      lessonName: selectedLessons.map(l => l.name).join(', '),
+      vocabularyWords: allPlayableWords,
+      language,
+      templateSettings: {
+        timerSeconds: settings.timerMinutes * 60,
+        difficulty: settings.boardSize,
+        minWordLength: 3,
+        allowLateJoin: settings.allowLateJoin,
+      },
+    }));
+
     socket.emit('createClassroomGame', {
       gameCode,
       classroomId: selectedClassroomId,
@@ -212,6 +225,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     allPlayableWords,
     settings,
     profile,
+    language,
     t,
   ]);
 
@@ -238,24 +252,74 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     );
   }
 
-  // No classrooms error
+  // No classrooms — guide teacher to create one
   if (classrooms.length === 0) {
     return (
       <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
+        <School className="w-12 h-12 text-neo-white/30 mx-auto mb-4" />
         <p className="text-neo-white/70 font-neo-body mb-4">
           {t('education.classroomGame.noClassrooms')}
         </p>
-        <button
-          onClick={onBack}
-          className={cn(
-            'px-6 py-3 font-bold',
-            'bg-neo-cyan text-neo-black',
-            'border-neo border-neo-black rounded-neo shadow-hard',
-            'hover:shadow-hard-lg transition-all'
-          )}
-        >
-          {t('common.back')}
-        </button>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={onBack}
+            className={cn(
+              'px-6 py-3 font-bold',
+              'bg-neo-navy text-neo-white',
+              'border-neo border-neo-black rounded-neo shadow-hard-sm',
+              'hover:shadow-hard transition-all'
+            )}
+          >
+            {t('common.back')}
+          </button>
+          <button
+            onClick={() => router.push(`/${language}/teacher`)}
+            className={cn(
+              'px-6 py-3 font-bold',
+              'bg-neo-cyan text-neo-black',
+              'border-neo border-neo-black rounded-neo shadow-hard',
+              'hover:shadow-hard-lg transition-all'
+            )}
+          >
+            {t('education.classroomGame.createClassroom')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No lessons — guide teacher to create one
+  if (lessons.length === 0) {
+    return (
+      <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
+        <BookOpen className="w-12 h-12 text-neo-white/30 mx-auto mb-4" />
+        <p className="text-neo-white/70 font-neo-body mb-4">
+          {t('education.classroomGame.noLessonsAvailable')}
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={onBack}
+            className={cn(
+              'px-6 py-3 font-bold',
+              'bg-neo-navy text-neo-white',
+              'border-neo border-neo-black rounded-neo shadow-hard-sm',
+              'hover:shadow-hard transition-all'
+            )}
+          >
+            {t('common.back')}
+          </button>
+          <button
+            onClick={() => router.push(`/${language}/teacher`)}
+            className={cn(
+              'px-6 py-3 font-bold',
+              'bg-neo-pink text-neo-black',
+              'border-neo border-neo-black rounded-neo shadow-hard',
+              'hover:shadow-hard-lg transition-all'
+            )}
+          >
+            {t('education.classroomGame.createLesson')}
+          </button>
+        </div>
       </div>
     );
   }

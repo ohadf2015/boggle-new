@@ -202,4 +202,105 @@ describe('MultiLessonSelector', () => {
     const animalsOption = screen.getByText(/Animals/).closest('button');
     expect(animalsOption).toHaveClass('bg-neo-cyan');
   });
+
+  describe('Select All / Deselect All', () => {
+    it('should show "Select All" button when not all lessons selected', () => {
+      // GIVEN
+      const onSelectChange = jest.fn();
+
+      // WHEN
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={[]}
+          onSelectChange={onSelectChange}
+        />
+      );
+
+      // THEN
+      expect(
+        screen.getByText('education.classroomGame.selectAllLessons')
+      ).toBeInTheDocument();
+    });
+
+    it('should select all lessons when "Select All" is clicked', () => {
+      // GIVEN
+      const onSelectChange = jest.fn();
+
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={[]}
+          onSelectChange={onSelectChange}
+        />
+      );
+
+      // WHEN
+      fireEvent.click(
+        screen.getByText('education.classroomGame.selectAllLessons')
+      );
+
+      // THEN
+      expect(onSelectChange).toHaveBeenCalledWith(['lesson-1', 'lesson-2']);
+    });
+
+    it('should show "Deselect All" when all lessons are selected', () => {
+      // GIVEN
+      const onSelectChange = jest.fn();
+
+      // WHEN
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={['lesson-1', 'lesson-2']}
+          onSelectChange={onSelectChange}
+        />
+      );
+
+      // THEN
+      expect(
+        screen.getByText('education.classroomGame.deselectAll')
+      ).toBeInTheDocument();
+    });
+
+    it('should deselect all lessons when "Deselect All" is clicked', () => {
+      // GIVEN
+      const onSelectChange = jest.fn();
+
+      render(
+        <MultiLessonSelector
+          lessons={mockLessons}
+          selectedLessonIds={['lesson-1', 'lesson-2']}
+          onSelectChange={onSelectChange}
+        />
+      );
+
+      // WHEN
+      fireEvent.click(
+        screen.getByText('education.classroomGame.deselectAll')
+      );
+
+      // THEN
+      expect(onSelectChange).toHaveBeenCalledWith([]);
+    });
+
+    it('should not show Select All button when no lessons available', () => {
+      // GIVEN
+      const onSelectChange = jest.fn();
+
+      // WHEN
+      render(
+        <MultiLessonSelector
+          lessons={[]}
+          selectedLessonIds={[]}
+          onSelectChange={onSelectChange}
+        />
+      );
+
+      // THEN - Empty state shown, no Select All button
+      expect(
+        screen.queryByText('education.classroomGame.selectAllLessons')
+      ).not.toBeInTheDocument();
+    });
+  });
 });

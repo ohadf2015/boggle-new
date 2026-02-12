@@ -5,6 +5,7 @@ import type { LetterGrid, Language } from '@/types';
 import { getLetterFeedback, isTargetWordFound, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { calculateLifeReward, calculateTokenReward, calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
 import { useLiveScoreTracker } from './useLiveScoreTracker';
 import {
@@ -93,6 +94,9 @@ export interface SurvivalGameState {
   // Toast feedback
   feedbackType: FeedbackType | null;
   feedbackMessage: string;
+
+  // WordFormingArea feedback
+  wordFeedback: WordFeedback | null;
 }
 
 export interface SurvivalGameActions {
@@ -144,7 +148,23 @@ export function useSurvivalGameLogic({
   // Toast helpers - dispatch-based
   const showToast = useCallback((type: FeedbackType, message: string) => {
     dispatch({ type: 'SHOW_TOAST', payload: { type, message } });
-  }, []);
+
+    // Also dispatch WordFeedback for WordFormingArea
+    const wordFeedbackType = type === 'valid-word' || type === 'target-found'
+      ? 'accepted' as const
+      : type === 'duplicate'
+        ? 'duplicate' as const
+        : 'rejected' as const;
+    const fb: WordFeedback = {
+      id: `${Date.now()}`,
+      type: wordFeedbackType,
+      word: state.formedWord || '',
+      message: wordFeedbackType !== 'accepted' ? message : undefined,
+      score: wordFeedbackType === 'accepted' ? undefined : undefined,
+      timestamp: Date.now(),
+    };
+    dispatch({ type: 'SET_WORD_FEEDBACK', payload: fb });
+  }, [state.formedWord]);
 
   const closeToast = useCallback(() => {
     dispatch({ type: 'CLOSE_TOAST' });
@@ -683,6 +703,7 @@ export function useSurvivalGameLogic({
     isClueGaining: clueState.isClueGaining,
     feedbackType: state.feedbackType,
     feedbackMessage: state.feedbackMessage,
+    wordFeedback: state.wordFeedback,
   };
 
   const actions: SurvivalGameActions = {
