@@ -36,39 +36,62 @@ const LETTER_WEIGHTS: Record<string, Record<string, number>> = {
   },
 };
 
+/** Vowels per language (used for vowel frequency modification) */
+const VOWELS: Record<string, Set<string>> = {
+  en: new Set(['A', 'E', 'I', 'O', 'U']),
+  he: new Set(['א', 'ו', 'י']), // approximate vowel letters
+  sv: new Set(['A', 'E', 'I', 'O', 'U', '\u00C4', '\u00C5', '\u00D6']),
+  ja: new Set(['\u3042', '\u3044', '\u3046', '\u3048', '\u304A']),
+};
+
 /** Pre-built weighted pools for fast random selection */
 const poolCache = new Map<string, string[]>();
 
-function getPool(language: Language): string[] {
-  const lang = language as string;
-  if (poolCache.has(lang)) return poolCache.get(lang)!;
+function getPool(language: Language, vowelModifier = 1.0): string[] {
+  // Cache key includes modifier to avoid stale pools
+  const cacheKey = `${language}-${vowelModifier}`;
+  if (poolCache.has(cacheKey)) return poolCache.get(cacheKey)!;
 
+  const lang = language as string;
   const weights = LETTER_WEIGHTS[lang] || LETTER_WEIGHTS.en;
+  const vowelSet = VOWELS[lang] || VOWELS.en;
   const pool: string[] = [];
+
   for (const [letter, weight] of Object.entries(weights)) {
-    for (let i = 0; i < weight; i++) {
+    const isVowel = vowelSet.has(letter);
+    const adjustedWeight = isVowel ? Math.max(1, Math.round(weight * vowelModifier)) : weight;
+    for (let i = 0; i < adjustedWeight; i++) {
       pool.push(letter);
     }
   }
-  poolCache.set(lang, pool);
+
+  poolCache.set(cacheKey, pool);
   return pool;
 }
 
-/** Generate a weighted random letter for the given language */
-export function generateBlastLetter(language: Language): string {
-  const pool = getPool(language);
+/**
+ * Generate a weighted random letter for the given language.
+ * @param vowelModifier - Multiplier for vowel frequency (1.0 = normal, lower = fewer vowels)
+ */
+export function generateBlastLetter(language: Language, vowelModifier = 1.0): string {
+  const pool = getPool(language, vowelModifier);
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-/** Roll for special tile type, or return 'standard' */
-export function rollSpecialType(specialTileChance: number): BlastTileType {
+/** Roll for special tile type, or return 'standard'. Accepts optional custom distribution. */
+export function rollSpecialType(
+  specialTileChance: number,
+  customDistribution?: Record<string, number>,
+): BlastTileType {
   if (Math.random() >= specialTileChance) return 'standard';
 
+  const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
   const roll = Math.random();
-  const { gold, bomb, rainbow, ice } = SPECIAL_TILE_DISTRIBUTION;
-  if (roll < gold) return 'gold';
-  if (roll < gold + bomb) return 'bomb';
-  if (roll < gold + bomb + rainbow) return 'rainbow';
-  if (roll < gold + bomb + rainbow + ice) return 'ice';
-  return 'wildcard';
+  let cumulative = 0;
+  for (const [tileType, weight] of Object.entries(dist)) {
+    if (weight <= 0) continue;
+    cumulative += weight;
+    if (roll < cumulative) return tileType as BlastTileType;
+  }
+  return 'wildcard'; // Fallback
 }

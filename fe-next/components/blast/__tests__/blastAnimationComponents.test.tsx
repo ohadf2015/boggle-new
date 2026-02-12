@@ -238,6 +238,7 @@ describe('BlastGrid', () => {
     onWordChange: noop,
     onExplosionComplete: noop,
     onScorePopupComplete: noop,
+    cascadeHighlightData: null,
   };
 
   it('renders GridComponent with grid data', () => {

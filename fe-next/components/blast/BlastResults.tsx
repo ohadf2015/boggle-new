@@ -156,7 +156,42 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
             delay={0.9}
           />
         )}
+        {(results.wavesCompleted ?? 0) > 0 && (
+          <StatCard
+            icon={<Zap className="w-5 h-5 text-fuchsia-400" />}
+            label={t('blast.wavesCompleted') || 'Waves'}
+            value={results.wavesCompleted}
+            delay={1.0}
+          />
+        )}
       </div>
+
+      {/* Wave-by-wave breakdown */}
+      {(results.waveResults?.length ?? 0) > 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+          className="w-full max-w-sm mb-8"
+        >
+          <div className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2 text-center">
+            {t('blast.waveBreakdown') || 'Wave Breakdown'}
+          </div>
+          <div className="space-y-1">
+            {results.waveResults.map((wr) => (
+              <div
+                key={wr.waveNumber}
+                className="flex items-center justify-between px-3 py-1.5 bg-white/5 rounded border border-white/10 text-sm"
+              >
+                <span className="font-bold text-fuchsia-300">Wave {wr.waveNumber}</span>
+                <span className="text-white/70 tabular-nums">
+                  {wr.score} pts · {wr.wordsFound} words · {wr.clearPercentage}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Action buttons */}
       <motion.div

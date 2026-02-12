@@ -4978,7 +4978,12 @@ const en = {
     "helpRainbowLabel": "Rainbow",
     "foundWords": "Found Words",
     "noWordsLeft": "No words remaining!",
-    "shuffle": "Shuffle"
+    "shuffle": "Shuffle",
+    "morePoints": "more pts",
+    "needScore": "Need {score}",
+    "totalScore": "Total",
+    "waveBreakdown": "Wave Breakdown",
+    "wavesCompleted": "Waves"
   },
   "student": {
         "activeGame": {

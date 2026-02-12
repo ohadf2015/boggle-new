@@ -6,10 +6,12 @@ import type { BlastExplosion, BlastScorePopup } from './types';
 
 /** Varied colors per explosion type — avoids monotone orange */
 const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
-  bomb: '#FF4444',   // red
-  clear: '#FFD700',  // gold
-  word: '#00FFFF',   // cyan (was orange — now varied via palette in ExplosionEffect)
-  cascade: '#FF00FF', // magenta — distinct from player word clears
+  bomb: '#FF4444',      // red
+  clear: '#FFD700',     // gold
+  word: '#00FFFF',      // cyan (was orange — now varied via palette in ExplosionEffect)
+  cascade: '#FF00FF',   // magenta — distinct from player word clears
+  lightning: '#FFFF00', // electric yellow
+  magnet: '#8B00FF',    // purple
 };
 
 interface BlastExplosionLayerProps {

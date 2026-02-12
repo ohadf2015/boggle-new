@@ -126,6 +126,8 @@ describe('BlastResults', () => {
     bestWord: 'DOG',
     maxCombo: 3,
     stars: 2,
+    wavesCompleted: 0,
+    waveResults: [],
   };
 
   const onPlayAgain = jest.fn();

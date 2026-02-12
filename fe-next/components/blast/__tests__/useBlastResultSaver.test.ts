@@ -20,6 +20,8 @@ const mockResults: BlastResultsData = {
   bestWord: 'FISH',
   maxCombo: 3,
   stars: 2,
+  wavesCompleted: 0,
+  waveResults: [],
 };
 
 describe('useBlastResultSaver', () => {

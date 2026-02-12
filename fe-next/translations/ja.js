@@ -4983,7 +4983,12 @@ const ja = {
     "helpRainbowLabel": "レインボー",
     "foundWords": "見つけた単語",
     "noWordsLeft": "残りの単語はありません！",
-    "shuffle": "シャッフル"
+    "shuffle": "シャッフル",
+    "morePoints": "ポイント追加",
+    "needScore": "{score}必要",
+    "totalScore": "合計",
+    "waveBreakdown": "ウェーブ詳細",
+    "wavesCompleted": "ウェーブ"
   },
   "student": {
     "activeGame": {

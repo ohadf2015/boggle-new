@@ -5,8 +5,9 @@ import GridComponent from '@/components/GridComponent';
 import { BlastTileOverlay } from './BlastTileOverlay';
 import { BlastExplosionLayer } from './BlastExplosionLayer';
 import { BlastCascadeOverlay } from './BlastCascadeOverlay';
+import { BlastCascadeHighlight } from './BlastCascadeHighlight';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { BlastTileState, BlastExplosion, BlastScorePopup } from './types';
+import type { BlastTileState, BlastExplosion, BlastScorePopup, CascadeHighlightData } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 
 interface BlastGridProps {
@@ -28,6 +29,8 @@ interface BlastGridProps {
   cascadePhase: BlastCascadePhase;
   /** Cascade animation data */
   cascadeAnimationData: CascadeAnimationData | null;
+  /** Cascade highlight data (words being showcased before clearing) */
+  cascadeHighlightData: CascadeHighlightData | null;
   /** Score popups from useBlastGame */
   scorePopups: BlastScorePopup[];
   /** Callbacks */
@@ -61,6 +64,7 @@ export function BlastGrid({
   comboLevel,
   cascadePhase,
   cascadeAnimationData,
+  cascadeHighlightData,
   scorePopups,
   onWordSubmit,
   onPathSubmit,
@@ -122,6 +126,15 @@ export function BlastGrid({
           tileStates={tileStates}
           gridSize={gridSize}
           containerWidth={containerWidth}
+        />
+      )}
+
+      {/* Cascade word highlight glow (z-15, between tile overlay and cascade overlay) */}
+      {containerWidth > 0 && cascadeHighlightData && (
+        <BlastCascadeHighlight
+          highlightData={cascadeHighlightData}
+          gridSize={gridSize}
+          cellSize={cellSize}
         />
       )}
 

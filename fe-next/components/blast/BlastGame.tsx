@@ -9,9 +9,18 @@ import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDe
 import { useBlastGame } from './hooks/useBlastGame';
 import { BlastGameLayout } from './BlastGameLayout';
 import type { BlastGameConfig, BlastResultsData } from './types';
+import type { WaveConfig } from './utils/blastWaveConfig';
 
 interface BlastGameProps {
   config: BlastGameConfig;
+  /** Current wave number (1-based) */
+  waveNumber?: number;
+  /** Wave-specific config from blastWaveConfig */
+  waveConfig?: WaveConfig;
+  /** Cumulative score from previous waves */
+  cumulativeScore?: number;
+  /** Called when the board is cleared and score threshold is met */
+  onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
   onGameEnd: (results: BlastResultsData) => void;
   onQuit: () => void;
 }
@@ -23,7 +32,15 @@ interface BlastGameProps {
  * Key difference from SinglePlayerGame: no timer, no bots.
  * Word submission intercepts valid words to clear tiles.
  */
-export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
+export function BlastGame({
+  config,
+  waveNumber = 1,
+  waveConfig,
+  cumulativeScore = 0,
+  onWaveComplete,
+  onGameEnd,
+  onQuit,
+}: BlastGameProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
 
@@ -65,7 +82,7 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
   // Track last submitted path for tile clearing
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
 
-  // Direct callback when a word is accepted — replaces fragile useEffect-on-score chain
+  // Direct callback when a word is accepted
   const handleWordAccepted = useCallback((data: { word: string; score: number }) => {
     if (lastPathRef.current.length > 0) {
       blast.clearTilesForWord(lastPathRef.current, data.word, data.score);
@@ -73,10 +90,13 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
     }
   }, [blast]);
 
+  // Min word length from wave config (defaults to 2)
+  const minWordLength = waveConfig?.minWordLength ?? 2;
+
   // Word submission hook - reuses proven validation pipeline
   const wordSubmission = useWordSubmission({
     language: config.language,
-    minWordLength: 2,
+    minWordLength,
     grid: blast.modifiedGrid,
     gameStartTime: gameStartTimeRef.current,
     getScoreMultiplier: () => 1,
@@ -106,18 +126,39 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
     setFormedWord(word);
   }, []);
 
-  // Detect game completion or dead end → show results
+  // Detect game completion or dead end
   useEffect(() => {
-    if (blast.gameState.isComplete || blast.gameState.isDeadEnd) {
+    if (blast.gameState.isComplete) {
+      const { score, wordsFound, tilesCleared, totalTiles } = blast.gameState;
+      const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
+      const scoreThreshold = waveConfig?.scoreThreshold;
+
+      // Wave complete: board cleared + threshold met (or no threshold)
+      if (onWaveComplete && (!scoreThreshold || score >= scoreThreshold)) {
+        const timer = setTimeout(() => {
+          onWaveComplete(score, wordsFound, clearPct);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+
+      // Board cleared but threshold not met — game ends
       const results = blast.getResultsData(combo.maxCombo);
-      // Small delay for celebration overlay to show
       const timer = setTimeout(() => {
         onGameEnd(results);
-      }, blast.gameState.isComplete ? 2000 : 500);
+      }, 2000);
       return () => clearTimeout(timer);
     }
+
+    if (blast.gameState.isDeadEnd) {
+      const results = blast.getResultsData(combo.maxCombo);
+      const timer = setTimeout(() => {
+        onGameEnd(results);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+
     return undefined;
-  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, blast, combo.maxCombo, onGameEnd]);
+  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig]);
 
   const handleQuitRequest = useCallback(() => {
     setShowQuitConfirm(true);
@@ -148,7 +189,12 @@ export function BlastGame({ config, onGameEnd, onQuit }: BlastGameProps) {
       cascadePhase={blast.cascadePhase}
       cascadeAnimationData={blast.cascadeAnimationData}
       cascadeChainLevel={blast.cascadeChainLevel}
+      cascadeHighlightData={blast.cascadeHighlightData}
+      cascadeHighlightPhase={blast.cascadeHighlightPhase}
       gameState={blast.gameState}
+      waveNumber={waveNumber}
+      cumulativeScore={cumulativeScore}
+      scoreThreshold={waveConfig?.scoreThreshold}
       comboLevel={combo.comboLevel}
       comboTimeRemaining={combo.comboTimeRemaining}
       comboDanger={combo.isDangerState}

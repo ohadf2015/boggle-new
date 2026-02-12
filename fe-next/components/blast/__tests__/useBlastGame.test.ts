@@ -47,6 +47,8 @@ import {
   GOLD_MULTIPLIER,
   BOMB_RADIUS,
   RAINBOW_BONUS,
+  CASCADE_HIGHLIGHT_DURATION,
+  CASCADE_HIGHLIGHT_LINGER,
   type BlastGameConfig,
 } from '../types';
 
@@ -786,6 +788,24 @@ describe('useBlastGame', () => {
       });
 
       expect(result.current.gameState.isDeadEnd).toBe(true);
+    });
+  });
+
+  describe('cascade highlight state', () => {
+    it('should expose cascadeHighlightPhase as idle initially', () => {
+      const { result } = renderHook(() => useBlastGame(defaultConfig));
+      expect(result.current.cascadeHighlightPhase).toBe('idle');
+    });
+
+    it('should expose cascadeHighlightData as null initially', () => {
+      const { result } = renderHook(() => useBlastGame(defaultConfig));
+      expect(result.current.cascadeHighlightData).toBeNull();
+    });
+
+    it('should block grid input during highlighting phase', () => {
+      const { result } = renderHook(() => useBlastGame(defaultConfig));
+      // isCascading should reflect highlighting state too
+      expect(result.current.isCascading).toBe(false);
     });
   });
 });

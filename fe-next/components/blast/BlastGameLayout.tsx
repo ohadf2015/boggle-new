@@ -14,7 +14,8 @@ import { BlastFoundWords } from './BlastFoundWords';
 import { BlastHelpModal } from './BlastHelpModal';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState } from './types';
+import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
+import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
 
@@ -31,9 +32,20 @@ interface BlastGameLayoutProps {
   cascadeAnimationData: CascadeAnimationData | null;
   /** Current cascade chain level (0 = no active chain) */
   cascadeChainLevel: number;
+  /** Cascade highlight data (words being showcased) */
+  cascadeHighlightData: CascadeHighlightData | null;
+  /** Cascade highlight phase */
+  cascadeHighlightPhase: CascadeHighlightPhase;
   // Game state
   gameState: BlastGameState;
   noWordsRemaining: boolean;
+  // Wave info
+  /** Current wave number */
+  waveNumber?: number;
+  /** Cumulative score from previous waves */
+  cumulativeScore?: number;
+  /** Score threshold for current wave (undefined = no threshold) */
+  scoreThreshold?: number;
   // Combo
   comboLevel: number;
   comboTimeRemaining: number | null;
@@ -75,7 +87,12 @@ export function BlastGameLayout({
   cascadePhase,
   cascadeAnimationData,
   cascadeChainLevel,
+  cascadeHighlightData,
+  cascadeHighlightPhase,
   gameState,
+  waveNumber = 1,
+  cumulativeScore = 0,
+  scoreThreshold,
   noWordsRemaining,
   comboLevel,
   comboTimeRemaining,
@@ -200,6 +217,20 @@ export function BlastGameLayout({
           <span className="hidden sm:inline">{t('common.quit') || 'QUIT'}</span>
         </Button>
 
+        {/* Wave badge */}
+        {waveNumber > 1 && (
+          <motion.div
+            key={waveNumber}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="px-2 py-0.5 rounded-neo border-2 border-fuchsia-400/60 bg-fuchsia-500/20"
+          >
+            <span className="font-black text-xs text-fuchsia-300 uppercase tracking-wider">
+              Wave {waveNumber}
+            </span>
+          </motion.div>
+        )}
+
         <Button
           variant="ghost"
           size="sm"
@@ -254,9 +285,23 @@ export function BlastGameLayout({
         )}
       </AnimatePresence>
 
-      {/* Cascade chain announcement */}
+      {/* Cascade word showcase banner (replaces simple text announcement) */}
       <AnimatePresence>
-        {cascadeAnnouncement && (
+        {cascadeHighlightPhase === 'highlighting' && cascadeHighlightData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute top-32 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <BlastCascadeWordBanner highlightData={cascadeHighlightData} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Fallback cascade chain announcement (when no highlight data, e.g. chain level text) */}
+      <AnimatePresence>
+        {cascadeAnnouncement && cascadeHighlightPhase !== 'highlighting' && (
           <motion.div
             initial={{ opacity: 0, scale: 0.5, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -314,6 +359,24 @@ export function BlastGameLayout({
           <BlastProgressBar cleared={tilesCleared} total={totalTiles} t={t} />
         </div>
       </div>
+
+      {/* Score threshold progress (visible on wave 3+) */}
+      {scoreThreshold && score < scoreThreshold && (
+        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
+          <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider text-center">
+            {t('blast.needScore') || 'Need'} {scoreThreshold - score} {t('blast.morePoints') || 'more pts'}
+          </div>
+        </div>
+      )}
+
+      {/* Cumulative score indicator (wave 2+) */}
+      {cumulativeScore > 0 && (
+        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
+          <div className="text-[10px] font-bold text-fuchsia-300/50 uppercase tracking-wider text-center tabular-nums">
+            {t('blast.totalScore') || 'Total'}: {(cumulativeScore + score).toLocaleString()}
+          </div>
+        </div>
+      )}
 
       {/* Word Forming Area */}
       <div className={cn(
@@ -456,6 +519,7 @@ export function BlastGameLayout({
           comboLevel={comboLevel}
           cascadePhase={cascadePhase}
           cascadeAnimationData={cascadeAnimationData}
+          cascadeHighlightData={cascadeHighlightData}
           scorePopups={scorePopups}
           onWordSubmit={onWordSubmit}
           onPathSubmit={onPathSubmit}

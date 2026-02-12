@@ -40,6 +40,26 @@ describe('generateBlastLetter', () => {
     expect(typeof letter).toBe('string');
     expect(letter.length).toBe(1);
   });
+
+  it('should produce fewer vowels with low vowelModifier', () => {
+    const vowels = new Set(['A', 'E', 'I', 'O', 'U']);
+    const iterations = 500;
+
+    // Normal vowel frequency
+    let normalVowelCount = 0;
+    for (let i = 0; i < iterations; i++) {
+      if (vowels.has(generateBlastLetter('en', 1.0))) normalVowelCount++;
+    }
+
+    // Reduced vowel frequency
+    let reducedVowelCount = 0;
+    for (let i = 0; i < iterations; i++) {
+      if (vowels.has(generateBlastLetter('en', 0.5))) reducedVowelCount++;
+    }
+
+    // Reduced should have noticeably fewer vowels (with 500 samples, this is statistically reliable)
+    expect(reducedVowelCount).toBeLessThan(normalVowelCount);
+  });
 });
 
 describe('rollSpecialType', () => {

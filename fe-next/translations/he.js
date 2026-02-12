@@ -4980,7 +4980,12 @@ const he = {
     "helpRainbowLabel": "קשת",
     "foundWords": "מילים שנמצאו",
     "noWordsLeft": "!לא נשארו מילים",
-    "shuffle": "ערבב"
+    "shuffle": "ערבב",
+    "morePoints": "נק' נוספות",
+    "needScore": "צריך {score}",
+    "totalScore": "סה\"כ",
+    "waveBreakdown": "פירוט גלים",
+    "wavesCompleted": "גלים"
   },
   "student": {
     "activeGame": {

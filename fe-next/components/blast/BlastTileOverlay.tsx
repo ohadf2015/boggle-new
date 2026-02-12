@@ -50,6 +50,18 @@ const TILE_BACKGROUNDS: Record<string, {
     shadow: 'inset 0 0 12px rgba(255,255,255,0.2), 0 0 8px rgba(200,200,255,0.15)',
     animationClass: 'blast-tile-wildcard',
   },
+  lightning: {
+    background: 'linear-gradient(135deg, rgba(255,225,0,0.45) 0%, rgba(0,191,255,0.35) 50%, rgba(255,255,0,0.4) 100%)',
+    border: '2px solid rgba(255,225,0,0.6)',
+    shadow: 'inset 0 0 16px rgba(255,255,0,0.3), 0 0 10px rgba(0,191,255,0.25)',
+    animationClass: 'blast-tile-lightning',
+  },
+  magnet: {
+    background: 'radial-gradient(circle at 40% 40%, rgba(139,0,255,0.45) 0%, rgba(255,0,64,0.35) 60%, rgba(139,0,255,0.25) 100%)',
+    border: '2px solid rgba(139,0,255,0.6)',
+    shadow: 'inset 0 0 14px rgba(139,0,255,0.3), 0 0 10px rgba(255,0,64,0.2)',
+    animationClass: 'blast-tile-magnet',
+  },
 };
 
 /**

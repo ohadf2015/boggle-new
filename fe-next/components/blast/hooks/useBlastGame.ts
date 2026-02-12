@@ -13,12 +13,16 @@ import {
   BOMB_RADIUS,
   RAINBOW_BONUS,
   CHAIN_BOMB_STAGGER,
+  LIGHTNING_COLUMN_CLEAR_BONUS,
+  MAGNET_ATTRACT_BONUS,
   SPECIAL_TILE_DISTRIBUTION,
   MAX_CASCADE_CHAIN,
   MAX_CASCADE_WORDS_PER_LEVEL,
   CASCADE_MIN_WORD_LENGTH,
   CASCADE_DETECTION_DELAY,
   CASCADE_CHAIN_BONUS_MULTIPLIER,
+  CASCADE_HIGHLIGHT_DURATION,
+  CASCADE_HIGHLIGHT_LINGER,
   type BlastGameConfig,
   type BlastGameState,
   type BlastTileState,
@@ -26,6 +30,8 @@ import {
   type BlastResultsData,
   type BlastExplosion,
   type BlastScorePopup,
+  type CascadeHighlightPhase,
+  type CascadeHighlightData,
 } from '../types';
 import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
 
@@ -40,14 +46,30 @@ function seededRandom(seed: number): () => number {
   };
 }
 
+/** Roll a special tile type from a distribution map using a given random value */
+function rollSpecialFromDistribution(
+  roll: number,
+  dist: Record<string, number>,
+): BlastTileType {
+  let cumulative = 0;
+  for (const [tileType, weight] of Object.entries(dist)) {
+    if (weight <= 0) continue;
+    cumulative += weight;
+    if (roll < cumulative) return tileType as BlastTileType;
+  }
+  return 'wildcard'; // Fallback (catches rounding errors)
+}
+
 /** Generate initial tile states with special tile placement */
 function generateTileStates(
   gridSize: number,
   specialTileChance: number,
-  seed: number = Date.now()
+  seed: number = Date.now(),
+  customDistribution?: Record<string, number>,
 ): BlastTileState[][] {
   const random = seededRandom(seed);
   const tiles: BlastTileState[][] = [];
+  const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
 
   for (let row = 0; row < gridSize; row++) {
     tiles[row] = [];
@@ -55,19 +77,7 @@ function generateTileStates(
       let type: BlastTileType = 'standard';
 
       if (random() < specialTileChance) {
-        const roll = random();
-        const { gold, bomb, rainbow, ice } = SPECIAL_TILE_DISTRIBUTION;
-        if (roll < gold) {
-          type = 'gold';
-        } else if (roll < gold + bomb) {
-          type = 'bomb';
-        } else if (roll < gold + bomb + rainbow) {
-          type = 'rainbow';
-        } else if (roll < gold + bomb + rainbow + ice) {
-          type = 'ice';
-        } else {
-          type = 'wildcard';
-        }
+        type = rollSpecialFromDistribution(random(), dist);
       }
 
       tiles[row][col] = {
@@ -134,6 +144,10 @@ export interface UseBlastGameReturn {
   cascadeAnimationData: CascadeAnimationData | null;
   /** Current cascade chain level (0 = no active chain) */
   cascadeChainLevel: number;
+  /** Cascade highlight phase (idle or highlighting) */
+  cascadeHighlightPhase: CascadeHighlightPhase;
+  /** Cascade highlight data (words being showcased before clearing) */
+  cascadeHighlightData: CascadeHighlightData | null;
   // Legacy alias
   modifiedGrid: LetterGrid | null;
 }
@@ -156,7 +170,7 @@ export function useBlastGame(
   config: BlastGameConfig = DEFAULT_BLAST_CONFIG,
   options?: UseBlastGameOptions,
 ): UseBlastGameReturn {
-  const { gridSize, specialTileChance, language, difficulty = 'medium' } = config;
+  const { gridSize, specialTileChance, language, difficulty = 'medium', customDistribution } = config;
 
   // Reuse grid generation from singleplayer, with blast gridSize override
   const {
@@ -175,7 +189,7 @@ export function useBlastGame(
 
   // Tile state management
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() =>
-    generateTileStates(gridSize, specialTileChance)
+    generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution)
   );
 
   // Game state
@@ -199,6 +213,11 @@ export function useBlastGame(
   // Track best word and total words cleared for results
   const bestWordRef = useRef<string>('');
   const totalWordsClearedRef = useRef(0);
+
+  // Cascade highlight state — visible glow before tiles clear
+  const [cascadeHighlightPhase, setCascadeHighlightPhase] = useState<CascadeHighlightPhase>('idle');
+  const [cascadeHighlightData, setCascadeHighlightData] = useState<CascadeHighlightData | null>(null);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cascade chain refs (avoid re-renders + break circular useCallback dependency)
   const cascadeChainLevelRef = useRef(0);
@@ -265,76 +284,91 @@ export function useBlastGame(
           const chainLevel = cascadeChainLevelRef.current + 1;
           cascadeChainLevelRef.current = chainLevel;
 
-          // Collect all paths and calculate scores
-          const allPaths: Array<{ row: number; col: number }> = [];
-          const newExplosions: BlastExplosion[] = [];
-          const now = Date.now();
-          let totalCascadeScore = 0;
-          let newlyClearedCount = 0;
-          const cascadeWords: string[] = [];
-
-          // Deep-copy tile states for mutation
-          const nextTileStates = newTileStates.map(row => row.map(tile => ({ ...tile })));
-
-          for (const vw of verticalWords) {
+          // Pre-calculate scores for highlight banners
+          const highlightWords = verticalWords.map(vw => {
             const baseScore = vw.word.length - 1;
             const chainBonus = Math.floor(baseScore * chainLevel * CASCADE_CHAIN_BONUS_MULTIPLIER);
-            const wordScore = baseScore + chainBonus;
-            totalCascadeScore += wordScore;
-            cascadeWords.push(vw.word);
+            return {
+              word: vw.word,
+              path: vw.path,
+              score: baseScore + chainBonus,
+              chainLevel,
+            };
+          });
 
-            // Clear tiles in the vertical word
-            for (const cell of vw.path) {
-              if (!nextTileStates[cell.row][cell.col].isCleared) {
-                nextTileStates[cell.row][cell.col].isCleared = true;
-                newlyClearedCount++;
+          // Show cascade highlight overlay (glow + banner)
+          setCascadeHighlightData({ words: highlightWords });
+          setCascadeHighlightPhase('highlighting');
+          setIsAutoDetecting(false);
+
+          // After showcase duration, clear tiles and trigger next cascade
+          if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+          highlightTimerRef.current = setTimeout(() => {
+            // Now actually clear the tiles
+            const newExplosions: BlastExplosion[] = [];
+            const now = Date.now();
+            let totalCascadeScore = 0;
+            let newlyClearedCount = 0;
+            const cascadeWords: string[] = [];
+
+            const nextTileStates = newTileStates.map(row => row.map(tile => ({ ...tile })));
+
+            for (const vw of verticalWords) {
+              const baseScore = vw.word.length - 1;
+              const chainBonus = Math.floor(baseScore * chainLevel * CASCADE_CHAIN_BONUS_MULTIPLIER);
+              const wordScore = baseScore + chainBonus;
+              totalCascadeScore += wordScore;
+              cascadeWords.push(vw.word);
+
+              for (const cell of vw.path) {
+                if (!nextTileStates[cell.row][cell.col].isCleared) {
+                  nextTileStates[cell.row][cell.col].isCleared = true;
+                  newlyClearedCount++;
+                }
               }
-              allPaths.push(cell);
+
+              const midIdx = Math.floor(vw.path.length / 2);
+              newExplosions.push({
+                id: `cascade-${now}-${vw.column}-${vw.startRow}`,
+                row: vw.path[midIdx].row,
+                col: vw.path[midIdx].col,
+                type: 'cascade',
+                intensity: 1,
+                timestamp: now,
+              });
+
+              setScorePopups(prev => [...prev, {
+                id: `cascade-score-${now}-${vw.column}-${vw.startRow}`,
+                score: wordScore,
+                row: vw.path[midIdx].row,
+                col: vw.path[midIdx].col,
+                isSpecial: true,
+                timestamp: now,
+              }]);
+
+              onAutoCascadeWordRef.current?.(vw.word, wordScore, chainLevel);
             }
 
-            // Cascade explosion at word midpoint — capped at intensity 1
-            // to keep auto-detected cascades visually light (player words get full intensity)
-            const midIdx = Math.floor(vw.path.length / 2);
-            newExplosions.push({
-              id: `cascade-${now}-${vw.column}-${vw.startRow}`,
-              row: vw.path[midIdx].row,
-              col: vw.path[midIdx].col,
-              type: 'cascade',
-              intensity: 1,
-              timestamp: now,
-            });
+            setGameState(prev => ({
+              ...prev,
+              score: prev.score + totalCascadeScore,
+              wordsFound: [...prev.wordsFound, ...cascadeWords],
+              tilesCleared: prev.tilesCleared + newlyClearedCount,
+              cascadeChainLevel: chainLevel,
+            }));
 
-            // Score popup
-            setScorePopups(prev => [...prev, {
-              id: `cascade-score-${now}-${vw.column}-${vw.startRow}`,
-              score: wordScore,
-              row: vw.path[midIdx].row,
-              col: vw.path[midIdx].col,
-              isSpecial: true,
-              timestamp: now,
-            }]);
+            setExplosions(prev => [...prev, ...newExplosions]);
+            setTileStates(nextTileStates);
 
-            // Notify parent
-            onAutoCascadeWordRef.current?.(vw.word, wordScore, chainLevel);
-          }
+            // Clear highlight state
+            setCascadeHighlightPhase('idle');
+            setCascadeHighlightData(null);
 
-          // Update game state
-          setGameState(prev => ({
-            ...prev,
-            score: prev.score + totalCascadeScore,
-            wordsFound: [...prev.wordsFound, ...cascadeWords],
-            tilesCleared: prev.tilesCleared + newlyClearedCount,
-            cascadeChainLevel: chainLevel,
-          }));
-
-          setExplosions(prev => [...prev, ...newExplosions]);
-          setTileStates(nextTileStates);
-
-          // Trigger next cascade (gravity + refill) for the newly cleared tiles
-          setIsAutoDetecting(false);
-          setTimeout(() => {
-            cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current);
-          }, 80);
+            // Trigger next cascade (gravity + refill)
+            setTimeout(() => {
+              cascade.startCascade(newGrid, nextTileStates, handleCascadeCompleteRef.current);
+            }, 80);
+          }, CASCADE_HIGHLIGHT_DURATION + CASCADE_HIGHLIGHT_LINGER);
         } else {
           // No cascade words found — reset chain
           cascadeChainLevelRef.current = 0;
@@ -355,9 +389,10 @@ export function useBlastGame(
   // Dead-end detection state
   const [noWordsRemaining, setNoWordsRemaining] = useState(false);
 
-  // Cleanup auto-detect timer on unmount
+  // Cleanup timers on unmount
   useEffect(() => () => {
     if (autoDetectTimerRef.current) clearTimeout(autoDetectTimerRef.current);
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
   }, []);
 
   // Auto-complete when cumulative tilesCleared reaches the board size
@@ -416,12 +451,18 @@ export function useBlastGame(
   ) => {
     // New player word = new cascade chain
     cascadeChainLevelRef.current = 0;
-    // Cancel any pending auto-detection from a previous cascade
+    // Cancel any pending auto-detection or highlight from a previous cascade
     if (autoDetectTimerRef.current) {
       clearTimeout(autoDetectTimerRef.current);
       autoDetectTimerRef.current = null;
     }
+    if (highlightTimerRef.current) {
+      clearTimeout(highlightTimerRef.current);
+      highlightTimerRef.current = null;
+    }
     setIsAutoDetecting(false);
+    setCascadeHighlightPhase('idle');
+    setCascadeHighlightData(null);
 
     setTileStates(prev => {
       const next = prev.map(row => row.map(tile => ({ ...tile })));
@@ -516,6 +557,52 @@ export function useBlastGame(
           case 'ice':
             // Ice tile on final hit — already cleared above
             break;
+
+          case 'lightning': {
+            // Lightning clears entire column
+            newExplosions.push({
+              id: `lightning-${now}-${cell.row}-${cell.col}`,
+              row: cell.row, col: cell.col, type: 'lightning', intensity: 3, timestamp: now,
+            });
+            for (let r = 0; r < gridSize; r++) {
+              if (r === cell.row) continue; // Skip the lightning tile itself (already cleared)
+              const target = next[r][cell.col];
+              if (target.isCleared) continue;
+              if (target.type === 'ice' && target.hitsRemaining > 1) {
+                target.hitsRemaining--;
+                target.activationEffect = 'ice-crack';
+              } else {
+                target.isCleared = true;
+                newlyClearedCount++;
+                bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+              }
+            }
+            break;
+          }
+
+          case 'magnet': {
+            // Magnet attracts (clears) adjacent wildcard tiles
+            newExplosions.push({
+              id: `magnet-${now}-${cell.row}-${cell.col}`,
+              row: cell.row, col: cell.col, type: 'magnet', intensity: 2, timestamp: now,
+            });
+            for (let dr = -1; dr <= 1; dr++) {
+              for (let dc = -1; dc <= 1; dc++) {
+                if (dr === 0 && dc === 0) continue;
+                const r = cell.row + dr;
+                const c = cell.col + dc;
+                if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+                  const target = next[r][c];
+                  if (!target.isCleared && target.type === 'wildcard') {
+                    target.isCleared = true;
+                    newlyClearedCount++;
+                    bonusScore += MAGNET_ATTRACT_BONUS;
+                  }
+                }
+              }
+            }
+            break;
+          }
         }
       }
 
@@ -581,7 +668,7 @@ export function useBlastGame(
   }, []);
 
   /** Generate results data for the results screen */
-  const getResultsData = useCallback((maxCombo: number): BlastResultsData => {
+  const getResultsData = useCallback((maxCombo: number, wavesCompleted = 0, waveResults: import('../types').WaveResult[] = []): BlastResultsData => {
     const { score, wordsFound, tilesCleared, totalTiles } = gameState;
     // In gravity mode, tilesCleared accumulates total cleared across all cascades
     const clearPercentage = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
@@ -595,6 +682,8 @@ export function useBlastGame(
       bestWord: bestWordRef.current || (wordsFound[0] ?? ''),
       maxCombo,
       stars: calculateStars(clearPercentage),
+      wavesCompleted,
+      waveResults,
     };
   }, [gameState]);
 
@@ -625,8 +714,10 @@ export function useBlastGame(
     dismissExplosion,
     dismissScorePopup,
     cascadePhase: cascade.cascadePhase,
-    isCascading: cascade.isAnimating || isAutoDetecting,
+    isCascading: cascade.isAnimating || isAutoDetecting || cascadeHighlightPhase === 'highlighting',
     cascadeAnimationData: cascade.animationData,
     cascadeChainLevel: gameState.cascadeChainLevel,
+    cascadeHighlightPhase,
+    cascadeHighlightData,
   };
 }

@@ -5004,7 +5004,12 @@ const sv = {
     "helpRainbowLabel": "Regnbåge",
     "foundWords": "Hittade ord",
     "noWordsLeft": "Inga ord kvar!",
-    "shuffle": "Blanda"
+    "shuffle": "Blanda",
+    "morePoints": "fler poäng",
+    "needScore": "Behöver {score}",
+    "totalScore": "Totalt",
+    "waveBreakdown": "Vågöversikt",
+    "wavesCompleted": "Vågor"
   },
   "student": {
     "activeGame": {

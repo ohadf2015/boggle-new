@@ -2,8 +2,8 @@ import type { Language } from '@/shared/types/game';
 
 // ==================== Tile Types ====================
 
-/** Tile types for blast mode (standard + 5 special) */
-export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow' | 'ice' | 'wildcard';
+/** Tile types for blast mode (standard + 7 special) */
+export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow' | 'ice' | 'wildcard' | 'lightning' | 'magnet';
 
 /** Per-cell state tracked alongside the LetterGrid */
 export interface BlastTileState {
@@ -56,6 +56,8 @@ export interface BlastGameConfig {
   language: Language;
   /** Difficulty level */
   difficulty?: BlastDifficulty;
+  /** Custom special tile distribution (overrides default). Used by wave system. */
+  customDistribution?: Record<string, number>;
 }
 
 export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
@@ -65,7 +67,7 @@ export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
   difficulty: 'medium',
 };
 
-export type BlastPhase = 'playing' | 'results';
+export type BlastPhase = 'playing' | 'waveTransition' | 'results';
 
 export interface BlastGameState {
   score: number;
@@ -80,6 +82,14 @@ export interface BlastGameState {
   cascadeChainLevel: number;
 }
 
+/** Per-wave summary for results breakdown */
+export interface WaveResult {
+  waveNumber: number;
+  score: number;
+  wordsFound: number;
+  clearPercentage: number;
+}
+
 // ==================== Results ====================
 
 export interface BlastResultsData {
@@ -92,6 +102,10 @@ export interface BlastResultsData {
   maxCombo: number;
   /** 1-3 stars based on clear percentage */
   stars: 1 | 2 | 3;
+  /** Number of waves completed (0 = failed on wave 1) */
+  wavesCompleted: number;
+  /** Per-wave breakdown for results screen */
+  waveResults: WaveResult[];
 }
 
 // ==================== Special Tile Effects ====================
@@ -104,6 +118,10 @@ export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 export const RAINBOW_BONUS = 5;
 /** Stagger delay (ms) between chain bomb explosions for visual ripple */
 export const CHAIN_BOMB_STAGGER = 120;
+/** Bonus per tile cleared by lightning strike (+1 per tile in column) */
+export const LIGHTNING_COLUMN_CLEAR_BONUS = 1;
+/** Bonus per wildcard attracted by magnet tile (+3 per wildcard) */
+export const MAGNET_ATTRACT_BONUS = 3;
 
 // ==================== Cascade Chain Constants ====================
 
@@ -114,17 +132,44 @@ export const MAX_CASCADE_WORDS_PER_LEVEL = 2;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
 export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles */
-export const CASCADE_DETECTION_DELAY = 400;
+export const CASCADE_DETECTION_DELAY = 700;
 /** Bonus multiplier per chain level: base * chainLevel * this */
 export const CASCADE_CHAIN_BONUS_MULTIPLIER = 0.5;
 
-/** Distribution of special tiles (must sum to 1.0) */
+// ==================== Cascade Highlight Constants ====================
+
+/** Duration (ms) cascade words stay highlighted on grid before clearing */
+export const CASCADE_HIGHLIGHT_DURATION = 800;
+/** Brief pause (ms) after banner before tiles clear */
+export const CASCADE_HIGHLIGHT_LINGER = 200;
+
+// ==================== Cascade Highlight Types ====================
+
+/** Phase of cascade word showcasing */
+export type CascadeHighlightPhase = 'idle' | 'highlighting';
+
+/** Data for a single cascade word being highlighted */
+export interface CascadeHighlightWord {
+  word: string;
+  path: Array<{ row: number; col: number }>;
+  score: number;
+  chainLevel: number;
+}
+
+/** Aggregate data for all cascade words being highlighted at once */
+export interface CascadeHighlightData {
+  words: CascadeHighlightWord[];
+}
+
+/** Default distribution of special tiles (must sum to 1.0). Lightning/magnet are wave-gated. */
 export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'>, number> = {
   gold: 0.22,
   bomb: 0.22,
   rainbow: 0.22,
   ice: 0.17,
   wildcard: 0.17,
+  lightning: 0,
+  magnet: 0,
 };
 
 // ==================== Animation Events ====================
@@ -133,7 +178,7 @@ export interface BlastExplosion {
   id: string;
   row: number;
   col: number;
-  type: 'word' | 'bomb' | 'clear' | 'cascade';
+  type: 'word' | 'bomb' | 'clear' | 'cascade' | 'lightning' | 'magnet';
   intensity: 1 | 2 | 3 | 4;
   timestamp: number;
 }

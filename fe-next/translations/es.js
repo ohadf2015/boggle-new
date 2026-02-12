@@ -5035,7 +5035,12 @@ const es = {
     "helpRainbowLabel": "Arcoíris",
     "foundWords": "Palabras encontradas",
     "noWordsLeft": "¡No quedan palabras!",
-    "shuffle": "Mezclar"
+    "shuffle": "Mezclar",
+    "morePoints": "más pts",
+    "needScore": "Necesitas {score}",
+    "totalScore": "Total",
+    "waveBreakdown": "Desglose de oleadas",
+    "wavesCompleted": "Oleadas"
   },
   "student": {
     "dashboard": {
