@@ -3,12 +3,11 @@ import { render, screen } from '@testing-library/react';
 import type { CascadeHighlightData } from '../types';
 
 // Mock framer-motion
+const MockMotionDiv = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
+  return <div ref={ref} {...rest}>{children}</div>;
+});
 jest.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, ...rest }: any, ref: any) => (
-      <div ref={ref} {...rest}>{children}</div>
-    )),
-  },
+  motion: { div: MockMotionDiv },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
