@@ -3,13 +3,16 @@ import { render, screen } from '@testing-library/react';
 import type { CascadeHighlightData } from '../types';
 
 // Mock framer-motion
-const MockMotionDiv = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
-  return <div ref={ref} {...rest}>{children}</div>;
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const Div = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
+    return React.createElement('div', { ref, ...rest }, children);
+  });
+  return {
+    motion: { div: Div },
+    AnimatePresence: ({ children }: any) => children,
+  };
 });
-jest.mock('framer-motion', () => ({
-  motion: { div: MockMotionDiv },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
 
 import { BlastCascadeWordBanner } from '../BlastCascadeWordBanner';
 
