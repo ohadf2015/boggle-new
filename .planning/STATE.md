@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 39 of 43 (Real-Time Duels) — VERIFIED COMPLETE
-Plan: 5 of 5 in current phase (all complete)
-Status: Phase goal verified (4/4 must-haves). Ready for Phase 40.
-Last activity: 2026-02-13 — Phase 39 verified and complete
+Phase: 40 of 43 (Gamification Enhancements) — IN PROGRESS
+Plan: 1 of 4 in current phase (foundation complete)
+Status: Database foundation ready. Plans 02-04 can proceed.
+Last activity: 2026-02-14 — Completed 40-01-PLAN.md
 
-Progress: [█████████████] ~50% (4/8 phases complete)
+Progress: [█████████████░] ~50% (4/8 phases complete, 1/4 plans in phase 40)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
-- Average duration: 14 min
-- Total execution time: 348 min
+- Total plans completed: 26
+- Average duration: 13 min
+- Total execution time: 350 min
 
 **By Phase:**
 
@@ -31,14 +31,12 @@ Progress: [█████████████] ~50% (4/8 phases complete)
 | 37 | 6 | 46 min | 8 min |
 | 38 | 8 | 83 min | 10 min |
 | 39 | 5 | 71 min | 14 min |
+| 40 | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 39-01 (25 min), 39-02 (24 min), 39-03 (7 min), 39-04 (9 min), 39-05 (6 min)
-- Phase 39 COMPLETE: 5 plans in 4 waves, 71 min total
-- Wave 1 parallel: realtime handlers + disconnection handlers (25+24 min)
-- Wave 2: registry wiring + hook extension (7 min)
-- Wave 3: 4 UI components with tests (9 min)
-- Wave 4: lobby integration + 29 translation keys × 4 languages + human verification (6 min)
+- Last 5 plans: 39-02 (24 min), 39-03 (7 min), 39-04 (9 min), 39-05 (6 min), 40-01 (2 min)
+- Phase 40 IN PROGRESS: 1/4 plans, 2 min so far
+- 40-01: Database foundation (leaderboard snapshots + 10 achievements + types)
 
 *Updated after each plan completion*
 
@@ -124,6 +122,11 @@ Recent decisions affecting current work:
 - **39-04:** Pending→accepted/rejected word status transitions (immediate feedback, server validates async)
 - **39-04:** Three UI sub-components pattern (OpponentProgressBar, DuelDisconnectOverlay, ForfeitConfirmDialog)
 - **39-04:** Animated split progress bar with Framer Motion spring (live score comparison, playful motion)
+- **40-01:** UNIQUE constraint instead of WITHOUT OVERLAPS for leaderboard snapshots (PostgreSQL 18+ feature not yet available)
+- **40-01:** Service role only for snapshot insert/update (server-controlled, prevents client tampering)
+- **40-01:** Four-tier achievement system (bronze → silver → gold → platinum with increasing thresholds)
+- **40-01:** Duel achievements track: wins, streak, comebacks, speed, veteran status
+- **40-01:** Practice achievements track: spelling accuracy, matching speed, blitz scores, streaks, mode variety
 
 ### Pending Todos
 
@@ -132,10 +135,11 @@ None yet.
 ### Blockers/Concerns
 
 - Pre-existing build error: utils/supabase/server.ts uses next/headers in client component context (not related to Phase 37)
+- **40-01:** Migration file created but NOT yet applied to database (requires Supabase credentials or MCP tools)
 
 ## Session Continuity
 
-Last session: 2026-02-13
-Stopped at: Phase 39 complete and verified
+Last session: 2026-02-14
+Stopped at: Completed 40-01-PLAN.md (database foundation)
 Resume file: None
-Next action: Plan Phase 40 (Gamification Enhancements)
+Next action: Execute 40-02 (Daily Challenges) or 40-03 (Weekly Quests) - both independent
