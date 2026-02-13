@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 38 of 43 (Async Duels) — IN PROGRESS
-Plan: 6 of 6 in current phase (just completed)
-Status: UI components complete (DuelGameView + DuelHistory)
-Last activity: 2026-02-13 — Completed 38-06-PLAN.md (UI Components)
+Plan: 5 of 6 in current phase (just completed)
+Status: Lobby and challenge UI complete
+Last activity: 2026-02-13 — Completed 38-05-PLAN.md (Duel Lobby UI)
 
 Progress: [████████░░] ~23%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 13 min
-- Total execution time: 231 min
+- Total execution time: 243 min
 
 **By Phase:**
 
@@ -29,13 +29,13 @@ Progress: [████████░░] ~23%
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
-| 38 | 5 | 44 min | 9 min |
+| 38 | 6 | 56 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 38-01 (4 min), 38-02 (8 min), 38-03 (9 min), 38-04 (16 min), 38-06 (7 min)
+- Last 5 plans: 38-02 (8 min), 38-03 (9 min), 38-04 (16 min), 38-05 (12 min), 38-06 (7 min)
 - Trend: Phase 38 averaging 9 min (consistent velocity)
-- TDD producing comprehensive test coverage (56 tests total: 39 previous + 17 new)
-- Socket.IO event listeners with cleanup pattern established
+- TDD producing comprehensive test coverage (84 tests total: 56 previous + 28 new)
+- UI component pattern established (Lobby, Modal, Notification)
 
 *Updated after each plan completion*
 
@@ -92,6 +92,10 @@ Recent decisions affecting current work:
 - **38-04:** In-memory lobby tracking acceptable for single-server deployment (Map-based, no Redis needed yet)
 - **38-04:** Event listener cleanup pattern: on* methods return unsubscribe function (React useEffect compatible)
 - **38-04:** Lobby state vs update: New joiner gets full state, others get delta (bandwidth optimization)
+- **38-05:** Modal overlay pattern with fixed positioning for challenge modal
+- **38-05:** Toast position: bottom-right desktop, top-right mobile (non-blocking)
+- **38-05:** 30-second auto-dismiss for challenge notifications
+- **38-05:** Quick Match uses random opponent selection (simple, fair)
 - **38-06:** Text input for word finding (not drag-based) - simplifies async duel UX
 - **38-06:** Score displayed only after submission (not during play) - focus on word finding, server validates
 - **38-06:** Win rate calculated client-side (simple formula, no server needed)
@@ -107,6 +111,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 38-06-PLAN.md (UI Components)
+Stopped at: Completed 38-05-PLAN.md (Duel Lobby UI)
 Resume file: None
-Next action: Phase 38 complete (6/6 plans done). Ready for next phase.
+Next action: Execute 38-06-PLAN.md (Full Duel Flow Integration)
