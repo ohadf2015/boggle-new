@@ -10,31 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 37 of 43 (Practice Modes) — IN PROGRESS
-Plan: 1 of 4 in current phase
-Status: Foundation complete, ready for component implementation
-Last activity: 2026-02-13 — Completed 37-01-PLAN.md (dnd-kit, practice CRUD, XP calculations)
+Plan: 2 of 4 in current phase
+Status: Word matching complete, spelling and blitz in progress
+Last activity: 2026-02-13 — Completed 37-02-PLAN.md (Word Matching Practice with dnd-kit)
 
-Progress: [█████░░░░░] ~13%
+Progress: [█████░░░░░] ~14%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 25 min
-- Total execution time: 146 min
+- Total plans completed: 7
+- Average duration: 22 min
+- Total execution time: 153 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
-| 37 | 1 | 5 min | 5 min |
+| 37 | 2 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 36-03 (17 min), 36-04 (20 min), 36-05 (20 min), 36-02 (40 min), 37-01 (5 min)
-- Trend: Phase 37-01 very fast due to pure foundation work (no UI, no complex logic)
-- TDD approach with tests-first made implementation straightforward
-- Wave 1 foundation complete, ready for parallel component implementation
+- Last 5 plans: 36-04 (20 min), 36-05 (20 min), 36-02 (40 min), 37-01 (5 min), 37-02 (7 min)
+- Trend: Phase 37 plans very fast with TDD approach - tests-first reduces debugging time
+- Word matching (37-02) implemented in 7 min with full test coverage
+- dnd-kit pattern established, ready for reuse in other modes
 
 *Updated after each plan completion*
 
@@ -65,6 +65,9 @@ Recent decisions affecting current work:
 - **37-01:** Separate usePracticeSessionNew hook instead of extending existing (different patterns)
 - **37-01:** Client-side accuracy calculation for immediate XP feedback (server validates)
 - **37-01:** Simplified spelling accuracy: wordsSpelled/10 for threshold checking
+- **37-02:** checkMatch signature uses definitionText (not definitionId) for simpler API
+- **37-02:** touch-action: none on draggable items for iOS scroll prevention
+- **37-02:** Component memoization pattern for drag-and-drop sub-components
 
 ### Pending Todos
 
@@ -77,6 +80,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 37-01-PLAN.md (Practice Foundation)
+Stopped at: Completed 37-02-PLAN.md (Word Matching Practice)
 Resume file: None
-Next action: Execute 37-02 (Word Matching), 37-03 (Spelling), 37-04 (Blitz) - can run in parallel (Wave 1)
+Next action: Execute 37-03 (Spelling Practice) or 37-04 (Blitz Practice) - can run in parallel (Wave 2)
