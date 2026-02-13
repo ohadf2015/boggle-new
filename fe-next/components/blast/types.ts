@@ -2,8 +2,8 @@ import type { Language } from '@/shared/types/game';
 
 // ==================== Tile Types ====================
 
-/** Tile types for blast mode (standard + 7 special) */
-export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow' | 'ice' | 'wildcard' | 'lightning' | 'magnet';
+/** Tile types for blast mode (standard + 10 special) */
+export type BlastTileType = 'standard' | 'gold' | 'bomb' | 'rainbow' | 'ice' | 'wildcard' | 'lightning' | 'magnet' | 'prism' | 'gem' | 'frozen';
 
 /** Per-cell state tracked alongside the LetterGrid */
 export interface BlastTileState {
@@ -122,15 +122,23 @@ export const CHAIN_BOMB_STAGGER = 120;
 export const LIGHTNING_COLUMN_CLEAR_BONUS = 1;
 /** Bonus per wildcard attracted by magnet tile (+3 per wildcard) */
 export const MAGNET_ATTRACT_BONUS = 3;
+/** Bonus per word a prism tile is used in (before detonation) */
+export const PRISM_USE_BONUS = 2;
+/** Bonus when prism detonates (cross-clear) */
+export const PRISM_CROSS_BONUS = 5;
+/** Bonus per word a gem tile is used in */
+export const GEM_USE_BONUS = 3;
+/** Bonus when gem is finally collected (cleared) */
+export const GEM_COLLECT_BONUS = 8;
 
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 3;
+export const MAX_CASCADE_CHAIN = 2;
 /** Maximum vertical words cleared per cascade level (limits simultaneous explosions) */
-export const MAX_CASCADE_WORDS_PER_LEVEL = 2;
+export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
-export const CASCADE_MIN_WORD_LENGTH = 4;
+export const CASCADE_MIN_WORD_LENGTH = 5;
 /** Delay (ms) before scanning for cascade words after grid settles */
 export const CASCADE_DETECTION_DELAY = 700;
 /** Bonus multiplier per chain level: base * chainLevel * this */
@@ -161,7 +169,7 @@ export interface CascadeHighlightData {
   words: CascadeHighlightWord[];
 }
 
-/** Default distribution of special tiles (must sum to 1.0). Lightning/magnet are wave-gated. */
+/** Default distribution of special tiles (must sum to 1.0). Wave-gated tiles start at 0. */
 export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'>, number> = {
   gold: 0.22,
   bomb: 0.22,
@@ -170,6 +178,9 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   wildcard: 0.17,
   lightning: 0,
   magnet: 0,
+  prism: 0,
+  gem: 0,
+  frozen: 0,
 };
 
 // ==================== Animation Events ====================
@@ -178,7 +189,7 @@ export interface BlastExplosion {
   id: string;
   row: number;
   col: number;
-  type: 'word' | 'bomb' | 'clear' | 'cascade' | 'lightning' | 'magnet';
+  type: 'word' | 'bomb' | 'clear' | 'cascade' | 'lightning' | 'magnet' | 'prism' | 'gem';
   intensity: 1 | 2 | 3 | 4;
   timestamp: number;
 }

@@ -10,6 +10,7 @@ import { useBlastGame } from './hooks/useBlastGame';
 import { BlastGameLayout } from './BlastGameLayout';
 import type { BlastGameConfig, BlastResultsData } from './types';
 import type { WaveConfig } from './utils/blastWaveConfig';
+import { getComboMultiplier } from '@/shared/utils/scoring';
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -99,7 +100,7 @@ export function BlastGame({
     minWordLength,
     grid: blast.modifiedGrid,
     gameStartTime: gameStartTimeRef.current,
-    getScoreMultiplier: () => 1,
+    getScoreMultiplier: () => getComboMultiplier(combo.comboLevel),
     fireRoundActive: false,
     combo,
     spamDetection,

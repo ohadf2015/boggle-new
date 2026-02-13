@@ -8,11 +8,22 @@ interface BlastCascadeWordBannerProps {
   highlightData: CascadeHighlightData | null;
 }
 
-/** Gradient class by chain level — intensity scales with chain depth */
+/** Chain color escalation: green → blue → purple → gold+sparkle */
 function getBannerGradient(chainLevel: number): string {
+  if (chainLevel >= 5) return 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500';
   if (chainLevel >= 4) return 'bg-gradient-to-r from-fuchsia-500 via-cyan-400 to-purple-500';
+  if (chainLevel >= 3) return 'bg-gradient-to-r from-blue-500 to-indigo-600';
   if (chainLevel >= 2) return 'bg-gradient-to-r from-fuchsia-500 to-purple-600';
-  return 'bg-gradient-to-r from-fuchsia-400 to-purple-500';
+  return 'bg-gradient-to-r from-emerald-500 to-green-600';
+}
+
+/** Chain badge color by level */
+function getChainBadgeStyle(chainLevel: number): string {
+  if (chainLevel >= 5) return 'bg-yellow-900/50 text-yellow-200 border-yellow-400/50';
+  if (chainLevel >= 4) return 'bg-purple-900/50 text-purple-200 border-purple-400/50';
+  if (chainLevel >= 3) return 'bg-blue-900/50 text-blue-200 border-blue-400/50';
+  if (chainLevel >= 2) return 'bg-fuchsia-900/50 text-fuchsia-200 border-fuchsia-400/50';
+  return 'bg-emerald-900/50 text-emerald-200 border-emerald-400/50';
 }
 
 /**
@@ -34,24 +45,30 @@ export function BlastCascadeWordBanner({ highlightData }: BlastCascadeWordBanner
           exit={{ opacity: 0, scale: 1.3, y: -10 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20, delay: idx * 0.1 }}
           className={cn(
-            'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard',
+            'px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-lg',
             'flex items-center gap-3 text-white',
             getBannerGradient(wordData.chainLevel),
             idx > 0 ? 'mt-2' : '',
           )}
+          style={{
+            transform: `rotate(${wordData.chainLevel >= 3 ? '-1' : '1'}deg)`,
+          }}
         >
           {/* Word text */}
-          <span className="font-black text-xl uppercase tracking-wider">
+          <span className="font-black text-xl uppercase tracking-wider drop-shadow-md">
             {wordData.word.toUpperCase()}
           </span>
 
-          {/* Chain level badge */}
-          <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider whitespace-nowrap">
-            CHAIN x{wordData.chainLevel}
+          {/* Chain level badge — escalating color */}
+          <span className={cn(
+            'px-2.5 py-1 rounded-neo border-2 text-xs font-black uppercase tracking-wider whitespace-nowrap',
+            getChainBadgeStyle(wordData.chainLevel),
+          )}>
+            x{wordData.chainLevel}
           </span>
 
           {/* Score */}
-          <span className="font-black text-lg tabular-nums">
+          <span className="font-black text-lg tabular-nums drop-shadow-md">
             +{wordData.score}
           </span>
         </motion.div>

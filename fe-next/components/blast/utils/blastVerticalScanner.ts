@@ -50,7 +50,9 @@ export function detectVerticalWords(
 
     for (let row = 0; row < rows; row++) {
       const isCleared = tileStates[row]?.[col]?.isCleared ?? true;
-      if (!isCleared && grid[row][col]) {
+      const isFrozen = tileStates[row]?.[col]?.type === 'frozen';
+      // Frozen tiles break contiguous runs (they block cascade detection)
+      if (!isCleared && !isFrozen && grid[row][col]) {
         if (!currentRun) {
           currentRun = { startRow: row, letters: [] };
         }

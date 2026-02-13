@@ -1,6 +1,7 @@
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from '../types';
 import { generateBlastLetter, rollSpecialType } from './blastLetterGenerator';
+import { getInitialHitsRemaining } from './blastTileUtils';
 
 /** Tile with computed fall distance for animation */
 export interface FallingTile {
@@ -140,7 +141,7 @@ export function computeGravityResult(
         type,
         isCleared: false,
         activationEffect: null,
-        hitsRemaining: type === 'ice' ? 2 : 0,
+        hitsRemaining: getInitialHitsRemaining(type),
       };
 
       newTiles.push({

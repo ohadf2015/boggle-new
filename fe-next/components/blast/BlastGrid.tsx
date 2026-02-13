@@ -102,7 +102,7 @@ export function BlastGrid({
   return (
     <div
       ref={containerRef}
-      className="blast-game relative w-full aspect-square max-w-[360px]"
+      className="blast-game blast-grid-frame relative w-full aspect-square max-w-[360px]"
       aria-label={ariaLabel}
     >
       {/* Base grid - proven word input */}

@@ -15,6 +15,10 @@ import {
   CHAIN_BOMB_STAGGER,
   LIGHTNING_COLUMN_CLEAR_BONUS,
   MAGNET_ATTRACT_BONUS,
+  PRISM_USE_BONUS,
+  PRISM_CROSS_BONUS,
+  GEM_USE_BONUS,
+  GEM_COLLECT_BONUS,
   SPECIAL_TILE_DISTRIBUTION,
   MAX_CASCADE_CHAIN,
   MAX_CASCADE_WORDS_PER_LEVEL,
@@ -34,6 +38,7 @@ import {
   type CascadeHighlightData,
 } from '../types';
 import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
+import { getInitialHitsRemaining } from '../utils/blastTileUtils';
 
 // ==================== Helpers ====================
 
@@ -86,7 +91,7 @@ function generateTileStates(
         type,
         isCleared: false,
         activationEffect: null,
-        hitsRemaining: type === 'ice' ? 2 : 0,
+        hitsRemaining: getInitialHitsRemaining(type),
       };
     }
   }
@@ -472,14 +477,34 @@ export function useBlastGame(
 
       // Clear path tiles and collect effects
       let newlyClearedCount = 0;
+
+      // Helper: check if a tile is multi-hit and not on its final hit
+      const isMultiHitAlive = (t: BlastTileState) =>
+        t.hitsRemaining > 1 && (t.type === 'ice' || t.type === 'prism' || t.type === 'frozen' || t.type === 'gem');
+
+      // Helper: hit a multi-hit tile from area damage (bomb blast, lightning, prism cross)
+      const hitMultiHitTile = (t: BlastTileState) => {
+        t.hitsRemaining--;
+        t.activationEffect = `${t.type}-crack`;
+      };
+
+      // BFS bomb queue (shared across path and prism cross-clear)
+      const bombQueue: Array<{ row: number; col: number; depth: number }> = [];
+      const processedBombs = new Set<string>();
+
       for (const cell of path) {
         const tile = next[cell.row]?.[cell.col];
         if (!tile || tile.isCleared) continue;
 
-        // Ice tiles require multiple hits before clearing
-        if (tile.type === 'ice' && tile.hitsRemaining > 1) {
+        // Multi-hit tiles: decrement on non-final hits
+        if (isMultiHitAlive(tile)) {
           tile.hitsRemaining--;
-          tile.activationEffect = 'ice-crack';
+          tile.activationEffect = `${tile.type}-crack`;
+
+          // Prism and gem get use bonuses even on non-final hits
+          if (tile.type === 'prism') bonusScore += PRISM_USE_BONUS;
+          if (tile.type === 'gem') bonusScore += GEM_USE_BONUS;
+
           continue; // Don't clear yet
         }
 
@@ -497,45 +522,8 @@ export function useBlastGame(
             break;
 
           case 'bomb': {
-            // BFS chain reaction: queue bombs whose blast may trigger more bombs
-            const bombQueue: Array<{ row: number; col: number; depth: number }> = [{ row: cell.row, col: cell.col, depth: 0 }];
-            const processedBombs = new Set<string>();
             processedBombs.add(`${cell.row},${cell.col}`);
-
-            while (bombQueue.length > 0) {
-              const bomb = bombQueue.shift()!;
-              // Stagger chain explosions for visual ripple effect
-              const staggeredTime = now + bomb.depth * CHAIN_BOMB_STAGGER;
-              newExplosions.push({
-                id: `bomb-${staggeredTime}-${bomb.row}-${bomb.col}`,
-                row: bomb.row, col: bomb.col, type: 'bomb', intensity: 3, timestamp: staggeredTime,
-              });
-
-              for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
-                for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
-                  if (dr === 0 && dc === 0) continue;
-                  const r = bomb.row + dr;
-                  const c = bomb.col + dc;
-                  if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-                    if (!next[r][c].isCleared) {
-                      // Ice tiles in bomb blast get hit but may not clear
-                      if (next[r][c].type === 'ice' && next[r][c].hitsRemaining > 1) {
-                        next[r][c].hitsRemaining--;
-                        next[r][c].activationEffect = 'ice-crack';
-                      } else {
-                        next[r][c].isCleared = true;
-                        newlyClearedCount++;
-                        // Chain: if this newly-cleared cell is also a bomb, queue it
-                        if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
-                          processedBombs.add(`${r},${c}`);
-                          bombQueue.push({ row: r, col: c, depth: bomb.depth + 1 });
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            bombQueue.push({ row: cell.row, col: cell.col, depth: 0 });
             break;
           }
 
@@ -558,6 +546,62 @@ export function useBlastGame(
             // Ice tile on final hit — already cleared above
             break;
 
+          case 'prism': {
+            // Final hit — DETONATE: cross-clear entire row + column
+            bonusScore += PRISM_USE_BONUS + PRISM_CROSS_BONUS;
+            newExplosions.push({
+              id: `prism-${now}-${cell.row}-${cell.col}`,
+              row: cell.row, col: cell.col, type: 'prism', intensity: 4, timestamp: now,
+            });
+
+            // Cross-clear row
+            for (let c = 0; c < gridSize; c++) {
+              if (c === cell.col) continue;
+              const target = next[cell.row][c];
+              if (target.isCleared) continue;
+              if (isMultiHitAlive(target)) {
+                hitMultiHitTile(target);
+              } else {
+                target.isCleared = true;
+                newlyClearedCount++;
+                if (target.type === 'bomb' && !processedBombs.has(`${cell.row},${c}`)) {
+                  processedBombs.add(`${cell.row},${c}`);
+                  bombQueue.push({ row: cell.row, col: c, depth: 0 });
+                }
+              }
+            }
+            // Cross-clear column
+            for (let r = 0; r < gridSize; r++) {
+              if (r === cell.row) continue;
+              const target = next[r][cell.col];
+              if (target.isCleared) continue;
+              if (isMultiHitAlive(target)) {
+                hitMultiHitTile(target);
+              } else {
+                target.isCleared = true;
+                newlyClearedCount++;
+                if (target.type === 'bomb' && !processedBombs.has(`${r},${cell.col}`)) {
+                  processedBombs.add(`${r},${cell.col}`);
+                  bombQueue.push({ row: r, col: cell.col, depth: 0 });
+                }
+              }
+            }
+            break;
+          }
+
+          case 'gem':
+            // Final hit — COLLECT
+            bonusScore += GEM_USE_BONUS + GEM_COLLECT_BONUS;
+            newExplosions.push({
+              id: `gem-${now}-${cell.row}-${cell.col}`,
+              row: cell.row, col: cell.col, type: 'gem', intensity: 2, timestamp: now,
+            });
+            break;
+
+          case 'frozen':
+            // Final hit — cleared, no bonus (obstacle)
+            break;
+
           case 'lightning': {
             // Lightning clears entire column
             newExplosions.push({
@@ -565,12 +609,11 @@ export function useBlastGame(
               row: cell.row, col: cell.col, type: 'lightning', intensity: 3, timestamp: now,
             });
             for (let r = 0; r < gridSize; r++) {
-              if (r === cell.row) continue; // Skip the lightning tile itself (already cleared)
+              if (r === cell.row) continue;
               const target = next[r][cell.col];
               if (target.isCleared) continue;
-              if (target.type === 'ice' && target.hitsRemaining > 1) {
-                target.hitsRemaining--;
-                target.activationEffect = 'ice-crack';
+              if (isMultiHitAlive(target)) {
+                hitMultiHitTile(target);
               } else {
                 target.isCleared = true;
                 newlyClearedCount++;
@@ -602,6 +645,38 @@ export function useBlastGame(
               }
             }
             break;
+          }
+        }
+      }
+
+      // Process bomb BFS chain (from path bombs + prism cross-clear bombs)
+      while (bombQueue.length > 0) {
+        const bomb = bombQueue.shift()!;
+        const staggeredTime = now + bomb.depth * CHAIN_BOMB_STAGGER;
+        newExplosions.push({
+          id: `bomb-${staggeredTime}-${bomb.row}-${bomb.col}`,
+          row: bomb.row, col: bomb.col, type: 'bomb', intensity: 3, timestamp: staggeredTime,
+        });
+
+        for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
+          for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            const r = bomb.row + dr;
+            const c = bomb.col + dc;
+            if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+              if (!next[r][c].isCleared) {
+                if (isMultiHitAlive(next[r][c])) {
+                  hitMultiHitTile(next[r][c]);
+                } else {
+                  next[r][c].isCleared = true;
+                  newlyClearedCount++;
+                  if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
+                    processedBombs.add(`${r},${c}`);
+                    bombQueue.push({ row: r, col: c, depth: bomb.depth + 1 });
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -9,7 +9,7 @@ describe('getWaveConfig', () => {
     expect(config.minWordLength).toBe(2);
     expect(config.specialTileChance).toBe(0.15);
     expect(config.vowelModifier).toBe(1.0);
-    expect(config.maxCascadeChain).toBe(3);
+    expect(config.maxCascadeChain).toBe(2);
     expect(config.lightningEnabled).toBe(false);
     expect(config.magnetEnabled).toBe(false);
   });
@@ -50,6 +50,21 @@ describe('getWaveConfig', () => {
   it('enables magnet at wave 6', () => {
     expect(getWaveConfig(5).magnetEnabled).toBe(false);
     expect(getWaveConfig(6).magnetEnabled).toBe(true);
+  });
+
+  it('enables gems at wave 2', () => {
+    expect(getWaveConfig(1).gemEnabled).toBe(false);
+    expect(getWaveConfig(2).gemEnabled).toBe(true);
+  });
+
+  it('enables prisms at wave 3', () => {
+    expect(getWaveConfig(2).prismEnabled).toBe(false);
+    expect(getWaveConfig(3).prismEnabled).toBe(true);
+  });
+
+  it('enables frozen at wave 4', () => {
+    expect(getWaveConfig(3).frozenEnabled).toBe(false);
+    expect(getWaveConfig(4).frozenEnabled).toBe(true);
   });
 
   it('has scoreThreshold starting at wave 3', () => {
@@ -96,10 +111,38 @@ describe('getWaveDistribution', () => {
     expect(dist.magnet).toBe(0);
   });
 
+  it('returns no new tiles for wave 1', () => {
+    const dist = getWaveDistribution(getWaveConfig(1));
+    expect(dist.gem).toBe(0);
+    expect(dist.prism).toBe(0);
+    expect(dist.frozen).toBe(0);
+  });
+
+  it('includes gems at wave 2', () => {
+    const dist = getWaveDistribution(getWaveConfig(2));
+    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.prism).toBe(0);
+    expect(dist.frozen).toBe(0);
+  });
+
+  it('includes gems + prisms at wave 3', () => {
+    const dist = getWaveDistribution(getWaveConfig(3));
+    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.prism).toBeGreaterThan(0);
+    expect(dist.frozen).toBe(0);
+  });
+
   it('includes lightning at wave 4', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.magnet).toBe(0);
+  });
+
+  it('includes all new tiles at wave 4', () => {
+    const dist = getWaveDistribution(getWaveConfig(4));
+    expect(dist.gem).toBeGreaterThan(0);
+    expect(dist.prism).toBeGreaterThan(0);
+    expect(dist.frozen).toBeGreaterThan(0);
   });
 
   it('includes both lightning and magnet at wave 6', () => {

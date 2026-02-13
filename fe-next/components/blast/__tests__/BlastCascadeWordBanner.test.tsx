@@ -51,8 +51,8 @@ describe('BlastCascadeWordBanner', () => {
 
     render(<BlastCascadeWordBanner highlightData={data} />);
 
-    expect(screen.getByText(/CHAIN/)).toBeInTheDocument();
-    expect(screen.getByText(/x2/)).toBeInTheDocument();
+    // Chain badge shows compact multiplier format: x{level}
+    expect(screen.getByText('x2')).toBeInTheDocument();
   });
 
   it('renders score value', () => {

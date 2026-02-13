@@ -48,7 +48,7 @@ export function BlastCascadeOverlay({
           scale: [1, 1.2, 0],
           opacity: [1, 1, 0],
           rotate: anime.stagger([-8, 8]),
-          filter: ['brightness(1)', 'brightness(1.3)', 'brightness(0.5)'],
+          filter: ['brightness(1)', 'brightness(1.5)', 'brightness(0.3)'],
           duration: BLAST_ANIM.clear.duration,
           easing: BLAST_ANIM.clear.easing,
           delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
@@ -59,7 +59,6 @@ export function BlastCascadeOverlay({
     if (phase === 'falling') {
       const fallTargets = el.querySelectorAll('.blast-cascade-fall');
       if (fallTargets.length > 0) {
-        // Per-element duration proportional to fall distance (simulates gravity)
         anime({
           targets: fallTargets,
           translateY: [
@@ -69,12 +68,13 @@ export function BlastCascadeOverlay({
             },
             0,
           ],
+          scaleY: [0.92, 1.06, 1.0],
+          scaleX: [1.04, 0.97, 1.0],
           duration: function (el: Element) {
             const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
             return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
           },
           easing: BLAST_ANIM.fall.easing,
-          // No stagger — all tiles start falling at once (real gravity)
         });
       }
     }
@@ -93,6 +93,7 @@ export function BlastCascadeOverlay({
           ],
           scale: [0.5, 1],
           opacity: [0, 1],
+          boxShadow: ['0 0 12px rgba(255,255,255,0.6)', '0 0 0px rgba(255,255,255,0)'],
           duration: BLAST_ANIM.appear.duration,
           easing: BLAST_ANIM.appear.easing,
           delay: anime.stagger(BLAST_ANIM.appear.stagger, { from: 'first' }),

@@ -61,28 +61,37 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
         </span>
       </div>
 
-      {/* Bar */}
-      <div className="relative h-3 bg-white/10 rounded-full overflow-hidden border border-white/20">
-        {/* Milestone markers */}
+      {/* Bar — chunky neo-brutalist */}
+      <div className="relative h-4 bg-white/10 rounded-neo overflow-hidden border-2 border-white/25 shadow-hard-sm">
+        {/* Milestone markers with star dots */}
         {MILESTONES.map(m => (
           <div
             key={m}
-            className="absolute top-0 bottom-0 w-px"
+            className="absolute top-0 bottom-0 flex items-center justify-center"
             style={{
               left: `${m}%`,
-              backgroundColor: percentage >= m ? `${getProgressColor(m)}60` : 'rgba(255,255,255,0.2)',
+              transform: 'translateX(-50%)',
+              width: '8px',
             }}
-          />
+          >
+            <div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{
+                backgroundColor: percentage >= m ? getProgressColor(m) : 'rgba(255,255,255,0.25)',
+                boxShadow: percentage >= m ? `0 0 6px ${getProgressColor(m)}80` : 'none',
+              }}
+            />
+          </div>
         ))}
 
-        {/* Animated fill — uses animate prop for reliable FM v12 updates */}
+        {/* Animated fill — chunky with glow trail */}
         <motion.div
-          className="absolute inset-y-0 left-0 rounded-full"
+          className="absolute inset-y-0 left-0 rounded-neo"
           initial={{ width: '0%' }}
           animate={{
             width: `${percentage}%`,
             backgroundColor: color,
-            boxShadow: `0 0 ${milestonePulse ? '16px' : '8px'} ${color}${milestonePulse ? '80' : '40'}`,
+            boxShadow: `0 0 ${milestonePulse ? '20px' : '10px'} ${color}${milestonePulse ? '90' : '50'}, inset 0 1px 0 rgba(255,255,255,0.3)`,
           }}
           transition={{
             width: { type: 'spring', stiffness: 120, damping: 20, mass: 0.8 },
@@ -92,7 +101,7 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
         />
 
         {/* Shine overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-full pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/25 to-transparent rounded-neo pointer-events-none" />
 
         {/* Milestone pulse flash */}
         <AnimatePresence>
@@ -103,8 +112,8 @@ export function BlastProgressBar({ cleared, total, t }: BlastProgressBarProps) {
               animate={{ opacity: 0, scaleX: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="absolute inset-0 rounded-full origin-left"
-              style={{ backgroundColor: `${getProgressColor(milestonePulse)}30` }}
+              className="absolute inset-0 rounded-neo origin-left"
+              style={{ backgroundColor: `${getProgressColor(milestonePulse)}40` }}
             />
           )}
         </AnimatePresence>

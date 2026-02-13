@@ -16,30 +16,34 @@ interface BlastResultsProps {
   onBackToHome: () => void;
 }
 
-/** Star display with fill animation */
+/** Star display with fill animation and gold burst */
 function StarRating({ stars }: { stars: 1 | 2 | 3 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       {[1, 2, 3].map(i => (
         <motion.div
           key={i}
           initial={{ scale: 0, rotate: -180 }}
           animate={{
             scale: i <= stars ? 1 : 0.6,
-            rotate: 0,
-            opacity: i <= stars ? 1 : 0.3,
+            rotate: i <= stars ? [0, -5, 5, 0] : 0,
+            opacity: i <= stars ? 1 : 0.25,
           }}
           transition={{
             type: 'spring',
             stiffness: 300,
             damping: 15,
-            delay: 0.3 + i * 0.15,
+            delay: 0.3 + i * 0.2,
+            rotate: { delay: 0.5 + i * 0.2, duration: 0.3 },
+          }}
+          style={{
+            filter: i <= stars ? 'drop-shadow(0 0 8px rgba(255,215,0,0.6)) drop-shadow(0 0 16px rgba(255,215,0,0.3))' : 'none',
           }}
         >
           <Star
             className={cn(
-              'w-10 h-10 sm:w-12 sm:h-12',
-              i <= stars ? 'text-yellow-400 fill-yellow-400 drop-shadow-lg' : 'text-white/20'
+              'w-11 h-11 sm:w-14 sm:h-14',
+              i <= stars ? 'text-yellow-400 fill-yellow-400' : 'text-white/15'
             )}
           />
         </motion.div>
@@ -48,34 +52,52 @@ function StarRating({ stars }: { stars: 1 | 2 | 3 }) {
   );
 }
 
-/** Stat card for results display */
+/** Alternating rotation angles for playful card tilt */
+const CARD_ROTATIONS = [0.8, -0.6, 0.5, -0.8, 0.6, -0.5];
+
+/** Stat card — neo-brutalist with colored accent border and tilt */
 function StatCard({
   icon,
   label,
   value,
+  accentColor = '#00FFFF',
   delay = 0,
+  index = 0,
+  isNewBest = false,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | number;
+  accentColor?: string;
   delay?: number;
+  index?: number;
+  isNewBest?: boolean;
 }) {
+  const rotation = CARD_ROTATIONS[index % CARD_ROTATIONS.length];
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4 }}
+      initial={{ opacity: 0, y: 20, rotate: rotation * 2 }}
+      animate={{ opacity: 1, y: 0, rotate: rotation }}
+      transition={{ delay, duration: 0.4, type: 'spring', stiffness: 200 }}
       className={cn(
         'flex items-center gap-3 px-4 py-3',
-        'bg-white/5 rounded-neo border-2 border-white/10',
-        'backdrop-blur-sm'
+        'bg-white/5 rounded-neo border-3 border-neo-black/50 shadow-hard-sm',
       )}
+      style={{ borderLeftColor: accentColor, borderLeftWidth: '4px' }}
     >
-      <div className="text-neo-cyan">{icon}</div>
-      <div>
-        <div className="font-black text-white text-lg leading-tight">{value}</div>
-        <div className="text-[10px] font-bold text-white/50 uppercase tracking-wider">{label}</div>
+      <div style={{ color: accentColor }}>{icon}</div>
+      <div className="flex-1 min-w-0">
+        <div className="font-black text-white text-lg leading-tight font-neo-display">{value}</div>
+        <div className="text-[10px] font-bold text-white/45 uppercase tracking-wider">{label}</div>
       </div>
+      {isNewBest && (
+        <span
+          className="px-2 py-0.5 text-[9px] font-black uppercase bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm"
+          style={{ transform: 'rotate(-3deg)' }}
+        >
+          NEW!
+        </span>
+      )}
     </motion.div>
   );
 }
@@ -125,43 +147,57 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         <StatCard
           icon={<Trophy className="w-5 h-5" />}
           label={t('common.score') || 'Score'}
-          value={`${results.finalScore.toLocaleString()}${isNewBestScore ? ' ★' : ''}`}
+          value={results.finalScore.toLocaleString()}
+          accentColor="#FFD700"
           delay={0.5}
+          index={0}
+          isNewBest={isNewBestScore}
         />
         <StatCard
           icon={<Grid3X3 className="w-5 h-5" />}
           label={t('blast.progress') || 'Cleared'}
           value={`${results.clearPercentage}% (${results.tilesCleared}/${results.totalTiles})`}
+          accentColor="#00FFFF"
           delay={0.6}
+          index={1}
         />
         <StatCard
           icon={<Zap className="w-5 h-5" />}
           label={t('common.words') || 'Words'}
           value={results.wordsFound.length}
+          accentColor="#BFFF00"
           delay={0.7}
+          index={2}
         />
         {results.bestWord && (
           <StatCard
             icon={<Star className="w-5 h-5" />}
             label={t('results.bestWord') || 'Best Word'}
             value={results.bestWord.toUpperCase()}
+            accentColor="#FF6B35"
             delay={0.8}
+            index={3}
           />
         )}
         {results.maxCombo > 0 && (
           <StatCard
-            icon={<Zap className="w-5 h-5 text-neo-orange" />}
+            icon={<Zap className="w-5 h-5" />}
             label={t('results.maxCombo') || 'Max Combo'}
-            value={`${results.maxCombo}x${isNewBestCombo ? ' ★' : ''}`}
+            value={`${results.maxCombo}x`}
+            accentColor="#FF1493"
             delay={0.9}
+            index={4}
+            isNewBest={isNewBestCombo}
           />
         )}
         {(results.wavesCompleted ?? 0) > 0 && (
           <StatCard
-            icon={<Zap className="w-5 h-5 text-fuchsia-400" />}
+            icon={<Zap className="w-5 h-5" />}
             label={t('blast.wavesCompleted') || 'Waves'}
             value={results.wavesCompleted}
+            accentColor="#A855F7"
             delay={1.0}
+            index={5}
           />
         )}
       </div>
@@ -174,20 +210,45 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
           transition={{ delay: 1.1 }}
           className="w-full max-w-sm mb-8"
         >
-          <div className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2 text-center">
+          <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2 text-center">
             {t('blast.waveBreakdown') || 'Wave Breakdown'}
           </div>
-          <div className="space-y-1">
-            {results.waveResults.map((wr) => (
-              <div
+          <div className="space-y-1.5 rounded-neo border-3 border-neo-black/50 bg-white/5 p-2 shadow-hard-sm">
+            {results.waveResults.map((wr, idx) => (
+              <motion.div
                 key={wr.waveNumber}
-                className="flex items-center justify-between px-3 py-1.5 bg-white/5 rounded border border-white/10 text-sm"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.2 + idx * 0.08 }}
+                className={cn(
+                  'relative flex items-center gap-2 px-3 py-2 rounded-neo overflow-hidden',
+                  idx % 2 === 0 ? 'bg-white/5' : 'bg-white/[0.02]',
+                )}
+                style={{
+                  borderLeft: '3px solid',
+                  borderLeftColor: idx === 0 ? '#A855F7' : idx === 1 ? '#06B6D4' : '#6366F1',
+                }}
               >
-                <span className="font-bold text-fuchsia-300">Wave {wr.waveNumber}</span>
-                <span className="text-white/70 tabular-nums">
-                  {wr.score} pts · {wr.wordsFound} words · {wr.clearPercentage}%
+                {/* Clear % background bar */}
+                <div
+                  className="absolute inset-y-0 left-0 opacity-10 rounded-neo"
+                  style={{
+                    width: `${wr.clearPercentage}%`,
+                    background: idx === 0 ? '#A855F7' : idx === 1 ? '#06B6D4' : '#6366F1',
+                  }}
+                />
+                <span className="font-black text-xs text-fuchsia-300 relative z-10 shrink-0">
+                  W{wr.waveNumber}
                 </span>
-              </div>
+                <span className="font-black text-sm text-white tabular-nums relative z-10">
+                  {wr.score}
+                </span>
+                <span className="text-[10px] text-white/40 relative z-10">pts</span>
+                <div className="flex-1" />
+                <span className="text-[10px] font-bold text-white/50 tabular-nums relative z-10">
+                  {wr.wordsFound}w · {wr.clearPercentage}%
+                </span>
+              </motion.div>
             ))}
           </div>
         </motion.div>
