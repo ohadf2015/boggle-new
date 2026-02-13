@@ -5443,6 +5443,14 @@ const en = {
       "submit": "Submit",
       "timesUp": "Time's Up!",
       "typeAnswer": "Type your answer",
+      "typeWord": "Type the word...",
+      "correct": "Correct!",
+      "incorrect": "Incorrect",
+      "correctAnswer": "Correct answer:",
+      "streak": "Streak",
+      "spelling": {
+        "title": "Spelling Challenge"
+      },
       "mastery": {
         "not_started": "Not Started",
         "started": "Getting Started",

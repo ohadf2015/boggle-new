@@ -1,0 +1,288 @@
+'use client';
+
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Lightbulb, Check, X } from 'lucide-react';
+import { useSpellingGame } from './hooks/useSpellingGame';
+import PracticeResultsCard from './PracticeResultsCard';
+import type { VocabularyWord } from '@/lib/supabase/education/types';
+
+export interface SpellingChallengePracticeProps {
+  words: VocabularyWord[];
+  onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
+  onBack: () => void;
+}
+
+/**
+ * SpellingChallengePractice - Type-the-word spelling practice mode
+ *
+ * Features:
+ * - Shows definition, student types the word
+ * - Progressive difficulty (shorter words first)
+ * - Hint system (first letter free, additional hints reset streak)
+ * - Streak tracking with visual feedback
+ * - Auto-advance after answer (1s correct, 2s incorrect)
+ * - Results display with PracticeResultsCard
+ */
+export function SpellingChallengePractice({
+  words,
+  onComplete,
+  onBack,
+}: SpellingChallengePracticeProps) {
+  const { t, dir } = useLanguage();
+  const isRTL = dir === 'rtl';
+
+  const {
+    currentWord,
+    wordIndex,
+    totalWords,
+    currentHint,
+    getHint,
+    submitAnswer,
+    currentStreak,
+    correctCount,
+    attempts,
+    accuracy,
+    isComplete,
+    resetGame,
+  } = useSpellingGame(words);
+
+  const [inputValue, setInputValue] = useState('');
+  const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input on mount and word change
+  useEffect(() => {
+    if (!isComplete && !feedback && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [wordIndex, isComplete, feedback]);
+
+  // Show results when complete
+  useEffect(() => {
+    if (isComplete && !showResults) {
+      setTimeout(() => setShowResults(true), 500);
+    }
+  }, [isComplete, showResults]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!inputValue.trim() || feedback) return;
+
+      const result = submitAnswer(inputValue);
+      setFeedback(result);
+      setInputValue('');
+
+      // Clear feedback after auto-advance delay
+      const delay = result.correct ? 1000 : 2000;
+      setTimeout(() => {
+        setFeedback(null);
+      }, delay);
+    },
+    [inputValue, feedback, submitAnswer]
+  );
+
+  const handleRestart = useCallback(() => {
+    resetGame();
+    setShowResults(false);
+    setFeedback(null);
+    setInputValue('');
+  }, [resetGame]);
+
+  const handleComplete = useCallback(() => {
+    onComplete({ correct: correctCount, total: attempts, accuracy });
+  }, [correctCount, attempts, accuracy, onComplete]);
+
+  if (showResults) {
+    return (
+      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+        <PracticeResultsCard
+          correct={correctCount}
+          total={attempts}
+          onRestart={handleRestart}
+          onBack={handleComplete}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="max-w-2xl mx-auto mb-6">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            aria-label={t('common.back')}
+            className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10"
+          >
+            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+          </Button>
+
+          <div className="text-center">
+            <h2 className="text-xl font-neo-display text-neo-white mb-1">
+              {t('education.practice.spelling.title') || 'Spelling Challenge'}
+            </h2>
+            <p className="text-neo-white/70 font-neo-body" data-testid="progress-text">
+              {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
+            </p>
+          </div>
+
+          <div className="w-10" />
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* Streak display */}
+        {currentStreak > 0 && (
+          <motion.div
+            data-testid="streak-display"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className={cn(
+              'mx-auto w-fit px-4 py-2 rounded-neo',
+              'bg-neo-orange border-neo border-neo-black shadow-hard',
+              'font-neo-display text-neo-white text-lg'
+            )}
+          >
+            {currentStreak}x {t('education.practice.streak') || 'Streak'}!
+          </motion.div>
+        )}
+
+        {/* Definition card */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={wordIndex}
+            initial={{ x: isRTL ? -20 : 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: isRTL ? 20 : -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            data-testid="definition-card"
+            className={cn(
+              'p-8 rounded-neo',
+              'bg-neo-navy border-neo-thick border-neo-black',
+              'shadow-hard-lg',
+              'min-h-[120px] flex items-center justify-center'
+            )}
+          >
+            <p className="font-neo-body text-neo-white text-2xl text-center">
+              {currentWord?.definition || t('education.practice.noWords') || 'No words available'}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Hint display */}
+        <div
+          data-testid="hint-display"
+          className="flex items-center justify-center gap-3"
+        >
+          <span className="font-mono text-neo-cyan text-2xl tracking-widest">
+            {currentHint}{'_'.repeat(Math.max(0, (words[wordIndex]?.word.length || 0) - currentHint.length))}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={getHint}
+            disabled={!!feedback || isComplete}
+            data-testid="hint-button"
+            className="text-neo-yellow hover:text-neo-yellow/80"
+          >
+            <Lightbulb className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Feedback display */}
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              data-testid="feedback-display"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className={cn(
+                'p-4 rounded-neo border-neo text-center',
+                feedback.correct
+                  ? 'bg-neo-green/20 border-neo-green'
+                  : 'bg-neo-pink/20 border-neo-pink'
+              )}
+            >
+              <div className="flex items-center justify-center gap-2 mb-1">
+                {feedback.correct ? (
+                  <Check className="w-6 h-6 text-neo-green" />
+                ) : (
+                  <X className="w-6 h-6 text-neo-pink" />
+                )}
+                <span className={cn(
+                  'font-neo-display text-lg',
+                  feedback.correct ? 'text-neo-green' : 'text-neo-pink'
+                )}>
+                  {feedback.correct
+                    ? (t('education.practice.correct') || 'Correct!')
+                    : (t('education.practice.incorrect') || 'Incorrect')}
+                </span>
+              </div>
+              {!feedback.correct && (
+                <p className="text-neo-white/70 font-neo-body">
+                  {t('education.practice.correctAnswer') || 'Correct answer:'}{' '}
+                  <span className="text-neo-white font-bold">{feedback.correctWord}</span>
+                </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Input form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            disabled={!!feedback || isComplete}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            data-testid="spelling-input"
+            className={cn(
+              'px-6 py-4 rounded-neo',
+              'border-neo-thick border-neo-black',
+              'bg-neo-white text-neo-black',
+              'font-neo-body text-xl',
+              'shadow-hard',
+              'focus:outline-none focus:ring-4 focus:ring-neo-purple',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'transition-all'
+            )}
+            placeholder={t('education.practice.typeWord') || 'Type the word...'}
+          />
+          <button
+            type="submit"
+            disabled={!!feedback || isComplete || !inputValue.trim()}
+            className={cn(
+              'px-6 py-4 rounded-neo',
+              'bg-neo-purple hover:bg-neo-purple/90',
+              'border-neo-thick border-neo-black',
+              'shadow-hard hover:shadow-hard-lg',
+              'font-neo-display text-neo-white text-xl',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'transition-all active:translate-y-1'
+            )}
+          >
+            {t('education.practice.submit') || 'Submit'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default SpellingChallengePractice;
