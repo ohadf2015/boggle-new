@@ -1,12 +1,13 @@
 /**
  * DuelHistory Component Tests
  *
- * Tests for duel history list and stats panel
+ * Tests for duel history display with stats panel
  */
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { DuelHistory } from '../DuelHistory';
-import { getDuelHistory, getDuelStats, type DuelHistoryEntry, type DuelStatsResult } from '@/lib/supabase/education/duels';
+import { getDuelHistory, getDuelStats } from '@/lib/supabase/education/duels';
+import type { DuelHistoryEntry, DuelStatsResult } from '@/lib/supabase/education/duels';
 
 // ============================================
 // MOCKS
@@ -17,18 +18,18 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, any>) => {
       const translations: Record<string, string> = {
-        duelHistory: 'Duel History',
-        wins: 'Wins',
-        losses: 'Losses',
-        draws: 'Draws',
-        winStreak: 'Win Streak',
-        winRate: 'Win Rate',
-        recentDuels: 'Recent Duels',
-        noDuelsYet: 'No duels played yet. Challenge a classmate!',
-        challengeClassmate: 'Challenge a classmate',
-        you: 'You',
-        vs: 'vs',
-        perOpponentStats: 'Per-Opponent Stats',
+        'duels.loading': 'Loading...',
+        'duels.duelHistory': 'Duel History',
+        'duels.wins': 'Wins',
+        'duels.losses': 'Losses',
+        'duels.draws': 'Draws',
+        'duels.winStreak': 'Win Streak',
+        'duels.winRate': 'Win Rate',
+        'duels.recentDuels': 'Recent Duels',
+        'duels.noDuelsYet': 'No duels played yet',
+        'duels.challengeClassmate': 'Challenge a classmate!',
+        'duels.you': 'You',
+        'duels.vs': 'vs',
       };
 
       let result = translations[key] || key;
@@ -51,84 +52,43 @@ const mockGetDuelStats = getDuelStats as jest.MockedFunction<typeof getDuelStats
 // TEST DATA
 // ============================================
 
-const mockBoardState = [
-  ['C', 'A', 'T', 'S'],
-  ['D', 'O', 'G', 'S'],
-  ['R', 'A', 'T', 'S'],
-  ['B', 'I', 'R', 'D'],
-];
-
-const mockDuelHistory: DuelHistoryEntry[] = [
-  {
-    id: 'duel-1',
-    classroom_id: 'class-1',
-    challenger_id: 'student-1',
-    opponent_id: 'student-2',
-    lesson_id: 'lesson-1',
-    duel_type: 'async',
-    status: 'completed',
-    board_state: mockBoardState,
-    challenger_score: 150,
-    opponent_score: 120,
-    winner_id: 'student-1',
-    xp_awarded: true,
-    created_at: '2026-02-13T10:00:00Z',
-    started_at: '2026-02-13T10:05:00Z',
-    completed_at: '2026-02-13T10:10:00Z',
-    expires_at: '2026-02-14T10:00:00Z',
-    challenger: {
-      id: 'student-1',
-      display_name: 'Alice',
-      avatar_url: null,
-    },
-    opponent: {
-      id: 'student-2',
-      display_name: 'Bob',
-      avatar_url: null,
-    },
-    isWin: true,
-  },
-  {
-    id: 'duel-2',
-    classroom_id: 'class-1',
-    challenger_id: 'student-2',
-    opponent_id: 'student-1',
-    lesson_id: 'lesson-1',
-    duel_type: 'async',
-    status: 'completed',
-    board_state: mockBoardState,
-    challenger_score: 180,
-    opponent_score: 150,
-    winner_id: 'student-2',
-    xp_awarded: true,
-    created_at: '2026-02-12T10:00:00Z',
-    started_at: '2026-02-12T10:05:00Z',
-    completed_at: '2026-02-12T10:10:00Z',
-    expires_at: '2026-02-13T10:00:00Z',
-    challenger: {
-      id: 'student-2',
-      display_name: 'Bob',
-      avatar_url: null,
-    },
-    opponent: {
-      id: 'student-1',
-      display_name: 'Alice',
-      avatar_url: null,
-    },
-    isWin: false,
-  },
-];
-
 const mockStats: DuelStatsResult = {
   wins: 5,
   losses: 3,
   draws: 1,
-  winStreak: 4,
+  winStreak: 2,
   currentStreak: 2,
-  opponentStats: new Map([
-    ['student-2', { wins: 3, losses: 2 }],
-    ['student-3', { wins: 2, losses: 1 }],
-  ]),
+  opponentStats: new Map(),
+};
+
+const mockHistoryEntry: DuelHistoryEntry = {
+  id: 'duel-1',
+  classroom_id: 'class-1',
+  challenger_id: 'student-1',
+  opponent_id: 'student-2',
+  lesson_id: 'lesson-1',
+  duel_type: 'async',
+  status: 'completed',
+  board_state: null,
+  challenger_score: 150,
+  opponent_score: 120,
+  winner_id: 'student-1',
+  xp_awarded: true,
+  created_at: '2026-02-13T10:00:00Z',
+  started_at: '2026-02-13T10:05:00Z',
+  completed_at: '2026-02-13T10:15:00Z',
+  expires_at: null,
+  challenger: {
+    id: 'student-1',
+    display_name: 'Alice',
+    avatar_url: null,
+  },
+  opponent: {
+    id: 'student-2',
+    display_name: 'Bob',
+    avatar_url: null,
+  },
+  isWin: true,
 };
 
 // ============================================
@@ -141,95 +101,168 @@ describe('DuelHistory', () => {
   });
 
   describe('Stats Panel', () => {
-    it('should render stats panel with win/loss/draw counts', async () => {
-      mockGetDuelHistory.mockResolvedValue({
-        data: mockDuelHistory,
-        error: null,
-      });
-
+    it('should render stats panel with correct counts', async () => {
       mockGetDuelStats.mockResolvedValue({
         data: mockStats,
         error: null,
       });
 
-      render(<DuelHistory studentId="student-1" />);
-
-      await waitFor(() => {
-        expect(screen.getByText('5')).toBeInTheDocument(); // Wins
-        expect(screen.getByText('3')).toBeInTheDocument(); // Losses
-        expect(screen.getByText('1')).toBeInTheDocument(); // Draws
-      });
-    });
-
-    it('should display win streak when >= 3', async () => {
-      mockGetDuelHistory.mockResolvedValue({
-        data: mockDuelHistory,
-        error: null,
-      });
-
-      mockGetDuelStats.mockResolvedValue({
-        data: mockStats,
-        error: null,
-      });
-
-      render(<DuelHistory studentId="student-1" />);
-
-      await waitFor(() => {
-        expect(screen.getByText('4')).toBeInTheDocument(); // Win streak
-      });
-    });
-
-    it('should calculate and display win rate percentage', async () => {
-      mockGetDuelHistory.mockResolvedValue({
-        data: mockDuelHistory,
-        error: null,
-      });
-
-      mockGetDuelStats.mockResolvedValue({
-        data: mockStats,
-        error: null,
-      });
-
-      render(<DuelHistory studentId="student-1" />);
-
-      // Win rate = 5 / (5 + 3 + 1) = 5 / 9 = 55.6%
-      await waitFor(() => {
-        expect(screen.getByText(/55\.6%|56%/)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Duel History List', () => {
-    it('should render duel history entries with win/loss badges', async () => {
-      mockGetDuelHistory.mockResolvedValue({
-        data: mockDuelHistory,
-        error: null,
-      });
-
-      mockGetDuelStats.mockResolvedValue({
-        data: mockStats,
-        error: null,
-      });
-
-      render(<DuelHistory studentId="student-1" />);
-
-      await waitFor(() => {
-        // Check opponent names appear (Bob appears in both duels)
-        const bobElements = screen.getAllByText('Bob');
-        expect(bobElements.length).toBeGreaterThan(0);
-
-        // Check "You" label appears (in score display)
-        const youElements = screen.getAllByText('You');
-        expect(youElements.length).toBeGreaterThan(0);
-      });
-    });
-
-    it('should show empty state when no duels', async () => {
       mockGetDuelHistory.mockResolvedValue({
         data: [],
         error: null,
       });
 
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Wins')).toBeInTheDocument();
+      });
+
+      expect(screen.getByText('5')).toBeInTheDocument(); // wins
+      expect(screen.getByText('3')).toBeInTheDocument(); // losses
+      expect(screen.getByText('1')).toBeInTheDocument(); // draws
+    });
+
+    it('should display win streak', async () => {
+      mockGetDuelStats.mockResolvedValue({
+        data: { ...mockStats, winStreak: 5 },
+        error: null,
+      });
+
+      mockGetDuelHistory.mockResolvedValue({
+        data: [],
+        error: null,
+      });
+
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Win Streak')).toBeInTheDocument();
+      });
+
+      // Find the win streak stat specifically (not other stats with "5")
+      const winStreakSection = screen.getByText('Win Streak').closest('div');
+      expect(winStreakSection).toHaveTextContent('5');
+    });
+
+    it('should calculate win rate percentage', async () => {
+      mockGetDuelStats.mockResolvedValue({
+        data: mockStats, // 5 wins out of 9 total = 55.6%
+        error: null,
+      });
+
+      mockGetDuelHistory.mockResolvedValue({
+        data: [],
+        error: null,
+      });
+
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Win Rate')).toBeInTheDocument();
+      });
+
+      // Win rate = wins / (wins + losses + draws) = 5 / 9 = 55.6%
+      expect(screen.getByText(/55.6%|56%/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Duel History List', () => {
+    it('should render duel history entries', async () => {
+      mockGetDuelStats.mockResolvedValue({
+        data: mockStats,
+        error: null,
+      });
+
+      mockGetDuelHistory.mockResolvedValue({
+        data: [mockHistoryEntry],
+        error: null,
+      });
+
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Recent Duels')).toBeInTheDocument();
+      });
+
+      // Check opponent name appears in the text
+      expect(screen.getAllByText(/vs Bob/)[0]).toBeInTheDocument();
+
+      // Check scores (student vs opponent)
+      expect(screen.getByText(/You: 150/)).toBeInTheDocument();
+    });
+
+    it('should show win badge for won duel', async () => {
+      mockGetDuelStats.mockResolvedValue({
+        data: mockStats,
+        error: null,
+      });
+
+      mockGetDuelHistory.mockResolvedValue({
+        data: [mockHistoryEntry],
+        error: null,
+      });
+
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('duel-entry-win')).toBeInTheDocument();
+      });
+    });
+
+    it('should show loss badge for lost duel', async () => {
+      const lossEntry: DuelHistoryEntry = {
+        ...mockHistoryEntry,
+        winner_id: 'student-2',
+        isWin: false,
+      };
+
+      mockGetDuelStats.mockResolvedValue({
+        data: mockStats,
+        error: null,
+      });
+
+      mockGetDuelHistory.mockResolvedValue({
+        data: [lossEntry],
+        error: null,
+      });
+
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('duel-entry-loss')).toBeInTheDocument();
+      });
+    });
+
+    it('should show draw badge for tied duel', async () => {
+      const drawEntry: DuelHistoryEntry = {
+        ...mockHistoryEntry,
+        winner_id: null,
+        challenger_score: 150,
+        opponent_score: 150,
+        isWin: false,
+      };
+
+      mockGetDuelStats.mockResolvedValue({
+        data: mockStats,
+        error: null,
+      });
+
+      mockGetDuelHistory.mockResolvedValue({
+        data: [drawEntry],
+        error: null,
+      });
+
+      render(<DuelHistory studentId="student-1" />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('duel-entry-draw')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Empty State', () => {
+    it('should show empty state when no duels', async () => {
       mockGetDuelStats.mockResolvedValue({
         data: {
           wins: 0,
@@ -242,32 +275,34 @@ describe('DuelHistory', () => {
         error: null,
       });
 
+      mockGetDuelHistory.mockResolvedValue({
+        data: [],
+        error: null,
+      });
+
       render(<DuelHistory studentId="student-1" />);
 
       await waitFor(() => {
-        expect(screen.getByText(/No duels played yet/i)).toBeInTheDocument();
+        expect(screen.getByText('No duels played yet')).toBeInTheDocument();
       });
+
+      expect(screen.getByText('Challenge a classmate!')).toBeInTheDocument();
     });
   });
 
-  describe('API Calls', () => {
-    it('should fetch duel history on mount', async () => {
-      mockGetDuelHistory.mockResolvedValue({
-        data: mockDuelHistory,
-        error: null,
-      });
+  describe('Loading State', () => {
+    it('should show loading state initially', () => {
+      mockGetDuelStats.mockReturnValue(
+        new Promise(() => {}) // Never resolves
+      );
 
-      mockGetDuelStats.mockResolvedValue({
-        data: mockStats,
-        error: null,
-      });
+      mockGetDuelHistory.mockReturnValue(
+        new Promise(() => {})
+      );
 
       render(<DuelHistory studentId="student-1" />);
 
-      await waitFor(() => {
-        expect(mockGetDuelHistory).toHaveBeenCalledWith('student-1', 20);
-        expect(mockGetDuelStats).toHaveBeenCalledWith('student-1');
-      });
+      expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
 });

@@ -1,22 +1,25 @@
 'use client';
 
 /**
- * DuelHistory - Duel History and Stats Panel
+ * DuelHistory - Duel History with Stats Panel
  *
- * Shows student's duel history with stats panel
+ * Shows duel statistics and recent duel history
+ * Flow: Load stats → Load history → Display with visual badges
+ *
  * Features:
- * - Stats panel: wins/losses/draws, win streak, win rate
- * - Recent duels list with win/loss badges
- * - Per-opponent stats (collapsible)
+ * - Stats panel (wins/losses/draws, win streak, win rate)
+ * - Recent duels list with win/loss/draw badges
  * - Empty state for no duels
  * - Neo-brutalist styling
+ * - RTL support
  */
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Swords, Trophy, Flame, TrendingUp } from 'lucide-react';
+import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getDuelHistory, getDuelStats, type DuelHistoryEntry, type DuelStatsResult } from '@/lib/supabase/education/duels';
+import { getDuelHistory, getDuelStats } from '@/lib/supabase/education/duels';
+import type { DuelHistoryEntry, DuelStatsResult } from '@/lib/supabase/education/duels';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 
@@ -25,263 +28,217 @@ import { Loader } from '@/components/ui/Loader';
 // ============================================
 
 export interface DuelHistoryProps {
-  /** Student ID to fetch duels for */
+  /** Student ID to show history for */
   studentId: string;
+  /** Additional CSS classes */
+  className?: string;
 }
 
 // ============================================
 // COMPONENT
 // ============================================
 
-export function DuelHistory({ studentId }: DuelHistoryProps) {
+export function DuelHistory({ studentId, className }: DuelHistoryProps) {
   const { t } = useLanguage();
 
   // State
   const [loading, setLoading] = useState(true);
-  const [duels, setDuels] = useState<DuelHistoryEntry[]>([]);
   const [stats, setStats] = useState<DuelStatsResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<DuelHistoryEntry[]>([]);
 
   // ============================================
   // EFFECTS
   // ============================================
 
+  // Load stats and history on mount
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      setError(null);
 
-      try {
-        // Fetch history and stats in parallel
-        const [historyResult, statsResult] = await Promise.all([
-          getDuelHistory(studentId, 20),
-          getDuelStats(studentId),
-        ]);
+      const [statsResult, historyResult] = await Promise.all([
+        getDuelStats(studentId),
+        getDuelHistory(studentId, 20),
+      ]);
 
-        if (historyResult.error) {
-          setError(historyResult.error.message);
-          return;
-        }
-
-        if (statsResult.error) {
-          setError(statsResult.error.message);
-          return;
-        }
-
-        setDuels(historyResult.data);
+      if (statsResult.data) {
         setStats(statsResult.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
       }
+
+      if (historyResult.data) {
+        setHistory(historyResult.data);
+      }
+
+      setLoading(false);
     }
 
     loadData();
   }, [studentId]);
 
   // ============================================
-  // HELPERS
-  // ============================================
-
-  const calculateWinRate = (): string => {
-    if (!stats) return '0%';
-    const total = stats.wins + stats.losses + stats.draws;
-    if (total === 0) return '0%';
-    const rate = (stats.wins / total) * 100;
-    return `${rate.toFixed(1)}%`;
-  };
-
-  const formatRelativeTime = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
-  };
-
-  // ============================================
   // RENDER HELPERS
   // ============================================
 
+  // Calculate win rate
+  const winRate = stats
+    ? stats.wins + stats.losses + stats.draws === 0
+      ? 0
+      : (stats.wins / (stats.wins + stats.losses + stats.draws)) * 100
+    : 0;
+
+  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader size="lg" />
+        <p className="ml-4 text-neo-white">{t('duels.loading')}</p>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-        <p className="text-neo-white text-lg">{error}</p>
-      </div>
-    );
-  }
-
-  // ============================================
-  // EMPTY STATE
-  // ============================================
-
+  // Empty state
   if (!stats || (stats.wins === 0 && stats.losses === 0 && stats.draws === 0)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8">
-        <Swords className="w-16 h-16 text-neo-orange mb-4" />
-        <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-2">
-          {t('noDuelsYet')}
-        </h2>
-        <p className="text-neo-white/70">{t('challengeClassmate')}</p>
+      <div className={cn('max-w-4xl mx-auto p-6', className)}>
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+          <Swords className="w-16 h-16 text-neo-white/30 mb-4" />
+          <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-2">
+            {t('duels.noDuelsYet')}
+          </h2>
+          <p className="text-neo-white/70">{t('duels.challengeClassmate')}</p>
+        </div>
       </div>
     );
   }
 
-  // ============================================
-  // MAIN RENDER
-  // ============================================
-
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className={cn('max-w-4xl mx-auto p-6', className)}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Trophy className="w-8 h-8 text-neo-yellow" />
+        <Trophy className="w-6 h-6 text-neo-yellow" />
         <h1 className="text-2xl font-neo-display font-bold text-neo-white">
-          {t('duelHistory')}
+          {t('duels.duelHistory')}
         </h1>
       </div>
 
       {/* Stats Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {/* Wins */}
-        <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-neo-white/70 text-sm">{t('wins')}</span>
-            <Trophy className="w-5 h-5 text-green-500" />
-          </div>
-          <p className="text-3xl font-neo-display font-bold text-neo-white mt-2">
-            {stats.wins}
+        <div className="p-4 bg-green-600 border-neo rounded-neo shadow-hard">
+          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+            {t('duels.wins')}
           </p>
+          <p className="text-3xl font-neo-display font-bold text-white">{stats.wins}</p>
         </div>
 
         {/* Losses */}
-        <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-neo-white/70 text-sm">{t('losses')}</span>
-            <Swords className="w-5 h-5 text-red-500" />
-          </div>
-          <p className="text-3xl font-neo-display font-bold text-neo-white mt-2">
-            {stats.losses}
+        <div className="p-4 bg-red-600 border-neo rounded-neo shadow-hard">
+          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+            {t('duels.losses')}
           </p>
+          <p className="text-3xl font-neo-display font-bold text-white">{stats.losses}</p>
         </div>
 
         {/* Draws */}
-        <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-neo-white/70 text-sm">{t('draws')}</span>
-            <TrendingUp className="w-5 h-5 text-yellow-500" />
-          </div>
-          <p className="text-3xl font-neo-display font-bold text-neo-white mt-2">
-            {stats.draws}
+        <div className="p-4 bg-yellow-500 border-neo rounded-neo shadow-hard">
+          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+            {t('duels.draws')}
           </p>
+          <p className="text-3xl font-neo-display font-bold text-white">{stats.draws}</p>
         </div>
 
         {/* Win Streak */}
-        <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-neo-white/70 text-sm">{t('winStreak')}</span>
-            {stats.winStreak >= 3 && <Flame className="w-5 h-5 text-neo-orange" />}
+        <div className="p-4 bg-neo-orange border-neo rounded-neo shadow-hard">
+          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+            {t('duels.winStreak')}
+          </p>
+          <div className="flex items-center gap-2">
+            {stats.winStreak >= 3 && <Flame className="w-5 h-5 text-white" />}
+            <p className="text-3xl font-neo-display font-bold text-white">
+              {stats.winStreak}
+            </p>
           </div>
-          <p className="text-3xl font-neo-display font-bold text-neo-white mt-2">
-            {stats.winStreak}
+        </div>
+
+        {/* Win Rate */}
+        <div className="p-4 bg-neo-cyan border-neo rounded-neo shadow-hard">
+          <p className="text-xs text-neo-black/70 uppercase tracking-wide mb-1">
+            {t('duels.winRate')}
+          </p>
+          <p className="text-3xl font-neo-display font-bold text-neo-black">
+            {winRate.toFixed(1)}%
           </p>
         </div>
       </div>
 
-      {/* Win Rate */}
-      <div className="bg-neo-yellow border-neo-thick rounded-neo shadow-hard p-4 mb-8">
-        <div className="flex items-center justify-between">
-          <span className="text-neo-black font-neo-body font-bold">{t('winRate')}</span>
-          <span className="text-neo-black text-2xl font-neo-display font-bold">
-            {calculateWinRate()}
-          </span>
-        </div>
-      </div>
-
-      {/* Recent Duels List */}
+      {/* Recent Duels */}
       <div>
-        <h2 className="text-xl font-neo-display font-bold text-neo-white mb-4">
-          {t('recentDuels')}
+        <h2 className="text-lg font-neo-display font-bold text-neo-white mb-4">
+          {t('duels.recentDuels')}
         </h2>
 
         <div className="space-y-3">
-          {duels.map((duel) => {
-            const isChallenger = duel.challenger_id === studentId;
-            const opponent = isChallenger ? duel.opponent : duel.challenger;
-            const studentScore = isChallenger ? duel.challenger_score : duel.opponent_score;
-            const opponentScore = isChallenger ? duel.opponent_score : duel.challenger_score;
+          {history.map((duel) => {
             const isDraw = duel.winner_id === null;
             const isWin = duel.isWin;
+            const isLoss = !isWin && !isDraw;
+
+            // Determine opponent based on perspective
+            const opponent =
+              duel.challenger_id === studentId ? duel.opponent : duel.challenger;
+
+            // Determine scores based on perspective
+            const studentScore =
+              duel.challenger_id === studentId
+                ? duel.challenger_score
+                : duel.opponent_score;
+            const opponentScore =
+              duel.challenger_id === studentId
+                ? duel.opponent_score
+                : duel.challenger_score;
 
             return (
               <motion.div
                 key={duel.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
                 className={cn(
-                  'bg-neo-navy border-neo rounded-neo shadow-hard p-4 border-l-4',
-                  isDraw
-                    ? 'border-l-yellow-500'
-                    : isWin
-                    ? 'border-l-green-500'
-                    : 'border-l-red-500'
+                  'p-4 rounded-neo border-neo shadow-hard flex items-center gap-4',
+                  'bg-neo-navy',
+                  isWin && 'border-l-4 border-l-green-500',
+                  isLoss && 'border-l-4 border-l-red-500',
+                  isDraw && 'border-l-4 border-l-yellow-500'
                 )}
+                data-testid={
+                  isDraw
+                    ? 'duel-entry-draw'
+                    : isWin
+                    ? 'duel-entry-win'
+                    : 'duel-entry-loss'
+                }
               >
-                <div className="flex items-center justify-between">
-                  {/* Result Badge */}
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        'w-12 h-12 flex items-center justify-center rounded-neo border-neo shadow-hard-sm',
-                        isDraw
-                          ? 'bg-yellow-500'
-                          : isWin
-                          ? 'bg-green-500'
-                          : 'bg-red-500'
-                      )}
-                    >
-                      {isWin ? (
-                        <Trophy className="w-6 h-6 text-neo-white" />
-                      ) : (
-                        <Swords className="w-6 h-6 text-neo-white" />
-                      )}
-                    </div>
+                {/* Badge */}
+                <div
+                  className={cn(
+                    'flex-shrink-0 w-10 h-10 rounded-neo border-neo shadow-hard flex items-center justify-center',
+                    isWin && 'bg-green-500',
+                    isLoss && 'bg-red-500',
+                    isDraw && 'bg-yellow-500'
+                  )}
+                >
+                  {isWin && <Trophy className="w-5 h-5 text-white" />}
+                  {isLoss && <X className="w-5 h-5 text-white" />}
+                  {isDraw && <Minus className="w-5 h-5 text-white" />}
+                </div>
 
-                    {/* Opponent Info */}
-                    <div>
-                      <p className="text-neo-white font-neo-body font-bold">
-                        {opponent.display_name}
-                      </p>
-                      <p className="text-neo-white/70 text-sm">
-                        {formatRelativeTime(duel.completed_at || duel.created_at)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Scores */}
-                  <div className="text-right">
-                    <p className="text-neo-white font-neo-body">
-                      <span className="font-bold">{t('you')}</span>: {studentScore}
-                    </p>
-                    <p className="text-neo-white/70 text-sm">
-                      {t('vs')} {opponentScore}
-                    </p>
-                  </div>
+                {/* Info */}
+                <div className="flex-1">
+                  <p className="text-neo-white font-neo-body font-bold mb-1">
+                    {t('duels.vs')} {opponent.display_name}
+                  </p>
+                  <p className="text-sm text-neo-white/70">
+                    {t('duels.you')}: {studentScore} {t('duels.vs')} {opponent.display_name}:{' '}
+                    {opponentScore}
+                  </p>
                 </div>
               </motion.div>
             );
