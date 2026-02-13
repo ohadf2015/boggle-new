@@ -48,14 +48,30 @@ describe('useLexiReactions', () => {
         { initialProps: { gameState: initialState } }
       );
 
-      // Add a long word
+      // Add a long word (9 letters → mindblown for 8+)
       const newState = createGameState({ wordsFound: ['ADVENTURE'] });
       rerender({ gameState: newState });
 
       expect(result.current.reaction).not.toBeNull();
       expect(result.current.reaction?.type).toBe('celebration');
-      expect(result.current.reaction?.variant).toBe('celebrating');
+      expect(result.current.reaction?.variant).toBe('mindblown');
       expect(result.current.reaction?.messageKey).toContain('longWord');
+    });
+
+    it('triggers celebrating (not mindblown) for 6-7 letter words', () => {
+      const initialState = createGameState({ wordsFound: [] });
+
+      const { result, rerender } = renderHook(
+        ({ gameState }) => useLexiReactions({ gameState, isPlaying: true }),
+        { initialProps: { gameState: initialState } }
+      );
+
+      // Add a 7-letter word (< 8, so celebrating, not mindblown)
+      const newState = createGameState({ wordsFound: ['PUZZLES'] });
+      rerender({ gameState: newState });
+
+      expect(result.current.reaction).not.toBeNull();
+      expect(result.current.reaction?.variant).toBe('celebrating');
     });
 
     it('does NOT trigger for words under 6 letters', () => {
@@ -137,7 +153,7 @@ describe('useLexiReactions', () => {
       expect(result.current.reaction).not.toBeNull();
       expect(result.current.reaction?.messageKey).toContain('combo10x');
       expect(result.current.reaction?.priority).toBe('high');
-      expect(result.current.reaction?.variant).toBe('victory');
+      expect(result.current.reaction?.variant).toBe('onfire');
     });
   });
 

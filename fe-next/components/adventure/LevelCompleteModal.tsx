@@ -62,7 +62,7 @@ function getMascotVariantForStars(stars: number): ExtendedMascotVariant {
   if (stars >= 3) return 'victory';      // Perfect! Trophy pose
   if (stars >= 2) return 'celebrating';  // Great! Celebration dance
   if (stars >= 1) return 'happy';        // Nice! Happy face
-  return 'thinking';                      // No stars? Thoughtful
+  return 'encouraging';                    // No stars? Supportive
 }
 
 /**

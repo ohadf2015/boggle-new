@@ -6,9 +6,17 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { getMascotImagePath, isGifVariant, MascotVariant, Mascot, MascotWithEntrance } from '../Mascot';
+import { getMascotImagePath, isGifVariant, MascotVariant, MASCOT_IMAGES, Mascot, MascotWithEntrance } from '../Mascot';
 import InteractiveMascot from '../InteractiveMascot';
 import IdleMascot from '../IdleMascot';
+import { getBaseVariant, BASE_VARIANTS, VARIANT_MAP } from '../mascotUtils';
+
+/** All 20 base GIF variants */
+const ALL_BASE_VARIANTS: MascotVariant[] = [
+  'happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy',
+  'panic', 'crying', 'onfire', 'bored', 'mindblown', 'encouraging',
+  'explorer', 'flexing', 'scared', 'shopkeeper', 'spectating', 'waving', 'powerup',
+];
 
 describe('GIF Mascot Integration', () => {
   describe('getMascotImagePath', () => {
@@ -32,28 +40,82 @@ describe('GIF Mascot Integration', () => {
       expect(path).toBe('/mascot/oops-nobg.gif');
     });
 
-    it('should return GIF paths for all 7 base variants', () => {
-      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
-
-      allVariants.forEach((variant) => {
+    it('should return GIF paths for all 20 base variants', () => {
+      ALL_BASE_VARIANTS.forEach((variant) => {
         const path = getMascotImagePath(variant);
         expect(path).toContain('.gif');
-        expect(path).toContain('-nobg.gif'); // All use background-removed GIFs
+        expect(path).toContain('-nobg.gif');
         expect(path).not.toContain('.png');
       });
+    });
+
+    it('should return correct paths for new variants', () => {
+      expect(getMascotImagePath('panic')).toBe('/mascot/panic-nobg.gif');
+      expect(getMascotImagePath('crying')).toBe('/mascot/crying-nobg.gif');
+      expect(getMascotImagePath('onfire')).toBe('/mascot/onfire-nobg.gif');
+      expect(getMascotImagePath('bored')).toBe('/mascot/bored-nobg.gif');
+      expect(getMascotImagePath('mindblown')).toBe('/mascot/mindblown-nobg.gif');
+      expect(getMascotImagePath('encouraging')).toBe('/mascot/encouraging-nobg.gif');
+      expect(getMascotImagePath('explorer')).toBe('/mascot/explorer-nobg.gif');
+      expect(getMascotImagePath('flexing')).toBe('/mascot/flexing-nobg.gif');
+      expect(getMascotImagePath('scared')).toBe('/mascot/scared-nobg.gif');
+      expect(getMascotImagePath('shopkeeper')).toBe('/mascot/shopkeeper-nobg.gif');
+      expect(getMascotImagePath('spectating')).toBe('/mascot/spectating-nobg.gif');
+      expect(getMascotImagePath('waving')).toBe('/mascot/waving-nobg.gif');
+      expect(getMascotImagePath('powerup')).toBe('/mascot/powerup-nobg.gif');
     });
   });
 
   describe('isGifVariant', () => {
     it('should return true for ALL variants (GIF-ONLY system)', () => {
-      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
-
-      allVariants.forEach((variant) => {
+      ALL_BASE_VARIANTS.forEach((variant) => {
         expect(isGifVariant(variant)).toBe(true);
       });
     });
   });
 
+  describe('BASE_VARIANTS and MASCOT_IMAGES consistency', () => {
+    it('should have 20 base variants', () => {
+      expect(BASE_VARIANTS).toHaveLength(20);
+    });
+
+    it('should have MASCOT_IMAGES entry for every base variant', () => {
+      BASE_VARIANTS.forEach((variant) => {
+        expect(MASCOT_IMAGES[variant]).toBeDefined();
+        expect(MASCOT_IMAGES[variant]).toContain('-nobg.gif');
+      });
+    });
+  });
+
+  describe('Remapped mood variant aliases', () => {
+    it('should map nervous to scared (was oops)', () => {
+      expect(getBaseVariant('nervous')).toBe('scared');
+    });
+
+    it('should map sad to crying (was thinking)', () => {
+      expect(getBaseVariant('sad')).toBe('crying');
+    });
+
+    it('should map sleepy to bored (was thinking)', () => {
+      expect(getBaseVariant('sleepy')).toBe('bored');
+    });
+
+    it('should map excited to onfire (was celebration)', () => {
+      expect(getBaseVariant('excited')).toBe('onfire');
+    });
+
+    it('should map surprised to mindblown (was oops)', () => {
+      expect(getBaseVariant('surprised')).toBe('mindblown');
+    });
+
+    it('should resolve encouraging as base variant (no longer an alias)', () => {
+      expect(getBaseVariant('encouraging')).toBe('encouraging');
+    });
+
+    it('should resolve waving as base variant (no longer an activity alias)', () => {
+      expect(getBaseVariant('waving')).toBe('waving');
+    });
+  });
 
   describe('Mascot Component (GIF-ONLY)', () => {
     it('should render happy GIF variant', () => {
@@ -64,28 +126,15 @@ describe('GIF Mascot Integration', () => {
       expect(img).toHaveAttribute('src');
     });
 
-    it('should render gaming GIF variant', () => {
-      render(<Mascot variant="gaming" />);
-      const img = screen.getByRole('img');
-      expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute('alt', 'Lexi mascot - gaming');
-      expect(img).toHaveAttribute('src');
-    });
-
-    it('should render thinking GIF variant', () => {
-      render(<Mascot variant="thinking" />);
-      const img = screen.getByRole('img');
-      expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute('alt', 'Lexi mascot - thinking');
-      expect(img).toHaveAttribute('src');
-    });
-
-    it('should render oops GIF variant', () => {
-      render(<Mascot variant="oops" />);
-      const img = screen.getByRole('img');
-      expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute('alt', 'Lexi mascot - oops');
-      expect(img).toHaveAttribute('src');
+    it('should render new base variants', () => {
+      const newVariants: MascotVariant[] = ['panic', 'crying', 'onfire', 'bored', 'encouraging'];
+      newVariants.forEach((variant) => {
+        const { unmount } = render(<Mascot variant={variant} />);
+        const img = screen.getByRole('img');
+        expect(img).toBeInTheDocument();
+        expect(img).toHaveAttribute('alt', `Lexi mascot - ${variant}`);
+        unmount();
+      });
     });
   });
 
@@ -108,8 +157,16 @@ describe('GIF Mascot Integration', () => {
       expect(img).toHaveAttribute('alt', expect.stringContaining('thinking'));
     });
 
+    it('should render new base variants directly', () => {
+      render(<InteractiveMascot variant="onfire" />);
+
+      const img = screen.getByRole('img');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/mascot/onfire-nobg.gif');
+    });
+
     it('should render extended variants (mapped to GIF)', () => {
-      // 'excited' maps to 'happy' GIF
+      // 'excited' now maps to 'onfire' GIF
       render(<InteractiveMascot variant="excited" />);
 
       const img = screen.getByRole('img');
@@ -126,8 +183,8 @@ describe('GIF Mascot Integration', () => {
       expect(img).toBeInTheDocument();
     });
 
-    it('should render with extended variant (mapped to GIF)', () => {
-      // 'encouraging' maps to 'happy' GIF
+    it('should render with encouraging as direct base variant', () => {
+      // 'encouraging' is now a base variant with dedicated GIF
       render(<IdleMascot baseVariant="encouraging" />);
 
       const img = screen.getByRole('img');
@@ -158,10 +215,8 @@ describe('GIF Mascot Integration', () => {
   });
 
   describe('GIF-Only System', () => {
-    it('should handle all 7 GIF variants without errors', () => {
-      const allVariants: MascotVariant[] = ['happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy'];
-
-      allVariants.forEach((variant) => {
+    it('should handle all 20 GIF variants without errors', () => {
+      ALL_BASE_VARIANTS.forEach((variant) => {
         expect(() => getMascotImagePath(variant)).not.toThrow();
         expect(() => isGifVariant(variant)).not.toThrow();
         const path = getMascotImagePath(variant);
@@ -173,11 +228,9 @@ describe('GIF Mascot Integration', () => {
 
   describe('Edge Cases', () => {
     it('should return true for all valid GIF variants', () => {
-      // All mascot variants are GIFs now
-      expect(isGifVariant('happy')).toBe(true);
-      expect(isGifVariant('gaming')).toBe(true);
-      expect(isGifVariant('thinking')).toBe(true);
-      expect(isGifVariant('oops')).toBe(true);
+      ALL_BASE_VARIANTS.forEach((variant) => {
+        expect(isGifVariant(variant)).toBe(true);
+      });
     });
 
     it('should return consistent results for same variant', () => {
@@ -188,6 +241,13 @@ describe('GIF Mascot Integration', () => {
       const isGif1 = isGifVariant('happy');
       const isGif2 = isGifVariant('happy');
       expect(isGif1).toBe(isGif2);
+    });
+
+    it('VARIANT_MAP should not contain keys that are base variants', () => {
+      // Base variants should resolve directly, not through VARIANT_MAP
+      BASE_VARIANTS.forEach((variant) => {
+        expect(VARIANT_MAP[variant]).toBeUndefined();
+      });
     });
   });
 });

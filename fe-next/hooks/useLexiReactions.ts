@@ -204,7 +204,7 @@ export function useLexiReactions({
     if (lastWord && lastWord.length >= LONG_WORD_LENGTH) {
       triggerReaction({
         type: 'celebration',
-        variant: 'celebrating',
+        variant: lastWord.length >= 8 ? 'mindblown' : 'celebrating',
         messageKey: getWorldMessageKey('longWord', gameState.worldId),
         priority: 'normal',
       });
@@ -233,7 +233,7 @@ export function useLexiReactions({
         const isHighCombo = milestone >= 10;
         triggerReaction({
           type: 'celebration',
-          variant: isHighCombo ? 'victory' : 'celebrating',
+          variant: isHighCombo ? 'onfire' : 'celebrating',
           messageKey: getDefaultMessageKey(`combo${milestone}x`),
           priority: isHighCombo ? 'high' : 'normal',
         });

@@ -47,13 +47,13 @@ describe('useSpellingGame', () => {
     it('should accept correct answer (exact match)', async () => {
       const { result } = renderHook(() => useSpellingGame(mockWords));
 
-      let response: { correct: boolean; correctWord: string } | null = null;
+      let response!: { correct: boolean; correctWord: string };
       act(() => {
         response = result.current.submitAnswer('cat');
       });
 
-      expect(response?.correct).toBe(true);
-      expect(response?.correctWord).toBe('cat');
+      expect(response.correct).toBe(true);
+      expect(response.correctWord).toBe('cat');
       expect(result.current.correctCount).toBe(1);
       expect(result.current.currentStreak).toBe(1);
       expect(result.current.attempts).toBe(1);
@@ -62,24 +62,24 @@ describe('useSpellingGame', () => {
     it('should accept correct answer (case insensitive)', async () => {
       const { result } = renderHook(() => useSpellingGame(mockWords));
 
-      let response: { correct: boolean; correctWord: string } | null = null;
+      let response!: { correct: boolean; correctWord: string };
       act(() => {
         response = result.current.submitAnswer('Cat');
       });
 
-      expect(response?.correct).toBe(true);
+      expect(response.correct).toBe(true);
       expect(result.current.correctCount).toBe(1);
     });
 
     it('should accept correct answer (with whitespace)', async () => {
       const { result } = renderHook(() => useSpellingGame(mockWords));
 
-      let response: { correct: boolean; correctWord: string } | null = null;
+      let response!: { correct: boolean; correctWord: string };
       act(() => {
         response = result.current.submitAnswer('  cat  ');
       });
 
-      expect(response?.correct).toBe(true);
+      expect(response.correct).toBe(true);
     });
 
     it('should increment streak on consecutive correct answers', async () => {
@@ -110,13 +110,13 @@ describe('useSpellingGame', () => {
     it('should reject incorrect answer', () => {
       const { result } = renderHook(() => useSpellingGame(mockWords));
 
-      let response: { correct: boolean; correctWord: string } | null = null;
+      let response!: { correct: boolean; correctWord: string };
       act(() => {
         response = result.current.submitAnswer('kat');
       });
 
-      expect(response?.correct).toBe(false);
-      expect(response?.correctWord).toBe('cat');
+      expect(response.correct).toBe(false);
+      expect(response.correctWord).toBe('cat');
       expect(result.current.correctCount).toBe(0);
       expect(result.current.attempts).toBe(1);
     });
@@ -147,12 +147,12 @@ describe('useSpellingGame', () => {
     it('should not accept empty string', () => {
       const { result } = renderHook(() => useSpellingGame(mockWords));
 
-      let response: { correct: boolean; correctWord: string } | null = null;
+      let response!: { correct: boolean; correctWord: string };
       act(() => {
         response = result.current.submitAnswer('');
       });
 
-      expect(response?.correct).toBe(false);
+      expect(response.correct).toBe(false);
       expect(result.current.attempts).toBe(1);
     });
   });
@@ -327,12 +327,12 @@ describe('useSpellingGame', () => {
       const { result } = renderHook(() => useSpellingGame(hebrewWords));
 
       // Submit without diacritics (normalized)
-      let response: { correct: boolean; correctWord: string } | null = null;
+      let response!: { correct: boolean; correctWord: string };
       act(() => {
         response = result.current.submitAnswer('שלום');
       });
 
-      expect(response?.correct).toBe(true);
+      expect(response.correct).toBe(true);
     });
   });
 });

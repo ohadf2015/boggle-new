@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { VocabularyWord } from '@/lib/supabase/education/types';
-import { normalizeForStorage } from '@/lib/supabase/education/types';
+import { normalizeForStorage, type VocabularyWord } from '@/lib/supabase/education/types';
 
 // ============================================
 // TYPE DEFINITIONS

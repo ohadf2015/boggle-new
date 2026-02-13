@@ -16,7 +16,20 @@ export type MascotVariant =
   | 'oops'        // oops-nobg.gif - Error/mistake/surprised states
   | 'celebration' // celebration-nobg.gif - Victory/cheering states
   | 'dj'          // dj-nobg.gif - Party/music/dancing states
-  | 'trophy';     // trophy-nobg.gif - Winner/achievement states
+  | 'trophy'      // trophy-nobg.gif - Winner/achievement states
+  | 'panic'       // panic-nobg.gif - Panicking/time pressure
+  | 'crying'      // crying-nobg.gif - Sad/losing/defeated
+  | 'onfire'      // onfire-nobg.gif - On fire/hot streak
+  | 'bored'       // bored-nobg.gif - Bored/waiting/idle
+  | 'mindblown'   // mindblown-nobg.gif - Amazed/shocked
+  | 'encouraging' // encouraging-nobg.gif - Supportive/cheering on
+  | 'explorer'    // explorer-nobg.gif - Adventuring/discovering
+  | 'flexing'     // flexing-nobg.gif - Proud/strong/earned it
+  | 'scared'      // scared-nobg.gif - Frightened/nervous
+  | 'shopkeeper'  // shopkeeper-nobg.gif - Shop/store context
+  | 'spectating'  // spectating-nobg.gif - Watching/observing
+  | 'waving'      // waving-nobg.gif - Greeting/welcoming
+  | 'powerup';    // powerup-nobg.gif - Power-up activation
 
 /**
  * Mascot GIF paths (ALL mascots use animated GIFs)
@@ -29,6 +42,19 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   celebration: '/mascot/celebration-nobg.gif',
   dj: '/mascot/dj-nobg.gif',
   trophy: '/mascot/trophy-nobg.gif',
+  panic: '/mascot/panic-nobg.gif',
+  crying: '/mascot/crying-nobg.gif',
+  onfire: '/mascot/onfire-nobg.gif',
+  bored: '/mascot/bored-nobg.gif',
+  mindblown: '/mascot/mindblown-nobg.gif',
+  encouraging: '/mascot/encouraging-nobg.gif',
+  explorer: '/mascot/explorer-nobg.gif',
+  flexing: '/mascot/flexing-nobg.gif',
+  scared: '/mascot/scared-nobg.gif',
+  shopkeeper: '/mascot/shopkeeper-nobg.gif',
+  spectating: '/mascot/spectating-nobg.gif',
+  waving: '/mascot/waving-nobg.gif',
+  powerup: '/mascot/powerup-nobg.gif',
 };
 
 /**
@@ -184,6 +210,158 @@ function getAnimationVariants(variant: MascotVariant): Variants {
           duration: 2,
           repeat: Infinity,
           ease: 'easeInOut',
+        },
+      },
+    },
+    // Panic: Fast jitter with increasing intensity
+    panic: {
+      animate: {
+        x: [0, -3, 3, -2, 2, -1, 1, 0],
+        y: [0, -2, 0, -1, 0],
+        transition: {
+          duration: 0.4,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Crying: Slow heaving bob with slight tilt
+    crying: {
+      animate: {
+        y: [0, -3, 0],
+        rotate: [0, -1, 1, 0],
+        transition: {
+          duration: 1.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // On Fire: Intense upward energy with scale pulsing
+    onfire: {
+      animate: {
+        y: [0, -10, 0],
+        scale: [1, 1.08, 1],
+        transition: {
+          duration: 0.5,
+          repeat: Infinity,
+          ease: 'easeOut',
+        },
+      },
+    },
+    // Bored: Slow lazy sway
+    bored: {
+      animate: {
+        y: [0, -2, 0],
+        rotate: [0, 1, -1, 0],
+        transition: {
+          duration: 4,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Mindblown: Dramatic scale pop with float
+    mindblown: {
+      animate: {
+        scale: [1, 1.1, 1],
+        y: [0, -8, 0],
+        transition: {
+          duration: 1,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Encouraging: Gentle nod-like motion
+    encouraging: {
+      animate: {
+        y: [0, -5, 0],
+        transition: {
+          duration: 2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Explorer: Slight swaying walk motion
+    explorer: {
+      animate: {
+        x: [0, -3, 3, 0],
+        transition: {
+          duration: 2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Flexing: Proud sway with scale pulse
+    flexing: {
+      animate: {
+        scale: [1, 1.05, 1],
+        y: [0, -3, 0],
+        transition: {
+          duration: 1.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Scared: Rapid trembling
+    scared: {
+      animate: {
+        x: [0, -4, 4, -3, 3, -1, 1, 0],
+        transition: {
+          duration: 0.6,
+          repeat: Infinity,
+          repeatDelay: 1,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Shopkeeper: Subtle lean forward/back
+    shopkeeper: {
+      animate: {
+        y: [0, -3, 0],
+        rotate: [0, 2, -2, 0],
+        transition: {
+          duration: 2.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Spectating: Relaxed bob
+    spectating: {
+      animate: {
+        y: [0, -4, 0],
+        transition: {
+          duration: 3,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Waving: Side-to-side with tilt
+    waving: {
+      animate: {
+        rotate: [0, -5, 5, 0],
+        transition: {
+          duration: 1,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Powerup: Pulsing energy
+    powerup: {
+      animate: {
+        scale: [1, 1.08, 1, 1.04, 1],
+        y: [0, -8, 0],
+        transition: {
+          duration: 0.8,
+          repeat: Infinity,
+          ease: 'easeOut',
         },
       },
     },

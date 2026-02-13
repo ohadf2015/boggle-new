@@ -42,7 +42,7 @@ interface MascotVideoProps {
  * Returns WebM (modern browsers) and MP4 (Safari fallback)
  */
 function getVideoSources(variant: MascotVariant): { webm: string; mp4: string; poster: string; gif: string } {
-  const variantMap: Record<MascotVariant, string> = {
+  const variantMap: Partial<Record<MascotVariant, string>> = {
     happy: 'main-nobg',
     gaming: 'play-nobg',
     thinking: 'study-nobg',
@@ -52,7 +52,7 @@ function getVideoSources(variant: MascotVariant): { webm: string; mp4: string; p
     trophy: 'trophy-nobg',
   };
 
-  const filename = variantMap[variant];
+  const filename = variantMap[variant] || `${variant}-nobg`;
 
   return {
     webm: `/mascot/video/${filename}.webm`,

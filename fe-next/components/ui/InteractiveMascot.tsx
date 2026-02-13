@@ -31,6 +31,19 @@ const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVar
   celebration: 'trophy',  // Celebration → Trophy (show off!)
   dj: 'celebration',      // DJ → Celebration (party time!)
   trophy: 'celebration',  // Trophy → Celebration (victory dance!)
+  panic: 'encouraging',   // Panic → Encouraging (calm down)
+  crying: 'encouraging',  // Crying → Encouraging (cheer up)
+  onfire: 'flexing',      // On Fire → Flexing (show strength)
+  bored: 'waving',        // Bored → Waving (perk up)
+  mindblown: 'happy',     // Mindblown → Happy (compose)
+  encouraging: 'happy',   // Encouraging → Happy (smile)
+  explorer: 'mindblown',  // Explorer → Mindblown (discover)
+  flexing: 'trophy',      // Flexing → Trophy (show off)
+  scared: 'encouraging',  // Scared → Encouraging (brave up)
+  shopkeeper: 'happy',    // Shopkeeper → Happy (welcome)
+  spectating: 'onfire',   // Spectating → On Fire (get hyped)
+  waving: 'happy',        // Waving → Happy (greet)
+  powerup: 'onfire',      // Powerup → On Fire (unleash)
 };
 
 const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
@@ -42,6 +55,19 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVar
   celebration: 'dj',      // Celebration → DJ (party mode!)
   dj: 'trophy',           // DJ → Trophy (winner!)
   trophy: 'celebration',  // Trophy → Celebration (celebrate win!)
+  panic: 'happy',         // Panic → Happy (relief)
+  crying: 'celebration',  // Crying → Celebration (overcome)
+  onfire: 'celebration',  // On Fire → Celebration (peak!)
+  bored: 'gaming',        // Bored → Gaming (let's play!)
+  mindblown: 'celebration', // Mindblown → Celebration (amazement)
+  encouraging: 'celebration', // Encouraging → Celebration (success!)
+  explorer: 'trophy',     // Explorer → Trophy (found it!)
+  flexing: 'celebration', // Flexing → Celebration (victory!)
+  scared: 'onfire',       // Scared → On Fire (power through!)
+  shopkeeper: 'trophy',   // Shopkeeper → Trophy (sold!)
+  spectating: 'celebration', // Spectating → Celebration (impressed!)
+  waving: 'celebration',  // Waving → Celebration (let's go!)
+  powerup: 'trophy',      // Powerup → Trophy (powered up!)
 };
 
 /**
@@ -195,6 +221,79 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       rotate: [0, 2, -2, 0],
       scale: [1, 1.03, 1],
       transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Panic: Fast jitter
+    panic: {
+      x: [0, -3, 3, -2, 2, -1, 1, 0],
+      y: [0, -2, 0, -1, 0],
+      transition: { duration: 0.4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Crying: Slow heaving bob
+    crying: {
+      y: [0, -3, 0],
+      rotate: [0, -1, 1, 0],
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // On Fire: Intense upward energy
+    onfire: {
+      y: [0, -10, 0],
+      scale: [1, 1.08, 1],
+      transition: { duration: 0.5, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Bored: Slow lazy sway
+    bored: {
+      y: [0, -2, 0],
+      rotate: [0, 1, -1, 0],
+      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Mindblown: Dramatic scale pop
+    mindblown: {
+      scale: [1, 1.1, 1],
+      y: [0, -8, 0],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Encouraging: Gentle nod
+    encouraging: {
+      y: [0, -5, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Explorer: Swaying walk
+    explorer: {
+      x: [0, -3, 3, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Flexing: Proud sway
+    flexing: {
+      scale: [1, 1.05, 1],
+      y: [0, -3, 0],
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Scared: Rapid trembling
+    scared: {
+      x: [0, -4, 4, -3, 3, -1, 1, 0],
+      transition: { duration: 0.6, repeat: Infinity, repeatDelay: 1, ease: 'easeInOut' },
+    },
+    // Shopkeeper: Subtle lean
+    shopkeeper: {
+      y: [0, -3, 0],
+      rotate: [0, 2, -2, 0],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Spectating: Relaxed bob
+    spectating: {
+      y: [0, -4, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Waving: Side-to-side tilt
+    waving: {
+      rotate: [0, -5, 5, 0],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Powerup: Pulsing energy
+    powerup: {
+      scale: [1, 1.08, 1, 1.04, 1],
+      y: [0, -8, 0],
+      transition: { duration: 0.8, repeat: Infinity, ease: 'easeOut' },
     },
   };
 

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Share } from 'lucide-react';
+import { Mascot } from '@/components/ui/Mascot';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { getAchievementShareUrl, shareWithOgImage } from '../../utils/ogShare';
@@ -155,10 +156,15 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               >
-                <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">
-                    {localizedAchievement.icon}
-                  </span>
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center">
+                    <span className="text-xl">
+                      {localizedAchievement.icon}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1">
+                    <Mascot variant="flexing" size="xs" animated={false} />
+                  </div>
                 </div>
               </motion.div>
 

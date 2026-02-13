@@ -491,7 +491,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
               <InteractiveMascot
-                variant={isMythicCombo ? 'cheering' : 'celebrating'}
+                variant={isInsaneCombo ? 'onfire' : isMythicCombo ? 'cheering' : 'celebrating'}
                 size="xs"
                 animated={!prefersReducedMotion}
                 enableHover={false}

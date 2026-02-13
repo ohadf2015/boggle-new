@@ -459,15 +459,15 @@ describe('LevelCompleteModal', () => {
       expect(mascot).toHaveAttribute('data-variant', 'happy');
     });
 
-    it('should render thinking mascot for 0 stars', () => {
+    it('should render encouraging mascot for 0 stars', () => {
       // GIVEN / WHEN
       render(<LevelCompleteModal {...defaultProps} stars={0} />);
 
       // THEN - Check that InteractiveMascot is rendered
-      // 0 stars = thinking (thoughtful)
+      // 0 stars = encouraging (supportive)
       const mascot = screen.getByTestId('interactive-mascot');
       expect(mascot).toBeInTheDocument();
-      expect(mascot).toHaveAttribute('data-variant', 'thinking');
+      expect(mascot).toHaveAttribute('data-variant', 'encouraging');
     });
   });
 });

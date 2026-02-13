@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Mascot } from '@/components/ui/Mascot';
 import MiniGrid from './MiniGrid';
 import { demoConfigs } from './demoConfigs';
 
@@ -29,13 +30,16 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
 
   return (
     <div className="flex flex-col items-center space-y-3 sm:space-y-5">
-      {/* Welcome header */}
+      {/* Welcome header with waving mascot */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
         className="text-center space-y-1"
       >
+        <div className="flex justify-center mb-1">
+          <Mascot variant="waving" size="sm" />
+        </div>
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.welcome.title')}
         </h2>

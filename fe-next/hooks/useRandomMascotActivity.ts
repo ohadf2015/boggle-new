@@ -38,7 +38,6 @@ export const DEFAULT_IDLE_ACTIVITIES: ActivityVariant[] = [
   'drinking_coffee',
   'dancing',
   'skateboarding',
-  'waving',
   'holding_trophy',
   'cheering',
 ];
@@ -55,6 +54,10 @@ export const DEFAULT_BASE_VARIANTS: MascotVariant[] = [
   'celebration',
   'dj',
   'trophy',
+  'waving',
+  'spectating',
+  'mindblown',
+  'flexing',
 ];
 
 interface UseRandomMascotActivityOptions {

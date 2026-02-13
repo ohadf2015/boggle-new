@@ -144,7 +144,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           {!isHost && (
             <div className="flex flex-col items-center gap-2">
               <InteractiveMascot
-                variant="sleepy"
+                variant="bored"
                 size="sm"
                 enableHover
                 enableClick
@@ -325,7 +325,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
                 {/* Interactive Mascot - Sleepy while waiting, excited on hover/click */}
                 <InteractiveMascot
-                  variant="sleepy"
+                  variant="bored"
                   size="xl"
                   enableHover
                   enableClick

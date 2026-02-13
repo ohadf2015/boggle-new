@@ -180,13 +180,13 @@ describe('useBlitzGame', () => {
       });
 
       const currentWord = result.current.currentWord?.word || '';
-      let response;
+      let response: { correct: boolean };
 
       act(() => {
         response = result.current.submitAnswer(currentWord.toUpperCase());
       });
 
-      expect(response.correct).toBe(true);
+      expect(response!.correct).toBe(true);
       expect(result.current.wordsFound).toBe(1);
       expect(result.current.combo).toBe(1);
     });
@@ -199,13 +199,13 @@ describe('useBlitzGame', () => {
       });
 
       const currentWord = result.current.currentWord?.word || '';
-      let response;
+      let response: { correct: boolean };
 
       act(() => {
         response = result.current.submitAnswer(`  ${currentWord}  `);
       });
 
-      expect(response.correct).toBe(true);
+      expect(response!.correct).toBe(true);
       expect(result.current.wordsFound).toBe(1);
     });
 
@@ -216,13 +216,13 @@ describe('useBlitzGame', () => {
         result.current.startGame();
       });
 
-      let response;
+      let response: { correct: boolean };
 
       act(() => {
         response = result.current.submitAnswer('wrongword');
       });
 
-      expect(response.correct).toBe(false);
+      expect(response!.correct).toBe(false);
       expect(result.current.wordsFound).toBe(0);
       expect(result.current.wordsAttempted).toBe(1);
     });

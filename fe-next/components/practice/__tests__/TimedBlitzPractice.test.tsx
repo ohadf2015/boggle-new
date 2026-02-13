@@ -15,26 +15,32 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 jest.mock('framer-motion', () => {
   const React = require('react');
+  const MockMotionDiv = React.forwardRef(
+    (
+      {
+        children,
+        initial,
+        animate,
+        exit,
+        transition,
+        whileHover,
+        whileTap,
+        ...props
+      }: any,
+      ref: any
+    ) => <div ref={ref} {...props}>{children}</div>
+  );
+  MockMotionDiv.displayName = 'MockMotionDiv';
+
+  const MockMotionSpan = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <span ref={ref} {...props}>{children}</span>
+  ));
+  MockMotionSpan.displayName = 'MockMotionSpan';
+
   return {
     motion: {
-      div: React.forwardRef(
-        (
-          {
-            children,
-            initial,
-            animate,
-            exit,
-            transition,
-            whileHover,
-            whileTap,
-            ...props
-          }: any,
-          ref: any
-        ) => <div ref={ref} {...props}>{children}</div>
-      ),
-      span: React.forwardRef(({ children, ...props }: any, ref: any) => (
-        <span ref={ref} {...props}>{children}</span>
-      )),
+      div: MockMotionDiv,
+      span: MockMotionSpan,
     },
     AnimatePresence: ({ children }: any) => <>{children}</>,
   };

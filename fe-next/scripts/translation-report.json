@@ -1,8 +1,8 @@
 {
   "summary": {
-    "totalKeysInCode": 3183,
+    "totalKeysInCode": 3190,
     "keyCountByLanguage": {
-      "en": 4563,
+      "en": 4570,
       "he": 4558,
       "sv": 4533,
       "ja": 4521,
@@ -21,21 +21,21 @@
       {
         "pattern": "achievements.${achievement.key}.name",
         "file": "components/achievements/AchievementPopup.tsx",
-        "line": 49,
+        "line": 50,
         "context": "? t(`achievements.${achievement.key}.name`) || achievement.key",
         "type": "template_literal"
       },
       {
         "pattern": "achievements.${achievement.key}.name",
         "file": "components/achievements/AchievementPopup.tsx",
-        "line": 89,
+        "line": 90,
         "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,",
         "type": "template_literal"
       },
       {
         "pattern": "achievements.${achievement.key}.description",
         "file": "components/achievements/AchievementPopup.tsx",
-        "line": 90,
+        "line": 91,
         "context": "description: t(`achievements.${achievement.key}.description`) || ''",
         "type": "template_literal"
       },
@@ -167,7 +167,14 @@
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
-      "accessibility.skipToMain"
+      "accessibility.skipToMain",
+      "education.practice.matching.title",
+      "education.practice.matching.words",
+      "education.practice.matching.definitions",
+      "education.practice.combo",
+      "education.practice.submit",
+      "education.practice.timesUp",
+      "education.practice.typeAnswer"
     ],
     "sv": [
       "share.qrCode",
@@ -217,7 +224,14 @@
       "teacher.curriculum.subjects.geography",
       "teacher.curriculum.subjects.general",
       "teacher.curriculum.standard",
-      "teacher.curriculum.lastUpdated"
+      "teacher.curriculum.lastUpdated",
+      "education.practice.matching.title",
+      "education.practice.matching.words",
+      "education.practice.matching.definitions",
+      "education.practice.combo",
+      "education.practice.submit",
+      "education.practice.timesUp",
+      "education.practice.typeAnswer"
     ],
     "ja": [
       "share.share",
@@ -281,7 +295,14 @@
       "teacher.curriculum.subjects.geography",
       "teacher.curriculum.subjects.general",
       "teacher.curriculum.standard",
-      "teacher.curriculum.lastUpdated"
+      "teacher.curriculum.lastUpdated",
+      "education.practice.matching.title",
+      "education.practice.matching.words",
+      "education.practice.matching.definitions",
+      "education.practice.combo",
+      "education.practice.submit",
+      "education.practice.timesUp",
+      "education.practice.typeAnswer"
     ],
     "es": [
       "share.share",
@@ -406,6 +427,13 @@
       "teacher.curriculum.subjects.general",
       "teacher.curriculum.standard",
       "teacher.curriculum.lastUpdated",
+      "education.practice.matching.title",
+      "education.practice.matching.words",
+      "education.practice.matching.definitions",
+      "education.practice.combo",
+      "education.practice.submit",
+      "education.practice.timesUp",
+      "education.practice.typeAnswer",
       "education.lesson.word",
       "education.lesson.words"
     ]

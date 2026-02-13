@@ -12,16 +12,15 @@ import { type MascotVariant } from './Mascot';
 export type MoodVariant =
   | 'confused'      // → thinking
   | 'proud'         // → trophy
-  | 'nervous'       // → oops
-  | 'sad'           // → thinking
+  | 'nervous'       // → scared
+  | 'sad'           // → crying
   | 'winking'       // → happy
   | 'celebrating'   // → celebration
   | 'victory'       // → celebration
-  | 'excited'       // → celebration
-  | 'encouraging'   // → happy
+  | 'excited'       // → onfire
   | 'pointing'      // → happy
-  | 'surprised'     // → oops
-  | 'sleepy'        // → thinking
+  | 'surprised'     // → mindblown
+  | 'sleepy'        // → bored
   | 'focused';      // → thinking
 
 /**
@@ -31,7 +30,6 @@ export type ActivityVariant =
   | 'eating_pizza'     // → happy
   | 'drinking_coffee'  // → thinking
   | 'dancing'          // → dj
-  | 'waving'           // → happy
   | 'holding_trophy'   // → trophy
   | 'holding_sign'     // → happy
   | 'cheering'         // → celebration
@@ -50,22 +48,20 @@ export const VARIANT_MAP: Record<string, MascotVariant> = {
   // Mood variants
   confused: 'thinking',
   proud: 'trophy',
-  nervous: 'oops',
-  sad: 'thinking',
+  nervous: 'scared',
+  sad: 'crying',
   winking: 'happy',
   celebrating: 'celebration',
   victory: 'celebration',
-  excited: 'celebration',
-  encouraging: 'happy',
+  excited: 'onfire',
   pointing: 'happy',
-  surprised: 'oops',
-  sleepy: 'thinking',
+  surprised: 'mindblown',
+  sleepy: 'bored',
   focused: 'thinking',
   // Activity variants
   eating_pizza: 'happy',
   drinking_coffee: 'thinking',
   dancing: 'dj',
-  waving: 'happy',
   holding_trophy: 'trophy',
   holding_sign: 'happy',
   cheering: 'celebration',
@@ -83,6 +79,19 @@ export const BASE_VARIANTS: MascotVariant[] = [
   'celebration',
   'dj',
   'trophy',
+  'panic',
+  'crying',
+  'onfire',
+  'bored',
+  'mindblown',
+  'encouraging',
+  'explorer',
+  'flexing',
+  'scared',
+  'shopkeeper',
+  'spectating',
+  'waving',
+  'powerup',
 ];
 
 /**

@@ -350,7 +350,7 @@ describe('useRandomMascotActivity', () => {
     it('should export DEFAULT_BASE_VARIANTS array', () => {
       expect(DEFAULT_BASE_VARIANTS).toBeDefined();
       expect(Array.isArray(DEFAULT_BASE_VARIANTS)).toBe(true);
-      expect(DEFAULT_BASE_VARIANTS.length).toBe(7); // GIF-only: 7 variants
+      expect(DEFAULT_BASE_VARIANTS.length).toBe(11); // 7 original + 4 new (waving, spectating, mindblown, flexing)
       expect(DEFAULT_BASE_VARIANTS).toContain('happy');
       expect(DEFAULT_BASE_VARIANTS).toContain('gaming');
       expect(DEFAULT_BASE_VARIANTS).toContain('thinking');
@@ -358,6 +358,10 @@ describe('useRandomMascotActivity', () => {
       expect(DEFAULT_BASE_VARIANTS).toContain('celebration');
       expect(DEFAULT_BASE_VARIANTS).toContain('dj');
       expect(DEFAULT_BASE_VARIANTS).toContain('trophy');
+      expect(DEFAULT_BASE_VARIANTS).toContain('waving');
+      expect(DEFAULT_BASE_VARIANTS).toContain('spectating');
+      expect(DEFAULT_BASE_VARIANTS).toContain('mindblown');
+      expect(DEFAULT_BASE_VARIANTS).toContain('flexing');
     });
 
     it('should use currentBaseVariant when resetting', () => {
