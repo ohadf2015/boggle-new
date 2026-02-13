@@ -72,7 +72,7 @@ describe('ChallengeButton', () => {
 
       const button = screen.getByTestId('challenge-button');
       expect(button).toBeInTheDocument();
-      expect(button).toHaveTextContent('challenge');
+      expect(button).toHaveTextContent('challengePlayer');
     });
 
     it('opens modal when clicked', () => {
@@ -137,14 +137,14 @@ describe('ChallengeButton', () => {
 
       const button = screen.getByTestId('challenge-button-icon');
       expect(button).toBeInTheDocument();
-      expect(button).not.toHaveTextContent('challenge');
+      expect(button).not.toHaveTextContent('challengePlayer');
     });
 
     it('has aria-label for accessibility', () => {
       render(<ChallengeButton {...mockProps} variant="icon" />);
 
       const button = screen.getByTestId('challenge-button-icon');
-      expect(button).toHaveAttribute('aria-label', 'challenge');
+      expect(button).toHaveAttribute('aria-label', 'challengePlayer');
     });
 
     it('opens modal when clicked', () => {

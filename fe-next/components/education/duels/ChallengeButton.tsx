@@ -103,7 +103,7 @@ export function ChallengeButton({
             'hover:bg-neo-navy/30',
             className
           )}
-          aria-label={t('challenge')}
+          aria-label={t('challengePlayer')}
           data-testid="challenge-button-icon"
         >
           <Swords className="w-5 h-5" />
@@ -139,7 +139,7 @@ export function ChallengeButton({
         data-testid="challenge-button"
       >
         <Swords className="w-5 h-5" />
-        {showSuccess ? t('challengeSent') : t('challenge')}
+        {showSuccess ? t('challengeSent') : t('challengePlayer')}
       </button>
 
       {showModal && (

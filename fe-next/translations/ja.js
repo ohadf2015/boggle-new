@@ -5104,6 +5104,10 @@ const ja = {
     }
   },
   "teacher": {
+    "teacher": {
+      "activeGames": "進行中のゲーム",
+      "noActiveGames": "進行中のゲームはありません"
+    },
     "accessRequired": "教師権限が必要です",
     "accessDenied": "このページには教師権限が必要です",
     "dashboard": {
@@ -6033,8 +6037,38 @@ const ja = {
       "retrying": "接続中..."
     }
   },
+  "backToLobby": "ロビーに戻る",
   "duelNotFound": "デュエルが見つかりません",
+  "duelsTitle": "デュエル",
   "notParticipant": "このデュエルの参加者ではありません",
+  "duels": {
+    "addWord": "単語を追加",
+    "backToLobby": "ロビーに戻る",
+    "challengeClassmate": "クラスメイトに挑戦！",
+    "draw": "引き分け！",
+    "draws": "引き分け",
+    "duelHistory": "デュエル履歴",
+    "findWords": "単語を見つけてポイントゲット！",
+    "loading": "デュエル読み込み中...",
+    "losses": "敗北",
+    "noDuelsYet": "まだデュエルなし。挑戦しよう！",
+    "playDuel": "デュエル開始",
+    "recentDuels": "最近のデュエル",
+    "scoreToBeat": "目標スコア",
+    "submitScore": "スコアを送信",
+    "typeWord": "単語を入力...",
+    "vs": "対",
+    "waitingForOpponent": "対戦相手を待っています...",
+    "winRate": "勝率",
+    "wins": "勝利",
+    "winStreak": "連勝",
+    "wordsAccepted": "承認された単語",
+    "wordsRejected": "拒否された単語",
+    "xpEarned": "獲得XP",
+    "you": "あなた",
+    "youLose": "敗北...",
+    "youWin": "勝利！"
+  },
   "system": {
     "updatingToNewVersion": "新しいバージョンに更新中..."
   }

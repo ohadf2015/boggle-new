@@ -6061,10 +6061,7 @@ const es = {
   },
   "system": {
     "updatingToNewVersion": "Actualizando a nueva versión..."
-  }
-};
-
-export { es,
+  },
   "duels": {
     "addWord": "Agregar palabra",
     "backToLobby": "Volver a la sala",
@@ -6094,3 +6091,5 @@ export { es,
     "youWin": "¡Ganaste!"
   }
 };
+
+export { es };
