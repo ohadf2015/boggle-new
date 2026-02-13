@@ -9,6 +9,89 @@
  * Event naming convention: All events use duel: prefix
  */
 
+import type { Socket } from 'socket.io';
+import { z } from 'zod';
+
+// ==========================================
+// Socket Types
+// ==========================================
+
+/**
+ * Socket with user data attached by middleware
+ * Middleware attaches userId, displayName, and classroomIds during connection
+ */
+export interface DuelSocket extends Socket {
+  data: {
+    userId: string;
+    displayName: string;
+    classroomIds: string[];
+  };
+}
+
+// ==========================================
+// State Machine
+// ==========================================
+
+/**
+ * Valid state transitions for duel lifecycle
+ * Prevents invalid state changes (e.g., accepting a completed duel)
+ */
+export const VALID_TRANSITIONS: Record<string, string[]> = {
+  pending: ['active', 'cancelled', 'expired', 'declined'],
+  active: ['completed', 'cancelled'],
+  completed: [],
+  cancelled: [],
+  expired: [],
+  declined: [],
+};
+
+// ==========================================
+// Validation Schemas
+// ==========================================
+
+/**
+ * Create duel payload validation
+ * Validates opponent, lesson, and classroom IDs are valid UUIDs
+ */
+export const createDuelSchema = z.object({
+  opponentId: z.string().uuid('Invalid opponent ID'),
+  lessonId: z.string().uuid('Invalid lesson ID'),
+  classroomId: z.string().uuid('Invalid classroom ID'),
+});
+
+export type CreateDuelPayload = z.infer<typeof createDuelSchema>;
+
+/**
+ * Accept duel payload validation
+ */
+export const acceptDuelSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+});
+
+export type AcceptDuelPayload = z.infer<typeof acceptDuelSchema>;
+
+/**
+ * Decline duel payload validation
+ */
+export const declineDuelSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+});
+
+export type DeclineDuelPayload = z.infer<typeof declineDuelSchema>;
+
+/**
+ * Cancel duel payload validation
+ */
+export const cancelDuelSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+});
+
+export type CancelDuelPayload = z.infer<typeof cancelDuelSchema>;
+
+// ==========================================
+// Event Interfaces
+// ==========================================
+
 /**
  * Client -> Server events
  * Events that clients can emit to the duel namespace
