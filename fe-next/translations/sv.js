@@ -6077,5 +6077,41 @@ const sv = {
   "realtimeDuel": "Realtidsduell",
   "duelComplete": "Duellen avslutad!"
 };
+  // Utmaningssystem (Daglig + Veckovis)
+  challenges: {
+    daily: {
+      practiceSessions: "Genomför Övningssessioner",
+      practiceSessionsDesc: "Slutför {target} övningssessioner idag",
+      wordsMastered: "Bemästra Nya Ord",
+      wordsMasteredDesc: "Bemästra {target} ord idag",
+      duelPlayed: "Spela en Duell",
+      duelPlayedDesc: "Spela {target} duellmatch idag",
+      duelWins: "Vinn Dueller",
+      duelWinsDesc: "Vinn {target} duellmatcher idag",
+      perfectAccuracy: "Perfekt Noggrannhet",
+      perfectAccuracyDesc: "Slutför en övning med 100% noggrannhet",
+      blitzHighScore: "Blitz-Läge Poäng",
+      blitzHighScoreDesc: "Få {target}+ poäng i Blitz-läge",
+      xpEarned: "Tjäna XP",
+      xpEarnedDesc: "Tjäna {target} XP idag",
+      duelStreak: "Duellvinst-serie",
+      duelStreakDesc: "Vinn {target} dueller i rad",
+      spellingPerfect: "Perfekt Stavning",
+      spellingPerfectDesc: "Få {target} perfekta poäng i stavningsövning",
+    },
+    weekly: {
+      masterWords: "Veckovis Ordbehärskning",
+      masterWordsDesc: "Bemästra {target} ord denna vecka",
+    },
+    claim: "Hämta Belöning",
+    claimed: "Hämtad!",
+    completed: "Slutförd",
+    easy: "Lätt",
+    medium: "Mellan",
+    hard: "Svår",
+    noActiveChallenges: "Inga aktiva utmaningar",
+    dailyReset: "Återställs om {hours}t {minutes}m",
+    weeklyReset: "Återställs på måndag",
+  },
 
 export { sv };

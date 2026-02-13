@@ -6080,5 +6080,41 @@ const he = {
     "youWin": "ניצחת! 🏆"
   }
 };
+  // מערכת אתגרים (יומי + שבועי)
+  challenges: {
+    daily: {
+      practiceSessions: "השלמת תרגולים",
+      practiceSessionsDesc: "השלם {target} תרגולים היום",
+      wordsMastered: "שליטה במילים חדשות",
+      wordsMasteredDesc: "שלוט ב-{target} מילים היום",
+      duelPlayed: "שחק דו-קרב",
+      duelPlayedDesc: "שחק {target} משחק דו-קרב היום",
+      duelWins: "נצח בדו-קרבות",
+      duelWinsDesc: "נצח ב-{target} משחקי דו-קרב היום",
+      perfectAccuracy: "דיוק מושלם",
+      perfectAccuracyDesc: "השלם תרגול עם 100% דיוק",
+      blitzHighScore: "ציון במצב בליץ",
+      blitzHighScoreDesc: "צבור {target}+ נקודות במצב בליץ",
+      xpEarned: "צבור ניסיון",
+      xpEarnedDesc: "צבור {target} נקודות ניסיון היום",
+      duelStreak: "רצף ניצחונות בדו-קרב",
+      duelStreakDesc: "נצח ב-{target} דו-קרבות ברצף",
+      spellingPerfect: "איות מושלם",
+      spellingPerfectDesc: "השג {target} ציונים מושלמים בתרגול איות",
+    },
+    weekly: {
+      masterWords: "שליטה שבועית במילים",
+      masterWordsDesc: "שלוט ב-{target} מילים השבוע",
+    },
+    claim: "קבל פרס",
+    claimed: "נתבע!",
+    completed: "הושלם",
+    easy: "קל",
+    medium: "בינוני",
+    hard: "קשה",
+    noActiveChallenges: "אין אתגרים פעילים",
+    dailyReset: "מתאפס בעוד {hours}ש {minutes}ד",
+    weeklyReset: "מתאפס ביום שני",
+  },
 
 export { he };

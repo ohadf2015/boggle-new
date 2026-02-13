@@ -6103,5 +6103,41 @@ const ja = {
     "updatingToNewVersion": "新しいバージョンに更新中..."
   }
 };
+  // チャレンジシステム（デイリー＋ウィークリー）
+  challenges: {
+    daily: {
+      practiceSessions: "練習セッションを完了",
+      practiceSessionsDesc: "今日{target}つの練習セッションを完了する",
+      wordsMastered: "新しい単語をマスター",
+      wordsMasteredDesc: "今日{target}つの単語をマスターする",
+      duelPlayed: "決闘をプレイ",
+      duelPlayedDesc: "今日{target}回決闘をプレイする",
+      duelWins: "決闘に勝利",
+      duelWinsDesc: "今日{target}回決闘に勝利する",
+      perfectAccuracy: "完璧な正確さ",
+      perfectAccuracyDesc: "100%の正確さで練習を完了する",
+      blitzHighScore: "ブリッツモードスコア",
+      blitzHighScoreDesc: "ブリッツモードで{target}以上のポイントを獲得",
+      xpEarned: "XPを獲得",
+      xpEarnedDesc: "今日{target}XPを獲得する",
+      duelStreak: "決闘連勝",
+      duelStreakDesc: "{target}回連続で決闘に勝利する",
+      spellingPerfect: "完璧なスペル",
+      spellingPerfectDesc: "スペル練習で{target}回完璧なスコアを獲得",
+    },
+    weekly: {
+      masterWords: "週間単語マスタリー",
+      masterWordsDesc: "今週{target}つの単語をマスターする",
+    },
+    claim: "報酬を受け取る",
+    claimed: "受取済み！",
+    completed: "完了",
+    easy: "簡単",
+    medium: "普通",
+    hard: "難しい",
+    noActiveChallenges: "アクティブなチャレンジがありません",
+    dailyReset: "{hours}時間{minutes}分後にリセット",
+    weeklyReset: "月曜日にリセット",
+  },
 
 export { ja };

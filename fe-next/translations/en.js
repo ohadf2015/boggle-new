@@ -6068,5 +6068,41 @@ const en = {
   "realtimeDuel": "Real-Time Duel",
   "duelComplete": "Duel Complete!"
 };
+  // Challenge system (Daily + Weekly)
+  challenges: {
+    daily: {
+      practiceSessions: "Complete Practice Sessions",
+      practiceSessionsDesc: "Finish {target} practice sessions today",
+      wordsMastered: "Master New Words",
+      wordsMasteredDesc: "Master {target} words today",
+      duelPlayed: "Play a Duel",
+      duelPlayedDesc: "Play {target} duel match today",
+      duelWins: "Win Duels",
+      duelWinsDesc: "Win {target} duel matches today",
+      perfectAccuracy: "Perfect Accuracy",
+      perfectAccuracyDesc: "Complete a practice with 100% accuracy",
+      blitzHighScore: "Blitz Mode Score",
+      blitzHighScoreDesc: "Score {target}+ points in Blitz mode",
+      xpEarned: "Earn XP",
+      xpEarnedDesc: "Earn {target} XP today",
+      duelStreak: "Duel Win Streak",
+      duelStreakDesc: "Win {target} duels in a row",
+      spellingPerfect: "Perfect Spelling",
+      spellingPerfectDesc: "Get {target} perfect scores in spelling practice",
+    },
+    weekly: {
+      masterWords: "Weekly Word Mastery",
+      masterWordsDesc: "Master {target} words this week",
+    },
+    claim: "Claim Reward",
+    claimed: "Claimed!",
+    completed: "Completed",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
+    noActiveChallenges: "No active challenges",
+    dailyReset: "Resets in {hours}h {minutes}m",
+    weeklyReset: "Resets on Monday",
+  },
 
 export { en };
