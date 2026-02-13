@@ -10,31 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 37 of 43 (Practice Modes) — IN PROGRESS
-Plan: 2 of 4 in current phase
-Status: Word matching complete, spelling and blitz in progress
-Last activity: 2026-02-13 — Completed 37-02-PLAN.md (Word Matching Practice with dnd-kit)
+Plan: 3 of 6 in current phase
+Status: Foundation + spelling hook complete
+Last activity: 2026-02-13 — Completed 37-03-PLAN.md (Spelling Challenge Hook)
 
-Progress: [█████░░░░░] ~14%
+Progress: [██████░░░░] ~14%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 22 min
-- Total execution time: 153 min
+- Total plans completed: 8
+- Average duration: 20 min
+- Total execution time: 160 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
-| 37 | 2 | 12 min | 6 min |
+| 37 | 3 | 19 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 36-04 (20 min), 36-05 (20 min), 36-02 (40 min), 37-01 (5 min), 37-02 (7 min)
-- Trend: Phase 37 plans very fast with TDD approach - tests-first reduces debugging time
-- Word matching (37-02) implemented in 7 min with full test coverage
-- dnd-kit pattern established, ready for reuse in other modes
+- Last 5 plans: 36-05 (20 min), 36-02 (40 min), 37-01 (5 min), 37-02 (7 min), 37-03 (7 min)
+- Trend: Phase 37 TDD plans very fast - RED-GREEN-REFACTOR cycle catches issues early
+- Spelling hook (37-03) completed in 7 min with full test coverage and bug fix
+- Hebrew normalization fix discovered and resolved through TDD
 
 *Updated after each plan completion*
 
@@ -68,6 +68,10 @@ Recent decisions affecting current work:
 - **37-02:** checkMatch signature uses definitionText (not definitionId) for simpler API
 - **37-02:** touch-action: none on draggable items for iOS scroll prevention
 - **37-02:** Component memoization pattern for drag-and-drop sub-components
+- **37-03:** First letter hint is free (doesn't count toward hints used)
+- **37-03:** Hints beyond first reset current streak to 0
+- **37-03:** Auto-advance timing: 1s for correct answers, 2s for incorrect (feedback visibility)
+- **37-03:** Hebrew normalization must sanitize niqqud before normalizing final letters
 
 ### Pending Todos
 
