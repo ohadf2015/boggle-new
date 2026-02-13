@@ -144,9 +144,9 @@ export default function PracticeModeSelector({
       solo_board: { title: 'education.practice.soloBoard', desc: 'education.practice.soloBoardDesc' },
       word_list: { title: 'education.practice.wordList', desc: 'education.practice.wordListDesc' },
       warmup: { title: 'education.practice.warmup', desc: 'education.practice.warmupDesc' },
-      matching: { title: 'education.practice.matching.title', desc: 'education.practice.matching.desc' },
-      spelling: { title: 'education.practice.spelling.title', desc: 'education.practice.spelling.desc' },
-      blitz: { title: 'education.practice.blitz.title', desc: 'education.practice.blitz.desc' },
+      matching: { title: 'education.practice.matching', desc: 'education.practice.matchingDesc' },
+      spelling: { title: 'education.practice.spelling', desc: 'education.practice.spellingDesc' },
+      blitz: { title: 'education.practice.blitz', desc: 'education.practice.blitzDesc' },
     };
     return map[type][key];
   };

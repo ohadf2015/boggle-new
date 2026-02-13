@@ -84,9 +84,9 @@ export function QuickPracticeButton({
       solo_board: t('education.practice.soloBoard') || 'Solo Board',
       word_list: t('education.practice.wordList') || 'Word List',
       warmup: t('education.practice.warmup') || 'Warmup',
-      matching: t('education.practice.matching.title') || 'Word Matching',
-      spelling: t('education.practice.spelling.title') || 'Spelling Challenge',
-      blitz: t('education.practice.blitz.title') || 'Timed Blitz',
+      matching: t('education.practice.matching') || 'Word Matching',
+      spelling: t('education.practice.spelling') || 'Spelling Challenge',
+      blitz: t('education.practice.blitz') || 'Timed Blitz',
     };
     return labels[type];
   };

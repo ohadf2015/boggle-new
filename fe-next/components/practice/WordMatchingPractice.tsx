@@ -246,7 +246,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
 
             <div className="text-center">
               <h2 className="text-xl font-neo-display text-neo-white mb-1">
-                {t('education.practice.matching.title') || 'Match Words & Definitions'}
+                {t('education.practice.matchPairs') || 'Match Words & Definitions'}
               </h2>
               <p className="text-neo-white/70 font-neo-body">
                 {matchedPairs.size} / {words.length}
@@ -273,7 +273,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             {/* Word column */}
             <div className="space-y-3">
               <h3 className="text-sm font-neo-display text-neo-white/60 uppercase tracking-wide mb-3">
-                {t('education.practice.matching.words') || 'Words'}
+                {t('education.practice.matchingWords') || 'Words'}
               </h3>
               <AdaptiveMotion.div className="space-y-3">
                 {wordColumn.map((item) => (
@@ -289,7 +289,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             {/* Definition column */}
             <div className="space-y-3">
               <h3 className="text-sm font-neo-display text-neo-white/60 uppercase tracking-wide mb-3">
-                {t('education.practice.matching.definitions') || 'Definitions'}
+                {t('education.practice.matchingDefinitions') || 'Definitions'}
               </h3>
               <AdaptiveMotion.div className="space-y-3">
                 {definitionColumn.map((item) => (

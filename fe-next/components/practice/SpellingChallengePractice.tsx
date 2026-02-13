@@ -128,7 +128,7 @@ export function SpellingChallengePractice({
 
           <div className="text-center">
             <h2 className="text-xl font-neo-display text-neo-white mb-1">
-              {t('education.practice.spelling.title') || 'Spelling Challenge'}
+              {t('education.practice.spellTheWord') || 'Spelling Challenge'}
             </h2>
             <p className="text-neo-white/70 font-neo-body" data-testid="progress-text">
               {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
