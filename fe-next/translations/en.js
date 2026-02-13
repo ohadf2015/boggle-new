@@ -5434,6 +5434,11 @@ const en = {
       "encouragement100": "Perfect! You've mastered these words.",
       "swipeHint": "Swipe to answer",
       "swipeExplain": "Swipe right for 'Got It', left for 'Don't Know'",
+      "matching": {
+        "title": "Word Matching",
+        "words": "Words",
+        "definitions": "Definitions"
+      },
       "mastery": {
         "not_started": "Not Started",
         "started": "Getting Started",
