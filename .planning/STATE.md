@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 38 of 43 (Async Duels) — IN PROGRESS
-Plan: 3 of 6 in current phase (just completed)
-Status: Duel gameplay handlers with server-side anti-cheat validation
-Last activity: 2026-02-13 — Completed 38-03-PLAN.md (Duel Gameplay Handlers)
+Plan: 4 of 6 in current phase (just completed)
+Status: Socket hook + lobby presence system complete
+Last activity: 2026-02-13 — Completed 38-04-PLAN.md (Socket Hook + Lobby Handlers)
 
-Progress: [████████░░] ~21%
+Progress: [████████░░] ~22%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 14 min
-- Total execution time: 208 min
+- Total execution time: 224 min
 
 **By Phase:**
 
@@ -29,13 +29,13 @@ Progress: [████████░░] ~21%
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
-| 38 | 3 | 21 min | 7 min |
+| 38 | 4 | 37 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 37-05 (15 min), 37-06 (12 min), 38-01 (4 min), 38-02 (8 min), 38-03 (9 min)
-- Trend: Phase 38 maintaining velocity (7 min average)
-- TDD approach with server-side validation
-- Anti-cheat architecture preventing score tampering
+- Last 5 plans: 37-06 (12 min), 38-01 (4 min), 38-02 (8 min), 38-03 (9 min), 38-04 (16 min)
+- Trend: Phase 38 averaging 9 min (slightly up from 7 min)
+- TDD producing comprehensive test coverage (39 tests total)
+- Socket.IO integration with React hooks pattern
 
 *Updated after each plan completion*
 
@@ -89,6 +89,9 @@ Recent decisions affecting current work:
 - **38-03:** Words validated against frozen board_state (fair play guarantee)
 - **38-03:** xp_awarded flag prevents double XP (race condition protection)
 - **38-03:** Draw awards DUEL_DRAW XP to both players (fair outcome for ties)
+- **38-04:** In-memory lobby tracking acceptable for single-server deployment (Map-based, no Redis needed yet)
+- **38-04:** Event listener cleanup pattern: on* methods return unsubscribe function (React useEffect compatible)
+- **38-04:** Lobby state vs update: New joiner gets full state, others get delta (bandwidth optimization)
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 38-03-PLAN.md (Duel Gameplay Handlers)
+Stopped at: Completed 38-04-PLAN.md (Socket Hook + Lobby Handlers)
 Resume file: None
-Next action: Execute 38-04-PLAN.md (Frontend Duel Integration)
+Next action: Execute 38-05-PLAN.md (Full Duel Flow Integration)
