@@ -3,7 +3,7 @@
  * DB operations for practice_sessions table
  */
 
-import { createClient } from '@/utils/supabase/server';
+import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 // ============================================
@@ -59,9 +59,9 @@ export async function createPracticeSession(
   data: CreatePracticeSessionData
 ): Promise<{ data: PracticeSessionRow | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
-    const { data: session, error } = await supabase
+const { data: session, error } = await supabase
       .from('practice_sessions')
       .insert({
         student_id: data.studentId,
@@ -104,9 +104,9 @@ export async function completePracticeSession(
   data: CompletePracticeSessionData
 ): Promise<{ data: PracticeSessionRow | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
-    const { data: session, error } = await supabase
+const { data: session, error } = await supabase
       .from('practice_sessions')
       .update({
         score: data.score,
@@ -148,9 +148,9 @@ export async function getPracticeSessions(
   mode?: PracticeMode
 ): Promise<{ data: PracticeSessionRow[]; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
 
-    let query = supabase
+let query = supabase
       .from('practice_sessions')
       .select('*')
       .eq('student_id', studentId);
@@ -187,9 +187,9 @@ export async function getPracticeSessionById(
   sessionId: string
 ): Promise<{ data: PracticeSessionRow | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
-    const { data: session, error } = await supabase
+const { data: session, error } = await supabase
       .from('practice_sessions')
       .select('*')
       .eq('id', sessionId)

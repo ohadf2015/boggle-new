@@ -3,7 +3,7 @@
  * Database CRUD operations for student_duels and duel_turns tables
  */
 
-import { createClient } from '@/utils/supabase/server';
+import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 // ============================================
@@ -95,7 +95,7 @@ export async function createDuel(
   data: CreateDuelData
 ): Promise<{ data: DuelRow | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
     // Default expires_at to 24 hours from now if not provided
     const expiresAt =
@@ -141,7 +141,7 @@ export async function getDuelById(
   duelId: string
 ): Promise<{ data: any | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
     const { data: duel, error } = await supabase
       .from('student_duels')
@@ -181,7 +181,7 @@ export async function updateDuelStatus(
   updates?: Partial<DuelRow>
 ): Promise<{ data: DuelRow | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
     const { data: duel, error } = await supabase
       .from('student_duels')
@@ -217,7 +217,7 @@ export async function getDuelHistory(
   limit?: number
 ): Promise<{ data: DuelHistoryEntry[]; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
 
     let query = supabase
       .from('student_duels')
@@ -267,7 +267,7 @@ export async function getDuelStats(
   studentId: string
 ): Promise<{ data: DuelStatsResult | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
     const { data: duels, error } = await supabase
       .from('student_duels')
@@ -373,7 +373,7 @@ export async function submitDuelTurn(
   wordsFound: string[]
 ): Promise<{ data: DuelTurnRow | null; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
     const { data: turn, error } = await supabase
       .from('duel_turns')
@@ -409,7 +409,7 @@ export async function getPendingDuelsForStudent(
   studentId: string
 ): Promise<{ data: DuelRow[]; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
 
     const { data: duels, error } = await supabase
       .from('student_duels')
@@ -440,7 +440,7 @@ export async function getActiveDuelsForStudent(
   studentId: string
 ): Promise<{ data: DuelRow[]; error: { message: string } | null }> {
   try {
-    const supabase = await createClient();
+    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
 
     const { data: duels, error } = await supabase
       .from('student_duels')

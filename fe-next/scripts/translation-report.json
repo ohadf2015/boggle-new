@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3243,
+    "totalKeysInCode": 3250,
     "keyCountByLanguage": {
-      "en": 4627,
-      "he": 4625,
-      "sv": 4600,
-      "ja": 4588,
-      "es": 4501
+      "en": 4653,
+      "he": 4676,
+      "sv": 4670,
+      "ja": 4685,
+      "es": 4595
     },
-    "missingFromEnglish": 44,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -160,447 +160,15 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "accept",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 201
-        }
-      ]
-    },
-    {
-      "key": "availableOpponents",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 119
-        },
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 242
-        }
-      ]
-    },
-    {
-      "key": "cancel",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 160
-        }
-      ]
-    },
-    {
-      "key": "challengedYou",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelNotification.tsx",
-          "line": 111
-        }
-      ]
-    },
-    {
-      "key": "challengeFrom",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 184
-        }
-      ]
-    },
-    {
-      "key": "challengePlayer",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 94
-        }
-      ]
-    },
-    {
-      "key": "challengeReceived",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelNotification.tsx",
-          "line": 108
-        }
-      ]
-    },
-    {
-      "key": "challengeSent",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 174
-        }
-      ]
-    },
-    {
-      "key": "decline",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 212
-        }
-      ]
-    },
-    {
-      "key": "duelLobbyTitle",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 155
-        }
-      ]
-    },
-    {
-      "key": "duels.addWord",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 363
-        }
-      ]
-    },
-    {
-      "key": "duels.backToLobby",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 250
-        }
-      ]
-    },
-    {
-      "key": "duels.challengeClassmate",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 107
-        }
-      ]
-    },
-    {
-      "key": "duels.draw",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "duels.draws",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 144
-        }
-      ]
-    },
-    {
-      "key": "duels.duelHistory",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 119
-        }
-      ]
-    },
-    {
-      "key": "duels.findWords",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 324
-        }
-      ]
-    },
-    {
-      "key": "duels.loading",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 163
-        },
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 398
-        },
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 93
-        }
-      ]
-    },
-    {
-      "key": "duels.losses",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 136
-        }
-      ]
-    },
-    {
-      "key": "duels.noDuelsYet",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 105
-        }
-      ]
-    },
-    {
-      "key": "duels.playDuel",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 309
-        }
-      ]
-    },
-    {
-      "key": "duels.recentDuels",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 176
-        }
-      ]
-    },
-    {
-      "key": "duels.scoreToBeat",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 292
-        }
-      ]
-    },
-    {
-      "key": "duels.submitScore",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 398
-        }
-      ]
-    },
-    {
-      "key": "duels.typeWord",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 345
-        },
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 355
-        },
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 372
-        }
-      ]
-    },
-    {
-      "key": "duels.vs",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 315
-        },
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 236
-        },
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 239
-        }
-      ]
-    },
-    {
-      "key": "duels.waitingForOpponent",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 269
-        }
-      ]
-    },
-    {
-      "key": "duels.winRate",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 165
-        }
-      ]
-    },
-    {
-      "key": "duels.wins",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 128
-        }
-      ]
-    },
-    {
-      "key": "duels.winStreak",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 152
-        }
-      ]
-    },
-    {
-      "key": "duels.wordsAccepted",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 277
-        }
-      ]
-    },
-    {
-      "key": "duels.wordsRejected",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 285
-        }
-      ]
-    },
-    {
-      "key": "duels.xpEarned",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 241
-        }
-      ]
-    },
-    {
-      "key": "duels.you",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 223
-        },
-        {
-          "file": "components/education/duels/DuelHistory.tsx",
-          "line": 239
-        }
-      ]
-    },
-    {
-      "key": "duels.youLose",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "duels.youWin",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelGameView.tsx",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "noOpponentsOnline",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 246
-        }
-      ]
-    },
-    {
-      "key": "noPendingChallenges",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 170
-        }
-      ]
-    },
-    {
-      "key": "pendingChallenges",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 162
-        }
-      ]
-    },
-    {
-      "key": "quickMatch",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelLobby.tsx",
-          "line": 235
-        }
-      ]
-    },
-    {
-      "key": "selectLesson",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 127
-        },
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 140
-        }
-      ]
-    },
-    {
-      "key": "sendChallenge",
-      "usages": [
-        {
-          "file": "components/education/duels/DuelChallengeModal.tsx",
-          "line": 174
-        }
-      ]
-    },
-    {
-      "key": "teacher.teacher.activeGames",
-      "usages": [
-        {
-          "file": "components/education/ActiveGamesIndicator.tsx",
-          "line": 30
-        }
-      ]
-    },
-    {
-      "key": "teacher.teacher.noActiveGames",
-      "usages": [
-        {
-          "file": "components/education/ActiveGamesIndicator.tsx",
-          "line": 18
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "share.qrCode",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
-      "accessibility.skipToMain"
+      "accessibility.skipToMain",
+      "challengeAction"
     ],
     "sv": [
       "share.qrCode",
@@ -608,120 +176,68 @@
       "buzz.error.failed",
       "buzz.error.noInternet",
       "accessibility.skipToMain",
-      "teacher.curriculum.title",
-      "teacher.curriculum.description",
-      "teacher.curriculum.browse",
-      "teacher.curriculum.import",
-      "teacher.curriculum.importing",
-      "teacher.curriculum.imported",
-      "teacher.curriculum.importError",
-      "teacher.curriculum.preview",
-      "teacher.curriculum.wordCount",
-      "teacher.curriculum.noResults",
-      "teacher.curriculum.selectGrade",
-      "teacher.curriculum.selectSubject",
-      "teacher.curriculum.allGrades",
-      "teacher.curriculum.allSubjects",
-      "teacher.curriculum.filters.title",
-      "teacher.curriculum.filters.grade",
-      "teacher.curriculum.filters.subject",
-      "teacher.curriculum.filters.language",
-      "teacher.curriculum.filters.clear",
-      "teacher.curriculum.grades.grade_1",
-      "teacher.curriculum.grades.grade_2",
-      "teacher.curriculum.grades.grade_3",
-      "teacher.curriculum.grades.grade_4",
-      "teacher.curriculum.grades.grade_5",
-      "teacher.curriculum.grades.grade_6",
-      "teacher.curriculum.grades.grade_7",
-      "teacher.curriculum.grades.grade_8",
-      "teacher.curriculum.grades.grade_9",
-      "teacher.curriculum.grades.grade_10",
-      "teacher.curriculum.grades.grade_11",
-      "teacher.curriculum.grades.grade_12",
-      "teacher.curriculum.gradeGroups.elementary",
-      "teacher.curriculum.gradeGroups.middle",
-      "teacher.curriculum.gradeGroups.high",
-      "teacher.curriculum.subjects.english",
-      "teacher.curriculum.subjects.hebrew",
-      "teacher.curriculum.subjects.science",
-      "teacher.curriculum.subjects.math",
-      "teacher.curriculum.subjects.history",
-      "teacher.curriculum.subjects.geography",
-      "teacher.curriculum.subjects.general",
-      "teacher.curriculum.standard",
-      "teacher.curriculum.lastUpdated"
+      "education.student.lessonsAssigned",
+      "education.student.join.title",
+      "education.student.join.subtitle",
+      "education.student.join.codeLabel",
+      "education.student.join.codeHint",
+      "education.student.join.button",
+      "education.student.join.joining",
+      "education.student.join.pasteButton",
+      "education.student.join.success",
+      "education.student.join.invalidCode",
+      "education.student.join.alreadyMember",
+      "education.student.join.codePasted",
+      "education.student.join.emptyClipboard",
+      "education.student.join.clipboardError",
+      "education.xp.level",
+      "education.xp.maxLevel",
+      "education.xp.nextLevel",
+      "education.xp.xpGained",
+      "education.xp.totalXp",
+      "education.xp.progress",
+      "education.xp.levelUp",
+      "education.xp.newLevel",
+      "education.xp.streak",
+      "education.xp.streakBonus",
+      "education.xp.keepGoing",
+      "education.xp.newTitleUnlocked",
+      "education.xp.continue",
+      "education.xp.mastery.perfectFlashcard",
+      "education.xp.mastery.learnedWords",
+      "education.xp.mastery.discoveredVocab",
+      "education.xp.mastery.greatPractice",
+      "education.xp.mastery.lessonMastered",
+      "education.xp.mastery.keepPracticing",
+      "education.xp.streakMilestone.week",
+      "education.xp.streakMilestone.weekDesc",
+      "education.xp.streakMilestone.twoWeeks",
+      "education.xp.streakMilestone.twoWeeksDesc",
+      "education.xp.streakMilestone.month",
+      "education.xp.streakMilestone.monthDesc",
+      "challengeAction"
     ],
     "ja": [
-      "share.share",
-      "share.qrCode",
-      "consent.modal.ageOptions.14",
-      "consent.modal.dataCollected.title",
-      "consent.modal.dataCollected.items",
-      "consent.modal.howWeUse.title",
-      "consent.modal.howWeUse.items",
-      "buzz.error.loading",
-      "buzz.error.failed",
-      "buzz.error.noInternet",
-      "accessibility.skipToMain",
-      "adventure.allStars",
-      "adventure.continue",
-      "adventure.perfect",
-      "adventure.restart",
-      "adventure.score",
-      "adventure.victory",
-      "adventure.hint.title",
-      "adventure.achievements.progress",
-      "teacher.curriculum.title",
-      "teacher.curriculum.description",
-      "teacher.curriculum.browse",
-      "teacher.curriculum.import",
-      "teacher.curriculum.importing",
-      "teacher.curriculum.imported",
-      "teacher.curriculum.importError",
-      "teacher.curriculum.preview",
-      "teacher.curriculum.wordCount",
-      "teacher.curriculum.noResults",
-      "teacher.curriculum.selectGrade",
-      "teacher.curriculum.selectSubject",
-      "teacher.curriculum.allGrades",
-      "teacher.curriculum.allSubjects",
-      "teacher.curriculum.filters.title",
-      "teacher.curriculum.filters.grade",
-      "teacher.curriculum.filters.subject",
-      "teacher.curriculum.filters.language",
-      "teacher.curriculum.filters.clear",
-      "teacher.curriculum.grades.grade_1",
-      "teacher.curriculum.grades.grade_2",
-      "teacher.curriculum.grades.grade_3",
-      "teacher.curriculum.grades.grade_4",
-      "teacher.curriculum.grades.grade_5",
-      "teacher.curriculum.grades.grade_6",
-      "teacher.curriculum.grades.grade_7",
-      "teacher.curriculum.grades.grade_8",
-      "teacher.curriculum.grades.grade_9",
-      "teacher.curriculum.grades.grade_10",
-      "teacher.curriculum.grades.grade_11",
-      "teacher.curriculum.grades.grade_12",
-      "teacher.curriculum.gradeGroups.elementary",
-      "teacher.curriculum.gradeGroups.middle",
-      "teacher.curriculum.gradeGroups.high",
-      "teacher.curriculum.subjects.english",
-      "teacher.curriculum.subjects.hebrew",
-      "teacher.curriculum.subjects.science",
-      "teacher.curriculum.subjects.math",
-      "teacher.curriculum.subjects.history",
-      "teacher.curriculum.subjects.geography",
-      "teacher.curriculum.subjects.general",
-      "teacher.curriculum.standard",
-      "teacher.curriculum.lastUpdated"
+      "challenge.yourRecord",
+      "challenge.noRecord",
+      "challenge.newRecord",
+      "challenge.tied",
+      "challenge.recordToBeat",
+      "challenge.toGo",
+      "challenge.settingFirst",
+      "challenge.allTimeRecord",
+      "challenge.firstRecord",
+      "challenge.shortOf",
+      "challenge.settingRecord",
+      "challenge.aheadOfRecord",
+      "challenge.behindRecord",
+      "challenge.tiedWithRecord",
+      "challenge.challengeFriend",
+      "challenge.shareHint",
+      "challenge.winnerPrompt",
+      "challengeAction"
     ],
     "es": [
-      "share.share",
-      "share.qrCode",
-      "achievements.cinematic.unlocked",
-      "achievements.cinematic.gold",
-      "achievements.cinematic.platinum",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -791,98 +307,85 @@
       "adventure.bosses.abilities.lexiconStorm.desc",
       "adventure.bosses.abilities.ultimateWord.name",
       "adventure.bosses.abilities.ultimateWord.desc",
-      "adventure.player.health",
-      "adventure.player.danger",
-      "adventure.player.healthLabel",
-      "teacher.progress.noProgressYet",
-      "teacher.progress.selectFilters",
-      "teacher.curriculum.title",
-      "teacher.curriculum.description",
-      "teacher.curriculum.browse",
-      "teacher.curriculum.import",
-      "teacher.curriculum.importing",
-      "teacher.curriculum.imported",
-      "teacher.curriculum.importError",
-      "teacher.curriculum.preview",
-      "teacher.curriculum.wordCount",
-      "teacher.curriculum.noResults",
-      "teacher.curriculum.selectGrade",
-      "teacher.curriculum.selectSubject",
-      "teacher.curriculum.allGrades",
-      "teacher.curriculum.allSubjects",
-      "teacher.curriculum.filters.title",
-      "teacher.curriculum.filters.grade",
-      "teacher.curriculum.filters.subject",
-      "teacher.curriculum.filters.language",
-      "teacher.curriculum.filters.clear",
-      "teacher.curriculum.grades.grade_1",
-      "teacher.curriculum.grades.grade_2",
-      "teacher.curriculum.grades.grade_3",
-      "teacher.curriculum.grades.grade_4",
-      "teacher.curriculum.grades.grade_5",
-      "teacher.curriculum.grades.grade_6",
-      "teacher.curriculum.grades.grade_7",
-      "teacher.curriculum.grades.grade_8",
-      "teacher.curriculum.grades.grade_9",
-      "teacher.curriculum.grades.grade_10",
-      "teacher.curriculum.grades.grade_11",
-      "teacher.curriculum.grades.grade_12",
-      "teacher.curriculum.gradeGroups.elementary",
-      "teacher.curriculum.gradeGroups.middle",
-      "teacher.curriculum.gradeGroups.high",
-      "teacher.curriculum.subjects.english",
-      "teacher.curriculum.subjects.hebrew",
-      "teacher.curriculum.subjects.science",
-      "teacher.curriculum.subjects.math",
-      "teacher.curriculum.subjects.history",
-      "teacher.curriculum.subjects.geography",
-      "teacher.curriculum.subjects.general",
-      "teacher.curriculum.standard",
-      "teacher.curriculum.lastUpdated",
-      "education.practice.matching",
-      "education.practice.matchingDesc",
-      "education.practice.spelling",
-      "education.practice.spellingDesc",
-      "education.practice.blitz",
-      "education.practice.blitzDesc",
-      "education.practice.sessionComplete",
-      "education.practice.hint",
-      "education.practice.matchingWords",
-      "education.practice.matchingDefinitions",
-      "education.practice.matchPairs",
-      "education.practice.pairsMatched",
-      "education.practice.dragToMatch",
-      "education.practice.tapToSelect",
-      "education.practice.correctMatch",
-      "education.practice.wrongMatch",
-      "education.practice.spellTheWord",
-      "education.practice.typeTheWord",
-      "education.practice.correctSpelling",
-      "education.practice.incorrectSpelling",
-      "education.practice.blitzTitle",
-      "education.practice.getReady",
-      "education.practice.go",
-      "education.practice.timesUp",
-      "education.practice.maxCombo",
-      "education.practice.blitzScore",
-      "education.practice.needsMoreWords",
-      "education.practice.combo",
-      "education.practice.submit",
-      "education.practice.typeAnswer",
-      "education.practice.typeWord",
-      "education.practice.correct",
-      "education.practice.incorrect",
-      "education.practice.correctAnswer",
-      "education.practice.streak",
-      "education.practice.difficulty.easy",
-      "education.practice.difficulty.medium",
-      "education.practice.difficulty.hard",
+      "teacher.progress.title",
+      "teacher.progress.student",
+      "teacher.progress.wordsAttempted",
+      "teacher.progress.wordsMastered",
+      "teacher.progress.accuracy",
+      "teacher.progress.lastActive",
+      "teacher.progress.noData",
+      "teacher.progress.assignLessons",
+      "teacher.progress.chartTitle",
+      "teacher.progress.wordsLearned",
+      "teacher.progress.expandDetails",
+      "teacher.progress.exportCSV",
+      "teacher.progress.exportSuccess",
+      "teacher.progress.noDataToExport",
+      "teacher.progress.allClassrooms",
+      "teacher.progress.allLessons",
+      "teacher.progress.anonymousStudent",
+      "teacher.progress.breakdownWord",
+      "teacher.progress.breakdownAttempts",
+      "teacher.progress.breakdownCorrect",
+      "teacher.progress.statusMastered",
+      "teacher.progress.statusLearning",
+      "teacher.progress.noWordsYet",
       "education.lesson.word",
-      "education.lesson.words"
+      "education.lesson.words",
+      "accept",
+      "availableOpponents",
+      "backToLobby",
+      "cancel",
+      "challengeAction",
+      "challengeFrom",
+      "challengePlayer",
+      "challengeReceived",
+      "challengeSent",
+      "challengedYou",
+      "decline",
+      "duelLobbyTitle",
+      "duelNotFound",
+      "duelsTitle",
+      "history",
+      "joinClassroomToDuel",
+      "lobby",
+      "noOpponentsOnline",
+      "noPendingChallenges",
+      "notParticipant",
+      "pendingChallenges",
+      "quickMatch",
+      "selectLesson",
+      "sendChallenge"
     ]
   },
   "keysNotInEnglish": {
     "he": [
+      "education.duels.addWord",
+      "education.duels.backToLobby",
+      "education.duels.challengeClassmate",
+      "education.duels.draw",
+      "education.duels.draws",
+      "education.duels.duelHistory",
+      "education.duels.findWords",
+      "education.duels.loading",
+      "education.duels.losses",
+      "education.duels.noDuelsYet",
+      "education.duels.playDuel",
+      "education.duels.recentDuels",
+      "education.duels.scoreToBeat",
+      "education.duels.submitScore",
+      "education.duels.typeWord",
+      "education.duels.vs",
+      "education.duels.waitingForOpponent",
+      "education.duels.winRate",
+      "education.duels.wins",
+      "education.duels.winStreak",
+      "education.duels.wordsAccepted",
+      "education.duels.wordsRejected",
+      "education.duels.xpEarned",
+      "education.duels.you",
+      "education.duels.youLose",
+      "education.duels.youWin",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "education.classroomGame.connecting"
@@ -906,6 +409,47 @@
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "education.duels.addWord",
+      "education.duels.backToLobby",
+      "education.duels.challengeClassmate",
+      "education.duels.draw",
+      "education.duels.draws",
+      "education.duels.duelHistory",
+      "education.duels.findWords",
+      "education.duels.loading",
+      "education.duels.losses",
+      "education.duels.noDuelsYet",
+      "education.duels.playDuel",
+      "education.duels.recentDuels",
+      "education.duels.scoreToBeat",
+      "education.duels.submitScore",
+      "education.duels.typeWord",
+      "education.duels.vs",
+      "education.duels.waitingForOpponent",
+      "education.duels.winRate",
+      "education.duels.wins",
+      "education.duels.winStreak",
+      "education.duels.wordsAccepted",
+      "education.duels.wordsRejected",
+      "education.duels.xpEarned",
+      "education.duels.you",
+      "education.duels.youLose",
+      "education.duels.youWin",
+      "education.student.keepGoing",
+      "education.student.newTitleUnlocked",
+      "education.student.continue",
+      "education.student.mastery.perfectFlashcard",
+      "education.student.mastery.learnedWords",
+      "education.student.mastery.discoveredVocab",
+      "education.student.mastery.greatPractice",
+      "education.student.mastery.lessonMastered",
+      "education.student.mastery.keepPracticing",
+      "education.student.streakMilestone.week",
+      "education.student.streakMilestone.weekDesc",
+      "education.student.streakMilestone.twoWeeks",
+      "education.student.streakMilestone.twoWeeksDesc",
+      "education.student.streakMilestone.month",
+      "education.student.streakMilestone.monthDesc",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "education.classroomGame.connecting"
@@ -913,6 +457,7 @@
     "ja": [
       "consent.modal.dataUsage.title",
       "consent.modal.dataUsage.items",
+      "challenge",
       "admin.wordBank.filters.allValidationStatuses",
       "admin.wordBank.filters.pending",
       "admin.wordBank.filters.approved",
@@ -931,6 +476,32 @@
       "admin.wordBank.wikipediaSync.errorMessage",
       "admin.wordBank.wikipediaSync.noFilesFound",
       "admin.wordBank.wikipediaSync.lastSynced",
+      "education.duels.addWord",
+      "education.duels.backToLobby",
+      "education.duels.challengeClassmate",
+      "education.duels.draw",
+      "education.duels.draws",
+      "education.duels.duelHistory",
+      "education.duels.findWords",
+      "education.duels.loading",
+      "education.duels.losses",
+      "education.duels.noDuelsYet",
+      "education.duels.playDuel",
+      "education.duels.recentDuels",
+      "education.duels.scoreToBeat",
+      "education.duels.submitScore",
+      "education.duels.typeWord",
+      "education.duels.vs",
+      "education.duels.waitingForOpponent",
+      "education.duels.winRate",
+      "education.duels.wins",
+      "education.duels.winStreak",
+      "education.duels.wordsAccepted",
+      "education.duels.wordsRejected",
+      "education.duels.xpEarned",
+      "education.duels.you",
+      "education.duels.youLose",
+      "education.duels.youWin",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "education.classroomGame.connecting"
@@ -970,8 +541,32 @@
       "adventure.skills.hintMaster.name",
       "adventure.skills.xpBoost.name",
       "adventure.skills.goldRush.name",
-      "progress.noProgressYet",
-      "progress.selectFilters"
+      "education.duels.loading",
+      "education.duels.playDuel",
+      "education.duels.findWords",
+      "education.duels.submitScore",
+      "education.duels.waitingForOpponent",
+      "education.duels.youWin",
+      "education.duels.youLose",
+      "education.duels.draw",
+      "education.duels.xpEarned",
+      "education.duels.backToLobby",
+      "education.duels.wordsAccepted",
+      "education.duels.wordsRejected",
+      "education.duels.scoreToBeat",
+      "education.duels.typeWord",
+      "education.duels.addWord",
+      "education.duels.vs",
+      "education.duels.you",
+      "education.duels.duelHistory",
+      "education.duels.wins",
+      "education.duels.losses",
+      "education.duels.draws",
+      "education.duels.winStreak",
+      "education.duels.winRate",
+      "education.duels.recentDuels",
+      "education.duels.noDuelsYet",
+      "education.duels.challengeClassmate"
     ]
   }
 }
