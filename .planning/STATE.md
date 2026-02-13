@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 37 of 43 (Practice Modes) — COMPLETE
-Plan: 6 of 6 in current phase (all done)
-Status: All 3 new practice modes built, integrated, translated, and verified
-Last activity: 2026-02-13 — Completed 37-06-PLAN.md (Translations + Human Verification)
+Phase: 38 of 43 (Async Duels) — IN PROGRESS
+Plan: 1 of 6 in current phase (just completed)
+Status: Duel types and CRUD operations implemented with TDD
+Last activity: 2026-02-13 — Completed 38-01-PLAN.md (Duel Types & CRUD)
 
-Progress: [████████░░] ~19%
+Progress: [████████░░] ~20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 17 min
-- Total execution time: 187 min
+- Total plans completed: 12
+- Average duration: 15 min
+- Total execution time: 191 min
 
 **By Phase:**
 
@@ -29,12 +29,13 @@ Progress: [████████░░] ~19%
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
+| 38 | 1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 37-01 (5 min), 37-02 (7 min), 37-03 (7 min), 37-05 (15 min), 37-06 (12 min)
-- Trend: Phase 37 consistently fast (~8 min/plan average)
+- Last 5 plans: 37-02 (7 min), 37-03 (7 min), 37-05 (15 min), 37-06 (12 min), 38-01 (4 min)
+- Trend: Phase 38 starting strong (4 min for TDD foundation)
 - Translation pre-commit hook catching missing keys early
-- Wave-based parallel execution effective for independent components
+- TDD cycle well-established (RED-GREEN-REFACTOR pattern)
 
 *Updated after each plan completion*
 
@@ -76,6 +77,10 @@ Recent decisions affecting current work:
 - **37-05:** CSS variables used for neo-purple and neo-red (no Tailwind classes yet)
 - **37-05:** Mode selector shows 7 practice modes with session counts
 - **37-06:** Flat translation key convention (matching, matchingDesc) not nested (matching.title, matching.desc)
+- **38-01:** Declined status separate from cancelled (opponent-initiated vs challenger-initiated)
+- **38-01:** Server-side Supabase client pattern for duels.ts (following practice.ts)
+- **38-01:** Computed isWin field in getDuelHistory (avoids complex SQL)
+- **38-01:** Streak calculation processes duels chronologically (current vs max streak)
 
 ### Pending Todos
 
@@ -88,6 +93,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Phase 37 COMPLETE
+Stopped at: Completed 38-01-PLAN.md (Duel Types & CRUD)
 Resume file: None
-Next action: Plan and execute Phase 38
+Next action: Execute 38-02-PLAN.md (Duel WebSocket Handlers)
