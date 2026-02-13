@@ -5523,6 +5523,34 @@ const he = {
         "monthDesc": "30 יום של מצוינות!"
       }
     },
+    "duels": {
+      "loading": "טוען...",
+      "playDuel": "שחק דו-קרב",
+      "findWords": "מצא מילים",
+      "submitScore": "שלח ניקוד",
+      "waitingForOpponent": "ממתין ליריב...",
+      "youWin": "ניצחת!",
+      "youLose": "הפסדת",
+      "draw": "תיקו!",
+      "xpEarned": "נקודות ניסיון שהושגו",
+      "backToLobby": "חזרה ללובי",
+      "wordsAccepted": "מילים שהתקבלו",
+      "wordsRejected": "מילים שנדחו",
+      "scoreToBeat": "ניקוד להכות",
+      "typeWord": "הקלד מילה...",
+      "addWord": "הוסף מילה",
+      "vs": "נגד",
+      "you": "אתה",
+      "duelHistory": "היסטוריית דו-קרבות",
+      "wins": "ניצחונות",
+      "losses": "הפסדים",
+      "draws": "תיקו",
+      "winStreak": "רצף ניצחונות",
+      "winRate": "אחוז ניצחונות",
+      "recentDuels": "דו-קרבות אחרונים",
+      "noDuelsYet": "עדיין לא שוחקו דו-קרבות",
+      "challengeClassmate": "אתגר חבר לכיתה!"
+    },
     "lesson": {
       "definition": "הגדרה",
       "examples": "דוגמאות שימוש",
@@ -5576,6 +5604,10 @@ const he = {
         "profile": "פרופיל"
       }
     },
+    "teacher": {
+      "activeGames": "משחקים פעילים",
+      "noActiveGames": "אין משחקים פעילים"
+    },
     "classroomGame": {
       "title": "משחק כיתתי",
       "createGame": "יצירת משחק כיתתי",
@@ -5612,7 +5644,8 @@ const he = {
       "selectAllLessons": "בחר הכל",
       "deselectAll": "בטל בחירה",
       "createClassroom": "צור כיתה",
-      "createLesson": "צור שיעור"
+      "createLesson": "צור שיעור",
+      "connecting": "מתחבר למשחק..."
     },
     "lessonWords": {
       "title": "אוצר מילים שיעורי",

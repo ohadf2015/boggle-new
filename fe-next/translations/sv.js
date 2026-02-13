@@ -5495,6 +5495,34 @@ const sv = {
         "monthDesc": "30 dagar av excellens!"
       }
     },
+    "duels": {
+      "loading": "Laddar...",
+      "playDuel": "Spela duell",
+      "findWords": "Hitta ord",
+      "submitScore": "Skicka poäng",
+      "waitingForOpponent": "Väntar på motståndare...",
+      "youWin": "Du vinner!",
+      "youLose": "Du förlorar",
+      "draw": "Oavgjort!",
+      "xpEarned": "XP intjänat",
+      "backToLobby": "Tillbaka till lobby",
+      "wordsAccepted": "Ord accepterade",
+      "wordsRejected": "Ord avvisade",
+      "scoreToBeat": "Poäng att slå",
+      "typeWord": "Skriv ett ord...",
+      "addWord": "Lägg till ord",
+      "vs": "mot",
+      "you": "Du",
+      "duelHistory": "Duellhistorik",
+      "wins": "Vinster",
+      "losses": "Förluster",
+      "draws": "Oavgjort",
+      "winStreak": "Vinst-svit",
+      "winRate": "Vinst-procent",
+      "recentDuels": "Senaste dueller",
+      "noDuelsYet": "Inga dueller spelade än",
+      "challengeClassmate": "Utmana en klasskamrat!"
+    },
     "lesson": {
       "definition": "Definition",
       "examples": "Användningsexempel",
@@ -5548,6 +5576,10 @@ const sv = {
         "profile": "Profil"
       }
     },
+    "teacher": {
+      "activeGames": "aktiva spel",
+      "noActiveGames": "Inga aktiva spel"
+    },
     "classroomGame": {
       "title": "Klassrumsspel",
       "createGame": "Skapa klassrumsspel",
@@ -5584,7 +5616,8 @@ const sv = {
       "selectAllLessons": "Välj alla",
       "deselectAll": "Avmarkera alla",
       "createClassroom": "Skapa klassrum",
-      "createLesson": "Skapa lektion"
+      "createLesson": "Skapa lektion",
+      "connecting": "Ansluter till spelet..."
     },
     "lessonWords": {
       "title": "Lektionsordförråd",

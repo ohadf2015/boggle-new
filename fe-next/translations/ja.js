@@ -5474,6 +5474,34 @@ const ja = {
         "monthDesc": "30日間の素晴らしい成果！"
       }
     },
+    "duels": {
+      "loading": "読み込み中...",
+      "playDuel": "デュエルをプレイ",
+      "findWords": "単語を見つける",
+      "submitScore": "スコアを送信",
+      "waitingForOpponent": "相手を待っています...",
+      "youWin": "勝利！",
+      "youLose": "敗北",
+      "draw": "引き分け！",
+      "xpEarned": "獲得XP",
+      "backToLobby": "ロビーに戻る",
+      "wordsAccepted": "承認された単語",
+      "wordsRejected": "拒否された単語",
+      "scoreToBeat": "目標スコア",
+      "typeWord": "単語を入力...",
+      "addWord": "単語を追加",
+      "vs": "対",
+      "you": "あなた",
+      "duelHistory": "デュエル履歴",
+      "wins": "勝利",
+      "losses": "敗北",
+      "draws": "引き分け",
+      "winStreak": "連勝",
+      "winRate": "勝率",
+      "recentDuels": "最近のデュエル",
+      "noDuelsYet": "まだデュエルがありません",
+      "challengeClassmate": "クラスメイトに挑戦！"
+    },
     "lesson": {
       "definition": "定義",
       "examples": "使用例",
@@ -5527,6 +5555,10 @@ const ja = {
         "profile": "プロフィール"
       }
     },
+    "teacher": {
+      "activeGames": "アクティブなゲーム",
+      "noActiveGames": "アクティブなゲームはありません"
+    },
     "classroomGame": {
       "title": "クラスゲーム",
       "createGame": "クラスゲームを作成",
@@ -5563,7 +5595,8 @@ const ja = {
       "selectAllLessons": "すべて選択",
       "deselectAll": "選択解除",
       "createClassroom": "教室を作成",
-      "createLesson": "レッスンを作成"
+      "createLesson": "レッスンを作成",
+      "connecting": "ゲームに接続中..."
     },
     "lessonWords": {
       "title": "レッスン語彙",
