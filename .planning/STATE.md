@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 39 of 43 (Real-Time Duels) — IN PROGRESS
-Plan: 3 of 5 complete (39-01, 39-02, 39-03)
-Status: Wave 2 complete. Real-time infrastructure wired into registry and hook API extended.
-Last activity: 2026-02-13 — Completed 39-03-PLAN.md (registry wiring + hook extension)
+Plan: 4 of 5 complete (39-01, 39-02, 39-03, 39-04)
+Status: Wave 3 complete. Real-time duel UI components built and tested.
+Last activity: 2026-02-13 — Completed 39-04-PLAN.md (real-time UI components)
 
-Progress: [███████████] ~40.6% (3.6/8 phases complete)
+Progress: [████████████] ~41.2% (3.8/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
+- Total plans completed: 24
 - Average duration: 13 min
-- Total execution time: 333 min
+- Total execution time: 342 min
 
 **By Phase:**
 
@@ -30,15 +30,16 @@ Progress: [███████████] ~40.6% (3.6/8 phases complete)
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
 | 38 | 8 | 83 min | 10 min |
-| 39 | 3 | 56 min | 19 min |
+| 39 | 4 | 65 min | 16 min |
 
 **Recent Trend:**
-- Last 5 plans: 38-08 (5 min), 39-01 (25 min), 39-02 (24 min), 39-03 (7 min)
-- Trend: Phase 39 Wave 2 complete (registry wiring + hook extension)
+- Last 5 plans: 39-01 (25 min), 39-02 (24 min), 39-03 (7 min), 39-04 (9 min)
+- Trend: Phase 39 Wave 3 complete (real-time UI components)
 - Wave 1 TDD: 11/11 core tests passing, 4 timer tests skipped (Jest limitation)
 - Wave 2: Integration complete (7 min for registry + hook)
+- Wave 3: UI components complete (9 min for 4 components + tests)
 - Phase 38 COMPLETE: All async duel functionality delivered
-- Phase 39 IN PROGRESS: Backend infrastructure wired, ready for UI (39-04, 39-05)
+- Phase 39 IN PROGRESS: Backend + UI complete, ready for flow testing (39-05)
 
 *Updated after each plan completion*
 
@@ -120,6 +121,10 @@ Recent decisions affecting current work:
 - **39-03:** duelType defaults to 'async' for backward compatibility (existing code unchanged)
 - **39-03:** Types extracted to separate file when hook exceeds 400 lines (useDuelSocket.types.ts)
 - **39-03:** All listeners follow cleanup pattern (useCallback, ref tracking, unsubscribe function)
+- **39-04:** Server-timestamp countdown with 100ms interval updates (accurate time sync, smooth display)
+- **39-04:** Pending→accepted/rejected word status transitions (immediate feedback, server validates async)
+- **39-04:** Three UI sub-components pattern (OpponentProgressBar, DuelDisconnectOverlay, ForfeitConfirmDialog)
+- **39-04:** Animated split progress bar with Framer Motion spring (live score comparison, playful motion)
 
 ### Pending Todos
 
@@ -132,6 +137,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 39-03-PLAN.md (registry wiring + hook extension)
+Stopped at: Completed 39-04-PLAN.md (real-time UI components)
 Resume file: None
-Next action: Execute 39-04 (real-time UI components) or 39-05 (real-time flow testing)
+Next action: Execute 39-05 (real-time flow testing) to complete Phase 39
