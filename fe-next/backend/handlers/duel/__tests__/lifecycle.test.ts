@@ -97,7 +97,7 @@ describe('Duel Lifecycle Handlers', () => {
     // Create opponent socket mock
     opponentSocket = {
       id: 'opponent-socket-id',
-      data: { userId: 'opponent-id', displayName: 'OpponentUser', classroomIds: [] },
+      data: { userId: '550e8400-e29b-41d4-a716-446655440099', displayName: 'OpponentUser', classroomIds: [] },
       emit: jest.fn(),
       join: jest.fn(),
     } as unknown as jest.Mocked<DuelSocket>;
@@ -195,7 +195,7 @@ describe('Duel Lifecycle Handlers', () => {
 
     test('should emit duel:challenge-received to opponent', async () => {
       const validPayload = {
-        opponentId: 'opponent-id',
+        opponentId: '550e8400-e29b-41d4-a716-446655440099',
         lessonId: '550e8400-e29b-41d4-a716-446655440001',
         classroomId: '550e8400-e29b-41d4-a716-446655440002',
       };
@@ -445,7 +445,7 @@ describe('Duel Lifecycle Handlers', () => {
           id: '550e8400-e29b-41d4-a716-446655440000',
           status: 'pending',
           opponent_id: 'user-123',
-          challenger_id: 'opponent-id', // matches socket in namespace
+          challenger_id: '550e8400-e29b-41d4-a716-446655440099', // matches socket in namespace
         },
         error: null,
       });
@@ -503,7 +503,7 @@ describe('Duel Lifecycle Handlers', () => {
           id: '550e8400-e29b-41d4-a716-446655440000',
           status: 'pending',
           challenger_id: 'other-user',
-          opponent_id: 'opponent-id',
+          opponent_id: '550e8400-e29b-41d4-a716-446655440099',
         },
         error: null,
       });
@@ -525,7 +525,7 @@ describe('Duel Lifecycle Handlers', () => {
           id: '550e8400-e29b-41d4-a716-446655440000',
           status: 'pending',
           challenger_id: 'user-123',
-          opponent_id: 'opponent-id',
+          opponent_id: '550e8400-e29b-41d4-a716-446655440099',
         },
         error: null,
       });
@@ -547,7 +547,7 @@ describe('Duel Lifecycle Handlers', () => {
           id: '550e8400-e29b-41d4-a716-446655440000',
           status: 'pending',
           challenger_id: 'user-123',
-          opponent_id: 'opponent-id', // matches socket in namespace
+          opponent_id: '550e8400-e29b-41d4-a716-446655440099', // matches socket in namespace
         },
         error: null,
       });
