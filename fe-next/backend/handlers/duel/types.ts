@@ -38,11 +38,12 @@ export interface DuelSocket extends Socket {
  */
 export const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['active', 'cancelled', 'expired', 'declined'],
-  active: ['completed', 'cancelled'],
+  active: ['completed', 'cancelled', 'forfeited'],
   completed: [],
   cancelled: [],
   expired: [],
   declined: [],
+  forfeited: [],
 };
 
 // ==========================================
@@ -88,6 +89,44 @@ export const cancelDuelSchema = z.object({
 
 export type CancelDuelPayload = z.infer<typeof cancelDuelSchema>;
 
+/**
+ * Submit word payload validation (real-time duels)
+ */
+export const submitWordSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+  word: z.string().min(1, 'Word cannot be empty'),
+  positions: z.array(z.number()).optional(),
+});
+
+export type SubmitWordPayload = z.infer<typeof submitWordSchema>;
+
+/**
+ * Forfeit duel payload validation
+ */
+export const forfeitDuelSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+});
+
+export type ForfeitDuelPayload = z.infer<typeof forfeitDuelSchema>;
+
+/**
+ * Join duel room payload validation
+ */
+export const joinDuelRoomSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+});
+
+export type JoinDuelRoomPayload = z.infer<typeof joinDuelRoomSchema>;
+
+/**
+ * Sync state payload validation
+ */
+export const syncStateSchema = z.object({
+  duelId: z.string().uuid('Invalid duel ID'),
+});
+
+export type SyncStatePayload = z.infer<typeof syncStateSchema>;
+
 // ==========================================
 // Event Interfaces
 // ==========================================
@@ -129,6 +168,10 @@ export interface DuelClientEvents {
   // Room events
   'duel:join-room': (data: { duelId: string }) => void;
   'duel:leave-room': (data: { duelId: string }) => void;
+
+  // Real-time duel events
+  'duel:forfeit': (data: { duelId: string }) => void;
+  'duel:sync-state': (data: { duelId: string }) => void;
 }
 
 /**
@@ -209,5 +252,50 @@ export interface DuelServerEvents {
     code: string;
     message: string;
     duelId?: string;
+  }) => void;
+
+  // Real-time duel events
+  'duel:started': (data: {
+    duelId: string;
+    boardState: string[][];
+    startTime: string;
+    timeLimit: number;
+    players: string[];
+  }) => void;
+
+  'duel:word-accepted': (data: {
+    word: string;
+    points: number;
+    totalScore: number;
+    wordCount: number;
+  }) => void;
+
+  'duel:word-rejected': (data: {
+    word: string;
+    reason: string;
+  }) => void;
+
+  'duel:opponent-disconnected': (data: {
+    opponentId: string;
+    gracePeriodSeconds: number;
+  }) => void;
+
+  'duel:opponent-reconnected': (data: {
+    opponentId: string;
+  }) => void;
+
+  'duel:state-synced': (data: {
+    duelId: string;
+    challengerScore: number;
+    opponentScore: number;
+    challengerWords: string[];
+    opponentWords: string[];
+    timeRemaining: number;
+  }) => void;
+
+  'duel:forfeited': (data: {
+    duelId: string;
+    forfeitedBy: string;
+    winnerId: string;
   }) => void;
 }
