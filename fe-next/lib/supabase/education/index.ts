@@ -7,3 +7,5 @@ export * from './leaderboard';
 export * from './curriculum';
 export * from './duels';
 export * from './practice';
+export * from './challenges';
+export * from './milestones';
