@@ -6109,6 +6109,8 @@ const sv = {
     easy: "Lätt",
     medium: "Mellan",
     hard: "Svår",
+    daily: "Dagliga Utmaningar",
+    weekly: "Veckovisa Uppdrag",
     noActiveChallenges: "Inga aktiva utmaningar",
     dailyReset: "Återställs om {hours}t {minutes}m",
     weeklyReset: "Återställs på måndag",

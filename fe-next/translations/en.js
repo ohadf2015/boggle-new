@@ -6100,6 +6100,8 @@ const en = {
     easy: "Easy",
     medium: "Medium",
     hard: "Hard",
+    daily: "Daily Challenges",
+    weekly: "Weekly Quests",
     noActiveChallenges: "No active challenges",
     dailyReset: "Resets in {hours}h {minutes}m",
     weeklyReset: "Resets on Monday",

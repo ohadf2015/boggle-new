@@ -6112,6 +6112,8 @@ const he = {
     easy: "קל",
     medium: "בינוני",
     hard: "קשה",
+    daily: "אתגרים יומיים",
+    weekly: "משימות שבועיות",
     noActiveChallenges: "אין אתגרים פעילים",
     dailyReset: "מתאפס בעוד {hours}ש {minutes}ד",
     weeklyReset: "מתאפס ביום שני",

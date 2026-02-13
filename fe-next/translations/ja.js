@@ -6135,6 +6135,8 @@ const ja = {
     easy: "簡単",
     medium: "普通",
     hard: "難しい",
+    daily: "デイリーチャレンジ",
+    weekly: "週間クエスト",
     noActiveChallenges: "アクティブなチャレンジがありません",
     dailyReset: "{hours}時間{minutes}分後にリセット",
     weeklyReset: "月曜日にリセット",
