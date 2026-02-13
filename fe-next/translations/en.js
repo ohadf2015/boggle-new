@@ -6005,7 +6005,13 @@ const en = {
     "xpEarned": "XP Earned",
     "you": "You",
     "youLose": "You Lose!",
-    "youWin": "You Win!"
+    "youWin": "You Win!",
+    "opponentDisconnected": "{opponentName} disconnected",
+    "autoForfeitMessage": "You'll win automatically",
+    "forfeitTitle": "Forfeit Duel?",
+    "forfeitDescription": "You'll lose and opponent wins. Can't be undone.",
+    "forfeitConfirm": "Forfeit",
+    "forfeitCancel": "Cancel"
   },
   "accept": "Accept",
   "availableOpponents": "Available Opponents",
