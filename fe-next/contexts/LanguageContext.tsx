@@ -252,7 +252,14 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
 export const useLanguage = (): LanguageContextValue => {
     const context = useContext(LanguageContext);
     if (!context) {
-        throw new Error('useLanguage must be used within a LanguageProvider');
+        // In development, throw to catch missing provider early
+        if (process.env.NODE_ENV === 'development') {
+            throw new Error('useLanguage must be used within a LanguageProvider');
+        }
+        // In production, gracefully fall back instead of crashing the page
+        // Fixes JAVASCRIPT-NEXTJS-FQ: React 19 edge case where context is
+        // briefly unavailable during dynamic import + Suspense on low-end devices
+        return LANGUAGE_FALLBACK;
     }
     return context;
 };

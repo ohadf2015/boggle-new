@@ -10,7 +10,7 @@
 import React, { Component, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, SkipForward } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 // ============================================
 // TYPES
@@ -83,7 +83,7 @@ interface ErrorFallbackProps {
 }
 
 function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
-  const { t } = useLanguage();
+  const { t } = useLanguageSafe();
 
   return (
     <div

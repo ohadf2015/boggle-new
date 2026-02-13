@@ -33,6 +33,16 @@ const IGNORED_ERROR_PATTERNS = [
   // Socket.IO user-facing errors - handled gracefully with toast messages
   /Game code already in use/i,
   /already in use/i,
+  /Game not found/i,
+  // Speech synthesis - non-critical TTS feature failure on some devices (JAVASCRIPT-NEXTJS-G2)
+  /Speech synthesis error/i,
+  // Share API failures - expected when Web Share API unavailable (JAVASCRIPT-NEXTJS-1Y)
+  /Share failed/i,
+  // Virtuoso scroll warnings - benign virtual list behavior (JAVASCRIPT-NEXTJS-3A, 3B)
+  /Failed to scroll to index/i,
+  /smooth.*scroll behavior.*not fully supported/i,
+  // LogRocket duplicate init - benign race condition (JAVASCRIPT-NEXTJS-1X)
+  /LogRocket has already been loaded/i,
   // Gifts network errors - transient errors with automatic retry (JAVASCRIPT-NEXTJS-8A, JAVASCRIPT-NEXTJS-74)
   /\[Gifts\].*Network error.*will retry/i,
 ] as const;
