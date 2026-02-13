@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 37 COMPLETE — Practice Modes. Ready for Phase 38.
+**Current focus:** Phase 38 COMPLETE — Async Duels. Ready for Phase 39.
 
 ## Current Position
 
-Phase: 38 of 43 (Async Duels) — IN PROGRESS
-Plan: 7 of 8 in current phase (just completed)
-Status: All UI + routing complete, translations pending
-Last activity: 2026-02-13 — Completed 38-07-PLAN.md (Duel Pages & Routes)
+Phase: 38 of 43 (Async Duels) — VERIFIED COMPLETE
+Plan: 8 of 8 in current phase (all complete)
+Status: Phase goal verified. SOC-02 ChallengeButton deferred to Phase 41 (needs roster/profile surfaces).
+Last activity: 2026-02-13 — Phase 38 verified and complete
 
-Progress: [████████░░] ~25%
+Progress: [██████████] ~37.5% (3/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 12 min
-- Total execution time: 265 min
+- Total plans completed: 20
+- Average duration: 14 min
+- Total execution time: 270 min
 
 **By Phase:**
 
@@ -29,14 +29,14 @@ Progress: [████████░░] ~25%
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
-| 38 | 8 | 78 min | 10 min |
+| 38 | 8 | 83 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 38-04 (16 min), 38-05 (12 min), 38-06 (12 min), 38-07 (6 min)
-- Trend: Phase 38 averaging 10 min (consistent efficiency)
-- TDD producing comprehensive test coverage (124 tests total: 113 previous + 11 new)
-- UI routing complete: All duel pages and components routable
-- ChallengeButton enables "challenge from anywhere" pattern (SOC-02)
+- Last 5 plans: 38-05 (12 min), 38-06 (12 min), 38-07 (6 min), 38-08 (5 min)
+- Trend: Phase 38 completed at 10 min avg (efficient execution)
+- Complete i18n coverage: 40+ translation keys across 4 languages
+- Human verification passed: RTL Hebrew, Swedish, Japanese all correct
+- Phase 38 COMPLETE: All async duel functionality delivered
 
 *Updated after each plan completion*
 
@@ -105,6 +105,7 @@ Recent decisions affecting current work:
 - **38-07:** State-based tabs instead of routing-based (instant switching, better UX)
 - **38-07:** Participant verification on duel page load (server-side security check)
 - **38-07:** ChallengeButton dual variants (button and icon) for flexible placement (SOC-02)
+- **38-08:** Flat translation key convention applied to duel keys (duelLobbyTitle not education.duels.duelLobbyTitle)
 
 ### Pending Todos
 
@@ -117,6 +118,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 38-07-PLAN.md (Duel Pages & Routes)
+Stopped at: Phase 38 complete and verified
 Resume file: None
-Next action: Execute 38-08-PLAN.md (Duel Translations)
+Next action: Plan Phase 39 (Real-Time Duels)

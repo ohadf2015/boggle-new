@@ -24,11 +24,11 @@ Infrastructure changes required before feature work.
 
 Student-vs-student competition — the centerpiece feature.
 
-- [ ] **DUEL-01**: User can create an async duel challenge — play a board, freeze state, send challenge to classmate with score to beat
-- [ ] **DUEL-02**: User can accept and play an async duel challenge — play same frozen board, compare scores, determine winner
+- [x] **DUEL-01**: User can create an async duel challenge — play a board, freeze state, send challenge to classmate with score to beat
+- [x] **DUEL-02**: User can accept and play an async duel challenge — play same frozen board, compare scores, determine winner
 - [ ] **DUEL-03**: User can start a real-time 1v1 duel — both players see same board simultaneously with live progress indicators
-- [ ] **DUEL-04**: User can browse a duel lobby showing pending invites, available opponents, and quick-match option within their classroom
-- [ ] **DUEL-05**: User can view duel history with win/loss record, streaks, and per-opponent stats
+- [x] **DUEL-04**: User can browse a duel lobby showing pending invites, available opponents, and quick-match option within their classroom
+- [x] **DUEL-05**: User can view duel history with win/loss record, streaks, and per-opponent stats
 
 ### Practice Modes (PRAC)
 
@@ -70,7 +70,7 @@ Improved teacher tools and workflows.
 Student-facing social features within classroom boundaries.
 
 - [ ] **SOC-01**: User has a student profile page showing stats, badges, recent activity, XP level, and duel record
-- [ ] **SOC-02**: User can challenge a specific classmate to a duel directly from their profile or the classroom roster
+- [x] **SOC-02**: User can challenge a specific classmate to a duel directly from their profile or the classroom roster
 - [ ] **SOC-03**: User can see a classroom activity feed showing recent duels, achievements unlocked, and milestones reached by classmates
 
 ---
@@ -109,15 +109,15 @@ These features were identified in research but deferred to future milestones:
 | FOUND-02 | Phase 36 | Complete |
 | FOUND-03 | Phase 36 | Complete |
 | FOUND-04 | Phase 36 | Complete |
-| DUEL-01 | Phase 38 | Pending |
-| DUEL-02 | Phase 38 | Pending |
+| DUEL-01 | Phase 38 | Complete |
+| DUEL-02 | Phase 38 | Complete |
 | DUEL-03 | Phase 39 | Pending |
-| DUEL-04 | Phase 38 | Pending |
-| DUEL-05 | Phase 38 | Pending |
-| PRAC-01 | Phase 37 | Pending |
-| PRAC-02 | Phase 37 | Pending |
-| PRAC-03 | Phase 37 | Pending |
-| PRAC-04 | Phase 37 | Pending |
+| DUEL-04 | Phase 38 | Complete |
+| DUEL-05 | Phase 38 | Complete |
+| PRAC-01 | Phase 37 | Complete |
+| PRAC-02 | Phase 37 | Complete |
+| PRAC-03 | Phase 37 | Complete |
+| PRAC-04 | Phase 37 | Complete |
 | GAMF-01 | Phase 40 | Pending |
 | GAMF-02 | Phase 40 | Pending |
 | GAMF-03 | Phase 40 | Pending |
@@ -130,7 +130,7 @@ These features were identified in research but deferred to future milestones:
 | TEACH-02 | Phase 42 | Pending |
 | TEACH-03 | Phase 42 | Pending |
 | SOC-01 | Phase 41 | Pending |
-| SOC-02 | Phase 38 | Pending |
+| SOC-02 | Phase 38 | Complete |
 | SOC-03 | Phase 41 | Pending |
 
 ---
