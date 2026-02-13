@@ -1,8 +1,24 @@
-// This page uses client-side contexts, so it must be rendered dynamically
 export const dynamic = 'force-dynamic';
 
-import DuelGamePageClient from './PageClient';
+import { Suspense } from 'react';
+import PageClient from './PageClient';
 
-export default function DuelGamePage({ params }: { params: { duelId: string } }) {
-  return <DuelGamePageClient duelId={params.duelId} />;
+export default async function DuelPage({
+  params,
+}: {
+  params: Promise<{ duelId: string }>;
+}) {
+  const { duelId } = await params;
+
+  return (
+    <Suspense
+      fallback={
+        <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan" />
+        </div>
+      }
+    >
+      <PageClient duelId={duelId} />
+    </Suspense>
+  );
 }
