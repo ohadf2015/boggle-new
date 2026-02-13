@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 40 of 43 (Gamification Enhancements) — IN PROGRESS
-Plan: 1 of 4 in current phase (foundation complete)
-Status: Database foundation ready. Plans 02-04 can proceed.
-Last activity: 2026-02-14 — Completed 40-01-PLAN.md
+Plan: 4 of 4 in current phase (milestones + achievements complete)
+Status: Core gamification features ready. Phase 40 nearly complete.
+Last activity: 2026-02-14 — Completed 40-04-PLAN.md
 
-Progress: [█████████████░] ~50% (4/8 phases complete, 1/4 plans in phase 40)
+Progress: [█████████████░] ~52% (4/8 phases complete, 4/4 plans in phase 40)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
+- Total plans completed: 27
 - Average duration: 13 min
-- Total execution time: 350 min
+- Total execution time: 361 min
 
 **By Phase:**
 
@@ -31,12 +31,13 @@ Progress: [█████████████░] ~50% (4/8 phases complete
 | 37 | 6 | 46 min | 8 min |
 | 38 | 8 | 83 min | 10 min |
 | 39 | 5 | 71 min | 14 min |
-| 40 | 1 | 2 min | 2 min |
+| 40 | 2 | 13 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 39-02 (24 min), 39-03 (7 min), 39-04 (9 min), 39-05 (6 min), 40-01 (2 min)
-- Phase 40 IN PROGRESS: 1/4 plans, 2 min so far
-- 40-01: Database foundation (leaderboard snapshots + 10 achievements + types)
+- Last 5 plans: 39-03 (7 min), 39-04 (9 min), 39-05 (6 min), 40-01 (2 min), 40-04 (11 min)
+- Phase 40 IN PROGRESS: 2/4 plans, 13 min so far
+- 40-01: Database foundation (2 min)
+- 40-04: Progression milestones + achievement grid (11 min)
 
 *Updated after each plan completion*
 
@@ -127,6 +128,10 @@ Recent decisions affecting current work:
 - **40-01:** Four-tier achievement system (bronze → silver → gold → platinum with increasing thresholds)
 - **40-01:** Duel achievements track: wins, streak, comebacks, speed, veteran status
 - **40-01:** Practice achievements track: spelling accuracy, matching speed, blitz scores, streaks, mode variety
+- **40-04:** Major vs Minor Milestones - Major (5,10,25,50,100) trigger celebration with larger rewards, minor give smaller rewards without overlay
+- **40-04:** Milestone rewards scale exponentially (100 XP at L5 → 5000 XP at L100)
+- **40-04:** Secret achievement pattern - show ??? until count >= 1
+- **40-04:** Category filter tabs for achievements (All, Progress, Skill, Consistency, Exploration)
 
 ### Pending Todos
 
@@ -136,10 +141,12 @@ None yet.
 
 - Pre-existing build error: utils/supabase/server.ts uses next/headers in client component context (not related to Phase 37)
 - **40-01:** Migration file created but NOT yet applied to database (requires Supabase credentials or MCP tools)
+- **40-04:** Pre-existing build error in PageClient.tsx (timeScope property not in UseClassroomLeaderboardOptions type) - from plan 40-01/40-02
+- **40-04:** Missing translation keys from challenges module (40-02 or 40-03) - not from this plan
 
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 40-01-PLAN.md (database foundation)
+Stopped at: Completed 40-04-PLAN.md (progression milestones + achievement grid)
 Resume file: None
-Next action: Execute 40-02 (Daily Challenges) or 40-03 (Weekly Quests) - both independent
+Next action: Phase 40 core features complete. Address blockers or move to Phase 41.
