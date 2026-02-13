@@ -23,7 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { WizardStep } from '@/components/ui/WizardStep';
 import { MultiLessonSelector } from './MultiLessonSelector';
-import { getLessons, getClassrooms, type VocabularyLesson, type Classroom } from '@/lib/supabase/teacher';
+import { getLessons, getClassrooms, type VocabularyLesson, type Classroom } from '@/lib/supabase/education';
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';

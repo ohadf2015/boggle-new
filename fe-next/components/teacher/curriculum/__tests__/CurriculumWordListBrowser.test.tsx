@@ -13,10 +13,10 @@ import {
   getCurriculumWordLists,
   importCurriculumToLesson,
   CurriculumWordList,
-} from '@/lib/supabase/teacher';
+} from '@/lib/supabase/education';
 
-// Mock the teacher data functions
-jest.mock('@/lib/supabase/teacher', () => ({
+// Mock the education data functions
+jest.mock('@/lib/supabase/education', () => ({
   getCurriculumWordLists: jest.fn(),
   importCurriculumToLesson: jest.fn(),
 }));

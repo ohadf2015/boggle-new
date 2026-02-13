@@ -6,7 +6,7 @@ import {
   getClassroomLeaderboard,
   type LeaderboardEntry,
   type ClassroomLeaderboardData,
-} from '@/lib/supabase/teacher';
+} from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
 // ============================================

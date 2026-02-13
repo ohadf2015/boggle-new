@@ -6,8 +6,8 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStudentProgress } from '../useStudentProgress';
-import * as teacherLib from '@/lib/supabase/teacher';
-import type { LessonAssignment, StudentLessonProgress } from '@/lib/supabase/teacher';
+import * as teacherLib from '@/lib/supabase/education';
+import type { LessonAssignment, StudentLessonProgress } from '@/lib/supabase/education';
 
 // Mock dependencies
 jest.mock('@/contexts/AuthContext', () => ({
@@ -21,7 +21,7 @@ jest.mock('@/hooks/useMounted', () => ({
   useMounted: () => ({ current: true })
 }));
 
-jest.mock('@/lib/supabase/teacher');
+jest.mock('@/lib/supabase/education');
 jest.mock('@/utils/logger', () => ({
   default: {
     warn: jest.fn(),

@@ -6,7 +6,7 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
-import * as supabaseTeacher from '@/lib/supabase/teacher';
+import * as supabaseTeacher from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
 
 // Mock dependencies
@@ -32,7 +32,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 jest.mock('socket.io-client');
-jest.mock('@/lib/supabase/teacher');
+jest.mock('@/lib/supabase/education');
 
 const mockSocket = {
   emit: jest.fn(),

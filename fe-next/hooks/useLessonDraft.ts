@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Language, VocabularyWord } from '@/lib/supabase/teacher';
+import type { Language, VocabularyWord } from '@/lib/supabase/education';
 
 // ============================================
 // CONSTANTS

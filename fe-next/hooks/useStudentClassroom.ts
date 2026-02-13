@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
-import { getStudentClassroom, type Classroom } from '@/lib/supabase/teacher';
+import { getStudentClassroom, type Classroom } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
 interface UseStudentClassroomState {

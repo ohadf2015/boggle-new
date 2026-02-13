@@ -13,7 +13,7 @@ import {
   type ClassroomWithMembers,
   type Classroom,
   type Language,
-} from '@/lib/supabase/teacher';
+} from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
 interface UseClassroomsState {

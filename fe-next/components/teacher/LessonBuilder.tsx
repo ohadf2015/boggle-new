@@ -19,7 +19,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { Plus, CheckCircle, AlertCircle, X, Pencil, Play, Settings, Clock, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/teacher';
+import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/education';
 import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 
 export default function LessonBuilder() {

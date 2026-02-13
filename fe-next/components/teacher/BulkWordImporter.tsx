@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, CheckCircle, AlertCircle, Upload } from 'lucide-react';
-import type { Language, VocabularyWord } from '@/lib/supabase/teacher';
+import type { Language, VocabularyWord } from '@/lib/supabase/education';
 
 // ============================================
 // TYPES

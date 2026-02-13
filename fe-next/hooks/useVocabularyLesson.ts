@@ -12,7 +12,7 @@ import {
   type VocabularyLesson,
   type VocabularyWord,
   type Language,
-} from '@/lib/supabase/teacher';
+} from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
 interface UseLessonsState {

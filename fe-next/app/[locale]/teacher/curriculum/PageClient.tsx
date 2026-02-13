@@ -12,7 +12,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { CurriculumWordListBrowser } from '@/components/teacher/curriculum/CurriculumWordListBrowser';
-import { VocabularyLesson } from '@/lib/supabase/teacher';
+import { VocabularyLesson } from '@/lib/supabase/education';
 
 /**
  * CurriculumPageClient - Teacher Curriculum Page

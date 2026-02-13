@@ -12,7 +12,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { Language } from '@/lib/supabase/teacher';
+import type { Language } from '@/lib/supabase/education';
 import ClassroomStudentList from './ClassroomStudentList';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 

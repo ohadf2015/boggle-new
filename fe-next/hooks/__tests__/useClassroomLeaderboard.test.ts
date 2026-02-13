@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useClassroomLeaderboard } from '../useClassroomLeaderboard';
-import * as teacherLib from '@/lib/supabase/teacher';
+import * as teacherLib from '@/lib/supabase/education';
 
-// Mock the teacher library
-jest.mock('@/lib/supabase/teacher');
+// Mock the education library
+jest.mock('@/lib/supabase/education');
 
 // Mock logger
 jest.mock('@/utils/logger', () => ({

@@ -20,7 +20,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import type { LetterGrid, Language, DifficultyLevel } from '@/types';
-import type { VocabularyWord } from '@/lib/supabase/teacher';
+import type { VocabularyWord } from '@/lib/supabase/education';
 
 interface WarmupRoundProps {
   lessonName: string;

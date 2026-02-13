@@ -13,7 +13,7 @@ import {
   AlertCircle,
   BookOpen
 } from 'lucide-react';
-import type { VocabularyWord } from '@/lib/supabase/teacher';
+import type { VocabularyWord } from '@/lib/supabase/education';
 
 interface WordListPreviewProps {
   lessonName: string;

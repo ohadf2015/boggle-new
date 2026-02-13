@@ -18,7 +18,7 @@ import {
   MousePointer2,
   Loader2,
 } from 'lucide-react';
-import type { VocabularyWord } from '@/lib/supabase/teacher';
+import type { VocabularyWord } from '@/lib/supabase/education';
 import { FlashcardSwipeStack } from './FlashcardSwipeStack';
 import type { EnrichedVocabularyWord, VocabularyExample } from '@/types/vocabulary';
 import { useSocketOptional } from '@/utils/SocketContext';

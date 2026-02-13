@@ -1,6 +1,6 @@
 import { render, act, waitFor } from '@testing-library/react';
 import SoloPracticeBoard from '../SoloPracticeBoard';
-import type { VocabularyWord } from '@/lib/supabase/teacher';
+import type { VocabularyWord } from '@/lib/supabase/education';
 
 // Use jest.fn() to capture GridComponent props without module-level reassignment
 const mockGridComponent = jest.fn<React.JSX.Element, [Record<string, unknown>]>(() => <div data-testid="grid-component" />);

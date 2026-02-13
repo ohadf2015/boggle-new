@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { assignLesson as assignLessonAPI } from '@/lib/supabase/teacher';
+import { assignLesson as assignLessonAPI } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
 interface AssignLessonState {

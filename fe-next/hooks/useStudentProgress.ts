@@ -12,7 +12,7 @@ import {
   type LessonAssignment,
   type VocabularyLesson,
   type WordAttempt,
-} from '@/lib/supabase/teacher';
+} from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
 // Student lesson with status

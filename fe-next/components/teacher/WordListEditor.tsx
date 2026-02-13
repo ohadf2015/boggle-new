@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, CheckCircle, AlertCircle, Trash2, Upload } from 'lucide-react';
-import type { Language, VocabularyWord } from '@/lib/supabase/teacher';
+import type { Language, VocabularyWord } from '@/lib/supabase/education';
 
 interface WordListEditorProps {
   words: VocabularyWord[];

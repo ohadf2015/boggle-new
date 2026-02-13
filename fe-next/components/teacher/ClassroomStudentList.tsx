@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getClassroomStudents, type ClassroomStudent } from '@/lib/supabase/teacher';
+import { getClassroomStudents, type ClassroomStudent } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { PageLoader } from '@/components/ui/PageLoader';

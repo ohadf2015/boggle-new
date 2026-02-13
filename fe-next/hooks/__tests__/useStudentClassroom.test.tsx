@@ -31,7 +31,7 @@ jest.mock('@/contexts/AuthContext', () => ({
 
 // Mock the Supabase API
 const mockGetStudentClassroom = jest.fn();
-jest.mock('@/lib/supabase/teacher', () => ({
+jest.mock('@/lib/supabase/education', () => ({
   getStudentClassroom: (...args: any[]) => mockGetStudentClassroom(...args),
 }));
 

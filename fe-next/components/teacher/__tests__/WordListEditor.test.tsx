@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WordListEditor from '../WordListEditor';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import type { VocabularyWord } from '@/lib/supabase/teacher';
+import type { VocabularyWord } from '@/lib/supabase/education';
 
 // Mock word integration hook
 jest.mock('@/hooks/useWordIntegration', () => ({

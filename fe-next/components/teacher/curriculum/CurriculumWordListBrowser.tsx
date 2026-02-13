@@ -19,7 +19,7 @@ import {
   GradeLevel,
   CurriculumSubject,
   VocabularyLesson,
-} from '@/lib/supabase/teacher';
+} from '@/lib/supabase/education';
 
 interface CurriculumWordListBrowserProps {
   /** Teacher ID for importing lists */

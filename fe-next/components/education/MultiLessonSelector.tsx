@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { BookOpen, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { VocabularyLesson } from '@/lib/supabase/teacher';
+import type { VocabularyLesson } from '@/lib/supabase/education';
 
 export interface MultiLessonSelectorProps {
   /** Available lessons to select from */
