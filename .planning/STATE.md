@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 39 of 43 (Real-Time Duels) — IN PROGRESS
-Plan: 1 of 8 in current phase (1 complete: 39-01)
-Status: Real-time duel handlers complete with TDD. Ready for 39-02 (disconnection handling).
-Last activity: 2026-02-13 — Completed 39-01-PLAN.md (real-time handlers)
+Plan: 3 of 5 complete (39-01, 39-02, 39-03)
+Status: Wave 2 complete. Real-time infrastructure wired into registry and hook API extended.
+Last activity: 2026-02-13 — Completed 39-03-PLAN.md (registry wiring + hook extension)
 
-Progress: [███████████] ~38.1% (3.125/8 phases complete)
+Progress: [███████████] ~40.6% (3.6/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
-- Average duration: 14 min
-- Total execution time: 301 min
+- Total plans completed: 23
+- Average duration: 13 min
+- Total execution time: 333 min
 
 **By Phase:**
 
@@ -30,14 +30,15 @@ Progress: [███████████] ~38.1% (3.125/8 phases complete)
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
 | 38 | 8 | 83 min | 10 min |
-| 39 | 1 | 25 min | 25 min |
+| 39 | 3 | 56 min | 19 min |
 
 **Recent Trend:**
-- Last 5 plans: 38-07 (6 min), 38-08 (5 min), 39-01 (research), 39-01 (25 min)
-- Trend: Phase 39 starting with comprehensive TDD (25 min for real-time handlers)
-- TDD execution: 11/11 core tests passing, 4 timer tests skipped (Jest limitation)
+- Last 5 plans: 38-08 (5 min), 39-01 (25 min), 39-02 (24 min), 39-03 (7 min)
+- Trend: Phase 39 Wave 2 complete (registry wiring + hook extension)
+- Wave 1 TDD: 11/11 core tests passing, 4 timer tests skipped (Jest limitation)
+- Wave 2: Integration complete (7 min for registry + hook)
 - Phase 38 COMPLETE: All async duel functionality delivered
-- Phase 39 IN PROGRESS: Real-time handlers complete
+- Phase 39 IN PROGRESS: Backend infrastructure wired, ready for UI (39-04, 39-05)
 
 *Updated after each plan completion*
 
@@ -112,6 +113,13 @@ Recent decisions affecting current work:
 - **39-01:** Server-side word validation with isWordOnBoardAsync + isDictionaryWord (anti-cheat)
 - **39-01:** Server-side timer for duel completion (prevents client clock drift)
 - **39-01:** Language type cast safe for DB strings (validated by DB constraints)
+- **39-02:** 30-second grace period on disconnect (prevents instant loss from network blip)
+- **39-02:** Reconnection cancels grace period timer (fair play for temporary disconnects)
+- **39-02:** Auto-forfeit after 30s if no reconnection (prevents indefinite waiting)
+- **39-02:** State sync on reconnect from DB (not in-memory map - source of truth)
+- **39-03:** duelType defaults to 'async' for backward compatibility (existing code unchanged)
+- **39-03:** Types extracted to separate file when hook exceeds 400 lines (useDuelSocket.types.ts)
+- **39-03:** All listeners follow cleanup pattern (useCallback, ref tracking, unsubscribe function)
 
 ### Pending Todos
 
@@ -124,6 +132,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 39-01-PLAN.md (real-time handlers with TDD)
+Stopped at: Completed 39-03-PLAN.md (registry wiring + hook extension)
 Resume file: None
-Next action: Execute 39-02 (disconnection handling)
+Next action: Execute 39-04 (real-time UI components) or 39-05 (real-time flow testing)
