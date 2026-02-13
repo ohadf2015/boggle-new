@@ -140,11 +140,15 @@ export function useDuelSocket(): UseDuelSocketReturn {
 
     // Cleanup on unmount
     return () => {
+      // Capture listeners map for cleanup
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const listeners = listenersRef.current;
+
       // Remove all registered listeners
-      listenersRef.current.forEach((handler, event) => {
+      listeners.forEach((handler, event) => {
         socket.off(event, handler as any);
       });
-      listenersRef.current.clear();
+      listeners.clear();
 
       // Disconnect socket
       socket.disconnect();
