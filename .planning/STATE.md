@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 36 of 43 (Foundation & Refactoring)
-Plan: 4 of 5 in current phase (just completed)
-Status: In progress
-Last activity: 2026-02-13 — Completed 36-04-PLAN.md
+Plan: 5 of 5 in current phase (just completed)
+Status: Phase complete
+Last activity: 2026-02-13 — Completed 36-05-PLAN.md
 
-Progress: [████░░░░░░] ~9%
+Progress: [█████░░░░░] ~12%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 20 min
-- Total execution time: 81 min
+- Total execution time: 101 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 36 | 4 | 81 min | 20 min |
+| 36 | 5 | 101 min | 20 min |
 
 **Recent Trend:**
-- Last 5 plans: 36-01 (21 min), 36-03 (20 min), 36-04 (20 min), 36-05 (20 min)
+- Last 5 plans: 36-01 (21 min), 36-02 (skip), 36-03 (20 min), 36-04 (20 min), 36-05 (20 min)
 - Trend: Consistent 20 min execution
 
 *Updated after each plan completion*
@@ -50,6 +50,10 @@ Recent decisions affecting current work:
 - **36-04:** Socket.IO namespace isolation pattern (/duel namespace separate from default)
 - **36-04:** Room naming convention: duel:${id} for games, duel:lobby:${classroomId} for lobbies
 - **36-04:** Event naming: All duel events use duel: prefix for namespace isolation
+- **36-05:** Mode parity design - Similar XP/hour across all practice modes (no favoritism)
+- **36-05:** Anti-inflation rules - New activities don't double-count XP
+- **36-05:** Progression target - Students level up every 3-4 days at early levels with daily practice
+- **36-05:** Loss XP floor - Losing a duel awards participation XP (60% of win)
 
 ### Pending Todos
 
@@ -61,7 +65,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13T10:53:07Z
-Stopped at: Completed 36-04-PLAN.md (Duel namespace infrastructure)
+Last session: 2026-02-13T10:54:44Z
+Stopped at: Completed 36-05-PLAN.md (XP economy model)
 Resume file: None
-Next: Phase 36 complete - ready for Phase 37
+Phase 36 complete - ready for Phase 37
