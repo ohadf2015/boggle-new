@@ -15,10 +15,10 @@
 
 Infrastructure changes required before feature work.
 
-- [ ] **FOUND-01**: Split `lib/supabase/teacher.ts` (1260 lines) into modular files under `lib/supabase/education/` (classrooms, lessons, progress, assignments, duels, practice)
-- [ ] **FOUND-02**: Create new Supabase tables for duels (`student_duels`, `duel_turns`), practice sessions (`practice_sessions`), and achievement progress (`student_achievements_progress`) with RLS policies
-- [ ] **FOUND-03**: Create Socket.IO duel namespace with room-based architecture extending existing classroom game infrastructure
-- [ ] **FOUND-04**: Rebalance XP awards for new activities (duels, practice modes, challenges) to prevent inflation while maintaining motivation
+- [x] **FOUND-01**: Split `lib/supabase/teacher.ts` (1260 lines) into modular files under `lib/supabase/education/` (classrooms, lessons, progress, assignments, duels, practice)
+- [x] **FOUND-02**: Create new Supabase tables for duels (`student_duels`, `duel_turns`), practice sessions (`practice_sessions`), and achievement progress (`student_achievements_progress`) with RLS policies
+- [x] **FOUND-03**: Create Socket.IO duel namespace with room-based architecture extending existing classroom game infrastructure
+- [x] **FOUND-04**: Rebalance XP awards for new activities (duels, practice modes, challenges) to prevent inflation while maintaining motivation
 
 ### Duels (DUEL)
 
@@ -105,10 +105,10 @@ These features were identified in research but deferred to future milestones:
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FOUND-01 | Phase 36 | Pending |
-| FOUND-02 | Phase 36 | Pending |
-| FOUND-03 | Phase 36 | Pending |
-| FOUND-04 | Phase 36 | Pending |
+| FOUND-01 | Phase 36 | Complete |
+| FOUND-02 | Phase 36 | Complete |
+| FOUND-03 | Phase 36 | Complete |
+| FOUND-04 | Phase 36 | Complete |
 | DUEL-01 | Phase 38 | Pending |
 | DUEL-02 | Phase 38 | Pending |
 | DUEL-03 | Phase 39 | Pending |

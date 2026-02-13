@@ -23,11 +23,11 @@ Transform the education section into an engaging, competitive learning platform 
 **Plans**: 5 plans
 
 Plans:
-- [ ] 36-01-PLAN.md — Create education module structure (extract teacher.ts into modular files)
-- [ ] 36-02-PLAN.md — Migrate all imports from teacher to education, delete teacher.ts
-- [ ] 36-03-PLAN.md — Supabase migration for duels, practice, achievement progress tables
-- [ ] 36-04-PLAN.md — Socket.IO /duel namespace with handler stubs
-- [ ] 36-05-PLAN.md — XP economy model + config values for new activities
+- [x] 36-01-PLAN.md — Create education module structure (extract teacher.ts into modular files)
+- [x] 36-02-PLAN.md — Migrate all imports from teacher to education, delete teacher.ts
+- [x] 36-03-PLAN.md — Supabase migration for duels, practice, achievement progress tables
+- [x] 36-04-PLAN.md — Socket.IO /duel namespace with handler stubs
+- [x] 36-05-PLAN.md — XP economy model + config values for new activities
 
 ### Phase 37: Practice Modes
 **Goal**: Students can practice vocabulary through 3 diverse modes (word matching, spelling challenge, timed blitz) with session tracking and XP rewards
@@ -134,7 +134,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 36. Foundation & Refactoring | v2.0 | 0/5 | Planned | - |
+| 36. Foundation & Refactoring | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 37. Practice Modes | v2.0 | 0/0 | Not started | - |
 | 38. Async Duels | v2.0 | 0/0 | Not started | - |
 | 39. Real-Time Duels | v2.0 | 0/0 | Not started | - |
@@ -144,4 +144,4 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-13 during roadmap creation*
+*Last updated: 2026-02-13 — Phase 36 completed*
