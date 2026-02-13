@@ -21,8 +21,8 @@ const ALL_SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 function getBuzzEnabledLanguages(): readonly string[] {
   const envValue = process.env.BUZZ_ENABLED_LANGUAGES;
   if (!envValue) {
-    // Default to English only
-    return ['en'];
+    // Default to English and Hebrew only (cost optimization)
+    return ['en', 'he'];
   }
 
   const requestedLanguages = envValue.split(',').map(l => l.trim().toLowerCase());

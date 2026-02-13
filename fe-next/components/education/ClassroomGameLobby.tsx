@@ -118,8 +118,8 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
       if (data.success) {
         toast.success(t('education.classroomGame.gameCreated'));
-        // Navigate to multiplayer (only time we leave education section)
-        router.push(`/${language}/multiplayer?fromLesson=true&classroom=true&room=${data.gameCode}`);
+        // Navigate to education game play page (stays inside education walled garden)
+        router.push(`/${language}/education/classroom-game/play?fromLesson=true&room=${data.gameCode}`);
       }
     });
 

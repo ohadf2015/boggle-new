@@ -12,6 +12,11 @@ import logger from '../utils/logger';
 
 const router = Router();
 
+// ==================== In-Flight Generation Deduplication ====================
+// Prevents multiple concurrent requests from triggering parallel (expensive) AI generations
+// for the same date/language. Second request gets the same promise as the first.
+const inFlightGenerations = new Map<string, Promise<unknown>>();
+
 // ==================== Admin Authentication Middleware ====================
 
 interface AdminUser {
@@ -263,10 +268,41 @@ router.get(
       // Get challenge from database
       let challenge = await getDailyBuzz(date, language);
 
-      // If not found, generate it (for manual requests or testing)
+      // If not found, attempt on-demand generation with deduplication
       if (!challenge) {
-        console.log(`[BUZZ] Challenge not found, generating for ${date} (${language})`);
-        challenge = await generateDailyBuzz(new Date(date), language);
+        const genKey = `${date}:${language}`;
+
+        // Check if generation is already in flight from another request
+        const existing = inFlightGenerations.get(genKey);
+        if (existing) {
+          console.log(`[BUZZ] Generation already in flight for ${genKey}, waiting...`);
+          try {
+            await existing;
+            challenge = await getDailyBuzz(date, language);
+          } catch {
+            // Generation failed, fall through to 404
+          }
+        } else {
+          console.log(`[BUZZ] Challenge not found, generating for ${date} (${language})`);
+          const genPromise = generateDailyBuzz(new Date(date), language);
+          inFlightGenerations.set(genKey, genPromise);
+
+          try {
+            challenge = await genPromise;
+          } catch (genError: any) {
+            console.error(`[BUZZ] On-demand generation failed for ${genKey}: ${genError.message}`);
+          } finally {
+            inFlightGenerations.delete(genKey);
+          }
+        }
+      }
+
+      if (!challenge) {
+        res.status(404).json({
+          success: false,
+          error: 'Challenge not available. Try again later.',
+        });
+        return;
       }
 
       // Transform snake_case database response to camelCase for frontend
