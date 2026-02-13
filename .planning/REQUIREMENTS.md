@@ -26,7 +26,7 @@ Student-vs-student competition — the centerpiece feature.
 
 - [x] **DUEL-01**: User can create an async duel challenge — play a board, freeze state, send challenge to classmate with score to beat
 - [x] **DUEL-02**: User can accept and play an async duel challenge — play same frozen board, compare scores, determine winner
-- [ ] **DUEL-03**: User can start a real-time 1v1 duel — both players see same board simultaneously with live progress indicators
+- [x] **DUEL-03**: User can start a real-time 1v1 duel — both players see same board simultaneously with live progress indicators
 - [x] **DUEL-04**: User can browse a duel lobby showing pending invites, available opponents, and quick-match option within their classroom
 - [x] **DUEL-05**: User can view duel history with win/loss record, streaks, and per-opponent stats
 
@@ -111,7 +111,7 @@ These features were identified in research but deferred to future milestones:
 | FOUND-04 | Phase 36 | Complete |
 | DUEL-01 | Phase 38 | Complete |
 | DUEL-02 | Phase 38 | Complete |
-| DUEL-03 | Phase 39 | Pending |
+| DUEL-03 | Phase 39 | Complete |
 | DUEL-04 | Phase 38 | Complete |
 | DUEL-05 | Phase 38 | Complete |
 | PRAC-01 | Phase 37 | Complete |

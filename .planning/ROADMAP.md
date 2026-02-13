@@ -83,11 +83,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 39-01-PLAN.md — Real-time handlers: word submission, opponent progress, server timer (TDD)
-- [ ] 39-02-PLAN.md — Disconnection grace period, reconnection, forfeit handlers (TDD)
-- [ ] 39-03-PLAN.md — Wire registry + lifecycle, extend useDuelSocket hook
-- [ ] 39-04-PLAN.md — RealTimeDuelGame UI + OpponentProgressBar + DisconnectOverlay + ForfeitDialog
-- [ ] 39-05-PLAN.md — Lobby integration (duel type selector) + translations (4 languages)
+- [x] 39-01-PLAN.md — Real-time handlers: word submission, opponent progress, server timer (TDD)
+- [x] 39-02-PLAN.md — Disconnection grace period, reconnection, forfeit handlers (TDD)
+- [x] 39-03-PLAN.md — Wire registry + lifecycle, extend useDuelSocket hook
+- [x] 39-04-PLAN.md — RealTimeDuelGame UI + OpponentProgressBar + DisconnectOverlay + ForfeitDialog
+- [x] 39-05-PLAN.md — Lobby integration (duel type selector) + translations (4 languages)
 
 ### Phase 40: Gamification Enhancements
 **Goal**: Students experience richer progression with visual milestones, competitive leaderboards, daily/weekly challenges, and expanded achievements
@@ -153,11 +153,11 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 36. Foundation & Refactoring | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 37. Practice Modes | v2.0 | 6/6 | Complete | 2026-02-13 |
 | 38. Async Duels | v2.0 | 8/8 | Complete | 2026-02-13 |
-| 39. Real-Time Duels | v2.0 | 0/5 | Planned | - |
+| 39. Real-Time Duels | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 40. Gamification Enhancements | v2.0 | 0/0 | Not started | - |
 | 41. Student Dashboard Overhaul | v2.0 | 0/0 | Not started | - |
 | 42. Teacher Dashboard & Workflows | v2.0 | 0/0 | Not started | - |
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-13 — Phase 38 complete (8/8 plans, goal verified)*
+*Last updated: 2026-02-13 — Phase 39 complete (5/5 plans, goal verified)*
