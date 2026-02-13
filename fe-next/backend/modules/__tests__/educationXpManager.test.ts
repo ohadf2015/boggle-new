@@ -531,4 +531,306 @@ describe('educationXpManager', () => {
       expect(result.masteryMessage.length).toBeGreaterThan(0);
     });
   });
+
+  // ============================================
+  // MATCHING PRACTICE XP CALCULATIONS (Phase 37)
+  // ============================================
+  describe('calculatePracticeXp - matching', () => {
+    it('should calculate basic matching XP (5/10 pairs)', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 5,
+          totalPairs: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 5 pairs * 15 = 75 + 20 daily = 95 XP
+      expect(result.totalXp).toBe(95);
+      expect(result.breakdown.matchingPairs).toBe(75);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should apply 80% accuracy bonus (8/10 pairs)', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 8,
+          totalPairs: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 8 pairs * 15 = 120 + 20 bonus + 20 daily = 160 XP
+      expect(result.totalXp).toBe(160);
+      expect(result.breakdown.matchingPairs).toBe(120);
+      expect(result.breakdown.accuracyBonus).toBe(20);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should apply 90% accuracy bonus (9/10 pairs)', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 9,
+          totalPairs: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 9 pairs * 15 = 135 + 40 bonus + 20 daily = 195 XP
+      expect(result.totalXp).toBe(195);
+      expect(result.breakdown.matchingPairs).toBe(135);
+      expect(result.breakdown.accuracyBonus).toBe(40);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should apply perfect session bonus (10/10 pairs)', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 10,
+          totalPairs: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 10 pairs * 15 = 150 + 40 accuracy + 60 perfect + 20 daily = 270 XP
+      expect(result.totalXp).toBe(270);
+      expect(result.breakdown.matchingPairs).toBe(150);
+      expect(result.breakdown.accuracyBonus).toBe(40);
+      expect(result.breakdown.perfectSession).toBe(60);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should not apply accuracy bonus below 70%', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 6,
+          totalPairs: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 6 pairs * 15 = 90 + 20 daily = 110 XP (no accuracy bonus)
+      expect(result.totalXp).toBe(110);
+      expect(result.breakdown.accuracyBonus).toBeUndefined();
+    });
+  });
+
+  // ============================================
+  // SPELLING PRACTICE XP CALCULATIONS (Phase 37)
+  // ============================================
+  describe('calculatePracticeXp - spelling', () => {
+    it('should calculate basic spelling XP (5 words)', () => {
+      const session: PracticeSessionXp = {
+        type: 'spelling',
+        sessionData: {
+          wordsSpelled: 5,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 5 words * 20 = 100 + 20 daily = 120 XP
+      expect(result.totalXp).toBe(120);
+      expect(result.breakdown.spellingWords).toBe(100);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should apply streak bonus (3 word streak)', () => {
+      const session: PracticeSessionXp = {
+        type: 'spelling',
+        sessionData: {
+          wordsSpelled: 5,
+          spellingStreak: 3,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 5 words * 20 = 100 + (3 streak * 5) = 15 + 20 daily = 135 XP
+      expect(result.totalXp).toBe(135);
+      expect(result.breakdown.spellingWords).toBe(100);
+      expect(result.breakdown.streakBonus).toBe(15);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should apply 90% accuracy bonus', () => {
+      const session: PracticeSessionXp = {
+        type: 'spelling',
+        sessionData: {
+          wordsSpelled: 9,
+          // Assume 10 total attempts for 90% accuracy
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 9 words * 20 = 180 + 50 accuracy + 20 daily = 250 XP
+      expect(result.totalXp).toBe(250);
+      expect(result.breakdown.spellingWords).toBe(180);
+      expect(result.breakdown.accuracyBonus).toBe(50);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should combine streak and accuracy bonuses', () => {
+      const session: PracticeSessionXp = {
+        type: 'spelling',
+        sessionData: {
+          wordsSpelled: 8,
+          spellingStreak: 5,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 8 words * 20 = 160 + (5 streak * 5) = 25 + 30 accuracy (80%+) + 20 daily = 235 XP
+      expect(result.totalXp).toBe(235);
+      expect(result.breakdown.spellingWords).toBe(160);
+      expect(result.breakdown.streakBonus).toBe(25);
+      expect(result.breakdown.accuracyBonus).toBe(30);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+  });
+
+  // ============================================
+  // BLITZ PRACTICE XP CALCULATIONS (Phase 37)
+  // ============================================
+  describe('calculatePracticeXp - blitz', () => {
+    it('should calculate basic blitz XP (10 words found)', () => {
+      const session: PracticeSessionXp = {
+        type: 'blitz',
+        sessionData: {
+          blitzWordsFound: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 10 words * 10 = 100 + 40 completion + 20 daily = 160 XP
+      expect(result.totalXp).toBe(160);
+      expect(result.breakdown.blitzWords).toBe(100);
+      expect(result.breakdown.blitzCompletion).toBe(40);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should apply combo bonus (5 max combo)', () => {
+      const session: PracticeSessionXp = {
+        type: 'blitz',
+        sessionData: {
+          blitzWordsFound: 15,
+          blitzMaxCombo: 5,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 15 words * 10 = 150 + (5 combo * 3) = 15 + 40 completion + 20 daily = 225 XP
+      expect(result.totalXp).toBe(225);
+      expect(result.breakdown.blitzWords).toBe(150);
+      expect(result.breakdown.comboBonus).toBe(15);
+      expect(result.breakdown.blitzCompletion).toBe(40);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+
+    it('should handle high word count and combo', () => {
+      const session: PracticeSessionXp = {
+        type: 'blitz',
+        sessionData: {
+          blitzWordsFound: 25,
+          blitzMaxCombo: 10,
+        },
+      };
+
+      const result = calculatePracticeXp(session);
+
+      // 25 words * 10 = 250 + (10 combo * 3) = 30 + 40 completion + 20 daily = 340 XP
+      expect(result.totalXp).toBe(340);
+      expect(result.breakdown.blitzWords).toBe(250);
+      expect(result.breakdown.comboBonus).toBe(30);
+      expect(result.breakdown.blitzCompletion).toBe(40);
+      expect(result.breakdown.dailyPractice).toBe(20);
+    });
+  });
+
+  // ============================================
+  // MASTERY MESSAGES FOR NEW MODES (Phase 37)
+  // ============================================
+  describe('getMasteryMessage - new modes', () => {
+    it('should generate matching perfect message', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 10,
+          totalPairs: 10,
+        },
+      };
+
+      const message = getMasteryMessage(session);
+
+      expect(message).toBe('Perfect matching!');
+    });
+
+    it('should generate matching partial message', () => {
+      const session: PracticeSessionXp = {
+        type: 'matching',
+        sessionData: {
+          pairsMatched: 7,
+          totalPairs: 10,
+        },
+      };
+
+      const message = getMasteryMessage(session);
+
+      expect(message).toBe('You matched 7 pairs!');
+    });
+
+    it('should generate spelling message', () => {
+      const session: PracticeSessionXp = {
+        type: 'spelling',
+        sessionData: {
+          wordsSpelled: 8,
+        },
+      };
+
+      const message = getMasteryMessage(session);
+
+      expect(message).toBe('You spelled 8 words correctly!');
+    });
+
+    it('should generate spelling perfect message', () => {
+      const session: PracticeSessionXp = {
+        type: 'spelling',
+        sessionData: {
+          wordsSpelled: 10,
+          spellingStreak: 10,
+        },
+      };
+
+      const message = getMasteryMessage(session);
+
+      expect(message).toBe('Perfect spelling!');
+    });
+
+    it('should generate blitz message', () => {
+      const session: PracticeSessionXp = {
+        type: 'blitz',
+        sessionData: {
+          blitzWordsFound: 15,
+        },
+      };
+
+      const message = getMasteryMessage(session);
+
+      expect(message).toBe('You found 15 words in 60 seconds!');
+    });
+  });
 });

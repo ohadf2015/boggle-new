@@ -149,6 +149,12 @@ export function calculatePracticeXp(session: PracticeSessionXp): PracticeXpResul
     totalXp += calculateBoardXp(session.sessionData, breakdown);
   } else if (session.type === 'lesson_completion') {
     totalXp += calculateLessonXp(session.sessionData, breakdown);
+  } else if (session.type === 'matching') {
+    totalXp += calculateMatchingXp(session.sessionData, breakdown);
+  } else if (session.type === 'spelling') {
+    totalXp += calculateSpellingXp(session.sessionData, breakdown);
+  } else if (session.type === 'blitz') {
+    totalXp += calculateBlitzXp(session.sessionData, breakdown);
   }
 
   // Streak multiplier (loss aversion - encourage consecutive days)
@@ -276,6 +282,124 @@ function calculateStreakBonus(baseXp: number, streakDays: number): number {
   return 0;
 }
 
+/**
+ * Calculate word matching practice XP (Phase 37)
+ * Base: 15 XP per pair matched
+ * Accuracy bonus: 90% = 40 XP, 80% = 20 XP, 70% = 10 XP
+ * Perfect session: +60 XP bonus
+ */
+function calculateMatchingXp(
+  sessionData: PracticeSessionXp['sessionData'],
+  breakdown: Record<string, number>
+): number {
+  const { pairsMatched = 0, totalPairs = 0 } = sessionData;
+  let xp = 0;
+
+  // Base matching XP
+  breakdown.matchingPairs = pairsMatched * EDUCATION_XP_CONFIG.MATCHING_PAIR_CORRECT;
+  xp += breakdown.matchingPairs;
+
+  // Accuracy bonus (encourages mastery)
+  if (totalPairs > 0) {
+    const accuracy = (pairsMatched / totalPairs) * 100;
+
+    // Check accuracy thresholds in descending order
+    const thresholds = Object.entries(EDUCATION_XP_CONFIG.MATCHING_ACCURACY_BONUS)
+      .map(([threshold, bonus]) => ({ threshold: parseInt(threshold), bonus }))
+      .sort((a, b) => b.threshold - a.threshold);
+
+    for (const { threshold, bonus } of thresholds) {
+      if (accuracy >= threshold) {
+        breakdown.accuracyBonus = bonus;
+        xp += bonus;
+        break;
+      }
+    }
+
+    // Perfect session bonus
+    if (pairsMatched === totalPairs && totalPairs > 0) {
+      breakdown.perfectSession = EDUCATION_XP_CONFIG.MATCHING_PERFECT_SESSION;
+      xp += breakdown.perfectSession;
+    }
+  }
+
+  return xp;
+}
+
+/**
+ * Calculate spelling challenge practice XP (Phase 37)
+ * Base: 20 XP per word spelled correctly
+ * Streak bonus: 5 XP per consecutive correct word
+ * Accuracy bonus: 90% = 50 XP, 80% = 30 XP, 70% = 10 XP
+ */
+function calculateSpellingXp(
+  sessionData: PracticeSessionXp['sessionData'],
+  breakdown: Record<string, number>
+): number {
+  const { wordsSpelled = 0, spellingStreak = 0 } = sessionData;
+  let xp = 0;
+
+  // Base spelling XP
+  breakdown.spellingWords = wordsSpelled * EDUCATION_XP_CONFIG.SPELLING_WORD_CORRECT;
+  xp += breakdown.spellingWords;
+
+  // Streak bonus (consecutive correct words)
+  if (spellingStreak > 0) {
+    breakdown.streakBonus = spellingStreak * EDUCATION_XP_CONFIG.SPELLING_STREAK_BONUS;
+    xp += breakdown.streakBonus;
+  }
+
+  // Accuracy bonus (assume wordsSpelled represents accuracy if streak is high)
+  // For perfect spelling streak = wordsSpelled
+  if (wordsSpelled > 0) {
+    const accuracy = spellingStreak === wordsSpelled ? 100 : (wordsSpelled / 10) * 100; // Assume 10 total for accuracy calc
+
+    const thresholds = Object.entries(EDUCATION_XP_CONFIG.SPELLING_ACCURACY_BONUS)
+      .map(([threshold, bonus]) => ({ threshold: parseInt(threshold), bonus }))
+      .sort((a, b) => b.threshold - a.threshold);
+
+    for (const { threshold, bonus } of thresholds) {
+      if (accuracy >= threshold) {
+        breakdown.accuracyBonus = bonus;
+        xp += bonus;
+        break;
+      }
+    }
+  }
+
+  return xp;
+}
+
+/**
+ * Calculate timed blitz practice XP (Phase 37)
+ * Base: 10 XP per word found
+ * Combo bonus: 3 XP per max combo level
+ * Completion: 40 XP for completing 60-second session
+ */
+function calculateBlitzXp(
+  sessionData: PracticeSessionXp['sessionData'],
+  breakdown: Record<string, number>
+): number {
+  const { blitzWordsFound = 0, blitzMaxCombo = 0 } = sessionData;
+  let xp = 0;
+
+  // Base blitz word XP
+  breakdown.blitzWords = blitzWordsFound * EDUCATION_XP_CONFIG.BLITZ_WORD_FOUND;
+  xp += breakdown.blitzWords;
+
+  // Combo bonus
+  if (blitzMaxCombo > 0) {
+    breakdown.comboBonus = blitzMaxCombo * EDUCATION_XP_CONFIG.BLITZ_COMBO_BONUS;
+    xp += breakdown.comboBonus;
+  }
+
+  // Completion bonus
+  breakdown.blitzCompletion = EDUCATION_XP_CONFIG.BLITZ_COMPLETION;
+  xp += breakdown.blitzCompletion;
+
+  return xp;
+}
+
 // ============================================
 // MASTERY MESSAGE GENERATION
 // ============================================
@@ -298,6 +422,19 @@ export function getMasteryMessage(session: PracticeSessionXp): string {
     return newWords > 0
       ? `You discovered ${newWords} new vocabulary words!`
       : 'Great practice! Keep finding those words!';
+  } else if (session.type === 'matching') {
+    const { pairsMatched = 0, totalPairs = 0 } = session.sessionData;
+    return pairsMatched === totalPairs && totalPairs > 0
+      ? 'Perfect matching!'
+      : `You matched ${pairsMatched} pairs!`;
+  } else if (session.type === 'spelling') {
+    const { wordsSpelled = 0, spellingStreak = 0 } = session.sessionData;
+    return spellingStreak === wordsSpelled && wordsSpelled > 0
+      ? 'Perfect spelling!'
+      : `You spelled ${wordsSpelled} words correctly!`;
+  } else if (session.type === 'blitz') {
+    const { blitzWordsFound = 0 } = session.sessionData;
+    return `You found ${blitzWordsFound} words in 60 seconds!`;
   } else {
     return session.sessionData.masteryLevel === 'mastered'
       ? 'Lesson mastered! You know these words!'

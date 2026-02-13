@@ -4,7 +4,7 @@ import { z } from 'zod';
 import logger from '@/utils/logger';
 
 // Validation schemas
-const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list']);
+const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz']);
 
 const startSessionSchema = z.object({
   lessonId: z.string().uuid(),
@@ -20,6 +20,12 @@ const updateSessionSchema = z.object({
   wordsFound: z.array(z.string()).optional(),
   vocabularyWordsFound: z.array(z.string()).optional(),
   totalScore: z.number().min(0).optional(),
+  // New practice modes (Phase 37)
+  wordsAttempted: z.number().min(0).optional(),
+  wordsCorrect: z.number().min(0).optional(),
+  accuracy: z.number().min(0).max(1).optional(),
+  maxCombo: z.number().min(0).optional(),
+  xpAwarded: z.number().min(0).optional(),
   // Common
   timeSpentSeconds: z.number().min(0).optional(),
   completed: z.boolean().optional(),
@@ -137,6 +143,9 @@ export async function GET(request: NextRequest) {
           solo_board_sessions: 0,
           warmup_sessions: 0,
           word_list_views: 0,
+          matching_sessions: 0,
+          spelling_sessions: 0,
+          blitz_sessions: 0,
           total_practice_time_seconds: 0,
           last_practice_at: null,
         },
@@ -291,6 +300,11 @@ export async function PATCH(request: NextRequest) {
     if (updateData.wordsFound !== undefined) updateObj.words_found = updateData.wordsFound;
     if (updateData.vocabularyWordsFound !== undefined) updateObj.vocabulary_words_found = updateData.vocabularyWordsFound;
     if (updateData.totalScore !== undefined) updateObj.total_score = updateData.totalScore;
+    if (updateData.wordsAttempted !== undefined) updateObj.words_attempted = updateData.wordsAttempted;
+    if (updateData.wordsCorrect !== undefined) updateObj.words_correct = updateData.wordsCorrect;
+    if (updateData.accuracy !== undefined) updateObj.accuracy = updateData.accuracy;
+    if (updateData.maxCombo !== undefined) updateObj.max_combo = updateData.maxCombo;
+    if (updateData.xpAwarded !== undefined) updateObj.xp_awarded = updateData.xpAwarded;
     if (updateData.timeSpentSeconds !== undefined) updateObj.time_spent_seconds = updateData.timeSpentSeconds;
     if (completed) updateObj.completed_at = new Date().toISOString();
 
