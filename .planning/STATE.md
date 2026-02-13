@@ -10,31 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 37 of 43 (Practice Modes) — IN PROGRESS
-Plan: 3 of 6 in current phase
-Status: Foundation + spelling hook complete
-Last activity: 2026-02-13 — Completed 37-03-PLAN.md (Spelling Challenge Hook)
+Plan: 5 of 6 in current phase
+Status: All 3 new modes wired and discoverable
+Last activity: 2026-02-13 — Completed 37-05-PLAN.md (Practice Mode Integration)
 
-Progress: [██████░░░░] ~14%
+Progress: [███████░░░] ~16%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 20 min
-- Total execution time: 160 min
+- Total plans completed: 9
+- Average duration: 19 min
+- Total execution time: 175 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
-| 37 | 3 | 19 min | 6 min |
+| 37 | 4 | 34 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 36-05 (20 min), 36-02 (40 min), 37-01 (5 min), 37-02 (7 min), 37-03 (7 min)
-- Trend: Phase 37 TDD plans very fast - RED-GREEN-REFACTOR cycle catches issues early
-- Spelling hook (37-03) completed in 7 min with full test coverage and bug fix
-- Hebrew normalization fix discovered and resolved through TDD
+- Last 5 plans: 36-02 (40 min), 37-01 (5 min), 37-02 (7 min), 37-03 (7 min), 37-05 (15 min)
+- Trend: Phase 37 integration plans faster than component builds
+- Type-safe integration minimizes debugging time
+- Translation pre-commit hook catching missing keys early
 
 *Updated after each plan completion*
 
@@ -72,6 +72,9 @@ Recent decisions affecting current work:
 - **37-03:** Hints beyond first reset current streak to 0
 - **37-03:** Auto-advance timing: 1s for correct answers, 2s for incorrect (feedback visibility)
 - **37-03:** Hebrew normalization must sanitize niqqud before normalizing final letters
+- **37-05:** PracticeType union extended (matching, spelling, blitz) - ripple effect managed across 6 files
+- **37-05:** CSS variables used for neo-purple and neo-red (no Tailwind classes yet)
+- **37-05:** Mode selector shows 7 practice modes with session counts
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 37-03-PLAN.md (Spelling Challenge Hook)
+Stopped at: Completed 37-05-PLAN.md (Practice Mode Integration)
 Resume file: None
-Next action: Execute remaining Wave 2 plans (37-02 matching component, 37-04 blitz component) or Wave 3 plans
+Next action: Execute 37-06 (translation completion) or 37-02/37-04 (remaining components)
