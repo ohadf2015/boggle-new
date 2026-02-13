@@ -98,6 +98,15 @@ describe('TimedBlitzPractice', () => {
     jest.useRealTimers();
   });
 
+  // Countdown uses chained setTimeouts (3→2→1→playing).
+  // Each step needs its own act() to flush React state updates
+  // before the next setTimeout can be scheduled.
+  function advanceThroughCountdown() {
+    act(() => { jest.advanceTimersByTime(1100); }); // 3 → 2
+    act(() => { jest.advanceTimersByTime(1100); }); // 2 → 1
+    act(() => { jest.advanceTimersByTime(1100); }); // 1 → playing
+  }
+
   describe('countdown phase', () => {
     it('should show 3-2-1 countdown before game starts', async () => {
       render(
@@ -152,10 +161,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -188,10 +195,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -229,10 +234,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -265,10 +268,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -293,9 +294,9 @@ describe('TimedBlitzPractice', () => {
       await user.clear(input);
       await user.type(input, 'wrongword{Enter}');
 
-      // Combo should reset to 0
+      // Combo should reset — badge disappears when combo is 0
       await waitFor(() => {
-        expect(screen.getByTestId('combo-display')).toHaveTextContent('0');
+        expect(screen.queryByTestId('combo-badge')).not.toBeInTheDocument();
       });
     });
 
@@ -310,10 +311,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -343,10 +342,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -374,10 +371,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -404,10 +399,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -436,10 +429,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -465,9 +456,7 @@ describe('TimedBlitzPractice', () => {
       });
     });
 
-    it('should disable input after time up', async () => {
-      const user = userEvent.setup({ delay: null });
-
+    it('should remove playing UI after time up', async () => {
       render(
         <TimedBlitzPractice
           words={mockWords}
@@ -476,10 +465,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -494,9 +481,9 @@ describe('TimedBlitzPractice', () => {
         expect(screen.getByTestId('times-up')).toBeInTheDocument();
       });
 
-      // Input should be disabled
-      const input = screen.getByTestId('word-input') as HTMLInputElement;
-      expect(input).toBeDisabled();
+      // Playing phase (with input) should be gone — replaced by TIME'S UP screen
+      expect(screen.queryByTestId('playing-phase')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('word-input')).not.toBeInTheDocument();
     });
 
     it('should show results with correct stats', async () => {
@@ -510,10 +497,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -558,10 +543,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Skip countdown (3 seconds + buffer)
-      act(() => {
-        jest.advanceTimersByTime(3300);
-      });
+      // Skip countdown (3 steps, each needing its own act flush)
+      advanceThroughCountdown();
 
       await waitFor(() => {
         expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
@@ -609,9 +592,7 @@ describe('TimedBlitzPractice', () => {
       );
 
       // Complete countdown and game
-      act(() => {
-        jest.advanceTimersByTime(3000);
-      });
+      advanceThroughCountdown();
       act(() => {
         jest.advanceTimersByTime(61000);
       });
@@ -645,9 +626,7 @@ describe('TimedBlitzPractice', () => {
       );
 
       // Complete countdown and game
-      act(() => {
-        jest.advanceTimersByTime(3000);
-      });
+      advanceThroughCountdown();
       act(() => {
         jest.advanceTimersByTime(61000);
       });

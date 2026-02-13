@@ -275,7 +275,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               <h3 className="text-sm font-neo-display text-neo-white/60 uppercase tracking-wide mb-3">
                 {t('education.practice.matching.words') || 'Words'}
               </h3>
-              <AdaptiveMotion className="space-y-3">
+              <AdaptiveMotion.div className="space-y-3">
                 {wordColumn.map((item) => (
                   <DraggableWordCard
                     key={item.id}
@@ -283,7 +283,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
                     isMatched={matchedPairs.has(item.id)}
                   />
                 ))}
-              </AdaptiveMotion>
+              </AdaptiveMotion.div>
             </div>
 
             {/* Definition column */}
@@ -291,7 +291,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               <h3 className="text-sm font-neo-display text-neo-white/60 uppercase tracking-wide mb-3">
                 {t('education.practice.matching.definitions') || 'Definitions'}
               </h3>
-              <AdaptiveMotion className="space-y-3">
+              <AdaptiveMotion.div className="space-y-3">
                 {definitionColumn.map((item) => (
                   <DroppableDefinitionSlot
                     key={item.id}
@@ -300,7 +300,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
                     feedback={feedback[item.id] || null}
                   />
                 ))}
-              </AdaptiveMotion>
+              </AdaptiveMotion.div>
             </div>
           </div>
         </DndContext>

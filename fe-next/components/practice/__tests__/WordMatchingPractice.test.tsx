@@ -51,14 +51,20 @@ jest.mock('@dnd-kit/sortable', () => ({
   sortableKeyboardCoordinates: jest.fn(),
 }));
 
-// Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
-  AdaptiveMotion: ({ children, ...props }: any) => (
-    <div data-testid="adaptive-motion" {...props}>
-      {children}
-    </div>
-  ),
-}));
+// Mock AdaptiveMotion (it's an object with element-keyed components like .div, .span, etc.)
+jest.mock('@/components/motion/AdaptiveMotion', () => {
+  const MockDiv = ({ children, ...props }: any) => (
+    <div data-testid="adaptive-motion" {...props}>{children}</div>
+  );
+  return {
+    AdaptiveMotion: {
+      div: MockDiv,
+      span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+      button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+    },
+    AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
+  };
+});
 
 describe('WordMatchingPractice', () => {
   const mockWords: VocabularyWord[] = [

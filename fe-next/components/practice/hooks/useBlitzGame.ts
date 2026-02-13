@@ -129,15 +129,17 @@ export function useBlitzGame(
 
       const correct = normalizedInput === normalizedCorrect;
 
+      // Always count the attempt
+      setWordsAttempted((prev) => prev + 1);
+
       if (correct) {
         // Increment combo and wordsFound
         setCombo((prev) => prev + 1);
         setMaxCombo((prev) => Math.max(prev, combo + 1));
         setWordsFound((prev) => prev + 1);
       } else {
-        // Reset combo, increment attempts
+        // Reset combo on incorrect
         setCombo(0);
-        setWordsAttempted((prev) => prev + 1);
       }
 
       // Move to next word
