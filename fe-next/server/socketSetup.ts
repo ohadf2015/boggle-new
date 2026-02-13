@@ -48,7 +48,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
   });
 
   // Connection limit middleware - prevents resource exhaustion on low-end devices
-  io.use((socket, next) => {
+  io.use((_socket, next) => {
     const currentConnections = io.sockets.sockets.size;
     if (currentConnections >= MAX_CONNECTIONS) {
       console.warn(`[SOCKET.IO] Connection rejected: limit reached (${currentConnections}/${MAX_CONNECTIONS})`);
@@ -66,7 +66,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
 
   // Middleware stub for duel namespace authentication
   // TODO (Phase 38): Add authentication middleware
-  duelNamespace.use((socket, next) => {
+  duelNamespace.use((_socket, next) => {
     // Future: Verify JWT token, attach user data to socket
     // For now, allow all connections
     next();

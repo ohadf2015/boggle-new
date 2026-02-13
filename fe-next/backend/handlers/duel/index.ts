@@ -40,7 +40,7 @@ import type { Namespace, Socket } from 'socket.io';
  * @param namespace - The /duel namespace instance
  * @param socket - The connected socket
  */
-export function registerDuelHandlers(namespace: Namespace, socket: Socket): void {
+export function registerDuelHandlers(_namespace: Namespace, socket: Socket): void {
   console.log(`[DUEL] Socket connected: ${socket.id}`);
 
   // =============================================================================
