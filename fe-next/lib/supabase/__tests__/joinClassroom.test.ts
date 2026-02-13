@@ -5,7 +5,7 @@
  * direct SELECT to prevent classroom enumeration attacks.
  */
 
-import { joinClassroom } from '../teacher';
+import { joinClassroom } from '../education';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase

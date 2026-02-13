@@ -8,7 +8,7 @@
  * Solution: Add a function to directly fetch student's classroom from membership.
  */
 
-import { getStudentClassroom } from '../teacher';
+import { getStudentClassroom } from '../education';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
@@ -144,7 +144,7 @@ describe('getStudentClassroom', () => {
       }));
 
       // Re-import to get the mocked version
-      const { getStudentClassroom: getStudentClassroomUnconfig } = await import('../teacher');
+      const { getStudentClassroom: getStudentClassroomUnconfig } = await import('../education');
 
       // WHEN: Fetching student's classroom
       const result = await getStudentClassroomUnconfig(mockStudentId);

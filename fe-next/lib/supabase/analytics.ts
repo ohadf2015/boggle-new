@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import type { StudentLessonProgress } from './teacher';
+import type { StudentLessonProgress } from './education';
 
 // =============================================
 // TYPE DEFINITIONS

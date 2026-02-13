@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import type { StudentLessonProgress, WordAttempt } from './types';
-import { normalizeForStorage } from './types';
+import { normalizeForStorage, type StudentLessonProgress, type WordAttempt } from './types';
 
 /**
  * Get student progress for a specific lesson or all lessons
