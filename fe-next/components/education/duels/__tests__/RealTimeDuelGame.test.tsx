@@ -1,0 +1,352 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { RealTimeDuelGame } from '../RealTimeDuelGame';
+import type {
+  DuelStartedData,
+  WordAcceptedData,
+  WordRejectedData,
+  OpponentProgressData,
+  DuelCompletedData,
+} from '@/hooks/useDuelSocket.types';
+
+// Mock useDuelSocket hook
+const mockSubmitWord = jest.fn();
+const mockForfeitDuel = jest.fn();
+const mockSyncState = jest.fn();
+let mockListeners: Record<string, Function> = {};
+
+jest.mock('@/hooks/useDuelSocket', () => ({
+  useDuelSocket: () => ({
+    isConnected: true,
+    submitWord: mockSubmitWord,
+    forfeitDuel: mockForfeitDuel,
+    syncState: mockSyncState,
+    onDuelStarted: (cb: Function) => {
+      mockListeners['duel:started'] = cb;
+      return () => delete mockListeners['duel:started'];
+    },
+    onWordAccepted: (cb: Function) => {
+      mockListeners['duel:word-accepted'] = cb;
+      return () => delete mockListeners['duel:word-accepted'];
+    },
+    onWordRejected: (cb: Function) => {
+      mockListeners['duel:word-rejected'] = cb;
+      return () => delete mockListeners['duel:word-rejected'];
+    },
+    onOpponentProgress: (cb: Function) => {
+      mockListeners['duel:opponent-progress'] = cb;
+      return () => delete mockListeners['duel:opponent-progress'];
+    },
+    onOpponentDisconnected: (cb: Function) => {
+      mockListeners['duel:opponent-disconnected'] = cb;
+      return () => delete mockListeners['duel:opponent-disconnected'];
+    },
+    onOpponentReconnected: (cb: Function) => {
+      mockListeners['duel:opponent-reconnected'] = cb;
+      return () => delete mockListeners['duel:opponent-reconnected'];
+    },
+    onDuelCompleted: (cb: Function) => {
+      mockListeners['duel:completed'] = cb;
+      return () => delete mockListeners['duel:completed'];
+    },
+    onStateSynced: (cb: Function) => {
+      mockListeners['duel:state-synced'] = cb;
+      return () => delete mockListeners['duel:state-synced'];
+    },
+  }),
+}));
+
+// Mock useLanguage
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  },
+  AnimatePresence: ({ children }: any) => <div>{children}</div>,
+}));
+
+describe('RealTimeDuelGame', () => {
+  beforeEach(() => {
+    mockListeners = {};
+    jest.clearAllMocks();
+  });
+
+  it('should render waiting phase initially', () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    expect(screen.getByTestId('realtime-duel-game')).toBeInTheDocument();
+    expect(screen.getByText('duels.waitingForOpponent')).toBeInTheDocument();
+  });
+
+  it('should transition to playing when duel:started received', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    // Initially waiting
+    expect(screen.getByText('duels.waitingForOpponent')).toBeInTheDocument();
+
+    // Emit duel:started event
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [
+        ['A', 'B', 'C', 'D'],
+        ['E', 'F', 'G', 'H'],
+        ['I', 'J', 'K', 'L'],
+        ['M', 'N', 'O', 'P'],
+      ],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    // Should transition to playing
+    await waitFor(() => {
+      expect(screen.queryByText('duels.waitingForOpponent')).not.toBeInTheDocument();
+      expect(screen.getByTestId('duel-timer')).toBeInTheDocument();
+    });
+  });
+
+  it('should display board grid with letters', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [
+        ['A', 'B', 'C', 'D'],
+        ['E', 'F', 'G', 'H'],
+        ['I', 'J', 'K', 'L'],
+        ['M', 'N', 'O', 'P'],
+      ],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => {
+      expect(screen.getByText('A')).toBeInTheDocument();
+      expect(screen.getByText('B')).toBeInTheDocument();
+      expect(screen.getByText('P')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle word submission', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('word-input')).toBeInTheDocument();
+    });
+
+    const input = screen.getByTestId('word-input');
+    const submitBtn = screen.getByTestId('submit-word-btn');
+
+    fireEvent.change(input, { target: { value: 'APPLE' } });
+    fireEvent.click(submitBtn);
+
+    expect(mockSubmitWord).toHaveBeenCalledWith('duel-123', 'APPLE');
+  });
+
+  it('should show accepted word with green status', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => screen.getByTestId('word-input'));
+
+    const input = screen.getByTestId('word-input');
+    fireEvent.change(input, { target: { value: 'APPLE' } });
+    fireEvent.click(screen.getByTestId('submit-word-btn'));
+
+    // Emit word-accepted event
+    const acceptedData: WordAcceptedData = {
+      word: 'APPLE',
+      points: 10,
+      totalScore: 10,
+      wordCount: 1,
+    };
+    mockListeners['duel:word-accepted']?.(acceptedData);
+
+    await waitFor(() => {
+      expect(screen.getByText('APPLE')).toBeInTheDocument();
+    });
+  });
+
+  it('should update opponent progress when received', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => screen.getByTestId('opponent-score'));
+
+    // Initial opponent score should be 0
+    expect(screen.getByTestId('opponent-score')).toHaveTextContent('0');
+
+    // Emit opponent-progress event
+    const progressData: OpponentProgressData = {
+      opponentId: 'opponent-456',
+      totalScore: 25,
+      wordCount: 3,
+    };
+    mockListeners['duel:opponent-progress']?.(progressData);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('opponent-score')).toHaveTextContent('25');
+    });
+  });
+
+  it('should show disconnect overlay when opponent disconnects', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => screen.getByTestId('word-input'));
+
+    // Emit opponent-disconnected event
+    mockListeners['duel:opponent-disconnected']?.({
+      opponentId: 'opponent-456',
+      gracePeriodSeconds: 30,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('disconnect-overlay')).toBeInTheDocument();
+    });
+  });
+
+  it('should open forfeit dialog when forfeit button clicked', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => screen.getByTestId('forfeit-btn'));
+
+    fireEvent.click(screen.getByTestId('forfeit-btn'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('forfeit-dialog')).toBeInTheDocument();
+    });
+  });
+
+  it('should show results when duel completed', async () => {
+    render(
+      <RealTimeDuelGame
+        duelId="duel-123"
+        studentId="student-123"
+        opponentName="Bob"
+      />
+    );
+
+    const startData: DuelStartedData = {
+      duelId: 'duel-123',
+      boardState: [['A', 'B'], ['C', 'D']],
+      startTime: new Date().toISOString(),
+      timeLimit: 180,
+      players: ['student-123', 'opponent-456'],
+    };
+    mockListeners['duel:started']?.(startData);
+
+    await waitFor(() => screen.getByTestId('word-input'));
+
+    // Emit completed event
+    const completedData: DuelCompletedData = {
+      winnerId: 'student-123',
+      challengerScore: 100,
+      opponentScore: 75,
+      xpAwarded: { winner: 50, loser: 30 },
+    };
+    mockListeners['duel:completed']?.(completedData);
+
+    await waitFor(() => {
+      expect(screen.getByText('duels.youWin')).toBeInTheDocument();
+    });
+  });
+});
