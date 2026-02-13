@@ -39,14 +39,15 @@ Plans:
   3. Student can play timed blitz (60s speed round) cycling through vocabulary with combo multipliers
   4. Student can select practice mode from mode selector UI showing all available modes with descriptions and progress per mode
   5. Practice sessions are tracked in database and award XP based on performance
-**Plans**: 5 plans
+**Plans**: 6 plans
 
 Plans:
-- [ ] 37-01-PLAN.md — Foundation: install dnd-kit, practice DB operations, XP calculations, shared hook
+- [ ] 37-01-PLAN.md — Foundation: install dnd-kit, practice DB operations, XP calculations, API route update, shared hook
 - [ ] 37-02-PLAN.md — Word Matching mode (TDD): useMatchingGame hook + drag-and-drop component
 - [ ] 37-03-PLAN.md — Spelling Challenge mode (TDD): useSpellingGame hook + progressive difficulty component
 - [ ] 37-04-PLAN.md — Timed Blitz mode (TDD): useBlitzGame hook + 60s timer component with combo
-- [ ] 37-05-PLAN.md — Integration: update mode selector, page routing, 4-language translations
+- [ ] 37-05-PLAN.md — Integration: update mode selector, page routing, barrel exports
+- [ ] 37-06-PLAN.md — Translations (4 languages) + human verification
 
 ### Phase 38: Async Duels
 **Goal**: Students can challenge classmates to turn-based duels (play board, send score to beat) and view duel history with win/loss records
@@ -139,7 +140,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 36. Foundation & Refactoring | v2.0 | 5/5 | Complete | 2026-02-13 |
-| 37. Practice Modes | v2.0 | 0/5 | Planned | - |
+| 37. Practice Modes | v2.0 | 0/6 | Planned | - |
 | 38. Async Duels | v2.0 | 0/0 | Not started | - |
 | 39. Real-Time Duels | v2.0 | 0/0 | Not started | - |
 | 40. Gamification Enhancements | v2.0 | 0/0 | Not started | - |
@@ -148,4 +149,4 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-13 — Phase 37 planned (5 plans in 3 waves)*
+*Last updated: 2026-02-13 — Phase 37 revised (6 plans in 4 waves)*
