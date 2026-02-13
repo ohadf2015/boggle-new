@@ -6,7 +6,7 @@ import { useMounted } from '@/hooks/useMounted';
 import logger from '@/utils/logger';
 
 // Types
-export type PracticeType = 'flashcard' | 'solo_board' | 'warmup' | 'word_list';
+export type PracticeType = 'flashcard' | 'solo_board' | 'warmup' | 'word_list' | 'matching' | 'spelling' | 'blitz';
 export type MasteryLevel = 'not_started' | 'started' | 'practicing' | 'mastered';
 
 export interface PracticeSession {
@@ -35,6 +35,9 @@ export interface PracticeProgress {
   solo_board_sessions: number;
   warmup_sessions: number;
   word_list_views: number;
+  matching_sessions: number;
+  spelling_sessions: number;
+  blitz_sessions: number;
   total_practice_time_seconds: number;
   last_practice_at: string | null;
 }

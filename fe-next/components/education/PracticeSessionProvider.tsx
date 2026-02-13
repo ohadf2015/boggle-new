@@ -45,7 +45,7 @@ export interface LevelUpPayload {
 }
 
 export interface CompletePracticeSessionData {
-  type: 'flashcard' | 'solo_board' | 'lesson_completion';
+  type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz';
   cardsReviewed?: number;
   cardsCorrect?: number;
   vocabularyWordsFound?: string[];

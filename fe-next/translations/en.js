@@ -5436,6 +5436,7 @@ const en = {
       "swipeExplain": "Swipe right for 'Got It', left for 'Don't Know'",
       "matching": {
         "title": "Word Matching",
+        "desc": "Match words with definitions",
         "words": "Words",
         "definitions": "Definitions"
       },
@@ -5449,7 +5450,12 @@ const en = {
       "correctAnswer": "Correct answer:",
       "streak": "Streak",
       "spelling": {
-        "title": "Spelling Challenge"
+        "title": "Spelling Challenge",
+        "desc": "Type words from definitions"
+      },
+      "blitz": {
+        "title": "Timed Blitz",
+        "desc": "Race against the clock"
       },
       "mastery": {
         "not_started": "Not Started",

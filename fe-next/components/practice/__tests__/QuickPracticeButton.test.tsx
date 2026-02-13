@@ -97,6 +97,9 @@ describe('QuickPracticeButton', () => {
       solo_board: 3,
       word_list: 2,
       warmup: 1,
+      matching: 0,
+      spelling: 0,
+      blitz: 0,
     };
 
     render(<QuickPracticeButton {...defaultProps} sessionCounts={sessionCounts} />);

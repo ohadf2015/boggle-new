@@ -21,6 +21,9 @@ import {
   SoloPracticeBoard,
   WordListPreview,
   WarmupRound,
+  WordMatchingPractice,
+  SpellingChallengePractice,
+  TimedBlitzPractice,
 } from '@/components/practice';
 import {
   PracticeSessionProvider,
@@ -34,7 +37,7 @@ import { cn } from '@/lib/utils';
 /**
  * Inner practice content component that uses XP session context
  */
-const VALID_PRACTICE_TYPES: PracticeType[] = ['flashcard', 'solo_board', 'word_list', 'warmup'];
+const VALID_PRACTICE_TYPES: PracticeType[] = ['flashcard', 'solo_board', 'word_list', 'warmup', 'matching', 'spelling', 'blitz'];
 
 function PracticeContent({
   lesson,
@@ -164,6 +167,48 @@ function PracticeContent({
             {...commonProps}
             onComplete={handleBoardComplete}
             onWordFound={handleWordFound}
+          />
+        );
+      case 'matching':
+        return (
+          <WordMatchingPractice
+            words={lesson.words}
+            onComplete={async (results) => {
+              await completePracticeSession({
+                type: 'matching',
+                cardsReviewed: results.total,
+                cardsCorrect: results.correct,
+              });
+            }}
+            onBack={handleBack}
+          />
+        );
+      case 'spelling':
+        return (
+          <SpellingChallengePractice
+            words={lesson.words}
+            onComplete={async (results) => {
+              await completePracticeSession({
+                type: 'spelling',
+                cardsReviewed: results.total,
+                cardsCorrect: results.correct,
+              });
+            }}
+            onBack={handleBack}
+          />
+        );
+      case 'blitz':
+        return (
+          <TimedBlitzPractice
+            words={lesson.words}
+            onComplete={async (results) => {
+              await completePracticeSession({
+                type: 'blitz',
+                cardsReviewed: results.wordsAttempted,
+                cardsCorrect: results.wordsFound,
+              });
+            }}
+            onBack={handleBack}
           />
         );
       default:

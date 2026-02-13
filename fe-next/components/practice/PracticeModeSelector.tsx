@@ -12,7 +12,10 @@ import {
   ArrowLeft,
   CheckCircle,
   Clock,
-  Target
+  Target,
+  Shuffle,
+  PenLine,
+  Timer
 } from 'lucide-react';
 import type { PracticeType, MasteryLevel } from '@/hooks/usePracticeSession';
 
@@ -33,6 +36,9 @@ interface PracticeModeSelectorProps {
       solo_board_sessions: number;
       warmup_sessions: number;
       word_list_views: number;
+      matching_sessions: number;
+      spelling_sessions: number;
+      blitz_sessions: number;
     } | null;
   };
   onSelectMode: (mode: PracticeType) => void;
@@ -53,8 +59,11 @@ export default function PracticeModeSelector({
         solo_board: progress.progress.solo_board_sessions,
         warmup: progress.progress.warmup_sessions,
         word_list: progress.progress.word_list_views,
+        matching: progress.progress.matching_sessions,
+        spelling: progress.progress.spelling_sessions,
+        blitz: progress.progress.blitz_sessions,
       }
-    : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0 };
+    : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0, matching: 0, spelling: 0, blitz: 0 };
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
 
@@ -82,6 +91,24 @@ export default function PracticeModeSelector({
       icon: <Zap className="w-8 h-8" />,
       colorClass: 'text-neo-pink',
       bgClass: 'bg-neo-pink/10 hover:bg-neo-pink/20',
+    },
+    {
+      type: 'matching',
+      icon: <Shuffle className="w-8 h-8" />,
+      colorClass: 'text-[var(--neo-cyan)]',
+      bgClass: 'bg-[var(--neo-cyan)]/10 hover:bg-[var(--neo-cyan)]/20',
+    },
+    {
+      type: 'spelling',
+      icon: <PenLine className="w-8 h-8" />,
+      colorClass: 'text-[var(--neo-purple)]',
+      bgClass: 'bg-[var(--neo-purple)]/10 hover:bg-[var(--neo-purple)]/20',
+    },
+    {
+      type: 'blitz',
+      icon: <Timer className="w-8 h-8" />,
+      colorClass: 'text-[var(--neo-red)]',
+      bgClass: 'bg-[var(--neo-red)]/10 hover:bg-[var(--neo-red)]/20',
     },
   ];
 
@@ -117,6 +144,9 @@ export default function PracticeModeSelector({
       solo_board: { title: 'education.practice.soloBoard', desc: 'education.practice.soloBoardDesc' },
       word_list: { title: 'education.practice.wordList', desc: 'education.practice.wordListDesc' },
       warmup: { title: 'education.practice.warmup', desc: 'education.practice.warmupDesc' },
+      matching: { title: 'education.practice.matching.title', desc: 'education.practice.matching.desc' },
+      spelling: { title: 'education.practice.spelling.title', desc: 'education.practice.spelling.desc' },
+      blitz: { title: 'education.practice.blitz.title', desc: 'education.practice.blitz.desc' },
     };
     return map[type][key];
   };

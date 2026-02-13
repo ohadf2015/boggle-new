@@ -63,6 +63,9 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
       solo_board: t('education.practice.soloBoard') || 'Solo Board',
       word_list: t('education.practice.wordList') || 'Word List',
       warmup: t('education.practice.warmup') || 'Warmup',
+      matching: t('education.practice.matching.title') || 'Word Matching',
+      spelling: t('education.practice.spelling.title') || 'Spelling Challenge',
+      blitz: t('education.practice.blitz.title') || 'Timed Blitz',
     };
     return labels[type];
   };
@@ -77,6 +80,12 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
         return 'gaming';
       case 'word_list':
         return 'happy';
+      case 'matching':
+        return 'thinking';
+      case 'spelling':
+        return 'thinking';
+      case 'blitz':
+        return 'gaming';
       default:
         return 'happy';
     }

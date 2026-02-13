@@ -13,6 +13,9 @@ interface SessionCounts {
   solo_board: number;
   word_list: number;
   warmup: number;
+  matching: number;
+  spelling: number;
+  blitz: number;
 }
 
 interface QuickPracticeButtonProps {
@@ -81,6 +84,9 @@ export function QuickPracticeButton({
       solo_board: t('education.practice.soloBoard') || 'Solo Board',
       word_list: t('education.practice.wordList') || 'Word List',
       warmup: t('education.practice.warmup') || 'Warmup',
+      matching: t('education.practice.matching.title') || 'Word Matching',
+      spelling: t('education.practice.spelling.title') || 'Spelling Challenge',
+      blitz: t('education.practice.blitz.title') || 'Timed Blitz',
     };
     return labels[type];
   };
