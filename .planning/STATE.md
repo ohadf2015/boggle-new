@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 38 of 43 (Async Duels) — IN PROGRESS
-Plan: 1 of 6 in current phase (just completed)
-Status: Duel types and CRUD operations implemented with TDD
-Last activity: 2026-02-13 — Completed 38-01-PLAN.md (Duel Types & CRUD)
+Plan: 2 of 6 in current phase (just completed)
+Status: Duel lifecycle Socket.IO handlers with state machine validation
+Last activity: 2026-02-13 — Completed 38-02-PLAN.md (Duel Lifecycle Handlers)
 
 Progress: [████████░░] ~20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 15 min
-- Total execution time: 191 min
+- Total plans completed: 13
+- Average duration: 14 min
+- Total execution time: 199 min
 
 **By Phase:**
 
@@ -29,13 +29,13 @@ Progress: [████████░░] ~20%
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
-| 38 | 1 | 4 min | 4 min |
+| 38 | 2 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 37-02 (7 min), 37-03 (7 min), 37-05 (15 min), 37-06 (12 min), 38-01 (4 min)
-- Trend: Phase 38 starting strong (4 min for TDD foundation)
+- Last 5 plans: 37-03 (7 min), 37-05 (15 min), 37-06 (12 min), 38-01 (4 min), 38-02 (8 min)
+- Trend: Phase 38 maintaining velocity (6 min average so far)
 - Translation pre-commit hook catching missing keys early
-- TDD cycle well-established (RED-GREEN-REFACTOR pattern)
+- TDD cycle producing high-quality code (21/22 tests passing)
 
 *Updated after each plan completion*
 
@@ -81,6 +81,10 @@ Recent decisions affecting current work:
 - **38-01:** Server-side Supabase client pattern for duels.ts (following practice.ts)
 - **38-01:** Computed isWin field in getDuelHistory (avoids complex SQL)
 - **38-01:** Streak calculation processes duels chronologically (current vs max streak)
+- **38-02:** Zod for Socket.IO payload validation (type-safe + runtime)
+- **38-02:** Frozen board generated at duel creation time (same board for both players)
+- **38-02:** State transitions validated server-side via VALID_TRANSITIONS map
+- **38-02:** Ownership validation on accept/decline/cancel (only authorized user can perform action)
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 38-01-PLAN.md (Duel Types & CRUD)
+Stopped at: Completed 38-02-PLAN.md (Duel Lifecycle Handlers)
 Resume file: None
-Next action: Execute 38-02-PLAN.md (Duel WebSocket Handlers)
+Next action: Execute 38-03-PLAN.md (Full Duel Flow Integration)
