@@ -1,0 +1,330 @@
+/**
+ * Tests for challenges module (daily challenges + weekly quests)
+ * TDD: RED phase - these tests MUST fail before implementation
+ */
+
+import { supabase } from '@/lib/supabase';
+import {
+  getDailyChallenges,
+  getWeeklyQuests,
+  assignDailyChallenges,
+  claimChallengeReward,
+  claimQuestReward,
+  getCurrentWeekStart,
+} from './challenges';
+
+// Mock supabase
+jest.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: jest.fn(),
+  },
+}));
+
+describe('challenges module', () => {
+  const mockPlayerId = 'test-player-123';
+  const mockDate = '2026-02-14';
+  const mockWeekStart = '2026-02-10'; // Monday
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // ==========================================
+  // getDailyChallenges
+  // ==========================================
+  describe('getDailyChallenges', () => {
+    it('should return today\'s challenges for a player', async () => {
+      const mockChallenges = [
+        {
+          id: 'challenge-1',
+          player_id: mockPlayerId,
+          challenge_date: mockDate,
+          challenge_type: 'practice_sessions',
+          challenge_tier: 'easy',
+          title: 'challenges.daily.practiceSessions',
+          description: 'challenges.daily.practiceSessionsDesc',
+          target_value: 3,
+          current_value: 1,
+          xp_reward: 50,
+          bonus_reward: { coins: 10 },
+          completed: false,
+          claimed: false,
+          created_at: '2026-02-14T00:00:00Z',
+        },
+      ];
+
+      const mockEq2 = jest.fn().mockResolvedValue({ data: mockChallenges, error: null });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+
+      const result = await getDailyChallenges(mockPlayerId, mockDate);
+
+      expect(result.data).toEqual(mockChallenges);
+      expect(result.error).toBeNull();
+      expect(supabase.from).toHaveBeenCalledWith('daily_challenges');
+    });
+
+    it.skip('should handle Supabase not configured', async () => {
+      // Skip: Cannot easily mock supabase as null with current setup
+      // This case is tested through integration tests
+    });
+  });
+
+  // ==========================================
+  // getWeeklyQuests
+  // ==========================================
+  describe('getWeeklyQuests', () => {
+    it('should return current week\'s quests for a player', async () => {
+      const mockQuests = [
+        {
+          id: 'quest-1',
+          player_id: mockPlayerId,
+          week_start: mockWeekStart,
+          quest_type: 'weekly_mastery',
+          title: 'challenges.weekly.masterWords',
+          description: 'challenges.weekly.masterWordsDesc',
+          requirements: { words_mastered: 15 },
+          current_progress: { words_mastered: 5 },
+          xp_reward: 300,
+          bonus_rewards: { coins: 100 },
+          completed: false,
+          claimed: false,
+          created_at: '2026-02-10T00:00:00Z',
+        },
+      ];
+
+      const mockEq2 = jest.fn().mockResolvedValue({ data: mockQuests, error: null });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+
+      const result = await getWeeklyQuests(mockPlayerId, mockWeekStart);
+
+      expect(result.data).toEqual(mockQuests);
+      expect(result.error).toBeNull();
+      expect(supabase.from).toHaveBeenCalledWith('weekly_quests');
+    });
+  });
+
+  // ==========================================
+  // assignDailyChallenges
+  // ==========================================
+  describe('assignDailyChallenges', () => {
+    it('should create 3 challenges (easy, medium, hard)', async () => {
+      const mockCreatedChallenges = [
+        { id: 'c1', challenge_tier: 'easy', xp_reward: 50, bonus_reward: { coins: 10 } },
+        { id: 'c2', challenge_tier: 'medium', xp_reward: 100, bonus_reward: { coins: 25 } },
+        { id: 'c3', challenge_tier: 'hard', xp_reward: 200, bonus_reward: { coins: 50 } },
+      ];
+
+      // Mock check for existing challenges (none found)
+      const mockCheckEq2 = jest.fn().mockResolvedValue({ data: [], error: null });
+      const mockCheckEq1 = jest.fn().mockReturnValue({ eq: mockCheckEq2 });
+      const mockCheckSelect = jest.fn().mockReturnValue({ eq: mockCheckEq1 });
+
+      // Mock insert chain
+      const mockInsertSelect = jest.fn().mockResolvedValue({ data: mockCreatedChallenges, error: null });
+      const mockInsert = jest.fn().mockReturnValue({ select: mockInsertSelect });
+
+      (supabase.from as jest.Mock)
+        .mockReturnValueOnce({ select: mockCheckSelect }) // First call: check existing
+        .mockReturnValueOnce({ insert: mockInsert }); // Second call: insert
+
+      const result = await assignDailyChallenges(mockPlayerId);
+
+      expect(result.data).toHaveLength(3);
+      expect(result.data?.[0].challenge_tier).toBe('easy');
+      expect(result.data?.[1].challenge_tier).toBe('medium');
+      expect(result.data?.[2].challenge_tier).toBe('hard');
+    });
+
+    it('should not create duplicates if challenges already exist today', async () => {
+      const mockExisting = [
+        { id: 'existing-1', challenge_tier: 'easy' },
+        { id: 'existing-2', challenge_tier: 'medium' },
+        { id: 'existing-3', challenge_tier: 'hard' },
+      ];
+
+      const mockEq2 = jest.fn().mockResolvedValue({ data: mockExisting, error: null });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+
+      const result = await assignDailyChallenges(mockPlayerId);
+
+      expect(result.data).toEqual(mockExisting);
+      // Should NOT call insert
+    });
+  });
+
+  // ==========================================
+  // claimChallengeReward
+  // ==========================================
+  describe('claimChallengeReward', () => {
+    it('should mark challenge as claimed and return reward', async () => {
+      const mockChallenge = {
+        id: 'challenge-1',
+        player_id: mockPlayerId,
+        completed: true,
+        claimed: false,
+        xp_reward: 50,
+        bonus_reward: { coins: 10 },
+      };
+
+      // Mock fetch challenge
+      const mockSelectQuery = {
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+      };
+
+      // Mock update
+      const mockUpdateQuery = {
+        eq: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({
+          data: { ...mockChallenge, claimed: true, claimed_at: '2026-02-14T12:00:00Z' },
+          error: null
+        }),
+      };
+
+      (supabase.from as jest.Mock)
+        .mockReturnValueOnce({ select: jest.fn().mockReturnValue(mockSelectQuery) })
+        .mockReturnValueOnce({ update: jest.fn().mockReturnValue(mockUpdateQuery) });
+
+      const result = await claimChallengeReward('challenge-1', mockPlayerId);
+
+      expect(result.data).toEqual({ xpReward: 50, bonusReward: { coins: 10 } });
+      expect(result.error).toBeNull();
+    });
+
+    it('should fail if challenge not completed', async () => {
+      const mockChallenge = {
+        id: 'challenge-1',
+        player_id: mockPlayerId,
+        completed: false,
+        claimed: false,
+      };
+
+      const mockSelectQuery = {
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue(mockSelectQuery)
+      });
+
+      const result = await claimChallengeReward('challenge-1', mockPlayerId);
+
+      expect(result.data).toBeNull();
+      expect(result.error?.message).toBe('Challenge not completed');
+    });
+
+    it('should fail if already claimed', async () => {
+      const mockChallenge = {
+        id: 'challenge-1',
+        player_id: mockPlayerId,
+        completed: true,
+        claimed: true,
+      };
+
+      const mockSelectQuery = {
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue(mockSelectQuery)
+      });
+
+      const result = await claimChallengeReward('challenge-1', mockPlayerId);
+
+      expect(result.data).toBeNull();
+      expect(result.error?.message).toBe('Challenge already claimed');
+    });
+
+    it('should fail if player_id does not match', async () => {
+      const mockChallenge = {
+        id: 'challenge-1',
+        player_id: 'different-player',
+        completed: true,
+        claimed: false,
+      };
+
+      const mockSelectQuery = {
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+      };
+
+      (supabase.from as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue(mockSelectQuery)
+      });
+
+      const result = await claimChallengeReward('challenge-1', mockPlayerId);
+
+      expect(result.data).toBeNull();
+      expect(result.error?.message).toBe('Player ID mismatch');
+    });
+  });
+
+  // ==========================================
+  // claimQuestReward
+  // ==========================================
+  describe('claimQuestReward', () => {
+    it('should mark quest as claimed and return reward', async () => {
+      const mockQuest = {
+        id: 'quest-1',
+        player_id: mockPlayerId,
+        completed: true,
+        claimed: false,
+        xp_reward: 300,
+        bonus_rewards: { coins: 100 },
+      };
+
+      const mockSelectQuery = {
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({ data: mockQuest, error: null }),
+      };
+
+      const mockUpdateQuery = {
+        eq: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({
+          data: { ...mockQuest, claimed: true },
+          error: null
+        }),
+      };
+
+      (supabase.from as jest.Mock)
+        .mockReturnValueOnce({ select: jest.fn().mockReturnValue(mockSelectQuery) })
+        .mockReturnValueOnce({ update: jest.fn().mockReturnValue(mockUpdateQuery) });
+
+      const result = await claimQuestReward('quest-1', mockPlayerId);
+
+      expect(result.data).toEqual({ xpReward: 300, bonusReward: { coins: 100 } });
+      expect(result.error).toBeNull();
+    });
+  });
+
+  // ==========================================
+  // getCurrentWeekStart helper
+  // ==========================================
+  describe('getCurrentWeekStart', () => {
+    it('should return Monday of current week', () => {
+      // Mock Date to Feb 14, 2026 (Saturday)
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-02-14T12:00:00Z'));
+
+      const result = getCurrentWeekStart();
+
+      // Should return Monday Feb 9, 2026
+      expect(result).toBe('2026-02-09');
+
+      jest.useRealTimers();
+    });
+  });
+});

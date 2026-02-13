@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 3261,
+    "totalKeysInCode": 3281,
     "keyCountByLanguage": {
       "en": 4689,
       "he": 4706,
@@ -8,7 +8,7 @@
       "ja": 4715,
       "es": 4595
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 20,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -160,7 +160,196 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "challenges.daily.blitzHighScore",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.blitzHighScoreDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.duelPlayed",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.duelPlayedDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.duelStreak",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 81
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.duelStreakDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.duelWins",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.duelWinsDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.perfectAccuracy",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.perfectAccuracyDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.practiceSessions",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.test.ts",
+          "line": 44
+        },
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.practiceSessionsDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.test.ts",
+          "line": 45
+        },
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.spellingPerfect",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.spellingPerfectDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.wordsMastered",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.wordsMasteredDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.xpEarned",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "key": "challenges.daily.xpEarnedDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.ts",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "key": "challenges.weekly.masterWords",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.test.ts",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "key": "challenges.weekly.masterWordsDesc",
+      "usages": [
+        {
+          "file": "lib/supabase/education/challenges.test.ts",
+          "line": 93
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "share.qrCode",
