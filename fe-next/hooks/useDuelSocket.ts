@@ -5,7 +5,8 @@
  * - Connection to /duel namespace
  * - Lobby actions (join/leave)
  * - Challenge actions (create, accept, decline, cancel)
- * - Gameplay actions (submit score)
+ * - Gameplay actions (submit score, submit word)
+ * - Real-time actions (forfeit, sync state)
  * - Event listeners with cleanup pattern
  *
  * Usage:
@@ -25,69 +26,39 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
+import type {
+  UseDuelSocketReturn,
+  ChallengeReceivedData,
+  LobbyUpdateData,
+  DuelAcceptedData,
+  DuelCompletedData,
+  ScoreSubmittedData,
+  DuelStartedData,
+  WordAcceptedData,
+  WordRejectedData,
+  OpponentProgressData,
+  OpponentDisconnectedData,
+  OpponentReconnectedData,
+  StateSyncedData,
+} from './useDuelSocket.types';
 
-// ==========================================
-// Types
-// ==========================================
-
-export interface ChallengeReceivedData {
-  duelId: string;
-  challengerName: string;
-  lessonId: string;
-}
-
-export interface LobbyUpdateData {
-  availableOpponents: OpponentInfo[];
-}
-
-export interface OpponentInfo {
-  userId: string;
-  displayName: string;
-  avatarUrl: string | null;
-}
-
-export interface DuelAcceptedData {
-  duelId: string;
-  boardState: string[][];
-  startedAt: string;
-}
-
-export interface DuelCompletedData {
-  winnerId: string | null;
-  challengerScore: number;
-  opponentScore: number;
-  xpAwarded: { winner: number; loser: number };
-}
-
-export interface ScoreSubmittedData {
-  playerId: string;
-  score: number;
-  wordsValidated: number;
-  wordsRejected: number;
-}
-
-export interface UseDuelSocketReturn {
-  socket: Socket | null;
-  isConnected: boolean;
-  // Lobby
-  joinLobby: (classroomId: string) => void;
-  leaveLobby: (classroomId: string) => void;
-  // Challenge
-  createChallenge: (opponentId: string, lessonId: string, classroomId: string) => void;
-  acceptChallenge: (duelId: string) => void;
-  declineChallenge: (duelId: string) => void;
-  cancelChallenge: (duelId: string) => void;
-  // Gameplay
-  submitScore: (duelId: string, wordsFound: string[]) => void;
-  // Event listeners (caller provides callbacks)
-  onChallengeReceived: (cb: (data: ChallengeReceivedData) => void) => () => void;
-  onLobbyUpdate: (cb: (data: LobbyUpdateData) => void) => () => void;
-  onDuelAccepted: (cb: (data: DuelAcceptedData) => void) => () => void;
-  onDuelDeclined: (cb: (data: { duelId: string }) => void) => () => void;
-  onDuelCompleted: (cb: (data: DuelCompletedData) => void) => () => void;
-  onScoreSubmitted: (cb: (data: ScoreSubmittedData) => void) => () => void;
-  onError: (cb: (data: { message: string }) => void) => () => void;
-}
+// Re-export types for consumer convenience
+export type {
+  UseDuelSocketReturn,
+  ChallengeReceivedData,
+  LobbyUpdateData,
+  OpponentInfo,
+  DuelAcceptedData,
+  DuelCompletedData,
+  ScoreSubmittedData,
+  DuelStartedData,
+  WordAcceptedData,
+  WordRejectedData,
+  OpponentProgressData,
+  OpponentDisconnectedData,
+  OpponentReconnectedData,
+  StateSyncedData,
+} from './useDuelSocket.types';
 
 // ==========================================
 // Hook Implementation
@@ -169,11 +140,12 @@ export function useDuelSocket(): UseDuelSocketReturn {
   }, []);
 
   const createChallenge = useCallback(
-    (opponentId: string, lessonId: string, classroomId: string) => {
+    (opponentId: string, lessonId: string, classroomId: string, duelType: 'async' | 'realtime' = 'async') => {
       socketRef.current?.emit('duel:create', {
         opponentId,
         lessonId,
         classroomId,
+        duelType,
       });
     },
     []
@@ -193,6 +165,18 @@ export function useDuelSocket(): UseDuelSocketReturn {
 
   const submitScore = useCallback((duelId: string, wordsFound: string[]) => {
     socketRef.current?.emit('duel:submit-score', { duelId, wordsFound });
+  }, []);
+
+  const submitWord = useCallback((duelId: string, word: string, positions?: number[]) => {
+    socketRef.current?.emit('duel:submit-word', { duelId, word, positions });
+  }, []);
+
+  const forfeitDuel = useCallback((duelId: string) => {
+    socketRef.current?.emit('duel:forfeit', { duelId });
+  }, []);
+
+  const syncState = useCallback((duelId: string) => {
+    socketRef.current?.emit('duel:sync-state', { duelId });
   }, []);
 
   // ==========================================
@@ -309,6 +293,104 @@ export function useDuelSocket(): UseDuelSocketReturn {
     };
   }, []);
 
+  const onDuelStarted = useCallback((cb: (data: DuelStartedData) => void) => {
+    const event = 'duel:started';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
+  const onWordAccepted = useCallback((cb: (data: WordAcceptedData) => void) => {
+    const event = 'duel:word-accepted';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
+  const onWordRejected = useCallback((cb: (data: WordRejectedData) => void) => {
+    const event = 'duel:word-rejected';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
+  const onOpponentProgress = useCallback((cb: (data: OpponentProgressData) => void) => {
+    const event = 'duel:opponent-progress';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
+  const onOpponentDisconnected = useCallback((cb: (data: OpponentDisconnectedData) => void) => {
+    const event = 'duel:opponent-disconnected';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
+  const onOpponentReconnected = useCallback((cb: (data: OpponentReconnectedData) => void) => {
+    const event = 'duel:opponent-reconnected';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
+  const onStateSynced = useCallback((cb: (data: StateSyncedData) => void) => {
+    const event = 'duel:state-synced';
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on(event, cb);
+    listenersRef.current.set(event, cb);
+
+    return () => {
+      socket.off(event, cb);
+      listenersRef.current.delete(event);
+    };
+  }, []);
+
   // ==========================================
   // Return API
   // ==========================================
@@ -326,6 +408,10 @@ export function useDuelSocket(): UseDuelSocketReturn {
     cancelChallenge,
     // Gameplay
     submitScore,
+    // Real-time actions
+    submitWord,
+    forfeitDuel,
+    syncState,
     // Event listeners
     onChallengeReceived,
     onLobbyUpdate,
@@ -334,5 +420,13 @@ export function useDuelSocket(): UseDuelSocketReturn {
     onDuelCompleted,
     onScoreSubmitted,
     onError,
+    // Real-time event listeners
+    onDuelStarted,
+    onWordAccepted,
+    onWordRejected,
+    onOpponentProgress,
+    onOpponentDisconnected,
+    onOpponentReconnected,
+    onStateSynced,
   };
 }

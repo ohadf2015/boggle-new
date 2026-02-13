@@ -134,6 +134,9 @@ describe('DuelGameView', () => {
       declineChallenge: jest.fn(),
       cancelChallenge: jest.fn(),
       submitScore: mockSubmitScore,
+      submitWord: jest.fn(),
+      forfeitDuel: jest.fn(),
+      syncState: jest.fn(),
       onChallengeReceived: jest.fn(),
       onLobbyUpdate: jest.fn(),
       onDuelAccepted: jest.fn(),
@@ -141,6 +144,13 @@ describe('DuelGameView', () => {
       onDuelCompleted: mockOnDuelCompleted,
       onScoreSubmitted: mockOnScoreSubmitted,
       onError: mockOnError,
+      onDuelStarted: jest.fn(),
+      onWordAccepted: jest.fn(),
+      onWordRejected: jest.fn(),
+      onOpponentProgress: jest.fn(),
+      onOpponentDisconnected: jest.fn(),
+      onOpponentReconnected: jest.fn(),
+      onStateSynced: jest.fn(),
     });
   });
 

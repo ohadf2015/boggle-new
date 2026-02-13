@@ -6,9 +6,8 @@
  */
 
 import type { Namespace } from 'socket.io';
-import type { DuelSocket, SubmitWordPayload } from './types';
 import type { Language } from '@/shared/types';
-import { submitWordSchema } from './types';
+import { type DuelSocket, type SubmitWordPayload, submitWordSchema } from './types';
 import { getSupabase } from '@/backend/modules/supabase/client';
 import { isDictionaryWord } from '@/backend/dictionary';
 import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
