@@ -6,14 +6,12 @@
  */
 
 import type { Namespace } from 'socket.io';
-import type {
-  DuelSocket,
-  CreateDuelPayload,
-  AcceptDuelPayload,
-  DeclineDuelPayload,
-  CancelDuelPayload,
-} from './types';
 import {
+  type DuelSocket,
+  type CreateDuelPayload,
+  type AcceptDuelPayload,
+  type DeclineDuelPayload,
+  type CancelDuelPayload,
   createDuelSchema,
   acceptDuelSchema,
   declineDuelSchema,
