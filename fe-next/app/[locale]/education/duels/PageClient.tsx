@@ -5,9 +5,8 @@ import { Swords, Trophy } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DuelLobby, DuelHistory, DuelNotification } from '@/components/education/duels';
-import { getStudentClassroom, getLessons } from '@/lib/supabase/education';
+import { getStudentClassroom, getLessons, type Classroom, type VocabularyLesson } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
-import type { Classroom, VocabularyLesson } from '@/lib/supabase/education';
 
 type Tab = 'lobby' | 'history';
 

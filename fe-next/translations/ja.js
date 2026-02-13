@@ -411,6 +411,7 @@ const ja = {
     "modalTitle": "仲間を集めろ",
     "copyLink": "コピー",
     "saveImage": "画像を保存",
+    "share": "シェア",
     "copy": "コピー",
     "copied": "コピー完了！",
     "generating": "作成中...",
@@ -435,6 +436,7 @@ const ja = {
     "joinInstructions": "lexiclash.comにアクセスしてコードを入力",
     "showQrCode": "QRコードを表示",
     "hideQrCode": "QRコードを非表示",
+    "qrCode": "QRコード",
     "scanQrCode": "スキャンして即参加",
     "orShareVia": "または共有",
     "telegram": "Telegram",
@@ -2020,7 +2022,16 @@ const ja = {
         "10": "10歳",
         "11": "11歳",
         "12": "12歳",
-        "13": "13歳"
+        "13": "13歳",
+        "14": "14歳以上"
+      },
+      "dataCollected": {
+        "title": "収集するデータ",
+        "items": "ゲームの進捗状況、ユーザー名、学習統計"
+      },
+      "howWeUse": {
+        "title": "データの使用目的",
+        "items": "学習体験の向上、進捗の追跡、ゲームの改善"
       },
       "dataUsage": {
         "title": "データの使用方法",
@@ -2771,6 +2782,26 @@ const ja = {
     "shareHint": "同じボードを友達とシェア",
     "winnerPrompt": "圧勝！友達に挑戦しよう 😈"
   },
+  "accept": "承諾",
+  "availableOpponents": "対戦可能な相手",
+  "cancel": "キャンセル",
+  "challenge": "挑戦",
+  "challengedYou": "が挑戦してきた！",
+  "challengeFrom": "からの挑戦",
+  "challengePlayer": "プレイヤーに挑戦",
+  "challengeReceived": "挑戦を受けた！",
+  "challengeSent": "挑戦状を送った！",
+  "decline": "辞退",
+  "duelLobbyTitle": "デュエルアリーナ",
+  "history": "履歴",
+  "joinClassroomToDuel": "クラスに参加してデュエルしよう！",
+  "lobby": "ロビー",
+  "noOpponentsOnline": "現在オンラインの対戦相手がいません",
+  "noPendingChallenges": "保留中の挑戦はありません",
+  "pendingChallenges": "保留中の挑戦",
+  "quickMatch": "クイックマッチ",
+  "selectLesson": "レッスンを選択",
+  "sendChallenge": "挑戦を送る",
   "rules": {
     "pageTitle": "LexiClash: リアルタイム単語バトル",
     "gameModes": "ゲームモード",
@@ -3029,9 +3060,11 @@ const ja = {
     "loading": "チャレンジ読み込み中...",
     "error": {
       "title": "エラー！",
-      "loading": "今日のバズを読み込み中...",
-      "failed": "読み込めませんでした。もう一度試しますか？",
-      "noInternet": "接続がありません。インターネット接続を確認してください。",
+      "description": "チャレンジの読み込み中に問題が発生しました。",
+      "helpText": "接続を確認してもう一度お試しください。",
+      "loading": "チャレンジを読み込み中...",
+      "failed": "チャレンジの読み込みに失敗",
+      "noInternet": "インターネット接続がありません",
       "noOptions": "選択肢がありません"
     },
     "topicIs": "今日のトピック",
@@ -3043,12 +3076,6 @@ const ja = {
     "challengeTrend": "今日のパズルに登場",
     "finish": "完了",
     "quitConfirmTitle": "デイリーバズを終了？",
-    "error": {
-      "title": "おっと！",
-      "description": "チャレンジの読み込み中に問題が発生しました。",
-      "helpText": "接続を確認してもう一度お試しください。",
-      "noOptions": "このチャレンジには選択肢がありません"
-    },
     "quitConfirm": "本当に終了しますか？",
     "fillTheBlank": "空欄を埋める",
     "connectingWord": "つなぐ単語",
@@ -3415,6 +3442,7 @@ const ja = {
     "title": "自分好みに",
     "subtitle": "快適に設定しよう。自動保存されるよ。",
     "footer": "この端末に保存されます。他の設定は端末の設定から。",
+    "skipToMain": "メインコンテンツへスキップ",
     "fireRoundLights": {
       "title": "ファイアラウンドを控えめに",
       "description": "虹色の光をオフにして、落ち着いた雰囲気に"
@@ -4282,6 +4310,15 @@ const ja = {
       }
     },
     "boss": "ボス",
+    "allStars": "全スター獲得！",
+    "continue": "続ける",
+    "perfect": "パーフェクト！",
+    "restart": "リスタート",
+    "score": "スコア",
+    "victory": "勝利！",
+    "hint": {
+      "title": "ヒント"
+    },
     "combo": {
       "nice": "ナイス!",
       "great": "グレイト!",
@@ -4813,6 +4850,7 @@ const ja = {
       "hidden": "非公開",
       "unlocked": "実績解除！",
       "upgraded": "実績アップグレード！",
+      "progress": "進捗",
       "categories": {
         "gameplay": "ゲームプレイ",
         "bosses": "ボスバトル",
@@ -5295,6 +5333,59 @@ const ja = {
         "pdf": "PDF出力",
         "downloading": "ダウンロード中..."
       }
+    },
+    "curriculum": {
+      "title": "カリキュラム",
+      "description": "カリキュラムからレッスンを閲覧・インポート",
+      "browse": "閲覧",
+      "import": "インポート",
+      "importing": "インポート中...",
+      "imported": "インポート完了！",
+      "importError": "インポートに失敗",
+      "preview": "プレビュー",
+      "wordCount": "単語数",
+      "noResults": "結果なし",
+      "selectGrade": "学年を選択",
+      "selectSubject": "科目を選択",
+      "allGrades": "すべての学年",
+      "allSubjects": "すべての科目",
+      "filters": {
+        "title": "フィルター",
+        "grade": "学年",
+        "subject": "科目",
+        "language": "言語",
+        "clear": "クリア"
+      },
+      "grades": {
+        "grade_1": "1年生",
+        "grade_2": "2年生",
+        "grade_3": "3年生",
+        "grade_4": "4年生",
+        "grade_5": "5年生",
+        "grade_6": "6年生",
+        "grade_7": "中学1年",
+        "grade_8": "中学2年",
+        "grade_9": "中学3年",
+        "grade_10": "高校1年",
+        "grade_11": "高校2年",
+        "grade_12": "高校3年"
+      },
+      "gradeGroups": {
+        "elementary": "小学校",
+        "middle": "中学校",
+        "high": "高校"
+      },
+      "subjects": {
+        "english": "英語",
+        "hebrew": "ヘブライ語",
+        "science": "理科",
+        "math": "数学",
+        "history": "歴史",
+        "geography": "地理",
+        "general": "一般"
+      },
+      "standard": "標準",
+      "lastUpdated": "最終更新"
     }
   },
   "education": {
@@ -5443,6 +5534,34 @@ const ja = {
         "clipboardError": "クリップボードを読み取れませんでした"
       }
     },
+    "duels": {
+      "addWord": "単語を追加",
+      "backToLobby": "ロビーに戻る",
+      "challengeClassmate": "クラスメイトに挑戦！",
+      "draw": "引き分け！",
+      "draws": "引き分け",
+      "duelHistory": "デュエル履歴",
+      "findWords": "単語を見つけてポイントゲット！",
+      "loading": "デュエルを読み込み中...",
+      "losses": "敗北",
+      "noDuelsYet": "まだデュエルなし。クラスメイトに挑戦！",
+      "playDuel": "デュエル開始",
+      "recentDuels": "最近のデュエル",
+      "scoreToBeat": "目標スコア",
+      "submitScore": "スコアを送信",
+      "typeWord": "単語を入力...",
+      "vs": "VS",
+      "waitingForOpponent": "対戦相手を待機中...",
+      "winRate": "勝率",
+      "wins": "勝利",
+      "winStreak": "連勝",
+      "wordsAccepted": "正解した単語",
+      "wordsRejected": "不正解の単語",
+      "xpEarned": "獲得XP",
+      "you": "あなた",
+      "youLose": "負けた！",
+      "youWin": "勝った！"
+    },
     "xp": {
       "level": "レベル",
       "maxLevel": "最大レベル",
@@ -5473,34 +5592,6 @@ const ja = {
         "month": "月間マスター！",
         "monthDesc": "30日間の素晴らしい成果！"
       }
-    },
-    "duels": {
-      "loading": "読み込み中...",
-      "playDuel": "デュエルをプレイ",
-      "findWords": "単語を見つける",
-      "submitScore": "スコアを送信",
-      "waitingForOpponent": "相手を待っています...",
-      "youWin": "勝利！",
-      "youLose": "敗北",
-      "draw": "引き分け！",
-      "xpEarned": "獲得XP",
-      "backToLobby": "ロビーに戻る",
-      "wordsAccepted": "承認された単語",
-      "wordsRejected": "拒否された単語",
-      "scoreToBeat": "目標スコア",
-      "typeWord": "単語を入力...",
-      "addWord": "単語を追加",
-      "vs": "対",
-      "you": "あなた",
-      "duelHistory": "デュエル履歴",
-      "wins": "勝利",
-      "losses": "敗北",
-      "draws": "引き分け",
-      "winStreak": "連勝",
-      "winRate": "勝率",
-      "recentDuels": "最近のデュエル",
-      "noDuelsYet": "まだデュエルがありません",
-      "challengeClassmate": "クラスメイトに挑戦！"
     },
     "lesson": {
       "definition": "定義",
@@ -5942,6 +6033,8 @@ const ja = {
       "retrying": "接続中..."
     }
   },
+  "duelNotFound": "デュエルが見つかりません",
+  "notParticipant": "このデュエルの参加者ではありません",
   "system": {
     "updatingToNewVersion": "新しいバージョンに更新中..."
   }

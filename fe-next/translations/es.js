@@ -439,7 +439,9 @@ const es = {
     "subtitle": "Reta a tus amigos a superar tu puntuación",
     "playAt": "Juega en",
     "beatMyScore": "¿Puedes superarme?",
-    "invite": "Invitar"
+    "invite": "Invitar",
+    "share": "Compartir",
+    "qrCode": "Código QR"
   },
   "consent": {
     "title": "Consentimiento de Padres",
@@ -1581,6 +1583,11 @@ const es = {
     "DAILY_DOUBLE": {
       "name": "Doble Diario",
       "description": "Aplastaste ambos retos de hoy"
+    },
+    "cinematic": {
+      "unlocked": "¡Logro desbloqueado!",
+      "gold": "¡Logro de oro!",
+      "platinum": "¡Logro de platino!"
     }
   },
   "achievementTiers": {
@@ -3063,9 +3070,9 @@ const es = {
     },
     "error": {
       "title": "¡Ups!",
-      "loading": "Cargando el buzz de hoy...",
-      "failed": "No se pudo cargar. ¿Intentar de nuevo?",
-      "noInternet": "Sin conexión. Revisa tu internet.",
+      "loading": "Cargando el desafío...",
+      "failed": "Error al cargar el desafío",
+      "noInternet": "Sin conexión a internet",
       "noOptions": "No hay opciones disponibles"
     },
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
@@ -4323,14 +4330,14 @@ const es = {
       "readyToFight": "¡Vamos!",
       "enraged": "¡ENFURECIDO!",
       "phases": {
-        "phase1": "FASE 1",
-        "phase2": "FASE 2"
+        "phase1": "Fase 1",
+        "phase2": "Fase 2"
       },
       "telegraph": {
         "incoming": "¡Ataque entrante!",
-        "warning": "¡Cuidado!",
+        "warning": "¡Advertencia!",
         "prepare": "¡Prepárate!",
-        "progress": "Ataque cargándose"
+        "progress": "Progreso"
       },
       "common": {
         "anagramPair": "¡Par de anagramas! ¡Golpe crítico!",
@@ -4339,13 +4346,16 @@ const es = {
       },
       "cinematics": {
         "skip": "Saltar",
-        "skipIn": "Saltar en {seconds}s",
+        "skipIn": "Saltar en",
         "progress": "Progreso",
         "loading": "Cargando...",
-        "victory": "¡VICTORIA!",
-        "defeated": "¡Jefe Derrotado!",
-        "bossApproaches": "El jefe se acerca...",
-        "prepareForBattle": "¡Prepárate para la batalla!"
+        "victory": "¡Victoria!",
+        "defeated": "¡Derrotado!",
+        "bossApproaches": "¡El jefe se acerca!",
+        "prepareForBattle": "¡Prepárate para la batalla!",
+        "errorTitle": "Error",
+        "errorDescription": "Algo salió mal",
+        "retry": "Reintentar"
       },
       "abilities": {
         "popQuiz": {
@@ -5005,7 +5015,12 @@ const es = {
       },
       "goldRush": {
         "name": "Fiebre del Oro"
-      },
+      }
+    },
+    "player": {
+      "health": "Salud",
+      "danger": "¡Peligro!",
+      "healthLabel": "Barra de salud"
     }
   },
   "blast": {
@@ -5345,12 +5360,69 @@ const es = {
         "pdf": "Exportar PDF",
         "downloading": "Descargando..."
       }
+    },
+    "teacher": {
+      "activeGames": "Juegos activos",
+      "noActiveGames": "No hay juegos activos"
+    },
+    "progress": {
+      "noProgressYet": "Aún no hay progreso",
+      "selectFilters": "Selecciona filtros"
+    },
+    "curriculum": {
+      "title": "Plan de Estudios",
+      "description": "Explora e importa lecciones del plan de estudios",
+      "browse": "Explorar",
+      "import": "Importar",
+      "importing": "Importando...",
+      "imported": "¡Importado!",
+      "importError": "Error al importar",
+      "preview": "Vista previa",
+      "wordCount": "Cantidad de palabras",
+      "noResults": "Sin resultados",
+      "selectGrade": "Seleccionar grado",
+      "selectSubject": "Seleccionar materia",
+      "allGrades": "Todos los grados",
+      "allSubjects": "Todas las materias",
+      "filters": {
+        "title": "Filtros",
+        "grade": "Grado",
+        "subject": "Materia",
+        "language": "Idioma",
+        "clear": "Limpiar"
+      },
+      "grades": {
+        "grade_1": "1er grado",
+        "grade_2": "2do grado",
+        "grade_3": "3er grado",
+        "grade_4": "4to grado",
+        "grade_5": "5to grado",
+        "grade_6": "6to grado",
+        "grade_7": "7mo grado",
+        "grade_8": "8vo grado",
+        "grade_9": "9no grado",
+        "grade_10": "10mo grado",
+        "grade_11": "11vo grado",
+        "grade_12": "12vo grado"
+      },
+      "gradeGroups": {
+        "elementary": "Primaria",
+        "middle": "Secundaria",
+        "high": "Preparatoria"
+      },
+      "subjects": {
+        "english": "Inglés",
+        "hebrew": "Hebreo",
+        "science": "Ciencias",
+        "math": "Matemáticas",
+        "history": "Historia",
+        "geography": "Geografía",
+        "general": "General"
+      },
+      "standard": "Estándar",
+      "lastUpdated": "Última actualización"
     }
   },
-    "progress": {
-      "noProgressYet": "Sin progreso aún",
-      "selectFilters": "Selecciona clase y lección arriba"
-    },
   "education": {
     "landing": {
       "title": "Modo Educativo",
@@ -5429,6 +5501,46 @@ const es = {
         "started": "Empezando",
         "practicing": "Practicando",
         "mastered": "Dominado"
+      },
+      "matching": "Emparejar",
+      "matchingDesc": "Conecta palabras con sus definiciones",
+      "spelling": "Ortografía",
+      "spellingDesc": "Escribe las palabras correctamente",
+      "blitz": "Blitz",
+      "blitzDesc": "¡Responde rápido antes de que se acabe el tiempo!",
+      "sessionComplete": "¡Sesión completada!",
+      "hint": "Pista",
+      "matchingWords": "Palabras",
+      "matchingDefinitions": "Definiciones",
+      "matchPairs": "Empareja los pares",
+      "pairsMatched": "Pares emparejados",
+      "dragToMatch": "Arrastra para emparejar",
+      "tapToSelect": "Toca para seleccionar",
+      "correctMatch": "¡Correcto!",
+      "wrongMatch": "Incorrecto",
+      "spellTheWord": "Escribe la palabra",
+      "typeTheWord": "Escribe la palabra",
+      "correctSpelling": "¡Bien escrito!",
+      "incorrectSpelling": "Incorrecto",
+      "blitzTitle": "¡Blitz!",
+      "getReady": "¡Prepárate!",
+      "go": "¡Ya!",
+      "timesUp": "¡Se acabó el tiempo!",
+      "maxCombo": "Combo máximo",
+      "blitzScore": "Puntaje Blitz",
+      "needsMoreWords": "Necesitas más palabras",
+      "combo": "Combo",
+      "submit": "Enviar",
+      "typeAnswer": "Escribe tu respuesta",
+      "typeWord": "Escribe la palabra",
+      "correct": "¡Correcto!",
+      "incorrect": "Incorrecto",
+      "correctAnswer": "Respuesta correcta",
+      "streak": "Racha",
+      "difficulty": {
+        "easy": "Fácil",
+        "medium": "Medio",
+        "hard": "Difícil"
       }
     },
     "student": {
@@ -5952,4 +6064,33 @@ const es = {
   }
 };
 
-export { es };
+export { es,
+  "duels": {
+    "addWord": "Agregar palabra",
+    "backToLobby": "Volver a la sala",
+    "challengeClassmate": "¡Desafía a un compañero!",
+    "draw": "¡Empate!",
+    "draws": "Empates",
+    "duelHistory": "Historial de duelos",
+    "findWords": "¡Encuentra palabras para sumar puntos!",
+    "loading": "Cargando duelo...",
+    "losses": "Derrotas",
+    "noDuelsYet": "Aún no hay duelos. ¡Desafía a un compañero!",
+    "playDuel": "Jugar duelo",
+    "recentDuels": "Duelos recientes",
+    "scoreToBeat": "Puntaje a superar",
+    "submitScore": "Enviar puntaje",
+    "typeWord": "Escribe una palabra...",
+    "vs": "VS",
+    "waitingForOpponent": "Esperando rival...",
+    "winRate": "Tasa de victorias",
+    "wins": "Victorias",
+    "winStreak": "Racha de victorias",
+    "wordsAccepted": "Palabras aceptadas",
+    "wordsRejected": "Palabras rechazadas",
+    "xpEarned": "XP ganada",
+    "you": "Tú",
+    "youLose": "¡Perdiste!",
+    "youWin": "¡Ganaste!"
+  }
+};

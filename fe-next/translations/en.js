@@ -5061,6 +5061,10 @@ const en = {
     }
   },
   "teacher": {
+    "teacher": {
+      "activeGames": "Active Games",
+      "noActiveGames": "No active games"
+    },
     "accessRequired": "Teacher Access Required",
     "accessDenied": "You need teacher privileges to access this page.",
     "dashboard": {
@@ -5480,34 +5484,6 @@ const en = {
         "practicing": "Practicing",
         "mastered": "Mastered"
       }
-    },
-    "duels": {
-      "loading": "Loading...",
-      "playDuel": "Play Duel",
-      "findWords": "Find Words",
-      "submitScore": "Submit Score",
-      "waitingForOpponent": "Waiting for opponent...",
-      "youWin": "You Win!",
-      "youLose": "You Lose",
-      "draw": "Draw!",
-      "xpEarned": "XP Earned",
-      "backToLobby": "Back to Lobby",
-      "wordsAccepted": "Words Accepted",
-      "wordsRejected": "Words Rejected",
-      "scoreToBeat": "Score to Beat",
-      "typeWord": "Type a word...",
-      "addWord": "Add Word",
-      "vs": "vs",
-      "you": "You",
-      "duelHistory": "Duel History",
-      "wins": "Wins",
-      "losses": "Losses",
-      "draws": "Draws",
-      "winStreak": "Win Streak",
-      "winRate": "Win Rate",
-      "recentDuels": "Recent Duels",
-      "noDuelsYet": "No duels played yet",
-      "challengeClassmate": "Challenge a classmate!"
     },
     "student": {
       "dashboard": "My Lessons",
@@ -6002,7 +5978,58 @@ const en = {
   },
   "system": {
     "updatingToNewVersion": "Updating to new version..."
-  }
+  },
+  "duels": {
+    "addWord": "Add Word",
+    "backToLobby": "Back to Lobby",
+    "challengeClassmate": "Challenge a Classmate!",
+    "draw": "Draw!",
+    "draws": "Draws",
+    "duelHistory": "Duel History",
+    "findWords": "Find words to score points!",
+    "loading": "Loading duel...",
+    "losses": "Losses",
+    "noDuelsYet": "No duels yet. Challenge a classmate!",
+    "playDuel": "Play Duel",
+    "recentDuels": "Recent Duels",
+    "scoreToBeat": "Score to Beat",
+    "submitScore": "Submit Score",
+    "typeWord": "Type a word...",
+    "vs": "VS",
+    "waitingForOpponent": "Waiting for opponent...",
+    "winRate": "Win Rate",
+    "wins": "Wins",
+    "winStreak": "Win Streak",
+    "wordsAccepted": "Words Accepted",
+    "wordsRejected": "Words Rejected",
+    "xpEarned": "XP Earned",
+    "you": "You",
+    "youLose": "You Lose!",
+    "youWin": "You Win!"
+  },
+  "accept": "Accept",
+  "availableOpponents": "Available Opponents",
+  "cancel": "Cancel",
+  "challenge": "Challenge",
+  "challengeFrom": "Challenge from",
+  "challengePlayer": "Challenge Player",
+  "challengeReceived": "Challenge Received!",
+  "challengeSent": "Challenge Sent!",
+  "challengedYou": "challenged you!",
+  "decline": "Decline",
+  "duelLobbyTitle": "Duel Arena",
+  "duelNotFound": "Duel not found",
+  "duelsTitle": "Duels",
+  "history": "History",
+  "joinClassroomToDuel": "Join a classroom to duel classmates!",
+  "lobby": "Lobby",
+  "noOpponentsOnline": "No opponents online right now",
+  "noPendingChallenges": "No pending challenges",
+  "notParticipant": "You are not a participant in this duel",
+  "pendingChallenges": "Pending Challenges",
+  "quickMatch": "Quick Match",
+  "selectLesson": "Select Lesson",
+  "sendChallenge": "Send Challenge"
 };
 
 export { en };
