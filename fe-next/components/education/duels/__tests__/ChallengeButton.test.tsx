@@ -1,162 +1,200 @@
 /**
- * Tests for ChallengeButton component
+ * ChallengeButton Tests
  *
- * Tests both button and icon variants, modal opening behavior.
+ * Test coverage for the ChallengeButton component.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import ChallengeButton from '../ChallengeButton';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ChallengeButton } from '../ChallengeButton';
+import type { OpponentInfo } from '@/hooks/useDuelSocket';
 
-// Mock contexts
+// ============================================
+// MOCKS
+// ============================================
+
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        challenge: 'Challenge',
-        challengeSent: 'Challenge sent!',
-      };
-      return translations[key] || key;
-    },
+    t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-// Mock DuelChallengeModal
-jest.mock('../DuelChallengeModal', () => ({
-  __esModule: true,
-  default: ({ opponent, onClose }: any) => (
-    <div data-testid="duel-challenge-modal">
-      <span>Challenge {opponent.displayName}</span>
-      <button onClick={onClose}>Close</button>
-    </div>
-  ),
-}));
-
-// Mock useDuelSocket
 jest.mock('@/hooks/useDuelSocket', () => ({
   useDuelSocket: () => ({
     createChallenge: jest.fn(),
   }),
 }));
 
+jest.mock('../DuelChallengeModal', () => {
+  return function MockDuelChallengeModal({
+    opponent,
+    onClose,
+  }: {
+    opponent: OpponentInfo;
+    onClose: () => void;
+  }) {
+    return (
+      <div data-testid="duel-challenge-modal">
+        <p>Modal for {opponent.displayName}</p>
+        <button onClick={onClose}>Close</button>
+      </div>
+    );
+  };
+});
+
+// ============================================
+// TESTS
+// ============================================
+
 describe('ChallengeButton', () => {
   const mockProps = {
-    opponentId: 'user-123',
+    opponentId: 'opponent-123',
     opponentName: 'John Doe',
-    opponentAvatar: null,
-    classroomId: 'classroom-456',
+    opponentAvatar: 'https://example.com/avatar.jpg',
+    classroomId: 'classroom-1',
     lessons: [
-      { id: 'lesson-1', name: 'Basic Words' },
-      { id: 'lesson-2', name: 'Advanced Words' },
+      { id: 'lesson-1', name: 'Lesson 1' },
+      { id: 'lesson-2', name: 'Lesson 2' },
     ],
   };
 
-  describe('Button Variant (default)', () => {
-    it('should render button with challenge text', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // ============================================
+  // BUTTON VARIANT TESTS
+  // ============================================
+
+  describe('Button Variant', () => {
+    it('renders button with challenge text', () => {
       render(<ChallengeButton {...mockProps} />);
 
-      const button = screen.getByRole('button');
+      const button = screen.getByTestId('challenge-button');
       expect(button).toBeInTheDocument();
-      expect(button).toHaveTextContent('Challenge');
+      expect(button).toHaveTextContent('challenge');
     });
 
-    it('should render Swords icon', () => {
+    it('opens modal when clicked', () => {
       render(<ChallengeButton {...mockProps} />);
 
-      const button = screen.getByRole('button');
-      // Check for SVG element (Lucide icons render as SVG)
-      const svg = button.querySelector('svg');
-      expect(svg).toBeInTheDocument();
-    });
-
-    it('should open modal when clicked', () => {
-      render(<ChallengeButton {...mockProps} />);
-
-      const button = screen.getByRole('button');
+      const button = screen.getByTestId('challenge-button');
       fireEvent.click(button);
 
-      // Modal should be rendered
-      const modal = screen.getByTestId('duel-challenge-modal');
-      expect(modal).toBeInTheDocument();
-      expect(modal).toHaveTextContent('Challenge John Doe');
-    });
-
-    it('should close modal when onClose is called', () => {
-      render(<ChallengeButton {...mockProps} />);
-
-      const button = screen.getByRole('button');
-      fireEvent.click(button);
-
-      // Modal should be visible
       expect(screen.getByTestId('duel-challenge-modal')).toBeInTheDocument();
+    });
 
-      // Click close button in modal
+    it('shows success state after modal closes', async () => {
+      render(<ChallengeButton {...mockProps} />);
+
+      // Open modal
+      const button = screen.getByTestId('challenge-button');
+      fireEvent.click(button);
+
+      // Close modal
       const closeButton = screen.getByText('Close');
       fireEvent.click(closeButton);
 
-      // Modal should be removed
-      expect(screen.queryByTestId('duel-challenge-modal')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Icon Variant', () => {
-    it('should render only icon without text when variant is icon', () => {
-      render(<ChallengeButton {...mockProps} variant="icon" />);
-
-      const button = screen.getByRole('button');
-      expect(button).toBeInTheDocument();
-
-      // Should have SVG but no "Challenge" text
-      const svg = button.querySelector('svg');
-      expect(svg).toBeInTheDocument();
-      expect(button).not.toHaveTextContent('Challenge');
+      // Success state
+      await waitFor(() => {
+        expect(button).toHaveTextContent('challengeSent');
+      });
     });
 
-    it('should open modal when icon is clicked', () => {
-      render(<ChallengeButton {...mockProps} variant="icon" />);
-
-      const button = screen.getByRole('button');
-      fireEvent.click(button);
-
-      // Modal should be rendered
-      const modal = screen.getByTestId('duel-challenge-modal');
-      expect(modal).toBeInTheDocument();
-    });
-  });
-
-  describe('Opponent Info', () => {
-    it('should pass opponent info to modal', () => {
+    it('disables button during success state', async () => {
       render(<ChallengeButton {...mockProps} />);
 
-      const button = screen.getByRole('button');
+      // Open and close modal
+      const button = screen.getByTestId('challenge-button');
       fireEvent.click(button);
 
-      // Modal should show opponent name
-      const modal = screen.getByTestId('duel-challenge-modal');
-      expect(modal).toHaveTextContent('John Doe');
+      const closeButton = screen.getByText('Close');
+      fireEvent.click(closeButton);
+
+      // Button disabled
+      await waitFor(() => {
+        expect(button).toBeDisabled();
+      });
     });
 
-    it('should handle null avatar', () => {
-      render(<ChallengeButton {...mockProps} opponentAvatar={null} />);
+    it('applies neo-brutalist styling', () => {
+      render(<ChallengeButton {...mockProps} />);
 
-      const button = screen.getByRole('button');
+      const button = screen.getByTestId('challenge-button');
+      expect(button).toHaveClass('bg-neo-orange');
+      expect(button).toHaveClass('border-3');
+      expect(button).toHaveClass('shadow-hard-sm');
+    });
+  });
+
+  // ============================================
+  // ICON VARIANT TESTS
+  // ============================================
+
+  describe('Icon Variant', () => {
+    it('renders icon button without text', () => {
+      render(<ChallengeButton {...mockProps} variant="icon" />);
+
+      const button = screen.getByTestId('challenge-button-icon');
+      expect(button).toBeInTheDocument();
+      expect(button).not.toHaveTextContent('challenge');
+    });
+
+    it('has aria-label for accessibility', () => {
+      render(<ChallengeButton {...mockProps} variant="icon" />);
+
+      const button = screen.getByTestId('challenge-button-icon');
+      expect(button).toHaveAttribute('aria-label', 'challenge');
+    });
+
+    it('opens modal when clicked', () => {
+      render(<ChallengeButton {...mockProps} variant="icon" />);
+
+      const button = screen.getByTestId('challenge-button-icon');
       fireEvent.click(button);
 
-      // Should not crash - modal should render
       expect(screen.getByTestId('duel-challenge-modal')).toBeInTheDocument();
     });
 
-    it('should handle string avatar URL', () => {
-      render(
-        <ChallengeButton {...mockProps} opponentAvatar="https://example.com/avatar.jpg" />
-      );
+    it('applies icon-specific styling', () => {
+      render(<ChallengeButton {...mockProps} variant="icon" />);
 
-      const button = screen.getByRole('button');
+      const button = screen.getByTestId('challenge-button-icon');
+      expect(button).toHaveClass('text-neo-orange');
+      expect(button).toHaveClass('hover:text-neo-yellow');
+    });
+  });
+
+  // ============================================
+  // MODAL INTEGRATION TESTS
+  // ============================================
+
+  describe('Modal Integration', () => {
+    it('passes correct opponent info to modal', () => {
+      render(<ChallengeButton {...mockProps} />);
+
+      const button = screen.getByTestId('challenge-button');
       fireEvent.click(button);
 
-      // Should not crash - modal should render
+      expect(screen.getByText('Modal for John Doe')).toBeInTheDocument();
+    });
+
+    it('closes modal when onClose is called', () => {
+      render(<ChallengeButton {...mockProps} />);
+
+      // Open modal
+      const button = screen.getByTestId('challenge-button');
+      fireEvent.click(button);
+
+      // Modal visible
       expect(screen.getByTestId('duel-challenge-modal')).toBeInTheDocument();
+
+      // Close modal
+      const closeButton = screen.getByText('Close');
+      fireEvent.click(closeButton);
+
+      // Modal gone
+      expect(screen.queryByTestId('duel-challenge-modal')).not.toBeInTheDocument();
     });
   });
 });

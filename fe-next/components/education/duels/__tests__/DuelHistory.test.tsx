@@ -6,8 +6,12 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { DuelHistory } from '../DuelHistory';
-import { getDuelHistory, getDuelStats } from '@/lib/supabase/education/duels';
-import type { DuelHistoryEntry, DuelStatsResult } from '@/lib/supabase/education/duels';
+import {
+  getDuelHistory,
+  getDuelStats,
+  type DuelHistoryEntry,
+  type DuelStatsResult,
+} from '@/lib/supabase/education/duels';
 
 // ============================================
 // MOCKS

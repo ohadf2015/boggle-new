@@ -1,21 +1,20 @@
 'use client';
 
 /**
- * ChallengeButton - Reusable Challenge Button Component
+ * ChallengeButton - Reusable Duel Challenge Button
  *
- * A button that opens the DuelChallengeModal for a specific opponent.
- * Supports two variants: full button with text, or icon-only for compact spaces.
- *
- * This satisfies SOC-02: Challenge from profile or classroom roster.
+ * Button component for challenging a specific student to a duel.
+ * Can be placed on student profiles, classroom rosters, or any student context.
+ * Satisfies SOC-02 requirement (challenge from anywhere).
  *
  * Features:
- * - Two variants: 'button' (default) and 'icon'
- * - Opens DuelChallengeModal on click
+ * - Two variants: full button or icon-only
+ * - Opens DuelChallengeModal with pre-filled opponent
+ * - Success state after challenge sent
  * - Neo-brutalist styling
- * - RTL support
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -27,7 +26,7 @@ import type { OpponentInfo } from '@/hooks/useDuelSocket';
 // ============================================
 
 export interface ChallengeButtonProps {
-  /** Opponent user ID */
+  /** Opponent student ID */
   opponentId: string;
   /** Opponent display name */
   opponentName: string;
@@ -37,8 +36,8 @@ export interface ChallengeButtonProps {
   classroomId: string;
   /** Available lessons for challenge */
   lessons: Array<{ id: string; name: string }>;
-  /** Display variant */
-  variant?: 'button' | 'icon';
+  /** Button variant (default: button) */
+  variant?: 'icon' | 'button';
   /** Additional CSS classes */
   className?: string;
 }
@@ -47,7 +46,7 @@ export interface ChallengeButtonProps {
 // COMPONENT
 // ============================================
 
-export default function ChallengeButton({
+export function ChallengeButton({
   opponentId,
   opponentName,
   opponentAvatar,
@@ -57,23 +56,42 @@ export default function ChallengeButton({
   className,
 }: ChallengeButtonProps) {
   const { t } = useLanguage();
-  const [showModal, setShowModal] = useState(false);
 
-  // Build opponent info object for modal
-  const opponentInfo: OpponentInfo = {
+  // State
+  const [showModal, setShowModal] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // ============================================
+  // HANDLERS
+  // ============================================
+
+  const handleClick = useCallback(() => {
+    setShowModal(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setShowModal(false);
+
+    // Brief success state
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 1500);
+  }, []);
+
+  // ============================================
+  // OPPONENT INFO
+  // ============================================
+
+  const opponent: OpponentInfo = {
     userId: opponentId,
     displayName: opponentName,
     avatarUrl: opponentAvatar || null,
   };
 
-  const handleClick = () => {
-    setShowModal(true);
-  };
+  // ============================================
+  // RENDER
+  // ============================================
 
-  const handleClose = () => {
-    setShowModal(false);
-  };
-
+  // Icon variant
   if (variant === 'icon') {
     return (
       <>
@@ -82,47 +100,54 @@ export default function ChallengeButton({
           className={cn(
             'p-2 rounded-neo transition-all',
             'text-neo-orange hover:text-neo-yellow',
+            'hover:bg-neo-navy/30',
             className
           )}
           aria-label={t('challenge')}
+          data-testid="challenge-button-icon"
         >
           <Swords className="w-5 h-5" />
         </button>
 
         {showModal && (
           <DuelChallengeModal
-            opponent={opponentInfo}
+            opponent={opponent}
             lessons={lessons}
             classroomId={classroomId}
-            onClose={handleClose}
+            onClose={handleModalClose}
           />
         )}
       </>
     );
   }
 
+  // Button variant
   return (
     <>
       <button
         onClick={handleClick}
+        disabled={showSuccess}
         className={cn(
-          'px-4 py-2 font-bold rounded-neo inline-flex items-center gap-2',
+          'px-4 py-2 font-neo-body font-bold rounded-neo',
           'bg-neo-orange text-white',
-          'border-3 border-neo-black shadow-hard-sm',
-          'hover:shadow-hard hover:scale-105 transition-all',
+          'border-3 border-neo border-neo-black shadow-hard-sm',
+          'hover:shadow-hard transition-all',
+          'disabled:opacity-70 disabled:cursor-not-allowed',
+          'flex items-center gap-2',
           className
         )}
+        data-testid="challenge-button"
       >
         <Swords className="w-5 h-5" />
-        <span>{t('challenge')}</span>
+        {showSuccess ? t('challengeSent') : t('challenge')}
       </button>
 
       {showModal && (
         <DuelChallengeModal
-          opponent={opponentInfo}
+          opponent={opponent}
           lessons={lessons}
           classroomId={classroomId}
-          onClose={handleClose}
+          onClose={handleModalClose}
         />
       )}
     </>

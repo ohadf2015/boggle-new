@@ -1,7 +1,7 @@
 /**
- * Barrel export for all duel components
+ * Duel Components Barrel Export
  *
- * Provides clean imports for duel-related UI components.
+ * Re-exports all duel-related components for clean imports.
  */
 
 export { default as DuelLobby } from './DuelLobby';
@@ -9,4 +9,4 @@ export { default as DuelChallengeModal } from './DuelChallengeModal';
 export { DuelGameView } from './DuelGameView';
 export { DuelHistory } from './DuelHistory';
 export { default as DuelNotification } from './DuelNotification';
-export { default as ChallengeButton } from './ChallengeButton';
+export { ChallengeButton } from './ChallengeButton';

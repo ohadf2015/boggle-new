@@ -18,8 +18,12 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getDuelHistory, getDuelStats } from '@/lib/supabase/education/duels';
-import type { DuelHistoryEntry, DuelStatsResult } from '@/lib/supabase/education/duels';
+import {
+  getDuelHistory,
+  getDuelStats,
+  type DuelHistoryEntry,
+  type DuelStatsResult,
+} from '@/lib/supabase/education/duels';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 

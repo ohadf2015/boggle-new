@@ -20,16 +20,29 @@ fe-next/.next/cache/
 # Test files
 coverage/
 __tests__/
+**/__tests__/
 *.test.js
 *.test.ts
+*.test.tsx
 *.spec.js
 *.spec.ts
+**/*.test.js
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.js
+**/*.spec.ts
+fe-next/jest.config.*
+fe-next/jest.setup.*
 
 # Development files
 .git/
 .github/
 .vscode/
 .idea/
+.husky/
+.worktrees/
+.planning/
+.claude/
 
 # Documentation
 *.md
@@ -38,6 +51,7 @@ BUILD.md
 DEPLOYMENT.md
 RAILWAY.md
 README.md
+CLAUDE.md
 
 # Environment and config
 .env*
@@ -53,12 +67,17 @@ logs/
 
 # Docker (not needed for Railway)
 Dockerfile
+Dockerfile.bun
 docker-compose.yml
 .dockerignore
 
+# Dev scripts not needed in production
+scripts/docker-*
+fe-next/lighthouserc.*.cjs
+fe-next/e2e/
+fe-next/playwright.config.*
+
 # Misc
-.husky/
-.git/
 *.swp
 *.swo
 *~
