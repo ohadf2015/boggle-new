@@ -35,6 +35,7 @@ import type { Namespace } from 'socket.io';
 import type { DuelSocket } from './types';
 import { registerLifecycleHandlers } from './lifecycle';
 import { registerLobbyHandlers } from './lobby';
+import { registerGameplayHandlers } from './gameplay';
 import logger from '@/backend/utils/logger';
 
 /**
@@ -44,7 +45,7 @@ import logger from '@/backend/utils/logger';
  * Wires together:
  * - Lifecycle handlers (create, accept, decline, cancel)
  * - Lobby handlers (join, leave, disconnect)
- * - Gameplay handlers (submit score) - Phase 39: real-time word submission
+ * - Gameplay handlers (score submission, duel completion, XP award)
  *
  * @param namespace - The /duel namespace instance
  * @param socket - The connected socket
@@ -58,6 +59,6 @@ export function registerDuelHandlers(namespace: Namespace, socket: DuelSocket): 
   // Register lobby handlers (join, leave, disconnect cleanup)
   registerLobbyHandlers(namespace, socket);
 
-  // TODO Phase 39: Register gameplay handlers (real-time word submission)
-  // registerGameplayHandlers(namespace, socket);
+  // Register gameplay handlers (score submission, duel completion, XP award)
+  registerGameplayHandlers(namespace, socket);
 }
