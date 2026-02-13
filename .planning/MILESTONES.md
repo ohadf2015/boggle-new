@@ -25,8 +25,16 @@ Work completed outside formal GSD workflow. Phases 1-35 covered:
 
 ## v2.0 — Education 2.0 (Current)
 
-**Status:** Initializing
+**Status:** Roadmap created
 **Started:** 2026-02-13
 **Goal:** Transform education section — student duels, diverse practice modes, polished UI, improved teacher workflows.
 
-**Phases:** Starting at 36
+**Phases:** 36-43 (8 phases, 27 requirements)
+- Phase 36: Foundation & Refactoring
+- Phase 37: Practice Modes
+- Phase 38: Async Duels
+- Phase 39: Real-Time Duels
+- Phase 40: Gamification Enhancements
+- Phase 41: Student Dashboard Overhaul
+- Phase 42: Teacher Dashboard & Workflows
+- Phase 43: Practice Experience & Design Polish
