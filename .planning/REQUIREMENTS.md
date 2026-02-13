@@ -4,7 +4,7 @@
 
 **Goal:** Transform the education section into an engaging, competitive learning platform with student duels as the centerpiece, diverse practice modes, polished UI, and improved teacher workflows.
 
-**Total requirements:** 30
+**Total requirements:** 27
 **Categories:** 7
 
 ---
@@ -105,33 +105,33 @@ These features were identified in research but deferred to future milestones:
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| FOUND-04 | — | Pending |
-| DUEL-01 | — | Pending |
-| DUEL-02 | — | Pending |
-| DUEL-03 | — | Pending |
-| DUEL-04 | — | Pending |
-| DUEL-05 | — | Pending |
-| PRAC-01 | — | Pending |
-| PRAC-02 | — | Pending |
-| PRAC-03 | — | Pending |
-| PRAC-04 | — | Pending |
-| GAMF-01 | — | Pending |
-| GAMF-02 | — | Pending |
-| GAMF-03 | — | Pending |
-| GAMF-04 | — | Pending |
-| UIPOL-01 | — | Pending |
-| UIPOL-02 | — | Pending |
-| UIPOL-03 | — | Pending |
-| UIPOL-04 | — | Pending |
-| TEACH-01 | — | Pending |
-| TEACH-02 | — | Pending |
-| TEACH-03 | — | Pending |
-| SOC-01 | — | Pending |
-| SOC-02 | — | Pending |
-| SOC-03 | — | Pending |
+| FOUND-01 | Phase 36 | Pending |
+| FOUND-02 | Phase 36 | Pending |
+| FOUND-03 | Phase 36 | Pending |
+| FOUND-04 | Phase 36 | Pending |
+| DUEL-01 | Phase 38 | Pending |
+| DUEL-02 | Phase 38 | Pending |
+| DUEL-03 | Phase 39 | Pending |
+| DUEL-04 | Phase 38 | Pending |
+| DUEL-05 | Phase 38 | Pending |
+| PRAC-01 | Phase 37 | Pending |
+| PRAC-02 | Phase 37 | Pending |
+| PRAC-03 | Phase 37 | Pending |
+| PRAC-04 | Phase 37 | Pending |
+| GAMF-01 | Phase 40 | Pending |
+| GAMF-02 | Phase 40 | Pending |
+| GAMF-03 | Phase 40 | Pending |
+| GAMF-04 | Phase 40 | Pending |
+| UIPOL-01 | Phase 41 | Pending |
+| UIPOL-02 | Phase 42 | Pending |
+| UIPOL-03 | Phase 43 | Pending |
+| UIPOL-04 | Phase 43 | Pending |
+| TEACH-01 | Phase 42 | Pending |
+| TEACH-02 | Phase 42 | Pending |
+| TEACH-03 | Phase 42 | Pending |
+| SOC-01 | Phase 41 | Pending |
+| SOC-02 | Phase 38 | Pending |
+| SOC-03 | Phase 41 | Pending |
 
 ---
 
