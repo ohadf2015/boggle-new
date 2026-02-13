@@ -6,6 +6,7 @@
 import { Server } from 'socket.io';
 import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
+import { registerDuelHandlers } from '../backend/handlers/duel';
 
 import type { Server as HttpServer } from 'http';
 
@@ -56,8 +57,32 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     next();
   });
 
-  // Initialize event handlers
+  // Initialize event handlers for default namespace
   initializeSocketHandlers(io);
+
+  // Create /duel namespace for duel-specific events
+  // Isolates duel room state from default namespace game rooms
+  const duelNamespace = io.of('/duel');
+
+  // Middleware stub for duel namespace authentication
+  // TODO (Phase 38): Add authentication middleware
+  duelNamespace.use((socket, next) => {
+    // Future: Verify JWT token, attach user data to socket
+    // For now, allow all connections
+    next();
+  });
+
+  // Register duel namespace connection handler
+  duelNamespace.on('connection', (socket) => {
+    console.log(`[DUEL NAMESPACE] Client connected: ${socket.id}`);
+
+    // Register all duel event handlers for this socket
+    registerDuelHandlers(duelNamespace, socket);
+
+    socket.on('disconnect', (reason) => {
+      console.log(`[DUEL NAMESPACE] Client disconnected: ${socket.id}, reason: ${reason}`);
+    });
+  });
 
   return io;
 }
