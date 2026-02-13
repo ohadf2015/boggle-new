@@ -20,6 +20,7 @@ import {
 } from './types';
 import { generateRandomTable } from '@/backend/utils/gameUtils';
 import { getSupabase } from '@/backend/modules/supabase/client';
+import { startRealtimeDuel } from './realtime';
 import logger from '@/backend/utils/logger';
 
 /**
@@ -88,6 +89,7 @@ export function registerLifecycleHandlers(
           opponent_id: payload.opponentId,
           lesson_id: payload.lessonId,
           classroom_id: payload.classroomId,
+          duel_type: payload.duelType,
           status: 'pending',
           board_state: boardState,
           expires_at: expiresAt.toISOString(),
@@ -224,14 +226,20 @@ export function registerLifecycleHandlers(
         challengerSocket.join(duelRoom);
       }
 
-      // Emit duel:accepted to duel room
-      namespace.to(duelRoom).emit('duel:accepted', {
-        duelId: payload.duelId,
-        boardState: duel.board_state,
-        startedAt: startedAt,
-      });
-
-      logger.info('DUEL', `Duel accepted: ${payload.duelId} by ${userId}`);
+      // Check duel type and start appropriate flow
+      if (updatedDuel.duel_type === 'realtime') {
+        // Real-time duel: Start simultaneous gameplay
+        await startRealtimeDuel(namespace, payload.duelId, updatedDuel);
+        logger.info('DUEL', `Real-time duel accepted: ${payload.duelId} by ${userId}`);
+      } else {
+        // Async duel: Emit board state for client-side play
+        namespace.to(duelRoom).emit('duel:accepted', {
+          duelId: payload.duelId,
+          boardState: duel.board_state,
+          startedAt: startedAt,
+        });
+        logger.info('DUEL', `Async duel accepted: ${payload.duelId} by ${userId}`);
+      }
     } catch (error) {
       logger.error('DUEL', `Error in duel:accept: ${(error as Error).message}`);
       socket.emit('duel:error', {

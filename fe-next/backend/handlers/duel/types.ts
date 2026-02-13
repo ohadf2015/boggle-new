@@ -58,6 +58,7 @@ export const createDuelSchema = z.object({
   opponentId: z.string().uuid('Invalid opponent ID'),
   lessonId: z.string().uuid('Invalid lesson ID'),
   classroomId: z.string().uuid('Invalid classroom ID'),
+  duelType: z.enum(['async', 'realtime']).default('async'),
 });
 
 export type CreateDuelPayload = z.infer<typeof createDuelSchema>;

@@ -36,6 +36,8 @@ import type { DuelSocket } from './types';
 import { registerLifecycleHandlers } from './lifecycle';
 import { registerLobbyHandlers } from './lobby';
 import { registerGameplayHandlers } from './gameplay';
+import { registerRealtimeHandlers } from './realtime';
+import { registerDisconnectionHandlers, handleReconnection } from './disconnection';
 import logger from '@/backend/utils/logger';
 
 /**
@@ -46,6 +48,8 @@ import logger from '@/backend/utils/logger';
  * - Lifecycle handlers (create, accept, decline, cancel)
  * - Lobby handlers (join, leave, disconnect)
  * - Gameplay handlers (score submission, duel completion, XP award)
+ * - Realtime handlers (word submission, progress updates)
+ * - Disconnection handlers (grace period, forfeit, reconnection)
  *
  * @param namespace - The /duel namespace instance
  * @param socket - The connected socket
@@ -61,4 +65,13 @@ export function registerDuelHandlers(namespace: Namespace, socket: DuelSocket): 
 
   // Register gameplay handlers (score submission, duel completion, XP award)
   registerGameplayHandlers(namespace, socket);
+
+  // Register realtime handlers (word submission, progress updates)
+  registerRealtimeHandlers(namespace, socket);
+
+  // Register disconnection handlers (grace period, forfeit)
+  registerDisconnectionHandlers(namespace, socket);
+
+  // Handle reconnection (check for pending grace period)
+  handleReconnection(namespace, socket);
 }
