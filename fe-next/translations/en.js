@@ -5439,6 +5439,10 @@ const en = {
         "words": "Words",
         "definitions": "Definitions"
       },
+      "combo": "Combo",
+      "submit": "Submit",
+      "timesUp": "Time's Up!",
+      "typeAnswer": "Type your answer",
       "mastery": {
         "not_started": "Not Started",
         "started": "Getting Started",

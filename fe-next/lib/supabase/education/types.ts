@@ -1,4 +1,4 @@
-import { normalizeWord, normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { normalizeWord, normalizeHebrewWord, sanitizeWord } from '@/shared/utils/wordNormalization';
 
 /**
  * Detect if a string contains Hebrew characters
@@ -11,11 +11,15 @@ export function containsHebrew(text: string): boolean {
 /**
  * Normalize a word for storage/comparison, with smart language detection
  * Falls back to Hebrew normalization if Hebrew characters are detected
+ *
+ * IMPORTANT: Sanitizes word first to remove niqqud/diacritics for Hebrew
  */
 export function normalizeForStorage(word: string, language?: Language): string {
   // If word contains Hebrew characters, always use Hebrew normalization
   if (containsHebrew(word)) {
-    return normalizeHebrewWord(word);
+    // Sanitize first to remove niqqud (vowel points) and other invisible chars
+    const sanitized = sanitizeWord(word, 'he');
+    return normalizeHebrewWord(sanitized);
   }
   // Otherwise use the specified language or default to lowercase
   return normalizeWord(word, language || 'en');
