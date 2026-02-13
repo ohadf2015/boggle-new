@@ -59,10 +59,17 @@ Plans:
   3. Student can browse duel lobby showing pending invites, available opponents, and quick-match option within classroom
   4. Student can view duel history with win/loss record, streaks, and per-opponent stats
   5. Student can challenge specific classmate to duel directly from their profile or classroom roster
-**Plans**: TBD
+**Plans**: 8 plans
 
 Plans:
-- [ ] 38-01: [TBD during planning]
+- [ ] 38-01-PLAN.md — Duel types + DB CRUD operations (TDD)
+- [ ] 38-02-PLAN.md — Duel lifecycle handlers: create, accept, decline, cancel (TDD)
+- [ ] 38-03-PLAN.md — Duel gameplay handlers: score submission, completion, XP award (TDD)
+- [ ] 38-04-PLAN.md — useDuelSocket hook + lobby handler + registry wiring
+- [ ] 38-05-PLAN.md — Duel Lobby + Challenge Modal + Notification UI
+- [ ] 38-06-PLAN.md — Duel Game View + History UI
+- [ ] 38-07-PLAN.md — Profile challenge button (SOC-02) + route integration
+- [ ] 38-08-PLAN.md — Translations (4 languages) + human verification
 
 ### Phase 39: Real-Time Duels
 **Goal**: Students can compete in real-time 1v1 duels where both players see same board simultaneously with live progress indicators
@@ -141,7 +148,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 |-------|-----------|----------------|--------|-----------|
 | 36. Foundation & Refactoring | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 37. Practice Modes | v2.0 | 0/6 | Planned | - |
-| 38. Async Duels | v2.0 | 0/0 | Not started | - |
+| 38. Async Duels | v2.0 | 0/8 | Planned | - |
 | 39. Real-Time Duels | v2.0 | 0/0 | Not started | - |
 | 40. Gamification Enhancements | v2.0 | 0/0 | Not started | - |
 | 41. Student Dashboard Overhaul | v2.0 | 0/0 | Not started | - |
@@ -149,4 +156,4 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-13 — Phase 37 revised (6 plans in 4 waves)*
+*Last updated: 2026-02-13 — Phase 38 planned (8 plans in 5 waves)*
