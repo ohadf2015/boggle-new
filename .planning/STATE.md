@@ -5,35 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 36 complete — ready for Phase 37
+**Current focus:** Phase 37 in progress — Practice Modes
 
 ## Current Position
 
-Phase: 36 of 43 (Foundation & Refactoring) — COMPLETE
-Plan: 5 of 5 in current phase
-Status: Phase verified and complete
-Last activity: 2026-02-13 — Phase 36 verified (4/4 must-haves passed)
+Phase: 37 of 43 (Practice Modes) — IN PROGRESS
+Plan: 1 of 4 in current phase
+Status: Foundation complete, ready for component implementation
+Last activity: 2026-02-13 — Completed 37-01-PLAN.md (dnd-kit, practice CRUD, XP calculations)
 
-Progress: [█████░░░░░] ~12%
+Progress: [█████░░░░░] ~13%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 28 min
-- Total execution time: 141 min
+- Total plans completed: 6
+- Average duration: 25 min
+- Total execution time: 146 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
+| 37 | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 36-01 (21 min), 36-03 (17 min), 36-04 (20 min), 36-05 (20 min), 36-02 (40 min)
-- Trend: Consistent 17-40 min execution, import migration took longer due to 27 consumer files
-- Wave 1 (4 plans parallel) completed in ~21 min wall time
-- Wave 2 (1 plan sequential) completed in ~40 min
+- Last 5 plans: 36-03 (17 min), 36-04 (20 min), 36-05 (20 min), 36-02 (40 min), 37-01 (5 min)
+- Trend: Phase 37-01 very fast due to pure foundation work (no UI, no complex logic)
+- TDD approach with tests-first made implementation straightforward
+- Wave 1 foundation complete, ready for parallel component implementation
 
 *Updated after each plan completion*
 
@@ -60,6 +61,10 @@ Recent decisions affecting current work:
 - **36-05:** Anti-inflation rules - New activities don't double-count XP
 - **36-05:** Progression target - Students level up every 3-4 days at early levels with daily practice
 - **36-05:** Loss XP floor - Losing a duel awards participation XP (60% of win)
+- **37-01:** Server-side Supabase client pattern for practice.ts DB operations
+- **37-01:** Separate usePracticeSessionNew hook instead of extending existing (different patterns)
+- **37-01:** Client-side accuracy calculation for immediate XP feedback (server validates)
+- **37-01:** Simplified spelling accuracy: wordsSpelled/10 for threshold checking
 
 ### Pending Todos
 
@@ -72,6 +77,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Phase 36 verified and complete
+Stopped at: Completed 37-01-PLAN.md (Practice Foundation)
 Resume file: None
-Next action: Plan Phase 37 (Practice Modes)
+Next action: Execute 37-02 (Word Matching), 37-03 (Spelling), 37-04 (Blitz) - can run in parallel (Wave 1)
