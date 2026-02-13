@@ -100,9 +100,9 @@ const mockDuelRow = {
 
 describe('DuelGameView', () => {
   let mockSubmitScore: jest.Mock;
-  let mockOnDuelCompleted: jest.Mock;
-  let mockOnScoreSubmitted: jest.Mock;
-  let mockOnError: jest.Mock;
+  let mockOnDuelCompleted: jest.Mock & { callback?: Function };
+  let mockOnScoreSubmitted: jest.Mock & { callback?: Function };
+  let mockOnError: jest.Mock & { callback?: Function };
 
   beforeEach(() => {
     // Reset mocks
@@ -290,7 +290,7 @@ describe('DuelGameView', () => {
         wordsRejected: 2,
       };
 
-      mockOnScoreSubmitted.callback(scoreData);
+      mockOnScoreSubmitted.callback!(scoreData);
 
       await waitFor(() => {
         expect(screen.getByText('Words Accepted')).toBeInTheDocument();
@@ -322,7 +322,7 @@ describe('DuelGameView', () => {
         xpAwarded: { winner: 100, loser: 60 },
       };
 
-      mockOnDuelCompleted.callback(completedData);
+      mockOnDuelCompleted.callback!(completedData);
 
       await waitFor(() => {
         expect(screen.getByText('You Win!')).toBeInTheDocument();
@@ -350,7 +350,7 @@ describe('DuelGameView', () => {
         xpAwarded: { winner: 100, loser: 60 },
       };
 
-      mockOnDuelCompleted.callback(completedData);
+      mockOnDuelCompleted.callback!(completedData);
 
       await waitFor(() => {
         expect(screen.getByText('You Lose')).toBeInTheDocument();
@@ -378,7 +378,7 @@ describe('DuelGameView', () => {
         xpAwarded: { winner: 80, loser: 80 },
       };
 
-      mockOnDuelCompleted.callback(completedData);
+      mockOnDuelCompleted.callback!(completedData);
 
       await waitFor(() => {
         expect(screen.getByText('Draw!')).toBeInTheDocument();

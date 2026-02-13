@@ -351,7 +351,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               type="text"
               value={currentWord}
               onChange={(e) => setCurrentWord(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder={t('duels.typeWord')}
               className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-none focus:ring-2 focus:ring-neo-cyan"
             />
