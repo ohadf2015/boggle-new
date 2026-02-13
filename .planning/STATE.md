@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 38 of 43 (Async Duels) — VERIFIED COMPLETE
-Plan: 8 of 8 in current phase (all complete)
-Status: Phase goal verified. SOC-02 ChallengeButton deferred to Phase 41 (needs roster/profile surfaces).
-Last activity: 2026-02-13 — Phase 38 verified and complete
+Phase: 39 of 43 (Real-Time Duels) — IN PROGRESS
+Plan: 2 of 8 in current phase (1 complete: 39-01, current: 39-02 complete)
+Status: Disconnection handling complete with TDD. Moving to 39-03 (real-time game state).
+Last activity: 2026-02-13 — Completed 39-02-PLAN.md (disconnection handling)
 
-Progress: [██████████] ~37.5% (3/8 phases complete)
+Progress: [███████████] ~38.7% (3.25/8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 14 min
-- Total execution time: 270 min
+- Total plans completed: 21
+- Average duration: 13 min
+- Total execution time: 276 min
 
 **By Phase:**
 
@@ -30,13 +30,14 @@ Progress: [██████████] ~37.5% (3/8 phases complete)
 | 36 | 5 | 141 min | 28 min |
 | 37 | 6 | 46 min | 8 min |
 | 38 | 8 | 83 min | 10 min |
+| 39 | 1 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 38-05 (12 min), 38-06 (12 min), 38-07 (6 min), 38-08 (5 min)
-- Trend: Phase 38 completed at 10 min avg (efficient execution)
-- Complete i18n coverage: 40+ translation keys across 4 languages
-- Human verification passed: RTL Hebrew, Swedish, Japanese all correct
+- Last 5 plans: 38-06 (12 min), 38-07 (6 min), 38-08 (5 min), 39-01 (research), 39-02 (6 min)
+- Trend: Phase 39 starting efficiently (6 min for disconnection handling)
+- TDD execution: 9/9 tests passing, 100% coverage
 - Phase 38 COMPLETE: All async duel functionality delivered
+- Phase 39 IN PROGRESS: Disconnection handling complete
 
 *Updated after each plan completion*
 
@@ -106,6 +107,10 @@ Recent decisions affecting current work:
 - **38-07:** Participant verification on duel page load (server-side security check)
 - **38-07:** ChallengeButton dual variants (button and icon) for flexible placement (SOC-02)
 - **38-08:** Flat translation key convention applied to duel keys (duelLobbyTitle not education.duels.duelLobbyTitle)
+- **39-02:** 30-second grace period for disconnection recovery (balances UX with fairness)
+- **39-02:** Forfeit awards DUEL_LOSS_REALTIME XP (not extra penalty - forfeiting already loses)
+- **39-02:** In-memory timer tracking for single-server deployment (simple, matches lobby approach)
+- **39-02:** Atomic forfeit with .eq('status', 'active') prevents race conditions
 
 ### Pending Todos
 
@@ -118,6 +123,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Phase 38 complete and verified
+Stopped at: Completed 39-02-PLAN.md (disconnection handling with TDD)
 Resume file: None
-Next action: Plan Phase 39 (Real-Time Duels)
+Next action: Execute 39-03 (real-time game state management)
