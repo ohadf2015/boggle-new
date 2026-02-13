@@ -6101,8 +6101,8 @@ const ja = {
   },
   "system": {
     "updatingToNewVersion": "新しいバージョンに更新中..."
-  }
-};
+  },
+
   // チャレンジシステム（デイリー＋ウィークリー）
   challenges: {
     daily: {
@@ -6138,6 +6138,7 @@ const ja = {
     noActiveChallenges: "アクティブなチャレンジがありません",
     dailyReset: "{hours}時間{minutes}分後にリセット",
     weeklyReset: "月曜日にリセット",
-  },
+  }
+};
 
 export { ja };

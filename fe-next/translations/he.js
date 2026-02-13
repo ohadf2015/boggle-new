@@ -6078,8 +6078,8 @@ const he = {
     "you": "אתה",
     "youLose": "הפסדת! 😢",
     "youWin": "ניצחת! 🏆"
-  }
-};
+  },
+
   // מערכת אתגרים (יומי + שבועי)
   challenges: {
     daily: {
@@ -6115,6 +6115,7 @@ const he = {
     noActiveChallenges: "אין אתגרים פעילים",
     dailyReset: "מתאפס בעוד {hours}ש {minutes}ד",
     weeklyReset: "מתאפס ביום שני",
-  },
+  }
+};
 
 export { he };

@@ -6075,8 +6075,8 @@ const sv = {
   "wonByForfeit": "Vann genom uppgivning",
   "lostByForfeit": "Förlorad genom uppgivning",
   "realtimeDuel": "Realtidsduell",
-  "duelComplete": "Duellen avslutad!"
-};
+  "duelComplete": "Duellen avslutad!",
+
   // Utmaningssystem (Daglig + Veckovis)
   challenges: {
     daily: {
@@ -6112,6 +6112,7 @@ const sv = {
     noActiveChallenges: "Inga aktiva utmaningar",
     dailyReset: "Återställs om {hours}t {minutes}m",
     weeklyReset: "Återställs på måndag",
-  },
+  }
+};
 
 export { sv };

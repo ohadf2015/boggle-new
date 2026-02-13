@@ -6066,8 +6066,8 @@ const en = {
   "wonByForfeit": "Won by forfeit",
   "lostByForfeit": "Lost by forfeit",
   "realtimeDuel": "Real-Time Duel",
-  "duelComplete": "Duel Complete!"
-};
+  "duelComplete": "Duel Complete!",
+
   // Challenge system (Daily + Weekly)
   challenges: {
     daily: {
@@ -6103,6 +6103,7 @@ const en = {
     noActiveChallenges: "No active challenges",
     dailyReset: "Resets in {hours}h {minutes}m",
     weeklyReset: "Resets on Monday",
-  },
+  }
+};
 
 export { en };
