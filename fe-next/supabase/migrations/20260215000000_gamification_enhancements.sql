@@ -54,7 +54,7 @@ CREATE POLICY IF NOT EXISTS "leaderboard_snapshots_read"
     TO authenticated
     USING (
         EXISTS (
-            SELECT 1 FROM classroom_members cm
+            SELECT 1 FROM classroom_memberships cm
             WHERE cm.classroom_id = leaderboard_snapshots.classroom_id
             AND cm.student_id = auth.uid()
         )
