@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { DuelGameView } from '@/components/education/duels';
+import { DuelGameView, RealTimeDuelGame } from '@/components/education/duels';
 import { cn } from '@/lib/utils';
 import { getDuelById } from '@/lib/supabase/education/duels';
 
@@ -24,6 +24,8 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
   const [isChecking, setIsChecking] = useState(true);
   const [duelError, setDuelError] = useState<string | null>(null);
+  const [duelType, setDuelType] = useState<'async' | 'realtime'>('async');
+  const [opponentName, setOpponentName] = useState<string>('');
 
   // Verify duel exists and user is a participant
   useEffect(() => {
@@ -53,6 +55,13 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
         setIsChecking(false);
         return;
       }
+
+      // Set duel type and opponent name
+      setDuelType(duel.duel_type || 'async');
+      const opponentId = duel.challenger_id === user.id ? duel.opponent_id : duel.challenger_id;
+      // Note: In real implementation, fetch opponent profile to get display name
+      // For now, we'll use a placeholder
+      setOpponentName(opponentId);
 
       setIsChecking(false);
     };
@@ -110,11 +119,20 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
       <EducationHeader showBackButton title={t('duelsTitle')} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <DuelGameView
-          duelId={duelId}
-          studentId={user!.id}
-          onBackToLobby={handleBackToLobby}
-        />
+        {duelType === 'realtime' ? (
+          <RealTimeDuelGame
+            duelId={duelId}
+            studentId={user!.id}
+            opponentName={opponentName}
+            onBackToLobby={handleBackToLobby}
+          />
+        ) : (
+          <DuelGameView
+            duelId={duelId}
+            studentId={user!.id}
+            onBackToLobby={handleBackToLobby}
+          />
+        )}
       </main>
     </div>
   );

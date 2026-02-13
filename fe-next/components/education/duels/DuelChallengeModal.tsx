@@ -51,6 +51,7 @@ export default function DuelChallengeModal({
 
   // State
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
+  const [duelType, setDuelType] = useState<'async' | 'realtime'>('async');
   const [isCreating, setIsCreating] = useState(false);
 
   // Handle send challenge
@@ -59,14 +60,14 @@ export default function DuelChallengeModal({
 
     setIsCreating(true);
 
-    createChallenge(opponent.userId, selectedLessonId, classroomId);
+    createChallenge(opponent.userId, selectedLessonId, classroomId, duelType);
 
     // Brief delay to show "Challenge sent!" state before closing
     setTimeout(() => {
       setIsCreating(false);
       onClose();
     }, 100);
-  }, [selectedLessonId, opponent.userId, classroomId, createChallenge, onClose]);
+  }, [selectedLessonId, duelType, opponent.userId, classroomId, createChallenge, onClose]);
 
   return (
     <>
@@ -118,6 +119,52 @@ export default function DuelChallengeModal({
               <p className="text-neo-white font-bold">{opponent.displayName}</p>
               <p className="text-neo-white/50 text-sm">{t('availableOpponents')}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Duel Type Selection */}
+        <div className="mb-6">
+          <label className="block text-neo-white font-bold mb-3">
+            {t('selectDuelType')}
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Turn-Based Option */}
+            <button
+              type="button"
+              onClick={() => setDuelType('async')}
+              className={cn(
+                'p-4 rounded-neo border-3 border-neo-black',
+                'shadow-hard-sm transition-all',
+                'text-left',
+                duelType === 'async'
+                  ? 'bg-neo-yellow text-neo-black shadow-hard'
+                  : 'bg-neo-navy text-neo-white hover:shadow-hard'
+              )}
+            >
+              <div className="font-black text-lg mb-1">{t('turnBased')}</div>
+              <div className={cn('text-sm', duelType === 'async' ? 'text-neo-black/70' : 'text-neo-white/60')}>
+                {t('turnBasedDesc')}
+              </div>
+            </button>
+
+            {/* Real-Time Option */}
+            <button
+              type="button"
+              onClick={() => setDuelType('realtime')}
+              className={cn(
+                'p-4 rounded-neo border-3 border-neo-black',
+                'shadow-hard-sm transition-all',
+                'text-left',
+                duelType === 'realtime'
+                  ? 'bg-neo-yellow text-neo-black shadow-hard'
+                  : 'bg-neo-navy text-neo-white hover:shadow-hard'
+              )}
+            >
+              <div className="font-black text-lg mb-1">{t('realTime')}</div>
+              <div className={cn('text-sm', duelType === 'realtime' ? 'text-neo-black/70' : 'text-neo-white/60')}>
+                {t('realTimeDesc')}
+              </div>
+            </button>
           </div>
         </div>
 

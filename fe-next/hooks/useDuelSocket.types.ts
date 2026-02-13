@@ -12,6 +12,7 @@ export interface ChallengeReceivedData {
   duelId: string;
   challengerName: string;
   lessonId: string;
+  duelType: 'async' | 'realtime';
 }
 
 export interface LobbyUpdateData {
@@ -28,6 +29,7 @@ export interface DuelAcceptedData {
   duelId: string;
   boardState: string[][];
   startedAt: string;
+  duelType: 'async' | 'realtime';
 }
 
 export interface DuelCompletedData {
