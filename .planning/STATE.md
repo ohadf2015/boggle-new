@@ -5,36 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 37 in progress — Practice Modes
+**Current focus:** Phase 37 COMPLETE — Practice Modes. Ready for Phase 38.
 
 ## Current Position
 
-Phase: 37 of 43 (Practice Modes) — IN PROGRESS
-Plan: 5 of 6 in current phase
-Status: All 3 new modes wired and discoverable
-Last activity: 2026-02-13 — Completed 37-05-PLAN.md (Practice Mode Integration)
+Phase: 37 of 43 (Practice Modes) — COMPLETE
+Plan: 6 of 6 in current phase (all done)
+Status: All 3 new practice modes built, integrated, translated, and verified
+Last activity: 2026-02-13 — Completed 37-06-PLAN.md (Translations + Human Verification)
 
-Progress: [███████░░░] ~16%
+Progress: [████████░░] ~19%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 19 min
-- Total execution time: 175 min
+- Total plans completed: 11
+- Average duration: 17 min
+- Total execution time: 187 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 36 | 5 | 141 min | 28 min |
-| 37 | 4 | 34 min | 9 min |
+| 37 | 6 | 46 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 36-02 (40 min), 37-01 (5 min), 37-02 (7 min), 37-03 (7 min), 37-05 (15 min)
-- Trend: Phase 37 integration plans faster than component builds
-- Type-safe integration minimizes debugging time
+- Last 5 plans: 37-01 (5 min), 37-02 (7 min), 37-03 (7 min), 37-05 (15 min), 37-06 (12 min)
+- Trend: Phase 37 consistently fast (~8 min/plan average)
 - Translation pre-commit hook catching missing keys early
+- Wave-based parallel execution effective for independent components
 
 *Updated after each plan completion*
 
@@ -75,6 +75,7 @@ Recent decisions affecting current work:
 - **37-05:** PracticeType union extended (matching, spelling, blitz) - ripple effect managed across 6 files
 - **37-05:** CSS variables used for neo-purple and neo-red (no Tailwind classes yet)
 - **37-05:** Mode selector shows 7 practice modes with session counts
+- **37-06:** Flat translation key convention (matching, matchingDesc) not nested (matching.title, matching.desc)
 
 ### Pending Todos
 
@@ -82,11 +83,11 @@ None yet.
 
 ### Blockers/Concerns
 
-None.
+- Pre-existing build error: utils/supabase/server.ts uses next/headers in client component context (not related to Phase 37)
 
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 37-05-PLAN.md (Practice Mode Integration)
+Stopped at: Phase 37 COMPLETE
 Resume file: None
-Next action: Execute 37-06 (translation completion) or 37-02/37-04 (remaining components)
+Next action: Plan and execute Phase 38
