@@ -98,10 +98,14 @@ Plans:
   2. Student can view competitive classroom leaderboards with weekly/monthly boards, tiers, rank change indicators, and streak badges
   3. Student receives daily and weekly challenges (time-limited goals like "Master 5 words today" or "Win 3 duels this week") with bonus XP/coin rewards
   4. Student can unlock new achievement categories for duels and practice (e.g., "Win 10 duels", "Perfect spelling streak", "Blitz master") with 4 tiers each
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 40-01: [TBD during planning]
+- [ ] 40-01-PLAN.md — DB migration: leaderboard snapshots + duel/practice achievement definitions + types
+- [ ] 40-02-PLAN.md — Leaderboard enhancement: weekly/monthly scopes, rank deltas, streak badges, full list
+- [ ] 40-03-PLAN.md — Daily/weekly challenges: backend CRUD + challenge UI cards + ChallengePanel
+- [ ] 40-04-PLAN.md — Progression milestones + achievement grid: milestone tracker, celebration, achievement categories
+- [ ] 40-05-PLAN.md — Translations (4 languages) + human verification
 
 ### Phase 41: Student Dashboard Overhaul
 **Goal**: Students interact with engaging dashboard featuring activity feed, duel invites, streak calendar, quick-play buttons, profile pages, and classroom activity
@@ -154,10 +158,10 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 37. Practice Modes | v2.0 | 6/6 | Complete | 2026-02-13 |
 | 38. Async Duels | v2.0 | 8/8 | Complete | 2026-02-13 |
 | 39. Real-Time Duels | v2.0 | 5/5 | Complete | 2026-02-13 |
-| 40. Gamification Enhancements | v2.0 | 0/0 | Not started | - |
+| 40. Gamification Enhancements | v2.0 | 0/5 | In progress | - |
 | 41. Student Dashboard Overhaul | v2.0 | 0/0 | Not started | - |
 | 42. Teacher Dashboard & Workflows | v2.0 | 0/0 | Not started | - |
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-13 — Phase 39 complete (5/5 plans, goal verified)*
+*Last updated: 2026-02-13 — Phase 40 planned (5 plans in 3 waves)*
