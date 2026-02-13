@@ -46,6 +46,39 @@ export const EDUCATION_XP_CONFIG = {
     14: 1.75, // 2 weeks: +75% XP
     30: 2.0, // 1 month: +100% XP (double XP)
   } as Record<number, number>,
+
+  // Duel XP (from XP Economy Model - Phase 38)
+  DUEL_WIN_ASYNC: 200,
+  DUEL_LOSS_ASYNC: 120,
+  DUEL_WIN_REALTIME: 250,
+  DUEL_LOSS_REALTIME: 150,
+  DUEL_DRAW: 175,
+
+  // Word Matching Practice XP (Phase 37)
+  MATCHING_PAIR_CORRECT: 15,
+  MATCHING_ACCURACY_BONUS: {
+    90: 40,
+    80: 20,
+    70: 10,
+  } as Record<number, number>,
+  MATCHING_PERFECT_SESSION: 60,
+
+  // Spelling Challenge Practice XP (Phase 37)
+  SPELLING_WORD_CORRECT: 20,
+  SPELLING_STREAK_BONUS: 5, // Per consecutive correct
+  SPELLING_ACCURACY_BONUS: {
+    90: 50,
+    80: 30,
+    70: 10,
+  } as Record<number, number>,
+
+  // Timed Blitz Practice XP (Phase 37)
+  BLITZ_WORD_FOUND: 10,
+  BLITZ_COMBO_BONUS: 3, // Per combo level
+  BLITZ_COMPLETION: 40,
+
+  // Daily Challenge XP (Phase 39)
+  DAILY_CHALLENGE_COMPLETE: 100,
 } as const;
 
 // ============================================
@@ -53,7 +86,7 @@ export const EDUCATION_XP_CONFIG = {
 // ============================================
 
 export interface PracticeSessionXp {
-  type: 'flashcard' | 'solo_board' | 'lesson_completion';
+  type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz' | 'duel_async' | 'duel_realtime' | 'daily_challenge';
   sessionData: {
     // Flashcard specific
     cardsReviewed?: number;
@@ -65,6 +98,21 @@ export interface PracticeSessionXp {
 
     // Lesson specific
     masteryLevel?: 'not_started' | 'started' | 'practicing' | 'mastered';
+
+    // Word Matching specific (Phase 37)
+    pairsMatched?: number;
+    totalPairs?: number;
+
+    // Spelling Challenge specific (Phase 37)
+    wordsSpelled?: number;
+    spellingStreak?: number;
+
+    // Timed Blitz specific (Phase 37)
+    blitzWordsFound?: number;
+    blitzMaxCombo?: number;
+
+    // Duel specific (Phase 38)
+    duelResult?: 'win' | 'loss' | 'draw';
   };
   streakDays?: number;
 }
