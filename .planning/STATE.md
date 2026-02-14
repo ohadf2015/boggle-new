@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 41 of 43 (Student Dashboard Overhaul) — COMPLETE
-Plan: 4 of 4 in current phase (all plans complete, verified)
-Status: Phase 41 COMPLETE — Dashboard overhaul with activity feed, streak calendar, quick-play, profile enhancements
-Last activity: 2026-02-14 — Phase 41 verified (3/3 must-haves passed)
+Phase: 42 of 43 (Teacher Dashboard & Workflows)
+Plan: 1 of 6 in current phase
+Status: In progress — Assignment data layer complete
+Last activity: 2026-02-14 — Completed 42-01-PLAN.md (assignment tracking foundation)
 
-Progress: [██████████████░] ~75% (6/8 phases complete)
+Progress: [██████████████░░] ~76% (41/43 phases, plan 42-01 of 6 complete)
 
 ## Performance Metrics
 
@@ -33,13 +33,12 @@ Progress: [██████████████░] ~75% (6/8 phases compl
 | 39 | 5 | 71 min | 14 min |
 | 40 | 7 | 48 min | 7 min |
 | 41 | 4 | 38 min | 10 min |
+| 42 | 1 | 18 min | 18 min |
 
 **Recent Trend:**
-- Last 5 plans: 40-07 (4 min), 40-06 (6 min), 41-01 (18 min), 41-03 (9 min), 41-02 (11 min)
-- Phase 41 IN PROGRESS: 4/6 plans, 38 min total
-- 41-01: Quick-play widgets (QuickPlayPanel + StreakCalendar) (18 min)
-- 41-03: Profile enhancements (duel record + recent activity) (9 min)
-- 41-02: Activity feed (classroom duels + achievements timeline) (11 min)
+- Last 5 plans: 40-06 (6 min), 41-01 (18 min), 41-03 (9 min), 41-02 (11 min), 42-01 (18 min)
+- Phase 42 IN PROGRESS: 1/6 plans, 18 min total
+- 42-01: Assignment data layer (migration + service functions + useAssignments hook) (18 min)
 
 *Updated after each plan completion*
 
@@ -148,6 +147,11 @@ Recent decisions affecting current work:
 - **41-03:** Recent duels limited to 5 on profile (full history on dedicated page)
 - **41-03:** Draws stat shown only when count > 0 (adaptive UI, avoids wasting space)
 - **41-03:** Opponent name resolution handles both challenger/opponent roles correctly
+- **42-01:** Assignment type includes both 'practice' and 'duel' (unified flow, simpler UI)
+- **42-01:** Due date is optional (nullable) for flexible assignment creation
+- **42-01:** UNIQUE constraint on (classroom_id, lesson_id, assignment_type) prevents duplicate assignments
+- **42-01:** Completion tracking in separate table (many-to-many relationship, better query performance)
+- **42-01:** useAssignments hook with optimistic updates (instant UI feedback, rollback on error)
 - **41-02:** Parallel queries for duels and achievements (Promise.all) for better performance
 - **41-02:** Achievements filtered by classroom membership (two-step query: classroom_memberships → filter by student_ids)
 - **41-02:** Activity feed default limit 20 items (balance between context and performance)
@@ -166,7 +170,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14
-Stopped at: Phase 41 COMPLETE — All 4 plans executed, verified 3/3 must-haves
+Last session: 2026-02-14 at 02:48 UTC
+Stopped at: Completed 42-01-PLAN.md (assignment data layer)
 Resume file: None
-Next action: Plan Phase 42 (Teacher Dashboard & Workflows)
+Next action: Continue Phase 42 (5 more plans: assignment creator, tracker, dashboard integration)
