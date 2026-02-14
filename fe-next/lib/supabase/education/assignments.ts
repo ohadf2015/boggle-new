@@ -1,9 +1,9 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import type { LessonAssignment } from './types';
+import type { LessonAssignment, TeacherAssignment } from './types';
 
 /**
- * Assign a lesson to a classroom
+ * Assign a lesson to a classroom (legacy - kept for backward compatibility)
  */
 export async function assignLesson(
   lessonId: string,
@@ -79,5 +79,199 @@ export async function getStudentAssignedLessons(
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getStudentAssignedLessons:', error);
     return { data: [], error: { message: error } };
+  }
+}
+
+// ============================================
+// TEACHER ASSIGNMENTS (Phase 42)
+// ============================================
+
+/**
+ * Create a new teacher assignment
+ */
+export async function createAssignment(data: {
+  classroom_id: string;
+  lesson_id: string;
+  teacher_id: string;
+  assignment_type?: 'practice' | 'duel';
+  due_date?: string | null;
+  title?: string | null;
+  instructions?: string | null;
+}): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data: assignment, error } = await supabase
+      .from('teacher_assignments')
+      .insert({
+        classroom_id: data.classroom_id,
+        lesson_id: data.lesson_id,
+        teacher_id: data.teacher_id,
+        assignment_type: data.assignment_type || 'practice',
+        due_date: data.due_date || null,
+        title: data.title || null,
+        instructions: data.instructions || null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      logger.error('Error creating assignment:', error);
+      return { data: null, error: { message: error.message } };
+    }
+
+    return { data: assignment, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in createAssignment:', error);
+    return { data: null, error: { message: error } };
+  }
+}
+
+/**
+ * Get all assignments for a classroom with completion stats
+ */
+export async function getClassroomAssignments(
+  classroomId: string
+): Promise<{ data: TeacherAssignment[]; error: { message: string } | null }> {
+  if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    // Fetch assignments with joined lesson data
+    const { data: assignments, error } = await supabase
+      .from('teacher_assignments')
+      .select('*, vocabulary_lessons(*)')
+      .eq('classroom_id', classroomId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      logger.error('Error fetching classroom assignments:', error);
+      return { data: [], error: { message: error.message } };
+    }
+
+    if (!assignments || assignments.length === 0) {
+      return { data: [], error: null };
+    }
+
+    // Get student count for classroom
+    const { count: studentCount } = await supabase
+      .from('classroom_memberships')
+      .select('*', { count: 'exact', head: true })
+      .eq('classroom_id', classroomId);
+
+    // Get completion counts for each assignment
+    const assignmentIds = assignments.map(a => a.id);
+    const { data: completions } = await supabase
+      .from('assignment_completions')
+      .select('assignment_id')
+      .in('assignment_id', assignmentIds);
+
+    // Count completions per assignment
+    const completionCounts: Record<string, number> = {};
+    completions?.forEach(c => {
+      completionCounts[c.assignment_id] = (completionCounts[c.assignment_id] || 0) + 1;
+    });
+
+    // Merge completion data into assignments
+    const enrichedAssignments = assignments.map(assignment => ({
+      ...assignment,
+      completion_count: completionCounts[assignment.id] || 0,
+      student_count: studentCount || 0,
+    }));
+
+    return { data: enrichedAssignments, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getClassroomAssignments:', error);
+    return { data: [], error: { message: error } };
+  }
+}
+
+/**
+ * Get all completions for an assignment with student profiles
+ */
+export async function getAssignmentCompletions(
+  assignmentId: string
+): Promise<{ data: any[]; error: { message: string } | null }> {
+  if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data: completions, error } = await supabase
+      .from('assignment_completions')
+      .select('*, profiles(display_name, avatar_emoji)')
+      .eq('assignment_id', assignmentId)
+      .order('completed_at', { ascending: false });
+
+    if (error) {
+      logger.error('Error fetching assignment completions:', error);
+      return { data: [], error: { message: error.message } };
+    }
+
+    return { data: completions || [], error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getAssignmentCompletions:', error);
+    return { data: [], error: { message: error } };
+  }
+}
+
+/**
+ * Delete a teacher assignment
+ */
+export async function deleteAssignment(
+  assignmentId: string
+): Promise<{ data: null; error: { message: string } | null }> {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    const { error } = await supabase
+      .from('teacher_assignments')
+      .delete()
+      .eq('id', assignmentId);
+
+    if (error) {
+      logger.error('Error deleting assignment:', error);
+      return { data: null, error: { message: error.message } };
+    }
+
+    return { data: null, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in deleteAssignment:', error);
+    return { data: null, error: { message: error } };
+  }
+}
+
+/**
+ * Update a teacher assignment
+ */
+export async function updateAssignment(
+  id: string,
+  updates: {
+    due_date?: string | null;
+    title?: string | null;
+    instructions?: string | null;
+  }
+): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data: assignment, error } = await supabase
+      .from('teacher_assignments')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      logger.error('Error updating assignment:', error);
+      return { data: null, error: { message: error.message } };
+    }
+
+    return { data: assignment, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in updateAssignment:', error);
+    return { data: null, error: { message: error } };
   }
 }
