@@ -5125,7 +5125,13 @@ const en = {
       "quickStart": "Quick Start",
       "repeatLastGame": "Repeat Last Game",
       "lastPlayed": "Last played",
-      "noRecentGames": "No recent games"
+      "noRecentGames": "No recent games",
+      "assignments": "Assignments",
+      "track": "TRACK",
+      "duelActivity": "Duel Activity",
+      "live": "LIVE",
+      "selectClassroom": "Select Classroom",
+      "createClassroomFirst": "Create a classroom first to track assignments and duel activity"
     },
     "game": {
       "qrCode": "Show QR Code",
@@ -5332,6 +5338,12 @@ const en = {
       "noAssignments": "No assignments yet",
       "noAssignmentsFilter": "No assignments in this category",
       "createFirst": "Create First Assignment"
+    },
+    "duels": {
+      "noDuels": "No recent duel activity",
+      "points": "pts",
+      "async": "Async",
+      "realtime": "Live"
     },
     "progress": {
       "title": "Student Progress",

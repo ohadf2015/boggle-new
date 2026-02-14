@@ -7,6 +7,9 @@
 // Sub-module barrels
 export * from './reports';
 export * from './curriculum';
+export * from './assignments';
+export * from './dashboard';
+export * from './lesson-creation';
 
 // Top-level components
 export { default as TeacherDashboard } from './TeacherDashboard';

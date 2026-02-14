@@ -17,7 +17,10 @@ import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import QuickStartButton from './QuickStartButton';
 import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecentGameSettings';
-import { Gamepad2, BookPlus, ChevronDown, ChevronUp } from 'lucide-react';
+import { useClassrooms } from '@/hooks/useClassroom';
+import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
+import { DuelMonitoringPanel } from './dashboard';
+import { Gamepad2, BookPlus, ChevronDown, ChevronUp, ClipboardCheck, Swords } from 'lucide-react';
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();
@@ -25,7 +28,21 @@ export default function TeacherDashboard() {
   const isRTL = language === 'he';
   const [showClassrooms, setShowClassrooms] = useState(true);
   const [showLessons, setShowLessons] = useState(false);
+  const [showAssignments, setShowAssignments] = useState(false);
+  const [showDuels, setShowDuels] = useState(false);
+  const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
+  const { classrooms } = useClassrooms();
+
+  // Classroom selection for assignments and duels
+  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
+
+  // Auto-select first classroom if only one exists
+  useState(() => {
+    if (classrooms.length === 1 && !selectedClassroomId) {
+      setSelectedClassroomId(classrooms[0].id);
+    }
+  });
 
   // Handle quick start - navigate to classroom game with pre-selected lessons
   const handleQuickStart = useCallback(
@@ -128,6 +145,142 @@ export default function TeacherDashboard() {
           </div>
         )}
 
+        {/* Assignment Tracking Section - Collapsible */}
+        <section className="mb-8">
+          <button
+            onClick={() => setShowAssignments(!showAssignments)}
+            aria-expanded={showAssignments}
+            className={cn(
+              'w-full flex items-center justify-between p-4',
+              'rounded-neo border-neo border-neo-black',
+              'bg-neo-navy shadow-hard hover:shadow-hard-lg transition-all',
+              'text-left',
+              'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-neo-display text-neo-white text-balance">
+                {t('teacher.dashboard.assignments')}
+              </h2>
+              <span className="px-2 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-neo border border-neo-yellow/50">
+                {t('teacher.dashboard.track')}
+              </span>
+            </div>
+            {showAssignments ? (
+              <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
+            ) : (
+              <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
+            )}
+          </button>
+
+          {showAssignments && (
+            <div className="mt-4">
+              {classrooms.length === 0 ? (
+                <div className="p-6 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard">
+                  <p className="text-neo-white/60 font-neo-body text-center">
+                    {t('teacher.dashboard.createClassroomFirst')}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Classroom selector if multiple classrooms */}
+                  {classrooms.length > 1 && (
+                    <div className="flex items-center gap-3">
+                      <label className="text-neo-white font-neo-body">
+                        {t('teacher.dashboard.selectClassroom')}:
+                      </label>
+                      <select
+                        value={selectedClassroomId}
+                        onChange={(e) => setSelectedClassroomId(e.target.value)}
+                        className={cn(
+                          'px-4 py-2 bg-neo-navy border-neo border-neo-black',
+                          'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
+                          'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                        )}
+                      >
+                        {classrooms.map((classroom) => (
+                          <option key={classroom.id} value={classroom.id}>
+                            {classroom.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {selectedClassroomId && (
+                    <AssignmentTrackingPanel
+                      classroomId={selectedClassroomId}
+                      onCreateAssignment={() => setShowAssignmentCreator(true)}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* Duel Monitoring Section - Collapsible */}
+        {classrooms.length > 0 && (
+          <section className="mb-8">
+            <button
+              onClick={() => setShowDuels(!showDuels)}
+              aria-expanded={showDuels}
+              className={cn(
+                'w-full flex items-center justify-between p-4',
+                'rounded-neo border-neo border-neo-black',
+                'bg-neo-navy shadow-hard hover:shadow-hard-lg transition-all',
+                'text-left',
+                'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <Swords className="w-6 h-6 text-neo-pink" />
+                <h2 className="text-2xl font-neo-display text-neo-white text-balance">
+                  {t('teacher.dashboard.duelActivity')}
+                </h2>
+                <span className="px-2 py-1 bg-neo-pink/20 text-neo-pink text-xs font-bold rounded-neo border border-neo-pink/50">
+                  {t('teacher.dashboard.live')}
+                </span>
+              </div>
+              {showDuels ? (
+                <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              ) : (
+                <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              )}
+            </button>
+
+            {showDuels && selectedClassroomId && (
+              <div className="mt-4">
+                <div className="p-6 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard">
+                  {classrooms.length > 1 && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <label className="text-neo-white font-neo-body">
+                        {t('teacher.dashboard.selectClassroom')}:
+                      </label>
+                      <select
+                        value={selectedClassroomId}
+                        onChange={(e) => setSelectedClassroomId(e.target.value)}
+                        className={cn(
+                          'px-4 py-2 bg-neo-navy border-neo border-neo-black',
+                          'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
+                          'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                        )}
+                      >
+                        {classrooms.map((classroom) => (
+                          <option key={classroom.id} value={classroom.id}>
+                            {classroom.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  <DuelMonitoringPanel classroomId={selectedClassroomId} />
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
         {/* Classrooms Section - Collapsible */}
         <section className="mb-8">
           <button
@@ -211,6 +364,19 @@ export default function TeacherDashboard() {
           </p>
         </div>
       </div>
+
+      {/* Assignment Creator Dialog */}
+      {selectedClassroomId && (
+        <AssignmentCreator
+          classroomId={selectedClassroomId}
+          isOpen={showAssignmentCreator}
+          onClose={() => setShowAssignmentCreator(false)}
+          onComplete={() => {
+            setShowAssignmentCreator(false);
+            // Assignments will auto-refresh via useAssignments hook
+          }}
+        />
+      )}
     </div>
   );
 }
