@@ -34,10 +34,10 @@ Student-vs-student competition — the centerpiece feature.
 
 Diverse vocabulary practice beyond flashcards and board play.
 
-- [ ] **PRAC-01**: User can practice word matching — drag-and-drop or tap to pair words with definitions, with instant feedback and scoring
-- [ ] **PRAC-02**: User can practice spelling challenge — see definition, type the correct word, with progressive difficulty and hints
-- [ ] **PRAC-03**: User can play timed blitz — 60-second speed round cycling through vocabulary with combo multipliers
-- [ ] **PRAC-04**: User can select practice mode from a mode selector UI showing all available modes with descriptions and progress per mode
+- [x] **PRAC-01**: User can practice word matching — drag-and-drop or tap to pair words with definitions, with instant feedback and scoring
+- [x] **PRAC-02**: User can practice spelling challenge — see definition, type the correct word, with progressive difficulty and hints
+- [x] **PRAC-03**: User can play timed blitz — 60-second speed round cycling through vocabulary with combo multipliers
+- [x] **PRAC-04**: User can select practice mode from a mode selector UI showing all available modes with descriptions and progress per mode
 
 ### Gamification (GAMF)
 
@@ -54,8 +54,8 @@ Visual improvements across all education pages.
 
 - [x] **UIPOL-01**: Student dashboard overhaul — engaging layout with activity feed, duel invites widget, streak calendar, quick-play buttons, progress visualization
 - [x] **UIPOL-02**: Teacher dashboard UX improvements — faster navigation, better analytics layout, assignment tracking panel, student duel monitoring
-- [ ] **UIPOL-03**: Practice experience polish — better feedback animations, progress indicators, mode transitions, session completion summaries
-- [ ] **UIPOL-04**: Neo-brutalist consistency audit — ensure all education pages follow design system (hard shadows, chunky borders, Fredoka/Rubik typography, proper color palette)
+- [x] **UIPOL-03**: Practice experience polish — better feedback animations, progress indicators, mode transitions, session completion summaries
+- [x] **UIPOL-04**: Neo-brutalist consistency audit — ensure all education pages follow design system (hard shadows, chunky borders, Fredoka/Rubik typography, proper color palette)
 
 ### Teacher Workflows (TEACH)
 
@@ -118,20 +118,20 @@ These features were identified in research but deferred to future milestones:
 | PRAC-02 | Phase 37 | Complete |
 | PRAC-03 | Phase 37 | Complete |
 | PRAC-04 | Phase 37 | Complete |
-| GAMF-01 | Phase 40 | Pending |
-| GAMF-02 | Phase 40 | Pending |
-| GAMF-03 | Phase 40 | Pending |
-| GAMF-04 | Phase 40 | Pending |
-| UIPOL-01 | Phase 41 | Pending |
-| UIPOL-02 | Phase 42 | Pending |
-| UIPOL-03 | Phase 43 | Pending |
-| UIPOL-04 | Phase 43 | Pending |
-| TEACH-01 | Phase 42 | Pending |
-| TEACH-02 | Phase 42 | Pending |
-| TEACH-03 | Phase 42 | Pending |
-| SOC-01 | Phase 41 | Pending |
+| GAMF-01 | Phase 40 | Complete |
+| GAMF-02 | Phase 40 | Complete |
+| GAMF-03 | Phase 40 | Complete |
+| GAMF-04 | Phase 40 | Complete |
+| UIPOL-01 | Phase 41 | Complete |
+| UIPOL-02 | Phase 42 | Complete |
+| UIPOL-03 | Phase 43 | Complete |
+| UIPOL-04 | Phase 43 | Complete |
+| TEACH-01 | Phase 42 | Complete |
+| TEACH-02 | Phase 42 | Complete |
+| TEACH-03 | Phase 42 | Complete |
+| SOC-01 | Phase 41 | Complete |
 | SOC-02 | Phase 38 | Complete |
-| SOC-03 | Phase 41 | Pending |
+| SOC-03 | Phase 41 | Complete |
 
 ---
 
