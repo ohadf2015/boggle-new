@@ -43,6 +43,8 @@ export function SpellingChallengePractice({
     getHint,
     submitAnswer,
     currentStreak,
+    maxStreak,
+    hintsUsed,
     correctCount,
     attempts,
     accuracy,
@@ -53,6 +55,8 @@ export function SpellingChallengePractice({
   const [inputValue, setInputValue] = useState('');
   const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [totalHintsUsed, setTotalHintsUsed] = useState(0);
+  const sessionStartRef = useRef<number>(Date.now());
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus input on mount and word change
@@ -92,13 +96,22 @@ export function SpellingChallengePractice({
     setShowResults(false);
     setFeedback(null);
     setInputValue('');
+    setTotalHintsUsed(0);
+    sessionStartRef.current = Date.now();
   }, [resetGame]);
 
   const handleComplete = useCallback(() => {
     onComplete({ correct: correctCount, total: attempts, accuracy });
   }, [correctCount, attempts, accuracy, onComplete]);
 
+  // Track hints used across all words
+  useEffect(() => {
+    setTotalHintsUsed(prev => prev + hintsUsed);
+  }, [wordIndex]); // Update when word changes
+
   if (showResults) {
+    const timeSpent = Math.floor((Date.now() - sessionStartRef.current) / 1000);
+
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
         <PracticeResultsCard
@@ -106,6 +119,9 @@ export function SpellingChallengePractice({
           total={attempts}
           onRestart={handleRestart}
           onBack={handleComplete}
+          timeSpent={timeSpent}
+          maxStreak={maxStreak}
+          hintsUsed={totalHintsUsed}
         />
       </div>
     );
