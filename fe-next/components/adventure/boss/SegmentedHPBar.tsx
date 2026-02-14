@@ -213,10 +213,10 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
   }, [hpPercentage]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-3">
+    <div className="w-full">
       {/* Header: Boss name + Phase indicator */}
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="font-neo-display text-lg font-bold text-neo-white">
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="font-neo-display text-sm sm:text-base font-bold text-neo-white truncate">
           {t(bossName) || bossName}
         </h2>
         <PhaseIndicator phase={phase} />
@@ -230,7 +230,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         aria-valuenow={hpPercentage}
         aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}
         data-testid="segmented-hp-bar"
-        className="relative w-full h-8 border-3 border-neo-black rounded-neo shadow-hard overflow-hidden flex"
+        className="relative w-full h-6 sm:h-7 border-3 border-neo-black rounded-neo shadow-hard overflow-hidden flex"
       >
         {/* Segments */}
         {segmentFills.map(segment => (
@@ -249,7 +249,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 
         {/* HP text overlay */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="font-neo-display text-sm font-bold text-neo-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-20">
+          <span className="font-neo-display text-xs sm:text-sm font-bold text-neo-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-20">
             {Math.max(0, currentHP)} / {maxHP}
           </span>
         </div>
