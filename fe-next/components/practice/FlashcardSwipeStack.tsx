@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useSwipeGesture, SwipeDirection } from '@/hooks/useSwipeGesture';
@@ -166,9 +166,9 @@ export function FlashcardSwipeStack({
         ))}
 
         {/* Current draggable card */}
-        <AnimatePresence mode="wait">
+        <AdaptiveAnimatePresence mode="wait">
           {currentWord && (
-            <motion.div
+            <AdaptiveMotion.div
               key={currentWord.word}
               className="absolute inset-x-0 top-0 h-full cursor-grab active:cursor-grabbing"
               drag={showDefinition ? 'x' : false}
@@ -213,9 +213,9 @@ export function FlashcardSwipeStack({
                   </div>
                 </div>
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* Progress indicator */}

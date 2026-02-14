@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -59,9 +59,9 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
   };
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {isVisible && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -77,7 +77,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
           )}
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -115,7 +115,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
               {/* Swipe direction indicators */}
               <div className="flex items-center justify-center gap-8 mb-6">
                 {/* Left indicator (Don't Know) */}
-                <motion.div
+                <AdaptiveMotion.div
                   data-testid="swipe-left-indicator"
                   className="flex flex-col items-center gap-2"
                   animate={{ x: [0, -10, 0] }}
@@ -134,10 +134,10 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                       {t('education.practice.dontKnow') || "Don't Know"}
                     </span>
                   </div>
-                </motion.div>
+                </AdaptiveMotion.div>
 
                 {/* Animated hand showing swipe gesture */}
-                <motion.div
+                <AdaptiveMotion.div
                   className="relative"
                   animate={{ x: [-30, 30, -30] }}
                   transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
@@ -145,10 +145,10 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   <div className="w-16 h-16 rounded-neo bg-neo-white/10 flex items-center justify-center">
                     <span className="text-4xl">👆</span>
                   </div>
-                </motion.div>
+                </AdaptiveMotion.div>
 
                 {/* Right indicator (Got It) */}
-                <motion.div
+                <AdaptiveMotion.div
                   data-testid="swipe-right-indicator"
                   className="flex flex-col items-center gap-2"
                   animate={{ x: [0, 10, 0] }}
@@ -167,7 +167,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                       {t('education.practice.gotIt') || 'Got It'}
                     </span>
                   </div>
-                </motion.div>
+                </AdaptiveMotion.div>
               </div>
 
               {/* Dismiss button */}
@@ -185,10 +185,10 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                 {t('common.gotIt') || 'Got it!'}
               </Button>
             </div>
-          </motion.div>
-        </motion.div>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 });
 

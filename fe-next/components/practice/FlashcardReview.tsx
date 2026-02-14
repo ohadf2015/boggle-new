@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -181,13 +181,13 @@ export default function FlashcardReview({
       <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
         <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
           <CardContent className="p-8 text-center">
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
               <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
-            </motion.div>
+            </AdaptiveMotion.div>
 
             <h2 className="text-2xl font-neo-display text-neo-white mb-2">
               {t('education.practice.complete') || 'Practice Complete!'}
@@ -368,7 +368,7 @@ export default function FlashcardReview({
         {/* Progress bar and auto-pronounce option */}
         <div className="mb-8">
           <div className="h-2 bg-neo-black/30 rounded-full mb-3 overflow-hidden">
-            <motion.div
+            <AdaptiveMotion.div
               className="h-full bg-neo-cyan"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
@@ -399,8 +399,8 @@ export default function FlashcardReview({
           className="relative h-64 sm:h-80 perspective-1000 cursor-pointer mb-8"
           onClick={handleFlip}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
+          <AdaptiveAnimatePresence mode="wait">
+            <AdaptiveMotion.div
               key={`${currentIndex}-${isFlipped}`}
               initial={{ rotateY: isFlipped ? -180 : 0, opacity: 0 }}
               animate={{ rotateY: 0, opacity: 1 }}
@@ -449,8 +449,8 @@ export default function FlashcardReview({
                   )}
                 </CardContent>
               </Card>
-            </motion.div>
-          </AnimatePresence>
+            </AdaptiveMotion.div>
+          </AdaptiveAnimatePresence>
         </div>
 
         {/* Answer buttons */}

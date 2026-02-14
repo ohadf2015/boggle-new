@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -164,7 +164,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
             data-testid="practice-progress-bar"
             className="h-1.5 bg-neo-black/30 rounded-full overflow-hidden"
           >
-            <motion.div
+            <AdaptiveMotion.div
               className="h-full bg-neo-cyan"
               initial={{ width: 0 }}
               animate={{ width: `${Math.min(100, Math.max(0, progress))}%` }}

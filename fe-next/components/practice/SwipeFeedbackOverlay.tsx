@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, MotionValue, useTransform } from 'framer-motion';
+import { MotionValue, useTransform } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
@@ -38,7 +39,7 @@ export function SwipeFeedbackOverlay({
   return (
     <div className={cn('pointer-events-none absolute inset-0 z-10', className)}>
       {/* Got It - Right swipe (Green) */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           'absolute inset-0 flex items-center justify-center',
           'bg-green-500/20 border-4 border-green-500 rounded-neo',
@@ -52,10 +53,10 @@ export function SwipeFeedbackOverlay({
             {t('education.lesson.gotIt')}
           </span>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Don't Know - Left swipe (Red) */}
-      <motion.div
+      <AdaptiveMotion.div
         className={cn(
           'absolute inset-0 flex items-center justify-center',
           'bg-red-500/20 border-4 border-red-500 rounded-neo',
@@ -69,7 +70,7 @@ export function SwipeFeedbackOverlay({
             {t('education.lesson.dontKnow')}
           </span>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     </div>
   );
 }

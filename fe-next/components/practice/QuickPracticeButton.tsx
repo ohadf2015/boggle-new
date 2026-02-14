@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -186,9 +186,9 @@ export function QuickPracticeButton({
       </Button>
 
       {/* Dropdown menu */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {isOpen && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, y: -8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -234,9 +234,9 @@ export function QuickPracticeButton({
                 </button>
               );
             })}
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }
