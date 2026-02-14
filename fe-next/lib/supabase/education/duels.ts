@@ -430,34 +430,3 @@ export async function getPendingDuelsForStudent(
     return { data: [], error: { message: error } };
   }
 }
-
-/**
- * Get active duels for a student (where they are challenger or opponent)
- * @param studentId - Student UUID
- * @returns Array of active duel rows or error
- */
-export async function getActiveDuelsForStudent(
-  studentId: string
-): Promise<{ data: DuelRow[]; error: { message: string } | null }> {
-  try {
-    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
-
-    const { data: duels, error } = await supabase
-      .from('student_duels')
-      .select('*')
-      .eq('status', 'active')
-      .or(`challenger_id.eq.${studentId},opponent_id.eq.${studentId}`)
-      .order('started_at', { ascending: false });
-
-    if (error) {
-      logger.error('Error fetching active duels:', error);
-      return { data: [], error: { message: error.message } };
-    }
-
-    return { data: (duels || []) as DuelRow[], error: null };
-  } catch (err) {
-    const error = err instanceof Error ? err.message : 'Unknown error';
-    logger.error('Exception in getActiveDuelsForStudent:', error);
-    return { data: [], error: { message: error } };
-  }
-}

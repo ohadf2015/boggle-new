@@ -11,7 +11,6 @@ import {
   getDuelStats,
   submitDuelTurn,
   getPendingDuelsForStudent,
-  getActiveDuelsForStudent,
   type DuelRow,
   type DuelTurnRow,
   type CreateDuelData,
@@ -512,27 +511,6 @@ describe('Duel CRUD Operations', () => {
       expect(mockSupabase.from).toHaveBeenCalledWith('student_duels');
       expect(mockSupabase.eq).toHaveBeenCalledWith('opponent_id', 'student-123');
       expect(mockSupabase.eq).toHaveBeenCalledWith('status', 'pending');
-    });
-  });
-
-  describe('getActiveDuelsForStudent', () => {
-    it('should fetch active duels where student is participant', async () => {
-      const mockActiveDuels = [
-        { id: 'duel-1', status: 'active', challenger_id: 'student-123' },
-        { id: 'duel-2', status: 'active', opponent_id: 'student-123' },
-      ];
-
-      mockSupabase.order.mockResolvedValue({
-        data: mockActiveDuels,
-        error: null,
-      });
-
-      const result = await getActiveDuelsForStudent('student-123');
-
-      expect(result.data).toHaveLength(2);
-      expect(result.error).toBeNull();
-      expect(mockSupabase.from).toHaveBeenCalledWith('student_duels');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('status', 'active');
     });
   });
 });
