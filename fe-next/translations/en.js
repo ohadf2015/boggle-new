@@ -5282,6 +5282,39 @@ const en = {
         "alreadyAssigned": "This lesson is already assigned to this classroom"
       }
     },
+    "assignment": {
+      "createTitle": "Create Assignment",
+      "create": "Create Assignment",
+      "creating": "Creating...",
+      "created": "Assignment created!",
+      "error": "Failed to create assignment",
+      "missingFields": "Please select a lesson and due date",
+      "typeLabel": "Assignment Type",
+      "practiceMode": "Practice Mode",
+      "duelChallenge": "Duel Challenge",
+      "lessonLabel": "Select Lesson",
+      "selectLesson": "Choose a lesson",
+      "words": "words",
+      "dueDate": "Due Date",
+      "selectDate": "Select due date",
+      "quickSelect": "Quick Select",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "nextWeek": "Next Week",
+      "nextMonth": "Next Month",
+      "customDate": "Custom Date",
+      "instructionsLabel": "Instructions",
+      "instructionsPlaceholder": "Add optional instructions for students..."
+    },
+    "completion": {
+      "overallProgress": "Overall Progress",
+      "studentsCompleted": "students completed",
+      "student": "Student",
+      "notCompleted": "Not completed",
+      "strugglingAreas": "Struggling Areas",
+      "studentsMissed": "students missed",
+      "noStrugglingAreas": "No struggling areas identified yet"
+    },
     "progress": {
       "title": "Student Progress",
       "student": "Student",
