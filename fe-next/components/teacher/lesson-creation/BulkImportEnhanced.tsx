@@ -13,13 +13,12 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
-import { containsHebrew } from '@/lib/supabase/education/types';
+import { containsHebrew, type Language, type VocabularyWord } from '@/lib/supabase/education/types';
 import { sanitizeWord } from '@/shared/utils/wordNormalization';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, CheckCircle, AlertCircle, Upload, FileUp } from 'lucide-react';
-import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 
 // ============================================
 // TYPES

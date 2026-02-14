@@ -56,8 +56,14 @@ export function SpellingChallengePractice({
   const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [totalHintsUsed, setTotalHintsUsed] = useState(0);
-  const sessionStartRef = useRef<number>(Date.now());
+  const [timeSpent, setTimeSpent] = useState(0);
+  const sessionStartRef = useRef<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize session start time
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+  }, []);
 
   // Focus input on mount and word change
   useEffect(() => {
@@ -69,6 +75,7 @@ export function SpellingChallengePractice({
   // Show results when complete
   useEffect(() => {
     if (isComplete && !showResults) {
+      setTimeSpent(Math.floor((Date.now() - sessionStartRef.current) / 1000));
       setTimeout(() => setShowResults(true), 500);
     }
   }, [isComplete, showResults]);
@@ -97,6 +104,7 @@ export function SpellingChallengePractice({
     setFeedback(null);
     setInputValue('');
     setTotalHintsUsed(0);
+    setTimeSpent(0);
     sessionStartRef.current = Date.now();
   }, [resetGame]);
 
@@ -104,14 +112,13 @@ export function SpellingChallengePractice({
     onComplete({ correct: correctCount, total: attempts, accuracy });
   }, [correctCount, attempts, accuracy, onComplete]);
 
-  // Track hints used across all words
+  // Track hints used across all words — intentionally fires on word transition only
   useEffect(() => {
     setTotalHintsUsed(prev => prev + hintsUsed);
-  }, [wordIndex]); // Update when word changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wordIndex]);
 
   if (showResults) {
-    const timeSpent = Math.floor((Date.now() - sessionStartRef.current) / 1000);
-
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
         <PracticeResultsCard
