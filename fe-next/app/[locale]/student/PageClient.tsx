@@ -21,7 +21,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import StudentLessonView from '@/components/student/StudentLessonView';
 import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
-import { ClassroomLeaderboard } from '@/components/education/ClassroomLeaderboard';
+import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
 import { ChallengePanel } from '@/components/education/challenges/ChallengePanel';
 import { MilestoneTracker } from '@/components/education/milestones/MilestoneTracker';
 import { MilestoneCelebration, type MilestonePayload } from '@/components/education/milestones/MilestoneCelebration';
@@ -81,7 +81,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
   const { topThree, currentUserRank, isLoading: leaderboardLoading } = useClassroomLeaderboard({
     classroomId,
     currentUserId: userId,
-    timeScope: 'all-time',
+    initialTimeScope: 'all-time',
   });
 
   const { currentStreak, isLoaded: streakLoaded } = useWinStreak();
