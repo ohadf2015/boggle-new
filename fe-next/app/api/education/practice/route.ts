@@ -278,10 +278,10 @@ export async function PATCH(request: NextRequest) {
 
     const { sessionId, completed, ...updateData } = parseResult.data;
 
-    // Verify user owns the session
+    // Verify user owns the session + idempotency guard
     const { data: existing, error: existingError } = await supabase
       .from('practice_sessions')
-      .select('id, student_id')
+      .select('id, student_id, completed_at')
       .eq('id', sessionId)
       .eq('student_id', user.id)
       .single();
@@ -291,6 +291,11 @@ export async function PATCH(request: NextRequest) {
         { error: 'Session not found or not authorized' },
         { status: 403 }
       );
+    }
+
+    // Idempotency guard: if already completed, return existing session without re-awarding XP
+    if (existing.completed_at) {
+      return NextResponse.json({ session: existing });
     }
 
     // Build update object with snake_case keys
@@ -313,12 +318,31 @@ export async function PATCH(request: NextRequest) {
       .from('practice_sessions')
       .update(updateObj)
       .eq('id', sessionId)
-      .select()
+      .select('*')
       .single();
 
     if (error) {
       logger.error('Error updating session:', error);
       return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
+    }
+
+    // Award XP to student_lesson_progress when session is completed with XP
+    if (completed && session.xp_awarded && session.xp_awarded > 0) {
+      const { error: xpError } = await supabase.rpc('award_education_xp', {
+        p_student_id: session.student_id,
+        p_xp_amount: session.xp_awarded,
+        p_lesson_id: session.lesson_id,
+      });
+
+      if (xpError) {
+        logger.error('Failed to award education XP:', xpError);
+        // Don't fail the request - session already saved, XP can be backfilled
+      } else {
+        logger.info(
+          'EDUCATION',
+          `Awarded ${session.xp_awarded} XP to student ${session.student_id} for lesson ${session.lesson_id}`
+        );
+      }
     }
 
     return NextResponse.json({ session });
