@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -253,6 +254,22 @@ export default function StudentProfilePageClient() {
               </div>
             </>
           )}
+        </div>
+
+        {/* Achievement Section Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-neo-display font-bold text-neo-white">
+            {t('student.dashboard.achievements')}
+          </h2>
+          <Link
+            href={`/${language}/student/achievements`}
+            className={cn(
+              'text-neo-cyan hover:text-neo-cyan/80 font-neo-body text-sm',
+              'transition-colors underline underline-offset-4'
+            )}
+          >
+            {t('student.dashboard.viewAll')} →
+          </Link>
         </div>
 
         {/* Achievement Grid */}
