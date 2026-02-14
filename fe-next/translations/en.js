@@ -6222,6 +6222,7 @@ const en = {
   "challengeReceived": "Challenge Received!",
   "challengeSent": "Challenge Sent!",
   "challengedYou": "challenged you!",
+  "classmates": "Classmates",
   "decline": "Decline",
   "duelLobbyTitle": "Duel Arena",
   "duelNotFound": "Duel not found",

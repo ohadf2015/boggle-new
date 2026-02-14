@@ -2807,6 +2807,7 @@ const ja = {
   "challengePlayer": "プレイヤーに挑戦",
   "challengeReceived": "挑戦を受けた！",
   "challengeSent": "挑戦状を送った！",
+  "classmates": "クラスメート",
   "decline": "辞退",
   "duelLobbyTitle": "デュエルアリーナ",
   "history": "履歴",

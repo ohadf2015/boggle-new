@@ -6229,6 +6229,7 @@ const sv = {
   "challengeReceived": "Utmaning mottagen!",
   "challengeSent": "Utmaning skickad!",
   "challengedYou": "utmanade dig",
+  "classmates": "Klasskamrater",
   "decline": "Neka",
   "duelLobbyTitle": "Duellarena",
   "duelNotFound": "Duellen hittades inte",

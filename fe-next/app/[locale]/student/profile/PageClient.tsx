@@ -24,6 +24,8 @@ import { getDuelStats, getDuelHistory, type DuelHistoryEntry, type DuelStatsResu
 import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
+import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
+import { getStudentClassroom, getClassroomStudents, getLessons as getStudentLessons, type Classroom, type ClassroomStudent, type VocabularyLesson } from '@/lib/supabase/education';
 
 export default function StudentProfilePageClient() {
   const { user, isAuthenticated, profile, loading } = useAuth();
@@ -37,6 +39,9 @@ export default function StudentProfilePageClient() {
   const [recentDuels, setRecentDuels] = useState<DuelHistoryEntry[]>([]);
   const [isLoadingDuels, setIsLoadingDuels] = useState(true);
   const { lessons, isLoading: isLoadingProgress } = useStudentProgress();
+  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classmates, setClassmates] = useState<ClassroomStudent[]>([]);
+  const [classroomLessons, setClassroomLessons] = useState<VocabularyLesson[]>([]);
 
   // Get student XP and level from first lesson progress
   const studentProgress = lessons.length > 0 ? lessons[0].progress : null;
@@ -160,6 +165,33 @@ export default function StudentProfilePageClient() {
     }
 
     fetchDuelData();
+  }, [user]);
+
+  // Fetch classroom and classmates data
+  useEffect(() => {
+    async function fetchClassroomData() {
+      if (!user) return;
+
+      const [classroomRes, lessonsRes] = await Promise.all([
+        getStudentClassroom(user.id),
+        getStudentLessons(user.id),
+      ]);
+
+      if (classroomRes.data) {
+        setClassroom(classroomRes.data);
+        // Fetch classmates once classroom is known
+        const studentsRes = await getClassroomStudents(classroomRes.data.id);
+        if (studentsRes.data) {
+          setClassmates(studentsRes.data);
+        }
+      }
+
+      if (lessonsRes.data) {
+        setClassroomLessons(lessonsRes.data);
+      }
+    }
+
+    fetchClassroomData();
   }, [user]);
 
   // Show loader during auth check or while auth is loading
@@ -410,6 +442,22 @@ export default function StudentProfilePageClient() {
                   </motion.div>
                 )}
               </div>
+
+              {/* Challenge Classmate */}
+              {classroom && classmates.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-neo-display font-bold text-neo-white mb-3">
+                    {t('duels.challengeClassmate')}
+                  </h3>
+                  <ClassmatesList
+                    classmates={classmates}
+                    classroomId={classroom.id}
+                    lessons={classroomLessons.map(l => ({ id: l.id, name: l.name }))}
+                    currentUserId={user.id}
+                    maxItems={5}
+                  />
+                </div>
+              )}
 
               {/* Recent Duels */}
               {recentDuels.length > 0 && (

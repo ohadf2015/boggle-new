@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Swords, Trophy } from 'lucide-react';
+import { Swords, Trophy, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DuelLobby, DuelHistory, DuelNotification } from '@/components/education/duels';
-import { getStudentClassroom, getLessons, type Classroom, type VocabularyLesson } from '@/lib/supabase/education';
+import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
+import { getStudentClassroom, getLessons, getClassroomStudents, type Classroom, type VocabularyLesson, type ClassroomStudent } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
 
-type Tab = 'lobby' | 'history';
+type Tab = 'lobby' | 'history' | 'classmates';
 
 export default function DuelsPageClient() {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ export default function DuelsPageClient() {
   const [activeTab, setActiveTab] = useState<Tab>('lobby');
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
+  const [classmates, setClassmates] = useState<ClassroomStudent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +29,12 @@ export default function DuelsPageClient() {
         getStudentClassroom(user!.id),
         getLessons(user!.id),
       ]);
-      if (classroomRes.data) setClassroom(classroomRes.data);
+      if (classroomRes.data) {
+        setClassroom(classroomRes.data);
+        // Fetch classmates when classroom is available
+        const studentsRes = await getClassroomStudents(classroomRes.data.id);
+        if (studentsRes.data) setClassmates(studentsRes.data);
+      }
       if (lessonsRes.data) setLessons(lessonsRes.data);
       setLoading(false);
     }
@@ -58,6 +65,7 @@ export default function DuelsPageClient() {
   const tabs: { id: Tab; label: string; icon: typeof Swords }[] = [
     { id: 'lobby', label: t('lobby'), icon: Swords },
     { id: 'history', label: t('history'), icon: Trophy },
+    { id: 'classmates', label: t('classmates'), icon: Users },
   ];
 
   const lessonOptions = lessons.map((l) => ({ id: l.id, name: l.name }));
@@ -95,6 +103,14 @@ export default function DuelsPageClient() {
         />
       )}
       {activeTab === 'history' && <DuelHistory studentId={user.id} />}
+      {activeTab === 'classmates' && (
+        <ClassmatesList
+          classmates={classmates}
+          classroomId={classroom.id}
+          lessons={lessonOptions}
+          currentUserId={user.id}
+        />
+      )}
     </div>
   );
 }

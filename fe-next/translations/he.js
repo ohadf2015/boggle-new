@@ -6204,6 +6204,7 @@ const he = {
   "challengeReceived": "התקבל אתגר! ⚔️",
   "challengeSent": "האתגר נשלח! 🚀",
   "challengedYou": "אתגר אותך",
+  "classmates": "חברים לכיתה",
   "decline": "דחה",
   "duelLobbyTitle": "זירת הדו-קרב",
   "duelNotFound": "הדו-קרב לא נמצא",
