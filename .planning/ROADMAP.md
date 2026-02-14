@@ -137,11 +137,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 42-01-PLAN.md — Assignment data layer: DB migration, types, CRUD functions, useAssignments hook
-- [ ] 42-02-PLAN.md — Lesson creation enhancements: TemplateLessonSelector + BulkImportEnhanced
-- [ ] 42-03-PLAN.md — Assignment UI: AssignmentCreator + AssignmentTrackingPanel + CompletionTracker
-- [ ] 42-04-PLAN.md — Dashboard integration: DuelMonitoringPanel + wire assignments/templates into dashboard
-- [ ] 42-05-PLAN.md — Translations (4 languages) for all new teacher workflow UI text
+- [x] 42-01-PLAN.md — Assignment data layer: DB migration, types, CRUD functions, useAssignments hook
+- [x] 42-02-PLAN.md — Lesson creation enhancements: TemplateLessonSelector + BulkImportEnhanced
+- [x] 42-03-PLAN.md — Assignment UI: AssignmentCreator + AssignmentTrackingPanel + CompletionTracker
+- [x] 42-04-PLAN.md — Dashboard integration: DuelMonitoringPanel + wire assignments/templates into dashboard
+- [x] 42-05-PLAN.md — Translations (4 languages) for all new teacher workflow UI text
 
 ### Phase 43: Practice Experience & Design Polish
 **Goal**: Practice experience delivers polished feedback animations and all education pages follow neo-brutalist design system consistently

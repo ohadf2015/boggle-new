@@ -53,7 +53,7 @@ Deeper progression and competitive systems.
 Visual improvements across all education pages.
 
 - [x] **UIPOL-01**: Student dashboard overhaul — engaging layout with activity feed, duel invites widget, streak calendar, quick-play buttons, progress visualization
-- [ ] **UIPOL-02**: Teacher dashboard UX improvements — faster navigation, better analytics layout, assignment tracking panel, student duel monitoring
+- [x] **UIPOL-02**: Teacher dashboard UX improvements — faster navigation, better analytics layout, assignment tracking panel, student duel monitoring
 - [ ] **UIPOL-03**: Practice experience polish — better feedback animations, progress indicators, mode transitions, session completion summaries
 - [ ] **UIPOL-04**: Neo-brutalist consistency audit — ensure all education pages follow design system (hard shadows, chunky borders, Fredoka/Rubik typography, proper color palette)
 
@@ -61,9 +61,9 @@ Visual improvements across all education pages.
 
 Improved teacher tools and workflows.
 
-- [ ] **TEACH-01**: Teacher can create lessons faster — bulk word import improvements, template lessons, streamlined word editor
-- [ ] **TEACH-02**: Teacher can assign practice modes and duels to students — set specific activities, due dates, and track completion status
-- [ ] **TEACH-03**: Teacher can view assignment dashboard showing per-student completion rates, scores, and struggling areas
+- [x] **TEACH-01**: Teacher can create lessons faster — bulk word import improvements, template lessons, streamlined word editor
+- [x] **TEACH-02**: Teacher can assign practice modes and duels to students — set specific activities, due dates, and track completion status
+- [x] **TEACH-03**: Teacher can view assignment dashboard showing per-student completion rates, scores, and struggling areas
 
 ### Student Social (SOC)
 
