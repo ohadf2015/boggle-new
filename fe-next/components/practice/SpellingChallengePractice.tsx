@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -130,9 +130,18 @@ export function SpellingChallengePractice({
             <h2 className="text-xl font-neo-display text-neo-white mb-1">
               {t('education.practice.spellTheWord') || 'Spelling Challenge'}
             </h2>
-            <p className="text-neo-white/70 font-neo-body" data-testid="progress-text">
-              {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
-            </p>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-neo-white/70 font-neo-body" data-testid="progress-text">
+                {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
+              </p>
+              <div className="h-1 w-20 bg-neo-black/30 rounded-neo overflow-hidden">
+                <AdaptiveMotion.div
+                  className="h-full bg-neo-cyan"
+                  animate={{ width: `${(wordIndex / totalWords) * 100}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="w-10" />
@@ -143,7 +152,7 @@ export function SpellingChallengePractice({
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Streak display */}
         {currentStreak > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             data-testid="streak-display"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -154,12 +163,12 @@ export function SpellingChallengePractice({
             )}
           >
             {currentStreak}x {t('education.practice.streak') || 'Streak'}!
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* Definition card */}
-        <AnimatePresence mode="wait">
-          <motion.div
+        <AdaptiveAnimatePresence mode="wait">
+          <AdaptiveMotion.div
             key={wordIndex}
             initial={{ x: isRTL ? -20 : 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -176,8 +185,8 @@ export function SpellingChallengePractice({
             <p className="font-neo-body text-neo-white text-2xl text-center">
               {currentWord?.definition || t('education.practice.noWords') || 'No words available'}
             </p>
-          </motion.div>
-        </AnimatePresence>
+          </AdaptiveMotion.div>
+        </AdaptiveAnimatePresence>
 
         {/* Hint display */}
         <div
@@ -200,34 +209,46 @@ export function SpellingChallengePractice({
         </div>
 
         {/* Feedback display */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {feedback && (
-            <motion.div
+            <AdaptiveMotion.div
               data-testid="feedback-display"
               initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+              animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 1] }}
               exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.25, times: [0, 0.6, 1] }}
               className={cn(
                 'p-4 rounded-neo border-neo text-center',
                 feedback.correct
                   ? 'bg-neo-green/20 border-neo-green'
-                  : 'bg-neo-pink/20 border-neo-pink'
+                  : 'bg-neo-pink/20 border-neo-pink animate-neo-shake'
               )}
             >
               <div className="flex items-center justify-center gap-2 mb-1">
-                {feedback.correct ? (
-                  <Check className="w-6 h-6 text-neo-green" />
-                ) : (
-                  <X className="w-6 h-6 text-neo-pink" />
-                )}
-                <span className={cn(
-                  'font-neo-display text-lg',
-                  feedback.correct ? 'text-neo-green' : 'text-neo-pink'
-                )}>
+                <AdaptiveMotion.div
+                  initial={{ rotate: -180, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.2 }}
+                >
+                  {feedback.correct ? (
+                    <Check className="w-6 h-6 text-neo-green" />
+                  ) : (
+                    <X className="w-6 h-6 text-neo-pink" />
+                  )}
+                </AdaptiveMotion.div>
+                <AdaptiveMotion.span
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.15, duration: 0.15 }}
+                  className={cn(
+                    'font-neo-display text-lg',
+                    feedback.correct ? 'text-neo-green' : 'text-neo-pink'
+                  )}
+                >
                   {feedback.correct
                     ? (t('education.practice.correct') || 'Correct!')
                     : (t('education.practice.incorrect') || 'Incorrect')}
-                </span>
+                </AdaptiveMotion.span>
               </div>
               {!feedback.correct && (
                 <p className="text-neo-white/70 font-neo-body">
@@ -235,9 +256,9 @@ export function SpellingChallengePractice({
                   <span className="text-neo-white font-bold">{feedback.correctWord}</span>
                 </p>
               )}
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
 
         {/* Input form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

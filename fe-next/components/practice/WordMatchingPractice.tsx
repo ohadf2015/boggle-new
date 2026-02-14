@@ -248,9 +248,18 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               <h2 className="text-xl font-neo-display text-neo-white mb-1">
                 {t('education.practice.matchPairs') || 'Match Words & Definitions'}
               </h2>
-              <p className="text-neo-white/70 font-neo-body">
-                {matchedPairs.size} / {words.length}
-              </p>
+              <div className="flex flex-col items-center gap-1">
+                <p className="text-neo-white/70 font-neo-body">
+                  {matchedPairs.size} / {words.length}
+                </p>
+                <div className="h-1.5 w-24 bg-neo-black/30 rounded-neo overflow-hidden">
+                  <AdaptiveMotion.div
+                    className="h-full bg-neo-cyan"
+                    animate={{ width: `${(matchedPairs.size / words.length) * 100}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="w-10" /> {/* Spacer for centering */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Flame, Sparkles } from 'lucide-react';
@@ -159,10 +159,10 @@ export function TimedBlitzPractice({
       )}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <AnimatePresence mode="wait">
+      <AdaptiveAnimatePresence mode="wait">
         {/* COUNTDOWN PHASE */}
         {phase === 'countdown' && (
-          <motion.div
+          <AdaptiveMotion.div
             key="countdown"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -171,7 +171,7 @@ export function TimedBlitzPractice({
             className="text-center"
             data-testid="countdown-phase"
           >
-            <motion.div
+            <AdaptiveMotion.div
               key={countdown}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -183,13 +183,13 @@ export function TimedBlitzPractice({
               )}
             >
               {countdown}
-            </motion.div>
-          </motion.div>
+            </AdaptiveMotion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* PLAYING PHASE */}
         {phase === 'playing' && (
-          <motion.div
+          <AdaptiveMotion.div
             key="playing"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -211,10 +211,10 @@ export function TimedBlitzPractice({
               {/* Combo display */}
               <div data-testid="combo-display" className="flex items-center gap-2">
                 {combo > 0 && (
-                  <motion.div
+                  <AdaptiveMotion.div
                     data-testid="combo-badge"
                     initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                    animate={{ scale: [0, 1.3, 1] }}
                     transition={{ type: 'spring', stiffness: 300 }}
                     className={cn(
                       'px-4 py-2 rounded-neo',
@@ -227,13 +227,16 @@ export function TimedBlitzPractice({
                     <span className="font-neo-display text-neo-white text-xl">
                       {combo}x {t('education.practice.combo') || 'Combo'}!
                     </span>
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 )}
               </div>
 
               {/* Score */}
-              <div
+              <AdaptiveMotion.div
+                key={score}
                 data-testid="score-display"
+                animate={{ scale: [1, 1.15, 1] }}
+                transition={{ duration: 0.2 }}
                 className={cn(
                   'px-4 py-2 rounded-neo',
                   'bg-neo-yellow/20 border-neo border-neo-yellow',
@@ -241,11 +244,11 @@ export function TimedBlitzPractice({
                 )}
               >
                 {score}
-              </div>
+              </AdaptiveMotion.div>
             </div>
 
             {/* Center: Definition card */}
-            <motion.div
+            <AdaptiveMotion.div
               key={currentWord?.word || 'empty'}
               initial={{ x: isRTL ? -20 : 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -261,7 +264,7 @@ export function TimedBlitzPractice({
               <p className="font-neo-body text-neo-white text-2xl text-center">
                 {currentWord?.definition || t('education.practice.noWords') || 'No words available'}
               </p>
-            </motion.div>
+            </AdaptiveMotion.div>
 
             {/* Bottom: Input form */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -305,12 +308,12 @@ export function TimedBlitzPractice({
                 {t('education.practice.submit') || 'Submit'}
               </button>
             </form>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* TIME'S UP PHASE */}
         {phase === 'timesup' && (
-          <motion.div
+          <AdaptiveMotion.div
             key="timesup"
             initial={{ scale: 0, opacity: 0, rotate: -180 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -329,12 +332,12 @@ export function TimedBlitzPractice({
               {t('education.practice.timesUp') || "TIME'S UP!"}
             </div>
             <Sparkles className="w-12 h-12 text-neo-yellow mx-auto mt-4" />
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* RESULTS PHASE */}
         {phase === 'results' && (
-          <motion.div
+          <AdaptiveMotion.div
             key="results"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -348,9 +351,9 @@ export function TimedBlitzPractice({
               onRestart={handleRestart}
               onBack={onBack}
             />
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 }
