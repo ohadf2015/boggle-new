@@ -189,6 +189,10 @@ export async function getWeeklyQuests(
       .eq('week_start', targetWeek);
 
     if (error) {
+      // PGRST205 = table not found in schema cache (table hasn't been created yet)
+      if (error.code === 'PGRST205') {
+        return { data: [], error: null };
+      }
       logger.error('Error fetching weekly quests:', error);
       return { data: [], error: { message: error.message } };
     }
@@ -196,6 +200,10 @@ export async function getWeeklyQuests(
     return { data: (quests || []) as WeeklyQuestRow[], error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
+    // Suppress missing table errors
+    if (error.includes('weekly_quests') && error.includes('schema cache')) {
+      return { data: [], error: null };
+    }
     logger.error('Exception in getWeeklyQuests:', error);
     return { data: [], error: { message: error } };
   }
@@ -370,8 +378,15 @@ export async function claimQuestReward(
       .eq('id', questId)
       .single();
 
-    if (fetchError || !quest) {
+    if (fetchError) {
+      // PGRST205 = table not found (hasn't been created yet)
+      if (fetchError.code === 'PGRST205') {
+        return { data: null, error: { message: 'Weekly quests not available yet' } };
+      }
       logger.error('Error fetching quest:', fetchError);
+      return { data: null, error: { message: 'Quest not found' } };
+    }
+    if (!quest) {
       return { data: null, error: { message: 'Quest not found' } };
     }
 
@@ -391,7 +406,7 @@ export async function claimQuestReward(
     }
 
     // Mark as claimed
-    const { data: updated, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from('weekly_quests')
       .update({
         claimed: true,
@@ -401,6 +416,9 @@ export async function claimQuestReward(
       .single();
 
     if (updateError) {
+      if (updateError.code === 'PGRST205') {
+        return { data: null, error: { message: 'Weekly quests not available yet' } };
+      }
       logger.error('Error claiming quest:', updateError);
       return { data: null, error: { message: updateError.message } };
     }

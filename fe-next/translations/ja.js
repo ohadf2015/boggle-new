@@ -5087,7 +5087,9 @@ const ja = {
       "title": "ゲーム開始！",
       "teacherStarted": "{{teacher}}がクラスゲームを開始しました",
       "joinNow": "今すぐ参加",
-      "joining": "参加中..."
+      "joining": "参加中...",
+      "listening": "クラスルームゲームを待機中...",
+      "connecting": "クラスルームに接続中..."
     },
     "dashboard": {
       "title": "マイレッスン",

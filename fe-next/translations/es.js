@@ -5096,7 +5096,9 @@ const es = {
       "title": "Juego Activo",
       "teacherStarted": "Tu profesor inició un juego",
       "joinNow": "Unirse Ahora",
-      "joining": "Uniéndose..."
+      "joining": "Uniéndose...",
+      "listening": "Esperando juegos de clase...",
+      "connecting": "Conectando al aula..."
     },
     "practice": {
       "title": "Modo Práctica",

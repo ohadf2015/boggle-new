@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X, Users } from 'lucide-react';
+import { Play, X, Users, Radio } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { io, Socket } from 'socket.io-client';
@@ -25,11 +25,14 @@ interface ActiveGame {
   playerCount?: number;
 }
 
+/** Polling interval for active game discovery (ms) */
+const POLL_INTERVAL = 15_000;
+
 /**
  * ClassroomGameBanner - Notification banner for active classroom games
  *
  * Shows a prominent banner when a teacher starts a game in the student's classroom.
- * Provides a quick "Join Game" button for instant access.
+ * Uses WebSocket for instant notifications + polling fallback for reliability.
  */
 export function ClassroomGameBanner({
   classroomId,
@@ -41,27 +44,45 @@ export function ClassroomGameBanner({
   const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Request active games from server (used on connect, reconnect, and polling)
+  const requestActiveGames = useCallback((sock: Socket) => {
+    if (sock.connected) {
+      sock.emit('getActiveClassroomGames', { classroomId });
+    }
+  }, [classroomId]);
 
   useEffect(() => {
-    // Initialize Socket.IO connection
-    // Use shared socket URL to ensure production compatibility
-    // (production uses NEXT_PUBLIC_WS_URL, not /api/socket)
     const socketUrl = getSocketURL();
     const socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });
 
     socketInstance.on('connect', () => {
-      // Join classroom room to receive notifications
-      socketInstance.emit('getActiveClassroomGames', { classroomId });
+      setIsConnected(true);
+      // Join classroom room + fetch active games
+      requestActiveGames(socketInstance);
     });
 
-    // Listen for new games created
+    socketInstance.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
+    // Re-request on reconnect to catch games created while disconnected
+    socketInstance.io.on('reconnect', () => {
+      requestActiveGames(socketInstance);
+    });
+
+    // Listen for new games created (real-time)
     socketInstance.on('classroomGameCreated', (data: {
       gameCode: string;
       teacherName: string;
       lessonNames: string[];
     }) => {
+      setDismissed(false);
       setActiveGame({
         gameCode: data.gameCode,
         teacherName: data.teacherName,
@@ -69,10 +90,9 @@ export function ClassroomGameBanner({
       });
     });
 
-    // Listen for active games list
+    // Listen for active games list (response to getActiveClassroomGames)
     socketInstance.on('activeClassroomGames', (data: { games: ActiveGame[] }) => {
       if (data.games && data.games.length > 0) {
-        // Show the first active game
         setActiveGame(data.games[0]);
       }
     });
@@ -92,10 +112,19 @@ export function ClassroomGameBanner({
 
     setSocket(socketInstance);
 
+    // Polling fallback: periodically check for active games
+    // Catches games missed due to timing or brief disconnects
+    pollIntervalRef.current = setInterval(() => {
+      requestActiveGames(socketInstance);
+    }, POLL_INTERVAL);
+
     return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
       socketInstance.disconnect();
     };
-  }, [classroomId]);
+  }, [classroomId, requestActiveGames]);
 
   const handleJoinGame = () => {
     if (!activeGame || !socket) return;
@@ -114,10 +143,37 @@ export function ClassroomGameBanner({
   };
 
   const handleDismiss = () => {
+    setDismissed(true);
     setActiveGame(null);
   };
 
-  if (!activeGame) return null;
+  // Always show the "listening" indicator even when no game is active
+  if (!activeGame) {
+    return (
+      <div className={cn(
+        'flex items-center gap-2 px-4 py-3 rounded-neo border-neo',
+        isConnected
+          ? 'border-neo-cyan/30 bg-neo-cyan/5'
+          : 'border-neo-orange/30 bg-neo-orange/5'
+      )}>
+        <Radio className={cn(
+          'w-4 h-4 flex-shrink-0',
+          isConnected ? 'text-neo-cyan animate-pulse' : 'text-neo-orange'
+        )} />
+        <span className={cn(
+          'text-sm font-neo-body',
+          isConnected ? 'text-neo-white/60' : 'text-neo-orange/80'
+        )}>
+          {isConnected
+            ? t('student.activeGame.listening')
+            : t('student.activeGame.connecting')
+          }
+        </span>
+      </div>
+    );
+  }
+
+  if (dismissed) return null;
 
   return (
     <AnimatePresence>

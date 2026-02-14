@@ -525,10 +525,40 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   );
 }
 
+// No-op stub returned when provider is unavailable (e.g., during SSR edge cases)
+const NOOP = () => {};
+const SOUND_EFFECTS_FALLBACK: SoundEffectsContextType = {
+  sfxVolume: 0.7,
+  sfxMuted: true,
+  isGameActive: false,
+  setSfxVolume: NOOP,
+  toggleSfxMute: NOOP,
+  setGameActive: NOOP,
+  playSound: NOOP,
+  playComboSound: NOOP,
+  playAchievementSound: NOOP,
+  playWordAcceptedSound: NOOP,
+  playCountdownBeep: NOOP,
+  playMessageSound: NOOP,
+  playErrorSound: NOOP,
+  playComboMilestoneSound: NOOP,
+  playComboBreakSound: NOOP,
+  playComboSavedSound: NOOP,
+  playEarthquakeRumble: NOOP,
+  playEarthquakeShake: NOOP,
+  playFireRoundStart: NOOP,
+  startFireCrackleLoop: NOOP,
+  stopFireCrackleLoop: NOOP,
+};
+
 export function useSoundEffects(): SoundEffectsContextType {
   const context = useContext(SoundEffectsContext);
   if (!context) {
-    throw new Error('useSoundEffects must be used within a SoundEffectsProvider');
+    // Graceful degradation instead of crashing the page
+    if (typeof window !== 'undefined') {
+      logger.warn('useSoundEffects called outside SoundEffectsProvider — returning no-op stub');
+    }
+    return SOUND_EFFECTS_FALLBACK;
   }
   return context;
 }

@@ -5014,7 +5014,9 @@ const he = {
       "title": "משחק מתחיל! 🎮",
       "teacherStarted": "{{teacher}} פתח משחק כיתתי",
       "joinNow": "הצטרף עכשיו",
-      "joining": "מצטרף..."
+      "joining": "מצטרף...",
+      "listening": "ממתין למשחקי כיתה...",
+      "connecting": "מתחבר לכיתה..."
     },
     "dashboard": {
       "title": "השיעורים שלי",

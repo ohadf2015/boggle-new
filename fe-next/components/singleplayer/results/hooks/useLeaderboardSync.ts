@@ -74,7 +74,8 @@ export function useLeaderboardSync({
         const result = await response.json();
         console.log('[useLeaderboardSync] Leaderboard synced:', result);
       } catch (error) {
-        console.error('[useLeaderboardSync] Failed to sync leaderboard:', error);
+        // Network errors (e.g., iOS "Load failed") are transient — warn, don't error
+        console.warn('[useLeaderboardSync] Failed to sync leaderboard:', error);
       }
     }
 

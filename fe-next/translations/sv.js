@@ -5038,7 +5038,9 @@ const sv = {
       "title": "Spel startar!",
       "teacherStarted": "{{teacher}} startade ett klassrumsspel",
       "joinNow": "Gå med nu",
-      "joining": "Går med..."
+      "joining": "Går med...",
+      "listening": "Lyssnar efter klassrumsspel...",
+      "connecting": "Ansluter till klassrummet..."
     },
     "dashboard": {
       "title": "Mina lektioner",

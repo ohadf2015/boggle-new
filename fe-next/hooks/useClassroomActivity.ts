@@ -126,7 +126,8 @@ export function useClassroomActivity(
           : Promise.resolve({ data: [], error: null }),
       ]);
 
-      if (duelsResult.error) {
+      // PGRST205 = table not found (student_duels hasn't been created yet)
+      if (duelsResult.error && duelsResult.error.code !== 'PGRST205') {
         throw new Error(`Failed to fetch duels: ${duelsResult.error.message}`);
       }
 

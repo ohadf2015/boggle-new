@@ -51,6 +51,10 @@ export async function getLesson(lessonId: string): Promise<{ data: VocabularyLes
       .single();
 
     if (error) {
+      // PGRST116 = no rows found — lesson doesn't exist, not an error
+      if (error.code === 'PGRST116') {
+        return { data: null, error: null };
+      }
       logger.error('Error fetching lesson:', error);
       return { data: null, error: { message: error.message } };
     }

@@ -5012,7 +5012,9 @@ const en = {
       "title": "Game Starting!",
       "teacherStarted": "{{teacher}} started a classroom game",
       "joinNow": "Join Game Now",
-      "joining": "Joining..."
+      "joining": "Joining...",
+      "listening": "Listening for classroom games...",
+      "connecting": "Connecting to classroom..."
     },
     "dashboard": {
       "title": "My Lessons",
