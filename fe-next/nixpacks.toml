@@ -5,7 +5,7 @@ aptPkgs = []
 [phases.install]
 dependsOn = ['setup']
 cmds = [
-    'npm install --prefer-offline --no-audit --no-fund --loglevel=error'
+    'NODE_ENV=development npm install --prefer-offline --no-audit --no-fund --loglevel=error'
 ]
 cacheDirectories = ['node_modules', '.next/cache']
 
@@ -19,5 +19,4 @@ cmds = [
 cmd = 'npm start'
 
 [variables]
-NODE_ENV = 'production'
 NPM_CONFIG_LOGLEVEL = 'error'
