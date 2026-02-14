@@ -2,12 +2,12 @@
 
 ## Overview
 
-Transform the education section into an engaging, competitive learning platform with student duels as the centerpiece, diverse practice modes, polished UI across all dashboards, and improved teacher workflows. This roadmap delivers 9 phases (36-44) spanning foundation refactoring, feature development (duels, practice modes, gamification), UI overhauls for both student and teacher experiences, comprehensive design polish, and gap closure.
+Transform the education section into an engaging, competitive learning platform with student duels as the centerpiece, diverse practice modes, polished UI across all dashboards, and improved teacher workflows. This roadmap delivers 10 phases (36-45) spanning foundation refactoring, feature development (duels, practice modes, gamification), UI overhauls for both student and teacher experiences, comprehensive design polish, and gap closure.
 
 ## Milestones
 
 - ✅ **v1.0 Foundation & Game Modes** - Phases 1-35 (shipped ~87% complete, pre-GSD)
-- 🚧 **v2.0 Education 2.0** - Phases 36-44 (in progress)
+- 🚧 **v2.0 Education 2.0** - Phases 36-45 (in progress)
 
 ## Phases
 
@@ -174,10 +174,24 @@ Plans:
 Plans:
 - [x] 44-01-PLAN.md — Wire ChallengeButton to profile + duel lobby classmates tab + remove unused export + Phase 37 verification
 
+### Phase 45: Practice XP Server-Side Wiring
+**Goal**: Wire server-side XP award for practice sessions so XP is persisted authoritatively via educationXpManager, completing E2E Flow #5
+**Depends on**: Phase 37
+**Requirements**: PRAC-01, PRAC-02, PRAC-03, PRAC-04 (completing server-side XP for all practice modes)
+**Gap Closure**: Closes integration gap from v2.0 milestone audit (practice API → educationXpManager)
+**Success Criteria** (what must be TRUE):
+  1. Practice API PATCH handler calls educationXpManager.awardEducationXp() after session completion
+  2. XP from practice sessions is persisted to student_progress.total_xp via server-side function
+  3. E2E Flow #5 (Practice Session: Select → Play → Track → XP Award) completes 9/9 steps
+**Plans**: 1 plan
+
+Plans:
+- [ ] 45-01-PLAN.md — Wire educationXpManager into practice API PATCH handler + verify E2E flow
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → 44
+Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → 44 → 45
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -190,6 +204,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 42. Teacher Dashboard & Workflows | v2.0 | 5/5 | Complete | 2026-02-14 |
 | 43. Practice Experience & Design Polish | v2.0 | 4/4 | Complete | 2026-02-14 |
 | 44. Milestone Gap Closure & Tech Debt | v2.0 | 1/1 | Complete | 2026-02-14 |
+| 45. Practice XP Server-Side Wiring | v2.0 | 0/1 | Not Started | - |
 
 ---
-*Last updated: 2026-02-14 — Phase 44 complete (all v2.0 phases done)*
+*Last updated: 2026-02-14 — Phase 45 added (gap closure from second audit)*
