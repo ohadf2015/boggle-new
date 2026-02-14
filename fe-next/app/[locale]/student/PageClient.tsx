@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +21,11 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import StudentLessonView from '@/components/student/StudentLessonView';
 import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
+import { ClassroomLeaderboard } from '@/components/education/ClassroomLeaderboard';
+import { ChallengePanel } from '@/components/education/challenges/ChallengePanel';
+import { MilestoneTracker } from '@/components/education/milestones/MilestoneTracker';
+import { MilestoneCelebration, type MilestonePayload } from '@/components/education/milestones/MilestoneCelebration';
+import { checkMilestoneCrossed, getMilestoneRewards } from '@/lib/supabase/education/milestones';
 import { cn } from '@/lib/utils';
 import { Trophy, Zap, Flame } from 'lucide-react';
 
@@ -89,6 +94,28 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
 
   const xpProgress = useMemo(() => getXpProgress(totalXP), [totalXP]);
 
+  // Milestone celebration state
+  const [milestonePayload, setMilestonePayload] = useState<MilestonePayload | null>(null);
+  const prevLevelRef = useRef(xpProgress.currentLevel);
+
+  // Check for milestone crossings when level changes
+  useEffect(() => {
+    const oldLevel = prevLevelRef.current;
+    const newLevel = xpProgress.currentLevel;
+    if (newLevel > oldLevel) {
+      const crossed = checkMilestoneCrossed(oldLevel, newLevel);
+      if (crossed && crossed.isMajor) {
+        const rewards = getMilestoneRewards(crossed.level);
+        setMilestonePayload({
+          level: crossed.level,
+          isMajor: crossed.isMajor,
+          rewards,
+        });
+      }
+    }
+    prevLevelRef.current = newLevel;
+  }, [xpProgress.currentLevel]);
+
   // Pick mascot variant based on streak / level
   const mascotVariant = useMemo(() => {
     if (currentStreak >= 7) return 'trophy' as const;
@@ -123,12 +150,13 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
   }
 
   return (
-    <motion.div
-      variants={heroEntrance}
-      initial="hidden"
-      animate="visible"
-      className="relative p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg overflow-hidden"
-    >
+    <>
+      <motion.div
+        variants={heroEntrance}
+        initial="hidden"
+        animate="visible"
+        className="relative p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg overflow-hidden"
+      >
       {/* Mascot - floating in top-right corner */}
       <motion.div
         className="absolute -top-2 -right-2 z-10 hidden sm:block"
@@ -234,7 +262,17 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
           </div>
         </motion.div>
       </motion.div>
-    </motion.div>
+
+      {/* Milestone Progress */}
+      <div className="border-t border-white/10 pt-4 mt-4">
+        <MilestoneTracker totalXp={totalXP} />
+      </div>
+      </motion.div>
+      <MilestoneCelebration
+        milestone={milestonePayload}
+        onClose={() => setMilestonePayload(null)}
+      />
+    </>
   );
 }
 
@@ -293,6 +331,23 @@ export default function StudentPageClient() {
         {classroomId && (
           <div className="mb-6">
             <StudentProgress classroomId={classroomId} userId={user.id} />
+          </div>
+        )}
+
+        {/* Daily & Weekly Challenges */}
+        {user && (
+          <div className="mb-6">
+            <ChallengePanel playerId={user.id} />
+          </div>
+        )}
+
+        {/* Full Classroom Leaderboard */}
+        {classroomId && (
+          <div className="mb-6">
+            <ClassroomLeaderboard
+              classroomId={classroomId}
+              currentUserId={user.id}
+            />
           </div>
         )}
 
