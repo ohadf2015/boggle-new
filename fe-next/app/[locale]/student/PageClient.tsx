@@ -26,6 +26,8 @@ import { ChallengePanel } from '@/components/education/challenges/ChallengePanel
 import { MilestoneTracker } from '@/components/education/milestones/MilestoneTracker';
 import { MilestoneCelebration, type MilestonePayload } from '@/components/education/milestones/MilestoneCelebration';
 import { checkMilestoneCrossed, getMilestoneRewards } from '@/lib/supabase/education/milestones';
+import QuickPlayPanel from '@/components/student/QuickPlayPanel';
+import StreakCalendar from '@/components/student/StreakCalendar';
 import { cn } from '@/lib/utils';
 import { Trophy, Zap, Flame } from 'lucide-react';
 
@@ -283,6 +285,7 @@ export default function StudentPageClient() {
   const isRTL = language === 'he';
   const [isChecking, setIsChecking] = useState(true);
   const { classroomId } = useStudentClassroom();
+  const { currentStreak, lastWinDate } = useWinStreak();
 
   useEffect(() => {
     if (loading) {
@@ -333,6 +336,18 @@ export default function StudentPageClient() {
             <StudentProgress classroomId={classroomId} userId={user.id} />
           </div>
         )}
+
+        {/* Quick Play Panel */}
+        {classroomId && (
+          <div className="mb-6">
+            <QuickPlayPanel classroomId={classroomId} userId={user.id} />
+          </div>
+        )}
+
+        {/* Streak Calendar */}
+        <div className="mb-6">
+          <StreakCalendar currentStreak={currentStreak} lastWinDate={lastWinDate} />
+        </div>
 
         {/* Daily & Weekly Challenges */}
         {user && (

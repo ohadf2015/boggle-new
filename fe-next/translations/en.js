@@ -5077,7 +5077,17 @@ const en = {
         "wordsLeft": "{{count}} words left",
         "streak": "{{count}} streak",
         "mastered": "Mastered!"
-      }
+      },
+      "wordsFound": "Words Found",
+      "complete": "Practice Sessions"
+    },
+    "profile": {
+      "duelRecord": "Duel Record",
+      "noDuelsYet": "No duels yet",
+      "challengePrompt": "Challenge a classmate to start your competitive journey!",
+      "recentDuels": "Recent Duels",
+      "viewDuelHistory": "View Full History",
+      "winRate": "Win Rate"
     }
   },
   "teacher": {
