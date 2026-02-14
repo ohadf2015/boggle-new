@@ -172,7 +172,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 44-01-PLAN.md — Wire ChallengeButton to profile + duel lobby classmates tab + remove unused export + Phase 37 verification
+- [x] 44-01-PLAN.md — Wire ChallengeButton to profile + duel lobby classmates tab + remove unused export + Phase 37 verification
 
 ## Progress
 
@@ -189,7 +189,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 41. Student Dashboard Overhaul | v2.0 | 4/4 | Complete | 2026-02-14 |
 | 42. Teacher Dashboard & Workflows | v2.0 | 5/5 | Complete | 2026-02-14 |
 | 43. Practice Experience & Design Polish | v2.0 | 4/4 | Complete | 2026-02-14 |
-| 44. Milestone Gap Closure & Tech Debt | v2.0 | 0/1 | Planned | — |
+| 44. Milestone Gap Closure & Tech Debt | v2.0 | 1/1 | Complete | 2026-02-14 |
 
 ---
-*Last updated: 2026-02-14 — Phase 44 added (gap closure from milestone audit)*
+*Last updated: 2026-02-14 — Phase 44 complete (all v2.0 phases done)*
