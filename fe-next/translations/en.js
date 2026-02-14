@@ -6229,6 +6229,7 @@ const en = {
   "history": "History",
   "joinClassroomToDuel": "Join a classroom to duel classmates!",
   "lobby": "Lobby",
+  "noClassmatesFound": "No classmates found",
   "noOpponentsOnline": "No opponents online right now",
   "noPendingChallenges": "No pending challenges",
   "notParticipant": "You are not a participant in this duel",

@@ -2812,6 +2812,7 @@ const ja = {
   "history": "履歴",
   "joinClassroomToDuel": "クラスに参加してデュエルしよう！",
   "lobby": "ロビー",
+  "noClassmatesFound": "クラスメートが見つかりません",
   "noOpponentsOnline": "現在オンラインの対戦相手がいません",
   "noPendingChallenges": "保留中の挑戦はありません",
   "pendingChallenges": "保留中の挑戦",

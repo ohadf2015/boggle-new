@@ -6236,6 +6236,7 @@ const sv = {
   "history": "Historik",
   "joinClassroomToDuel": "Gå med i ett klassrum för att duellera!",
   "lobby": "Lobby",
+  "noClassmatesFound": "Inga klasskamrater hittades",
   "noOpponentsOnline": "Inga motståndare online just nu",
   "noPendingChallenges": "Inga väntande utmaningar",
   "notParticipant": "Du deltar inte i den här duellen",

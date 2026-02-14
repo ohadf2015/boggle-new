@@ -6211,6 +6211,7 @@ const he = {
   "history": "היסטוריה",
   "joinClassroomToDuel": "הצטרף לכיתה כדי להתחרות! 🎓",
   "lobby": "לובי",
+  "noClassmatesFound": "לא נמצאו חברים לכיתה",
   "noOpponentsOnline": "אין יריבים מחוברים כרגע",
   "noPendingChallenges": "אין אתגרים ממתינים",
   "notParticipant": "אתה לא משתתף בדו-קרב הזה",
