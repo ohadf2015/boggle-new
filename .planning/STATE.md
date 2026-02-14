@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 41 of 43 (Student Dashboard Overhaul) — IN PROGRESS
-Plan: 3 of 6 in current phase (profile enhancements complete)
-Status: Plan 41-03 COMPLETE — Student profile enhanced with duel record and recent activity
-Last activity: 2026-02-14 — Completed 41-03-PLAN.md (profile enhancements)
+Plan: 4 of 6 in current phase (activity feed complete)
+Status: Plan 41-02 COMPLETE — Classroom activity feed showing recent duels and achievements
+Last activity: 2026-02-14 — Completed 41-02-PLAN.md (activity feed)
 
-Progress: [█████████████░] ~64% (5.5/8 phases complete, 3/6 plans in phase 41)
+Progress: [█████████████░] ~66% (5.5/8 phases complete, 4/6 plans in phase 41)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 35
+- Total plans completed: 36
 - Average duration: 12 min
-- Total execution time: 441 min
+- Total execution time: 452 min
 
 **By Phase:**
 
@@ -32,13 +32,14 @@ Progress: [█████████████░] ~64% (5.5/8 phases comple
 | 38 | 8 | 83 min | 10 min |
 | 39 | 5 | 71 min | 14 min |
 | 40 | 7 | 48 min | 7 min |
-| 41 | 3 | 27 min | 9 min |
+| 41 | 4 | 38 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 40-03 (15 min), 40-07 (4 min), 40-06 (6 min), 41-01 (18 min), 41-03 (9 min)
-- Phase 41 IN PROGRESS: 3/6 plans, 27 min total
+- Last 5 plans: 40-07 (4 min), 40-06 (6 min), 41-01 (18 min), 41-03 (9 min), 41-02 (11 min)
+- Phase 41 IN PROGRESS: 4/6 plans, 38 min total
 - 41-01: Quick-play widgets (QuickPlayPanel + StreakCalendar) (18 min)
 - 41-03: Profile enhancements (duel record + recent activity) (9 min)
+- 41-02: Activity feed (classroom duels + achievements timeline) (11 min)
 
 *Updated after each plan completion*
 
@@ -147,6 +148,10 @@ Recent decisions affecting current work:
 - **41-03:** Recent duels limited to 5 on profile (full history on dedicated page)
 - **41-03:** Draws stat shown only when count > 0 (adaptive UI, avoids wasting space)
 - **41-03:** Opponent name resolution handles both challenger/opponent roles correctly
+- **41-02:** Parallel queries for duels and achievements (Promise.all) for better performance
+- **41-02:** Achievements filtered by classroom membership (two-step query: classroom_memberships → filter by student_ids)
+- **41-02:** Activity feed default limit 20 items (balance between context and performance)
+- **41-02:** Type assertions (any) used for Supabase join results (simpler than complex type definitions)
 
 ### Pending Todos
 
@@ -162,6 +167,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 41-03-PLAN.md (profile enhancements with duel record)
+Stopped at: Completed 41-02-PLAN.md (classroom activity feed)
 Resume file: None
-Next action: Continue Phase 41 with plan 41-04 (full duel history page) or other subsequent plans.
+Next action: Continue Phase 41 with remaining plans (41-04 or others as orchestrator assigns).
