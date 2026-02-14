@@ -134,10 +134,14 @@ Plans:
   2. Teacher can create lessons faster using bulk word import improvements, template lessons, and streamlined word editor
   3. Teacher can assign practice modes and duels to students with specific activities, due dates, and completion tracking
   4. Teacher can view assignment dashboard showing per-student completion rates, scores, and struggling areas
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 42-01: [TBD during planning]
+- [ ] 42-01-PLAN.md — Assignment data layer: DB migration, types, CRUD functions, useAssignments hook
+- [ ] 42-02-PLAN.md — Lesson creation enhancements: TemplateLessonSelector + BulkImportEnhanced
+- [ ] 42-03-PLAN.md — Assignment UI: AssignmentCreator + AssignmentTrackingPanel + CompletionTracker
+- [ ] 42-04-PLAN.md — Dashboard integration: DuelMonitoringPanel + wire assignments/templates into dashboard
+- [ ] 42-05-PLAN.md — Translations (4 languages) for all new teacher workflow UI text
 
 ### Phase 43: Practice Experience & Design Polish
 **Goal**: Practice experience delivers polished feedback animations and all education pages follow neo-brutalist design system consistently
@@ -165,8 +169,8 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 39. Real-Time Duels | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 40. Gamification Enhancements | v2.0 | 7/7 | Complete | 2026-02-14 |
 | 41. Student Dashboard Overhaul | v2.0 | 4/4 | Complete | 2026-02-14 |
-| 42. Teacher Dashboard & Workflows | v2.0 | 0/0 | Not started | - |
+| 42. Teacher Dashboard & Workflows | v2.0 | 0/5 | In progress | - |
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-14 — Phase 41 complete (4 plans, 3 waves, verified)*
+*Last updated: 2026-02-14 — Phase 42 planned (5 plans, 3 waves)*
