@@ -3,19 +3,17 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Set production environment for build
-ENV NODE_ENV=production
-
 # Copy package files
 COPY fe-next/package*.json ./
 
-# Install dependencies
+# Install ALL dependencies (including devDependencies needed for build)
 RUN npm install
 
 # Copy application files
 COPY fe-next/ ./
 
-# Build Next.js app (without postbuild migration - handled at runtime)
+# Build Next.js app in production mode
+ENV NODE_ENV=production
 RUN npm run build --ignore-scripts
 
 # Production stage
