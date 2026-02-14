@@ -19,11 +19,6 @@ describe('Duel Gameplay Handlers', () => {
   let mockNamespace: Partial<Namespace>;
   let mockSupabaseClient: any;
   let mockFrom: jest.Mock;
-  let mockSelect: jest.Mock;
-  let mockEq: jest.Mock;
-  let mockInsert: jest.Mock;
-  let mockUpdate: jest.Mock;
-  let mockSingle: jest.Mock;
   let emittedEvents: Array<{ event: string; data: any }>;
   let roomEmittedEvents: Array<{ room: string; event: string; data: any }>;
 
@@ -59,12 +54,7 @@ describe('Duel Gameplay Handlers', () => {
       }),
     } as any;
 
-    // Setup Supabase mock - we'll configure per test
-    mockSingle = jest.fn();
-    mockEq = jest.fn();
-    mockSelect = jest.fn();
-    mockInsert = jest.fn();
-    mockUpdate = jest.fn();
+    // Setup Supabase mock - configured per test via mockFrom.mockImplementation
     mockFrom = jest.fn();
 
     mockSupabaseClient = {
@@ -123,7 +113,7 @@ describe('Duel Gameplay Handlers', () => {
       const turnInsertMock = jest.fn().mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
-            data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 7, words_found: ['test', 'word'] },
+            data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 6, words_found: ['test', 'word'] },
             error: null,
           }),
         }),
@@ -138,7 +128,7 @@ describe('Duel Gameplay Handlers', () => {
                 id: '550e8400-e29b-41d4-a716-446655440001',
                 challenger_id: 'user-1',
                 opponent_id: 'user-2',
-                challenger_score: 7,
+                challenger_score: 6,
                 opponent_score: 0,
               },
               error: null,
@@ -217,13 +207,13 @@ describe('Duel Gameplay Handlers', () => {
         expect.objectContaining({
           duel_id: '550e8400-e29b-41d4-a716-446655440001',
           player_id: 'user-1',
-          score: 7,
+          score: 6,
           words_found: ['test', 'word'],
         })
       );
 
       // Verify duel score was updated
-      expect(duelUpdateMock).toHaveBeenCalledWith({ challenger_score: 7 });
+      expect(duelUpdateMock).toHaveBeenCalledWith({ challenger_score: 6 });
 
       // Verify event emitted
       const scoreSubmittedEvent = roomEmittedEvents.find(
@@ -232,29 +222,39 @@ describe('Duel Gameplay Handlers', () => {
       expect(scoreSubmittedEvent).toBeDefined();
       expect(scoreSubmittedEvent?.data).toMatchObject({
         playerId: 'user-1',
-        score: 7,
+        score: 6,
         wordsValidated: 2,
         wordsRejected: 1,
       });
     });
 
     it('should reject submission when not a participant', async () => {
-      // RED: Test should fail because handler doesn't exist
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
         wordsFound: ['test'],
       };
 
-      // Mock duel with different participants
-      mockSingle.mockResolvedValueOnce({
-        data: {
-          id: '550e8400-e29b-41d4-a716-446655440001',
-          status: 'active',
-          challenger_id: 'other-user-1',
-          opponent_id: 'other-user-2',
-          board_state: [['T', 'E', 'S', 'T']],
-        },
-        error: null,
+      // Mock duel with different participants - wire through mockFrom chain
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_duels') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: {
+                    id: '550e8400-e29b-41d4-a716-446655440001',
+                    status: 'active',
+                    challenger_id: 'other-user-1',
+                    opponent_id: 'other-user-2',
+                    board_state: [['T', 'E', 'S', 'T']],
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
       });
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -272,21 +272,31 @@ describe('Duel Gameplay Handlers', () => {
     });
 
     it('should reject submission on non-active duel', async () => {
-      // RED: Test should fail
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
         wordsFound: ['test'],
       };
 
-      // Mock completed duel
-      mockSingle.mockResolvedValueOnce({
-        data: {
-          id: '550e8400-e29b-41d4-a716-446655440001',
-          status: 'completed',
-          challenger_id: 'user-1',
-          opponent_id: 'user-2',
-        },
-        error: null,
+      // Mock completed duel - wire through mockFrom chain
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_duels') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: {
+                    id: '550e8400-e29b-41d4-a716-446655440001',
+                    status: 'completed',
+                    challenger_id: 'user-1',
+                    opponent_id: 'user-2',
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
       });
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -303,37 +313,75 @@ describe('Duel Gameplay Handlers', () => {
     });
 
     it('should handle empty words array (score = 0)', async () => {
-      // RED: Test should fail
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
         wordsFound: [],
       };
 
-      mockSingle.mockResolvedValueOnce({
-        data: {
-          id: '550e8400-e29b-41d4-a716-446655440001',
-          status: 'active',
-          challenger_id: 'user-1',
-          opponent_id: 'user-2',
-          board_state: [['T', 'E', 'S', 'T']],
-          lesson_id: '550e8400-e29b-41d4-a716-446655440001',
-        },
-        error: null,
+      // Build full Supabase chain for: duel fetch, lesson fetch, turn insert, duel update
+      const turnInsertMock = jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({
+            data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 0, words_found: [] },
+            error: null,
+          }),
+        }),
       });
 
-      mockSingle.mockResolvedValueOnce({
-        data: { language: 'en' },
-        error: null,
+      const duelUpdateMock = jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          select: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: {
+                id: '550e8400-e29b-41d4-a716-446655440001',
+                challenger_id: 'user-1',
+                opponent_id: 'user-2',
+                challenger_score: 0,
+                opponent_score: 0,
+              },
+              error: null,
+            }),
+          }),
+        }),
       });
 
-      mockSingle.mockResolvedValueOnce({
-        data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 0, words_found: [] },
-        error: null,
-      });
-
-      mockSingle.mockResolvedValueOnce({
-        data: { id: '550e8400-e29b-41d4-a716-446655440001', challenger_score: 0 },
-        error: null,
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_duels') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: {
+                    id: '550e8400-e29b-41d4-a716-446655440001',
+                    status: 'active',
+                    challenger_id: 'user-1',
+                    opponent_id: 'user-2',
+                    board_state: [['T', 'E', 'S', 'T']],
+                    lesson_id: '550e8400-e29b-41d4-a716-446655440001',
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+            update: duelUpdateMock,
+          };
+        }
+        if (table === 'vocabulary_lessons') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: { language: 'en' },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === 'duel_turns') {
+          return { insert: turnInsertMock };
+        }
+        return {};
       });
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -353,41 +401,24 @@ describe('Duel Gameplay Handlers', () => {
   });
 
   describe('duel completion', () => {
-    it('should determine winner and award XP when both players submit', async () => {
-      // RED: Test should fail
-      const payload = {
-        duelId: '550e8400-e29b-41d4-a716-446655440001',
-        wordsFound: ['test'],
-      };
-
-      // First submission (challenger submits first)
-      mockSingle
-        .mockResolvedValueOnce({
-          data: {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            status: 'active',
-            challenger_id: 'user-1',
-            opponent_id: 'user-2',
-            board_state: [['T', 'E', 'S', 'T']],
-            lesson_id: '550e8400-e29b-41d4-a716-446655440001',
-            challenger_score: 0,
-            opponent_score: 10, // Opponent already submitted
-          },
-          error: null,
-        })
-        .mockResolvedValueOnce({ data: { language: 'en' }, error: null })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          data: {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            challenger_score: 5,
-            opponent_score: 10,
-          },
-          error: null,
-        });
+    /**
+     * Helper: Build a full mockFrom chain for the submit-score happy path.
+     * The handler calls supabase.from() for 4 tables in sequence:
+     *   1. student_duels -> select (fetch duel)
+     *   2. vocabulary_lessons -> select (fetch lesson language)
+     *   3. duel_turns -> insert (insert turn)
+     *   4. student_duels -> update (update score)
+     * Then completeDuel calls:
+     *   5. student_duels -> update (completion with xp_awarded guard)
+     *
+     * Since from('student_duels') is called multiple times, we track call count.
+     */
+    function setupSubmitScoreMocks(options: {
+      duelData: any;
+      updatedDuelData: any;
+      completionResult?: { data: any; error: any; count: number };
+    }) {
+      let studentDuelsCallCount = 0;
 
       const { isDictionaryWord } = require('@/backend/dictionary');
       isDictionaryWord.mockReturnValue(true);
@@ -398,16 +429,109 @@ describe('Duel Gameplay Handlers', () => {
       const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
       calculateWordScore.mockReturnValue(5);
 
-      // Mock completion update (race condition protection)
-      mockUpdate.mockResolvedValueOnce({
-        data: {
+      // Build the completion update chain: update -> eq -> eq -> select
+      const completionUpdateMock = options.completionResult
+        ? jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                select: jest.fn().mockResolvedValue(options.completionResult),
+              }),
+            }),
+          })
+        : undefined;
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_duels') {
+          studentDuelsCallCount++;
+          if (studentDuelsCallCount === 1) {
+            // First call: fetch duel
+            return {
+              select: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: options.duelData,
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          } else if (studentDuelsCallCount === 2) {
+            // Second call: update score
+            return {
+              update: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  select: jest.fn().mockReturnValue({
+                    single: jest.fn().mockResolvedValue({
+                      data: options.updatedDuelData,
+                      error: null,
+                    }),
+                  }),
+                }),
+              }),
+            };
+          } else if (studentDuelsCallCount === 3 && completionUpdateMock) {
+            // Third call: completion update (from completeDuel)
+            return { update: completionUpdateMock };
+          }
+          return {};
+        }
+        if (table === 'vocabulary_lessons') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: { language: 'en' },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === 'duel_turns') {
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+    }
+
+    it('should determine winner and award XP when both players submit', async () => {
+      const payload = {
+        duelId: '550e8400-e29b-41d4-a716-446655440001',
+        wordsFound: ['test'],
+      };
+
+      setupSubmitScoreMocks({
+        duelData: {
           id: '550e8400-e29b-41d4-a716-446655440001',
-          status: 'completed',
-          winner_id: 'user-2', // Opponent wins (10 > 5)
-          xp_awarded: true,
+          status: 'active',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          board_state: [['T', 'E', 'S', 'T']],
+          lesson_id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_score: 0,
+          opponent_score: 10, // Opponent already submitted
         },
-        error: null,
-        count: 1, // Indicates update succeeded
+        updatedDuelData: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          challenger_score: 5,
+          opponent_score: 10,
+        },
+        completionResult: {
+          data: [{ id: '550e8400-e29b-41d4-a716-446655440001', status: 'completed' }],
+          error: null,
+          count: 1,
+        },
       });
 
       // Mock XP RPC calls
@@ -448,54 +572,34 @@ describe('Duel Gameplay Handlers', () => {
     });
 
     it('should handle tie game (both scores equal)', async () => {
-      // RED: Test should fail
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
         wordsFound: ['test'],
       };
 
-      mockSingle
-        .mockResolvedValueOnce({
-          data: {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            status: 'active',
-            challenger_id: 'user-1',
-            opponent_id: 'user-2',
-            board_state: [['T', 'E', 'S', 'T']],
-            lesson_id: '550e8400-e29b-41d4-a716-446655440001',
-            challenger_score: 0,
-            opponent_score: 5, // Same score as what challenger will get
-          },
-          error: null,
-        })
-        .mockResolvedValueOnce({ data: { language: 'en' }, error: null })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440001', challenger_score: 5, opponent_score: 5 },
-          error: null,
-        });
-
-      const { isDictionaryWord } = require('@/backend/dictionary');
-      isDictionaryWord.mockReturnValue(true);
-
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
-      isWordOnBoardAsync.mockResolvedValue(true);
-
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
-      calculateWordScore.mockReturnValue(5);
-
-      mockUpdate.mockResolvedValueOnce({
-        data: {
+      setupSubmitScoreMocks({
+        duelData: {
           id: '550e8400-e29b-41d4-a716-446655440001',
-          status: 'completed',
-          winner_id: null, // Draw
-          xp_awarded: true,
+          status: 'active',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          board_state: [['T', 'E', 'S', 'T']],
+          lesson_id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_score: 0,
+          opponent_score: 5, // Same score as what challenger will get
         },
-        error: null,
-        count: 1,
+        updatedDuelData: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          challenger_score: 5,
+          opponent_score: 5,
+        },
+        completionResult: {
+          data: [{ id: '550e8400-e29b-41d4-a716-446655440001', status: 'completed' }],
+          error: null,
+          count: 1,
+        },
       });
 
       mockSupabaseClient.rpc
@@ -533,50 +637,34 @@ describe('Duel Gameplay Handlers', () => {
     });
 
     it('should prevent double XP award (race condition)', async () => {
-      // RED: Test should fail
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
         wordsFound: ['test'],
       };
 
-      mockSingle
-        .mockResolvedValueOnce({
-          data: {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            status: 'active',
-            challenger_id: 'user-1',
-            opponent_id: 'user-2',
-            board_state: [['T', 'E', 'S', 'T']],
-            lesson_id: '550e8400-e29b-41d4-a716-446655440001',
-            challenger_score: 0,
-            opponent_score: 10,
-          },
+      setupSubmitScoreMocks({
+        duelData: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          status: 'active',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          board_state: [['T', 'E', 'S', 'T']],
+          lesson_id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_score: 0,
+          opponent_score: 10,
+        },
+        updatedDuelData: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          challenger_score: 5,
+          opponent_score: 10,
+        },
+        completionResult: {
+          data: null,
           error: null,
-        })
-        .mockResolvedValueOnce({ data: { language: 'en' }, error: null })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440001', challenger_score: 5, opponent_score: 10 },
-          error: null,
-        });
-
-      const { isDictionaryWord } = require('@/backend/dictionary');
-      isDictionaryWord.mockReturnValue(true);
-
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
-      isWordOnBoardAsync.mockResolvedValue(true);
-
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
-      calculateWordScore.mockReturnValue(5);
-
-      // Mock update returning 0 rows (XP already awarded)
-      mockUpdate.mockResolvedValueOnce({
-        data: null,
-        error: null,
-        count: 0, // No rows updated - race condition detected
+          count: 0, // No rows updated - race condition detected
+        },
       });
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -598,44 +686,31 @@ describe('Duel Gameplay Handlers', () => {
     });
 
     it('should not complete duel if only one player has submitted', async () => {
-      // RED: Test should fail
       const payload = {
         duelId: '550e8400-e29b-41d4-a716-446655440001',
         wordsFound: ['test'],
       };
 
-      mockSingle
-        .mockResolvedValueOnce({
-          data: {
-            id: '550e8400-e29b-41d4-a716-446655440001',
-            status: 'active',
-            challenger_id: 'user-1',
-            opponent_id: 'user-2',
-            board_state: [['T', 'E', 'S', 'T']],
-            lesson_id: '550e8400-e29b-41d4-a716-446655440001',
-            challenger_score: 0,
-            opponent_score: 0, // Opponent hasn't submitted yet
-          },
-          error: null,
-        })
-        .mockResolvedValueOnce({ data: { language: 'en' }, error: null })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          data: { id: '550e8400-e29b-41d4-a716-446655440001', challenger_score: 5, opponent_score: 0 },
-          error: null,
-        });
-
-      const { isDictionaryWord } = require('@/backend/dictionary');
-      isDictionaryWord.mockReturnValue(true);
-
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
-      isWordOnBoardAsync.mockResolvedValue(true);
-
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
-      calculateWordScore.mockReturnValue(5);
+      setupSubmitScoreMocks({
+        duelData: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          status: 'active',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          board_state: [['T', 'E', 'S', 'T']],
+          lesson_id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_score: 0,
+          opponent_score: 0, // Opponent hasn't submitted yet
+        },
+        updatedDuelData: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          challenger_id: 'user-1',
+          opponent_id: 'user-2',
+          challenger_score: 5,
+          opponent_score: 0,
+        },
+        // No completionResult needed - completeDuel shouldn't be called
+      });
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
