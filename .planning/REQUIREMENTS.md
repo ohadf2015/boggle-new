@@ -43,10 +43,10 @@ Diverse vocabulary practice beyond flashcards and board play.
 
 Deeper progression and competitive systems.
 
-- [ ] **GAMF-01**: User sees progression milestones with visual rewards — milestone badges, animated celebrations, visual progress indicators beyond basic XP bar
-- [ ] **GAMF-02**: User can view competitive classroom leaderboards — weekly/monthly boards with tiers, rank change indicators, and streak badges
-- [ ] **GAMF-03**: User receives daily and weekly challenges — time-limited goals (e.g., "Master 5 words today", "Win 3 duels this week") with bonus XP/coin rewards
-- [ ] **GAMF-04**: User can unlock new achievement categories for duels and practice — "Win 10 duels", "Perfect spelling streak", "Blitz master", etc. with 4 tiers each
+- [x] **GAMF-01**: User sees progression milestones with visual rewards — milestone badges, animated celebrations, visual progress indicators beyond basic XP bar
+- [x] **GAMF-02**: User can view competitive classroom leaderboards — weekly/monthly boards with tiers, rank change indicators, and streak badges
+- [x] **GAMF-03**: User receives daily and weekly challenges — time-limited goals (e.g., "Master 5 words today", "Win 3 duels this week") with bonus XP/coin rewards
+- [x] **GAMF-04**: User can unlock new achievement categories for duels and practice — "Win 10 duels", "Perfect spelling streak", "Blitz master", etc. with 4 tiers each
 
 ### UI Polish (UIPOL)
 

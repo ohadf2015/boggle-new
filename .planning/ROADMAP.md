@@ -106,8 +106,8 @@ Plans:
 - [x] 40-03-PLAN.md — Daily/weekly challenges: backend CRUD + challenge UI cards + ChallengePanel
 - [x] 40-04-PLAN.md — Progression milestones + achievement grid: milestone tracker, celebration, achievement categories
 - [x] 40-05-PLAN.md — Translations (4 languages) + human verification
-- [ ] 40-06-PLAN.md — Gap closure: wire leaderboard, challenges, milestones into student dashboard
-- [ ] 40-07-PLAN.md — Gap closure: student achievements page + profile navigation link
+- [x] 40-06-PLAN.md — Gap closure: wire leaderboard, challenges, milestones into student dashboard
+- [x] 40-07-PLAN.md — Gap closure: student achievements page + profile navigation link
 
 ### Phase 41: Student Dashboard Overhaul
 **Goal**: Students interact with engaging dashboard featuring activity feed, duel invites, streak calendar, quick-play buttons, profile pages, and classroom activity
@@ -160,10 +160,10 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 37. Practice Modes | v2.0 | 6/6 | Complete | 2026-02-13 |
 | 38. Async Duels | v2.0 | 8/8 | Complete | 2026-02-13 |
 | 39. Real-Time Duels | v2.0 | 5/5 | Complete | 2026-02-13 |
-| 40. Gamification Enhancements | v2.0 | 5/7 | In progress | - |
+| 40. Gamification Enhancements | v2.0 | 7/7 | Complete | 2026-02-14 |
 | 41. Student Dashboard Overhaul | v2.0 | 0/0 | Not started | - |
 | 42. Teacher Dashboard & Workflows | v2.0 | 0/0 | Not started | - |
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-14 — Phase 40 gap closure planned (2 additional plans, 7 total)*
+*Last updated: 2026-02-14 — Phase 40 complete (7/7 plans, gap closure verified)*
