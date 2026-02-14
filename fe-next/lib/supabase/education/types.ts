@@ -220,3 +220,40 @@ export interface MilestoneLevel {
 }
 
 export type AchievementCategory = 'progress' | 'skill' | 'consistency' | 'exploration';
+
+// ============================================
+// ASSIGNMENT TYPES (Phase 42)
+// ============================================
+
+export type AssignmentType = 'practice' | 'duel';
+export type AssignmentStatus = 'active' | 'overdue' | 'completed';
+
+export interface TeacherAssignment {
+  id: string;
+  classroom_id: string;
+  lesson_id: string;
+  teacher_id: string;
+  assignment_type: AssignmentType;
+  due_date: string | null;
+  title: string | null;
+  instructions: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data (optional)
+  vocabulary_lessons?: VocabularyLesson;
+  completions?: AssignmentCompletion[];
+  completion_count?: number;
+  student_count?: number;
+}
+
+export interface AssignmentCompletion {
+  id: string;
+  assignment_id: string;
+  student_id: string;
+  completed_at: string;
+  score: number;
+  accuracy: number;
+  time_spent_seconds: number;
+  // Joined data (optional)
+  profiles?: { display_name: string; avatar_emoji: string | null };
+}
