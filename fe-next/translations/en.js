@@ -5256,7 +5256,9 @@ const en = {
       "resumeDraft": "Resume Draft?",
       "draftFound": "You have an unsaved lesson draft from {{time}}",
       "resumeDraftButton": "Resume",
-      "discardDraftButton": "Discard"
+      "discardDraftButton": "Discard",
+      "startFromTemplate": "Start from Template",
+      "templateLoaded": "Template loaded: {{count}} words"
     },
     "lessons": {
       "assign": {
@@ -5850,6 +5852,7 @@ const en = {
       "practiceToSee": "Students need to practice to see mastery",
       "viewLessons": "Lessons",
       "viewVocabulary": "Vocabulary",
+      "viewAssignments": "Assignments",
       "backToClassroom": "Back to Classroom"
     },
     "reports": {

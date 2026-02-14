@@ -23,6 +23,7 @@ import { StudentProgressTable } from '@/components/teacher/analytics/StudentProg
 import LessonEffectivenessChart from '@/components/teacher/analytics/LessonEffectivenessChart';
 import { VocabularyHeatmap } from '@/components/teacher/analytics/VocabularyHeatmap';
 import { LiveActivityIndicator } from '@/components/teacher/analytics/LiveActivityIndicator';
+import { AssignmentTrackingPanel } from '@/components/teacher/assignments';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
@@ -164,7 +165,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
         <Tabs defaultValue="students" className="space-y-4">
           <TabsList
             className={cn(
-              'grid w-full grid-cols-3 gap-2',
+              'grid w-full grid-cols-4 gap-2',
               'bg-neo-navy/50 border-neo border-neo-black shadow-hard rounded-neo p-2'
             )}
           >
@@ -201,6 +202,17 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
             >
               {t('education.analytics.viewVocabulary')}
             </TabsTrigger>
+            <TabsTrigger
+              value="assignments"
+              className={cn(
+                'font-neo-body font-bold rounded-neo',
+                'data-[state=active]:bg-neo-yellow data-[state=active]:text-neo-black',
+                'data-[state=inactive]:text-neo-white/70',
+                'transition-all duration-200'
+              )}
+            >
+              {t('education.analytics.viewAssignments')}
+            </TabsTrigger>
           </TabsList>
 
           {/* Student Progress Tab */}
@@ -230,6 +242,19 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
                 {t('education.analytics.vocabularyMastery')}
               </h2>
               <VocabularyHeatmap classroomId={classroomId} />
+            </div>
+          </TabsContent>
+
+          {/* Assignments Tab */}
+          <TabsContent value="assignments" className="space-y-4">
+            <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
+              <AssignmentTrackingPanel
+                classroomId={classroomId}
+                onCreateAssignment={() => {
+                  // Navigate to dashboard with assignment creator open
+                  router.push(`/${locale}/teacher`);
+                }}
+              />
             </div>
           </TabsContent>
         </Tabs>

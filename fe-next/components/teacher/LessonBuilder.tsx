@@ -13,11 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import LessonTemplateEditor from './LessonTemplateEditor';
 import LessonAssignmentDialog from './LessonAssignmentDialog';
-import BulkWordImporter from './BulkWordImporter';
+import { BulkImportEnhanced, TemplateLessonSelector } from './lesson-creation';
 import WordListEditor from './WordListEditor';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Plus, CheckCircle, AlertCircle, X, Pencil, Play, Settings, Clock, Share2 } from 'lucide-react';
+import { Plus, CheckCircle, AlertCircle, X, Pencil, Play, Settings, Clock, Share2, BookTemplate, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/education';
 import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
@@ -44,6 +44,7 @@ export default function LessonBuilder() {
   const [isSaving, setIsSaving] = useState(false);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(true);
 
   // Edit dialog state
   const [editingLesson, setEditingLesson] = useState<VocabularyLesson | null>(null);
@@ -94,6 +95,27 @@ export default function LessonBuilder() {
     toast.success(
       t('teacher.lesson.bulkImportDetected').replace('{{count}}', String(importedWords.length))
     );
+  }, [t]);
+
+  // Handle template selection
+  const handleTemplateSelect = useCallback((template: {
+    id: string;
+    name: string;
+    description: string;
+    language: Language;
+    wordCount: number;
+    category: string;
+    words: VocabularyWord[];
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      name: template.name,
+      description: template.description,
+      language: template.language,
+    }));
+    setWords(template.words);
+    setShowTemplateSelector(false); // Collapse after selection
+    toast.success(t('teacher.lesson.templateLoaded').replace('{{count}}', String(template.words.length)));
   }, [t]);
 
   // Handle draft restore
@@ -422,6 +444,37 @@ export default function LessonBuilder() {
             </Dialog.Description>
 
             <div className="space-y-4">
+              {/* Template Selector - Collapsible */}
+              <div className="border-neo border-neo-black rounded-neo p-4 bg-neo-navy/50">
+                <button
+                  onClick={() => setShowTemplateSelector(!showTemplateSelector)}
+                  className="flex items-center justify-between w-full text-left"
+                  type="button"
+                >
+                  <div className="flex items-center gap-2">
+                    <BookTemplate className="w-5 h-5 text-neo-yellow" />
+                    <span className="font-neo-body font-bold text-neo-white">
+                      {t('teacher.lesson.startFromTemplate')}
+                    </span>
+                  </div>
+                  <ChevronDown
+                    className={cn(
+                      'w-5 h-5 text-neo-white transition-transform',
+                      showTemplateSelector && 'rotate-180'
+                    )}
+                  />
+                </button>
+
+                {showTemplateSelector && (
+                  <div className="mt-4">
+                    <TemplateLessonSelector
+                      classroomLanguage={formData.language}
+                      onSelect={handleTemplateSelect}
+                    />
+                  </div>
+                )}
+              </div>
+
               {/* Lesson Name */}
               <div>
                 <label className="block text-sm font-neo-body text-neo-white mb-2">
@@ -615,7 +668,7 @@ export default function LessonBuilder() {
       )}
 
       {/* Bulk Word Importer */}
-      <BulkWordImporter
+      <BulkImportEnhanced
         isOpen={isBulkImportOpen}
         onClose={() => setIsBulkImportOpen(false)}
         onImport={handleBulkImport}
