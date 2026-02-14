@@ -169,10 +169,10 @@ Plans:
   2. Duel PageClient.tsx uses real API fetches instead of mock classroom/lesson data
   3. No unused exported functions in duel data layer (getActiveDuelsForStudent removed or used)
   4. Phase 37 has a VERIFICATION.md confirming all success criteria were met
-**Plans**: TBD (created by /gsd:plan-phase 44)
+**Plans**: 1 plan
 
 Plans:
-- [ ] 44-01-PLAN.md — Wire ChallengeButton + replace mock data + cleanup unused exports + Phase 37 verification
+- [ ] 44-01-PLAN.md — Wire ChallengeButton to profile + duel lobby classmates tab + remove unused export + Phase 37 verification
 
 ## Progress
 
