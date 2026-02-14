@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 40 COMPLETE — Gamification Enhancements. Ready for Phase 41.
+**Current focus:** Phase 41 COMPLETE — Student Dashboard Overhaul. Ready for Phase 42.
 
 ## Current Position
 
-Phase: 41 of 43 (Student Dashboard Overhaul) — IN PROGRESS
-Plan: 4 of 6 in current phase (activity feed complete)
-Status: Plan 41-02 COMPLETE — Classroom activity feed showing recent duels and achievements
-Last activity: 2026-02-14 — Completed 41-02-PLAN.md (activity feed)
+Phase: 41 of 43 (Student Dashboard Overhaul) — COMPLETE
+Plan: 4 of 4 in current phase (all plans complete, verified)
+Status: Phase 41 COMPLETE — Dashboard overhaul with activity feed, streak calendar, quick-play, profile enhancements
+Last activity: 2026-02-14 — Phase 41 verified (3/3 must-haves passed)
 
-Progress: [█████████████░] ~66% (5.5/8 phases complete, 4/6 plans in phase 41)
+Progress: [██████████████░] ~75% (6/8 phases complete)
 
 ## Performance Metrics
 
@@ -167,6 +167,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 41-02-PLAN.md (classroom activity feed)
+Stopped at: Phase 41 COMPLETE — All 4 plans executed, verified 3/3 must-haves
 Resume file: None
-Next action: Continue Phase 41 with remaining plans (41-04 or others as orchestrator assigns).
+Next action: Plan Phase 42 (Teacher Dashboard & Workflows)

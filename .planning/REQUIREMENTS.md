@@ -52,7 +52,7 @@ Deeper progression and competitive systems.
 
 Visual improvements across all education pages.
 
-- [ ] **UIPOL-01**: Student dashboard overhaul — engaging layout with activity feed, duel invites widget, streak calendar, quick-play buttons, progress visualization
+- [x] **UIPOL-01**: Student dashboard overhaul — engaging layout with activity feed, duel invites widget, streak calendar, quick-play buttons, progress visualization
 - [ ] **UIPOL-02**: Teacher dashboard UX improvements — faster navigation, better analytics layout, assignment tracking panel, student duel monitoring
 - [ ] **UIPOL-03**: Practice experience polish — better feedback animations, progress indicators, mode transitions, session completion summaries
 - [ ] **UIPOL-04**: Neo-brutalist consistency audit — ensure all education pages follow design system (hard shadows, chunky borders, Fredoka/Rubik typography, proper color palette)
@@ -69,9 +69,9 @@ Improved teacher tools and workflows.
 
 Student-facing social features within classroom boundaries.
 
-- [ ] **SOC-01**: User has a student profile page showing stats, badges, recent activity, XP level, and duel record
+- [x] **SOC-01**: User has a student profile page showing stats, badges, recent activity, XP level, and duel record
 - [x] **SOC-02**: User can challenge a specific classmate to a duel directly from their profile or the classroom roster
-- [ ] **SOC-03**: User can see a classroom activity feed showing recent duels, achievements unlocked, and milestones reached by classmates
+- [x] **SOC-03**: User can see a classroom activity feed showing recent duels, achievements unlocked, and milestones reached by classmates
 
 ---
 
