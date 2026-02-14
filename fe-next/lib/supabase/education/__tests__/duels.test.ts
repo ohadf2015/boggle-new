@@ -14,8 +14,6 @@ import {
   type DuelRow,
   type DuelTurnRow,
   type CreateDuelData,
-  type DuelHistoryEntry,
-  type DuelStatsResult,
 } from '../duels';
 
 // Mock Supabase client following practice.test.ts pattern
