@@ -1,6 +1,6 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useClassroomLeaderboard } from '../useClassroomLeaderboard';
-import * as teacherLib from '@/lib/supabase/education';
+import * as educationLib from '@/lib/supabase/education';
 
 // Mock the education library
 jest.mock('@/lib/supabase/education');
@@ -16,6 +16,23 @@ jest.mock('@/utils/logger', () => ({
   },
 }));
 
+// Helper to create a LeaderboardEntryWithDelta
+const createEntry = (overrides: Record<string, any> = {}) => ({
+  userId: 'student-1',
+  displayName: 'Student',
+  avatarUrl: null,
+  totalXp: 100,
+  currentLevel: 1,
+  rank: 1,
+  isCurrentUser: false,
+  isInactive: false,
+  currentStreak: 0,
+  previousRank: null,
+  rankDelta: null,
+  isNew: false,
+  ...overrides,
+});
+
 describe('useClassroomLeaderboard', () => {
   const mockClassroomId = 'classroom-123';
   const mockCurrentUserId = 'student-456';
@@ -29,7 +46,7 @@ describe('useClassroomLeaderboard', () => {
   describe('Basic Functionality', () => {
     it('returns loading state initially', () => {
       // GIVEN: Mock returns pending promise
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockImplementation(
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockImplementation(
         () => new Promise(() => {}) // Never resolves
       );
 
@@ -43,61 +60,24 @@ describe('useClassroomLeaderboard', () => {
 
       // THEN: Should show loading state
       expect(result.current.isLoading).toBe(true);
+      expect(result.current.fullList).toEqual([]);
       expect(result.current.topThree).toEqual([]);
       expect(result.current.currentUserRank).toBeNull();
       expect(result.current.error).toBeNull();
     });
 
-    it('fetches and returns top 3 students sorted by XP descending', async () => {
+    it('fetches and returns full list sorted by XP descending', async () => {
       // GIVEN: Mock data with 5 students
-      const mockData = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: 'https://example.com/alice.jpg',
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-2',
-            displayName: 'Bob',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: 'https://example.com/carol.jpg',
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: {
-          userId: mockCurrentUserId,
-          displayName: 'Current User',
-          avatarUrl: null,
-          totalXp: 150,
-          currentLevel: 2,
-          rank: 4,
-          isCurrentUser: true,
-          isInactive: false,
-        },
-        totalStudents: 5,
-      };
+      const mockFullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, currentLevel: 5, rank: 1 }),
+        createEntry({ userId: 'student-2', displayName: 'Bob', totalXp: 350, currentLevel: 4, rank: 2 }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, currentLevel: 3, rank: 3 }),
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 150, currentLevel: 2, rank: 4, isCurrentUser: true }),
+        createEntry({ userId: 'student-5', displayName: 'Eve', totalXp: 50, currentLevel: 1, rank: 5 }),
+      ];
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: mockFullList,
         error: null,
       });
 
@@ -109,11 +89,12 @@ describe('useClassroomLeaderboard', () => {
         })
       );
 
-      // THEN: Should return top 3 students in descending XP order
+      // THEN: Should return full list and derived top 3
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      expect(result.current.fullList).toHaveLength(5);
       expect(result.current.topThree).toHaveLength(3);
       expect(result.current.topThree[0].totalXp).toBe(500);
       expect(result.current.topThree[1].totalXp).toBe(350);
@@ -123,54 +104,16 @@ describe('useClassroomLeaderboard', () => {
 
     it('returns current user rank when not in top 3', async () => {
       // GIVEN: Current user is 4th place
-      const mockData = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-2',
-            displayName: 'Bob',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: {
-          userId: mockCurrentUserId,
-          displayName: 'Current User',
-          avatarUrl: null,
-          totalXp: 150,
-          currentLevel: 2,
-          rank: 4,
-          isCurrentUser: true,
-          isInactive: false,
-        },
-        totalStudents: 5,
-      };
+      const mockFullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+        createEntry({ userId: 'student-2', displayName: 'Bob', totalXp: 350, rank: 2 }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 150, rank: 4, isCurrentUser: true }),
+        createEntry({ userId: 'student-5', displayName: 'Eve', totalXp: 50, rank: 5 }),
+      ];
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: mockFullList,
         error: null,
       });
 
@@ -182,7 +125,7 @@ describe('useClassroomLeaderboard', () => {
         })
       );
 
-      // THEN: Should return current user as separate rank
+      // THEN: Should return current user as separate rank (derived from fullList)
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
@@ -195,45 +138,14 @@ describe('useClassroomLeaderboard', () => {
 
     it('handles current user in top 3 (isCurrentUser = true, no duplicate)', async () => {
       // GIVEN: Current user is 2nd place
-      const mockData = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: mockCurrentUserId,
-            displayName: 'Current User',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: true,
-            isInactive: false,
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null, // Not needed when in top 3
-        totalStudents: 3,
-      };
+      const mockFullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 350, rank: 2, isCurrentUser: true }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
+      ];
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: mockFullList,
         error: null,
       });
 
@@ -245,7 +157,7 @@ describe('useClassroomLeaderboard', () => {
         })
       );
 
-      // THEN: Current user should be in top 3 with isCurrentUser = true
+      // THEN: Current user should be in top 3, currentUserRank should be null
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
@@ -258,45 +170,14 @@ describe('useClassroomLeaderboard', () => {
 
     it('marks inactive students (7+ days no practice)', async () => {
       // GIVEN: Mock data with inactive student
-      const mockData = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-2',
-            displayName: 'Bob (Inactive)',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: false,
-            isInactive: true, // Marked as inactive
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 3,
-      };
+      const mockFullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+        createEntry({ userId: 'student-2', displayName: 'Bob (Inactive)', totalXp: 350, rank: 2, isInactive: true }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
+      ];
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: mockFullList,
         error: null,
       });
 
@@ -313,9 +194,9 @@ describe('useClassroomLeaderboard', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.topThree[1].isInactive).toBe(true);
-      expect(result.current.topThree[0].isInactive).toBe(false);
-      expect(result.current.topThree[2].isInactive).toBe(false);
+      expect(result.current.fullList[1].isInactive).toBe(true);
+      expect(result.current.fullList[0].isInactive).toBe(false);
+      expect(result.current.fullList[2].isInactive).toBe(false);
     });
   });
 
@@ -324,14 +205,8 @@ describe('useClassroomLeaderboard', () => {
   describe('Edge Cases', () => {
     it('handles empty classroom gracefully', async () => {
       // GIVEN: Empty classroom
-      const mockData = {
-        topThree: [],
-        currentUserRank: null,
-        totalStudents: 0,
-      };
-
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: [],
         error: null,
       });
 
@@ -348,6 +223,7 @@ describe('useClassroomLeaderboard', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      expect(result.current.fullList).toEqual([]);
       expect(result.current.topThree).toEqual([]);
       expect(result.current.currentUserRank).toBeNull();
       expect(result.current.totalStudents).toBe(0);
@@ -356,25 +232,12 @@ describe('useClassroomLeaderboard', () => {
 
     it('handles classroom with only 1 student', async () => {
       // GIVEN: Only current user in classroom
-      const mockData = {
-        topThree: [
-          {
-            userId: mockCurrentUserId,
-            displayName: 'Current User',
-            avatarUrl: null,
-            totalXp: 100,
-            currentLevel: 2,
-            rank: 1,
-            isCurrentUser: true,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 1,
-      };
+      const mockFullList = [
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 100, rank: 1, isCurrentUser: true }),
+      ];
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: mockFullList,
         error: null,
       });
 
@@ -386,11 +249,12 @@ describe('useClassroomLeaderboard', () => {
         })
       );
 
-      // THEN: Should return single student
+      // THEN: Should return single student in top 3 and fullList
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      expect(result.current.fullList).toHaveLength(1);
       expect(result.current.topThree).toHaveLength(1);
       expect(result.current.topThree[0].isCurrentUser).toBe(true);
       expect(result.current.currentUserRank).toBeNull();
@@ -398,35 +262,13 @@ describe('useClassroomLeaderboard', () => {
 
     it('handles classroom with exactly 2 students', async () => {
       // GIVEN: 2 students
-      const mockData = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: mockCurrentUserId,
-            displayName: 'Current User',
-            avatarUrl: null,
-            totalXp: 100,
-            currentLevel: 2,
-            rank: 2,
-            isCurrentUser: true,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 2,
-      };
+      const mockFullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 200, rank: 1 }),
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 100, rank: 2, isCurrentUser: true }),
+      ];
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: mockData,
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: mockFullList,
         error: null,
       });
 
@@ -443,6 +285,7 @@ describe('useClassroomLeaderboard', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      expect(result.current.fullList).toHaveLength(2);
       expect(result.current.topThree).toHaveLength(2);
       expect(result.current.currentUserRank).toBeNull();
     });
@@ -458,7 +301,7 @@ describe('useClassroomLeaderboard', () => {
         resolvePromise = resolve;
       });
 
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockReturnValue(promise as any);
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockReturnValue(promise as any);
 
       // WHEN: Hook is rendered
       const { result } = renderHook(() =>
@@ -472,9 +315,8 @@ describe('useClassroomLeaderboard', () => {
       expect(result.current.isLoading).toBe(true);
 
       // Complete the promise
-      resolvePromise!({
-        data: { topThree: [], currentUserRank: null, totalStudents: 0 },
-        error: null,
+      await act(async () => {
+        resolvePromise!({ data: [], error: null });
       });
 
       await waitFor(() => {
@@ -485,8 +327,8 @@ describe('useClassroomLeaderboard', () => {
     it('handles error state', async () => {
       // GIVEN: API returns error
       const mockError = { message: 'Failed to fetch leaderboard' };
-      jest.spyOn(teacherLib, 'getClassroomLeaderboard').mockResolvedValue({
-        data: { topThree: [], currentUserRank: null, totalStudents: 0 },
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+        data: [],
         error: mockError,
       });
 
@@ -512,55 +354,19 @@ describe('useClassroomLeaderboard', () => {
 
   describe('Refresh Functionality', () => {
     it('refresh function re-fetches data', async () => {
-      // GIVEN: Initial data
-      const mockData1 = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 1,
-      };
-
-      const mockData2 = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 600,
-            currentLevel: 6,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: mockCurrentUserId,
-            displayName: 'Current User',
-            avatarUrl: null,
-            totalXp: 100,
-            currentLevel: 2,
-            rank: 2,
-            isCurrentUser: true,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 2,
-      };
+      // GIVEN: Initial data (1 student) then updated data (2 students)
+      const mockFullList1 = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+      ];
+      const mockFullList2 = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 600, rank: 1 }),
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 100, rank: 2, isCurrentUser: true }),
+      ];
 
       const mockFetch = jest
-        .spyOn(teacherLib, 'getClassroomLeaderboard')
-        .mockResolvedValueOnce({ data: mockData1, error: null })
-        .mockResolvedValueOnce({ data: mockData2, error: null });
+        .spyOn(educationLib, 'getLeaderboardWithRankDelta')
+        .mockResolvedValueOnce({ data: mockFullList1, error: null })
+        .mockResolvedValueOnce({ data: mockFullList2, error: null });
 
       // WHEN: Hook is rendered and refreshed
       const { result } = renderHook(() =>
@@ -574,15 +380,17 @@ describe('useClassroomLeaderboard', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.topThree).toHaveLength(1);
+      expect(result.current.fullList).toHaveLength(1);
       expect(result.current.totalStudents).toBe(1);
 
       // Refresh
-      await result.current.refresh();
+      await act(async () => {
+        await result.current.refresh();
+      });
 
       // THEN: Should fetch new data
       await waitFor(() => {
-        expect(result.current.topThree).toHaveLength(2);
+        expect(result.current.fullList).toHaveLength(2);
       });
 
       expect(result.current.totalStudents).toBe(2);
@@ -590,63 +398,62 @@ describe('useClassroomLeaderboard', () => {
     });
   });
 
-  // ==================== TIME SCOPE (WEEKLY) ====================
+  // ==================== TIME SCOPE ====================
 
-  describe('Time Scope - Weekly', () => {
-    it('supports weekly time scope filtering', async () => {
-      // GIVEN: Weekly leaderboard data
-      const mockData = {
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 150, // XP earned this week
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 1,
-      };
-
+  describe('Time Scope', () => {
+    it('defaults to weekly scope', async () => {
+      // GIVEN: Leaderboard data
       const mockFetch = jest
-        .spyOn(teacherLib, 'getClassroomLeaderboard')
-        .mockResolvedValue({ data: mockData, error: null });
+        .spyOn(educationLib, 'getLeaderboardWithRankDelta')
+        .mockResolvedValue({ data: [], error: null });
 
-      // WHEN: Hook is rendered with weekly scope
+      // WHEN: Hook is rendered without initialTimeScope
       const { result } = renderHook(() =>
         useClassroomLeaderboard({
           classroomId: mockClassroomId,
           currentUserId: mockCurrentUserId,
-          timeScope: 'weekly',
         })
       );
 
-      // THEN: Should pass weekly scope to API
+      // THEN: Should default to 'weekly'
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
+      expect(result.current.timeScope).toBe('weekly');
       expect(mockFetch).toHaveBeenCalledWith(mockClassroomId, mockCurrentUserId, 'weekly');
-      expect(result.current.topThree).toHaveLength(1);
     });
 
-    it('defaults to all-time scope when not specified', async () => {
-      // GIVEN: All-time leaderboard data
-      const mockData = {
-        topThree: [],
-        currentUserRank: null,
-        totalStudents: 0,
-      };
-
+    it('supports custom initialTimeScope', async () => {
+      // GIVEN: Monthly scope requested
       const mockFetch = jest
-        .spyOn(teacherLib, 'getClassroomLeaderboard')
-        .mockResolvedValue({ data: mockData, error: null });
+        .spyOn(educationLib, 'getLeaderboardWithRankDelta')
+        .mockResolvedValue({ data: [], error: null });
 
-      // WHEN: Hook is rendered without timeScope
+      // WHEN: Hook is rendered with monthly scope
+      const { result } = renderHook(() =>
+        useClassroomLeaderboard({
+          classroomId: mockClassroomId,
+          currentUserId: mockCurrentUserId,
+          initialTimeScope: 'monthly',
+        })
+      );
+
+      // THEN: Should use monthly scope
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.timeScope).toBe('monthly');
+      expect(mockFetch).toHaveBeenCalledWith(mockClassroomId, mockCurrentUserId, 'monthly');
+    });
+
+    it('exposes setTimeScope to change scope', async () => {
+      // GIVEN: Hook with default scope
+      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta')
+        .mockResolvedValue({ data: [], error: null });
+
+      // WHEN: Hook is rendered
       const { result } = renderHook(() =>
         useClassroomLeaderboard({
           classroomId: mockClassroomId,
@@ -654,12 +461,12 @@ describe('useClassroomLeaderboard', () => {
         })
       );
 
-      // THEN: Should default to 'all-time'
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(mockClassroomId, mockCurrentUserId, 'all-time');
+      // THEN: setTimeScope should be available
+      expect(typeof result.current.setTimeScope).toBe('function');
     });
   });
 });

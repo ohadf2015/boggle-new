@@ -1717,6 +1717,22 @@ const en = {
     "DAILY_DOUBLE": {
       "name": "Daily Double",
       "description": "Crushed both challenges today"
+    },
+    "duelWinner": {
+      "name": "Duel Winner",
+      "description": "Win duels against opponents"
+    },
+    "practiceMaster": {
+      "name": "Practice Master",
+      "description": "Master all practice modes"
+    },
+    "streakLegend": {
+      "name": "Streak Legend",
+      "description": "Maintain an impressive streak"
+    },
+    "secretWord": {
+      "name": "Secret Word",
+      "description": "Discover a secret word"
     }
   },
   "achievementTiers": {
@@ -5571,7 +5587,17 @@ const en = {
       "xp": "{xp} XP",
       "rank": "Rank",
       "totalXP": "Total XP",
-      "streak": "Streak"
+      "streak": "Streak",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "allTime": "All Time",
+      "rankUp": "+{{count}}",
+      "rankDown": "-{{count}}",
+      "newEntry": "NEW",
+      "noChange": "-",
+      "top10": "Top 10%",
+      "top25": "Top 25%",
+      "top50": "Top 50%"
     },
     "header": {
       "title": "LexiClash",
@@ -5780,6 +5806,18 @@ const en = {
         "noData": "No data available for report"
       }
     },
+    "milestones": {
+      "xpRemaining": "{{xp}} XP to Level {{level}}",
+      "nextMilestone": "Next Milestone",
+      "titleUnlock": "Unlocks: {{title}}",
+      "reached": "Milestone Reached!",
+      "xpBonus": "+{{xp}} XP Bonus",
+      "coinBonus": "+{{coins}} Coins",
+      "continue": "Continue",
+      "maxLevel": "Max Level!",
+      "level": "Level",
+      "titleUnlocked": "Title Unlocked"
+    },
     "achievements": {
       "title": "Achievements",
       "completion": "{percent}% Complete - {earned}/{total} badges",
@@ -5797,6 +5835,12 @@ const en = {
       "continue": "Continue",
       "newBadge": "New Badge!",
       "tierUpgrade": "Tier Upgrade!",
+      "all": "All",
+      "skill": "Skill",
+      "consistency": "Consistency",
+      "exploration": "Exploration",
+      "maxTier": "MAX",
+      "tierProgress": "{{current}} / {{target}}",
       "tiers": {
         "bronze": "Bronze",
         "silver": "Silver",
@@ -5901,6 +5945,46 @@ const en = {
         "name": "Word Variety",
         "description": "Discover many unique vocabulary words",
         "hint": "Hidden until discovered..."
+      },
+      "duel_champion": {
+        "name": "Duel Champion",
+        "description": "Win duels against classmates"
+      },
+      "duel_streak": {
+        "name": "Winning Streak",
+        "description": "Win consecutive duels"
+      },
+      "comeback_king": {
+        "name": "Comeback King",
+        "description": "Win after trailing"
+      },
+      "speed_dueler": {
+        "name": "Speed Dueler",
+        "description": "Find words fast in real-time duels"
+      },
+      "duel_veteran": {
+        "name": "Duel Veteran",
+        "description": "Play many duels"
+      },
+      "spelling_ace": {
+        "name": "Spelling Ace",
+        "description": "Perfect spelling rounds"
+      },
+      "matching_master": {
+        "name": "Matching Master",
+        "description": "Fast matching completions"
+      },
+      "blitz_champion": {
+        "name": "Blitz Champion",
+        "description": "Score high in Blitz mode"
+      },
+      "practice_streak": {
+        "name": "Practice Streak",
+        "description": "Practice on consecutive days"
+      },
+      "mode_master": {
+        "name": "Mode Master",
+        "description": "Complete all practice modes"
       }
     }
   },
@@ -6071,40 +6155,39 @@ const en = {
   // Challenge system (Daily + Weekly)
   challenges: {
     daily: {
-      practiceSessions: "Complete Practice Sessions",
-      practiceSessionsDesc: "Finish {target} practice sessions today",
-      wordsMastered: "Master New Words",
-      wordsMasteredDesc: "Master {target} words today",
-      duelPlayed: "Play a Duel",
-      duelPlayedDesc: "Play {target} duel match today",
-      duelWins: "Win Duels",
-      duelWinsDesc: "Win {target} duel matches today",
-      perfectAccuracy: "Perfect Accuracy",
-      perfectAccuracyDesc: "Complete a practice with 100% accuracy",
-      blitzHighScore: "Blitz Mode Score",
-      blitzHighScoreDesc: "Score {target}+ points in Blitz mode",
-      xpEarned: "Earn XP",
-      xpEarnedDesc: "Earn {target} XP today",
-      duelStreak: "Duel Win Streak",
-      duelStreakDesc: "Win {target} duels in a row",
-      spellingPerfect: "Perfect Spelling",
-      spellingPerfectDesc: "Get {target} perfect scores in spelling practice",
+      title: "Daily Challenges",
+      resetsIn: "Resets in {{time}}",
+      practiceSessions: "Complete {{count}} practice sessions",
+      practiceSessionsDesc: "Practice makes perfect!",
+      wordsMastered: "Master {{count}} new words",
+      wordsMasteredDesc: "Expand your vocabulary",
+      duelPlayed: "Play {{count}} duel",
+      duelPlayedDesc: "Challenge a classmate",
+      duelWins: "Win {{count}} duels",
+      duelWinsDesc: "Show your word skills",
+      perfectAccuracy: "Get perfect accuracy",
+      perfectAccuracyDesc: "No mistakes allowed!",
+      blitzHighScore: "Score {{count}}+ in Blitz",
+      blitzHighScoreDesc: "Speed and accuracy",
+      xpEarned: "Earn {{count}} XP",
+      xpEarnedDesc: "Keep learning!",
+      duelStreak: "Win {{count}} duels in a row",
+      duelStreakDesc: "Unstoppable!",
+      spellingPerfect: "{{count}} perfect spelling rounds",
+      spellingPerfectDesc: "Spell it right!",
     },
     weekly: {
+      title: "Weekly Quests",
       masterWords: "Weekly Word Mastery",
       masterWordsDesc: "Master {target} words this week",
     },
-    claim: "Claim Reward",
-    claimed: "Claimed!",
+    claim: "Claim",
+    claimed: "Claimed",
+    noChallenges: "No challenges available",
     completed: "Completed",
     easy: "Easy",
     medium: "Medium",
-    hard: "Hard",
-    daily: "Daily Challenges",
-    weekly: "Weekly Quests",
-    noActiveChallenges: "No active challenges",
-    dailyReset: "Resets in {hours}h {minutes}m",
-    weeklyReset: "Resets on Monday",
+    hard: "Hard"
   }
 };
 

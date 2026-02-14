@@ -4,8 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useMounted } from '@/hooks/useMounted';
 import {
   getClassroomLeaderboard,
+  getLeaderboardWithRankDelta,
   type LeaderboardEntry,
+  type LeaderboardEntryWithDelta,
   type ClassroomLeaderboardData,
+  type LeaderboardTimeScope,
 } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 
@@ -18,17 +21,21 @@ export interface UseClassroomLeaderboardOptions {
   classroomId: string;
   /** Current student's user ID (for isCurrentUser marking) */
   currentUserId: string;
-  /** Time scope: 'all-time' (default) or 'weekly' */
-  timeScope?: 'weekly' | 'all-time';
+  /** Initial time scope: 'weekly' (default), 'monthly', or 'all-time' */
+  initialTimeScope?: LeaderboardTimeScope;
 }
 
 interface UseClassroomLeaderboardState {
-  /** Top 3 students by XP */
+  /** Top 3 students by XP (deprecated - use fullList instead) */
   topThree: LeaderboardEntry[];
-  /** Current user's rank (if not in top 3) */
+  /** Current user's rank (if not in top 3) (deprecated - use fullList instead) */
   currentUserRank: LeaderboardEntry | null;
+  /** Full list of all students with rank delta */
+  fullList: LeaderboardEntryWithDelta[];
   /** Total number of students in classroom */
   totalStudents: number;
+  /** Current time scope */
+  timeScope: LeaderboardTimeScope;
   /** Loading state */
   isLoading: boolean;
   /** Error state */
@@ -38,6 +45,8 @@ interface UseClassroomLeaderboardState {
 interface UseClassroomLeaderboardActions {
   /** Re-fetch leaderboard data */
   refresh: () => Promise<void>;
+  /** Change time scope (weekly, monthly, all-time) */
+  setTimeScope: (scope: LeaderboardTimeScope) => void;
 }
 
 export type UseClassroomLeaderboardReturn = UseClassroomLeaderboardState &
@@ -78,13 +87,17 @@ export type UseClassroomLeaderboardReturn = UseClassroomLeaderboardState &
 export function useClassroomLeaderboard(
   options: UseClassroomLeaderboardOptions
 ): UseClassroomLeaderboardReturn {
-  const { classroomId, currentUserId, timeScope = 'all-time' } = options;
+  const { classroomId, currentUserId, initialTimeScope = 'weekly' } = options;
   const isMounted = useMounted();
+
+  const [timeScope, setTimeScope] = useState<LeaderboardTimeScope>(initialTimeScope);
 
   const [state, setState] = useState<UseClassroomLeaderboardState>({
     topThree: [],
     currentUserRank: null,
+    fullList: [],
     totalStudents: 0,
+    timeScope: initialTimeScope,
     isLoading: true,
     error: null,
   });
@@ -96,7 +109,9 @@ export function useClassroomLeaderboard(
       setState({
         topThree: [],
         currentUserRank: null,
+        fullList: [],
         totalStudents: 0,
+        timeScope,
         isLoading: false,
         error: null,
       });
@@ -106,7 +121,8 @@ export function useClassroomLeaderboard(
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
 
-      const { data, error } = await getClassroomLeaderboard(
+      // Fetch full leaderboard with rank delta
+      const { data: fullList, error } = await getLeaderboardWithRankDelta(
         classroomId,
         currentUserId,
         timeScope
@@ -117,15 +133,26 @@ export function useClassroomLeaderboard(
           setState({
             topThree: [],
             currentUserRank: null,
+            fullList: [],
             totalStudents: 0,
+            timeScope,
             isLoading: false,
             error: new Error(error.message),
           });
         } else {
+          // Extract top 3 and current user rank for backward compatibility
+          const topThree = fullList.slice(0, 3);
+          const currentUserInTopThree = topThree.some(e => e.isCurrentUser);
+          const currentUserRank = currentUserInTopThree
+            ? null
+            : fullList.find(e => e.isCurrentUser) || null;
+
           setState({
-            topThree: data.topThree,
-            currentUserRank: data.currentUserRank,
-            totalStudents: data.totalStudents,
+            topThree,
+            currentUserRank,
+            fullList,
+            totalStudents: fullList.length,
+            timeScope,
             isLoading: false,
             error: null,
           });
@@ -160,6 +187,7 @@ export function useClassroomLeaderboard(
   return {
     ...state,
     refresh,
+    setTimeScope,
   };
 }
 

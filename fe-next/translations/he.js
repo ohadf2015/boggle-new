@@ -1726,6 +1726,22 @@ const he = {
     "DAILY_DOUBLE": {
       "name": "דאבל יומי 🏆",
       "description": "ריסקת את שני האתגרים היום!"
+    },
+    "duelWinner": {
+      "name": "מנצח דו-קרב",
+      "description": "נצח בדו-קרבות מול יריבים"
+    },
+    "practiceMaster": {
+      "name": "מאסטר תרגול",
+      "description": "שלוט בכל מצבי התרגול"
+    },
+    "streakLegend": {
+      "name": "אגדת רצף",
+      "description": "שמור על רצף מרשים"
+    },
+    "secretWord": {
+      "name": "מילה סודית",
+      "description": "גלה מילה סודית"
     }
   },
   "achievementTiers": {
@@ -5585,7 +5601,17 @@ const he = {
       "xp": "{xp} נקודות ניסיון",
       "rank": "דירוג",
       "totalXP": "סה״כ XP",
-      "streak": "רצף ימים"
+      "streak": "רצף ימים",
+      "weekly": "שבועי",
+      "monthly": "חודשי",
+      "allTime": "כל הזמנים",
+      "rankUp": "+{{count}}",
+      "rankDown": "-{{count}}",
+      "newEntry": "חדש",
+      "noChange": "-",
+      "top10": "10% עליון",
+      "top25": "25% עליון",
+      "top50": "50% עליון"
     },
     "header": {
       "title": "LexiClash",
@@ -5799,6 +5825,18 @@ const he = {
         "noData": "אין נתונים זמינים לדוח"
       }
     },
+    "milestones": {
+      "xpRemaining": "{{xp}} XP לרמה {{level}}",
+      "nextMilestone": "אבן דרך הבאה",
+      "titleUnlock": "פותח: {{title}}",
+      "reached": "אבן דרך הושגה!",
+      "xpBonus": "+{{xp}} XP בונוס",
+      "coinBonus": "+{{coins}} מטבעות",
+      "continue": "המשך",
+      "maxLevel": "רמה מקסימלית!",
+      "level": "רמה",
+      "titleUnlocked": "תואר נפתח"
+    },
     "achievements": {
       "title": "הישגים",
       "completion": "{percent}% הושלמו - {earned}/{total} תגים",
@@ -5816,6 +5854,12 @@ const he = {
       "continue": "המשך",
       "newBadge": "תג חדש!",
       "tierUpgrade": "שדרוג דרגה!",
+      "all": "הכל",
+      "skill": "מיומנות",
+      "consistency": "עקביות",
+      "exploration": "חקירה",
+      "maxTier": "מקסימום",
+      "tierProgress": "{{current}} / {{target}}",
       "tiers": {
         "bronze": "ארד",
         "silver": "כסף",
@@ -5920,6 +5964,46 @@ const he = {
         "name": "מגוון מילים",
         "description": "גלה מילות אוצר ייחודיות רבות",
         "hint": "מוסתר עד שיתגלה..."
+      },
+      "duel_champion": {
+        "name": "אלוף הדו-קרב",
+        "description": "נצח בדו-קרבות נגד חברים"
+      },
+      "duel_streak": {
+        "name": "רצף ניצחונות",
+        "description": "נצח בדו-קרבות ברצף"
+      },
+      "comeback_king": {
+        "name": "מלך הקאמבק",
+        "description": "נצח אחרי פיגור"
+      },
+      "speed_dueler": {
+        "name": "דו-קרב מהיר",
+        "description": "מצא מילים מהר בדו-קרב"
+      },
+      "duel_veteran": {
+        "name": "ותיק הדו-קרב",
+        "description": "שחק הרבה דו-קרבות"
+      },
+      "spelling_ace": {
+        "name": "אלוף האיות",
+        "description": "סבבי איות מושלמים"
+      },
+      "matching_master": {
+        "name": "מומחה ההתאמה",
+        "description": "השלמות התאמה מהירות"
+      },
+      "blitz_champion": {
+        "name": "אלוף הבליץ",
+        "description": "השג ציון גבוה בבליץ"
+      },
+      "practice_streak": {
+        "name": "רצף אימונים",
+        "description": "התאמן בימים רצופים"
+      },
+      "mode_master": {
+        "name": "מומחה המצבים",
+        "description": "השלם את כל מצבי האימון"
       }
     }
   },
@@ -6083,40 +6167,39 @@ const he = {
   // מערכת אתגרים (יומי + שבועי)
   challenges: {
     daily: {
-      practiceSessions: "השלמת תרגולים",
-      practiceSessionsDesc: "השלם {target} תרגולים היום",
-      wordsMastered: "שליטה במילים חדשות",
-      wordsMasteredDesc: "שלוט ב-{target} מילים היום",
-      duelPlayed: "שחק דו-קרב",
-      duelPlayedDesc: "שחק {target} משחק דו-קרב היום",
-      duelWins: "נצח בדו-קרבות",
-      duelWinsDesc: "נצח ב-{target} משחקי דו-קרב היום",
-      perfectAccuracy: "דיוק מושלם",
-      perfectAccuracyDesc: "השלם תרגול עם 100% דיוק",
-      blitzHighScore: "ציון במצב בליץ",
-      blitzHighScoreDesc: "צבור {target}+ נקודות במצב בליץ",
-      xpEarned: "צבור ניסיון",
-      xpEarnedDesc: "צבור {target} נקודות ניסיון היום",
-      duelStreak: "רצף ניצחונות בדו-קרב",
-      duelStreakDesc: "נצח ב-{target} דו-קרבות ברצף",
-      spellingPerfect: "איות מושלם",
-      spellingPerfectDesc: "השג {target} ציונים מושלמים בתרגול איות",
+      title: "אתגרים יומיים",
+      resetsIn: "מתאפס בעוד {{time}}",
+      practiceSessions: "השלם {{count}} אימונים",
+      practiceSessionsDesc: "תרגול עושה מושלם!",
+      wordsMastered: "למד {{count}} מילים חדשות",
+      wordsMasteredDesc: "הרחב את אוצר המילים שלך",
+      duelPlayed: "שחק {{count}} דו-קרב",
+      duelPlayedDesc: "אתגר חבר לכיתה",
+      duelWins: "נצח ב-{{count}} דו-קרבות",
+      duelWinsDesc: "הראה את כישורי המילים שלך",
+      perfectAccuracy: "השג דיוק מושלם",
+      perfectAccuracyDesc: "בלי טעויות!",
+      blitzHighScore: "השג {{count}}+ בבליץ",
+      blitzHighScoreDesc: "מהירות ודיוק",
+      xpEarned: "צבור {{count}} XP",
+      xpEarnedDesc: "המשך ללמוד!",
+      duelStreak: "נצח {{count}} דו-קרבות ברצף",
+      duelStreakDesc: "בלתי ניתן לעצירה!",
+      spellingPerfect: "{{count}} סבבי איות מושלמים",
+      spellingPerfectDesc: "אייתו נכון!",
     },
     weekly: {
+      title: "משימות שבועיות",
       masterWords: "שליטה שבועית במילים",
       masterWordsDesc: "שלוט ב-{target} מילים השבוע",
     },
-    claim: "קבל פרס",
-    claimed: "נתבע!",
+    claim: "קבל",
+    claimed: "נקבל",
+    noChallenges: "אין אתגרים זמינים",
     completed: "הושלם",
     easy: "קל",
     medium: "בינוני",
-    hard: "קשה",
-    daily: "אתגרים יומיים",
-    weekly: "משימות שבועיות",
-    noActiveChallenges: "אין אתגרים פעילים",
-    dailyReset: "מתאפס בעוד {hours}ש {minutes}ד",
-    weeklyReset: "מתאפס ביום שני",
+    hard: "קשה"
   }
 };
 

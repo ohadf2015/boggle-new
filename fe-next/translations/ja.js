@@ -1715,6 +1715,22 @@ const ja = {
     "DAILY_DOUBLE": {
       "name": "デイリー・ダブル",
       "description": "今日の2つのチャレンジを完全制覇！"
+    },
+    "duelWinner": {
+      "name": "デュエルウィナー",
+      "description": "対戦相手にデュエルで勝利"
+    },
+    "practiceMaster": {
+      "name": "練習マスター",
+      "description": "すべての練習モードをマスター"
+    },
+    "streakLegend": {
+      "name": "連続記録の伝説",
+      "description": "印象的な連続記録を維持"
+    },
+    "secretWord": {
+      "name": "秘密の言葉",
+      "description": "秘密の言葉を発見"
     }
   },
   "achievementTiers": {
@@ -5657,7 +5673,17 @@ const ja = {
       "xp": "{xp} XP",
       "rank": "順位",
       "totalXP": "合計XP",
-      "streak": "連続記録"
+      "streak": "連続記録",
+      "weekly": "週間",
+      "monthly": "月間",
+      "allTime": "全期間",
+      "rankUp": "+{{count}}",
+      "rankDown": "-{{count}}",
+      "newEntry": "NEW",
+      "noChange": "-",
+      "top10": "トップ10%",
+      "top25": "トップ25%",
+      "top50": "トップ50%"
     },
     "header": {
       "title": "LexiClash",
@@ -5871,6 +5897,18 @@ const ja = {
         "noData": "レポートに使用できるデータがありません"
       }
     },
+    "milestones": {
+      "xpRemaining": "レベル{{level}}まで {{xp}} XP",
+      "nextMilestone": "次のマイルストーン",
+      "titleUnlock": "解放: {{title}}",
+      "reached": "マイルストーン達成!",
+      "xpBonus": "+{{xp}} XPボーナス",
+      "coinBonus": "+{{coins}} コイン",
+      "continue": "続ける",
+      "maxLevel": "最大レベル!",
+      "level": "レベル",
+      "titleUnlocked": "タイトル解放"
+    },
     "achievements": {
       "title": "実績",
       "completion": "{percent}%完了 - {earned}/{total}バッジ",
@@ -5888,6 +5926,12 @@ const ja = {
       "continue": "続ける",
       "newBadge": "新しいバッジ！",
       "tierUpgrade": "ランクアップ！",
+      "all": "全て",
+      "skill": "スキル",
+      "consistency": "継続",
+      "exploration": "探索",
+      "maxTier": "MAX",
+      "tierProgress": "{{current}} / {{target}}",
       "tiers": {
         "bronze": "ブロンズ",
         "silver": "シルバー",
@@ -5992,6 +6036,46 @@ const ja = {
         "name": "単語バラエティ",
         "description": "多くのユニークな語彙を発見する",
         "hint": "発見されるまで隠されています..."
+      },
+      "duel_champion": {
+        "name": "デュエルチャンピオン",
+        "description": "クラスメートとのデュエルに勝利"
+      },
+      "duel_streak": {
+        "name": "連勝記録",
+        "description": "連続でデュエルに勝利"
+      },
+      "comeback_king": {
+        "name": "逆転王",
+        "description": "劣勢から勝利"
+      },
+      "speed_dueler": {
+        "name": "スピードデュエリスト",
+        "description": "リアルタイムデュエルで素早く単語を発見"
+      },
+      "duel_veteran": {
+        "name": "デュエルベテラン",
+        "description": "多くのデュエルをプレイ"
+      },
+      "spelling_ace": {
+        "name": "スペリングの達人",
+        "description": "完璧なスペリングラウンド"
+      },
+      "matching_master": {
+        "name": "マッチングマスター",
+        "description": "素早いマッチング完了"
+      },
+      "blitz_champion": {
+        "name": "ブリッツチャンピオン",
+        "description": "ブリッツモードで高得点"
+      },
+      "practice_streak": {
+        "name": "練習連続記録",
+        "description": "連続日数で練習"
+      },
+      "mode_master": {
+        "name": "モードマスター",
+        "description": "全練習モードを完了"
       }
     }
   },
@@ -6106,40 +6190,39 @@ const ja = {
   // チャレンジシステム（デイリー＋ウィークリー）
   challenges: {
     daily: {
-      practiceSessions: "練習セッションを完了",
-      practiceSessionsDesc: "今日{target}つの練習セッションを完了する",
-      wordsMastered: "新しい単語をマスター",
-      wordsMasteredDesc: "今日{target}つの単語をマスターする",
-      duelPlayed: "決闘をプレイ",
-      duelPlayedDesc: "今日{target}回決闘をプレイする",
-      duelWins: "決闘に勝利",
-      duelWinsDesc: "今日{target}回決闘に勝利する",
-      perfectAccuracy: "完璧な正確さ",
-      perfectAccuracyDesc: "100%の正確さで練習を完了する",
-      blitzHighScore: "ブリッツモードスコア",
-      blitzHighScoreDesc: "ブリッツモードで{target}以上のポイントを獲得",
-      xpEarned: "XPを獲得",
-      xpEarnedDesc: "今日{target}XPを獲得する",
-      duelStreak: "決闘連勝",
-      duelStreakDesc: "{target}回連続で決闘に勝利する",
-      spellingPerfect: "完璧なスペル",
-      spellingPerfectDesc: "スペル練習で{target}回完璧なスコアを獲得",
+      title: "デイリーチャレンジ",
+      resetsIn: "リセットまで {{time}}",
+      practiceSessions: "練習セッションを{{count}}回完了",
+      practiceSessionsDesc: "練習は力なり!",
+      wordsMastered: "新しい単語を{{count}}個マスター",
+      wordsMasteredDesc: "語彙を広げよう",
+      duelPlayed: "デュエルを{{count}}回プレイ",
+      duelPlayedDesc: "クラスメートに挑戦",
+      duelWins: "デュエルに{{count}}回勝利",
+      duelWinsDesc: "言葉の実力を見せよう",
+      perfectAccuracy: "完全な正確さを達成",
+      perfectAccuracyDesc: "ミスは許されない!",
+      blitzHighScore: "ブリッツで{{count}}+点",
+      blitzHighScoreDesc: "スピードと正確さ",
+      xpEarned: "{{count}} XPを獲得",
+      xpEarnedDesc: "学び続けよう!",
+      duelStreak: "デュエルに{{count}}連勝",
+      duelStreakDesc: "止められない!",
+      spellingPerfect: "完璧なスペリングラウンドを{{count}}回",
+      spellingPerfectDesc: "正しくスペリング!",
     },
     weekly: {
+      title: "ウィークリークエスト",
       masterWords: "週間単語マスタリー",
       masterWordsDesc: "今週{target}つの単語をマスターする",
     },
-    claim: "報酬を受け取る",
-    claimed: "受取済み！",
+    claim: "受け取る",
+    claimed: "受取済み",
+    noChallenges: "チャレンジはありません",
     completed: "完了",
     easy: "簡単",
     medium: "普通",
-    hard: "難しい",
-    daily: "デイリーチャレンジ",
-    weekly: "週間クエスト",
-    noActiveChallenges: "アクティブなチャレンジがありません",
-    dailyReset: "{hours}時間{minutes}分後にリセット",
-    weeklyReset: "月曜日にリセット",
+    hard: "難しい"
   }
 };
 

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ClassroomLeaderboard from './ClassroomLeaderboard';
 import * as useClassroomLeaderboardHook from '@/hooks/useClassroomLeaderboard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -13,9 +13,51 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
+// Mock getLeaderboardTier used directly by TierBadge
+jest.mock('@/lib/supabase/education/leaderboard', () => ({
+  getLeaderboardTier: (rank: number, total: number) => {
+    const pct = rank / total;
+    if (pct <= 0.1) return 'top10';
+    if (pct <= 0.25) return 'top25';
+    if (pct <= 0.5) return 'top50';
+    return null;
+  },
+}));
+
 const mockUseClassroomLeaderboard = useClassroomLeaderboardHook.useClassroomLeaderboard as jest.MockedFunction<
   typeof useClassroomLeaderboardHook.useClassroomLeaderboard
 >;
+
+// Helper to create a fullList entry with delta properties
+const createEntry = (overrides: Record<string, any> = {}) => ({
+  userId: 'student-1',
+  displayName: 'Student',
+  avatarUrl: null,
+  totalXp: 100,
+  currentLevel: 1,
+  rank: 1,
+  isCurrentUser: false,
+  isInactive: false,
+  currentStreak: 0,
+  previousRank: null,
+  rankDelta: null,
+  isNew: false,
+  ...overrides,
+});
+
+// Helper: default mock return value (empty list, not loading)
+const defaultMock = (overrides: Record<string, any> = {}) => ({
+  topThree: [],
+  currentUserRank: null,
+  fullList: [],
+  totalStudents: 0,
+  isLoading: false,
+  error: null,
+  refresh: jest.fn(),
+  timeScope: 'weekly' as const,
+  setTimeScope: jest.fn(),
+  ...overrides,
+} as any);
 
 // Helper to render with language context
 const renderWithLanguage = (ui: React.ReactElement, language: 'en' | 'he' | 'sv' | 'ja' | 'es' = 'en') => {
@@ -39,86 +81,36 @@ describe('ClassroomLeaderboard', () => {
   describe('Rendering', () => {
     it('renders loading skeleton when loading', () => {
       // GIVEN: Loading state
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [],
-        currentUserRank: null,
-        totalStudents: 0,
-        isLoading: true,
-        error: null,
-        refresh: jest.fn(),
-      });
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ isLoading: true }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should show loading state
       expect(screen.getByTestId('leaderboard-skeleton')).toBeInTheDocument();
     });
 
-    it('renders top 3 students with correct rank badges', () => {
-      // GIVEN: Top 3 students
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: 'https://example.com/alice.jpg',
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-2',
-            displayName: 'Bob',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: 'https://example.com/carol.jpg',
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 3,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+    it('renders students from fullList with names and XP', () => {
+      // GIVEN: 3 students in fullList
+      const fullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', avatarUrl: 'https://example.com/alice.jpg', totalXp: 500, currentLevel: 5, rank: 1 }),
+        createEntry({ userId: 'student-2', displayName: 'Bob', totalXp: 350, currentLevel: 4, rank: 2 }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', avatarUrl: 'https://example.com/carol.jpg', totalXp: 200, currentLevel: 3, rank: 3 }),
+      ];
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 3 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should show all 3 students
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
       expect(screen.getByText('Carol')).toBeInTheDocument();
-
-      // Should show rank badges
-      expect(screen.getByTestId('rank-badge-1')).toBeInTheDocument();
-      expect(screen.getByTestId('rank-badge-2')).toBeInTheDocument();
-      expect(screen.getByTestId('rank-badge-3')).toBeInTheDocument();
 
       // Should show XP values
       expect(screen.getByText('500 XP')).toBeInTheDocument();
@@ -131,54 +123,19 @@ describe('ClassroomLeaderboard', () => {
       expect(screen.getByText('Lv. 3')).toBeInTheDocument();
     });
 
-    it('highlights current user when in top 3', () => {
-      // GIVEN: Current user is 2nd place
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: mockCurrentUserId,
-            displayName: 'Current User',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: true,
-            isInactive: false,
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 3,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+    it('highlights current user in list', () => {
+      // GIVEN: Current user is in the list
+      const fullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+        createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 350, rank: 2, isCurrentUser: true }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
+      ];
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 3 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Current user should have highlight class
@@ -187,121 +144,44 @@ describe('ClassroomLeaderboard', () => {
       expect(currentUserCard).toHaveClass('border-neo-cyan');
     });
 
-    it('shows "Your Position" section when user not in top 3', () => {
-      // GIVEN: Current user is 4th place
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-2',
-            displayName: 'Bob',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: {
-          userId: mockCurrentUserId,
-          displayName: 'Current User',
-          avatarUrl: null,
-          totalXp: 150,
-          currentLevel: 2,
-          rank: 4,
-          isCurrentUser: true,
-          isInactive: false,
-        },
-        totalStudents: 5,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+    it('current user highlighted even when not in top 3', () => {
+      // GIVEN: Current user is 5th in a 5-student list
+      const fullList = Array.from({ length: 5 }, (_, i) => createEntry({
+        userId: i === 4 ? mockCurrentUserId : `student-${i + 1}`,
+        displayName: i === 4 ? 'Current User' : `Student ${i + 1}`,
+        totalXp: (5 - i) * 100,
+        currentLevel: 5 - i,
+        rank: i + 1,
+        isCurrentUser: i === 4,
+      }));
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 5 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
-      // THEN: Should show current user position section
-      expect(screen.getByText('You')).toBeInTheDocument();
-      // Verify rank is displayed (there may be multiple #4 on page)
-      expect(screen.getAllByText('#4').length).toBeGreaterThan(0);
-      expect(screen.getByText('150 XP')).toBeInTheDocument();
-      expect(screen.getByText('Lv. 2')).toBeInTheDocument();
+      // THEN: Current user's entry should be highlighted
+      const currentUserCard = screen.getByTestId('leaderboard-entry-current-user');
+      expect(currentUserCard).toHaveClass('bg-neo-cyan/20');
+      expect(screen.getByText('Current User')).toBeInTheDocument();
+      expect(screen.getByText('100 XP')).toBeInTheDocument();
     });
 
     it('displays inactive badge for inactive students', () => {
       // GIVEN: Student 2 is inactive
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-          {
-            userId: 'student-2',
-            displayName: 'Bob',
-            avatarUrl: null,
-            totalXp: 350,
-            currentLevel: 4,
-            rank: 2,
-            isCurrentUser: false,
-            isInactive: true, // Inactive student
-          },
-          {
-            userId: 'student-3',
-            displayName: 'Carol',
-            avatarUrl: null,
-            totalXp: 200,
-            currentLevel: 3,
-            rank: 3,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 3,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      const fullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+        createEntry({ userId: 'student-2', displayName: 'Bob', totalXp: 350, rank: 2, isInactive: true }),
+        createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
+      ];
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 3 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should show inactive badge
@@ -313,22 +193,19 @@ describe('ClassroomLeaderboard', () => {
     });
 
     it('shows footer with total students count', () => {
-      // GIVEN: 5 students in classroom
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [],
-        currentUserRank: null,
-        totalStudents: 5,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      // GIVEN: 5 students in fullList
+      const fullList = Array.from({ length: 5 }, (_, i) => createEntry({
+        userId: `student-${i + 1}`,
+        displayName: `Student ${i + 1}`,
+        totalXp: (5 - i) * 100,
+        rank: i + 1,
+      }));
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 5 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should show student count
@@ -341,21 +218,11 @@ describe('ClassroomLeaderboard', () => {
   describe('Empty State', () => {
     it('shows empty state when no students', () => {
       // GIVEN: Empty classroom
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [],
-        currentUserRank: null,
-        totalStudents: 0,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock());
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should show empty message
@@ -367,33 +234,16 @@ describe('ClassroomLeaderboard', () => {
 
   describe('Translations', () => {
     it('uses correct translation keys', () => {
-      // GIVEN: Mock data
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 1,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      // GIVEN: 1 student in list
+      const fullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, currentLevel: 5, rank: 1 }),
+      ];
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
 
       // WHEN: Component is rendered in English
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should use translation keys
@@ -402,22 +252,12 @@ describe('ClassroomLeaderboard', () => {
     });
 
     it('handles RTL layout (Hebrew)', () => {
-      // GIVEN: Mock data
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [],
-        currentUserRank: null,
-        totalStudents: 0,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      // GIVEN: Empty classroom
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock());
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Container should have dir attribute (ltr from mock context)
@@ -426,37 +266,235 @@ describe('ClassroomLeaderboard', () => {
     });
   });
 
+  // ==================== TIME SCOPE TABS ====================
+
+  describe('Time Scope Tabs', () => {
+    it('renders time scope tabs (Weekly, Monthly, All-Time)', () => {
+      // GIVEN: Mock data with 1 student (so tabs are rendered)
+      const fullList = [createEntry()];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show tabs
+      expect(screen.getByRole('button', { name: /weekly/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /monthly/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /all.time/i })).toBeInTheDocument();
+    });
+  });
+
+  // ==================== RANK DELTA INDICATORS ====================
+
+  describe('Rank Delta Indicators', () => {
+    it('shows green up-arrow for improved rank', () => {
+      // GIVEN: Student improved from rank 3 to rank 1
+      const fullList = [
+        createEntry({ displayName: 'Alice', totalXp: 500, rank: 1, currentStreak: 2, previousRank: 3, rankDelta: 2 }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show up arrow with delta
+      expect(screen.getByTestId('rank-delta-up')).toBeInTheDocument();
+      expect(screen.getByText('+2')).toBeInTheDocument();
+    });
+
+    it('shows orange down-arrow for declined rank', () => {
+      // GIVEN: Student declined from rank 1 to rank 3
+      const fullList = [
+        createEntry({ displayName: 'Bob', totalXp: 200, rank: 3, previousRank: 1, rankDelta: -2 }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show down arrow with delta
+      expect(screen.getByTestId('rank-delta-down')).toBeInTheDocument();
+      expect(screen.getByText('-2')).toBeInTheDocument();
+    });
+
+    it('shows cyan NEW badge for new entry', () => {
+      // GIVEN: New student on leaderboard
+      const fullList = [
+        createEntry({ displayName: 'Charlie', totalXp: 300, rank: 2, currentStreak: 1, isNew: true }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show NEW badge
+      expect(screen.getByTestId('rank-delta-new')).toBeInTheDocument();
+      expect(screen.getByText('NEW')).toBeInTheDocument();
+    });
+
+    it('shows gray dash for no rank change', () => {
+      // GIVEN: Student rank unchanged
+      const fullList = [
+        createEntry({ displayName: 'Dave', totalXp: 400, rank: 1, currentStreak: 4, previousRank: 1, rankDelta: 0 }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show dash
+      expect(screen.getByTestId('rank-delta-none')).toBeInTheDocument();
+      expect(screen.getByText('−')).toBeInTheDocument();
+    });
+  });
+
+  // ==================== STREAK BADGES ====================
+
+  describe('Streak Badges', () => {
+    it('shows streak badge for streak >= 3', () => {
+      // GIVEN: Student with 5-day streak
+      const fullList = [
+        createEntry({ displayName: 'Eve', totalXp: 600, rank: 1, currentStreak: 5, isNew: true }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show streak badge with count
+      expect(screen.getByTestId('streak-badge')).toBeInTheDocument();
+      expect(screen.getByText('🔥 5')).toBeInTheDocument();
+    });
+
+    it('does not show streak badge for streak < 3', () => {
+      // GIVEN: Student with 2-day streak
+      const fullList = [
+        createEntry({ displayName: 'Frank', totalXp: 300, rank: 1, currentStreak: 2, isNew: true }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should NOT show streak badge
+      expect(screen.queryByTestId('streak-badge')).not.toBeInTheDocument();
+    });
+  });
+
+  // ==================== TIER BADGES ====================
+
+  describe('Tier Badges', () => {
+    it('shows Top 10% tier badge', () => {
+      // GIVEN: Student in top 10% (rank 1 of 100)
+      const fullList = [
+        createEntry({ displayName: 'Grace', totalXp: 1000, rank: 1, currentStreak: 7, isNew: true }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 100 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show Top 10% badge
+      expect(screen.getByTestId('tier-badge-top10')).toBeInTheDocument();
+      expect(screen.getByText('Top 10%')).toBeInTheDocument();
+    });
+
+    it('shows Top 25% tier badge', () => {
+      // GIVEN: Student in top 25% (rank 15 of 100)
+      const fullList = [
+        createEntry({ displayName: 'Hank', totalXp: 800, rank: 15, currentStreak: 3, isNew: true }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 100 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show Top 25% badge
+      expect(screen.getByTestId('tier-badge-top25')).toBeInTheDocument();
+      expect(screen.getByText('Top 25%')).toBeInTheDocument();
+    });
+
+    it('shows Top 50% tier badge', () => {
+      // GIVEN: Student in top 50% (rank 30 of 100)
+      const fullList = [
+        createEntry({ displayName: 'Ivy', totalXp: 600, rank: 30, currentStreak: 2, isNew: true }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 100 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show Top 50% badge
+      expect(screen.getByTestId('tier-badge-top50')).toBeInTheDocument();
+      expect(screen.getByText('Top 50%')).toBeInTheDocument();
+    });
+  });
+
+  // ==================== FULL STUDENT LIST ====================
+
+  describe('Full Student List', () => {
+    it('renders full list of all students (not just top 3)', () => {
+      // GIVEN: 10 students
+      const fullList = Array.from({ length: 10 }, (_, i) => createEntry({
+        userId: `student-${i + 1}`,
+        displayName: `Student ${i + 1}`,
+        totalXp: (10 - i) * 100,
+        currentLevel: 10 - i,
+        rank: i + 1,
+        isCurrentUser: i === 4,
+      }));
+
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 10 }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show all 10 students
+      expect(screen.getByText('Student 1')).toBeInTheDocument();
+      expect(screen.getByText('Student 5')).toBeInTheDocument();
+      expect(screen.getByText('Student 10')).toBeInTheDocument();
+
+      // Current user should be highlighted
+      const currentUserEntry = screen.getByTestId('leaderboard-entry-current-user');
+      expect(currentUserEntry).toHaveClass('bg-neo-cyan/20');
+    });
+  });
+
   // ==================== ACCESSIBILITY ====================
 
   describe('Accessibility', () => {
     it('has proper ARIA labels', () => {
-      // GIVEN: Mock data
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: null,
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 1,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      // GIVEN: 1 student in list
+      const fullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', totalXp: 500, rank: 1 }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Should have ARIA label
@@ -465,32 +503,14 @@ describe('ClassroomLeaderboard', () => {
 
     it('includes alt text for avatars', () => {
       // GIVEN: Student with avatar
-      mockUseClassroomLeaderboard.mockReturnValue({
-        topThree: [
-          {
-            userId: 'student-1',
-            displayName: 'Alice',
-            avatarUrl: 'https://example.com/alice.jpg',
-            totalXp: 500,
-            currentLevel: 5,
-            rank: 1,
-            isCurrentUser: false,
-            isInactive: false,
-          },
-        ],
-        currentUserRank: null,
-        totalStudents: 1,
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      });
+      const fullList = [
+        createEntry({ userId: 'student-1', displayName: 'Alice', avatarUrl: 'https://example.com/alice.jpg', totalXp: 500, rank: 1 }),
+      ];
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
 
       // WHEN: Component is rendered
       renderWithLanguage(
-        <ClassroomLeaderboard
-          classroomId={mockClassroomId}
-          currentUserId={mockCurrentUserId}
-        />
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
       // THEN: Avatar should have alt text

@@ -1713,6 +1713,22 @@ const sv = {
     "DAILY_DOUBLE": {
       "name": "Dubbel Daglig",
       "description": "Klarade båda utmaningarna idag"
+    },
+    "duelWinner": {
+      "name": "Duellvinnare",
+      "description": "Vinn dueller mot motståndare"
+    },
+    "practiceMaster": {
+      "name": "Övningsmästare",
+      "description": "Bemästra alla övningslägen"
+    },
+    "streakLegend": {
+      "name": "Serielegend",
+      "description": "Behåll en imponerande serie"
+    },
+    "secretWord": {
+      "name": "Hemligt ord",
+      "description": "Upptäck ett hemligt ord"
     }
   },
   "achievementTiers": {
@@ -5582,7 +5598,17 @@ const sv = {
       "xp": "{xp} XP",
       "rank": "Placering",
       "totalXP": "Totalt XP",
-      "streak": "Svit"
+      "streak": "Svit",
+      "weekly": "Veckovis",
+      "monthly": "Månadsvis",
+      "allTime": "Alla tider",
+      "rankUp": "+{{count}}",
+      "rankDown": "-{{count}}",
+      "newEntry": "NY",
+      "noChange": "-",
+      "top10": "Topp 10%",
+      "top25": "Topp 25%",
+      "top50": "Topp 50%"
     },
     "header": {
       "title": "LexiClash",
@@ -5796,6 +5822,18 @@ const sv = {
         "noData": "Ingen data för rapport"
       }
     },
+    "milestones": {
+      "xpRemaining": "{{xp}} XP till nivå {{level}}",
+      "nextMilestone": "Nästa milstolpe",
+      "titleUnlock": "Låser upp: {{title}}",
+      "reached": "Milstolpe uppnådd!",
+      "xpBonus": "+{{xp}} XP Bonus",
+      "coinBonus": "+{{coins}} Mynt",
+      "continue": "Fortsätt",
+      "maxLevel": "Max nivå!",
+      "level": "Nivå",
+      "titleUnlocked": "Titel upplåst"
+    },
     "achievements": {
       "title": "Prestationer",
       "completion": "{percent}% Slutfört - {earned}/{total} märken",
@@ -5813,6 +5851,12 @@ const sv = {
       "continue": "Fortsätt",
       "newBadge": "Nytt Märke!",
       "tierUpgrade": "Nivåuppgradering!",
+      "all": "Alla",
+      "skill": "Skicklighet",
+      "consistency": "Konsistens",
+      "exploration": "Utforskning",
+      "maxTier": "MAX",
+      "tierProgress": "{{current}} / {{target}}",
       "tiers": {
         "bronze": "Brons",
         "silver": "Silver",
@@ -5917,6 +5961,46 @@ const sv = {
         "name": "Ordvariation",
         "description": "Upptäck många unika ordförrådsord",
         "hint": "Dold tills upptäckt..."
+      },
+      "duel_champion": {
+        "name": "Duellmästare",
+        "description": "Vinn dueller mot klasskamrater"
+      },
+      "duel_streak": {
+        "name": "Vinstsvit",
+        "description": "Vinn dueller i följd"
+      },
+      "comeback_king": {
+        "name": "Comebackkungen",
+        "description": "Vinn efter att ha legat under"
+      },
+      "speed_dueler": {
+        "name": "Snabbduellant",
+        "description": "Hitta ord snabbt i realtidsdueller"
+      },
+      "duel_veteran": {
+        "name": "Duellveteran",
+        "description": "Spela många dueller"
+      },
+      "spelling_ace": {
+        "name": "Stavningsäss",
+        "description": "Perfekta stavningsrundor"
+      },
+      "matching_master": {
+        "name": "Matchningsmästare",
+        "description": "Snabba matchningar"
+      },
+      "blitz_champion": {
+        "name": "Blitzmästare",
+        "description": "Få höga poäng i Blitz"
+      },
+      "practice_streak": {
+        "name": "Övningssvit",
+        "description": "Öva på dagar i rad"
+      },
+      "mode_master": {
+        "name": "Lägemästare",
+        "description": "Genomför alla övningslägen"
       }
     }
   },
@@ -6080,40 +6164,39 @@ const sv = {
   // Utmaningssystem (Daglig + Veckovis)
   challenges: {
     daily: {
-      practiceSessions: "Genomför Övningssessioner",
-      practiceSessionsDesc: "Slutför {target} övningssessioner idag",
-      wordsMastered: "Bemästra Nya Ord",
-      wordsMasteredDesc: "Bemästra {target} ord idag",
-      duelPlayed: "Spela en Duell",
-      duelPlayedDesc: "Spela {target} duellmatch idag",
-      duelWins: "Vinn Dueller",
-      duelWinsDesc: "Vinn {target} duellmatcher idag",
-      perfectAccuracy: "Perfekt Noggrannhet",
-      perfectAccuracyDesc: "Slutför en övning med 100% noggrannhet",
-      blitzHighScore: "Blitz-Läge Poäng",
-      blitzHighScoreDesc: "Få {target}+ poäng i Blitz-läge",
-      xpEarned: "Tjäna XP",
-      xpEarnedDesc: "Tjäna {target} XP idag",
-      duelStreak: "Duellvinst-serie",
-      duelStreakDesc: "Vinn {target} dueller i rad",
-      spellingPerfect: "Perfekt Stavning",
-      spellingPerfectDesc: "Få {target} perfekta poäng i stavningsövning",
+      title: "Dagliga utmaningar",
+      resetsIn: "Återställs om {{time}}",
+      practiceSessions: "Genomför {{count}} övningssessioner",
+      practiceSessionsDesc: "Övning ger färdighet!",
+      wordsMastered: "Bemästra {{count}} nya ord",
+      wordsMasteredDesc: "Utöka ditt ordförråd",
+      duelPlayed: "Spela {{count}} duell",
+      duelPlayedDesc: "Utmana en klasskompis",
+      duelWins: "Vinn {{count}} dueller",
+      duelWinsDesc: "Visa dina ordkunskaper",
+      perfectAccuracy: "Få perfekt precision",
+      perfectAccuracyDesc: "Inga misstag tillåtna!",
+      blitzHighScore: "Få {{count}}+ i Blitz",
+      blitzHighScoreDesc: "Snabbhet och precision",
+      xpEarned: "Tjäna {{count}} XP",
+      xpEarnedDesc: "Fortsätt lära dig!",
+      duelStreak: "Vinn {{count}} dueller i rad",
+      duelStreakDesc: "Ostoppbar!",
+      spellingPerfect: "{{count}} perfekta stavningsrundor",
+      spellingPerfectDesc: "Stava rätt!",
     },
     weekly: {
+      title: "Veckouppdrag",
       masterWords: "Veckovis Ordbehärskning",
       masterWordsDesc: "Bemästra {target} ord denna vecka",
     },
-    claim: "Hämta Belöning",
-    claimed: "Hämtad!",
+    claim: "Hämta",
+    claimed: "Hämtad",
+    noChallenges: "Inga utmaningar tillgängliga",
     completed: "Slutförd",
     easy: "Lätt",
-    medium: "Mellan",
-    hard: "Svår",
-    daily: "Dagliga Utmaningar",
-    weekly: "Veckovisa Uppdrag",
-    noActiveChallenges: "Inga aktiva utmaningar",
-    dailyReset: "Återställs om {hours}t {minutes}m",
-    weeklyReset: "Återställs på måndag",
+    medium: "Medel",
+    hard: "Svår"
   }
 };
 

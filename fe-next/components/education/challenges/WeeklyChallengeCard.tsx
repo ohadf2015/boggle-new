@@ -26,7 +26,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-neo-cyan text-xs font-bold px-2 py-1 rounded uppercase">
-          {t('challenges.weekly')}
+          {t('challenges.weekly.title')}
         </span>
       </div>
 
