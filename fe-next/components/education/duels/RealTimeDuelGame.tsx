@@ -438,7 +438,7 @@ export function RealTimeDuelGame({
                         'px-3 py-1 font-neo-body font-bold rounded-neo border-neo shadow-hard-sm',
                         wordStatus.status === 'accepted' && 'bg-green-500 text-neo-white',
                         wordStatus.status === 'rejected' && 'bg-red-500 text-neo-white',
-                        wordStatus.status === 'pending' && 'bg-gray-500 text-neo-white'
+                        wordStatus.status === 'pending' && 'bg-neo-navy text-neo-white'
                       )}
                     >
                       {wordStatus.word}

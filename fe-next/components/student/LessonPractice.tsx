@@ -753,7 +753,7 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
                 aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />

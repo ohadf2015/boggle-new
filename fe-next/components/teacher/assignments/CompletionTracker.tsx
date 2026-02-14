@@ -88,7 +88,7 @@ export default function CompletionTracker({
       {/* Overall Progress */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-neo-body text-slate-300">
+          <span className="text-sm font-neo-body text-neo-white/80">
             {t('teacher.completion.overallProgress')}
           </span>
           <span className="text-sm font-bold text-neo-cyan">
@@ -101,7 +101,7 @@ export default function CompletionTracker({
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
-        <div className="text-xs text-slate-400 mt-1">
+        <div className="text-xs text-neo-white/60 mt-1">
           {completions.length} / {totalStudents} {t('teacher.completion.studentsCompleted')}
         </div>
       </div>
@@ -119,14 +119,14 @@ export default function CompletionTracker({
                 <div className="font-neo-body text-neo-white">
                   {completion.profiles?.display_name || t('teacher.completion.student')}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-neo-white/60">
                   {new Date(completion.completed_at).toLocaleDateString()}
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-4 text-sm">
               <div className="text-neo-cyan font-bold">{completion.score}</div>
-              <div className="text-slate-300">{completion.accuracy}%</div>
+              <div className="text-neo-white/80">{completion.accuracy}%</div>
             </div>
           </div>
         ))}
@@ -138,8 +138,8 @@ export default function CompletionTracker({
             className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-black/30"
           >
             <div className="flex items-center gap-3">
-              <Circle className="w-5 h-5 text-slate-600" />
-              <div className="font-neo-body text-slate-500">
+              <Circle className="w-5 h-5 text-neo-white/30" />
+              <div className="font-neo-body text-neo-white/40">
                 {t('teacher.completion.notCompleted')}
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function CompletionTracker({
           {showStrugglingAreas && (
             <div className="mt-3 space-y-2">
               {strugglingWords.length === 0 ? (
-                <div className="p-4 text-center text-sm text-slate-400">
+                <div className="p-4 text-center text-sm text-neo-white/60">
                   {t('teacher.completion.noStrugglingAreas')}
                 </div>
               ) : (
@@ -183,7 +183,7 @@ export default function CompletionTracker({
                       <div className="font-neo-body text-neo-white font-bold">
                         {item.word}
                       </div>
-                      <div className="text-xs text-slate-400 mt-1">
+                      <div className="text-xs text-neo-white/60 mt-1">
                         {item.errorCount}/{completions.length} {t('teacher.completion.studentsMissed')}
                       </div>
                     </div>

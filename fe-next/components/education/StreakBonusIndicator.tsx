@@ -108,7 +108,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
           // Base styles
           'inline-flex flex-col items-center',
           // Neo-brutalist styling
-          'bg-neo-orange border-2 border-neo-black rounded-neo shadow-hard',
+          'bg-neo-orange border-neo border-neo-black rounded-neo shadow-hard',
           sizeConfig.padding,
           className
         )}

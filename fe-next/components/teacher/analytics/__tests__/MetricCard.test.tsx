@@ -126,7 +126,7 @@ describe('MetricCard - Trend Indicator', () => {
     });
 
     const trendElement = screen.getByText('0%').parentElement;
-    expect(trendElement).toHaveClass('text-slate-400');
+    expect(trendElement).toHaveClass('text-neo-white/60');
   });
 });
 

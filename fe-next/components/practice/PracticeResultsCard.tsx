@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,12 @@ export interface PracticeResultsCardProps {
   onBack: () => void;
   /** Custom className */
   className?: string;
+  /** Total session time in seconds (optional) */
+  timeSpent?: number;
+  /** Best streak achieved (optional) */
+  maxStreak?: number;
+  /** Hints consumed during session (optional) */
+  hintsUsed?: number;
 }
 
 /**
@@ -45,6 +51,9 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
   onRestart,
   onBack,
   className,
+  timeSpent,
+  maxStreak,
+  hintsUsed,
 }) => {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -94,17 +103,17 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
 
       <CardContent className="p-8 text-center">
         {/* Mascot */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
           className="mb-4"
         >
           <Mascot variant={mascotVariant} size="lg" animated />
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Animated trophy */}
-        <motion.div
+        <AdaptiveMotion.div
           data-testid="results-trophy"
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -132,10 +141,10 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
               )}
             />
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Score display */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -157,11 +166,11 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
             {correct} / {total}{' '}
             {t('education.practice.correctCount') || 'correct'}
           </p>
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* XP earned */}
         {xpEarned && xpEarned > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.6, type: 'spring' }}
@@ -172,24 +181,55 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           >
             <Star className="w-5 h-5 text-neo-yellow" />
             <span className="font-neo-display text-neo-yellow">+{xpEarned} XP</span>
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
 
         {/* Encouragement message */}
-        <motion.p
+        <AdaptiveMotion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
           className="mt-4 text-neo-white/80 font-neo-body"
         >
           {encouragementMessage}
-        </motion.p>
+        </AdaptiveMotion.p>
+
+        {/* Extended stats grid */}
+        {(timeSpent || (maxStreak && maxStreak > 1) || (hintsUsed !== undefined && hintsUsed > 0)) && (
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+            className="mt-4 grid grid-cols-2 gap-3"
+          >
+            {timeSpent !== undefined && timeSpent > 0 && (
+              <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
+                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.time') || 'Time'}</p>
+                <p className="text-lg text-neo-cyan font-neo-display">
+                  {Math.floor(timeSpent / 60)}:{(timeSpent % 60).toString().padStart(2, '0')}
+                </p>
+              </div>
+            )}
+            {maxStreak !== undefined && maxStreak > 1 && (
+              <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
+                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.maxStreak') || 'Max Streak'}</p>
+                <p className="text-lg text-neo-yellow font-neo-display">{maxStreak}x</p>
+              </div>
+            )}
+            {hintsUsed !== undefined && hintsUsed > 0 && (
+              <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
+                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.hintsUsed') || 'Hints Used'}</p>
+                <p className="text-lg text-neo-purple font-neo-display">{hintsUsed}</p>
+              </div>
+            )}
+          </AdaptiveMotion.div>
+        )}
 
         {/* Action buttons */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.85 }}
           className="mt-6 flex flex-col sm:flex-row gap-3 justify-center"
         >
           <Button
@@ -220,7 +260,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
             {t('education.practice.back') || 'Back'}
           </Button>
-        </motion.div>
+        </AdaptiveMotion.div>
       </CardContent>
     </Card>
   );

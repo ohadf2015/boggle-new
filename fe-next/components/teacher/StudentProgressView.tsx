@@ -176,11 +176,11 @@ export default function StudentProgressView() {
       {!selectedClassroomId || !selectedLessonId ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <Users className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
             <h3 className="text-xl font-neo-display text-neo-white mb-2">
               {t('teacher.progress.noData')}
             </h3>
-            <p className="text-slate-400">{t('teacher.progress.assignLessons')}</p>
+            <p className="text-neo-white/60">{t('teacher.progress.assignLessons')}</p>
           </CardContent>
         </Card>
       ) : loadingProgress ? (
@@ -190,11 +190,11 @@ export default function StudentProgressView() {
       ) : studentStats.length === 0 ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <Users className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
             <h3 className="text-xl font-neo-display text-neo-white mb-2">
               {t('teacher.progress.noData')}
             </h3>
-            <p className="text-slate-400">{t('teacher.progress.noProgressYet')}</p>
+            <p className="text-neo-white/60">{t('teacher.progress.noProgressYet')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -258,7 +258,7 @@ export default function StudentProgressView() {
                               {student.accuracy.toFixed(0)}%
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-slate-400 text-sm">
+                          <td className="px-4 py-3 text-neo-white/60 text-sm">
                             {new Date(student.lastActive).toLocaleDateString()}
                           </td>
                           <td className="px-4 py-3">
@@ -275,13 +275,13 @@ export default function StudentProgressView() {
                           <tr className="bg-neo-black/30">
                             <td colSpan={6} className="px-6 py-4">
                               {wordEntries.length === 0 ? (
-                                <p className="text-slate-400 text-sm italic">
+                                <p className="text-neo-white/60 text-sm italic">
                                   {t('teacher.progress.noWordsYet')}
                                 </p>
                               ) : (
                                 <table className="w-full text-sm">
                                   <thead>
-                                    <tr className="text-slate-400">
+                                    <tr className="text-neo-white/60">
                                       <th className="text-left pb-2 font-medium">
                                         {t('teacher.progress.breakdownWord')}
                                       </th>

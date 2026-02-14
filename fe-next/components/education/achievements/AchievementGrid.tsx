@@ -68,7 +68,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
               key={key}
               onClick={() => setActiveCategory(key)}
               className={cn(
-                'px-4 py-2 rounded-neo border-2 border-neo-black',
+                'px-4 py-2 rounded-neo border-neo border-neo-black',
                 'font-bold text-sm transition-all duration-200',
                 activeCategory === key
                   ? 'bg-neo-yellow text-neo-black shadow-hard'
@@ -123,7 +123,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 <div className="flex justify-center mb-2">
                   {tierProgress.isMaxTier ? (
                     <div
-                      className="px-3 py-1 rounded-full border-2 font-black text-xs"
+                      className="px-3 py-1 rounded-full border-neo font-black text-xs"
                       style={{
                         backgroundColor: tierDisplay?.colors.bg || TIER_COLORS.PLATINUM.bg,
                         borderColor: tierDisplay?.colors.border || TIER_COLORS.PLATINUM.border,
@@ -134,7 +134,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                     </div>
                   ) : tierProgress.currentTier ? (
                     <div
-                      className="px-3 py-1 rounded-full border-2 font-black text-xs flex items-center gap-1"
+                      className="px-3 py-1 rounded-full border-neo font-black text-xs flex items-center gap-1"
                       style={{
                         backgroundColor: tierDisplay?.colors.bg,
                         borderColor: tierDisplay?.colors.border,
@@ -145,7 +145,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                       <span>{tierProgress.currentTier}</span>
                     </div>
                   ) : (
-                    <div className="px-3 py-1 rounded-full border-2 border-gray-600 bg-gray-700 text-gray-400 font-black text-xs">
+                    <div className="px-3 py-1 rounded-full border-neo border-neo-black bg-neo-navy/50 text-neo-white/40 font-black text-xs">
                       {t('education.achievements.locked')}
                     </div>
                   )}
@@ -160,7 +160,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                     </p>
 
                     {/* Progress bar */}
-                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden border border-neo-black">
+                    <div className="w-full h-2 bg-neo-navy/50 rounded-full overflow-hidden border border-neo-black">
                       <div
                         className="h-full rounded-full transition-all duration-300"
                         style={{

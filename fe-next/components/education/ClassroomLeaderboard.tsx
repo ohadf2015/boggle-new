@@ -153,9 +153,9 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
   if (!tier) return null;
 
   const tierConfig = {
-    top10: { bg: 'bg-yellow-500', label: t('education.leaderboard.top10') },
-    top25: { bg: 'bg-slate-400', label: t('education.leaderboard.top25') },
-    top50: { bg: 'bg-orange-600', label: t('education.leaderboard.top50') },
+    top10: { bg: 'bg-neo-yellow', label: t('education.leaderboard.top10') },
+    top25: { bg: 'bg-neo-white/60', label: t('education.leaderboard.top25') },
+    top50: { bg: 'bg-neo-orange', label: t('education.leaderboard.top50') },
   };
 
   const config = tierConfig[tier];

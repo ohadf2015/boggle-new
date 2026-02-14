@@ -45,12 +45,12 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       <h3 className="font-neo-display text-lg text-white mb-1" data-testid="challenge-title">
         {t(challenge.title)}
       </h3>
-      <p className="text-sm text-gray-400 mb-3" data-testid="challenge-description">
+      <p className="text-sm text-neo-white/60 mb-3" data-testid="challenge-description">
         {t(challenge.description).replace('{target}', String(challenge.target_value))}
       </p>
 
       {/* Progress Bar */}
-      <div className="relative h-6 bg-gray-700 rounded-full overflow-hidden mb-3">
+      <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
         <motion.div
           className="absolute inset-y-0 left-0 bg-neo-cyan"
           initial={{ width: 0 }}

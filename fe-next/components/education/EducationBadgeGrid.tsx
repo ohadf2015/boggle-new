@@ -152,7 +152,7 @@ export default function EducationBadgeGrid({
 
           {/* Overall Progress Bar */}
           <div
-            className="h-4 bg-neo-navy-light border-2 border-neo-black rounded-neo overflow-hidden"
+            className="h-4 bg-neo-navy-light border-neo border-neo-black rounded-neo overflow-hidden"
             role="progressbar"
             aria-label="Overall progress"
             aria-valuenow={completionPercent}

@@ -264,7 +264,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                     {opponent.displayName.charAt(0).toUpperCase()}
                   </span>
                   {/* Online indicator */}
-                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime border-2 border-neo-black"></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime border-neo border-neo-black"></div>
                 </div>
 
                 {/* Name */}

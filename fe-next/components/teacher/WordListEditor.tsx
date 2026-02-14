@@ -99,7 +99,7 @@ export default function WordListEditor({
       )}
 
       {words.length > 0 ? (
-        <div className={cn('bg-neo-black/30 border-2 border-neo-cyan p-4 rounded-neo overflow-y-auto', maxHeight)}>
+        <div className={cn('bg-neo-black/30 border-neo border-neo-cyan p-4 rounded-neo overflow-y-auto', maxHeight)}>
           <div className="space-y-2">
             {words.map((word, idx) => (
               <div
@@ -142,7 +142,7 @@ export default function WordListEditor({
           </div>
         </div>
       ) : (
-        <p className="text-sm text-slate-500 text-center py-4">
+        <p className="text-sm text-neo-white/40 text-center py-4">
           {t('teacher.lesson.noWords')}
         </p>
       )}

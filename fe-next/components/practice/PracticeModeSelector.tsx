@@ -95,20 +95,20 @@ export default function PracticeModeSelector({
     {
       type: 'matching',
       icon: <Shuffle className="w-8 h-8" />,
-      colorClass: 'text-[var(--neo-cyan)]',
-      bgClass: 'bg-[var(--neo-cyan)]/10 hover:bg-[var(--neo-cyan)]/20',
+      colorClass: 'text-neo-cyan',
+      bgClass: 'bg-neo-cyan/10 hover:bg-neo-cyan/20',
     },
     {
       type: 'spelling',
       icon: <PenLine className="w-8 h-8" />,
-      colorClass: 'text-[var(--neo-purple)]',
-      bgClass: 'bg-[var(--neo-purple)]/10 hover:bg-[var(--neo-purple)]/20',
+      colorClass: 'text-neo-purple',
+      bgClass: 'bg-neo-purple/10 hover:bg-neo-purple/20',
     },
     {
       type: 'blitz',
       icon: <Timer className="w-8 h-8" />,
-      colorClass: 'text-[var(--neo-red)]',
-      bgClass: 'bg-[var(--neo-red)]/10 hover:bg-[var(--neo-red)]/20',
+      colorClass: 'text-neo-pink',
+      bgClass: 'bg-neo-pink/10 hover:bg-neo-pink/20',
     },
   ];
 
@@ -121,7 +121,7 @@ export default function PracticeModeSelector({
       case 'started':
         return 'text-neo-orange';
       default:
-        return 'text-slate-400';
+        return 'text-neo-white/60';
     }
   };
 
@@ -164,7 +164,7 @@ export default function PracticeModeSelector({
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="text-slate-400 hover:text-neo-white"
+            className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
           </Button>
@@ -172,7 +172,7 @@ export default function PracticeModeSelector({
             <h1 className="text-2xl font-neo-display text-neo-white">
               {t('education.practice.title') || 'Practice Mode'}
             </h1>
-            <p className="text-sm text-slate-400">{lessonName}</p>
+            <p className="text-sm text-neo-white/60">{lessonName}</p>
           </div>
         </div>
 
@@ -183,8 +183,8 @@ export default function PracticeModeSelector({
               <div className="flex items-center gap-4">
                 <div className="text-center">
                   <p className="text-2xl font-neo-display text-neo-white">{wordCount}</p>
-                  <p className="text-xs text-slate-400">
-                    {wordCount === 1 ? 'word' : 'words'}
+                  <p className="text-xs text-neo-white/60">
+                    {t('education.practice.wordCount') || 'words'}
                   </p>
                 </div>
                 <div className="h-8 w-px bg-neo-black/30" />
@@ -220,12 +220,12 @@ export default function PracticeModeSelector({
                     <h3 className={cn('text-lg font-neo-display', option.colorClass)}>
                       {t(getTranslationKey(option.type, 'title')) || option.type}
                     </h3>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <p className="text-sm text-neo-white/60 mt-1">
                       {t(getTranslationKey(option.type, 'desc')) || ''}
                     </p>
                     {getSessionCount(option.type) > 0 && (
-                      <p className="text-xs text-slate-500 mt-2">
-                        {getSessionCount(option.type)} sessions completed
+                      <p className="text-xs text-neo-white/40 mt-2">
+                        {getSessionCount(option.type)} {t('education.practice.sessionsCompleted') || 'sessions completed'}
                       </p>
                     )}
                   </div>

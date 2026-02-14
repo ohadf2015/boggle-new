@@ -135,7 +135,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               className={cn(
                 'flex-shrink-0 w-12 h-12',
                 'flex items-center justify-center',
-                'bg-neo-cyan/20 border-2 border-neo-cyan',
+                'bg-neo-cyan/20 border-neo border-neo-cyan',
                 'rounded-neo'
               )}
               style={{

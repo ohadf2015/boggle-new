@@ -133,11 +133,11 @@ export default function ClassroomManager() {
       {classrooms.length === 0 ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <Users className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
             <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.classroom.noClassrooms')}
             </h3>
-            <p className="text-slate-400 mb-6 text-pretty">{t('teacher.classroom.createFirst')}</p>
+            <p className="text-neo-white/60 mb-6 text-pretty">{t('teacher.classroom.createFirst')}</p>
             <Button
               onClick={() => {
                 setFormData({ name: '', language: language as Language });
@@ -161,7 +161,7 @@ export default function ClassroomManager() {
                 <CardTitle className="text-xl font-neo-display text-neo-white text-balance">
                   {classroom.name}
                 </CardTitle>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-neo-white/60 mt-1">
                   {classroom.language.toUpperCase()} •{' '}
                   {classroom.member_count === 1
                     ? t('teacher.classroom.member')
@@ -170,8 +170,8 @@ export default function ClassroomManager() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Join Code */}
-                <div className="bg-neo-black/30 border-2 border-neo-yellow p-3 rounded-neo">
-                  <p className="text-xs text-slate-400 mb-1">{t('teacher.classroom.joinCode')}</p>
+                <div className="bg-neo-black/30 border-neo border-neo-yellow p-3 rounded-neo">
+                  <p className="text-xs text-neo-white/60 mb-1">{t('teacher.classroom.joinCode')}</p>
                   <div className="flex items-center justify-between">
                     <code className="text-2xl font-neo-display text-neo-yellow tracking-wider">
                       {classroom.join_code}
@@ -344,7 +344,7 @@ export default function ClassroomManager() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
                 aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
@@ -368,7 +368,7 @@ export default function ClassroomManager() {
             <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.classroom.delete')}
             </AlertDialog.Title>
-            <AlertDialog.Description className="text-slate-400 mb-6 text-pretty">
+            <AlertDialog.Description className="text-neo-white/60 mb-6 text-pretty">
               {t('teacher.classroom.confirmDelete')}
             </AlertDialog.Description>
 

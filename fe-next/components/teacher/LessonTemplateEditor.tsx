@@ -201,7 +201,7 @@ export default function LessonTemplateEditor({
                 ))}
               </div>
               {selectedDifficulty && (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-neo-white/60">
                   {t('education.template.boardPreview') || 'Board will be'} {selectedDifficulty.rows}x{selectedDifficulty.cols}
                 </p>
               )}
@@ -241,7 +241,7 @@ export default function LessonTemplateEditor({
                   <Label className="text-sm font-neo-body text-neo-white">
                     {t('education.template.allowLateJoin') || 'Allow Late Join'}
                   </Label>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-neo-white/60">
                     {t('education.template.allowLateJoinDesc') || 'Players can join after game starts'}
                   </p>
                 </div>
@@ -258,7 +258,7 @@ export default function LessonTemplateEditor({
                 <Label className="text-sm font-neo-body text-neo-white">
                   {t('education.template.setDefault') || 'Set as Default'}
                 </Label>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-neo-white/60">
                   {t('education.template.setDefaultDesc') || 'Use these settings by default for this lesson'}
                 </p>
               </div>
@@ -297,7 +297,7 @@ export default function LessonTemplateEditor({
           <Dialog.Close asChild>
             <button
               className={cn(
-                'absolute top-4 text-slate-400 hover:text-neo-white',
+                'absolute top-4 text-neo-white/60 hover:text-neo-white',
                 isRTL ? 'left-4' : 'right-4'
               )}
               aria-label="Close"

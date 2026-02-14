@@ -57,7 +57,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
   return (
     <div className={`space-y-6 ${className}`} data-testid="challenge-panel">
       {!hasContent && (
-        <div className="text-center text-gray-400 py-8">
+        <div className="text-center text-neo-white/60 py-8">
           {t('challenges.noChallenges')}
         </div>
       )}
@@ -81,7 +81,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
 
       {weeklyQuests.length > 0 && (
         <div>
-          <div className="h-px bg-gray-700 my-6" />
+          <div className="h-px bg-neo-navy my-6" />
           <h2 className="font-neo-display text-2xl text-white mb-4 flex items-center gap-2">
             📅 {t('challenges.weekly.title')}
           </h2>

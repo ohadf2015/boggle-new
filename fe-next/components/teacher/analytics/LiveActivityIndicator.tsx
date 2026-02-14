@@ -85,7 +85,7 @@ export function LiveActivityIndicator({
     default:
       statusText = t('education.analytics.offline');
       statusColor = 'text-neo-white/50';
-      dotColor = 'bg-gray-500';
+      dotColor = 'bg-neo-navy';
       shouldPulse = false;
       break;
   }

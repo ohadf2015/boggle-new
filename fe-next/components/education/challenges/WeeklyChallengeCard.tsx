@@ -31,11 +31,11 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       </div>
 
       <h3 className="font-neo-display text-lg text-white mb-1">{t(quest.title)}</h3>
-      <p className="text-sm text-gray-400 mb-3">
+      <p className="text-sm text-neo-white/60 mb-3">
         {t(quest.description).replace('{target}', String((quest.requirements as any)?.words_mastered || 0))}
       </p>
 
-      <div className="relative h-6 bg-gray-700 rounded-full overflow-hidden mb-3">
+      <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
         <motion.div
           className="absolute inset-y-0 left-0 bg-neo-cyan"
           initial={{ width: 0 }}

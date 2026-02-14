@@ -198,7 +198,7 @@ export default function BulkImportEnhanced({
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
-                  'w-full p-4 border-2 border-dashed border-neo-cyan/50 rounded-neo',
+                  'w-full p-4 border-neo border-dashed border-neo-cyan/50 rounded-neo',
                   'bg-neo-black/30 hover:bg-neo-black/50 transition-all',
                   'flex items-center justify-center gap-2 text-neo-cyan font-neo-body'
                 )}
@@ -263,7 +263,7 @@ export default function BulkImportEnhanced({
                 )}
 
                 {/* Word preview (scrollable) */}
-                <div className="bg-neo-black/30 border-2 border-neo-cyan/50 p-3 rounded-neo max-h-40 overflow-y-auto">
+                <div className="bg-neo-black/30 border-neo border-neo-cyan/50 p-3 rounded-neo max-h-40 overflow-y-auto">
                   <div className="flex flex-wrap gap-2">
                     {validationResults.slice(0, 50).map((result, idx) => (
                       <div
@@ -319,7 +319,7 @@ export default function BulkImportEnhanced({
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+              className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
               aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />

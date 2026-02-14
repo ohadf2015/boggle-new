@@ -38,7 +38,7 @@ function AssignmentCard({
   const statusConfig = {
     active: { label: t('teacher.tracking.statusActive'), color: 'bg-green-500' },
     overdue: { label: t('teacher.tracking.statusOverdue'), color: 'bg-red-500 animate-pulse' },
-    completed: { label: t('teacher.tracking.statusCompleted'), color: 'bg-slate-500' },
+    completed: { label: t('teacher.tracking.statusCompleted'), color: 'bg-neo-navy' },
   };
 
   const typeConfig = {
@@ -80,7 +80,7 @@ function AssignmentCard({
               {assignment.vocabulary_lessons?.name || t('teacher.tracking.untitledLesson')}
             </h3>
             {assignment.due_date && (
-              <div className="text-sm text-slate-400">
+              <div className="text-sm text-neo-white/60">
                 {t('teacher.tracking.dueDate')}: {new Date(assignment.due_date).toLocaleDateString()}
               </div>
             )}
@@ -88,7 +88,7 @@ function AssignmentCard({
 
           {/* Right: Progress */}
           <div className="text-right flex-shrink-0">
-            <div className="text-sm font-neo-body text-slate-300 mb-1">
+            <div className="text-sm font-neo-body text-neo-white/80 mb-1">
               {assignment.completion_count}/{assignment.student_count} {t('teacher.tracking.studentsCompleted')}
             </div>
             <div className="w-24 h-2 bg-neo-black/30 rounded-full overflow-hidden">
@@ -105,7 +105,7 @@ function AssignmentCard({
             {isExpanded ? (
               <ChevronUp className="w-5 h-5 text-neo-cyan" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-slate-400" />
+              <ChevronDown className="w-5 h-5 text-neo-white/60" />
             )}
           </div>
         </div>

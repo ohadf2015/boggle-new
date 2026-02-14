@@ -46,9 +46,9 @@ const TIER_COLORS = {
     fill: 'bg-amber-600',
   },
   silver: {
-    bg: 'bg-gray-400',
-    border: 'border-gray-500',
-    fill: 'bg-gray-300',
+    bg: 'bg-neo-white/60',
+    border: 'border-neo-white/40',
+    fill: 'bg-neo-white/80',
   },
   gold: {
     bg: 'bg-yellow-500',
@@ -156,7 +156,7 @@ export default function AchievementProgressCard({
                 title={!isPinned && !canPin ? t('education.achievements.maxPinsReached') : ''}
                 className={`
                   w-8 h-8 rounded flex items-center justify-center
-                  border-2 border-neo-black transition-all
+                  border-neo border-neo-black transition-all
                   ${isPinned ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-white/30'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
@@ -171,7 +171,7 @@ export default function AchievementProgressCard({
             <div className="mt-3">
               {/* Progress Bar */}
               <div
-                className="h-3 bg-neo-navy-light border-2 border-neo-black rounded-sm overflow-hidden"
+                className="h-3 bg-neo-navy-light border-neo border-neo-black rounded-sm overflow-hidden"
                 role="progressbar"
                 aria-valuenow={achievement.progressValue}
                 aria-valuemax={achievement.nextThreshold}
@@ -199,7 +199,7 @@ export default function AchievementProgressCard({
           {/* Max Tier Badge */}
           {isEarned && achievement.isMaxTier && (
             <div className="mt-3">
-              <span className="inline-block px-3 py-1 bg-neo-yellow text-neo-black font-neo-display font-bold text-sm border-2 border-neo-black rounded-neo shadow-hard-sm">
+              <span className="inline-block px-3 py-1 bg-neo-yellow text-neo-black font-neo-display font-bold text-sm border-neo border-neo-black rounded-neo shadow-hard-sm">
                 {t('education.achievements.maxTier')}
               </span>
             </div>

@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload, t }: any) => {
 
   return (
     <div
-      className="bg-neo-navy border-2 border-neo-cyan shadow-hard p-3 rounded-neo"
+      className="bg-neo-navy border-neo border-neo-cyan shadow-hard p-3 rounded-neo"
       style={{ backgroundColor: CHART_COLORS.tooltip, borderColor: CHART_COLORS.tooltipBorder }}
     >
       <p className="text-neo-white font-neo-body font-bold mb-2">{payload[0].payload.formattedDate}</p>
@@ -180,11 +180,11 @@ export default function ClassProgressChart() {
       {!selectedClassroomId || !selectedLessonId ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
-            <TrendingUp className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <TrendingUp className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
             <h3 className="text-xl font-neo-display text-neo-white mb-2">
               {t('teacher.progress.noData')}
             </h3>
-            <p className="text-slate-400">{t('teacher.progress.assignLessons')}</p>
+            <p className="text-neo-white/60">{t('teacher.progress.assignLessons')}</p>
           </CardContent>
         </Card>
       ) : loadingProgress ? (
@@ -194,11 +194,11 @@ export default function ClassProgressChart() {
       ) : chartData.length === 0 ? (
         <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
           <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <Users className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
             <h3 className="text-xl font-neo-display text-neo-white mb-2">
               {t('teacher.progress.noData')}
             </h3>
-            <p className="text-slate-400">No progress data available for this lesson yet</p>
+            <p className="text-neo-white/60">No progress data available for this lesson yet</p>
           </CardContent>
         </Card>
       ) : (

@@ -159,7 +159,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               <motion.div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-orange/20 border-2 border-neo-orange'
+                  'bg-neo-orange/20 border-neo border-neo-orange'
                 )}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

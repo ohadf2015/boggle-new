@@ -84,7 +84,7 @@ export function MetricCard({
   const trendColor = {
     up: 'text-green-400',
     down: 'text-red-400',
-    neutral: 'text-slate-400',
+    neutral: 'text-neo-white/60',
   }[trend || 'neutral'];
 
   // Trend icon

@@ -51,7 +51,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
 
   if (error) {
     return (
-      <div className="bg-neo-pink/20 border-2 border-neo-pink rounded-neo p-4 text-center">
+      <div className="bg-neo-pink/20 border-neo border-neo-pink rounded-neo p-4 text-center">
         <p className="text-neo-white font-neo-body">{t('teacher.classrooms.students.error')}</p>
       </div>
     );
@@ -61,11 +61,11 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
     return (
       <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
         <CardContent className="py-8 text-center">
-          <Users className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+          <Users className="w-10 h-10 text-neo-white/40 mx-auto mb-3" />
           <p className="text-neo-white font-neo-body mb-1">
             {t('teacher.classrooms.students.empty')}
           </p>
-          <p className="text-slate-400 text-sm">
+          <p className="text-neo-white/60 text-sm">
             {t('teacher.classrooms.students.emptyHint').replace('{{code}}', joinCode)}
           </p>
         </CardContent>
@@ -98,11 +98,11 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
                       alt={username}
                       width={48}
                       height={48}
-                      className="w-12 h-12 rounded-full border-2 border-neo-cyan object-cover"
+                      className="w-12 h-12 rounded-full border-neo border-neo-cyan object-cover"
                       unoptimized
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-neo-cyan/20 border-2 border-neo-cyan flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-neo-cyan/20 border-neo border-neo-cyan flex items-center justify-center">
                       <span className="text-neo-cyan font-neo-display text-xl">
                         {username.charAt(0).toUpperCase()}
                       </span>
@@ -116,12 +116,12 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
                     {username}
                   </h4>
                   {email && (
-                    <div className={cn('flex items-center gap-2 text-slate-400 text-sm mt-1')}>
+                    <div className={cn('flex items-center gap-2 text-neo-white/60 text-sm mt-1')}>
                       <Mail className="w-4 h-4 flex-shrink-0" />
                       <span className="truncate">{email}</span>
                     </div>
                   )}
-                  <div className={cn('flex items-center gap-2 text-slate-400 text-sm mt-1')}>
+                  <div className={cn('flex items-center gap-2 text-neo-white/60 text-sm mt-1')}>
                     <Calendar className="w-4 h-4 flex-shrink-0" />
                     <span>{joinedAt}</span>
                   </div>

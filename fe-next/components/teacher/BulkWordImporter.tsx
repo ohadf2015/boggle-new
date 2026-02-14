@@ -168,7 +168,7 @@ export default function BulkWordImporter({
                 </div>
 
                 {/* Word preview (scrollable) */}
-                <div className="bg-neo-black/30 border-2 border-neo-cyan/50 p-3 rounded-neo max-h-40 overflow-y-auto">
+                <div className="bg-neo-black/30 border-neo border-neo-cyan/50 p-3 rounded-neo max-h-40 overflow-y-auto">
                   <div className="flex flex-wrap gap-2">
                     {parsedWords.slice(0, 50).map((word, idx) => (
                       <div
@@ -223,7 +223,7 @@ export default function BulkWordImporter({
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+              className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
               aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />

@@ -72,8 +72,8 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
           <div
             className={cn(
               'relative h-8 w-full',
-              'bg-gray-700/50 rounded-full',
-              'border-2 border-neo-black',
+              'bg-neo-navy/50 rounded-full',
+              'border-neo border-neo-black',
               'overflow-hidden'
             )}
             role="progressbar"
@@ -117,7 +117,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
                       // Size: major = larger
                       milestone.isMajor ? 'w-4 h-8' : 'w-2 h-6',
                       // Color: major = yellow, minor = gray
-                      milestone.isMajor ? 'bg-neo-yellow' : 'bg-gray-400',
+                      milestone.isMajor ? 'bg-neo-yellow' : 'bg-neo-white/60',
                       // Dim upcoming milestones
                       !isPassed && 'opacity-30'
                     )}

@@ -120,7 +120,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
       className={cn(
         'w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pb-1 lg:pb-2',
         'sticky top-0 lg:static',
-        'z-[60] bg-slate-50 dark:bg-slate-900',
+        'z-[60] bg-neo-cream dark:bg-neo-navy',
         'min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]',
         className
       )}
@@ -152,7 +152,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               className={cn(
                 'flex items-center justify-center',
                 'w-10 h-10 min-w-[40px] min-h-[40px]',
-                'bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white',
+                'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
                 'border-3 border-neo-black dark:border-slate-500',
                 'rounded-neo shadow-hard-sm',
                 'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
@@ -182,7 +182,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'flex items-center justify-center',
                 'w-8 h-8 sm:w-10 sm:h-10',
                 'bg-neo-cyan text-neo-black',
-                'border-2 sm:border-3 border-neo-black',
+                'border-neo sm:border-3 border-neo-black',
                 'rounded-neo shadow-hard-sm'
               )}
             >
@@ -293,7 +293,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 className={cn(
                   'fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-80 sm:hidden',
-                  'bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600',
+                  'bg-neo-cream dark:bg-neo-navy border-neo-black dark:border-slate-600',
                   'shadow-hard-xl overflow-y-auto',
                   'pb-[max(env(safe-area-inset-bottom),1rem)]',
                   isRTL
@@ -311,7 +311,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                     className={cn(
                       'flex items-center justify-center',
                       'min-w-[48px] min-h-[48px] w-12 h-12',
-                      'bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white',
+                      'bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-white',
                       'border-3 border-neo-black dark:border-slate-500',
                       'rounded-neo shadow-hard-sm',
                       'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
@@ -327,19 +327,19 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 <div className="flex flex-col gap-3 p-4">
                   {/* Language Section */}
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white/80 uppercase tracking-wide">
                       {t('settings.language')}
                     </span>
-                    <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-slate-700">
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-neo-navy">
                       <QuickLanguageSwitcher showLabel />
                     </div>
                   </div>
 
-                  <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+                  <div className="h-0.5 bg-neo-black/20 dark:bg-neo-navy-light rounded-full" />
 
                   {/* Navigation Section */}
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white/80 uppercase tracking-wide">
                       {t('education.header.navigation')}
                     </span>
 
@@ -352,10 +352,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                           isOnTeacherSection
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                            : 'bg-neo-cream dark:bg-slate-700 hover:bg-neo-cyan/30 dark:hover:bg-slate-600 text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
                         )}
                       >
-                        <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-3 border-neo-black text-neo-black">
+                        <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-cyan/50 border-3 border-neo-black text-neo-black">
                           <Users className="w-4 h-4" aria-hidden="true" />
                         </span>
                         <span>{t('education.header.teacherDashboard')}</span>
@@ -371,10 +371,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                           isOnStudentSection
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                            : 'bg-neo-cream dark:bg-slate-700 hover:bg-neo-cyan/30 dark:hover:bg-slate-600 text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
                         )}
                       >
-                        <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink/50 border-3 border-neo-black text-neo-black">
+                        <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
                           <BookOpen className="w-4 h-4" aria-hidden="true" />
                         </span>
                         <span>{t('education.header.studentDashboard')}</span>
@@ -387,11 +387,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       onClick={() => setShowMobileMenu(false)}
                       className={cn(
                         'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
-                        'bg-neo-cream dark:bg-slate-700 hover:bg-neo-lime/30 dark:hover:bg-slate-600 text-neo-black dark:text-white',
+                        'bg-neo-cream dark:bg-neo-navy hover:bg-neo-lime/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
                         'shadow-hard-sm hover:shadow-hard'
                       )}
                     >
-                      <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime/50 border-3 border-neo-black text-neo-black">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-lime/50 border-3 border-neo-black text-neo-black">
                         <GraduationCap className="w-4 h-4" aria-hidden="true" />
                       </span>
                       <span>{t('education.header.educationHome')}</span>
@@ -400,11 +400,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
                   {isAuthenticated && (
                     <>
-                      <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+                      <div className="h-0.5 bg-neo-black/20 dark:bg-neo-navy-light rounded-full" />
 
                       {/* Account Section */}
                       <div className="flex flex-col gap-2">
-                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                        <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white/80 uppercase tracking-wide">
                           {t('common.account')}
                         </span>
 
@@ -413,11 +413,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           onClick={handleSignOut}
                           className={cn(
                             'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
-                            'bg-neo-cream dark:bg-slate-700 hover:bg-neo-pink/30 dark:hover:bg-slate-600 text-neo-black dark:text-white',
+                            'bg-neo-cream dark:bg-neo-navy hover:bg-neo-pink/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
                             'shadow-hard-sm hover:shadow-hard'
                           )}
                         >
-                          <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink/50 border-3 border-neo-black text-neo-black">
+                          <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
                             <LogOut className="w-4 h-4" aria-hidden="true" />
                           </span>
                           <span>{t('auth.signOut')}</span>
@@ -481,7 +481,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
         className={cn(
           'flex items-center justify-center',
           'w-10 h-10 sm:w-11 sm:h-11',
-          'bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white',
+          'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
           'border-3 border-neo-black dark:border-slate-500',
           'rounded-neo shadow-hard-sm',
           'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
@@ -504,7 +504,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
             transition={{ duration: 0.15 }}
             className={cn(
               'absolute top-full mt-2 w-56',
-              'bg-neo-cream dark:bg-slate-800',
+              'bg-neo-cream dark:bg-neo-navy',
               'border-3 border-neo-black dark:border-slate-500',
               'rounded-neo shadow-hard-lg',
               'overflow-hidden z-50',
@@ -560,7 +560,7 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
 
             {isAuthenticated && (
               <>
-                <div className="h-[1px] bg-neo-black/20 dark:bg-slate-600 mx-2" />
+                <div className="h-[1px] bg-neo-black/20 dark:bg-neo-navy-light mx-2" />
 
                 <div className="p-2">
                   <button

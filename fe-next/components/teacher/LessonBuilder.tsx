@@ -280,7 +280,7 @@ export default function LessonBuilder() {
             <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.lesson.noLessons')}
             </h3>
-            <p className="text-slate-400 mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
+            <p className="text-neo-white/60 mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
             <Button
               onClick={() => setIsCreateDialogOpen(true)}
               className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
@@ -306,9 +306,9 @@ export default function LessonBuilder() {
                     {lesson.name}
                   </CardTitle>
                   {lesson.description && (
-                    <p className="text-sm text-slate-400 mt-1">{lesson.description}</p>
+                    <p className="text-sm text-neo-white/60 mt-1">{lesson.description}</p>
                   )}
-                  <div className="flex items-center gap-2 mt-1 text-sm text-slate-400">
+                  <div className="flex items-center gap-2 mt-1 text-sm text-neo-white/60">
                     <span>
                       {lesson.language.toUpperCase()} •{' '}
                       {lesson.words.length === 1
@@ -322,7 +322,7 @@ export default function LessonBuilder() {
                           ? 'text-neo-cyan bg-neo-cyan/10'
                           : defCount > 0
                             ? 'text-neo-yellow bg-neo-yellow/10'
-                            : 'text-slate-500 bg-slate-500/10'
+                            : 'text-neo-white/40 bg-neo-navy/10'
                       )}
                     >
                       {t('teacher.lesson.definitionCoverage')
@@ -351,14 +351,14 @@ export default function LessonBuilder() {
                         )}
                         <span className="text-neo-white font-neo-body">{word.word}</span>
                         {word.definition && (
-                          <span className="text-xs text-slate-500 truncate max-w-[120px]">
+                          <span className="text-xs text-neo-white/40 truncate max-w-[120px]">
                             — {word.definition}
                           </span>
                         )}
                       </div>
                     ))}
                     {lesson.words.length > 5 && (
-                      <p className="text-xs text-slate-500 mt-2">
+                      <p className="text-xs text-neo-white/40 mt-2">
                         {t('teacher.lesson.moreWords').replace('{{count}}', String(lesson.words.length - 5))}
                       </p>
                     )}
@@ -576,7 +576,7 @@ export default function LessonBuilder() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
                 aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
@@ -631,7 +631,7 @@ export default function LessonBuilder() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 right-4 text-slate-400 hover:text-neo-white"
+                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
                 aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
@@ -689,7 +689,7 @@ export default function LessonBuilder() {
             <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.lesson.resumeDraft')}
             </AlertDialog.Title>
-            <AlertDialog.Description className="text-slate-400 mb-6 text-pretty">
+            <AlertDialog.Description className="text-neo-white/60 mb-6 text-pretty">
               {t('teacher.lesson.draftFound').replace('{{time}}', formatDraftAge(draftAge))}
             </AlertDialog.Description>
 

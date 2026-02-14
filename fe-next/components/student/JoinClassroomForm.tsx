@@ -160,7 +160,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                           size="icon"
                           variant="outline"
                           onClick={handlePaste}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-hard-pressed transition-all"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-neo border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-hard-pressed transition-all"
                           aria-label={t('education.student.join.pasteButton')}
                         >
                           <ClipboardPaste className="w-4 h-4" />

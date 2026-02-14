@@ -162,7 +162,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               <motion.div
                 className={cn(
                   'p-3 rounded-neo',
-                  'bg-neo-cyan/10 border-2 border-neo-cyan'
+                  'bg-neo-cyan/10 border-neo border-neo-cyan'
                 )}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -180,7 +180,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               <motion.div
                 className={cn(
                   'p-3 rounded-neo',
-                  'bg-neo-yellow/10 border-2 border-neo-yellow'
+                  'bg-neo-yellow/10 border-neo border-neo-yellow'
                 )}
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -200,7 +200,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               <motion.div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-orange/20 border-2 border-neo-orange'
+                  'bg-neo-orange/20 border-neo border-neo-orange'
                 )}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
