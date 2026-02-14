@@ -151,10 +151,12 @@ Plans:
   1. Practice sessions display better feedback animations, progress indicators, smooth mode transitions, and comprehensive session completion summaries
   2. All education pages follow neo-brutalist design system (hard shadows, chunky borders, Fredoka/Rubik typography, proper color palette)
   3. Neo-brutalist consistency audit completed with design violations fixed across student and teacher dashboards
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 43-01: [TBD during planning]
+- [ ] 43-01-PLAN.md — Practice feedback animations + AdaptiveMotion migration + session summary enhancement + PracticeModeSelector design fix
+- [ ] 43-02-PLAN.md — Neo-brutalist consistency audit + design violation fixes across education, student, teacher components
+- [ ] 43-03-PLAN.md — Translations (4 languages) for new practice polish UI text
 
 ## Progress
 
@@ -169,8 +171,8 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 39. Real-Time Duels | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 40. Gamification Enhancements | v2.0 | 7/7 | Complete | 2026-02-14 |
 | 41. Student Dashboard Overhaul | v2.0 | 4/4 | Complete | 2026-02-14 |
-| 42. Teacher Dashboard & Workflows | v2.0 | 0/5 | In progress | - |
-| 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
+| 42. Teacher Dashboard & Workflows | v2.0 | 5/5 | Complete | 2026-02-14 |
+| 43. Practice Experience & Design Polish | v2.0 | 0/3 | In progress | - |
 
 ---
-*Last updated: 2026-02-14 — Phase 42 planned (5 plans, 3 waves)*
+*Last updated: 2026-02-14 — Phase 43 planned (3 plans, 2 waves)*
