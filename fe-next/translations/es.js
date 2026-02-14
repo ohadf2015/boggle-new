@@ -5264,6 +5264,15 @@ const es = {
       "bulkImportPlaceholder": "Pega palabras, una por línea. Usa 'palabra - definición' para definiciones.",
       "bulkImportDetected": "{{count}} palabras detectadas",
       "bulkImportButton": "Importar",
+      "templates": "Plantillas de Lecciones",
+      "category": {
+        "all": "Todo",
+        "grade-1": "Grado 1",
+        "grade-2": "Grado 2",
+        "grade-3": "Grado 3",
+        "academic": "Académico",
+        "everyday": "Cotidiano"
+      },
       "resumeDraft": "¿Continuar Borrador?",
       "draftFound": "Tienes un borrador de lección sin guardar de {{time}}",
       "resumeDraftButton": "Continuar",

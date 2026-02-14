@@ -5264,6 +5264,15 @@ const sv = {
       "bulkImportPlaceholder": "Klistra in ord, ett per rad. Använd 'ord - definition' för definitioner.",
       "bulkImportDetected": "{{count}} ord upptäckta",
       "bulkImportButton": "Importera",
+      "templates": "Lektionsmallar",
+      "category": {
+        "all": "Alla",
+        "grade-1": "Åk 1",
+        "grade-2": "Åk 2",
+        "grade-3": "Åk 3",
+        "academic": "Akademisk",
+        "everyday": "Vardaglig"
+      },
       "resumeDraft": "Återuppta utkast?",
       "draftFound": "Du har ett osparat lektionsutkast från {{time}}",
       "resumeDraftButton": "Återuppta",

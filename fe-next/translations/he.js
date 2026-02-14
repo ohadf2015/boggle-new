@@ -5240,6 +5240,15 @@ const he = {
       "bulkImportPlaceholder": "הדבק מילים, אחת בכל שורה. השתמש ב'מילה - הגדרה' להוספת הגדרות.",
       "bulkImportDetected": "זוהו {{count}} מילים",
       "bulkImportButton": "ייבא",
+      "templates": "תבניות שיעורים",
+      "category": {
+        "all": "הכל",
+        "grade-1": "כיתה א'",
+        "grade-2": "כיתה ב'",
+        "grade-3": "כיתה ג'",
+        "academic": "אקדמי",
+        "everyday": "יומיומי"
+      },
       "resumeDraft": "לחזור לטיוטה?",
       "draftFound": "יש לך טיוטת שיעור שלא נשמרה מ{{time}}",
       "resumeDraftButton": "המשך",

@@ -5238,6 +5238,15 @@ const en = {
       "bulkImportPlaceholder": "Paste words, one per line or comma-separated. Use 'word - definition' for definitions.",
       "bulkImportDetected": "{{count}} words detected",
       "bulkImportButton": "Import",
+      "templates": "Lesson Templates",
+      "category": {
+        "all": "All",
+        "grade-1": "Grade 1",
+        "grade-2": "Grade 2",
+        "grade-3": "Grade 3",
+        "academic": "Academic",
+        "everyday": "Everyday"
+      },
       "resumeDraft": "Resume Draft?",
       "draftFound": "You have an unsaved lesson draft from {{time}}",
       "resumeDraftButton": "Resume",

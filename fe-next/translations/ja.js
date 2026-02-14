@@ -5311,6 +5311,15 @@ const ja = {
       "bulkImportPlaceholder": "単語を貼り付け（1行に1つ）。「単語 - 定義」で定義も追加可能。",
       "bulkImportDetected": "{{count}}個の単語を検出",
       "bulkImportButton": "インポート",
+      "templates": "レッスンテンプレート",
+      "category": {
+        "all": "すべて",
+        "grade-1": "1年生",
+        "grade-2": "2年生",
+        "grade-3": "3年生",
+        "academic": "学術",
+        "everyday": "日常"
+      },
       "resumeDraft": "下書きを再開しますか？",
       "draftFound": "{{time}}からの未保存のレッスン下書きがあります",
       "resumeDraftButton": "再開",
