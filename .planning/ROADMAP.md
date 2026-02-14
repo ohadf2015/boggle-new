@@ -117,10 +117,13 @@ Plans:
   1. Student dashboard displays engaging layout with activity feed, duel invites widget, streak calendar, quick-play buttons, and progress visualization
   2. Student profile page shows stats, badges, recent activity, XP level, and duel record
   3. Classroom activity feed shows recent duels, achievements unlocked, and milestones reached by classmates
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 41-01: [TBD during planning]
+- [ ] 41-01-PLAN.md — QuickPlayPanel + StreakCalendar widgets for student dashboard
+- [ ] 41-02-PLAN.md — Classroom activity feed (useClassroomActivity hook + ActivityFeed component)
+- [ ] 41-03-PLAN.md — Student profile enhancement with duel record and recent activity
+- [ ] 41-04-PLAN.md — Translations (4 languages) for all new dashboard/profile UI text
 
 ### Phase 42: Teacher Dashboard & Workflows
 **Goal**: Teachers experience improved workflows for lesson creation, assignment tracking, and classroom monitoring with better UX
@@ -161,9 +164,9 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 38. Async Duels | v2.0 | 8/8 | Complete | 2026-02-13 |
 | 39. Real-Time Duels | v2.0 | 5/5 | Complete | 2026-02-13 |
 | 40. Gamification Enhancements | v2.0 | 7/7 | Complete | 2026-02-14 |
-| 41. Student Dashboard Overhaul | v2.0 | 0/0 | Not started | - |
+| 41. Student Dashboard Overhaul | v2.0 | 0/4 | In progress | - |
 | 42. Teacher Dashboard & Workflows | v2.0 | 0/0 | Not started | - |
 | 43. Practice Experience & Design Polish | v2.0 | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-02-14 — Phase 40 complete (7/7 plans, gap closure verified)*
+*Last updated: 2026-02-14 — Phase 41 planned (4 plans in 3 waves)*
