@@ -5151,7 +5151,13 @@ const sv = {
       "quickStart": "Snabbstart",
       "repeatLastGame": "Upprepa senaste spel",
       "lastPlayed": "Senast spelat",
-      "noRecentGames": "Inga senaste spel"
+      "noRecentGames": "Inga senaste spel",
+      "assignments": "Uppgifter",
+      "track": "SPÅRA",
+      "duelActivity": "Duellaktivitet",
+      "live": "LIVE",
+      "selectClassroom": "Välj klassrum",
+      "createClassroomFirst": "Skapa ett klassrum först för att spåra uppgifter och duellaktivitet"
     },
     "game": {
       "qrCode": "Visa QR-kod",
@@ -5276,7 +5282,9 @@ const sv = {
       "resumeDraft": "Återuppta utkast?",
       "draftFound": "Du har ett osparat lektionsutkast från {{time}}",
       "resumeDraftButton": "Återuppta",
-      "discardDraftButton": "Kasta"
+      "discardDraftButton": "Kasta",
+      "startFromTemplate": "Börja från mall",
+      "templateLoaded": "Mall laddad: {{count}} ord"
     },
     "lessons": {
       "assign": {
@@ -5292,6 +5300,63 @@ const sv = {
         "error": "Kunde inte tilldela lektion",
         "alreadyAssigned": "Lektionen är redan tilldelad detta klassrum"
       }
+    },
+    "assignment": {
+      "createTitle": "Skapa uppgift",
+      "create": "Skapa uppgift",
+      "creating": "Skapar...",
+      "created": "Uppgift skapad!",
+      "error": "Kunde inte skapa uppgift",
+      "missingFields": "Välj en lektion och ett slutdatum",
+      "typeLabel": "Uppgiftstyp",
+      "practiceMode": "Övningsläge",
+      "duelChallenge": "Duellutmaning",
+      "lessonLabel": "Välj lektion",
+      "selectLesson": "Välj en lektion",
+      "words": "ord",
+      "dueDate": "Slutdatum",
+      "selectDate": "Välj slutdatum",
+      "quickSelect": "Snabbval",
+      "today": "Idag",
+      "tomorrow": "Imorgon",
+      "nextWeek": "Nästa vecka",
+      "nextMonth": "Nästa månad",
+      "customDate": "Anpassat datum",
+      "instructionsLabel": "Instruktioner",
+      "instructionsPlaceholder": "Lägg till valfria instruktioner för elever..."
+    },
+    "completion": {
+      "overallProgress": "Övergripande framsteg",
+      "studentsCompleted": "elever slutförda",
+      "student": "Elev",
+      "notCompleted": "Ej slutförd",
+      "strugglingAreas": "Svårighetsområden",
+      "studentsMissed": "elever missade",
+      "noStrugglingAreas": "Inga svårighetsområden identifierade än"
+    },
+    "tracking": {
+      "all": "Alla",
+      "active": "Aktiva",
+      "overdue": "Försenade",
+      "completed": "Slutförda",
+      "practice": "Övning",
+      "duel": "Duell",
+      "statusActive": "Aktiv",
+      "statusOverdue": "Försenad",
+      "statusCompleted": "Slutförd",
+      "untitledLesson": "Namnlös lektion",
+      "dueDate": "Slutdatum",
+      "studentsCompleted": "elever",
+      "createAssignment": "Skapa uppgift",
+      "noAssignments": "Inga uppgifter än",
+      "noAssignmentsFilter": "Inga uppgifter i denna kategori",
+      "createFirst": "Skapa första uppgiften"
+    },
+    "duels": {
+      "noDuels": "Ingen senaste duellaktivitet",
+      "points": "p",
+      "async": "Asynk",
+      "realtime": "Live"
     },
     "progress": {
       "title": "Elevframsteg",

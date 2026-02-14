@@ -5127,7 +5127,13 @@ const he = {
       "quickStart": "התחלה מהירה",
       "repeatLastGame": "חזור על המשחק האחרון",
       "lastPlayed": "שוחק לאחרונה",
-      "noRecentGames": "אין משחקים אחרונים"
+      "noRecentGames": "אין משחקים אחרונים",
+      "assignments": "משימות",
+      "track": "עקוב",
+      "duelActivity": "פעילות דו-קרבות",
+      "live": "חי",
+      "selectClassroom": "בחר כיתה",
+      "createClassroomFirst": "צור כיתה ראשונה כדי לעקוב אחר משימות ופעילות דו-קרבות"
     },
     "game": {
       "qrCode": "הצג קוד QR",
@@ -5252,7 +5258,9 @@ const he = {
       "resumeDraft": "לחזור לטיוטה?",
       "draftFound": "יש לך טיוטת שיעור שלא נשמרה מ{{time}}",
       "resumeDraftButton": "המשך",
-      "discardDraftButton": "מחק"
+      "discardDraftButton": "מחק",
+      "startFromTemplate": "התחל מתבנית",
+      "templateLoaded": "תבנית נטענה: {{count}} מילים"
     },
     "lessons": {
       "assign": {
@@ -5268,6 +5276,63 @@ const he = {
         "error": "שגיאה בשיוך השיעור",
         "alreadyAssigned": "השיעור כבר משויך לכיתה זו"
       }
+    },
+    "assignment": {
+      "createTitle": "צור משימה",
+      "create": "צור משימה",
+      "creating": "יוצר...",
+      "created": "המשימה נוצרה!",
+      "error": "יצירת המשימה נכשלה",
+      "missingFields": "נא לבחור שיעור ותאריך יעד",
+      "typeLabel": "סוג משימה",
+      "practiceMode": "מצב תרגול",
+      "duelChallenge": "אתגר דו-קרב",
+      "lessonLabel": "בחר שיעור",
+      "selectLesson": "בחר שיעור",
+      "words": "מילים",
+      "dueDate": "תאריך יעד",
+      "selectDate": "בחר תאריך יעד",
+      "quickSelect": "בחירה מהירה",
+      "today": "היום",
+      "tomorrow": "מחר",
+      "nextWeek": "שבוע הבא",
+      "nextMonth": "חודש הבא",
+      "customDate": "תאריך מותאם",
+      "instructionsLabel": "הוראות",
+      "instructionsPlaceholder": "הוסף הוראות אופציונליות לתלמידים..."
+    },
+    "completion": {
+      "overallProgress": "התקדמות כללית",
+      "studentsCompleted": "תלמידים השלימו",
+      "student": "תלמיד",
+      "notCompleted": "לא הושלם",
+      "strugglingAreas": "תחומי קושי",
+      "studentsMissed": "תלמידים החטיאו",
+      "noStrugglingAreas": "לא זוהו תחומי קושי"
+    },
+    "tracking": {
+      "all": "הכל",
+      "active": "פעילות",
+      "overdue": "באיחור",
+      "completed": "הושלם",
+      "practice": "תרגול",
+      "duel": "דו-קרב",
+      "statusActive": "פעיל",
+      "statusOverdue": "באיחור",
+      "statusCompleted": "הושלם",
+      "untitledLesson": "שיעור ללא כותרת",
+      "dueDate": "יעד",
+      "studentsCompleted": "תלמידים",
+      "createAssignment": "צור משימה",
+      "noAssignments": "אין משימות עדיין",
+      "noAssignmentsFilter": "אין משימות בקטגוריה זו",
+      "createFirst": "צור משימה ראשונה"
+    },
+    "duels": {
+      "noDuels": "אין פעילות דו-קרבות לאחרונה",
+      "points": "נק׳",
+      "async": "אסינכרוני",
+      "realtime": "חי"
     },
     "progress": {
       "title": "התקדמות תלמידים",

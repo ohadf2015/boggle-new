@@ -5198,7 +5198,13 @@ const ja = {
       "quickStart": "クイックスタート",
       "repeatLastGame": "前回のゲームを繰り返す",
       "lastPlayed": "最後にプレイ",
-      "noRecentGames": "最近のゲームはありません"
+      "noRecentGames": "最近のゲームはありません",
+      "assignments": "課題",
+      "track": "追跡",
+      "duelActivity": "デュエルアクティビティ",
+      "live": "ライブ",
+      "selectClassroom": "クラスを選択",
+      "createClassroomFirst": "課題とデュエルアクティビティを追跡するには、まずクラスを作成してください"
     },
     "game": {
       "qrCode": "QRコードを表示",
@@ -5323,7 +5329,9 @@ const ja = {
       "resumeDraft": "下書きを再開しますか？",
       "draftFound": "{{time}}からの未保存のレッスン下書きがあります",
       "resumeDraftButton": "再開",
-      "discardDraftButton": "破棄"
+      "discardDraftButton": "破棄",
+      "startFromTemplate": "テンプレートから開始",
+      "templateLoaded": "テンプレート読み込み完了：{{count}}語"
     },
     "lessons": {
       "assign": {
@@ -5339,6 +5347,63 @@ const ja = {
         "error": "レッスンの割り当てに失敗しました",
         "alreadyAssigned": "このレッスンは既にこのクラスに割り当てられています"
       }
+    },
+    "assignment": {
+      "createTitle": "課題を作成",
+      "create": "課題を作成",
+      "creating": "作成中...",
+      "created": "課題を作成しました！",
+      "error": "課題の作成に失敗しました",
+      "missingFields": "レッスンと期日を選択してください",
+      "typeLabel": "課題タイプ",
+      "practiceMode": "練習モード",
+      "duelChallenge": "デュエルチャレンジ",
+      "lessonLabel": "レッスンを選択",
+      "selectLesson": "レッスンを選択",
+      "words": "単語",
+      "dueDate": "期日",
+      "selectDate": "期日を選択",
+      "quickSelect": "クイック選択",
+      "today": "今日",
+      "tomorrow": "明日",
+      "nextWeek": "来週",
+      "nextMonth": "来月",
+      "customDate": "カスタム日付",
+      "instructionsLabel": "指示",
+      "instructionsPlaceholder": "生徒への指示を追加（任意）..."
+    },
+    "completion": {
+      "overallProgress": "全体的な進捗",
+      "studentsCompleted": "生徒が完了",
+      "student": "生徒",
+      "notCompleted": "未完了",
+      "strugglingAreas": "苦手分野",
+      "studentsMissed": "生徒が間違えた",
+      "noStrugglingAreas": "苦手分野は特定されていません"
+    },
+    "tracking": {
+      "all": "すべて",
+      "active": "アクティブ",
+      "overdue": "期限切れ",
+      "completed": "完了",
+      "practice": "練習",
+      "duel": "デュエル",
+      "statusActive": "アクティブ",
+      "statusOverdue": "期限切れ",
+      "statusCompleted": "完了",
+      "untitledLesson": "無題のレッスン",
+      "dueDate": "期日",
+      "studentsCompleted": "生徒",
+      "createAssignment": "課題を作成",
+      "noAssignments": "まだ課題がありません",
+      "noAssignmentsFilter": "このカテゴリには課題がありません",
+      "createFirst": "最初の課題を作成"
+    },
+    "duels": {
+      "noDuels": "最近のデュエルアクティビティはありません",
+      "points": "pt",
+      "async": "非同期",
+      "realtime": "ライブ"
     },
     "progress": {
       "title": "生徒の進捗",

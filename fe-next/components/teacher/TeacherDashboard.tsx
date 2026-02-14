@@ -20,7 +20,7 @@ import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecent
 import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
-import { Gamepad2, BookPlus, ChevronDown, ChevronUp, ClipboardCheck, Swords } from 'lucide-react';
+import { Gamepad2, BookPlus, ChevronDown, ChevronUp, Swords } from 'lucide-react';
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();
