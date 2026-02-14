@@ -253,36 +253,49 @@ describe('BlastTileOverlay', () => {
     expect(bombDiv.style.gridColumn).toBe('2');
   });
 
-  it('renders icon badge for gold tile (Star icon)', () => {
+  it('renders effect badge with icon and label for gold tile', () => {
     const tileStates: BlastTileState[][] = [
       [makeTile(0, 0, 'gold')],
     ];
     render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
     expect(screen.getByTestId('star-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('badge-gold')).toHaveTextContent('3×');
   });
 
-  it('renders icon badge for bomb tile (Bomb icon)', () => {
+  it('renders effect badge with icon and label for bomb tile', () => {
     const tileStates: BlastTileState[][] = [
       [makeTile(0, 0, 'bomb')],
     ];
     render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
     expect(screen.getByTestId('bomb-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('badge-bomb')).toHaveTextContent('8');
   });
 
-  it('renders icon badge for rainbow tile (Rainbow icon)', () => {
+  it('renders effect badge with icon and label for rainbow tile', () => {
     const tileStates: BlastTileState[][] = [
       [makeTile(0, 0, 'rainbow')],
     ];
     render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
     expect(screen.getByTestId('rainbow-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('badge-rainbow')).toHaveTextContent('+5');
   });
 
-  it('renders icon badge for ice tile (Snowflake icon)', () => {
+  it('renders effect badge with icon and label for ice tile', () => {
     const tileStates: BlastTileState[][] = [
       [makeTile(0, 0, 'ice')],
     ];
     render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
     expect(screen.getByTestId('snowflake-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('badge-ice')).toHaveTextContent('×2');
+  });
+
+  it('sets dir="ltr" on overlay to match GridComponent', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'gold')],
+    ];
+    render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
+    const overlay = screen.getByTestId('blast-tile-overlay');
+    expect(overlay.getAttribute('dir')).toBe('ltr');
   });
 
   it('applies selection glow class when tile is in selectedPositions', () => {

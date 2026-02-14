@@ -6,6 +6,7 @@ import {
   Zap, Magnet, Sparkles, Diamond,
   type LucideIcon,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { BlastTileState } from './types';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 
@@ -88,18 +89,18 @@ const TILE_BACKGROUNDS: Record<string, {
   },
 };
 
-/** Icon + color for each special tile type */
-const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string }> = {
-  gold: { Icon: Star, color: 'text-yellow-900' },
-  bomb: { Icon: Bomb, color: 'text-white' },
-  rainbow: { Icon: Rainbow, color: 'text-white' },
-  ice: { Icon: Snowflake, color: 'text-blue-200' },
-  wildcard: { Icon: Shuffle, color: 'text-white' },
-  lightning: { Icon: Zap, color: 'text-yellow-300' },
-  magnet: { Icon: Magnet, color: 'text-white' },
-  prism: { Icon: Sparkles, color: 'text-white' },
-  gem: { Icon: Diamond, color: 'text-white' },
-  frozen: { Icon: Snowflake, color: 'text-blue-400' },
+/** Icon, color, and short effect label for each special tile type */
+const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string; label: string; labelBg: string }> = {
+  gold:      { Icon: Star,      color: 'text-yellow-900',  label: '3×',   labelBg: 'bg-yellow-400/90 text-yellow-900' },
+  bomb:      { Icon: Bomb,      color: 'text-white',       label: '8',    labelBg: 'bg-red-500/90 text-white' },
+  rainbow:   { Icon: Rainbow,   color: 'text-white',       label: '+5',   labelBg: 'bg-purple-500/90 text-white' },
+  ice:       { Icon: Snowflake, color: 'text-blue-200',    label: '×2',   labelBg: 'bg-blue-400/90 text-white' },
+  wildcard:  { Icon: Shuffle,   color: 'text-white',       label: '?',    labelBg: 'bg-white/80 text-gray-800' },
+  lightning: { Icon: Zap,       color: 'text-yellow-300',  label: 'row',  labelBg: 'bg-yellow-400/90 text-yellow-900' },
+  magnet:    { Icon: Magnet,    color: 'text-white',       label: 'pull', labelBg: 'bg-purple-600/90 text-white' },
+  prism:     { Icon: Sparkles,  color: 'text-white',       label: '×2',   labelBg: 'bg-pink-400/90 text-white' },
+  gem:       { Icon: Diamond,   color: 'text-white',       label: '+3',   labelBg: 'bg-emerald-500/90 text-white' },
+  frozen:    { Icon: Snowflake, color: 'text-blue-400',    label: '×3',   labelBg: 'bg-blue-300/90 text-blue-900' },
 };
 
 /**
@@ -114,6 +115,7 @@ export function BlastTileOverlay({
 }: BlastTileOverlayProps) {
   return (
     <div
+      dir="ltr"
       data-testid="blast-tile-overlay"
       className={`absolute inset-0 pointer-events-none z-[11] grid ${GRID_GAP_CLASS}`}
       style={{
@@ -215,10 +217,18 @@ export function BlastTileOverlay({
                 boxShadow: shadow,
               }}
             >
-              {/* Icon badge - bottom-end for RTL support */}
+              {/* Effect badge - icon + short label showing what this tile does */}
               {iconEntry && (
-                <span className={`absolute bottom-0.5 end-0.5 bg-black/40 rounded-full p-0.5 ${iconEntry.color}`}>
-                  <iconEntry.Icon className="w-3 h-3" />
+                <span
+                  className={cn(
+                    'absolute bottom-0 right-0 flex items-center gap-px rounded-tl-md rounded-br-lg px-1 py-px',
+                    'text-[8px] font-black leading-none',
+                    iconEntry.labelBg,
+                  )}
+                  data-testid={`badge-${tile.type}`}
+                >
+                  <iconEntry.Icon className="w-2.5 h-2.5" />
+                  <span>{iconEntry.label}</span>
                 </span>
               )}
             </motion.div>
