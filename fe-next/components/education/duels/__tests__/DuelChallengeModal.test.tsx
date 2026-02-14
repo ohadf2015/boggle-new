@@ -131,7 +131,8 @@ describe('DuelChallengeModal', () => {
       expect(mockCreateChallenge).toHaveBeenCalledWith(
         'opponent-1',
         'lesson-1',
-        'classroom-1'
+        'classroom-1',
+        'async'
       );
     });
 

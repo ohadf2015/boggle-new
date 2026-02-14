@@ -16,35 +16,37 @@ import {
   type CreateDuelData,
 } from '../duels';
 
-// Mock Supabase client following practice.test.ts pattern
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn(),
+// Mock Supabase client
+jest.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: jest.fn(),
+  },
 }));
 
-import { createClient } from '@/utils/supabase/server';
+// Mock logger
+jest.mock('@/utils/logger', () => ({
+  __esModule: true,
+  default: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
+}));
+
+import { supabase } from '@/lib/supabase';
 
 describe('Duel CRUD Operations', () => {
-  let mockSupabase: any;
+  const mockFrom = supabase!.from as jest.Mock;
 
   beforeEach(() => {
-    // Reset mock before each test
     jest.clearAllMocks();
-
-    // Create mock Supabase client
-    mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      single: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      or: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-    };
-
-    (createClient as jest.Mock).mockResolvedValue(mockSupabase);
   });
+
+  // Helper: build chainable mock ending at .single()
+  // Chain: from → insert/select/update → ... → select → single
+  function chainInsertSelectSingle(resolvedValue: any) {
+    const mockSingle = jest.fn().mockResolvedValue(resolvedValue);
+    const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
+    const mockInsert = jest.fn().mockReturnValue({ select: mockSelect });
+    mockFrom.mockReturnValue({ insert: mockInsert });
+    return { mockInsert, mockSelect, mockSingle };
+  }
 
   describe('createDuel', () => {
     it('should create a duel with default values', async () => {
@@ -78,14 +80,14 @@ describe('Duel CRUD Operations', () => {
         expires_at: '2026-02-14T14:00:00Z',
       };
 
-      mockSupabase.single.mockResolvedValue({ data: mockDuel, error: null });
+      const { mockInsert } = chainInsertSelectSingle({ data: mockDuel, error: null });
 
       const result = await createDuel(createData);
 
       expect(result.data).toEqual(mockDuel);
       expect(result.error).toBeNull();
-      expect(mockSupabase.from).toHaveBeenCalledWith('student_duels');
-      expect(mockSupabase.insert).toHaveBeenCalledWith(
+      expect(mockFrom).toHaveBeenCalledWith('student_duels');
+      expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           challenger_id: createData.challengerId,
           opponent_id: createData.opponentId,
@@ -110,11 +112,11 @@ describe('Duel CRUD Operations', () => {
         expiresAt: '2026-02-15T10:00:00Z',
       };
 
-      mockSupabase.single.mockResolvedValue({ data: {}, error: null });
+      const { mockInsert } = chainInsertSelectSingle({ data: {}, error: null });
 
       await createDuel(createData);
 
-      expect(mockSupabase.insert).toHaveBeenCalledWith(
+      expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           expires_at: createData.expiresAt,
         })
@@ -130,7 +132,7 @@ describe('Duel CRUD Operations', () => {
         boardState: [['A']],
       };
 
-      mockSupabase.single.mockResolvedValue({
+      chainInsertSelectSingle({
         data: null,
         error: { message: 'Database error' },
       });
@@ -143,6 +145,15 @@ describe('Duel CRUD Operations', () => {
   });
 
   describe('getDuelById', () => {
+    // Chain: from → select → eq → single
+    function chainSelectEqSingle(resolvedValue: any) {
+      const mockSingle = jest.fn().mockResolvedValue(resolvedValue);
+      const mockEq = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      mockFrom.mockReturnValue({ select: mockSelect });
+      return { mockSelect, mockEq, mockSingle };
+    }
+
     it('should fetch duel with challenger and opponent profiles', async () => {
       const mockDuelWithProfiles = {
         id: 'duel-123',
@@ -159,7 +170,7 @@ describe('Duel CRUD Operations', () => {
         },
       };
 
-      mockSupabase.single.mockResolvedValue({
+      const { mockEq } = chainSelectEqSingle({
         data: mockDuelWithProfiles,
         error: null,
       });
@@ -168,12 +179,12 @@ describe('Duel CRUD Operations', () => {
 
       expect(result.data).toEqual(mockDuelWithProfiles);
       expect(result.error).toBeNull();
-      expect(mockSupabase.from).toHaveBeenCalledWith('student_duels');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'duel-123');
+      expect(mockFrom).toHaveBeenCalledWith('student_duels');
+      expect(mockEq).toHaveBeenCalledWith('id', 'duel-123');
     });
 
     it('should handle not found error', async () => {
-      mockSupabase.single.mockResolvedValue({
+      chainSelectEqSingle({
         data: null,
         error: { message: 'Not found' },
       });
@@ -186,8 +197,18 @@ describe('Duel CRUD Operations', () => {
   });
 
   describe('updateDuelStatus', () => {
+    // Chain: from → update → eq → select → single
+    function chainUpdateEqSelectSingle(resolvedValue: any) {
+      const mockSingle = jest.fn().mockResolvedValue(resolvedValue);
+      const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq = jest.fn().mockReturnValue({ select: mockSelect });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
+      mockFrom.mockReturnValue({ update: mockUpdate });
+      return { mockUpdate, mockEq, mockSelect, mockSingle };
+    }
+
     it('should update status only', async () => {
-      mockSupabase.single.mockResolvedValue({
+      const { mockUpdate, mockEq } = chainUpdateEqSelectSingle({
         data: { id: 'duel-123', status: 'active' },
         error: null,
       });
@@ -195,10 +216,10 @@ describe('Duel CRUD Operations', () => {
       const result = await updateDuelStatus('duel-123', 'active');
 
       expect(result.data).toEqual({ id: 'duel-123', status: 'active' });
-      expect(mockSupabase.update).toHaveBeenCalledWith(
+      expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ status: 'active' })
       );
-      expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'duel-123');
+      expect(mockEq).toHaveBeenCalledWith('id', 'duel-123');
     });
 
     it('should update status and additional fields', async () => {
@@ -209,7 +230,7 @@ describe('Duel CRUD Operations', () => {
         completed_at: '2026-02-13T15:00:00Z',
       };
 
-      mockSupabase.single.mockResolvedValue({
+      const { mockUpdate } = chainUpdateEqSelectSingle({
         data: { id: 'duel-123', ...updates, status: 'completed' },
         error: null,
       });
@@ -217,7 +238,7 @@ describe('Duel CRUD Operations', () => {
       const result = await updateDuelStatus('duel-123', 'completed', updates);
 
       expect(result.data).toBeDefined();
-      expect(mockSupabase.update).toHaveBeenCalledWith(
+      expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           status: 'completed',
           ...updates,
@@ -226,7 +247,7 @@ describe('Duel CRUD Operations', () => {
     });
 
     it('should handle update error', async () => {
-      mockSupabase.single.mockResolvedValue({
+      chainUpdateEqSelectSingle({
         data: null,
         error: { message: 'Update failed' },
       });
@@ -239,6 +260,25 @@ describe('Duel CRUD Operations', () => {
   });
 
   describe('getDuelHistory', () => {
+    // Chain: from → select → eq → or → order (→ optional limit)
+    function chainHistoryQuery(resolvedValue: any, withLimit = false) {
+      if (withLimit) {
+        const mockLimit = jest.fn().mockResolvedValue(resolvedValue);
+        const mockOrder = jest.fn().mockReturnValue({ limit: mockLimit });
+        const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
+        const mockEq = jest.fn().mockReturnValue({ or: mockOr });
+        const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+        mockFrom.mockReturnValue({ select: mockSelect });
+        return { mockSelect, mockEq, mockOr, mockOrder, mockLimit };
+      }
+      const mockOrder = jest.fn().mockResolvedValue(resolvedValue);
+      const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
+      const mockEq = jest.fn().mockReturnValue({ or: mockOr });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      mockFrom.mockReturnValue({ select: mockSelect });
+      return { mockSelect, mockEq, mockOr, mockOrder };
+    }
+
     it('should fetch completed duels with isWin computed correctly', async () => {
       const studentId = 'student-123';
       const mockHistory = [
@@ -266,30 +306,26 @@ describe('Duel CRUD Operations', () => {
         },
       ];
 
-      // Mock the final query result (order is the last method in chain)
-      mockSupabase.order.mockResolvedValue({
-        data: mockHistory,
-        error: null,
-      });
+      chainHistoryQuery({ data: mockHistory, error: null });
 
       const result = await getDuelHistory(studentId);
 
       expect(result.data).toHaveLength(2);
-      expect(result.data![0]).toHaveProperty('isWin', true); // student won duel-1
-      expect(result.data![1]).toHaveProperty('isWin', false); // student lost duel-2
-      expect(mockSupabase.from).toHaveBeenCalledWith('student_duels');
+      expect(result.data![0]).toHaveProperty('isWin', true);
+      expect(result.data![1]).toHaveProperty('isWin', false);
+      expect(mockFrom).toHaveBeenCalledWith('student_duels');
     });
 
     it('should respect limit parameter', async () => {
-      mockSupabase.limit.mockResolvedValue({ data: [], error: null });
+      const { mockLimit } = chainHistoryQuery({ data: [], error: null }, true);
 
       await getDuelHistory('student-123', 10);
 
-      expect(mockSupabase.limit).toHaveBeenCalledWith(10);
+      expect(mockLimit!).toHaveBeenCalledWith(10);
     });
 
     it('should handle fetch error', async () => {
-      mockSupabase.order.mockResolvedValue({
+      chainHistoryQuery({
         data: null,
         error: { message: 'Fetch error' },
       });
@@ -302,48 +338,26 @@ describe('Duel CRUD Operations', () => {
   });
 
   describe('getDuelStats', () => {
+    // Chain: from → select → eq → or → order
+    function chainStatsQuery(resolvedValue: any) {
+      const mockOrder = jest.fn().mockResolvedValue(resolvedValue);
+      const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
+      const mockEq = jest.fn().mockReturnValue({ or: mockOr });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      mockFrom.mockReturnValue({ select: mockSelect });
+      return { mockSelect, mockEq, mockOr, mockOrder };
+    }
+
     it('should compute win/loss/draw counts correctly', async () => {
       const studentId = 'student-123';
       const mockDuels = [
-        {
-          id: 'duel-1',
-          challenger_id: studentId,
-          opponent_id: 'other-1',
-          challenger_score: 100,
-          opponent_score: 80,
-          winner_id: studentId,
-          completed_at: '2026-02-13T10:00:00Z',
-        },
-        {
-          id: 'duel-2',
-          challenger_id: 'other-2',
-          opponent_id: studentId,
-          challenger_score: 90,
-          opponent_score: 100,
-          winner_id: studentId,
-          completed_at: '2026-02-13T11:00:00Z',
-        },
-        {
-          id: 'duel-3',
-          challenger_id: studentId,
-          opponent_id: 'other-3',
-          challenger_score: 80,
-          opponent_score: 100,
-          winner_id: 'other-3',
-          completed_at: '2026-02-13T12:00:00Z',
-        },
-        {
-          id: 'duel-4',
-          challenger_id: studentId,
-          opponent_id: 'other-4',
-          challenger_score: 50,
-          opponent_score: 50,
-          winner_id: null,
-          completed_at: '2026-02-13T13:00:00Z',
-        },
+        { id: 'duel-1', challenger_id: studentId, opponent_id: 'other-1', winner_id: studentId, completed_at: '2026-02-13T10:00:00Z' },
+        { id: 'duel-2', challenger_id: 'other-2', opponent_id: studentId, winner_id: studentId, completed_at: '2026-02-13T11:00:00Z' },
+        { id: 'duel-3', challenger_id: studentId, opponent_id: 'other-3', winner_id: 'other-3', completed_at: '2026-02-13T12:00:00Z' },
+        { id: 'duel-4', challenger_id: studentId, opponent_id: 'other-4', winner_id: null, completed_at: '2026-02-13T13:00:00Z' },
       ];
 
-      mockSupabase.order.mockResolvedValue({ data: mockDuels, error: null });
+      chainStatsQuery({ data: mockDuels, error: null });
 
       const result = await getDuelStats(studentId);
 
@@ -355,29 +369,13 @@ describe('Duel CRUD Operations', () => {
 
     it('should compute current win streak correctly', async () => {
       const studentId = 'student-123';
-      // Last 3 duels: win, win, loss (streak = 2)
       const mockDuels = [
-        {
-          id: 'duel-3',
-          challenger_id: studentId,
-          winner_id: studentId,
-          completed_at: '2026-02-13T13:00:00Z',
-        },
-        {
-          id: 'duel-2',
-          challenger_id: studentId,
-          winner_id: studentId,
-          completed_at: '2026-02-13T12:00:00Z',
-        },
-        {
-          id: 'duel-1',
-          challenger_id: studentId,
-          winner_id: 'other',
-          completed_at: '2026-02-13T11:00:00Z',
-        },
+        { id: 'duel-3', challenger_id: studentId, winner_id: studentId, completed_at: '2026-02-13T13:00:00Z' },
+        { id: 'duel-2', challenger_id: studentId, winner_id: studentId, completed_at: '2026-02-13T12:00:00Z' },
+        { id: 'duel-1', challenger_id: studentId, winner_id: 'other', completed_at: '2026-02-13T11:00:00Z' },
       ];
 
-      mockSupabase.order.mockResolvedValue({ data: mockDuels, error: null });
+      chainStatsQuery({ data: mockDuels, error: null });
 
       const result = await getDuelStats(studentId);
 
@@ -386,7 +384,6 @@ describe('Duel CRUD Operations', () => {
 
     it('should compute max win streak correctly', async () => {
       const studentId = 'student-123';
-      // Wins: 3 in a row, then loss, then 2 in a row (max = 3)
       const mockDuels = [
         { id: 'd5', challenger_id: studentId, winner_id: studentId, completed_at: '2026-02-13T15:00:00Z' },
         { id: 'd4', challenger_id: studentId, winner_id: studentId, completed_at: '2026-02-13T14:00:00Z' },
@@ -396,7 +393,7 @@ describe('Duel CRUD Operations', () => {
         { id: 'd0', challenger_id: studentId, winner_id: studentId, completed_at: '2026-02-13T10:00:00Z' },
       ];
 
-      mockSupabase.order.mockResolvedValue({ data: mockDuels, error: null });
+      chainStatsQuery({ data: mockDuels, error: null });
 
       const result = await getDuelStats(studentId);
 
@@ -411,23 +408,17 @@ describe('Duel CRUD Operations', () => {
         { challenger_id: 'opponent-B', opponent_id: studentId, winner_id: studentId, completed_at: '2026-02-13T12:00:00Z' },
       ];
 
-      mockSupabase.order.mockResolvedValue({ data: mockDuels, error: null });
+      chainStatsQuery({ data: mockDuels, error: null });
 
       const result = await getDuelStats(studentId);
 
       expect(result.data!.opponentStats).toBeDefined();
-      expect(result.data!.opponentStats.get('opponent-A')).toEqual({
-        wins: 1,
-        losses: 1,
-      });
-      expect(result.data!.opponentStats.get('opponent-B')).toEqual({
-        wins: 1,
-        losses: 0,
-      });
+      expect(result.data!.opponentStats.get('opponent-A')).toEqual({ wins: 1, losses: 1 });
+      expect(result.data!.opponentStats.get('opponent-B')).toEqual({ wins: 1, losses: 0 });
     });
 
     it('should handle empty stats', async () => {
-      mockSupabase.order.mockResolvedValue({ data: [], error: null });
+      chainStatsQuery({ data: [], error: null });
 
       const result = await getDuelStats('student-123');
 
@@ -455,7 +446,7 @@ describe('Duel CRUD Operations', () => {
         completed_at: '2026-02-13T14:05:00Z',
       };
 
-      mockSupabase.single.mockResolvedValue({ data: mockTurn, error: null });
+      const { mockInsert } = chainInsertSelectSingle({ data: mockTurn, error: null });
 
       const result = await submitDuelTurn(
         'duel-123',
@@ -466,8 +457,8 @@ describe('Duel CRUD Operations', () => {
 
       expect(result.data).toEqual(mockTurn);
       expect(result.error).toBeNull();
-      expect(mockSupabase.from).toHaveBeenCalledWith('duel_turns');
-      expect(mockSupabase.insert).toHaveBeenCalledWith(
+      expect(mockFrom).toHaveBeenCalledWith('duel_turns');
+      expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           duel_id: 'duel-123',
           player_id: 'player-123',
@@ -478,7 +469,7 @@ describe('Duel CRUD Operations', () => {
     });
 
     it('should handle insert error', async () => {
-      mockSupabase.single.mockResolvedValue({
+      chainInsertSelectSingle({
         data: null,
         error: { message: 'Insert failed' },
       });
@@ -497,18 +488,20 @@ describe('Duel CRUD Operations', () => {
         { id: 'duel-2', status: 'pending', opponent_id: 'student-123' },
       ];
 
-      mockSupabase.order.mockResolvedValue({
-        data: mockPendingDuels,
-        error: null,
-      });
+      // Chain: from → select → eq → eq → order
+      const mockOrder = jest.fn().mockResolvedValue({ data: mockPendingDuels, error: null });
+      const mockEq2 = jest.fn().mockReturnValue({ order: mockOrder });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      mockFrom.mockReturnValue({ select: mockSelect });
 
       const result = await getPendingDuelsForStudent('student-123');
 
       expect(result.data).toHaveLength(2);
       expect(result.error).toBeNull();
-      expect(mockSupabase.from).toHaveBeenCalledWith('student_duels');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('opponent_id', 'student-123');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('status', 'pending');
+      expect(mockFrom).toHaveBeenCalledWith('student_duels');
+      expect(mockEq1).toHaveBeenCalledWith('opponent_id', 'student-123');
+      expect(mockEq2).toHaveBeenCalledWith('status', 'pending');
     });
   });
 });

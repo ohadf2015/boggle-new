@@ -136,6 +136,7 @@ describe('useDuelSocket', () => {
         opponentId: 'opponent-id',
         lessonId: 'lesson-id',
         classroomId: 'classroom-id',
+        duelType: 'async',
       });
     });
 
