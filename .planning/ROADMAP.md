@@ -2,12 +2,12 @@
 
 ## Overview
 
-Transform the education section into an engaging, competitive learning platform with student duels as the centerpiece, diverse practice modes, polished UI across all dashboards, and improved teacher workflows. This roadmap delivers 8 phases (36-43) spanning foundation refactoring, feature development (duels, practice modes, gamification), UI overhauls for both student and teacher experiences, and comprehensive design polish.
+Transform the education section into an engaging, competitive learning platform with student duels as the centerpiece, diverse practice modes, polished UI across all dashboards, and improved teacher workflows. This roadmap delivers 9 phases (36-44) spanning foundation refactoring, feature development (duels, practice modes, gamification), UI overhauls for both student and teacher experiences, comprehensive design polish, and gap closure.
 
 ## Milestones
 
 - ✅ **v1.0 Foundation & Game Modes** - Phases 1-35 (shipped ~87% complete, pre-GSD)
-- 🚧 **v2.0 Education 2.0** - Phases 36-43 (in progress)
+- 🚧 **v2.0 Education 2.0** - Phases 36-44 (in progress)
 
 ## Phases
 
@@ -159,10 +159,25 @@ Plans:
 - [x] 43-03-PLAN.md — Translations (4 languages) for new practice polish UI text
 - [x] 43-04-PLAN.md — Gap closure: AdaptiveMotion migration for 6 remaining practice components + border-neo fix in AchievementUnlockModal
 
+### Phase 44: Milestone Gap Closure & Tech Debt
+**Goal**: Close the one partial requirement (SOC-02) and clean up accumulated tech debt before milestone completion
+**Depends on**: Phase 38, Phase 41
+**Requirements**: SOC-02
+**Gap Closure**: Closes gaps from v2.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Student can challenge specific classmate from their profile page or the classroom roster (ChallengeButton wired)
+  2. Duel PageClient.tsx uses real API fetches instead of mock classroom/lesson data
+  3. No unused exported functions in duel data layer (getActiveDuelsForStudent removed or used)
+  4. Phase 37 has a VERIFICATION.md confirming all success criteria were met
+**Plans**: TBD (created by /gsd:plan-phase 44)
+
+Plans:
+- [ ] 44-01-PLAN.md — Wire ChallengeButton + replace mock data + cleanup unused exports + Phase 37 verification
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43
+Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 → 43 → 44
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -174,6 +189,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 41. Student Dashboard Overhaul | v2.0 | 4/4 | Complete | 2026-02-14 |
 | 42. Teacher Dashboard & Workflows | v2.0 | 5/5 | Complete | 2026-02-14 |
 | 43. Practice Experience & Design Polish | v2.0 | 4/4 | Complete | 2026-02-14 |
+| 44. Milestone Gap Closure & Tech Debt | v2.0 | 0/1 | Planned | — |
 
 ---
-*Last updated: 2026-02-14 — Phase 43 complete (4/4 plans, all verified)*
+*Last updated: 2026-02-14 — Phase 44 added (gap closure from milestone audit)*

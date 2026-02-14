@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 43 COMPLETE — All v2.0 phases done. Ready for milestone audit.
+**Current focus:** Phase 44 — Gap closure from milestone audit (SOC-02 wiring + tech debt cleanup).
 
 ## Current Position
 
-Phase: 43 of 43 (Practice Experience & Design Polish)
-Plan: 4 of 4 in current phase
-Status: COMPLETE — Phase verified (15/15 must-haves, 100%)
-Last activity: 2026-02-14 — Phase 43 verified and complete
+Phase: 44 of 44 (Milestone Gap Closure & Tech Debt)
+Plan: 0 of 1 in current phase
+Status: PLANNED — Needs /gsd:plan-phase 44
+Last activity: 2026-02-14 — Phase 44 created from audit gaps
 
-Progress: [████████████████] 100% (43/43 phases complete)
+Progress: [███████████████░] 97% (43/44 phases complete, 1 planned)
 
 ## Performance Metrics
 
@@ -87,7 +87,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14 at 12:00 UTC
-Stopped at: Phase 43 COMPLETE — all v2.0 phases done
+Last session: 2026-02-14 at 12:30 UTC
+Stopped at: Phase 44 created from milestone audit gaps
 Resume file: None
-Next action: Milestone v2.0 audit — /gsd:audit-milestone
+Next action: /gsd:plan-phase 44 — plan gap closure tasks
