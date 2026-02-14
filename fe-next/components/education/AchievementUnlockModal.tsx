@@ -246,7 +246,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
             <motion.div
               className={cn(
                 'mb-6 py-2 px-4 rounded-neo',
-                'border-2'
+                'border-neo'
               )}
               style={{
                 backgroundColor: `${TIER_COLORS[tier]}20`,
