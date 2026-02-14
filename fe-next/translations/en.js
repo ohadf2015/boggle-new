@@ -5021,7 +5021,19 @@ const en = {
       "challenges": "Your Challenges",
       "leaderboard": "Classroom Leaderboard",
       "viewAll": "View All",
-      "achievements": "Achievements"
+      "achievements": "Achievements",
+      "classroomActivity": "Classroom Activity",
+      "quickPractice": "Quick Practice",
+      "randomLesson": "Random Lesson",
+      "quickDuel": "Quick Duel",
+      "challengeClassmate": "Challenge a Classmate",
+      "streakCalendar": "Your Streak",
+      "activity": {
+        "wonDuel": "won a duel",
+        "unlockedAchievement": "unlocked an achievement",
+        "noActivity": "No activity yet",
+        "errorLoading": "Failed to load activity"
+      }
     },
     "lessons": {
       "lesson": "Lesson",

@@ -5047,7 +5047,19 @@ const sv = {
       "challenges": "Dina utmaningar",
       "leaderboard": "Klassrumstavla",
       "viewAll": "Visa alla",
-      "achievements": "Prestationer"
+      "achievements": "Prestationer",
+      "classroomActivity": "Klassrumsaktivitet",
+      "quickPractice": "Snabb övning",
+      "randomLesson": "Slumpmässig lektion",
+      "quickDuel": "Snabb duell",
+      "challengeClassmate": "Utmana klasskamrat",
+      "streakCalendar": "Din serie",
+      "activity": {
+        "wonDuel": "vann en duell",
+        "unlockedAchievement": "låste upp en prestation",
+        "noActivity": "Ingen aktivitet än",
+        "errorLoading": "Kunde inte ladda aktivitet"
+      }
     },
     "lessons": {
       "lesson": "Lektion",

@@ -5094,7 +5094,19 @@ const ja = {
       "challenges": "チャレンジ",
       "leaderboard": "クラスリーダーボード",
       "viewAll": "すべて表示",
-      "achievements": "実績"
+      "achievements": "実績",
+      "classroomActivity": "クラス活動",
+      "quickPractice": "クイック練習",
+      "randomLesson": "ランダムレッスン",
+      "quickDuel": "クイック決闘",
+      "challengeClassmate": "クラスメイトに挑戦",
+      "streakCalendar": "連続記録",
+      "activity": {
+        "wonDuel": "決闘に勝利",
+        "unlockedAchievement": "実績解除",
+        "noActivity": "アクティビティなし",
+        "errorLoading": "読み込みエラー"
+      }
     },
     "lessons": {
       "lesson": "レッスン",

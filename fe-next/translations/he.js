@@ -5023,7 +5023,19 @@ const he = {
       "challenges": "האתגרים שלך",
       "leaderboard": "טבלת הדירוג",
       "viewAll": "הצג הכל",
-      "achievements": "הישגים"
+      "achievements": "הישגים",
+      "classroomActivity": "פעילות בכיתה",
+      "quickPractice": "תרגול מהיר",
+      "randomLesson": "שיעור אקראי",
+      "quickDuel": "דו קרב מהיר",
+      "challengeClassmate": "אתגר חבר לכיתה",
+      "streakCalendar": "הרצף שלך",
+      "activity": {
+        "wonDuel": "ניצח בדו קרב",
+        "unlockedAchievement": "פתח הישג",
+        "noActivity": "אין פעילות עדיין",
+        "errorLoading": "שגיאה בטעינת הפעילות"
+      }
     },
     "lessons": {
       "lesson": "שיעור",
