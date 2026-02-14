@@ -186,7 +186,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 45-01-PLAN.md — Wire educationXpManager into practice API PATCH handler + verify E2E flow
+- [x] 45-01-PLAN.md — Wire educationXpManager into practice API PATCH handler + verify E2E flow
 
 ## Progress
 
@@ -204,7 +204,7 @@ Phases execute in numeric order: 36 → 37 → 38 → 39 → 40 → 41 → 42 �
 | 42. Teacher Dashboard & Workflows | v2.0 | 5/5 | Complete | 2026-02-14 |
 | 43. Practice Experience & Design Polish | v2.0 | 4/4 | Complete | 2026-02-14 |
 | 44. Milestone Gap Closure & Tech Debt | v2.0 | 1/1 | Complete | 2026-02-14 |
-| 45. Practice XP Server-Side Wiring | v2.0 | 0/1 | Not Started | - |
+| 45. Practice XP Server-Side Wiring | v2.0 | 1/1 | Complete | 2026-02-14 |
 
 ---
-*Last updated: 2026-02-14 — Phase 45 added (gap closure from second audit)*
+*Last updated: 2026-02-14 — Phase 45 complete (all v2.0 phases done)*

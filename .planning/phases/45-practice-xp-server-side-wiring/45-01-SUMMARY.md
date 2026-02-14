@@ -29,7 +29,7 @@ tech-stack:
 key-files:
   created:
     - "fe-next/supabase/migrations/20260215200000_award_education_xp.sql"
-    - "fe-next/backend/__tests__/api/education/practice/route.test.ts"
+    - "fe-next/app/api/education/practice/__tests__/route.test.ts"
   modified:
     - "fe-next/app/api/education/practice/route.ts"
 
@@ -37,7 +37,7 @@ decisions:
   - "RPC signature: award_education_xp(p_student_id UUID, p_xp_amount INTEGER, p_lesson_id UUID DEFAULT NULL) for backward compatibility with existing duel handler calls"
   - "Idempotency guard checks completed_at in ownership query to prevent double-awarding on retry"
   - "RPC errors logged but do not fail request (graceful degradation - session saved, XP can be backfilled)"
-  - "Test file placed in backend/__tests__/api/ (Node environment, no browser globals) instead of app/api/__tests__/ (frontend config)"
+  - "Test file colocated at app/api/education/practice/__tests__/ with MockNextRequest class (jsdom compatible)"
 
 metrics:
   duration: 575s (9 min 35 sec)
@@ -77,8 +77,8 @@ Created `award_education_xp` RPC function with backward-compatible signature (p_
   - **Success Logging:** `logger.info('EDUCATION', 'Awarded ${xp} XP...')`
 
 ### Tests
-- **File:** `fe-next/backend/__tests__/api/education/practice/route.test.ts`
-- **Test Environment:** Node (not jsdom) to support Next.js Request/Response APIs
+- **File:** `fe-next/app/api/education/practice/__tests__/route.test.ts`
+- **Test Environment:** jsdom with MockNextRequest class (follows project convention)
 - **Test Cases (4):**
   1. **XP award on completion:** Verifies `award_education_xp` RPC called with correct snake_case params when session completed with xpAwarded > 0
   2. **No XP when not completed:** Verifies RPC NOT called when `completed` flag is false or missing
@@ -94,7 +94,7 @@ Created `award_education_xp` RPC function with backward-compatible signature (p_
 4. **Double-awarding on retry:** Added idempotency guard checking `completed_at` before processing
 
 ### Deviations from Plan
-None - plan executed exactly as written.
+- Test file initially placed in `backend/__tests__/` (excluded by Jest's testPathIgnorePatterns). Relocated to colocated `app/api/education/practice/__tests__/` and rewritten with MockNextRequest for jsdom compatibility.
 
 ## Testing
 
