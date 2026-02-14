@@ -6104,6 +6104,7 @@ const en = {
     "vs": "VS",
     "waitingForOpponent": "Waiting for opponent...",
     "winRate": "Win Rate",
+    "winStreak": "Win Streak",
     "wins": "Wins",
     "winStreak": "Win Streak",
     "wordsAccepted": "Words Accepted",

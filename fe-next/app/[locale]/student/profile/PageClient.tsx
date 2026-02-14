@@ -20,6 +20,10 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getXpProgress } from '@/backend/modules/xpManager';
+import { getDuelStats, getDuelHistory, type DuelHistoryEntry, type DuelStatsResult } from '@/lib/supabase/education/duels';
+import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { motion } from 'framer-motion';
 
 export default function StudentProfilePageClient() {
   const { user, isAuthenticated, profile, loading } = useAuth();
@@ -29,6 +33,9 @@ export default function StudentProfilePageClient() {
   const [isChecking, setIsChecking] = useState(true);
   const [achievements, setAchievements] = useState<StudentAchievement[]>([]);
   const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
+  const [duelStats, setDuelStats] = useState<DuelStatsResult | null>(null);
+  const [recentDuels, setRecentDuels] = useState<DuelHistoryEntry[]>([]);
+  const [isLoadingDuels, setIsLoadingDuels] = useState(true);
   const { lessons, isLoading: isLoadingProgress } = useStudentProgress();
 
   // Get student XP and level from first lesson progress
@@ -121,6 +128,38 @@ export default function StudentProfilePageClient() {
     }
 
     fetchAchievements();
+  }, [user]);
+
+  // Fetch duel data
+  useEffect(() => {
+    async function fetchDuelData() {
+      if (!user) {
+        setIsLoadingDuels(false);
+        return;
+      }
+
+      try {
+        const [statsResult, historyResult] = await Promise.all([
+          getDuelStats(user.id),
+          getDuelHistory(user.id, 5),
+        ]);
+
+        if (statsResult.data) {
+          setDuelStats(statsResult.data);
+        }
+
+        if (historyResult.data) {
+          setRecentDuels(historyResult.data);
+        }
+
+        setIsLoadingDuels(false);
+      } catch (error) {
+        logger.error('Error fetching duel data:', error);
+        setIsLoadingDuels(false);
+      }
+    }
+
+    fetchDuelData();
   }, [user]);
 
   // Show loader during auth check or while auth is loading
@@ -253,6 +292,208 @@ export default function StudentProfilePageClient() {
                 </div>
               </div>
             </>
+          )}
+        </div>
+
+        {/* Duel Record Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-4">
+            {t('student.profile.duelRecord')}
+          </h2>
+
+          {isLoadingDuels ? (
+            // Skeleton loader
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
+                  <div className="h-4 w-16 bg-neo-white/10 rounded mb-2" />
+                  <div className="h-8 w-12 bg-neo-white/20 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : duelStats && (duelStats.wins > 0 || duelStats.losses > 0 || duelStats.draws > 0) ? (
+            <>
+              {/* Duel Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {/* Wins */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="p-4 bg-green-500/20 border-neo border-neo-black rounded-neo shadow-hard"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <Trophy className="w-4 h-4 text-green-400" />
+                    <span className="text-green-400 font-neo-body text-sm">
+                      {t('duels.wins')}
+                    </span>
+                  </div>
+                  <div className="text-3xl font-neo-display font-black text-neo-white">
+                    {duelStats.wins}
+                  </div>
+                </motion.div>
+
+                {/* Losses */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="p-4 bg-red-500/20 border-neo border-neo-black rounded-neo shadow-hard"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <X className="w-4 h-4 text-red-400" />
+                    <span className="text-red-400 font-neo-body text-sm">
+                      {t('duels.losses')}
+                    </span>
+                  </div>
+                  <div className="text-3xl font-neo-display font-black text-neo-white">
+                    {duelStats.losses}
+                  </div>
+                </motion.div>
+
+                {/* Win Rate */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="p-4 bg-neo-cyan/20 border-neo border-neo-black rounded-neo shadow-hard"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-neo-cyan font-neo-body text-sm">
+                      {t('student.profile.winRate')}
+                    </span>
+                  </div>
+                  <div className="text-3xl font-neo-display font-black text-neo-white">
+                    {(() => {
+                      const total = duelStats.wins + duelStats.losses + duelStats.draws;
+                      if (total === 0) return '0.0';
+                      return ((duelStats.wins / total) * 100).toFixed(1);
+                    })()}%
+                  </div>
+                </motion.div>
+
+                {/* Win Streak */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="p-4 bg-neo-orange/20 border-neo border-neo-black rounded-neo shadow-hard"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    {duelStats.currentStreak >= 3 && <Flame className="w-4 h-4 text-neo-orange" />}
+                    <span className="text-neo-orange font-neo-body text-sm">
+                      {t('duels.winStreak')}
+                    </span>
+                  </div>
+                  <div className="text-3xl font-neo-display font-black text-neo-white">
+                    {duelStats.winStreak}
+                  </div>
+                </motion.div>
+
+                {/* Draws (if any) - hidden if 0 */}
+                {duelStats.draws > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="p-4 bg-gray-500/20 border-neo border-neo-black rounded-neo shadow-hard col-span-2 md:col-span-1"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Minus className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-400 font-neo-body text-sm">
+                        {t('duels.draws')}
+                      </span>
+                    </div>
+                    <div className="text-3xl font-neo-display font-black text-neo-white">
+                      {duelStats.draws}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Recent Duels */}
+              {recentDuels.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-lg font-neo-display font-bold text-neo-white">
+                    {t('student.profile.recentDuels')}
+                  </h3>
+
+                  <div className="space-y-2">
+                    {recentDuels.map((duel, index) => {
+                      const opponentName = duel.challenger_id === user.id
+                        ? duel.opponent.display_name
+                        : duel.challenger.display_name;
+                      const score = duel.challenger_id === user.id
+                        ? duel.challenger_score
+                        : duel.opponent_score;
+
+                      return (
+                        <motion.div
+                          key={duel.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="flex items-center justify-between p-3 bg-neo-navy/30 border-2 border-neo-black rounded-neo hover:bg-neo-navy/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Win/Loss/Draw badge */}
+                            <div className={cn(
+                              'px-2 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs',
+                              duel.isWin && 'bg-green-500 text-white',
+                              !duel.isWin && duel.winner_id !== null && 'bg-red-500 text-white',
+                              duel.winner_id === null && 'bg-gray-500 text-white'
+                            )}>
+                              {duel.isWin ? 'W' : duel.winner_id === null ? 'D' : 'L'}
+                            </div>
+
+                            {/* Opponent */}
+                            <div>
+                              <div className="text-neo-white font-neo-body text-sm">
+                                {t('duels.vs')} {opponentName}
+                              </div>
+                              <div className="text-neo-white/50 font-neo-body text-xs">
+                                {duel.completed_at && formatDistanceToNow(new Date(duel.completed_at), { addSuffix: true })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Score */}
+                          <div className="text-neo-white font-neo-display font-bold">
+                            {score}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Link to full duel history */}
+                  <Link
+                    href={`/${language}/duels/history`}
+                    className={cn(
+                      'block text-center text-neo-cyan hover:text-neo-cyan/80 font-neo-body text-sm',
+                      'transition-colors underline underline-offset-4 mt-2'
+                    )}
+                  >
+                    {t('student.profile.viewDuelHistory')} →
+                  </Link>
+                </div>
+              )}
+            </>
+          ) : (
+            // Empty state
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-8 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard text-center"
+            >
+              <Swords className="w-12 h-12 text-neo-white/30 mx-auto mb-3" />
+              <div className="text-neo-white/70 font-neo-body mb-1">
+                {t('student.profile.noDuelsYet')}
+              </div>
+              <div className="text-neo-white/50 font-neo-body text-sm">
+                {t('student.profile.challengePrompt')}
+              </div>
+            </motion.div>
           )}
         </div>
 

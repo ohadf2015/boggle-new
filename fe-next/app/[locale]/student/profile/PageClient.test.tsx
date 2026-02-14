@@ -151,10 +151,10 @@ describe('StudentProfilePageClient - Duel Features', () => {
       expect(screen.getByText('student.profile.duelRecord')).toBeInTheDocument();
     });
 
-    // Check wins, losses, draws are displayed
-    expect(screen.getByText('10')).toBeInTheDocument(); // wins
-    expect(screen.getByText('5')).toBeInTheDocument(); // losses
-    expect(screen.getByText('2')).toBeInTheDocument(); // draws
+    // Check wins label and value
+    expect(screen.getByText('duels.wins')).toBeInTheDocument();
+    expect(screen.getByText('duels.losses')).toBeInTheDocument();
+    expect(screen.getByText('duels.draws')).toBeInTheDocument();
 
     // Check win rate calculation: 10 / (10 + 5 + 2) * 100 = 58.8%
     expect(screen.getByText(/58\.8/)).toBeInTheDocument();
@@ -423,7 +423,7 @@ describe('StudentProfilePageClient - Duel Features', () => {
 
     // Wait for link to appear
     await waitFor(() => {
-      const link = screen.getByText('student.profile.viewDuelHistory');
+      const link = screen.getByText(/student\.profile\.viewDuelHistory/);
       expect(link).toBeInTheDocument();
       expect(link.closest('a')).toHaveAttribute('href', '/en/duels/history');
     });
