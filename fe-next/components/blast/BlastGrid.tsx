@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTileOverlay } from './BlastTileOverlay';
+import type { SelectedCell } from '@/components/grid';
 import { BlastExplosionLayer } from './BlastExplosionLayer';
 import { BlastCascadeOverlay } from './BlastCascadeOverlay';
 import { BlastCascadeHighlight } from './BlastCascadeHighlight';
@@ -99,6 +100,16 @@ export function BlastGrid({
   // Block interaction during cascade
   const isInteractive = interactive && cascadePhase === 'idle';
 
+  // Track selected cells for overlay selection glow
+  const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
+  const handleSelectionChange = useCallback((cells: SelectedCell[]) => {
+    setSelectedCells(cells);
+  }, []);
+  const selectedPositions = useMemo(
+    () => new Set(selectedCells.map(c => `${c.row}-${c.col}`)),
+    [selectedCells],
+  );
+
   return (
     <div
       ref={containerRef}
@@ -112,6 +123,7 @@ export function BlastGrid({
         onWordSubmit={onWordSubmit}
         onPathSubmit={onPathSubmit}
         onWordChange={onWordChange}
+        onSelectionChange={handleSelectionChange}
         hideWordPreview
         hideComboIndicator
         comboLevel={comboLevel}
@@ -120,14 +132,12 @@ export function BlastGrid({
         language={language}
       />
 
-      {/* Special tile full-cell backgrounds (below letters) */}
-      {containerWidth > 0 && (
-        <BlastTileOverlay
-          tileStates={tileStates}
-          gridSize={gridSize}
-          containerWidth={containerWidth}
-        />
-      )}
+      {/* Special tile full-cell backgrounds with selection glow */}
+      <BlastTileOverlay
+        tileStates={tileStates}
+        gridSize={gridSize}
+        selectedPositions={selectedPositions}
+      />
 
       {/* Cascade word highlight glow (z-15, between tile overlay and cascade overlay) */}
       {containerWidth > 0 && cascadeHighlightData && (

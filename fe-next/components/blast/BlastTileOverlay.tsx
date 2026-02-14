@@ -1,18 +1,24 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Star, Bomb, Rainbow, Snowflake, Shuffle,
+  Zap, Magnet, Sparkles, Diamond,
+  type LucideIcon,
+} from 'lucide-react';
 import type { BlastTileState } from './types';
+import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 
 interface BlastTileOverlayProps {
   tileStates: BlastTileState[][];
   gridSize: number;
-  containerWidth: number;
+  /** Set of "row-col" keys for cells currently selected/dragged by the player */
+  selectedPositions?: Set<string>;
 }
 
 /**
  * Full-cell background config for each special tile type.
- * These render BEHIND the letter (z-index below GridComponent's cells)
- * to create distinctive visual treatments.
+ * These render ABOVE the letter cells (z-[11]) because cells have opaque backgrounds.
  */
 const TILE_BACKGROUNDS: Record<string, {
   background: string;
@@ -82,41 +88,58 @@ const TILE_BACKGROUNDS: Record<string, {
   },
 };
 
+/** Icon + color for each special tile type */
+const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string }> = {
+  gold: { Icon: Star, color: 'text-yellow-900' },
+  bomb: { Icon: Bomb, color: 'text-white' },
+  rainbow: { Icon: Rainbow, color: 'text-white' },
+  ice: { Icon: Snowflake, color: 'text-blue-200' },
+  wildcard: { Icon: Shuffle, color: 'text-white' },
+  lightning: { Icon: Zap, color: 'text-yellow-300' },
+  magnet: { Icon: Magnet, color: 'text-white' },
+  prism: { Icon: Sparkles, color: 'text-white' },
+  gem: { Icon: Diamond, color: 'text-white' },
+  frozen: { Icon: Snowflake, color: 'text-blue-400' },
+};
+
 /**
  * BlastTileOverlay - Full-cell background treatments for special tiles + cleared gap cells.
- * Renders underneath the grid letters as colored overlays with animations.
+ * Uses CSS Grid aligned to GridComponent's layout for pixel-perfect tile alignment.
  * Cleared cells render as dark inset gaps so the board visually "breathes" during cascade.
  */
 export function BlastTileOverlay({
   tileStates,
   gridSize,
-  containerWidth,
+  selectedPositions,
 }: BlastTileOverlayProps) {
-  const cellSize = containerWidth / gridSize;
-  const inset = 2; // Small inset to not cover cell borders
-
   return (
-    <div className="absolute inset-0 pointer-events-none z-[11]">
+    <div
+      data-testid="blast-tile-overlay"
+      className={`absolute inset-0 pointer-events-none z-[11] grid ${GRID_GAP_CLASS}`}
+      style={{
+        padding: GRID_PADDING,
+        gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
+      }}
+    >
       <AnimatePresence mode="sync">
         {tileStates.flat().map(tile => {
-          const x = tile.col * cellSize;
-          const y = tile.row * cellSize;
+          const posKey = `${tile.row}-${tile.col}`;
+          const isSelected = selectedPositions?.has(posKey) ?? false;
 
           // Cleared tile → dark void cell
           if (tile.isCleared) {
             return (
               <motion.div
-                key={`gap-${tile.row}-${tile.col}`}
+                key={`gap-${posKey}`}
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="absolute rounded-lg"
+                className="rounded-lg"
                 style={{
-                  left: x + inset,
-                  top: y + inset,
-                  width: cellSize - inset * 2,
-                  height: cellSize - inset * 2,
+                  gridRow: tile.row + 1,
+                  gridColumn: tile.col + 1,
                   background: 'radial-gradient(circle at 50% 50%, rgba(15,15,35,0.85) 0%, rgba(8,8,25,0.95) 100%)',
                   border: '2px solid rgba(255,255,255,0.06)',
                   boxShadow: 'inset 0 3px 12px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.4)',
@@ -148,7 +171,6 @@ export function BlastTileOverlay({
             border = '3px solid rgba(255,255,255,0.5)';
             shadow = 'inset 0 0 16px rgba(150,220,255,0.3), 0 0 10px rgba(180,230,255,0.25)';
           } else if (isCrackedPrism) {
-            // Rainbow light leaking through cracks
             background = 'conic-gradient(from 0deg, rgba(255,0,0,0.35), rgba(255,165,0,0.35), rgba(255,255,0,0.35), rgba(0,255,0,0.35), rgba(0,100,255,0.35), rgba(148,0,211,0.35), rgba(255,0,0,0.35))';
             border = '3px solid rgba(255,255,255,0.85)';
             shadow = 'inset 0 0 24px rgba(255,255,255,0.5), 0 0 18px rgba(255,200,100,0.4), 0 0 32px rgba(168,85,247,0.25)';
@@ -172,9 +194,11 @@ export function BlastTileOverlay({
             shadow = `inset 0 0 ${glowBase}px rgba(80,200,120,${0.25 + gemGlowIntensity * 0.12}), 0 0 ${outerBase}px rgba(0,255,100,${0.2 + gemGlowIntensity * 0.12}), 0 0 ${haloBase}px rgba(0,255,100,${0.05 + gemGlowIntensity * 0.08})`;
           }
 
+          const iconEntry = TILE_ICONS[tile.type];
+
           return (
             <motion.div
-              key={`bg-${tile.row}-${tile.col}`}
+              key={`bg-${posKey}`}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: isWeakened ? [1, 0.85, 1] : 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.3 }}
@@ -182,17 +206,22 @@ export function BlastTileOverlay({
                 ? { opacity: { duration: 1, repeat: Infinity, ease: 'easeInOut' }, type: 'spring', stiffness: 300, damping: 20 }
                 : { type: 'spring', stiffness: 300, damping: 20 }
               }
-              className={`absolute rounded-lg ${config.animationClass}`}
+              className={`relative rounded-lg ${config.animationClass}${isSelected ? ' blast-tile-selected' : ''}`}
               style={{
-                left: x + inset,
-                top: y + inset,
-                width: cellSize - inset * 2,
-                height: cellSize - inset * 2,
+                gridRow: tile.row + 1,
+                gridColumn: tile.col + 1,
                 background,
                 border,
                 boxShadow: shadow,
               }}
-            />
+            >
+              {/* Icon badge - bottom-end for RTL support */}
+              {iconEntry && (
+                <span className={`absolute bottom-0.5 end-0.5 bg-black/40 rounded-full p-0.5 ${iconEntry.color}`}>
+                  <iconEntry.Icon className="w-3 h-3" />
+                </span>
+              )}
+            </motion.div>
           );
         })}
       </AnimatePresence>

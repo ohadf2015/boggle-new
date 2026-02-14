@@ -13,6 +13,7 @@ import {
   type SelectedCell,
   type PerformanceMode,
 } from './grid';
+import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import { useDisableFireRoundLights, useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -53,6 +54,8 @@ interface GridComponentProps {
   language?: Language;
   /** Disable grid's built-in letter key input - allows external keyboard input hook to handle typing */
   disableLetterKeyInput?: boolean;
+  /** Callback when selected cells change - used by BlastGrid to sync selection state with overlay */
+  onSelectionChange?: (cells: SelectedCell[]) => void;
 }
 
 /**
@@ -99,6 +102,7 @@ const GridComponent = memo<GridComponentProps>(({
   onSingleTapDetected,
   language = 'en',
   disableLetterKeyInput = false,
+  onSelectionChange,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -180,6 +184,11 @@ const GridComponent = memo<GridComponentProps>(({
       onWordChange(formedWord, selectedCellsLength);
     }
   }, [formedWord, selectedCellsLength, onWordChange]);
+
+  // Notify parent of selection changes (for BlastTileOverlay selection glow)
+  useEffect(() => {
+    onSelectionChange?.(selectedCells);
+  }, [selectedCells, onSelectionChange]);
 
   // Calculate adjacent cells for highlighting hints
   const adjacentHintCells = useMemo(() => {
@@ -400,7 +409,7 @@ const GridComponent = memo<GridComponentProps>(({
   const gridDimensions = useMemo(() => ({
     cols: grid[0]?.length || 4,
     rows: grid.length || 4,
-    gap: "gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2", // Responsive gap: 2px -> 4px -> 6px -> 8px
+    gap: GRID_GAP_CLASS,
   }), [grid]);
 
   return (
@@ -487,7 +496,7 @@ const GridComponent = memo<GridComponentProps>(({
           )}
           style={{
             inset: '0',
-            padding: '0.4rem',
+            padding: GRID_PADDING,
             gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
             backgroundColor: 'var(--neo-cream)',

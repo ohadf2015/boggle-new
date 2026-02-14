@@ -41,10 +41,12 @@ jest.mock('lucide-react', () => ({
   Diamond: () => <span data-testid="diamond-icon" />,
   Snowflake: () => <span data-testid="snowflake-icon" />,
   Sparkles: () => <span data-testid="sparkles-icon" />,
+  Shuffle: () => <span data-testid="shuffle-icon" />,
+  Magnet: () => <span data-testid="magnet-icon" />,
+  Zap: () => <span data-testid="zap-icon" />,
   RotateCcw: () => <span />,
   Home: () => <span />,
   Trophy: () => <span />,
-  Zap: () => <span />,
   Grid3X3: () => <span />,
 }));
 
@@ -194,10 +196,10 @@ describe('BlastTileOverlay', () => {
       [makeTile(1, 0, 'standard'), makeTile(1, 1, 'standard')],
     ];
     const { container } = render(
-      <BlastTileOverlay tileStates={tileStates} gridSize={2} containerWidth={200} />,
+      <BlastTileOverlay tileStates={tileStates} gridSize={2} />,
     );
-    // The wrapper div exists but no child overlay divs inside the AnimatePresence region
-    const overlayChildren = container.querySelector('.absolute.inset-0')?.children;
+    // Only the wrapper grid div exists, no overlay children rendered
+    const overlayChildren = container.querySelector('[data-testid="blast-tile-overlay"]')?.children;
     expect(overlayChildren?.length).toBe(0);
   });
 
@@ -206,7 +208,7 @@ describe('BlastTileOverlay', () => {
       [makeTile(0, 0, 'standard', true), makeTile(0, 1, 'standard')],
     ];
     const { container } = render(
-      <BlastTileOverlay tileStates={tileStates} gridSize={2} containerWidth={200} />,
+      <BlastTileOverlay tileStates={tileStates} gridSize={2} />,
     );
     const gapDivs = container.querySelectorAll('.rounded-lg');
     expect(gapDivs.length).toBe(1);
@@ -217,7 +219,7 @@ describe('BlastTileOverlay', () => {
       [makeTile(0, 0, 'gold'), makeTile(0, 1, 'standard')],
     ];
     const { container } = render(
-      <BlastTileOverlay tileStates={tileStates} gridSize={2} containerWidth={200} />,
+      <BlastTileOverlay tileStates={tileStates} gridSize={2} />,
     );
     const goldDivs = container.querySelectorAll('.blast-tile-gold');
     expect(goldDivs.length).toBe(1);
@@ -228,10 +230,84 @@ describe('BlastTileOverlay', () => {
       [makeTile(0, 0, 'bomb')],
     ];
     const { container } = render(
-      <BlastTileOverlay tileStates={tileStates} gridSize={1} containerWidth={100} />,
+      <BlastTileOverlay tileStates={tileStates} gridSize={1} />,
     );
     const bombDivs = container.querySelectorAll('.blast-tile-bomb');
     expect(bombDivs.length).toBe(1);
+  });
+
+  it('uses CSS Grid layout with correct gridRow/gridColumn', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'gold'), makeTile(0, 1, 'standard')],
+      [makeTile(1, 0, 'standard'), makeTile(1, 1, 'bomb')],
+    ];
+    const { container } = render(
+      <BlastTileOverlay tileStates={tileStates} gridSize={2} />,
+    );
+    const goldDiv = container.querySelector('.blast-tile-gold') as HTMLElement;
+    const bombDiv = container.querySelector('.blast-tile-bomb') as HTMLElement;
+    // CSS Grid placement: 1-indexed (row + 1, col + 1)
+    expect(goldDiv.style.gridRow).toBe('1');
+    expect(goldDiv.style.gridColumn).toBe('1');
+    expect(bombDiv.style.gridRow).toBe('2');
+    expect(bombDiv.style.gridColumn).toBe('2');
+  });
+
+  it('renders icon badge for gold tile (Star icon)', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'gold')],
+    ];
+    render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
+    expect(screen.getByTestId('star-icon')).toBeInTheDocument();
+  });
+
+  it('renders icon badge for bomb tile (Bomb icon)', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'bomb')],
+    ];
+    render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
+    expect(screen.getByTestId('bomb-icon')).toBeInTheDocument();
+  });
+
+  it('renders icon badge for rainbow tile (Rainbow icon)', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'rainbow')],
+    ];
+    render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
+    expect(screen.getByTestId('rainbow-icon')).toBeInTheDocument();
+  });
+
+  it('renders icon badge for ice tile (Snowflake icon)', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'ice')],
+    ];
+    render(<BlastTileOverlay tileStates={tileStates} gridSize={1} />);
+    expect(screen.getByTestId('snowflake-icon')).toBeInTheDocument();
+  });
+
+  it('applies selection glow class when tile is in selectedPositions', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'gold'), makeTile(0, 1, 'bomb')],
+    ];
+    const selectedPositions = new Set(['0-0']);
+    const { container } = render(
+      <BlastTileOverlay tileStates={tileStates} gridSize={2} selectedPositions={selectedPositions} />,
+    );
+    const goldDiv = container.querySelector('.blast-tile-gold') as HTMLElement;
+    const bombDiv = container.querySelector('.blast-tile-bomb') as HTMLElement;
+    expect(goldDiv.className).toContain('blast-tile-selected');
+    expect(bombDiv.className).not.toContain('blast-tile-selected');
+  });
+
+  it('does not apply selection glow when selectedPositions is empty', () => {
+    const tileStates: BlastTileState[][] = [
+      [makeTile(0, 0, 'gold')],
+    ];
+    const { container } = render(
+      <BlastTileOverlay tileStates={tileStates} gridSize={1} />,
+    );
+    const goldDiv = container.querySelector('.blast-tile-gold') as HTMLElement;
+    expect(goldDiv.className).not.toContain('blast-tile-selected');
   });
 });
 
