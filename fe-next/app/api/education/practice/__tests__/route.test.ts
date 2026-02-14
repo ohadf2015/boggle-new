@@ -3,13 +3,35 @@
  * Tests for PATCH handler XP wiring and idempotency
  */
 
-// Configure test environment
-/**
- * @jest-environment node
- * @jest-environment-options {"customExportConditions": ["node"]}
- */
+// Mock next/server BEFORE any imports
+jest.mock('next/server', () => {
+  class MockNextRequest {
+    private _body: any;
+    url: string;
+    method: string;
 
-// Mock dependencies BEFORE importing route
+    constructor(url: string, init?: { method?: string; body?: string }) {
+      this.url = url;
+      this.method = init?.method || 'GET';
+      this._body = init?.body ? JSON.parse(init.body) : null;
+    }
+
+    async json() {
+      return this._body;
+    }
+  }
+
+  return {
+    NextRequest: MockNextRequest,
+    NextResponse: {
+      json: jest.fn((data: any, init?: { status?: number }) => ({
+        json: async () => data,
+        status: init?.status || 200,
+      })),
+    },
+  };
+});
+
 jest.mock('@/utils/supabase/server');
 jest.mock('@/utils/logger', () => ({
   __esModule: true,
@@ -25,7 +47,7 @@ jest.mock('@/utils/logger', () => ({
 }));
 
 import { NextRequest } from 'next/server';
-import { PATCH } from '@/app/api/education/practice/route';
+import { PATCH } from '../route';
 
 describe('PATCH /api/education/practice', () => {
   let mockSupabase: any;
@@ -65,13 +87,6 @@ describe('PATCH /api/education/practice', () => {
     // Mock createClient to return our mock
     const { createClient } = require('@/utils/supabase/server');
     createClient.mockResolvedValue(mockSupabase);
-
-    // Mock logger to suppress output
-    const logger = require('@/utils/logger');
-    logger.default = {
-      error: jest.fn(),
-      info: jest.fn(),
-    };
   });
 
   describe('XP Award on Completion', () => {
@@ -97,31 +112,19 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      mockFrom.mockImplementation((table: string) => {
+      mockFrom.mockImplementation(() => {
+        const callCount = mockFrom.mock.calls.length;
         const builder = {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           update: jest.fn().mockReturnThis(),
-          single: jest.fn(),
+          single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
         };
-
-        if (table === 'practice_sessions') {
-          // First call: ownership check
-          // Second call: session update
-          const callCount = mockFrom.mock.calls.filter((c: any) => c[0] === 'practice_sessions').length;
-          if (callCount === 1) {
-            builder.single = ownershipCheckMock;
-          } else {
-            builder.single = sessionUpdateMock;
-          }
-        }
-
         return builder;
       });
 
       const request = new NextRequest('http://localhost/api/education/practice', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: '550e8400-e29b-41d4-a716-446655440001',
           xpAwarded: 120,
@@ -149,7 +152,7 @@ describe('PATCH /api/education/practice', () => {
       // GIVEN: Session update without completion
       const ownershipCheckMock = jest.fn().mockResolvedValue({
         data: {
-          id: 'session-456',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
           completed_at: null,
         },
@@ -158,7 +161,7 @@ describe('PATCH /api/education/practice', () => {
 
       const sessionUpdateMock = jest.fn().mockResolvedValue({
         data: {
-          id: 'session-456',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
           lesson_id: '550e8400-e29b-41d4-a716-446655440003',
           xp_awarded: 0,
@@ -168,29 +171,19 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      mockFrom.mockImplementation((table: string) => {
+      mockFrom.mockImplementation(() => {
+        const callCount = mockFrom.mock.calls.length;
         const builder = {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           update: jest.fn().mockReturnThis(),
-          single: jest.fn(),
+          single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
         };
-
-        if (table === 'practice_sessions') {
-          const callCount = mockFrom.mock.calls.filter((c: any) => c[0] === 'practice_sessions').length;
-          if (callCount === 1) {
-            builder.single = ownershipCheckMock;
-          } else {
-            builder.single = sessionUpdateMock;
-          }
-        }
-
         return builder;
       });
 
       const request = new NextRequest('http://localhost/api/education/practice', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: '550e8400-e29b-41d4-a716-446655440001',
           wordsAttempted: 5,
@@ -215,26 +208,21 @@ describe('PATCH /api/education/practice', () => {
       // GIVEN: Session already completed
       const ownershipCheckMock = jest.fn().mockResolvedValue({
         data: {
-          id: 'session-456',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
-          completed_at: '2026-02-14T10:00:00Z', // Already completed
+          completed_at: '2026-02-14T10:00:00Z',
         },
         error: null,
       });
 
-      mockFrom.mockImplementation((table: string) => {
-        const builder = {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          single: ownershipCheckMock,
-        };
-
-        return builder;
-      });
+      mockFrom.mockImplementation(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: ownershipCheckMock,
+      }));
 
       const request = new NextRequest('http://localhost/api/education/practice', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: '550e8400-e29b-41d4-a716-446655440001',
           xpAwarded: 120,
@@ -250,9 +238,8 @@ describe('PATCH /api/education/practice', () => {
       expect(response.status).toBe(200);
       expect(data.session.completed_at).toBe('2026-02-14T10:00:00Z');
 
-      // THEN: Session update was NOT called
-      const fromCalls = mockFrom.mock.calls;
-      expect(fromCalls.length).toBe(1); // Only ownership check, no update
+      // THEN: Session update was NOT called (only ownership check)
+      expect(mockFrom).toHaveBeenCalledTimes(1);
 
       // THEN: RPC was NOT called (no double-awarding)
       expect(mockRpc).not.toHaveBeenCalled();
@@ -269,7 +256,7 @@ describe('PATCH /api/education/practice', () => {
 
       const ownershipCheckMock = jest.fn().mockResolvedValue({
         data: {
-          id: 'session-456',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
           completed_at: null,
         },
@@ -278,7 +265,7 @@ describe('PATCH /api/education/practice', () => {
 
       const sessionUpdateMock = jest.fn().mockResolvedValue({
         data: {
-          id: 'session-456',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
           lesson_id: '550e8400-e29b-41d4-a716-446655440003',
           xp_awarded: 100,
@@ -287,29 +274,19 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      mockFrom.mockImplementation((table: string) => {
+      mockFrom.mockImplementation(() => {
+        const callCount = mockFrom.mock.calls.length;
         const builder = {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           update: jest.fn().mockReturnThis(),
-          single: jest.fn(),
+          single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
         };
-
-        if (table === 'practice_sessions') {
-          const callCount = mockFrom.mock.calls.filter((c: any) => c[0] === 'practice_sessions').length;
-          if (callCount === 1) {
-            builder.single = ownershipCheckMock;
-          } else {
-            builder.single = sessionUpdateMock;
-          }
-        }
-
         return builder;
       });
 
       const request = new NextRequest('http://localhost/api/education/practice', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: '550e8400-e29b-41d4-a716-446655440001',
           xpAwarded: 100,
