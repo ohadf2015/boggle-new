@@ -5162,7 +5162,17 @@ const ja = {
         "wordsLeft": "残り{{count}}単語",
         "streak": "{{count}}連続",
         "mastered": "習得！"
-      }
+      },
+      "wordsFound": "見つけた単語",
+      "sessions": "練習セッション"
+    },
+    "profile": {
+      "duelRecord": "対戦記録",
+      "noDuelsYet": "まだ対戦がありません",
+      "challengePrompt": "クラスメートに最初の対戦を挑もう！",
+      "recentDuels": "最近の対戦",
+      "viewDuelHistory": "全履歴を見る",
+      "winRate": "勝率"
     }
   },
   "teacher": {

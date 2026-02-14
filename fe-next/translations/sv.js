@@ -5115,7 +5115,17 @@ const sv = {
         "wordsLeft": "{{count}} ord kvar",
         "streak": "{{count}} i rad",
         "mastered": "Bemästrad!"
-      }
+      },
+      "wordsFound": "Ord hittade",
+      "sessions": "Övningssessioner"
+    },
+    "profile": {
+      "duelRecord": "Duellstatistik",
+      "noDuelsYet": "Inga dueller än",
+      "challengePrompt": "Utmana en klasskamrat till din första duell!",
+      "recentDuels": "Senaste duellerna",
+      "viewDuelHistory": "Visa fullständig historik",
+      "winRate": "Vinstprocent"
     }
   },
   "teacher": {

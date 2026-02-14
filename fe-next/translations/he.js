@@ -5091,7 +5091,17 @@ const he = {
         "wordsLeft": "נותרו {{count}} מילים",
         "streak": "רצף של {{count}}",
         "mastered": "נשלט!"
-      }
+      },
+      "wordsFound": "מילים שנמצאו",
+      "sessions": "מפגשי תרגול"
+    },
+    "profile": {
+      "duelRecord": "תוצאות דו-קרב",
+      "noDuelsYet": "עדיין אין דו-קרבות",
+      "challengePrompt": "אתגר חבר לכיתה לדו-קרב הראשון שלך!",
+      "recentDuels": "דו-קרבות אחרונים",
+      "viewDuelHistory": "צפה בהיסטוריה המלאה",
+      "winRate": "אחוז ניצחונות"
     }
   },
   "teacher": {
