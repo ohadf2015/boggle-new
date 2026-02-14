@@ -7,14 +7,14 @@ dependsOn = ['setup']
 cmds = [
     'NODE_ENV=development npm install --prefer-offline --no-audit --no-fund --loglevel=error'
 ]
-cacheDirectories = ['node_modules', '.next/cache']
+cacheDirectories = ['.next/cache']
 
 [phases.build]
 dependsOn = ['install']
 cmds = [
     'NODE_ENV=production npm run build --loglevel=error 2>&1 | grep -v "baseline-browser-mapping"'
 ]
-cacheDirectories = ['node_modules', '.next/cache']
+cacheDirectories = ['.next/cache']
 
 [start]
 cmd = 'npm start'
