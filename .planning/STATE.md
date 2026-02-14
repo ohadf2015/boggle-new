@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 42 of 43 (Teacher Dashboard & Workflows)
-Plan: 2 of 6 in current phase
-Status: In progress — Lesson creation enhancements complete
-Last activity: 2026-02-14 — Completed 42-02-PLAN.md (template selector + enhanced bulk import)
+Plan: 3 of 6 in current phase
+Status: In progress — Assignment management UI complete
+Last activity: 2026-02-14 — Completed 42-03-PLAN.md (AssignmentCreator + CompletionTracker + AssignmentTrackingPanel)
 
-Progress: [██████████████░░] ~76% (41/43 phases, plan 42-02 of 6 complete)
+Progress: [██████████████░░] ~76% (41/43 phases, plan 42-03 of 6 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 12 min
-- Total execution time: 458 min
+- Total execution time: 467 min
 
 **By Phase:**
 
@@ -33,13 +33,14 @@ Progress: [██████████████░░] ~76% (41/43 phases,
 | 39 | 5 | 71 min | 14 min |
 | 40 | 7 | 48 min | 7 min |
 | 41 | 4 | 38 min | 10 min |
-| 42 | 2 | 24 min | 12 min |
+| 42 | 3 | 33 min | 11 min |
 
 **Recent Trend:**
-- Last 5 plans: 41-01 (18 min), 41-03 (9 min), 41-02 (11 min), 42-01 (18 min), 42-02 (6 min)
-- Phase 42 IN PROGRESS: 2/6 plans, 24 min total
+- Last 5 plans: 41-03 (9 min), 41-02 (11 min), 42-01 (18 min), 42-02 (6 min), 42-03 (9 min)
+- Phase 42 IN PROGRESS: 3/6 plans, 33 min total
 - 42-01: Assignment data layer (migration + service functions + useAssignments hook) (18 min)
 - 42-02: Lesson creation enhancements (TemplateLessonSelector + BulkImportEnhanced) (6 min)
+- 42-03: Assignment management UI (AssignmentCreator + CompletionTracker + AssignmentTrackingPanel) (9 min)
 
 *Updated after each plan completion*
 
@@ -153,6 +154,10 @@ Recent decisions affecting current work:
 - **42-01:** UNIQUE constraint on (classroom_id, lesson_id, assignment_type) prevents duplicate assignments
 - **42-01:** Completion tracking in separate table (many-to-many relationship, better query performance)
 - **42-01:** useAssignments hook with optimistic updates (instant UI feedback, rollback on error)
+- **42-03:** Inline date picker instead of Radix Popover (no new dependencies, simpler implementation)
+- **42-03:** Struggling words section collapsible by default (reduces visual clutter, opt-in analysis)
+- **42-03:** AssignmentCompletion.incorrectWords optional field (placeholder for backend data population)
+- **42-03:** Status badges use hard-coded neo-brutalist colors (green/red/gray for immediate visual feedback)
 - **41-02:** Parallel queries for duels and achievements (Promise.all) for better performance
 - **41-02:** Achievements filtered by classroom membership (two-step query: classroom_memberships → filter by student_ids)
 - **41-02:** Activity feed default limit 20 items (balance between context and performance)
@@ -171,7 +176,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14 at 02:48 UTC
-Stopped at: Completed 42-01-PLAN.md (assignment data layer)
+Last session: 2026-02-14 at 03:04 UTC
+Stopped at: Completed 42-03-PLAN.md (assignment management UI)
 Resume file: None
-Next action: Continue Phase 42 (5 more plans: assignment creator, tracker, dashboard integration)
+Next action: Continue Phase 42 (3 more plans: dashboard integration, classroom analytics, workflow polish)
