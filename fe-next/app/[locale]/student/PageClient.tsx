@@ -28,6 +28,7 @@ import { MilestoneCelebration, type MilestonePayload } from '@/components/educat
 import { checkMilestoneCrossed, getMilestoneRewards } from '@/lib/supabase/education/milestones';
 import QuickPlayPanel from '@/components/student/QuickPlayPanel';
 import StreakCalendar from '@/components/student/StreakCalendar';
+import ActivityFeed from '@/components/student/ActivityFeed';
 import { cn } from '@/lib/utils';
 import { Trophy, Zap, Flame } from 'lucide-react';
 
@@ -363,6 +364,13 @@ export default function StudentPageClient() {
               classroomId={classroomId}
               currentUserId={user.id}
             />
+          </div>
+        )}
+
+        {/* Classroom Activity Feed */}
+        {classroomId && (
+          <div className="mb-6">
+            <ActivityFeed classroomId={classroomId} userId={user.id} />
           </div>
         )}
 

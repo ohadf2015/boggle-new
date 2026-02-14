@@ -135,7 +135,7 @@ export function useClassroomActivity(
       }
 
       // Transform duels into ActivityItems
-      const duelActivities: ActivityItem[] = (duelsResult.data || []).map(duel => {
+      const duelActivities: ActivityItem[] = (duelsResult.data || []).map((duel: any) => {
         const winner = duel.winner_id || duel.challenger_id; // Use challenger if no winner (draw)
         const isChallenger = winner === duel.challenger_id;
         const actor = isChallenger ? duel.challenger : duel.opponent;
@@ -155,7 +155,7 @@ export function useClassroomActivity(
       });
 
       // Transform achievements into ActivityItems
-      const achievementActivities: ActivityItem[] = (achievementsResult.data || []).map(ach => ({
+      const achievementActivities: ActivityItem[] = (achievementsResult.data || []).map((ach: any) => ({
         id: `achievement-${ach.id}`,
         type: 'achievement_unlocked' as const,
         actorId: ach.student_id,
