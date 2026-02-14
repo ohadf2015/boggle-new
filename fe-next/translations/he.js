@@ -5019,7 +5019,11 @@ const he = {
     "dashboard": {
       "title": "השיעורים שלי",
       "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות",
-      "defaultName": "תלמיד"
+      "defaultName": "תלמיד",
+      "challenges": "האתגרים שלך",
+      "leaderboard": "טבלת הדירוג",
+      "viewAll": "הצג הכל",
+      "achievements": "הישגים"
     },
     "lessons": {
       "lesson": "שיעור",
@@ -5612,6 +5616,14 @@ const he = {
       "top10": "10% עליון",
       "top25": "25% עליון",
       "top50": "50% עליון"
+    },
+    "achievements": {
+      "all": "הכל",
+      "progress": "התקדמות",
+      "skill": "מיומנות",
+      "consistency": "עקביות",
+      "exploration": "חקירה",
+      "locked": "נעול"
     },
     "header": {
       "title": "LexiClash",

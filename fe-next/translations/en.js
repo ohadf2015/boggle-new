@@ -5017,7 +5017,11 @@ const en = {
     "dashboard": {
       "title": "My Lessons",
       "subtitle": "Practice vocabulary and track your progress",
-      "defaultName": "Student"
+      "defaultName": "Student",
+      "challenges": "Your Challenges",
+      "leaderboard": "Classroom Leaderboard",
+      "viewAll": "View All",
+      "achievements": "Achievements"
     },
     "lessons": {
       "lesson": "Lesson",
@@ -5598,6 +5602,14 @@ const en = {
       "top10": "Top 10%",
       "top25": "Top 25%",
       "top50": "Top 50%"
+    },
+    "achievements": {
+      "all": "All",
+      "progress": "Progress",
+      "skill": "Skill",
+      "consistency": "Consistency",
+      "exploration": "Exploration",
+      "locked": "Locked"
     },
     "header": {
       "title": "LexiClash",

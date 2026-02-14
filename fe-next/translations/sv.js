@@ -5043,7 +5043,11 @@ const sv = {
     "dashboard": {
       "title": "Mina lektioner",
       "subtitle": "Öva glosor och följ dina framsteg",
-      "defaultName": "Elev"
+      "defaultName": "Elev",
+      "challenges": "Dina utmaningar",
+      "leaderboard": "Klassrumstavla",
+      "viewAll": "Visa alla",
+      "achievements": "Prestationer"
     },
     "lessons": {
       "lesson": "Lektion",
@@ -5609,6 +5613,14 @@ const sv = {
       "top10": "Topp 10%",
       "top25": "Topp 25%",
       "top50": "Topp 50%"
+    },
+    "achievements": {
+      "all": "Alla",
+      "progress": "Framsteg",
+      "skill": "Skicklighet",
+      "consistency": "Konsekvens",
+      "exploration": "Utforskning",
+      "locked": "Låst"
     },
     "header": {
       "title": "LexiClash",

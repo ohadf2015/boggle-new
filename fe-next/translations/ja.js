@@ -5090,7 +5090,11 @@ const ja = {
     "dashboard": {
       "title": "マイレッスン",
       "subtitle": "語彙を練習して上達しよう",
-      "defaultName": "生徒"
+      "defaultName": "生徒",
+      "challenges": "チャレンジ",
+      "leaderboard": "クラスリーダーボード",
+      "viewAll": "すべて表示",
+      "achievements": "実績"
     },
     "lessons": {
       "lesson": "レッスン",
@@ -5684,6 +5688,14 @@ const ja = {
       "top10": "トップ10%",
       "top25": "トップ25%",
       "top50": "トップ50%"
+    },
+    "achievements": {
+      "all": "すべて",
+      "progress": "進捗",
+      "skill": "スキル",
+      "consistency": "一貫性",
+      "exploration": "探索",
+      "locked": "ロック済み"
     },
     "header": {
       "title": "LexiClash",
