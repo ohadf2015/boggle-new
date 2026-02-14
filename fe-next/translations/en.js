@@ -5315,6 +5315,24 @@ const en = {
       "studentsMissed": "students missed",
       "noStrugglingAreas": "No struggling areas identified yet"
     },
+    "tracking": {
+      "all": "All",
+      "active": "Active",
+      "overdue": "Overdue",
+      "completed": "Completed",
+      "practice": "Practice",
+      "duel": "Duel",
+      "statusActive": "Active",
+      "statusOverdue": "Overdue",
+      "statusCompleted": "Completed",
+      "untitledLesson": "Untitled Lesson",
+      "dueDate": "Due",
+      "studentsCompleted": "students",
+      "createAssignment": "Create Assignment",
+      "noAssignments": "No assignments yet",
+      "noAssignmentsFilter": "No assignments in this category",
+      "createFirst": "Create First Assignment"
+    },
     "progress": {
       "title": "Student Progress",
       "student": "Student",
