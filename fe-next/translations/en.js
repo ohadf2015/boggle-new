@@ -5079,7 +5079,7 @@ const en = {
         "mastered": "Mastered!"
       },
       "wordsFound": "Words Found",
-      "complete": "Practice Sessions"
+      "sessions": "Practice Sessions"
     },
     "profile": {
       "duelRecord": "Duel Record",
