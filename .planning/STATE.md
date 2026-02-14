@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Students learn vocabulary through engaging, competitive gameplay that makes practice feel like play — not homework.
-**Current focus:** Phase 44 — Gap closure from milestone audit (SOC-02 wiring + tech debt cleanup).
+**Current focus:** Phase 45 — Practice XP server-side wiring (E2E Flow #5 completion).
 
 ## Current Position
 
-Phase: 44 of 44 (Milestone Gap Closure & Tech Debt)
+Phase: 45 of 45 (Practice XP Server-Side Wiring)
 Plan: 1 of 1 in current phase
-Status: COMPLETE — Phase 44 fully executed
-Last activity: 2026-02-14 — Completed 44-01-PLAN.md (SOC-02 wiring + tech debt cleanup)
+Status: COMPLETE — Phase 45 fully executed
+Last activity: 2026-02-14 — Completed 45-01-PLAN.md (practice XP server-side wiring)
 
-Progress: [████████████████] 100% (44/44 phases complete)
+Progress: [████████████████] 100% (45/45 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 49
+- Total plans completed: 50
 - Average duration: 11 min
-- Total execution time: 584 min
+- Total execution time: 593 min
 
 **By Phase:**
 
@@ -36,14 +36,15 @@ Progress: [████████████████] 100% (44/44 phases 
 | 42 | 5 | 46 min | 9 min |
 | 43 | 4 | 40 min | 10 min |
 | 44 | 1 | 10 min | 10 min |
+| 45 | 1 | 9 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 43-01 (11 min), 43-02 (7 min), 43-03 (15 min), 43-04 (7 min), 44-01 (10 min)
-- Phase 42 COMPLETE: 5/5 plans, 46 min total
+- Last 5 plans: 43-02 (7 min), 43-03 (15 min), 43-04 (7 min), 44-01 (10 min), 45-01 (9 min)
 - Phase 43 COMPLETE: 4/4 plans, 40 min total
 - Phase 44 COMPLETE: 1/1 plans, 10 min total
-- 43-04: AdaptiveMotion migration + border-neo compliance gap closure (7 min)
+- Phase 45 COMPLETE: 1/1 plans, 9 min total
 - 44-01: SOC-02 wiring, tech debt cleanup, Phase 37 verification (10 min)
+- 45-01: Practice XP server-side wiring (award_education_xp RPC + PATCH handler integration) (9 min)
 
 *Updated after each plan completion*
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - **43-01:** Neo-brutalist design tokens enforced in PracticeModeSelector (replaced all slate/CSS variables)
 - **43-04:** MotionValue exception pattern: Use motion.div for drag/MotionValue bindings, AdaptiveMotion for static animations
 - **43-04:** AdaptiveAnimatePresence can wrap motion.div (hybrid pattern for performance + functionality)
+- [Phase 45]: RPC signature with backward-compatible p_lesson_id DEFAULT NULL for existing duel handler calls
+- [Phase 45]: Idempotency guard via completed_at check prevents double-awarding XP on retry
 
 ### Pending Todos
 
@@ -87,7 +90,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14 at 18:00 UTC
-Stopped at: Completed Phase 44 — v2.0 milestone gap closure + tech debt cleanup
+Last session: 2026-02-14 at 16:28 UTC
+Stopped at: Completed 45-01-PLAN.md (practice XP server-side wiring)
 Resume file: None
-Next action: All phases complete! Ready for v2.0 milestone completion or future phase planning
+Next action: Phase 45 complete! E2E Flow #5 wired. Apply migration (npm run db:migrate) to activate XP award in production.
