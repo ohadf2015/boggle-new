@@ -3,7 +3,9 @@
  * Tests getFullClassroomLeaderboard, getLeaderboardWithRankDelta, saveLeaderboardSnapshot, getLeaderboardTier
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase as _supabase } from '@/lib/supabase';
+
+const supabase = _supabase!;
 import {
   getFullClassroomLeaderboard,
   getLeaderboardWithRankDelta,

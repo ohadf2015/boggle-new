@@ -46,15 +46,19 @@ describe('StudentProfilePageClient - Duel Features', () => {
   const mockUser = {
     id: 'user-123',
     email: 'student@test.com',
-  };
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '2026-01-01T00:00:00Z',
+  } as any;
 
   const mockProfile = {
     id: 'user-123',
     username: 'TestStudent',
     display_name: 'Test Student',
     avatar_emoji: '🎮',
-    avatar_image: null,
-  };
+    avatar_image: undefined,
+  } as any;
 
   const mockLessons = [
     {
@@ -81,20 +85,22 @@ describe('StudentProfilePageClient - Duel Features', () => {
       login: jest.fn(),
       logout: jest.fn(),
       updateProfile: jest.fn(),
-    });
+    } as any);
 
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
       setLanguage: jest.fn(),
-    });
+      dir: 'ltr',
+      currentFlag: '🇺🇸',
+    } as any);
 
     mockUseStudentProgress.mockReturnValue({
-      lessons: mockLessons,
+      lessons: mockLessons as any,
       isLoading: false,
       error: null,
       refetch: jest.fn(),
-    });
+    } as any);
 
     // Mock Supabase achievements query
     const mockSupabase = require('@/lib/supabase');

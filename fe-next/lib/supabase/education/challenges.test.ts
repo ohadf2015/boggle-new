@@ -3,7 +3,9 @@
  * TDD: RED phase - these tests MUST fail before implementation
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase as _supabase } from '@/lib/supabase';
+
+const supabase = _supabase!;
 import {
   getDailyChallenges,
   getWeeklyQuests,
