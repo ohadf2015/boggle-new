@@ -133,22 +133,23 @@ describe('useBlastGame — magnet tile', () => {
       .find(t => t.type === 'magnet' && t.row > 0 && t.row < 3 && t.col > 0 && t.col < 3);
     if (!magnetTile) return;
 
-    // Count adjacent wildcards
-    let adjacentWildcardCount = 0;
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
+    // Count attractable tiles (wildcards + rainbows) in MAGNET_RADIUS (5×5 area)
+    let attractableCount = 0;
+    for (let dr = -2; dr <= 2; dr++) {
+      for (let dc = -2; dc <= 2; dc++) {
         if (dr === 0 && dc === 0) continue;
         const r = magnetTile.row + dr;
         const c = magnetTile.col + dc;
         if (r >= 0 && r < 4 && c >= 0 && c < 4) {
-          if (result.current.tileStates[r][c].type === 'wildcard') {
-            adjacentWildcardCount++;
+          const type = result.current.tileStates[r][c].type;
+          if (type === 'wildcard' || type === 'rainbow') {
+            attractableCount++;
           }
         }
       }
     }
 
-    if (adjacentWildcardCount === 0) return;
+    if (attractableCount === 0) return;
 
     act(() => {
       result.current.clearTilesForWord(
@@ -157,7 +158,7 @@ describe('useBlastGame — magnet tile', () => {
       );
     });
 
-    const expectedScore = 5 + adjacentWildcardCount * MAGNET_ATTRACT_BONUS;
+    const expectedScore = 5 + attractableCount * MAGNET_ATTRACT_BONUS;
     expect(result.current.gameState.score).toBe(expectedScore);
   });
 

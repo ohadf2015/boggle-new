@@ -11,9 +11,13 @@ import {
   DEFAULT_BLAST_CONFIG,
   GOLD_MULTIPLIER,
   BOMB_RADIUS,
+  BOMB_AREA_CLEAR_BONUS,
   RAINBOW_BONUS,
   CHAIN_BOMB_STAGGER,
   LIGHTNING_COLUMN_CLEAR_BONUS,
+  ICE_CLEAR_BONUS,
+  FROZEN_CLEAR_BONUS,
+  MAGNET_RADIUS,
   MAGNET_ATTRACT_BONUS,
   PRISM_USE_BONUS,
   PRISM_CROSS_BONUS,
@@ -238,6 +242,7 @@ export function useBlastGame(
     gridSize,
     language,
     specialTileChance,
+    customDistribution,
   });
 
   // The effective grid = currentGrid (post-cascade) or initialGrid (pre-first-cascade)
@@ -519,6 +524,16 @@ export function useBlastGame(
               id: `gold-${now}-${cell.row}-${cell.col}`,
               row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now,
             });
+            // Separate gold multiplier popup at the gold tile position
+            setScorePopups(prev => [...prev, {
+              id: `gold-bonus-${now}-${cell.row}-${cell.col}`,
+              score: baseScore * (GOLD_MULTIPLIER - 1),
+              row: cell.row,
+              col: cell.col,
+              isSpecial: true,
+              timestamp: now,
+              tileType: 'gold',
+            }]);
             break;
 
           case 'bomb': {
@@ -543,7 +558,8 @@ export function useBlastGame(
             break;
 
           case 'ice':
-            // Ice tile on final hit — already cleared above
+            // Ice tile on final hit — small bonus for clearing obstacle
+            bonusScore += ICE_CLEAR_BONUS;
             break;
 
           case 'prism': {
@@ -599,7 +615,8 @@ export function useBlastGame(
             break;
 
           case 'frozen':
-            // Final hit — cleared, no bonus (obstacle)
+            // Final hit — bonus for clearing toughest obstacle
+            bonusScore += FROZEN_CLEAR_BONUS;
             break;
 
           case 'lightning': {
@@ -629,14 +646,14 @@ export function useBlastGame(
               id: `magnet-${now}-${cell.row}-${cell.col}`,
               row: cell.row, col: cell.col, type: 'magnet', intensity: 2, timestamp: now,
             });
-            for (let dr = -1; dr <= 1; dr++) {
-              for (let dc = -1; dc <= 1; dc++) {
+            for (let dr = -MAGNET_RADIUS; dr <= MAGNET_RADIUS; dr++) {
+              for (let dc = -MAGNET_RADIUS; dc <= MAGNET_RADIUS; dc++) {
                 if (dr === 0 && dc === 0) continue;
                 const r = cell.row + dr;
                 const c = cell.col + dc;
                 if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
                   const target = next[r][c];
-                  if (!target.isCleared && target.type === 'wildcard') {
+                  if (!target.isCleared && (target.type === 'wildcard' || target.type === 'rainbow')) {
                     target.isCleared = true;
                     newlyClearedCount++;
                     bonusScore += MAGNET_ATTRACT_BONUS;
@@ -670,6 +687,7 @@ export function useBlastGame(
                 } else {
                   next[r][c].isCleared = true;
                   newlyClearedCount++;
+                  bonusScore += BOMB_AREA_CLEAR_BONUS;
                   if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
                     processedBombs.add(`${r},${c}`);
                     bombQueue.push({ row: r, col: c, depth: bomb.depth + 1 });

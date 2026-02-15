@@ -19,7 +19,7 @@ export interface CascadeAnimationData {
 // Shared between this hook (timing) and BlastCascadeOverlay (animation params).
 
 export const BLAST_ANIM = {
-  clear: { duration: 200, stagger: 10, easing: 'easeInQuart' },
+  clear: { duration: 280, stagger: 12, easing: 'easeInQuart' },
   fall: { baseDuration: 160, perRowDuration: 60, easing: 'easeInCubic' },
   appear: { duration: 200, stagger: 14, easing: 'easeOutBack' },
   buffer: 30, // safety margin (ms)
@@ -56,6 +56,8 @@ interface UseBlastCascadeOptions {
   gridSize: number;
   language: Language;
   specialTileChance: number;
+  /** Custom special tile distribution (overrides default). Used by wave system. */
+  customDistribution?: Record<string, number>;
   /** Respect prefers-reduced-motion */
   reducedMotion?: boolean;
 }
@@ -91,6 +93,7 @@ export function useBlastCascade({
   gridSize,
   language,
   specialTileChance,
+  customDistribution,
   reducedMotion = false,
 }: UseBlastCascadeOptions): UseBlastCascadeReturn {
   const [cascadePhase, setCascadePhase] = useState<BlastCascadePhase>('idle');
@@ -115,7 +118,7 @@ export function useBlastCascade({
     clearTimers();
 
     // Compute gravity result upfront (pure function)
-    const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance);
+    const result = computeGravityResult(grid, tileStates, gridSize, language, specialTileChance, customDistribution);
 
     // Columns that received new tiles (these are the only ones worth scanning for cascade words)
     const affectedColumns = [...new Set(result.newTiles.map(t => t.col))];
@@ -159,7 +162,7 @@ export function useBlastCascade({
     }, timing.clear + timing.fall + timing.appear);
 
     timersRef.current = [t1, t2, t3];
-  }, [gridSize, language, specialTileChance, reducedMotion, clearTimers]);
+  }, [gridSize, language, specialTileChance, customDistribution, reducedMotion, clearTimers]);
 
   const isAnimating = cascadePhase !== 'idle';
 

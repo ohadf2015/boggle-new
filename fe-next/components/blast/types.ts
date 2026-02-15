@@ -118,9 +118,17 @@ export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 export const RAINBOW_BONUS = 5;
 /** Stagger delay (ms) between chain bomb explosions for visual ripple */
 export const CHAIN_BOMB_STAGGER = 120;
+/** Bonus per tile cleared by bomb area blast (+1 per tile) */
+export const BOMB_AREA_CLEAR_BONUS = 1;
 /** Bonus per tile cleared by lightning strike (+1 per tile in column) */
 export const LIGHTNING_COLUMN_CLEAR_BONUS = 1;
-/** Bonus per wildcard attracted by magnet tile (+3 per wildcard) */
+/** Bonus for clearing an ice obstacle */
+export const ICE_CLEAR_BONUS = 1;
+/** Bonus for clearing a frozen obstacle (toughest) */
+export const FROZEN_CLEAR_BONUS = 3;
+/** Magnet search radius (2 = 5×5 area) */
+export const MAGNET_RADIUS = 2;
+/** Bonus per wildcard/rainbow attracted by magnet tile (+3 per tile) */
 export const MAGNET_ATTRACT_BONUS = 3;
 /** Bonus per word a prism tile is used in (before detonation) */
 export const PRISM_USE_BONUS = 2;
@@ -138,7 +146,7 @@ export const MAX_CASCADE_CHAIN = 2;
 /** Maximum vertical words cleared per cascade level (limits simultaneous explosions) */
 export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
-export const CASCADE_MIN_WORD_LENGTH = 5;
+export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles */
 export const CASCADE_DETECTION_DELAY = 700;
 /** Bonus multiplier per chain level: base * chainLevel * this */
@@ -203,4 +211,6 @@ export interface BlastScorePopup {
   col: number;
   isSpecial: boolean;
   timestamp: number;
+  /** Tile type that triggered this popup (for color-coded display) */
+  tileType?: BlastTileType;
 }

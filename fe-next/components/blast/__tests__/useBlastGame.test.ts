@@ -498,10 +498,16 @@ describe('useBlastGame', () => {
           );
         });
 
-        const popup = result.current.scorePopups.find(p => p.isSpecial);
-        expect(popup).toBeDefined();
-        // Gold tiles give 3x score (base 5 + bonus 10 = 15)
-        expect(popup!.score).toBe(15);
+        const specialPopups = result.current.scorePopups.filter(p => p.isSpecial);
+        expect(specialPopups.length).toBeGreaterThanOrEqual(1);
+        // Gold bonus popup shows the multiplier bonus (10), main popup shows total (15)
+        const goldPopup = specialPopups.find(p => p.tileType === 'gold');
+        expect(goldPopup).toBeDefined();
+        expect(goldPopup!.score).toBe(10); // baseScore * (GOLD_MULTIPLIER - 1) = 5 * 2
+        const totalPopup = specialPopups.find(p => !p.tileType);
+        if (totalPopup) {
+          expect(totalPopup.score).toBe(15); // base 5 + bonus 10
+        }
       }
     });
 

@@ -58,7 +58,8 @@ export function computeGravityResult(
   tileStates: BlastTileState[][],
   gridSize: number,
   language: Language,
-  specialTileChance: number
+  specialTileChance: number,
+  customDistribution?: Record<string, number>,
 ): GravityResult {
   const newGrid: LetterGrid = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => '')
@@ -132,7 +133,7 @@ export function computeGravityResult(
     for (let i = 0; i < emptyCount; i++) {
       const row = bottomRow - i; // top-most first
       const letter = generateBlastLetter(language);
-      const type = rollSpecialType(specialTileChance);
+      const type = rollSpecialType(specialTileChance, customDistribution);
 
       newGrid[row][col] = letter;
       newTileStates[row][col] = {

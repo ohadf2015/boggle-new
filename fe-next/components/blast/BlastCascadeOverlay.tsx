@@ -3,6 +3,21 @@
 import { useEffect, useRef } from 'react';
 import anime from 'animejs';
 import { BLAST_ANIM, type BlastCascadePhase, type CascadeAnimationData } from './hooks/useBlastCascade';
+import type { BlastTileType } from './types';
+
+/** Clearing phase background color per tile type — gives visual feedback about what cleared */
+const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string; border: string }>> = {
+  gold:      { background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', border: '2px solid rgba(255,215,0,0.8)' },
+  bomb:      { background: 'radial-gradient(circle, #FF4444 0%, #CC0000 100%)', border: '2px solid rgba(255,50,50,0.8)' },
+  rainbow:   { background: 'linear-gradient(135deg, #FF69B4 0%, #A855F7 50%, #00BFFF 100%)', border: '2px solid rgba(168,85,247,0.8)' },
+  ice:       { background: 'linear-gradient(135deg, #B4E6FF 0%, #82C8FF 100%)', border: '2px solid rgba(150,220,255,0.8)' },
+  lightning: { background: 'linear-gradient(135deg, #FFE100 0%, #00BFFF 100%)', border: '2px solid rgba(255,225,0,0.8)' },
+  prism:     { background: 'conic-gradient(from 0deg, #f00, #f90, #ff0, #0f0, #06f, #93f, #f00)', border: '2px solid rgba(255,255,255,0.8)' },
+  gem:       { background: 'radial-gradient(circle, #50C878 0%, #009450 100%)', border: '2px solid rgba(80,200,120,0.8)' },
+  frozen:    { background: 'linear-gradient(135deg, #C8DCFF 0%, #A0C8F0 100%)', border: '2px solid rgba(180,220,255,0.8)' },
+  magnet:    { background: 'radial-gradient(circle, #8B00FF 0%, #FF0040 100%)', border: '2px solid rgba(139,0,255,0.8)' },
+  wildcard:  { background: 'radial-gradient(circle, #FFFFFF 0%, #C8C8FF 100%)', border: '2px dashed rgba(255,255,255,0.6)' },
+};
 
 interface BlastCascadeOverlayProps {
   /** Current cascade phase */
@@ -68,8 +83,8 @@ export function BlastCascadeOverlay({
             },
             0,
           ],
-          scaleY: [0.92, 1.06, 1.0],
-          scaleX: [1.04, 0.97, 1.0],
+          scaleY: [0.88, 1.12, 0.97, 1.0],
+          scaleX: [1.08, 0.92, 1.02, 1.0],
           duration: function (el: Element) {
             const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
             return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
@@ -109,23 +124,26 @@ export function BlastCascadeOverlay({
   return (
     <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-20">
       {/* Clearing phase: render ghost tiles at cleared positions that animate away */}
-      {phase === 'clearing' && data.clearedTiles.map(tile => (
-        <div
-          key={`clear-${tile.row}-${tile.col}`}
-          className="blast-cascade-clear absolute flex items-center justify-center rounded-lg font-black text-neo-black letter-tile-gradient"
-          style={{
-            left: tile.col * cellSize + inset,
-            top: tile.row * cellSize + inset,
-            width: cellSize - inset * 2,
-            height: cellSize - inset * 2,
-            fontSize: cellSize * 0.45,
-            border: '2px solid rgba(0,0,0,0.3)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          }}
-        >
-          {tile.letter}
-        </div>
-      ))}
+      {phase === 'clearing' && data.clearedTiles.map(tile => {
+        const colorConfig = CLEARING_COLORS[tile.type];
+        return (
+          <div
+            key={`clear-${tile.row}-${tile.col}`}
+            className={`blast-cascade-clear absolute flex items-center justify-center rounded-lg font-black ${colorConfig ? 'text-white' : 'text-neo-black letter-tile-gradient'}`}
+            style={{
+              left: tile.col * cellSize + inset,
+              top: tile.row * cellSize + inset,
+              width: cellSize - inset * 2,
+              height: cellSize - inset * 2,
+              fontSize: cellSize * 0.45,
+              ...(colorConfig ? { background: colorConfig.background, border: colorConfig.border } : { border: '2px solid rgba(0,0,0,0.3)' }),
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+          >
+            {tile.letter}
+          </div>
+        );
+      })}
 
       {/* Falling phase: render tiles at final positions with translateY offset */}
       {phase === 'falling' && data.fallingTiles.map(tile => (

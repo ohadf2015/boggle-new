@@ -96,7 +96,7 @@ const TILE_ICONS: Record<string, { Icon: LucideIcon; color: string; label: strin
   rainbow:   { Icon: Rainbow,   color: 'text-white',       label: '+5',   labelBg: 'bg-purple-500/90 text-white' },
   ice:       { Icon: Snowflake, color: 'text-blue-200',    label: '×2',   labelBg: 'bg-blue-400/90 text-white' },
   wildcard:  { Icon: Shuffle,   color: 'text-white',       label: '?',    labelBg: 'bg-white/80 text-gray-800' },
-  lightning: { Icon: Zap,       color: 'text-yellow-300',  label: 'row',  labelBg: 'bg-yellow-400/90 text-yellow-900' },
+  lightning: { Icon: Zap,       color: 'text-yellow-300',  label: 'col',  labelBg: 'bg-yellow-400/90 text-yellow-900' },
   magnet:    { Icon: Magnet,    color: 'text-white',       label: 'pull', labelBg: 'bg-purple-600/90 text-white' },
   prism:     { Icon: Sparkles,  color: 'text-white',       label: '×2',   labelBg: 'bg-pink-400/90 text-white' },
   gem:       { Icon: Diamond,   color: 'text-white',       label: '+3',   labelBg: 'bg-emerald-500/90 text-white' },

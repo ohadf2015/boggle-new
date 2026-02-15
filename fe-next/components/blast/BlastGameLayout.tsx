@@ -18,6 +18,7 @@ import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
+import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -138,17 +139,28 @@ export function BlastGameLayout({
     return undefined;
   }, [wordsFound.length]);
 
-  // Screen shake on bomb explosions
+  // Screen shake on bomb, prism, and lightning explosions
   useEffect(() => {
-    const bombCount = explosions.filter(e => e.type === 'bomb').length;
-    if (bombCount > prevExplosionsRef.current) {
-      const intensity = bombCount >= 4 ? 'animate-neo-shake' : 'animate-neo-wobble';
+    const shakeTypes = new Set(['bomb', 'prism', 'lightning']);
+    const shakeCount = explosions.filter(e => shakeTypes.has(e.type)).length;
+    if (shakeCount > prevExplosionsRef.current) {
+      const hasPrism = explosions.some(e => e.type === 'prism');
+      const hasBomb = explosions.some(e => e.type === 'bomb');
+      const hasLightning = explosions.some(e => e.type === 'lightning');
+      // Prism = strongest shake, bomb cluster = strong, lightning/single = wobble
+      const intensity = hasPrism || (hasBomb && shakeCount >= 4)
+        ? 'animate-neo-shake'
+        : 'animate-neo-wobble';
       setShakeClass(intensity);
+      // Haptic feedback for blast effects
+      if (hasPrism) vibrateBlastPrism();
+      else if (hasBomb) vibrateBlastBomb();
+      else if (hasLightning) vibrateBlastLightning();
       const timer = setTimeout(() => setShakeClass(''), 350);
-      prevExplosionsRef.current = bombCount;
+      prevExplosionsRef.current = shakeCount;
       return () => clearTimeout(timer);
     }
-    prevExplosionsRef.current = bombCount;
+    prevExplosionsRef.current = shakeCount;
     return undefined;
   }, [explosions]);
 
@@ -165,10 +177,11 @@ export function BlastGameLayout({
     return undefined;
   }, [comboLevel]);
 
-  // Cascade chain announcement
+  // Cascade chain announcement + haptic
   useEffect(() => {
     if (cascadeChainLevel > prevCascadeRef.current && cascadeChainLevel >= 1) {
       setCascadeAnnouncement(`CASCADE x${cascadeChainLevel}`);
+      vibrateBlastCascade();
       const timer = setTimeout(() => setCascadeAnnouncement(null), 1500);
       prevCascadeRef.current = cascadeChainLevel;
       return () => clearTimeout(timer);

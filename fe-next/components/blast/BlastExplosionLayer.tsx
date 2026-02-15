@@ -2,7 +2,7 @@
 
 import { ExplosionEffect } from '@/components/adventure/juice/ExplosionEffect';
 import { ScorePopup } from '@/components/adventure/juice/ScorePopup';
-import type { BlastExplosion, BlastScorePopup } from './types';
+import type { BlastExplosion, BlastScorePopup, BlastTileType } from './types';
 
 /** Varied colors per explosion type — avoids monotone orange */
 const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
@@ -14,6 +14,19 @@ const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
   magnet: '#8B00FF',    // purple
   prism: '#FF69B4',     // hot pink — spectrum detonation
   gem: '#50C878',       // emerald green — collection sparkle
+};
+
+/** Drop-shadow color per tile type for score popups */
+const POPUP_GLOW_COLORS: Partial<Record<BlastTileType, string>> = {
+  gold: 'rgba(255,215,0,0.7)',
+  bomb: 'rgba(255,50,50,0.6)',
+  rainbow: 'rgba(168,85,247,0.6)',
+  lightning: 'rgba(255,255,0,0.6)',
+  prism: 'rgba(255,105,180,0.6)',
+  gem: 'rgba(80,200,120,0.6)',
+  magnet: 'rgba(139,0,255,0.6)',
+  ice: 'rgba(150,220,255,0.5)',
+  frozen: 'rgba(180,220,255,0.5)',
 };
 
 /** Score popup intensity tier — scales visual impact with score value */
@@ -70,13 +83,17 @@ export function BlastExplosionLayer({
         const x = containerOffset.x + popup.col * cellSize + cellSize / 2;
         const y = containerOffset.y + popup.row * cellSize + cellSize / 2;
         const intensity = getScoreIntensity(popup.score);
+        const glowColor = popup.tileType ? POPUP_GLOW_COLORS[popup.tileType] : undefined;
+        const defaultGlow = `rgba(255,215,0,${intensity === 3 ? '0.6' : '0.35'})`;
 
         return (
           <div
             key={popup.id}
             style={{
               transform: intensity === 3 ? 'scale(1.35)' : intensity === 2 ? 'scale(1.15)' : 'scale(1)',
-              filter: intensity >= 2 ? `drop-shadow(0 0 ${intensity === 3 ? '12' : '6'}px rgba(255,215,0,${intensity === 3 ? '0.6' : '0.35'}))` : 'none',
+              filter: intensity >= 2 || glowColor
+                ? `drop-shadow(0 0 ${intensity === 3 ? '12' : '8'}px ${glowColor || defaultGlow})`
+                : 'none',
             }}
           >
             <ScorePopup

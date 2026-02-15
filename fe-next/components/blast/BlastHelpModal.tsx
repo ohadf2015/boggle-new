@@ -146,7 +146,7 @@ export function BlastHelpModal({ open, onOpenChange, t }: BlastHelpModalProps) {
                 preview={<TilePreview gradient="linear-gradient(135deg, #C8DCFF 0%, #A0C8F0 50%, #DCEFFF 100%)" border="4px solid #93C5FD" icon={<Snowflake className="w-4 h-4 text-blue-800" />} />}
                 label={t('blast.helpFrozenLabel') as string || 'Frozen'}
                 labelColor="#93C5FD"
-                description={t('blast.helpFrozen') as string || '3 hits to break. Blocks cascades.'}
+                description={t('blast.helpFrozen') as string || '3 hits to break. Toughest obstacle.'}
               />
 
               {/* Goal */}

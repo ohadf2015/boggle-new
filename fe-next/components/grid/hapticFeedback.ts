@@ -24,6 +24,12 @@ const PATTERNS: Record<string, number | number[]> = {
   normalLongWord: 20,
   normalShortWord: 15,
 
+  // Blast mode patterns
+  blastBomb: [80, 30, 80, 30, 120],
+  blastLightning: [40, 20, 60, 20, 40],
+  blastPrism: [100, 40, 100, 40, 150],
+  blastCascade: [30, 20, 30, 20, 50],
+
   // Interaction feedback
   cellTapFire: 18,
   cellTapNormal: 12,
@@ -132,4 +138,32 @@ export function vibrateClickSelect(): void {
  */
 export function vibrateKeyboardSelect(fireRoundActive: boolean): void {
   vibrate(fireRoundActive ? 20 : 8);
+}
+
+/**
+ * Haptic feedback for blast bomb explosion
+ */
+export function vibrateBlastBomb(): void {
+  vibrate(PATTERNS.blastBomb);
+}
+
+/**
+ * Haptic feedback for blast lightning strike
+ */
+export function vibrateBlastLightning(): void {
+  vibrate(PATTERNS.blastLightning);
+}
+
+/**
+ * Haptic feedback for blast prism detonation
+ */
+export function vibrateBlastPrism(): void {
+  vibrate(PATTERNS.blastPrism);
+}
+
+/**
+ * Haptic feedback for blast cascade chain
+ */
+export function vibrateBlastCascade(): void {
+  vibrate(PATTERNS.blastCascade);
 }
