@@ -2449,40 +2449,40 @@ const sv = {
       },
       "advertising": {
         "title": "4. Tredjepartsannonsering",
-        "intro": "Vi använder tredjepartsannonseringsföretag för att visa annonser när du besöker vår webbplats. Dessa företag kan använda information om dina besök för att erbjuda annonser om varor och tjänster som kan intressera dig.",
-        "googleAdsense": "Google AdSense: Vi visar annonser via Google AdSense, som kan använda cookies och webbfyrar för att samla in information om ditt surfbeteende för annonspersonalisering.",
-        "cookies": "Annonskookies: Tredjepartsannonsörer kan placera cookies på din enhet för att spåra din surfning över webbplatser och visa relevanta annonser.",
-        "personalization": "Annonspersonalisering: Annonser kan personaliseras baserat på dina intressen, surfhistorik och demografisk information som samlas in av annonspartners.",
-        "thirdPartyAccess": "Tredjepartsåtkomst: Annonspartners kan komma åt data om ditt besök, inklusive visade sidor, tid spenderad och klick på annonser, i enlighet med sina egna integritetspolicyer.",
-        "optOut": "Du kan avanmäla personliga annonser genom att besöka Googles annonsinställningar på https://www.google.com/settings/ads eller genom att använda branschverktyg för avanmälan.",
-        "learnMore": "För mer information om hur Google använder data när du använder vår webbplats, besök https://policies.google.com/technologies/partner-sites"
+        "intro": "Vi visar icke-personaliserade annonser via Google AdSense. Eftersom LexiClash är utformat för spelare i alla åldrar, inklusive barn, fungerar vår annonsvisning under Googles barnriktat innehåll-läge (TFCD).",
+        "googleAdsense": "Google AdSense: Alla annonser som visas på LexiClash är icke-personaliserade. Vi har aktiverat Tag For Child-Directed Treatment (TFCD), som förhindrar annonspersonalisering, intressebaserad annonsering och remarketing.",
+        "cookies": "Annonskookies: Under TFCD-läget sätter Google inte personaliserade annonskookies. Begränsade cookies kan användas för annonsfrekvenstak och aggregerad annonsrapportering.",
+        "personalization": "Ingen annonspersonalisering: Annonser personaliseras inte baserat på surfhistorik, intressen eller demografiska profiler. Alla användare ser samma kontextuella, icke-riktade annonser.",
+        "thirdPartyAccess": "Begränsad dataåtkomst: Under barnriktat behandling får annonspartners endast aggregerad, icke-identifierbar data för annonsprestandarapportering.",
+        "optOut": "Eftersom annonser redan är icke-personaliserade krävs ingen avanmälan. Du kan läsa mer om Googles annonspolicyer på https://www.google.com/settings/ads.",
+        "learnMore": "För mer information om hur Google hanterar barnriktat innehåll, besök https://policies.google.com/technologies/partner-sites"
       },
       "advertisingPartners": {
         "title": "Annonspartners",
-        "intro": "Vi samarbetar med annonsnätverk för att visa annonser på vår webbplats. Dessa partners hjälper till att hålla LexiClash gratis för alla spelare.",
+        "intro": "Vi samarbetar med Google AdSense för att visa icke-personaliserade annonser på vår webbplats. Annonsintäkter hjälper till att hålla LexiClash gratis för alla spelare. Alla annonser fungerar under barnriktat innehåll-läge (TFCD).",
         "howItWorks": {
           "title": "Hur annonsering fungerar",
-          "cookies": "Annonspartners kan använda cookies för att spåra din surfaktivitet över webbplatser",
-          "control": "Du har kontroll över personaliserad annonsering genom dina webbläsar- och annonsinställningar",
+          "cookies": "Alla annonser är icke-personaliserade — inget surfbeteende spåras för annonsriktning",
+          "control": "Barnriktat behandling (TFCD) är aktiverat som standard, vilket säkerställer ingen annonspersonalisering",
           "noSale": "Vi säljer aldrig din personliga data till annonsörer",
           "revenue": "Annonsintäkter hjälper oss att hålla LexiClash gratis att spela",
-          "thirdParty": "Tredjepartsannonsörer har sina egna integritetspolicyer"
+          "thirdParty": "Googles annonsvisning uppfyller COPPA-kraven för barnriktade webbplatser"
         },
         "yourChoices": {
           "title": "Dina val",
-          "intro": "Du har flera alternativ för att kontrollera hur annonsering fungerar för dig:",
-          "optOut": "Välj bort personaliserade annonser",
+          "intro": "Eftersom alla annonser är icke-personaliserade krävs ingen åtgärd. För mer information:",
+          "optOut": "Läs om icke-personaliserade annonser",
           "googlePrivacy": "Granska Googles integritetspraxis",
           "partnerPolicy": "Läs om AdSense partnerregler"
         },
         "important": {
           "title": "Viktigt:",
-          "content": "Även om du väljer bort personaliserad annonsering kan du fortfarande se annonser, men de kommer inte att baseras på dina intressen. Du kan också hantera dina annonspreferenser via"
+          "content": "Alla annonser på LexiClash är icke-personaliserade och uppfyller krav för barnriktat innehåll. Inga intressebaserade eller remarketingannonser visas. Du kan läsa mer om Googles annonspolicyer via"
         }
       },
       "cookies": {
         "title": "5. Cookies och lokal lagring",
-        "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Vi använder inte reklam- eller spårningscookies."
+        "content": "Vi använder essentiella cookies och lokal lagring för: autentiseringstoken (Supabase), användarnamn och preferenser (localStorage), temainställningar (mörkt/ljust läge) och språkpreferenser. Vi använder också LogRocket-cookies för analysändamål. Annonsering fungerar under barnriktat innehåll-läge (TFCD), som begränsar cookies till annonsfrekvenstak och aggregerad rapportering — inga personaliserade annons- eller spårningscookies används."
       },
       "dataRetention": {
         "title": "6. Datalagring",
@@ -2507,6 +2507,17 @@ const sv = {
       "governingLaw": {
         "title": "10. Tillämplig lag",
         "content": "Denna integritetspolicy styrs av lagarna i staten Israel. Alla tvister ska lösas i domstolar i Israel."
+      },
+      "childrensPrivacy": {
+        "title": "11. Barns integritet",
+        "content": "LexiClash är utformat för spelare från 6 år och uppåt, inklusive barn. Vi är engagerade i att följa Children's Online Privacy Protection Act (COPPA) och liknande internationella bestämmelser för att skydda barns integritet.",
+        "measures": "Åtgärder vi vidtar:",
+        "noPersonalizedAds": "Inga personaliserade annonser — alla annonser visas i barnriktat innehåll-läge (TFCD), som förhindrar intressebaserad annonsriktning",
+        "noAdTracking": "Inga spårningscookies för annonsering — vi tillåter inte annonsnätverk att spåra barns surfbeteende över webbplatser",
+        "minimalData": "Minimal datainsamling — vi samlar bara in data som behövs för att tillhandahålla spelupplevelsen",
+        "parentalInvolvement": "Föräldrars medverkan — användare under 13 år kräver föräldrarnas samtycke för att skapa konton, som anges i våra användarvillkor",
+        "noDataSale": "Ingen försäljning av barns data — vi säljer, hyr eller delar aldrig personlig information om någon användare, inklusive barn, till tredje part för marknadsföringsändamål",
+        "parentContact": "Kontakt för föräldrar/vårdnadshavare — föräldrar eller vårdnadshavare kan kontakta oss på lexiclash.game@gmail.com för att granska, radera eller hantera sitt barns information"
       }
     },
     "about": {

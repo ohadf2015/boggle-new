@@ -191,6 +191,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             applicationCategory: 'GameApplication',
             applicationSubCategory: 'Multiplayer Word Game',
             typicalAgeRange: '6-99',
+            contentRating: 'Everyone',
+            isFamilyFriendly: true,
             audience: {
                 '@type': 'PeopleAudience',
                 suggestedMinAge: 6,

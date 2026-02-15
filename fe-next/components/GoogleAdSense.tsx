@@ -29,13 +29,18 @@ export function GoogleAdSense() {
   }
 
   return (
-    <Script
-      id="google-adsense"
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-      crossOrigin="anonymous"
-      strategy="lazyOnload"
-    />
+    <>
+      <Script id="adsense-config" strategy="lazyOnload">
+        {`(window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;`}
+      </Script>
+      <Script
+        id="google-adsense"
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}&tfcd=1`}
+        crossOrigin="anonymous"
+        strategy="lazyOnload"
+      />
+    </>
   );
 }
 

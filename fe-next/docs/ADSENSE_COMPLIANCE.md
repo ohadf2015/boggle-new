@@ -4,7 +4,7 @@
 
 This document outlines how LexiClash complies with Google AdSense policies, particularly focusing on gaming site requirements.
 
-**Last Updated:** January 26, 2026
+**Last Updated:** February 15, 2026
 **AdSense Account ID:** ca-pub-1896836706464880
 
 ---
@@ -148,6 +148,52 @@ Translation keys are in `/translations/` directory.
 
 ---
 
+## 5. COPPA Compliance (Child-Directed Treatment)
+
+### Why TFCD is Required
+
+LexiClash explicitly targets children ages 6+ through:
+- Schema.org `suggestedMinAge: 6` and `typicalAgeRange: '6-99'`
+- `contentRating: 'Everyone'` and `isFamilyFriendly: true`
+- Genre tags including "Educational" and "Family Friendly"
+- FAQ schema stating "Suitable for ages 6 and up"
+
+Under COPPA and Google's policies, sites that target children must use Tag For Child-Directed Treatment (TFCD) to prevent personalized ad serving.
+
+### TFCD Configuration
+
+**File:** `/components/GoogleAdSense.tsx`
+
+Two mechanisms are used (defense-in-depth):
+
+1. **URL Parameter:** `&tfcd=1` appended to the AdSense script URL
+   - Works at the network/CDN level before any JS executes
+   - Tells Google's ad servers to treat all requests as child-directed
+
+2. **JS Config:** `requestNonPersonalizedAds = 1` set before AdSense loads
+   - Works at the client-side SDK level
+   - Ensures the AdSense SDK itself respects non-personalized mode
+
+### Impact of TFCD
+
+When TFCD is enabled:
+- No personalized/interest-based ads are served
+- No remarketing or audience targeting
+- No ad tracking cookies for behavioral profiling
+- Limited cookies only for frequency capping and aggregated reporting
+- All users see the same contextual, non-targeted advertisements
+- Lower CPM/revenue compared to personalized ads (expected trade-off)
+
+### Privacy Policy Updates
+
+The privacy policy (all 5 languages) has been updated to:
+- Remove contradictory claims about "no advertising cookies"
+- Accurately describe TFCD mode and its limited cookie usage
+- Add Section 12: Children's Privacy with COPPA-specific disclosures
+- Update advertising sections to reflect non-personalized ad serving
+
+---
+
 ## AdSense Policy Compliance Checklist
 
 ### Pre-Launch
@@ -159,6 +205,9 @@ Translation keys are in `/translations/` directory.
 - [x] app-ads.txt configured with publisher ID
 - [x] AdSense meta tag added to site
 - [x] AdPlaceholder component created for safe zones
+- [x] TFCD enabled (tfcd=1 URL param + requestNonPersonalizedAds)
+- [x] Children's Privacy section added to privacy policy (all 5 languages)
+- [x] Schema.org contentRating and isFamilyFriendly added
 - [ ] AdSense ad code integrated (pending approval)
 - [ ] Ads tested in safe zones only
 - [ ] No ads on active gameplay verified
@@ -170,6 +219,7 @@ Translation keys are in `/translations/` directory.
 - [ ] User feedback monitoring
 - [ ] Privacy policy updates (as needed)
 - [ ] AdSense performance reports
+- [ ] COPPA compliance audit (annual)
 
 ---
 
@@ -253,6 +303,6 @@ For AdSense-related inquiries:
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 **Maintained By:** LexiClash Development Team
 **Review Frequency:** Quarterly or upon policy updates

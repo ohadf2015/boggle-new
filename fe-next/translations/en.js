@@ -2109,40 +2109,40 @@ const en = {
       },
       "advertising": {
         "title": "4. Third-Party Advertising",
-        "intro": "We use third-party advertising companies to serve ads when you visit our website. These companies may use information about your visits to provide advertisements about goods and services of interest to you.",
-        "googleAdsense": "Google AdSense: We display ads via Google AdSense, which may use cookies and web beacons to collect information about your browsing behavior for ad personalization.",
-        "cookies": "Advertising Cookies: Third-party advertisers may place cookies on your device to track your browsing across websites and serve relevant ads.",
-        "personalization": "Ad Personalization: Ads may be personalized based on your interests, browsing history, and demographic information collected by advertising partners.",
-        "thirdPartyAccess": "Third-Party Access: Advertising partners may access data about your visit, including pages viewed, time spent, and clicks on ads, in accordance with their own privacy policies.",
-        "optOut": "You can opt out of personalized advertising by visiting Google's Ads Settings at https://www.google.com/settings/ads or by using industry opt-out tools.",
-        "learnMore": "For more information about how Google uses data when you use our site, visit https://policies.google.com/technologies/partner-sites"
+        "intro": "We display non-personalized advertisements via Google AdSense. Because LexiClash is designed for players of all ages, including children, our ad serving operates under Google's Child-Directed Treatment (TFCD) mode.",
+        "googleAdsense": "Google AdSense: All ads served on LexiClash are non-personalized. We have enabled Tag For Child-Directed Treatment (TFCD), which prevents ad personalization, interest-based advertising, and remarketing.",
+        "cookies": "Advertising Cookies: Under TFCD mode, Google does not set personalized advertising cookies. Limited cookies may be used for ad frequency capping and aggregated ad reporting only.",
+        "personalization": "No Ad Personalization: Ads are not personalized based on browsing history, interests, or demographic profiles. All users see the same contextual, non-targeted advertisements.",
+        "thirdPartyAccess": "Limited Data Access: Under child-directed treatment, advertising partners receive only aggregated, non-identifiable data for ad performance reporting.",
+        "optOut": "Since ads are already non-personalized, no opt-out is required. You can learn more about Google's ad policies at https://www.google.com/settings/ads.",
+        "learnMore": "For more information about how Google handles child-directed content, visit https://policies.google.com/technologies/partner-sites"
       },
       "advertisingPartners": {
         "title": "Advertising Partners",
-        "intro": "We partner with advertising networks to display ads on our website. These partners help keep LexiClash free for all players.",
+        "intro": "We partner with Google AdSense to display non-personalized ads on our website. Ad revenue helps keep LexiClash free for all players. All ads operate under child-directed treatment (TFCD) mode.",
         "howItWorks": {
           "title": "How Advertising Works",
-          "cookies": "Advertising partners may use cookies to track your browsing activity across websites",
-          "control": "You have control over personalized advertising through your browser and ad settings",
+          "cookies": "All ads are non-personalized — no browsing behavior is tracked for ad targeting",
+          "control": "Child-directed treatment (TFCD) is enabled by default, ensuring no ad personalization",
           "noSale": "We never sell your personal data to advertisers",
           "revenue": "Ad revenue helps us keep LexiClash free to play",
-          "thirdParty": "Third-party advertisers have their own privacy policies"
+          "thirdParty": "Google's ad serving complies with COPPA requirements for child-directed sites"
         },
         "yourChoices": {
           "title": "Your Choices",
-          "intro": "You have several options to control how advertising works for you:",
-          "optOut": "Opt out of personalized ads",
+          "intro": "Since all ads are non-personalized, no action is required. For more information:",
+          "optOut": "Learn about non-personalized ads",
           "googlePrivacy": "Review Google's privacy practices",
           "partnerPolicy": "Learn about AdSense partner policies"
         },
         "important": {
           "title": "Important:",
-          "content": "Even if you opt out of personalized advertising, you may still see ads, but they won't be based on your interests. You can also manage your ad preferences through"
+          "content": "All ads on LexiClash are non-personalized and comply with child-directed content requirements. No interest-based or remarketing ads are served. You can learn more about Google's ad policies through"
         }
       },
       "cookies": {
         "title": "5. Cookies and Local Storage",
-        "content": "We use essential cookies and local storage for: authentication tokens (Supabase), username and preferences (localStorage), theme settings (dark/light mode), and language preferences. We also use LogRocket cookies for analytics purposes. We do not use advertising or tracking cookies."
+        "content": "We use essential cookies and local storage for: authentication tokens (Supabase), username and preferences (localStorage), theme settings (dark/light mode), and language preferences. We also use LogRocket cookies for analytics purposes. Advertising operates under child-directed treatment (TFCD) mode, which limits cookies to ad frequency capping and aggregated reporting only — no personalized advertising or cross-site tracking cookies are used."
       },
       "dataRetention": {
         "title": "6. Data Retention",
@@ -2167,6 +2167,17 @@ const en = {
       "governingLaw": {
         "title": "11. Governing Law",
         "content": "This Privacy Policy is governed by the laws of the State of Israel. Any disputes shall be resolved in the courts located in Israel."
+      },
+      "childrensPrivacy": {
+        "title": "12. Children's Privacy",
+        "content": "LexiClash is designed for players ages 6 and up, including children. We are committed to complying with the Children's Online Privacy Protection Act (COPPA) and similar international regulations to protect children's privacy.",
+        "measures": "Measures we take:",
+        "noPersonalizedAds": "No personalized advertising — all ads are served in child-directed treatment (TFCD) mode, preventing interest-based ad targeting",
+        "noAdTracking": "No advertising tracking cookies — we do not allow ad networks to track children's browsing behavior across websites",
+        "minimalData": "Minimal data collection — we collect only the data necessary to provide the game experience",
+        "parentalInvolvement": "Parental involvement — users under 13 require parental consent to create accounts, as stated in our Terms of Service",
+        "noDataSale": "No sale of children's data — we never sell, rent, or share personal information of any user, including children, to third parties for marketing purposes",
+        "parentContact": "Parent/guardian contact — parents or guardians may contact us at lexiclash.game@gmail.com to review, delete, or manage their child's information"
       }
     },
     "about": {

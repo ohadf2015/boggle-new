@@ -310,6 +310,39 @@ export default function PrivacyPolicyPageClient(): React.ReactElement {
           {t('legal.privacy.governingLaw.content')}
         </p>
       </section>
+
+      {/* Section 12: Children's Privacy */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.privacy.childrensPrivacy.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed mb-3',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.privacy.childrensPrivacy.content')}
+        </p>
+        <p className={cn(
+          'font-semibold mb-2',
+          isDarkMode ? 'text-gray-200' : 'text-gray-700'
+        )}>
+          {t('legal.privacy.childrensPrivacy.measures')}
+        </p>
+        <ul className={cn(
+          'list-disc pl-6 space-y-2',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          <li>{t('legal.privacy.childrensPrivacy.noPersonalizedAds')}</li>
+          <li>{t('legal.privacy.childrensPrivacy.noAdTracking')}</li>
+          <li>{t('legal.privacy.childrensPrivacy.minimalData')}</li>
+          <li>{t('legal.privacy.childrensPrivacy.parentalInvolvement')}</li>
+          <li>{t('legal.privacy.childrensPrivacy.noDataSale')}</li>
+          <li>{t('legal.privacy.childrensPrivacy.parentContact')}</li>
+        </ul>
+      </section>
     </LegalPageLayout>
   );
 }
