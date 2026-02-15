@@ -162,7 +162,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
       >
       {/* Mascot - floating in top-right corner */}
       <motion.div
-        className="absolute -top-2 -right-2 z-10 hidden sm:block"
+        className="absolute -top-2 -right-2 z-10"
         initial={{ scale: 0, rotate: 30 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.5 }}
@@ -170,6 +170,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
         <InteractiveMascot
           variant={mascotVariant}
           size="sm"
+          sizeClassName="w-12 h-12 sm:w-16 sm:h-16"
           enableHover
           enableClick
           clickAnimation="bounce"
@@ -320,6 +321,21 @@ export default function StudentPageClient() {
 
       {/* Single-column content */}
       <div className="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex-1">
+        {/* Page Header - animated entrance */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <h1 className="text-3xl font-neo-display text-neo-white mb-2 text-balance">
+            {t('student.dashboard.title')}
+          </h1>
+          <p className="text-neo-white/70 font-neo-body text-pretty">
+            {t('student.dashboard.subtitle')}
+          </p>
+        </motion.div>
+
         {/* Classroom Game Banner (if active) */}
         {classroomId && (
           <div className="mb-6">
@@ -373,21 +389,6 @@ export default function StudentPageClient() {
             <ActivityFeed classroomId={classroomId} userId={user.id} />
           </div>
         )}
-
-        {/* Page Header - animated entrance */}
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-        >
-          <h1 className="text-3xl font-neo-display text-neo-white mb-2 text-balance">
-            {t('student.dashboard.title')}
-          </h1>
-          <p className="text-neo-white/70 font-neo-body text-pretty">
-            {t('student.dashboard.subtitle')}
-          </p>
-        </motion.div>
 
         {/* Lesson List */}
         <StudentLessonView />

@@ -5501,7 +5501,19 @@ const en = {
       "teacherDesc": "Build lessons, create classrooms, watch students level up",
       "student": "I'm a Student",
       "studentDesc": "Join your class and practice your vocab",
-      "signInRequired": "Sign in first"
+      "signInRequired": "Sign in first",
+      "tagline": "Where learning meets play",
+      "socialProof": "Join 1000+ classrooms worldwide improving their vocabulary together!",
+      "teacherFeature1": "Create Custom Word Lists",
+      "teacherFeature2": "Manage Multiple Classrooms",
+      "teacherFeature3": "Live Performance Analytics",
+      "studentFeature1": "Join Interactive Classrooms",
+      "studentFeature2": "Fun Vocabulary Challenges",
+      "studentFeature3": "Weekly Leaderboards",
+      "teacherCta": "Teacher Login Required",
+      "studentCta": "Enter Student Hub",
+      "premium": "Premium",
+      "freeAccess": "Free Access"
     },
     "template": {
       "settings": "Settings",

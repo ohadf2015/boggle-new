@@ -5452,7 +5452,19 @@ const es = {
       "teacherDesc": "Crea aulas, lecciones de vocabulario y sigue el progreso",
       "student": "Soy Estudiante",
       "studentDesc": "Únete a tu aula y practica vocabulario",
-      "signInRequired": "Requiere iniciar sesión"
+      "signInRequired": "Requiere iniciar sesión",
+      "tagline": "Donde el aprendizaje se encuentra con el juego",
+      "socialProof": "Únete a más de 1000 aulas en todo el mundo que mejoran su vocabulario juntos!",
+      "teacherFeature1": "Crear listas de palabras personalizadas",
+      "teacherFeature2": "Gestionar múltiples aulas",
+      "teacherFeature3": "Análisis de rendimiento en vivo",
+      "studentFeature1": "Unirse a aulas interactivas",
+      "studentFeature2": "Desafíos de vocabulario divertidos",
+      "studentFeature3": "Tablas de clasificación semanales",
+      "teacherCta": "Requiere inicio de sesión de profesor",
+      "studentCta": "Entrar al centro de estudiantes",
+      "premium": "Premium",
+      "freeAccess": "Acceso gratuito"
     },
     "template": {
       "settings": "Ajustes",

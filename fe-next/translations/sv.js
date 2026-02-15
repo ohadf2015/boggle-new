@@ -5511,7 +5511,19 @@ const sv = {
       "teacherDesc": "Skapa klassrum, bygg ordförrådslektioner och spåra elevernas framsteg",
       "student": "Jag är elev",
       "studentDesc": "Gå med i ditt klassrum och öva ordförrådslektioner",
-      "signInRequired": "Inloggning krävs"
+      "signInRequired": "Inloggning krävs",
+      "tagline": "Där lärande möter lek",
+      "socialProof": "Gå med i 1000+ klassrum världen över som förbättrar sitt ordförråd tillsammans!",
+      "teacherFeature1": "Skapa anpassade ordlistor",
+      "teacherFeature2": "Hantera flera klassrum",
+      "teacherFeature3": "Liveanalys av prestationer",
+      "studentFeature1": "Gå med i interaktiva klassrum",
+      "studentFeature2": "Roliga ordförrådsutmaningar",
+      "studentFeature3": "Veckovisa topplistor",
+      "teacherCta": "Lärarinloggning krävs",
+      "studentCta": "Gå till elevhubben",
+      "premium": "Premium",
+      "freeAccess": "Fri tillgång"
     },
     "template": {
       "settings": "Inställningar",

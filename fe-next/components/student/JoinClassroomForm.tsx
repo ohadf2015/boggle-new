@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useJoinClassroom } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import Header from '@/components/Header';
+import { EducationHeader } from '@/components/education/EducationHeader';
 
 /**
  * JoinClassroomForm - Student classroom join form
@@ -102,7 +102,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
 
   return (
     <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col">
-      <Header />
+      <EducationHeader showBackButton />
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}

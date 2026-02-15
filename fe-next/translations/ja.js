@@ -5560,7 +5560,19 @@ const ja = {
       "teacherDesc": "クラスルームを作成し、語彙レッスンを構築し、生徒の進捗を追跡します",
       "student": "私は生徒です",
       "studentDesc": "クラスルームに参加して語彙レッスンを練習します",
-      "signInRequired": "サインインが必要です"
+      "signInRequired": "サインインが必要です",
+      "tagline": "学びと遊びが出会う場所",
+      "socialProof": "世界中の1000以上の教室が一緒に語彙力を向上させています！",
+      "teacherFeature1": "カスタム単語リストを作成",
+      "teacherFeature2": "複数のクラスルームを管理",
+      "teacherFeature3": "リアルタイム成績分析",
+      "studentFeature1": "インタラクティブな教室に参加",
+      "studentFeature2": "楽しい語彙チャレンジ",
+      "studentFeature3": "週間リーダーボード",
+      "teacherCta": "教師ログインが必要",
+      "studentCta": "生徒ハブへ入る",
+      "premium": "プレミアム",
+      "freeAccess": "無料アクセス"
     },
     "template": {
       "settings": "設定",
