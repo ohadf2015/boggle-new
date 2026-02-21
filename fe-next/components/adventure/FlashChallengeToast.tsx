@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { X, Coins, Check, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { m } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';

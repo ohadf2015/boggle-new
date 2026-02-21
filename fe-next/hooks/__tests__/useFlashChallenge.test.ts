@@ -42,7 +42,7 @@ describe('useFlashChallenge', () => {
   });
 
   it('dismiss() clears the challenge', () => {
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
       ({ timeRemaining }) => useFlashChallenge({ ...baseProps, timeRemaining, wordsFound: [] }),
       { initialProps: { timeRemaining: 69 } }
     );
