@@ -2910,6 +2910,7 @@ const ja = {
     "fullStandings": "全ランキング",
     "dailyDouble": "デイリーダブル",
     "dailyDoubleBonus": "両方クリアでボーナスXP獲得",
+    "bonusChallenge": "ボーナスチャレンジ",
     "browseArchive": "アーカイブ：過去のチャレンジ",
     "bonusXP": "ボーナスXP",
     "chooseChallengeHint": "挑戦を選んで！両方クリアでボーナスXP獲得！",
@@ -5091,7 +5092,26 @@ const ja = {
     "needScore": "{score}必要",
     "totalScore": "合計",
     "waveBreakdown": "ウェーブ詳細",
-    "wavesCompleted": "ウェーブ"
+    "wavesCompleted": "ウェーブ",
+    "ready": {
+      "title": "ブラストモード",
+      "subtitle": "単語を作ってタイルをクリア。コンボをつなげて高得点！",
+      "play": "ブラスト開始！",
+      "difficulty": "難易度",
+      "tileGuide": "タイルガイド",
+      "wave2Plus": "ウェーブ2以降",
+      "easy": "かんたん",
+      "medium": "ふつう",
+      "hard": "むずかしい",
+      "easyDesc": "特殊タイル少なめ、穏やかなカスケード",
+      "mediumDesc": "バランスのとれた混沌",
+      "hardDesc": "特殊タイルだらけ、激しいウェーブ"
+    },
+    "hint": "ヒント",
+    "stuck": "詰まった？",
+    "hintCooldown": "使用済",
+    "waveClear": "ウェーブクリア！",
+    "tapToContinue": "タップして続ける"
   },
   "student": {
     "activeGame": {

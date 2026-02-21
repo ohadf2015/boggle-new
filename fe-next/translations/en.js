@@ -2863,6 +2863,7 @@ const en = {
     "fullStandings": "Full Standings",
     "dailyDouble": "Daily Double",
     "dailyDoubleBonus": "Complete both quests for bonus XP",
+    "bonusChallenge": "Bonus Challenge",
     "browseArchive": "Archive: View Past Challenges",
     "bonusXP": "Bonus XP",
     "timed90Seconds": "Fast Pace",
@@ -5016,7 +5017,26 @@ const en = {
     "needScore": "Need {score}",
     "totalScore": "Total",
     "waveBreakdown": "Wave Breakdown",
-    "wavesCompleted": "Waves"
+    "wavesCompleted": "Waves",
+    "ready": {
+      "title": "Blast Mode",
+      "subtitle": "Clear tiles by forming words. Chain combos for big scores!",
+      "play": "Blast Off!",
+      "difficulty": "Difficulty",
+      "tileGuide": "Tile Guide",
+      "wave2Plus": "Wave 2+",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "easyDesc": "Fewer specials, relaxed cascades",
+      "mediumDesc": "Balanced chaos",
+      "hardDesc": "Specials everywhere, brutal waves"
+    },
+    "hint": "Hint",
+    "stuck": "Stuck?",
+    "hintCooldown": "Used",
+    "waveClear": "Wave Clear!",
+    "tapToContinue": "Tap to continue"
   },
   "student": {
         "activeGame": {

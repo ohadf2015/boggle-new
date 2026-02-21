@@ -3017,6 +3017,7 @@ const he = {
     "fullStandings": "טבלה מלאה",
     "dailyDouble": "דאבל יומי",
     "dailyDoubleBonus": "השלימו את שני האתגרים לבונוס XP",
+    "bonusChallenge": "אתגר בונוס",
     "browseArchive": "ארכיון: אתגרים קודמים",
     "bonusXP": "בונוס XP",
     "chooseChallengeHint": "בחרו את האתגר להיום. השלימו את שניהם לבונוס XP! 🎯",
@@ -5018,7 +5019,26 @@ const he = {
     "needScore": "צריך {score}",
     "totalScore": "סה\"כ",
     "waveBreakdown": "פירוט גלים",
-    "wavesCompleted": "גלים"
+    "wavesCompleted": "גלים",
+    "ready": {
+      "title": "מצב פיצוץ",
+      "subtitle": "נקה אריחים ביצירת מילים. שרשר קומבו לניקוד גדול!",
+      "play": "יאללה!",
+      "difficulty": "רמת קושי",
+      "tileGuide": "מדריך אריחים",
+      "wave2Plus": "גל 2+",
+      "easy": "קל",
+      "medium": "בינוני",
+      "hard": "קשה",
+      "easyDesc": "פחות מיוחדים, קסקדות רגועות",
+      "mediumDesc": "כאוס מאוזן",
+      "hardDesc": "מיוחדים בכל מקום, גלים אכזריים"
+    },
+    "hint": "רמז",
+    "stuck": "תקוע?",
+    "hintCooldown": "שומש",
+    "waveClear": "גל הושלם!",
+    "tapToContinue": "הקש להמשיך"
   },
   "student": {
     "activeGame": {

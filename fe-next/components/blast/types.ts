@@ -67,7 +67,7 @@ export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
   difficulty: 'medium',
 };
 
-export type BlastPhase = 'playing' | 'waveTransition' | 'results';
+export type BlastPhase = 'ready' | 'playing' | 'waveTransition' | 'results';
 
 export interface BlastGameState {
   score: number;

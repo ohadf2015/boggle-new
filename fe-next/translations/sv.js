@@ -2864,6 +2864,7 @@ const sv = {
     "fullStandings": "Hela Listan",
     "dailyDouble": "Daglig Dubbel",
     "dailyDoubleBonus": "Klara båda uppdragen för bonus-XP",
+    "bonusChallenge": "Bonusutmaning",
     "browseArchive": "Arkiv: Tidigare Utmaningar",
     "bonusXP": "Bonus-XP",
     "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
@@ -5042,7 +5043,26 @@ const sv = {
     "needScore": "Behöver {score}",
     "totalScore": "Totalt",
     "waveBreakdown": "Vågöversikt",
-    "wavesCompleted": "Vågor"
+    "wavesCompleted": "Vågor",
+    "ready": {
+      "title": "Blast-läge",
+      "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng!",
+      "play": "Sätt igång!",
+      "difficulty": "Svårighetsgrad",
+      "tileGuide": "Brickguide",
+      "wave2Plus": "Våg 2+",
+      "easy": "Lätt",
+      "medium": "Medel",
+      "hard": "Svårt",
+      "easyDesc": "Färre specialbrickor, lugna kaskader",
+      "mediumDesc": "Balanserat kaos",
+      "hardDesc": "Specialbrickor överallt, brutala vågor"
+    },
+    "hint": "Tips",
+    "stuck": "Fastnat?",
+    "hintCooldown": "Använt",
+    "waveClear": "Vågen klar!",
+    "tapToContinue": "Tryck för att fortsätta"
   },
   "student": {
     "activeGame": {

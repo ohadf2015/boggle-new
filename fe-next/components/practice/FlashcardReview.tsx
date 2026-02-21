@@ -12,8 +12,6 @@ import {
   X,
   RotateCcw,
   Trophy,
-  ChevronLeft,
-  ChevronRight,
   Layers,
   MousePointer2,
   Loader2,
@@ -159,7 +157,7 @@ export default function FlashcardReview({
   // Loading state while enriching
   if (isEnriching) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
         <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
           <CardContent className="p-8 text-center">
             <Loader2 className="w-12 h-12 mx-auto text-neo-cyan animate-spin mb-4" />
@@ -178,7 +176,7 @@ export default function FlashcardReview({
     const percentage = Math.round((correctCount / words.length) * 100);
 
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
         <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
           <CardContent className="p-8 text-center">
             <AdaptiveMotion.div
@@ -259,7 +257,7 @@ export default function FlashcardReview({
   // Render swipe mode
   if (reviewMode === 'swipe' && enrichedWords.length > 0) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6">
         <div className="max-w-lg mx-auto">
           {/* Header with mode toggle */}
           <div className="flex items-center gap-4 mb-6">
@@ -305,8 +303,8 @@ export default function FlashcardReview({
           {/* Swipe stack */}
           <FlashcardSwipeStack
             words={enrichedWords}
-            onGotIt={(word) => handleAnswer(true)}
-            onDontKnow={(word) => handleAnswer(false)}
+            onGotIt={() => handleAnswer(true)}
+            onDontKnow={() => handleAnswer(false)}
             onComplete={() => {
               const correctCount = results.filter(Boolean).length;
               setShowResults(true);
@@ -320,7 +318,7 @@ export default function FlashcardReview({
 
   // Classic mode (existing tap-to-flip)
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6">
       <div className="max-w-lg mx-auto">
         {/* Header with mode toggle */}
         <div className="flex items-center gap-4 mb-6">
@@ -370,8 +368,9 @@ export default function FlashcardReview({
           <div className="h-2 bg-neo-black/30 rounded-full mb-3 overflow-hidden">
             <AdaptiveMotion.div
               className="h-full bg-neo-cyan"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              style={{ transformOrigin: 'left' }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: progress / 100 }}
               transition={{ duration: 0.3 }}
             />
           </div>

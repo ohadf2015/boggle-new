@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackShare } from '@/utils/growthTracking';
 
@@ -20,6 +20,14 @@ export function useReferralShare(): ReferralShareState {
   const [referralRewardXp, setReferralRewardXp] = useState(100);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    };
+  }, []);
 
   const fetchShareData = useCallback(async () => {
     if (!isAuthenticated) {
@@ -52,7 +60,8 @@ export function useReferralShare(): ReferralShareState {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       trackShare('copy');
-      setTimeout(() => setCopied(false), 2000);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // Silently fail — clipboard may be unavailable
     }
