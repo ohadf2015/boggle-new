@@ -21,6 +21,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import PracticeResultsCard from './PracticeResultsCard';
 import { useMatchingGame, type MatchingItem } from './hooks/useMatchingGame';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import { WordContextRow } from './WordContextRow';
 
 export interface WordMatchingPracticeProps {
   words: VocabularyWord[];
@@ -285,13 +286,21 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
                 {t('education.practice.matchingWords') || 'Words'}
               </h3>
               <AdaptiveMotion.div className="space-y-3">
-                {wordColumn.map((item) => (
-                  <DraggableWordCard
-                    key={item.id}
-                    item={item}
-                    isMatched={matchedPairs.has(item.id)}
-                  />
-                ))}
+                {wordColumn.map((item) => {
+                  const wordData = words.find((w) => w.word === item.id);
+                  return (
+                    <div key={item.id}>
+                      <DraggableWordCard
+                        item={item}
+                        isMatched={matchedPairs.has(item.id)}
+                      />
+                      <WordContextRow
+                        partOfSpeech={(wordData as any)?.partOfSpeech}
+                        example={(wordData as any)?.examples?.[0]?.text}
+                      />
+                    </div>
+                  );
+                })}
               </AdaptiveMotion.div>
             </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -9,6 +9,7 @@ import { ArrowLeft, Lightbulb, Check, X } from 'lucide-react';
 import { useSpellingGame } from './hooks/useSpellingGame';
 import PracticeResultsCard from './PracticeResultsCard';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import { WordContextRow } from './WordContextRow';
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
@@ -51,6 +52,12 @@ export function SpellingChallengePractice({
     isComplete,
     resetGame,
   } = useSpellingGame(words);
+
+  // Mirror the hook's sort-by-length so wordIndex maps to the right enriched word
+  const sortedWords = useMemo(
+    () => [...words].sort((a, b) => a.word.length - b.word.length),
+    [words]
+  );
 
   const [inputValue, setInputValue] = useState('');
   const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
@@ -208,6 +215,10 @@ export function SpellingChallengePractice({
             <p className="font-neo-body text-neo-white text-2xl text-center">
               {currentWord?.definition || t('education.practice.noWords') || 'No words available'}
             </p>
+            <WordContextRow
+              partOfSpeech={(sortedWords[wordIndex] as any)?.partOfSpeech}
+              example={(sortedWords[wordIndex] as any)?.examples?.[0]?.text}
+            />
           </AdaptiveMotion.div>
         </AdaptiveAnimatePresence>
 

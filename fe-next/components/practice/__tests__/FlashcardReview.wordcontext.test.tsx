@@ -1,0 +1,153 @@
+/**
+ * Integration tests: WordContextRow visible in FlashcardReview word face
+ * when enrichedWords data is available.
+ */
+import { render, screen, act } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import FlashcardReview from '../FlashcardReview';
+import type { VocabularyWord } from '@/lib/supabase/education';
+
+// ── Mocks ────────────────────────────────────────────────────────────────────
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+jest.mock('@/hooks/useSpeechSynthesis', () => ({
+  useSpeechSynthesis: () => ({ speak: jest.fn(), isSpeaking: false }),
+}));
+
+// Provide a socket that emits vocabularyEnriched so enrichedWords gets populated
+const mockSocket = {
+  emit: jest.fn(),
+  on: jest.fn(),
+  off: jest.fn(),
+};
+
+jest.mock('@/utils/SocketContext', () => ({
+  useSocketOptional: () => ({ socket: mockSocket }),
+}));
+
+jest.mock('../PronunciationButton', () => ({
+  PronunciationButton: () => null,
+}));
+
+jest.mock('../FlashcardSwipeStack', () => ({
+  FlashcardSwipeStack: () => <div data-testid="swipe-stack" />,
+}));
+
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const MotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <div ref={ref} {...props}>{children}</div>
+  ));
+  MotionDiv.displayName = 'MotionDiv';
+  return {
+    motion: { div: MotionDiv },
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+  };
+});
+
+jest.mock('@/components/motion/AdaptiveMotion', () => {
+  const React = require('react');
+  const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <div ref={ref} {...props}>{children}</div>
+  ));
+  MockDiv.displayName = 'MockDiv';
+  return {
+    AdaptiveMotion: { div: MockDiv },
+    AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
+  };
+});
+
+jest.mock('@/components/ui/button', () => ({
+  Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+}));
+
+jest.mock('@/components/ui/card', () => ({
+  Card: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  CardContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+}));
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const mockWords: VocabularyWord[] = [
+  { word: 'serendipity', definition: 'A happy accident', canIntegrate: true },
+];
+
+const enrichedPayload = [
+  {
+    word: 'serendipity',
+    definition: 'A happy accident',
+    pronunciation: '/ˌsɛr.ənˈdɪp.ɪ.ti/',
+    partOfSpeech: 'noun',
+    examples: [{ text: 'Finding that book was pure serendipity.' }],
+    contextualExamples: [],
+  },
+];
+
+/**
+ * Trigger the vocabularyEnriched socket callback so enrichedWords state is set.
+ */
+function triggerEnrichment() {
+  const onCall = mockSocket.on.mock.calls.find(([event]: [string]) => event === 'vocabularyEnriched');
+  if (onCall) {
+    act(() => {
+      onCall[1]({ enrichedWords: enrichedPayload });
+    });
+  }
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+describe('FlashcardReview — WordContextRow integration', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('shows part-of-speech on the word face when enriched data is available', () => {
+    render(
+      <FlashcardReview
+        words={mockWords}
+        onComplete={jest.fn()}
+        onBack={jest.fn()}
+      />
+    );
+
+    triggerEnrichment();
+
+    // The word face is shown by default (not-flipped)
+    expect(screen.getByText('noun')).toBeInTheDocument();
+  });
+
+  it('shows usage example on the word face when enriched data is available', () => {
+    render(
+      <FlashcardReview
+        words={mockWords}
+        onComplete={jest.fn()}
+        onBack={jest.fn()}
+      />
+    );
+
+    triggerEnrichment();
+
+    expect(
+      screen.getByText(/Finding that book was pure serendipity\./)
+    ).toBeInTheDocument();
+  });
+
+  it('renders nothing for WordContextRow before enrichment callback fires', () => {
+    // The socket mock is set up but triggerEnrichment() is NOT called,
+    // so enrichedWords starts empty and WordContextRow receives undefined props → renders null.
+    render(
+      <FlashcardReview
+        words={mockWords}
+        onComplete={jest.fn()}
+        onBack={jest.fn()}
+      />
+    );
+
+    // part-of-speech 'noun' should not appear (enrichment hasn't happened yet)
+    expect(screen.queryByText('noun')).not.toBeInTheDocument();
+  });
+});

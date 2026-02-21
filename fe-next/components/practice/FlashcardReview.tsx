@@ -22,6 +22,7 @@ import type { EnrichedVocabularyWord, VocabularyExample } from '@/types/vocabula
 import { useSocketOptional } from '@/utils/SocketContext';
 import { PronunciationButton } from './PronunciationButton';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
+import { WordContextRow } from './WordContextRow';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -441,6 +442,10 @@ export default function FlashcardReview({
                       <p className="text-3xl sm:text-4xl font-neo-display text-neo-white">
                         {currentWord.word}
                       </p>
+                      <WordContextRow
+                        partOfSpeech={enrichedWords[currentIndex]?.partOfSpeech}
+                        example={enrichedWords[currentIndex]?.examples?.[0]?.text}
+                      />
                       <p className="text-sm text-slate-500 mt-4">
                         {t('education.practice.tapToFlip') || 'Tap to reveal'}
                       </p>
