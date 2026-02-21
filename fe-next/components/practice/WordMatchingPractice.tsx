@@ -218,7 +218,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
 
     if (showResults) {
       return (
-        <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+        <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
           <PracticeResultsCard
             correct={correctCount}
             total={attempts}
