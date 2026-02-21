@@ -10,6 +10,7 @@ import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
+import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
@@ -102,6 +103,15 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
   // Coin reward animation state
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
+
+  // Score popup state for word-found fly animation
+  const [scorePopup, setScorePopup] = useState<{
+    id: number;
+    value: number;
+    x: number;
+    y: number;
+    word?: string;
+  } | null>(null);
 
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
@@ -222,6 +232,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       setScore(prev => prev + wordScore);
       playWordAcceptedSound?.();
       combo.incrementCombo(true);
+      setScorePopup({
+        id: Date.now(),
+        value: wordScore,
+        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
+        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0,
+        word,
+      });
     },
     onWordRejected: () => {
       combo.resetCombo();
@@ -571,6 +588,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         cancelText={t('common.cancel') || 'Cancel'}
         onConfirm={handleConfirmQuit}
         variant="danger"
+      />
+
+      {/* Score popup fly animation - shows +N when a word is accepted */}
+      <ScorePopupFly
+        popup={scorePopup}
+        flyToTarget={false}
+        showWord
+        onComplete={() => setScorePopup(null)}
       />
     </motion.div>
   );
