@@ -3,7 +3,12 @@ import { useFlashChallenge } from '../useFlashChallenge';
 
 jest.useFakeTimers();
 
+// Mock Math.random to always return 0 (selects first candidate: flash-long-word-6)
+const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0);
+
 const baseProps = { worldId: 1, totalTimeSeconds: 100, isPlaying: true };
+
+afterAll(() => { mockRandom.mockRestore(); });
 
 describe('useFlashChallenge', () => {
   afterEach(() => { jest.clearAllTimers(); });
