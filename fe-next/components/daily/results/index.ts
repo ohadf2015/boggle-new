@@ -87,3 +87,6 @@ export { GuestBrainScorePreview } from './GuestBrainScorePreview';
 export type { GuestBrainScorePreviewProps } from './GuestBrainScorePreview';
 export { MoreOptionsAccordion } from './MoreOptionsAccordion';
 export type { MoreOptionsAccordionProps } from './MoreOptionsAccordion';
+
+export { EmojiShareCard } from './EmojiShareCard';
+export type { EmojiShareCardProps } from './EmojiShareCard';

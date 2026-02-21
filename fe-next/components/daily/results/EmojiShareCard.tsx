@@ -1,0 +1,73 @@
+'use client';
+
+import React, { useMemo } from 'react';
+import { m } from 'framer-motion';
+import type { Language } from '@/types';
+
+interface WordEntry {
+  word: string;
+  found: boolean;
+}
+
+export interface EmojiShareCardProps {
+  puzzleNumber: number;
+  score: number;
+  solved: boolean;
+  words: WordEntry[];
+  language: Language;
+}
+
+function wordToEmoji(entry: WordEntry): string {
+  const square = entry.found ? '🟩' : '⬛';
+  return square.repeat(entry.word.length);
+}
+
+export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
+  puzzleNumber,
+  score,
+  solved,
+  words,
+  language,
+}) => {
+  const emojiRows = useMemo(() => words.map(wordToEmoji), [words]);
+
+  return (
+    <m.div
+      data-testid="emoji-share-card"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 }}
+      className="bg-slate-900 border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
+    >
+      {/* Puzzle header */}
+      <div className="text-neo-lime font-black text-xs uppercase tracking-widest mb-3">
+        Word Hunt #{puzzleNumber} {solved ? '✅' : '❌'}
+      </div>
+
+      {/* Emoji rows */}
+      <div className="space-y-1 mb-3">
+        {words.map((entry, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="text-base leading-none">{emojiRows[i]}</span>
+            {entry.found && (
+              <span className="text-slate-400 text-xs uppercase tracking-wide">
+                {entry.word}
+              </span>
+            )}
+            {!entry.found && (
+              <span className="text-slate-600 text-xs">????</span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Score + domain */}
+      <div className="border-t border-slate-700/50 pt-2 mt-2">
+        <div className="text-neo-white font-bold text-sm">{score} pts</div>
+        <div className="text-slate-500 text-xs mt-0.5">lexiclash.live</div>
+      </div>
+    </m.div>
+  );
+};
+
+export default EmojiShareCard;
