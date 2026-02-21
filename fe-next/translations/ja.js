@@ -705,6 +705,7 @@ const ja = {
     "inviteWarriors": "戦士を招待",
     "invitePlayer": "プレイヤーを招待",
     "battleFeed": "バトルフィード",
+    "roomChat": "ルームチャット",
     "hostIs": "ホストは",
     "playersJoined": "プレイヤー",
     "gameSettings": "設定",
@@ -810,8 +811,7 @@ const ja = {
     "presetDrawerBoardHard": "9×9（むずかしい）",
     "presetDrawerLetters": "文字",
     "difficultyTooltipGrid": "グリッドサイズで難易度が変わる",
-    "difficultyTooltipTimer": "長い時間＝たくさん見つかる",
-    "roomChat": "ルームチャット"
+    "difficultyTooltipTimer": "長い時間＝たくさん見つかる"
   },
   "tvBroadcast": {
     "liveGameInProgress": "ライブゲーム進行中",

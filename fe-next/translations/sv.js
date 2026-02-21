@@ -704,6 +704,7 @@ const sv = {
     "inviteWarriors": "Bjud in krigare",
     "invitePlayer": "Bjud in spelare",
     "battleFeed": "Stridsflöde",
+    "roomChat": "Rumschatt",
     "hostIs": "Värd är",
     "playersJoined": "Spelare",
     "gameSettings": "Inställningar",
@@ -809,8 +810,7 @@ const sv = {
     "presetDrawerBoardHard": "9×9 (Svår)",
     "presetDrawerLetters": "bokstäver",
     "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
-    "difficultyTooltipTimer": "Längre tid = fler ord hittade",
-    "roomChat": "Rumschatt"
+    "difficultyTooltipTimer": "Längre tid = fler ord hittade"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Livespel pågår",
