@@ -4,6 +4,8 @@ import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { Mascot } from '@/components/ui/Mascot';
+import { MINDBLOWN_PROGRESS_THRESHOLD } from '@/utils/mascotConfig';
 
 interface AchievementProgress {
   key: string;
@@ -186,6 +188,11 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
     return achievementProgress.filter(p => !dismissedAchievements.has(p.key));
   }, [achievementProgress, dismissedAchievements]);
 
+  // Show mindblown mascot when any visible achievement is near completion
+  const hasNearMilestone = visibleAchievements.some(
+    (a) => a.percentage >= MINDBLOWN_PROGRESS_THRESHOLD
+  );
+
   // Auto-dismiss achievements after 3 seconds
   useEffect(() => {
     if (isGameOver) return; // Don't set up individual timers if game is over (global dismiss handles it)
@@ -226,6 +233,11 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
 
   return (
     <div className={cn("fixed bottom-20 ltr:right-4 rtl:left-4 z-40 space-y-2", className)}>
+      {hasNearMilestone && (
+        <div className="flex justify-center my-1">
+          <Mascot variant="mindblown" size="xs" animated />
+        </div>
+      )}
       <AnimatePresence>
         {visibleAchievements.map((progress) => (
           <motion.div
