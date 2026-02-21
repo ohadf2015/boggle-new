@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, Copy, LogOut, Plus } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
@@ -72,7 +72,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             const isMe = name === username;
 
             return (
-              <motion.div
+              <m.div
                 key={name}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1, y: [0, -4, 0] }}
@@ -114,7 +114,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
                   {name}
                 </span>
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>
@@ -136,24 +136,24 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   // Waiting status banner (player-specific, replaces StartButton)
   const renderWaitingStatus = (): React.ReactElement => (
-    <motion.div
+    <m.div
       data-testid="waiting-status"
       className="bg-neo-cream text-neo-black p-6 rounded-xl border-3 border-neo-black shadow-hard text-center"
     >
-      <motion.div
+      <m.div
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         className="text-4xl mb-3"
       >
         ⏳
-      </motion.div>
+      </m.div>
       <h2 className="font-neo-display font-bold text-xl uppercase leading-none mb-2">
         {t('playerView.waitingForHostToStart') || 'Waiting for host to start...'}
       </h2>
       <p className="text-sm text-gray-600">
         {t('playerView.hostWillStart') || 'The host will start the game when everyone is ready'}
       </p>
-    </motion.div>
+    </m.div>
   );
 
   // Mobile scrollable content (mirrors host's renderLobbyContent)
@@ -187,7 +187,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   );
 
   return (
-    <div className="h-dvh flex flex-col bg-neo-navy lg:max-w-7xl lg:mx-auto">
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
       {/* Header - Command Center style (matches host) */}
       <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
@@ -234,7 +234,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95">
+      <main className="flex-1 min-h-0 overflow-hidden flex flex-col bg-neo-navy/95">
         {/* Desktop Layout: Two-column via DesktopLobbyLayout */}
         <div className="hidden lg:block h-full">
           <DesktopLobbyLayout
@@ -265,7 +265,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </div>
 
         {/* Mobile Layout: Single-scroll Command Center */}
-        <div className="lg:hidden h-full">
+        <div className="lg:hidden flex flex-col flex-1 min-h-0">
           {renderMobileContent()}
         </div>
       </main>
