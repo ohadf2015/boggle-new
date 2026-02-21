@@ -15,7 +15,7 @@
  * - Neo-brutalist modal style
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { cn } from '@/lib/utils';
@@ -53,6 +53,17 @@ export default function DuelChallengeModal({
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
   const [duelType, setDuelType] = useState<'async' | 'realtime'>('async');
   const [isCreating, setIsCreating] = useState(false);
+
+  // Dismiss modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Handle send challenge
   const handleSendChallenge = useCallback(() => {
@@ -199,9 +210,9 @@ export default function DuelChallengeModal({
             onClick={onClose}
             className={cn(
               'flex-1 px-6 py-3 font-bold rounded-neo',
-              'bg-neo-navy text-neo-white',
+              'bg-red-500 text-white',
               'border-neo border-neo-black shadow-hard-sm',
-              'hover:shadow-hard transition-all'
+              'hover:bg-red-600 hover:shadow-hard transition-all'
             )}
           >
             {t('cancel')}

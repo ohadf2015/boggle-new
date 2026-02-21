@@ -200,4 +200,44 @@ describe('DuelChallengeModal', () => {
       expect(modal).toHaveClass('shadow-hard-lg');
     });
   });
+
+  describe('forfeit/cancel button destructive styling', () => {
+    it('cancel button has destructive background color', () => {
+      render(<DuelChallengeModal {...defaultProps} />);
+
+      const cancelButton = screen.getByText('Cancel');
+      // Must be visually destructive — red or neo-pink
+      const hasDestructiveStyle =
+        cancelButton.classList.contains('bg-red-500') ||
+        cancelButton.classList.contains('bg-neo-pink');
+      expect(hasDestructiveStyle).toBe(true);
+    });
+
+    it('cancel button has neo-brutalist border and shadow', () => {
+      render(<DuelChallengeModal {...defaultProps} />);
+
+      const cancelButton = screen.getByText('Cancel');
+      expect(cancelButton).toHaveClass('border-neo-black');
+      expect(cancelButton).toHaveClass('shadow-hard-sm');
+    });
+  });
+
+  describe('Esc key dismissal', () => {
+    it('calls onClose when Escape key is pressed', () => {
+      render(<DuelChallengeModal {...defaultProps} />);
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onClose for other keys', () => {
+      render(<DuelChallengeModal {...defaultProps} />);
+
+      fireEvent.keyDown(document, { key: 'Enter' });
+      fireEvent.keyDown(document, { key: 'Space' });
+
+      expect(mockOnClose).not.toHaveBeenCalled();
+    });
+  });
 });
