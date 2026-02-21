@@ -2625,7 +2625,11 @@ const es = {
     "personalBest": "mejor marca personal",
     "shareModalTitle": "Invita amigos y gana XP",
     "shareGuestNudge": "Inicia sesión para obtener tu enlace personal y ganar XP",
-    "shareXpReward": "¡Ganas +100 XP cuando se unan!"
+    "shareXpReward": "¡Ganas +100 XP cuando se unan!",
+    "shareTitle": "Invita amigos, gana XP",
+    "shareSubtitle": "100 XP por cada amigo que se une",
+    "shareSubtitleGuest": "¡Juega con amigos!",
+    "shareButton": "Compartir"
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",
