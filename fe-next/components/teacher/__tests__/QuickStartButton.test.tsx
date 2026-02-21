@@ -5,7 +5,6 @@
  * Following TDD RED-GREEN-REFACTOR cycle
  */
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import QuickStartButton from '../QuickStartButton';
 import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
