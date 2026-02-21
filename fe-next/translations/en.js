@@ -3272,7 +3272,8 @@ const en = {
       "generating": "Creating...",
       "previewImage": "Preview Image",
       "moreOptions": "More share options",
-      "lessOptions": "Less options"
+      "lessOptions": "Less options",
+      "challengeFriends": "Challenge Friends →"
     },
     "score": {
       "title": "Your Score",
@@ -5838,7 +5839,8 @@ const en = {
       "selectAllLessons": "Select All",
       "deselectAll": "Deselect All",
       "createClassroom": "Create Classroom",
-      "createLesson": "Create Lesson"
+      "createLesson": "Create Lesson",
+      "scanToJoin": "Scan to join game"
     },
     "lessonWords": {
       "title": "Lesson Vocabulary",

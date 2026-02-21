@@ -3280,7 +3280,8 @@ const sv = {
       "generating": "Skapar...",
       "previewImage": "Förhandsgranska bild",
       "moreOptions": "Fler delningsalternativ",
-      "lessOptions": "Färre alternativ"
+      "lessOptions": "Färre alternativ",
+      "challengeFriends": "Utmana vänner →"
     },
     "score": {
       "title": "Din Poäng",
@@ -5854,6 +5855,7 @@ const sv = {
       "deselectAll": "Avmarkera alla",
       "createClassroom": "Skapa klassrum",
       "createLesson": "Skapa lektion",
+      "scanToJoin": "Skanna för att gå med",
       "connecting": "Ansluter till spelet..."
     },
     "lessonWords": {

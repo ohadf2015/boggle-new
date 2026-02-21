@@ -3329,7 +3329,8 @@ const ja = {
       "generating": "作成中...",
       "previewImage": "プレビュー画像",
       "moreOptions": "その他の共有オプション",
-      "lessOptions": "オプションを減らす"
+      "lessOptions": "オプションを減らす",
+      "challengeFriends": "友達に挑戦 →"
     },
     "score": {
       "title": "あなたのスコア",
@@ -5931,6 +5932,7 @@ const ja = {
       "deselectAll": "選択解除",
       "createClassroom": "教室を作成",
       "createLesson": "レッスンを作成",
+      "scanToJoin": "スキャンして参加",
       "connecting": "ゲームに接続中..."
     },
     "lessonWords": {

@@ -3285,7 +3285,8 @@ const he = {
       "generating": "יוצר...",
       "previewImage": "תצוגה מקדימה",
       "moreOptions": "אפשרויות שיתוף נוספות",
-      "lessOptions": "פחות אפשרויות"
+      "lessOptions": "פחות אפשרויות",
+      "challengeFriends": "אתגר חברים ←"
     },
     "score": {
       "title": "הניקוד שלך",
@@ -5857,6 +5858,7 @@ const he = {
       "deselectAll": "בטל בחירה",
       "createClassroom": "צור כיתה",
       "createLesson": "צור שיעור",
+      "scanToJoin": "סרוק להצטרף למשחק",
       "connecting": "מתחבר למשחק..."
     },
     "lessonWords": {
