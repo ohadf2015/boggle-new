@@ -4978,6 +4978,35 @@ const he = {
         "name": "מכפיל מתקדם",
         "description": "כל מכפילי הניקוד מוגברים ב-10%"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "אתגר מהיר!",
+        "longWord": "מצא מילה עם {param}+ אותיות",
+        "comboStreak": "בנה רצף של {param} מילים",
+        "specificLetter": "השתמש באות {param}",
+        "fastWord": "מצא מילה ב-{param} שניות",
+        "complete": "הושלם!"
+      },
+      "chapter": {
+        "panelTitle": "משימות פרק",
+        "wordCount": {
+          "title": "אוסף מילים",
+          "desc": "מצא {target} מילים בפרק"
+        },
+        "bossNoHint": {
+          "title": "ללא רחמים",
+          "desc": "הביס את הבוס בלי רמזים"
+        },
+        "longWords": {
+          "title": "אומן מילים",
+          "desc": "מצא {target} מילים עם 6+ אותיות"
+        },
+        "perfectLevels": {
+          "title": "פרפקציוניסט",
+          "desc": "השלם {target} שלבים עם 3 כוכבים"
+        }
+      }
     }
   },
   "blast": {

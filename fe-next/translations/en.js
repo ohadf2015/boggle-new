@@ -4976,6 +4976,35 @@ const en = {
         "name": "Advanced Multiplier",
         "description": "All score multipliers increased by 10%"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "Flash Challenge!",
+        "longWord": "Find a {param}+ letter word",
+        "comboStreak": "Build a {param}-word streak",
+        "specificLetter": "Use the letter {param}",
+        "fastWord": "Find any word in {param}s",
+        "complete": "Complete!"
+      },
+      "chapter": {
+        "panelTitle": "Chapter Quests",
+        "wordCount": {
+          "title": "Word Collector",
+          "desc": "Find {target} words in this chapter"
+        },
+        "bossNoHint": {
+          "title": "No Mercy",
+          "desc": "Defeat the boss without hints"
+        },
+        "longWords": {
+          "title": "Wordsmith",
+          "desc": "Find {target} words with 6+ letters"
+        },
+        "perfectLevels": {
+          "title": "Perfectionist",
+          "desc": "Complete {target} levels with 3 stars"
+        }
+      }
     }
   },
   "blast": {

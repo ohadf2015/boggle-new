@@ -5002,6 +5002,35 @@ const sv = {
         "name": "Avancerad multiplikator",
         "description": "Alla poängmultiplikatorer ökas med 10%"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "Blixtutmaning!",
+        "longWord": "Hitta ett ord med {param}+ bokstäver",
+        "comboStreak": "Bygg en streak med {param} ord",
+        "specificLetter": "Använd bokstaven {param}",
+        "fastWord": "Hitta ett ord på {param}s",
+        "complete": "Klart!"
+      },
+      "chapter": {
+        "panelTitle": "Kapiteluppdrag",
+        "wordCount": {
+          "title": "Ordssamlare",
+          "desc": "Hitta {target} ord i det här kapitlet"
+        },
+        "bossNoHint": {
+          "title": "Ingen Nåd",
+          "desc": "Besegra bossen utan ledtrådar"
+        },
+        "longWords": {
+          "title": "Ordsmid",
+          "desc": "Hitta {target} ord med 6+ bokstäver"
+        },
+        "perfectLevels": {
+          "title": "Perfektionist",
+          "desc": "Slutför {target} nivåer med 3 stjärnor"
+        }
+      }
     }
   },
   "blast": {

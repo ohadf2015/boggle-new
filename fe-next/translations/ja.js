@@ -5051,6 +5051,35 @@ const ja = {
         "name": "アドバンスド倍率",
         "description": "全スコア倍率が10%増加"
       }
+    },
+    "quests": {
+      "flash": {
+        "title": "フラッシュチャレンジ!",
+        "longWord": "{param}文字以上の単語を見つけよう",
+        "comboStreak": "{param}連続ストリークを作ろう",
+        "specificLetter": "{param}の文字を使おう",
+        "fastWord": "{param}秒以内に単語を見つけよう",
+        "complete": "完了!"
+      },
+      "chapter": {
+        "panelTitle": "チャプタークエスト",
+        "wordCount": {
+          "title": "ワードコレクター",
+          "desc": "このチャプターで{target}個の単語を見つけよう"
+        },
+        "bossNoHint": {
+          "title": "ノーマーシー",
+          "desc": "ヒントなしでボスを倒そう"
+        },
+        "longWords": {
+          "title": "ワードスミス",
+          "desc": "6文字以上の単語を{target}個見つけよう"
+        },
+        "perfectLevels": {
+          "title": "パーフェクショニスト",
+          "desc": "3つ星で{target}レベルクリアしよう"
+        }
+      }
     }
   },
   "blast": {
