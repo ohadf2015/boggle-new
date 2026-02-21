@@ -22,6 +22,7 @@ import PracticeResultsCard from './PracticeResultsCard';
 import { useMatchingGame, type MatchingItem } from './hooks/useMatchingGame';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { WordContextRow } from './WordContextRow';
+import { PronunciationButton } from '@/components/practice/PronunciationButton';
 
 export interface WordMatchingPracticeProps {
   words: VocabularyWord[];
@@ -119,7 +120,7 @@ DroppableDefinitionSlot.displayName = 'DroppableDefinitionSlot';
 
 export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
   ({ words, onComplete, onBack }) => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const isRTL = dir === 'rtl';
 
     const {
@@ -290,10 +291,19 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
                   const wordData = words.find((w) => w.word === item.id);
                   return (
                     <div key={item.id}>
-                      <DraggableWordCard
-                        item={item}
-                        isMatched={matchedPairs.has(item.id)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <DraggableWordCard
+                            item={item}
+                            isMatched={matchedPairs.has(item.id)}
+                          />
+                        </div>
+                        <PronunciationButton
+                          word={item.id}
+                          lang={language}
+                          size="sm"
+                        />
+                      </div>
                       <WordContextRow
                         partOfSpeech={(wordData as any)?.partOfSpeech}
                         example={(wordData as any)?.examples?.[0]?.text}

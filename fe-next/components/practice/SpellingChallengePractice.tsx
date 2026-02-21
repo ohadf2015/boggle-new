@@ -10,6 +10,7 @@ import { useSpellingGame } from './hooks/useSpellingGame';
 import PracticeResultsCard from './PracticeResultsCard';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { WordContextRow } from './WordContextRow';
+import { PronunciationButton } from './PronunciationButton';
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
@@ -33,7 +34,7 @@ export function SpellingChallengePractice({
   onComplete,
   onBack,
 }: SpellingChallengePracticeProps) {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const isRTL = dir === 'rtl';
 
   const {
@@ -230,6 +231,13 @@ export function SpellingChallengePractice({
           <span className="font-mono text-neo-cyan text-2xl tracking-widest">
             {currentHint}{'_'.repeat(Math.max(0, (words[wordIndex]?.word.length || 0) - currentHint.length))}
           </span>
+          {sortedWords[wordIndex] && (
+            <PronunciationButton
+              word={sortedWords[wordIndex].word}
+              lang={language}
+              size="sm"
+            />
+          )}
           <Button
             variant="ghost"
             size="sm"
