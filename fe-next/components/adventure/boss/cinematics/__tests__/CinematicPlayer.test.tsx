@@ -311,4 +311,69 @@ describe('CinematicPlayer', () => {
       expect(matchingCall).toBeTruthy();
     });
   });
+
+  describe('portrait mobile letterbox', () => {
+    const originalInnerWidth = window.innerWidth;
+    const originalInnerHeight = window.innerHeight;
+
+    beforeEach(() => {
+      // Simulate portrait mobile (390x844)
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 390,
+      });
+      Object.defineProperty(window, 'innerHeight', {
+        writable: true,
+        configurable: true,
+        value: 844,
+      });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: originalInnerWidth,
+      });
+      Object.defineProperty(window, 'innerHeight', {
+        writable: true,
+        configurable: true,
+        value: originalInnerHeight,
+      });
+    });
+
+    it('should use 16:9 letterbox height in portrait fullscreen mode', () => {
+      const { Player } = require('@remotion/player');
+      Player.mockClear();
+
+      render(<CinematicPlayer {...defaultProps} fullscreen />);
+      waitForReady();
+
+      // In portrait (390x844), height should be 390 * (720/1280) ≈ 219, not 844
+      const calls = Player.mock.calls as unknown[][];
+      const lastCall = calls[calls.length - 1]?.[0] as Record<string, unknown>;
+      const style = lastCall?.style as React.CSSProperties | undefined;
+      const height = style?.height;
+
+      // Height should be letterboxed: ~219px, NOT 100vh (844px)
+      const expectedHeight = Math.round(390 * (720 / 1280));
+      expect(height).toBe(expectedHeight);
+    });
+
+    it('should keep full width in portrait fullscreen mode', () => {
+      const { Player } = require('@remotion/player');
+      Player.mockClear();
+
+      render(<CinematicPlayer {...defaultProps} fullscreen />);
+      waitForReady();
+
+      const calls = Player.mock.calls as unknown[][];
+      const lastCall = calls[calls.length - 1]?.[0] as Record<string, unknown>;
+      const style = lastCall?.style as React.CSSProperties | undefined;
+
+      // Width should be 390 (full screen width) not 100vw string
+      expect(style?.width).toBe(390);
+    });
+  });
 });

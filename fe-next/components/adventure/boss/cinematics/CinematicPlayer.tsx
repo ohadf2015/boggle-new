@@ -225,6 +225,7 @@ function CinematicPlayerInner({
   return (
     <div className={containerClasses} data-testid={testId}>
       {/* Remotion Player */}
+      {/* Portrait letterbox: on mobile portrait, scale 16:9 to fit screen width */}
       <Player
         ref={playerRef}
         component={composition}
@@ -233,12 +234,24 @@ function CinematicPlayerInner({
         compositionWidth={width}
         compositionHeight={height}
         fps={fps}
-        style={{
-          width: fullscreen ? '100vw' : width,
-          height: fullscreen ? '100vh' : height,
-          maxWidth: '100%',
-          maxHeight: '100%',
-        }}
+        style={(() => {
+          if (!fullscreen) return { width, height, maxWidth: '100%', maxHeight: '100%' };
+          // Detect portrait mobile
+          const screenW = typeof window !== 'undefined' ? window.innerWidth : 1280;
+          const screenH = typeof window !== 'undefined' ? window.innerHeight : 720;
+          const isPortrait = screenW < screenH;
+          const isMobile = screenW < 768;
+          const playerWidth = screenW;
+          const playerHeight = isPortrait && isMobile
+            ? Math.round(playerWidth * (720 / 1280))
+            : screenH;
+          return {
+            width: playerWidth,
+            height: playerHeight,
+            maxWidth: '100%',
+            maxHeight: '100%',
+          };
+        })()}
         autoPlay={autoPlay}
         loop={false}
         showVolumeControls={false}
@@ -287,7 +300,8 @@ function CinematicPlayerInner({
       {/* Skip Button */}
       <AnimatePresence>
         <motion.div
-          className="absolute bottom-8 right-8"
+          className="absolute right-4 z-50"
+          style={{ bottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
