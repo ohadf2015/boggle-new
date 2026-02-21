@@ -12,6 +12,7 @@ import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateCh
 import AuthModal from '../auth/AuthModal';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
 import { useMusic } from '@/contexts/MusicContext';
+import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -222,6 +223,11 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
 
       {/* Main content - SIMPLIFIED */}
       <div className="max-w-md w-full text-center space-y-5 mt-16 sm:mt-20">
+        {/* Explorer mascot — sets adventure tone before the word hunt */}
+        <div className="flex justify-center">
+          <MascotWithEntrance variant="explorer" size="lg" delay={0.1} />
+        </div>
+
         {/* Guest Mode Notice - Show only for anonymous users */}
         {!isAuthenticated && (
           <motion.div

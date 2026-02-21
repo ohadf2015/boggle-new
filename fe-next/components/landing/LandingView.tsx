@@ -93,7 +93,7 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
