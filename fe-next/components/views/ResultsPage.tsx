@@ -377,7 +377,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   return (
     <>
       {overlayModals}
-      <div className="min-h-dvh flex flex-col bg-neo-navy transition-colors duration-300 relative">
+      <div className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative">
         {/* Neo-brutalist halftone dot pattern overlay */}
         <div
           className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
