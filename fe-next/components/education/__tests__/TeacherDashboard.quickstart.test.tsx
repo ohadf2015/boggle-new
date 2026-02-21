@@ -7,7 +7,6 @@
  * 3. Navigates to classroom-game with the right lessonId on click
  */
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
