@@ -5061,7 +5061,8 @@ const en = {
     "stuck": "Stuck?",
     "hintCooldown": "Used",
     "waveClear": "Wave Clear!",
-    "tapToContinue": "Tap to continue"
+    "tapToContinue": "Tap to continue",
+    "celebrateAgain": "Celebrate again"
   },
   "student": {
         "activeGame": {
@@ -5558,7 +5559,12 @@ const en = {
       "teacherCta": "Teacher Login Required",
       "studentCta": "Enter Student Hub",
       "premium": "Premium",
-      "freeAccess": "Free Access"
+      "freeAccess": "Free Access",
+      "duelTeaser": {
+        "headline": "Challenge a classmate",
+        "subtext": "Play head-to-head and climb the class ranking",
+        "cta": "Start a Duel →"
+      }
     },
     "template": {
       "settings": "Settings",

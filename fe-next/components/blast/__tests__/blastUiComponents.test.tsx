@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import type { BlastTileState, BlastResultsData } from '../types';
 
 // ---------------------------------------------------------------------------
@@ -16,6 +16,11 @@ jest.mock('framer-motion', () => ({
 
 jest.mock('../hooks/useBlastResultSaver', () => ({
   useBlastResultSaver: () => ({ saved: false, personalBests: null, isNewBestScore: false, isNewBestCombo: false, error: null }),
+}));
+
+jest.mock('canvas-confetti', () => ({
+  __esModule: true,
+  default: jest.fn(),
 }));
 
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -138,11 +143,31 @@ describe('BlastResults', () => {
   const onPlayAgain = jest.fn();
   const onBackToHome = jest.fn();
 
-  it('renders the final score', () => {
-    render(
+  it('renders the final score (via animated count-up display)', () => {
+    // Score animates from 0 → finalScore; use requestAnimationFrame mock to advance to final
+    const rafCalls: FrameRequestCallback[] = [];
+    const originalRAF = global.requestAnimationFrame;
+    global.requestAnimationFrame = (cb: FrameRequestCallback) => {
+      rafCalls.push(cb);
+      return 0;
+    };
+
+    const { unmount } = render(
       <BlastResults results={resultsData} onPlayAgain={onPlayAgain} onBackToHome={onBackToHome} />,
     );
-    expect(screen.getByText('150')).toBeInTheDocument();
+
+    // Simulate animation completing: advance time past duration and flush RAF
+    const now = Date.now();
+    jest.spyOn(Date, 'now').mockReturnValue(now + 2000); // past 1500ms duration
+    act(() => {
+      rafCalls.forEach(cb => cb(now + 2000));
+    });
+
+    expect(screen.getByTestId('blast-score-display')).toHaveTextContent('150');
+
+    global.requestAnimationFrame = originalRAF;
+    jest.restoreAllMocks();
+    unmount();
   });
 
   it('renders the clear percentage', () => {
