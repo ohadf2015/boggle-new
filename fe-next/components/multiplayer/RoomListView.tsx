@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Zap, ChevronRight, Ghost, RefreshCw, Settings2 } from 'lucide-react';
+import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, Settings2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -29,7 +29,7 @@ interface RoomListViewProps {
 
 /**
  * RoomListView - Social Hub multiplayer landing
- * Single Quick Play CTA, friend activity, active battles
+ * Single Quick Play CTA and active battles list
  */
 const RoomListView: React.FC<RoomListViewProps> = ({
   activeRooms,
@@ -70,7 +70,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-neo-navy relative flex flex-col max-w-5xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col max-w-5xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -80,7 +80,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         />
 
         {/* Header */}
-        <motion.header
+        <m.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between py-3 px-4 flex-shrink-0"
@@ -105,23 +105,23 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           >
             <Settings2 className="w-5 h-5 text-neo-white" />
           </button>
-        </motion.header>
+        </m.header>
 
         {/* Scrollable Content */}
         <div className="flex-1 flex flex-col px-4 gap-8 overflow-y-auto pb-10">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-6">
 
           {/* Left Column: Quick Play CTA */}
-          <div className="lg:sticky lg:top-0 lg:self-start">
+          <div className="lg:sticky lg:top-4 lg:self-start">
           {/* Quick Play CTA */}
           {onQuickPlay && (
-            <motion.section
+            <m.section
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
               className="flex flex-col items-center"
             >
-              <motion.button
+              <m.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
                 className="w-full py-6 lg:py-5 flex flex-col items-center justify-center gap-1 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
@@ -141,7 +141,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 <span className="text-neo-black/60 font-bold text-[10px] uppercase tracking-widest">
                   {t('multiplayerFlow.roomList.instantMatch') || 'Instant Matchmaking'}
                 </span>
-              </motion.button>
+              </m.button>
 
               <button
                 onClick={onCreateRoom}
@@ -150,45 +150,14 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 {t('multiplayerFlow.roomList.orCreateCustom') || 'or create a custom room'}
                 <ChevronRight className="w-3 h-3" />
               </button>
-            </motion.section>
+            </m.section>
           )}
           </div>
 
-          {/* Right Column: Friend Activity + Active Battles */}
-          <div className="grid gap-8">
-          {/* Friend Activity Section */}
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-col gap-3"
-          >
-            <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/50">
-              {t('multiplayerFlow.roomList.friendActivity') || 'Friend Activity'}
-            </h2>
-
-            {/* Empty State: No friends online */}
-            <div className="bg-neo-navy-light/50 border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-neo-navy border-3 border-neo-black rounded-2xl flex items-center justify-center mb-4 shadow-hard-sm">
-                <Users className="w-8 h-8 text-neo-cream/30" />
-              </div>
-              <h3 className="text-neo-white font-bold text-sm mb-1 uppercase">
-                {t('multiplayerFlow.roomList.noFriendsOnline') || 'No friends online yet'}
-              </h3>
-              <p className="text-slate-500 text-[10px] mb-5 font-medium leading-relaxed uppercase tracking-wider">
-                {t('multiplayerFlow.roomList.invitePrompt') || 'Start a party by sending an invite link'}
-              </p>
-              <button
-                onClick={onCreateRoom}
-                className="bg-neo-pink border-3 border-neo-black shadow-hard-sm px-6 py-2 rounded-lg text-neo-black font-black text-[10px] uppercase tracking-wider hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
-              >
-                {t('multiplayerFlow.roomList.inviteFriends') || 'Invite Friends'}
-              </button>
-            </div>
-          </motion.section>
-
+          {/* Right Column: Active Battles */}
+          <div className="grid gap-6">
           {/* Active Battles Section */}
-          <motion.section
+          <m.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
@@ -224,7 +193,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             ) : hasRooms ? (
               <div className="flex flex-col gap-2">
                 {activeRooms.map((room, index) => (
-                  <motion.button
+                  <m.button
                     key={room.gameCode}
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -248,7 +217,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     <span className="px-3 py-1.5 text-xs font-bold text-neo-black bg-neo-cyan rounded-neo border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard group-hover:-translate-y-0.5 transition-all">
                       {t('common.join')}
                     </span>
-                  </motion.button>
+                  </m.button>
                 ))}
               </div>
             ) : (
@@ -263,7 +232,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 </p>
               </div>
             )}
-          </motion.section>
+          </m.section>
           </div>
           </div>
         </div>
