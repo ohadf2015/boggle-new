@@ -22,6 +22,7 @@ import {
   HostModeFields,
   JoinModeFields,
 } from '@/components/join';
+import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
 
 export type JoinMode = 'join' | 'host';
 
@@ -367,6 +368,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               {t('multiplayer.subtitle') || 'Compete with friends in real-time'}
             </p>
           </div>
+          <DJMascotWithEntrance size="md" className="hidden sm:block" delay={0.3} />
         </motion.div>
 
         {/* Desktop: Single row layout - Form | Rooms side by side without scroll */}
