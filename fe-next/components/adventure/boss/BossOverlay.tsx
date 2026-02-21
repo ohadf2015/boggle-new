@@ -17,7 +17,7 @@ import React, { memo, useCallback, useEffect, useRef, useState, useMemo } from '
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swords } from 'lucide-react';
-import BossDialogue from '../BossDialogue';
+import { BossDialogue as BossDialogueInline } from '../BossDialogue';
 import BossVictory from '../BossVictory';
 import SegmentedHPBar from './SegmentedHPBar';
 import { AttackTelegraph } from './AttackTelegraph';
@@ -451,20 +451,19 @@ const BossOverlay = memo<BossOverlayProps>(
                       phase={derivedPhase}
                       bossName={boss.displayName}
                     />
+                    {/* Boss Dialogue inline below HP bar */}
+                    {showTaunt && currentTaunt && (
+                      <BossDialogueInline
+                        dialogue={t(currentTaunt)}
+                        bossAvatarUrl={boss.imagePath}
+                        bossName={t(boss.displayName)}
+                        className="mt-2"
+                      />
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Boss Dialogue/Taunts */}
-            {showTaunt && currentTaunt && (
-              <BossDialogue
-                boss={boss}
-                currentTaunt={currentTaunt}
-                isVisible={showTaunt}
-                position="top"
-              />
-            )}
 
             {/* Attack Telegraph (2s warning before ability) */}
             <AttackTelegraph
