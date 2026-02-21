@@ -188,7 +188,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Show placeholder if no grid
   if (!effectiveGrid) {
     return (
-      <div className="min-h-dvh bg-neo-cream dark:bg-neo-navy p-4 flex items-center justify-center">
+      <div className="flex-1 flex flex-col min-h-0 bg-neo-cream dark:bg-neo-navy p-4 items-center justify-center">
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
@@ -203,7 +203,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }
 
   return (
-    <div className="h-dvh overflow-hidden bg-neo-cream dark:bg-neo-navy p-0 md:p-4 flex flex-col transition-colors duration-300">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-cream dark:bg-neo-navy p-0 md:p-4 transition-colors duration-300">
 
       {/* Main Game Content */}
       <InGameScreen
