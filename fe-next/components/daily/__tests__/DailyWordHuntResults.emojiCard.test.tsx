@@ -206,8 +206,8 @@ import type { DailyWordHuntResultsProps } from '../results';
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 const wordsDiscovered = [
-  { word: 'BRAVE', found: true, lifeGained: 0 },
-  { word: 'RAVEN', found: true, lifeGained: 5 },
+  { word: 'BRAVE', lifeGained: 0, timestamp: 1000, tokensGained: 0 },
+  { word: 'RAVEN', lifeGained: 5, timestamp: 2000, tokensGained: 0 },
 ];
 
 const baseResult = {
