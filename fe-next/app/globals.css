@@ -999,6 +999,22 @@ body {
     50% { box-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 36px rgba(0,255,255,0.5), inset 0 0 18px rgba(255,255,255,0.35); }
   }
 
+  /* Accessibility: disable all blast tile idle animations for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .blast-tile-gold,
+    .blast-tile-bomb,
+    .blast-tile-lightning,
+    .blast-tile-prism,
+    .blast-tile-gem,
+    .blast-tile-rainbow,
+    .blast-tile-ice,
+    .blast-tile-wildcard,
+    .blast-tile-magnet,
+    .blast-tile-frozen {
+      animation: none;
+    }
+  }
+
   /* Blast grid frame styling */
   .blast-grid-frame {
     border: 4px solid rgb(var(--neo-black));
