@@ -34,6 +34,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
+import { WinCinematic } from './WinCinematic';
 
 // Import from results module
 import {
@@ -74,6 +75,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 }) => {
   const { t } = useLanguage();
   const { user, profile, isAuthenticated } = useAuth();
+
+  // Show win cinematic for new completions before revealing results
+  const [showCinematic, setShowCinematic] = useState(() => Boolean(isNewCompletion && result.solved));
 
   // Local state
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
@@ -415,6 +419,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   // ============================================================================
   // RENDER
   // ============================================================================
+
+  // Show win cinematic before revealing results
+  if (showCinematic) {
+    return (
+      <WinCinematic
+        puzzleNumber={puzzleNumber}
+        finalScore={result.efficiencyScore ?? 0}
+        onComplete={() => setShowCinematic(false)}
+      />
+    );
+  }
 
   return (
     <motion.div

@@ -14,6 +14,7 @@ import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 // Mock dependencies
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/en/daily'),
+  useSearchParams: jest.fn(() => ({ get: jest.fn(() => null) })),
 }));
 
 jest.mock('@/contexts/LanguageContext', () => ({

@@ -21,6 +21,7 @@ jest.mock('@/utils/guestManager', () => ({
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/en/daily'),
+  useSearchParams: jest.fn(() => ({ get: jest.fn(() => null) })),
   useRouter: jest.fn(() => ({
     push: jest.fn(),
     replace: jest.fn(),
