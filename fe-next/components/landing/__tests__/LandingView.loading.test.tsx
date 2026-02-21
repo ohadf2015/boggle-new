@@ -133,6 +133,12 @@ jest.mock('../ModeCard', () => {
   };
 });
 
+jest.mock('../LandingShareBanner', () => ({
+  LandingShareBanner: ({ onShareClick }: { onShareClick: () => void }) => (
+    <button data-testid="landing-share-banner" onClick={onShareClick}>Share</button>
+  ),
+}));
+
 jest.mock('@/components/auth/AuthModal', () => {
   return function MockAuthModal() {
     return <div data-testid="auth-modal">Auth Modal</div>;

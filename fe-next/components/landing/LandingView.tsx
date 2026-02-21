@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Map, Sparkles, Gift, X, Bomb } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Map, Sparkles, Bomb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +20,7 @@ import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
+import { LandingShareBanner } from './LandingShareBanner';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -28,6 +29,12 @@ import { getPerfVariant } from '@/utils/perfVariant';
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), {
   ssr: false,
 });
+
+// Lazy-load the share modal — not needed until user clicks banner
+const ShareReferralModal = dynamic(
+  () => import('./ShareReferralModal').then((m) => m.ShareReferralModal),
+  { ssr: false }
+);
 
 interface HeroMascotProps {
   /** Whether in mobile portrait mode - uses smaller size */
@@ -125,8 +132,8 @@ const LandingView: React.FC = () => {
   // Auth modal state (opened when user clicks locked feature)
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Referral callout visibility (shown when tutorial callout is hidden)
-  const [showReferralCallout, setShowReferralCallout] = useState(false);
+  // Share modal state
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Note: Profile customization is now handled globally in ProfileCustomizationWrapper
 
@@ -153,20 +160,6 @@ const LandingView: React.FC = () => {
     setShowTutorialCallout(isFirstTime);
   }, [isAuthenticated]);
 
-  // Show referral callout for returning users who haven't dismissed it
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Only show referral callout to returning users (not first-time)
-    const hasDismissedReferral = localStorage.getItem('referral_callout_dismissed') === 'true';
-    const hasCompletedOnboardingCheck = hasCompletedOnboarding();
-
-    // Show if: not first-time user, hasn't dismissed, and isn't currently seeing tutorial callout
-    if (hasCompletedOnboardingCheck && !hasDismissedReferral && !showTutorialCallout) {
-      setShowReferralCallout(true);
-    }
-  }, [showTutorialCallout]);
-
   /**
    * Handle Single Player button click
    * Unlocks audio (required for autoplay policy) and navigates to bot game
@@ -175,13 +168,6 @@ const LandingView: React.FC = () => {
     e.preventDefault(); // Prevent default Link behavior
     unlockAudio(); // Critical for audio autoplay policy
     router.push(`/${language}/singleplayer?autoStart=bots`);
-  };
-
-  // Dismiss referral callout and persist to localStorage
-  const handleDismissReferral = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    localStorage.setItem('referral_callout_dismissed', 'true');
-    setShowReferralCallout(false);
   };
 
   // Open tutorial modal (from FAB button)
@@ -232,6 +218,9 @@ const LandingView: React.FC = () => {
 
       {/* Auth Modal - for locked features */}
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+
+      {/* Share Referral Modal */}
+      <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
 
       {/* Note: ProfileCustomizationModal is now rendered globally by ProfileCustomizationWrapper */}
 
@@ -336,9 +325,11 @@ const LandingView: React.FC = () => {
           <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-fr content-center">
             {/* Multiplayer Card - Compact with glow */}
             <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 26, delay: 0.05 }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
               className="group"
             >
               <Link
@@ -377,9 +368,11 @@ const LandingView: React.FC = () => {
 
             {/* Single Player Card - Compact with glow */}
             <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 26, delay: 0.15 }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
               className="group"
             >
               <Link
@@ -467,6 +460,10 @@ const LandingView: React.FC = () => {
               </motion.div>
             )}
           </div>
+            {/* Share banner — below game mode cards on mobile/landscape */}
+            <div className="w-full mt-2">
+              <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+            </div>
           </div>
         ) : (
           /* Desktop: Centered grid layout with visual hierarchy */
@@ -502,36 +499,55 @@ const LandingView: React.FC = () => {
 
               {/* Primary cards - Multiplayer and Single Player */}
               {/* Cards stretch to fill their grid cells, container max-w-4xl constrains overall width */}
-              <ModeCard
-                title={t('landing.multiplayer') || 'Multiplayer'}
-                description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
-                href={`/${language}/multiplayer`}
-                icon={<Users className="w-6 h-6" />}
-                variant="pink"
-                className="w-full"
-                liveBadge={{
-                  openRooms: liveRoomStats.openRooms,
-                  totalPlayers: liveRoomStats.totalPlayers,
-                  roomsLabel: t('landing.openRooms') || 'open rooms',
-                  playersLabel: t('landing.playersLive') || 'playing now',
-                }}
-                playerCount={{
-                  count: liveRoomStats.activePlayers,
-                  label: t('landing.playingNow') || 'playing',
-                }}
-              />
-              <ModeCard
-                title={t('landing.singlePlayer') || 'Single Player'}
-                description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
-                href={`/${language}/singleplayer`}
-                icon={<User className="w-6 h-6" />}
-                variant="cyan"
-                className="w-full"
-                personalBest={playerAllTimeBest ? {
-                  score: playerAllTimeBest.score,
-                  label: t('landing.personalBest') || 'personal best',
-                } : undefined}
-              />
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
+                className="w-full h-full"
+              >
+                <ModeCard
+                  title={t('landing.multiplayer') || 'Multiplayer'}
+                  description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
+                  href={`/${language}/multiplayer`}
+                  icon={<Users className="w-6 h-6" />}
+                  variant="pink"
+                  className="w-full"
+                  liveBadge={{
+                    openRooms: liveRoomStats.openRooms,
+                    totalPlayers: liveRoomStats.totalPlayers,
+                    roomsLabel: t('landing.openRooms') || 'open rooms',
+                    playersLabel: t('landing.playersLive') || 'playing now',
+                  }}
+                  playerCount={{
+                    count: liveRoomStats.activePlayers,
+                    label: t('landing.playingNow') || 'playing',
+                  }}
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
+                className="w-full h-full"
+              >
+                <ModeCard
+                  title={t('landing.singlePlayer') || 'Single Player'}
+                  description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
+                  href={`/${language}/singleplayer`}
+                  icon={<User className="w-6 h-6" />}
+                  variant="cyan"
+                  className="w-full"
+                  personalBest={playerAllTimeBest ? {
+                    score: playerAllTimeBest.score,
+                    label: t('landing.personalBest') || 'personal best',
+                  } : undefined}
+                />
+              </motion.div>
+
+              {/* Share banner — full-width below mode cards */}
+              <div className="col-span-1 sm:col-span-2">
+                <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+              </div>
 
               {/* Secondary card - Adventure Mode (only visible to admins) */}
               {isAdmin && (
@@ -608,50 +624,6 @@ const LandingView: React.FC = () => {
                   {t('tutorialPrompt.title') || 'First time here?'}
                 </span>
               </motion.div>
-              {/* Arrow pointing down to button */}
-              <motion.div
-                animate={{ y: [0, 3, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-                className="absolute -bottom-2 right-4 rtl:right-auto rtl:left-4"
-              >
-                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Referral callout for returning users */}
-        <AnimatePresence>
-          {showReferralCallout && !showTutorialCallout && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 5, scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="relative"
-            >
-              <Link
-                href={`/${language}/profile?tab=collection`}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2",
-                  "bg-gradient-to-r from-neo-pink/90 to-purple-600/90",
-                  "border-2 border-neo-black rounded-neo shadow-hard",
-                  "hover:from-neo-pink hover:to-purple-500",
-                  "transition-colors"
-                )}
-              >
-                <Gift className="w-4 h-4 text-neo-lime" />
-                <span className="text-sm font-bold text-white whitespace-nowrap">
-                  {t('referral.teaser.title') || 'Invite Friends, Earn XP'}
-                </span>
-                <button
-                  onClick={handleDismissReferral}
-                  className="p-0.5 rounded-full hover:bg-white/20 transition-colors"
-                  aria-label={t('common.dismiss') || 'Dismiss'}
-                >
-                  <X className="w-3.5 h-3.5 text-white/70" />
-                </button>
-              </Link>
               {/* Arrow pointing down to button */}
               <motion.div
                 animate={{ y: [0, 3, 0] }}
