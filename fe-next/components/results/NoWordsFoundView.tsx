@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Gamepad2, Sparkles, Target, RefreshCw, Brain } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
+import { Mascot } from '@/components/ui/Mascot';
 
 interface NoWordsFoundViewProps {
   isCurrentPlayer: boolean;
@@ -95,6 +96,10 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         animate={{ opacity: 1, y: 0 }}
         className="mt-3 p-4 rounded-neo border-2 border-neo-black bg-slate-100 dark:bg-slate-700"
       >
+        {/* Crying mascot — Lexi commiserates with the player */}
+        <div className="flex justify-center mb-3">
+          <Mascot variant="crying" size="lg" animated />
+        </div>
         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
           <Target className="w-4 h-4" />
           <span className="text-sm font-bold">
@@ -141,6 +146,11 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         </motion.div>
 
         <div className="relative z-10">
+          {/* Crying mascot — Lexi commiserates with the player */}
+          <div className="flex justify-center mb-3">
+            <Mascot variant="crying" size="lg" animated />
+          </div>
+
           {/* Header with emoji */}
           <div className="flex items-center gap-3 mb-3">
             <motion.div
