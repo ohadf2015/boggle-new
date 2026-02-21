@@ -4655,6 +4655,9 @@ const es = {
       "purchase": "Comprar",
       "needMore": "Necesitas {amount} más de oro"
     },
+    "shop": {
+      "title": "Tienda de mejoras"
+    },
     "bosses": {
       "fightBoss": "Luchar contra el jefe",
       "bossIntro": "¡Batalla de jefe!",

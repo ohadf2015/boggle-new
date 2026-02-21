@@ -4614,6 +4614,9 @@ const ja = {
       "purchase": "購入",
       "needMore": "あと{amount}ゴールド必要"
     },
+    "shop": {
+      "title": "アップグレードショップ"
+    },
     "bosses": {
       "fightBoss": "ボスと戦う",
       "bossIntro": "ボスバトル！",
