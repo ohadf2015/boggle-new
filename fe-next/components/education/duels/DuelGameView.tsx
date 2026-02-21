@@ -23,6 +23,7 @@ import { getDuelById } from '@/lib/supabase/education/duels';
 import { useDuelSocket, type DuelCompletedData, type ScoreSubmittedData } from '@/hooks/useDuelSocket';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -157,12 +158,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   // ============================================
 
   if (phase === 'loading') {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader size="lg" />
-        <p className="ml-4 text-neo-white">{t('duels.loading')}</p>
-      </div>
-    );
+    return <PageLoader text="Loading your duel..." size="lg" nested />;
   }
 
   if (error) {

@@ -11,6 +11,7 @@ import {
   claimQuestReward,
 } from '@/lib/supabase/education';
 import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education/types';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 interface ChallengePanelProps {
   playerId: string;
@@ -50,7 +51,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
     loadChallenges();
   }
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <PageLoader text="Loading your challenges..." size="lg" nested />;
 
   const hasContent = dailyChallenges.length > 0 || weeklyQuests.length > 0;
 

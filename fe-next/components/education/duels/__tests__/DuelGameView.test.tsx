@@ -162,7 +162,8 @@ describe('DuelGameView', () => {
 
       render(<DuelGameView duelId="duel-123" studentId="student-1" />);
 
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
+      // PageLoader renders with data-testid="page-loader" and contextual text
+      expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
 
     it('should fetch duel data on mount', async () => {

@@ -8,6 +8,7 @@ import { DuelLobby, DuelHistory, DuelNotification } from '@/components/education
 import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
 import { getStudentClassroom, getLessons, getClassroomStudents, type Classroom, type VocabularyLesson, type ClassroomStudent } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 type Tab = 'lobby' | 'history' | 'classmates';
 
@@ -44,11 +45,7 @@ export default function DuelsPageClient() {
   if (!user) return null;
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan" />
-      </div>
-    );
+    return <PageLoader text="Finding your classmates..." size="lg" nested />;
   }
 
   if (!classroom) {

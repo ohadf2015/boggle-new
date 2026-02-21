@@ -27,6 +27,7 @@ import { getLessons, getClassrooms, type VocabularyLesson, type Classroom } from
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 export interface ClassroomGameLobbyProps {
   /** Initial lesson ID to pre-select (optional) */
@@ -245,11 +246,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12" role="progressbar">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan"></div>
-      </div>
-    );
+    return <PageLoader text="Setting up your classroom..." size="lg" nested />;
   }
 
   // No classrooms — guide teacher to create one
