@@ -30,6 +30,8 @@ import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { Mascot } from '@/components/ui/Mascot';
+import { PANIC_TIMER_THRESHOLD, ONFIRE_COMBO_THRESHOLD } from '@/utils/mascotConfig';
 import type { LetterGrid, Language } from '@/types';
 
 interface DailyChallengeGameProps {
@@ -456,6 +458,23 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         </motion.div>
       </div>
 
+      {/* Conditional mascots: panic when time runs low, onfire when on a hot streak */}
+      <div className="relative h-0">
+        {/* Panic mascot: urgency indicator when clock runs low */}
+        {timer.remainingTime <= PANIC_TIMER_THRESHOLD && (
+          <div className="absolute top-2 end-2 z-10 pointer-events-none">
+            <Mascot variant="panic" size="sm" animated />
+          </div>
+        )}
+
+        {/* On-fire mascot: celebrates active combo streaks */}
+        {combo.comboLevel >= ONFIRE_COMBO_THRESHOLD && timer.remainingTime > PANIC_TIMER_THRESHOLD && (
+          <div className="absolute top-2 start-2 z-10 pointer-events-none">
+            <Mascot variant="onfire" size="sm" animated />
+          </div>
+        )}
+      </div>
+
       {/* Achievement Progress Tracker - shows near-completion achievements, auto-dismisses 2s after game ends */}
       <AchievementProgressTracker
         validWordCount={wordSubmission.validWordCount}
@@ -499,6 +518,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           onWordChange={handleWordChange}
           hideWordPreview
           hideComboIndicator={true}
+          animateOnMount={true}
           comboLevel={combo.comboLevel}
           highlightedPath={
             // Keyboard typing takes priority over tutorial path
