@@ -16,6 +16,7 @@
 'use client';
 
 import React, { memo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ScorePopup } from '../juice/ScorePopup';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import { AdaptiveParticles } from '../juice/AdaptiveParticles';
@@ -98,6 +99,9 @@ export interface AdventureEffectsLayerProps {
   isBossLevel: boolean;
   showBossFireworks: boolean;
   defeatedBossTier: BossTier | null;
+
+  /** Edge vignette flash (boss counter attack warning) */
+  showEdgeVignetteFlash?: boolean;
 }
 
 // ==============================================
@@ -115,7 +119,7 @@ export interface AdventureEffectsLayerProps {
  * - Character reactions
  * - Celebration overlays
  */
-const AdventureEffectsLayer = memo<AdventureEffectsLayerProps>(({
+const AdventureEffectsLayerFull = memo<AdventureEffectsLayerProps>(({
   currentPopup,
   onPopupComplete,
   scoreDisplayRef,
@@ -207,6 +211,45 @@ const AdventureEffectsLayer = memo<AdventureEffectsLayerProps>(({
   );
 });
 
-AdventureEffectsLayer.displayName = 'AdventureEffectsLayer';
+AdventureEffectsLayerFull.displayName = 'AdventureEffectsLayerFull';
 
-export default AdventureEffectsLayer;
+export default AdventureEffectsLayerFull;
+
+// ==============================================
+// NAMED EXPORT — simplified for edge vignette + composable use
+// ==============================================
+
+interface AdventureEffectsLayerNamedProps {
+  /** Show a red radial-gradient vignette around screen edges (boss counter warning) */
+  showEdgeVignetteFlash?: boolean;
+}
+
+/**
+ * Named AdventureEffectsLayer — lightweight component that handles
+ * the edge vignette flash for boss counter-attack warnings.
+ * Composable with the full default export.
+ */
+export const AdventureEffectsLayer = memo(function AdventureEffectsLayer({
+  showEdgeVignetteFlash = false,
+}: AdventureEffectsLayerNamedProps) {
+  return (
+    <AnimatePresence>
+      {showEdgeVignetteFlash && (
+        <motion.div
+          key="edge-vignette"
+          data-testid="edge-vignette"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1 }}
+          className="fixed inset-0 pointer-events-none z-30"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(220,38,38,0.6) 100%)',
+          }}
+        />
+      )}
+    </AnimatePresence>
+  );
+});
+
+AdventureEffectsLayer.displayName = 'AdventureEffectsLayer';
