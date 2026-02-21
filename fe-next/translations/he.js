@@ -87,6 +87,9 @@ const he = {
     "cancel": "ביטול",
     "dismiss": "סגור",
     "info": "מידע",
+    "reward": "פרס",
+    "shareViaWhatsApp": "שתף דרך WhatsApp",
+    "shareViaTelegram": "שתף דרך Telegram",
     "close": "סגור",
     "home": "בית",
     "playAgain": "שחק שוב",
@@ -2648,7 +2651,10 @@ const he = {
     "playersLive": "משחקים עכשיו",
     "playingNow": "משחקים",
     "tutorial": "מדריך",
-    "personalBest": "שיא אישי"
+    "personalBest": "שיא אישי",
+    "shareModalTitle": "הזמן חברים וצבור XP",
+    "shareGuestNudge": "התחבר כדי לקבל קישור אישי ולהרוויח XP",
+    "shareXpReward": "תרוויח +100 XP כשהם מצטרפים!"
   },
   "modeDiscovery": {
     "title": "מוכנים לעוד? 🚀",

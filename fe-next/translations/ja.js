@@ -87,6 +87,9 @@ const ja = {
     "cancel": "キャンセル",
     "dismiss": "閉じる",
     "info": "情報",
+    "reward": "報酬",
+    "shareViaWhatsApp": "WhatsAppでシェア",
+    "shareViaTelegram": "Telegramでシェア",
     "close": "閉じる",
     "home": "ホーム",
     "playAgain": "もう一度",
@@ -2636,7 +2639,10 @@ const ja = {
     "playersLive": "プレイ中",
     "playingNow": "プレイ中",
     "tutorial": "チュートリアル",
-    "personalBest": "自己ベスト"
+    "personalBest": "自己ベスト",
+    "shareModalTitle": "友達を招待してXPを獲得",
+    "shareGuestNudge": "サインインして個人リンクを取得しXPを獲得しよう",
+    "shareXpReward": "参加したら+100 XP獲得！"
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",

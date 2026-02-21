@@ -89,6 +89,9 @@ const en = {
     "or": "or",
     "dismiss": "Dismiss",
     "info": "Info",
+    "reward": "Reward",
+    "shareViaWhatsApp": "Share via WhatsApp",
+    "shareViaTelegram": "Share via Telegram",
     "validating": "Checking...",
     "valid": "Valid",
     "invalid": "Invalid",
@@ -2639,7 +2642,10 @@ const en = {
     "playersLive": "live",
     "playingNow": "playing",
     "tutorial": "Tutorial",
-    "personalBest": "personal best"
+    "personalBest": "personal best",
+    "shareModalTitle": "Invite Friends & Earn XP",
+    "shareGuestNudge": "Sign in to get your personal link & earn XP",
+    "shareXpReward": "You earn +100 XP when they join!"
   },
   "modeDiscovery": {
     "title": "Want More?",

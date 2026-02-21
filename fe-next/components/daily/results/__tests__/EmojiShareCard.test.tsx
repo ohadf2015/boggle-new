@@ -2,6 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { EmojiShareCard } from '../EmojiShareCard';
 
+// Returns a value with '{number}' for daily.puzzleNumber so replace() works in tests.
+const t = (key: string) => {
+  if (key === 'daily.puzzleNumber') return 'Word Hunt #{number}';
+  return key;
+};
+
 const mockWords = [
   { word: 'CATCH', found: true },
   { word: 'LIGHT', found: true },
@@ -18,6 +24,7 @@ describe('EmojiShareCard', () => {
         solved={true}
         words={mockWords}
         language="en"
+        t={t}
       />
     );
     expect(screen.getByText(/421/)).toBeInTheDocument();
@@ -32,6 +39,7 @@ describe('EmojiShareCard', () => {
         solved={true}
         words={mockWords}
         language="en"
+        t={t}
       />
     );
     // CATCH = 5 letters = 5 green squares
@@ -47,6 +55,7 @@ describe('EmojiShareCard', () => {
         solved={true}
         words={mockWords}
         language="en"
+        t={t}
       />
     );
     // STONE = 5 letters = 5 black squares
@@ -62,8 +71,24 @@ describe('EmojiShareCard', () => {
         solved={true}
         words={mockWords}
         language="en"
+        t={t}
       />
     );
     expect(screen.getByText(/lexiclash\.live/)).toBeInTheDocument();
+  });
+
+  it('renders ❌ when not solved', () => {
+    render(
+      <EmojiShareCard
+        puzzleNumber={421}
+        score={0}
+        solved={false}
+        words={[{ word: 'CATCH', found: false }]}
+        language="en"
+        t={t}
+      />
+    );
+    const card = screen.getByTestId('emoji-share-card');
+    expect(card).toHaveTextContent('❌');
   });
 });

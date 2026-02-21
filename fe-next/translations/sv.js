@@ -87,6 +87,9 @@ const sv = {
     "cancel": "Avbryt",
     "dismiss": "Stäng",
     "info": "Info",
+    "reward": "Belöning",
+    "shareViaWhatsApp": "Dela via WhatsApp",
+    "shareViaTelegram": "Dela via Telegram",
     "close": "Stäng",
     "home": "Hem",
     "playAgain": "Spela igen",
@@ -2635,7 +2638,10 @@ const sv = {
     "playersLive": "spelar nu",
     "playingNow": "spelar",
     "tutorial": "Handledning",
-    "personalBest": "personligt bästa"
+    "personalBest": "personligt bästa",
+    "shareModalTitle": "Bjud in vänner & tjäna XP",
+    "shareGuestNudge": "Logga in för att få din personliga länk & tjäna XP",
+    "shareXpReward": "Du tjänar +100 XP när de går med!"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",

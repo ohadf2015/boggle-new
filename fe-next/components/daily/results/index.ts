@@ -21,6 +21,7 @@
  * - StatsSection.tsx   - Statistics with histogram
  * - TryAnotherLanguage.tsx - Language switching component
  * - SharePanel.tsx     - Share modal component
+ * - EmojiShareCard.tsx   - Wordle-style emoji share card for results
  */
 
 // Types
