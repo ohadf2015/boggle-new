@@ -10,8 +10,9 @@ import { BlastGame } from './BlastGame';
 import { BlastResults } from './BlastResults';
 import { BlastWaveTransition } from './BlastWaveTransition';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
-import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
+import { resolveBlastConfig, type BlastPhase, type BlastDifficulty, type BlastResultsData, type WaveResult } from './types';
 import type { Language } from '@/shared/types/game';
+import { BlastReadyScreen } from './BlastReadyScreen';
 
 /**
  * BlastView - Page orchestrator for Blast Mode.
@@ -23,7 +24,8 @@ const BlastView: React.FC = () => {
   const { unlockAudio } = useMusic();
   const setIsInGame = useHideNavigation();
 
-  const [phase, setPhase] = useState<BlastPhase>('playing');
+  const [phase, setPhase] = useState<BlastPhase>('ready');
+  const [difficulty, setDifficulty] = useState<BlastDifficulty>('medium');
   const [results, setResults] = useState<BlastResultsData | null>(null);
   // Monotonically increasing key to force remount on play again / wave advance
   const gameKeyRef = useRef(0);
@@ -35,7 +37,7 @@ const BlastView: React.FC = () => {
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
 
-  const baseConfig = resolveBlastConfig((language as Language) || 'en', 'medium');
+  const baseConfig = resolveBlastConfig((language as Language) || 'en', difficulty);
 
   // Apply wave-specific overrides to config
   const waveConfig = getWaveConfig(currentWave);
@@ -102,6 +104,11 @@ const BlastView: React.FC = () => {
     setPhase('playing');
   }, []);
 
+  const handleStart = useCallback((selectedDifficulty: BlastDifficulty) => {
+    setDifficulty(selectedDifficulty);
+    setPhase('playing');
+  }, []);
+
   const handlePlayAgain = useCallback(() => {
     setResults(null);
     setCurrentWave(1);
@@ -109,7 +116,7 @@ const BlastView: React.FC = () => {
     setAllWordsFound([]);
     setWaveHistory([]);
     gameKeyRef.current += 1;
-    setPhase('playing');
+    setPhase('ready');
   }, []);
 
   const handleBackToHome = useCallback(() => {
@@ -123,6 +130,10 @@ const BlastView: React.FC = () => {
   return (
     <div className="flex flex-col min-h-full bg-neo-navy relative">
       <PlayfulBackground intensity="low" colorScheme="game" />
+
+      {phase === 'ready' && (
+        <BlastReadyScreen onStart={handleStart} />
+      )}
 
       {phase === 'playing' && (
         <BlastGame
