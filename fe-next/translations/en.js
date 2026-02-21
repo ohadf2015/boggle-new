@@ -813,7 +813,8 @@ const en = {
     "presetDrawerBoardHard": "9×9 (Hard)",
     "presetDrawerLetters": "letters",
     "difficultyTooltipGrid": "Grid size affects difficulty",
-    "difficultyTooltipTimer": "Longer time = more words found"
+    "difficultyTooltipTimer": "Longer time = more words found",
+    "roomChat": "Room Chat"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Live Game in Progress",

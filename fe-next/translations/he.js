@@ -820,7 +820,8 @@ const he = {
     "presetDrawerBoardHard": "9×9 (קשה)",
     "presetDrawerLetters": "אותיות",
     "difficultyTooltipGrid": "גודל הלוח משפיע על הקושי",
-    "difficultyTooltipTimer": "יותר זמן = יותר מילים"
+    "difficultyTooltipTimer": "יותר זמן = יותר מילים",
+    "roomChat": "צ'אט חדר"
   },
   "tvBroadcast": {
     "liveGameInProgress": "משחק חי מתנהל",

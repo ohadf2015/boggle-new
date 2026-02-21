@@ -810,7 +810,8 @@ const ja = {
     "presetDrawerBoardHard": "9×9（むずかしい）",
     "presetDrawerLetters": "文字",
     "difficultyTooltipGrid": "グリッドサイズで難易度が変わる",
-    "difficultyTooltipTimer": "長い時間＝たくさん見つかる"
+    "difficultyTooltipTimer": "長い時間＝たくさん見つかる",
+    "roomChat": "ルームチャット"
   },
   "tvBroadcast": {
     "liveGameInProgress": "ライブゲーム進行中",

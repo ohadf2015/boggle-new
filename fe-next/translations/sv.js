@@ -809,7 +809,8 @@ const sv = {
     "presetDrawerBoardHard": "9×9 (Svår)",
     "presetDrawerLetters": "bokstäver",
     "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
-    "difficultyTooltipTimer": "Längre tid = fler ord hittade"
+    "difficultyTooltipTimer": "Längre tid = fler ord hittade",
+    "roomChat": "Rumschatt"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Livespel pågår",
