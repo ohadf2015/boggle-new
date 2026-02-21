@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FlashcardReview from '../FlashcardReview';
@@ -32,7 +31,7 @@ jest.mock('@/utils/SocketContext', () => ({
 }));
 
 const mockWords = [
-  { id: '1', word: 'שלום', definition: 'Hello', partOfSpeech: 'noun', examples: [] },
+  { id: '1', word: 'שלום', definition: 'Hello', partOfSpeech: 'noun', examples: [], canIntegrate: true },
 ];
 
 describe('FlashcardReview RTL', () => {
