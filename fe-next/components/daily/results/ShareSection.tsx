@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 export interface ShareSectionProps {
   solved: boolean;
   onShare: () => void;
+  onChallengeShare?: () => void;
   onRetry: () => void;
   canAffordRetry: boolean;
   retryCost: number;
@@ -32,6 +33,7 @@ export interface ShareSectionProps {
 export const ShareSection: React.FC<ShareSectionProps> = ({
   solved,
   onShare,
+  onChallengeShare,
   onRetry,
   canAffordRetry,
   retryCost,
@@ -80,13 +82,13 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
         </Button>
       </>
     ) : (
-      /* Winners: Only show Share button, no retry option */
+      /* Winners: Challenge Friends CTA (falls back to native share) */
       <Button
-        onClick={onShare}
+        onClick={onChallengeShare ?? onShare}
         className="w-full max-w-btn py-3.5 text-lg font-black uppercase bg-gradient-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
       >
         <Share2 className="mr-2 w-5 h-5" />
-        {t('wordHunt.results.share') || 'Share'}
+        {t('wordHunt.results.challengeFriends') || 'Challenge Friends →'}
       </Button>
     )}
   </motion.div>

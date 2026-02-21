@@ -54,6 +54,7 @@ import {
   RankBadge,
   MoreOptionsAccordion,
   SharePanel,
+  EmojiShareCard,
 } from './results';
 
 // ============================================================================
@@ -104,6 +105,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const survivalBonusTime = useMemo(() => {
     if (!result.wordsDiscovered || result.wordsDiscovered.length === 0) return 0;
     return result.wordsDiscovered.reduce((total, word) => total + (word.lifeGained || 0), 0);
+  }, [result.wordsDiscovered]);
+
+  const emojiWords = useMemo(() => {
+    if (!result.wordsDiscovered) return [];
+    return result.wordsDiscovered.map((w: { word: string }) => ({
+      word: w.word || '',
+      found: true,
+    }));
   }, [result.wordsDiscovered]);
 
   const efficiency = result.efficiencyScore ?? 0;
@@ -289,10 +298,23 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       {/* Rank badge - shows for both WIN and FAIL */}
       {stats && <RankBadge stats={stats} t={t} />}
 
+      {/* Emoji share card — visible for winners with discovered words */}
+      {result.solved && emojiWords.length > 0 && (
+        <EmojiShareCard
+          puzzleNumber={puzzleNumber}
+          score={result.efficiencyScore || 0}
+          solved={result.solved}
+          words={emojiWords}
+          language={language}
+          t={t}
+        />
+      )}
+
       {/* Share/Retry Section */}
       <ShareSection
         solved={result.solved}
         onShare={shareHandlers.handleNativeShare}
+        onChallengeShare={shareHandlers.handleChallengeShare}
         onRetry={coinActions.handleRetryChallenge}
         canAffordRetry={coinActions.canAffordRetry}
         retryCost={coinActions.retryCost}
