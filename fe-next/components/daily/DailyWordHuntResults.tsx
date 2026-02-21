@@ -32,6 +32,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { MascotWithEntrance } from '@/components/ui/Mascot';
+import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
 
 // Import from results module
 import {
@@ -103,6 +105,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     if (!result.wordsDiscovered || result.wordsDiscovered.length === 0) return 0;
     return result.wordsDiscovered.reduce((total, word) => total + (word.lifeGained || 0), 0);
   }, [result.wordsDiscovered]);
+
+  const efficiency = result.efficiencyScore ?? 0;
+  const showFlexing = efficiency >= FLEXING_SCORE_THRESHOLD;
+  const showEncouraging = efficiency < ENCOURAGING_SCORE_THRESHOLD;
 
   const displayName = isAuthenticated && profile
     ? profile.display_name || profile.username || 'Player'
@@ -238,6 +244,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   const renderResultsContent = () => (
     <div className="space-y-4">
+      {/* Performance mascot — reacts to how many words the player found */}
+      {showFlexing && (
+        <div className="flex justify-center mb-4">
+          <MascotWithEntrance variant="flexing" size="lg" delay={0.2} />
+        </div>
+      )}
+      {showEncouraging && (
+        <div className="flex justify-center mb-4">
+          <MascotWithEntrance variant="encouraging" size="md" delay={0.2} />
+        </div>
+      )}
+
       {/* Hero Result Display */}
       <ResultDisplay
         solved={result.solved}
