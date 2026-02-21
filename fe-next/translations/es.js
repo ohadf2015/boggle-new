@@ -3334,7 +3334,8 @@ const es = {
       "pts": "pts",
       "challenge": "Desafío",
       "scored": "logró",
-      "canYouBeat": "¿Puedes superarlo?"
+      "canYouBeat": "¿Puedes superarlo?",
+      "shareText": "¿Puedes superar mi puntuación de {score}? ¡Desafío de {name}!"
     }
   },
   "keepPlaying": {

@@ -174,6 +174,43 @@ export function useShareHandlers({
     }
   }, [shareTextWithUrl]);
 
+  // Build challenge URL with gauntlet params so recipients see the challenger's score
+  const challengeUrl = useMemo(() => {
+    const origin = typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://www.lexiclash.live';
+    const score = result.efficiencyScore ?? 0;
+    const params = new URLSearchParams({
+      whChallenger: displayName,
+      whChallengeScore: String(score),
+      whChallengeEmoji: avatarEmoji,
+      whChallengeDate: puzzleDate,
+    });
+    return `${origin}/${language}/daily?${params.toString()}`;
+  }, [displayName, avatarEmoji, puzzleDate, language, result.efficiencyScore]);
+
+  // Handle challenge (gauntlet) share via native share or panel fallback
+  const handleChallengeShare = useCallback(async () => {
+    const score = result.efficiencyScore ?? 0;
+    const text = t('wordHunt.gauntlet.shareText')
+      .replace('{score}', String(score))
+      .replace('{name}', displayName);
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: t('wordHunt.title'),
+          text,
+          url: challengeUrl,
+        });
+      } catch {
+        // User cancelled or share failed — no-op
+      }
+    } else {
+      setShowSharePanel(true);
+    }
+  }, [challengeUrl, displayName, result.efficiencyScore, t]);
+
   // Handle download personalized share image
   const handleDownloadShareImage = useCallback(async () => {
     if (isGeneratingImage) return;
@@ -223,5 +260,7 @@ export function useShareHandlers({
     handleSMS,
     handleNativeShare,
     handleDownloadShareImage,
+    challengeUrl,
+    handleChallengeShare,
   };
 }

@@ -3364,7 +3364,8 @@ const he = {
       "pts": "נק'",
       "challenge": "אתגר",
       "scored": "קיבל",
-      "canYouBeat": "תוכל לנצח?"
+      "canYouBeat": "תוכל לנצח?",
+      "shareText": "האם תוכל לנצח את הניקוד שלי של {score}? אתגר מ-{name}!"
     }
   },
   "keepPlaying": {

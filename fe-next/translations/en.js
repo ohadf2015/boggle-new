@@ -3351,7 +3351,8 @@ const en = {
       "pts": "pts",
       "challenge": "Challenge",
       "scored": "scored",
-      "canYouBeat": "Can you beat it?"
+      "canYouBeat": "Can you beat it?",
+      "shareText": "Can you beat my score of {score}? Challenge from {name}!"
     }
   },
   "keepPlaying": {

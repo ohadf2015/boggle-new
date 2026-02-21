@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Timer, Hourglass, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,6 +10,7 @@ import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 
+import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
 import { StreakCounter } from './landing/StreakCounter';
@@ -53,6 +54,13 @@ export function DailyChallengeLanding({
   const { t } = useLanguage();
   const { user } = useAuth();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const challengerName = searchParams?.get('whChallenger') || null;
+  const challengerScore = searchParams?.get('whChallengeScore')
+    ? Number(searchParams.get('whChallengeScore'))
+    : null;
+  const challengerEmoji = searchParams?.get('whChallengeEmoji') || null;
 
   const [status, setStatus] = useState<ChallengeStatus>({
     wordHunt: 'new',
@@ -266,6 +274,7 @@ export function DailyChallengeLanding({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 280, damping: 26 }}
       className="flex-1 flex flex-col items-center px-3 py-3 sm:px-4 sm:py-4 max-w-3xl mx-auto w-full relative"
     >
       {/* Ambient effects */}
@@ -274,6 +283,14 @@ export function DailyChallengeLanding({
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} />
+
+      {/* Score Gauntlet Banner: shown when arriving via a challenge share link */}
+      <ScoreGauntletBanner
+        challengerName={challengerName}
+        challengerScore={challengerScore}
+        challengerEmoji={challengerEmoji}
+        t={t}
+      />
 
       {/* Quest 1: Word Hunt */}
       <QuestCard
@@ -344,7 +361,7 @@ export function DailyChallengeLanding({
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 26, delay: 0.4 }}
           whileHover={{ scale: 1.02 }}
           onClick={onShowBuzzHistory}
           className="mt-4 text-sm text-slate-400 hover:text-neo-pink transition-colors underline underline-offset-4 decoration-slate-600 hover:decoration-neo-pink"
@@ -358,7 +375,7 @@ export function DailyChallengeLanding({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut', delay: 0.4 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
           className="mt-5 w-full"
         >
           <div className="px-5 py-3 bg-neo-navy-light border-3 border-neo-lime rounded-xl shadow-hard">

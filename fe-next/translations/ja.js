@@ -3408,7 +3408,8 @@ const ja = {
       "pts": "点",
       "challenge": "チャレンジ",
       "scored": "が獲得",
-      "canYouBeat": "超えられる？"
+      "canYouBeat": "超えられる？",
+      "shareText": "{name}からの挑戦！{score}点を超えられる？"
     }
   },
   "keepPlaying": {

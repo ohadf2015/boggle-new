@@ -3359,7 +3359,8 @@ const sv = {
       "pts": "poäng",
       "challenge": "Utmaning",
       "scored": "fick",
-      "canYouBeat": "Kan du slå det?"
+      "canYouBeat": "Kan du slå det?",
+      "shareText": "Kan du slå min poäng på {score}? Utmaning från {name}!"
     }
   },
   "keepPlaying": {
