@@ -6,6 +6,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 
 interface StreakMilestoneCelebrationProps {
   isOpen: boolean;
@@ -178,6 +179,11 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             >
               <X className="w-5 h-5" />
             </Button>
+
+            {/* Celebration mascot — Lexi joins the streak party */}
+            <div className="flex justify-center mb-2">
+              <CelebrationMascotWithEntrance variant="celebration" size="xl" delay={0.3} />
+            </div>
 
             {/* Animated emoji */}
             <motion.div
