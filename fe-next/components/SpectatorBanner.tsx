@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Eye, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Mascot } from '@/components/ui/Mascot';
 
 interface SpectatorBannerProps {
   /** Whether the user is currently spectating */
@@ -80,6 +81,9 @@ export function SpectatorBanner({
               </p>
             </div>
           </div>
+
+          {/* Mascot: spectating */}
+          <Mascot variant="spectating" size="sm" className="flex-shrink-0" />
 
           {/* Right: Action button */}
           {onRequestUpgrade && (

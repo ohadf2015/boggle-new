@@ -5136,7 +5136,8 @@ const ja = {
     "stuck": "詰まった？",
     "hintCooldown": "使用済",
     "waveClear": "ウェーブクリア！",
-    "tapToContinue": "タップして続ける"
+    "tapToContinue": "タップして続ける",
+    "celebrateAgain": "また祝おう"
   },
   "student": {
     "activeGame": {

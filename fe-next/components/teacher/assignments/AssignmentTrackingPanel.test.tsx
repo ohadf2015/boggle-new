@@ -26,7 +26,7 @@ const mockAssignments = [
     lesson_id: 'lesson-1',
     teacher_id: 'teacher-1',
     assignment_type: 'practice' as const,
-    due_date: '2026-02-20',
+    due_date: '2027-02-20',
     title: null,
     instructions: null,
     created_at: '2026-02-14',

@@ -5063,7 +5063,8 @@ const he = {
     "stuck": "תקוע?",
     "hintCooldown": "שומש",
     "waveClear": "גל הושלם!",
-    "tapToContinue": "הקש להמשיך"
+    "tapToContinue": "הקש להמשיך",
+    "celebrateAgain": "חגוג שוב"
   },
   "student": {
     "activeGame": {

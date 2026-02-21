@@ -5087,7 +5087,8 @@ const sv = {
     "stuck": "Fastnat?",
     "hintCooldown": "Använt",
     "waveClear": "Vågen klar!",
-    "tapToContinue": "Tryck för att fortsätta"
+    "tapToContinue": "Tryck för att fortsätta",
+    "celebrateAgain": "Fira igen"
   },
   "student": {
     "activeGame": {
