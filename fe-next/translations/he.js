@@ -2654,7 +2654,11 @@ const he = {
     "personalBest": "שיא אישי",
     "shareModalTitle": "הזמן חברים וצבור XP",
     "shareGuestNudge": "התחבר כדי לקבל קישור אישי ולהרוויח XP",
-    "shareXpReward": "תרוויח +100 XP כשהם מצטרפים!"
+    "shareXpReward": "תרוויח +100 XP כשהם מצטרפים!",
+    "shareTitle": "הזמן חברים, צבור XP",
+    "shareSubtitle": "100 XP לכל חבר שמצטרף",
+    "shareSubtitleGuest": "שחק עם חברים!",
+    "shareButton": "שתף"
   },
   "modeDiscovery": {
     "title": "מוכנים לעוד? 🚀",

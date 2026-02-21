@@ -2642,7 +2642,11 @@ const ja = {
     "personalBest": "自己ベスト",
     "shareModalTitle": "友達を招待してXPを獲得",
     "shareGuestNudge": "サインインして個人リンクを取得しXPを獲得しよう",
-    "shareXpReward": "参加したら+100 XP獲得！"
+    "shareXpReward": "参加したら+100 XP獲得！",
+    "shareTitle": "友達を招待してXPを獲得",
+    "shareSubtitle": "参加1人につき100 XP",
+    "shareSubtitleGuest": "友達と遊ぼう！",
+    "shareButton": "シェア"
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",

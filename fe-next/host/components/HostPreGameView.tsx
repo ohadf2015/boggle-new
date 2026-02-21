@@ -259,6 +259,7 @@ function HostPreGameView({
             const avatar = typeof player === 'object' ? player.avatar : null;
             const isHostPlayer = typeof player === 'object' ? player.isHost : false;
             const isBot = typeof player === 'object' ? player.isBot : false;
+            const isMe = name === username;
 
             return (
               <motion.div
@@ -279,7 +280,8 @@ function HostPreGameView({
                   )}
                   <div className={cn(
                     'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
-                    avatarColors[index % avatarColors.length]
+                    avatarColors[index % avatarColors.length],
+                    isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : ''
                   )}>
                     {avatar?.profilePictureUrl || avatar?.avatarImage ? (
                       <Avatar
@@ -371,6 +373,22 @@ function HostPreGameView({
           })}
         </div>
 
+        {/* TV Mode Toggle - always visible */}
+        <div className="mt-3 pt-3 border-t border-neo-black/10 flex items-center gap-2">
+          <Monitor className="w-4 h-4 text-neo-cream/80 flex-shrink-0" />
+          <Checkbox
+            id="broadcastMode"
+            checked={!hostPlaying}
+            onCheckedChange={(checked) => setHostPlaying(checked !== true)}
+          />
+          <label
+            htmlFor="broadcastMode"
+            className="text-xs font-bold uppercase text-neo-black cursor-pointer flex-1"
+          >
+            {t('hostView.broadcastModeTitle') || 'TV Mode'}
+          </label>
+        </div>
+
         {/* Advanced Settings Toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
@@ -393,22 +411,6 @@ function HostPreGameView({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden mt-2"
           >
-            {/* TV Mode Toggle */}
-            <div className="flex items-center gap-2 p-2 bg-neo-navy/40 rounded-neo border border-neo-black/50 mb-2">
-              <Monitor className="w-4 h-4 text-neo-cream/80" />
-              <Checkbox
-                id="broadcastMode"
-                checked={!hostPlaying}
-                onCheckedChange={(checked) => setHostPlaying(checked !== true)}
-              />
-              <label
-                htmlFor="broadcastMode"
-                className="text-xs font-bold uppercase text-neo-cream cursor-pointer flex-1"
-              >
-                {t('hostView.broadcastModeTitle') || 'TV Mode'}
-              </label>
-            </div>
-
             <BotControls
               socket={socket}
               gameCode={gameCode}
@@ -449,9 +451,9 @@ function HostPreGameView({
       {/* 5. Battle Feed / Chat */}
       <section className="pb-4">
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
-          {t('hostView.battleFeed') || 'Battle Feed'}
+          {t('hostView.roomChat') || 'Room Chat'}
         </h3>
-        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-72">
+        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-48 sm:h-64">
           <RoomChat
             username="Host"
             isHost={true}

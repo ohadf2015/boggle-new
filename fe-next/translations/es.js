@@ -87,6 +87,9 @@ const es = {
     "cancel": "Cancelar",
     "dismiss": "Cerrar",
     "info": "Info",
+    "reward": "Recompensa",
+    "shareViaWhatsApp": "Compartir por WhatsApp",
+    "shareViaTelegram": "Compartir por Telegram",
     "close": "Cerrar",
     "home": "Inicio",
     "playAgain": "Jugar de nuevo",
@@ -780,6 +783,7 @@ const es = {
     "inviteWarriors": "Invitar guerreros",
     "invitePlayer": "Invitar jugador",
     "battleFeed": "Feed de batalla",
+    "roomChat": "Chat de sala",
     "hostIs": "Anfitrión es",
     "playersJoined": "Guerreros",
     "gameSettings": "Config. de batalla",
@@ -2618,7 +2622,10 @@ const es = {
     "playersLive": "jugando ahora",
     "playingNow": "jugando",
     "tutorial": "Tutorial",
-    "personalBest": "mejor marca personal"
+    "personalBest": "mejor marca personal",
+    "shareModalTitle": "Invita amigos y gana XP",
+    "shareGuestNudge": "Inicia sesión para obtener tu enlace personal y ganar XP",
+    "shareXpReward": "¡Ganas +100 XP cuando se unan!"
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",

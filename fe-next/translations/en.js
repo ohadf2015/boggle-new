@@ -2645,7 +2645,11 @@ const en = {
     "personalBest": "personal best",
     "shareModalTitle": "Invite Friends & Earn XP",
     "shareGuestNudge": "Sign in to get your personal link & earn XP",
-    "shareXpReward": "You earn +100 XP when they join!"
+    "shareXpReward": "You earn +100 XP when they join!",
+    "shareTitle": "Invite Friends, Earn XP",
+    "shareSubtitle": "100 XP per friend who joins",
+    "shareSubtitleGuest": "Play with friends!",
+    "shareButton": "Share"
   },
   "modeDiscovery": {
     "title": "Want More?",

@@ -2641,7 +2641,11 @@ const sv = {
     "personalBest": "personligt bästa",
     "shareModalTitle": "Bjud in vänner & tjäna XP",
     "shareGuestNudge": "Logga in för att få din personliga länk & tjäna XP",
-    "shareXpReward": "Du tjänar +100 XP när de går med!"
+    "shareXpReward": "Du tjänar +100 XP när de går med!",
+    "shareTitle": "Bjud in vänner, tjäna XP",
+    "shareSubtitle": "100 XP per vän som går med",
+    "shareSubtitleGuest": "Spela med vänner!",
+    "shareButton": "Dela"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",
