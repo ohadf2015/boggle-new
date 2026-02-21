@@ -20,6 +20,7 @@ import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCa
 import { cn } from '@/lib/utils';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
+import { Mascot } from '@/components/ui/Mascot';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -224,6 +225,13 @@ export function BlastGameLayout({
   return (
     <div className={cn('relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy', shakeClass)}>
       <DynamicEnergyBackground />
+
+      {/* Powerup mascot — overlays when hint path is active */}
+      {hintPath && hintPath.length > 0 && (
+        <div className="absolute top-4 end-4 z-20 pointer-events-none">
+          <Mascot variant="powerup" size="sm" animated />
+        </div>
+      )}
 
       {/* Screen flash on word clear */}
       <AnimatePresence>
