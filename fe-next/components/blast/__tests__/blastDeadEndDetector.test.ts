@@ -5,7 +5,7 @@
  * on the grid after tiles are cleared and gravity cascades settle.
  */
 
-import { hasValidWords } from '../utils/blastDeadEndDetector';
+import { hasValidWords, findHintPath } from '../utils/blastDeadEndDetector';
 
 describe('hasValidWords', () => {
   // Mock dictionary: only these words are valid
@@ -148,5 +148,47 @@ describe('hasValidWords', () => {
       const result = hasValidWords(grid, 'en', check, new Set());
       expect(result).toBe(false);
     });
+  });
+});
+
+describe('findHintPath', () => {
+  const grid = [
+    ['c', 'a', 't'],
+    ['o', 'g', 'd'],
+    ['d', 'e', 'f'],
+  ];
+  const checkWord = (w: string) => ['cat', 'dog', 'god', 'cog', 'age'].includes(w);
+  const foundWords = new Set<string>();
+
+  it('returns a valid word path', () => {
+    const result = findHintPath(grid, 'en', checkWord, foundWords, 3, 6);
+    expect(result).not.toBeNull();
+    expect(result!.word.length).toBeGreaterThanOrEqual(3);
+    expect(result!.path.length).toBe(result!.word.length);
+    expect(checkWord(result!.word)).toBe(true);
+  });
+
+  it('returns null when no valid words exist', () => {
+    const emptyGrid = [['', '', ''], ['', '', ''], ['', '', '']];
+    const result = findHintPath(emptyGrid, 'en', checkWord, foundWords, 3, 6);
+    expect(result).toBeNull();
+  });
+
+  it('skips already found words', () => {
+    const allFound = new Set(['cat', 'dog', 'god', 'cog', 'age']);
+    const result = findHintPath(grid, 'en', checkWord, allFound, 3, 6);
+    expect(result).toBeNull();
+  });
+
+  it('returns path with valid grid coordinates', () => {
+    const result = findHintPath(grid, 'en', checkWord, foundWords, 3, 6);
+    if (result) {
+      for (const { row, col } of result.path) {
+        expect(row).toBeGreaterThanOrEqual(0);
+        expect(row).toBeLessThan(grid.length);
+        expect(col).toBeGreaterThanOrEqual(0);
+        expect(col).toBeLessThan(grid[0].length);
+      }
+    }
   });
 });
