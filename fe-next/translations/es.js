@@ -3255,7 +3255,8 @@ const es = {
       "generating": "Creando...",
       "previewImage": "Vista previa de imagen",
       "moreOptions": "Más opciones de compartir",
-      "lessOptions": "Menos opciones"
+      "lessOptions": "Menos opciones",
+      "challengeFriends": "Desafiar amigos →"
     },
     "score": {
       "title": "Tu Puntuación",
