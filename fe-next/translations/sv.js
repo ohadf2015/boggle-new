@@ -2645,7 +2645,10 @@ const sv = {
     "shareTitle": "Bjud in vänner, tjäna XP",
     "shareSubtitle": "100 XP per vän som går med",
     "shareSubtitleGuest": "Spela med vänner!",
-    "shareButton": "Dela"
+    "shareButton": "Dela",
+    "shareTextAuth": "Gå med mig i LexiClash! Använd min referenskod: {code}",
+    "shareTextGuest": "Spela LexiClash - det bästa multiplayer-ordspelet!",
+    "shareNativeTitle": "Gå med i LexiClash"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",

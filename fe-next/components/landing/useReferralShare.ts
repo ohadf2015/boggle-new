@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { trackShare } from '@/utils/growthTracking';
 
 export interface ReferralShareState {
@@ -15,6 +16,7 @@ export interface ReferralShareState {
 
 export function useReferralShare(): ReferralShareState {
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState('');
   const [referralRewardXp, setReferralRewardXp] = useState(100);
@@ -72,12 +74,12 @@ export function useReferralShare(): ReferralShareState {
       if (!shareUrl) return;
 
       const shareText = referralCode
-        ? `Join me on LexiClash! Use my referral code: ${referralCode}`
-        : 'Play LexiClash - the best multiplayer word game!';
+        ? t('landing.shareTextAuth', { code: referralCode })
+        : t('landing.shareTextGuest');
 
       if (platform === 'native' && navigator.share) {
         try {
-          await navigator.share({ title: 'Join LexiClash', text: shareText, url: shareUrl });
+          await navigator.share({ title: t('landing.shareNativeTitle'), text: shareText, url: shareUrl });
           trackShare('native');
           return;
         } catch {
@@ -95,7 +97,7 @@ export function useReferralShare(): ReferralShareState {
         trackShare(platform as 'whatsapp' | 'telegram');
       }
     },
-    [shareUrl, referralCode]
+    [shareUrl, referralCode, t]
   );
 
   return { referralCode, shareUrl, referralRewardXp, isLoading, copied, fetchShareData, handleCopy, handleShare };

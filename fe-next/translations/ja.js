@@ -2646,7 +2646,10 @@ const ja = {
     "shareTitle": "友達を招待してXPを獲得",
     "shareSubtitle": "参加1人につき100 XP",
     "shareSubtitleGuest": "友達と遊ぼう！",
-    "shareButton": "シェア"
+    "shareButton": "シェア",
+    "shareTextAuth": "LexiClashで一緒に遊ぼう！私の招待コードを使ってね: {code}",
+    "shareTextGuest": "LexiClashをプレイしよう - 最高のマルチプレイヤー単語ゲーム！",
+    "shareNativeTitle": "LexiClashに参加"
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",

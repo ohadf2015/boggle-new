@@ -2649,7 +2649,10 @@ const en = {
     "shareTitle": "Invite Friends, Earn XP",
     "shareSubtitle": "100 XP per friend who joins",
     "shareSubtitleGuest": "Play with friends!",
-    "shareButton": "Share"
+    "shareButton": "Share",
+    "shareTextAuth": "Join me on LexiClash! Use my referral code: {code}",
+    "shareTextGuest": "Play LexiClash - the best multiplayer word game!",
+    "shareNativeTitle": "Join LexiClash"
   },
   "modeDiscovery": {
     "title": "Want More?",

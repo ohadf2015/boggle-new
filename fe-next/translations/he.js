@@ -2658,7 +2658,10 @@ const he = {
     "shareTitle": "הזמן חברים, צבור XP",
     "shareSubtitle": "100 XP לכל חבר שמצטרף",
     "shareSubtitleGuest": "שחק עם חברים!",
-    "shareButton": "שתף"
+    "shareButton": "שתף",
+    "shareTextAuth": "הצטרף אלי ב-LexiClash! השתמש בקוד ההפניה שלי: {code}",
+    "shareTextGuest": "שחק LexiClash - משחק המילים הרב-משתתפים הכי טוב!",
+    "shareNativeTitle": "הצטרף ל-LexiClash"
   },
   "modeDiscovery": {
     "title": "מוכנים לעוד? 🚀",

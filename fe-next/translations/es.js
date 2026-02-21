@@ -2629,7 +2629,10 @@ const es = {
     "shareTitle": "Invita amigos, gana XP",
     "shareSubtitle": "100 XP por cada amigo que se une",
     "shareSubtitleGuest": "¡Juega con amigos!",
-    "shareButton": "Compartir"
+    "shareButton": "Compartir",
+    "shareTextAuth": "¡Únete a LexiClash! Usa mi código de referido: {code}",
+    "shareTextGuest": "¡Juega LexiClash - el mejor juego de palabras multijugador!",
+    "shareNativeTitle": "Únete a LexiClash"
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",

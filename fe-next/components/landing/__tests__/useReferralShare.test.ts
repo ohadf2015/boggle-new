@@ -7,6 +7,11 @@ jest.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: mockIsAuthenticated }),
 }));
 
+// Mock language context — t() returns the key for simplicity
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (key: string) => key }),
+}));
+
 // Mock growthTracking
 jest.mock('@/utils/growthTracking', () => ({
   trackShare: jest.fn(),
@@ -218,7 +223,7 @@ describe('useReferralShare', () => {
 
       // THEN
       expect(mockShare).toHaveBeenCalledWith(expect.objectContaining({
-        title: 'Join LexiClash',
+        title: 'landing.shareNativeTitle',
         url: 'https://lexiclash.test',
       }));
     });
