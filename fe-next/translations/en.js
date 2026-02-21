@@ -3343,6 +3343,9 @@ const en = {
       "cta3": "Beat that.",
       "cta4": "I dare you to try.",
       "cta5": "Good luck topping this!"
+    },
+    "gauntlet": {
+      "pts": "pts"
     }
   },
   "keepPlaying": {

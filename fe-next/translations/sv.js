@@ -3351,6 +3351,9 @@ const sv = {
       "cta3": "Slå det.",
       "cta4": "Jag vågar dig.",
       "cta5": "Lycka till att toppa det här!"
+    },
+    "gauntlet": {
+      "pts": "poäng"
     }
   },
   "keepPlaying": {
