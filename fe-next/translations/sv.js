@@ -5568,7 +5568,12 @@ const sv = {
       "teacherCta": "Lärarinloggning krävs",
       "studentCta": "Gå till elevhubben",
       "premium": "Premium",
-      "freeAccess": "Fri tillgång"
+      "freeAccess": "Fri tillgång",
+      "duelTeaser": {
+        "headline": "Utmana en klasskamrat",
+        "subtext": "Spela en mot en och klättra i klassrankingen",
+        "cta": "Starta en Duel →"
+      }
     },
     "template": {
       "settings": "Inställningar",

@@ -5544,7 +5544,12 @@ const he = {
       "teacherCta": "נדרשת כניסת מורה",
       "studentCta": "כניסה למרכז התלמידים",
       "premium": "פרימיום",
-      "freeAccess": "גישה חופשית"
+      "freeAccess": "גישה חופשית",
+      "duelTeaser": {
+        "headline": "אתגר חבר לכיתה",
+        "subtext": "שחק אחד על אחד ותטפס בדירוג הכיתה",
+        "cta": "התחל דואל →"
+      }
     },
     "template": {
       "settings": "הגדרות",

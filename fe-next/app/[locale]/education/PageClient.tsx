@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { GraduationCap, BookOpen, CheckCircle, Globe, Lock, Star, Puzzle } from 'lucide-react';
+import { GraduationCap, BookOpen, CheckCircle, Globe, Lock, Star, Puzzle, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -141,6 +141,59 @@ function RoleCard({
   );
 }
 
+interface DuelTeaserCardProps {
+  onDuelClick: () => void;
+}
+
+function DuelTeaserCard({ onDuelClick }: DuelTeaserCardProps) {
+  const { t } = useLanguage();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24, delay: 0.55 }}
+      className={cn(
+        'relative rounded-neo-lg border-neo-thick border-neo-black overflow-hidden mt-6',
+        'bg-neo-orange shadow-hard-lg',
+      )}
+    >
+      {/* Top stripe */}
+      <div className="h-2 bg-neo-pink" />
+
+      <div className="p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        {/* Icon */}
+        <div className="w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-pink/30 flex items-center justify-center flex-shrink-0">
+          <Swords className="w-6 h-6 text-neo-black" />
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg sm:text-xl font-black uppercase text-neo-black mb-0.5">
+            {t('education.landing.duelTeaser.headline')}
+          </h3>
+          <p className="text-sm text-neo-black/75">
+            {t('education.landing.duelTeaser.subtext')}
+          </p>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={onDuelClick}
+          className={cn(
+            'flex-shrink-0 px-5 py-2.5 rounded-neo border-2 border-neo-black',
+            'bg-neo-black text-neo-white font-bold uppercase text-sm',
+            'shadow-hard-sm hover:shadow-hard transition-shadow',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+          )}
+        >
+          {t('education.landing.duelTeaser.cta')}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function EducationPageClient() {
   const { t, language } = useLanguage();
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -158,6 +211,10 @@ export default function EducationPageClient() {
 
   const handleStudentClick = () => {
     router.push(`/${language}/student`);
+  };
+
+  const handleDuelClick = () => {
+    router.push(`/${language}/education/duels`);
   };
 
   return (
@@ -280,6 +337,9 @@ export default function EducationPageClient() {
               index={1}
             />
           </div>
+
+          {/* Duel Teaser — surface duels feature for students */}
+          <DuelTeaserCard onDuelClick={handleDuelClick} />
         </div>
       </main>
 

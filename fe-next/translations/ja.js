@@ -5617,7 +5617,12 @@ const ja = {
       "teacherCta": "教師ログインが必要",
       "studentCta": "生徒ハブへ入る",
       "premium": "プレミアム",
-      "freeAccess": "無料アクセス"
+      "freeAccess": "無料アクセス",
+      "duelTeaser": {
+        "headline": "クラスメートに挑戦",
+        "subtext": "一対一で対決してクラスランキングを上げよう",
+        "cta": "デュエルを始める →"
+      }
     },
     "template": {
       "settings": "設定",
