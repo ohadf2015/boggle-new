@@ -3345,7 +3345,10 @@ const en = {
       "cta5": "Good luck topping this!"
     },
     "gauntlet": {
-      "pts": "pts"
+      "pts": "pts",
+      "challenge": "Challenge",
+      "scored": "scored",
+      "canYouBeat": "Can you beat it?"
     }
   },
   "keepPlaying": {

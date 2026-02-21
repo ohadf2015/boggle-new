@@ -3358,7 +3358,10 @@ const he = {
       "cta5": "בהצלחה לנצח את זה!"
     },
     "gauntlet": {
-      "pts": "נק'"
+      "pts": "נק'",
+      "challenge": "אתגר",
+      "scored": "קיבל",
+      "canYouBeat": "תוכל לנצח?"
     }
   },
   "keepPlaying": {

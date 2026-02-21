@@ -3322,6 +3322,12 @@ const es = {
       "cta3": "Supéralo.",
       "cta4": "A ver si te animas.",
       "cta5": "¡Suerte superando esto!"
+    },
+    "gauntlet": {
+      "pts": "pts",
+      "challenge": "Desafío",
+      "scored": "logró",
+      "canYouBeat": "¿Puedes superarlo?"
     }
   },
   "keepPlaying": {

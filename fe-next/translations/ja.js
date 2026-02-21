@@ -3402,7 +3402,10 @@ const ja = {
       "cta5": "これを超えるのは難しいよ！"
     },
     "gauntlet": {
-      "pts": "点"
+      "pts": "点",
+      "challenge": "チャレンジ",
+      "scored": "が獲得",
+      "canYouBeat": "超えられる？"
     }
   },
   "keepPlaying": {

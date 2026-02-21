@@ -3353,7 +3353,10 @@ const sv = {
       "cta5": "Lycka till att toppa det här!"
     },
     "gauntlet": {
-      "pts": "poäng"
+      "pts": "poäng",
+      "challenge": "Utmaning",
+      "scored": "fick",
+      "canYouBeat": "Kan du slå det?"
     }
   },
   "keepPlaying": {
