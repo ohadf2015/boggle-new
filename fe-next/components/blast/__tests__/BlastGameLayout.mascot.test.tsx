@@ -117,6 +117,9 @@ const defaultGameState: BlastGameState = {
   tilesCleared: 3,
   totalTiles: 16,
   isComplete: false,
+  comboCount: 0,
+  isDeadEnd: false,
+  cascadeChainLevel: 0,
 };
 
 const baseProps = {
