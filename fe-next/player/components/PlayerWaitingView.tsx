@@ -78,6 +78,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 animate={{ scale: 1, opacity: 1, y: [0, -4, 0] }}
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{
+                  scale: { type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06 },
+                  opacity: { type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06 },
                   y: { duration: 3, repeat: Infinity, ease: 'easeInOut', delay: index * 0.2 },
                 }}
                 className="flex-shrink-0 flex flex-col items-center gap-2"
@@ -171,9 +173,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       {/* 4. Chat */}
       <section className="pb-4">
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
-          {t('hostView.battleFeed') || 'Battle Feed'}
+          {t('hostView.roomChat') || 'Room Chat'}
         </h3>
-        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-72">
+        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-48 sm:h-64">
           <RoomChat
             username={username}
             isHost={false}
