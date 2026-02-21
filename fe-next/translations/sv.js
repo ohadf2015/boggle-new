@@ -4565,6 +4565,9 @@ const sv = {
       "purchase": "Köp",
       "needMore": "Behöver {amount} mer guld"
     },
+    "shop": {
+      "title": "Uppgraderingsaffär"
+    },
     "bosses": {
       "fightBoss": "Bekampa bossen",
       "bossIntro": "Bosskamp!",

@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import type { UpgradeId, PurchaseResult } from '../../../shared/types/progression';
 import { STAT_UPGRADES, getUpgradeCost } from '../../../shared/utils/currencyUtils';
+import { MascotWithEntrance } from '@/components/ui/Mascot';
 
 /**
  * Component props
@@ -187,11 +188,21 @@ export function UpgradeShop({
   };
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${className}`}>
-      {/* Render all upgrades */}
-      {(['timeBonus', 'scoreBonus', 'xpBonus'] as UpgradeId[]).map(
-        renderUpgradeCard
-      )}
+    <div className={`flex flex-col gap-4 ${className}`}>
+      {/* Shop header — Lexi acts as the friendly shopkeeper */}
+      <div className="flex items-center gap-3">
+        <MascotWithEntrance variant="shopkeeper" size="md" delay={0.2} />
+        <h2 className="font-neo-display font-bold text-xl">
+          {t('adventure.shop.title')}
+        </h2>
+      </div>
+
+      {/* Upgrade cards grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {(['timeBonus', 'scoreBonus', 'xpBonus'] as UpgradeId[]).map(
+          renderUpgradeCard
+        )}
+      </div>
     </div>
   );
 }

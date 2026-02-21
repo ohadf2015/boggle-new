@@ -4539,6 +4539,9 @@ const en = {
       "purchase": "Purchase",
       "needMore": "Need {amount} more gold"
     },
+    "shop": {
+      "title": "Upgrade Shop"
+    },
     "bosses": {
       "fightBoss": "Fight Boss",
       "bossIntro": "Boss Battle!",

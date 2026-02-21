@@ -17,6 +17,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
+import { QRCodeCanvas } from 'qrcode.react';
 import { Users, Copy, Check, BookOpen, School, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -52,6 +53,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   );
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
   const [gameCode, setGameCode] = useState<string>('');
+  const [joinUrl, setJoinUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -145,6 +147,13 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     }
     setGameCode(code);
   }, []);
+
+  // Build SSR-safe join URL whenever the game code is ready
+  useEffect(() => {
+    if (gameCode && typeof window !== 'undefined') {
+      setJoinUrl(`${window.location.origin}/join?code=${gameCode}`);
+    }
+  }, [gameCode]);
 
   // Get selected lessons
   const selectedLessons = useMemo(() => {
@@ -440,6 +449,24 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
               {t('education.classroomGame.waitingForPlayers')}
             </span>
           </div>
+
+          {/* QR code — scan to join directly without typing the game code */}
+          {joinUrl && (
+            <div className="flex flex-col items-center gap-2 mt-4">
+              <p className="text-xs text-neo-white/60 font-neo-body">
+                {t('education.classroomGame.scanToJoin')}
+              </p>
+              <div className="p-2 bg-white rounded-neo border-neo border-neo-black shadow-hard-sm">
+                <QRCodeCanvas
+                  value={joinUrl}
+                  size={180}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Smart Defaults Summary */}

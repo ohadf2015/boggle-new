@@ -4541,6 +4541,9 @@ const he = {
       "purchase": "רכישה",
       "needMore": "צריך עוד {amount} זהב"
     },
+    "shop": {
+      "title": "חנות שדרוגים"
+    },
     "bosses": {
       "fightBoss": "הילחם בבוס",
       "bossIntro": "קרב בוס!",
