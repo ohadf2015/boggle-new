@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { spring, interpolate } from 'remotion';
+import { spring, interpolate, useVideoConfig } from 'remotion';
 import { fredokaFamily } from '../fonts';
 
 export interface TitleRevealProps {
@@ -14,8 +14,11 @@ export interface TitleRevealProps {
   text: string;
   /** Text color (hex) */
   color: string;
-  /** Font size in px */
-  fontSize: number;
+  /**
+   * Font size in px. When omitted, scales responsively based on
+   * useVideoConfig().width at 7% of composition width (capped at 1280px basis).
+   */
+  fontSize?: number;
   /** Current frame (relative to sequence start) */
   frame: number;
   /** Frames per second */
@@ -38,6 +41,12 @@ export const TitleReveal: React.FC<TitleRevealProps> = ({
   springConfig = { damping: 10, stiffness: 100 },
   letterSpacing = '0.1em',
 }) => {
+  const { width } = useVideoConfig();
+
+  // Scale font size with composition width when not explicitly provided.
+  // 7% of width gives ~90px at 1280px (standard) and ~27px at 390px (portrait mobile).
+  const resolvedFontSize = fontSize ?? Math.round(width * 0.07);
+
   const adjustedFrame = frame - startFrame;
 
   const scale = spring({
@@ -60,15 +69,16 @@ export const TitleReveal: React.FC<TitleRevealProps> = ({
       }}
     >
       <h1
+        data-testid="title-text"
         style={{
           fontFamily: fredokaFamily,
-          fontSize,
+          fontSize: resolvedFontSize,
           fontWeight: 700,
           color,
           textShadow: `
-            ${Math.max(4, fontSize / 16)}px ${Math.max(4, fontSize / 16)}px 0 black,
-            -${Math.max(2, fontSize / 32)}px -${Math.max(2, fontSize / 32)}px 0 black,
-            0 0 ${Math.max(30, fontSize / 3)}px ${color}
+            ${Math.max(4, resolvedFontSize / 16)}px ${Math.max(4, resolvedFontSize / 16)}px 0 black,
+            -${Math.max(2, resolvedFontSize / 32)}px -${Math.max(2, resolvedFontSize / 32)}px 0 black,
+            0 0 ${Math.max(30, resolvedFontSize / 3)}px ${color}
           `,
           letterSpacing,
           margin: 0,
