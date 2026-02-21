@@ -6,7 +6,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { interpolate } from 'remotion';
+import { interpolate, useVideoConfig } from 'remotion';
 import { generateParticleArray } from '../utils/seededRandom';
 
 export interface ParticleLayerProps {
@@ -35,9 +35,16 @@ export const ParticleLayer: React.FC<ParticleLayerProps> = ({
   seed = 42,
   sizeRange = [4, 12],
 }) => {
+  const { width: compositionWidth } = useVideoConfig();
+
+  // Scale particle count proportionally with composition width.
+  // Fewer particles on smaller screens avoids overdraw and improves performance.
+  const scale = Math.min(1, compositionWidth / 1280);
+  const scaledCount = Math.round(count * scale);
+
   const particles = useMemo(
-    () => generateParticleArray(count, width, height, seed, sizeRange),
-    [count, width, height, seed, sizeRange],
+    () => generateParticleArray(scaledCount, width, height, seed, sizeRange),
+    [scaledCount, width, height, seed, sizeRange],
   );
 
   return (
