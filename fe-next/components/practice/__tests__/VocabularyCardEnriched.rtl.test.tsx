@@ -11,17 +11,16 @@ jest.mock('@/components/practice/PronunciationButton', () => ({
 }));
 
 const mockWord = {
-  id: '1',
   word: 'שלום',
   definition: 'Hello',
   partOfSpeech: 'noun',
   examples: [{ text: 'שלום עולם', translation: 'Hello world' }],
-  canIntegrate: true,
 };
 
 describe('VocabularyCardEnriched RTL', () => {
   it('applies dir=rtl on root element when language is Hebrew', () => {
     const { container } = render(<VocabularyCardEnriched word={mockWord} />);
     expect(container.firstChild).toHaveAttribute('dir', 'rtl');
+    expect(container.textContent).toContain('שלום');
   });
 });
