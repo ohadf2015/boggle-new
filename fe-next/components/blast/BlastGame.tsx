@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
+import { useBlastHint } from './hooks/useBlastHint';
 import { BlastGameLayout } from './BlastGameLayout';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import type { BlastGameConfig, BlastResultsData } from './types';
 import type { WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
@@ -63,6 +65,25 @@ export function BlastGame({
   // Spam detection
   const spamDetection = useSpamDetection();
 
+  // Dictionary for hint system
+  const { checkWord } = useDictionaryCache(config.language);
+
+  // Min word length from wave config (defaults to 2)
+  const minWordLength = waveConfig?.minWordLength ?? 2;
+
+  // Hint system
+  const foundWordsSet = useMemo(
+    () => new Set(blast.gameState.wordsFound),
+    [blast.gameState.wordsFound],
+  );
+  const { hintPath, hasHintAvailable, requestHint, clearHint } = useBlastHint(
+    blast.modifiedGrid ?? [],
+    config.language,
+    checkWord,
+    foundWordsSet,
+    minWordLength,
+  );
+
   // Game timing - initialized once via effect
   const gameStartTimeRef = useRef(0);
   useEffect(() => {
@@ -90,9 +111,6 @@ export function BlastGame({
       lastPathRef.current = [];
     }
   }, [blast]);
-
-  // Min word length from wave config (defaults to 2)
-  const minWordLength = waveConfig?.minWordLength ?? 2;
 
   // Word submission hook - reuses proven validation pipeline
   const wordSubmission = useWordSubmission({
@@ -215,6 +233,10 @@ export function BlastGame({
       setShowQuitConfirm={setShowQuitConfirm}
       showEndGameConfirm={showEndGameConfirm}
       setShowEndGameConfirm={setShowEndGameConfirm}
+      hintPath={hintPath}
+      hasHintAvailable={hasHintAvailable}
+      onRequestHint={requestHint}
+      onClearHint={clearHint}
       t={(key: string) => t(key) || undefined}
     />
   );

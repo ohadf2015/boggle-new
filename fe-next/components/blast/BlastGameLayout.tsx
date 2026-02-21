@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Bomb, HelpCircle, Shuffle, Star } from 'lucide-react';
+import { ArrowLeft, Bomb, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LetterTileWord } from '@/components/singleplayer/game/components/LetterTileWord';
@@ -64,6 +64,11 @@ interface BlastGameLayoutProps {
   onQuitRequest: () => void;
   onConfirmQuit: () => void;
   onEndGame: () => void;
+  // Hint system
+  hintPath?: Array<{ row: number; col: number }> | null;
+  hasHintAvailable?: boolean;
+  onRequestHint?: () => void;
+  onClearHint?: () => void;
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
@@ -113,6 +118,10 @@ export function BlastGameLayout({
   setShowQuitConfirm,
   showEndGameConfirm,
   setShowEndGameConfirm,
+  hintPath = null,
+  hasHintAvailable = false,
+  onRequestHint,
+  onClearHint,
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound } = gameState;
@@ -191,6 +200,15 @@ export function BlastGameLayout({
     }
     return undefined;
   }, [cascadeChainLevel]);
+
+  // Auto-clear hint after 2000ms
+  useEffect(() => {
+    if (!hintPath) return;
+    const timer = setTimeout(() => {
+      onClearHint?.();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [hintPath, onClearHint]);
 
   // Combo-based grid glow color
   const comboGlow = comboLevel >= 7
@@ -435,13 +453,23 @@ export function BlastGameLayout({
           >
             <div className={cn(
               'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
-              'bg-gradient-to-r from-neo-orange/90 to-neo-pink/90',
+              'bg-indigo-900/80 border border-indigo-500',
               'flex items-center justify-between gap-2'
             )}>
-              <span className="font-bold text-white text-xs sm:text-sm">
-                {t('blast.noWordsLeft') || 'No words left!'}
+              <span className="font-bold text-white text-xs sm:text-sm shrink-0">
+                {t('blast.stuck') || 'Stuck?'}
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap justify-end">
+                {hasHintAvailable && !hintPath && (
+                  <Button
+                    size="sm"
+                    onClick={onRequestHint}
+                    className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none bg-lime-400 text-black font-bold text-xs"
+                  >
+                    <Lightbulb className="h-3.5 w-3.5 me-1" />
+                    {t('blast.hint') || 'Hint'}
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   onClick={onShuffle}
@@ -540,6 +568,7 @@ export function BlastGameLayout({
           onExplosionComplete={onExplosionComplete}
           onScorePopupComplete={onScorePopupComplete}
           ariaLabel={t('blast.gridLabel') || 'Letter grid'}
+          highlightedPath={hintPath ?? undefined}
         />
       </div>
 
