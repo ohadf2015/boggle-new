@@ -29,10 +29,12 @@ export function VocabularyCardEnriched({
   compact = false,
   className = '',
 }: VocabularyCardEnrichedProps) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const isRTL = dir === 'rtl';
 
   return (
     <div
+      dir={isRTL ? 'rtl' : 'ltr'}
       className={`
         bg-neo-white
         border-neo border-black
