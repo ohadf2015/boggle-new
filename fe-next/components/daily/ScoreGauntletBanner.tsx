@@ -46,7 +46,7 @@ export const ScoreGauntletBanner: React.FC<ScoreGauntletBannerProps> = ({
           </div>
         </div>
         <div className="flex-shrink-0">
-          <Swords className="w-5 h-5 text-neo-pink" />
+          <Swords className="w-5 h-5 text-neo-pink" aria-hidden="true" />
         </div>
       </div>
     </m.div>
