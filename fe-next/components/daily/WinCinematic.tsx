@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
@@ -26,8 +26,12 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
     const total = 40;
     const interval = setInterval(() => {
       frame++;
-      setDisplayScore(Math.round((frame / total) * finalScore));
-      if (frame >= total) clearInterval(interval);
+      if (frame >= total) {
+        setDisplayScore(finalScore);
+        clearInterval(interval);
+      } else {
+        setDisplayScore(Math.round((frame / total) * finalScore));
+      }
     }, 30);
     return () => clearInterval(interval);
   }, [finalScore]);
@@ -41,19 +45,24 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
     }
   }, []);
 
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const doneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Show "tap to continue" at 2s, auto-advance at 2.5s
   useEffect(() => {
-    const tapTimer = setTimeout(() => setShowTap(true), 2000);
-    const doneTimer = setTimeout(onComplete, 2500);
+    tapTimerRef.current = setTimeout(() => setShowTap(true), 2000);
+    doneTimerRef.current = setTimeout(onComplete, 2500);
     return () => {
-      clearTimeout(tapTimer);
-      clearTimeout(doneTimer);
+      if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+      if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
     };
   }, [onComplete]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
     onComplete();
-  }, [onComplete]);
+  };
 
   return (
     <m.div

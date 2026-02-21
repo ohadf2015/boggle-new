@@ -30,6 +30,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('WinCinematic', () => {
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.clearAllMocks();
+  });
+
   it('renders puzzle number', () => {
     render(
       <WinCinematic
@@ -54,7 +59,7 @@ describe('WinCinematic', () => {
     expect(onComplete).toHaveBeenCalled();
   });
 
-  it('calls onComplete on click', async () => {
+  it('calls onComplete on click exactly once', async () => {
     const onComplete = jest.fn();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     render(
@@ -65,6 +70,22 @@ describe('WinCinematic', () => {
       />
     );
     await user.click(screen.getByTestId('win-cinematic'));
-    expect(onComplete).toHaveBeenCalled();
+    // Advance past the original 2.5s timer — should NOT fire again
+    act(() => { jest.advanceTimersByTime(3000); });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onComplete after unmount', () => {
+    const onComplete = jest.fn();
+    const { unmount } = render(
+      <WinCinematic
+        puzzleNumber={421}
+        finalScore={847}
+        onComplete={onComplete}
+      />
+    );
+    unmount();
+    act(() => { jest.advanceTimersByTime(3000); });
+    expect(onComplete).not.toHaveBeenCalled();
   });
 });
