@@ -34,7 +34,6 @@ const mockResult: WordHuntResult = {
   streakDays: 5,
   completedAt: '2026-02-22T10:00:00.000Z',
   efficiencyScore: 87,
-  score: 100,
 };
 
 const baseProps = {

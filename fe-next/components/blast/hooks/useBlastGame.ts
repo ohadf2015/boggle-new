@@ -43,6 +43,7 @@ import {
 } from '../types';
 import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
 import { getInitialHitsRemaining } from '../utils/blastTileUtils';
+import { calculateEarnedStars } from '../utils/blastStarCalculator';
 
 // ==================== Helpers ====================
 
@@ -101,13 +102,6 @@ function generateTileStates(
   }
 
   return tiles;
-}
-
-/** Calculate star rating from clear percentage */
-function calculateStars(clearPercentage: number): 1 | 2 | 3 {
-  if (clearPercentage >= 100) return 3;
-  if (clearPercentage >= 75) return 2;
-  return 1;
 }
 
 // ==================== Return Type ====================
@@ -774,7 +768,7 @@ export function useBlastGame(
       wordsFound,
       bestWord: bestWordRef.current || (wordsFound[0] ?? ''),
       maxCombo,
-      stars: calculateStars(clearPercentage),
+      stars: calculateEarnedStars(tilesCleared, totalTiles),
       wavesCompleted,
       waveResults,
     };

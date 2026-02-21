@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
@@ -91,6 +92,21 @@ export function BlastGame({
       gameStartTimeRef.current = Date.now();
     }
   }, []);
+
+  // Confetti burst on board complete — fires once per wave clear
+  const confettiFiredRef = useRef(false);
+  useEffect(() => {
+    if (blast.gameState.isComplete && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
+      });
+    }
+    // Reset guard when wave resets (waveNumber prop changes)
+  }, [blast.gameState.isComplete]);
 
   // Word forming state (from GridComponent drag)
   const [formedWord, setFormedWord] = useState('');

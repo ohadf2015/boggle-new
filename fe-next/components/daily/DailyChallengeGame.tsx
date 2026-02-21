@@ -33,6 +33,9 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { PANIC_TIMER_THRESHOLD, ONFIRE_COMBO_THRESHOLD } from '@/utils/mascotConfig';
+import { useScorePopup } from './useScorePopup';
+import { useGridWords } from './useGridWords';
+import { buildGameResult, type DailyChallengeGameResult } from './dailyChallengeGameUtils';
 import type { LetterGrid, Language } from '@/types';
 
 interface DailyChallengeGameProps {
@@ -42,15 +45,6 @@ interface DailyChallengeGameProps {
   duration: number; // in seconds
   onComplete: (result: DailyChallengeGameResult) => void;
   onQuit: () => void;
-}
-
-interface DailyChallengeGameResult {
-  score: number;
-  wordCount: number;
-  wordsByLength: Record<number, number>;
-  timeSeconds: number;
-  words: string[];
-  longestWord: string;
 }
 
 /**
@@ -76,11 +70,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const [isGameOver, setIsGameOver] = useState(false);
 
   // Available words from grid solver (for first-play tutorial)
-  const [availableWords, setAvailableWords] = useState<{
-    easy: string[];
-    medium: string[];
-    hard: string[];
-  } | null>(null);
+  const availableWords = useGridWords(grid, language);
 
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
@@ -104,14 +94,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Coin reward animation state
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
 
-  // Score popup state for word-found fly animation
-  const [scorePopup, setScorePopup] = useState<{
-    id: number;
-    value: number;
-    x: number;
-    y: number;
-    word?: string;
-  } | null>(null);
+  // Score popup hook - stable IDs via ref, stable clearPopup via useCallback
+  const { scorePopup, triggerPopup, clearPopup } = useScorePopup();
 
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
@@ -137,37 +121,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       setGameActive(false);
     };
   }, [setGameActive]);
-
-  // Fetch valid words from grid for first-play tutorial
-  useEffect(() => {
-    if (!grid) return;
-
-    const fetchGridWords = async () => {
-      try {
-        const response = await fetch('/api/solve-grid', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ grid, language }),
-        });
-
-        if (!response.ok) {
-          setAvailableWords({ easy: [], medium: [], hard: [] });
-          return;
-        }
-
-        const result = await response.json();
-        if (result.success && result.words) {
-          setAvailableWords(result.words);
-        } else {
-          setAvailableWords({ easy: [], medium: [], hard: [] });
-        }
-      } catch {
-        setAvailableWords({ easy: [], medium: [], hard: [] });
-      }
-    };
-
-    fetchGridWords();
-  }, [grid, language]);
 
   // Stable callback for timer - prevents timer restart on every render
   const stableOnTimeUp = useCallback(() => {
@@ -232,13 +185,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       setScore(prev => prev + wordScore);
       playWordAcceptedSound?.();
       combo.incrementCombo(true);
-      setScorePopup({
-        id: Date.now(),
-        value: wordScore,
-        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
-        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0,
-        word,
-      });
+      triggerPopup(wordScore, word);
     },
     onWordRejected: () => {
       combo.resetCombo();
@@ -595,7 +542,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         popup={scorePopup}
         flyToTarget={false}
         showWord
-        onComplete={() => setScorePopup(null)}
+        onComplete={clearPopup}
       />
     </motion.div>
   );

@@ -19,6 +19,7 @@ import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, C
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
+import { calculateEarnedStars } from './utils/blastStarCalculator';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -125,6 +126,7 @@ export function BlastGameLayout({
   t,
 }: BlastGameLayoutProps) {
   const { score, tilesCleared, totalTiles, isComplete, wordsFound } = gameState;
+  const earnedStars = calculateEarnedStars(tilesCleared, totalTiles);
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
   const [screenFlash, setScreenFlash] = useState(false);
@@ -514,7 +516,7 @@ export function BlastGameLayout({
                   'text-center space-y-3'
                 )}
               >
-                {/* Stars */}
+                {/* Stars — filled count based on tilesCleared percentage */}
                 <div className="flex justify-center gap-2">
                   {[0, 1, 2].map(i => (
                     <motion.div
@@ -523,7 +525,12 @@ export function BlastGameLayout({
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.15 }}
                     >
-                      <Star className="h-8 w-8 fill-neo-orange text-neo-black" />
+                      <Star
+                        className={cn(
+                          'h-8 w-8 text-neo-black',
+                          i < earnedStars ? 'fill-neo-orange' : 'fill-neo-black/20',
+                        )}
+                      />
                     </motion.div>
                   ))}
                 </div>
