@@ -215,7 +215,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.2, duration: 0.4, type: 'spring' }}
+      transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
         'bg-gradient-to-br', config.gradient,
         'border-4 border-neo-black rounded-neo-lg shadow-hard-xl',

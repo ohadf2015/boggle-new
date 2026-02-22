@@ -222,7 +222,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
     >
       {/* Neo-Brutalist Main Container - Clickable for confetti */}
@@ -271,7 +271,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
               className="flex items-center gap-2 sm:gap-3"
             >
               {/* Winner Avatar - Smaller */}

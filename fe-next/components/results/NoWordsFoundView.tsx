@@ -115,7 +115,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
       className="mt-3"
     >
       {/* Main encouragement card */}
@@ -139,7 +139,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         <motion.div
           initial={{ opacity: 0, rotate: -20 }}
           animate={{ opacity: 0.15, rotate: 15 }}
-          transition={{ delay: 0.3 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
           className="absolute top-2 right-2"
         >
           <Gamepad2 className="w-16 h-16 text-neo-black" />
@@ -156,7 +156,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
               className="w-12 h-12 rounded-neo bg-neo-lime border-3 border-neo-black shadow-hard flex items-center justify-center"
             >
               <span className="text-2xl">{encouragement.emoji}</span>
@@ -178,7 +178,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
           <motion.p
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
             className="text-sm font-bold text-neo-black/90 leading-relaxed mb-4"
           >
             {encouragement.message}
@@ -189,7 +189,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.4 }}
               className="bg-neo-cream border-2 border-neo-black rounded-neo p-3 shadow-hard-sm"
             >
               <div className="flex items-start gap-2">
@@ -207,7 +207,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
             className="mt-4 flex items-center justify-center gap-2 text-neo-black/70"
           >
             <RefreshCw className="w-4 h-4" />
@@ -222,7 +222,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.6 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
         className="mt-2 p-2 rounded-neo border-2 border-neo-black bg-neo-lime shadow-hard-sm"
       >
         <p className="text-[10px] font-black text-neo-black text-center uppercase tracking-wide">

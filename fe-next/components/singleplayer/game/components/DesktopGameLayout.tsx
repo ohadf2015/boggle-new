@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ArrowLeft, Pause, Play, Coins } from 'lucide-react';
-import { type WordFeedback } from '@/components/game/WordFormingArea';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import GridComponent from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -12,7 +12,6 @@ import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { GameOverlays } from './GameOverlays';
 import { HintPromptButton } from './HintPromptButton';
 import { DynamicEnergyBackground } from './DynamicEnergyBackground';
-import { LetterTileWord } from './LetterTileWord';
 import { TutorialCallout } from '@/components/tutorial/TutorialCallout';
 import { DesktopStatsPanel, DesktopWordList } from '../../desktop';
 import type { LetterGrid, Language } from '@/shared/types/game';
@@ -277,12 +276,9 @@ export function DesktopGameLayout({
             </div>
           )}
 
-          {/* Word Forming Area - Letter Tiles */}
+          {/* Word Forming Area */}
           <div className="flex items-center justify-center">
-            <LetterTileWord
-              word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-              feedback={currentFeedback}
-            />
+            <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
           </div>
 
           {/* Tutorial Callout - Shows above grid for new players */}

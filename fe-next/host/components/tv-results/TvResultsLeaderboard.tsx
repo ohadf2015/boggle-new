@@ -124,7 +124,7 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: displayPlayers.length * 0.08 + 0.2 }}
+                transition={{ type: 'spring', stiffness: 280, damping: 26, delay: displayPlayers.length * 0.08 + 0.2 }}
                 className="text-center py-2 text-neo-cream/60 font-bold"
               >
                 {remainingCount === 1

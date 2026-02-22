@@ -36,7 +36,7 @@ export function DesktopLobbyLayout({
       data-testid="desktop-lobby-layout"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
         'grid h-full p-6 bg-neo-navy',
         'grid-cols-12',

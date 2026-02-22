@@ -131,7 +131,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.3, type: 'spring' }}
+      transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
       className={cn(
         'px-4 py-3 bg-gradient-to-r from-neo-lime to-amber-400 rounded-neo border-3 border-neo-black shadow-hard',
         className
@@ -238,7 +238,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.3, type: 'spring' }}
+      transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
       className={cn(
         'px-4 py-3 bg-slate-700/80 rounded-neo border-3 border-slate-500 shadow-hard',
         className

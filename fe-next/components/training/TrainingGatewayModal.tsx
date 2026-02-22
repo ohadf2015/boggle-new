@@ -167,7 +167,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
             className="text-center mb-6"
           >
             <h2 className={cn(
@@ -190,7 +190,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.35 }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'mb-4 p-3 rounded-xl text-center',
               isDarkMode ? 'bg-purple-900/30 border border-purple-500/20' : 'bg-purple-50 border border-purple-200'
@@ -247,7 +247,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'mb-6 p-4 rounded-xl',
               isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
@@ -265,7 +265,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
                   key={benefit.key}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
+                  transition={{ delay: 0.5 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'flex items-center gap-3 text-sm',
                     isDarkMode ? 'text-gray-200' : 'text-gray-700'
@@ -288,7 +288,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
             className={cn(
               'mb-6 p-3 rounded-lg text-center text-sm',
               isDarkMode ? 'bg-neo-lime/20 border border-neo-lime/30' : 'bg-lime-50 border border-lime-200'
@@ -304,7 +304,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.7, type: 'spring', stiffness: 280, damping: 26 }}
             className="space-y-3"
           >
             {/* Primary: Start Training */}

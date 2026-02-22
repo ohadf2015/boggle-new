@@ -85,7 +85,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15 }}
+      transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
       className="bg-slate-900/70 rounded-neo border-2 border-slate-700/50 p-4"
     >
       {/* Score Breakdown Bars */}

@@ -166,7 +166,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                       type="button"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 26, delay: Math.min(index * 0.02, 0.3) }}
                       onClick={() => handleToggleWord(item.word, isDuplicate)}
                       disabled={isDuplicate}
                       className={cn(

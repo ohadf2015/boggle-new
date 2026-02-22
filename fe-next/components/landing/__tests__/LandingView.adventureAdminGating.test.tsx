@@ -104,7 +104,7 @@ jest.mock('@/components/ProfileCustomizationModal', () => {
   };
 });
 
-describe('LandingView - Adventure Mode Admin Gating', () => {
+describe('LandingView - Adventure Mode Visibility', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -143,12 +143,12 @@ describe('LandingView - Adventure Mode Admin Gating', () => {
       });
     });
 
-    it('should NOT show adventure mode for non-admin users', () => {
+    it('should show adventure mode for non-admin users', () => {
       render(<LandingView />);
 
-      // Adventure mode should not be in the document
-      const adventureText = screen.queryByText('Adventure');
-      expect(adventureText).not.toBeInTheDocument();
+      // Adventure mode is visible to all authenticated users
+      const adventureText = screen.getByText('Adventure');
+      expect(adventureText).toBeInTheDocument();
     });
   });
 
@@ -189,12 +189,12 @@ describe('LandingView - Adventure Mode Admin Gating', () => {
       });
     });
 
-    it('should hide adventure mode while loading auth state', () => {
+    it('should show adventure mode even while loading auth state', () => {
       render(<LandingView />);
 
-      // Should not show adventure mode during loading
-      const adventureText = screen.queryByText('Adventure');
-      expect(adventureText).not.toBeInTheDocument();
+      // Adventure is available to all users, shown regardless of auth loading state
+      const adventureText = screen.getByText('Adventure');
+      expect(adventureText).toBeInTheDocument();
     });
   });
 });

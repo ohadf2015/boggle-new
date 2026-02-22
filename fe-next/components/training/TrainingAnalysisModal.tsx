@@ -167,7 +167,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', damping: 10, delay: 0.1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10, delay: 0.1 }}
             className="flex justify-center mb-4"
           >
             {hasPassed ? (
@@ -200,7 +200,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
             className="text-center mb-6"
           >
             <h2 className={cn(
@@ -231,7 +231,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
+            transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
             className="mb-6"
           >
             <div className="flex justify-between mb-1">
@@ -264,7 +264,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
             className="grid grid-cols-2 gap-3 mb-6"
           >
             {allSkills.map((skill, index) => {
@@ -277,7 +277,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   key={skill}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 + index * 0.05 }}
+                  transition={{ delay: 0.35 + index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'p-3 rounded-xl border-2 transition-all',
                     isMastered
@@ -326,7 +326,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'p-4 rounded-xl mb-6',
               isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
@@ -389,7 +389,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.45 }}
+              transition={{ delay: 0.45, type: 'spring', stiffness: 280, damping: 26 }}
               className={cn(
                 'p-4 rounded-xl mb-6 border',
                 isDarkMode
@@ -424,7 +424,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
             className="space-y-3"
           >
             {hasPassed ? (

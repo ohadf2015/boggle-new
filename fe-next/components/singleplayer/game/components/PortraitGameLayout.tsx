@@ -4,8 +4,7 @@ import React from 'react';
 import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Coins } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { type WordFeedback } from '@/components/game/WordFormingArea';
-import { LetterTileWord } from './LetterTileWord';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
@@ -360,12 +359,9 @@ export function PortraitGameLayout({
         </div>
       </div>
 
-      {/* Word Forming Area - Letter Tiles */}
+      {/* Word Forming Area */}
       <div className="h-12 flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2 max-w-[360px] mx-auto w-full overflow-visible">
-        <LetterTileWord
-          word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-          feedback={currentFeedback}
-        />
+        <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
       </div>
 
       {/* Words Progress - subtle indicator */}

@@ -68,7 +68,7 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({
           key={index}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.05 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: index * 0.05 }}
           className={cn(
             'bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 lg:p-3 xl:p-4 text-center',
             stat.hiddenOnMobile && 'hidden sm:block'

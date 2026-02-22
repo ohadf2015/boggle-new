@@ -203,7 +203,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
               key={`title-${step.id}`}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
               className="text-2xl font-black text-neo-black text-center mb-3"
             >
               {t(step.titleKey)}
@@ -214,7 +214,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
               key={`desc-${step.id}`}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
               className="text-neo-black/80 text-center mb-6 leading-relaxed"
             >
               {t(step.descriptionKey)}

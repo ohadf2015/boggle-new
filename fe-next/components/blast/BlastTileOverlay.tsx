@@ -137,7 +137,7 @@ export function BlastTileOverlay({
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
+                transition={{ type: 'spring', stiffness: 600, damping: 30 }}
                 className="rounded-lg"
                 style={{
                   gridRow: tile.row + 1,

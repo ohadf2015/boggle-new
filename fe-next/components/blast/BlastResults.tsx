@@ -85,7 +85,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
         className="mb-6 flex items-center gap-3"
       >
         <StarRating stars={results.stars} />
@@ -171,7 +171,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.0 }}
         className="flex flex-col gap-3 w-full max-w-sm"
       >
         <Button

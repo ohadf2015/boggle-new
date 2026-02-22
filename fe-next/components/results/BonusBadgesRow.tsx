@@ -67,7 +67,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
         <motion.span
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 300 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black',
             sizeClasses
@@ -82,7 +82,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
         <motion.span
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-cream font-black',
             sizeClasses
@@ -97,7 +97,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
         <motion.span
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
+          transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'bg-neo-pink border-neo-black rounded-neo shadow-hard-sm text-neo-cream font-black',
             sizeClasses
@@ -112,7 +112,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
         <motion.span
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'bg-neo-lime border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black',
             sizeClasses

@@ -313,15 +313,28 @@ const WorldNode = ({
               isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'
             )}
             style={{
-              // Enhanced glow for unlocked worlds - larger radius and stronger
+              // Triple-layer drop-shadow for stronger outer glow
               filter: isUnlocked
-                ? `drop-shadow(0 0 20px ${glowColor}) drop-shadow(0 0 40px ${glowColor})`
+                ? `drop-shadow(0 0 20px ${glowColor}) drop-shadow(0 0 40px ${glowColor}) drop-shadow(0 0 65px ${glowColor})`
                 : 'grayscale(1) brightness(0.5)',
             }}
           >
+            {/* Aura: radial gradient halo that sits behind the world sphere */}
+            {isUnlocked && (
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle, ${glowColor} 0%, ${glowColor.replace(/[\d.]+\)$/, '0.25)')} 45%, transparent 72%)`,
+                  transform: 'scale(1.9)',
+                  filter: 'blur(14px)',
+                  zIndex: 0,
+                }}
+              />
+            )}
+
             {/* Circular World Image - larger and more prominent (96-144px range) */}
             <div className={cn(
-              'relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36',
+              'relative z-10 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36',
               'rounded-full overflow-hidden',
               'border-[5px] border-neo-black',
               // Stronger ring for unlocked worlds

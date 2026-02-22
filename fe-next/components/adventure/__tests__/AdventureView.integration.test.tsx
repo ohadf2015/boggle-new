@@ -356,7 +356,7 @@ describe('AdventureView Integration', () => {
       fireEvent.click(screen.getByTestId('world-1'));
 
       // THEN
-      expect(screen.getByRole('button', { name: /world map/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
     });
   });
 
@@ -380,7 +380,7 @@ describe('AdventureView Integration', () => {
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
 
       // WHEN
-      fireEvent.click(screen.getByRole('button', { name: /world map/i }));
+      fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
       // THEN
       expect(screen.getByTestId('world-map')).toBeInTheDocument();
@@ -515,7 +515,7 @@ describe('AdventureView Integration', () => {
       const backSpy = jest.spyOn(window.history, 'back');
 
       // WHEN
-      fireEvent.click(screen.getByRole('button', { name: /world map/i }));
+      fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
       // THEN - should call history.back()
       expect(backSpy).toHaveBeenCalled();
@@ -632,7 +632,7 @@ describe('AdventureView Integration', () => {
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
 
       // WHEN - go back to world map
-      fireEvent.click(screen.getByRole('button', { name: /world map/i }));
+      fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
       // THEN - back at world map
       expect(screen.getByTestId('world-map')).toBeInTheDocument();

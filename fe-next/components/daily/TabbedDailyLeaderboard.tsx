@@ -113,7 +113,7 @@ const TodayParticipantRow = memo<{
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
       className={`
         flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
         ${getRankColors()}
@@ -237,7 +237,7 @@ const AllTimeParticipantRow = memo<{
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
+      transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
       className={`
         flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
         ${getRankColors()}
@@ -323,7 +323,7 @@ const SkeletonRow = memo<{ index: number }>(({ index }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
-    transition={{ delay: index * 0.05 }}
+    transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
     className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50"
   >
     {/* Rank skeleton */}
@@ -665,6 +665,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={`
         bg-white/95 dark:bg-slate-800/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700

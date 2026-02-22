@@ -179,6 +179,7 @@ export function NewPlayerOnboarding({ t, onDismiss, className }: NewPlayerOnboar
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'relative w-full max-w-sm',
             'bg-slate-800 rounded-neo-lg',
@@ -215,7 +216,7 @@ export function NewPlayerOnboarding({ t, onDismiss, className }: NewPlayerOnboar
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="text-center"
             >
               {/* Icon */}

@@ -11,7 +11,13 @@ jest.mock('@/components/GridComponent', () => {
   return Wrapped;
 });
 
-// Mock framer-motion for WordFormingArea
+jest.mock('@/components/game/WordFormingArea', () => ({
+  __esModule: true,
+  default: ({ feedback }: { feedback: { type: string } | null }) => (
+    <div data-testid="word-forming-area" data-feedback-type={feedback?.type ?? ''} />
+  ),
+}));
+
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -82,7 +88,7 @@ describe('SoloPracticeBoard - Word Feedback & Validation', () => {
     render(<SoloPracticeBoard {...defaultProps} />);
 
     // THEN: WordFormingArea should be present (feedback display area)
-    const feedbackArea = document.querySelector('[aria-live="polite"]');
+    const feedbackArea = document.querySelector('[data-testid="word-forming-area"]');
     expect(feedbackArea).toBeInTheDocument();
   });
 
@@ -140,10 +146,10 @@ describe('SoloPracticeBoard - Word Feedback & Validation', () => {
       onWordSubmit('test');
     });
 
-    // THEN: Accepted feedback should appear (checkmark)
+    // THEN: WordFormingArea should receive accepted feedback
     await waitFor(() => {
-      const feedbackArea = document.querySelector('[aria-live="polite"]');
-      expect(feedbackArea?.textContent).toContain('✓');
+      const tileWord = document.querySelector('[data-testid="word-forming-area"]');
+      expect(tileWord).toHaveAttribute('data-feedback-type', 'accepted');
     });
   });
 
@@ -162,10 +168,10 @@ describe('SoloPracticeBoard - Word Feedback & Validation', () => {
       onWordSubmit('xyz');
     });
 
-    // THEN: Rejected feedback should appear
+    // THEN: WordFormingArea should receive rejected feedback
     await waitFor(() => {
-      const feedbackArea = document.querySelector('[aria-live="polite"]');
-      expect(feedbackArea?.textContent).toContain('✗');
+      const tileWord = document.querySelector('[data-testid="word-forming-area"]');
+      expect(tileWord).toHaveAttribute('data-feedback-type', 'rejected');
     });
   });
 });

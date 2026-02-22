@@ -60,7 +60,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                 initial={{ x: -10, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 10, opacity: 0 }}
-                transition={{ delay: index * 0.03, duration: 0.2 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 26, delay: index * 0.03 }}
               >
                 <div
                   className={cn(

@@ -299,7 +299,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+      transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
       className="mt-3 pt-3 border-t-3 border-neo-black/20"
     >
       {/* Player Story Card - The headline insight */}
@@ -307,7 +307,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95, rotate: -1 }}
           animate={{ opacity: 1, scale: 1, rotate: 1 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className={cn(
             'mb-3 p-3 rounded-neo border-3 border-neo-black',
             'bg-gradient-to-br from-neo-pink to-neo-pink-light',
@@ -323,7 +323,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
+                transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
                 className="text-2xl"
               >
                 {playerStory.emoji}
@@ -353,7 +353,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
               key={card.label}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 + index * 0.05 }}
+              transition={{ delay: 0.1 + index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
               className={cn(
                 'p-2 rounded-neo border-2 border-neo-black',
                 'bg-white shadow-hard-sm',
@@ -389,7 +389,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
         className={cn(
           'mt-1.5 p-2 rounded-neo border-2 border-neo-black',
           'bg-white shadow-hard-sm'
@@ -442,7 +442,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="mt-1.5 text-[10px] font-bold text-foreground/90 text-center"
         >
           {t('insights.accuracy') || 'Accuracy'}: {insights.accuracy}%

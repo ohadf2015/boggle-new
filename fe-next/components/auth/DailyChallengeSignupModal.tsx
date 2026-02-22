@@ -248,7 +248,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
             className="text-center mb-4"
           >
             <h2 className={cn(
@@ -272,7 +272,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.35 }}
+              transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
               className={cn(
                 'mb-4 p-3 rounded-xl border-2 flex items-center gap-3',
                 isDarkMode
@@ -305,7 +305,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'mb-5 p-4 rounded-xl',
               isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
@@ -323,7 +323,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
                   key={benefit.key}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.45 + index * 0.08 }}
+                  transition={{ delay: 0.45 + index * 0.08, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'flex items-center gap-3 text-sm',
                     isDarkMode ? 'text-gray-200' : 'text-gray-700'
@@ -344,7 +344,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.55 }}
+              transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 26 }}
               className={cn(
                 'mb-4 p-2 rounded-lg text-center text-xs',
                 isDarkMode ? 'bg-green-900/30 border border-green-500/30' : 'bg-green-50 border border-green-200'
@@ -360,7 +360,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
             className="space-y-3"
           >
             {providers.map((provider) => (
@@ -397,7 +397,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.7, type: 'spring', stiffness: 280, damping: 26 }}
             className="mt-5 text-center"
           >
             <button

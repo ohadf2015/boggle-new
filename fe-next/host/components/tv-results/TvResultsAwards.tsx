@@ -263,6 +263,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
           <motion.h3
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             className="text-xl font-black uppercase tracking-wide text-neo-cream"
           >
             {t('tvResults.specialAwards')}
@@ -289,7 +290,7 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: index * 0.2 + 0.3, type: 'spring' }}
+                  transition={{ delay: index * 0.2 + 0.3, type: 'spring', stiffness: 400, damping: 22 }}
                   className="absolute -top-4 -right-4 w-12 h-12 bg-neo-cream rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard"
                 >
                   <award.icon className="w-6 h-6 text-neo-black" />

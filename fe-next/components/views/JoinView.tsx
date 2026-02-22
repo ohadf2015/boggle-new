@@ -404,7 +404,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         <motion.div
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26 }}
           className="flex-1 max-w-md mx-auto w-full"
         >
           <Card className="backdrop-blur-md bg-white/90 text-neo-black dark:bg-slate-800/90 dark:text-white shadow-2xl border border-purple-500/30">
@@ -415,7 +415,7 @@ const JoinView: React.FC<JoinViewProps> = ({
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 26 }}
                 >
                   <Alert variant="destructive">
                     <AlertDescription>
@@ -553,7 +553,7 @@ const JoinView: React.FC<JoinViewProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5, type: 'spring' }}
+        transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
         className="fixed bottom-6 left-6 z-50 safe-area-bottom"
       >
         <TooltipProvider>

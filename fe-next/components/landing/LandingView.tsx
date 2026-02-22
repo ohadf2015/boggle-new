@@ -20,6 +20,7 @@ import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
+import ModeCardV2 from './ModeCardV2';
 import { LandingShareBanner } from './LandingShareBanner';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
@@ -400,36 +401,47 @@ const LandingView: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Adventure Mode Card - Only visible to admins */}
-            {isAdmin && (
-              <motion.div
-                className="col-span-2 group"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            {/* Adventure Mode Card */}
+            <motion.div
+              className="col-span-2 group"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <Link
+                href={`/${language}/adventure`}
+                className={cn(
+                  'flex items-center gap-3 p-3 sm:p-4 relative',
+                  'bg-gradient-to-br from-neo-lime via-lime-400 to-lime-500',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'transition-all duration-200 min-h-[72px]',
+                  'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.5))]',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                )}
+                aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
               >
-                <Link
-                  href={`/${language}/adventure`}
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
-                    'bg-gradient-to-br from-neo-lime to-lime-500',
-                    'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                    // Reduced min-height: 64px on xs, 80px on sm (was 80/100px)
-                    'transition-all duration-200 min-h-[64px] sm:min-h-[80px]',
-                    'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.4))]',
-                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-                  )}
-                  aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
-                >
-                  {/* Beta badge */}
-                  <span className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3">
+                {/* Icon container */}
+                <div className="flex-shrink-0 w-11 h-11 sm:w-13 sm:h-13 bg-neo-black/15 rounded-neo border-2 border-neo-black/20 flex items-center justify-center">
+                  <Map className="w-6 h-6 sm:w-7 sm:h-7 text-neo-black" aria-hidden="true" />
+                </div>
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <span className="block text-sm sm:text-base font-black uppercase text-neo-black leading-tight">
+                    {t('landing.adventureMode') || 'Adventure'}
+                  </span>
+                  <span className="block text-xs sm:text-sm text-neo-black/65 font-semibold mt-0.5 truncate">
+                    {t('landing.adventureModeDesc') || '100 levels · 10 worlds'}
+                  </span>
+                </div>
+                {/* Badge + sparkle */}
+                <div className="flex-shrink-0 flex flex-col items-center gap-1.5">
+                  <span className="px-2 py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[9px] border border-neo-black rounded-neo shadow-hard-xs">
                     BETA
                   </span>
-                  <Map className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                  <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.adventureMode') || 'Adventure'}</span>
-                </Link>
-              </motion.div>
-            )}
+                  <Sparkles className="w-4 h-4 text-neo-black/40" aria-hidden="true" />
+                </div>
+              </Link>
+            </motion.div>
 
             {/* Blast Mode Card - Only visible to admins */}
             {isAdmin && (
@@ -549,21 +561,18 @@ const LandingView: React.FC = () => {
                 <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
               </div>
 
-              {/* Secondary card - Adventure Mode (only visible to admins) */}
-              {isAdmin && (
-                <div className="sm:col-span-2 w-full max-w-md mx-auto">
-                  <ModeCard
-                    title={t('landing.adventureMode') || 'Adventure'}
-                    description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
-                    href={`/${language}/adventure`}
-                    icon={<Map className="w-6 h-6" />}
-                    variant="lime"
-                    secondary
-                    badge="BETA"
-                    className="w-full"
-                  />
-                </div>
-              )}
+              {/* Adventure Mode card */}
+              <div className="sm:col-span-2 w-full">
+                <ModeCardV2
+                  title={t('landing.adventureMode') || 'Adventure'}
+                  description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
+                  href={`/${language}/adventure`}
+                  mode="adventure"
+                  variant="lime"
+                  badge="BETA"
+                  className="w-full"
+                />
+              </div>
 
               {/* Secondary card - Blast Mode (only visible to admins) */}
               {isAdmin && (

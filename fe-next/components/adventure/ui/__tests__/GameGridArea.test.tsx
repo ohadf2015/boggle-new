@@ -33,8 +33,8 @@ jest.mock('../../AdventureGrid', () => ({
 
 jest.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
-  default: jest.fn(({ word, feedback, compact }: { word: string; feedback: unknown; compact: boolean }) => (
-    <div data-testid="word-forming-area" data-word={word} data-compact={compact} data-has-feedback={!!feedback} />
+  default: jest.fn(({ word, feedback, compact }: { word: string; letterCount?: number; feedback?: unknown; compact?: boolean }) => (
+    <div data-testid="word-forming-area" data-word={word} data-has-feedback={!!feedback} data-compact={compact} />
   )),
 }));
 
@@ -90,6 +90,12 @@ describe('GameGridArea', () => {
     expect(wfa).toHaveAttribute('data-word', 'TEST');
   });
 
+  it('should render WordFormingArea in compact mode', () => {
+    render(<GameGridArea {...defaultProps} />);
+    const wfa = screen.getByTestId('word-forming-area');
+    expect(wfa).toHaveAttribute('data-compact', 'true');
+  });
+
   it('should pass wordFeedback to WordFormingArea when accepted', () => {
     const feedback: WordFeedback = {
       id: '1',
@@ -114,12 +120,6 @@ describe('GameGridArea', () => {
     render(<GameGridArea {...defaultProps} wordFeedback={feedback} />);
     const wfa = screen.getByTestId('word-forming-area');
     expect(wfa).toHaveAttribute('data-has-feedback', 'true');
-  });
-
-  it('should render WordFormingArea in compact mode', () => {
-    render(<GameGridArea {...defaultProps} />);
-    const wfa = screen.getByTestId('word-forming-area');
-    expect(wfa).toHaveAttribute('data-compact', 'true');
   });
 
   it('should still show min word length hint when selection is too short', () => {

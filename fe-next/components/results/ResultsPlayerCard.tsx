@@ -175,7 +175,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.3 }}
+      transition={{ delay: Math.min(index * 0.05, 0.3), type: 'spring', stiffness: 300, damping: 26 }}
       style={{ transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
     >
       {/* Neo-Brutalist Card */}
@@ -220,7 +220,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                     <motion.span
                       initial={{ scale: 0, opacity: 0, rotate: -5 }}
                       animate={{ scale: 1, opacity: 1, rotate: 3 }}
-                      transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+                      transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
                       className="text-xs font-black bg-neo-pink text-neo-cream px-1.5 py-0.5 rounded-neo border-2 border-neo-black"
                     >
                       {t('results.youWon')}
@@ -236,7 +236,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                           <motion.div
                             initial={{ scale: 0, opacity: 0, x: -10 }}
                             animate={{ scale: 1, opacity: 1, x: 0 }}
-                            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+                            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
                             className="flex items-center gap-1 cursor-help bg-neo-black px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
                           >
                             <span className="text-sm">{player.title.icon}</span>
@@ -271,7 +271,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                 <motion.div
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
                   className="bg-neo-lime border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
                 >
                   <span className="text-xs font-black">⚡ +{totalComboBonus}</span>
@@ -283,7 +283,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                 <motion.div
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
-                  transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
+                  transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 26 }}
                   className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
                 >
                   <span className="text-xs font-black">🔥 +{totalFireRoundBonus}</span>
@@ -330,6 +330,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
                       className="bg-slate-800 border-2 border-neo-cyan rounded-neo p-2"
                     >
                       <div className="grid grid-cols-3 gap-2 text-center">

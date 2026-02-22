@@ -91,7 +91,7 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', damping: 10, stiffness: 100, delay: 0.2 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.2 }}
             className="flex justify-center mb-4"
           >
             <div className="relative">
@@ -132,7 +132,7 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
             className="text-center mb-6"
           >
             <h2 className={cn(
@@ -155,7 +155,7 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
             className={cn(
               'mb-6 p-4 rounded-xl',
               isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
@@ -173,7 +173,7 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
                   key={benefit.key}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 0.5 + index * 0.1 }}
                   className={cn(
                     'flex items-center gap-3 text-sm',
                     isDarkMode ? 'text-gray-200' : 'text-gray-700'
@@ -196,7 +196,7 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
             className={cn(
               'mb-6 p-3 rounded-lg text-center text-sm',
               isDarkMode ? 'bg-neo-orange/20 border border-neo-orange/30' : 'bg-orange-50 border border-orange-200'
@@ -211,7 +211,7 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.7 }}
             className="space-y-3"
           >
             {/* Primary: Start Training */}

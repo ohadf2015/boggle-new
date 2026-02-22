@@ -193,7 +193,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-black mb-3 text-neo-lime">
@@ -210,7 +210,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
             className="space-y-6"
           >
             {/* Avatar Selection */}
@@ -228,6 +228,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   key={useProfilePicture ? 'profile' : selectedAvatar.id}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                   className="relative"
                 >
                   <div className={cn(

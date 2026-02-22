@@ -111,7 +111,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
-            transition={{ duration: 0.25 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             className="absolute inset-0 p-4 flex flex-col"
           >
             {currentStep === 0 && <Step1SwipeAndColors isRTL={isRTL} t={t} />}
@@ -244,7 +244,8 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
               transition={{
                 delay: idx * 0.08,
                 type: 'spring',
-                stiffness: 300
+                stiffness: 380,
+                damping: 26,
               }}
             >
               <motion.span
@@ -262,7 +263,7 @@ const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: strin
           className="flex items-center gap-2"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
         >
           <div className="flex gap-1">
             {['C', 'A', 'T'].map((letter, idx) => (

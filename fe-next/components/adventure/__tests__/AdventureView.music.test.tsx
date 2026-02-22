@@ -392,8 +392,8 @@ describe('AdventureView Music Integration', () => {
       // Navigate to level grid
       fireEvent.click(screen.getByTestId('world-1'));
 
-      // Navigate back to world map (t() returns the key in tests: adventure.backToMap)
-      fireEvent.click(screen.getByRole('button', { name: /backToMap/i }));
+      // Navigate back to world map (t() returns the key in tests: common.back)
+      fireEvent.click(screen.getByRole('button', { name: /back/i }));
 
       // THEN - music should still be enabled
       const lastCall =

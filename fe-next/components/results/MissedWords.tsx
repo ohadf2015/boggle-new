@@ -85,7 +85,7 @@ const MissedWords = memo<MissedWordsProps>(({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
       className={cn('w-full', className)}
     >
       <div
@@ -121,7 +121,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: index * 0.03 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 26, delay: index * 0.03 }}
                   onClick={() => hasPath && handleWordClick(wordData)}
                   disabled={!hasPath}
                   className={cn(

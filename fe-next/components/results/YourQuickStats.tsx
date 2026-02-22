@@ -60,7 +60,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
     <motion.div
       initial={{ opacity: 0, y: -20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="w-full max-w-sm mx-auto mb-4"
     >
       <div
@@ -86,7 +86,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ scale: 0, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.1 }}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2',
                 rankStyle.bg,
@@ -109,7 +109,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
               className="text-right"
             >
               <div className="text-3xl sm:text-4xl font-black text-white">
@@ -126,7 +126,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.25 }}
               className="flex items-center gap-1.5 mb-3 px-2 py-1.5 rounded-neo bg-neo-cyan/20 border border-neo-cyan/40"
             >
               <TrendingUp className="w-3.5 h-3.5 text-neo-cyan" />
@@ -143,7 +143,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
               className="bg-white/10 rounded-neo border border-white/20 p-1.5 text-center"
             >
               <div className="flex justify-center mb-0.5">
@@ -163,7 +163,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.35 }}
               className="bg-white/10 rounded-neo border border-white/20 p-1.5 text-center"
             >
               <div className="flex justify-center mb-0.5">
@@ -183,7 +183,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.4 }}
               className="bg-white/10 rounded-neo border border-white/20 p-1.5 text-center"
             >
               <div className="flex justify-center mb-0.5">
@@ -205,7 +205,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
               className="flex justify-center"
             >
               <PlayerArchetypeBadge archetype={archetype} size="lg" />

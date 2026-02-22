@@ -102,7 +102,7 @@ const SkillCheckpoint = memo<{
     <motion.div
       initial={isJustUnlocked ? { scale: 0.8, opacity: 0 } : false}
       animate={isJustUnlocked ? { scale: [0.8, 1.2, 1], opacity: 1 } : { scale: 1, opacity: 1 }}
-      transition={isJustUnlocked ? { duration: 0.5, ease: 'easeOut' } : undefined}
+      transition={isJustUnlocked ? { type: 'spring', stiffness: 400, damping: 22 } : undefined}
       className={cn(
         'flex items-center gap-2 p-2 rounded-lg border-2 transition-all duration-300',
         isCompleted
@@ -121,7 +121,7 @@ const SkillCheckpoint = memo<{
           <motion.div
             initial={isJustUnlocked ? { rotate: -180, scale: 0 } : false}
             animate={isJustUnlocked ? { rotate: 0, scale: 1 } : undefined}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 22 }}
           >
             <Check className="w-4 h-4 text-neo-lime" />
           </motion.div>
@@ -289,6 +289,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       {...containerProps}
       className={cn(
         'rounded-xl border-2 overflow-hidden shadow-hard-sm',

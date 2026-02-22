@@ -214,7 +214,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', damping: 10 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 10 }}
             className={cn(
               'w-20 h-20 mx-auto mb-6',
               'flex items-center justify-center',
@@ -231,7 +231,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'text-xl font-black text-center mb-2',
               'text-neo-white'
@@ -244,7 +244,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.h3
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
             className={cn('text-2xl font-black text-center mb-2')}
             style={{ color: tierColors?.text || '#BFFF00' }}
           >
@@ -256,7 +256,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
               className="flex items-center justify-center gap-2 mb-4"
             >
               <span className="text-2xl">{tierIcon}</span>
@@ -273,7 +273,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
             className="text-center text-neo-white/80 text-sm"
           >
             {normalized.description}
@@ -283,7 +283,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.7, type: 'spring', stiffness: 280, damping: 26 }}
             onClick={props.onClose}
             className={cn(
               'mt-6 w-full py-3',

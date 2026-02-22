@@ -132,7 +132,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
     <motion.div
       initial={{ opacity: 0, y: -20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="w-full max-w-xl mx-auto mb-4"
     >
       <div
@@ -163,7 +163,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <motion.div
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 3 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.1 }}
                 className={cn(
                   'flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
                   rankStyle.bg, rankStyle.text
@@ -205,7 +205,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
                 className="flex-shrink-0 text-right"
               >
                 <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
@@ -221,7 +221,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.25 }}
               className="flex items-center gap-1.5 mb-2 sm:mb-3 px-2 py-1 sm:py-1.5 rounded-neo bg-neo-cyan/20 border border-neo-cyan/40"
             >
               <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cyan" />
@@ -285,7 +285,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             <motion.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
               className="mb-2 sm:mb-3 p-2 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30"
             >
               <div className="text-[10px] sm:text-xs text-neo-cyan font-bold flex items-center gap-1.5 mb-1">

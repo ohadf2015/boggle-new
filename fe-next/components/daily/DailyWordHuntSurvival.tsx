@@ -182,12 +182,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
         {/* Word Feedback — inline WordFormingArea */}
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-          <WordFormingArea
-            word={state.formedWord}
-            letterCount={state.letterCount}
-            feedback={state.wordFeedback}
-            compact
-          />
+          <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
         </div>
 
         {/* Auto-Clue Notifications */}
@@ -356,12 +351,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Word Feedback — inline WordFormingArea */}
       <div className="flex justify-center py-1">
-        <WordFormingArea
-          word={state.formedWord}
-          letterCount={state.letterCount}
-          feedback={state.wordFeedback}
-          compact
-        />
+        <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
       </div>
 
       {/* Auto-Clue Notifications */}

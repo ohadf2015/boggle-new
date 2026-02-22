@@ -114,7 +114,7 @@ export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.1 }}
+      transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.1 }}
       className="w-full max-w-sm mb-8"
     >
       <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2 text-center">
@@ -128,7 +128,7 @@ export function WaveBreakdown({ waveResults, label }: { waveResults: WaveResult[
               key={wr.waveNumber}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.2 + idx * 0.08 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 1.2 + idx * 0.08 }}
               className={cn(
                 'relative flex items-center gap-2 px-3 py-2 rounded-neo overflow-hidden',
                 idx % 2 === 0 ? 'bg-white/5' : 'bg-white/[0.02]',

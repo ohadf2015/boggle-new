@@ -140,6 +140,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const renderWaitingStatus = (): React.ReactElement => (
     <m.div
       data-testid="waiting-status"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="bg-neo-cream text-neo-black p-6 rounded-xl border-3 border-neo-black shadow-hard text-center"
     >
       <m.div

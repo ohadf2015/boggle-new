@@ -173,7 +173,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <motion.h3
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 }}
+                  transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
                   className="text-sm font-black uppercase text-neo-lime truncate"
                 >
                   {localizedAchievement.name}
@@ -181,7 +181,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <motion.p
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
                   className="text-xs font-bold text-neo-white/90 line-clamp-1"
                 >
                   {localizedAchievement.description}
@@ -192,7 +192,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
                 className="flex-shrink-0 flex gap-1.5"
               >
                 {/* Share button */}

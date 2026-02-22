@@ -233,7 +233,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.05 }}
+            transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 26 }}
             className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center"
           >
             <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-300 text-sm font-bold">
@@ -251,7 +251,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <motion.div
             initial={{ scale: 0.8, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ delay: 0.05, type: 'spring' }}
+            transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
             className="w-full max-w-sm mx-auto bg-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -282,14 +282,14 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className="space-y-2"
         >
           {/* Daily Badge - Simple text, no box */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.05, type: 'spring' }}
+            transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
             className="inline-flex items-center gap-2"
           >
             <Target className="w-6 h-6 text-amber-500" />
@@ -311,7 +311,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           >
             <DailyIntroCarousel targetWordLength={targetWordLength} />
           </motion.div>
@@ -321,7 +321,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, type: 'spring' }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
         >
           <Button
             onClick={onStart}
@@ -336,7 +336,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35, type: 'spring' }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
           >
             <Button
               onClick={() => setShowCreateChallenge(true)}
@@ -355,7 +355,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
           className="flex items-center justify-center gap-4 pt-2"
         >
           <button
@@ -411,7 +411,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="text-xs text-gray-500 dark:text-gray-400"
         >
           {t('daily.samePuzzle')}

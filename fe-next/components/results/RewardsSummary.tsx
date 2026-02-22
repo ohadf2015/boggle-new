@@ -148,7 +148,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
                 className={cn(
                   'flex items-center justify-between p-3 rounded-neo border-2',
                   isAuthenticated
@@ -202,7 +202,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
               >
                 <WinStreakDisplay
                   currentStreak={winStreak.currentStreak}
@@ -219,7 +219,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
                 onClick={onAchievementsClick}
                 role={onAchievementsClick ? 'button' : undefined}
                 tabIndex={onAchievementsClick ? 0 : undefined}
@@ -260,7 +260,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
             <motion.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring' }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
               className="absolute -top-2 -right-2 w-12 h-12 bg-neo-lime rounded-full border-3 border-neo-black shadow-hard flex items-center justify-center"
             >
               <Star className="w-6 h-6 text-neo-black fill-neo-black" />

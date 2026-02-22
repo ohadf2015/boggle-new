@@ -83,7 +83,7 @@ export function GamePreviewCard({
               key={i}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.015 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 28, delay: i * 0.015 }}
               className={cn(
                 'aspect-square rounded-sm xl:rounded border border-neo-black/30',
                 i % 3 === 0 ? 'bg-neo-pink/20' :

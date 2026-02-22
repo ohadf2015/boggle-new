@@ -74,7 +74,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="w-full max-w-3xl mx-auto" // Constrain max width for desktop
     >
       <div className="bg-neo-navy/90 rounded-neo-lg border-3 border-neo-black shadow-hard-lg overflow-hidden">
@@ -106,7 +106,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1, duration: 0.2, ease: 'easeOut' }}
+                  transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
                   className="relative flex flex-col items-center md:items-start"
                 >
                   <div
@@ -136,7 +136,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
                   className="flex flex-col items-center md:items-start justify-center gap-4 pt-4 md:pt-0 md:border-l md:border-t-0 border-t border-slate-700/40 md:pl-8"
                 >
                   {/* Target word */}
@@ -189,7 +189,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
             >
               {/* Desktop: Side by side | Mobile: Stacked */}
               <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 md:gap-8 items-center">

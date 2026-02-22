@@ -326,7 +326,7 @@ export default function AdventureView(): React.JSX.Element {
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
               <span className="hidden sm:inline">
-                {t('adventure.backToMap') || 'World Map'}
+                {t('common.back') || 'Back'}
               </span>
             </button>
           ) : (

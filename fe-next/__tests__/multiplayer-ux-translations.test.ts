@@ -6,7 +6,7 @@ import { sv } from '../translations/sv';
 import { ja } from '../translations/ja';
 
 describe('Multiplayer UX translation keys', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const langs: Record<string, any> = { en, he, sv, ja };
 
   it.each(Object.entries(langs))('%s: has hostView.roomChat key', (_name, t) => {

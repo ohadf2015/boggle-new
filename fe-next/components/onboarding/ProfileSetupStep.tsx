@@ -81,6 +81,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26 }}
         className="text-center space-y-1"
       >
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
@@ -95,7 +96,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full"
       >
         <div className="grid grid-cols-6 sm:grid-cols-6 gap-1.5 sm:gap-2">
@@ -116,7 +117,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                 )}
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.2 + index * 0.015 }}
+                transition={{ delay: 0.2 + index * 0.015, type: 'spring', stiffness: 500, damping: 28 }}
                 whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -132,6 +133,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                     className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
                   >
                     <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
@@ -149,7 +151,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.35 }}
+        transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full bg-neo-cream border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard-md"
       >
         <div className="flex items-start gap-3 sm:gap-4">
@@ -198,6 +200,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
                   className={cn(
                     'w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center shadow-hard-sm shrink-0',
                     isNameValid

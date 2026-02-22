@@ -70,7 +70,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
       key={player.username}
       initial={!useVirtual ? { x: 50, opacity: 0 } : false}
       animate={!useVirtual ? { x: 0, opacity: 1 } : undefined}
-      transition={!useVirtual ? { delay: index * 0.05 } : undefined}
+      transition={!useVirtual ? { type: 'spring', stiffness: 380, damping: 26, delay: index * 0.05 } : undefined}
       className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
         hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}

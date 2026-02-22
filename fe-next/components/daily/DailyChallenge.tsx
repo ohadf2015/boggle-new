@@ -708,9 +708,14 @@ const DailyChallenge: React.FC = () => {
   // CRITICAL: Use flex-1 + min-h-0 to establish proper height constraint for child scroll containers.
   // Using min-h-full alone allows unbounded growth which breaks overflow-y-auto on children.
   // The parent screen-fit-content has flex: 1, so flex-1 here inherits the constrained height.
+  //
+  // SCROLL CONTRACT: Results phases ('completed', 'already-played') render DailyWordHuntResults
+  // which manages its own scroll via isolate-scroll-daily. Adding overflow-y-auto here would
+  // create a competing intermediate scroll container that breaks mobile scrolling.
+  const isResultsPhase = phase === 'completed' || phase === 'already-played';
   return (
     <div
-      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : 'overflow-y-auto'}`}
+      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : isResultsPhase ? '' : 'overflow-y-auto'}`}
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show when not playing */}

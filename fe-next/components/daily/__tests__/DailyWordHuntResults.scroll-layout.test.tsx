@@ -185,6 +185,32 @@ describe('DailyChallenge Container Layout', () => {
         expect(hasMinHFullAlone).toBe(false);
       }
     });
+
+    it('should NOT apply overflow-y-auto unconditionally for all non-playing phases', () => {
+      // CRITICAL BUG REGRESSION TEST:
+      // Commit 0cb9ba22 added overflow-y-auto to ALL non-playing phases, including
+      // 'completed' and 'already-played'. These phases render DailyWordHuntResults
+      // which has its own isolate-scroll-daily scroll container.
+      //
+      // Having overflow-y-auto on BOTH:
+      //   1. DailyChallenge wrapper (intermediate container) ← the bug
+      //   2. DailyWordHuntResults inner div (isolate-scroll-daily) ← intentional
+      // ... creates competing scroll containers that prevent mobile scrolling.
+      //
+      // INCORRECT pattern (bug):
+      //   phase === 'playing' ? 'overflow-hidden' : 'overflow-y-auto'
+      //   ↑ applies overflow-y-auto to completed/already-played phases too
+      //
+      // CORRECT pattern (fix): results phases must be excluded from overflow-y-auto
+      //   phase === 'playing' ? 'overflow-hidden' : isResultsPhase ? '' : 'overflow-y-auto'
+      //   ↑ completed/already-played get no overflow class, letting their child manage scroll
+
+      // The bug: simple ternary with only 'playing' as the guard for overflow-y-auto
+      const bugPattern = /phase\s*===\s*'playing'\s*\?\s*'overflow-hidden'\s*:\s*'overflow-y-auto'/;
+
+      // This assertion FAILS currently (bug present), PASSES after fix
+      expect(source).not.toMatch(bugPattern);
+    });
   });
 });
 

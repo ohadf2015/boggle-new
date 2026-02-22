@@ -289,13 +289,7 @@ export default function SoloPracticeBoard({
         </Card>
 
         {/* Word forming area with feedback */}
-        <WordFormingArea
-          word={formingWord}
-          letterCount={formingLetterCount}
-          feedback={currentFeedback}
-          compact
-          className="mb-3 justify-center"
-        />
+        <WordFormingArea word={formingWord} letterCount={formingLetterCount} feedback={currentFeedback} compact className="mb-3 justify-center" />
 
         {/* Game grid - container needs proper dimensions for absolute-positioned inner grid */}
         <div className="mb-4 flex items-center justify-center">

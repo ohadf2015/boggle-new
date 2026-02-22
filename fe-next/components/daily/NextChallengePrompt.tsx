@@ -120,7 +120,7 @@ export function NextChallengePrompt({ completedChallenge, locale }: NextChalleng
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        transition={{ delay: 0.5, duration: 0.4, type: 'spring', damping: 20 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.5 }}
         className="w-full mt-6"
       >
         <div className={`${copy.bgColor} border-3 border-neo-black rounded-neo shadow-hard-lg p-6 relative overflow-hidden`}>

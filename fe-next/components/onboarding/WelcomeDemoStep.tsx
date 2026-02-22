@@ -34,7 +34,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
         className="text-center space-y-1"
       >
         <div className="flex justify-center mb-1">
@@ -53,7 +53,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-1">
@@ -75,7 +75,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
         className="w-full"
       >
         <MiniGrid

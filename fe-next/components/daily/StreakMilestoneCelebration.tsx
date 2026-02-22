@@ -199,7 +199,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             <motion.h2
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
               className="text-3xl md:text-4xl font-black text-neo-black dark:text-white mb-2"
             >
               {title}
@@ -209,7 +209,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.4 }}
+              transition={{ type: 'spring', delay: 0.4, stiffness: 400, damping: 22 }}
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard mb-4"
             >
               <span className="text-4xl font-black text-white">{streak}</span>
@@ -220,7 +220,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             <motion.p
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
               className="text-gray-600 dark:text-gray-300 text-lg mb-6"
             >
               {subtitle}
@@ -230,7 +230,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
             >
               <Button
                 onClick={onClose}

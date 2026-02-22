@@ -101,7 +101,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
+      transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
         'rounded-neo border-2 border-neo-black shadow-hard overflow-hidden',
         'bg-slate-800/90 backdrop-blur-sm'
@@ -128,7 +128,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
               key={index}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 + index * 0.1 }}
+              transition={{ delay: 0.6 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
               className={cn(
                 'rounded-lg border-2 p-2.5',
                 colors.bg,
@@ -208,7 +208,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
+            transition={{ delay: 1, type: 'spring', stiffness: 300, damping: 26 }}
             onClick={onPlayAgain}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

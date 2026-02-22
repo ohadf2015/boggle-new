@@ -297,6 +297,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                           initial={{ opacity: 0, y: rankChange === 'up' ? 5 : -5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                           className={cn(
                             'text-[9px] font-black',
                             rankChange === 'up' ? 'text-neo-lime' : 'text-neo-red'

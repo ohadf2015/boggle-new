@@ -200,7 +200,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 0.2 }}
               >
                 <div className="relative">
                   <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-sm" strokeWidth={2.5} />
@@ -231,7 +231,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   className="space-y-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
                 >
                   {/* Board Size Selection */}
                   <div className="space-y-3">
@@ -310,7 +310,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
                     className="space-y-2"
                   >
                     <label htmlFor="target-word" className="block text-sm sm:text-base font-black text-neo-black dark:text-neo-white uppercase tracking-tight">
@@ -351,7 +351,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
                   >
                     <Button
                       onClick={handleCreate}
@@ -489,7 +489,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
                   >
                     <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black dark:text-neo-white uppercase tracking-tight">
                       {t('daily.challengeCreated')}
@@ -502,7 +502,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     className="flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-xl p-3 shadow-hard-sm"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
                   >
                     <div className="flex-1 overflow-hidden">
                       <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
@@ -530,7 +530,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
                     className="space-y-3"
                   >
                     <Button
@@ -562,7 +562,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
                     className="pt-4 border-t-3 border-gray-200"
                   >
                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium flex items-center justify-center gap-2">

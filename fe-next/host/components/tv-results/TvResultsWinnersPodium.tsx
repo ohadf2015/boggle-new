@@ -206,7 +206,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.5 }}
         className={cn(
           'font-black uppercase tracking-wide mb-3',
           config.textColor,
@@ -220,7 +220,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ delay: 0.4, type: 'spring', stiffness: 400 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.4 }}
         className={cn(
           'relative mb-3',
           isWinner && 'animate-pulse-subtle'
@@ -238,7 +238,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
+        transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
         className={cn(
           'font-black uppercase truncate max-w-full text-center mb-2',
           config.textColor,
@@ -252,7 +252,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
       <motion.div
         initial={{ scale: 0, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        transition={{ delay: 0.7, type: 'spring', stiffness: 300 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.7 }}
         className={cn(
           'font-black',
           config.textColor,
@@ -268,7 +268,7 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.8 }}
           className={cn('text-sm font-bold opacity-70', config.textColor)}
         >
           {player.wordCount} {t('tvResults.words')}

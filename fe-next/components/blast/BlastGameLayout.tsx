@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Bomb, HelpCircle, Lightbulb, Shuffle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { LetterTileWord } from '@/components/singleplayer/game/components/LetterTileWord';
+
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -12,7 +12,7 @@ import { BlastGrid } from './BlastGrid';
 import { BlastProgressBar } from './BlastProgressBar';
 import { BlastFoundWords } from './BlastFoundWords';
 import { BlastHelpModal } from './BlastHelpModal';
-import type { WordFeedback } from '@/components/game/WordFormingArea';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
 import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase } from './types';
@@ -426,10 +426,7 @@ export function BlastGameLayout({
         'min-h-[48px] rounded-neo',
         formedWord ? 'bg-white/5 border border-white/10' : ''
       )}>
-        <LetterTileWord
-          word={formedWord}
-          feedback={currentFeedback}
-        />
+        <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
         {formedWord && (
           <span className="absolute end-3 text-[10px] font-bold text-white/40 tabular-nums">
             {formedWord.length}
@@ -511,7 +508,7 @@ export function BlastGameLayout({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="absolute inset-0 z-50 flex items-center justify-center bg-neo-black/40 backdrop-blur-sm"
             >
               <motion.div
@@ -546,7 +543,7 @@ export function BlastGameLayout({
                 <motion.div
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.5 }}
                   className="text-2xl font-black uppercase text-neo-black"
                 >
                   {t('blast.complete') || 'Board Cleared!'}
@@ -555,7 +552,7 @@ export function BlastGameLayout({
                 <motion.div
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.65 }}
+                  transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.65 }}
                   className="text-lg font-bold text-neo-black/70 tabular-nums"
                 >
                   {score.toLocaleString()} {t('common.points') || 'pts'}

@@ -141,7 +141,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -154,7 +154,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -167,7 +167,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -180,7 +180,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -237,7 +237,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                 key={idx}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.05 * idx }}
+                transition={{ delay: 0.05 * idx, type: 'spring', stiffness: 380, damping: 26 }}
                 className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border-2 border-slate-200"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-neo-black text-neo-white font-black text-sm">

@@ -19,7 +19,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
     <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.3 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
     >
       <button
         onClick={onShareClick}

@@ -161,6 +161,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 22 }}
           className={cn(
             'flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
             comboLevel >= 10

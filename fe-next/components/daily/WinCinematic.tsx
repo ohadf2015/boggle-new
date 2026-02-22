@@ -87,7 +87,7 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
       <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
         className="text-[8rem] font-black text-neo-lime leading-none tabular-nums"
       >
         {displayScore}
@@ -96,7 +96,7 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
       <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
         className="text-slate-400 text-lg font-bold uppercase tracking-widest"
       >
         {t('common.pts')}
@@ -108,6 +108,7 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
           <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 26 }}
             className="absolute bottom-12 text-slate-500 text-sm uppercase tracking-widest"
           >
             {t('common.tapToContinue')}

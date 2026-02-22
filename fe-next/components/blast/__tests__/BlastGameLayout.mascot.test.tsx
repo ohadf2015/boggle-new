@@ -54,8 +54,9 @@ jest.mock('@/components/game/ComboDisplay', () => ({
   default: () => <div data-testid="combo-display" />,
 }));
 
-jest.mock('@/components/singleplayer/game/components/LetterTileWord', () => ({
-  LetterTileWord: () => <div data-testid="letter-tile-word" />,
+jest.mock('@/components/game/WordFormingArea', () => ({
+  __esModule: true,
+  default: () => <div data-testid="word-forming-area" />,
 }));
 
 jest.mock('@/components/ui/ConfirmationDialog', () => ({

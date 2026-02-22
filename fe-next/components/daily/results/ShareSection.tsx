@@ -43,7 +43,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
   <motion.div
     initial={{ y: 20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
-    transition={{ delay: 0.3 }}
+    transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
     className="space-y-2"
   >
     {/* Failed players: Retry is primary, Share is secondary */}

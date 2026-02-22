@@ -143,6 +143,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="mt-2 text-neo-lime font-bold text-sm"
             >
               {t('wordHunt.score.perfect') || 'Perfect Score!'}
@@ -158,7 +159,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
             key={category.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
             className="flex items-center gap-3"
           >
             {/* Icon */}
@@ -197,7 +198,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="px-4 pb-4"
         >
           <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-neo-cyan/10 to-neo-pink/10 rounded-lg border border-gray-700">

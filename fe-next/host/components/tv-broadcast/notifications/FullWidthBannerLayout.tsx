@@ -67,7 +67,7 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
               className="font-bold text-lg md:text-xl opacity-90 mt-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.9 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 280, damping: 26 }}
             >
               {subtext}
             </motion.p>

@@ -53,6 +53,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26 }}
         className="text-center space-y-1"
       >
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
@@ -67,7 +68,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full"
       >
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
@@ -78,7 +79,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
                 key={tip.titleKey}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.15 + index * 0.1 }}
+                transition={{ delay: 0.15 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
                 className="flex sm:flex-col items-center gap-2 sm:gap-2 p-2.5 sm:p-3 rounded-neo border-2 border-neo-black shadow-hard-sm bg-neo-cream"
               >
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm shrink-0">
@@ -102,7 +103,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full"
       >
         <div
@@ -133,7 +134,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
+        transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
         className="bg-neo-lime/30 border-2 border-neo-black/20 rounded-neo px-4 py-2"
       >
         <p className="text-center font-bold text-xs text-neo-black dark:text-neo-white">

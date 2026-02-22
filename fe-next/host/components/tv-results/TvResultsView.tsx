@@ -253,7 +253,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
+                  transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
                   className="text-neo-cream/70 font-bold mt-2"
                 >
                   Round {tournamentData.currentRound} of {tournamentData.totalRounds}

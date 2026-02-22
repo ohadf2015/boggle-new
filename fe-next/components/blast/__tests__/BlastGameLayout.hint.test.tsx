@@ -43,8 +43,9 @@ jest.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
-jest.mock('@/components/singleplayer/game/components/LetterTileWord', () => ({
-  LetterTileWord: () => <div data-testid="letter-tile-word" />,
+jest.mock('@/components/game/WordFormingArea', () => ({
+  __esModule: true,
+  default: () => <div data-testid="word-forming-area" />,
 }));
 
 jest.mock('@/components/game/ComboDisplay', () => ({

@@ -105,7 +105,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
               >
                 {showNextRound ? (
                   <Button

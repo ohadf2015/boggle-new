@@ -340,7 +340,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
                 className="mt-6 text-center"
               >
                 <div className="bg-neo-black text-neo-white px-6 py-3 font-black uppercase text-xl md:text-2xl tracking-wider rotate-[1deg] shadow-hard border-4 border-neo-black">
@@ -392,7 +392,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                     initial={{ scale: 0, opacity: 0, rotate: -5 }}
                     animate={{ scale: 1, opacity: 1, rotate: 0 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
                   >
                     <Badge
                       className={`font-black px-3 py-3 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm ${

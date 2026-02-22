@@ -128,7 +128,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
+      transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
       className={cn('flex flex-col gap-2', className)}
     >
       {/* Winner callout - draws attention to share action */}
@@ -138,6 +138,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
             initial={{ opacity: 0, y: -5, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             className={cn(
               'flex items-center justify-center gap-2 px-3 py-2',
               'bg-gradient-to-r from-neo-yellow/20 to-neo-orange/20',

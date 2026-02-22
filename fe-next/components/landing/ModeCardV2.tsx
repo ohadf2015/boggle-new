@@ -326,7 +326,7 @@ const ModeCardV2: React.FC<ModeCardV2Props> = ({
                 <motion.span
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.1 }}
                   className="inline-flex items-center gap-1.5 bg-neo-cream text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm px-2.5 py-1 text-sm"
                 >
                   <Users className="w-4 h-4" />
@@ -341,6 +341,7 @@ const ModeCardV2: React.FC<ModeCardV2Props> = ({
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 26 }}
               className="inline-flex items-center gap-1.5 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm px-2.5 py-1 text-sm"
             >
               <span className="relative flex h-2 w-2">
@@ -356,7 +357,7 @@ const ModeCardV2: React.FC<ModeCardV2Props> = ({
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 0.1 }}
               className="inline-flex items-center gap-1.5 bg-neo-orange text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm px-2.5 py-1 text-sm"
             >
               <Trophy className="w-4 h-4" />
