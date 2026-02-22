@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader } from '@/components/ui/Loader';
@@ -119,8 +118,8 @@ export default function ClassroomManager() {
             setIsCreateDialogOpen(true);
           }}
           className={cn(
-            'bg-neo-cyan text-neo-black font-neo-body font-bold',
-            'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
+            'bg-neo-cyan text-black font-neo-body font-black',
+            'border-3 border-black shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5',
             'transition-all'
           )}
         >
@@ -131,133 +130,144 @@ export default function ClassroomManager() {
 
       {/* Classroom Grid */}
       {classrooms.length === 0 ? (
-        <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
-          <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
-            <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
-              {t('teacher.classroom.noClassrooms')}
-            </h3>
-            <p className="text-neo-white/60 mb-6 text-pretty">{t('teacher.classroom.createFirst')}</p>
-            <Button
-              onClick={() => {
-                setFormData({ name: '', language: language as Language });
-                setIsCreateDialogOpen(true);
-              }}
-              className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-            >
-              <Plus className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
-              {t('teacher.classroom.create')}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="border-3 border-black rounded-neo bg-white shadow-hard py-12 text-center">
+          <div className="w-16 h-16 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
+            <Users className="w-9 h-9 text-black" />
+          </div>
+          <h3 className="text-xl font-neo-display font-black text-black mb-2 text-balance">
+            {t('teacher.classroom.noClassrooms')}
+          </h3>
+          <p className="text-black/60 font-bold mb-6 text-pretty">{t('teacher.classroom.createFirst')}</p>
+          <Button
+            onClick={() => {
+              setFormData({ name: '', language: language as Language });
+              setIsCreateDialogOpen(true);
+            }}
+            className="bg-neo-cyan text-black font-black border-3 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+          >
+            <Plus className={cn('w-5 h-5', isRTL ? 'ml-2' : 'mr-2')} />
+            {t('teacher.classroom.create')}
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {classrooms.map((classroom) => (
-            <Card
-              key={classroom.id}
-              className="border-neo border-neo-black shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all"
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl font-neo-display text-neo-white text-balance">
-                  {classroom.name}
-                </CardTitle>
-                <p className="text-sm text-neo-white/60 mt-1">
-                  {classroom.language.toUpperCase()} •{' '}
-                  {classroom.member_count === 1
-                    ? t('teacher.classroom.member')
-                    : t('teacher.classroom.members').replace('{{count}}', String(classroom.member_count || 0))}
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Join Code */}
-                <div className="bg-neo-black/30 border-neo border-neo-yellow p-3 rounded-neo">
-                  <p className="text-xs text-neo-white/60 mb-1">{t('teacher.classroom.joinCode')}</p>
-                  <div className="flex items-center justify-between">
-                    <code className="text-2xl font-neo-display text-neo-yellow tracking-wider">
-                      {classroom.join_code}
-                    </code>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyJoinCode(classroom.join_code)}
-                        className="text-neo-yellow hover:bg-neo-yellow/20"
-                        aria-label={t('teacher.classroom.copyCode')}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyInviteLink(classroom.join_code)}
-                        className="text-neo-cyan hover:bg-neo-cyan/20"
-                        aria-label={t('teacher.classroom.copyLink')}
-                      >
-                        <Link2 className="w-4 h-4" />
-                      </Button>
+          {classrooms.map((classroom, idx) => {
+            // Alternate card accent colors
+            const headerColors = ['bg-neo-cyan', 'bg-neo-yellow', 'bg-neo-pink'];
+            const headerBg = headerColors[idx % headerColors.length];
+
+            return (
+              <div
+                key={classroom.id}
+                className="border-3 border-black rounded-neo shadow-hard bg-white overflow-hidden hover:-translate-y-0.5 hover:shadow-hard-lg transition-all"
+              >
+                {/* Colored header */}
+                <div className={cn('px-5 py-4', headerBg)}>
+                  <h3 className="text-xl font-neo-display font-black text-black text-balance truncate">
+                    {classroom.name}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="px-2 py-0.5 bg-black text-white text-xs font-black rounded-neo">
+                      {classroom.language.toUpperCase()}
+                    </span>
+                    <span className="text-sm text-black/70 font-bold">
+                      {classroom.member_count === 1
+                        ? t('teacher.classroom.member')
+                        : t('teacher.classroom.members').replace('{{count}}', String(classroom.member_count || 0))}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card body */}
+                <div className="p-4 space-y-3">
+                  {/* Join Code */}
+                  <div className="bg-neo-yellow/20 border-2 border-black p-3 rounded-neo">
+                    <p className="text-xs text-black/60 font-bold mb-1">{t('teacher.classroom.joinCode')}</p>
+                    <div className="flex items-center justify-between">
+                      <code className="text-2xl font-neo-display font-black text-black tracking-wider">
+                        {classroom.join_code}
+                      </code>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => copyJoinCode(classroom.join_code)}
+                          className="text-black hover:bg-black/10 border border-black/20 rounded-neo"
+                          aria-label={t('teacher.classroom.copyCode')}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => copyInviteLink(classroom.join_code)}
+                          className="text-black hover:bg-black/10 border border-black/20 rounded-neo"
+                          aria-label={t('teacher.classroom.copyLink')}
+                        >
+                          <Link2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* View Students Button */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)}
-                  className={cn(
-                    'w-full border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20',
-                    'flex items-center justify-between'
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    {t('teacher.classrooms.students.count').replace('{{count}}', String(classroom.member_count || 0))}
-                  </span>
-                  {expandedClassroomId === classroom.id ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
-                </Button>
+                  {/* View Students Button */}
+                  <button
+                    onClick={() => setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)}
+                    className={cn(
+                      'w-full flex items-center justify-between px-3 py-2 rounded-neo border-2 border-black font-bold text-sm transition-all shadow-hard-sm',
+                      expandedClassroomId === classroom.id
+                        ? 'bg-black text-white'
+                        : 'bg-white text-black hover:bg-black/5'
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      {t('teacher.classrooms.students.count').replace('{{count}}', String(classroom.member_count || 0))}
+                    </span>
+                    {expandedClassroomId === classroom.id ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
 
-                {/* Student List (Expanded) */}
-                {expandedClassroomId === classroom.id && (
-                  <div className="mt-4">
-                    <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
+                  {/* Student List (Expanded) */}
+                  {expandedClassroomId === classroom.id && (
+                    <div>
+                      <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedClassroomId(classroom.id);
+                        setFormData({ name: classroom.name, language: classroom.language });
+                        setIsEditDialogOpen(true);
+                      }}
+                      className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
+                    >
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      {t('teacher.classroom.edit')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedClassroomId(classroom.id);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      className="bg-neo-pink text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
+                      aria-label={t('teacher.classroom.delete')}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedClassroomId(classroom.id);
-                      setFormData({ name: classroom.name, language: classroom.language });
-                      setIsEditDialogOpen(true);
-                    }}
-                    className="flex-1 border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20"
-                  >
-                    <Edit2 className="w-4 h-4 mr-2" />
-                    {t('teacher.classroom.edit')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedClassroomId(classroom.id);
-                      setIsDeleteDialogOpen(true);
-                    }}
-                    className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-                    aria-label={t('teacher.classroom.delete')}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -274,42 +284,44 @@ export default function ClassroomManager() {
           <Dialog.Content
             className={cn(
               'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50',
-              'rounded-neo'
+              'w-full max-w-md bg-white border-3 border-black shadow-hard-lg z-50',
+              'rounded-neo overflow-hidden'
             )}
           >
-            <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
-              {isCreateDialogOpen ? t('teacher.classroom.create') : t('teacher.classroom.edit')}
-            </Dialog.Title>
+            <div className="bg-neo-cyan px-6 py-4 border-b-3 border-black">
+              <Dialog.Title className="text-2xl font-neo-display font-black text-black text-balance">
+                {isCreateDialogOpen ? t('teacher.classroom.create') : t('teacher.classroom.edit')}
+              </Dialog.Title>
+            </div>
             <Dialog.Description className="sr-only">
               {isCreateDialogOpen
                 ? t('teacher.classroom.dialog.createDescription')
                 : t('teacher.classroom.dialog.editDescription')}
             </Dialog.Description>
 
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
+                <label className="block text-sm font-neo-body font-black text-black mb-2">
                   {t('teacher.classroom.name')}
                 </label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder={t('teacher.classroom.namePlaceholder')}
-                  className="border-neo border-neo-black shadow-hard-sm"
+                  className="border-2 border-black shadow-hard-sm font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-2">
+                <label className="block text-sm font-neo-body font-black text-black mb-2">
                   {t('teacher.classroom.language')}
                 </label>
                 <select
                   value={formData.language}
                   onChange={(e) => setFormData({ ...formData, language: e.target.value as Language })}
                   className={cn(
-                    'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
-                    'text-neo-white font-neo-body shadow-hard-sm',
+                    'w-full px-4 py-2 bg-white border-2 border-black',
+                    'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
                     'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
                   )}
                 >
@@ -324,18 +336,17 @@ export default function ClassroomManager() {
                 <Button
                   onClick={isCreateDialogOpen ? handleCreate : handleEdit}
                   disabled={isSaving || !formData.name.trim()}
-                  className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
+                  className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
                 >
                   {isSaving ? t('common.loading') : isCreateDialogOpen ? t('teacher.classroom.create') : t('teacher.classroom.edit')}
                 </Button>
                 <Button
-                  variant="outline"
                   onClick={() => {
                     setIsCreateDialogOpen(false);
                     setIsEditDialogOpen(false);
                     setSelectedClassroomId(null);
                   }}
-                  className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
+                  className="bg-white text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all"
                 >
                   {t('common.cancel')}
                 </Button>
@@ -344,10 +355,10 @@ export default function ClassroomManager() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
                 aria-label={t('common.close')}
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </Dialog.Close>
           </Dialog.Content>
@@ -361,32 +372,36 @@ export default function ClassroomManager() {
           <AlertDialog.Content
             className={cn(
               'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50',
-              'rounded-neo'
+              'w-full max-w-md bg-white border-3 border-black shadow-hard-lg z-50',
+              'rounded-neo overflow-hidden'
             )}
           >
-            <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
-              {t('teacher.classroom.delete')}
-            </AlertDialog.Title>
-            <AlertDialog.Description className="text-neo-white/60 mb-6 text-pretty">
-              {t('teacher.classroom.confirmDelete')}
-            </AlertDialog.Description>
+            <div className="bg-neo-pink px-6 py-4 border-b-3 border-black">
+              <AlertDialog.Title className="text-2xl font-neo-display font-black text-black text-balance">
+                {t('teacher.classroom.delete')}
+              </AlertDialog.Title>
+            </div>
+            <div className="p-6">
+              <AlertDialog.Description className="text-black/70 font-bold mb-6 text-pretty">
+                {t('teacher.classroom.confirmDelete')}
+              </AlertDialog.Description>
 
-            <div className="flex gap-3">
-              <AlertDialog.Action asChild>
-                <Button
-                  onClick={handleDelete}
-                  disabled={isSaving}
-                  className="flex-1 bg-neo-pink text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-                >
-                  {isSaving ? t('common.loading') : t('teacher.classroom.delete')}
-                </Button>
-              </AlertDialog.Action>
-              <AlertDialog.Cancel asChild>
-                <Button variant="outline" className="border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20">
-                  {t('common.cancel')}
-                </Button>
-              </AlertDialog.Cancel>
+              <div className="flex gap-3">
+                <AlertDialog.Action asChild>
+                  <Button
+                    onClick={handleDelete}
+                    disabled={isSaving}
+                    className="flex-1 bg-neo-pink text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+                  >
+                    {isSaving ? t('common.loading') : t('teacher.classroom.delete')}
+                  </Button>
+                </AlertDialog.Action>
+                <AlertDialog.Cancel asChild>
+                  <Button className="bg-white text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all">
+                    {t('common.cancel')}
+                  </Button>
+                </AlertDialog.Cancel>
+              </div>
             </div>
           </AlertDialog.Content>
         </AlertDialog.Portal>

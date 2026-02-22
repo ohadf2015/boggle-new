@@ -126,13 +126,13 @@ export default function StudentLessonView() {
     >
       {/* Section header */}
       <motion.div variants={headerEntrance} className="flex items-center gap-3 mb-2">
-        <h2 className="text-2xl font-neo-display text-neo-white">
+        <h2 className="text-2xl font-neo-display font-black text-neo-white">
           {t('student.dashboard.title')}
         </h2>
         {activeLessonCount > 0 && (
           <motion.span
             variants={countBadgePop}
-            className="px-2.5 py-0.5 bg-neo-cyan/20 text-neo-cyan text-sm font-bold rounded-full tabular-nums"
+            className="px-2.5 py-0.5 bg-neo-cyan border-2 border-black text-black text-sm font-black rounded-neo shadow-hard-sm tabular-nums"
           >
             {activeLessonCount}
           </motion.span>
@@ -151,13 +151,21 @@ export default function StudentLessonView() {
 
         const lessonName = lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
 
-        // Accent border color per status
-        const accentBorder =
+        // Card accent color per status
+        const cardBg =
           status === 'assigned'
-            ? 'border-s-neo-cyan'
+            ? 'bg-white'
             : status === 'completed'
-              ? 'border-s-neo-yellow'
-              : 'border-s-neo-white/20';
+              ? 'bg-neo-yellow/10'
+              : 'bg-white';
+
+        // Left accent bar color per status
+        const accentBar =
+          status === 'assigned'
+            ? 'bg-neo-cyan'
+            : status === 'completed'
+              ? 'bg-neo-yellow'
+              : 'bg-black/20';
 
         // Progress bar fill color
         const fillColor = status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan';
@@ -167,87 +175,90 @@ export default function StudentLessonView() {
             key={studentLesson.lessonId}
             variants={cardEntrance}
             whileHover={{
-              x: 6,
-              boxShadow: '6px 6px 0px rgba(0,0,0,0.3)',
+              translateY: -3,
+              boxShadow: '6px 6px 0px black',
               transition: { type: 'spring', stiffness: 400, damping: 25 },
             }}
             whileTap={{ scale: 0.99 }}
             className={cn(
-              'p-6 rounded-neo border border-neo-black/50',
-              'bg-neo-navy/40 backdrop-blur-sm',
-              'border-s-[6px]', accentBorder,
-              'cursor-default'
+              'flex rounded-neo border-3 border-black shadow-hard-sm overflow-hidden cursor-default',
+              cardBg
             )}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              {/* Lesson info */}
-              <div className="flex-1 min-w-0">
-                {/* Lesson name + badge */}
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-2xl font-neo-display text-neo-white truncate">
-                    {lessonName}
-                  </h3>
+            {/* Color accent bar on the left */}
+            <div className={cn('w-1.5 flex-shrink-0', accentBar)} />
 
-                  {status === 'assigned' && (
-                    <span className="flex-shrink-0 px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-xs font-bold rounded-neo border border-neo-cyan/50 animate-pulse-subtle">
-                      NEW
-                    </span>
-                  )}
-                  {status === 'completed' && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                      className="flex-shrink-0 px-2 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-neo border border-neo-yellow/50"
-                    >
-                      ✓ DONE
-                    </motion.span>
-                  )}
-                </div>
+            <div className="flex-1 p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                {/* Lesson info */}
+                <div className="flex-1 min-w-0">
+                  {/* Lesson name + badge */}
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                    <h3 className="text-xl font-neo-display font-black text-black truncate">
+                      {lessonName}
+                    </h3>
 
-                {/* Stats row with icons */}
-                <div className="flex items-center gap-5 text-sm text-neo-white/60">
-                  <span className="flex items-center gap-1.5">
-                    <BookOpen className="w-4 h-4" />
-                    {totalWords} {t('student.lessons.words')}
-                  </span>
-
-                  {status !== 'assigned' && progress && (
-                    <>
-                      <span className="flex items-center gap-1.5 text-neo-cyan font-bold">
-                        <Award className="w-4 h-4" />
-                        {masteredWords} {t('student.lessons.mastered')}
+                    {status === 'assigned' && (
+                      <span className="flex-shrink-0 px-2 py-0.5 bg-neo-cyan border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm animate-pulse-subtle">
+                        ✨ NEW
                       </span>
-                      <span className="flex items-center gap-1.5 text-neo-yellow font-bold">
-                        <Activity className="w-4 h-4" />
-                        {masteryPercent}%
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                {/* Animated progress bar */}
-                {status !== 'assigned' && progress && (
-                  <div className="mt-3 w-full h-2 rounded-full bg-black/40 overflow-hidden">
-                    <motion.div
-                      className={cn('h-full rounded-full', fillColor)}
-                      variants={progressBarFill}
-                      custom={masteryPercent}
-                    />
+                    )}
+                    {status === 'completed' && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                        className="flex-shrink-0 px-2 py-0.5 bg-neo-yellow border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
+                      >
+                        ✓ DONE
+                      </motion.span>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* Practice button */}
-              <div className="sm:flex-shrink-0 w-full sm:w-auto">
-                <QuickPracticeButton
-                  lessonId={studentLesson.lessonId}
-                  onPractice={(mode: PracticeType) => {
-                    router.push(`/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`);
-                  }}
-                  size="lg"
-                  className="w-full sm:w-auto"
-                />
+                  {/* Stats row with icons */}
+                  <div className="flex items-center gap-4 text-sm flex-wrap">
+                    <span className="flex items-center gap-1.5 font-bold text-black/60">
+                      <BookOpen className="w-4 h-4" />
+                      {totalWords} {t('student.lessons.words')}
+                    </span>
+
+                    {status !== 'assigned' && progress && (
+                      <>
+                        <span className="flex items-center gap-1.5 font-black text-black">
+                          <Award className="w-4 h-4 text-neo-cyan" />
+                          {masteredWords} {t('student.lessons.mastered')}
+                        </span>
+                        <span className="flex items-center gap-1.5 font-black text-black">
+                          <Activity className="w-4 h-4 text-neo-yellow" />
+                          {masteryPercent}%
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Animated progress bar */}
+                  {status !== 'assigned' && progress && (
+                    <div className="mt-3 w-full h-3 rounded-neo border-2 border-black bg-black/10 overflow-hidden">
+                      <motion.div
+                        className={cn('h-full rounded-neo', fillColor)}
+                        variants={progressBarFill}
+                        custom={masteryPercent}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Practice button */}
+                <div className="sm:flex-shrink-0 w-full sm:w-auto">
+                  <QuickPracticeButton
+                    lessonId={studentLesson.lessonId}
+                    onPractice={(mode: PracticeType) => {
+                      router.push(`/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`);
+                    }}
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  />
+                </div>
               </div>
             </div>
           </motion.div>

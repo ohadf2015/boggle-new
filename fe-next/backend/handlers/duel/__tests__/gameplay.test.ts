@@ -403,15 +403,17 @@ describe('Duel Gameplay Handlers', () => {
   describe('duel completion', () => {
     /**
      * Helper: Build a full mockFrom chain for the submit-score happy path.
-     * The handler calls supabase.from() for 4 tables in sequence:
+     * The handler calls supabase.from() for 5 tables in sequence:
      *   1. student_duels -> select (fetch duel)
      *   2. vocabulary_lessons -> select (fetch lesson language)
      *   3. duel_turns -> insert (insert turn)
      *   4. student_duels -> update (update score)
+     *   5. duel_turns -> select count (check both players submitted)
      * Then completeDuel calls:
-     *   5. student_duels -> update (completion with xp_awarded guard)
+     *   6. student_duels -> update (completion with xp_awarded guard)
      *
-     * Since from('student_duels') is called multiple times, we track call count.
+     * Since from('student_duels') and from('duel_turns') are called multiple
+     * times, we track call counts for each.
      */
     function setupSubmitScoreMocks(options: {
       duelData: any;
@@ -419,6 +421,7 @@ describe('Duel Gameplay Handlers', () => {
       completionResult?: { data: any; error: any; count: number };
     }) {
       let studentDuelsCallCount = 0;
+      let duelTurnsCallCount = 0;
 
       const { isDictionaryWord } = require('@/backend/dictionary');
       isDictionaryWord.mockReturnValue(true);
@@ -488,16 +491,30 @@ describe('Duel Gameplay Handlers', () => {
           };
         }
         if (table === 'duel_turns') {
-          return {
-            insert: jest.fn().mockReturnValue({
+          duelTurnsCallCount++;
+          if (duelTurnsCallCount === 1) {
+            // First call: insert turn
+            return {
+              insert: jest.fn().mockReturnValue({
+                select: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          } else {
+            // Second call: count query (check if both players submitted)
+            return {
               select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
+                eq: jest.fn().mockResolvedValue({
+                  count: 2,
                   error: null,
                 }),
               }),
-            }),
-          };
+            };
+          }
         }
         return {};
       });

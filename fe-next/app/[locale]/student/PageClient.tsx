@@ -129,21 +129,21 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
   // Skeleton loader
   if (leaderboardLoading || !streakLoaded) {
     return (
-      <div className="p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg animate-pulse">
+      <div className="p-6 rounded-neo border-3 border-black bg-white shadow-hard animate-pulse">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 rounded-neo bg-neo-white/10" />
+          <div className="w-14 h-14 rounded-neo bg-black/10" />
           <div className="flex-1">
-            <div className="h-4 w-24 bg-neo-white/10 rounded mb-2" />
-            <div className="h-3 w-full bg-neo-white/10 rounded" />
+            <div className="h-4 w-24 bg-black/10 rounded mb-2" />
+            <div className="h-3 w-full bg-black/10 rounded" />
           </div>
         </div>
-        <div className="border-t border-white/10 pt-4 grid grid-cols-3 gap-4">
+        <div className="border-t-2 border-black/10 pt-4 grid grid-cols-3 gap-4">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-neo bg-neo-white/10" />
+              <div className="w-9 h-9 rounded-neo bg-black/10" />
               <div>
-                <div className="h-3 w-10 bg-neo-white/10 rounded mb-1" />
-                <div className="h-5 w-12 bg-neo-white/10 rounded" />
+                <div className="h-3 w-10 bg-black/10 rounded mb-1" />
+                <div className="h-5 w-12 bg-black/10 rounded" />
               </div>
             </div>
           ))}
@@ -158,118 +158,118 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
         variants={heroEntrance}
         initial="hidden"
         animate="visible"
-        className="relative p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg overflow-hidden"
+        className="relative rounded-neo border-3 border-black shadow-hard overflow-hidden"
       >
-      {/* Mascot - floating in top-right corner */}
-      <motion.div
-        className="absolute -top-2 -right-2 z-10"
-        initial={{ scale: 0, rotate: 30 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.5 }}
-      >
-        <InteractiveMascot
-          variant={mascotVariant}
-          size="sm"
-          sizeClassName="w-12 h-12 sm:w-16 sm:h-16"
-          enableHover
-          enableClick
-          clickAnimation="bounce"
-          animated
-        />
-      </motion.div>
-
-      {/* Top: Level badge + XP progress */}
-      <motion.div variants={childFadeUp} className="flex items-center gap-4 mb-4 pe-16 sm:pe-20">
-        {/* Level badge - pops in with rotation */}
-        <motion.div variants={levelBadgePop} className="relative flex-shrink-0">
-          <motion.div
-            className="w-14 h-14 rounded-neo bg-neo-lime/20 border-neo border-neo-lime/50 flex items-center justify-center"
-            whileHover={{ scale: 1.15, rotate: -5 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <span className="text-2xl font-neo-display font-black text-neo-lime tabular-nums">
-              {xpProgress.currentLevel}
-            </span>
-          </motion.div>
+      {/* Colorful header band */}
+      <div className="bg-neo-yellow px-6 pt-5 pb-4">
+        {/* Mascot - floating in top-right corner */}
+        <motion.div
+          className="absolute top-2 right-2 z-10"
+          initial={{ scale: 0, rotate: 30 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.5 }}
+        >
+          <InteractiveMascot
+            variant={mascotVariant}
+            size="sm"
+            sizeClassName="w-12 h-12 sm:w-16 sm:h-16"
+            enableHover
+            enableClick
+            clickAnimation="bounce"
+            animated
+          />
         </motion.div>
 
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-neo-body text-neo-white/70 mb-1">
-            {t('education.xp.level')} {xpProgress.currentLevel}
-          </p>
-          {/* Animated XP progress bar */}
-          <div className="w-full h-3 rounded-full bg-black/40 border border-neo-black overflow-hidden">
+        {/* Level badge + XP progress */}
+        <motion.div variants={childFadeUp} className="flex items-center gap-4 pe-14 sm:pe-20">
+          {/* Level badge - pops in with rotation */}
+          <motion.div variants={levelBadgePop} className="relative flex-shrink-0">
             <motion.div
-              className="h-full rounded-full bg-neo-lime origin-left"
-              variants={xpBarFill}
-              custom={xpProgress.progressPercent}
-            />
-          </div>
-          <p className="text-xs font-neo-body text-neo-white/50 mt-1 tabular-nums">
-            {xpProgress.xpInCurrentLevel} / {xpProgress.xpNeededForNextLevel} XP
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Bottom: 3-column stats with stagger */}
-      <motion.div
-        variants={statsContainer}
-        className="border-t border-white/10 pt-4 grid grid-cols-3 gap-4"
-      >
-        {/* Rank */}
-        <motion.div variants={statItem} className="flex items-center gap-2">
-          <motion.div
-            className="w-9 h-9 rounded-neo bg-neo-yellow/15 flex items-center justify-center"
-            whileHover={{ scale: 1.2, rotate: -8 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <Trophy className="w-5 h-5 text-neo-yellow" />
+              className="w-14 h-14 rounded-neo bg-black border-3 border-black flex items-center justify-center shadow-hard-sm"
+              whileHover={{ scale: 1.15, rotate: -5 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <span className="text-2xl font-neo-display font-black text-neo-yellow tabular-nums">
+                {xpProgress.currentLevel}
+              </span>
+            </motion.div>
           </motion.div>
-          <div>
-            <p className="text-xs text-neo-white/50">{t('education.leaderboard.rank')}</p>
-            <p className="text-lg font-bold text-neo-yellow tabular-nums">
+
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-neo-body font-bold text-black/70 mb-1">
+              {t('education.xp.level')} {xpProgress.currentLevel}
+            </p>
+            {/* Animated XP progress bar */}
+            <div className="w-full h-4 rounded-neo border-2 border-black bg-black/20 overflow-hidden">
+              <motion.div
+                className="h-full rounded-neo bg-black origin-left"
+                variants={xpBarFill}
+                custom={xpProgress.progressPercent}
+              />
+            </div>
+            <p className="text-xs font-neo-body font-bold text-black/60 mt-1 tabular-nums">
+              {xpProgress.xpInCurrentLevel} / {xpProgress.xpNeededForNextLevel} XP
+            </p>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* White body with stats */}
+      <div className="bg-white px-6 py-4">
+        {/* 3-column stats with stagger */}
+        <motion.div
+          variants={statsContainer}
+          className="grid grid-cols-3 gap-3"
+        >
+          {/* Rank */}
+          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-2 border-black bg-neo-yellow/20 shadow-hard-sm text-center">
+            <motion.div
+              className="w-9 h-9 rounded-neo bg-neo-yellow border-2 border-black flex items-center justify-center shadow-hard-sm"
+              whileHover={{ scale: 1.2, rotate: -8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <Trophy className="w-5 h-5 text-black" />
+            </motion.div>
+            <p className="text-xs text-black/60 font-bold">{t('education.leaderboard.rank')}</p>
+            <p className="text-xl font-black text-black tabular-nums">
               {typeof rank === 'number' ? `#${rank}` : rank}
             </p>
-          </div>
-        </motion.div>
-
-        {/* Total XP */}
-        <motion.div variants={statItem} className="flex items-center gap-2">
-          <motion.div
-            className="w-9 h-9 rounded-neo bg-neo-cyan/15 flex items-center justify-center"
-            whileHover={{ scale: 1.2, rotate: 8 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <Zap className="w-5 h-5 text-neo-cyan" />
           </motion.div>
-          <div>
-            <p className="text-xs text-neo-white/50">{t('education.leaderboard.totalXP')}</p>
-            <p className="text-lg font-bold text-neo-cyan tabular-nums">{totalXP.toLocaleString()}</p>
-          </div>
-        </motion.div>
 
-        {/* Streak */}
-        <motion.div variants={statItem} className="flex items-center gap-2">
-          <motion.div
-            className="w-9 h-9 rounded-neo bg-neo-pink/15 flex items-center justify-center"
-            whileHover={{ scale: 1.2, rotate: -8 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            <Flame className="w-5 h-5 text-neo-pink" />
+          {/* Total XP */}
+          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-2 border-black bg-neo-cyan/20 shadow-hard-sm text-center">
+            <motion.div
+              className="w-9 h-9 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center shadow-hard-sm"
+              whileHover={{ scale: 1.2, rotate: 8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <Zap className="w-5 h-5 text-black" />
+            </motion.div>
+            <p className="text-xs text-black/60 font-bold">{t('education.leaderboard.totalXP')}</p>
+            <p className="text-xl font-black text-black tabular-nums">{totalXP.toLocaleString()}</p>
           </motion.div>
-          <div>
-            <p className="text-xs text-neo-white/50">{t('education.leaderboard.streak')}</p>
-            <p className="text-lg font-bold text-neo-pink tabular-nums">
+
+          {/* Streak */}
+          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-2 border-black bg-neo-pink/20 shadow-hard-sm text-center">
+            <motion.div
+              className="w-9 h-9 rounded-neo bg-neo-pink border-2 border-black flex items-center justify-center shadow-hard-sm"
+              whileHover={{ scale: 1.2, rotate: -8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <Flame className="w-5 h-5 text-white" />
+            </motion.div>
+            <p className="text-xs text-black/60 font-bold">{t('education.leaderboard.streak')}</p>
+            <p className="text-xl font-black text-black tabular-nums">
               {currentStreak} {t('common.days')}
             </p>
-          </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
 
-      {/* Milestone Progress */}
-      <div className="border-t border-white/10 pt-4 mt-4">
-        <MilestoneTracker totalXp={totalXP} />
+        {/* Milestone Progress */}
+        <div className="border-t-2 border-black/10 pt-4 mt-4">
+          <MilestoneTracker totalXp={totalXP} />
+        </div>
       </div>
       </motion.div>
       <MilestoneCelebration
@@ -328,10 +328,13 @@ export default function StudentPageClient() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <h1 className="text-3xl font-neo-display text-neo-white mb-2 text-balance">
-            {t('student.dashboard.title')}
-          </h1>
-          <p className="text-neo-white/70 font-neo-body text-pretty">
+          <div className="flex items-center gap-3 mb-1">
+            <span className="text-3xl">🎓</span>
+            <h1 className="text-3xl font-neo-display font-black text-neo-white text-balance">
+              {t('student.dashboard.title')}
+            </h1>
+          </div>
+          <p className="text-neo-white/70 font-neo-body text-pretty ps-1">
             {t('student.dashboard.subtitle')}
           </p>
         </motion.div>

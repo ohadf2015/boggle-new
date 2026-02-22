@@ -26,6 +26,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useAuth } from '@/contexts/AuthContext';
 import type {
   UseDuelSocketReturn,
   ChallengeReceivedData,
@@ -68,6 +69,7 @@ export function useDuelSocket(): UseDuelSocketReturn {
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
   const listenersRef = useRef<Map<string, Function>>(new Map());
+  const { user, profile } = useAuth();
 
   // ==========================================
   // Connection Lifecycle
@@ -80,12 +82,24 @@ export function useDuelSocket(): UseDuelSocketReturn {
         ? window.location.origin
         : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-    // Connect to /duel namespace
+    // Build display name from profile or fall back to email prefix
+    const displayName =
+      profile?.display_name ||
+      profile?.username ||
+      user?.email?.split('@')[0] ||
+      'Anonymous';
+
+    // Connect to /duel namespace with user credentials in handshake auth
+    // so server middleware can set socket.data.userId / socket.data.displayName
     const socket = io(`${baseUrl}/duel`, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
+      auth: {
+        userId: user?.id || '',
+        displayName,
+      },
     });
 
     // Handle null socket from io()
@@ -125,7 +139,9 @@ export function useDuelSocket(): UseDuelSocketReturn {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, []);
+    // Re-connect when the user id changes (e.g. user logs in after mount)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // ==========================================
   // Action Methods

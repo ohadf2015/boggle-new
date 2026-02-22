@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Crown, Bot, Copy, LogOut, Plus } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
@@ -72,7 +72,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             const isMe = name === username;
 
             return (
-              <m.div
+              <motion.div
                 key={name}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1, y: [0, -4, 0] }}
@@ -116,7 +116,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
                   {name}
                 </span>
-              </m.div>
+              </motion.div>
             );
           })}
         </AnimatePresence>
@@ -138,27 +138,27 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   // Waiting status banner (player-specific, replaces StartButton)
   const renderWaitingStatus = (): React.ReactElement => (
-    <m.div
+    <motion.div
       data-testid="waiting-status"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="bg-neo-cream text-neo-black p-6 rounded-xl border-3 border-neo-black shadow-hard text-center"
     >
-      <m.div
+      <motion.div
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         className="text-4xl mb-3"
       >
         ⏳
-      </m.div>
+      </motion.div>
       <h2 className="font-neo-display font-bold text-xl uppercase leading-none mb-2">
         {t('playerView.waitingForHostToStart') || 'Waiting for host to start...'}
       </h2>
       <p className="text-sm text-gray-600">
         {t('playerView.hostWillStart') || 'The host will start the game when everyone is ready'}
       </p>
-    </m.div>
+    </motion.div>
   );
 
   // Mobile scrollable content (mirrors host's renderLobbyContent)

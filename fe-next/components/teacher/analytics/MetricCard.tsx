@@ -66,17 +66,22 @@ export function MetricCard({
 }: MetricCardProps) {
   // ==================== STYLING ====================
 
-  // Border color based on severity
-  const borderColor = {
-    info: 'border-neo-cyan',
-    warning: 'border-neo-orange',
-    urgent: 'border-neo-pink',
-  }[severity || 'info'] || 'border-neo-black';
+  // Card bg + icon bg based on severity
+  const cardBg = {
+    info: 'bg-neo-cyan',
+    warning: 'bg-neo-yellow',
+    urgent: 'bg-neo-pink',
+  }[severity || 'info'] || 'bg-neo-cyan';
 
-  // Icon color based on severity
-  const iconColor = {
+  const iconBg = {
+    info: 'bg-black',
+    warning: 'bg-black',
+    urgent: 'bg-black',
+  }[severity || 'info'] || 'bg-black';
+
+  const iconFg = {
     info: 'text-neo-cyan',
-    warning: 'text-neo-orange',
+    warning: 'text-neo-yellow',
     urgent: 'text-neo-pink',
   }[severity || 'info'] || 'text-neo-cyan';
 
@@ -100,50 +105,57 @@ export function MetricCard({
     <div
       data-testid={testId}
       className={cn(
-        'bg-neo-navy border-neo shadow-hard rounded-neo p-4',
-        'flex flex-col gap-3',
-        borderColor
+        'rounded-neo border-3 shadow-hard overflow-hidden',
+        'flex flex-col',
+        {
+          info: 'border-neo-cyan',
+          warning: 'border-neo-orange',
+          urgent: 'border-neo-pink',
+        }[severity || 'info'] || 'border-neo-cyan'
       )}
     >
-      {/* Top Row: Icon and Value */}
-      <div className="flex items-center gap-3">
-        {/* Icon */}
-        <div className={cn('flex-shrink-0', iconColor)}>{icon}</div>
-
-        {/* Value */}
-        <div className="flex-1">
-          <div className="text-4xl font-neo-display font-bold text-neo-white">
-            {value}
-          </div>
+      {/* Colored header */}
+      <div className={cn('px-4 pt-4 pb-3 flex items-center gap-3', cardBg)}>
+        <div className={cn(
+          'w-11 h-11 rounded-neo border-2 border-black flex items-center justify-center flex-shrink-0 shadow-hard-sm',
+          iconBg
+        )}>
+          <span className={iconFg}>{icon}</span>
+        </div>
+        <div className="text-4xl font-neo-display font-black text-black tabular-nums leading-none">
+          {value}
         </div>
       </div>
 
-      {/* Title */}
-      <div className="text-sm text-neo-white/70 font-neo-body">{title}</div>
+      {/* White body */}
+      <div className="bg-white px-4 py-3 flex flex-col gap-2 flex-1">
+        {/* Title */}
+        <div className="text-sm font-neo-body font-bold text-black">{title}</div>
 
-      {/* Trend Indicator */}
-      {trend && trendValue && (
-        <div className={cn('flex items-center gap-1 text-sm font-neo-body', trendColor)}>
-          {trendIcon}
-          <span>{trendValue}</span>
-        </div>
-      )}
+        {/* Trend Indicator */}
+        {trend && trendValue && (
+          <div className={cn('flex items-center gap-1 text-sm font-bold font-neo-body', trendColor)}>
+            {trendIcon}
+            <span>{trendValue}</span>
+          </div>
+        )}
 
-      {/* Actionable Button */}
-      {actionable && (
-        <button
-          onClick={actionable.onClick}
-          className={cn(
-            'mt-2 px-4 py-2 bg-neo-cyan text-neo-black',
-            'font-bold font-neo-body text-sm rounded-neo shadow-hard-sm',
-            'hover:shadow-hard-pressed active:shadow-hard-pressed',
-            'transition-all duration-100',
-            'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 focus:ring-offset-neo-navy'
-          )}
-        >
-          {actionable.label}
-        </button>
-      )}
+        {/* Actionable Button */}
+        {actionable && (
+          <button
+            onClick={actionable.onClick}
+            className={cn(
+              'mt-1 px-3 py-2 bg-black text-white',
+              'font-bold font-neo-body text-sm rounded-neo shadow-hard-sm',
+              'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
+              'transition-all duration-100',
+              'focus:outline-none focus:ring-2 focus:ring-black'
+            )}
+          >
+            {actionable.label}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

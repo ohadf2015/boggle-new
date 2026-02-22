@@ -64,11 +64,28 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
   // Isolates duel room state from default namespace game rooms
   const duelNamespace = io.of('/duel');
 
-  // Middleware stub for duel namespace authentication
-  // TODO (Phase 38): Add authentication middleware
-  duelNamespace.use((_socket, next) => {
-    // Future: Verify JWT token, attach user data to socket
-    // For now, allow all connections
+  // Duel namespace authentication middleware
+  // Reads userId and displayName from handshake auth/query params
+  // so all duel handlers can rely on socket.data.userId and socket.data.displayName
+  duelNamespace.use((socket, next) => {
+    const auth = socket.handshake.auth || {};
+    const query = socket.handshake.query || {};
+
+    const userId = (auth.userId || query.userId || '') as string;
+    const displayName = (auth.displayName || query.displayName || 'Anonymous') as string;
+
+    if (!userId) {
+      // Allow unauthenticated connections with a generated ID for now,
+      // so the game UI can still render. Handlers that need a real user
+      // will reject actions without a valid userId.
+      socket.data.userId = socket.id;
+    } else {
+      socket.data.userId = userId;
+    }
+
+    socket.data.displayName = displayName;
+    socket.data.classroomIds = [];
+
     next();
   });
 

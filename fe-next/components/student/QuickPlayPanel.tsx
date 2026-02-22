@@ -49,20 +49,22 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
       <motion.button
         onClick={handleQuickPractice}
         disabled={!hasLessons || isNavigating}
-        whileHover={hasLessons ? { scale: 1.02, rotate: -1 } : undefined}
-        whileTap={hasLessons ? { scale: 0.98 } : undefined}
-        className="relative p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-cyan shadow-hard-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex flex-col items-center gap-3"
+        whileHover={hasLessons ? { scale: 1.02, rotate: -1, translateY: -2 } : undefined}
+        whileTap={hasLessons ? { scale: 0.97, translateY: 2 } : undefined}
+        className="relative p-6 rounded-neo border-3 border-black bg-neo-cyan shadow-hard disabled:opacity-50 disabled:cursor-not-allowed transition-all flex flex-col items-center gap-3"
       >
-        {isNavigating ? (
-          <Loader2 className="w-8 h-8 text-neo-black animate-spin" />
-        ) : (
-          <Zap className="w-8 h-8 text-neo-black" />
-        )}
+        <div className="w-14 h-14 rounded-neo border-2 border-black bg-white/30 flex items-center justify-center shadow-hard-sm">
+          {isNavigating ? (
+            <Loader2 className="w-8 h-8 text-black animate-spin" />
+          ) : (
+            <Zap className="w-8 h-8 text-black" />
+          )}
+        </div>
         <div className="text-center">
-          <p className="text-lg font-neo-display font-bold text-neo-black">
+          <p className="text-xl font-neo-display font-black text-black">
             {t('student.dashboard.quickPractice')}
           </p>
-          <p className="text-sm font-neo-body text-neo-black/70">
+          <p className="text-sm font-neo-body font-bold text-black/70">
             {t('student.dashboard.randomLesson')}
           </p>
         </div>
@@ -71,16 +73,18 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
       {/* Quick Duel Button */}
       <motion.button
         onClick={handleQuickDuel}
-        whileHover={{ scale: 1.02, rotate: 1 }}
-        whileTap={{ scale: 0.98 }}
-        className="relative p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-pink shadow-hard-lg transition-all flex flex-col items-center gap-3"
+        whileHover={{ scale: 1.02, rotate: 1, translateY: -2 }}
+        whileTap={{ scale: 0.97, translateY: 2 }}
+        className="relative p-6 rounded-neo border-3 border-black bg-neo-pink shadow-hard transition-all flex flex-col items-center gap-3"
       >
-        <Swords className="w-8 h-8 text-neo-black" />
+        <div className="w-14 h-14 rounded-neo border-2 border-black bg-white/30 flex items-center justify-center shadow-hard-sm">
+          <Swords className="w-8 h-8 text-black" />
+        </div>
         <div className="text-center">
-          <p className="text-lg font-neo-display font-bold text-neo-black">
+          <p className="text-xl font-neo-display font-black text-black">
             {t('student.dashboard.quickDuel')}
           </p>
-          <p className="text-sm font-neo-body text-neo-black/70">
+          <p className="text-sm font-neo-body font-bold text-black/70">
             {t('student.dashboard.challengeClassmate')}
           </p>
         </div>

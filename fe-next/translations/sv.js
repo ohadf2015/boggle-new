@@ -4301,6 +4301,7 @@ const sv = {
     "progress": "Framsteg",
     "levels": "nivåer",
     "level": "Nivå",
+    "levelShort": "Lv.",
     "backToMap": "Tillbaka till världskartan",
     "menu": {
       "skills": "Färdigheter",

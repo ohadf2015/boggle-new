@@ -120,6 +120,7 @@ export function registerLifecycleHandlers(
           duelId: duel.id,
           challengerName: displayName,
           lessonId: payload.lessonId,
+          duelType: payload.duelType,
         });
       }
 
@@ -237,6 +238,7 @@ export function registerLifecycleHandlers(
           duelId: payload.duelId,
           boardState: duel.board_state,
           startedAt: startedAt,
+          duelType: 'async',
         });
         logger.info('DUEL', `Async duel accepted: ${payload.duelId} by ${userId}`);
       }

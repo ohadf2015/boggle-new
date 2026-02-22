@@ -151,19 +151,16 @@ export function ClassroomGameBanner({
   if (!activeGame) {
     return (
       <div className={cn(
-        'flex items-center gap-2 px-4 py-3 rounded-neo border-neo',
+        'flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-black shadow-hard-sm',
         isConnected
-          ? 'border-neo-cyan/30 bg-neo-cyan/5'
-          : 'border-neo-orange/30 bg-neo-orange/5'
+          ? 'bg-neo-cyan/20'
+          : 'bg-neo-yellow/20'
       )}>
         <Radio className={cn(
           'w-4 h-4 flex-shrink-0',
-          isConnected ? 'text-neo-cyan animate-pulse' : 'text-neo-orange'
+          isConnected ? 'text-black animate-pulse' : 'text-black'
         )} />
-        <span className={cn(
-          'text-sm font-neo-body',
-          isConnected ? 'text-neo-white/60' : 'text-neo-orange/80'
-        )}>
+        <span className="text-sm font-neo-body font-bold text-black">
           {isConnected
             ? t('student.activeGame.listening')
             : t('student.activeGame.connecting')
@@ -182,78 +179,64 @@ export function ClassroomGameBanner({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className={cn(
-          'relative mb-6 p-6 rounded-neo border-neo-thick border-neo-cyan',
-          'bg-gradient-to-r from-neo-cyan/20 to-neo-pink/20',
-          'shadow-hard-lg overflow-hidden'
-        )}
+        className="relative rounded-neo border-3 border-black shadow-hard overflow-hidden"
       >
-        {/* Animated background pulse */}
-        <motion.div
-          className="absolute inset-0 bg-neo-cyan/10"
-          animate={{
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-
-        {/* Content */}
-        <div className="relative z-10">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Play className="w-6 h-6 text-neo-cyan animate-pulse" />
-                <h3 className="text-xl font-neo-display text-neo-white font-black">
-                  {t('student.activeGame.title')}
-                </h3>
+        {/* Vivid top bar */}
+        <div className="bg-neo-cyan px-6 pt-5 pb-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm">
+                <Play className="w-5 h-5 text-neo-cyan animate-pulse" />
               </div>
-
-              <p className="text-neo-white/80 font-neo-body mb-3">
-                {t('student.activeGame.teacherStarted', { teacher: activeGame.teacherName })}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                {activeGame.lessonNames.map((name, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 text-sm font-bold bg-neo-pink text-neo-white rounded-neo border border-neo-pink/50"
-                  >
-                    {name}
-                  </span>
-                ))}
-              </div>
-
-              {activeGame.playerCount && activeGame.playerCount > 0 && (
-                <div className="flex items-center gap-2 text-neo-white/60 text-sm">
-                  <Users className="w-4 h-4" />
-                  <span>{activeGame.playerCount} {t('multiplayer.playersJoined')}</span>
-                </div>
-              )}
+              <h3 className="text-xl font-neo-display font-black text-black">
+                {t('student.activeGame.title')}
+              </h3>
             </div>
 
             <button
               onClick={handleDismiss}
-              className="p-2 rounded-neo border-neo border-neo-black bg-neo-navy/50 hover:bg-neo-navy shadow-hard-sm text-neo-white"
+              className="p-1.5 rounded-neo border-2 border-black bg-white/40 hover:bg-white/60 shadow-hard-sm text-black transition-all"
               aria-label={t('common.close')}
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        {/* White body */}
+        <div className="bg-white px-6 py-4">
+          <p className="text-black/80 font-neo-body font-bold mb-3">
+            {t('student.activeGame.teacherStarted', { teacher: activeGame.teacherName })}
+          </p>
+
+          <div className="flex flex-wrap gap-2 mb-4">
+            {activeGame.lessonNames.map((name, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1 text-sm font-black bg-neo-pink border-2 border-black text-black rounded-neo shadow-hard-sm"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+
+          {activeGame.playerCount && activeGame.playerCount > 0 && (
+            <div className="flex items-center gap-2 text-black/60 text-sm font-bold mb-4">
+              <Users className="w-4 h-4" />
+              <span>{activeGame.playerCount} {t('multiplayer.playersJoined')}</span>
+            </div>
+          )}
 
           {/* Join Button */}
           <button
             onClick={handleJoinGame}
             disabled={isJoining}
             className={cn(
-              'w-full px-6 py-4 font-black text-lg',
-              'bg-neo-lime text-neo-black',
-              'border-neo-thick border-neo-black rounded-neo shadow-hard',
-              'hover:shadow-hard-lg hover:translate-y-[-2px]',
-              'active:shadow-hard active:translate-y-0',
+              'w-full px-6 py-4 font-black text-lg rounded-neo',
+              'bg-neo-yellow text-black',
+              'border-3 border-black shadow-hard',
+              'hover:shadow-hard-lg hover:-translate-y-0.5',
+              'active:shadow-hard-sm active:translate-y-0.5',
               'transition-all duration-150',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}

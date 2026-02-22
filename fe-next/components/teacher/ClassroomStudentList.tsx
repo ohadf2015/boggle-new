@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomStudents, type ClassroomStudent } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Users, Mail, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -51,84 +50,86 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
 
   if (error) {
     return (
-      <div className="bg-neo-pink/20 border-neo border-neo-pink rounded-neo p-4 text-center">
-        <p className="text-neo-white font-neo-body">{t('teacher.classrooms.students.error')}</p>
+      <div className="bg-neo-pink border-3 border-black rounded-neo p-4 text-center shadow-hard-sm">
+        <p className="text-black font-neo-body font-bold">{t('teacher.classrooms.students.error')}</p>
       </div>
     );
   }
 
   if (students.length === 0) {
     return (
-      <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
-        <CardContent className="py-8 text-center">
-          <Users className="w-10 h-10 text-neo-white/40 mx-auto mb-3" />
-          <p className="text-neo-white font-neo-body mb-1">
-            {t('teacher.classrooms.students.empty')}
-          </p>
-          <p className="text-neo-white/60 text-sm">
-            {t('teacher.classrooms.students.emptyHint').replace('{{code}}', joinCode)}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="border-3 border-black rounded-neo p-8 text-center bg-white shadow-hard-sm">
+        <div className="w-14 h-14 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center mx-auto mb-3 shadow-hard-sm">
+          <Users className="w-8 h-8 text-black" />
+        </div>
+        <p className="text-black font-neo-body font-bold mb-1">
+          {t('teacher.classrooms.students.empty')}
+        </p>
+        <p className="text-black/60 text-sm font-bold">
+          {t('teacher.classrooms.students.emptyHint').replace('{{code}}', joinCode)}
+        </p>
+      </div>
     );
   }
 
+  // Cycle through bold accent colors for visual interest
+  const accentColors = ['bg-neo-cyan', 'bg-neo-yellow', 'bg-neo-pink', 'bg-neo-orange'];
+
   return (
-    <div className="space-y-3">
-      {students.map((student) => {
+    <div className="space-y-2">
+      {students.map((student, idx) => {
         // Handle Supabase returning profiles as array or object
         const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles;
         const username = profile?.username || t('teacher.classrooms.students.unknown');
         const email = profile?.email || '';
         const avatarUrl = profile?.avatar_url;
         const joinedAt = formatDistanceToNow(new Date(student.joined_at), { addSuffix: true });
+        const accentBg = accentColors[idx % accentColors.length];
 
         return (
-          <Card
+          <div
             key={student.id}
-            className="border-neo border-neo-black shadow-hard-sm bg-neo-navy/80 hover:shadow-hard transition-all"
+            className="flex items-center gap-3 p-3 border-2 border-black rounded-neo bg-white shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
           >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                {/* Avatar */}
-                <div className="flex-shrink-0">
-                  {avatarUrl ? (
-                    <Image
-                      src={avatarUrl}
-                      alt={username}
-                      width={48}
-                      height={48}
-                      className="w-12 h-12 rounded-full border-neo border-neo-cyan object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-neo-cyan/20 border-neo border-neo-cyan flex items-center justify-center">
-                      <span className="text-neo-cyan font-neo-display text-xl">
-                        {username.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+            {/* Avatar */}
+            <div className="flex-shrink-0">
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt={username}
+                  width={44}
+                  height={44}
+                  className="w-11 h-11 rounded-neo border-2 border-black object-cover shadow-hard-sm"
+                  unoptimized
+                />
+              ) : (
+                <div className={cn('w-11 h-11 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm', accentBg)}>
+                  <span className="text-black font-neo-display font-black text-lg">
+                    {username.charAt(0).toUpperCase()}
+                  </span>
                 </div>
+              )}
+            </div>
 
-                {/* Student Info */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-neo-white font-neo-display text-lg truncate">
-                    {username}
-                  </h4>
-                  {email && (
-                    <div className={cn('flex items-center gap-2 text-neo-white/60 text-sm mt-1')}>
-                      <Mail className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{email}</span>
-                    </div>
-                  )}
-                  <div className={cn('flex items-center gap-2 text-neo-white/60 text-sm mt-1')}>
-                    <Calendar className="w-4 h-4 flex-shrink-0" />
-                    <span>{joinedAt}</span>
-                  </div>
+            {/* Student Info */}
+            <div className="flex-1 min-w-0">
+              <h4 className="text-black font-neo-display font-black text-base truncate">
+                {username}
+              </h4>
+              {email && (
+                <div className={cn('flex items-center gap-1.5 text-black/60 text-xs mt-0.5 font-bold')}>
+                  <Mail className="w-3 h-3 flex-shrink-0" />
+                  <span className="truncate">{email}</span>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              )}
+            </div>
+
+            {/* Joined badge */}
+            <div className={cn('flex items-center gap-1.5 text-xs font-black px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm flex-shrink-0', accentBg)}>
+              <Calendar className="w-3 h-3 text-black" />
+              <span className="text-black">{joinedAt}</span>
+            </div>
+          </div>
         );
       })}
     </div>

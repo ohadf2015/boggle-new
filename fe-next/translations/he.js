@@ -4278,6 +4278,7 @@ const he = {
     "progress": "התקדמות",
     "levels": "שלבים",
     "level": "שלב",
+    "levelShort": "Lv.",
     "backToMap": "חזרה למפת העולם",
     "menu": {
       "skills": "כישורים",

@@ -68,23 +68,25 @@ export function AnalyticsDashboard({
     return (
       <div
         className={cn(
-          'bg-neo-navy border-neo border-neo-pink shadow-hard rounded-neo p-6',
+          'bg-white border-3 border-black shadow-hard rounded-neo p-6',
           'flex flex-col items-center gap-4 text-center'
         )}
       >
-        <AlertCircle className="w-12 h-12 text-neo-pink" />
+        <div className="w-14 h-14 rounded-neo bg-neo-pink border-3 border-black flex items-center justify-center shadow-hard-sm">
+          <AlertCircle className="w-8 h-8 text-black" />
+        </div>
         <div>
-          <h3 className="text-xl font-neo-display text-neo-white mb-2">
+          <h3 className="text-xl font-neo-display font-black text-black mb-2">
             {t('education.analytics.error')}
           </h3>
-          <p className="text-neo-white/70 text-sm">{error.message}</p>
+          <p className="text-black/60 font-bold text-sm">{error.message}</p>
         </div>
         <button
           onClick={refresh}
           className={cn(
-            'px-6 py-2 bg-neo-cyan text-neo-black',
-            'font-bold font-neo-body rounded-neo shadow-hard-sm',
-            'hover:shadow-hard-pressed active:shadow-hard-pressed',
+            'px-6 py-2 bg-neo-cyan text-black border-3 border-black',
+            'font-black font-neo-body rounded-neo shadow-hard-sm',
+            'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
             'transition-all duration-100'
           )}
         >
@@ -100,16 +102,18 @@ export function AnalyticsDashboard({
     return (
       <div
         className={cn(
-          'bg-neo-navy border-neo border-neo-black shadow-hard rounded-neo p-6',
+          'bg-white border-3 border-black shadow-hard rounded-neo p-6',
           'flex flex-col items-center gap-4 text-center'
         )}
       >
-        <Users className="w-12 h-12 text-neo-cyan" />
+        <div className="w-14 h-14 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center shadow-hard-sm">
+          <Users className="w-8 h-8 text-black" />
+        </div>
         <div>
-          <h3 className="text-xl font-neo-display text-neo-white mb-2">
+          <h3 className="text-xl font-neo-display font-black text-black mb-2">
             {t('education.analytics.noData')}
           </h3>
-          <p className="text-neo-white/70 text-sm">{t('education.analytics.assignLessons')}</p>
+          <p className="text-black/60 font-bold text-sm">{t('education.analytics.assignLessons')}</p>
         </div>
       </div>
     );
@@ -142,10 +146,10 @@ export function AnalyticsDashboard({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-neo-display text-neo-white">
+          <h2 className="text-2xl font-neo-display font-black text-neo-white">
             {t('education.analytics.title')}
           </h2>
-          <p className="text-neo-white/70 text-sm">{t('education.analytics.subtitle')}</p>
+          <p className="text-neo-white/70 text-sm font-bold">{t('education.analytics.subtitle')}</p>
         </div>
       </div>
 

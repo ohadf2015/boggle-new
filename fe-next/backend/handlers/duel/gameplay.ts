@@ -196,10 +196,16 @@ export function registerGameplayHandlers(
       });
 
       // Check for completion (both players submitted)
-      const challengerScore = updatedDuel.challenger_score || 0;
-      const opponentScore = updatedDuel.opponent_score || 0;
+      // Use duel_turns count to detect submission, not score > 0
+      // (a player can legitimately score 0 and still have submitted)
+      const { count: turnsCount, error: turnsCountError } = await supabase
+        .from('duel_turns')
+        .select('*', { count: 'exact', head: true })
+        .eq('duel_id', payload.duelId);
 
-      if (challengerScore > 0 && opponentScore > 0) {
+      if (!turnsCountError && turnsCount === 2) {
+        const challengerScore = updatedDuel.challenger_score ?? 0;
+        const opponentScore = updatedDuel.opponent_score ?? 0;
         await completeDuel(
           namespace,
           payload.duelId,
@@ -280,10 +286,11 @@ async function completeDuel(
     }
 
     // Award XP
+    // Draw uses challenger/opponent keys; win/loss uses winner/loser keys
     let xpAwarded: { winner?: number; loser?: number; challenger?: number; opponent?: number };
 
     if (winnerId === null) {
-      // Draw - both get DUEL_DRAW XP
+      // Draw - both get DUEL_DRAW XP; use challenger/opponent keys to distinguish draw from win/loss
       xpAwarded = {
         challenger: EDUCATION_XP_CONFIG.DUEL_DRAW,
         opponent: EDUCATION_XP_CONFIG.DUEL_DRAW,
@@ -310,7 +317,7 @@ async function completeDuel(
       xpAwarded = {
         winner: EDUCATION_XP_CONFIG.DUEL_WIN_ASYNC,
         loser: EDUCATION_XP_CONFIG.DUEL_LOSS_ASYNC,
-      };
+      } as { winner: number; loser: number };
 
       await Promise.all([
         supabase.rpc('award_education_xp', {

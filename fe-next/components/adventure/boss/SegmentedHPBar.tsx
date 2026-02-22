@@ -1,23 +1,23 @@
 /**
  * SegmentedHPBar Component
  *
- * 3-segment HP bar for boss battles showing phase thresholds.
- * Segments correspond to boss phases:
- * - Segment 1 (0-33%): Red - Enraged phase
- * - Segment 2 (33-66%): Lime - Phase 2
- * - Segment 3 (66-100%): Green - Phase 1
+ * Neo-brutalist RPG-style segmented health bar for boss battles.
+ * Three phase-based segments (0-33%, 33-66%, 66-100%) with:
  *
  * Features:
- * - Smooth fill animations with framer-motion
- * - Phase indicator badge integration
- * - Neo-brutalist styling
- * - Respects reduced motion preferences
+ * - Chunked/segmented HP display (old-school RPG style)
+ * - Color gradient per segment: red (danger) → lime (phase 2) → green (phase 1)
+ * - Flash animation on hit
+ * - Glow/pulse when HP is critically low (< 25%)
+ * - Boss name above the bar with HP numbers
+ * - Neo-brutalist: border-3, shadow-hard, rounded-neo
+ * - Phase indicator badge
  * - ARIA progressbar for accessibility
  */
 
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import PhaseIndicator from './PhaseIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,7 +42,7 @@ export interface SegmentedHPBarProps {
 // ==============================================
 
 /**
- * Phase threshold percentages (from bossStateMachine types)
+ * Phase threshold percentages
  */
 const THRESHOLDS = {
   /** Below this % = enraged (segment 1 only) */
@@ -53,8 +53,14 @@ const THRESHOLDS = {
   FULL: 100,
 };
 
+/** HP fraction below which segment glows/pulses */
+const LOW_HP_THRESHOLD = 0.25;
+
 /**
- * Segment configuration
+ * Segment configuration — colors chosen to match phase/danger progression.
+ * Segment 1 (0-33%): red (enraged danger zone)
+ * Segment 2 (33-66%): lime (phase 2)
+ * Segment 3 (66-100%): lime-500 (healthy phase 1)
  */
 const SEGMENTS = [
   {
@@ -84,18 +90,12 @@ const SEGMENTS = [
 // HELPERS
 // ==============================================
 
-/**
- * Calculate HP percentage (clamped 0-100)
- */
 function calculateHpPercentage(currentHP: number, maxHP: number): number {
   if (maxHP <= 0) return 0;
   const percentage = (currentHP / maxHP) * 100;
   return Math.max(0, Math.min(100, Math.round(percentage)));
 }
 
-/**
- * Calculate fill percentage for a segment (0-100)
- */
 function calculateSegmentFill(
   hpPercentage: number,
   minThreshold: number,
@@ -107,8 +107,6 @@ function calculateSegmentFill(
   if (hpPercentage >= maxThreshold) {
     return 100;
   }
-
-  // Calculate partial fill
   const segmentRange = maxThreshold - minThreshold;
   const hpWithinSegment = hpPercentage - minThreshold;
   return Math.round((hpWithinSegment / segmentRange) * 100);
@@ -123,12 +121,13 @@ interface SegmentProps {
   fill: number;
   color: string;
   label: string;
+  isLowHP: boolean;
 }
 
 /**
- * Individual HP segment with animated fill
+ * Individual HP segment with animated fill and RPG-style chunked look.
  */
-const Segment = memo<SegmentProps>(({ id, fill, color, label }) => {
+const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
   return (
     <div
       data-segment={id}
@@ -145,13 +144,29 @@ const Segment = memo<SegmentProps>(({ id, fill, color, label }) => {
           motion-reduce:transition-none
         `.trim().replace(/\s+/g, ' ')}
         initial={{ width: `${fill}%` }}
-        animate={{ width: `${fill}%` }}
-        transition={{
-          type: 'spring',
-          stiffness: 200,
-          damping: 20,
+        animate={{
+          width: `${fill}%`,
+          // Pulse opacity when HP is critically low
+          opacity: isLowHP && fill > 0 ? [1, 0.55, 1] : 1,
         }}
-      />
+        transition={{
+          width: { type: 'spring', stiffness: 200, damping: 20 },
+          opacity: isLowHP && fill > 0
+            ? { duration: 0.7, repeat: Infinity, ease: 'easeInOut' }
+            : { duration: 0 },
+        }}
+      >
+        {/* Shine overlay for visual depth */}
+        <div className="absolute inset-x-0 top-0 h-1/3 bg-white/25 pointer-events-none" />
+        {/* Chunked RPG-style inner dividers - subtle notches within segment */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(90deg, transparent, transparent 11px, rgba(0,0,0,0.15) 11px, rgba(0,0,0,0.15) 12px)',
+          }}
+        />
+      </motion.div>
     </div>
   );
 });
@@ -170,7 +185,7 @@ const Divider = memo<DividerProps>(({ threshold }) => {
     <div
       data-divider
       data-threshold={threshold}
-      className="absolute top-0 bottom-0 w-[2px] bg-neo-black z-10"
+      className="absolute top-0 bottom-0 w-[3px] bg-neo-black z-10"
       style={{ left: `${threshold}%` }}
       aria-hidden="true"
     />
@@ -183,9 +198,6 @@ Divider.displayName = 'Divider';
 // MAIN COMPONENT
 // ==============================================
 
-/**
- * SegmentedHPBar - 3-segment HP bar with phase indicators
- */
 const SegmentedHPBar = memo<SegmentedHPBarProps>(({
   currentHP,
   maxHP,
@@ -194,13 +206,13 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 }) => {
   const { t } = useLanguage();
 
-  // Calculate HP percentage
   const hpPercentage = useMemo(
     () => calculateHpPercentage(currentHP, maxHP),
     [currentHP, maxHP]
   );
 
-  // Calculate fill for each segment
+  const isLowHP = hpPercentage <= LOW_HP_THRESHOLD * 100;
+
   const segmentFills = useMemo(() => {
     return SEGMENTS.map(segment => ({
       ...segment,
@@ -212,25 +224,66 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
     }));
   }, [hpPercentage]);
 
+  // Flash effect when HP drops
+  const prevHPRef = useRef(currentHP);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (currentHP < prevHPRef.current) {
+      setIsFlashing(true);
+      if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+      flashTimeoutRef.current = setTimeout(() => setIsFlashing(false), 200);
+    }
+    prevHPRef.current = currentHP;
+
+    return () => {
+      if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+    };
+  }, [currentHP]);
+
+  const displayHP = Math.max(0, currentHP);
+
   return (
     <div className="w-full">
       {/* Header: Boss name + Phase indicator */}
       <div className="flex items-center justify-between mb-1">
-        <h2 className="font-neo-display text-sm sm:text-base font-bold text-neo-white truncate">
+        <h2 className="font-neo-display text-sm sm:text-base font-black text-neo-white truncate">
           {t(bossName) || bossName}
         </h2>
-        <PhaseIndicator phase={phase} />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* HP numbers */}
+          <span
+            className={`font-mono text-xs font-bold tabular-nums ${
+              isLowHP ? 'text-neo-red' : 'text-neo-white/70'
+            }`}
+          >
+            {displayHP} / {maxHP}
+          </span>
+          <PhaseIndicator phase={phase} />
+        </div>
       </div>
 
       {/* HP Bar Container */}
-      <div
+      <motion.div
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={hpPercentage}
         aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}
         data-testid="segmented-hp-bar"
-        className="relative w-full h-6 sm:h-7 border-3 border-neo-black rounded-neo shadow-hard overflow-hidden flex"
+        className={`
+          relative w-full h-6 sm:h-7
+          border-3 border-neo-black rounded-neo
+          shadow-hard
+          overflow-hidden flex
+        `}
+        animate={
+          isFlashing
+            ? { backgroundColor: ['rgba(255,255,255,0.5)', 'rgba(0,0,0,0)'] }
+            : {}
+        }
+        transition={isFlashing ? { duration: 0.2 } : {}}
       >
         {/* Segments */}
         {segmentFills.map(segment => (
@@ -240,6 +293,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
             fill={segment.fill}
             color={segment.color}
             label={segment.label}
+            isLowHP={isLowHP}
           />
         ))}
 
@@ -247,13 +301,21 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         <Divider threshold={33} />
         <Divider threshold={66} />
 
-        {/* HP text overlay */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="font-neo-display text-xs sm:text-sm font-bold text-neo-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] z-20">
-            {Math.max(0, currentHP)} / {maxHP}
-          </span>
-        </div>
-      </div>
+        {/* Low HP outer glow */}
+        {isLowHP && (
+          <motion.div
+            className="absolute inset-0 rounded-neo pointer-events-none"
+            animate={{
+              boxShadow: [
+                'inset 0 0 6px rgba(255,0,0,0.5)',
+                'inset 0 0 14px rgba(255,0,0,0.8)',
+                'inset 0 0 6px rgba(255,0,0,0.5)',
+              ],
+            }}
+            transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+      </motion.div>
     </div>
   );
 });

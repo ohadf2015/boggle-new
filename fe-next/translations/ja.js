@@ -4351,6 +4351,7 @@ const ja = {
     "progress": "進捗",
     "levels": "レベル",
     "level": "レベル",
+    "levelShort": "Lv.",
     "backToMap": "ワールドマップに戻る",
     "menu": {
       "skills": "スキル",

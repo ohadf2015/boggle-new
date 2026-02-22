@@ -31,11 +31,11 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
     return (
       <div
         className={cn(
-          'p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg mb-6',
+          'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
           isRTL && 'rtl'
         )}
       >
-        <h2 className="text-xl font-neo-display text-neo-white mb-4">
+        <h2 className="text-xl font-neo-display font-black text-black mb-4">
           {t('student.dashboard.classroomActivity')}
         </h2>
         <div className="space-y-3">
@@ -43,14 +43,14 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
             <div
               key={i}
               data-testid="activity-skeleton-row"
-              className="flex items-center gap-3 p-3 rounded-neo bg-neo-navy/20 border border-neo-black/20 animate-pulse"
+              className="flex items-center gap-3 p-3 rounded-neo border-2 border-black/20 bg-gray-100 animate-pulse"
             >
-              <div className="w-10 h-10 rounded-full bg-neo-white/10" />
+              <div className="w-10 h-10 rounded-full bg-black/10" />
               <div className="flex-1">
-                <div className="h-3 w-32 bg-neo-white/10 rounded mb-2" />
-                <div className="h-2 w-24 bg-neo-white/10 rounded" />
+                <div className="h-3 w-32 bg-black/10 rounded mb-2" />
+                <div className="h-2 w-24 bg-black/10 rounded" />
               </div>
-              <div className="w-8 h-8 rounded-neo bg-neo-white/10" />
+              <div className="w-8 h-8 rounded-neo bg-black/10" />
             </div>
           ))}
         </div>
@@ -64,14 +64,14 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
     return (
       <div
         className={cn(
-          'p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg mb-6',
+          'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
           isRTL && 'rtl'
         )}
       >
-        <h2 className="text-xl font-neo-display text-neo-white mb-4">
+        <h2 className="text-xl font-neo-display font-black text-black mb-4">
           {t('student.dashboard.classroomActivity')}
         </h2>
-        <p className="text-neo-white/70 text-sm text-center py-8">
+        <p className="text-black/50 text-sm text-center py-8">
           {t('student.dashboard.activity.errorLoading')}
         </p>
       </div>
@@ -84,14 +84,14 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
     return (
       <div
         className={cn(
-          'p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg mb-6',
+          'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
           isRTL && 'rtl'
         )}
       >
-        <h2 className="text-xl font-neo-display text-neo-white mb-4">
+        <h2 className="text-xl font-neo-display font-black text-black mb-4">
           {t('student.dashboard.classroomActivity')}
         </h2>
-        <p className="text-neo-white/70 text-sm text-center py-8">
+        <p className="text-black/50 text-sm text-center py-8">
           {t('student.dashboard.activity.noActivity')}
         </p>
       </div>
@@ -103,13 +103,18 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
   return (
     <div
       className={cn(
-        'p-6 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg mb-6',
+        'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
         isRTL && 'rtl'
       )}
     >
-      <h2 className="text-xl font-neo-display text-neo-white mb-4">
-        {t('student.dashboard.classroomActivity')}
-      </h2>
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-xl font-neo-display font-black text-black">
+          {t('student.dashboard.classroomActivity')}
+        </h2>
+        <span className="px-2 py-0.5 bg-neo-cyan border-2 border-black rounded-neo text-xs font-bold text-black shadow-hard-sm">
+          {activities.length}
+        </span>
+      </div>
 
       <div className="space-y-2">
         {activities.map((activity, index) => {
@@ -124,26 +129,29 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               className={cn(
-                'flex items-center gap-3 p-3 rounded-neo border-neo bg-neo-navy/20',
+                'flex items-center gap-3 p-3 rounded-neo border-2 transition-all',
                 isCurrentUser
-                  ? 'border-neo-cyan shadow-hard-sm'
-                  : 'border-neo-black/20 hover:border-neo-white/20 transition-colors'
+                  ? 'border-neo-cyan bg-neo-cyan/10 shadow-hard-sm'
+                  : 'border-black/20 bg-gray-50 hover:border-black hover:bg-gray-100'
               )}
             >
               {/* Avatar */}
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-neo-white/10 flex items-center justify-center text-lg">
+              <div className={cn(
+                'flex-shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
+                isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-yellow'
+              )}>
                 {activity.actorAvatar || '👤'}
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-neo-body text-neo-white truncate">
+                <p className="text-sm font-neo-body text-black truncate">
                   <span className="font-bold">{activity.actorName}</span>{' '}
                   {isDuel
                     ? t('student.dashboard.activity.wonDuel')
                     : t('student.dashboard.activity.unlockedAchievement')}
                 </p>
-                <p className="text-xs text-neo-white/50">
+                <p className="text-xs text-black/50">
                   {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
                 </p>
               </div>
@@ -152,14 +160,14 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               <div
                 data-testid={`activity-icon-${activity.type}`}
                 className={cn(
-                  'flex-shrink-0 w-9 h-9 rounded-neo flex items-center justify-center',
-                  isDuel ? 'bg-neo-yellow/15' : 'bg-neo-cyan/15'
+                  'flex-shrink-0 w-9 h-9 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
+                  isDuel ? 'bg-neo-yellow' : 'bg-neo-cyan'
                 )}
               >
                 {isDuel ? (
-                  <Trophy className="w-5 h-5 text-neo-yellow" />
+                  <Trophy className="w-5 h-5 text-black" />
                 ) : (
-                  <Award className="w-5 h-5 text-neo-cyan" />
+                  <Award className="w-5 h-5 text-black" />
                 )}
               </div>
             </motion.div>

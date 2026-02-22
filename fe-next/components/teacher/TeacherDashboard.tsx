@@ -64,10 +64,13 @@ export default function TeacherDashboard() {
       <div className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-neo-display text-neo-white mb-2 text-balance">
-            {t('teacher.dashboard.title')}
-          </h1>
-          <p className="text-neo-white/70 font-neo-body text-pretty">
+          <div className="flex items-center gap-3 mb-1">
+            <span className="text-3xl">🏫</span>
+            <h1 className="text-3xl font-neo-display font-black text-neo-white text-balance">
+              {t('teacher.dashboard.title')}
+            </h1>
+          </div>
+          <p className="text-neo-white/70 font-neo-body text-pretty ps-1">
             {t('teacher.dashboard.subtitle')}
           </p>
         </div>
@@ -78,28 +81,28 @@ export default function TeacherDashboard() {
           <button
             onClick={() => router.push(`/${language}/education/classroom-game`)}
             className={cn(
-              'group p-6 rounded-neo border-neo border-neo-black',
+              'group p-6 rounded-neo border-3 border-black',
               'bg-neo-cyan',
               'shadow-hard hover:shadow-hard-lg transition-all',
-              'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
+              'text-left hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-0.5 active:translate-x-0.5',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
             )}
           >
-            <div className="flex items-start justify-between mb-3">
+            <div className="flex items-start justify-between mb-4">
               <div className={cn(
-                'w-12 h-12 rounded-neo bg-neo-black flex items-center justify-center',
+                'w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center',
                 'shadow-hard-sm'
               )}>
-                <Gamepad2 className="w-6 h-6 text-neo-cyan" />
+                <Gamepad2 className="w-7 h-7 text-neo-cyan" />
               </div>
-              <div className="text-neo-black opacity-50 group-hover:opacity-100 transition-opacity">
+              <span className="text-2xl font-black text-black opacity-40 group-hover:opacity-100 transition-opacity">
                 →
-              </div>
+              </span>
             </div>
-            <h3 className="text-xl font-neo-display text-neo-black mb-1 text-balance">
+            <h3 className="text-xl font-neo-display font-black text-black mb-1 text-balance">
               {t('education.classroomGame.startGame')}
             </h3>
-            <p className="text-sm text-neo-black/80 font-neo-body text-pretty">
+            <p className="text-sm text-black/70 font-neo-body font-bold text-pretty">
               {t('education.classroomGame.startGameDescription')}
             </p>
           </button>
@@ -108,28 +111,28 @@ export default function TeacherDashboard() {
           <button
             onClick={() => setShowLessons(true)}
             className={cn(
-              'group p-6 rounded-neo border-neo border-neo-black',
+              'group p-6 rounded-neo border-3 border-black',
               'bg-neo-pink',
               'shadow-hard hover:shadow-hard-lg transition-all',
-              'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
+              'text-left hover:-translate-y-0.5 hover:-translate-x-0.5 active:translate-y-0.5 active:translate-x-0.5',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
             )}
           >
-            <div className="flex items-start justify-between mb-3">
+            <div className="flex items-start justify-between mb-4">
               <div className={cn(
-                'w-12 h-12 rounded-neo bg-neo-black flex items-center justify-center',
+                'w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center',
                 'shadow-hard-sm'
               )}>
-                <BookPlus className="w-6 h-6 text-neo-pink" />
+                <BookPlus className="w-7 h-7 text-neo-pink" />
               </div>
-              <div className="text-neo-black opacity-50 group-hover:opacity-100 transition-opacity">
+              <span className="text-2xl font-black text-black opacity-40 group-hover:opacity-100 transition-opacity">
                 →
-              </div>
+              </span>
             </div>
-            <h3 className="text-xl font-neo-display text-neo-black mb-1 text-balance">
+            <h3 className="text-xl font-neo-display font-black text-black mb-1 text-balance">
               {t('teacher.dashboard.createLesson')}
             </h3>
-            <p className="text-sm text-neo-black/80 font-neo-body text-pretty">
+            <p className="text-sm text-black/70 font-neo-body font-bold text-pretty">
               {t('teacher.dashboard.createLessonDescription')}
             </p>
           </button>
@@ -146,55 +149,54 @@ export default function TeacherDashboard() {
         )}
 
         {/* Assignment Tracking Section - Collapsible */}
-        <section className="mb-8">
+        <section className="mb-6">
           <button
             onClick={() => setShowAssignments(!showAssignments)}
             aria-expanded={showAssignments}
             className={cn(
               'w-full flex items-center justify-between p-4',
-              'rounded-neo border-neo border-neo-black',
-              'bg-neo-navy shadow-hard hover:shadow-hard-lg transition-all',
+              'rounded-neo border-3 border-black',
+              showAssignments ? 'bg-neo-yellow rounded-b-none border-b-0' : 'bg-white',
+              'shadow-hard transition-all',
               'text-left',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
             )}
           >
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-neo-display text-neo-white text-balance">
+              <h2 className="text-xl font-neo-display font-black text-black text-balance">
                 {t('teacher.dashboard.assignments')}
               </h2>
-              <span className="px-2 py-1 bg-neo-yellow/20 text-neo-yellow text-xs font-bold rounded-neo border border-neo-yellow/50">
+              <span className="px-2 py-0.5 bg-neo-yellow border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm">
                 {t('teacher.dashboard.track')}
               </span>
             </div>
             {showAssignments ? (
-              <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              <ChevronUp className="w-6 h-6 text-black" aria-hidden="true" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              <ChevronDown className="w-6 h-6 text-black" aria-hidden="true" />
             )}
           </button>
 
           {showAssignments && (
-            <div className="mt-4">
+            <div className="rounded-neo rounded-t-none border-3 border-t-0 border-black bg-white shadow-hard p-4">
               {classrooms.length === 0 ? (
-                <div className="p-6 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard">
-                  <p className="text-neo-white/60 font-neo-body text-center">
-                    {t('teacher.dashboard.createClassroomFirst')}
-                  </p>
-                </div>
+                <p className="text-black/60 font-neo-body font-bold text-center py-4">
+                  {t('teacher.dashboard.createClassroomFirst')}
+                </p>
               ) : (
                 <div className="space-y-4">
                   {/* Classroom selector if multiple classrooms */}
                   {classrooms.length > 1 && (
                     <div className="flex items-center gap-3">
-                      <label className="text-neo-white font-neo-body">
+                      <label className="text-black font-neo-body font-bold">
                         {t('teacher.dashboard.selectClassroom')}:
                       </label>
                       <select
                         value={selectedClassroomId}
                         onChange={(e) => setSelectedClassroomId(e.target.value)}
                         className={cn(
-                          'px-4 py-2 bg-neo-navy border-neo border-neo-black',
-                          'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
+                          'px-4 py-2 bg-white border-2 border-black',
+                          'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
                           'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
                         )}
                       >
@@ -221,145 +223,143 @@ export default function TeacherDashboard() {
 
         {/* Duel Monitoring Section - Collapsible */}
         {classrooms.length > 0 && (
-          <section className="mb-8">
+          <section className="mb-6">
             <button
               onClick={() => setShowDuels(!showDuels)}
               aria-expanded={showDuels}
               className={cn(
                 'w-full flex items-center justify-between p-4',
-                'rounded-neo border-neo border-neo-black',
-                'bg-neo-navy shadow-hard hover:shadow-hard-lg transition-all',
+                'rounded-neo border-3 border-black',
+                showDuels ? 'bg-neo-pink rounded-b-none border-b-0' : 'bg-white',
+                'shadow-hard transition-all',
                 'text-left',
                 'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
               )}
             >
               <div className="flex items-center gap-3">
-                <Swords className="w-6 h-6 text-neo-pink" />
-                <h2 className="text-2xl font-neo-display text-neo-white text-balance">
+                <Swords className="w-5 h-5 text-black" />
+                <h2 className="text-xl font-neo-display font-black text-black text-balance">
                   {t('teacher.dashboard.duelActivity')}
                 </h2>
-                <span className="px-2 py-1 bg-neo-pink/20 text-neo-pink text-xs font-bold rounded-neo border border-neo-pink/50">
+                <span className="px-2 py-0.5 bg-neo-pink border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm">
                   {t('teacher.dashboard.live')}
                 </span>
               </div>
               {showDuels ? (
-                <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
+                <ChevronUp className="w-6 h-6 text-black" aria-hidden="true" />
               ) : (
-                <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
+                <ChevronDown className="w-6 h-6 text-black" aria-hidden="true" />
               )}
             </button>
 
             {showDuels && selectedClassroomId && (
-              <div className="mt-4">
-                <div className="p-6 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard">
-                  {classrooms.length > 1 && (
-                    <div className="flex items-center gap-3 mb-4">
-                      <label className="text-neo-white font-neo-body">
-                        {t('teacher.dashboard.selectClassroom')}:
-                      </label>
-                      <select
-                        value={selectedClassroomId}
-                        onChange={(e) => setSelectedClassroomId(e.target.value)}
-                        className={cn(
-                          'px-4 py-2 bg-neo-navy border-neo border-neo-black',
-                          'text-neo-white font-neo-body shadow-hard-sm rounded-neo',
-                          'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
-                        )}
-                      >
-                        {classrooms.map((classroom) => (
-                          <option key={classroom.id} value={classroom.id}>
-                            {classroom.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                  <DuelMonitoringPanel classroomId={selectedClassroomId} />
-                </div>
+              <div className="rounded-neo rounded-t-none border-3 border-t-0 border-black bg-white shadow-hard p-4">
+                {classrooms.length > 1 && (
+                  <div className="flex items-center gap-3 mb-4">
+                    <label className="text-black font-neo-body font-bold">
+                      {t('teacher.dashboard.selectClassroom')}:
+                    </label>
+                    <select
+                      value={selectedClassroomId}
+                      onChange={(e) => setSelectedClassroomId(e.target.value)}
+                      className={cn(
+                        'px-4 py-2 bg-white border-2 border-black',
+                        'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
+                        'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+                      )}
+                    >
+                      {classrooms.map((classroom) => (
+                        <option key={classroom.id} value={classroom.id}>
+                          {classroom.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <DuelMonitoringPanel classroomId={selectedClassroomId} />
               </div>
             )}
           </section>
         )}
 
         {/* Classrooms Section - Collapsible */}
-        <section className="mb-8">
+        <section className="mb-6">
           <button
             onClick={() => setShowClassrooms(!showClassrooms)}
             aria-expanded={showClassrooms}
             className={cn(
               'w-full flex items-center justify-between p-4',
-              'rounded-neo border-neo border-neo-black',
-              'bg-neo-navy shadow-hard hover:shadow-hard-lg transition-all',
+              'rounded-neo border-3 border-black',
+              showClassrooms ? 'bg-neo-cyan rounded-b-none border-b-0' : 'bg-white',
+              'shadow-hard transition-all',
               'text-left',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
             )}
           >
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-neo-display text-neo-white text-balance">
+              <h2 className="text-xl font-neo-display font-black text-black text-balance">
                 {t('teacher.dashboard.classrooms')}
               </h2>
-              <span className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-xs font-bold rounded-neo border border-neo-cyan/50">
+              <span className="px-2 py-0.5 bg-neo-cyan border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm">
                 {t('teacher.dashboard.manage')}
               </span>
             </div>
             {showClassrooms ? (
-              <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              <ChevronUp className="w-6 h-6 text-black" aria-hidden="true" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              <ChevronDown className="w-6 h-6 text-black" aria-hidden="true" />
             )}
           </button>
 
           {showClassrooms && (
-            <div className="mt-4">
+            <div className="rounded-neo rounded-t-none border-3 border-t-0 border-black bg-white shadow-hard p-4">
               <ClassroomManager />
             </div>
           )}
         </section>
 
         {/* Lessons Section - Collapsible */}
-        <section className="mb-8">
+        <section className="mb-6">
           <button
             onClick={() => setShowLessons(!showLessons)}
             aria-expanded={showLessons}
             className={cn(
               'w-full flex items-center justify-between p-4',
-              'rounded-neo border-neo border-neo-black',
-              'bg-neo-navy shadow-hard hover:shadow-hard-lg transition-all',
+              'rounded-neo border-3 border-black',
+              showLessons ? 'bg-neo-pink rounded-b-none border-b-0' : 'bg-white',
+              'shadow-hard transition-all',
               'text-left',
               'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
             )}
           >
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-neo-display text-neo-white text-balance">
+              <h2 className="text-xl font-neo-display font-black text-black text-balance">
                 {t('teacher.dashboard.lessons')}
               </h2>
-              <span className="px-2 py-1 bg-neo-pink/20 text-neo-pink text-xs font-bold rounded-neo border border-neo-pink/50">
+              <span className="px-2 py-0.5 bg-neo-pink border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm">
                 {t('teacher.dashboard.build')}
               </span>
             </div>
             {showLessons ? (
-              <ChevronUp className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              <ChevronUp className="w-6 h-6 text-black" aria-hidden="true" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-neo-white" aria-hidden="true" />
+              <ChevronDown className="w-6 h-6 text-black" aria-hidden="true" />
             )}
           </button>
 
           {showLessons && (
-            <div className="mt-4">
+            <div className="rounded-neo rounded-t-none border-3 border-t-0 border-black bg-white shadow-hard p-4">
               <LessonBuilder />
             </div>
           )}
         </section>
 
         {/* Info Card - Quick Tips */}
-        <div className={cn(
-          'p-6 rounded-neo border-neo border-neo-yellow',
-          'bg-neo-yellow/10 shadow-hard-sm'
-        )}>
-          <h3 className="text-lg font-neo-display text-neo-yellow mb-2">
+        <div className="p-5 rounded-neo border-3 border-black bg-neo-yellow shadow-hard-sm">
+          <h3 className="text-lg font-neo-display font-black text-black mb-2">
             💡 {t('teacher.dashboard.quickTip')}
           </h3>
-          <p className="text-sm text-neo-white/80 font-neo-body">
+          <p className="text-sm text-black/80 font-neo-body font-bold">
             {t('teacher.dashboard.quickTipDescription')}
           </p>
         </div>

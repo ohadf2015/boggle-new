@@ -312,13 +312,14 @@ async function completeRealtimeDuel(
     ]).select();
 
     // Award XP
-    let xpAwarded: { winner?: number; loser?: number; challenger?: number; opponent?: number };
+    // winner/loser keys match what the client reads (result.xpAwarded.winner / .loser)
+    let xpAwarded: { winner: number; loser: number };
 
     if (winnerId === null) {
-      // Draw - both get DUEL_DRAW XP
+      // Draw - both get DUEL_DRAW XP; winner and loser have the same value
       xpAwarded = {
-        challenger: EDUCATION_XP_CONFIG.DUEL_DRAW,
-        opponent: EDUCATION_XP_CONFIG.DUEL_DRAW,
+        winner: EDUCATION_XP_CONFIG.DUEL_DRAW,
+        loser: EDUCATION_XP_CONFIG.DUEL_DRAW,
       };
 
       await Promise.all([
@@ -345,7 +346,7 @@ async function completeRealtimeDuel(
       xpAwarded = {
         winner: EDUCATION_XP_CONFIG.DUEL_WIN_REALTIME,
         loser: EDUCATION_XP_CONFIG.DUEL_LOSS_REALTIME,
-      };
+      } as { winner: number; loser: number };
 
       await Promise.all([
         supabase.rpc('award_education_xp', {

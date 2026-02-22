@@ -218,127 +218,148 @@ function CinematicPlayerInner({
   // RENDER
   // ==============================================
 
-  const containerClasses = fullscreen
+  const outerContainerClasses = fullscreen
     ? 'fixed inset-0 z-50 bg-black flex items-center justify-center'
     : 'relative';
 
+  // Aspect ratio of the composition (default 1280x720 = 16:9)
+  const aspectRatio = `${width} / ${height}`;
+
+  // Inner wrapper: constrains the player to the composition's aspect ratio,
+  // fitting within the available screen space. On mobile portrait screens this
+  // keeps the 16:9 content correctly sized and letterboxed inside the black
+  // background rather than being stretched or cut off.
+  const innerStyle: React.CSSProperties = fullscreen
+    ? {
+        position: 'relative',
+        width: '100%',
+        maxWidth: `calc(100vh * ${width / height})`,
+        aspectRatio,
+      }
+    : {
+        position: 'relative',
+        width,
+        height,
+      };
+
   return (
-    <div className={containerClasses} data-testid={testId}>
-      {/* Remotion Player */}
-      <Player
-        ref={playerRef}
-        component={composition}
-        inputProps={compositionProps}
-        durationInFrames={durationFrames}
-        compositionWidth={width}
-        compositionHeight={height}
-        fps={fps}
-        style={{
-          width: fullscreen ? '100vw' : width,
-          height: fullscreen ? '100vh' : height,
-          maxWidth: '100%',
-          maxHeight: '100%',
-        }}
-        autoPlay={autoPlay}
-        loop={false}
-        showVolumeControls={false}
-        controls={false}
-        acknowledgeRemotionLicense
-        renderLoading={({ height: h, width: w }) => (
-          <div
-            style={{
-              width: w,
-              height: h,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#0a0a1a',
-            }}
-          >
-            <div style={{ color: '#FFE135', fontSize: 24, fontFamily: 'sans-serif' }}>
-              Loading...
-            </div>
-          </div>
-        )}
-        errorFallback={({ error }) => {
-          console.error('[CinematicPlayer] Remotion render error:', error);
-          return (
+    <div className={outerContainerClasses} data-testid={testId}>
+      {/* Inner aspect-ratio constrained wrapper */}
+      <div style={innerStyle}>
+        {/* Remotion Player - fills the aspect-ratio wrapper exactly */}
+        <Player
+          ref={playerRef}
+          component={composition}
+          inputProps={compositionProps}
+          durationInFrames={durationFrames}
+          compositionWidth={width}
+          compositionHeight={height}
+          fps={fps}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          autoPlay={autoPlay}
+          loop={false}
+          showVolumeControls={false}
+          controls={false}
+          acknowledgeRemotionLicense
+          renderLoading={({ height: h, width: w }) => (
             <div
               style={{
-                width: '100%',
-                height: '100%',
+                width: w,
+                height: h,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: '#0a0a1a',
-                color: '#FF6B35',
-                fontSize: 18,
-                fontFamily: 'sans-serif',
-                padding: 20,
-                textAlign: 'center',
               }}
             >
-              Cinematic failed to load. Press ESC or wait to skip.
+              <div style={{ color: '#FFE135', fontSize: 24, fontFamily: 'sans-serif' }}>
+                Loading...
+              </div>
             </div>
-          );
-        }}
-      />
-
-      {/* Skip Button */}
-      <AnimatePresence>
-        <motion.div
-          className="absolute bottom-8 right-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <button
-            onClick={skip}
-            disabled={!canSkip}
-            className={`
-              px-6 py-3 rounded-neo border-neo border-black
-              font-neo-display text-lg
-              transition-all duration-200
-              ${
-                canSkip
-                  ? 'bg-neo-yellow hover:bg-neo-orange text-black cursor-pointer shadow-hard hover:shadow-hard-lg'
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-70'
-              }
-            `}
-            data-testid="skip-button"
-            aria-label={
-              canSkip
-                ? t('adventure.bosses.cinematics.skip')
-                : t('adventure.bosses.cinematics.skipIn', { seconds: Math.ceil(SKIP_DELAY_MS / 1000) })
-            }
-          >
-            {canSkip ? (
-              <span className="flex items-center gap-2">
-                {t('adventure.bosses.cinematics.skip')}
-                <kbd className="px-2 py-1 bg-black/20 rounded text-sm">ESC</kbd>
-              </span>
-            ) : (
-              <SkipCountdown />
-            )}
-          </button>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Progress Bar */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800"
-        role="progressbar"
-        aria-valuenow={progress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={t('adventure.bosses.cinematics.progress')}
-      >
-        <motion.div
-          className="h-full bg-neo-yellow"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.1, ease: 'linear' }}
+          )}
+          errorFallback={({ error }) => {
+            console.error('[CinematicPlayer] Remotion render error:', error);
+            return (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#0a0a1a',
+                  color: '#FF6B35',
+                  fontSize: 18,
+                  fontFamily: 'sans-serif',
+                  padding: 20,
+                  textAlign: 'center',
+                }}
+              >
+                Cinematic failed to load. Press ESC or wait to skip.
+              </div>
+            );
+          }}
         />
+
+        {/* Skip Button - positioned relative to the video area */}
+        <AnimatePresence>
+          <motion.div
+            className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <button
+              onClick={skip}
+              disabled={!canSkip}
+              className={`
+                px-4 py-2 sm:px-6 sm:py-3 rounded-neo border-neo border-black
+                font-neo-display text-base sm:text-lg
+                transition-all duration-200
+                ${
+                  canSkip
+                    ? 'bg-neo-yellow hover:bg-neo-orange text-black cursor-pointer shadow-hard hover:shadow-hard-lg'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-70'
+                }
+              `}
+              data-testid="skip-button"
+              aria-label={
+                canSkip
+                  ? t('adventure.bosses.cinematics.skip')
+                  : t('adventure.bosses.cinematics.skipIn', { seconds: Math.ceil(SKIP_DELAY_MS / 1000) })
+              }
+            >
+              {canSkip ? (
+                <span className="flex items-center gap-2">
+                  {t('adventure.bosses.cinematics.skip')}
+                  <kbd className="px-2 py-1 bg-black/20 rounded text-sm">ESC</kbd>
+                </span>
+              ) : (
+                <SkipCountdown />
+              )}
+            </button>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Progress Bar - anchored to the bottom of the video area */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800"
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={t('adventure.bosses.cinematics.progress')}
+        >
+          <motion.div
+            className="h-full bg-neo-yellow"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.1, ease: 'linear' }}
+          />
+        </div>
       </div>
     </div>
   );

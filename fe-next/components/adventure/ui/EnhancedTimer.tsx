@@ -174,8 +174,8 @@ export const EnhancedTimer = memo(function EnhancedTimer({
       animate={criticalAnimation}
       transition={criticalTransition}
     >
-      {/* Progress ring SVG */}
-      <svg 
+      {/* Progress ring SVG - perimeter ≈ 2*(96+96)=384 */}
+      <svg
         className="absolute inset-0 w-full h-full -z-10 opacity-20"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
@@ -189,7 +189,7 @@ export const EnhancedTimer = memo(function EnhancedTimer({
           fill="none"
           stroke={styles.progressColor}
           strokeWidth="4"
-          strokeDasharray="384"
+          strokeDasharray="384 384"
           strokeDashoffset={384 - (384 * progress) / 100}
           className="transition-all duration-1000"
         />

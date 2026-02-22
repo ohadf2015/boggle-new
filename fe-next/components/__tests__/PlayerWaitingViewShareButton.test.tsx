@@ -16,8 +16,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+jest.mock('framer-motion', () => {
+  const motionObj = {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
     ),
@@ -27,9 +27,13 @@ jest.mock('framer-motion', () => ({
     span: ({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
       <span className={className} {...props}>{children}</span>
     ),
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+  };
+  return {
+    motion: motionObj,
+    m: motionObj,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
 
 // Mock RoomChat component
 jest.mock('../../components/RoomChat', () => ({

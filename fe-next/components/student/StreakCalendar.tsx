@@ -73,16 +73,21 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
   }, [currentStreak, lastWinDate]);
 
   return (
-    <div className="p-4 rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy/40 shadow-hard-lg">
+    <div className="p-5 rounded-neo border-3 border-black bg-white shadow-hard-sm">
       {/* Header: Streak count */}
-      <div className="flex items-center gap-2 mb-4">
-        <Flame className="w-5 h-5 text-neo-pink" />
-        <p className="text-sm font-neo-body text-neo-white/70">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-neo bg-neo-pink border-2 border-black shadow-hard-sm flex items-center justify-center flex-shrink-0">
+          <Flame className="w-5 h-5 text-white" />
+        </div>
+        <p className="text-base font-neo-display font-bold text-black">
           {t('student.dashboard.streakCalendar')}
         </p>
-        <span className="ms-auto text-lg font-neo-display font-bold text-neo-pink tabular-nums">
-          {currentStreak} 🔥
-        </span>
+        <div className="ms-auto flex items-center gap-2 bg-neo-pink border-2 border-black rounded-neo px-3 py-1 shadow-hard-sm">
+          <span className="text-xl font-neo-display font-black text-white tabular-nums">
+            {currentStreak}
+          </span>
+          <span className="text-lg">🔥</span>
+        </div>
       </div>
 
       {/* 7-day calendar */}
@@ -93,18 +98,21 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
             data-testid={`day-${day.index}`}
             data-active={day.isActive}
             className={cn(
-              'flex flex-col items-center gap-1 p-2 rounded-neo border-neo',
+              'flex flex-col items-center gap-1 p-2 rounded-neo border-2',
               day.isActive
-                ? 'bg-neo-pink/30 border-neo-pink text-neo-pink'
-                : 'bg-neo-black/20 border-neo-black/50 text-neo-white/30',
+                ? 'bg-neo-pink border-black shadow-hard-sm text-white'
+                : 'bg-gray-100 border-black/30 text-black/40',
+              day.isToday && !day.isActive && 'border-black bg-neo-yellow/30 text-black',
               day.isToday && 'ring-2 ring-neo-cyan'
             )}
           >
-            <span className="text-xs font-neo-body font-medium">
+            <span className="text-xs font-neo-body font-bold">
               {day.dayName}
             </span>
-            {day.isActive && (
-              <Flame className="w-4 h-4 text-neo-pink" />
+            {day.isActive ? (
+              <Flame className="w-4 h-4 text-white" />
+            ) : (
+              <div className="w-3 h-3 rounded-full bg-black/20" />
             )}
           </div>
         ))}

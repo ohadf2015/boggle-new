@@ -11,9 +11,11 @@ import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useLanguage } from '@/contexts/LanguageContext';
 import AdventureTimer from '@/components/adventure/AdventureTimer';
 import AdventureXpProgressBar from '@/components/adventure/meta/AdventureXpProgressBar';
 import { CurrencyDisplay } from '@/components/adventure/meta/CurrencyDisplay';
+import { RollingNumber } from '@/components/adventure/ui/RollingNumber';
 import { ObjectiveProgress, type ObjectiveProgressProps } from './ObjectiveProgress';
 import { CooldownIndicator } from './CooldownIndicator';
 
@@ -71,9 +73,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
     className,
   }) => {
     const prefersReducedMotion = usePrefersReducedMotion();
-
-    // Format score with commas
-    const formattedScore = score.toLocaleString('en-US');
+    const { t } = useLanguage();
 
     return (
       <div
@@ -103,7 +103,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
                 'font-neo-display font-black text-sm'
               )}
             >
-              Lv. {playerLevel}
+              {t('adventure.levelShort', 'Lv.')} {playerLevel}
             </div>
 
             {/* XP Progress */}
@@ -162,8 +162,8 @@ export const AdventureHUD = memo<AdventureHUDProps>(
                   'font-neo-display font-black text-xl'
                 )}
               >
-                <span className="text-xs opacity-70">Score: </span>
-                {formattedScore}
+                <span className="text-xs opacity-70">{t('common.score') || 'Score'}: </span>
+                <RollingNumber value={score} variant="gold" className="text-xl font-black" />
               </div>
 
               {/* Recent score gain animation */}

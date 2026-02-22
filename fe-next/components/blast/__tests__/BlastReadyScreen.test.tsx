@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastReadyScreen } from '../BlastReadyScreen';
 
 jest.mock('framer-motion', () => ({
-  m: {
+  motion: {
     div: ({ children, ...p }: any) => <div {...p}>{children}</div>,
     button: ({ children, ...p }: any) => <button {...p}>{children}</button>,
   },

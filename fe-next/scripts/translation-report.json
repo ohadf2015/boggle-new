@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3438,
+    "totalKeysInCode": 3439,
     "keyCountByLanguage": {
       "en": 4933,
-      "he": 4948,
-      "sv": 4942,
-      "ja": 4957,
+      "he": 4949,
+      "sv": 4943,
+      "ja": 4958,
       "es": 4646
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -91,7 +91,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 220,
+        "line": 252,
         "context": "{t(bossName) || bossName}",
         "type": "variable_key"
       },
@@ -99,7 +99,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 231,
+        "line": 273,
         "context": "aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}",
         "type": "variable_key"
       },
@@ -160,7 +160,17 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "adventure.level.short",
+      "usages": [
+        {
+          "file": "components/adventure/hud/AdventureHUD.tsx",
+          "line": 106
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "share.qrCode",
@@ -168,7 +178,6 @@
       "buzz.error.failed",
       "buzz.error.noInternet",
       "accessibility.skipToMain",
-      "blast.celebrateAgain",
       "education.analytics.viewAssignments",
       "duels.opponentDisconnected",
       "duels.autoForfeitMessage",
@@ -184,7 +193,6 @@
       "buzz.error.failed",
       "buzz.error.noInternet",
       "accessibility.skipToMain",
-      "blast.celebrateAgain",
       "education.student.lessonsAssigned",
       "education.student.join.title",
       "education.student.join.subtitle",
@@ -251,7 +259,6 @@
       "challenge.challengeFriend",
       "challenge.shareHint",
       "challenge.winnerPrompt",
-      "blast.celebrateAgain",
       "education.analytics.viewAssignments",
       "duels.opponentDisconnected",
       "duels.autoForfeitMessage",

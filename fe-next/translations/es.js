@@ -4276,6 +4276,7 @@ const es = {
     "progress": "Progreso",
     "levels": "niveles",
     "level": "Nivel",
+    "levelShort": "Lv.",
     "backToMap": "Volver al mapa del mundo",
     "worldLabel": "Mundo",
     "world": "Mundo",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Star, Bomb, Sparkles, Snowflake, Shuffle,
   Zap, Magnet, Gem, Diamond, ChevronRight,
@@ -65,7 +65,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
   return (
     <div className="flex-1 flex flex-col items-center justify-between px-4 py-6 overflow-y-auto">
       {/* Title */}
-      <m.div
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -77,7 +77,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
         <p className="text-sm font-bold text-white/50 mt-1">
           {t('blast.ready.subtitle')}
         </p>
-      </m.div>
+      </motion.div>
 
       {/* Difficulty picker */}
       <div className="w-full max-w-sm space-y-2 mb-4">
@@ -85,7 +85,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
           {t('blast.ready.difficulty')}
         </div>
         {DIFFICULTIES.map((diff, i) => (
-          <m.button
+          <motion.button
             key={diff.id}
             data-testid={`difficulty-${diff.id}`}
             aria-pressed={selected === diff.id}
@@ -108,15 +108,15 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
               {t(diff.descKey) || diff.fallbackDesc}
             </div>
             {selected === diff.id && (
-              <m.div
+              <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
               >
                 <ChevronRight className={cn('h-4 w-4', diff.color)} />
-              </m.div>
+              </motion.div>
             )}
-          </m.button>
+          </motion.button>
         ))}
       </div>
 
@@ -159,7 +159,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
       </div>
 
       {/* CTA */}
-      <m.div
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 25 }}
@@ -173,7 +173,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
         >
           {t('blast.ready.play')}
         </Button>
-      </m.div>
+      </motion.div>
     </div>
   );
 }

@@ -4276,6 +4276,7 @@ const en = {
     "progress": "Progress",
     "levels": "levels",
     "level": "Level",
+    "levelShort": "Lv.",
     "backToMap": "Back to World Map",
     "menu": {
       "skills": "Skills",
