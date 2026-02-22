@@ -63,7 +63,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
   const [selected, setSelected] = useState<BlastDifficulty>('medium');
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-between px-4 py-6 overflow-y-auto">
+    <div className="flex-1 flex flex-col items-center px-4 py-6 min-h-0">
       {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -95,10 +95,10 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
             transition={{ delay: i * 0.08, type: 'spring', stiffness: 300, damping: 25 }}
             className={cn(
               'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-3 text-start transition-all',
-              'border-neo-black/50 shadow-hard-sm hover:shadow-hard active:shadow-none',
+              'shadow-hard-sm hover:shadow-hard active:shadow-none',
               selected === diff.id
                 ? cn(diff.border, diff.selectedBg, 'shadow-hard')
-                : 'bg-white/5 border-white/20 hover:bg-white/10',
+                : 'bg-white/10 border-white/30 hover:bg-white/15 hover:border-white/50',
             )}
           >
             <div className={cn('text-base font-black uppercase tracking-wider', diff.color)}>
@@ -120,8 +120,8 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
         ))}
       </div>
 
-      {/* Tile guide */}
-      <div className="w-full max-w-sm mb-4">
+      {/* Tile guide — scrollable so CTA stays in view */}
+      <div className="flex-1 overflow-y-auto w-full max-w-sm mb-4 min-h-0">
         <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">
           {t('blast.ready.tileGuide')}
         </div>
@@ -158,7 +158,7 @@ export function BlastReadyScreen({ onStart }: BlastReadyScreenProps) {
         </div>
       </div>
 
-      {/* CTA */}
+      {/* CTA — always visible at bottom */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

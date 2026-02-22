@@ -128,7 +128,7 @@ const BlastView: React.FC = () => {
   }, [router, language]);
 
   return (
-    <div className="flex flex-col min-h-full bg-neo-navy relative">
+    <div className="flex flex-col h-full bg-neo-navy relative">
       <PlayfulBackground intensity="low" colorScheme="game" />
 
       {phase === 'ready' && (

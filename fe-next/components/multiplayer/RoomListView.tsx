@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { m } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Zap, ChevronRight, Ghost, RefreshCw, Settings2 } from 'lucide-react';
