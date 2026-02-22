@@ -1,14 +1,14 @@
 /**
- * StudentLessonView - Animated Accent-border Design
+ * StudentLessonView - Playful Game Quest Log
  *
- * Glass-dark cards with staggered entrance animations,
- * spring hover effects, pulsing NEW badges, and lucide icons.
+ * Bouncier spring entrances, alternating card tilt, glowing NEW badge,
+ * bouncy DONE celebration, richer hover/tap feedback.
  */
 
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
-import { BookOpen, Award, Activity } from 'lucide-react';
+import { BookOpen, Award, Activity, Star } from 'lucide-react';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 
 // --- Animation variants ---
@@ -25,34 +25,36 @@ const listContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.15 },
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
   },
 };
 
+// Bouncier spring — gives each card a satisfying pop on entrance
 const cardEntrance = {
-  hidden: { opacity: 0, y: 20, scale: 0.97 },
+  hidden: { opacity: 0, y: 28, scale: 0.94 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
+    transition: { type: 'spring' as const, stiffness: 420, damping: 16 },
   },
 };
 
 const headerEntrance = {
-  hidden: { opacity: 0, x: -12 },
+  hidden: { opacity: 0, x: -16 },
   visible: {
     opacity: 1,
     x: 0,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
+    transition: { type: 'spring' as const, stiffness: 380, damping: 22 },
   },
 };
 
 const countBadgePop = {
-  hidden: { scale: 0 },
+  hidden: { scale: 0, rotate: -15 },
   visible: {
     scale: 1,
-    transition: { type: 'spring' as const, stiffness: 500, damping: 15, delay: 0.3 },
+    rotate: 0,
+    transition: { type: 'spring' as const, stiffness: 600, damping: 14, delay: 0.35 },
   },
 };
 
@@ -60,8 +62,17 @@ const progressBarFill = {
   hidden: { width: 0 },
   visible: (percent: number) => ({
     width: `${percent}%`,
-    transition: { type: 'spring' as const, stiffness: 60, damping: 20, delay: 0.3 },
+    transition: { type: 'spring' as const, stiffness: 55, damping: 18, delay: 0.4 },
   }),
+};
+
+const doneBadge = {
+  hidden: { scale: 0, rotate: -10 },
+  visible: {
+    scale: 1,
+    rotate: [0, 8, -5, 3, 0],
+    transition: { type: 'spring' as const, stiffness: 500, damping: 12 },
+  },
 };
 
 export default function StudentLessonView() {
@@ -129,85 +140,103 @@ export default function StudentLessonView() {
         <h2 className="text-2xl font-neo-display font-black text-neo-white">
           {t('student.dashboard.title')}
         </h2>
-        {activeLessonCount > 0 && (
-          <motion.span
-            variants={countBadgePop}
-            className="px-2.5 py-0.5 bg-neo-cyan border-2 border-black text-black text-sm font-black rounded-neo shadow-hard-sm tabular-nums"
-          >
-            {activeLessonCount}
-          </motion.span>
-        )}
+        <AnimatePresence>
+          {activeLessonCount > 0 && (
+            <motion.span
+              key="count"
+              variants={countBadgePop}
+              initial="hidden"
+              animate="visible"
+              exit={{ scale: 0, opacity: 0, transition: { duration: 0.15 } }}
+              className="px-2.5 py-0.5 bg-neo-cyan border-2 border-black text-black text-sm font-black rounded-neo shadow-hard-sm tabular-nums"
+            >
+              {activeLessonCount}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </motion.div>
 
-      {lessons.map((studentLesson) => {
+      {lessons.map((studentLesson, index) => {
         const { status, lesson, progress } = studentLesson;
 
         const lessonWords = lesson?.words || [];
         const totalWords = lessonWords.length || 1;
         const masteredWords = (progress?.words_mastered || []).length;
-        const masteryPercent = progress
-          ? Math.round((masteredWords / totalWords) * 100)
-          : 0;
+        const masteryPercent = progress ? Math.round((masteredWords / totalWords) * 100) : 0;
 
-        const lessonName = lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
+        const lessonName =
+          lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
 
-        // Card accent color per status
+        // Card colors per status
         const cardBg =
-          status === 'assigned'
-            ? 'bg-white'
-            : status === 'completed'
-              ? 'bg-neo-yellow/10'
-              : 'bg-white';
-
-        // Left accent bar color per status
+          status === 'assigned' ? 'bg-white' : status === 'completed' ? 'bg-neo-yellow/10' : 'bg-white';
         const accentBar =
-          status === 'assigned'
-            ? 'bg-neo-cyan'
-            : status === 'completed'
-              ? 'bg-neo-yellow'
-              : 'bg-black/20';
-
-        // Progress bar fill color
+          status === 'assigned' ? 'bg-neo-cyan' : status === 'completed' ? 'bg-neo-yellow' : 'bg-black/20';
         const fillColor = status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan';
+
+        // Alternating slight tilt for visual rhythm
+        const cardTilt = index % 2 === 0 ? -0.4 : 0.4;
 
         return (
           <motion.div
             key={studentLesson.lessonId}
             variants={cardEntrance}
+            style={{ rotate: cardTilt }}
             whileHover={{
-              translateY: -3,
-              boxShadow: '6px 6px 0px black',
-              transition: { type: 'spring', stiffness: 400, damping: 25 },
+              rotate: 0,
+              y: -5,
+              x: -2,
+              boxShadow: '8px 8px 0px black',
+              transition: { type: 'spring', stiffness: 420, damping: 22 },
             }}
-            whileTap={{ scale: 0.99 }}
+            whileTap={{
+              scale: 0.98,
+              rotate: 0,
+              y: 1,
+              boxShadow: '2px 2px 0px black',
+              transition: { duration: 0.08 },
+            }}
             className={cn(
               'flex rounded-neo border-3 border-black shadow-hard-sm overflow-hidden cursor-default',
               cardBg
             )}
           >
-            {/* Color accent bar on the left */}
+            {/* Accent bar */}
             <div className={cn('w-1.5 flex-shrink-0', accentBar)} />
 
             <div className="flex-1 p-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 {/* Lesson info */}
                 <div className="flex-1 min-w-0">
-                  {/* Lesson name + badge */}
+                  {/* Name + status badge */}
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="text-xl font-neo-display font-black text-black truncate">
                       {lessonName}
                     </h3>
 
                     {status === 'assigned' && (
-                      <span className="flex-shrink-0 px-2 py-0.5 bg-neo-cyan border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm animate-pulse-subtle">
-                        ✨ NEW
-                      </span>
+                      <motion.span
+                        animate={{
+                          scale: [1, 1.08, 1],
+                          boxShadow: [
+                            '2px 2px 0px black, 0 0 0px rgba(0,255,255,0)',
+                            '2px 2px 0px black, 0 0 10px rgba(0,255,255,0.4)',
+                            '2px 2px 0px black, 0 0 0px rgba(0,255,255,0)',
+                          ],
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 bg-neo-cyan border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
+                      >
+                        <Star className="w-3 h-3 fill-current" />
+                        NEW
+                      </motion.span>
                     )}
+
                     {status === 'completed' && (
                       <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                        variants={doneBadge}
+                        initial="hidden"
+                        animate="visible"
                         className="flex-shrink-0 px-2 py-0.5 bg-neo-yellow border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
                       >
                         ✓ DONE
@@ -215,7 +244,7 @@ export default function StudentLessonView() {
                     )}
                   </div>
 
-                  {/* Stats row with icons */}
+                  {/* Stats */}
                   <div className="flex items-center gap-4 text-sm flex-wrap">
                     <span className="flex items-center gap-1.5 font-bold text-black/60">
                       <BookOpen className="w-4 h-4" />
@@ -228,10 +257,14 @@ export default function StudentLessonView() {
                           <Award className="w-4 h-4 text-neo-cyan" />
                           {masteredWords} {t('student.lessons.mastered')}
                         </span>
-                        <span className="flex items-center gap-1.5 font-black text-black">
+                        <motion.span
+                          className="flex items-center gap-1.5 font-black text-black"
+                          animate={masteryPercent === 100 ? { scale: [1, 1.15, 1] } : {}}
+                          transition={{ duration: 0.6, delay: 0.8 }}
+                        >
                           <Activity className="w-4 h-4 text-neo-yellow" />
                           {masteryPercent}%
-                        </span>
+                        </motion.span>
                       </>
                     )}
                   </div>
@@ -253,7 +286,9 @@ export default function StudentLessonView() {
                   <QuickPracticeButton
                     lessonId={studentLesson.lessonId}
                     onPractice={(mode: PracticeType) => {
-                      router.push(`/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`);
+                      router.push(
+                        `/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`
+                      );
                     }}
                     size="lg"
                     className="w-full sm:w-auto"
