@@ -46,6 +46,7 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
 
 jest.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({ x: 0, y: 0 }),
+  useTiltEffect: () => ({ ref: { current: null }, style: {}, handlers: {} }),
 }));
 
 jest.mock('@/hooks/useDevicePerformance', () => ({
@@ -82,15 +83,20 @@ jest.mock('next/dynamic', () => () => {
 });
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+jest.mock('framer-motion', () => {
+  const motionObj = {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
     p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  };
+  return {
+    motion: motionObj,
+    m: motionObj,
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+  };
+});
 
 // Mock components
 jest.mock('@/components/Header', () => {
@@ -132,6 +138,24 @@ jest.mock('../ModeCard', () => {
     );
   };
 });
+
+jest.mock('../ModeCardV2', () => {
+  return function MockModeCardV2({ title }: { title: string }) {
+    return <div data-testid={`mode-card-${title}`}>{title}</div>;
+  };
+});
+
+jest.mock('@/hooks/usePlayerStats', () => ({
+  usePlayerStats: () => ({ allTimeBest: null }),
+}));
+
+jest.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => ({ hasCompleted: false, isLoading: false }),
+}));
+
+jest.mock('@/utils/perfVariant', () => ({
+  getPerfVariant: () => 'control',
+}));
 
 jest.mock('../LandingShareBanner', () => ({
   LandingShareBanner: ({ onShareClick }: { onShareClick: () => void }) => (
