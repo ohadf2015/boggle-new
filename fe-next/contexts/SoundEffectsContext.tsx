@@ -555,9 +555,9 @@ export function useSoundEffects(): SoundEffectsContextType {
   const context = useContext(SoundEffectsContext);
   if (!context) {
     // Graceful degradation instead of crashing the page
-    if (typeof window !== 'undefined') {
-      logger.warn('useSoundEffects called outside SoundEffectsProvider — returning no-op stub');
-    }
+    // Use log (not warn) — this is expected in edge cases (e.g. race conditions during mount)
+    // and is already handled by the NOOP stub, so no Sentry alert needed
+    logger.log('useSoundEffects called outside SoundEffectsProvider — returning no-op stub');
     return SOUND_EFFECTS_FALLBACK;
   }
   return context;
