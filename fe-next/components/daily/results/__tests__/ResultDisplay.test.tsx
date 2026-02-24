@@ -5,7 +5,30 @@
  * Verifies that all scoring parameters are correctly used.
  */
 
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { ResultDisplay } from '../ResultDisplay';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
+
+// Mock framer-motion to render immediately
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  },
+}));
+
+jest.mock('@/hooks/useCountUp', () => ({
+  useCountUp: ({ target }: { target: number }) => target,
+}));
+
+jest.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: jest.fn(),
+}));
+
+jest.mock('@/shared/utils/wordNormalization', () => ({
+  applyHebrewFinalLetters: (w: string) => w,
+}));
 
 describe('ResultDisplay Score Calculation', () => {
   describe('getScoreBreakdown', () => {
@@ -75,5 +98,44 @@ describe('ResultDisplay Props Requirements', () => {
     expect(withWords.exploration).toBe(100);    // 10 * 10
     expect(withoutWords.exploration).toBe(0);   // 0 * 10
     expect(withWords.total).toBeGreaterThan(withoutWords.total);
+  });
+});
+
+const mockT = (key: string) => key;
+
+describe('ResultDisplay Component', () => {
+  const solvedProps = {
+    solved: true,
+    attemptsUsed: 3,
+    targetWord: 'HELLO',
+    streakDays: 5,
+    language: 'en' as const,
+    puzzleNumber: 42,
+    countdown: '12:34:56',
+    lifeRemaining: 60,
+    wordsDiscovered: 8,
+    t: mockT,
+  };
+
+  it('renders score hero with data-testid for solved puzzle', () => {
+    render(<ResultDisplay {...solvedProps} />);
+    expect(screen.getByTestId('score-hero')).toBeInTheDocument();
+  });
+
+  it('renders target word letters individually for animation', () => {
+    render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
+    expect(screen.getByTestId('letter-C')).toBeInTheDocument();
+    expect(screen.getByTestId('letter-A')).toBeInTheDocument();
+    expect(screen.getByTestId('letter-T')).toBeInTheDocument();
+  });
+
+  it('renders puzzle number stamp badge', () => {
+    render(<ResultDisplay {...solvedProps} />);
+    expect(screen.getByText('#42')).toBeInTheDocument();
+  });
+
+  it('renders fail state without score hero', () => {
+    render(<ResultDisplay {...solvedProps} solved={false} />);
+    expect(screen.queryByTestId('score-hero')).not.toBeInTheDocument();
   });
 });

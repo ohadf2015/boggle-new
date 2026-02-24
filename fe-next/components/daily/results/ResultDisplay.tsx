@@ -12,6 +12,7 @@ import { Flame, Clock } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { useCountUp } from '@/hooks/useCountUp';
 import type { Language } from '@/types';
 
 export interface ResultDisplayProps {
@@ -55,6 +56,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   );
 
   const styles = getScoreStyles(scoreBreakdown.total);
+  const animatedScore = useCountUp({ target: scoreBreakdown.total, duration: 1500, startDelay: 200 });
   const displayedTargetWord = language === 'he'
     ? applyHebrewFinalLetters(targetWord ?? '')
     : (targetWord ?? '').toUpperCase();
@@ -109,11 +111,15 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
                   className="relative flex flex-col items-center md:items-start"
                 >
-                  <div
+                  <motion.div
+                    data-testid="score-hero"
+                    initial={{ scale: 0.3, opacity: 0, rotate: -5 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 20 }}
                     className={`text-[5rem] sm:text-[6rem] lg:text-[7rem] font-black ${styles.color} leading-none tracking-tight`}
                   >
-                    {scoreBreakdown.total}
-                  </div>
+                    {animatedScore}
+                  </motion.div>
                   <div className="text-slate-500 text-sm md:text-base font-bold -mt-1">
                     / 1000
                   </div>
@@ -130,6 +136,9 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                       🎯 +{scoreBreakdown.accuracy}
                     </span>
                   </div>
+                  <div className="absolute -top-2 -end-2 bg-neo-pink px-3 py-1 border-3 border-neo-black rounded-neo shadow-hard-sm -rotate-6 text-xs font-black text-white uppercase">
+                    #{puzzleNumber}
+                  </div>
                 </motion.div>
 
                 {/* Right Column: Target Word + Stats */}
@@ -144,8 +153,24 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">
                       {t('wordHunt.results.targetWord')}
                     </div>
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-black text-neo-lime tracking-wider">
-                      {displayedTargetWord}
+                    <div className="flex gap-1 justify-center md:justify-start flex-wrap">
+                      {displayedTargetWord.split('').map((letter, i) => (
+                        <motion.span
+                          key={i}
+                          data-testid={`letter-${letter}`}
+                          initial={{ scale: 0, rotate: -15 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 400,
+                            damping: 15,
+                            delay: 0.4 + i * 0.08,
+                          }}
+                          className="inline-block text-2xl sm:text-3xl md:text-4xl font-black text-neo-lime"
+                        >
+                          {letter}
+                        </motion.span>
+                      ))}
                     </div>
                   </div>
 
