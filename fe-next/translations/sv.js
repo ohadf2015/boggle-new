@@ -3220,6 +3220,7 @@ const sv = {
       "betterThan": "bättre än andra spelare"
     },
     "survival": {
+      "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
       "shop": "Ledtrådsbutik",
       "revealLetter": "Avslöja bokstav",
       "revealLetterDesc": "Avslöja en slumpmässig bokstav i målordet",
@@ -3252,6 +3253,7 @@ const sv = {
       "beFirst": "Bli först på topplistan!"
     },
     "results": {
+      "gameOver": "Spelet är slut",
       "tapToCelebrate": "Tryck för att fira!",
       "targetWord": "Målordet",
       "betterLuckNextTime": "Bättre lycka nästa gång!",

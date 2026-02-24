@@ -3194,6 +3194,7 @@ const es = {
       "betterThan": "mejor que otros jugadores"
     },
     "survival": {
+      "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
       "shop": "Tienda de Pistas",
       "revealLetter": "Revelar Letra",
       "revealLetterDesc": "Revelar una letra aleatoria de la palabra objetivo",
@@ -3226,6 +3227,7 @@ const es = {
       "beFirst": "¡Sé el primero en el ranking!"
     },
     "results": {
+      "gameOver": "Fin del juego",
       "tapToCelebrate": "¡Toca para celebrar!",
       "targetWord": "Palabra Objetivo",
       "betterLuckNextTime": "¡Mejor suerte la próxima vez!",

@@ -3269,6 +3269,7 @@ const ja = {
       "betterThan": "他のプレイヤーより上位"
     },
     "survival": {
+      "keyboardTip": "グリッドをスワイプするかキーボードで入力",
       "shop": "ヒントショップ",
       "revealLetter": "文字を表示",
       "revealLetterDesc": "目標単語のランダムな文字を表示",
@@ -3301,6 +3302,7 @@ const ja = {
       "beFirst": "最初のランカーになろう!"
     },
     "results": {
+      "gameOver": "ゲームオーバー",
       "tapToCelebrate": "タップしてお祝い！",
       "targetWord": "目標単語",
       "betterLuckNextTime": "次回は頑張って！",

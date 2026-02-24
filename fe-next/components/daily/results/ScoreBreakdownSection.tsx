@@ -118,14 +118,19 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
             {t('wordHunt.score.title') || 'Your Score'}
           </div>
           <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            initial={{ scale: 0.3, opacity: 0, y: 10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 250, damping: 14 }}
             className="flex items-baseline justify-center gap-1"
           >
-            <span className={`text-5xl font-black ${isPerfect ? 'text-neo-lime' : 'text-white'}`}>
+            <motion.span
+              className={`text-5xl font-black ${isPerfect ? 'text-neo-lime' : 'text-white'}`}
+              style={{
+                textShadow: isPerfect ? '0 0 20px rgba(191, 255, 0, 0.5)' : undefined,
+              }}
+            >
               {breakdown.total}
-            </span>
+            </motion.span>
             <span className="text-xl font-bold text-gray-500">/ 1000</span>
           </motion.div>
 
@@ -176,14 +181,29 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
                 </span>
               </div>
 
-              {/* Progress bar */}
-              <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+              {/* Progress bar with overshoot spring */}
+              <div className="h-2 bg-gray-800 rounded-full overflow-hidden relative">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(category.score / category.maxScore) * 100}%` }}
-                  transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                  className={`h-full rounded-full ${category.bgColor}`}
-                />
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.2 + index * 0.12,
+                    ease: [0.34, 1.56, 0.64, 1],
+                  }}
+                  className={`h-full rounded-full ${category.bgColor} relative overflow-hidden`}
+                >
+                  {/* Shimmer sweep on the bar */}
+                  <motion.div
+                    className="absolute inset-0"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                    }}
+                    initial={{ x: '-100%' }}
+                    animate={{ x: '200%' }}
+                    transition={{ delay: 0.8 + index * 0.12, duration: 0.6 }}
+                  />
+                </motion.div>
               </div>
 
               {/* Description */}

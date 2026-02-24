@@ -3212,6 +3212,7 @@ const en = {
       "betterThan": "better than other players"
     },
     "survival": {
+      "keyboardTip": "Swipe on grid or type with keyboard",
       "shop": "Clue Shop",
       "revealLetter": "Reveal Letter",
       "revealLetterDesc": "Reveal a random letter in the target word",
@@ -3244,6 +3245,7 @@ const en = {
       "beFirst": "Be the first to rank!"
     },
     "results": {
+      "gameOver": "Game Over",
       "tapToCelebrate": "Tap to celebrate!",
       "targetWord": "Target Word",
       "betterLuckNextTime": "Better luck next time!",

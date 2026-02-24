@@ -1,7 +1,7 @@
 'use client';
 
-import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { memo, useRef, useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ScoreBreakdownTooltip from '../../ScoreBreakdownTooltip';
 import type { TranslationFn } from '../types';
 
@@ -17,6 +17,7 @@ interface ScoreDisplayProps {
 
 /**
  * ScoreDisplay - Shows player's score with rank badge
+ * Enhanced with pulse ring on score change and glowing number
  */
 export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
   score,
@@ -29,14 +30,25 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
   const isDesktop = variant === 'desktop';
   const isLandscape = variant === 'landscape';
 
+  // Track score changes for pulse effect
+  const prevScoreRef = useRef(score);
+  const [pulseKey, setPulseKey] = useState(0);
+  useEffect(() => {
+    if (score > prevScoreRef.current) {
+      setPulseKey(k => k + 1);
+    }
+    prevScoreRef.current = score;
+  }, [score]);
+
   // Landscape variant (simpler display)
   if (isLandscape) {
     return (
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center relative">
         <motion.div
           key={score}
-          initial={{ scale: 1.3 }}
-          animate={{ scale: 1 }}
+          initial={{ scale: 1.4, color: '#BFFF00' }}
+          animate={{ scale: 1, color: '#1a1a2e' }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="landscape-stat-primary text-neo-black"
         >
           {score}
@@ -59,12 +71,26 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
         style={{ background: 'linear-gradient(135deg, #BFFF00 0%, #9AFF00 50%, #FFE135 100%)' }}
         whileHover={{ scale: 1.05 }}
       >
+        {/* Expanding pulse ring on score increase */}
+        <AnimatePresence>
+          {pulseKey > 0 && (
+            <motion.div
+              key={`pulse-${pulseKey}`}
+              className="absolute inset-0 rounded-neo border-2 border-neo-lime pointer-events-none"
+              initial={{ scale: 1, opacity: 0.7 }}
+              animate={{ scale: 1.6, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          )}
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
-        <div className="text-center">
+        <div className="text-center relative z-10">
           <motion.div
             key={score}
-            initial={{ scale: 1.3 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 1.4, y: -4 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 18 }}
             className="text-3xl font-black text-neo-black leading-tight"
             style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5)' }}
           >
@@ -76,9 +102,15 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           </div>
         </div>
         {rank && rank > 0 && (
-          <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-6 h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-xs font-black shadow-hard-sm">
+          <motion.div
+            key={`rank-${rank}`}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+            className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-6 h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-xs font-black shadow-hard-sm"
+          >
             #{rank}
-          </div>
+          </motion.div>
         )}
       </motion.div>
     );
@@ -94,11 +126,25 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
         background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
       }}
     >
-      <div className="text-center">
+      {/* Expanding pulse ring on score increase */}
+      <AnimatePresence>
+        {pulseKey > 0 && (
+          <motion.div
+            key={`pulse-${pulseKey}`}
+            className="absolute inset-0 rounded-neo border-2 border-neo-lime pointer-events-none"
+            initial={{ scale: 1, opacity: 0.7 }}
+            animate={{ scale: 1.6, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          />
+        )}
+      </AnimatePresence>
+      <div className="text-center relative z-10">
         <motion.div
           key={score}
-          initial={{ scale: 1.3 }}
-          animate={{ scale: 1 }}
+          initial={{ scale: 1.4, y: -3 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 18 }}
           className="font-black text-neo-black leading-tight text-lg md:text-2xl"
           style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
         >
@@ -108,11 +154,17 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           {t('common.score') || 'Score'}
         </div>
       </div>
-      {/* Rank badge */}
+      {/* Rank badge with spring entrance */}
       {rank && rank > 0 && leaderboardSize > 1 && (
-        <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-hard-sm">
+        <motion.div
+          key={`rank-${rank}`}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+          className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-hard-sm"
+        >
           #{rank}
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );

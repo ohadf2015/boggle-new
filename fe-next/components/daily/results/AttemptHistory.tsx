@@ -50,12 +50,26 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
           >
             <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800 text-neo-black dark:text-neo-white">
               {attempts.map((attempt, idx) => (
-                <div key={idx} className="flex items-center justify-center gap-1.5">
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.08, type: 'spring', stiffness: 400, damping: 25 }}
+                  className="flex items-center justify-center gap-1.5"
+                >
                   <span className="text-[10px] text-gray-700 dark:text-gray-400 w-5">{idx + 1}.</span>
                   <div className="flex gap-0.5">
                     {attempt.feedback.map((letterFb, letterIdx) => (
-                      <div
+                      <motion.div
                         key={letterIdx}
+                        initial={{ scale: 0, rotateX: -90 }}
+                        animate={{ scale: 1, rotateX: 0 }}
+                        transition={{
+                          delay: idx * 0.08 + letterIdx * 0.04,
+                          type: 'spring',
+                          stiffness: 500,
+                          damping: 20,
+                        }}
                         className={cn(
                           "w-7 h-7 flex items-center justify-center font-bold text-white rounded border border-neo-black text-sm",
                           letterFb.feedback === 'green' && "bg-green-500",
@@ -64,10 +78,10 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
                         )}
                       >
                         {letterFb.letter}
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>

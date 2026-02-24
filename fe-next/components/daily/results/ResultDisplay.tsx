@@ -1,18 +1,19 @@
 /**
  * ResultDisplay Component
- * Streamlined hero section for efficiency score display
- * Clean, focused design with minimal visual noise
+ * Speedometer Gauge hero section — circular ring fills proportionally (score/1000)
+ * with eye icon toggle for spoiler-free sharing.
+ * Enhanced with dramatic entrances, ambient glow, and staggered choreography.
  */
 
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Clock } from 'lucide-react';
+import { Flame, Clock, Eye, EyeOff, Skull } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { fireConfetti } from '@/utils/confettiUtils';
-import { useCountUp } from '@/hooks/useCountUp';
+import { ScoreGaugeRing } from './ScoreGaugeRing';
 import type { Language } from '@/types';
 
 export interface ResultDisplayProps {
@@ -30,13 +31,36 @@ export interface ResultDisplayProps {
   t: (key: string) => string;
 }
 
-/** Score tier colors */
-function getScoreStyles(score: number) {
-  if (score >= 800) return { color: 'text-neo-lime' };
-  if (score >= 600) return { color: 'text-neo-yellow' };
-  if (score >= 400) return { color: 'text-neo-orange' };
-  return { color: 'text-neo-pink' };
+/** Score tier accent colors for the gauge ring */
+function getGaugeColor(score: number): 'neo-lime' | 'neo-yellow' | 'neo-orange' | 'neo-pink' {
+  if (score >= 800) return 'neo-lime';
+  if (score >= 600) return 'neo-yellow';
+  if (score >= 400) return 'neo-orange';
+  return 'neo-pink';
 }
+
+const COLOR_HEX: Record<string, string> = {
+  'neo-lime': '#BFFF00',
+  'neo-yellow': '#FFE135',
+  'neo-orange': '#FF6B35',
+  'neo-pink': '#FF1493',
+};
+
+/** Chip entrance variant: staggered slide-up with scale pop */
+const chipVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.8 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: 0.7 + i * 0.1,
+      type: 'spring' as const,
+      stiffness: 400,
+      damping: 20,
+    },
+  }),
+};
 
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   solved,
@@ -50,13 +74,16 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   wordsDiscovered = 0,
   t,
 }) => {
+  const [wordHidden, setWordHidden] = useState(false);
+
   const scoreBreakdown = useMemo(() =>
     getScoreBreakdown(lifeRemaining, attemptsUsed, wordsDiscovered, solved),
     [lifeRemaining, attemptsUsed, wordsDiscovered, solved]
   );
 
-  const styles = getScoreStyles(scoreBreakdown.total);
-  const animatedScore = useCountUp({ target: scoreBreakdown.total, duration: 1500, startDelay: 200 });
+  const gaugeColor = solved ? getGaugeColor(scoreBreakdown.total) : 'neo-pink';
+  const glowHex = COLOR_HEX[gaugeColor] || '#BFFF00';
+
   const displayedTargetWord = language === 'he'
     ? applyHebrewFinalLetters(targetWord ?? '')
     : (targetWord ?? '').toUpperCase();
@@ -77,179 +104,288 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="w-full max-w-3xl mx-auto" // Constrain max width for desktop
+      className="w-full"
     >
-      <div className="bg-neo-navy/90 rounded-neo-lg border-3 border-neo-black shadow-hard-lg overflow-hidden">
-        {/* Compact Header with Puzzle # and Streak */}
-        <div className="flex items-center justify-between px-4 py-2 bg-slate-900/50 border-b border-slate-700/50">
+      <div className="bg-neo-navy/90 rounded-neo-lg border-3 border-neo-black shadow-hard-lg overflow-hidden relative">
+        {/* Ambient background glow matching score tier */}
+        {solved && scoreBreakdown.total > 0 && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1.5 }}
+            style={{
+              background: `radial-gradient(ellipse at 50% 30%, ${glowHex}12 0%, ${glowHex}06 40%, transparent 70%)`,
+            }}
+          />
+        )}
+
+        {/* Compact Header — Puzzle # and Streak */}
+        <div className="flex items-center justify-between px-4 py-2 bg-slate-900/50 border-b border-slate-700/50 relative z-10">
           <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">
             {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
           </span>
           {streakDays > 0 && (
-            <div className="flex items-center gap-1 text-orange-400">
-              <Flame className="w-3.5 h-3.5" />
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 500, damping: 15 }}
+              className="flex items-center gap-1 text-orange-400"
+            >
+              <motion.div
+                animate={{ rotate: [0, -10, 10, -5, 0] }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+              >
+                <Flame className="w-3.5 h-3.5" />
+              </motion.div>
               <span className="text-xs font-bold">{streakDays}</span>
-            </div>
+            </motion.div>
           )}
         </div>
 
-        {/* Main Content - Responsive padding for desktop */}
-        <div className="px-5 py-6 md:px-8 md:py-8 text-center md:text-left">
+        {/* Main Content */}
+        <div className="px-5 py-6 md:px-8 md:py-8 relative z-10">
           {solved ? (
-            /* WIN STATE - Two-column layout on desktop */
+            /* ===== WIN STATE — Speedometer Gauge ===== */
             <motion.div
               onClick={handleTapCelebrate}
-              className="cursor-pointer select-none"
+              className="cursor-pointer select-none flex flex-col items-center gap-5"
               whileTap={{ scale: 0.98 }}
             >
-              {/* Desktop: Two-column grid | Mobile: Stacked */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
-                {/* Left Column: Score */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
-                  className="relative flex flex-col items-center md:items-start"
-                >
-                  <motion.div
-                    data-testid="score-hero"
-                    initial={{ scale: 0.3, opacity: 0, rotate: -5 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 20 }}
-                    className={`text-[5rem] sm:text-[6rem] lg:text-[7rem] font-black ${styles.color} leading-none tracking-tight`}
-                  >
-                    {animatedScore}
-                  </motion.div>
-                  <div className="text-slate-500 text-sm md:text-base font-bold -mt-1">
-                    / 1000
-                  </div>
+              {/* Hero Gauge Ring — dramatic slam-in entrance */}
+              <motion.div
+                initial={{ scale: 0.3, opacity: 0, rotate: -10 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 250,
+                  damping: 14,
+                  delay: 0.1,
+                }}
+              >
+                <ScoreGaugeRing
+                  score={scoreBreakdown.total}
+                  maxScore={1000}
+                  size={200}
+                  strokeWidth={14}
+                  color={gaugeColor}
+                  delay={0.3}
+                />
+              </motion.div>
 
-                  {/* Score breakdown chips - visible on desktop */}
-                  <div className="hidden md:flex flex-wrap gap-2 mt-4">
-                    <span className="px-3 py-1.5 bg-slate-800 rounded-neo border-2 border-slate-600 text-xs font-bold text-slate-300">
-                      ⚡ +{scoreBreakdown.speed}
-                    </span>
-                    <span className="px-3 py-1.5 bg-slate-800 rounded-neo border-2 border-slate-600 text-xs font-bold text-slate-300">
-                      📝 +{scoreBreakdown.exploration}
-                    </span>
-                    <span className="px-3 py-1.5 bg-slate-800 rounded-neo border-2 border-slate-600 text-xs font-bold text-slate-300">
-                      🎯 +{scoreBreakdown.accuracy}
-                    </span>
-                  </div>
-                  <div className="absolute -top-2 -end-2 bg-neo-pink px-3 py-1 border-3 border-neo-black rounded-neo shadow-hard-sm -rotate-6 text-xs font-black text-white uppercase">
-                    #{puzzleNumber}
-                  </div>
-                </motion.div>
-
-                {/* Right Column: Target Word + Stats */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-                  className="flex flex-col items-center md:items-start justify-center gap-4 pt-4 md:pt-0 md:border-l md:border-t-0 border-t border-slate-700/40 md:pl-8"
-                >
-                  {/* Target word */}
-                  <div className="text-center md:text-left">
-                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">
-                      {t('wordHunt.results.targetWord')}
-                    </div>
-                    <div className="flex gap-1 justify-center md:justify-start flex-wrap">
-                      {displayedTargetWord.split('').map((letter, i) => (
+              {/* Target Word with Eye Toggle */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+                  {t('wordHunt.results.targetWord')}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1 justify-center flex-wrap">
+                    {wordHidden ? (
+                      /* Hidden: dot placeholders */
+                      displayedTargetWord.split('').map((_, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.5 + i * 0.04 }}
+                          className="inline-flex items-center justify-center w-8 h-10 bg-slate-800 rounded-neo border-2 border-slate-600 text-slate-500 font-black text-lg"
+                        >
+                          ?
+                        </motion.span>
+                      ))
+                    ) : (
+                      /* Revealed: letter tiles with 3D flip effect */
+                      displayedTargetWord.split('').map((letter, i) => (
                         <motion.span
                           key={i}
                           data-testid={`letter-${letter}`}
-                          initial={{ scale: 0, rotate: -15 }}
-                          animate={{ scale: 1, rotate: 0 }}
+                          initial={{ scale: 0, rotateY: -90, opacity: 0 }}
+                          animate={{ scale: 1, rotateY: 0, opacity: 1 }}
                           transition={{
                             type: 'spring',
                             stiffness: 400,
                             damping: 15,
-                            delay: 0.4 + i * 0.08,
+                            delay: 0.5 + i * 0.1,
                           }}
-                          className="inline-block text-2xl sm:text-3xl md:text-4xl font-black text-neo-lime"
+                          className="inline-flex items-center justify-center w-8 h-10 bg-neo-lime/20 rounded-neo border-2 border-neo-lime/40 text-neo-lime font-black text-lg"
+                          style={{ perspective: '400px' }}
                         >
                           {letter}
                         </motion.span>
-                      ))}
-                    </div>
+                      ))
+                    )}
                   </div>
+                  {/* Eye toggle button */}
+                  <button
+                    data-testid="word-visibility-toggle"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setWordHidden(!wordHidden);
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
+                    aria-label={wordHidden ? 'Show word' : 'Hide word'}
+                  >
+                    {wordHidden ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </motion.div>
 
-                  {/* Tap to celebrate hint - mobile only */}
-                  <div className="md:hidden text-[10px] text-slate-500 mt-2">
-                    {t('wordHunt.results.tapToCelebrate') || 'Tap to celebrate!'}
-                  </div>
-
-                  {/* Next challenge countdown - desktop placement */}
-                  <div className="hidden md:inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 rounded-neo border-2 border-slate-600/50 mt-2">
-                    <Clock className="w-4 h-4 text-neo-cyan" />
-                    <div>
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">
-                        {t('wordHunt.results.nextChallengeIn')}
-                      </div>
-                      <div className="text-xl font-black text-neo-cyan -mt-0.5">
-                        {countdown}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+              {/* Score breakdown chips — staggered pop-in */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  { color: 'neo-cyan', icon: '⚡', value: scoreBreakdown.speed },
+                  { color: 'neo-lime', icon: '🎯', value: scoreBreakdown.accuracy },
+                  { color: 'neo-pink', icon: '📝', value: scoreBreakdown.exploration },
+                ].map((chip, i) => (
+                  <motion.span
+                    key={chip.color}
+                    custom={i}
+                    variants={chipVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className={`px-3 py-1.5 bg-${chip.color}/10 rounded-neo border-2 border-${chip.color}/30 text-xs font-bold text-${chip.color}`}
+                  >
+                    {chip.icon} +{chip.value}
+                  </motion.span>
+                ))}
               </div>
 
-              {/* Mobile: Countdown below */}
-              <div className="md:hidden mt-5 pt-4 border-t border-slate-700/40">
-                <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 rounded-neo border-2 border-slate-600/50">
-                  <Clock className="w-4 h-4 text-neo-cyan" />
-                  <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-bold">
-                      {t('wordHunt.results.nextChallengeIn')}
-                    </div>
-                    <div className="text-xl font-black text-neo-cyan -mt-0.5">
-                      {countdown}
-                    </div>
+              {/* Tap to celebrate hint (mobile) */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+                className="md:hidden text-[10px] text-slate-500"
+              >
+                {t('wordHunt.results.tapToCelebrate') || 'Tap to celebrate!'}
+              </motion.div>
+
+              {/* Countdown — slides up with glow */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.0, type: 'spring', stiffness: 300, damping: 26 }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-slate-600/50"
+              >
+                <Clock className="w-4 h-4 text-neo-cyan" />
+                <div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">
+                    {t('wordHunt.results.nextChallengeIn')}
+                  </div>
+                  <div className="text-lg font-black text-neo-cyan -mt-0.5">
+                    {countdown}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           ) : (
-            /* FAIL STATE - Two-column on desktop */
+            /* ===== FAIL STATE — Gauge at 0 with skull ===== */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
+              className="flex flex-col items-center gap-5"
             >
-              {/* Desktop: Side by side | Mobile: Stacked */}
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 md:gap-8 items-center">
-                {/* Left: Message & Attempts */}
-                <div className="space-y-5 flex flex-col items-center md:items-start">
-                  <div className="text-slate-300 font-medium text-base md:text-lg">
-                    {t('wordHunt.results.betterLuckNextTime')}
-                  </div>
+              {/* Gauge ring with 0 score — dramatic shake entrance */}
+              <motion.div
+                initial={{ scale: 0.3, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 250,
+                  damping: 14,
+                  delay: 0.1,
+                }}
+                className="relative"
+                style={{ width: 180, height: 180 }}
+              >
+                <ScoreGaugeRing
+                  score={0}
+                  maxScore={1000}
+                  size={180}
+                  strokeWidth={12}
+                  color="neo-pink"
+                  delay={0.3}
+                  showScore={false}
+                />
+                {/* Skull overlay with dramatic entrance */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -30 }}
+                    animate={{
+                      scale: [0, 1.3, 1],
+                      rotate: [-30, 5, 0],
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      delay: 0.5,
+                      times: [0, 0.6, 1],
+                    }}
+                  >
+                    <Skull className="w-12 h-12 text-neo-pink mb-1" />
+                  </motion.div>
+                  <motion.span
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="text-neo-pink font-black text-sm uppercase tracking-wider"
+                  >
+                    {t('wordHunt.results.gameOver') || 'Game Over'}
+                  </motion.span>
+                </div>
+              </motion.div>
 
-                  {/* Attempts display */}
-                  <div className="text-center md:text-left">
-                    <div className="text-5xl md:text-6xl font-black text-slate-400 tracking-tight">
-                      {attemptsUsed}<span className="text-slate-600">/10</span>
-                    </div>
-                    <div className="text-xs text-slate-500 uppercase font-medium mt-1">
-                      {t('wordHunt.results.attemptsUsed') || 'attempts used'}
-                    </div>
+              {/* Attempts used — slam counter */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 18 }}
+                className="text-center"
+              >
+                <div className="text-4xl font-black text-slate-400 tracking-tight">
+                  {attemptsUsed}<span className="text-slate-600">/10</span>
+                </div>
+                <div className="text-xs text-slate-500 uppercase font-medium mt-1">
+                  {t('wordHunt.results.attemptsUsed') || 'attempts used'}
+                </div>
+              </motion.div>
+
+              {/* Better luck message */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-slate-400 font-medium text-sm text-center"
+              >
+                {t('wordHunt.results.betterLuckNextTime')}
+              </motion.div>
+
+              {/* Countdown */}
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, type: 'spring', stiffness: 300, damping: 26 }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-slate-600/50"
+              >
+                <Clock className="w-4 h-4 text-neo-cyan" />
+                <div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">
+                    {t('wordHunt.results.nextChallengeIn')}
+                  </div>
+                  <div className="text-lg font-black text-neo-cyan -mt-0.5">
+                    {countdown}
                   </div>
                 </div>
-
-                {/* Right: Countdown (more prominent on desktop) */}
-                <div className="flex items-center justify-center md:justify-end">
-                  <div className="inline-flex flex-col items-center gap-2 px-6 py-4 bg-slate-800/80 rounded-neo border-3 border-slate-600/50">
-                    <Clock className="w-6 h-6 text-neo-cyan" />
-                    <div className="text-center">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">
-                        {t('wordHunt.results.nextChallengeIn')}
-                      </div>
-                      <div className="text-2xl md:text-3xl font-black text-neo-cyan">
-                        {countdown}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </div>

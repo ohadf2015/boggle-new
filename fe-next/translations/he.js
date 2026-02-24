@@ -3225,6 +3225,7 @@ const he = {
       "betterThan": "טוב יותר משאר השחקנים"
     },
     "survival": {
+      "keyboardTip": "החלק על הלוח או הקלד עם המקלדת",
       "shop": "חנות רמזים",
       "revealLetter": "חשוף אות",
       "revealLetterDesc": "חשוף אות אקראית במילת היעד",
@@ -3257,6 +3258,7 @@ const he = {
       "beFirst": "היה הראשון בדירוג!"
     },
     "results": {
+      "gameOver": "גמר המשחק",
       "tapToCelebrate": "לחץ לחגוג!",
       "targetWord": "מילת היעד",
       "betterLuckNextTime": "בהצלחה בפעם הבאה!",
