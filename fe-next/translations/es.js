@@ -3231,6 +3231,8 @@ const es = {
       "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
       "nextChallengeIn": "Próximo desafío en",
       "rankOutOf": "#{rank} de {total} jugadores",
+      "outOf": "de {total}",
+      "topPercentile": "Top {percentile}%",
       "survivalMetrics": "Métricas del Modo Supervivencia",
       "avgLifeLeft": "Vida Promedio",
       "avgEfficiency": "Eficiencia Prom.",

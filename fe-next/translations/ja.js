@@ -3306,6 +3306,8 @@ const ja = {
       "betterLuckNextTime": "次回は頑張って！",
       "nextChallengeIn": "次のチャレンジまで",
       "rankOutOf": "{total}人中{rank}位",
+      "outOf": "{total}人中",
+      "topPercentile": "トップ {percentile}%",
       "survivalMetrics": "サバイバルモード統計",
       "avgLifeLeft": "平均残りライフ",
       "avgEfficiency": "平均効率",

@@ -3249,6 +3249,8 @@ const en = {
       "betterLuckNextTime": "Better luck next time!",
       "nextChallengeIn": "Next challenge in",
       "rankOutOf": "#{rank} out of {total} players",
+      "outOf": "out of {total}",
+      "topPercentile": "Top {percentile}%",
       "survivalMetrics": "Survival Mode Metrics",
       "avgLifeLeft": "Avg Life Left",
       "avgEfficiency": "Avg Efficiency",

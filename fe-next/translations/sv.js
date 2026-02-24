@@ -3257,6 +3257,8 @@ const sv = {
       "betterLuckNextTime": "Bättre lycka nästa gång!",
       "nextChallengeIn": "Nästa utmaning om",
       "rankOutOf": "#{rank} av {total} spelare",
+      "outOf": "av {total}",
+      "topPercentile": "Topp {percentile}%",
       "survivalMetrics": "Överlevnadsstatistik",
       "avgLifeLeft": "Genomsnittligt liv",
       "avgEfficiency": "Genomsnittlig effektivitet",

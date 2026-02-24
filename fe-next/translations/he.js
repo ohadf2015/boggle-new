@@ -3262,6 +3262,8 @@ const he = {
       "betterLuckNextTime": "בהצלחה בפעם הבאה!",
       "nextChallengeIn": "האתגר הבא בעוד",
       "rankOutOf": "מקום #{rank} מתוך {total} שחקנים",
+      "outOf": "מתוך {total}",
+      "topPercentile": "טופ {percentile}%",
       "survivalMetrics": "מדדי מצב הישרדות",
       "avgLifeLeft": "חיים ממוצעים",
       "avgEfficiency": "יעילות ממוצעת",
