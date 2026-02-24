@@ -2,11 +2,19 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DailyChallengeRouter from '../DailyChallengeRouter';
 
+// Mock getWordHuntStatusToday
+const mockGetWordHuntStatusToday = jest.fn();
+jest.mock('@/utils/dailyChallenge/storage', () => ({
+  getWordHuntStatusToday: (...args: unknown[]) => mockGetWordHuntStatusToday(...args),
+}));
+
 // Mock useRouter
 const mockPush = jest.fn();
+const mockReplace = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
+    replace: mockReplace,
   }),
 }));
 
@@ -51,6 +59,16 @@ jest.mock('../../Header', () => ({
   default: () => <header data-testid="header">Header</header>,
 }));
 
+jest.mock('@/components/ui/PageLoader', () => ({
+  __esModule: true,
+  default: ({ text }: { text?: string }) => (
+    <div data-testid="page-loader">{text}</div>
+  ),
+  PageLoader: ({ text }: { text?: string }) => (
+    <div data-testid="page-loader">{text}</div>
+  ),
+}));
+
 jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
@@ -58,87 +76,114 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-describe('DailyChallengeRouter - All Users See Landing Page', () => {
+describe('DailyChallengeRouter - Smart Routing', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPush.mockClear();
   });
 
-  test('all users see the landing page with dual challenge selection', () => {
-    render(<DailyChallengeRouter />);
+  describe('redirect when not played today', () => {
+    test('redirects to word hunt via router.replace when user has not played today', () => {
+      // GIVEN: user has not played today's word hunt
+      mockGetWordHuntStatusToday.mockReturnValue(null);
 
-    // All users should see the landing page with challenge selection
-    expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
-    expect(screen.getByTestId('header')).toBeInTheDocument();
+      // WHEN: component renders
+      render(<DailyChallengeRouter />);
+
+      // THEN: should redirect to word hunt using replace (not push)
+      expect(mockReplace).toHaveBeenCalledWith('/en/daily/word-hunt');
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    test('does not show landing page when redirecting', () => {
+      // GIVEN: user has not played
+      mockGetWordHuntStatusToday.mockReturnValue(null);
+
+      // WHEN
+      render(<DailyChallengeRouter />);
+
+      // THEN: landing page should not be visible
+      expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
+    });
   });
 
-  test('selecting Word Hunt navigates to Word Hunt page', () => {
-    render(<DailyChallengeRouter />);
+  describe('show landing when already played', () => {
+    test('shows landing page when user has already played (solved)', () => {
+      // GIVEN: user solved today's word hunt
+      mockGetWordHuntStatusToday.mockReturnValue({ solved: true });
 
-    // Start on landing
-    expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
+      // WHEN
+      render(<DailyChallengeRouter />);
 
-    // Select Word Hunt
-    fireEvent.click(screen.getByTestId('select-word-hunt'));
+      // THEN: should see landing page, no redirect
+      expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
+      expect(screen.getByTestId('header')).toBeInTheDocument();
+      expect(mockReplace).not.toHaveBeenCalled();
+    });
 
-    // Should navigate to Word Hunt page
-    expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt');
+    test('shows landing page when user played but did not solve', () => {
+      // GIVEN: user played but didn't solve
+      mockGetWordHuntStatusToday.mockReturnValue({ solved: false });
+
+      // WHEN
+      render(<DailyChallengeRouter />);
+
+      // THEN: should see landing page (played = show results)
+      expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
+      expect(mockReplace).not.toHaveBeenCalled();
+    });
   });
 
-  test('selecting Buzz navigates to Buzz page', () => {
-    render(<DailyChallengeRouter />);
+  describe('landing page interactions (when played)', () => {
+    beforeEach(() => {
+      // User already played — landing page is shown
+      mockGetWordHuntStatusToday.mockReturnValue({ solved: true });
+    });
 
-    // Start on landing
-    expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
+    test('selecting Word Hunt navigates to Word Hunt page', () => {
+      render(<DailyChallengeRouter />);
 
-    // Select Buzz
-    fireEvent.click(screen.getByTestId('select-buzz'));
+      fireEvent.click(screen.getByTestId('select-word-hunt'));
 
-    // Should navigate to Buzz page
-    expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz');
-  });
+      expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt');
+    });
 
-  test('showing buzz history opens modal', () => {
-    render(<DailyChallengeRouter />);
+    test('selecting Buzz navigates to Buzz page', () => {
+      render(<DailyChallengeRouter />);
 
-    // No history modal initially
-    expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('select-buzz'));
 
-    // Show history
-    fireEvent.click(screen.getByTestId('show-buzz-history'));
+      expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz');
+    });
 
-    // History modal should appear
-    expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
-  });
+    test('showing buzz history opens modal', () => {
+      render(<DailyChallengeRouter />);
 
-  test('selecting past buzz navigates to buzz page with date query', () => {
-    render(<DailyChallengeRouter />);
+      expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
 
-    // Show history
-    fireEvent.click(screen.getByTestId('show-buzz-history'));
-    expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('show-buzz-history'));
 
-    // Select past buzz
-    fireEvent.click(screen.getByTestId('select-past-buzz'));
+      expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
+    });
 
-    // Should navigate to buzz page with date query
-    expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz?date=2024-01-15');
+    test('selecting past buzz navigates to buzz page with date query', () => {
+      render(<DailyChallengeRouter />);
 
-    // History modal should close
-    expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
-  });
+      fireEvent.click(screen.getByTestId('show-buzz-history'));
+      fireEvent.click(screen.getByTestId('select-past-buzz'));
 
-  test('closing buzz history modal hides it', () => {
-    render(<DailyChallengeRouter />);
+      expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz?date=2024-01-15');
+      expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
+    });
 
-    // Show history
-    fireEvent.click(screen.getByTestId('show-buzz-history'));
-    expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
+    test('closing buzz history modal hides it', () => {
+      render(<DailyChallengeRouter />);
 
-    // Close history
-    fireEvent.click(screen.getByTestId('close-history'));
+      fireEvent.click(screen.getByTestId('show-buzz-history'));
+      expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
 
-    // History modal should disappear
-    expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('close-history'));
+
+      expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
+    });
   });
 });

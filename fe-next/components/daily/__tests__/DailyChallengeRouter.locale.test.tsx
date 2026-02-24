@@ -3,7 +3,7 @@
  * Bug: Navigation to daily challenges reverts to geolocation language
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useRouter, usePathname } from 'next/navigation';
 import DailyChallengeRouter from '../DailyChallengeRouter';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -45,6 +45,18 @@ jest.mock('../../buzz/BuzzHistoryList', () => ({
       </button>
     </div>
   ),
+}));
+
+// Mock storage — simulate user already played so landing page shows
+jest.mock('@/utils/dailyChallenge/storage', () => ({
+  getWordHuntStatusToday: () => ({ solved: true }),
+}));
+
+// Mock PageLoader
+jest.mock('@/components/ui/PageLoader', () => ({
+  __esModule: true,
+  default: ({ text }: { text?: string }) => <div data-testid="page-loader">{text}</div>,
+  PageLoader: ({ text }: { text?: string }) => <div data-testid="page-loader">{text}</div>,
 }));
 
 describe('DailyChallengeRouter - Language Routing', () => {
