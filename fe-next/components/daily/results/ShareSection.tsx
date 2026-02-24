@@ -46,6 +46,13 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
     transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
     className="space-y-2"
   >
+    {/* Screenshot share hint */}
+    <div className="text-center mb-3">
+      <span className="text-[11px] text-slate-500 font-medium">
+        {t('wordHunt.results.screenshotHint')}
+      </span>
+    </div>
+
     {/* Failed players: Retry is primary, Share is secondary */}
     {!solved ? (
       <>

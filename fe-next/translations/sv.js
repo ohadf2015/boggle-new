@@ -3284,7 +3284,8 @@ const sv = {
       "previewImage": "Förhandsgranska bild",
       "moreOptions": "Fler delningsalternativ",
       "lessOptions": "Färre alternativ",
-      "challengeFriends": "Utmana vänner →"
+      "challengeFriends": "Utmana vänner →",
+      "screenshotHint": "Skärmdumpa och dela din poäng!"
     },
     "score": {
       "title": "Din Poäng",

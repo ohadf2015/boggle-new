@@ -3333,7 +3333,8 @@ const ja = {
       "previewImage": "プレビュー画像",
       "moreOptions": "その他の共有オプション",
       "lessOptions": "オプションを減らす",
-      "challengeFriends": "友達に挑戦 →"
+      "challengeFriends": "友達に挑戦 →",
+      "screenshotHint": "スクリーンショットでスコアをシェア!"
     },
     "score": {
       "title": "あなたのスコア",

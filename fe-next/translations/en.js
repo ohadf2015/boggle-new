@@ -3276,7 +3276,8 @@ const en = {
       "previewImage": "Preview Image",
       "moreOptions": "More share options",
       "lessOptions": "Less options",
-      "challengeFriends": "Challenge Friends →"
+      "challengeFriends": "Challenge Friends →",
+      "screenshotHint": "Screenshot & share your score!"
     },
     "score": {
       "title": "Your Score",

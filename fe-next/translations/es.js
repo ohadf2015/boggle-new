@@ -3258,7 +3258,8 @@ const es = {
       "previewImage": "Vista previa de imagen",
       "moreOptions": "Más opciones de compartir",
       "lessOptions": "Menos opciones",
-      "challengeFriends": "Desafiar amigos →"
+      "challengeFriends": "Desafiar amigos →",
+      "screenshotHint": "¡Haz captura de pantalla y comparte tu puntuación!"
     },
     "score": {
       "title": "Tu Puntuación",

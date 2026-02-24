@@ -3289,7 +3289,8 @@ const he = {
       "previewImage": "תצוגה מקדימה",
       "moreOptions": "אפשרויות שיתוף נוספות",
       "lessOptions": "פחות אפשרויות",
-      "challengeFriends": "אתגר חברים ←"
+      "challengeFriends": "אתגר חברים ←",
+      "screenshotHint": "צלמו מסך ושתפו את הציון!"
     },
     "score": {
       "title": "הניקוד שלך",
