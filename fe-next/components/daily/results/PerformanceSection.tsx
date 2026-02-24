@@ -9,6 +9,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Target, BookOpen, Coins, Lock } from 'lucide-react';
+import { useCountUp } from '@/hooks/useCountUp';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import type { CoinRewardMode } from '@/components/results/CoinRewardDisplay';
 
@@ -46,6 +47,13 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
 }) => {
   const isTeasing = coinRewardMode === 'teasing';
   const breakdown = getScoreBreakdown(lifeRemaining, guessesUsed, wordsDiscovered, solved);
+
+  // Hooks must be called before any early return
+  const animatedValues = [
+    useCountUp({ target: breakdown.speed, duration: 800, startDelay: 400 }),
+    useCountUp({ target: breakdown.accuracy, duration: 800, startDelay: 500 }),
+    useCountUp({ target: breakdown.exploration, duration: 800, startDelay: 600 }),
+  ];
 
   if (!solved || breakdown.total === 0) return null;
 
@@ -101,13 +109,18 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold text-slate-300">{bar.label}</span>
-                <span className="text-xs font-black text-white">{bar.value}<span className="text-slate-500">/{bar.max}</span></span>
+                <span className="text-xs font-black text-white">{animatedValues[index]}<span className="text-slate-500">/{bar.max}</span></span>
               </div>
               <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(bar.value / bar.max) * 100}%` }}
-                  transition={{ duration: 0.5, delay: 0.1 + index * 0.08 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 120,
+                    damping: 14,
+                    delay: 0.4 + index * 0.1,
+                  }}
                   className={`h-full rounded-full ${bar.color}`}
                 />
               </div>
