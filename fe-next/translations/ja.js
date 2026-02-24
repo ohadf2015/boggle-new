@@ -2926,6 +2926,7 @@ const ja = {
     "dailyDoubleBonus": "両方クリアでボーナスXP獲得",
     "bonusChallenge": "ボーナスチャレンジ",
     "browseArchive": "アーカイブ：過去のチャレンジ",
+    "continueMissions": "デイリーミッションを続ける",
     "bonusXP": "ボーナスXP",
     "chooseChallengeHint": "挑戦を選んで！両方クリアでボーナスXP獲得！",
     "timed90Seconds": "スピード勝負",

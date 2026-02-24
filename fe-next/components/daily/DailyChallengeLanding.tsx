@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Timer, Hourglass, Trophy } from 'lucide-react';
+import { Timer, Hourglass, Trophy, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
@@ -268,6 +269,7 @@ export function DailyChallengeLanding({
     (status.wordHunt === 'won' ? 1 : 0) +
     (status.buzz === 'won' ? 1 : 0);
 
+  const wordHuntPlayed = status.wordHunt === 'won' || status.wordHunt === 'lost';
   const bothWon = status.wordHunt === 'won' && status.buzz === 'won';
 
   return (
@@ -292,69 +294,186 @@ export function DailyChallengeLanding({
         t={t}
       />
 
-      {/* Quest 1: Word Hunt */}
-      <QuestCard
-        challengeId="wordHunt"
-        icon={<Timer className="w-8 h-8" />}
-        title={t('daily.wordHunt.title')}
-        tagline={t('daily.wordHunt.desc')}
-        details={t('daily.wordHunt.details')}
-        color="orange"
-        status={status.wordHunt}
-        isLoadingStatus={loadingStatus.wordHunt}
-        onPlay={onSelectWordHunt}
-        timeMode="timed"
-        timeModeLabel={t('daily.timedQuest')}
-        customPreview="word-hunt-grid"
-        currentLanguage={currentLanguage}
-        buttonText={
-          (status.wordHunt === 'won' || status.wordHunt === 'lost')
-            ? t('daily.viewResults')
-            : t('daily.startQuest')
-        }
-        delay={0.15}
-      />
+      {/* Word Hunt: hero results card when played, full QuestCard when new */}
+      {wordHuntPlayed ? (
+        <>
+          {/* Word Hunt Results Hero Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 25 }}
+            className="w-full"
+            data-testid="word-hunt-hero"
+          >
+            <div
+              onClick={onSelectWordHunt}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && onSelectWordHunt()}
+              className={cn(
+                'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
+                'shadow-hard overflow-hidden cursor-pointer p-4',
+                'flex items-center gap-4',
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
+                'transition-shadow duration-200 group'
+              )}
+            >
+              {/* Status icon */}
+              <div className={cn(
+                'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
+                'flex items-center justify-center',
+                'shadow-hard-xs',
+                status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+              )}>
+                {status.wordHunt === 'won'
+                  ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
+                  : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
+                }
+              </div>
 
-      {/* Quest path connector */}
-      <QuestPathLine />
+              {/* Title + status badge */}
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xl font-neo-display font-black text-neo-orange leading-none">
+                  {t('daily.wordHunt.title')}
+                </h2>
+                <span className={cn(
+                  'inline-block mt-1 px-2 py-0.5 text-[10px] font-black uppercase rounded-md border',
+                  status.wordHunt === 'won'
+                    ? 'bg-neo-lime/20 text-neo-lime border-neo-lime'
+                    : 'bg-neo-pink/20 text-neo-pink border-neo-pink'
+                )}>
+                  {status.wordHunt === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
+                </span>
+              </div>
 
-      {/* Streak counter between quests */}
-      <StreakCounter streak={streak} />
+              {/* View Results CTA */}
+              <div className={cn(
+                'shrink-0 py-2.5 px-4 text-[10px] font-black uppercase rounded-lg text-center',
+                'bg-neo-orange text-neo-black border-2 border-neo-black shadow-hard-sm',
+                'active:translate-y-0.5 active:shadow-none transition-all',
+                'flex items-center gap-1.5'
+              )}>
+                <Eye className="w-3.5 h-3.5" />
+                {t('daily.viewResults')}
+              </div>
+            </div>
+          </motion.div>
 
-      {/* Quest path connector */}
-      <QuestPathLine />
+          {/* Continue missions divider */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="w-full flex items-center gap-3 my-4"
+          >
+            <div className="flex-1 h-px bg-slate-700" />
+            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider whitespace-nowrap">
+              {t('daily.continueMissions')}
+            </span>
+            <div className="flex-1 h-px bg-slate-700" />
+          </motion.div>
 
-      {/* Quest 2: Daily Buzz */}
-      <QuestCard
-        challengeId="buzz"
-        icon={<Hourglass className="w-8 h-8" />}
-        title={t('buzz.title')}
-        tagline={
-          status.buzz === 'unavailable'
-            ? t('buzz.unavailableTagline')
-            : t('buzz.tagline')
-        }
-        details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
-        color="yellow"
-        status={status.buzz}
-        isLoadingStatus={loadingStatus.buzz}
-        onPlay={onSelectBuzz}
-        timeMode="relaxed"
-        timeModeLabel={t('daily.untimedQuest')}
-        badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
-        buttonText={
-          (status.buzz === 'won' || status.buzz === 'lost')
-            ? t('daily.viewResults')
-            : status.buzz === 'unavailable'
-              ? t('buzz.requestChallenge')
-              : t('daily.startQuest')
-        }
-        delay={0.3}
-        previewImageUrl={buzzPreview.imageUrl}
-        previewImageAlt={buzzPreview.trendingSummary}
-        onRequestChallenge={handleRequestChallenge}
-        requestState={requestState}
-      />
+          {/* Streak counter */}
+          <StreakCounter streak={streak} />
+
+          <QuestPathLine />
+
+          {/* Buzz as secondary card */}
+          <QuestCard
+            challengeId="buzz"
+            icon={<Hourglass className="w-8 h-8" />}
+            title={t('buzz.title')}
+            tagline={
+              status.buzz === 'unavailable'
+                ? t('buzz.unavailableTagline')
+                : t('buzz.tagline')
+            }
+            details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
+            color="yellow"
+            status={status.buzz}
+            isLoadingStatus={loadingStatus.buzz}
+            onPlay={onSelectBuzz}
+            timeMode="relaxed"
+            timeModeLabel={t('daily.untimedQuest')}
+            badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
+            buttonText={
+              (status.buzz === 'won' || status.buzz === 'lost')
+                ? t('daily.viewResults')
+                : status.buzz === 'unavailable'
+                  ? t('buzz.requestChallenge')
+                  : t('daily.startQuest')
+            }
+            delay={0.3}
+            previewImageUrl={buzzPreview.imageUrl}
+            previewImageAlt={buzzPreview.trendingSummary}
+            onRequestChallenge={handleRequestChallenge}
+            requestState={requestState}
+            variant="secondary"
+          />
+        </>
+      ) : (
+        <>
+          {/* Quest 1: Word Hunt (new — hasn't played) */}
+          <QuestCard
+            challengeId="wordHunt"
+            icon={<Timer className="w-8 h-8" />}
+            title={t('daily.wordHunt.title')}
+            tagline={t('daily.wordHunt.desc')}
+            details={t('daily.wordHunt.details')}
+            color="orange"
+            status={status.wordHunt}
+            isLoadingStatus={loadingStatus.wordHunt}
+            onPlay={onSelectWordHunt}
+            timeMode="timed"
+            timeModeLabel={t('daily.timedQuest')}
+            customPreview="word-hunt-grid"
+            currentLanguage={currentLanguage}
+            buttonText={t('daily.startQuest')}
+            delay={0.15}
+          />
+
+          {/* Quest path connector */}
+          <QuestPathLine />
+
+          {/* Streak counter between quests */}
+          <StreakCounter streak={streak} />
+
+          {/* Quest path connector */}
+          <QuestPathLine />
+
+          {/* Quest 2: Daily Buzz */}
+          <QuestCard
+            challengeId="buzz"
+            icon={<Hourglass className="w-8 h-8" />}
+            title={t('buzz.title')}
+            tagline={
+              status.buzz === 'unavailable'
+                ? t('buzz.unavailableTagline')
+                : t('buzz.tagline')
+            }
+            details={status.buzz !== 'unavailable' ? t('buzz.details') : undefined}
+            color="yellow"
+            status={status.buzz}
+            isLoadingStatus={loadingStatus.buzz}
+            onPlay={onSelectBuzz}
+            timeMode="relaxed"
+            timeModeLabel={t('daily.untimedQuest')}
+            badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
+            buttonText={
+              (status.buzz === 'won' || status.buzz === 'lost')
+                ? t('daily.viewResults')
+                : status.buzz === 'unavailable'
+                  ? t('buzz.requestChallenge')
+                  : t('daily.startQuest')
+            }
+            delay={0.3}
+            previewImageUrl={buzzPreview.imageUrl}
+            previewImageAlt={buzzPreview.trendingSummary}
+            onRequestChallenge={handleRequestChallenge}
+            requestState={requestState}
+          />
+        </>
+      )}
 
       {/* Browse Past Challenges */}
       {onShowBuzzHistory && (

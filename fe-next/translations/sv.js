@@ -2880,6 +2880,7 @@ const sv = {
     "dailyDoubleBonus": "Klara båda uppdragen för bonus-XP",
     "bonusChallenge": "Bonusutmaning",
     "browseArchive": "Arkiv: Tidigare Utmaningar",
+    "continueMissions": "Fortsätt dina dagliga uppdrag",
     "bonusXP": "Bonus-XP",
     "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
     "timed90Seconds": "Snabbt Tempo",

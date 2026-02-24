@@ -3033,6 +3033,7 @@ const he = {
     "dailyDoubleBonus": "השלימו את שני האתגרים לבונוס XP",
     "bonusChallenge": "אתגר בונוס",
     "browseArchive": "ארכיון: אתגרים קודמים",
+    "continueMissions": "המשיכו במשימות היומיות",
     "bonusXP": "בונוס XP",
     "chooseChallengeHint": "בחרו את האתגר להיום. השלימו את שניהם לבונוס XP! 🎯",
     "timed90Seconds": "קצב מהיר",

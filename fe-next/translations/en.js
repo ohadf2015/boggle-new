@@ -2879,6 +2879,7 @@ const en = {
     "dailyDoubleBonus": "Complete both quests for bonus XP",
     "bonusChallenge": "Bonus Challenge",
     "browseArchive": "Archive: View Past Challenges",
+    "continueMissions": "Continue your daily missions",
     "bonusXP": "Bonus XP",
     "timed90Seconds": "Fast Pace",
     "takeYourTime": "No Timer",
