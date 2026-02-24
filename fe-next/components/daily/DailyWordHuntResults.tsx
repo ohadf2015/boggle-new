@@ -23,6 +23,7 @@ import {
   findRarestWord,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
+import { fireConfetti } from '@/utils/confettiUtils';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
@@ -230,6 +231,22 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     stats,
   });
 
+  // Confetti burst after results entrance (centered, timed after rank badge appears)
+  useEffect(() => {
+    if (isNewCompletion && result.solved) {
+      const timer = setTimeout(() => {
+        fireConfetti({
+          particleCount: 80,
+          spread: 120,
+          origin: { y: 0.5 },
+          colors: ['#BFFF00', '#00FFFF', '#FF1493', '#FFE135'],
+        });
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isNewCompletion, result.solved]);
+
   // Show streak milestone
   useEffect(() => {
     if (isNewCompletion && milestoneMessage) {
@@ -285,53 +302,79 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       {/* WIN state: Performance breakdown with 3 bars */}
       {result.solved && (
-        <PerformanceSection
-          coinReward={coinActions.coinReward}
-          coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
-          survivalBonusTime={survivalBonusTime}
-          rarestWord={rarestWord}
-          solved={result.solved}
-          efficiencyScore={result.efficiencyScore || 0}
-          lifeRemaining={result.lifeRemaining || 0}
-          wordsDiscovered={result.wordsDiscovered?.length || 0}
-          guessesUsed={result.attemptsUsed}
-          t={t}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <PerformanceSection
+            coinReward={coinActions.coinReward}
+            coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
+            survivalBonusTime={survivalBonusTime}
+            rarestWord={rarestWord}
+            solved={result.solved}
+            efficiencyScore={result.efficiencyScore || 0}
+            lifeRemaining={result.lifeRemaining || 0}
+            wordsDiscovered={result.wordsDiscovered?.length || 0}
+            guessesUsed={result.attemptsUsed}
+            t={t}
+          />
+        </motion.div>
       )}
 
       {/* Rank badge - shows for both WIN and FAIL */}
-      {stats && <RankBadge stats={stats} t={t} />}
+      {stats && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <RankBadge stats={stats} t={t} />
+        </motion.div>
+      )}
 
       {/* Emoji share card — visible for winners with discovered words */}
       {result.solved && emojiWords.length > 0 && (
-        <EmojiShareCard
-          puzzleNumber={puzzleNumber}
-          score={result.efficiencyScore || 0}
-          solved={result.solved}
-          words={emojiWords}
-          language={language}
-          t={t}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <EmojiShareCard
+            puzzleNumber={puzzleNumber}
+            score={result.efficiencyScore || 0}
+            solved={result.solved}
+            words={emojiWords}
+            language={language}
+            t={t}
+          />
+        </motion.div>
       )}
 
       {/* Share/Retry Section */}
-      <ShareSection
-        solved={result.solved}
-        onShare={shareHandlers.handleNativeShare}
-        onChallengeShare={shareHandlers.handleChallengeShare}
-        onRetry={coinActions.handleRetryChallenge}
-        canAffordRetry={coinActions.canAffordRetry}
-        retryCost={coinActions.retryCost}
-        currentCoins={coinActions.currentCoins}
-        onWhatsApp={shareHandlers.handleWhatsApp}
-        onTwitter={shareHandlers.handleTwitter}
-        onTelegram={shareHandlers.handleTelegram}
-        onCopy={shareHandlers.handleCopy}
-        onDownloadImage={shareHandlers.handleDownloadShareImage}
-        copied={shareHandlers.copied}
-        isGeneratingImage={shareHandlers.isGeneratingImage}
-        t={t}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <ShareSection
+          solved={result.solved}
+          onShare={shareHandlers.handleNativeShare}
+          onChallengeShare={shareHandlers.handleChallengeShare}
+          onRetry={coinActions.handleRetryChallenge}
+          canAffordRetry={coinActions.canAffordRetry}
+          retryCost={coinActions.retryCost}
+          currentCoins={coinActions.currentCoins}
+          onWhatsApp={shareHandlers.handleWhatsApp}
+          onTwitter={shareHandlers.handleTwitter}
+          onTelegram={shareHandlers.handleTelegram}
+          onCopy={shareHandlers.handleCopy}
+          onDownloadImage={shareHandlers.handleDownloadShareImage}
+          copied={shareHandlers.copied}
+          isGeneratingImage={shareHandlers.isGeneratingImage}
+          t={t}
+        />
+      </motion.div>
 
       {/* Inline signup for guests */}
       {!isAuthenticated && !inlineSignupDismissed && (
