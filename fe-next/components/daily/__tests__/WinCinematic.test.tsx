@@ -7,13 +7,15 @@ jest.useFakeTimers();
 
 // Mock framer-motion to render plain divs
 jest.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, className, onClick, ...props }: any) => (
-      <div className={className} onClick={onClick} {...props}>{children}</div>
-    ),
-    span: ({ children, className, ...props }: any) => (
-      <span className={className} {...props}>{children}</span>
-    ),
+  motion: {
+    div: ({ children, className, onClick, ...props }: any) => {
+      const { initial, animate, transition, exit, whileTap, variants, whileHover, ...rest } = props;
+      return <div className={className} onClick={onClick} {...rest}>{children}</div>;
+    },
+    span: ({ children, className, ...props }: any) => {
+      const { initial, animate, transition, exit, whileTap, variants, whileHover, ...rest } = props;
+      return <span className={className} {...rest}>{children}</span>;
+    },
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));

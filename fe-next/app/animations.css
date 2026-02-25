@@ -1305,11 +1305,13 @@ body.crazygames-embed {
   touch-action: pan-y;
 }
 
-/* On desktop/tablet, revert to flex-based layout (no fixed tab bar) */
+/* On desktop/tablet, use max-height constraint instead of fixed height.
+ * height: auto lets the element grow with content; max-height caps it
+ * at the viewport minus header so overflow-y: auto can activate. */
 @media (min-width: 768px) {
   .isolate-scroll-daily {
     height: auto;
-    max-height: none;
+    max-height: calc(100dvh - 60px);
     overflow-y: auto;
   }
 }

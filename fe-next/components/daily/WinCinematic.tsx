@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 
@@ -19,6 +19,10 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
   const { t } = useLanguage();
   const [displayScore, setDisplayScore] = useState(0);
   const [showTap, setShowTap] = useState(false);
+
+  // Stable ref for onComplete — prevents timer resets when parent re-renders
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   // Rolling score counter — animates from 0 to finalScore over ~1.2s
   useEffect(() => {
@@ -49,23 +53,24 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
   const doneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Show "tap to continue" at 2s, auto-advance at 2.5s
+  // Uses ref for onComplete so parent re-renders don't reset the timers
   useEffect(() => {
     tapTimerRef.current = setTimeout(() => setShowTap(true), 2000);
-    doneTimerRef.current = setTimeout(onComplete, 2500);
+    doneTimerRef.current = setTimeout(() => onCompleteRef.current(), 2500);
     return () => {
       if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
       if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
     };
-  }, [onComplete]);
+  }, []);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
     if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
-    onComplete();
-  };
+    onCompleteRef.current();
+  }, []);
 
   return (
-    <m.div
+    <motion.div
       data-testid="win-cinematic"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -74,48 +79,48 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
       onClick={handleClick}
     >
       {/* Puzzle label — number rendered explicitly so it's always in the DOM */}
-      <m.div
+      <motion.div
         initial={{ scale: 0, rotate: -10 }}
         animate={{ scale: 1, rotate: -3 }}
         transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.1 }}
         className="text-slate-500 text-sm font-black uppercase tracking-widest mb-4"
       >
         {t('wordHunt.title')} #{puzzleNumber}
-      </m.div>
+      </motion.div>
 
       {/* Rolling score */}
-      <m.div
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
         className="text-[8rem] font-black text-neo-lime leading-none tabular-nums"
       >
         {displayScore}
-      </m.div>
+      </motion.div>
 
-      <m.div
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
         className="text-slate-400 text-lg font-bold uppercase tracking-widest"
       >
         {t('common.pts')}
-      </m.div>
+      </motion.div>
 
       {/* Tap to continue */}
       <AnimatePresence>
         {showTap && (
-          <m.div
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', stiffness: 280, damping: 26 }}
             className="absolute bottom-12 text-slate-500 text-sm uppercase tracking-widest"
           >
             {t('common.tapToContinue')}
-          </m.div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </m.div>
+    </motion.div>
   );
 };
 

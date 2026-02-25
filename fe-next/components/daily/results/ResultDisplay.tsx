@@ -9,7 +9,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Clock, Eye, EyeOff, Skull } from 'lucide-react';
+import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -249,9 +249,9 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
               {/* Score breakdown chips — staggered pop-in */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {[
-                  { color: 'neo-cyan', icon: '⚡', value: scoreBreakdown.speed },
-                  { color: 'neo-lime', icon: '🎯', value: scoreBreakdown.accuracy },
-                  { color: 'neo-pink', icon: '📝', value: scoreBreakdown.exploration },
+                  { color: 'neo-cyan', icon: <Zap className="w-3.5 h-3.5 inline-block" />, value: scoreBreakdown.speed },
+                  { color: 'neo-lime', icon: <Target className="w-3.5 h-3.5 inline-block" />, value: scoreBreakdown.accuracy },
+                  { color: 'neo-pink', icon: <BookOpen className="w-3.5 h-3.5 inline-block" />, value: scoreBreakdown.exploration },
                 ].map((chip, i) => (
                   <motion.span
                     key={chip.color}
@@ -259,7 +259,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     variants={chipVariants}
                     initial="hidden"
                     animate="visible"
-                    className={`px-3 py-1.5 rounded-neo border-2 text-xs font-bold ${CHIP_STYLES[chip.color]}`}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 text-xs font-bold ${CHIP_STYLES[chip.color]}`}
                   >
                     {chip.icon} +{chip.value}
                   </motion.span>
