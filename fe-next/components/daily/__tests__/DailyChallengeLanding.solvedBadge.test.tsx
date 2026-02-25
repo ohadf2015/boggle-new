@@ -109,6 +109,18 @@ describe('DailyChallengeLanding Solved Badge', () => {
           }),
         });
       }
+      if (url.includes('daily-streak')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ streak: 0 }),
+        });
+      }
+      if (url.includes('daily-challenge/leaderboard')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [] }),
+        });
+      }
       return Promise.reject(new Error('Unknown URL'));
     });
   });

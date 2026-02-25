@@ -319,12 +319,15 @@ export function DailyChallengeLanding({
               )}
             >
               {/* Status icon */}
-              <div className={cn(
-                'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-                'flex items-center justify-center',
-                'shadow-hard-xs',
-                status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
-              )}>
+              <div
+                data-testid={status.wordHunt === 'won' ? 'won-badge' : 'lost-badge'}
+                className={cn(
+                  'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
+                  'flex items-center justify-center',
+                  'shadow-hard-xs',
+                  status.wordHunt === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+                )}
+              >
                 {status.wordHunt === 'won'
                   ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
                   : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />

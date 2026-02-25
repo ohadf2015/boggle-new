@@ -208,7 +208,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
   });
 
   describe('Visual hierarchy', () => {
-    test('completed card should have reduced opacity', async () => {
+    test('completed Word Hunt shows hero card instead of quest card', async () => {
       const storage = require('@/utils/dailyChallenge/storage');
       storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
 
@@ -221,9 +221,9 @@ describe('DailyChallengeLanding Completion Indicator', () => {
       renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
       await waitFor(() => {
-        const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
-        const cardInner = wordHuntCard.querySelector('[role="button"]');
-        expect(cardInner?.className).toContain('opacity-85');
+        // When played, the hero card replaces the quest card
+        expect(screen.getByTestId('word-hunt-hero')).toBeInTheDocument();
+        expect(screen.queryByTestId('quest-card-wordHunt')).not.toBeInTheDocument();
       }, { timeout: 2000 });
 
       storage.getWordHuntStatusToday.mockReturnValue(null);
