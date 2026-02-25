@@ -3252,6 +3252,10 @@ const sv = {
       "noWordsYet": "Hitta ord för att samla byte!",
       "beFirst": "Bli först på topplistan!"
     },
+    "mobile": {
+      "words": "ord",
+      "rank": "Rank"
+    },
     "results": {
       "gameOver": "Spelet är slut",
       "tapToCelebrate": "Tryck för att fira!",

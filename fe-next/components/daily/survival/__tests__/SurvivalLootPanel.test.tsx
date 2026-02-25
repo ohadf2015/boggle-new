@@ -81,4 +81,30 @@ describe('SurvivalLootPanel', () => {
     render(<SurvivalLootPanel {...baseProps} />);
     expect(screen.getByText('Loot Collected')).toBeInTheDocument();
   });
+
+  it('uses icons instead of emojis for life and token rewards', () => {
+    const words: WordDiscovery[] = [
+      { word: 'HELLO', timestamp: Date.now(), lifeGained: 5, tokensGained: 2 },
+    ];
+    const { container } = render(<SurvivalLootPanel {...baseProps} discoveredWords={words} />);
+
+    // Should NOT contain emoji characters
+    const textContent = container.textContent || '';
+    expect(textContent).not.toContain('❤️');
+    expect(textContent).not.toContain('🔑');
+
+    // Should contain the numeric values with icons (rendered as SVG by Lucide)
+    expect(screen.getByText('+5')).toBeInTheDocument();
+    expect(screen.getByText('+2')).toBeInTheDocument();
+  });
+
+  it('shows star icon for long words (7+ letters)', () => {
+    const words: WordDiscovery[] = [
+      { word: 'SURVIVAL', timestamp: Date.now(), lifeGained: 12, tokensGained: 3 },
+    ];
+    render(<SurvivalLootPanel {...baseProps} discoveredWords={words} />);
+    expect(screen.getByText('SURVIVAL')).toBeInTheDocument();
+    // Word should be styled as pink for 7+ letter words
+    expect(screen.getByText('SURVIVAL')).toHaveClass('text-neo-pink');
+  });
 });

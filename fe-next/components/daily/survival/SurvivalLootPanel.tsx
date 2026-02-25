@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Lightbulb, Target, Star } from 'lucide-react';
+import { Package, Lightbulb, Target, Star, Heart, KeyRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MAX_ATTEMPTS } from './constants';
 import type { WordDiscovery, TargetAttempt } from './types';
@@ -40,9 +40,9 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
   }, [sortedWords.length]);
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy/50 rounded-neo border-2 border-neo-black/30 overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Loot Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-neo-cream/15 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-2 border-b-3 border-neo-black flex-shrink-0 bg-neo-black/30">
         <div className="flex items-center gap-2">
           <Package className="w-4 h-4 text-neo-lime" />
           <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
@@ -78,7 +78,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
       </div>
 
       {/* Power-ups Footer */}
-      <div className="flex-shrink-0 border-t border-neo-cream/10 bg-neo-black/20 p-3 space-y-2">
+      <div className="flex-shrink-0 border-t-3 border-neo-black bg-neo-black/30 p-3 space-y-2">
         {/* Hints Unlocked */}
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1 text-neo-cream/60">
@@ -134,10 +134,16 @@ const LootWordItem: React.FC<{ word: WordDiscovery }> = ({ word }) => {
       </div>
       <div className="flex items-center gap-2 flex-shrink-0 text-xs">
         {word.lifeGained > 0 && (
-          <span className="text-green-400 font-bold">+{word.lifeGained}❤️</span>
+          <span className="text-green-400 font-bold flex items-center gap-0.5">
+            +{word.lifeGained}
+            <Heart className="w-3 h-3 fill-current" />
+          </span>
         )}
         {word.tokensGained > 0 && (
-          <span className="text-neo-yellow font-bold">+{word.tokensGained}🔑</span>
+          <span className="text-neo-yellow font-bold flex items-center gap-0.5">
+            +{word.tokensGained}
+            <KeyRound className="w-3 h-3" />
+          </span>
         )}
       </div>
     </motion.div>

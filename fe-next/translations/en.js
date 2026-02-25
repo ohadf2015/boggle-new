@@ -3244,6 +3244,10 @@ const en = {
       "noWordsYet": "Find words to collect loot!",
       "beFirst": "Be the first to rank!"
     },
+    "mobile": {
+      "words": "words",
+      "rank": "Rank"
+    },
     "results": {
       "gameOver": "Game Over",
       "tapToCelebrate": "Tap to celebrate!",

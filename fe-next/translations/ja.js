@@ -3301,6 +3301,10 @@ const ja = {
       "noWordsYet": "単語を見つけて戦利品を集めよう！",
       "beFirst": "最初のランカーになろう!"
     },
+    "mobile": {
+      "words": "単語",
+      "rank": "ランク"
+    },
     "results": {
       "gameOver": "ゲームオーバー",
       "tapToCelebrate": "タップしてお祝い！",

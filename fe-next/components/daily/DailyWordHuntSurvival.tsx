@@ -29,6 +29,7 @@ import {
   AutoClueNotification,
 } from './survival';
 import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
+import { SurvivalMobileInfoBar } from './survival/SurvivalMobileInfoBar';
 
 // Re-export types for backwards compatibility
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
@@ -353,6 +354,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <div className="flex justify-center py-1">
         <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
       </div>
+
+      {/* Mobile Info Bar — rank + loot with expandable bottom sheet */}
+      {puzzleDate && (
+        <SurvivalMobileInfoBar
+          discoveredWords={state.discoveredWords}
+          hintStage={state.hintStage}
+          attempts={state.attempts}
+          puzzleDate={puzzleDate}
+          language={language}
+          currentPlayerId={currentPlayerId ?? null}
+          currentGuestFingerprint={currentGuestFingerprint ?? null}
+          t={t}
+        />
+      )}
 
       {/* Auto-Clue Notifications */}
       <AnimatePresence>

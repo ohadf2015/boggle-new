@@ -86,3 +86,6 @@ export type { SurvivalLiveRanksProps } from './SurvivalLiveRanks';
 
 export { SurvivalLootPanel } from './SurvivalLootPanel';
 export type { SurvivalLootPanelProps } from './SurvivalLootPanel';
+
+export { SurvivalMobileInfoBar } from './SurvivalMobileInfoBar';
+export type { SurvivalMobileInfoBarProps } from './SurvivalMobileInfoBar';

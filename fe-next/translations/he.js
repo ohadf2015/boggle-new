@@ -3257,6 +3257,10 @@ const he = {
       "noWordsYet": "מצא מילים כדי לאסוף שלל!",
       "beFirst": "היה הראשון בדירוג!"
     },
+    "mobile": {
+      "words": "מילים",
+      "rank": "דירוג"
+    },
     "results": {
       "gameOver": "גמר המשחק",
       "tapToCelebrate": "לחץ לחגוג!",

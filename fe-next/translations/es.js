@@ -3226,6 +3226,10 @@ const es = {
       "noWordsYet": "¡Encuentra palabras para recolectar botín!",
       "beFirst": "¡Sé el primero en el ranking!"
     },
+    "mobile": {
+      "words": "palabras",
+      "rank": "Rango"
+    },
     "results": {
       "gameOver": "Fin del juego",
       "tapToCelebrate": "¡Toca para celebrar!",
