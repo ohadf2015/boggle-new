@@ -54,7 +54,18 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
       }
 
       const data = await response.json();
-      setEntries(data.data || []);
+      // API returns snake_case from Supabase view — map to camelCase
+      const mapped: LeaderboardEntry[] = (data.data || []).map((row: Record<string, unknown>, idx: number) => ({
+        rank: (row.rank_position as number) ?? idx + 1,
+        displayName: (row.display_name as string) || 'Anonymous',
+        score: (row.efficiency_score as number) ?? 0,
+        solved: (row.solved as boolean) ?? false,
+        playerId: row.player_id as string | undefined,
+        guestFingerprint: row.guest_fingerprint as string | undefined,
+        profile_picture_url: row.profile_picture_url as string | null,
+        avatar_image: row.avatar_image as string | null,
+      }));
+      setEntries(mapped);
       setTotalPlayers(data.totalPlayers || data.totalParticipants || 0);
     } catch {
       // Silently fail - leaderboard is non-critical during gameplay
@@ -77,9 +88,9 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy/50 rounded-neo border-2 border-neo-black/30 overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neo-cream/15 bg-neo-black/20 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b-3 border-neo-black flex-shrink-0 bg-neo-black/30">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-neo-yellow" />
           <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">

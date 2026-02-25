@@ -56,11 +56,12 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+// Mock response matches real Supabase view output (snake_case)
 const mockLeaderboardResponse = {
   data: [
-    { rank: 1, displayName: 'Alice', score: 350, solved: true, playerId: 'alice-id' },
-    { rank: 2, displayName: 'Bob', score: 280, solved: true, guestFingerprint: 'bob-fp' },
-    { rank: 3, displayName: 'Charlie', score: 200, solved: false, playerId: 'charlie-id' },
+    { rank_position: 1, display_name: 'Alice', efficiency_score: 350, solved: true, player_id: 'alice-id', guest_fingerprint: null, profile_picture_url: null, avatar_image: null },
+    { rank_position: 2, display_name: 'Bob', efficiency_score: 280, solved: true, player_id: null, guest_fingerprint: 'bob-fp', profile_picture_url: null, avatar_image: null },
+    { rank_position: 3, display_name: 'Charlie', efficiency_score: 200, solved: false, player_id: 'charlie-id', guest_fingerprint: null, profile_picture_url: null, avatar_image: null },
   ],
   totalPlayers: 25,
 };

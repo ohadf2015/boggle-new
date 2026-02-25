@@ -63,7 +63,18 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
       const response = await fetch(url);
       if (!response.ok) return;
       const data = await response.json();
-      setEntries(data.data || []);
+      // API returns snake_case from Supabase view — map to camelCase
+      const mapped: LeaderboardEntry[] = (data.data || []).map((row: Record<string, unknown>, idx: number) => ({
+        rank: (row.rank_position as number) ?? idx + 1,
+        displayName: (row.display_name as string) || 'Anonymous',
+        score: (row.efficiency_score as number) ?? 0,
+        solved: (row.solved as boolean) ?? false,
+        playerId: row.player_id as string | undefined,
+        guestFingerprint: row.guest_fingerprint as string | undefined,
+        profile_picture_url: row.profile_picture_url as string | null,
+        avatar_image: row.avatar_image as string | null,
+      }));
+      setEntries(mapped);
       setTotalPlayers(data.totalPlayers || data.totalParticipants || 0);
     } catch {
       // Silently fail — leaderboard is non-critical
