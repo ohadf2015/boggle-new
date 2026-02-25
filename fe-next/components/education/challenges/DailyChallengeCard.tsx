@@ -50,7 +50,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       </p>
 
       {/* Progress Bar */}
-      <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
+      <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3" data-testid="progress-bar">
         <motion.div
           className="absolute inset-y-0 left-0 bg-neo-cyan"
           initial={{ width: 0 }}

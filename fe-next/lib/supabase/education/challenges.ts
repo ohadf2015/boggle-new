@@ -281,6 +281,72 @@ export async function assignDailyChallenges(
 }
 
 /**
+ * Assign weekly quest to a player (1 words_mastered quest per week)
+ * @param playerId - Player UUID
+ * @returns Array of created quest rows
+ */
+export async function assignWeeklyQuests(
+  playerId: string
+): Promise<{ data: WeeklyQuestRow[] | null; error: { message: string } | null }> {
+  try {
+    if (!supabase)
+      return { data: null, error: { message: 'Supabase not configured' } };
+
+    const weekStart = getCurrentWeekStart();
+
+    // Check if quests already exist for this week
+    const { data: existing } = await supabase
+      .from('weekly_quests')
+      .select('*')
+      .eq('player_id', playerId)
+      .eq('week_start', weekStart);
+
+    if (existing && existing.length > 0) {
+      return { data: existing as WeeklyQuestRow[], error: null };
+    }
+
+    // Create 1 weekly quest: words_mastered, 20 words, 300 XP, 50 coins
+    const questRow = {
+      player_id: playerId,
+      week_start: weekStart,
+      quest_type: 'words_mastered',
+      title: 'challenges.weekly.masterWords',
+      description: 'challenges.weekly.masterWordsDesc',
+      requirements: { target: 20 },
+      current_progress: { count: 0 },
+      xp_reward: 300,
+      bonus_rewards: { coins: 50 },
+      completed: false,
+      claimed: false,
+    };
+
+    const { data: created, error } = await supabase
+      .from('weekly_quests')
+      .insert([questRow])
+      .select();
+
+    if (error) {
+      // PGRST205 = table not found (hasn't been created yet)
+      if (error.code === 'PGRST205') {
+        return { data: [], error: null };
+      }
+      logger.error('Error creating weekly quests:', error);
+      return { data: null, error: { message: error.message } };
+    }
+
+    return { data: created as WeeklyQuestRow[], error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    // Suppress missing table errors
+    if (error.includes('weekly_quests') && error.includes('schema cache')) {
+      return { data: [], error: null };
+    }
+    logger.error('Exception in assignWeeklyQuests:', error);
+    return { data: null, error: { message: error } };
+  }
+}
+
+/**
  * Claim reward for a completed daily challenge
  * @param challengeId - Challenge UUID
  * @param playerId - Player UUID (for verification)
@@ -325,7 +391,7 @@ export async function claimChallengeReward(
     }
 
     // Mark as claimed
-    const { data: updated, error: updateError } = await supabase
+    const { error: updateError } = await supabase
       .from('daily_challenges')
       .update({
         claimed: true,
@@ -436,3 +502,6 @@ export async function claimQuestReward(
     return { data: null, error: { message: error } };
   }
 }
+
+// Re-export event-driven progress from dedicated module
+export { updateEducationChallengeProgress, type ChallengeEventType } from './challengeProgress';

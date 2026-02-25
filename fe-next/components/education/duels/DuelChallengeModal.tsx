@@ -103,7 +103,7 @@ export default function DuelChallengeModal({
           <div className="flex items-center gap-3">
             <Swords className="w-6 h-6 text-neo-yellow" />
             <h3 className="text-xl font-neo-display font-black text-neo-white">
-              {t('challengePlayer', { name: opponent.displayName })}
+              {t('challengePlayer', { name: opponent.displayName ?? '?' })}
             </h3>
           </div>
           <button
@@ -121,13 +121,13 @@ export default function DuelChallengeModal({
             {/* Avatar */}
             <div className="w-12 h-12 rounded-full bg-neo-cyan flex items-center justify-center">
               <span className="text-neo-black font-black text-xl">
-                {opponent.displayName.charAt(0).toUpperCase()}
+                {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
               </span>
             </div>
 
             {/* Name */}
             <div>
-              <p className="text-neo-white font-bold">{opponent.displayName}</p>
+              <p className="text-neo-white font-bold">{opponent.displayName ?? '?'}</p>
               <p className="text-neo-white/50 text-sm">{t('availableOpponents')}</p>
             </div>
           </div>

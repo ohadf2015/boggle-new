@@ -46,7 +46,7 @@ describe('ChallengePanel — loading state', () => {
   it('shows contextual loading text', () => {
     render(<ChallengePanel playerId="student-1" />);
 
-    expect(screen.getByText('Loading your challenges...')).toBeInTheDocument();
+    expect(screen.getByText('challenges.loading')).toBeInTheDocument();
   });
 
   it('does not render challenge panel content while loading', () => {

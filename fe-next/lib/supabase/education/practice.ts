@@ -179,6 +179,43 @@ let query = supabase
 }
 
 /**
+ * Get all practice sessions for a specific lesson (teacher analytics view)
+ * @param lessonId - Lesson UUID
+ * @param classroomId - Optional classroom filter
+ * @returns Array of session rows or error
+ */
+export async function getPracticeSessionsForLesson(
+  lessonId: string,
+  classroomId?: string
+): Promise<{ data: PracticeSessionRow[]; error: { message: string } | null }> {
+  try {
+    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+
+    let query = supabase
+      .from('practice_sessions')
+      .select('*')
+      .eq('lesson_id', lessonId);
+
+    if (classroomId) {
+      query = query.eq('classroom_id', classroomId);
+    }
+
+    const { data: sessions, error } = await query.order('created_at', { ascending: false });
+
+    if (error) {
+      logger.error('Error fetching sessions for lesson:', error);
+      return { data: [], error: { message: error.message } };
+    }
+
+    return { data: (sessions || []) as PracticeSessionRow[], error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getPracticeSessionsForLesson:', error);
+    return { data: [], error: { message: error } };
+  }
+}
+
+/**
  * Get a single practice session by ID
  * @param sessionId - Session UUID
  * @returns Session row or error

@@ -13,6 +13,7 @@ import {
   claimChallengeReward,
   claimQuestReward,
   getCurrentWeekStart,
+  updateEducationChallengeProgress,
 } from './challenges';
 
 // Mock supabase
@@ -309,6 +310,135 @@ describe('challenges module', () => {
 
       expect(result.data).toEqual({ xpReward: 300, bonusReward: { coins: 100 } });
       expect(result.error).toBeNull();
+    });
+  });
+
+  // ==========================================
+  // updateEducationChallengeProgress
+  // ==========================================
+  describe('updateEducationChallengeProgress', () => {
+    const today = new Date().toISOString().split('T')[0];
+
+    it('increments current_value for matching challenge type', async () => {
+      // GIVEN: one incomplete practice_sessions challenge
+      const mockChallenges = [
+        {
+          id: 'ch-1',
+          player_id: mockPlayerId,
+          challenge_date: today,
+          challenge_type: 'practice_sessions',
+          target_value: 3,
+          current_value: 1,
+          completed: false,
+          claimed: false,
+        },
+      ];
+
+      // Mock select (fetch today's incomplete challenges)
+      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
+      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+
+      // Mock update for increment
+      const mockUpdateEqId = jest.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 2 }, error: null });
+      const mockUpdateEq = jest.fn().mockReturnValue({ eq: mockUpdateEqId });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq });
+
+      (supabase.from as jest.Mock)
+        .mockReturnValueOnce({ select: mockSelectChain })
+        .mockReturnValueOnce({ update: mockUpdate });
+
+      // WHEN
+      const result = await updateEducationChallengeProgress(mockPlayerId, 'practice_session', 1);
+
+      // THEN
+      expect(result.updated).toBe(1);
+      expect(supabase.from).toHaveBeenCalledWith('daily_challenges');
+    });
+
+    it('marks challenge as completed when current_value reaches target', async () => {
+      // GIVEN: challenge one away from completion
+      const mockChallenges = [
+        {
+          id: 'ch-1',
+          player_id: mockPlayerId,
+          challenge_date: today,
+          challenge_type: 'words_mastered',
+          target_value: 5,
+          current_value: 4,
+          completed: false,
+          claimed: false,
+        },
+      ];
+
+      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
+      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+
+      const mockUpdateEqId = jest.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 5, completed: true }, error: null });
+      const mockUpdateEq = jest.fn().mockReturnValue({ eq: mockUpdateEqId });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq });
+
+      (supabase.from as jest.Mock)
+        .mockReturnValueOnce({ select: mockSelectChain })
+        .mockReturnValueOnce({ update: mockUpdate });
+
+      // WHEN
+      const result = await updateEducationChallengeProgress(mockPlayerId, 'word_mastered', 1);
+
+      // THEN
+      expect(result.updated).toBe(1);
+      // Verify update includes completed = true and completed_at
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          current_value: 5,
+          completed: true,
+          completed_at: expect.any(String),
+        })
+      );
+    });
+
+    it('ignores challenges with non-matching challenge_type', async () => {
+      // GIVEN: practice_sessions challenge but eventType is duel_played
+      const mockChallenges = [
+        {
+          id: 'ch-1',
+          player_id: mockPlayerId,
+          challenge_date: today,
+          challenge_type: 'practice_sessions',
+          target_value: 3,
+          current_value: 0,
+          completed: false,
+          claimed: false,
+        },
+      ];
+
+      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
+      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelectChain });
+
+      // WHEN: fire duel_played event
+      const result = await updateEducationChallengeProgress(mockPlayerId, 'duel_played', 1);
+
+      // THEN: no challenges updated for non-matching type
+      expect(result.updated).toBe(0);
+    });
+
+    it('returns 0 when player has no challenges today', async () => {
+      // GIVEN: empty challenges
+      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: [], error: null }) });
+      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+
+      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelectChain });
+
+      // WHEN
+      const result = await updateEducationChallengeProgress(mockPlayerId, 'xp_earned', 50);
+
+      // THEN
+      expect(result.updated).toBe(0);
     });
   });
 

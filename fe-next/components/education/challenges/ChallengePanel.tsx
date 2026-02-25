@@ -9,6 +9,8 @@ import {
   getWeeklyQuests,
   claimChallengeReward,
   claimQuestReward,
+  assignDailyChallenges,
+  assignWeeklyQuests,
 } from '@/lib/supabase/education';
 import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education/types';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -31,8 +33,21 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
       getWeeklyQuests(playerId),
     ]);
 
-    if (dailyResult.data) setDailyChallenges(dailyResult.data);
-    if (weeklyResult.data) setWeeklyQuests(weeklyResult.data);
+    // Auto-assign daily challenges if none exist for today
+    if (!dailyResult.error && dailyResult.data && dailyResult.data.length === 0) {
+      const assigned = await assignDailyChallenges(playerId);
+      if (assigned.data) setDailyChallenges(assigned.data);
+    } else if (dailyResult.data) {
+      setDailyChallenges(dailyResult.data);
+    }
+
+    // Auto-assign weekly quests if none exist for this week
+    if (!weeklyResult.error && weeklyResult.data && weeklyResult.data.length === 0) {
+      const assigned = await assignWeeklyQuests(playerId);
+      if (assigned.data) setWeeklyQuests(assigned.data);
+    } else if (weeklyResult.data) {
+      setWeeklyQuests(weeklyResult.data);
+    }
     setLoading(false);
   };
 
@@ -51,7 +66,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
     loadChallenges();
   }
 
-  if (loading) return <PageLoader text="Loading your challenges..." size="lg" nested />;
+  if (loading) return <PageLoader text={t('challenges.loading')} size="lg" nested />;
 
   const hasContent = dailyChallenges.length > 0 || weeklyQuests.length > 0;
 

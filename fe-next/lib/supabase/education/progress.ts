@@ -191,3 +191,115 @@ export async function updateProgress(
     return { data: null, error: { message: error } };
   }
 }
+
+/**
+ * Get all student progress records for a specific lesson (teacher analytics view)
+ */
+export async function getStudentProgressForLesson(
+  lessonId: string
+): Promise<{ data: StudentLessonProgress[]; error: { message: string } | null }> {
+  if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await supabase
+      .from('student_lesson_progress')
+      .select('*')
+      .eq('lesson_id', lessonId)
+      .order('started_at', { ascending: false });
+
+    if (error) {
+      logger.error('Error fetching progress for lesson:', error);
+      return { data: [], error: { message: error.message } };
+    }
+
+    return { data: data || [], error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in getStudentProgressForLesson:', error);
+    return { data: [], error: { message: error } };
+  }
+}
+
+// ============================================
+// SPACED REPETITION EXTENSION
+// ============================================
+
+export interface WordAttemptWithSR extends WordAttempt {
+  intervalDays?: number;
+  easinessFactor?: number;
+  repetitions?: number;
+  nextReviewDate?: string;
+}
+
+/**
+ * Update spaced repetition scheduling data for a specific word in a student's progress.
+ * Merges SR fields into the existing word attempt data.
+ */
+export async function updateWordSpacedRepetition(
+  studentId: string,
+  lessonId: string,
+  word: string,
+  srData: {
+    intervalDays: number;
+    easinessFactor: number;
+    repetitions: number;
+    nextReviewDate: string;
+  }
+): Promise<{ data: StudentLessonProgress | null; error: { message: string } | null }> {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    // Fetch existing progress
+    const { data: existing, error: fetchError } = await supabase
+      .from('student_lesson_progress')
+      .select('*')
+      .eq('student_id', studentId)
+      .eq('lesson_id', lessonId)
+      .maybeSingle();
+
+    if (fetchError) {
+      logger.error('Error fetching progress for SR update:', fetchError);
+      return { data: null, error: { message: fetchError.message } };
+    }
+
+    if (!existing) {
+      return { data: null, error: { message: `Progress not found for student ${studentId} in lesson ${lessonId}` } };
+    }
+
+    // Merge SR data into the word's attempt entry
+    const wordsAttempted = existing.words_attempted || {};
+    const currentWordData: WordAttemptWithSR = wordsAttempted[word] || {
+      attempts: 0,
+      correct: 0,
+      lastAttemptAt: new Date().toISOString(),
+    };
+
+    const updatedWordData: WordAttemptWithSR = {
+      ...currentWordData,
+      ...srData,
+    };
+
+    const updatedWordsAttempted = {
+      ...wordsAttempted,
+      [word]: updatedWordData,
+    };
+
+    const { data: updated, error: updateError } = await supabase
+      .from('student_lesson_progress')
+      .update({ words_attempted: updatedWordsAttempted })
+      .eq('id', existing.id)
+      .select()
+      .single();
+
+    if (updateError) {
+      logger.error('Error updating SR data:', updateError);
+      return { data: null, error: { message: updateError.message } };
+    }
+
+    return { data: updated, error: null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Exception in updateWordSpacedRepetition:', error);
+    return { data: null, error: { message: error } };
+  }
+}

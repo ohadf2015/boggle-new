@@ -261,7 +261,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                 {/* Avatar placeholder */}
                 <div className="w-12 h-12 rounded-full bg-neo-cyan flex items-center justify-center relative">
                   <span className="text-neo-black font-black text-xl">
-                    {opponent.displayName.charAt(0).toUpperCase()}
+                    {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
                   </span>
                   {/* Online indicator */}
                   <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime border-neo border-neo-black"></div>
@@ -269,7 +269,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
 
                 {/* Name */}
                 <span className="text-neo-white font-bold text-sm text-center">
-                  {opponent.displayName}
+                  {opponent.displayName ?? '?'}
                 </span>
               </button>
             ))}
