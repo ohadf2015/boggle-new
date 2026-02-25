@@ -17,6 +17,7 @@ const logger = require('../utils/logger');
 let _redisClient: RedisClient | null = null;
 let _isRedisAvailable = false;
 let _errorReported = false; // Prevent repeated error events to Sentry
+let _highLatencyReported = false; // Prevent repeated high-latency warnings to Sentry
 let lastHealthCheck = Date.now();
 let healthCheckInterval: NodeJS.Timeout | null = null;
 let memoryCheckInterval: NodeJS.Timeout | null = null;
@@ -109,7 +110,15 @@ export async function healthCheck(): Promise<boolean> {
     const latency = Date.now() - start;
 
     if (latency > 100) {
-      logger.warn('REDIS', `High latency: ${latency}ms`);
+      // Only warn (→ Sentry) on first occurrence; subsequent spikes use debug
+      if (!_highLatencyReported) {
+        logger.warn('REDIS', `High latency: ${latency}ms`);
+        _highLatencyReported = true;
+      } else {
+        logger.debug('REDIS', `High latency: ${latency}ms`);
+      }
+    } else {
+      _highLatencyReported = false; // Reset when latency returns to normal
     }
 
     lastHealthCheck = Date.now();

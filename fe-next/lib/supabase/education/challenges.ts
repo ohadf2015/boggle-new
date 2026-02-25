@@ -4,8 +4,15 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
 import type { DailyChallengeRow, WeeklyQuestRow, ChallengeTier } from './types';
+
+// Use admin client (service role) for write operations that require bypassing RLS.
+// Falls back to anon browser client when service role key is unavailable (browser/test).
+function getWriteClient() {
+  return createAdminClient() ?? supabase;
+}
 
 // ============================================
 // CHALLENGE DEFINITIONS
@@ -218,13 +225,14 @@ export async function assignDailyChallenges(
   playerId: string
 ): Promise<{ data: DailyChallengeRow[] | null; error: { message: string } | null }> {
   try {
-    if (!supabase)
+    const db = getWriteClient();
+    if (!db)
       return { data: null, error: { message: 'Supabase not configured' } };
 
     const today = getToday();
 
     // Check if challenges already exist for today
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('daily_challenges')
       .select('*')
       .eq('player_id', playerId)
@@ -262,7 +270,7 @@ export async function assignDailyChallenges(
       claimed: false,
     }));
 
-    const { data: created, error } = await supabase
+    const { data: created, error } = await db
       .from('daily_challenges')
       .insert(challengeRows)
       .select();
@@ -289,13 +297,14 @@ export async function assignWeeklyQuests(
   playerId: string
 ): Promise<{ data: WeeklyQuestRow[] | null; error: { message: string } | null }> {
   try {
-    if (!supabase)
+    const db = getWriteClient();
+    if (!db)
       return { data: null, error: { message: 'Supabase not configured' } };
 
     const weekStart = getCurrentWeekStart();
 
     // Check if quests already exist for this week
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('weekly_quests')
       .select('*')
       .eq('player_id', playerId)
@@ -320,7 +329,7 @@ export async function assignWeeklyQuests(
       claimed: false,
     };
 
-    const { data: created, error } = await supabase
+    const { data: created, error } = await db
       .from('weekly_quests')
       .insert([questRow])
       .select();
@@ -360,11 +369,12 @@ export async function claimChallengeReward(
   error: { message: string } | null;
 }> {
   try {
-    if (!supabase)
+    const db = getWriteClient();
+    if (!db)
       return { data: null, error: { message: 'Supabase not configured' } };
 
     // Fetch challenge
-    const { data: challenge, error: fetchError } = await supabase
+    const { data: challenge, error: fetchError } = await db
       .from('daily_challenges')
       .select('*')
       .eq('id', challengeId)
@@ -391,7 +401,7 @@ export async function claimChallengeReward(
     }
 
     // Mark as claimed
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('daily_challenges')
       .update({
         claimed: true,
@@ -434,11 +444,12 @@ export async function claimQuestReward(
   error: { message: string } | null;
 }> {
   try {
-    if (!supabase)
+    const db = getWriteClient();
+    if (!db)
       return { data: null, error: { message: 'Supabase not configured' } };
 
     // Fetch quest
-    const { data: quest, error: fetchError } = await supabase
+    const { data: quest, error: fetchError } = await db
       .from('weekly_quests')
       .select('*')
       .eq('id', questId)
@@ -472,7 +483,7 @@ export async function claimQuestReward(
     }
 
     // Mark as claimed
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('weekly_quests')
       .update({
         claimed: true,

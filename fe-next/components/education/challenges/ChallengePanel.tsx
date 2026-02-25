@@ -4,14 +4,6 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DailyChallengeCard } from './DailyChallengeCard';
 import { WeeklyChallengeCard } from './WeeklyChallengeCard';
-import {
-  getDailyChallenges,
-  getWeeklyQuests,
-  claimChallengeReward,
-  claimQuestReward,
-  assignDailyChallenges,
-  assignWeeklyQuests,
-} from '@/lib/supabase/education';
 import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education/types';
 import { PageLoader } from '@/components/ui/PageLoader';
 
@@ -28,41 +20,42 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
 
   const loadChallenges = async () => {
     setLoading(true);
-    const [dailyResult, weeklyResult] = await Promise.all([
-      getDailyChallenges(playerId),
-      getWeeklyQuests(playerId),
+    const [dailyRes, weeklyRes] = await Promise.all([
+      fetch('/api/education/challenges/daily'),
+      fetch('/api/education/challenges/weekly'),
     ]);
-
-    // Auto-assign daily challenges if none exist for today
-    if (!dailyResult.error && dailyResult.data && dailyResult.data.length === 0) {
-      const assigned = await assignDailyChallenges(playerId);
-      if (assigned.data) setDailyChallenges(assigned.data);
-    } else if (dailyResult.data) {
-      setDailyChallenges(dailyResult.data);
+    const [dailyJson, weeklyJson] = await Promise.all([
+      dailyRes.json(),
+      weeklyRes.json(),
+    ]);
+    if (dailyRes.ok && dailyJson.challenges) {
+      setDailyChallenges(dailyJson.challenges);
     }
-
-    // Auto-assign weekly quests if none exist for this week
-    if (!weeklyResult.error && weeklyResult.data && weeklyResult.data.length === 0) {
-      const assigned = await assignWeeklyQuests(playerId);
-      if (assigned.data) setWeeklyQuests(assigned.data);
-    } else if (weeklyResult.data) {
-      setWeeklyQuests(weeklyResult.data);
+    if (weeklyRes.ok && weeklyJson.quests) {
+      setWeeklyQuests(weeklyJson.quests);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     loadChallenges();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerId]);
 
   async function handleClaimChallenge(challengeId: string) {
-    await claimChallengeReward(challengeId, playerId);
+    await fetch('/api/education/challenges/daily', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ challengeId }),
+    });
     loadChallenges();
   }
 
   async function handleClaimQuest(questId: string) {
-    await claimQuestReward(questId, playerId);
+    await fetch('/api/education/challenges/weekly', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questId }),
+    });
     loadChallenges();
   }
 

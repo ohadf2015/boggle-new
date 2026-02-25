@@ -1,5 +1,6 @@
 /**
  * ChallengePanel — full behavior tests (TDD)
+ * Component now uses API routes instead of direct Supabase calls.
  */
 
 import { render, screen, waitFor, act } from '@testing-library/react';
@@ -16,22 +17,6 @@ jest.mock('@/contexts/LanguageContext', () => ({
     t: (key: string) => key,
     language: 'en',
   }),
-}));
-
-const mockGetDailyChallenges = jest.fn();
-const mockGetWeeklyQuests = jest.fn();
-const mockAssignDailyChallenges = jest.fn();
-const mockAssignWeeklyQuests = jest.fn();
-const mockClaimChallengeReward = jest.fn();
-const mockClaimQuestReward = jest.fn();
-
-jest.mock('@/lib/supabase/education', () => ({
-  getDailyChallenges: (...args: unknown[]) => mockGetDailyChallenges(...args),
-  getWeeklyQuests: (...args: unknown[]) => mockGetWeeklyQuests(...args),
-  assignDailyChallenges: (...args: unknown[]) => mockAssignDailyChallenges(...args),
-  assignWeeklyQuests: (...args: unknown[]) => mockAssignWeeklyQuests(...args),
-  claimChallengeReward: (...args: unknown[]) => mockClaimChallengeReward(...args),
-  claimQuestReward: (...args: unknown[]) => mockClaimQuestReward(...args),
 }));
 
 jest.mock('@/components/ui/PageLoader', () => ({
@@ -57,6 +42,23 @@ jest.mock('../WeeklyChallengeCard', () => ({
     </div>
   ),
 }));
+
+// ============================================================
+// fetch mock helpers
+// ============================================================
+
+function makeFetchResponse(body: object, ok = true) {
+  return {
+    ok,
+    json: jest.fn().mockResolvedValue(body),
+  } as unknown as Response;
+}
+
+function setupFetch(daily: DailyChallengeRow[], weekly: WeeklyQuestRow[]) {
+  (global.fetch as jest.Mock)
+    .mockResolvedValueOnce(makeFetchResponse({ challenges: daily }))
+    .mockResolvedValueOnce(makeFetchResponse({ quests: weekly }));
+}
 
 // ============================================================
 // Test data
@@ -101,30 +103,21 @@ const makeQuest = (overrides: Partial<WeeklyQuestRow> = {}): WeeklyQuestRow => (
 });
 
 // ============================================================
-// Helpers
-// ============================================================
-
-function setup() {
-  mockGetDailyChallenges.mockReset();
-  mockGetWeeklyQuests.mockReset();
-  mockAssignDailyChallenges.mockReset();
-  mockAssignWeeklyQuests.mockReset();
-  mockClaimChallengeReward.mockReset();
-  mockClaimQuestReward.mockReset();
-}
-
-// ============================================================
 // Tests
 // ============================================================
 
 describe('ChallengePanel', () => {
-  beforeEach(setup);
+  beforeEach(() => {
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
   describe('loading state', () => {
     it('renders PageLoader while fetching data', () => {
-      // Never resolves → stuck in loading
-      mockGetDailyChallenges.mockReturnValue(new Promise(() => {}));
-      mockGetWeeklyQuests.mockReturnValue(new Promise(() => {}));
+      (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -132,8 +125,7 @@ describe('ChallengePanel', () => {
     });
 
     it('does not render challenge-panel while loading', () => {
-      mockGetDailyChallenges.mockReturnValue(new Promise(() => {}));
-      mockGetWeeklyQuests.mockReturnValue(new Promise(() => {}));
+      (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -141,100 +133,30 @@ describe('ChallengePanel', () => {
     });
   });
 
-  describe('auto-assignment of daily challenges', () => {
-    it('calls assignDailyChallenges when fetch returns empty array', async () => {
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
+  describe('loading challenges via API', () => {
+    it('calls the daily challenges API endpoint', async () => {
+      setupFetch([], []);
 
       render(<ChallengePanel playerId="player-1" />);
 
       await waitFor(() => {
-        expect(mockAssignDailyChallenges).toHaveBeenCalledWith('player-1');
+        expect(global.fetch).toHaveBeenCalledWith('/api/education/challenges/daily');
       });
     });
 
-    it('does NOT call assignDailyChallenges when challenges already exist', async () => {
-      const challenge = makeChallenge();
-      mockGetDailyChallenges.mockResolvedValue({ data: [challenge], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
+    it('calls the weekly challenges API endpoint', async () => {
+      setupFetch([], []);
 
       render(<ChallengePanel playerId="player-1" />);
 
       await waitFor(() => {
-        expect(screen.getByTestId('challenge-panel')).toBeInTheDocument();
-      });
-
-      expect(mockAssignDailyChallenges).not.toHaveBeenCalled();
-    });
-
-    it('renders assigned challenges returned by assignDailyChallenges', async () => {
-      const assigned = [makeChallenge({ id: 'assigned-1' })];
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: assigned, error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
-
-      render(<ChallengePanel playerId="player-1" />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('daily-card-assigned-1')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('auto-assignment of weekly quests', () => {
-    it('calls assignWeeklyQuests when fetch returns empty array', async () => {
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
-
-      render(<ChallengePanel playerId="player-1" />);
-
-      await waitFor(() => {
-        expect(mockAssignWeeklyQuests).toHaveBeenCalledWith('player-1');
+        expect(global.fetch).toHaveBeenCalledWith('/api/education/challenges/weekly');
       });
     });
 
-    it('does NOT call assignWeeklyQuests when quests already exist', async () => {
-      const quest = makeQuest();
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [quest], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-
-      render(<ChallengePanel playerId="player-1" />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('challenge-panel')).toBeInTheDocument();
-      });
-
-      expect(mockAssignWeeklyQuests).not.toHaveBeenCalled();
-    });
-
-    it('renders assigned quests returned by assignWeeklyQuests', async () => {
-      const assigned = [makeQuest({ id: 'wq-assigned-1' })];
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: assigned, error: null });
-
-      render(<ChallengePanel playerId="player-1" />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('weekly-card-wq-assigned-1')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('rendering content', () => {
-    it('renders daily challenge cards when challenges exist', async () => {
-      const challenges = [makeChallenge({ id: 'ch-a' }), makeChallenge({ id: 'ch-b', challenge_tier: 'medium' })];
-      mockGetDailyChallenges.mockResolvedValue({ data: challenges, error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
+    it('renders challenges returned from daily API', async () => {
+      const challenges = [makeChallenge({ id: 'ch-a' }), makeChallenge({ id: 'ch-b' })];
+      setupFetch(challenges, []);
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -244,11 +166,9 @@ describe('ChallengePanel', () => {
       });
     });
 
-    it('renders weekly quest cards when quests exist', async () => {
+    it('renders quests returned from weekly API', async () => {
       const quests = [makeQuest({ id: 'wq-a' })];
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: quests, error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
+      setupFetch([], quests);
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -258,10 +178,7 @@ describe('ChallengePanel', () => {
     });
 
     it('shows noChallenges message when both collections are empty', async () => {
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
+      setupFetch([], []);
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -271,9 +188,7 @@ describe('ChallengePanel', () => {
     });
 
     it('does NOT show noChallenges when challenges are present', async () => {
-      mockGetDailyChallenges.mockResolvedValue({ data: [makeChallenge()], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
+      setupFetch([makeChallenge()], []);
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -284,15 +199,14 @@ describe('ChallengePanel', () => {
   });
 
   describe('claiming rewards', () => {
-    it('calls claimChallengeReward with challengeId and playerId', async () => {
+    it('POSTs to daily API with challengeId when claiming a challenge', async () => {
       const challenge = makeChallenge({ id: 'ch-claim-1', completed: true });
-      mockGetDailyChallenges.mockResolvedValue({ data: [challenge], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockClaimChallengeReward.mockResolvedValue({ data: { xpReward: 50 }, error: null });
+      setupFetch([challenge], []);
       // Re-fetch after claim
-      mockGetDailyChallenges.mockResolvedValueOnce({ data: [challenge], error: null })
-        .mockResolvedValue({ data: [{ ...challenge, claimed: true }], error: null });
+      (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(makeFetchResponse({ data: { xpReward: 50 } }))
+        .mockResolvedValueOnce(makeFetchResponse({ challenges: [{ ...challenge, claimed: true }] }))
+        .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -304,17 +218,20 @@ describe('ChallengePanel', () => {
         await userEvent.click(screen.getByText('claim-challenge'));
       });
 
-      expect(mockClaimChallengeReward).toHaveBeenCalledWith('ch-claim-1', 'player-1');
+      expect(global.fetch).toHaveBeenCalledWith('/api/education/challenges/daily', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeId: 'ch-claim-1' }),
+      });
     });
 
     it('re-fetches challenges after claiming a challenge reward', async () => {
       const challenge = makeChallenge({ id: 'ch-refetch-1', completed: true });
-      mockGetDailyChallenges
-        .mockResolvedValueOnce({ data: [challenge], error: null })
-        .mockResolvedValue({ data: [{ ...challenge, claimed: true }], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockClaimChallengeReward.mockResolvedValue({ data: { xpReward: 50 }, error: null });
+      setupFetch([challenge], []);
+      (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(makeFetchResponse({ data: { xpReward: 50 } }))
+        .mockResolvedValueOnce(makeFetchResponse({ challenges: [{ ...challenge, claimed: true }] }))
+        .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -326,19 +243,17 @@ describe('ChallengePanel', () => {
         await userEvent.click(screen.getByText('claim-challenge'));
       });
 
-      // getDailyChallenges called once on mount + once after claim
-      expect(mockGetDailyChallenges).toHaveBeenCalledTimes(2);
+      // 2 initial loads + 1 POST + 2 re-fetch loads = 5 calls
+      expect(global.fetch).toHaveBeenCalledTimes(5);
     });
 
-    it('calls claimQuestReward with questId and playerId', async () => {
+    it('POSTs to weekly API with questId when claiming a quest', async () => {
       const quest = makeQuest({ id: 'wq-claim-1', completed: true });
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [quest], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockClaimQuestReward.mockResolvedValue({ data: { xpReward: 300 }, error: null });
-      mockGetWeeklyQuests
-        .mockResolvedValueOnce({ data: [quest], error: null })
-        .mockResolvedValue({ data: [{ ...quest, claimed: true }], error: null });
+      setupFetch([], [quest]);
+      (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(makeFetchResponse({ data: { xpReward: 300 } }))
+        .mockResolvedValueOnce(makeFetchResponse({ challenges: [] }))
+        .mockResolvedValueOnce(makeFetchResponse({ quests: [{ ...quest, claimed: true }] }));
 
       render(<ChallengePanel playerId="player-1" />);
 
@@ -350,16 +265,21 @@ describe('ChallengePanel', () => {
         await userEvent.click(screen.getByText('claim-quest'));
       });
 
-      expect(mockClaimQuestReward).toHaveBeenCalledWith('wq-claim-1', 'player-1');
+      expect(global.fetch).toHaveBeenCalledWith('/api/education/challenges/weekly', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questId: 'wq-claim-1' }),
+      });
     });
   });
 
   describe('re-fetching on playerId change', () => {
     it('re-fetches when playerId prop changes', async () => {
-      mockGetDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockGetWeeklyQuests.mockResolvedValue({ data: [], error: null });
-      mockAssignDailyChallenges.mockResolvedValue({ data: [], error: null });
-      mockAssignWeeklyQuests.mockResolvedValue({ data: [], error: null });
+      setupFetch([], []);
+      // second render
+      (global.fetch as jest.Mock)
+        .mockResolvedValueOnce(makeFetchResponse({ challenges: [] }))
+        .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 
       const { rerender } = render(<ChallengePanel playerId="player-1" />);
 
@@ -370,7 +290,8 @@ describe('ChallengePanel', () => {
       rerender(<ChallengePanel playerId="player-2" />);
 
       await waitFor(() => {
-        expect(mockGetDailyChallenges).toHaveBeenCalledWith('player-2');
+        // 4 total fetch calls: 2 on mount + 2 on playerId change
+        expect(global.fetch).toHaveBeenCalledTimes(4);
       });
     });
   });
