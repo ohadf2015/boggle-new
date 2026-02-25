@@ -113,7 +113,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
           json: () => Promise.resolve({ streak: 0 }),
         });
       }
-      if (url.includes('daily-leaderboard')) {
+      if (url.includes('daily-challenge/leaderboard')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ data: [] }),

@@ -45,9 +45,9 @@ describe('LeaderboardTeaser', () => {
       ok: true,
       json: () => Promise.resolve({
         data: [
-          { name: 'JellyDrifter', score: 12450 },
-          { name: 'ZenithX', score: 11920 },
-          { name: 'WordWiz99', score: 10105 },
+          { display_name: 'JellyDrifter', score: 12450 },
+          { display_name: 'ZenithX', score: 11920 },
+          { display_name: 'WordWiz99', score: 10105 },
         ],
       }),
     });
@@ -58,6 +58,20 @@ describe('LeaderboardTeaser', () => {
       expect(screen.getByText('JellyDrifter')).toBeInTheDocument();
       expect(screen.getByText('ZenithX')).toBeInTheDocument();
       expect(screen.getByText('WordWiz99')).toBeInTheDocument();
+    });
+  });
+
+  test('fetches from correct daily-challenge leaderboard URL', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: [] }),
+    });
+
+    renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
+
+    await waitFor(() => {
+      const url = mockFetch.mock.calls[0]?.[0] as string;
+      expect(url).toMatch(/\/api\/daily-challenge\/leaderboard\/\d{4}-\d{2}-\d{2}\/en\?limit=3/);
     });
   });
 

@@ -35,13 +35,13 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       setLoading(true);
       try {
         const today = new Date().toISOString().split('T')[0];
-        const res = await fetch(`/api/daily-leaderboard?date=${today}&lang=${currentLanguage}&limit=3`);
+        const res = await fetch(`/api/daily-challenge/leaderboard/${today}/${currentLanguage}?limit=3`);
         if (res.ok && !cancelled) {
           const data = await res.json();
           if (data.data && Array.isArray(data.data)) {
-            setEntries(data.data.slice(0, 3).map((e: { name?: string; display_name?: string; score?: number }, i: number) => ({
+            setEntries(data.data.slice(0, 3).map((e: { display_name?: string; score?: number }, i: number) => ({
               rank: i + 1,
-              name: e.name || e.display_name || 'Player',
+              name: e.display_name || 'Player',
               score: e.score || 0,
             })));
           }

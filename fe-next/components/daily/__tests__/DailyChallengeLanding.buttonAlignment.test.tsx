@@ -74,7 +74,7 @@ global.fetch = jest.fn((url: string) => {
       json: () => Promise.resolve({ streak: 0 }),
     });
   }
-  if (typeof url === 'string' && url.includes('daily-leaderboard')) {
+  if (typeof url === 'string' && url.includes('daily-challenge/leaderboard')) {
     return Promise.resolve({
       ok: true,
       json: () => Promise.resolve({ data: [] }),
