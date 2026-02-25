@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { Language } from '@/types';
 
 interface WordEntry {
@@ -32,7 +32,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   t,
 }) => {
   return (
-    <m.div
+    <motion.div
       data-testid="emoji-share-card"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
         <div className="text-neo-white font-bold text-sm">{score} {t('wordHunt.leaderboard.pts')}</div>
         <div className="text-slate-500 text-xs mt-0.5">lexiclash.live</div>
       </div>
-    </m.div>
+    </motion.div>
   );
 };
 

@@ -46,6 +46,13 @@ const COLOR_HEX: Record<string, string> = {
   'neo-pink': '#FF1493',
 };
 
+/** Static chip style map — Tailwind JIT needs complete class strings */
+const CHIP_STYLES: Record<string, string> = {
+  'neo-cyan': 'bg-neo-cyan/10 border-neo-cyan/30 text-neo-cyan shadow-hard-sm',
+  'neo-lime': 'bg-neo-lime/10 border-neo-lime/30 text-neo-lime shadow-hard-sm',
+  'neo-pink': 'bg-neo-pink/10 border-neo-pink/30 text-neo-pink shadow-hard-sm',
+};
+
 /** Chip entrance variant: staggered slide-up with scale pop */
 const chipVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.8 },
@@ -115,7 +122,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1.5 }}
             style={{
-              background: `radial-gradient(ellipse at 50% 30%, ${glowHex}12 0%, ${glowHex}06 40%, transparent 70%)`,
+              background: `radial-gradient(ellipse at 50% 30%, ${glowHex}26 0%, ${glowHex}12 40%, transparent 70%)`,
             }}
           />
         )}
@@ -252,7 +259,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     variants={chipVariants}
                     initial="hidden"
                     animate="visible"
-                    className={`px-3 py-1.5 bg-${chip.color}/10 rounded-neo border-2 border-${chip.color}/30 text-xs font-bold text-${chip.color}`}
+                    className={`px-3 py-1.5 rounded-neo border-2 text-xs font-bold ${CHIP_STYLES[chip.color]}`}
                   >
                     {chip.icon} +{chip.value}
                   </motion.span>
@@ -274,7 +281,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0, type: 'spring', stiffness: 300, damping: 26 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-slate-600/50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
               >
                 <Clock className="w-4 h-4 text-neo-cyan" />
                 <div>
@@ -374,7 +381,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, type: 'spring', stiffness: 300, damping: 26 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-slate-600/50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
               >
                 <Clock className="w-4 h-4 text-neo-cyan" />
                 <div>

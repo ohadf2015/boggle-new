@@ -83,7 +83,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
-      className="bg-slate-900/70 rounded-neo border-2 border-slate-700/50 p-4"
+      className="bg-neo-gray rounded-neo-lg border-3 border-neo-black shadow-hard p-4"
     >
       {/* Three Mini Gauge Rings — dramatic staggered entrance */}
       <div className="flex justify-center gap-4 sm:gap-6">
@@ -132,7 +132,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
 
       {/* Coin Reward — Compact inline display */}
       {coinReward && coinReward.awarded > 0 && (
-        <div className="mt-3 pt-3 border-t border-slate-700/40">
+        <div className="mt-3 pt-3 border-t border-neo-black/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {isTeasing && <Lock className="w-3 h-3 text-slate-400" />}
