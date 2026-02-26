@@ -14,8 +14,11 @@ export default function TeacherPageClient() {
   const { t, language } = useLanguage();
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
 
-  // Check if user is teacher or admin
-  const isTeacher = profile?.is_admin === true;
+  // Check if user is teacher or admin — accepts user_role OR legacy is_admin flag
+  const isTeacher =
+    profile?.user_role === 'teacher' ||
+    profile?.user_role === 'admin' ||
+    profile?.is_admin === true;
   const isProfileLoading = !authLoading && user && !profile;
 
   // Redirect if not authenticated or not teacher

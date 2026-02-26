@@ -39,6 +39,7 @@ describe('HeaderMenuDropdown', () => {
         user: null,
         isAuthenticated: false,
         isAdmin: false,
+      isTeacher: false,
         isGuest: true,
         profile: null,
         rankedProgress: null,

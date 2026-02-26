@@ -88,6 +88,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     isAuthenticated,
     isGuest,
     isAdmin,
+    isTeacher,
     needsProfileCustomization,
   } = useComputedAuthValues(user, profile, rankedProgress);
 
@@ -114,6 +115,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       isAuthenticated,
       isGuest,
       isAdmin,
+      isTeacher,
       canPlayRanked,
       gamesUntilRanked,
       needsProfileCustomization,
@@ -132,6 +134,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       isAuthenticated,
       isGuest,
       isAdmin,
+      isTeacher,
       canPlayRanked,
       gamesUntilRanked,
       needsProfileCustomization,
@@ -155,6 +158,7 @@ const defaultAuthValue: AuthContextValue = {
   isAuthenticated: false,
   isGuest: true,
   isAdmin: false,
+  isTeacher: false,
   canPlayRanked: false,
   gamesUntilRanked: 10,
   needsProfileCustomization: false,

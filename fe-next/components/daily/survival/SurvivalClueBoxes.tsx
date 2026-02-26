@@ -1,12 +1,12 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { AccumulatedClue, TargetAttempt } from './types';
-import { MAX_ATTEMPTS } from './constants';
+import { MAX_ATTEMPTS, GRAY_LETTER_FADE_DELAY } from './constants';
 
 export interface SurvivalClueBoxesProps {
   currentHint: HintLevel | null;
@@ -153,6 +153,14 @@ interface FeedbackOverlayProps {
 }
 
 const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordLength, skipAnimations }) => {
+  // Gray letters flash briefly then fade to '?' after a delay
+  const [grayFaded, setGrayFaded] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setGrayFaded(true), GRAY_LETTER_FADE_DELAY);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Normalize feedback to match target word length
   const normalizedFeedback = normalizeToTargetLength(feedback, targetWordLength);
   const wordLength = normalizedFeedback.length;
@@ -173,31 +181,37 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
       transition={{ duration: 0.3 }}
       className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
     >
-      {normalizedFeedback.map((letterFb, idx) => (
-        <motion.div
-          key={idx}
-          initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
-          animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
-          transition={skipAnimations ? {
-            delay: idx * 0.03,
-            duration: 0.15
-          } : {
-            delay: idx * 0.1,
-            type: "spring",
-            stiffness: 300,
-            damping: 20
-          }}
-          className={cn(
-            "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard text-white",
-            sizeClass,
-            letterFb.feedback === 'green' && "bg-green-500 border-green-700 ring-1 ring-green-300/50",
-            letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-1 ring-yellow-300/50",
-            letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
-          )}
-        >
-          {letterFb.letter}
-        </motion.div>
-      ))}
+      {normalizedFeedback.map((letterFb, idx) => {
+        const isClue = letterFb.feedback === 'green' || letterFb.feedback === 'yellow';
+        const isGray = !isClue;
+        const showGrayLetter = isGray && !grayFaded;
+        return (
+          <motion.div
+            key={idx}
+            initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
+            animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
+            transition={skipAnimations ? {
+              delay: idx * 0.03,
+              duration: 0.15
+            } : {
+              delay: idx * 0.1,
+              type: "spring",
+              stiffness: 300,
+              damping: 20
+            }}
+            className={cn(
+              "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard transition-colors duration-500",
+              sizeClass,
+              letterFb.feedback === 'green' && "bg-green-500 border-green-700 text-white ring-1 ring-green-300/50",
+              letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-1 ring-yellow-300/50",
+              isGray && showGrayLetter && "bg-gray-400 border-gray-500 text-white",
+              isGray && !showGrayLetter && "bg-neo-black border-neo-black text-white"
+            )}
+          >
+            {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 };

@@ -12,6 +12,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
 import {
   registerPushToken,
@@ -40,6 +41,7 @@ interface UsePushTokenRegistrationReturn {
 export function usePushTokenRegistration(): UsePushTokenRegistrationReturn {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { language } = useLanguage();
 
   const [isAvailable] = useState(() => isNative());
   const [isEnabled, setIsEnabled] = useState(false);
@@ -64,11 +66,15 @@ export function usePushTokenRegistration(): UsePushTokenRegistrationReturn {
     (data: Record<string, string>) => {
       const actionUrl = data.actionUrl || data.route;
       if (actionUrl) {
-        // Navigate to the specified route
-        router.push(actionUrl);
+        // Prepend locale for relative paths — Next.js requires /{locale}/ prefix
+        const localizedUrl =
+          actionUrl.startsWith('/') && !actionUrl.startsWith(`/${language}`)
+            ? `/${language}${actionUrl}`
+            : actionUrl;
+        router.push(localizedUrl);
       }
     },
-    [router]
+    [router, language]
   );
 
   // Register token when user logs in

@@ -73,6 +73,7 @@ const en = {
     }
   },
   "common": {
+    "email": "Email",
     "loading": "Shuffling letters...",
     "error": "Whoops!",
     "retry": "Try Again",
@@ -5179,6 +5180,15 @@ const en = {
     },
     "accessRequired": "Teacher Access Required",
     "accessDenied": "You need teacher privileges to access this page.",
+    "profile": {
+      "teacherBadge": "Teacher",
+      "classrooms": "Classrooms",
+      "totalStudents": "Total Students",
+      "roleStatus": "Role",
+      "contactAdmin": "Need Help?",
+      "contactAdminDesc": "To update your teacher access or role, contact your administrator. Teacher accounts are granted by school administrators.",
+      "avatar": "Teacher avatar"
+    },
     "dashboard": {
       "title": "Teacher Dashboard",
       "subtitle": "Manage your classrooms, lessons, and student progress",
@@ -5575,7 +5585,11 @@ const en = {
         "headline": "Challenge a classmate",
         "subtext": "Play head-to-head and climb the class ranking",
         "cta": "Start a Duel →"
-      }
+      },
+      "roleTeacher": "Teacher",
+      "roleStudent": "Student",
+      "roleGuest": "Signed In",
+      "goToDashboard": "Go to Dashboard"
     },
     "template": {
       "settings": "Settings",

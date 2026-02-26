@@ -131,7 +131,8 @@ describe('AdminPage - Race Condition Tests', () => {
       mockUseAuth.mockReturnValue({
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: null, // Profile not yet loaded
-        isAdmin: false, // False because profile is null
+        isAdmin: false,
+      isTeacher: false, // False because profile is null
         loading: false, // Auth loading complete
         isAuthenticated: true,
         isGuest: false,
@@ -158,7 +159,8 @@ describe('AdminPage - Race Condition Tests', () => {
       mockUseAuth.mockReturnValue({
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: null, // Profile loading
-        isAdmin: false, // False because profile is null
+        isAdmin: false,
+      isTeacher: false, // False because profile is null
         loading: false, // Auth check complete
         isAuthenticated: true,
         isGuest: false,
@@ -186,6 +188,7 @@ describe('AdminPage - Race Condition Tests', () => {
         user: { id: 'user-1', email: 'admin@test.com' } as any,
         profile: null,
         isAdmin: false,
+      isTeacher: false,
         loading: false,
         isAuthenticated: true,
         isGuest: false,
@@ -216,7 +219,8 @@ describe('AdminPage - Race Condition Tests', () => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
-        isAdmin: true, // NOW isAdmin is true
+        isAdmin: true,
+      isTeacher: false, // NOW isAdmin is true
         loading: false,
         isAuthenticated: true,
         isGuest: false,
@@ -258,7 +262,8 @@ describe('AdminPage - Race Condition Tests', () => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
-        isAdmin: false, // Correctly false
+        isAdmin: false,
+      isTeacher: false, // Correctly false
         loading: false, // Auth complete
         isAuthenticated: true,
         isGuest: false,
@@ -297,6 +302,7 @@ describe('AdminPage - Race Condition Tests', () => {
           updated_at: new Date().toISOString(),
         },
         isAdmin: true,
+      isTeacher: false,
         loading: false,
         isAuthenticated: true,
         isGuest: false,

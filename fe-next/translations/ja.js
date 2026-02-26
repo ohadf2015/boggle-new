@@ -73,6 +73,7 @@ const ja = {
     }
   },
   "common": {
+    "email": "メール",
     "loading": "文字をシャッフル中...",
     "error": "おっと！",
     "creating": "作成中...",
@@ -5254,6 +5255,15 @@ const ja = {
     },
     "accessRequired": "教師権限が必要です",
     "accessDenied": "このページには教師権限が必要です",
+    "profile": {
+      "teacherBadge": "教師",
+      "classrooms": "クラス",
+      "totalStudents": "生徒合計",
+      "roleStatus": "役割",
+      "contactAdmin": "お困りですか?",
+      "contactAdminDesc": "教師アクセスや役割を変更するには、管理者にお問い合わせください。教師アカウントは学校管理者が付与します。",
+      "avatar": "教師アバター"
+    },
     "dashboard": {
       "title": "教師ダッシュボード",
       "subtitle": "クラス、レッスン、生徒の進捗を管理する",
@@ -5634,7 +5644,11 @@ const ja = {
         "headline": "クラスメートに挑戦",
         "subtext": "一対一で対決してクラスランキングを上げよう",
         "cta": "デュエルを始める →"
-      }
+      },
+      "roleTeacher": "教師",
+      "roleStudent": "学生",
+      "roleGuest": "ログイン済み",
+      "goToDashboard": "ダッシュボードへ"
     },
     "template": {
       "settings": "設定",

@@ -1,5 +1,11 @@
 {
   "mcpServers": {
+    "animate-ai": {
+      "command": "node",
+      "args": [
+        "/Users/ohadfisher/git/animate_ai/skill/animate-ai-skill/dist/server.js"
+      ]
+    },
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=hdtmpkicuxvtmvrmtybx"

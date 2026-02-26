@@ -281,7 +281,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
 }
 
 export default function StudentPageClient() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, profile } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
@@ -299,8 +299,18 @@ export default function StudentPageClient() {
       return;
     }
 
+    // Teachers and admins should use the teacher dashboard, not student view
+    const isTeacherOrAdmin =
+      profile?.user_role === 'teacher' ||
+      profile?.user_role === 'admin' ||
+      profile?.is_admin === true;
+    if (isTeacherOrAdmin) {
+      router.push(`/${language}/teacher`);
+      return;
+    }
+
     setIsChecking(false);
-  }, [isAuthenticated, loading, router, language]);
+  }, [isAuthenticated, loading, router, language, profile]);
 
   // Show loader during auth check
   if (isChecking || loading) {

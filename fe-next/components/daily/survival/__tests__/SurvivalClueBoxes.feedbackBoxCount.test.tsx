@@ -10,9 +10,10 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { SurvivalClueBoxes } from '../SurvivalClueBoxes';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
+import { GRAY_LETTER_FADE_DELAY } from '../constants';
 import type { AccumulatedClue } from '../types';
 
 // Mock framer-motion to make tests synchronous
@@ -66,10 +67,10 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
     const allBoxes = screen.getAllByText(/^[A-Z?]$/);
     expect(allBoxes).toHaveLength(5);
 
-    // First 3 boxes should show submitted letters
-    expect(allBoxes[0]).toHaveTextContent('C');
-    expect(allBoxes[1]).toHaveTextContent('A');
-    expect(allBoxes[2]).toHaveTextContent('T');
+    // Gray letters initially flash (visible before fade timer fires)
+    expect(allBoxes[0]).toHaveTextContent('C'); // C is gray but visible initially
+    expect(allBoxes[1]).toHaveTextContent('A'); // A is yellow (clue)
+    expect(allBoxes[2]).toHaveTextContent('T'); // T is gray but visible initially
 
     // Remaining 2 boxes should show '?' placeholder
     expect(allBoxes[3]).toHaveTextContent('?');
@@ -91,14 +92,14 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
     render(<SurvivalClueBoxes {...createProps(targetWord, feedback, true)} />);
 
     // Should show 4 boxes (target word length), not 6 (submitted word length)
-    const allBoxes = screen.getAllByText(/^[A-Z]$/);
+    const allBoxes = screen.getAllByText(/^[A-Z?]$/);
     expect(allBoxes).toHaveLength(4);
 
-    // Should only show first 4 letters of submitted word
-    expect(allBoxes[0]).toHaveTextContent('C');
-    expect(allBoxes[1]).toHaveTextContent('A');
-    expect(allBoxes[2]).toHaveTextContent('S');
-    expect(allBoxes[3]).toHaveTextContent('T');
+    // Green letters shown, gray letters initially flash before fading
+    expect(allBoxes[0]).toHaveTextContent('C'); // green
+    expect(allBoxes[1]).toHaveTextContent('A'); // green
+    expect(allBoxes[2]).toHaveTextContent('S'); // gray (visible before fade)
+    expect(allBoxes[3]).toHaveTextContent('T'); // gray (visible before fade)
   });
 
   it('should show all boxes when submitted word matches target word length', () => {
@@ -129,13 +130,47 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
 
     render(<SurvivalClueBoxes {...createProps(targetWord, feedback, true)} />);
 
+    // Green letter shown with green styling
     const wBox = screen.getByText('W').closest('div');
     expect(wBox).toHaveClass('bg-green-500');
 
+    // Gray letter initially flashes with gray styling (before fade timer)
     const aBox = screen.getByText('A').closest('div');
     expect(aBox).toHaveClass('bg-gray-400');
 
+    // Yellow letter shown with yellow styling
     const rBox = screen.getByText('R').closest('div');
     expect(rBox).toHaveClass('bg-yellow-500');
+  });
+
+  it('should fade gray letters to "?" after delay while keeping green/yellow visible', () => {
+    jest.useFakeTimers();
+    const targetWord = 'WORLD';
+    const feedback: LetterFeedback[] = [
+      { letter: 'W', position: 0, feedback: 'green' },
+      { letter: 'A', position: 1, feedback: 'gray' },
+      { letter: 'R', position: 2, feedback: 'yellow' },
+      { letter: 'X', position: 3, feedback: 'gray' },
+      { letter: 'Y', position: 4, feedback: 'gray' },
+    ];
+
+    render(<SurvivalClueBoxes {...createProps(targetWord, feedback, true)} />);
+
+    // Initially gray letters are visible
+    expect(screen.getByText('A')).toBeInTheDocument();
+    expect(screen.getByText('X')).toBeInTheDocument();
+
+    // After fade delay, gray letters become '?'
+    act(() => { jest.advanceTimersByTime(GRAY_LETTER_FADE_DELAY); });
+
+    // Gray letters should now be '?'
+    expect(screen.queryByText('A')).not.toBeInTheDocument();
+    expect(screen.queryByText('X')).not.toBeInTheDocument();
+
+    // Green and yellow letters should persist
+    expect(screen.getByText('W')).toBeInTheDocument();
+    expect(screen.getByText('R')).toBeInTheDocument();
+
+    jest.useRealTimers();
   });
 });

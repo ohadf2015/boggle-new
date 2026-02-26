@@ -41,6 +41,7 @@ const createMockAuthState = (overrides: Record<string, unknown>) => ({
   isAuthenticated: false,
   isGuest: true,
   isAdmin: false,
+      isTeacher: false,
   canPlayRanked: false,
   gamesUntilRanked: 10,
   setupProfile: jest.fn(),

@@ -22,9 +22,8 @@ jest.mock('@/lib/supabase/education/duels');
 jest.mock('@/lib/supabase', () => ({
   supabase: null,
 }));
-jest.mock('@/components/Header', () => ({
-  __esModule: true,
-  default: () => <div data-testid="header">Header</div>,
+jest.mock('@/components/education/EducationHeader', () => ({
+  EducationHeader: () => <div data-testid="education-header">EducationHeader</div>,
 }));
 jest.mock('@/components/education', () => ({
   EducationBadgeGrid: ({ achievements }: any) => (

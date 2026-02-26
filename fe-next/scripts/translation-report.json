@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3439,
+    "totalKeysInCode": 3461,
     "keyCountByLanguage": {
-      "en": 4933,
-      "he": 4949,
-      "sv": 4943,
-      "ja": 4958,
-      "es": 4646
+      "en": 4965,
+      "he": 4981,
+      "sv": 4975,
+      "ja": 4990,
+      "es": 4654
     },
     "missingFromEnglish": 1,
     "problematicFlatKeys": 0,
@@ -162,11 +162,11 @@
   },
   "missingFromEnglish": [
     {
-      "key": "adventure.level.short",
+      "key": "common.email",
       "usages": [
         {
-          "file": "components/adventure/hud/AdventureHUD.tsx",
-          "line": 106
+          "file": "app/[locale]/teacher/profile/PageClient.tsx",
+          "line": 176
         }
       ]
     }
@@ -278,6 +278,7 @@
       "achievements.secretWord.name",
       "achievements.secretWord.description",
       "daily.bonusChallenge",
+      "daily.continueMissions",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -387,6 +388,13 @@
       "student.profile.recentDuels",
       "student.profile.viewDuelHistory",
       "student.profile.winRate",
+      "teacher.profile.teacherBadge",
+      "teacher.profile.classrooms",
+      "teacher.profile.totalStudents",
+      "teacher.profile.roleStatus",
+      "teacher.profile.contactAdmin",
+      "teacher.profile.contactAdminDesc",
+      "teacher.profile.avatar",
       "teacher.dashboard.assignments",
       "teacher.dashboard.track",
       "teacher.dashboard.duelActivity",
@@ -470,6 +478,10 @@
       "education.landing.duelTeaser.headline",
       "education.landing.duelTeaser.subtext",
       "education.landing.duelTeaser.cta",
+      "education.landing.roleTeacher",
+      "education.landing.roleStudent",
+      "education.landing.roleGuest",
+      "education.landing.goToDashboard",
       "education.practice.sessionsCompleted",
       "education.practice.time",
       "education.practice.wordCount",
@@ -588,6 +600,11 @@
       "duelComplete",
       "challenges.daily.title",
       "challenges.daily.resetsIn",
+      "challenges.daily.claim",
+      "challenges.daily.claimed",
+      "challenges.daily.completed",
+      "challenges.daily.progress",
+      "challenges.daily.xpReward",
       "challenges.daily.practiceSessions",
       "challenges.daily.practiceSessionsDesc",
       "challenges.daily.wordsMastered",
@@ -607,15 +624,22 @@
       "challenges.daily.spellingPerfect",
       "challenges.daily.spellingPerfectDesc",
       "challenges.weekly.title",
+      "challenges.weekly.claim",
+      "challenges.weekly.claimed",
+      "challenges.weekly.thisWeek",
+      "challenges.weekly.progress",
       "challenges.weekly.masterWords",
       "challenges.weekly.masterWordsDesc",
       "challenges.claim",
       "challenges.claimed",
+      "challenges.loading",
       "challenges.noChallenges",
       "challenges.completed",
       "challenges.easy",
       "challenges.medium",
-      "challenges.hard"
+      "challenges.hard",
+      "quests.weeklyWordMastery",
+      "quests.weeklyWordMasteryDesc"
     ]
   },
   "keysNotInEnglish": {

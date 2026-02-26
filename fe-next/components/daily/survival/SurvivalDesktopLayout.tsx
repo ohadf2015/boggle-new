@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Keyboard } from 'lucide-react';
 import { SurvivalHeader } from './SurvivalHeader';
 import { SurvivalClueBoxes } from './SurvivalClueBoxes';
 import { SurvivalLifeBar } from './SurvivalLifeBar';
@@ -57,7 +58,8 @@ export interface SurvivalDesktopLayoutProps {
 }
 
 /**
- * Desktop 3-column layout for Word Hunt survival mode.
+ * Desktop 3-column layout — Minimal Cyber-Hybrid design.
+ * Rounded zone panels with thin neon glow borders (pink/cyan/lime).
  * Left: Live leaderboard, Center: Game area, Right: Loot/Score panel
  */
 export function SurvivalDesktopLayout({
@@ -96,20 +98,22 @@ export function SurvivalDesktopLayout({
   onQuitClick,
   t,
 }: SurvivalDesktopLayoutProps): React.ReactElement {
+  const sidebarWidth = isTv ? '320px' : '280px';
+
   return (
     <div className="relative flex h-full w-full bg-neo-navy">
       {/* 3-Column Grid */}
       <div
         data-testid="desktop-grid"
-        className="flex w-full h-full max-h-full gap-4 p-4 overflow-hidden"
+        className="flex w-full h-full max-h-full gap-6 p-5 overflow-hidden"
         style={{
           display: 'grid',
-          gridTemplateColumns: isTv ? '320px 1fr 320px' : '280px 1fr 280px',
+          gridTemplateColumns: `${sidebarWidth} 1fr ${sidebarWidth}`,
           gridTemplateRows: '1fr',
         }}
       >
-        {/* Left Sidebar - Live Ranks */}
-        <div className="h-full overflow-hidden">
+        {/* Left Sidebar — Live Ranks (pink accent) */}
+        <div className="h-full overflow-hidden zone-panel-pink rounded-neo">
           <SurvivalLiveRanks
             puzzleDate={puzzleDate}
             language={language}
@@ -119,8 +123,8 @@ export function SurvivalDesktopLayout({
           />
         </div>
 
-        {/* Center - Game Area */}
-        <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-2 relative z-10">
+        {/* Center — Game Area (cyan accent + glow) */}
+        <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-2 relative z-10 zone-panel-cyan rounded-neo px-4 py-3">
           {/* Header */}
           <SurvivalHeader
             liveScore={liveScore}
@@ -130,22 +134,24 @@ export function SurvivalDesktopLayout({
             t={t}
           />
 
-          {/* Clue Boxes */}
-          <SurvivalClueBoxes
-            ref={clueContainerRef}
-            currentHint={currentHint}
-            targetWord={targetWord}
-            attempts={attempts}
-            accumulatedClues={accumulatedClues}
-            revealedLetters={revealedLetters}
-            knownLetters={knownLetters}
-            latestAttemptFeedback={latestAttemptFeedback}
-            showFeedbackOverlay={showFeedbackOverlay}
-            isClueGaining={isClueGaining}
-            skipAnimations={skipAnimations}
-            gameDir={gameDir}
-            t={t}
-          />
+          {/* Clue Boxes — fixed min-height prevents layout shift during feedback */}
+          <div className="w-full min-h-[120px] flex items-center justify-center">
+            <SurvivalClueBoxes
+              ref={clueContainerRef}
+              currentHint={currentHint}
+              targetWord={targetWord}
+              attempts={attempts}
+              accumulatedClues={accumulatedClues}
+              revealedLetters={revealedLetters}
+              knownLetters={knownLetters}
+              latestAttemptFeedback={latestAttemptFeedback}
+              showFeedbackOverlay={showFeedbackOverlay}
+              isClueGaining={isClueGaining}
+              skipAnimations={skipAnimations}
+              gameDir={gameDir}
+              t={t}
+            />
+          </div>
 
           {/* Life Bar */}
           <SurvivalLifeBar
@@ -157,20 +163,34 @@ export function SurvivalDesktopLayout({
             onLifeGainComplete={onLifeGainComplete}
           />
 
-          {/* Game Grid */}
-          <SurvivalGridSection
-            grid={grid}
-            isGameOver={isGameOver}
-            eliminatedLetters={eliminatedLetters}
-            onWordSubmit={onWordSubmit}
-            onWordChange={onWordChange}
-            highlightedPath={highlightedPath}
-            t={t}
-          />
+          {/* Game Grid with HUD corner accents */}
+          <div className="relative">
+            {/* HUD Corner Accents */}
+            <div className="absolute -top-1.5 -left-1.5 w-6 h-6 border-t-[3px] border-l-[3px] border-neo-cyan rounded-tl pointer-events-none opacity-40" />
+            <div className="absolute -top-1.5 -right-1.5 w-6 h-6 border-t-[3px] border-r-[3px] border-neo-cyan rounded-tr pointer-events-none opacity-40" />
+            <div className="absolute -bottom-1.5 -left-1.5 w-6 h-6 border-b-[3px] border-l-[3px] border-neo-cyan rounded-bl pointer-events-none opacity-40" />
+            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 border-b-[3px] border-r-[3px] border-neo-cyan rounded-br pointer-events-none opacity-40" />
+
+            <SurvivalGridSection
+              grid={grid}
+              isGameOver={isGameOver}
+              eliminatedLetters={eliminatedLetters}
+              onWordSubmit={onWordSubmit}
+              onWordChange={onWordChange}
+              highlightedPath={highlightedPath}
+              t={t}
+            />
+          </div>
+
+          {/* Desktop Keyboard Tip */}
+          <div className="flex items-center gap-1.5 text-slate-500 text-xs font-medium mt-1">
+            <Keyboard className="w-3.5 h-3.5" />
+            <span>{t('wordHunt.survival.keyboardTip') || 'Swipe on grid or type with keyboard'}</span>
+          </div>
         </div>
 
-        {/* Right Sidebar - Loot Panel */}
-        <div className="h-full overflow-hidden">
+        {/* Right Sidebar — Loot Panel (lime accent) */}
+        <div className="h-full overflow-hidden zone-panel-lime rounded-neo">
           <SurvivalLootPanel
             discoveredWords={discoveredWords}
             hintStage={hintStage}

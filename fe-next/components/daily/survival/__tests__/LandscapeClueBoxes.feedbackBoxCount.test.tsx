@@ -108,10 +108,10 @@ describe('LandscapeClueBoxes - Feedback Box Count', () => {
     const allBoxes = screen.getAllByText(/^[A-Z?]$/);
     expect(allBoxes).toHaveLength(5);
 
-    // First 3 boxes should show submitted letters
-    expect(allBoxes[0]).toHaveTextContent('C');
-    expect(allBoxes[1]).toHaveTextContent('A');
-    expect(allBoxes[2]).toHaveTextContent('T');
+    // Gray letters initially flash (visible before fade timer fires)
+    expect(allBoxes[0]).toHaveTextContent('C'); // gray, visible initially
+    expect(allBoxes[1]).toHaveTextContent('A'); // gray, visible initially
+    expect(allBoxes[2]).toHaveTextContent('T'); // gray, visible initially
 
     // Remaining 2 boxes should show '?' placeholder
     expect(allBoxes[3]).toHaveTextContent('?');
@@ -133,13 +133,13 @@ describe('LandscapeClueBoxes - Feedback Box Count', () => {
     render(<SurvivalLandscapeLayout {...createProps(targetWord, feedback, true)} />);
 
     // Should show 4 boxes (target word length), not 6 (submitted word length)
-    const allBoxes = screen.getAllByText(/^[A-Z]$/);
+    const allBoxes = screen.getAllByText(/^[A-Z?]$/);
     expect(allBoxes).toHaveLength(4);
 
-    // Should only show first 4 letters of submitted word
-    expect(allBoxes[0]).toHaveTextContent('C');
-    expect(allBoxes[1]).toHaveTextContent('A');
-    expect(allBoxes[2]).toHaveTextContent('S');
-    expect(allBoxes[3]).toHaveTextContent('T');
+    // Green letters shown, gray letters initially flash before fading
+    expect(allBoxes[0]).toHaveTextContent('C'); // green
+    expect(allBoxes[1]).toHaveTextContent('A'); // green
+    expect(allBoxes[2]).toHaveTextContent('S'); // gray (visible before fade)
+    expect(allBoxes[3]).toHaveTextContent('T'); // gray (visible before fade)
   });
 });

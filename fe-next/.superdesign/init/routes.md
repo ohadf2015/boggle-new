@@ -1,212 +1,138 @@
 # LexiClash Routes & Pages
 
 ## Overview
-Next.js App Router with `[locale]/` dynamic segment for i18n (Hebrew, English, Swedish, Japanese).
+Next.js App Router with `[locale]/` dynamic segment for i18n.
+Supported locales: `en`, `he` (RTL), `sv`, `ja`, `es`.
+
+All routes below are under `app/` directory. The `[locale]` segment is one of the 5 locales above.
 
 ---
 
-## Main Routes
+## Route Map
 
-### Home (`/[locale]/page.tsx`)
-Landing page with game mode selection.
-- **Components:** `LandingView`, `ModeCardV2`, `Mascot`
-- **Purpose:** Game mode selection (Singleplayer, Multiplayer, Brain Training, Daily)
+### Core Pages
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]` | `app/[locale]/page.tsx` | Landing page (HomePageClient -> LandingView) |
+| `/[locale]/about` | `app/[locale]/about/page.tsx` | About page |
+| `/[locale]/rules` | `app/[locale]/rules/page.tsx` | Game rules |
+| `/[locale]/contact` | `app/[locale]/contact/page.tsx` | Contact form |
+| `/[locale]/faq` | `app/[locale]/faq/page.tsx` | FAQ page |
+| `/[locale]/settings` | `app/[locale]/settings/page.tsx` | User settings |
+| `/[locale]/leaderboard` | `app/[locale]/leaderboard/page.tsx` | Global leaderboard |
+| `/[locale]/profile` | `app/[locale]/profile/page.tsx` | User profile |
+| `/[locale]/friends` | `app/[locale]/friends/page.tsx` | Friends list |
+| `/[locale]/accessibility` | `app/[locale]/accessibility/page.tsx` | Accessibility statement |
+| `/[locale]/unsubscribe` | `app/[locale]/unsubscribe/page.tsx` | Email unsubscribe |
 
-### Single Player (`/[locale]/singleplayer/page.tsx`)
-Single player game mode.
-- **Components:** `SinglePlayerGame`, `GridComponent`, `Timer`, `ScoreDisplay`
+### Game Modes
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/multiplayer` | `app/[locale]/multiplayer/page.tsx` | Multiplayer lobby & game |
+| `/[locale]/singleplayer` | `app/[locale]/singleplayer/page.tsx` | Single player vs AI |
+| `/[locale]/blast` | `app/[locale]/blast/page.tsx` | Blast mode |
+| `/[locale]/join/[code]` | `app/[locale]/join/[code]/page.tsx` | Join room by code |
+| `/[locale]/challenge/[code]` | `app/[locale]/challenge/[code]/page.tsx` | Challenge link |
+| `/[locale]/custom/[puzzleCode]` | `app/[locale]/custom/[puzzleCode]/page.tsx` | Custom puzzle |
+| `/[locale]/hebrew-multiplayer-word-game` | `app/[locale]/hebrew-multiplayer-word-game/page.tsx` | SEO landing for Hebrew |
 
-### Multiplayer (`/[locale]/multiplayer/page.tsx`)
-Multiplayer lobby and game.
-- **Components:** `MultiplayerLobby`, `PlayerCard`, `WaitingRoom`
+### Daily Challenge
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/daily` | `app/[locale]/daily/page.tsx` | Daily challenge router (redirects or shows landing) |
+| `/[locale]/daily/word-hunt` | `app/[locale]/daily/word-hunt/page.tsx` | Word Hunt Survival puzzle |
+| `/[locale]/daily/buzz` | `app/[locale]/daily/buzz/page.tsx` | Daily Buzz (AI-generated trending topics) |
 
-### Daily Challenge (`/[locale]/daily/page.tsx`)
-Daily challenge mode hub.
-- **Sub-routes:**
-  - `/daily/buzz` - Daily Buzz trending topics
-  - `/daily/word-hunt` - Word hunt challenge
+### Adventure Mode
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/adventure` | `app/[locale]/adventure/page.tsx` | Adventure mode (world map) |
+| `/[locale]/adventure/skills` | `app/[locale]/adventure/skills/page.tsx` | Skills tree |
+| `/[locale]/adventure/achievements` | `app/[locale]/adventure/achievements/page.tsx` | Adventure achievements |
 
-### Brain Training (`/[locale]/brain/page.tsx`)
-Cognitive training hub.
-- **Sub-routes (Drills):**
-  - `/brain/drills/memory-hunt`
-  - `/brain/drills/pattern-switcher`
-  - `/brain/drills/rare-gems`
-  - `/brain/drills/combo-master`
-  - `/brain/drills/lightning-round`
+### Brain Training
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/brain` | `app/[locale]/brain/page.tsx` | Brain training hub |
+| `/[locale]/brain/drills/memory-hunt` | `app/[locale]/brain/drills/memory-hunt/page.tsx` | Memory Hunt drill |
+| `/[locale]/brain/drills/pattern-switcher` | `app/[locale]/brain/drills/pattern-switcher/page.tsx` | Pattern Switcher drill |
+| `/[locale]/brain/drills/rare-gems` | `app/[locale]/brain/drills/rare-gems/page.tsx` | Rare Gems drill |
+| `/[locale]/brain/drills/combo-master` | `app/[locale]/brain/drills/combo-master/page.tsx` | Combo Master drill |
+| `/[locale]/brain/drills/lightning-round` | `app/[locale]/brain/drills/lightning-round/page.tsx` | Lightning Round drill |
 
-### Adventure Mode (`/[locale]/adventure/page.tsx`)
-Story-driven progression mode.
-- **Sub-routes:**
-  - `/adventure/skills` - Skill tree
-  - `/adventure/achievements` - Achievement gallery
+### Education
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/education` | `app/[locale]/education/page.tsx` | Education hub |
+| `/[locale]/education/classroom-game` | `app/[locale]/education/classroom-game/page.tsx` | Classroom game mode |
+| `/[locale]/education/duels` | `app/[locale]/education/duels/page.tsx` | Duels lobby |
+| `/[locale]/education/duels/[duelId]` | `app/[locale]/education/duels/[duelId]/page.tsx` | Active duel |
 
----
+### Teacher Dashboard
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/teacher` | `app/[locale]/teacher/page.tsx` | Teacher dashboard |
+| `/[locale]/teacher/reports` | `app/[locale]/teacher/reports/page.tsx` | Teaching reports |
+| `/[locale]/teacher/curriculum` | `app/[locale]/teacher/curriculum/page.tsx` | Curriculum management |
+| `/[locale]/teacher/classroom/[id]/analytics` | `app/[locale]/teacher/classroom/[id]/analytics/page.tsx` | Classroom analytics |
 
-## User Routes
+### Student Portal
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/student` | `app/[locale]/student/page.tsx` | Student dashboard |
+| `/[locale]/student/join` | `app/[locale]/student/join/page.tsx` | Join classroom |
+| `/[locale]/student/profile` | `app/[locale]/student/profile/page.tsx` | Student profile |
+| `/[locale]/student/lessons` | `app/[locale]/student/lessons/page.tsx` | Lesson list |
+| `/[locale]/student/lessons/[id]` | `app/[locale]/student/lessons/[id]/page.tsx` | Individual lesson |
+| `/[locale]/student/achievements` | `app/[locale]/student/achievements/page.tsx` | Student achievements |
 
-### Profile (`/[locale]/profile/page.tsx`)
-User profile with stats and settings.
+### Admin
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/admin` | `app/[locale]/admin/page.tsx` | Admin dashboard |
+| `/[locale]/admin/words` | `app/[locale]/admin/words/page.tsx` | Word management |
+| `/[locale]/admin/players` | `app/[locale]/admin/players/page.tsx` | Player management |
+| `/[locale]/admin/dictionary` | `app/[locale]/admin/dictionary/page.tsx` | Dictionary management |
+| `/[locale]/admin/invalid-words` | `app/[locale]/admin/invalid-words/page.tsx` | Invalid words review |
+| `/[locale]/admin/wikipedia-words` | `app/[locale]/admin/wikipedia-words/page.tsx` | Wikipedia words import |
+| `/[locale]/admin/milog-words` | `app/[locale]/admin/milog-words/page.tsx` | Milog words import |
+| `/[locale]/admin/word-bank` | `app/[locale]/admin/word-bank/page.tsx` | Word bank |
+| `/[locale]/admin/daily-buzz` | `app/[locale]/admin/daily-buzz/page.tsx` | Daily Buzz admin |
+| `/[locale]/admin/web-vitals` | `app/[locale]/admin/web-vitals/page.tsx` | Web vitals dashboard |
 
-### Leaderboard (`/[locale]/leaderboard/page.tsx`)
-Global and friends leaderboards.
+### Blog & Content
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/blog` | `app/[locale]/blog/page.tsx` | Blog index |
+| `/[locale]/blog/improve-word-game-skills` | `app/[locale]/blog/improve-word-game-skills/page.tsx` | Blog post |
+| `/[locale]/blog/science-behind-word-games` | `app/[locale]/blog/science-behind-word-games/page.tsx` | Blog post |
+| `/[locale]/blog/10-surprising-benefits-word-games` | `app/[locale]/blog/10-surprising-benefits-word-games/page.tsx` | Blog post |
+| `/[locale]/blog/daily-challenge-strategies` | `app/[locale]/blog/daily-challenge-strategies/page.tsx` | Blog post |
+| `/[locale]/blog/multilingual-word-learning` | `app/[locale]/blog/multilingual-word-learning/page.tsx` | Blog post |
+| `/[locale]/blog/top-player-secrets` | `app/[locale]/blog/top-player-secrets/page.tsx` | Blog post |
 
-### Friends (`/[locale]/friends/page.tsx`)
-Friend list and social features.
+### Legal
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/legal` | `app/[locale]/legal/page.tsx` | Legal index |
+| `/[locale]/legal/privacy` | `app/[locale]/legal/privacy/page.tsx` | Privacy policy |
+| `/[locale]/legal/terms` | `app/[locale]/legal/terms/page.tsx` | Terms of service |
 
-### Settings (`/[locale]/settings/page.tsx`)
-App settings and preferences.
+### Auth
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/[locale]/auth/callback` | `app/[locale]/auth/callback/page.tsx` | OAuth callback handler |
 
----
-
-## Join/Challenge Routes
-
-### Join Game (`/[locale]/join/[code]/page.tsx`)
-Join multiplayer room by code.
-- **Dynamic:** `[code]` - Room code
-
-### Challenge (`/[locale]/challenge/[code]/page.tsx`)
-Challenge a friend.
-- **Dynamic:** `[code]` - Challenge code
-
-### Custom Puzzle (`/[locale]/custom/[puzzleCode]/page.tsx`)
-Play custom puzzle.
-- **Dynamic:** `[puzzleCode]` - Puzzle identifier
-
----
-
-## Education Routes
-
-### Education Hub (`/[locale]/education/page.tsx`)
-Educational features overview.
-
-### Classroom Game (`/[locale]/education/classroom-game/page.tsx`)
-Classroom gameplay mode.
-
-### Teacher Portal (`/[locale]/teacher/page.tsx`)
-Teacher dashboard.
-- **Sub-routes:**
-  - `/teacher/classroom/[id]/analytics` - Class analytics
-  - `/teacher/reports` - Reports dashboard
-  - `/teacher/curriculum` - Curriculum management
-
-### Student Portal (`/[locale]/student/page.tsx`)
-Student dashboard.
-- **Sub-routes:**
-  - `/student/join` - Join classroom
-  - `/student/profile` - Student profile
-  - `/student/lessons` - Lessons list
-  - `/student/lessons/[id]` - Specific lesson
-
----
-
-## Content Routes
-
-### Blog (`/[locale]/blog/page.tsx`)
-Blog listing page.
-- **Articles:**
-  - `/blog/improve-word-game-skills`
-  - `/blog/science-behind-word-games`
-  - `/blog/10-surprising-benefits-word-games`
-  - `/blog/daily-challenge-strategies`
-  - `/blog/multilingual-word-learning`
-  - `/blog/top-player-secrets`
-
-### About (`/[locale]/about/page.tsx`)
-About the game.
-
-### Rules (`/[locale]/rules/page.tsx`)
-Game rules explanation.
-
-### FAQ (`/[locale]/faq/page.tsx`)
-Frequently asked questions.
-
-### Contact (`/[locale]/contact/page.tsx`)
-Contact form.
-
----
-
-## Legal Routes
-
-### Legal Hub (`/[locale]/legal/page.tsx`)
-Legal documents hub.
-
-### Privacy Policy (`/[locale]/legal/privacy/page.tsx`)
-Privacy policy.
-
-### Terms of Service (`/[locale]/legal/terms/page.tsx`)
-Terms of service.
-
-### Accessibility (`/[locale]/accessibility/page.tsx`)
-Accessibility statement.
+### Special (Non-locale)
+| URL Pattern | Page File | Description |
+|---|---|---|
+| `/party-screen` | `app/party-screen/page.tsx` | Party screen (TV display) |
+| `/party-screen/[roomCode]` | `app/party-screen/[roomCode]/page.tsx` | Party screen for specific room |
 
 ---
 
-## Admin Routes
-
-### Admin Dashboard (`/[locale]/admin/page.tsx`)
-Admin overview.
-- **Sub-routes:**
-  - `/admin/words` - Word management
-  - `/admin/players` - Player management
-  - `/admin/dictionary` - Dictionary management
-  - `/admin/invalid-words` - Invalid word reports
-  - `/admin/wikipedia-words` - Wikipedia word imports
-  - `/admin/daily-buzz` - Daily buzz management
-  - `/admin/web-vitals` - Performance metrics
-  - `/admin/word-bank` - Word bank management
-  - `/admin/milog-words` - Hebrew dictionary enrichment
-
----
-
-## Special Routes
-
-### Auth Callback (`/[locale]/auth/callback/page.tsx`)
-OAuth authentication callback.
-
-### Unsubscribe (`/[locale]/unsubscribe/page.tsx`)
-Email unsubscribe.
-
-### Hebrew SEO (`/[locale]/hebrew-multiplayer-word-game/page.tsx`)
-Hebrew-specific landing for SEO.
-
-### Party Screen (`/party-screen/page.tsx`)
-TV/screen display for party mode.
-- `/party-screen/[roomCode]` - Specific room display
-
----
-
-## Route Components Mapping
-
-| Route | Primary Components |
-|-------|-------------------|
-| Home | LandingView, ModeCardV2, Mascot |
-| Singleplayer | SinglePlayerGame, GridComponent, Timer |
-| Multiplayer | MultiplayerLobby, PlayerCard, GameRoom |
-| Daily | DailyChallengeHub, DailyBuzzGame |
-| Brain | BrainTrainingHub, DrillCard |
-| Adventure | AdventureMap, WorldNode, BossBattle |
-| Results | ResultsPage, ScoreReveal, WordList |
-| Profile | ProfileStats, AchievementGrid |
-| Leaderboard | LeaderboardTable, RankBadge |
-
----
-
-## Layout Structure
-
-```
-app/
-├── layout.tsx              # Root layout (fonts, providers)
-├── [locale]/
-│   ├── layout.tsx          # Locale layout (i18n provider)
-│   ├── page.tsx            # Home/Landing
-│   ├── singleplayer/
-│   ├── multiplayer/
-│   ├── daily/
-│   ├── brain/
-│   ├── adventure/
-│   ├── profile/
-│   ├── settings/
-│   └── ...
-└── party-screen/           # No locale (display only)
-```
+## Route Count Summary
+- **Total pages:** 67
+- **Locale-based:** 65
+- **Non-locale:** 2 (party-screen)
+- **Dynamic segments:** `[locale]`, `[code]`, `[puzzleCode]`, `[id]`, `[duelId]`, `[roomCode]`

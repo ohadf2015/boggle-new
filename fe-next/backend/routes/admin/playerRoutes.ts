@@ -339,4 +339,97 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
   }
 });
 
+/**
+ * POST /api/admin/users/:userId/set-teacher-role
+ * Promote a user to the teacher role.
+ * Only admins (is_admin = true) may call this.
+ * - Returns 404 if user not found
+ * - Returns 409 ALREADY_TEACHER if user is already a teacher
+ * - Returns 409 ALREADY_ADMIN if user is an admin (cannot downgrade via this endpoint)
+ */
+router.post('/users/:userId/set-teacher-role', async (req: AdminRequest, res: Response): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    const supabase = getSupabase();
+
+    // Fetch the target user's current role
+    const { data: profile, error: lookupError } = await supabase
+      .from('profiles')
+      .select('id, user_role, is_admin')
+      .eq('id', userId)
+      .single();
+
+    if (lookupError || !profile) {
+      res.status(404).json({ error: 'USER_NOT_FOUND', message: 'User not found' });
+      return;
+    }
+
+    // Prevent accidentally downgrading an admin
+    if (profile.is_admin || profile.user_role === 'admin') {
+      res.status(409).json({ error: 'ALREADY_ADMIN', message: 'Cannot change role of an admin user' });
+      return;
+    }
+
+    // Idempotency: already a teacher
+    if (profile.user_role === 'teacher') {
+      res.status(409).json({ error: 'ALREADY_TEACHER', message: 'User is already a teacher' });
+      return;
+    }
+
+    // Promote to teacher
+    const { data: updated, error: updateError } = await supabase
+      .from('profiles')
+      .update({ user_role: 'teacher' })
+      .eq('id', userId)
+      .select('id, user_role')
+      .single();
+
+    if (updateError || !updated) {
+      logger.error('ADMIN_API', `Failed to set teacher role for ${userId}: ${updateError?.message}`);
+      res.status(500).json({ error: 'UPDATE_FAILED', message: 'Failed to update user role' });
+      return;
+    }
+
+    logger.info('ADMIN_API', `Admin ${req.adminUser?.email} promoted user ${userId} to teacher`);
+    res.json({ success: true, userId, user_role: updated.user_role });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Set teacher role error: ${err.message}`);
+    res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Internal server error' });
+  }
+});
+
+/**
+ * POST /api/admin/players/:id/blast-access
+ * Grant or revoke blast mode access for a specific player
+ * Body: { enabled: boolean }
+ */
+router.post('/players/:id/blast-access', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { enabled } = req.body;
+
+    if (typeof enabled !== 'boolean') {
+      res.status(400).json({ error: 'enabled (boolean) is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('profiles')
+      .update({ blast_access: enabled })
+      .eq('id', id);
+
+    if (error) throw error;
+
+    logger.info('ADMIN_API', `Blast access ${enabled ? 'granted' : 'revoked'} for player ${id}`);
+    res.json({ success: true, blast_access: enabled });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Blast access update error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to update blast access' });
+  }
+});
+
 export default router;

@@ -73,6 +73,7 @@ const sv = {
     }
   },
   "common": {
+    "email": "E-post",
     "loading": "Blandar bokstäver...",
     "error": "Hoppsan!",
     "creating": "Skapar...",
@@ -5205,6 +5206,15 @@ const sv = {
     },
     "accessRequired": "Lärarbehörighet krävs",
     "accessDenied": "Du behöver lärarbehörighet för denna sida.",
+    "profile": {
+      "teacherBadge": "Lärare",
+      "classrooms": "Klassrum",
+      "totalStudents": "Totalt elever",
+      "roleStatus": "Roll",
+      "contactAdmin": "Behöver du hjälp?",
+      "contactAdminDesc": "För att uppdatera din läraråtkomst eller roll, kontakta din administratör. Lärarkonton beviljas av skoladministratörer.",
+      "avatar": "Läraravatar"
+    },
     "dashboard": {
       "title": "Lärarpanel",
       "subtitle": "Hantera dina klassrum, lektioner och elevernas framsteg",
@@ -5585,7 +5595,11 @@ const sv = {
         "headline": "Utmana en klasskamrat",
         "subtext": "Spela en mot en och klättra i klassrankingen",
         "cta": "Starta en Duel →"
-      }
+      },
+      "roleTeacher": "Lärare",
+      "roleStudent": "Elev",
+      "roleGuest": "Inloggad",
+      "goToDashboard": "Gå till instrumentpanel"
     },
     "template": {
       "settings": "Inställningar",

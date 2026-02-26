@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
-import Header from '@/components/Header';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { EducationBadgeGrid, type StudentAchievement } from '@/components/education';
 import { cn } from '@/lib/utils';
@@ -209,7 +209,7 @@ export default function StudentProfilePageClient() {
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <Header />
+      <EducationHeader showBackButton />
 
       <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* Profile Header */}

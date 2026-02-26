@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Search, User, Calendar, Trophy, Gamepad2,
-  MoreVertical, ChevronLeft, ChevronRight, Gift
+  Search, Calendar,
+  ChevronLeft, ChevronRight, Gift, Bomb
 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,7 @@ interface Player {
   ranked_games: number;
   last_game_at: string;
   created_at: string;
+  blast_access?: boolean;
 }
 
 export function PlayerManager({ authToken }: { authToken: string }) {
@@ -58,6 +59,30 @@ export function PlayerManager({ authToken }: { authToken: string }) {
     setSelectedPlayerForGift(playerId);
     setGiftDialogOpen(true);
   };
+
+  const [blastAccessLoading, setBlastAccessLoading] = useState<string | null>(null);
+
+  const handleToggleBlastAccess = useCallback(async (player: Player) => {
+    setBlastAccessLoading(player.id);
+    try {
+      const newValue = !player.blast_access;
+      const response = await fetch(`/api/admin/players/${player.id}/blast-access`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ enabled: newValue }),
+      });
+      if (!response.ok) throw new Error('Failed');
+      toast.success(`Blast access ${newValue ? 'granted' : 'revoked'} for ${player.display_name || player.username}`);
+      setPlayers((prev) => prev.map((p) => p.id === player.id ? { ...p, blast_access: newValue } : p));
+    } catch {
+      toast.error('Failed to update blast access');
+    } finally {
+      setBlastAccessLoading(null);
+    }
+  }, [authToken]);
 
   const fetchPlayers = useCallback(async () => {
     try {
@@ -201,7 +226,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                       <span className="text-xs text-slate-400 uppercase">MMR</span>
                       <span className="font-mono font-bold text-amber-500">{player.ranked_mmr}</span>
                     </div>
-                    <div className="flex flex-col items-center sm:items-end">
+                    <div className="flex flex-col items-center sm:items-end gap-1">
                       <Button
                         variant="outline"
                         size="sm"
@@ -210,6 +235,20 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                       >
                         <Gift className="w-4 h-4 mr-1" />
                         Gift
+                      </Button>
+                      <Button
+                        variant={player.blast_access ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleToggleBlastAccess(player)}
+                        disabled={blastAccessLoading === player.id}
+                        className={player.blast_access
+                          ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500'
+                          : 'text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/20'
+                        }
+                        title={player.blast_access ? 'Revoke blast access' : 'Grant blast access'}
+                      >
+                        <Bomb className="w-4 h-4 mr-1" />
+                        {player.blast_access ? 'Blast ✓' : 'Blast'}
                       </Button>
                     </div>
                   </div>

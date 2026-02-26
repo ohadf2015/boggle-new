@@ -25,9 +25,9 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
   const { language } = useLanguage();
   const pathname = usePathname();
 
-  // Check if on a game route where footer should be hidden
+  // Check if on a game route or education route where footer should be hidden
   const cleanPath = pathname.replace(`/${language}`, '');
-  const isGameRoute = ['/singleplayer', '/multiplayer', '/daily', '/adventure'].some(
+  const isGameRoute = ['/singleplayer', '/multiplayer', '/daily', '/adventure', '/education', '/student', '/teacher'].some(
     path => cleanPath.startsWith(path)
   );
 

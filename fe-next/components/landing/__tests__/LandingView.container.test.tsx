@@ -99,6 +99,10 @@ describe('LandingView - Daily Challenge Banner Container', () => {
       TRACKS: { LOBBY: 'lobby' },
     });
 
+    // Simulate mobile landscape dimensions (< 1024px wide)
+    // so isDesktopWidth stays false and the mobile layout renders
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 768 });
+
     // Mock window.matchMedia for mobile landscape
     Object.defineProperty(window, 'matchMedia', {
       writable: true,

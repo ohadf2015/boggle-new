@@ -38,7 +38,7 @@ export default function QuickPlayPanel({ classroomId, userId }: QuickPlayPanelPr
   };
 
   const handleQuickDuel = () => {
-    router.push(`/${language}/duels/lobby?classroomId=${classroomId}`);
+    router.push(`/${language}/education/duels?classroomId=${classroomId}`);
   };
 
   const hasLessons = lessons.length > 0;

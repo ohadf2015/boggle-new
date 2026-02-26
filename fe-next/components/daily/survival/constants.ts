@@ -74,6 +74,13 @@ export const MIN_TOKENS_FOR_HINT = 1;
 export const FEEDBACK_OVERLAY_DURATION = 3000;
 
 /**
+ * Delay before gray (non-clue) letters fade to '?' in the feedback overlay.
+ * Gray letters flash briefly so the player sees what they guessed,
+ * then fade out to keep focus on green/yellow clue letters.
+ */
+export const GRAY_LETTER_FADE_DELAY = 1000;
+
+/**
  * Duration to auto-dismiss shop hint in milliseconds
  * @deprecated Shop has been removed - clues auto-unlock now
  */

@@ -49,6 +49,10 @@ export interface ProfileData {
   last_daily_email_sent_at?: string | null;
   // Gift Modal Dismissal
   gift_modal_dismissed_at?: string | null;
+  // Feature Access (admin-granted)
+  blast_access?: boolean;
+  // Role-based access control
+  user_role?: 'student' | 'teacher' | 'admin';
 }
 
 // Collectible item from the catalog
@@ -100,6 +104,7 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isGuest: boolean;
   isAdmin: boolean;
+  isTeacher: boolean;
   canPlayRanked: boolean;
   gamesUntilRanked: number;
   needsProfileCustomization: boolean;

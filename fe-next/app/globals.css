@@ -1262,6 +1262,25 @@ body {
     @apply badge-neo bg-neo-lime text-neo-black;
   }
 
+  /* Cyber-Hybrid Zone Panels — thick top border accent + hard shadow for desktop game layout */
+  .zone-panel-pink {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 8px solid #FF1493;
+    box-shadow: 4px 4px 0px 0px #000000;
+  }
+
+  .zone-panel-cyan {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 8px solid #00FFFF;
+    box-shadow: 4px 4px 0px 0px #000000, 0 0 20px rgba(0, 255, 255, 0.15);
+  }
+
+  .zone-panel-lime {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 8px solid #BFFF00;
+    box-shadow: 4px 4px 0px 0px #000000;
+  }
+
   /* Neo-Brutalist Panel with tilt */
   .neo-panel {
     @apply bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-lg p-4;

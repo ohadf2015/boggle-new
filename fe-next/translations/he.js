@@ -73,6 +73,7 @@ const he = {
     }
   },
   "common": {
+    "email": "אימייל",
     "loading": "מערבב אותיות...",
     "error": "אופס!",
     "creating": "יוצר...",
@@ -5181,6 +5182,15 @@ const he = {
     },
     "accessRequired": "נדרשת גישת מורה",
     "accessDenied": "צריך הרשאות מורה לדף זה.",
+    "profile": {
+      "teacherBadge": "מורה",
+      "classrooms": "כיתות",
+      "totalStudents": "סה\"כ תלמידים",
+      "roleStatus": "תפקיד",
+      "contactAdmin": "צריך עזרה?",
+      "contactAdminDesc": "לעדכון הגישה או התפקיד שלך, פנה למנהל. חשבונות מורים מוקצים על ידי מנהלי בית הספר.",
+      "avatar": "אווטאר מורה"
+    },
     "dashboard": {
       "title": "לוח המורה",
       "subtitle": "נהל את הכיתות, השיעורים והתקדמות התלמידים שלך",
@@ -5561,7 +5571,11 @@ const he = {
         "headline": "אתגר חבר לכיתה",
         "subtext": "שחק אחד על אחד ותטפס בדירוג הכיתה",
         "cta": "התחל דואל →"
-      }
+      },
+      "roleTeacher": "מורה",
+      "roleStudent": "תלמיד",
+      "roleGuest": "מחובר",
+      "goToDashboard": "עבור ללוח הבקרה"
     },
     "template": {
       "settings": "הגדרות",

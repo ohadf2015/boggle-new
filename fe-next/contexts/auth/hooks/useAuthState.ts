@@ -95,6 +95,10 @@ export function useComputedAuthValues(
   const isAuthenticated = useMemo(() => !!user && !!profile, [user, profile]);
   const isGuest = useMemo(() => !user, [user]);
   const isAdmin = useMemo(() => !!profile?.is_admin, [profile?.is_admin]);
+  const isTeacher = useMemo(
+    () => profile?.user_role === 'teacher' || profile?.user_role === 'admin',
+    [profile?.user_role]
+  );
   const needsProfileCustomization = useMemo(
     () => isAuthenticated && profile?.has_customized_profile === false,
     [isAuthenticated, profile?.has_customized_profile]
@@ -106,6 +110,7 @@ export function useComputedAuthValues(
     isAuthenticated,
     isGuest,
     isAdmin,
+    isTeacher,
     needsProfileCustomization,
   };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import type { LetterGrid } from '@/types';
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from './types';
-import { MAX_ATTEMPTS } from './constants';
+import { MAX_ATTEMPTS, GRAY_LETTER_FADE_DELAY } from './constants';
 
 export interface LandscapeClueBoxesProps {
   currentHint: HintLevel;
@@ -439,6 +439,18 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   skipAnimations = false,
   t,
 }) => {
+  // Gray letters flash briefly then fade to '?' after a delay
+  const [grayFaded, setGrayFaded] = useState(false);
+
+  useEffect(() => {
+    if (!showFeedbackOverlay) {
+      setGrayFaded(false);
+      return;
+    }
+    const timer = setTimeout(() => setGrayFaded(true), GRAY_LETTER_FADE_DELAY);
+    return () => clearTimeout(timer);
+  }, [showFeedbackOverlay]);
+
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
   const wordLength = hintChars.length;
   const sizeClass = wordLength <= 4
@@ -496,7 +508,11 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                   transition={{ duration: 0.3 }}
                   className="flex justify-center flex-wrap gap-1.5"
                 >
-                  {normalizedFeedback.map((letterFb, idx) => (
+                  {normalizedFeedback.map((letterFb, idx) => {
+                    const isClue = letterFb.feedback === 'green' || letterFb.feedback === 'yellow';
+                    const isGray = !isClue;
+                    const showGrayLetter = isGray && !grayFaded;
+                    return (
                 <motion.div
                   key={idx}
                   initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
@@ -511,16 +527,18 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                     damping: 20
                   }}
                   className={cn(
-                    "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard-sm text-white",
+                    "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard-sm transition-colors duration-500",
                     sizeClass,
-                    letterFb.feedback === 'green' && "bg-green-500 border-green-700 ring-1 ring-green-300/50",
+                    letterFb.feedback === 'green' && "bg-green-500 border-green-700 text-white ring-1 ring-green-300/50",
                     letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-1 ring-yellow-300/50",
-                    letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
+                    isGray && showGrayLetter && "bg-gray-400 border-gray-500 text-white",
+                    isGray && !showGrayLetter && "bg-neo-black border-neo-black text-white"
                   )}
                 >
-                    {letterFb.letter}
+                    {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
                   </motion.div>
-                ))}
+                    );
+                  })}
               </motion.div>
               );
             })()

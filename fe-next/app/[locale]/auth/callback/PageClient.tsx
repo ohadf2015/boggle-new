@@ -25,6 +25,29 @@ const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
 const RETRY_TIMEOUT_SECONDS = 6; // Show retry button after 6 seconds
 
 /**
+ * Fetches user profile and returns a role-based redirect URL.
+ * Students → /[locale]/student, teachers/admins → /[locale]/teacher
+ * Falls back to /[locale] if role cannot be determined.
+ */
+async function getRoleBasedRedirect(userId: string, locale: string): Promise<string> {
+  if (!supabase) return `/${locale}`;
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_role, is_admin')
+      .eq('id', userId)
+      .single();
+    if (!data) return `/${locale}`;
+    const isTeacher = data.is_admin === true || data.user_role === 'teacher' || data.user_role === 'admin';
+    if (isTeacher) return `/${locale}/teacher`;
+    if (data.user_role === 'student') return `/${locale}/student`;
+  } catch {
+    // Fall through to default
+  }
+  return `/${locale}`;
+}
+
+/**
  * Clears all Supabase auth-related cookies and storage from the browser.
  * This allows the user to start fresh with a new sign-in attempt.
  */
@@ -153,16 +176,19 @@ function AuthCallbackContent(): React.JSX.Element {
     router.replace(`/${locale}?auth_error=true&reason=timeout`);
   }, [router, locale]);
 
-  // Helper to get redirect URL
+  // Helper to get redirect URL. Returns { url, isDefault } where isDefault means no explicit destination was provided.
   const getRedirectUrl = useCallback(() => {
-    let next = searchParams.get('next') || `/${locale}`;
+    const nextParam = searchParams.get('next');
+    let next = nextParam || `/${locale}`;
     if (next === '/') {
       next = `/${locale}`;
     } else if (!next.startsWith(`/${locale}`)) {
       const pathWithoutLocale = next.replace(/^\/(he|en|sv|ja)/, '');
       next = `/${locale}${pathWithoutLocale || ''}`;
     }
-    return next;
+    // isDefault = no explicit next param was provided (user came from login, not a deep link)
+    const isDefault = !nextParam || nextParam === '/' || nextParam === `/${locale}`;
+    return { url: next, isDefault };
   }, [searchParams, locale]);
 
   // Track if we've already navigated away
@@ -180,6 +206,17 @@ function AuthCallbackContent(): React.JSX.Element {
     window.history.replaceState(null, '', window.location.pathname);
     router.replace(url);
   }, [router]);
+
+  // Helper to redirect with optional role-based routing.
+  // When no explicit destination was requested, route based on user_role.
+  const redirectWithRole = useCallback(async (userId: string | undefined, next: string, isDefault: boolean) => {
+    if (isDefault && userId) {
+      const roleUrl = await getRoleBasedRedirect(userId, locale);
+      safeRedirect(roleUrl);
+    } else {
+      safeRedirect(next);
+    }
+  }, [locale, safeRedirect]);
 
   // Wait for session from another tab using BroadcastChannel + polling
   const waitForSessionFromOtherTab = useCallback(async (next: string, maxWaitMs = 10000): Promise<boolean> => {
@@ -266,7 +303,7 @@ function AuthCallbackContent(): React.JSX.Element {
     // After RETRY_TIMEOUT_SECONDS, user sees "Try Again" button to manually retry.
 
     const handleCallback = async (): Promise<void> => {
-      const next = getRedirectUrl();
+      const { url: next, isDefault } = getRedirectUrl();
 
       try {
         if (!supabase) {
@@ -298,7 +335,7 @@ function AuthCallbackContent(): React.JSX.Element {
           const { data: existingSession } = await supabase.auth.getSession();
           if (existingSession?.session) {
             logger.log(`Auth callback: Session already exists (attempt ${attempt + 1}), redirecting`);
-            safeRedirect(next);
+            await redirectWithRole(existingSession.session.user.id, next, isDefault);
             return;
           }
           // Wait 400ms before retry to allow cookies to sync across tabs (increased from 300ms)
@@ -320,7 +357,7 @@ function AuthCallbackContent(): React.JSX.Element {
               const { data: finalCheck } = await supabase.auth.getSession();
               if (finalCheck?.session) {
                 logger.log('Auth callback: Session found after waiting for other tab');
-                safeRedirect(next);
+                await redirectWithRole(finalCheck.session.user.id, next, isDefault);
                 return;
               }
               logger.warn('Auth callback: Timed out waiting for session from other tab');
@@ -338,7 +375,7 @@ function AuthCallbackContent(): React.JSX.Element {
             if (!gotSession) {
               const { data: finalCheck } = await supabase.auth.getSession();
               if (finalCheck?.session) {
-                safeRedirect(next);
+                await redirectWithRole(finalCheck.session.user.id, next, isDefault);
                 return;
               }
               broadcastAuthFailed('Timed out waiting for other tab');
@@ -377,7 +414,7 @@ function AuthCallbackContent(): React.JSX.Element {
                 logger.log('Auth callback: Found session after failed exchange');
                 // Broadcast success since we have a valid session
                 broadcastAuthSuccess(retrySession.session.user.id);
-                safeRedirect(next);
+                await redirectWithRole(retrySession.session.user.id, next, isDefault);
                 return;
               }
             }
@@ -393,7 +430,7 @@ function AuthCallbackContent(): React.JSX.Element {
             logger.log('Auth callback: Session established successfully from code exchange');
             // Broadcast success to other tabs
             broadcastAuthSuccess(data.session.user.id);
-            safeRedirect(next);
+            await redirectWithRole(data.session.user.id, next, isDefault);
             return;
           }
 
@@ -402,7 +439,7 @@ function AuthCallbackContent(): React.JSX.Element {
           if (sessionData?.session) {
             logger.log('Auth callback: Session found in fallback getSession()');
             broadcastAuthSuccess(sessionData.session.user.id);
-            safeRedirect(next);
+            await redirectWithRole(sessionData.session.user.id, next, isDefault);
             return;
           }
         }
@@ -434,7 +471,7 @@ function AuthCallbackContent(): React.JSX.Element {
           if (sessionData?.session) {
             logger.log('Auth callback: Session established from hash tokens');
             broadcastAuthSuccess(sessionData.session.user.id);
-            safeRedirect(next);
+            await redirectWithRole(sessionData.session.user.id, next, isDefault);
             return;
           }
         }
@@ -446,7 +483,7 @@ function AuthCallbackContent(): React.JSX.Element {
         if (finalCheck?.session) {
           logger.log('Auth callback: Session found in final check');
           broadcastAuthSuccess(finalCheck.session.user.id);
-          safeRedirect(next);
+          await redirectWithRole(finalCheck.session.user.id, next, isDefault);
           return;
         }
 
@@ -469,7 +506,8 @@ function AuthCallbackContent(): React.JSX.Element {
           if (recoverySession?.session) {
             logger.log('Auth callback: Found session after exception, redirecting');
             broadcastAuthSuccess(recoverySession.session.user.id);
-            safeRedirect(getRedirectUrl());
+            const { url: recoveryNext, isDefault: recoveryIsDefault } = getRedirectUrl();
+            await redirectWithRole(recoverySession.session.user.id, recoveryNext, recoveryIsDefault);
             return;
           }
         }
@@ -486,7 +524,7 @@ function AuthCallbackContent(): React.JSX.Element {
       cleanupFunctions.current.forEach(fn => fn());
       cleanupFunctions.current = [];
     };
-  }, [router, searchParams, locale, getRedirectUrl, safeRedirect, waitForSessionFromOtherTab]);
+  }, [router, searchParams, locale, getRedirectUrl, safeRedirect, waitForSessionFromOtherTab, redirectWithRole]);
 
   return (
     <LoadingUI

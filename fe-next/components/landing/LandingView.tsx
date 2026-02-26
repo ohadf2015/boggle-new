@@ -94,7 +94,7 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, profile } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
@@ -188,6 +188,18 @@ const LandingView: React.FC = () => {
     setEnableHeavyBackground(getPerfVariant() === 'control');
   }, []);
 
+  // Desktop breakpoint: screens ≥1024px always use the rich desktop layout
+  // regardless of window height (prevents compact laptop browser windows from
+  // incorrectly triggering the mobile landscape layout)
+  const [isDesktopWidth, setIsDesktopWidth] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setIsDesktopWidth(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   // Play lobby music on landing page (same as multiplayer lobby)
   // Note: We always call playTrack even if audio isn't unlocked yet
   // The MusicContext will queue the request and play when user interacts
@@ -232,7 +244,9 @@ const LandingView: React.FC = () => {
       <section className={cn(
         'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col',
         (isLandscape || isMobilePortrait) && 'justify-center px-2 sm:px-4 py-2',
-        !isLandscape && !isMobilePortrait && 'justify-center px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
+        // Desktop: justify-start so content flows top-down; justify-center would
+        // clip the mascot above the viewport when total height > viewport height
+        !isLandscape && !isMobilePortrait && 'justify-start px-2 sm:px-3 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8'
       )}>
         <>
             {/* Hero section with mascot - hidden in landscape only, shown on mobile portrait and desktop */}
@@ -242,7 +256,7 @@ const LandingView: React.FC = () => {
               "text-center animate-fade-in-fast relative",
               // Max-width for desktop to prevent text stretching
               "max-w-3xl mx-auto",
-              isMobilePortrait ? "mb-2" : "mb-4 sm:mb-6 lg:mb-8"
+              isMobilePortrait ? "mb-2" : "mb-3 sm:mb-4 lg:mb-5"
             )}
             style={!isMobilePortrait ? {
               transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
@@ -283,9 +297,12 @@ const LandingView: React.FC = () => {
         {/* Wrapper ensures cards are vertically centered in remaining viewport space */}
         <div className={cn(
           "flex items-center gap-2 sm:gap-4 justify-center",
-          !isMobilePortrait && "flex-1"
+          // On mobile portrait, no flex-1 (content stacks naturally)
+          // On desktop, no flex-1 either — let content height be natural so
+          // the mascot above doesn't get compressed or vertically "split"
+          !isMobilePortrait && !isDesktopWidth && "flex-1"
         )}>
-        {(isLandscape || isMobilePortrait) ? (
+        {(!isDesktopWidth && (isLandscape || isMobilePortrait)) ? (
           <div className='flex flex-col w-full'>
             {/* Landscape-only: Show compact welcome text (mobile portrait shows hero section above) */}
             {isLandscape && (
@@ -443,8 +460,8 @@ const LandingView: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Blast Mode Card - Only visible to admins */}
-            {isAdmin && (
+            {/* Blast Mode Card - Visible to admins and players granted blast access */}
+            {(isAdmin || profile?.blast_access) && (
               <motion.div
                 className="col-span-2 group"
                 whileHover={{ scale: 1.03 }}
@@ -482,7 +499,7 @@ const LandingView: React.FC = () => {
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
             {/* Cards container - Daily Challenge Banner + Mode Cards in single grid */}
             {/* max-w-4xl (896px) constrains overall width, cards stretch to fill columns */}
-            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 xl:gap-8 items-stretch px-4 lg:px-6">
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch px-4 lg:px-6">
               {/* Daily Challenge Banner - spans full width with its own max-width */}
               <div className="col-span-1 sm:col-span-2 w-full max-w-4xl mx-auto">
                 <Suspense fallback={
@@ -556,13 +573,8 @@ const LandingView: React.FC = () => {
                 />
               </motion.div>
 
-              {/* Share banner — full-width below mode cards */}
-              <div className="col-span-1 sm:col-span-2">
-                <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
-              </div>
-
               {/* Adventure Mode card */}
-              <div className="sm:col-span-2 w-full">
+              <div className="col-span-1 sm:col-span-2 w-full">
                 <ModeCardV2
                   title={t('landing.adventureMode') || 'Adventure'}
                   description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
@@ -574,9 +586,9 @@ const LandingView: React.FC = () => {
                 />
               </div>
 
-              {/* Secondary card - Blast Mode (only visible to admins) */}
-              {isAdmin && (
-                <div className="sm:col-span-2 w-full max-w-md mx-auto">
+              {/* Secondary card - Blast Mode (visible to admins and players with blast access) */}
+              {(isAdmin || profile?.blast_access) && (
+                <div className="col-span-1 sm:col-span-2 w-full max-w-md mx-auto">
                   <ModeCard
                     title={t('landing.blastMode') || 'Blast Mode'}
                     description={t('landing.blastModeDesc') || 'Clear the board!'}
@@ -589,6 +601,11 @@ const LandingView: React.FC = () => {
                   />
                 </div>
               )}
+
+              {/* Share banner — bottom of page, after all mode cards */}
+              <div className="col-span-1 sm:col-span-2">
+                <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
+              </div>
             </div>
           </div>
         )}

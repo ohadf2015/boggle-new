@@ -265,6 +265,41 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
             expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
+
+        it('should hide on education path (education section has own nav)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/education');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('should hide on student path (education section has own nav)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/student');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('should hide on teacher path (education section has own nav)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/teacher');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('should hide on student sub-paths (e.g. /student/lessons)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/student/lessons');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('should hide on teacher sub-paths (e.g. /teacher/classroom)', () => {
+            (usePathname as jest.Mock).mockReturnValue('/en/teacher/classroom');
+
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
     });
 
     describe('Authentication State', () => {

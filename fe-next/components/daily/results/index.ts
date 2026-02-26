@@ -53,6 +53,9 @@ export type { ScoreBadgeProps } from './ScoreBadge';
 export { ResultDisplay } from './ResultDisplay';
 export type { ResultDisplayProps } from './ResultDisplay';
 
+export { ScoreGaugeRing } from './ScoreGaugeRing';
+export type { ScoreGaugeRingProps } from './ScoreGaugeRing';
+
 export { ScoreBreakdownSection } from './ScoreBreakdownSection';
 export type { ScoreBreakdownSectionProps } from './ScoreBreakdownSection';
 

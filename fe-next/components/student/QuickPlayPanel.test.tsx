@@ -105,7 +105,7 @@ describe('QuickPlayPanel', () => {
     const duelButton = screen.getByText('student.dashboard.quickDuel').closest('button');
     fireEvent.click(duelButton!);
 
-    expect(mockPush).toHaveBeenCalledWith('/en/duels/lobby?classroomId=class-1');
+    expect(mockPush).toHaveBeenCalledWith('/en/education/duels?classroomId=class-1');
   });
 
   it('shows loading spinner while navigating', async () => {

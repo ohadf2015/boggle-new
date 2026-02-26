@@ -1,20 +1,26 @@
 /**
  * ResultDisplay Component Tests
  *
- * Tests for the score display in WordHunt daily challenge results.
- * Verifies that all scoring parameters are correctly used.
+ * Tests for the Speedometer Gauge hero section in WordHunt daily challenge results.
+ * Verifies scoring, eye toggle behavior, win/fail states.
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ResultDisplay } from '../ResultDisplay';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 
 // Mock framer-motion to render immediately
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+    div: ({ children, ...props }: any) => {
+      const { initial, animate, transition, whileTap, exit, variants, whileHover, ...rest } = props;
+      return <div {...rest}>{children}</div>;
+    },
+    span: ({ children, ...props }: any) => {
+      const { initial, animate, transition, whileTap, exit, variants, whileHover, ...rest } = props;
+      return <span {...rest}>{children}</span>;
+    },
   },
 }));
 
@@ -28,6 +34,15 @@ jest.mock('@/utils/confettiUtils', () => ({
 
 jest.mock('@/shared/utils/wordNormalization', () => ({
   applyHebrewFinalLetters: (w: string) => w,
+}));
+
+// Mock ScoreGaugeRing to avoid SVG rendering complexity
+jest.mock('../ScoreGaugeRing', () => ({
+  ScoreGaugeRing: (props: any) => (
+    <div data-testid="score-gauge-ring" data-score={props.score} data-max={props.maxScore}>
+      {props.showScore !== false && <span data-testid="gauge-score">{props.score}</span>}
+    </div>
+  ),
 }));
 
 describe('ResultDisplay Score Calculation', () => {
@@ -56,20 +71,14 @@ describe('ResultDisplay Score Calculation', () => {
     });
 
     it('should NOT return accuracy score alone when other params are missing', () => {
-      // If lifeRemaining and wordsFound are 0, only accuracy contributes
-      // This was the bug: ResultDisplay wasn't receiving these props
       const breakdown = getScoreBreakdown(0, 7, 0, true);
       expect(breakdown.speed).toBe(0);
       expect(breakdown.exploration).toBe(0);
       expect(breakdown.accuracy).toBe(160);
-      expect(breakdown.total).toBe(160); // Only accuracy score
+      expect(breakdown.total).toBe(160);
     });
 
     it('should calculate total as sum of all components', () => {
-      // 50 life: 50 * 4 = 200 speed
-      // 3 guesses: 400 - (3-1) * 40 = 320 accuracy
-      // 15 words: 15 * 10 = 150 exploration
-      // Total: 200 + 320 + 150 = 670
       const breakdown = getScoreBreakdown(50, 3, 15, true);
       expect(breakdown.speed).toBe(200);
       expect(breakdown.accuracy).toBe(320);
@@ -81,22 +90,20 @@ describe('ResultDisplay Score Calculation', () => {
 
 describe('ResultDisplay Props Requirements', () => {
   it('should require lifeRemaining for accurate speed score', () => {
-    // Default of 0 would give 0 speed score
     const withLife = getScoreBreakdown(50, 3, 10, true);
     const withoutLife = getScoreBreakdown(0, 3, 10, true);
 
-    expect(withLife.speed).toBe(200);    // 50 * 4
-    expect(withoutLife.speed).toBe(0);   // 0 * 4
+    expect(withLife.speed).toBe(200);
+    expect(withoutLife.speed).toBe(0);
     expect(withLife.total).toBeGreaterThan(withoutLife.total);
   });
 
   it('should require wordsDiscovered for accurate exploration score', () => {
-    // Default of 0 would give 0 exploration score
     const withWords = getScoreBreakdown(50, 3, 10, true);
     const withoutWords = getScoreBreakdown(50, 3, 0, true);
 
-    expect(withWords.exploration).toBe(100);    // 10 * 10
-    expect(withoutWords.exploration).toBe(0);   // 0 * 10
+    expect(withWords.exploration).toBe(100);
+    expect(withoutWords.exploration).toBe(0);
     expect(withWords.total).toBeGreaterThan(withoutWords.total);
   });
 });
@@ -117,25 +124,98 @@ describe('ResultDisplay Component', () => {
     t: mockT,
   };
 
-  it('renders score hero with data-testid for solved puzzle', () => {
-    render(<ResultDisplay {...solvedProps} />);
-    expect(screen.getByTestId('score-hero')).toBeInTheDocument();
+  describe('Win state', () => {
+    it('renders the gauge ring for solved puzzle', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
+    });
+
+    it('renders target word letters individually for animation', () => {
+      render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
+      expect(screen.getByTestId('letter-C')).toBeInTheDocument();
+      expect(screen.getByTestId('letter-A')).toBeInTheDocument();
+      expect(screen.getByTestId('letter-T')).toBeInTheDocument();
+    });
+
+    it('renders puzzle number in header', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByText('daily.puzzleNumber')).toBeInTheDocument();
+    });
+
+    it('renders streak badge when streak > 0', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByText('5')).toBeInTheDocument();
+    });
+
+    it('does not render streak badge when streak is 0', () => {
+      render(<ResultDisplay {...solvedProps} streakDays={0} />);
+      expect(screen.queryByText('0')).not.toBeInTheDocument();
+    });
+
+    it('renders countdown', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByText('12:34:56')).toBeInTheDocument();
+    });
+
+    it('renders score breakdown chips', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      // getScoreBreakdown(60, 3, 8, true) yields speed=240, accuracy=320, exploration=80
+      expect(screen.getByText(/\+240/)).toBeInTheDocument();
+      expect(screen.getByText(/\+320/)).toBeInTheDocument();
+      expect(screen.getByText(/\+80/)).toBeInTheDocument();
+    });
   });
 
-  it('renders target word letters individually for animation', () => {
-    render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
-    expect(screen.getByTestId('letter-C')).toBeInTheDocument();
-    expect(screen.getByTestId('letter-A')).toBeInTheDocument();
-    expect(screen.getByTestId('letter-T')).toBeInTheDocument();
+  describe('Eye toggle', () => {
+    it('renders the word visibility toggle button', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByTestId('word-visibility-toggle')).toBeInTheDocument();
+    });
+
+    it('hides letters and shows ? placeholders when toggle is clicked', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle);
+
+      // Letters should be hidden
+      expect(screen.queryByTestId('letter-H')).not.toBeInTheDocument();
+      // Should show ? placeholders (5 for HELLO)
+      const questionMarks = screen.getAllByText('?');
+      expect(questionMarks.length).toBe(5);
+    });
+
+    it('restores letters when toggle is clicked twice', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle); // hide
+      fireEvent.click(toggle); // show
+      expect(screen.getByTestId('letter-H')).toBeInTheDocument();
+    });
   });
 
-  it('renders puzzle number stamp badge', () => {
-    render(<ResultDisplay {...solvedProps} />);
-    expect(screen.getByText('#42')).toBeInTheDocument();
-  });
+  describe('Fail state', () => {
+    const failProps = { ...solvedProps, solved: false };
 
-  it('renders fail state without score hero', () => {
-    render(<ResultDisplay {...solvedProps} solved={false} />);
-    expect(screen.queryByTestId('score-hero')).not.toBeInTheDocument();
+    it('renders fail state without gauge score', () => {
+      render(<ResultDisplay {...failProps} />);
+      // Gauge is rendered but with showScore=false
+      expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
+    });
+
+    it('shows attempts used', () => {
+      render(<ResultDisplay {...failProps} />);
+      const text = screen.getByText('3');
+      expect(text).toBeInTheDocument();
+    });
+
+    it('shows countdown in fail state', () => {
+      render(<ResultDisplay {...failProps} />);
+      expect(screen.getByText('12:34:56')).toBeInTheDocument();
+    });
+
+    it('does not show eye toggle in fail state', () => {
+      render(<ResultDisplay {...failProps} />);
+      expect(screen.queryByTestId('word-visibility-toggle')).not.toBeInTheDocument();
+    });
   });
 });

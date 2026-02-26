@@ -2,6 +2,49 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 import logger from '@/utils/logger';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+// ==================== RBAC Helper ====================
+
+/**
+ * Verify the authenticated user has teacher or admin role.
+ * Returns null if authorized, or a NextResponse (403) if not.
+ * Uses the user_role column (enum: student | teacher | admin) plus
+ * the legacy is_admin boolean as a fallback for existing admins.
+ */
+async function requireTeacherRole(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<NextResponse | null> {
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('user_role, is_admin')
+    .eq('id', userId)
+    .single();
+
+  if (error || !profile) {
+    // If we can't read the profile, deny access
+    logger.error('Education templates: failed to read profile for RBAC', error);
+    return NextResponse.json(
+      { error: 'TEACHER_ROLE_REQUIRED', message: 'Teacher or admin role required' },
+      { status: 403 }
+    );
+  }
+
+  const isTeacherOrAdmin =
+    profile.is_admin === true ||
+    profile.user_role === 'teacher' ||
+    profile.user_role === 'admin';
+
+  if (!isTeacherOrAdmin) {
+    return NextResponse.json(
+      { error: 'TEACHER_ROLE_REQUIRED', message: 'Teacher or admin role required to manage templates' },
+      { status: 403 }
+    );
+  }
+
+  return null; // authorized
+}
 
 // Validation schemas
 const createTemplateSchema = z.object({
@@ -101,6 +144,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Verify teacher/admin role before processing
+    const roleError = await requireTeacherRole(supabase, user.id);
+    if (roleError) return roleError;
+
     const body = await request.json();
     const parseResult = createTemplateSchema.safeParse(body);
 
@@ -180,6 +227,10 @@ export async function PATCH(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Verify teacher/admin role before processing
+    const roleError = await requireTeacherRole(supabase, user.id);
+    if (roleError) return roleError;
 
     const body = await request.json();
     const parseResult = updateTemplateSchema.safeParse(body);
@@ -263,6 +314,10 @@ export async function DELETE(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Verify teacher/admin role before processing
+    const roleError = await requireTeacherRole(supabase, user.id);
+    if (roleError) return roleError;
 
     const { searchParams } = new URL(request.url);
     const templateId = searchParams.get('id');

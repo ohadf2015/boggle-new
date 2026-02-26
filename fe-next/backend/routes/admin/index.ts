@@ -11,6 +11,7 @@
  * Route structure:
  * - /api/admin/stats - Dashboard statistics
  * - /api/admin/players/* - Player management
+ * - /api/admin/users/:userId/set-teacher-role - Promote user to teacher role
  * - /api/admin/games/* - Game history
  * - /api/admin/activity/* - Activity tracking
  * - /api/admin/realtime - Live stats

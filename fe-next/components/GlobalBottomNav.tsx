@@ -87,6 +87,10 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             '/singleplayer',
             '/daily',
             '/adventure',
+            // Education section has its own EducationHeader nav — hide main app nav
+            '/education',
+            '/student',
+            '/teacher',
             // REMOVED: '/multiplayer' - Keep bottom nav visible on multiplayer lobby
             // REMOVED: '/profile' - GlobalBottomNav should remain visible on profile
             // to avoid confusing tab switching UX

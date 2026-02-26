@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { GraduationCap, BookOpen, CheckCircle, Globe, Lock, Star, Puzzle, Swords } from 'lucide-react';
+import { GraduationCap, BookOpen, CheckCircle, Globe, Lock, Star, Puzzle, Swords, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import { cn } from '@/lib/utils';
+import { ClickSpark } from '@/components/education/animations/ClickSpark';
+import { WobbleJellyCard } from '@/components/education/animations/WobbleJellyCard';
 
 /**
  * Education Landing Page - Clean Hero Edition
@@ -178,17 +181,19 @@ function DuelTeaserCard({ onDuelClick }: DuelTeaserCardProps) {
         </div>
 
         {/* CTA */}
-        <button
-          onClick={onDuelClick}
-          className={cn(
-            'flex-shrink-0 px-5 py-2.5 rounded-neo border-2 border-neo-black',
-            'bg-neo-black text-neo-white font-bold uppercase text-sm',
-            'shadow-hard-sm hover:shadow-hard transition-shadow',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-          )}
-        >
-          {t('education.landing.duelTeaser.cta')}
-        </button>
+        <WobbleJellyCard className="flex-shrink-0">
+          <button
+            onClick={onDuelClick}
+            className={cn(
+              'px-5 py-2.5 rounded-neo border-2 border-neo-black',
+              'bg-neo-black text-neo-white font-bold uppercase text-sm',
+              'shadow-hard-sm hover:shadow-hard transition-shadow',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+            )}
+          >
+            {t('education.landing.duelTeaser.cta')}
+          </button>
+        </WobbleJellyCard>
       </div>
     </motion.div>
   );
@@ -196,9 +201,17 @@ function DuelTeaserCard({ onDuelClick }: DuelTeaserCardProps) {
 
 export default function EducationPageClient() {
   const { t, language } = useLanguage();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, profile } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const router = useRouter();
+
+  // Determine the user's role for dashboard shortcut
+  const userRole = profile?.user_role;
+  const isTeacherRole = profile?.is_admin === true || userRole === 'teacher' || userRole === 'admin';
+  const isStudentRole = userRole === 'student';
+  const dashboardHref = isTeacherRole
+    ? `/${language}/teacher`
+    : `/${language}/student`;
 
   const handleTeacherClick = () => {
     if (authLoading) return;
@@ -293,49 +306,103 @@ export default function EducationPageClient() {
             </p>
           </motion.div>
 
+          {/* Authenticated User Dashboard Shortcut */}
+          {isAuthenticated && !authLoading && (
+            <motion.div
+              data-testid="auth-dashboard-shortcut"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.2 }}
+              className={cn(
+                'rounded-neo border-neo-thick border-neo-black overflow-hidden mb-8',
+                'bg-neo-yellow shadow-hard',
+              )}
+            >
+              <div className="px-5 py-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-neo border-2 border-neo-black bg-neo-black flex items-center justify-center flex-shrink-0">
+                    {isTeacherRole ? (
+                      <GraduationCap className="w-5 h-5 text-neo-yellow" />
+                    ) : (
+                      <BookOpen className="w-5 h-5 text-neo-yellow" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-black text-neo-black uppercase tracking-tight">
+                      {profile?.display_name || profile?.username || t('common.guest')}
+                    </p>
+                    <p className="text-xs text-neo-black/70 font-bold">
+                      {isTeacherRole
+                        ? t('education.landing.roleTeacher')
+                        : isStudentRole
+                          ? t('education.landing.roleStudent')
+                          : t('education.landing.roleGuest')}
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href={dashboardHref}
+                  data-testid="go-to-dashboard-link"
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
+                    'bg-neo-black text-neo-yellow font-bold uppercase text-sm flex-shrink-0',
+                    'shadow-hard-sm hover:shadow-hard transition-shadow',
+                  )}
+                >
+                  {t('education.landing.goToDashboard')}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </motion.div>
+          )}
+
           {/* Role Selection Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Teacher Card */}
-            <RoleCard
-              title={t('education.landing.teacher')}
-              description={t('education.landing.teacherDesc')}
-              icon={<GraduationCap className="w-6 h-6 text-neo-black" />}
-              features={[
-                t('education.landing.teacherFeature1'),
-                t('education.landing.teacherFeature2'),
-                t('education.landing.teacherFeature3'),
-              ]}
-              ctaLabel={isAuthenticated ? t('education.landing.teacher') : t('education.landing.teacherCta')}
-              badge={t('education.landing.premium')}
-              stripeColor="bg-neo-cyan"
-              badgeBg="bg-neo-cyan text-neo-black"
-              iconBg="bg-neo-cyan/20"
-              ctaBg="bg-neo-cyan text-neo-black"
-              locked={!isAuthenticated}
-              loading={authLoading}
-              onClick={handleTeacherClick}
-              index={0}
-            />
+            <ClickSpark colors={['#00FFFF', '#FFE135', '#FF6B35']}>
+              <RoleCard
+                title={t('education.landing.teacher')}
+                description={t('education.landing.teacherDesc')}
+                icon={<GraduationCap className="w-6 h-6 text-neo-black" />}
+                features={[
+                  t('education.landing.teacherFeature1'),
+                  t('education.landing.teacherFeature2'),
+                  t('education.landing.teacherFeature3'),
+                ]}
+                ctaLabel={isAuthenticated ? t('education.landing.teacher') : t('education.landing.teacherCta')}
+                badge={t('education.landing.premium')}
+                stripeColor="bg-neo-cyan"
+                badgeBg="bg-neo-cyan text-neo-black"
+                iconBg="bg-neo-cyan/20"
+                ctaBg="bg-neo-cyan text-neo-black"
+                locked={!isAuthenticated}
+                loading={authLoading}
+                onClick={handleTeacherClick}
+                index={0}
+              />
+            </ClickSpark>
 
             {/* Student Card */}
-            <RoleCard
-              title={t('education.landing.student')}
-              description={t('education.landing.studentDesc')}
-              icon={<BookOpen className="w-6 h-6 text-neo-black" />}
-              features={[
-                t('education.landing.studentFeature1'),
-                t('education.landing.studentFeature2'),
-                t('education.landing.studentFeature3'),
-              ]}
-              ctaLabel={t('education.landing.studentCta')}
-              badge={t('education.landing.freeAccess')}
-              stripeColor="bg-neo-pink"
-              badgeBg="bg-neo-pink text-neo-black"
-              iconBg="bg-neo-pink/20"
-              ctaBg="bg-neo-pink text-neo-black"
-              onClick={handleStudentClick}
-              index={1}
-            />
+            <ClickSpark colors={['#FF1493', '#FFE135', '#FF6B35']}>
+              <RoleCard
+                title={t('education.landing.student')}
+                description={t('education.landing.studentDesc')}
+                icon={<BookOpen className="w-6 h-6 text-neo-black" />}
+                features={[
+                  t('education.landing.studentFeature1'),
+                  t('education.landing.studentFeature2'),
+                  t('education.landing.studentFeature3'),
+                ]}
+                ctaLabel={t('education.landing.studentCta')}
+                badge={t('education.landing.freeAccess')}
+                stripeColor="bg-neo-pink"
+                badgeBg="bg-neo-pink text-neo-black"
+                iconBg="bg-neo-pink/20"
+                ctaBg="bg-neo-pink text-neo-black"
+                onClick={handleStudentClick}
+                index={1}
+              />
+            </ClickSpark>
           </div>
 
           {/* Duel Teaser — surface duels feature for students */}

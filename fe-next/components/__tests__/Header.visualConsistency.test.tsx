@@ -93,6 +93,7 @@ describe('Header Visual Consistency - Desktop Mode', () => {
         mockUseAuth.mockReturnValue({
             isAuthenticated: true,
             isAdmin: false,
+      isTeacher: false,
             profile: {
                 id: 'user-1',
                 total_coins: 100,

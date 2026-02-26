@@ -26,6 +26,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import toast from 'react-hot-toast';
 import type { Language } from '@/shared/types/game';
 import { PracticeCardSkeleton } from '@/components/ui/EducationSkeletons';
+import { ConfettiBurst } from '@/components/education/animations/ConfettiBurst';
 
 /**
  * Detect if a string contains Hebrew characters
@@ -341,6 +342,8 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
   // Completion screen
   if (showCompletion) {
     return (
+      <>
+      <ConfettiBurst trigger={showCompletion} />
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -399,6 +402,7 @@ export default function LessonPractice({ lessonId }: LessonPracticeProps) {
           </Button>
         </div>
       </motion.div>
+      </>
     );
   }
 
