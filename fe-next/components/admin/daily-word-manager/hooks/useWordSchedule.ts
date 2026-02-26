@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { Language } from '@/types';
 import type { DailyTargetWord } from '../types';
+import { captureError } from '@/utils/sentry';
 
 interface UseWordScheduleReturn {
   schedule: DailyTargetWord[];
@@ -91,7 +92,9 @@ export function useWordSchedule(
       setEditWordValue('');
       return true;
     } catch (e) {
-      console.error('Failed to save word:', e);
+      const err = e instanceof Error ? e : new Error(String(e));
+      console.error('Failed to save word:', err.message);
+      captureError(err, { action: 'saveSingleWord', date, language: selectedLang });
       return false;
     }
   }, [accessToken, editWordValue, selectedLang, fetchSchedule]);
