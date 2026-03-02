@@ -189,6 +189,104 @@ export function LandingSEOSection() {
         </motion.ol>
       </motion.div>
 
+      {/* ── Who Can Play ──────────────────────────────────── */}
+      <motion.div
+        className="mb-8 sm:mb-10"
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-40px' }}
+      >
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
+          {t('landing.seo.whoCanPlayTitle') || 'Who Can Play?'}
+        </h2>
+        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
+          {t('landing.seo.whoCanPlayContent') || 'LexiClash is designed for everyone — from casual players to competitive word game enthusiasts.'}
+        </p>
+      </motion.div>
+
+      {/* ── Game Modes Explained ──────────────────────────── */}
+      <motion.div
+        className="mb-8 sm:mb-10"
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-40px' }}
+      >
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
+          {t('landing.seo.gameModesTitle') || 'Game Modes Explained'}
+        </h2>
+        <div className="space-y-3 max-w-3xl">
+          {[
+            { key: 'gameModesMultiplayer', fallback: 'Multiplayer Rooms — Create a private room and share the code with up to 20 friends.' },
+            { key: 'gameModesSingle', fallback: 'Single Player vs. Bots — Practice your word-finding skills against AI opponents.' },
+            { key: 'gameModesDaily', fallback: 'Daily Challenge — A fresh puzzle every day, identical for all players worldwide.' },
+            { key: 'gameModesAdventure', fallback: 'Adventure Mode — Journey through 10 themed worlds with 100 levels.' },
+          ].map(({ key, fallback }) => (
+            <p key={key} className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed">
+              {t(`landing.seo.${key}`) || fallback}
+            </p>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ── Built for Learning ────────────────────────────── */}
+      <motion.div
+        className="mb-8 sm:mb-10"
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-40px' }}
+      >
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
+          {t('landing.seo.educationTitle') || 'Built for Learning'}
+        </h2>
+        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
+          {t('landing.seo.educationContent') || 'Word games are one of the most effective ways to build vocabulary and improve spelling.'}
+        </p>
+      </motion.div>
+
+      {/* ── FAQ Section ───────────────────────────────────── */}
+      <motion.div
+        className="mb-8 sm:mb-10"
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-40px' }}
+      >
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-black dark:text-neo-white mb-4">
+          {t('landing.seo.faqTitle') || 'Frequently Asked Questions'}
+        </h2>
+        <dl className="space-y-4 max-w-3xl">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <div key={n}>
+              <dt className="text-sm sm:text-base font-bold text-neo-black dark:text-neo-white mb-1">
+                {t(`landing.seo.faq${n}Q`) || `Question ${n}`}
+              </dt>
+              <dd className="text-sm sm:text-base text-neo-black/75 dark:text-neo-white/75 leading-relaxed">
+                {t(`landing.seo.faq${n}A`) || `Answer ${n}`}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </motion.div>
+
+      {/* ── Community ─────────────────────────────────────── */}
+      <motion.div
+        className="mb-8 sm:mb-10"
+        variants={sectionReveal}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-40px' }}
+      >
+        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-black dark:text-neo-white mb-3">
+          {t('landing.seo.communityTitle') || 'Join Thousands of Word Game Enthusiasts'}
+        </h2>
+        <p className="text-sm sm:text-base text-neo-black/80 dark:text-neo-white/80 leading-relaxed max-w-3xl">
+          {t('landing.seo.communityContent') || 'LexiClash players span over 40 countries and five languages.'}
+        </p>
+      </motion.div>
+
       {/* ── Blog Links ───────────────────────────────────── */}
       <motion.div
         variants={sectionReveal}

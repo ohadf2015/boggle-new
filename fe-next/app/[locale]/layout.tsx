@@ -17,6 +17,7 @@ import AnimationsLoader from '@/components/AnimationsLoader';
 import DeepLinkHandler from '@/components/DeepLinkHandler';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
+import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import { fredoka, rubik } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -722,6 +723,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
+                <WebSiteJsonLd />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"
