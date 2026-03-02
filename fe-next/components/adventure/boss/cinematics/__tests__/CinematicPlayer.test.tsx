@@ -23,7 +23,7 @@ jest.mock('@remotion/player', () => {
       }
     },
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const Player = React.forwardRef(({ inputProps }: { inputProps?: Record<string, unknown> }, ref: any) => {
     React.useImperativeHandle(ref, () => instance);
     return React.createElement('div', { 'data-testid': 'mock-remotion-player' },

@@ -9,9 +9,8 @@
  * RED phase: tests fail until BlastScene is enhanced.
  */
 
-import { GameBridge } from '@/lib/phaser/bridge/GameBridge';
+import { GameBridge, type BridgeEvents } from '@/lib/phaser/bridge/GameBridge';
 import { BlastScene } from '../BlastScene';
-import type { BridgeEvents } from '@/lib/phaser/bridge/GameBridge';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

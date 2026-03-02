@@ -297,9 +297,21 @@ jest.mock('@/hooks/useAdventureAchievements', () => ({
   }),
 }));
 
-jest.mock('../effects/AdventureEffectsLayer', () => () => <div data-testid="effects-layer" />);
-jest.mock('../LevelCompleteModal', () => () => null);
-jest.mock('../LevelEntryOverlay', () => () => null);
+jest.mock('../effects/AdventureEffectsLayer', () => {
+  const Mock = () => <div data-testid="effects-layer" />;
+  Mock.displayName = 'AdventureEffectsLayer';
+  return Mock;
+});
+jest.mock('../LevelCompleteModal', () => {
+  const Mock = () => null;
+  Mock.displayName = 'LevelCompleteModal';
+  return Mock;
+});
+jest.mock('../LevelEntryOverlay', () => {
+  const Mock = () => null;
+  Mock.displayName = 'LevelEntryOverlay';
+  return Mock;
+});
 jest.mock('../boss', () => ({
   BossOverlay: () => null,
   PlayerHealthBar: () => null,
