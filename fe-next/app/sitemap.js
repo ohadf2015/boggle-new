@@ -354,6 +354,48 @@ export default function sitemap() {
     });
   });
 
+  // About pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/about`,
+          he: `${baseUrl}/he/about`,
+          en: `${baseUrl}/en/about`,
+          sv: `${baseUrl}/sv/about`,
+          ja: `${baseUrl}/ja/about`,
+          es: `${baseUrl}/es/about`,
+        },
+      },
+    });
+  });
+
+  // Contact pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/contact`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/contact`,
+          he: `${baseUrl}/he/contact`,
+          en: `${baseUrl}/en/contact`,
+          sv: `${baseUrl}/sv/contact`,
+          ja: `${baseUrl}/ja/contact`,
+          es: `${baseUrl}/es/contact`,
+        },
+      },
+    });
+  });
+
   // Hebrew SEO landing page (high priority for Hebrew keyword searches)
   routes.push({
     url: `${baseUrl}/he/hebrew-multiplayer-word-game`,

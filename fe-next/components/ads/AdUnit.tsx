@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 /** Google AdSense publisher ID — matches GoogleAdSense.tsx head script */
-const AD_CLIENT = 'ca-pub-5765729012345678';
+const AD_CLIENT = 'ca-pub-1896836706464880';
 
 declare global {
   interface Window {

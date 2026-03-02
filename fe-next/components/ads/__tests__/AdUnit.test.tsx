@@ -46,7 +46,7 @@ describe('AdUnit', () => {
 
     const ins = container.querySelector('ins.adsbygoogle');
     expect(ins).toBeInTheDocument();
-    expect(ins).toHaveAttribute('data-ad-client', 'ca-pub-5765729012345678');
+    expect(ins).toHaveAttribute('data-ad-client', 'ca-pub-1896836706464880');
     expect(ins).toHaveAttribute('data-ad-slot', '1234567890');
     expect(ins).toHaveAttribute('data-ad-format', 'auto');
     expect(ins).toHaveAttribute('data-full-width-responsive', 'true');

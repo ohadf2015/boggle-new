@@ -749,13 +749,15 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <NativeOAuthInitializer />
                 {/* Server-rendered legal navigation — guarantees crawlers find
                     privacy/terms/about links even without JS execution (AdSense requirement) */}
-                <nav aria-label="Legal" className="sr-only">
+                <nav aria-label="Site Navigation" className="sr-only">
                     <ul>
+                        <li><a href={`/${validLocale}/blog`}>Blog</a></li>
+                        <li><a href={`/${validLocale}/faq`}>FAQ</a></li>
+                        <li><a href={`/${validLocale}/about`}>About LexiClash</a></li>
+                        <li><a href={`/${validLocale}/contact`}>Contact Us</a></li>
                         <li><a href={`/${validLocale}/legal/privacy`}>Privacy Policy</a></li>
                         <li><a href={`/${validLocale}/legal/terms`}>Terms of Service</a></li>
                         <li><a href={`/${validLocale}/legal/disclaimer`}>Disclaimer</a></li>
-                        <li><a href={`/${validLocale}/about`}>About LexiClash</a></li>
-                        <li><a href={`/${validLocale}/contact`}>Contact Us</a></li>
                     </ul>
                 </nav>
                 <ConditionalProviders lang={validLocale}>

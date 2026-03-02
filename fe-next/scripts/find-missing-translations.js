@@ -262,7 +262,9 @@ function extractTFunctionCallsWithTypeScript(filePath, content) {
       if (propName && indirectPropertyNames.has(propName)) {
         const init = node.initializer;
         if (ts.isStringLiteral(init) || ts.isNoSubstitutionTemplateLiteral(init)) {
-          if (init.text.includes('.')) pushKey(init.text, node);
+          // Only treat as translation key if it looks like one:
+          // alphanumeric + dots + underscores + hyphens (no spaces, no non-ASCII)
+          if (init.text.includes('.') && /^[a-zA-Z0-9._-]+$/.test(init.text)) pushKey(init.text, node);
         }
       }
     }
@@ -335,9 +337,9 @@ function extractTFunctionCalls(filePath) {
         if (key.includes(' ') || key.startsWith('#') || key.startsWith('/') || key.includes('(')) continue;
 
         // For indirect patterns (from object properties), only accept keys that look like translation keys
-        // (must contain a dot, indicating namespace.key pattern)
+        // (must contain a dot and only ASCII key characters — no non-Latin content)
         const isIndirectPattern = pattern.source.includes('nameKey|description|label');
-        if (isIndirectPattern && !key.includes('.')) continue;
+        if (isIndirectPattern && (!key.includes('.') || !/^[a-zA-Z0-9._-]+$/.test(key))) continue;
 
         calls.push({
           key,

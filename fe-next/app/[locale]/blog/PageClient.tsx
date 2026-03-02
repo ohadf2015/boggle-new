@@ -40,27 +40,27 @@ const blogPosts: BlogPost[] = [
   },
   {
     slug: 'science-behind-word-games',
-    image: '/images/blog/brain-health.jpg',
+    image: '/images/blog/science-brain.jpg',
     date: '2026-01-30',
   },
   {
     slug: 'daily-challenge-strategies',
-    image: '/images/blog/strategy-tactics.jpg',
+    image: '/images/blog/daily-strategies.jpg',
     date: '2026-01-30',
   },
   {
     slug: 'multilingual-word-learning',
-    image: '/images/blog/multilingual-learning.jpg',
+    image: '/images/blog/multilingual.jpg',
     date: '2026-01-30',
   },
   {
     slug: 'top-player-secrets',
-    image: '/images/blog/top-player-secrets.jpg',
+    image: '/images/blog/top-secrets.jpg',
     date: '2026-01-30',
   },
   {
     slug: 'improve-word-game-skills',
-    image: '/images/blog/strategy-tactics.jpg',
+    image: '/images/blog/improve-skills.jpg',
     date: '2026-01-30',
   },
 ];
