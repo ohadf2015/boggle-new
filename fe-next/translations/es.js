@@ -8,7 +8,7 @@ const es = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
+    "title": "LexiClash - Juego de Palabras Multijugador | Online",
     "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
     "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis",
     "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
@@ -2156,6 +2156,12 @@ const es = {
         "title": "Información Comercial",
         "companyLabel": "Nombre de la Empresa",
         "company": "LexiClash Ltd",
+        "founderLabel": "Fundador",
+        "founder": "Ohad Fisher",
+        "locationLabel": "Ubicación",
+        "location": "Israel",
+        "foundedLabel": "Fundado",
+        "founded": "2024",
         "emailLabel": "Correo Electrónico",
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",

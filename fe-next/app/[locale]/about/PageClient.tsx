@@ -13,7 +13,10 @@ export default function AboutPageClient(): React.ReactElement {
   const isDarkMode = theme === 'dark';
 
   return (
-    <LegalPageLayout title={t('legal.about.title')}>
+    <LegalPageLayout
+      title={t('legal.about.title')}
+      breadcrumbs={[{ label: t('legal.about.title') || 'About' }]}
+    >
       {/* Last Updated */}
       <p className="text-sm mb-6 text-gray-500">
         {t('legal.lastUpdated')}: {t('legal.lastUpdatedDate')}
@@ -253,6 +256,30 @@ export default function AboutPageClient(): React.ReactElement {
               </dt>
               <dd className={cn('text-lg font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
                 {t('legal.about.businessInfo.company')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
+                {t('legal.about.businessInfo.founderLabel') || 'Founder'}
+              </dt>
+              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
+                {t('legal.about.businessInfo.founder') || 'Ohad Fisher'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
+                {t('legal.about.businessInfo.locationLabel') || 'Location'}
+              </dt>
+              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
+                {t('legal.about.businessInfo.location') || 'Israel'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
+                {t('legal.about.businessInfo.foundedLabel') || 'Founded'}
+              </dt>
+              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
+                {t('legal.about.businessInfo.founded') || '2024'}
               </dd>
             </div>
             <div>

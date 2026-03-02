@@ -8,7 +8,7 @@ const en = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "LexiClash - Free Multiplayer Word Game Like Boggle & Wordle | Play Online",
+    "title": "LexiClash - Free Multiplayer Word Game | Play Online",
     "description": "Play the best free multiplayer word game online! LexiClash combines Boggle-style gameplay with real-time competition. Race friends to find words, build combos, and climb leaderboards. Perfect Wordle alternative for groups. No download - play instantly in 5 languages. Great for parties, team building, and family game nights!",
     "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
@@ -2302,6 +2302,12 @@ const en = {
         "title": "Business Information",
         "companyLabel": "Company Name",
         "company": "LexiClash Ltd",
+        "founderLabel": "Founder",
+        "founder": "Ohad Fisher",
+        "locationLabel": "Location",
+        "location": "Israel",
+        "foundedLabel": "Founded",
+        "founded": "2024",
         "emailLabel": "Email",
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",

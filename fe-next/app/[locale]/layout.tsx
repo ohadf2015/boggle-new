@@ -750,6 +750,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <ul>
                         <li><a href={`/${validLocale}/legal/privacy`}>Privacy Policy</a></li>
                         <li><a href={`/${validLocale}/legal/terms`}>Terms of Service</a></li>
+                        <li><a href={`/${validLocale}/legal/disclaimer`}>Disclaimer</a></li>
                         <li><a href={`/${validLocale}/about`}>About LexiClash</a></li>
                         <li><a href={`/${validLocale}/contact`}>Contact Us</a></li>
                     </ul>
@@ -765,7 +766,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         >
                             {children}
                         </main>
-                        <AutoHideFooter className="hidden sm:block relative z-0 flex-shrink-0" />
+                        <AutoHideFooter className="relative z-0 flex-shrink-0" />
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
                     </div>
