@@ -22,6 +22,7 @@ const MobileCompactLeaderboard = dynamic(() => import('@/components/results/Mobi
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
+import { AdPlaceholder } from '@/components/ads';
 
 // ==============================================
 // TYPES
@@ -347,12 +348,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         </div>
       )}
 
-      {/* CrazyGames Banner Ad */}
-      {showBanner && (
-        <div className="flex justify-center py-2">
-          <CrazyGamesBanner size={bannerSize} />
-        </div>
-      )}
+      {/* Ad: Post-game AdSense (primary) + CrazyGames (fallback) */}
+      <div className="flex flex-col items-center gap-2 py-2">
+        <AdPlaceholder zone="post-game" />
+        {showBanner && <CrazyGamesBanner size={bannerSize} />}
+      </div>
     </div>
   );
 };

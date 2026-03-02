@@ -1900,6 +1900,7 @@ const es = {
     }
   },
   "legal": {
+    "title": "Legal",
     "termsOfService": "Términos de Servicio",
     "privacyPolicy": "Política de Privacidad",
     "backToGame": "Volver al Juego",
@@ -3259,8 +3260,7 @@ const es = {
     "challengeCompleted": "Reto completado",
     "lockedYourAnswer": "Tu respuesta",
     "lockedCorrectAnswer": "Respuesta correcta",
-    "badge": "BETA",
-    "betaPreview": "✨ BETA",
+    "badge": "NUEVO",
     "breaking": "ÚLTIMA HORA",
     "tapToCelebrate": "Toca para celebrar",
     "challenges": "Retos",
@@ -6314,6 +6314,9 @@ const es = {
     "you": "Tú",
     "youLose": "¡Perdiste!",
     "youWin": "¡Ganaste!"
+  },
+  "ads": {
+    "label": "Anuncio"
   }
 };
 

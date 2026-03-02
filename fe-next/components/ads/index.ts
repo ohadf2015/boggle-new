@@ -5,4 +5,5 @@
  */
 
 export { AdPlaceholder } from './AdPlaceholder';
+export { AdUnit } from './AdUnit';
 export type { default as AdPlaceholderProps } from './AdPlaceholder';

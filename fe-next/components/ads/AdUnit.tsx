@@ -1,0 +1,85 @@
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+
+/** Google AdSense publisher ID — matches GoogleAdSense.tsx head script */
+const AD_CLIENT = 'ca-pub-5765729012345678';
+
+declare global {
+  interface Window {
+    adsbygoogle: Array<Record<string, unknown>>;
+  }
+}
+
+interface AdUnitProps {
+  /** AdSense ad slot ID (assigned after approval, use placeholder until then) */
+  adSlot: string;
+  /** Fixed width in pixels — omit for responsive */
+  width?: number;
+  /** Fixed height in pixels — omit for responsive */
+  height?: number;
+  /** Extra CSS class on the wrapper */
+  className?: string;
+}
+
+/**
+ * Returns true when the page is served from a dev/local origin
+ * where AdSense should NOT render (avoids console errors + policy issues).
+ */
+function isDevHost(): boolean {
+  if (typeof window === 'undefined') return true;
+  const h = window.location.hostname;
+  return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0';
+}
+
+/**
+ * Renders a real Google AdSense `<ins>` display ad.
+ *
+ * - Responsive (format=auto) by default; pass width+height for fixed sizes.
+ * - Skips rendering on localhost / SSR (matches GoogleAdSense.tsx pattern).
+ * - Calls `adsbygoogle.push({})` once after mount to activate the slot.
+ */
+export const AdUnit: React.FC<AdUnitProps> = ({ adSlot, width, height, className }) => {
+  const { t } = useLanguage();
+  const pushed = useRef(false);
+
+  useEffect(() => {
+    if (isDevHost() || pushed.current) return;
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      pushed.current = true;
+    } catch {
+      // AdSense not loaded yet — silent fail
+    }
+  }, []);
+
+  if (isDevHost()) return null;
+
+  const isFixed = width != null && height != null;
+
+  return (
+    <aside
+      className={cn('ad-unit flex justify-center', className)}
+      aria-label={t('ads.label')}
+      role="complementary"
+    >
+      <ins
+        className="adsbygoogle"
+        style={isFixed
+          ? { display: 'inline-block', width: `${width}px`, height: `${height}px` }
+          : { display: 'block' }
+        }
+        data-ad-client={AD_CLIENT}
+        data-ad-slot={adSlot}
+        {...(!isFixed && {
+          'data-ad-format': 'auto',
+          'data-full-width-responsive': 'true',
+        })}
+      />
+    </aside>
+  );
+};
+
+export default AdUnit;

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
+import { AdPlaceholder } from '@/components/ads';
 
 // Genuinely human content - each language has its own authentic voice
 type LocaleContent = {
@@ -451,6 +452,9 @@ export default function BenefitsPageClient(): React.ReactElement {
           </div>
         </header>
 
+        {/* Ad: After hero */}
+        <AdPlaceholder zone="content-page" className="my-6" />
+
         {/* Article Content */}
         <div className={cn(
           'prose prose-lg max-w-none',
@@ -479,6 +483,9 @@ export default function BenefitsPageClient(): React.ReactElement {
               ))}
             </div>
           ))}
+
+          {/* Ad: Before CTAs */}
+          <AdPlaceholder zone="content-page" className="my-6" />
 
           {/* Simple navigation - no marketing CTAs */}
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>

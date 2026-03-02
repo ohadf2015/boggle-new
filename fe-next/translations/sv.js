@@ -2386,6 +2386,7 @@ const sv = {
     "unlockProgress": "{current}/{required} spel för att låsa upp"
   },
   "legal": {
+    "title": "Juridiskt",
     "termsOfService": "Användarvillkor",
     "privacyPolicy": "Integritetspolicy",
     "backToGame": "Tillbaka till spelet",
@@ -3219,8 +3220,7 @@ const sv = {
     "tagline": "Dagens trender som ordpussel",
     "subtitle": "Vad buzzer idag?",
     "details": "Chill stämning, ingen timer. Bara du mot dagens buzz!",
-    "badge": "BETA",
-    "betaPreview": "✨ BETA",
+    "badge": "NYTT",
     "breaking": "JUST NU",
     "tapToCelebrate": "Tryck för att fira",
     "challenges": "Utmaningar",
@@ -6597,6 +6597,9 @@ const sv = {
   quests: {
     weeklyWordMastery: "Veckans Ordmästerskap",
     weeklyWordMasteryDesc: "Bemästra {target} ord den här veckan"
+  },
+  ads: {
+    label: "Annons"
   }
 };
 

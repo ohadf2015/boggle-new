@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
+import { AdPlaceholder } from '@/components/ads';
 
 interface FAQItem {
   question: string;
@@ -150,8 +151,10 @@ export default function FAQPageClient(): React.ReactElement {
         </div>
 
         {/* FAQ by Category */}
-        {categories.map((category) => (
+        {categories.map((category, catIdx) => (
           <div key={category} className="mb-8">
+            {/* Ad: Between category sections (after ~8 items) */}
+            {catIdx === 2 && <AdPlaceholder zone="content-page" className="mb-8" />}
             <h2 className={cn(
               'text-2xl font-bold mb-4',
               isDarkMode ? 'text-white' : 'text-neo-black'

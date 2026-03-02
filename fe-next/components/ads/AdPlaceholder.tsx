@@ -2,6 +2,7 @@
  * AdPlaceholder Component
  *
  * Marks safe zones where advertisements can be placed according to AdSense policies.
+ * In production, renders a real AdUnit. In development, shows a visual placeholder.
  *
  * CRITICAL AdSense Compliance Rules for Gaming Sites:
  * ✅ ALLOWED: Ads between game rounds, on content pages, in lobbies
@@ -17,75 +18,70 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
+import { AdUnit } from './AdUnit';
 
 type AdZoneType =
-  | 'lobby' // Game lobby before starting
-  | 'between-rounds' // Between game rounds
-  | 'content-page' // Static content pages (About, Contact, Legal, etc.)
-  | 'post-game' // After game completion
-  | 'menu'; // Main menu or settings
+  | 'lobby'
+  | 'between-rounds'
+  | 'content-page'
+  | 'post-game'
+  | 'menu';
+
+/** Default ad sizes per zone — override with size prop */
+const ZONE_SIZES: Record<AdZoneType, { width?: number; height?: number }> = {
+  'content-page': {},                    // responsive (auto)
+  'post-game':    { width: 300, height: 250 },
+  'lobby':        { width: 300, height: 250 },
+  'between-rounds': { width: 320, height: 100 },
+  'menu':         {},                    // responsive (auto)
+};
+
+const ZONE_LABELS: Record<AdZoneType, string> = {
+  'lobby': 'Safe Zone: Game Lobby',
+  'between-rounds': 'Safe Zone: Between Rounds',
+  'content-page': 'Safe Zone: Content Page',
+  'post-game': 'Safe Zone: Post-Game',
+  'menu': 'Safe Zone: Menu',
+};
 
 interface AdPlaceholderProps {
-  /**
-   * The type of safe zone where the ad will be placed.
-   * Each zone type has specific AdSense compliance considerations.
-   */
   zone: AdZoneType;
-
-  /**
-   * Optional CSS class name for custom styling
-   */
   className?: string;
-
-  /**
-   * Whether to show a visual placeholder (useful during development)
-   * @default false in production
-   */
+  /** Show dev placeholder instead of real ad. Defaults to true in dev. */
   showPlaceholder?: boolean;
 }
 
-/**
- * AdPlaceholder Component
- *
- * This component identifies safe zones for ad placement that comply with
- * Google AdSense policies for gaming websites.
- *
- * In production, this would integrate with Google AdSense.
- * For now, it serves as a placeholder to mark compliant ad zones.
- */
 export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
   zone,
   className,
   showPlaceholder = process.env.NODE_ENV === 'development',
 }) => {
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
-
-  // Zone-specific labels for development
-  const zoneLabels: Record<AdZoneType, string> = {
-    'lobby': 'Safe Zone: Game Lobby',
-    'between-rounds': 'Safe Zone: Between Rounds',
-    'content-page': 'Safe Zone: Content Page',
-    'post-game': 'Safe Zone: Post-Game',
-    'menu': 'Safe Zone: Menu',
-  };
-
-  // In production without placeholder, render nothing (ads would be injected here)
+  // Production / test: render real AdSense unit (no theme dependency)
   if (!showPlaceholder) {
+    const { width, height } = ZONE_SIZES[zone];
     return (
-      <div
-        data-ad-zone={zone}
-        data-adsense-placeholder="true"
-        className={cn('ad-zone', className)}
-        aria-label={`Advertisement zone: ${zone}`}
-      >
-        {/* AdSense ad code would go here in production */}
+      <div data-ad-zone={zone} className={cn('ad-zone', className)}>
+        <AdUnit
+          adSlot="PENDING_APPROVAL"
+          width={width}
+          height={height}
+        />
       </div>
     );
   }
 
-  // Development placeholder to visualize ad zones
+  // Development: visual placeholder (lazy-import theme to avoid hook in production)
+  return <DevPlaceholder zone={zone} className={className} />;
+};
+
+/** Dev-only placeholder that uses ThemeContext for styling */
+const DevPlaceholder: React.FC<{ zone: AdZoneType; className?: string }> = ({ zone, className }) => {
+  // useTheme is only called when showPlaceholder=true (dev mode)
+  // Lazy-require avoids the hook call in production/test paths
+  const { useTheme } = require('@/utils/ThemeContext');
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+
   return (
     <div
       data-ad-zone={zone}
@@ -102,7 +98,7 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
       aria-label={`Advertisement placeholder: ${zone}`}
     >
       <div className="text-xs font-black uppercase tracking-wider">
-        {zoneLabels[zone]}
+        {ZONE_LABELS[zone]}
       </div>
       <div className="text-[10px] opacity-70">
         AdSense Compliant Zone
@@ -125,10 +121,6 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
  * - active-game: During active gameplay (NEVER place ads here)
  * - game-board: On or near the active game board
  * - timer-active: While game timer is running
- *
- * References:
- * - AdSense Gaming Policies: https://support.google.com/adsense/answer/9335567
- * - Ad Placement Policies: https://support.google.com/adsense/answer/1346295
  */
 
 export default AdPlaceholder;

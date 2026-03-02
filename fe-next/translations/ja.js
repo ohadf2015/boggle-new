@@ -2387,6 +2387,7 @@ const ja = {
     "unlockProgress": "解放まであと{required}ゲーム中{current}"
   },
   "legal": {
+    "title": "法的情報",
     "termsOfService": "利用規約",
     "privacyPolicy": "プライバシーポリシー",
     "backToGame": "ゲームに戻る",
@@ -3272,8 +3273,7 @@ const ja = {
     "tagline": "今日のトレンドがワードパズルに",
     "subtitle": "今日のバズは？",
     "details": "まったり、タイマーなし。あなた対今日のバズ！",
-    "badge": "BETA",
-    "betaPreview": "✨ BETA",
+    "badge": "NEW",
     "breaking": "速報",
     "tapToCelebrate": "タップしてお祝い",
     "challenges": "チャレンジ",
@@ -6623,6 +6623,9 @@ const ja = {
   quests: {
     weeklyWordMastery: "週間単語習得",
     weeklyWordMasteryDesc: "今週{target}単語を習得する"
+  },
+  ads: {
+    label: "広告"
   }
 };
 

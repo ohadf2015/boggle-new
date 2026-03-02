@@ -2055,6 +2055,7 @@ const he = {
     }
   },
   "legal": {
+    "title": "משפטי",
     "termsOfService": "תנאי שימוש",
     "privacyPolicy": "מדיניות פרטיות",
     "backToGame": "חזרה למשחק",
@@ -3308,8 +3309,7 @@ const he = {
     "challengeCompleted": "האתגר הושלם",
     "lockedYourAnswer": "התשובה שלך",
     "lockedCorrectAnswer": "התשובה הנכונה",
-    "badge": "BETA",
-    "betaPreview": "גרסת ביתא ✨",
+    "badge": "חדש",
     "breaking": "חדשות חמות",
     "tapToCelebrate": "לחצו לחגוג",
     "challenges": "אתגרים",
@@ -6600,6 +6600,9 @@ const he = {
   quests: {
     weeklyWordMastery: "שליטה שבועית במילים",
     weeklyWordMasteryDesc: "שלוט ב-{target} מילים השבוע"
+  },
+  ads: {
+    label: "פרסומת"
   }
 };
 

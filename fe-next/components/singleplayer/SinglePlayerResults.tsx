@@ -46,6 +46,7 @@ import {
 import { CelebrationHero } from './results/components/CelebrationHero';
 import { ResultsInfoCards } from './results/components/ResultsInfoCards';
 import { TrainingAnalysisModal } from '@/components/training';
+import { AdPlaceholder } from '@/components/ads';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
@@ -371,6 +372,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Ad: Post-game */}
+      <div className="flex justify-center px-2 md:px-4 xl:px-6 pb-4">
+        <AdPlaceholder zone="post-game" />
       </div>
 
       {/* Mobile sticky bottom bar - compact single row */}

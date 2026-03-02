@@ -19,6 +19,7 @@ import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
+import { AdPlaceholder } from '@/components/ads';
 import ModeCard from './ModeCard';
 import ModeCardV2 from './ModeCardV2';
 import { LandingShareBanner } from './LandingShareBanner';
@@ -275,14 +276,14 @@ const LandingView: React.FC = () => {
                   : "text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl mb-1 sm:mb-1.5 lg:mb-2"
               )}
             >
-              {t('landing.welcomeTitle') || 'Ready to Play?'}
+              <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle') || 'Ready to Play?'}
             </h1>
             <p
               className={cn(
-                "font-medium text-neo-black/80 dark:text-neo-white/85 animate-fade-in-up",
+                "font-medium text-neo-black/80 dark:text-neo-white/90 animate-fade-in-up",
                 // Max-width for subtitle readability
                 "max-w-xl mx-auto",
-                isMobilePortrait ? "text-xs" : "text-sm sm:text-base lg:text-lg xl:text-xl"
+                isMobilePortrait ? "text-sm" : "text-sm sm:text-base lg:text-lg xl:text-xl"
               )}
               style={{ animationDelay: '0.1s' }}
             >
@@ -309,10 +310,10 @@ const LandingView: React.FC = () => {
             {/* Landscape-only: Show compact welcome text (mobile portrait shows hero section above) */}
             {isLandscape && (
               <div className="text-center mb-2 animate-fade-in-fast">
-                <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
-                  {t('landing.welcomeTitle') || 'Ready to Play?'}
-                </h2>
-                <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/85">
+                <p className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white" role="heading" aria-level={1}>
+                  <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle') || 'Ready to Play?'}
+                </p>
+                <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/90">
                   {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
                 </p>
               </div>
@@ -452,11 +453,8 @@ const LandingView: React.FC = () => {
                     {t('landing.adventureModeDesc') || '100 levels · 10 worlds'}
                   </span>
                 </div>
-                {/* Badge + sparkle */}
+                {/* Sparkle accent */}
                 <div className="flex-shrink-0 flex flex-col items-center gap-1.5">
-                  <span className="px-2 py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[9px] border border-neo-black rounded-neo shadow-hard-xs">
-                    BETA
-                  </span>
                   <Sparkles className="w-4 h-4 text-neo-black/40" aria-hidden="true" />
                 </div>
               </Link>
@@ -583,7 +581,6 @@ const LandingView: React.FC = () => {
                   href={`/${language}/adventure`}
                   mode="adventure"
                   variant="lime"
-                  badge="BETA"
                   className="w-full"
                 />
               </div>
@@ -617,6 +614,14 @@ const LandingView: React.FC = () => {
 
       {/* Scroll indicator + SEO Content — visually hidden in landscape but kept in DOM for crawlers */}
       {!isLandscape && <ScrollIndicator />}
+
+      {/* Ad: Desktop only, between mode cards and SEO content */}
+      {!isLandscape && !isMobilePortrait && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AdPlaceholder zone="menu" className="my-4" />
+        </div>
+      )}
+
       <LandingSEOSection className={isLandscape ? 'sr-only' : undefined} />
 
       {/* Tutorial FAB with Callout - Fixed bottom corner */}
