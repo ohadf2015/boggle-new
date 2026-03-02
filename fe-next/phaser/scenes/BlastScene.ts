@@ -80,11 +80,14 @@ export class BlastScene extends GameScene {
   private previousBlastCombo: number | null = null;
 
   // Cascade chain text overlay (cleaned up between phases)
-  private cascadeText: Phaser.GameObjects.Text | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private cascadeText: any = null;
   // Milestone text overlay
-  private milestoneText: Phaser.GameObjects.Text | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private milestoneText: any = null;
   // Background radial glow overlay for high combo
-  private radialGlow: Phaser.GameObjects.Graphics | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private radialGlow: any = null;
 
   // ─── Temporal juice state ──────────────────────────────────────────────────
   private isHitStopped = false;
@@ -92,6 +95,12 @@ export class BlastScene extends GameScene {
 
   // ─── Living background ─────────────────────────────────────────────────────
   private bgLayers: BackgroundLayers | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private backgroundGradient: any = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private ambientEmitter: any = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private vignetteOverlay: any = null;
 
   // Stored bound handlers for cleanup
   private readonly blastHandlers = {
@@ -668,8 +677,10 @@ export class BlastScene extends GameScene {
   }
 
   // Wave text references
-  private waveText: Phaser.GameObjects.Text | null = null;
-  private waveScoreText: Phaser.GameObjects.Text | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private waveText: any = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+  private waveScoreText: any = null;
 
   private cleanupWaveText(): void {
     if (this.waveText) {
