@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { InstagramIcon } from '@/components/icons/SocialIcons';
 
 // Kofi brand icon SVG component
 const KofiIcon = ({ className }: { className?: string }) => (
@@ -106,6 +107,19 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
+              href={`/${language}/legal/cookies`}
+              className="
+                min-h-[48px] px-3 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-lime
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.cookiePolicy')}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
               href={`/${language}/contact`}
               className="
                 min-h-[48px] px-3 flex items-center
@@ -138,6 +152,19 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
             </a>
           </nav>
+
+          {/* Social Links */}
+          <div className="flex items-center gap-3">
+            <a
+              href="https://www.instagram.com/lexi.clash"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-neo-cream/90 hover:text-neo-pink transition-colors duration-100"
+            >
+              <InstagramIcon className="text-xl" size="1.25em" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

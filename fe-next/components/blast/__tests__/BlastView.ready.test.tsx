@@ -18,6 +18,9 @@ jest.mock('@/components/ui/PlayfulBackground', () => ({
 jest.mock('../BlastGame', () => ({
   BlastGame: () => <div data-testid="blast-game" />,
 }));
+jest.mock('../BlastGamePhaser', () => ({
+  BlastGamePhaser: () => <div data-testid="blast-game" />,
+}));
 jest.mock('../BlastReadyScreen', () => ({
   BlastReadyScreen: ({ onStart }: { onStart: (d: string) => void }) => (
     <div data-testid="blast-ready-screen">

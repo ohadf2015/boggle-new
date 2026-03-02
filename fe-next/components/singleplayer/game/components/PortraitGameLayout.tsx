@@ -9,6 +9,9 @@ import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
+import { PhaserGame } from '@/components/phaser/PhaserGame';
+
+const USE_PHASER_GRID = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
@@ -420,21 +423,33 @@ export function PortraitGameLayout({
         </AdaptiveAnimatePresence>
 
         <div className="game-board-container relative w-full max-w-[360px] aspect-square">
-          <GridComponent
-            grid={grid}
-            interactive={!isPaused}
-            onWordSubmit={onWordSubmit}
-            onPathSubmit={onPathSubmit}
-            onWordChange={onWordChange}
-            hideWordPreview
-            hideComboIndicator={true}
-            comboLevel={comboLevel}
-            largeText
-            fireRoundActive={fireRoundActive}
-            earthquakeShaking={earthquakeState === 'shaking'}
-            highlightedPath={gridHighlightedPath}
-            language={language}
-          />
+          {USE_PHASER_GRID ? (
+            <div className="relative w-full h-full">
+              <PhaserGame
+                grid={grid}
+                comboLevel={comboLevel}
+                fireRoundActive={fireRoundActive}
+                onWordSubmit={onWordSubmit}
+                onWordChange={(word, count) => onWordChange(word, count)}
+              />
+            </div>
+          ) : (
+            <GridComponent
+              grid={grid}
+              interactive={!isPaused}
+              onWordSubmit={onWordSubmit}
+              onPathSubmit={onPathSubmit}
+              onWordChange={onWordChange}
+              hideWordPreview
+              hideComboIndicator={true}
+              comboLevel={comboLevel}
+              largeText
+              fireRoundActive={fireRoundActive}
+              earthquakeShaking={earthquakeState === 'shaking'}
+              highlightedPath={gridHighlightedPath}
+              language={language}
+            />
+          )}
         </div>
       </div>
 

@@ -6,6 +6,9 @@ import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent from '@/components/GridComponent';
+import { PhaserGame } from '@/components/phaser/PhaserGame';
+
+const USE_PHASER_GRID = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
 import CircularTimer from '@/components/CircularTimer';
 import RoomChat from '@/components/RoomChat';
 import WordFormingArea, { type WordFeedback } from '../../WordFormingArea';
@@ -395,26 +398,40 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Grid - no expansion on mobile to stay close to word forming area, centers on desktop */}
           <div className="flex-grow-0 md:flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0 gap-2">
-            <GridComponent
-              key={isPlaying ? 'playing-grid' : 'spectating-grid'}
-              grid={letterGrid}
-              interactive={isPlaying && !showStartAnimation}
-              animateOnMount={!hasAnimated}
-              onWordSubmit={onWordSubmit}
-              onWordChange={onWordChange}
-              comboLevel={comboLevel}
-              hideComboIndicator={true}
-              hideWordPreview={true}
-              fireRoundActive={fireRoundActive}
-              earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={
-                shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
-                  ? highlightedCells
-                  : []
-              }
-              onSingleTapDetected={onSingleTapDetected}
-              language={gameLanguage}
-            />
+            {USE_PHASER_GRID ? (
+              <div className="relative w-full aspect-square max-w-[min(100%,60vh)]">
+                <PhaserGame
+                  grid={letterGrid}
+                  comboLevel={comboLevel}
+                  fireRoundActive={fireRoundActive}
+                  earthquakeState={earthquakeState}
+                  wordFeedback={currentFeedback}
+                  onWordSubmit={onWordSubmit}
+                  onWordChange={onWordChange}
+                />
+              </div>
+            ) : (
+              <GridComponent
+                key={isPlaying ? 'playing-grid' : 'spectating-grid'}
+                grid={letterGrid}
+                interactive={isPlaying && !showStartAnimation}
+                animateOnMount={!hasAnimated}
+                onWordSubmit={onWordSubmit}
+                onWordChange={onWordChange}
+                comboLevel={comboLevel}
+                hideComboIndicator={true}
+                hideWordPreview={true}
+                fireRoundActive={fireRoundActive}
+                earthquakeShaking={earthquakeState === 'shaking'}
+                highlightedPath={
+                  shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed)
+                    ? highlightedCells
+                    : []
+                }
+                onSingleTapDetected={onSingleTapDetected}
+                language={gameLanguage}
+              />
+            )}
 
             {/* Desktop keyboard input hint - appears below grid */}
             {isPlaying && isDesktop && (

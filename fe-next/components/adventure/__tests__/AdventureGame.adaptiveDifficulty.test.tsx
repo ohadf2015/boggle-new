@@ -502,9 +502,9 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
       render(<AdventureGame {...defaultProps} />);
 
-      // When hintLevel is 'length', the hint text "Keep trying! Look for common patterns." is shown
+      // When hintLevel is 'length', the hint text uses the translation key
       // Multiple elements due to responsive design (mobile + desktop)
-      const hints = screen.getAllByText(/Keep trying/);
+      const hints = screen.getAllByText(/adventure\.game\.hintGeneral/);
       expect(hints.length).toBeGreaterThan(0);
     });
 
@@ -527,9 +527,9 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
       render(<AdventureGame {...defaultProps} />);
 
-      // When hintLevel is 'lengthAndStart', the hint text about starting letters is shown
+      // When hintLevel is 'lengthAndStart', the hint text uses the translation key
       // Multiple elements due to responsive design (mobile + desktop)
-      const hints = screen.getAllByText(/Look for words starting with specific letters/);
+      const hints = screen.getAllByText(/adventure\.game\.hintLengthAndStart/);
       expect(hints.length).toBeGreaterThan(0);
     });
 
@@ -554,9 +554,9 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
       render(<AdventureGame {...defaultProps} />);
 
-      // When hintLevel is 'fullReveal', the hint text about shorter words is shown
+      // When hintLevel is 'fullReveal', the hint text uses the translation key
       // Multiple elements due to responsive design (mobile + desktop)
-      const hints = screen.getAllByText(/Try looking for shorter words first/);
+      const hints = screen.getAllByText(/adventure\.game\.hintFullReveal/);
       expect(hints.length).toBeGreaterThan(0);
     });
   });

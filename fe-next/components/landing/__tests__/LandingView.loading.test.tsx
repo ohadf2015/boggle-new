@@ -163,6 +163,11 @@ jest.mock('../LandingShareBanner', () => ({
   ),
 }));
 
+jest.mock('../LandingSEOSection', () => ({
+  LandingSEOSection: () => <div data-testid="seo-section">SEO Content</div>,
+  ScrollIndicator: () => <div data-testid="scroll-indicator">Scroll</div>,
+}));
+
 jest.mock('@/components/auth/AuthModal', () => {
   return function MockAuthModal() {
     return <div data-testid="auth-modal">Auth Modal</div>;

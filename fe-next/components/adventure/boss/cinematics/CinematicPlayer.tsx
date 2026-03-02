@@ -27,7 +27,9 @@ import {
 } from '../../../../hooks/useCinematic';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { usePrefersReducedMotion } from '../../../../hooks/usePrefersReducedMotion';
+import { useDevicePerformance } from '../../../../hooks/useDevicePerformance';
 import { CinematicErrorBoundary } from './CinematicErrorBoundary';
+import { CinematicFallback, CinematicType } from './CinematicFallback';
 
 // ==============================================
 // TYPES
@@ -56,6 +58,8 @@ export interface CinematicPlayerProps {
   testId?: string;
   /** Enable debug mode with verbose logging (default: false) */
   debug?: boolean;
+  /** Type of cinematic (used for fallback rendering) */
+  cinematicType?: CinematicType;
 }
 
 // ==============================================
@@ -100,9 +104,11 @@ function CinematicPlayerInner({
   autoPlay = true,
   testId = 'cinematic-player',
   debug = false,
+  cinematicType = 'victory',
 }: CinematicPlayerProps) {
   const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { isMobile } = useDevicePerformance();
   const playerRef = useRef<PlayerRef>(null);
 
   // Debug logging - must be defined before use
@@ -132,6 +138,7 @@ function CinematicPlayerInner({
     progress,
     skip,
     handleFrameUpdate,
+    isStalled,
   } = useCinematic({
     durationFrames,
     fps,
@@ -242,6 +249,20 @@ function CinematicPlayerInner({
         height,
       };
 
+  // When stalled, swap Remotion for the CSS fallback
+  if (isStalled) {
+    return (
+      <div data-testid={testId}>
+        <CinematicFallback
+          cinematicType={cinematicType}
+          compositionProps={compositionProps}
+          durationSeconds={durationSeconds}
+          onComplete={onComplete}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={outerContainerClasses} data-testid={testId}>
       {/* Inner aspect-ratio constrained wrapper */}
@@ -298,7 +319,9 @@ function CinematicPlayerInner({
                   textAlign: 'center',
                 }}
               >
-                Cinematic failed to load. Press ESC or wait to skip.
+                {isMobile
+                  ? t('adventure.bosses.cinematics.errorTapToSkip')
+                  : t('adventure.bosses.cinematics.errorPressEscToSkip')}
               </div>
             );
           }}
@@ -335,7 +358,7 @@ function CinematicPlayerInner({
               {canSkip ? (
                 <span className="flex items-center gap-2">
                   {t('adventure.bosses.cinematics.skip')}
-                  <kbd className="px-2 py-1 bg-black/20 rounded text-sm">ESC</kbd>
+                  {!isMobile && <kbd className="px-2 py-1 bg-black/20 rounded text-sm">ESC</kbd>}
                 </span>
               ) : (
                 <SkipCountdown />

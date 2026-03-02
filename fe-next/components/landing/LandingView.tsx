@@ -22,6 +22,7 @@ import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
 import ModeCardV2 from './ModeCardV2';
 import { LandingShareBanner } from './LandingShareBanner';
+import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -211,8 +212,7 @@ const LandingView: React.FC = () => {
     <div
       className={cn(
         'flex-1 flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe',
-        isLandscape && 'landscape-full-height',
-        !isLandscape && !isMobilePortrait && 'h-full'
+        isLandscape && 'landscape-full-height'
       )}
       {...pullToRefreshHandlers}
     >
@@ -242,15 +242,17 @@ const LandingView: React.FC = () => {
 
       {/* Main content */}
       <section className={cn(
-        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col',
-        (isLandscape || isMobilePortrait) && 'justify-center px-2 sm:px-4 py-2',
-        // Desktop: justify-start so content flows top-down; justify-center would
-        // clip the mascot above the viewport when total height > viewport height
+        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex flex-col',
+        // Landscape: flex-1 + center to fill viewport (SEO hidden in landscape)
+        isLandscape && 'flex-1 justify-center px-2 sm:px-4 py-2',
+        // Mobile portrait: natural flow so SEO section scrolls into view below cards
+        isMobilePortrait && 'px-2 py-2',
+        // Desktop: natural flow with generous padding
         !isLandscape && !isMobilePortrait && 'justify-start px-2 sm:px-3 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8'
       )}>
         <>
-            {/* Hero section with mascot - hidden in landscape only, shown on mobile portrait and desktop */}
-            {!isLandscape && (
+            {/* Hero section with mascot - hidden in mobile landscape only, always shown on desktop */}
+            {(!isLandscape || isDesktopWidth) && (
           <motion.div
             className={cn(
               "text-center animate-fade-in-fast relative",
@@ -573,8 +575,8 @@ const LandingView: React.FC = () => {
                 />
               </motion.div>
 
-              {/* Adventure Mode card */}
-              <div className="col-span-1 sm:col-span-2 w-full">
+              {/* Adventure Mode card — constrained width on desktop to match card proportions */}
+              <div className="col-span-1 sm:col-span-2 w-full max-w-lg mx-auto">
                 <ModeCardV2
                   title={t('landing.adventureMode') || 'Adventure'}
                   description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
@@ -612,6 +614,14 @@ const LandingView: React.FC = () => {
         </div>
         </>
       </section>
+
+      {/* Scroll indicator + SEO Content — hidden in landscape for UX */}
+      {!isLandscape && (
+        <>
+          <ScrollIndicator />
+          <LandingSEOSection />
+        </>
+      )}
 
       {/* Tutorial FAB with Callout - Fixed bottom corner */}
       {/* Position accounts for GlobalBottomNav (64px h-16 + safe area) on mobile */}

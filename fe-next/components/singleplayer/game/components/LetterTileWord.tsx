@@ -89,6 +89,7 @@ export function LetterTileWord({
               'font-black text-xl uppercase',
               getTileStyle()
             )}
+            style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
           >
             {letter}
           </AdaptiveMotion.div>

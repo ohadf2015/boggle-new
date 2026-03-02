@@ -612,8 +612,8 @@ export default function LevelGrid({
             }}
           />
 
-          {/* World icon preview */}
-          <div className="absolute -top-4 -right-4 w-32 h-32 sm:w-40 sm:h-40 opacity-40 rotate-12">
+          {/* World icon preview — contained by parent overflow-hidden */}
+          <div className="absolute -top-4 -right-4 rtl:-right-auto rtl:-left-4 w-32 h-32 sm:w-40 sm:h-40 opacity-40 rotate-12">
             <Image
               src={worldImage}
               alt=""
@@ -636,7 +636,7 @@ export default function LevelGrid({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15 }}
-                className={cn('text-xl sm:text-2xl font-bold mt-1', worldColors.text)}
+                className={cn('text-xl sm:text-2xl font-bold mt-1 break-words', worldColors.text)}
               >
                 {worldName}
               </motion.p>
@@ -787,11 +787,11 @@ export default function LevelGrid({
                         .map((obj, i) => (
                           <div
                             key={i}
-                            className="text-xs text-neo-white/60 flex items-center gap-1.5"
+                            className="text-xs text-neo-white/60 flex items-center gap-1.5 min-w-0"
                           >
                             <Target className="w-3 h-3 flex-shrink-0" />
                             <span
-                              className="truncate"
+                              className="truncate min-w-0"
                               title={`${t(`adventure.objectives.${obj.type}`) || obj.type}: ${obj.target}`}
                             >
                               {t(`adventure.objectives.${obj.type}`) || obj.type}:{' '}
@@ -843,7 +843,7 @@ export default function LevelGrid({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-neo-yellow rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard"
+                      className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-8 h-8 bg-neo-yellow rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-10"
                     >
                       <span className="text-neo-black font-black text-sm">★</span>
                     </motion.div>

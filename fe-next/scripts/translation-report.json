@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3461,
+    "totalKeysInCode": 3517,
     "keyCountByLanguage": {
-      "en": 4965,
-      "he": 4981,
-      "sv": 4975,
-      "ja": 4990,
-      "es": 4654
+      "en": 5049,
+      "he": 5065,
+      "sv": 5059,
+      "ja": 5074,
+      "es": 4728
     },
-    "missingFromEnglish": 1,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -160,17 +160,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "common.email",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/profile/PageClient.tsx",
-          "line": 176
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "share.qrCode",
@@ -269,6 +259,7 @@
       "challengeAction"
     ],
     "es": [
+      "common.email",
       "achievements.duelWinner.name",
       "achievements.duelWinner.description",
       "achievements.practiceMaster.name",
@@ -299,7 +290,16 @@
       "adventure.bosses.cinematics.prepareForBattle",
       "adventure.bosses.cinematics.errorTitle",
       "adventure.bosses.cinematics.errorDescription",
+      "adventure.bosses.cinematics.errorTapToSkip",
+      "adventure.bosses.cinematics.errorPressEscToSkip",
       "adventure.bosses.cinematics.retry",
+      "adventure.bosses.cinematics.fallbackTitle.victory",
+      "adventure.bosses.cinematics.fallbackTitle.defeat",
+      "adventure.bosses.cinematics.fallbackTitle.bossEntrance",
+      "adventure.bosses.cinematics.fallbackTitle.bossDefeat",
+      "adventure.bosses.cinematics.fallbackTitle.worldUnlock",
+      "adventure.bosses.cinematics.fallbackStats.score",
+      "adventure.bosses.cinematics.fallbackStats.wordsFound",
       "adventure.bosses.abilities.popQuiz.name",
       "adventure.bosses.abilities.popQuiz.desc",
       "adventure.bosses.abilities.redPen.name",

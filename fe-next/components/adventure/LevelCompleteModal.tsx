@@ -277,7 +277,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               <div className="bg-neo-purple/20 backdrop-blur-sm border-3 border-neo-purple rounded-neo p-3">
                 <div className="text-neo-purple text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
                   <Zap className="w-3 h-3" />
-                  +XP
+                  +{t('common.xp')}
                 </div>
                 <RollingNumber 
                   value={Math.floor(score / 100)} 
@@ -293,7 +293,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               )}>
                 <div className="text-neo-yellow text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
                   <Coins className="w-3 h-3" />
-                  Gold
+                  {t('adventure.gold')}
                 </div>
                 <RollingNumber 
                   value={stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0} 

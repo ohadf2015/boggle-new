@@ -37,6 +37,7 @@ const customJestConfig = {
     '<rootDir>/shared/**/*.test.{ts,tsx}',
     '<rootDir>/stores/**/*.test.{ts,tsx}',
     '<rootDir>/__tests__/**/*.test.{ts,tsx}',
+    '<rootDir>/phaser/**/*.test.{ts,tsx}',
   ],
 
   // Ignore backend tests (they have their own config)
@@ -73,6 +74,9 @@ const customJestConfig = {
 
     // Capacitor plugins (mock for web testing)
     '^@capgo/capacitor-social-login$': '<rootDir>/__mocks__/@capgo/capacitor-social-login.ts',
+
+    // Phaser: browser-only game engine — stub all canvas/WebGL APIs in Jest
+    '^phaser$': '<rootDir>/__mocks__/phaser.ts',
 
     // Handle CSS imports (with CSS modules)
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',

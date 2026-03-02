@@ -72,6 +72,13 @@ const en = {
       "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
     }
   },
+  "cookieConsent": {
+    "title": "Cookie consent",
+    "message": "We use cookies for analytics and to serve relevant ads. You can accept or decline non-essential cookies.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "learnMore": "Learn more"
+  },
   "common": {
     "email": "Email",
     "loading": "Shuffling letters...",
@@ -121,6 +128,7 @@ const en = {
     "yesterday": "Yesterday",
     "processing": "Processing...",
     "coins": "coins",
+    "xp": "XP",
     "chat": "Chat",
     "connecting": "Connecting...",
     "signIn": "Sign In",
@@ -2025,7 +2033,8 @@ const en = {
       "intro": "Review our legal documents to understand your rights and how we protect your data when using LexiClash.",
       "aboutDescription": "Learn about our company, mission, and team",
       "termsDescription": "Rules and guidelines for using LexiClash",
-      "privacyDescription": "How we collect, use, and protect your data"
+      "privacyDescription": "How we collect, use, and protect your data",
+      "cookiesDescription": "How we use cookies and how to manage them"
     },
     "terms": {
       "title": "Terms of Service",
@@ -2185,6 +2194,63 @@ const en = {
         "parentContact": "Parent/guardian contact — parents or guardians may contact us at lexiclash.game@gmail.com to review, delete, or manage their child's information"
       }
     },
+    "cookies": {
+      "title": "Cookie Policy",
+      "intro": "This Cookie Policy explains how LexiClash uses cookies and similar technologies when you visit our website at lexiclash.live.",
+      "whatAreCookies": {
+        "title": "1. What Are Cookies",
+        "content": "Cookies are small text files stored on your device by your web browser when you visit a website. They help websites remember your preferences, keep you logged in, and understand how you use the site. Similar technologies include localStorage and sessionStorage."
+      },
+      "cookiesWeUse": {
+        "title": "2. Cookies We Use",
+        "intro": "We use the following categories of cookies:",
+        "essential": {
+          "title": "Essential Cookies",
+          "auth": "Authentication tokens (Supabase) — keep you logged in securely",
+          "prefs": "User preferences (localStorage) — remember your username and settings",
+          "theme": "Theme settings — remember your dark/light mode choice",
+          "language": "Language preference — remember your chosen language"
+        },
+        "analytics": {
+          "title": "Analytics Cookies",
+          "logrocket": "LogRocket — helps us understand how players use the game so we can improve the experience"
+        },
+        "advertising": {
+          "title": "Advertising Cookies",
+          "adsense": "Google AdSense — serves ads to help support the game. Under child-directed treatment (TFCD) mode, no personalized advertising cookies are set",
+          "tfcd": "Limited cookies may be used for ad frequency capping and aggregated ad reporting only — no cross-site tracking"
+        }
+      },
+      "thirdPartyCookies": {
+        "title": "3. Third-Party Cookies",
+        "intro": "Some cookies are placed by third-party services we use:",
+        "google": "Google AdSense — for serving non-personalized ads. Google may use cookies for frequency capping and reporting. See Google's Privacy Policy for details.",
+        "logrocket": "LogRocket — for session replay and analytics to help us improve the game experience."
+      },
+      "managingCookies": {
+        "title": "4. Managing Cookies",
+        "intro": "You have several options to control cookies:",
+        "browser": "Browser settings — most browsers let you block or delete cookies through their settings menu",
+        "banner": "Our consent banner — when you first visit, our cookie consent banner lets you accept or decline non-essential cookies",
+        "optOut": "Opt out of Google ad personalization",
+        "googlePrivacy": "Learn more about Google's data practices"
+      },
+      "consent": {
+        "title": "5. Cookie Consent",
+        "intro": "When you first visit LexiClash, we show a cookie consent banner. Here's how it works:",
+        "accept": "Accept — enables analytics and advertising cookies for the best experience",
+        "decline": "Decline — only essential cookies are used (authentication, preferences, language)",
+        "change": "You can change your preference at any time by clearing your browser's localStorage for lexiclash.live"
+      },
+      "changes": {
+        "title": "6. Changes to This Policy",
+        "content": "We may update this Cookie Policy from time to time. Changes will be posted on this page with an updated date. Continued use of LexiClash after changes constitutes acceptance of the updated policy."
+      },
+      "contactUs": {
+        "title": "7. Contact Us",
+        "content": "If you have questions about our use of cookies, please visit our"
+      }
+    },
     "about": {
       "title": "About LexiClash",
       "whoWeAre": {
@@ -2215,6 +2281,26 @@ const en = {
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",
         "instagram": "@lexi.clash"
+      },
+      "story": {
+        "title": "Our Story",
+        "content": "LexiClash started in 2024 as a passion project born from a simple idea: what if word games were as exciting as competitive esports? Founded in Israel, we set out to build a word game that combines the strategic depth of Scrabble with the speed of real-time competition. Today, thousands of players from over 30 countries compete daily in word battles across 5 languages."
+      },
+      "technology": {
+        "title": "Built for Speed",
+        "content": "LexiClash is built with cutting-edge web technology. Our real-time engine delivers sub-100ms response times for seamless multiplayer gameplay. The game runs entirely in the browser — no app downloads needed. We use WebSocket connections for instant word validation and live score updates, ensuring every player gets a fair and responsive experience."
+      },
+      "education": {
+        "title": "Education & Learning",
+        "content": "Beyond entertainment, LexiClash is a powerful vocabulary-building tool. Teachers use our Education Mode to create custom word lessons and track student progress. Research shows that competitive word games improve vocabulary retention by up to 40% compared to traditional flashcard methods. Our multilingual support makes LexiClash ideal for language learners practicing across Hebrew, English, Swedish, Japanese, and Spanish."
+      },
+      "community": {
+        "title": "Our Community",
+        "content": "The LexiClash community is diverse and growing. From casual family game nights to competitive tournaments, our players span all ages and skill levels. We host daily challenges where everyone plays the same puzzle, weekly leaderboard resets that keep competition fresh, and special events during holidays. Join thousands of word game enthusiasts who have made LexiClash their go-to game."
+      },
+      "values": {
+        "title": "What We Stand For",
+        "content": "We believe games should be accessible to everyone. LexiClash is free to play with no paywalls or pay-to-win mechanics. We prioritize accessibility with full screen reader support, keyboard navigation, and high-contrast design. We protect player privacy — especially for younger players — with child-safe advertising and transparent data practices."
       }
     }
   },
@@ -2602,7 +2688,8 @@ const en = {
     "interactiveTutorial": "Interactive Tutorial",
     "about": "About",
     "blog": "Blog",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "cookiePolicy": "Cookie Policy"
   },
   "support": {
     "kofiFooter": "Buy Us a Coffee",
@@ -2618,7 +2705,10 @@ const en = {
     "readTime": "5 min read",
     "research": "Research",
     "startPlaying": "Start Playing",
-    "tryDaily": "Try Daily Challenge"
+    "tryDaily": "Try Daily Challenge",
+    "scienceTitle": "The Science Behind Word Games",
+    "strategiesTitle": "Daily Challenge Strategies",
+    "improveTitle": "How to Get Better at Word Games"
   },
   "landing": {
     "playingNow": "Playing Now",
@@ -2653,7 +2743,26 @@ const en = {
     "shareButton": "Share",
     "shareTextAuth": "Join me on LexiClash! Use my referral code: {code}",
     "shareTextGuest": "Play LexiClash - the best multiplayer word game!",
-    "shareNativeTitle": "Join LexiClash"
+    "shareNativeTitle": "Join LexiClash",
+    "seo": {
+      "whatIsTitle": "What is LexiClash?",
+      "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.",
+      "featuresTitle": "Why Players Love LexiClash",
+      "feature1Title": "Real-Time Multiplayer",
+      "feature1Desc": "Compete head-to-head with 2-20 players simultaneously. Create a room, share the code, and play instantly.",
+      "feature2Title": "Daily Challenges",
+      "feature2Desc": "Same puzzle for everyone worldwide, every day. Track your streak and share emoji results — just like Wordle.",
+      "feature3Title": "Adventure Mode",
+      "feature3Desc": "100 levels across 10 themed worlds. Special tiles, boss battles, and power-ups keep every round fresh.",
+      "feature4Title": "5 Languages",
+      "feature4Desc": "Play in English, Hebrew, Swedish, Japanese, or Spanish. Switch anytime and challenge friends across languages.",
+      "howToPlayTitle": "How to Play",
+      "step1": "Create or join a game room",
+      "step2": "Swipe adjacent letters to form words",
+      "step3": "Build combos for bonus points",
+      "step4": "Score the most points to win!",
+      "blogTitle": "From Our Blog"
+    }
   },
   "modeDiscovery": {
     "title": "Want More?",
@@ -4308,6 +4417,7 @@ const en = {
     "continue": "Continue",
     "perfect": "Perfect!",
     "restart": "Restart",
+    "gold": "Gold",
     "score": "Score",
     "victory": "Victory!",
     "hint": {
@@ -4590,7 +4700,20 @@ const en = {
         "prepareForBattle": "Prepare for battle!",
         "errorTitle": "Video Error",
         "errorDescription": "Something went wrong while playing the cinematic. You can retry or skip to continue.",
-        "retry": "Retry"
+        "errorTapToSkip": "Tap Skip to continue",
+        "errorPressEscToSkip": "Cinematic failed to load. Press ESC or wait to skip.",
+        "retry": "Retry",
+        "fallbackTitle": {
+          "victory": "VICTORY!",
+          "defeat": "Time's Up!",
+          "bossEntrance": "Boss Approaches!",
+          "bossDefeat": "Boss Defeated!",
+          "worldUnlock": "World Unlocked!"
+        },
+        "fallbackStats": {
+          "score": "Score",
+          "wordsFound": "Words Found"
+        }
       },
       "abilities": {
         "popQuiz": {

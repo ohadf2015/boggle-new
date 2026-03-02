@@ -154,7 +154,7 @@ const WorldOrbitingLetters = ({
         <OrbitingLetter
           key={`${worldId}-${letter}-${i}`}
           letter={letter}
-          radius={65 + i * 14} // Larger radius to match bigger world nodes
+          radius={52 + i * 10} // Tighter radius to prevent overflow beyond world node
           duration={8 + i * 3} // Slower, more varied durations
           delay={i * 2.5} // More staggered delays
           clockwise={i % 2 === 0}
@@ -184,7 +184,7 @@ const TrailPath = ({
     : `M ${rightX} -5 C ${rightX} 25, ${leftX} 35, ${leftX} 65`;
 
   return (
-    <div className="relative h-20 sm:h-24 w-full -my-2 lg:max-w-4xl lg:mx-auto">
+    <div className="relative h-20 sm:h-24 w-full -my-2 lg:max-w-4xl lg:mx-auto overflow-hidden">
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 100 60"
@@ -275,7 +275,7 @@ const WorldNode = ({
   return (
     <motion.div
       className={cn(
-        'relative w-full px-4 sm:px-8 lg:px-12 overflow-hidden',
+        'relative w-full px-4 sm:px-8 lg:px-12',
         // Flex layout with justify for proper centering on desktop
         'flex items-center gap-3 sm:gap-6 lg:gap-8',
         isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
@@ -285,9 +285,9 @@ const WorldNode = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, type: 'spring', stiffness: 100, damping: 15 }}
     >
-      {/* World node container */}
-      <div className="flex-shrink-0">
-        {/* Container for world + orbiting letters */}
+      {/* World node container — min-w prevents squishing on small viewports */}
+      <div className="flex-shrink-0 min-w-[6rem] sm:min-w-[7rem]">
+        {/* Container for world + orbiting letters — overflow visible for glow/orbits */}
         <div className="relative">
           {/* Orbiting letters around unlocked worlds */}
           <WorldOrbitingLetters
@@ -313,9 +313,9 @@ const WorldNode = ({
               isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'
             )}
             style={{
-              // Triple-layer drop-shadow for stronger outer glow
+              // Double-layer drop-shadow for outer glow (constrained to avoid overflow)
               filter: isUnlocked
-                ? `drop-shadow(0 0 20px ${glowColor}) drop-shadow(0 0 40px ${glowColor}) drop-shadow(0 0 65px ${glowColor})`
+                ? `drop-shadow(0 0 16px ${glowColor}) drop-shadow(0 0 32px ${glowColor})`
                 : 'grayscale(1) brightness(0.5)',
             }}
           >
@@ -325,7 +325,7 @@ const WorldNode = ({
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   background: `radial-gradient(circle, ${glowColor} 0%, ${glowColor.replace(/[\d.]+\)$/, '0.25)')} 45%, transparent 72%)`,
-                  transform: 'scale(1.9)',
+                  transform: 'scale(1.5)',
                   filter: 'blur(14px)',
                   zIndex: 0,
                 }}
@@ -397,10 +397,10 @@ const WorldNode = ({
       {/* World Info Card - in flex flow next to world */}
       <motion.div
         className={cn(
-          'flex-shrink-0',
+          'flex-shrink min-w-0',
           'w-[140px] sm:w-[200px] lg:w-[220px]',
           'bg-neo-navy-light border-4 border-neo-black rounded-neo',
-          'p-3 sm:p-4 shadow-hard',
+          'p-3 sm:p-4 shadow-hard overflow-hidden',
           !isUnlocked && 'opacity-60'
         )}
         initial={{ opacity: 0, scale: 0.9 }}
@@ -408,39 +408,43 @@ const WorldNode = ({
         transition={{ delay: index * 0.08 + 0.1 }}
       >
         {/* World name - bolder with truncation for overflow */}
-        <h3 className={cn(
-          'font-black text-xs sm:text-sm md:text-base uppercase tracking-tight leading-tight truncate',
-          isUnlocked ? 'text-neo-white' : 'text-neo-white/50'
-        )}>
+        <h3
+          className={cn(
+            'font-black text-xs sm:text-sm md:text-base uppercase tracking-tight leading-tight',
+            'line-clamp-2',
+            isUnlocked ? 'text-neo-white' : 'text-neo-white/50'
+          )}
+          title={worldName}
+        >
           {worldName}
         </h3>
 
-        {/* Stars progress - larger icons and text */}
-        <div className="flex items-center gap-2 mt-2">
+        {/* Stars progress — compact row with no-wrap to prevent breaking */}
+        <div className="flex items-center gap-1.5 sm:gap-2 mt-2 whitespace-nowrap">
           <Star className={cn(
-            'w-4 h-4 sm:w-5 sm:h-5',
+            'w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0',
             currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/30'
           )} />
           <span className={cn(
-            'text-sm font-bold',
+            'text-xs sm:text-sm font-bold',
             isUnlocked ? 'text-neo-yellow' : 'text-neo-white/40'
           )}>
             {currentStars}/{totalWorldStars}
           </span>
           <span className={cn(
-            'text-sm',
+            'text-xs sm:text-sm',
             isUnlocked ? 'text-neo-white/60' : 'text-neo-white/30'
           )}>
             · {completedLevels}/{LEVELS_PER_WORLD}
           </span>
         </div>
 
-        {/* Unlock requirement - slightly larger */}
+        {/* Unlock requirement */}
         {!isUnlocked && (
-          <div className="flex items-center gap-1.5 mt-2.5 text-xs text-neo-white/50">
-            <Lock className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 mt-2.5 text-xs text-neo-white/50 whitespace-nowrap">
+            <Lock className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{unlockRequirement}</span>
-            <Star className="w-3.5 h-3.5 text-neo-yellow/50" />
+            <Star className="w-3.5 h-3.5 flex-shrink-0 text-neo-yellow/50" />
           </div>
         )}
       </motion.div>

@@ -16,7 +16,7 @@ import type {
 } from '@/types/adventure';
 import { WORLDS_COUNT, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { useCascadeLoop, type CascadePhase } from './useCascadeLoop';
-import { useSpecialTileActivation } from './useSpecialTileActivation';
+
 
 // ==============================================
 // TYPES
@@ -74,6 +74,8 @@ interface UseAdventureGameReturn {
   cascadePhase: CascadePhase;
   /** Add time to the countdown timer (for power-ups) */
   addTime: (seconds: number) => void;
+  /** Replace grid with new letters (earthquake fire-round) */
+  regenerateGrid: (grid: string[][]) => void;
 }
 
 // ==============================================
@@ -97,7 +99,8 @@ type GameAction =
   | { type: 'RESET_GAME'; payload: { initialState: GameState } }
   | { type: 'COMBO_TIMEOUT' }
   | { type: 'CASCADE_COMPLETE' }
-  | { type: 'CLEAR_ACTIVATION_EFFECTS' };
+  | { type: 'CLEAR_ACTIVATION_EFFECTS' }
+  | { type: 'REGENERATE_GRID'; payload: { grid: string[][] } };
 
 interface GameState {
   gameState: AdventureGameState;
@@ -236,18 +239,6 @@ function calculateStars(objectives: LevelObjective[]): 0 | 1 | 2 | 3 {
   return 1; // Only primary met
 }
 
-/**
- * Check if position is adjacent to another
- */
-function isAdjacent(
-  pos1: { row: number; col: number },
-  pos2: { row: number; col: number }
-): boolean {
-  const rowDiff = Math.abs(pos1.row - pos2.row);
-  const colDiff = Math.abs(pos1.col - pos2.col);
-  return rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0);
-}
-
 // ==============================================
 // REDUCER
 // ==============================================
@@ -283,9 +274,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'ADD_TIME': {
-      const newTime = Math.min(
-        state.timeRemaining + action.payload.seconds,
-        state.levelConfig.timerSeconds
+      const newTime = Math.max(
+        0,
+        Math.min(
+          state.timeRemaining + action.payload.seconds,
+          MAX_TIMER_SECONDS
+        )
       );
       return { ...state, timeRemaining: newTime };
     }
@@ -526,10 +520,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         // The ice and bomb clearing logic above already handles those cases.
       }
 
-      // Apply time bonus (capped at level's original timer duration)
+      // Apply time bonus (capped at MAX_TIMER_SECONDS, not initial duration)
       const newTimeRemaining = Math.min(
         state.timeRemaining + timeBonusSeconds,
-        state.levelConfig.timerSeconds
+        MAX_TIMER_SECONDS
       );
 
       // Update objectives
@@ -623,6 +617,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'COMBO_TIMEOUT':
+      // Don't reset combo after game is complete (avoids unnecessary state update)
+      if (state.gameState.isComplete) return state;
       return {
         ...state,
         gameState: {
@@ -649,6 +645,17 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         tiles: clearedTiles,
+        tilesVersion: state.tilesVersion + 1,
+      };
+    }
+
+    case 'REGENERATE_GRID': {
+      // Replace tiles with fresh standard tiles from new grid (earthquake fire-round)
+      // No special tiles — fire round grids are plain
+      const emptyConfig: LevelConfig = { ...state.levelConfig, specialTiles: [] };
+      return {
+        ...state,
+        tiles: initializeTiles(action.payload.grid, emptyConfig),
         tilesVersion: state.tilesVersion + 1,
       };
     }
@@ -716,14 +723,11 @@ export function useAdventureGame({
 
   // Cascade loop integration
   const cascade = useCascadeLoop({
-    onPhaseChange: (phase: CascadePhase) => {
+    onPhaseChange: (_phase: CascadePhase) => {
       // Cascade phase changes can be used by components for explosion timing
       // The explosion will be triggered at REMOVING phase in AdventureGame component
     },
   });
-
-  // Special tile activation integration
-  const specialTileActivation = useSpecialTileActivation();
 
   // Combo timeout ref
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -842,6 +846,10 @@ export function useAdventureGame({
     dispatch({ type: 'ADD_TIME', payload: { seconds } });
   }, []);
 
+  const regenerateGrid = useCallback((grid: string[][]) => {
+    dispatch({ type: 'REGENERATE_GRID', payload: { grid } });
+  }, []);
+
   return {
     gameState: state.gameState,
     tiles: state.tiles,
@@ -863,5 +871,6 @@ export function useAdventureGame({
     isCascading: cascade.state.isProcessing,
     cascadePhase: cascade.state.phase,
     addTime,
+    regenerateGrid,
   };
 }

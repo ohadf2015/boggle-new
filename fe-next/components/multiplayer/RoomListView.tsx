@@ -70,7 +70,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col max-w-5xl mx-auto"
+        className="flex-1 min-h-0 bg-neo-navy relative flex flex-col w-full max-w-lg lg:max-w-xl mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator
@@ -83,7 +83,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         <m.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between py-3 px-4 flex-shrink-0"
+          className="flex items-center justify-between py-3 px-4 lg:px-6 flex-shrink-0"
         >
           <Link
             href="/"
@@ -108,11 +108,8 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </m.header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 flex flex-col px-4 gap-8 overflow-y-auto pb-10">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-6">
+        <div className="flex-1 flex flex-col px-4 lg:px-6 gap-6 overflow-y-auto pb-10">
 
-          {/* Left Column: Quick Play CTA */}
-          <div className="lg:sticky lg:top-4 lg:self-start">
           {/* Quick Play CTA */}
           {onQuickPlay && (
             <m.section
@@ -124,7 +121,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <m.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
-                className="w-full py-6 lg:py-5 flex flex-col items-center justify-center gap-1 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className="w-full max-w-md py-6 flex flex-col items-center justify-center gap-1 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 animate={!isQuickPlayLoading ? { boxShadow: ['6px 6px 0px #000', '6px 6px 20px rgba(191,255,0,0.4), 6px 6px 0px #000', '6px 6px 0px #000'] } : {}}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
@@ -134,7 +131,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   ) : (
                     <Zap className="w-8 h-8 text-neo-black" />
                   )}
-                  <span className="text-neo-black font-black text-2xl lg:text-xl uppercase tracking-tight">
+                  <span className="text-neo-black font-black text-2xl uppercase tracking-tight">
                     {t('multiplayerFlow.roomList.quickPlay') || 'Quick Play'}
                   </span>
                 </div>
@@ -152,16 +149,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </button>
             </m.section>
           )}
-          </div>
 
-          {/* Right Column: Active Battles */}
-          <div className="grid gap-6">
           {/* Active Battles Section */}
           <m.section
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
-            className="flex flex-col gap-3 mb-4"
+            className="flex flex-col gap-3"
           >
             <div className="flex items-center justify-between">
               <h2 className="font-neo-display font-black uppercase text-xs tracking-widest text-white/50">
@@ -233,8 +227,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </div>
             )}
           </m.section>
-          </div>
-          </div>
         </div>
 
         {/* How to Play Dialog */}

@@ -72,6 +72,13 @@ const es = {
       "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
     }
   },
+  "cookieConsent": {
+    "title": "Consentimiento de cookies",
+    "message": "Usamos cookies para analisis y para mostrar anuncios relevantes. Puedes aceptar o rechazar las cookies no esenciales.",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "learnMore": "Más información"
+  },
   "common": {
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
@@ -118,6 +125,7 @@ const es = {
     "online": "en línea",
     "sending": "Enviando...",
     "coins": "monedas",
+    "xp": "XP",
     "chat": "Chat",
     "connecting": "Conectando...",
     "signIn": "Iniciar Sesión",
@@ -1879,7 +1887,8 @@ const es = {
       "intro": "Revisa nuestros documentos legales para entender tus derechos y cómo protegemos tus datos cuando usas LexiClash.",
       "aboutDescription": "Conoce nuestra empresa, misión y equipo",
       "termsDescription": "Reglas y directrices para usar LexiClash",
-      "privacyDescription": "Cómo recopilamos, usamos y protegemos tus datos"
+      "privacyDescription": "Cómo recopilamos, usamos y protegemos tus datos",
+      "cookiesDescription": "Cómo usamos cookies y cómo gestionarlas"
     },
     "terms": {
       "title": "Términos de Servicio",
@@ -2039,6 +2048,63 @@ const es = {
         "parentContact": "Contacto para padres/tutores — los padres o tutores pueden contactarnos en lexiclash.game@gmail.com para revisar, eliminar o gestionar la información de su hijo"
       }
     },
+    "cookies": {
+      "title": "Política de Cookies",
+      "intro": "Esta Política de Cookies explica cómo LexiClash utiliza cookies y tecnologías similares cuando visitas nuestro sitio web en lexiclash.live.",
+      "whatAreCookies": {
+        "title": "1. Qué son las cookies",
+        "content": "Las cookies son pequeños archivos de texto almacenados en tu dispositivo por tu navegador web cuando visitas un sitio web. Ayudan a los sitios web a recordar tus preferencias, mantener tu sesión iniciada y entender cómo usas el sitio. Tecnologías similares incluyen localStorage y sessionStorage."
+      },
+      "cookiesWeUse": {
+        "title": "2. Cookies que usamos",
+        "intro": "Usamos las siguientes categorías de cookies:",
+        "essential": {
+          "title": "Cookies esenciales",
+          "auth": "Tokens de autenticación (Supabase) — te mantienen conectado de forma segura",
+          "prefs": "Preferencias de usuario (localStorage) — recuerdan tu nombre de usuario y configuración",
+          "theme": "Configuración de tema — recuerda tu elección de modo oscuro/claro",
+          "language": "Preferencia de idioma — recuerda tu idioma elegido"
+        },
+        "analytics": {
+          "title": "Cookies de análisis",
+          "logrocket": "LogRocket — nos ayuda a entender cómo los jugadores usan el juego para mejorar la experiencia"
+        },
+        "advertising": {
+          "title": "Cookies publicitarias",
+          "adsense": "Google AdSense — muestra anuncios para apoyar el juego. En modo de contenido dirigido a niños (TFCD), no se establecen cookies publicitarias personalizadas",
+          "tfcd": "Se pueden usar cookies limitadas para limitar la frecuencia de anuncios e informes agregados — sin seguimiento entre sitios"
+        }
+      },
+      "thirdPartyCookies": {
+        "title": "3. Cookies de terceros",
+        "intro": "Algunas cookies son colocadas por servicios de terceros que usamos:",
+        "google": "Google AdSense — para mostrar anuncios no personalizados. Google puede usar cookies para limitar frecuencia e informes. Consulta la Política de Privacidad de Google para más detalles.",
+        "logrocket": "LogRocket — para reproducción de sesiones y análisis para ayudarnos a mejorar la experiencia del juego."
+      },
+      "managingCookies": {
+        "title": "4. Gestión de cookies",
+        "intro": "Tienes varias opciones para controlar las cookies:",
+        "browser": "Configuración del navegador — la mayoría de los navegadores te permiten bloquear o eliminar cookies a través de su menú de configuración",
+        "banner": "Nuestro banner de consentimiento — cuando visitas por primera vez, nuestro banner de consentimiento de cookies te permite aceptar o rechazar cookies no esenciales",
+        "optOut": "Desactivar la personalización de anuncios de Google",
+        "googlePrivacy": "Más información sobre las prácticas de datos de Google"
+      },
+      "consent": {
+        "title": "5. Consentimiento de cookies",
+        "intro": "Cuando visitas LexiClash por primera vez, mostramos un banner de consentimiento de cookies. Así funciona:",
+        "accept": "Aceptar — habilita cookies de análisis y publicidad para la mejor experiencia",
+        "decline": "Rechazar — solo se usan cookies esenciales (autenticación, preferencias, idioma)",
+        "change": "Puedes cambiar tu preferencia en cualquier momento borrando el localStorage de tu navegador para lexiclash.live"
+      },
+      "changes": {
+        "title": "6. Cambios en esta política",
+        "content": "Podemos actualizar esta Política de Cookies de vez en cuando. Los cambios se publicarán en esta página con una fecha actualizada. El uso continuado de LexiClash después de los cambios constituye la aceptación de la política actualizada."
+      },
+      "contactUs": {
+        "title": "7. Contáctanos",
+        "content": "Si tienes preguntas sobre nuestro uso de cookies, por favor visita nuestra"
+      }
+    },
     "about": {
       "title": "Acerca de LexiClash",
       "whoWeAre": {
@@ -2069,6 +2135,26 @@ const es = {
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",
         "instagram": "@lexi.clash"
+      },
+      "story": {
+        "title": "Nuestra historia",
+        "content": "LexiClash comenzo en 2024 como un proyecto de pasion nacido de una idea simple: y si los juegos de palabras fueran tan emocionantes como los esports competitivos? Fundado en Israel, nos propusimos crear un juego de palabras que combine la profundidad estrategica de Scrabble con la velocidad de la competicion en tiempo real. Hoy, miles de jugadores de mas de 30 paises compiten diariamente en batallas de palabras en 5 idiomas."
+      },
+      "technology": {
+        "title": "Construido para la velocidad",
+        "content": "LexiClash esta construido con tecnologia web de vanguardia. Nuestro motor en tiempo real ofrece tiempos de respuesta inferiores a 100ms para un juego multijugador fluido. El juego se ejecuta completamente en el navegador — sin necesidad de descargar aplicaciones."
+      },
+      "education": {
+        "title": "Educacion y aprendizaje",
+        "content": "Mas alla del entretenimiento, LexiClash es una poderosa herramienta de construccion de vocabulario. Los profesores usan nuestro Modo Educacion para crear lecciones de palabras personalizadas y seguir el progreso de los estudiantes."
+      },
+      "community": {
+        "title": "Nuestra comunidad",
+        "content": "La comunidad de LexiClash es diversa y esta creciendo. Desde noches de juegos familiares casuales hasta torneos competitivos, nuestros jugadores abarcan todas las edades y niveles de habilidad."
+      },
+      "values": {
+        "title": "Lo que defendemos",
+        "content": "Creemos que los juegos deben ser accesibles para todos. LexiClash es gratuito sin muros de pago. Priorizamos la accesibilidad con soporte completo de lector de pantalla, navegacion por teclado y diseno de alto contraste."
       }
     }
   },
@@ -2581,7 +2667,8 @@ const es = {
     "interactiveTutorial": "Tutorial Interactivo",
     "about": "Acerca de",
     "blog": "Blog",
-    "faq": "Preguntas frecuentes"
+    "faq": "Preguntas frecuentes",
+    "cookiePolicy": "Política de Cookies"
   },
   "support": {
     "kofiFooter": "Invítanos un Café",
@@ -2597,7 +2684,10 @@ const es = {
     "readTime": "5 min de lectura",
     "research": "Investigación",
     "startPlaying": "Empezar a Jugar",
-    "tryDaily": "Prueba el Desafío Diario"
+    "tryDaily": "Prueba el Desafío Diario",
+    "scienceTitle": "Qué pasa en tu cerebro cuando buscas palabras",
+    "strategiesTitle": "Estrategias para el desafío diario",
+    "improveTitle": "Cómo mejorar en los juegos de palabras"
   },
   "landing": {
     "playingNow": "Jugando Ahora",
@@ -2632,7 +2722,26 @@ const es = {
     "shareButton": "Compartir",
     "shareTextAuth": "¡Únete a LexiClash! Usa mi código de referido: {code}",
     "shareTextGuest": "¡Juega LexiClash - el mejor juego de palabras multijugador!",
-    "shareNativeTitle": "Únete a LexiClash"
+    "shareNativeTitle": "Únete a LexiClash",
+    "seo": {
+      "whatIsTitle": "Que es LexiClash?",
+      "whatIsContent": "LexiClash es un juego de palabras multijugador gratuito y rapido que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real en una cuadricula de letras compartida: encuentra palabras, construye combos y sube en la clasificacion. Es como Boggle y Wordle, pero multijugador. Sin descargas, sin registro. Disponible en ingles, hebreo, sueco, japones y espanol.",
+      "featuresTitle": "Por que a los jugadores les encanta LexiClash",
+      "feature1Title": "Multijugador en tiempo real",
+      "feature1Desc": "Compite contra 2-20 jugadores simultaneamente. Crea una sala, comparte el codigo y juega al instante.",
+      "feature2Title": "Desafios diarios",
+      "feature2Desc": "El mismo puzzle para todos en el mundo, cada dia. Sigue tu racha y comparte resultados con emojis — como Wordle.",
+      "feature3Title": "Modo aventura",
+      "feature3Desc": "100 niveles en 10 mundos tematicos. Fichas especiales, batallas contra jefes y potenciadores.",
+      "feature4Title": "5 idiomas",
+      "feature4Desc": "Juega en ingles, hebreo, sueco, japones o espanol. Cambia en cualquier momento y desafia a amigos en diferentes idiomas.",
+      "howToPlayTitle": "Como jugar",
+      "step1": "Crea o unete a una sala de juego",
+      "step2": "Desliza letras adyacentes para formar palabras",
+      "step3": "Construye combos para puntos extra",
+      "step4": "Consigue mas puntos para ganar!",
+      "blogTitle": "De nuestro blog"
+    }
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",
@@ -4310,6 +4419,7 @@ const es = {
     "continue": "Continuar",
     "perfect": "¡Perfecto!",
     "restart": "Reiniciar",
+    "gold": "Oro",
     "score": "Puntuación",
     "victory": "¡Victoria!",
     "world": "Mundo",

@@ -24,6 +24,9 @@ const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureMod
   loading: () => null,
 });
 
+// Lazy-load cookie consent banner — only needed on first visit
+const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
+
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -757,6 +760,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <PWAInstallPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />
+                    <CookieConsent />
                     {/* Toast notifications container */}
                     <ToastContainer position="bottom-right" />
                 </ConditionalProviders>

@@ -419,12 +419,15 @@ export const AdventureTile = memo(({
       )}
 
       {/* Letter */}
-      <span className={cn(
-        'relative z-10 select-none',
-        letterGlowClass,
-        'drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]',
-        (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
-      )}>
+      <span
+        className={cn(
+          'relative z-10 select-none',
+          letterGlowClass,
+          'drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]',
+          (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
+        )}
+        style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
+      >
         {tile.letter}
       </span>
 

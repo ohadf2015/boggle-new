@@ -162,8 +162,10 @@ describe('Time Tile Effects', () => {
       ]);
     });
 
-    // THEN - Should cap at original timer duration (120), not 123
-    expect(result.current.timeRemaining).toBeLessThanOrEqual(120);
+    // THEN - Timer can exceed timerSeconds now, capped at MAX_TIMER_SECONDS (180)
+    // 118 + 5 = 123, which is under 180
+    expect(result.current.timeRemaining).toBe(123);
+    expect(result.current.timeRemaining).toBeLessThanOrEqual(180);
   });
 
   it('should initialize time tile with bonusTime property', () => {

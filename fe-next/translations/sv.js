@@ -72,6 +72,13 @@ const sv = {
       "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
     }
   },
+  "cookieConsent": {
+    "title": "Cookiemedgivande",
+    "message": "Vi använder cookies för analys och för att visa relevanta annonser. Du kan acceptera eller avvisa icke-nödvändiga cookies.",
+    "accept": "Acceptera",
+    "decline": "Avvisa",
+    "learnMore": "Läs mer"
+  },
   "common": {
     "email": "E-post",
     "loading": "Blandar bokstäver...",
@@ -116,6 +123,7 @@ const sv = {
     "yesterday": "Igår",
     "processing": "Bearbetar...",
     "coins": "mynt",
+    "xp": "XP",
     "chat": "Chatt",
     "connecting": "Ansluter...",
     "signIn": "Logga in",
@@ -2365,7 +2373,8 @@ const sv = {
       "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
       "aboutDescription": "Lär dig mer om vårt företag, uppdrag och team",
       "termsDescription": "Regler och riktlinjer för användning av LexiClash",
-      "privacyDescription": "Hur vi samlar in, använder och skyddar dina data"
+      "privacyDescription": "Hur vi samlar in, använder och skyddar dina data",
+      "cookiesDescription": "Hur vi använder cookies och hur du hanterar dem"
     },
     "terms": {
       "title": "Användarvillkor",
@@ -2525,6 +2534,63 @@ const sv = {
         "parentContact": "Kontakt för föräldrar/vårdnadshavare — föräldrar eller vårdnadshavare kan kontakta oss på lexiclash.game@gmail.com för att granska, radera eller hantera sitt barns information"
       }
     },
+    "cookies": {
+      "title": "Cookiepolicy",
+      "intro": "Denna cookiepolicy förklarar hur LexiClash använder cookies och liknande teknologier när du besöker vår webbplats på lexiclash.live.",
+      "whatAreCookies": {
+        "title": "1. Vad är cookies",
+        "content": "Cookies är små textfiler som lagras på din enhet av din webbläsare när du besöker en webbplats. De hjälper webbplatser att komma ihåg dina inställningar, hålla dig inloggad och förstå hur du använder webbplatsen. Liknande teknologier inkluderar localStorage och sessionStorage."
+      },
+      "cookiesWeUse": {
+        "title": "2. Cookies vi använder",
+        "intro": "Vi använder följande kategorier av cookies:",
+        "essential": {
+          "title": "Nödvändiga cookies",
+          "auth": "Autentiseringstoken (Supabase) — håller dig inloggad säkert",
+          "prefs": "Användarinställningar (localStorage) — kommer ihåg ditt användarnamn och inställningar",
+          "theme": "Temainställningar — kommer ihåg ditt val av mörkt/ljust läge",
+          "language": "Språkpreferens — kommer ihåg ditt valda språk"
+        },
+        "analytics": {
+          "title": "Analyticscookies",
+          "logrocket": "LogRocket — hjälper oss förstå hur spelare använder spelet så vi kan förbättra upplevelsen"
+        },
+        "advertising": {
+          "title": "Annonscookies",
+          "adsense": "Google AdSense — visar annonser för att stödja spelet. Under barnriktat behandlingsläge (TFCD) sätts inga personaliserade annonscookies",
+          "tfcd": "Begränsade cookies kan användas för annonsfrekvenstak och aggregerad annonsrapportering — ingen spårning över webbplatser"
+        }
+      },
+      "thirdPartyCookies": {
+        "title": "3. Tredjepartscookies",
+        "intro": "Vissa cookies placeras av tredjepartstjänster vi använder:",
+        "google": "Google AdSense — för att visa icke-personaliserade annonser. Google kan använda cookies för frekvenstak och rapportering. Se Googles integritetspolicy för detaljer.",
+        "logrocket": "LogRocket — för sessionsinspelning och analys för att hjälpa oss förbättra spelupplevelsen."
+      },
+      "managingCookies": {
+        "title": "4. Hantera cookies",
+        "intro": "Du har flera alternativ för att kontrollera cookies:",
+        "browser": "Webbläsarinställningar — de flesta webbläsare låter dig blockera eller ta bort cookies via inställningsmenyn",
+        "banner": "Vår samtycksbanner — när du besöker oss första gången låter vår cookiesamtycksbanner dig acceptera eller avvisa icke-nödvändiga cookies",
+        "optOut": "Avaktivera Googles annonspersonalisering",
+        "googlePrivacy": "Läs mer om Googles datapraxis"
+      },
+      "consent": {
+        "title": "5. Cookiesamtycke",
+        "intro": "När du besöker LexiClash första gången visar vi en cookiesamtycksbanner. Så här fungerar det:",
+        "accept": "Acceptera — aktiverar analys- och annonscookies för bästa upplevelse",
+        "decline": "Avvisa — endast nödvändiga cookies används (autentisering, inställningar, språk)",
+        "change": "Du kan ändra ditt val när som helst genom att rensa din webbläsares localStorage för lexiclash.live"
+      },
+      "changes": {
+        "title": "6. Ändringar i denna policy",
+        "content": "Vi kan uppdatera denna cookiepolicy från tid till annan. Ändringar publiceras på denna sida med ett uppdaterat datum. Fortsatt användning av LexiClash efter ändringar innebär godkännande av den uppdaterade policyn."
+      },
+      "contactUs": {
+        "title": "7. Kontakta oss",
+        "content": "Om du har frågor om vår användning av cookies, besök vår"
+      }
+    },
     "about": {
       "title": "Om LexiClash",
       "whoWeAre": {
@@ -2555,6 +2621,26 @@ const sv = {
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",
         "instagram": "@lexi.clash"
+      },
+      "story": {
+        "title": "Var historia",
+        "content": "LexiClash startade 2024 som ett passionsprojekt fran en enkel ide: tankt om ordspel var lika spannande som konkurrensinriktad e-sport? Grundat i Israel satte vi ut att bygga ett ordspel som kombinerar Scrabbles strategiska djup med hastigheten av tavlingar i realtid. Idag tavlar tusentals spelare fran over 30 lander dagligen i ordstrider pa 5 sprak."
+      },
+      "technology": {
+        "title": "Byggt for hastighet",
+        "content": "LexiClash ar byggt med den senaste webbtekniken. Var realtidsmotor levererar svarstider under 100ms for somlost multiplayerspel. Spelet kors helt i webblasaren — inga appnedladdningar behövs."
+      },
+      "education": {
+        "title": "Utbildning och larande",
+        "content": "Bortom underhallning ar LexiClash ett kraftfullt verktyg for ordforraduppbyggnad. Larare anvander vart utbildningslage for att skapa anpassade ordlektioner och folja elevers framsteg. Forskning visar att kompetitiva ordspel forbattrar ordforradsinlarningen med upp till 40%."
+      },
+      "community": {
+        "title": "Var gemenskap",
+        "content": "LexiClash-gemenskapen ar mangfaldig och vaxande. Fran avslappnade familjespelavkvallar till tavlingsinriktade turneringar spanner vara spelare alla aldrar och fardighetsnivaer."
+      },
+      "values": {
+        "title": "Vad vi star for",
+        "content": "Vi tror att spel ska vara tillgangliga for alla. LexiClash ar gratis att spela utan betalvaggar. Vi prioriterar tillganglighet med fullt skarmlasar-stod, tangentbordsnavigering och hogkontrast-design."
       }
     }
   },
@@ -2598,7 +2684,8 @@ const sv = {
     "interactiveTutorial": "Interaktiv handledning",
     "about": "Om oss",
     "blog": "Blogg",
-    "faq": "Vanliga frågor"
+    "faq": "Vanliga frågor",
+    "cookiePolicy": "Cookiepolicy"
   },
   "support": {
     "kofiFooter": "Köp oss en kaffe",
@@ -2614,7 +2701,10 @@ const sv = {
     "readTime": "5 min läsning",
     "research": "Forskning",
     "startPlaying": "Börja spela",
-    "tryDaily": "Prova daglig utmaning"
+    "tryDaily": "Prova daglig utmaning",
+    "scienceTitle": "Vad som händer i hjärnan när du söker efter ord",
+    "strategiesTitle": "Strategier för dagliga utmaningen",
+    "improveTitle": "Hur du faktiskt blir bättre på ordspel"
   },
   "landing": {
     "playingNow": "Spelar Nu",
@@ -2649,7 +2739,26 @@ const sv = {
     "shareButton": "Dela",
     "shareTextAuth": "Gå med mig i LexiClash! Använd min referenskod: {code}",
     "shareTextGuest": "Spela LexiClash - det bästa multiplayer-ordspelet!",
-    "shareNativeTitle": "Gå med i LexiClash"
+    "shareNativeTitle": "Gå med i LexiClash",
+    "seo": {
+      "whatIsTitle": "Vad ar LexiClash?",
+      "whatIsContent": "LexiClash ar ett gratis, snabbt multiplayer-ordspel som du kan spela direkt i webblasaren. Tavla mot vanner i ordstrider i realtid pa ett delat bokstavsrutn - hitta ord, bygg kombos och klatter pa topplistorna. Det ar som Boggle mots Wordle, men multiplayer. Inga nedladdningar, ingen registrering kravs. Tillgangligt pa engelska, hebreiska, svenska, japanska och spanska.",
+      "featuresTitle": "Darfor alskar spelare LexiClash",
+      "feature1Title": "Multiplayer i realtid",
+      "feature1Desc": "Tavla mot 2-20 spelare samtidigt. Skapa ett rum, dela koden och borja spela direkt.",
+      "feature2Title": "Dagliga utmaningar",
+      "feature2Desc": "Samma pussel for alla varlden over, varje dag. Folj din streak och dela emoji-resultat — precis som Wordle.",
+      "feature3Title": "Aventyrslage",
+      "feature3Desc": "100 nivaer i 10 tematicerade varldar. Specialbrickor, bossstrider och power-ups haller varje omgang frask.",
+      "feature4Title": "5 sprak",
+      "feature4Desc": "Spela pa engelska, hebreiska, svenska, japanska eller spanska. Byt nar som helst och utmana vanner pa olika sprak.",
+      "howToPlayTitle": "Hur man spelar",
+      "step1": "Skapa eller ga med i ett spelrum",
+      "step2": "Svep over intilliggande bokstaver for att bilda ord",
+      "step3": "Bygg kombos for bonuspoang",
+      "step4": "Fa flest poang for att vinna!",
+      "blogTitle": "Fran var blogg"
+    }
   },
   "modeDiscovery": {
     "title": "Redo för mer?",
@@ -4340,6 +4449,7 @@ const sv = {
     "continue": "Fortsätt",
     "perfect": "Perfekt!",
     "restart": "Börja om",
+    "gold": "Guld",
     "score": "Poäng",
     "victory": "Seger!",
     "world": "Värld",
@@ -4616,7 +4726,20 @@ const sv = {
         "prepareForBattle": "Forebered dig for strid!",
         "errorTitle": "Videofel",
         "errorDescription": "Något gick fel vid uppspelning. Försök igen eller hoppa över.",
-        "retry": "Försök igen"
+        "errorTapToSkip": "Tryck på Hoppa för att fortsätta",
+        "errorPressEscToSkip": "Filmen kunde inte laddas. Tryck ESC eller vänta för att hoppa över.",
+        "retry": "Försök igen",
+        "fallbackTitle": {
+          "victory": "SEGER!",
+          "defeat": "Tiden är ute!",
+          "bossEntrance": "Bossen närmar sig!",
+          "bossDefeat": "Bossen besegrad!",
+          "worldUnlock": "Ny värld upplåst!"
+        },
+        "fallbackStats": {
+          "score": "Poäng",
+          "wordsFound": "Ord hittade"
+        }
       },
       "abilities": {
         "popQuiz": {

@@ -138,6 +138,17 @@ export default function LegalPageLayout({
               </li>
               <li>
                 <a
+                  href={`/${language}/legal/cookies`}
+                  className={cn(
+                    'hover:underline font-medium',
+                    isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {t('footer.cookiePolicy')}
+                </a>
+              </li>
+              <li>
+                <a
                   href={`/${language}/contact`}
                   className={cn(
                     'hover:underline font-medium',

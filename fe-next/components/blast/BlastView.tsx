@@ -7,6 +7,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { BlastGame } from './BlastGame';
+import { BlastGamePhaser } from './BlastGamePhaser';
 import { BlastResults } from './BlastResults';
 import { BlastWaveTransition } from './BlastWaveTransition';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
@@ -23,6 +24,9 @@ const BlastView: React.FC = () => {
   const { language } = useLanguage();
   const { unlockAudio } = useMusic();
   const setIsInGame = useHideNavigation();
+
+  // Feature flag: use Phaser canvas rendering (true) or React DOM rendering (false)
+  const usePhaser = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
 
   const [phase, setPhase] = useState<BlastPhase>('ready');
   const [difficulty, setDifficulty] = useState<BlastDifficulty>('medium');
@@ -136,16 +140,29 @@ const BlastView: React.FC = () => {
       )}
 
       {phase === 'playing' && (
-        <BlastGame
-          key={`game-${gameKeyRef.current}`}
-          config={config}
-          waveNumber={currentWave}
-          waveConfig={waveConfig}
-          cumulativeScore={totalScore}
-          onWaveComplete={handleWaveComplete}
-          onGameEnd={handleGameEnd}
-          onQuit={handleQuit}
-        />
+        usePhaser ? (
+          <BlastGamePhaser
+            key={`game-${gameKeyRef.current}`}
+            config={config}
+            waveNumber={currentWave}
+            waveConfig={waveConfig}
+            cumulativeScore={totalScore}
+            onWaveComplete={handleWaveComplete}
+            onGameEnd={handleGameEnd}
+            onQuit={handleQuit}
+          />
+        ) : (
+          <BlastGame
+            key={`game-${gameKeyRef.current}`}
+            config={config}
+            waveNumber={currentWave}
+            waveConfig={waveConfig}
+            cumulativeScore={totalScore}
+            onWaveComplete={handleWaveComplete}
+            onGameEnd={handleGameEnd}
+            onQuit={handleQuit}
+          />
+        )
       )}
 
       {phase === 'waveTransition' && (

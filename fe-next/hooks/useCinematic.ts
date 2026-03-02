@@ -29,6 +29,9 @@ export const DEFAULT_FPS = 30;
 /** Default cinematic duration (frames at 30fps) = 8 seconds */
 export const DEFAULT_DURATION_FRAMES = 240;
 
+/** Time (ms) to wait for first frameupdate before declaring stall */
+export const STALL_DETECTION_MS = 1000;
+
 // ==============================================
 // TYPES
 // ==============================================
@@ -46,6 +49,8 @@ export interface UseCinematicOptions {
   onFrameChange?: (frame: number) => void;
   /** Whether to auto-play on mount */
   autoPlay?: boolean;
+  /** Override stall detection timeout (ms). Defaults to STALL_DETECTION_MS. */
+  stallDetectionMs?: number;
 }
 
 export interface UseCinematicReturn {
@@ -61,6 +66,8 @@ export interface UseCinematicReturn {
   durationFrames: number;
   /** Whether cinematic has completed */
   isComplete: boolean;
+  /** Whether Remotion Player appears stalled (no frameupdate received) */
+  isStalled: boolean;
   /** Skip the cinematic */
   skip: () => void;
   /** Start playing */
@@ -112,6 +119,7 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
     onSkipAvailable,
     onFrameChange,
     autoPlay = true,
+    stallDetectionMs = STALL_DETECTION_MS,
   } = options;
 
   // ==============================================
@@ -122,6 +130,7 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
   const [canSkip, setCanSkip] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [isStalled, setIsStalled] = useState(false);
 
   // ==============================================
   // REFS
@@ -129,6 +138,12 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
 
   // Track skip timer for cleanup
   const skipTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Track stall detection timer
+  const stallTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Whether we've received at least one frame update
+  const hasReceivedFrameRef = useRef(false);
 
   // Prevent multiple completion callbacks
   const hasCompletedRef = useRef(false);
@@ -178,6 +193,32 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
   }, [isPlaying, canSkip, isComplete]);
 
   // ==============================================
+  // STALL DETECTION EFFECT
+  // ==============================================
+
+  /**
+   * Start a timer when playback begins. If no frameupdate event fires
+   * within STALL_DETECTION_MS, the Remotion Player is likely stalled
+   * (black screen on mobile). Clear the timer if a frame arrives.
+   */
+  useEffect(() => {
+    if (isPlaying && !isComplete && !hasReceivedFrameRef.current) {
+      stallTimerRef.current = setTimeout(() => {
+        if (!hasReceivedFrameRef.current) {
+          setIsStalled(true);
+        }
+      }, stallDetectionMs);
+    }
+
+    return () => {
+      if (stallTimerRef.current) {
+        clearTimeout(stallTimerRef.current);
+        stallTimerRef.current = null;
+      }
+    };
+  }, [isPlaying, isComplete, stallDetectionMs]);
+
+  // ==============================================
   // COMPLETION HANDLER
   // ==============================================
 
@@ -204,6 +245,15 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
    */
   const handleFrameUpdate = useCallback(
     (frame: number) => {
+      // Clear stall detection — Remotion is rendering frames
+      if (!hasReceivedFrameRef.current) {
+        hasReceivedFrameRef.current = true;
+        if (stallTimerRef.current) {
+          clearTimeout(stallTimerRef.current);
+          stallTimerRef.current = null;
+        }
+      }
+
       setCurrentFrame(frame);
       onFrameChangeRef.current?.(frame);
 
@@ -252,12 +302,18 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
     setCanSkip(false);
     setCurrentFrame(0);
     setIsComplete(false);
+    setIsStalled(false);
     hasCompletedRef.current = false;
+    hasReceivedFrameRef.current = false;
 
-    // Clear any pending skip timer
+    // Clear any pending timers
     if (skipTimerRef.current) {
       clearTimeout(skipTimerRef.current);
       skipTimerRef.current = null;
+    }
+    if (stallTimerRef.current) {
+      clearTimeout(stallTimerRef.current);
+      stallTimerRef.current = null;
     }
   }, []);
 
@@ -282,6 +338,9 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
       if (skipTimerRef.current) {
         clearTimeout(skipTimerRef.current);
       }
+      if (stallTimerRef.current) {
+        clearTimeout(stallTimerRef.current);
+      }
     };
   }, []);
 
@@ -296,6 +355,7 @@ export function useCinematic(options: UseCinematicOptions = {}): UseCinematicRet
     progress,
     durationFrames,
     isComplete,
+    isStalled,
     skip,
     play,
     pause,

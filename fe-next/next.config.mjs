@@ -52,6 +52,9 @@ const nextConfig = {
     'react-hot-toast',
     'remotion',
     '@remotion/player',
+    // Phaser: exclude from SSR bundle (browser-only, needs window/canvas)
+    // PhaserCanvas.tsx imports it only via dynamic({ ssr: false })
+    'phaser',
   ],
 
   // Compiler optimizations
@@ -242,9 +245,9 @@ const nextConfig = {
             // SDK script loading is controlled separately by NEXT_PUBLIC_CRAZYGAMES_ENABLED
             value: isCrazyGamesEnabled
               // Full CrazyGames mode: SDK script + iframe embedding
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com https://*.poki.com https://poki.com;"
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com https://*.poki.com https://poki.com;"
               // Iframe embedding allowed for game portals, but no SDK script
-              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com https://*.poki.com https://poki.com;",
+              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com https://*.poki.com https://poki.com;",
           },
         ],
       },
@@ -260,9 +263,16 @@ const nextConfig = {
   },
 
   // Webpack configuration - alias for swedish-words package
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // Alias the TypeScript index to the compiled JavaScript version
     config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
+
+    // Phaser must never be bundled server-side: it accesses window/canvas at module load time.
+    // PhaserCanvas.tsx uses dynamic({ ssr: false }) so the client bundle is unaffected.
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'phaser'];
+    }
+
     return config;
   },
 };

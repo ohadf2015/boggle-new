@@ -72,6 +72,13 @@ const ja = {
       "ogDescription": "リアルタイムマルチプレイヤーワードゲーム - ルームをホスト、友達を招待、ライブワードバトルで競争！"
     }
   },
+  "cookieConsent": {
+    "title": "Cookieの同意",
+    "message": "分析および関連広告の表示にCookieを使用しています。必須でないCookieを承認または拒否できます。",
+    "accept": "承認",
+    "decline": "拒否",
+    "learnMore": "詳細を見る"
+  },
   "common": {
     "email": "メール",
     "loading": "文字をシャッフル中...",
@@ -119,6 +126,7 @@ const ja = {
     "online": "オンライン",
     "sending": "送信中...",
     "coins": "コイン",
+    "xp": "XP",
     "chat": "チャット",
     "connecting": "接続中...",
     "signIn": "サインイン",
@@ -2366,7 +2374,8 @@ const ja = {
       "intro": "LexiClashをご利用いただく際の権利と、私たちがどのようにお客様のデータを保護するかを理解するため、法的文書をご確認ください。",
       "aboutDescription": "当社、ミッション、チームについて",
       "termsDescription": "LexiClashを使用するためのルールとガイドライン",
-      "privacyDescription": "データの収集、使用、保護方法"
+      "privacyDescription": "データの収集、使用、保護方法",
+      "cookiesDescription": "Cookieの使用方法と管理方法"
     },
     "terms": {
       "title": "利用規約",
@@ -2526,6 +2535,63 @@ const ja = {
         "parentContact": "保護者への連絡 — 保護者は lexiclash.game@gmail.com にご連絡いただき、お子様の情報の確認、削除、管理を行うことができます"
       }
     },
+    "cookies": {
+      "title": "Cookieポリシー",
+      "intro": "このCookieポリシーは、LexiClashがlexiclash.liveのウェブサイトを訪問した際に使用するCookieおよび類似技術について説明します。",
+      "whatAreCookies": {
+        "title": "1. Cookieとは",
+        "content": "Cookieは、ウェブサイトを訪問した際にウェブブラウザによってデバイスに保存される小さなテキストファイルです。ウェブサイトが設定を記憶し、ログイン状態を維持し、サイトの使用状況を理解するのに役立ちます。類似の技術にはlocalStorageやsessionStorageがあります。"
+      },
+      "cookiesWeUse": {
+        "title": "2. 使用するCookie",
+        "intro": "以下のカテゴリのCookieを使用しています：",
+        "essential": {
+          "title": "必須Cookie",
+          "auth": "認証トークン（Supabase）— 安全にログイン状態を維持します",
+          "prefs": "ユーザー設定（localStorage）— ユーザー名と設定を記憶します",
+          "theme": "テーマ設定 — ダーク/ライトモードの選択を記憶します",
+          "language": "言語設定 — 選択した言語を記憶します"
+        },
+        "analytics": {
+          "title": "分析Cookie",
+          "logrocket": "LogRocket — プレイヤーがゲームをどのように使用しているかを理解し、体験を向上させるのに役立ちます"
+        },
+        "advertising": {
+          "title": "広告Cookie",
+          "adsense": "Google AdSense — ゲームを支援するための広告を配信します。子供向けコンテンツ（TFCD）モードでは、パーソナライズされた広告Cookieは設定されません",
+          "tfcd": "広告頻度の制限と集計レポートのみに限定されたCookieが使用される場合があります — クロスサイトトラッキングはありません"
+        }
+      },
+      "thirdPartyCookies": {
+        "title": "3. サードパーティCookie",
+        "intro": "一部のCookieは、使用しているサードパーティサービスによって設置されます：",
+        "google": "Google AdSense — 非パーソナライズ広告の配信用。Googleは頻度制限とレポートのためにCookieを使用する場合があります。詳細はGoogleのプライバシーポリシーをご覧ください。",
+        "logrocket": "LogRocket — ゲーム体験の向上に役立つセッションリプレイと分析用。"
+      },
+      "managingCookies": {
+        "title": "4. Cookieの管理",
+        "intro": "Cookieを制御するためのいくつかのオプションがあります：",
+        "browser": "ブラウザ設定 — ほとんどのブラウザでは、設定メニューからCookieをブロックまたは削除できます",
+        "banner": "同意バナー — 初回訪問時に、Cookie同意バナーで必須でないCookieを承認または拒否できます",
+        "optOut": "Google広告のパーソナライズをオプトアウト",
+        "googlePrivacy": "Googleのデータ慣行の詳細"
+      },
+      "consent": {
+        "title": "5. Cookieの同意",
+        "intro": "LexiClashに初めて訪問すると、Cookie同意バナーが表示されます。仕組みは次のとおりです：",
+        "accept": "承認 — 最高の体験のために分析および広告Cookieを有効にします",
+        "decline": "拒否 — 必須Cookieのみ使用されます（認証、設定、言語）",
+        "change": "lexiclash.liveのブラウザのlocalStorageをクリアすることで、いつでも設定を変更できます"
+      },
+      "changes": {
+        "title": "6. ポリシーの変更",
+        "content": "このCookieポリシーは随時更新される場合があります。変更は更新日とともにこのページに掲載されます。変更後もLexiClashを継続して使用することは、更新されたポリシーへの同意を意味します。"
+      },
+      "contactUs": {
+        "title": "7. お問い合わせ",
+        "content": "Cookieの使用に関するご質問がある場合は、こちらをご覧ください"
+      }
+    },
     "about": {
       "title": "LexiClashについて",
       "whoWeAre": {
@@ -2556,6 +2622,26 @@ const ja = {
         "email": "lexiclash.game@gmail.com",
         "instagramLabel": "Instagram",
         "instagram": "@lexi.clash"
+      },
+      "story": {
+        "title": "私たちのストーリー",
+        "content": "LexiClashは2024年にシンプルなアイデアから生まれた情熱プロジェクトとして始まりました：ワードゲームがeスポーツのようにエキサイティングだったらどうだろう？イスラエルで設立され、Scrabbleの戦略的深さとリアルタイム競争のスピードを組み合わせたワードゲームを構築しました。現在、30カ国以上から何千人ものプレイヤーが5言語でワードバトルに参加しています。"
+      },
+      "technology": {
+        "title": "スピードのために構築",
+        "content": "LexiClashは最先端のウェブ技術で構築されています。リアルタイムエンジンは100ms未満の応答時間を提供し、シームレスなマルチプレイヤーゲームプレイを実現。ゲームは完全にブラウザで動作 — アプリのダウンロードは不要です。"
+      },
+      "education": {
+        "title": "教育と学習",
+        "content": "エンターテイメントを超えて、LexiClashは強力な語彙構築ツールです。教師は教育モードを使用してカスタムワードレッスンを作成し、生徒の進捗を追跡します。研究によると、競争的なワードゲームは従来のフラッシュカード法と比較して語彙の定着率を最大40%向上させます。"
+      },
+      "community": {
+        "title": "コミュニティ",
+        "content": "LexiClashコミュニティは多様で成長しています。カジュアルな家族のゲームナイトから競技トーナメントまで、あらゆる年齢とスキルレベルのプレイヤーが参加しています。"
+      },
+      "values": {
+        "title": "私たちの信念",
+        "content": "ゲームはすべての人にアクセス可能であるべきだと信じています。LexiClashはペイウォールなしの無料プレイです。スクリーンリーダーサポート、キーボードナビゲーション、高コントラストデザインでアクセシビリティを優先しています。"
       }
     }
   },
@@ -2599,7 +2685,8 @@ const ja = {
     "interactiveTutorial": "インタラクティブチュートリアル",
     "about": "概要",
     "blog": "ブログ",
-    "faq": "よくある質問"
+    "faq": "よくある質問",
+    "cookiePolicy": "Cookieポリシー"
   },
   "support": {
     "kofiFooter": "コーヒーをおごる",
@@ -2615,7 +2702,10 @@ const ja = {
     "readTime": "5分で読める",
     "research": "研究",
     "startPlaying": "プレイ開始",
-    "tryDaily": "デイリーチャレンジに挑戦"
+    "tryDaily": "デイリーチャレンジに挑戦",
+    "scienceTitle": "言葉を探す時、脳で何が起きているか",
+    "strategiesTitle": "デイリーチャレンジ戦略",
+    "improveTitle": "言葉ゲームで上達する方法"
   },
   "landing": {
     "playingNow": "プレイ中",
@@ -2650,7 +2740,26 @@ const ja = {
     "shareButton": "シェア",
     "shareTextAuth": "LexiClashで一緒に遊ぼう！私の招待コードを使ってね: {code}",
     "shareTextGuest": "LexiClashをプレイしよう - 最高のマルチプレイヤー単語ゲーム！",
-    "shareNativeTitle": "LexiClashに参加"
+    "shareNativeTitle": "LexiClashに参加",
+    "seo": {
+      "whatIsTitle": "LexiClashとは？",
+      "whatIsContent": "LexiClashは、ブラウザで直接プレイできる無料の高速マルチプレイヤーワードゲームです。共有された文字グリッド上でリアルタイムのワードバトルで友達と競い合いましょう。単語を見つけ、コンボを構築し、リーダーボードを上りましょう。BoggleとWordleが合体したようなマルチプレイヤーゲームです。ダウンロード不要、登録不要。英語、ヘブライ語、スウェーデン語、日本語、スペイン語で利用可能。",
+      "featuresTitle": "プレイヤーがLexiClashを愛する理由",
+      "feature1Title": "リアルタイムマルチプレイヤー",
+      "feature1Desc": "2〜20人のプレイヤーと同時に対戦。ルームを作成し、コードを共有して、すぐにプレイ開始。",
+      "feature2Title": "デイリーチャレンジ",
+      "feature2Desc": "毎日世界中で同じパズル。ストリークを追跡し、絵文字の結果を共有 — Wordleのように。",
+      "feature3Title": "アドベンチャーモード",
+      "feature3Desc": "10のテーマワールドに100のレベル。特殊タイル、ボスバトル、パワーアップで毎回新鮮。",
+      "feature4Title": "5言語対応",
+      "feature4Desc": "英語、ヘブライ語、スウェーデン語、日本語、スペイン語でプレイ。いつでも切り替えて、言語を超えて友達に挑戦。",
+      "howToPlayTitle": "遊び方",
+      "step1": "ゲームルームを作成または参加",
+      "step2": "隣接する文字をスワイプして単語を作成",
+      "step3": "コンボを構築してボーナスポイント獲得",
+      "step4": "最も多くのポイントを獲得して勝利！",
+      "blogTitle": "ブログから"
+    }
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",
@@ -4408,6 +4517,7 @@ const ja = {
     "continue": "続ける",
     "perfect": "パーフェクト！",
     "restart": "リスタート",
+    "gold": "ゴールド",
     "score": "スコア",
     "victory": "勝利！",
     "hint": {
@@ -4665,7 +4775,20 @@ const ja = {
         "prepareForBattle": "戦いの準備をせよ！",
         "errorTitle": "動画エラー",
         "errorDescription": "ムービーの再生中に問題が発生しました。再試行するかスキップしてください。",
-        "retry": "再試行"
+        "errorTapToSkip": "スキップをタップして続行",
+        "errorPressEscToSkip": "ムービーの読み込みに失敗しました。ESCキーまたは待機してスキップ。",
+        "retry": "再試行",
+        "fallbackTitle": {
+          "victory": "勝利！",
+          "defeat": "タイムアップ！",
+          "bossEntrance": "ボス登場！",
+          "bossDefeat": "ボス撃破！",
+          "worldUnlock": "新ワールド解放！"
+        },
+        "fallbackStats": {
+          "score": "スコア",
+          "wordsFound": "発見した単語"
+        }
       },
       "abilities": {
         "popQuiz": {

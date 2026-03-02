@@ -27,6 +27,7 @@ import { useAdventureCinematics } from './hooks/useAdventureCinematics';
 import { useAdventureEntryPhase } from './hooks/useAdventureEntryPhase';
 import { useAdventureBoss } from './hooks/useAdventureBoss';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
+import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { neoInfoToast } from '@/components/NeoToast';
 import { useComboMilestone } from '@/hooks/useComboMilestone';
@@ -51,8 +52,10 @@ import GameplayBackground from './themed/GameplayBackground';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
+import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
+import type { Language, DifficultyLevel } from '@/types';
 
 // ==============================================
 // TYPES
@@ -271,6 +274,7 @@ const AdventureGame = memo<AdventureGameProps>(
       isCascading,
       cascadePhase,
       addTime,
+      regenerateGrid,
     } = useAdventureGame({
       levelConfig: adjustedLevelConfig,
       initialGrid,
@@ -305,6 +309,29 @@ const AdventureGame = memo<AdventureGameProps>(
     const entryPhaseManager = useAdventureEntryPhase();
     const { entryPhase } = entryPhaseManager;
 
+    // Earthquake / fire-round integration
+    const {
+      earthquakeState,
+      fireRoundActive,
+      fireRoundRemaining,
+      getScoreMultiplier,
+    } = useEarthquakeFireRound({
+      enabled: isPlaying && entryPhase === 'playing' && !isPaused,
+      gameDurationSeconds: adjustedLevelConfig.timerSeconds,
+      currentTimeSeconds: timeRemaining,
+      language: (language || 'en') as Language,
+      difficulty: 'MEDIUM' as DifficultyLevel,
+      mode: 'singleplayer',
+      onGridRegenerate: (newGrid) => regenerateGrid(newGrid),
+      onEarthquakeStart: () => pauseGame(),
+      onEarthquakeShake: () => { /* shake phase — visual only via Phaser */ },
+      onFireRoundStart: () => startGame(),
+      onFireRoundEnd: () => { /* fire round ended, back to normal */ },
+      onTimerPause: () => pauseGame(),
+      onTimerResume: () => startGame(),
+      config: { minGameDurationSeconds: 45 },
+    });
+
     useEffect(() => {
       return () => {
         if (validationErrorTimeoutRef.current) clearTimeout(validationErrorTimeoutRef.current);
@@ -337,6 +364,10 @@ const AdventureGame = memo<AdventureGameProps>(
       disabled: !isPlaying || isPaused || isValidating,
       gridRef,
     });
+
+    // Phaser drag word preview — takes priority over React selection during Phaser drags
+    const [phaserCurrentWord, setPhaserCurrentWord] = useState<string>('');
+    const effectiveCurrentWord = phaserCurrentWord || currentWord;
 
     const adjustedInactivityThresholdMs = useMemo(() => {
       const baseThreshold = 15000;
@@ -465,10 +496,8 @@ const AdventureGame = memo<AdventureGameProps>(
         }
       },
       onTimerPenalty: (seconds: number) => {
-        // Timer penalty - reduce remaining time
-        // Note: addTime with negative value not yet implemented
-        // For now, log the penalty (will be implemented in Phase 4)
-        console.log(`[Boss Effect] Timer penalty: ${seconds}s`);
+        // Timer penalty - reduce remaining time by passing negative value
+        addTime(-seconds);
       },
       onScreenShake: (intensity?: number) => {
         effects.shake(intensity ?? 4);
@@ -481,7 +510,7 @@ const AdventureGame = memo<AdventureGameProps>(
         // Board scramble handled by game state
         console.log('[Boss Effect] Scramble triggered');
       },
-    }), [isBossLevel, takePlayerDamage, effects]);
+    }), [isBossLevel, takePlayerDamage, effects, addTime]);
 
     const lastReportedStateRef = useRef<LastReportedTimerState | null>(null);
 
@@ -842,8 +871,13 @@ const AdventureGame = memo<AdventureGameProps>(
     );
 
     const handleWordSubmit = useCallback(
-      async (_word: string, _indices: number[]) => {
-        if (!isPlaying || isPaused || currentWord.length < minWordLength || isValidating || isCascading) return;
+      async (submittedWord: string, submittedIndices: number[]) => {
+        // Use explicitly passed word/indices (from Phaser or React grid),
+        // falling back to React selection state for backward compatibility
+        const word = submittedWord || currentWord;
+        const indices = submittedIndices.length > 0 ? submittedIndices : selectedIndices;
+
+        if (!isPlaying || isPaused || word.length < minWordLength || isValidating || isCascading) return;
 
         if (validationErrorTimeoutRef.current) {
           clearTimeout(validationErrorTimeoutRef.current);
@@ -856,21 +890,25 @@ const AdventureGame = memo<AdventureGameProps>(
 
         setValidationFeedback(prev => ({ ...prev, error: null }));
 
-        const path = getPath();
-        const result = await validateWord(currentWord, path);
+        // Convert flat indices to row/col path using gridSize
+        const path = indices.map(i => ({
+          row: Math.floor(i / levelConfig.gridSize),
+          col: i % levelConfig.gridSize,
+        }));
+        const result = await validateWord(word, path);
 
         if (result.isValid && result.score) {
           const startPos = getPopupStartPosition();
-          let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus);
+          let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus * getScoreMultiplier());
 
           let bossBonus: string | undefined;
           if (isBossActive && bossConfig) {
-            const mechResult = checkBossWord(currentWord);
+            const mechResult = checkBossWord(word);
             scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
 
             let baseDamage = Math.floor(scoreValue / 10);
             baseDamage = Math.floor(baseDamage * skillEffects.bossDamageMultiplier);
-            baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(currentWord.length));
+            baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(word.length));
 
             const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
             const damageDealt = dealBossDamage(baseDamage, gameState.comboCount, mechanicMultiplier, skillEffects.comboMultiplierBonus);
@@ -893,16 +931,16 @@ const AdventureGame = memo<AdventureGameProps>(
             value: scoreValue,
             x: startPos.x,
             y: startPos.y,
-            word: currentWord,
+            word,
             bonus: bossBonus || comboBonus,
           });
 
           setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
-          setLastAccepted({ word: currentWord, score: scoreValue });
-          setWordFeedback({ id: `${Date.now()}`, type: 'accepted', word: currentWord, score: scoreValue, timestamp: Date.now() });
-          lastSubmittedWordRef.current = { word: currentWord, path };
+          setLastAccepted({ word, score: scoreValue });
+          setWordFeedback({ id: `${Date.now()}`, type: 'accepted', word, score: scoreValue, timestamp: Date.now() });
+          lastSubmittedWordRef.current = { word, path };
 
-          submitWordWithPath(currentWord, scoreValue, path);
+          submitWordWithPath(word, scoreValue, path);
           clearSelection();
           clearCurrentHint();
           recordActivity();
@@ -912,10 +950,10 @@ const AdventureGame = memo<AdventureGameProps>(
           if (gameState.wordsFound.length === 0) {
             handleEarnAchievement('FIRST_WORD');
           }
-          if (currentWord.length >= 6) {
+          if (word.length >= 6) {
             handleEarnAchievement('LONG_WORD_6');
           }
-          if (currentWord.length >= 8) {
+          if (word.length >= 8) {
             handleEarnAchievement('LONG_WORD_8');
           }
           if (gameState.comboCount >= 5) {
@@ -933,7 +971,7 @@ const AdventureGame = memo<AdventureGameProps>(
         } else if (result.errorKey) {
           const errorMessage = t(result.errorKey) || result.errorKey;
           setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
-          setWordFeedback({ id: `${Date.now()}`, type: 'rejected', word: currentWord, message: errorMessage, timestamp: Date.now() });
+          setWordFeedback({ id: `${Date.now()}`, type: 'rejected', word, message: errorMessage, timestamp: Date.now() });
           clearSelection();
 
           recordAIWord(false, 0);
@@ -952,7 +990,7 @@ const AdventureGame = memo<AdventureGameProps>(
           }, 2000);
         }
       },
-      [isPlaying, isPaused, isValidating, isCascading, currentWord, getPath, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, prevComboCountRef, handleAITransition, effects]
+      [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, levelConfig.gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, gameState.comboCount, gameState.wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, prevComboCountRef, handleAITransition, effects, getScoreMultiplier]
     );
 
     const handleLevelUpClose = useCallback(() => {
@@ -972,11 +1010,14 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleRetry = useCallback(() => {
       setShowLevelComplete(false);
       setHasAwardedLevelRewards(false);
+      completionProcessedRef.current = false;
       clearSelection();
       resetGame();
+      resetBossHealth();
       resetPlayerHealth();
+      cinematics.resetCinematics();
       startGame();
-    }, [resetGame, startGame, clearSelection, resetPlayerHealth]);
+    }, [resetGame, startGame, clearSelection, resetPlayerHealth, resetBossHealth, cinematics]);
 
     const handleExit = onExit;
 
@@ -1087,8 +1128,12 @@ const AdventureGame = memo<AdventureGameProps>(
               selectedLength={selectedIndices.length}
               minWordLength={minWordLength}
               wordFeedback={wordFeedback}
-              currentWord={currentWord}
+              currentWord={effectiveCurrentWord}
+              comboCount={gameState.comboCount}
+              earthquakeState={earthquakeState}
+              fireRoundActive={fireRoundActive}
               hintLevel={hintData.level}
+              onPhaserWordChange={setPhaserCurrentWord}
             />
           }
           sidebar={
@@ -1106,6 +1151,15 @@ const AdventureGame = memo<AdventureGameProps>(
           }
           overlays={
             <>
+              {/* Earthquake Warning Overlay */}
+              <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
+
+              {/* Fire Round Indicator */}
+              <FireRoundIndicator
+                isActive={fireRoundActive}
+                remainingSeconds={fireRoundRemaining}
+              />
+
               {/* Boss Battle Overlay */}
               <BossOverlay
                 boss={bossConfig}
@@ -1163,6 +1217,7 @@ const AdventureGame = memo<AdventureGameProps>(
                   }}
                   durationSeconds={VICTORY_DURATION_FRAMES / 30}
                   onComplete={handleCinematicComplete}
+                  cinematicType="victory"
                 />
               )}
 
@@ -1179,6 +1234,7 @@ const AdventureGame = memo<AdventureGameProps>(
                   }}
                   durationSeconds={DEFEAT_DURATION_FRAMES / 30}
                   onComplete={handleCinematicComplete}
+                  cinematicType="defeat"
                 />
               )}
 

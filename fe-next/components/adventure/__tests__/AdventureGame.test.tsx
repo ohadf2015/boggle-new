@@ -69,14 +69,18 @@ const mockTranslations: Record<string, string> = {
   'common.validating': 'Checking...',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+jest.mock('@/contexts/LanguageContext', () => {
+  const langValue = {
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),
-  }),
-}));
+  };
+  return {
+    useLanguage: () => langValue,
+    useLanguageSafe: () => langValue,
+  };
+});
 
 // Mock useAdventureWordValidation hook
 const mockValidateWord = jest.fn().mockResolvedValue({
@@ -316,6 +320,27 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
     playGameEndSound: jest.fn(),
     playSoloGameSound: jest.fn(),
   }),
+}));
+
+// Mock earthquake/fire-round hook (wired in AdventureGame for earthquake integration)
+jest.mock('@/hooks/useEarthquakeFireRound', () => ({
+  useEarthquakeFireRound: () => ({
+    earthquakeState: 'idle' as const,
+    fireRoundActive: false,
+    fireRoundRemaining: 0,
+    getScoreMultiplier: jest.fn(() => 1),
+    forceEarthquake: jest.fn(),
+  }),
+}));
+
+// Mock earthquake UI components (imported by AdventureGame for overlays)
+jest.mock('@/components/earthquake', () => ({
+  EarthquakeWarning: ({ isVisible }: { isVisible: boolean }) =>
+    isVisible ? <div data-testid="earthquake-warning" /> : null,
+  FireRoundIndicator: ({ isActive }: { isActive: boolean }) =>
+    isActive ? <div data-testid="fire-round-indicator" /> : null,
+  EffectsPreferencePrompt: () => null,
+  ComicDustReveal: () => null,
 }));
 
 // ==============================================

@@ -63,18 +63,18 @@ describe('useAdventureGame - addTime', () => {
     // Verify timer decreased
     expect(result.current.timeRemaining).toBe(55);
 
-    // Add 10 seconds (should go from 55 to 60, capped at max)
+    // Add 10 seconds (should go from 55 to 65, no longer capped at timerSeconds)
     act(() => {
       result.current.addTime(10);
     });
 
-    // Should be capped at 60 (max)
-    expect(result.current.timeRemaining).toBe(60);
+    // Timer can exceed initial timerSeconds, capped at MAX_TIMER_SECONDS (180)
+    expect(result.current.timeRemaining).toBe(65);
 
     jest.useRealTimers();
   });
 
-  it('should cap addTime at totalTime (cannot exceed original timer)', () => {
+  it('should cap addTime at MAX_TIMER_SECONDS (180), not timerSeconds', () => {
     const { result } = renderHook(() =>
       useAdventureGame({
         levelConfig: { ...mockLevelConfig, timerSeconds: 60 },
@@ -86,12 +86,12 @@ describe('useAdventureGame - addTime', () => {
     const initialTime = result.current.timeRemaining;
     expect(initialTime).toBe(60);
 
-    // Try to add 20 seconds (should cap at 60)
+    // Add 20 seconds — can now exceed timerSeconds
     act(() => {
       result.current.addTime(20);
     });
 
-    expect(result.current.timeRemaining).toBe(60); // Capped at max
+    expect(result.current.timeRemaining).toBe(80); // No longer capped at 60
   });
 
   it('should handle adding time when timer is low', () => {
@@ -106,14 +106,12 @@ describe('useAdventureGame - addTime', () => {
       result.current.startGame();
     });
 
-    // Manually dispatch ticks to reduce time (simulate gameplay)
-    // For this test, we just verify the math is correct
-    // Starting at 120, adding 10 should work
+    // Starting at 120, adding 10 should go to 130 (under MAX_TIMER_SECONDS 180)
     act(() => {
       result.current.addTime(10);
     });
 
-    // Should be capped at 120 since we started there
-    expect(result.current.timeRemaining).toBe(120);
+    // Timer can exceed timerSeconds, capped at MAX_TIMER_SECONDS (180)
+    expect(result.current.timeRemaining).toBe(130);
   });
 });

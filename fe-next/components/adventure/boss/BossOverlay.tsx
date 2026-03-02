@@ -44,6 +44,9 @@ import { BOSS_PHASE_THRESHOLDS, type BossStateMachineState, type BossStateMachin
 interface BossOverlayProps {
   /** Boss configuration (null if not a boss level) */
   boss: BossConfig | null;
+  /** When true, active battle UI is rendered in Phaser canvas (default: true).
+   *  Intro/victory/defeat cinematics always render as React/Remotion. */
+  usePhaserBossUI?: boolean;
   /** Maximum HP for boss */
   maxHP?: number;
   /** Current taunt text (translation key) */
@@ -131,6 +134,7 @@ function deriveBossState(
 const BossOverlay = memo<BossOverlayProps>(
   ({
     boss,
+    usePhaserBossUI = true,
     maxHP = 100,
     currentTaunt,
     showTaunt,
@@ -399,7 +403,7 @@ const BossOverlay = memo<BossOverlayProps>(
         {/* ========================================
             ACTIVE BATTLE UI
             ======================================== */}
-        {showingActivePhase && !showingVictory && !showingDefeat && (
+        {showingActivePhase && !showingVictory && !showingDefeat && !usePhaserBossUI && (
           <>
             {/* Boss HP Bar + Avatar Row */}
             <div className="fixed top-12 sm:top-14 left-0 right-0 z-30 pointer-events-none">
