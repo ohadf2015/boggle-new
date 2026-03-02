@@ -70,6 +70,30 @@ const es = {
       "description": "¡Únete a batallas de palabras en tiempo real con amigos! Crea o únete a salas multijugador, compite en vivo contra oponentes y sube en la clasificación.",
       "ogTitle": "Batalla de Palabras Multijugador - Compite en Vivo",
       "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
+    },
+    "about": {
+      "title": "Sobre Nosotros - Nuestra Historia y Misión | LexiClash",
+      "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 5 idiomas.",
+      "ogTitle": "Sobre LexiClash - Innovación en Juegos de Palabras",
+      "ogDescription": "La historia detrás de LexiClash: hacer el aprendizaje de idiomas divertido y competitivo a través de batallas de palabras en tiempo real."
+    },
+    "contact": {
+      "title": "Contáctanos | LexiClash",
+      "description": "¿Tienes preguntas o comentarios sobre LexiClash? Contacta a nuestro equipo por correo electrónico o redes sociales. Nos encantaría saber de ti.",
+      "ogTitle": "Contacta a LexiClash",
+      "ogDescription": "Ponte en contacto con el equipo de LexiClash. Envía comentarios, reporta problemas o simplemente saluda."
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes | LexiClash",
+      "description": "Encuentra respuestas a preguntas comunes sobre el juego de palabras LexiClash. Aprende sobre jugabilidad, puntuación, gestión de cuentas, funciones multijugador y soporte técnico.",
+      "ogTitle": "FAQ - LexiClash Juego de Palabras",
+      "ogDescription": "Respuestas a preguntas frecuentes sobre LexiClash: jugabilidad, puntuación, cuentas y más."
+    },
+    "blog": {
+      "title": "Blog y Recursos de Juegos de Palabras | LexiClash",
+      "description": "Consejos, estrategias e información para entusiastas de juegos de palabras. Aprende a mejorar tu vocabulario, dominar técnicas de búsqueda de palabras y convertirte en campeón de LexiClash.",
+      "ogTitle": "Blog de LexiClash - Consejos y Estrategias",
+      "ogDescription": "Consejos expertos, estrategias e información para mejorar tus habilidades en juegos de palabras."
     }
   },
   "cookieConsent": {

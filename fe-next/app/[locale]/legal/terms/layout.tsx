@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         en: 'https://www.lexiclash.live/en/legal/terms',
         sv: 'https://www.lexiclash.live/sv/legal/terms',
         ja: 'https://www.lexiclash.live/ja/legal/terms',
+        es: 'https://www.lexiclash.live/es/legal/terms',
       },
     },
     robots: {

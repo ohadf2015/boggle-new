@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         en: 'https://www.lexiclash.live/en/legal/privacy',
         sv: 'https://www.lexiclash.live/sv/legal/privacy',
         ja: 'https://www.lexiclash.live/ja/legal/privacy',
+        es: 'https://www.lexiclash.live/es/legal/privacy',
       },
     },
     robots: {

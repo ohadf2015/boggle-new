@@ -154,7 +154,87 @@ export default function AboutPageClient(): React.ReactElement {
         </div>
       </section>
 
-      {/* Section 6: Business Information */}
+      {/* Section 6: Our Story */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.about.story.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.about.story.content')}
+        </p>
+      </section>
+
+      {/* Section 7: Technology */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.about.technology.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.about.technology.content')}
+        </p>
+      </section>
+
+      {/* Section 8: Education */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.about.education.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.about.education.content')}
+        </p>
+      </section>
+
+      {/* Section 9: Community */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.about.community.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.about.community.content')}
+        </p>
+      </section>
+
+      {/* Section 10: Values */}
+      <section className="mb-6">
+        <h2 className={cn(
+          'text-xl font-bold mb-3',
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        )}>
+          {t('legal.about.values.title')}
+        </h2>
+        <p className={cn(
+          'leading-relaxed',
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        )}>
+          {t('legal.about.values.content')}
+        </p>
+      </section>
+
+      {/* Section 11: Business Information */}
       <section className="mb-6">
         <h2 className={cn(
           'text-xl font-bold mb-3',

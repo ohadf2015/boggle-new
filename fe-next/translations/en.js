@@ -70,6 +70,30 @@ const en = {
       "description": "Join real-time word battles with friends! Host or join multiplayer rooms, compete live against opponents, and climb the leaderboard. Perfect for parties and game nights.",
       "ogTitle": "Multiplayer Word Battle - Compete Live",
       "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
+    },
+    "about": {
+      "title": "About Us - Our Story & Mission | LexiClash",
+      "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 5 languages.",
+      "ogTitle": "About LexiClash - Word Game Innovation",
+      "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
+    },
+    "contact": {
+      "title": "Contact Us - Get in Touch | LexiClash",
+      "description": "Have questions or feedback about LexiClash? Contact our team via email or social media. We'd love to hear from you about our multiplayer word game.",
+      "ogTitle": "Contact LexiClash - We'd Love to Hear From You",
+      "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions | LexiClash",
+      "description": "Find answers to common questions about LexiClash word game. Learn about gameplay, scoring, account management, multiplayer features, and technical support.",
+      "ogTitle": "FAQ - LexiClash Word Game",
+      "ogDescription": "Answers to common questions about LexiClash gameplay, scoring, accounts, and more."
+    },
+    "blog": {
+      "title": "Blog & Word Game Resources | LexiClash",
+      "description": "Tips, strategies, and insights for word game enthusiasts. Learn how to improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
+      "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
+      "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
     }
   },
   "cookieConsent": {

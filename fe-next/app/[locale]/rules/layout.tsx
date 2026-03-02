@@ -63,6 +63,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
                 en: 'https://www.lexiclash.live/en/rules',
                 sv: 'https://www.lexiclash.live/sv/rules',
                 ja: 'https://www.lexiclash.live/ja/rules',
+                es: 'https://www.lexiclash.live/es/rules',
             },
         },
         robots: {

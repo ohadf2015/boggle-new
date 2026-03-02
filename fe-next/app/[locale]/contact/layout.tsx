@@ -11,7 +11,7 @@ interface LayoutParams {
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
   const validLocale = (locale in translations ? locale : 'en') as Locale;
-  const seo = translations[validLocale]?.seo?.blog || translations.en.seo.blog;
+  const seo = translations[validLocale]?.seo?.contact || translations.en.seo.contact;
   const baseSeo = translations[validLocale]?.seo || translations.en.seo;
 
   const localePath = `/${locale}`;
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     openGraph: {
       type: 'website',
       locale: baseSeo.locale,
-      url: `https://www.lexiclash.live${localePath}/blog`,
+      url: `https://www.lexiclash.live${localePath}/contact`,
       title: seo.ogTitle,
       description: seo.ogDescription,
       siteName: 'LexiClash',
@@ -42,14 +42,14 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       images: ['https://www.lexiclash.live/lexiclash.jpg'],
     },
     alternates: {
-      canonical: `https://www.lexiclash.live${localePath}/blog`,
+      canonical: `https://www.lexiclash.live${localePath}/contact`,
       languages: {
-        'x-default': 'https://www.lexiclash.live/en/blog',
-        he: 'https://www.lexiclash.live/he/blog',
-        en: 'https://www.lexiclash.live/en/blog',
-        sv: 'https://www.lexiclash.live/sv/blog',
-        ja: 'https://www.lexiclash.live/ja/blog',
-        es: 'https://www.lexiclash.live/es/blog',
+        'x-default': 'https://www.lexiclash.live/en/contact',
+        he: 'https://www.lexiclash.live/he/contact',
+        en: 'https://www.lexiclash.live/en/contact',
+        sv: 'https://www.lexiclash.live/sv/contact',
+        ja: 'https://www.lexiclash.live/ja/contact',
+        es: 'https://www.lexiclash.live/es/contact',
       },
     },
     robots: {
@@ -59,6 +59,6 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   };
 }
 
-export default function BlogLayout({ children }: { children: ReactNode }): ReactNode {
+export default function ContactLayout({ children }: { children: ReactNode }): ReactNode {
   return children;
 }

@@ -70,6 +70,30 @@ const sv = {
       "description": "Gå med i ordstrider i realtid med vänner! Var värd för eller gå med i multiplayer-rum, tävla live mot motståndare och klättra på topplistan. Perfekt för fester och spelkvällar.",
       "ogTitle": "Multiplayer Ordstrid - Tävla Live",
       "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
+    },
+    "about": {
+      "title": "Om Oss - Vår Historia & Mission | LexiClash",
+      "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 5 språk.",
+      "ogTitle": "Om LexiClash - Innovation inom Ordspel",
+      "ogDescription": "Historien bakom LexiClash: att göra språkinlärning rolig och tävlingsinriktad genom ordstrider i realtid."
+    },
+    "contact": {
+      "title": "Kontakta Oss | LexiClash",
+      "description": "Har du frågor eller feedback om LexiClash? Kontakta vårt team via e-post eller sociala medier. Vi vill gärna höra från dig.",
+      "ogTitle": "Kontakta LexiClash",
+      "ogDescription": "Kontakta LexiClash-teamet. Skicka feedback, rapportera problem eller bara säg hej."
+    },
+    "faq": {
+      "title": "Vanliga Frågor | LexiClash",
+      "description": "Hitta svar på vanliga frågor om LexiClash ordspel. Lär dig om gameplay, poängsättning, kontohantering, multiplayer-funktioner och teknisk support.",
+      "ogTitle": "FAQ - LexiClash Ordspel",
+      "ogDescription": "Svar på vanliga frågor om LexiClash gameplay, poängsättning, konton och mer."
+    },
+    "blog": {
+      "title": "Blogg & Ordspelsresurser | LexiClash",
+      "description": "Tips, strategier och insikter för ordspelsentusiaster. Lär dig förbättra ditt ordförråd, bemästra ordsökningstekniker och bli en LexiClash-mästare.",
+      "ogTitle": "LexiClash Blogg - Ordspelstips & Strategier",
+      "ogDescription": "Experttips, strategier och insikter för att förbättra dina ordspelsfärdigheter."
     }
   },
   "cookieConsent": {
