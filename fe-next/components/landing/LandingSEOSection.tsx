@@ -12,8 +12,11 @@ import { cn } from '@/lib/utils';
 const easeOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const easeOutQuart: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
+// SSR-safe variants: initial state is visible (opacity: 1) so crawlers
+// that don't execute JS still see the content. The whileInView animation
+// enhances the experience for real users without gating visibility.
 const sectionReveal: Variants = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 1, y: 0 },
   visible: {
     opacity: 1,
     y: 0,
@@ -27,7 +30,7 @@ const staggerContainer: Variants = {
 };
 
 const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 28, scale: 0.97 },
+  hidden: { opacity: 1, y: 0, scale: 1 },
   visible: {
     opacity: 1,
     y: 0,
@@ -37,7 +40,7 @@ const staggerItem: Variants = {
 };
 
 const stepItem: Variants = {
-  hidden: { opacity: 0, x: -20 },
+  hidden: { opacity: 1, x: 0 },
   visible: {
     opacity: 1,
     x: 0,
@@ -85,7 +88,11 @@ const BLOG_LINKS = [
 
 /* ── Main component ─────────────────────────────────────── */
 
-export function LandingSEOSection() {
+interface LandingSEOSectionProps {
+  className?: string;
+}
+
+export function LandingSEOSection({ className }: LandingSEOSectionProps) {
   const { t, language } = useLanguage();
 
   const steps = [
@@ -96,7 +103,7 @@ export function LandingSEOSection() {
   ];
 
   return (
-    <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-12 relative z-20">
+    <section className={cn("w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-12 relative z-20", className)}>
 
       {/* ── What is LexiClash ────────────────────────────── */}
       <motion.div

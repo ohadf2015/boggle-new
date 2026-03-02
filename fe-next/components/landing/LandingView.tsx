@@ -615,13 +615,9 @@ const LandingView: React.FC = () => {
         </>
       </section>
 
-      {/* Scroll indicator + SEO Content — hidden in landscape for UX */}
-      {!isLandscape && (
-        <>
-          <ScrollIndicator />
-          <LandingSEOSection />
-        </>
-      )}
+      {/* Scroll indicator + SEO Content — visually hidden in landscape but kept in DOM for crawlers */}
+      {!isLandscape && <ScrollIndicator />}
+      <LandingSEOSection className={isLandscape ? 'sr-only' : undefined} />
 
       {/* Tutorial FAB with Callout - Fixed bottom corner */}
       {/* Position accounts for GlobalBottomNav (64px h-16 + safe area) on mobile */}

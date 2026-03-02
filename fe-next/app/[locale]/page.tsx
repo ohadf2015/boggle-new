@@ -58,11 +58,42 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage({ params }: PageProps) {
+  const { locale } = await params;
+
   return (
     <>
       <FAQPageJsonLd items={FAQ_ITEMS} />
       <HomePageClient />
+
+      {/* Server-rendered SEO content — visible to crawlers without JS execution.
+          Hidden visually since the client-side LandingSEOSection covers the same content
+          with richer interactivity. This is a fallback for non-JS bots (e.g. AdSense). */}
+      <section className="sr-only" aria-hidden="true">
+        <h2>What is LexiClash?</h2>
+        <p>
+          LexiClash is a free, fast-paced multiplayer word game you can play right in your browser.
+          Compete with friends in real-time word battles on a shared letter grid — find words, build
+          combos, and climb the leaderboard. No download required. Available in English, Hebrew,
+          Swedish, Japanese, and Spanish.
+        </p>
+        <h2>Game Modes</h2>
+        <ul>
+          <li>Multiplayer Rooms — Create a private room and share the code with up to 20 friends.</li>
+          <li>Single Player vs. Bots — Practice your word-finding skills against AI opponents.</li>
+          <li>Daily Challenge — A fresh puzzle every day, identical for all players worldwide.</li>
+          <li>Adventure Mode — Journey through 10 themed worlds with 100 levels.</li>
+        </ul>
+        <h2>Legal &amp; Policies</h2>
+        <nav>
+          <ul>
+            <li><a href={`/${locale}/legal/privacy`}>Privacy Policy</a></li>
+            <li><a href={`/${locale}/legal/terms`}>Terms of Service</a></li>
+            <li><a href={`/${locale}/about`}>About LexiClash</a></li>
+            <li><a href={`/${locale}/contact`}>Contact Us</a></li>
+          </ul>
+        </nav>
+      </section>
     </>
   );
 }
