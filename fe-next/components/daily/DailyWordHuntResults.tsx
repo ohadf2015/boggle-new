@@ -396,7 +396,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               </div>
             </div>
           ) : (
-            <div className="max-w-xs mx-auto">
+            <div className="max-w-btn">
               <CoinUnlockCard
                 icon={<Eye className="w-5 h-5 text-white" />}
                 title={t('wordHunt.results.revealTargetWord')}

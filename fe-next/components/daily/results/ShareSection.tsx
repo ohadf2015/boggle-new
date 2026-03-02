@@ -55,39 +55,38 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
 
     {/* Failed players: Retry is primary, Share is secondary */}
     {!solved ? (
-      <>
-        {/* Container needs max-w-btn and mx-auto to center, so coin badge aligns with button */}
-        <div className="relative max-w-btn mx-auto">
-          <Button
-            onClick={onRetry}
-            disabled={!canAffordRetry}
-            className={cn(
-              "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
-              canAffordRetry
-                ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
-                : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
-            )}
-          >
-            <RotateCcw className="mr-2 w-5 h-5" />
-            {t('wordHunt.results.retry') || 'Retry'}
-            <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
-          </Button>
+      <div className="max-w-btn space-y-2">
+        {/* Inline coin balance row */}
+        <div className="flex justify-end">
           <CoinBalanceBadge
             balance={currentCoins}
             size="sm"
             canAfford={canAffordRetry}
-            className="absolute -top-2 end-2"
           />
         </div>
         <Button
+          onClick={onRetry}
+          disabled={!canAffordRetry}
+          className={cn(
+            "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
+            canAffordRetry
+              ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+              : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
+          )}
+        >
+          <RotateCcw className="mr-2 w-5 h-5" />
+          {t('wordHunt.results.retry') || 'Retry'}
+          <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
+        </Button>
+        <Button
           onClick={onShare}
           variant="ghost"
-          className="w-full max-w-btn py-2 text-sm font-medium uppercase text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-2 border-gray-300 dark:border-gray-600 rounded-neo"
+          className="w-full py-2 text-sm font-medium uppercase text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-2 border-gray-300 dark:border-gray-600 rounded-neo"
         >
           <Share2 className="mr-1.5 w-4 h-4" />
           {t('wordHunt.results.share') || 'Share'}
         </Button>
-      </>
+      </div>
     ) : (
       /* Winners: Challenge Friends CTA (falls back to native share) */
       <Button
