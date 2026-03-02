@@ -49,7 +49,7 @@ interface ModeCardProps {
   lockedMessage?: string;
   /** Callback when locked card is clicked */
   onLockedClick?: () => void;
-  /** Optional badge to display (e.g., "BETA", "NEW") */
+  /** Optional badge to display (e.g., "NEW", "HOT") */
   badge?: string;
 }
 
@@ -181,7 +181,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       }}
       {...handlers}
     >
-      {/* Badge (e.g., BETA, NEW) - positioned in top-right corner */}
+      {/* Badge (e.g., NEW, HOT) - positioned in top-right corner */}
       {badge && !locked && (
         <div
           className={cn(

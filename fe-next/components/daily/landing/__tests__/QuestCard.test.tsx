@@ -138,9 +138,9 @@ describe('QuestCard', () => {
 
   test('renders badge when provided', () => {
     renderWithProviders(
-      <QuestCard {...defaultProps} challengeId="buzz" color="yellow" badge="BETA" />
+      <QuestCard {...defaultProps} challengeId="buzz" color="yellow" badge="NEW" />
     );
 
-    expect(screen.getByText('BETA')).toBeInTheDocument();
+    expect(screen.getByText('NEW')).toBeInTheDocument();
   });
 });

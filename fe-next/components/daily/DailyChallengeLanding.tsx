@@ -398,7 +398,6 @@ export function DailyChallengeLanding({
             onPlay={onSelectBuzz}
             timeMode="relaxed"
             timeModeLabel={t('daily.untimedQuest')}
-            badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
             buttonText={
               (status.buzz === 'won' || status.buzz === 'lost')
                 ? t('daily.viewResults')
@@ -461,7 +460,6 @@ export function DailyChallengeLanding({
             onPlay={onSelectBuzz}
             timeMode="relaxed"
             timeModeLabel={t('daily.untimedQuest')}
-            badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
             buttonText={
               (status.buzz === 'won' || status.buzz === 'lost')
                 ? t('daily.viewResults')

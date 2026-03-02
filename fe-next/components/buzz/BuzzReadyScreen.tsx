@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Play, ArrowLeft, Sparkles, FastForward, TrendingUp, Zap } from 'lucide-react';
+import { Play, ArrowLeft, Sparkles, FastForward, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -157,12 +157,6 @@ export default function BuzzReadyScreen({
             <div className="absolute bottom-0 end-0 w-10 h-10 bg-neo-pink border-s-3 border-t-3 border-neo-black" />
             {/* Gradient overlay for readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-neo-navy/60 via-transparent to-transparent" />
-            {/* Beta badge */}
-            <div className="absolute top-3 end-3 px-3 py-1 bg-neo-pink/95 rounded-neo border-2 border-neo-black shadow-hard-sm">
-              <span className="text-xs font-black text-neo-black">
-                {t('buzz.betaPreview')}
-              </span>
-            </div>
           </motion.div>
         )}
 
