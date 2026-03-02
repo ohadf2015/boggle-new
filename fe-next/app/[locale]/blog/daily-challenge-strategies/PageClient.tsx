@@ -113,7 +113,7 @@ export default function StrategiesPageClient(): React.ReactElement {
           {/* Hero Image */}
           <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
             <Image
-              src="/images/blog/daily-strategies.jpg"
+              src="/images/blog/strategy-tactics.jpg"
               alt="Word game board with timer showing daily challenge"
               fill
               className="object-cover"

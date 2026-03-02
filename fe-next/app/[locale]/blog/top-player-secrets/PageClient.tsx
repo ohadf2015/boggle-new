@@ -90,7 +90,7 @@ export default function SecretsPageClient(): React.ReactElement {
           {/* Hero Image */}
           <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
             <Image
-              src="/images/blog/top-secrets.jpg"
+              src="/images/blog/top-player-secrets.jpg"
               alt="Competitive word game tournament with focused players"
               fill
               className="object-cover"
