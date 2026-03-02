@@ -44,7 +44,7 @@ describe('CookiePolicyPageClient', () => {
 
   it('renders the page title', () => {
     render(<CookiePolicyPageClient />);
-    expect(screen.getByText('legal.cookies.title')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'legal.cookies.title' })).toBeInTheDocument();
   });
 
   it('renders introduction text', () => {
