@@ -2540,15 +2540,15 @@ const sv = {
         "content": "Dina data kan överföras till och lagras i länder utanför ditt hemland, inklusive länder som kan ha andra dataskyddslagar. Genom att använda LexiClash samtycker du till sådana överföringar."
       },
       "changes": {
-        "title": "9. Ändringar i denna policy",
+        "title": "10. Ändringar i denna policy",
         "content": "Vi kan uppdatera denna integritetspolicy från tid till annan. Ändringar kommer att publiceras på denna sida med ett uppdaterat datum. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av den uppdaterade policyn."
       },
       "governingLaw": {
-        "title": "10. Tillämplig lag",
+        "title": "11. Tillämplig lag",
         "content": "Denna integritetspolicy styrs av lagarna i staten Israel. Alla tvister ska lösas i domstolar i Israel."
       },
       "childrensPrivacy": {
-        "title": "11. Barns integritet",
+        "title": "12. Barns integritet",
         "content": "LexiClash är utformat för spelare från 6 år och uppåt, inklusive barn. Vi är engagerade i att följa Children's Online Privacy Protection Act (COPPA) och liknande internationella bestämmelser för att skydda barns integritet.",
         "measures": "Åtgärder vi vidtar:",
         "noPersonalizedAds": "Inga personaliserade annonser — alla annonser visas i barnriktat innehåll-läge (TFCD), som förhindrar intressebaserad annonsriktning",
@@ -2672,6 +2672,41 @@ const sv = {
       "values": {
         "title": "Vad vi star for",
         "content": "Vi tror att spel ska vara tillgangliga for alla. LexiClash ar gratis att spela utan betalvaggar. Vi prioriterar tillganglighet med fullt skarmlasar-stod, tangentbordsnavigering och hogkontrast-design."
+      }
+    },
+    "disclaimer": {
+      "title": "Ansvarsfriskrivning",
+      "general": {
+        "title": "Allmän ansvarsfriskrivning",
+        "content": "Informationen som tillhandahålls på LexiClash är endast avsedd för allmän underhållning och utbildningsändamål. Även om vi strävar efter noggrannhet, ger vi inga garantier eller utfästelser angående fullständighet, noggrannhet eller tillförlitlighet av något innehåll på denna webbplats. Din användning av webbplatsen och ditt beroende av information sker på egen risk."
+      },
+      "noProfessionalAdvice": {
+        "title": "Inte professionell rådgivning",
+        "content": "LexiClash är en ordspelsplattform. Inget på denna webbplats utgör professionell, pedagogisk, lingvistisk eller någon annan form av rådgivning. Spelinnehåll, orddefinitioner och utbildningsfunktioner tillhandahålls för underhållning och bör inte förlitas som auktoritativa språkreferenser."
+      },
+      "asIs": {
+        "title": "\"I befintligt skick\"",
+        "content": "LexiClash tillhandahålls \"i befintligt skick\" och \"som tillgängligt\" utan några garantier av något slag, varken uttryckliga eller underförstådda. Vi garanterar inte att tjänsten kommer att vara oavbruten, säker eller felfri. Spelpoäng, topplistor och statistik tillhandahålls för underhållningsändamål."
+      },
+      "thirdParty": {
+        "title": "Tredjepartslänkar och innehåll",
+        "content": "LexiClash kan innehålla länkar till tredjepartswebbplatser eller -tjänster. Vi har ingen kontroll över innehåll, integritetspolicyer eller praxis på tredjepartssajter. Vi stödjer inte och tar inget ansvar för tredjepartsinnehåll, produkter eller tjänster."
+      },
+      "advertising": {
+        "title": "Reklaminnehåll",
+        "content": "LexiClash visar annonser som tillhandahålls av tredjepartsnätverk inklusive Google AdSense. Dessa annonser är inte rekommendationer från LexiClash. Annonsinnehåll bestäms av annonsnätverken baserat på olika faktorer och återspeglar kanske inte LexiClashs åsikter eller värderingar. Vi ansvarar inte för noggrannhet eller innehåll i annonser som visas på webbplatsen."
+      },
+      "liability": {
+        "title": "Ansvarsbegränsning",
+        "content": "I den utsträckning som tillåts enligt lag ska LexiClash och dess skapare inte hållas ansvariga för indirekta, tillfälliga, speciella, följd- eller bestraffningsskador som uppstår från din användning av tjänsten, inklusive men inte begränsat till förlust av data, förlust av vinst eller avbrott i tjänsten."
+      },
+      "changes": {
+        "title": "Ändringar i denna ansvarsfriskrivning",
+        "content": "Vi förbehåller oss rätten att uppdatera denna ansvarsfriskrivning när som helst. Ändringar kommer att publiceras på denna sida med ett uppdaterat revisionsdatum. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av den uppdaterade ansvarsfriskrivningen."
+      },
+      "contact": {
+        "title": "Kontakta oss",
+        "content": "Om du har frågor om denna ansvarsfriskrivning, vänligen kontakta oss på lexiclash.game@gmail.com."
       }
     }
   },

@@ -189,7 +189,7 @@ export default function LegalPageLayout({
             'text-sm',
             isDarkMode ? 'text-gray-600' : 'text-gray-600'
           )}>
-            {t('legal.copyright')}
+            {t('legal.copyright', { year: new Date().getFullYear() })}
           </p>
         </footer>
       </div>
