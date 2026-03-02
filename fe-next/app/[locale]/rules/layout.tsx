@@ -8,27 +8,27 @@ interface LayoutParams {
 // Localized metadata for rules page
 const rulesMetadata: Record<string, { title: string; description: string; ogDescription: string }> = {
     en: {
-        title: 'How to Play LexiClash - Game Rules & Strategy Guide',
+        title: 'Game Rules & Strategy Guide',
         description: 'Learn how to play LexiClash, the real-time multiplayer word game. Complete guide covering game rules, scoring system, winning strategies, and tips for beginners.',
         ogDescription: 'Learn how to play LexiClash, the real-time multiplayer word game. Complete guide covering game rules, scoring system, and winning strategies.',
     },
     he: {
-        title: 'איך לשחק לקסיקלאש - חוקי המשחק ומדריך אסטרטגיה',
+        title: 'חוקי המשחק ומדריך אסטרטגיה',
         description: 'למדו איך לשחק לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. מדריך מלא הכולל חוקי משחק, מערכת ניקוד, אסטרטגיות ניצחון וטיפים למתחילים.',
         ogDescription: 'למדו איך לשחק לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. מדריך מלא הכולל חוקי משחק ואסטרטגיות ניצחון.',
     },
     sv: {
-        title: 'Hur man spelar LexiClash - Spelregler & Strategiguide',
+        title: 'Spelregler & Strategiguide',
         description: 'Lär dig spela LexiClash, ordspelet för flera spelare i realtid. Komplett guide med spelregler, poängsystem, vinnande strategier och tips för nybörjare.',
         ogDescription: 'Lär dig spela LexiClash, ordspelet för flera spelare i realtid. Komplett guide med spelregler och vinnande strategier.',
     },
     ja: {
-        title: 'LexiClashの遊び方 - ゲームルール＆戦略ガイド',
+        title: 'ゲームルール＆戦略ガイド',
         description: 'リアルタイムマルチプレイヤーワードゲーム、LexiClashの遊び方を学びましょう。ゲームルール、スコアリングシステム、勝利戦略、初心者向けヒントを網羅した完全ガイド。',
         ogDescription: 'リアルタイムマルチプレイヤーワードゲーム、LexiClashの遊び方を学びましょう。ゲームルールと勝利戦略の完全ガイド。',
     },
     es: {
-        title: 'Cómo jugar LexiClash - Reglas del juego y guía de estrategia',
+        title: 'Reglas del Juego y Guía de Estrategia',
         description: 'Aprende a jugar LexiClash, el juego de palabras multijugador en tiempo real. Guía completa con reglas del juego, sistema de puntuación, estrategias ganadoras y consejos para principiantes.',
         ogDescription: 'Aprende a jugar LexiClash, el juego de palabras multijugador en tiempo real. Guía completa con reglas y estrategias ganadoras.',
     },

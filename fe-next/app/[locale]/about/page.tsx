@@ -6,11 +6,11 @@ interface PageProps {
 }
 
 const titleMap: Record<string, string> = {
-  en: 'About LexiClash - Our Mission & Team | LexiClash',
-  he: 'אודות לקסיקלאש - המשימה והצוות שלנו',
-  sv: 'Om LexiClash - Vårt Uppdrag & Team',
-  ja: 'LexiClashについて - 私たちのミッションとチーム',
-  es: 'Sobre LexiClash - Nuestra Mision y Equipo',
+  en: 'About Us - Our Mission & Team',
+  he: 'אודות - המשימה והצוות שלנו',
+  sv: 'Om Oss - Vårt Uppdrag & Team',
+  ja: '私たちについて - ミッションとチーム',
+  es: 'Sobre Nosotros - Mision y Equipo',
 };
 
 const descriptionMap: Record<string, string> = {

@@ -8,7 +8,7 @@ const en = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "LexiClash - Free Multiplayer Word Game | Play Online",
+    "title": "Free Multiplayer Word Game - Play Online",
     "description": "Play the best free multiplayer word game online! LexiClash combines Boggle-style gameplay with real-time competition. Race friends to find words, build combos, and climb leaderboards. Perfect Wordle alternative for groups. No download - play instantly in 5 languages. Great for parties, team building, and family game nights!",
     "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
@@ -18,79 +18,79 @@ const en = {
     "locale": "en_US",
     "language": "English",
     "leaderboard": {
-      "title": "Global Leaderboard - Top Players | LexiClash",
+      "title": "Global Leaderboard - Top Players",
       "description": "View the top-ranked players on LexiClash global leaderboard. Compete with word game enthusiasts worldwide and track your progress to become the ultimate word master.",
       "ogTitle": "Global Leaderboard - Top Word Game Players",
       "ogDescription": "See where you rank among the best word game players. Join LexiClash and compete for the top spot!"
     },
     "profile": {
-      "title": "Your Profile & Stats | LexiClash",
+      "title": "Your Profile & Stats",
       "description": "View your LexiClash profile, game statistics, achievements, and progress. Track your wins, total score, words found, and time played in this competitive word game.",
       "ogTitle": "Player Profile & Game Stats - LexiClash",
       "ogDescription": "Track your word game achievements, statistics, and climb the leaderboard rankings."
     },
     "studentProfile": {
-      "title": "Student Profile & Progress | LexiClash Education",
+      "title": "Student Profile & Progress",
       "description": "View your LexiClash student profile, XP progress, lesson completion, and educational achievements. Track your learning journey and vocabulary mastery.",
       "ogTitle": "Student Profile - LexiClash Education",
       "ogDescription": "Track your learning progress, achievements, and vocabulary mastery in LexiClash Education."
     },
     "terms": {
-      "title": "Terms of Service | LexiClash",
+      "title": "Terms of Service",
       "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer word game platform.",
       "ogTitle": "Terms of Service - LexiClash",
       "ogDescription": "LexiClash Terms of Service - User rights and acceptable use policies."
     },
     "privacy": {
-      "title": "Privacy Policy | LexiClash",
+      "title": "Privacy Policy",
       "description": "LexiClash Privacy Policy - Learn how we collect, use, and protect your data. We prioritize your privacy and use industry-standard security measures.",
       "ogTitle": "Privacy Policy - LexiClash",
       "ogDescription": "Learn how LexiClash protects your privacy and handles your data securely."
     },
     "legal": {
-      "title": "Legal Information | LexiClash",
+      "title": "Legal Information",
       "description": "LexiClash legal information - Access our Terms of Service and Privacy Policy. Learn about your rights and how we protect your data.",
       "ogTitle": "Legal Information - LexiClash",
       "ogDescription": "Access LexiClash Terms of Service and Privacy Policy."
     },
     "singleplayer": {
-      "title": "Single Player Word Game - Practice & Challenge | LexiClash",
+      "title": "Single Player - Practice & Challenge",
       "description": "Play LexiClash solo! Practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Track your progress and beat your high scores.",
       "ogTitle": "Single Player Mode - Practice & Challenge",
       "ogDescription": "Practice word finding solo, challenge AI bots, and beat your high scores in LexiClash single player mode."
     },
     "daily": {
-      "title": "Daily Word Challenge - Same Puzzle Worldwide | LexiClash",
+      "title": "Daily Word Challenge - Same Puzzle Worldwide",
       "description": "Play the LexiClash Daily Challenge! Same puzzle for everyone worldwide each day. Share your emoji results like Wordle. Compete globally and track your daily streaks.",
       "ogTitle": "Daily Challenge - Same Puzzle Worldwide",
       "ogDescription": "Daily word puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
     },
     "multiplayer": {
-      "title": "Multiplayer Word Battle - Real-Time Competition | LexiClash",
+      "title": "Multiplayer Word Battle - Real-Time",
       "description": "Join real-time word battles with friends! Host or join multiplayer rooms, compete live against opponents, and climb the leaderboard. Perfect for parties and game nights.",
       "ogTitle": "Multiplayer Word Battle - Compete Live",
       "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
     },
     "about": {
-      "title": "About Us - Our Story & Mission | LexiClash",
+      "title": "About Us - Our Story & Mission",
       "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 5 languages.",
       "ogTitle": "About LexiClash - Word Game Innovation",
       "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
     },
     "contact": {
-      "title": "Contact Us - Get in Touch | LexiClash",
+      "title": "Contact Us - Get in Touch",
       "description": "Have questions or feedback about LexiClash? Contact our team via email or social media. We'd love to hear from you about our multiplayer word game.",
       "ogTitle": "Contact LexiClash - We'd Love to Hear From You",
       "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
     },
     "faq": {
-      "title": "Frequently Asked Questions | LexiClash",
+      "title": "Frequently Asked Questions",
       "description": "Find answers to common questions about LexiClash word game. Learn about gameplay, scoring, account management, multiplayer features, and technical support.",
       "ogTitle": "FAQ - LexiClash Word Game",
       "ogDescription": "Answers to common questions about LexiClash gameplay, scoring, accounts, and more."
     },
     "blog": {
-      "title": "Blog & Word Game Resources | LexiClash",
+      "title": "Blog & Word Game Resources",
       "description": "Tips, strategies, and insights for word game enthusiasts. Learn how to improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
       "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
       "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."

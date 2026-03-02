@@ -8,7 +8,7 @@ const es = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "LexiClash - Juego de Palabras Multijugador | Online",
+    "title": "Juego de Palabras Multijugador Gratis - Online",
     "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
     "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis",
     "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
@@ -18,79 +18,79 @@ const es = {
     "locale": "es_ES",
     "language": "Spanish",
     "leaderboard": {
-      "title": "Clasificación Global - Mejores Jugadores | LexiClash",
+      "title": "Clasificación Global - Mejores Jugadores",
       "description": "Ve a los jugadores mejor clasificados en la tabla de LexiClash. Compite con entusiastas de juegos de palabras de todo el mundo.",
       "ogTitle": "Clasificación Global - Mejores Jugadores de Palabras",
       "ogDescription": "¡Mira dónde te clasificas entre los mejores jugadores de palabras!"
     },
     "profile": {
-      "title": "Tu Perfil y Estadísticas | LexiClash",
+      "title": "Tu Perfil y Estadísticas",
       "description": "Ve tu perfil de LexiClash, estadísticas de juego, logros y progreso.",
       "ogTitle": "Perfil del Jugador y Estadísticas - LexiClash",
       "ogDescription": "Rastrea tus logros y estadísticas de juegos de palabras."
     },
     "studentProfile": {
-      "title": "Perfil de Estudiante y Progreso | LexiClash Educación",
+      "title": "Perfil de Estudiante y Progreso",
       "description": "Ve tu perfil de estudiante de LexiClash, progreso de XP, lecciones completadas y logros educativos. Rastrea tu viaje de aprendizaje y dominio del vocabulario.",
       "ogTitle": "Perfil de Estudiante - LexiClash Educación",
       "ogDescription": "Rastrea tu progreso de aprendizaje, logros y dominio del vocabulario en LexiClash Educación."
     },
     "terms": {
-      "title": "Términos de Servicio | LexiClash",
+      "title": "Términos de Servicio",
       "description": "Lee los Términos de Servicio de LexiClash.",
       "ogTitle": "Términos de Servicio - LexiClash",
       "ogDescription": "Términos de Servicio de LexiClash."
     },
     "privacy": {
-      "title": "Política de Privacidad | LexiClash",
+      "title": "Política de Privacidad",
       "description": "Política de Privacidad de LexiClash - Aprende cómo protegemos tus datos.",
       "ogTitle": "Política de Privacidad - LexiClash",
       "ogDescription": "Aprende cómo LexiClash protege tu privacidad."
     },
     "legal": {
-      "title": "Información Legal | LexiClash",
+      "title": "Información Legal",
       "description": "Información legal de LexiClash - Términos de Servicio y Política de Privacidad.",
       "ogTitle": "Información Legal - LexiClash",
       "ogDescription": "Accede a los Términos de Servicio y Política de Privacidad de LexiClash."
     },
     "singleplayer": {
-      "title": "Modo Un Jugador - Practica y Desafía | LexiClash",
+      "title": "Modo Un Jugador - Practica y Desafía",
       "description": "¡Juega LexiClash solo! Practica la búsqueda de palabras, desafía bots de IA y mejora tu vocabulario. Múltiples niveles de dificultad. Sigue tu progreso y supera tus mejores puntuaciones.",
       "ogTitle": "Modo Un Jugador - Practica y Desafía",
       "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones."
     },
     "daily": {
-      "title": "Desafío Diario de Palabras - Mismo Puzzle Mundial | LexiClash",
+      "title": "Desafío Diario - Mismo Puzzle Mundial",
       "description": "¡Juega el Desafío Diario de LexiClash! Mismo puzzle para todos en el mundo cada día. Comparte tus resultados como Wordle. Compite globalmente.",
       "ogTitle": "Desafío Diario - Mismo Puzzle Mundial",
       "ogDescription": "Desafío de palabras diario - mismo tablero para todos. ¡Comparte tus resultados y compite globalmente!"
     },
     "multiplayer": {
-      "title": "Batalla de Palabras Multijugador - Competencia en Tiempo Real | LexiClash",
+      "title": "Batalla de Palabras Multijugador - Tiempo Real",
       "description": "¡Únete a batallas de palabras en tiempo real con amigos! Crea o únete a salas multijugador, compite en vivo contra oponentes y sube en la clasificación.",
       "ogTitle": "Batalla de Palabras Multijugador - Compite en Vivo",
       "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
     },
     "about": {
-      "title": "Sobre Nosotros - Nuestra Historia y Misión | LexiClash",
+      "title": "Sobre Nosotros - Nuestra Historia y Misión",
       "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 5 idiomas.",
       "ogTitle": "Sobre LexiClash - Innovación en Juegos de Palabras",
       "ogDescription": "La historia detrás de LexiClash: hacer el aprendizaje de idiomas divertido y competitivo a través de batallas de palabras en tiempo real."
     },
     "contact": {
-      "title": "Contáctanos | LexiClash",
+      "title": "Contáctanos",
       "description": "¿Tienes preguntas o comentarios sobre LexiClash? Contacta a nuestro equipo por correo electrónico o redes sociales. Nos encantaría saber de ti.",
       "ogTitle": "Contacta a LexiClash",
       "ogDescription": "Ponte en contacto con el equipo de LexiClash. Envía comentarios, reporta problemas o simplemente saluda."
     },
     "faq": {
-      "title": "Preguntas Frecuentes | LexiClash",
+      "title": "Preguntas Frecuentes",
       "description": "Encuentra respuestas a preguntas comunes sobre el juego de palabras LexiClash. Aprende sobre jugabilidad, puntuación, gestión de cuentas, funciones multijugador y soporte técnico.",
       "ogTitle": "FAQ - LexiClash Juego de Palabras",
       "ogDescription": "Respuestas a preguntas frecuentes sobre LexiClash: jugabilidad, puntuación, cuentas y más."
     },
     "blog": {
-      "title": "Blog y Recursos de Juegos de Palabras | LexiClash",
+      "title": "Blog y Recursos de Juegos de Palabras",
       "description": "Consejos, estrategias e información para entusiastas de juegos de palabras. Aprende a mejorar tu vocabulario, dominar técnicas de búsqueda de palabras y convertirte en campeón de LexiClash.",
       "ogTitle": "Blog de LexiClash - Consejos y Estrategias",
       "ogDescription": "Consejos expertos, estrategias e información para mejorar tus habilidades en juegos de palabras."

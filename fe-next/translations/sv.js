@@ -8,7 +8,7 @@ const sv = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
+    "title": "Gratis Multiplayer Ordspel - Spela Online",
     "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
     "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel",
     "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
@@ -18,79 +18,79 @@ const sv = {
     "locale": "sv_SE",
     "language": "Swedish",
     "leaderboard": {
-      "title": "Global topplista - Toppspelare | LexiClash",
+      "title": "Global Topplista - Toppspelare",
       "description": "Visa de högst rankade spelarna på LexiClash globala topplista. Tävla med ordspelsentusiaster över hela världen och följ dina framsteg.",
       "ogTitle": "Global topplista - Topp ordspelspelare",
       "ogDescription": "Se var du rankas bland de bästa ordspelsspelarna. Gå med i LexiClash och tävla om toppplatsen!"
     },
     "profile": {
-      "title": "Din profil och statistik | LexiClash",
+      "title": "Din Profil och Statistik",
       "description": "Visa din LexiClash-profil, spelstatistik, prestationer och framsteg. Följ dina vinster, totala poäng, hittade ord och speltid i detta tävlingsinriktade ordspel.",
       "ogTitle": "Spelarprofil och spelstatistik - LexiClash",
       "ogDescription": "Följ dina ordspelsprestationer, statistik och klättra i topplistans rankningar."
     },
     "studentProfile": {
-      "title": "Elevprofil och framsteg | LexiClash Utbildning",
+      "title": "Elevprofil och Framsteg",
       "description": "Visa din LexiClash-elevprofil, XP-framsteg, lektionsslutförande och utbildningsprestationer. Följ din inlärningsresa och ordförrådsbehärskning.",
       "ogTitle": "Elevprofil - LexiClash Utbildning",
       "ogDescription": "Följ dina inlärningsframsteg, prestationer och ordförrådsbehärskning i LexiClash Utbildning."
     },
     "terms": {
-      "title": "Användarvillkor | LexiClash",
+      "title": "Användarvillkor",
       "description": "Läs LexiClash användarvillkor. Lär dig om användarrättigheter, acceptabel användning, kontohantering och våra spelregler för denna multiplayer-ordspelsplattform.",
       "ogTitle": "Användarvillkor - LexiClash",
       "ogDescription": "LexiClash användarvillkor - Användarrättigheter och policyer för acceptabel användning."
     },
     "privacy": {
-      "title": "Integritetspolicy | LexiClash",
+      "title": "Integritetspolicy",
       "description": "LexiClash integritetspolicy - Lär dig hur vi samlar in, använder och skyddar dina data. Vi prioriterar din integritet och använder branschstandardiserade säkerhetsåtgärder.",
       "ogTitle": "Integritetspolicy - LexiClash",
       "ogDescription": "Lär dig hur LexiClash skyddar din integritet och hanterar dina data säkert."
     },
     "legal": {
-      "title": "Juridisk information | LexiClash",
+      "title": "Juridisk Information",
       "description": "LexiClash juridisk information - Få tillgång till våra användarvillkor och integritetspolicy. Lär dig om dina rättigheter och hur vi skyddar dina data.",
       "ogTitle": "Juridisk information - LexiClash",
       "ogDescription": "Få tillgång till LexiClash användarvillkor och integritetspolicy."
     },
     "singleplayer": {
-      "title": "Enspelarläge - Öva & Utmana | LexiClash",
+      "title": "Enspelarläge - Öva och Utmana",
       "description": "Spela LexiClash solo! Öva ordhittning, utmana AI-bottar och förbättra ditt ordförråd. Flera svårighetsgrader från lätt till svår. Följ dina framsteg och slå dina highscores.",
       "ogTitle": "Enspelarläge - Öva & Utmana",
       "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
     },
     "daily": {
-      "title": "Daglig Ordutmaning - Samma Pussel Världen Över | LexiClash",
+      "title": "Daglig Ordutmaning - Samma Pussel Världen Över",
       "description": "Spela LexiClash dagliga utmaning! Samma pussel för alla världen över varje dag. Dela dina emoji-resultat som Wordle. Tävla globalt och följ dina dagliga serier.",
       "ogTitle": "Daglig Utmaning - Samma Pussel Världen Över",
       "ogDescription": "Dagligt ordpussel - samma bräda för alla världen över. Dela dina resultat och tävla globalt!"
     },
     "multiplayer": {
-      "title": "Multiplayer Ordstrid - Realtidstävling | LexiClash",
+      "title": "Multiplayer Ordstrid - Realtidstävling",
       "description": "Gå med i ordstrider i realtid med vänner! Var värd för eller gå med i multiplayer-rum, tävla live mot motståndare och klättra på topplistan. Perfekt för fester och spelkvällar.",
       "ogTitle": "Multiplayer Ordstrid - Tävla Live",
       "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
     },
     "about": {
-      "title": "Om Oss - Vår Historia & Mission | LexiClash",
+      "title": "Om Oss - Vår Historia och Mission",
       "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 5 språk.",
       "ogTitle": "Om LexiClash - Innovation inom Ordspel",
       "ogDescription": "Historien bakom LexiClash: att göra språkinlärning rolig och tävlingsinriktad genom ordstrider i realtid."
     },
     "contact": {
-      "title": "Kontakta Oss | LexiClash",
+      "title": "Kontakta Oss",
       "description": "Har du frågor eller feedback om LexiClash? Kontakta vårt team via e-post eller sociala medier. Vi vill gärna höra från dig.",
       "ogTitle": "Kontakta LexiClash",
       "ogDescription": "Kontakta LexiClash-teamet. Skicka feedback, rapportera problem eller bara säg hej."
     },
     "faq": {
-      "title": "Vanliga Frågor | LexiClash",
+      "title": "Vanliga Frågor",
       "description": "Hitta svar på vanliga frågor om LexiClash ordspel. Lär dig om gameplay, poängsättning, kontohantering, multiplayer-funktioner och teknisk support.",
       "ogTitle": "FAQ - LexiClash Ordspel",
       "ogDescription": "Svar på vanliga frågor om LexiClash gameplay, poängsättning, konton och mer."
     },
     "blog": {
-      "title": "Blogg & Ordspelsresurser | LexiClash",
+      "title": "Blogg och Ordspelsresurser",
       "description": "Tips, strategier och insikter för ordspelsentusiaster. Lär dig förbättra ditt ordförråd, bemästra ordsökningstekniker och bli en LexiClash-mästare.",
       "ogTitle": "LexiClash Blogg - Ordspelstips & Strategier",
       "ogDescription": "Experttips, strategier och insikter för att förbättra dina ordspelsfärdigheter."

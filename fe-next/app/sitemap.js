@@ -396,6 +396,48 @@ export default function sitemap() {
     });
   });
 
+  // Cookie Policy pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/legal/cookies`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/legal/cookies`,
+          he: `${baseUrl}/he/legal/cookies`,
+          en: `${baseUrl}/en/legal/cookies`,
+          sv: `${baseUrl}/sv/legal/cookies`,
+          ja: `${baseUrl}/ja/legal/cookies`,
+          es: `${baseUrl}/es/legal/cookies`,
+        },
+      },
+    });
+  });
+
+  // Adventure mode pages for all locales
+  locales.forEach((locale) => {
+    const localePath = `/${locale}`;
+    routes.push({
+      url: `${baseUrl}${localePath}/adventure`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/adventure`,
+          he: `${baseUrl}/he/adventure`,
+          en: `${baseUrl}/en/adventure`,
+          sv: `${baseUrl}/sv/adventure`,
+          ja: `${baseUrl}/ja/adventure`,
+          es: `${baseUrl}/es/adventure`,
+        },
+      },
+    });
+  });
+
   // Hebrew SEO landing page (high priority for Hebrew keyword searches)
   routes.push({
     url: `${baseUrl}/he/hebrew-multiplayer-word-game`,

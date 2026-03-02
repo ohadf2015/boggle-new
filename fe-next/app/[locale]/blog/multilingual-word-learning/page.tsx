@@ -1,7 +1,7 @@
 import MultilingualPageClient from './PageClient';
 
 export const metadata = {
-  title: 'The Ultimate Guide to Multilingual Word Learning Through Games | LexiClash Blog',
+  title: 'Multilingual Word Learning Through Games',
   description: 'Discover how playing word games in multiple languages accelerates vocabulary acquisition and boosts cognitive skills. Research-backed strategies for Hebrew, English, Swedish, and Japanese learners.',
 };
 
