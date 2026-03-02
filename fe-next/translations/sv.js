@@ -98,10 +98,22 @@ const sv = {
   },
   "cookieConsent": {
     "title": "Cookiemedgivande",
-    "message": "Vi använder cookies för analys och för att visa relevanta annonser. Du kan acceptera eller avvisa icke-nödvändiga cookies.",
-    "accept": "Acceptera",
-    "decline": "Avvisa",
-    "learnMore": "Läs mer"
+    "message": "Vi använder cookies för analys och för att visa relevanta annonser. Du kan anpassa dina inställningar nedan.",
+    "accept": "Acceptera alla",
+    "decline": "Avvisa alla",
+    "customize": "Anpassa",
+    "learnMore": "Läs mer",
+    "savePreferences": "Spara inställningar",
+    "manageCookies": "Hantera cookies",
+    "required": "Krävs",
+    "categories": {
+      "essential": "Nödvändiga",
+      "essentialDesc": "Krävs för webbplatsens funktion (inloggning, inställningar, spelstatus)",
+      "analytics": "Analys",
+      "analyticsDesc": "Hjälper oss förstå hur du använder webbplatsen för att förbättra din upplevelse",
+      "advertising": "Reklam",
+      "advertisingDesc": "Visa relevanta annonser via Google AdSense"
+    }
   },
   "common": {
     "email": "E-post",

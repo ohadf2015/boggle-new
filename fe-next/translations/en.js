@@ -98,10 +98,22 @@ const en = {
   },
   "cookieConsent": {
     "title": "Cookie consent",
-    "message": "We use cookies for analytics and to serve relevant ads. You can accept or decline non-essential cookies.",
-    "accept": "Accept",
-    "decline": "Decline",
-    "learnMore": "Learn more"
+    "message": "We use cookies for analytics and to serve relevant ads. You can customize your preferences below.",
+    "accept": "Accept All",
+    "decline": "Decline All",
+    "customize": "Customize",
+    "learnMore": "Learn more",
+    "savePreferences": "Save Preferences",
+    "manageCookies": "Manage Cookies",
+    "required": "Required",
+    "categories": {
+      "essential": "Essential",
+      "essentialDesc": "Required for site functionality (login, preferences, game state)",
+      "analytics": "Analytics",
+      "analyticsDesc": "Help us understand how you use the site to improve your experience",
+      "advertising": "Advertising",
+      "advertisingDesc": "Show relevant ads via Google AdSense"
+    }
   },
   "common": {
     "email": "Email",

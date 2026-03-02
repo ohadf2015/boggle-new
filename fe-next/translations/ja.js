@@ -98,10 +98,22 @@ const ja = {
   },
   "cookieConsent": {
     "title": "Cookieの同意",
-    "message": "分析および関連広告の表示にCookieを使用しています。必須でないCookieを承認または拒否できます。",
-    "accept": "承認",
-    "decline": "拒否",
-    "learnMore": "詳細を見る"
+    "message": "分析および関連広告の表示にCookieを使用しています。以下で設定をカスタマイズできます。",
+    "accept": "すべて承認",
+    "decline": "すべて拒否",
+    "customize": "カスタマイズ",
+    "learnMore": "詳細を見る",
+    "savePreferences": "設定を保存",
+    "manageCookies": "Cookie管理",
+    "required": "必須",
+    "categories": {
+      "essential": "必須",
+      "essentialDesc": "サイト機能に必要（ログイン、設定、ゲーム状態）",
+      "analytics": "分析",
+      "analyticsDesc": "サイトの使用状況を理解し、体験を改善するのに役立ちます",
+      "advertising": "広告",
+      "advertisingDesc": "Google AdSenseを通じて関連広告を表示"
+    }
   },
   "common": {
     "email": "メール",

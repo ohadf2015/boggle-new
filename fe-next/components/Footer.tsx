@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
+import { ManageCookiesButton } from '@/components/CookieConsent';
 
 // Kofi brand icon SVG component
 const KofiIcon = ({ className }: { className?: string }) => (
@@ -144,6 +145,10 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             >
               {t('footer.contact') || 'Contact'}
             </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <span className="min-h-[48px] px-3 flex items-center">
+              <ManageCookiesButton />
+            </span>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <a
               href="https://ko-fi.com/lexiclash"

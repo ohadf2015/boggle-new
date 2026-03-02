@@ -5,6 +5,7 @@ import { translations } from '@/translations';
 import { ConditionalProviders } from '../conditional-providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
+import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import GoogleAdSense from '@/components/GoogleAdSense';
 import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
@@ -732,6 +733,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 >
                     {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 </a>
+                {/* Google Consent Mode v2 — MUST load before GA/AdSense */}
+                <GoogleConsentMode />
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
                 <GoogleAdSense />

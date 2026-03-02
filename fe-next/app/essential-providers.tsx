@@ -23,6 +23,7 @@ import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
+import { hasConsent } from '@/utils/cookieConsent';
 
 import type { Language } from '@/shared/types/game';
 
@@ -78,12 +79,14 @@ if (typeof window !== 'undefined') {
     initResizeObserverErrorHandler();
 }
 
-// Lazy load LogRocket after user interaction to avoid blocking initial load
-// Deferred to 3 seconds OR first user interaction (whichever comes first)
+// Lazy load LogRocket — only when analytics consent is granted.
+// Deferred to 3 seconds OR first user interaction (whichever comes first).
 let logRocketInitialized = false;
 const initLogRocket = () => {
     if (logRocketInitialized) return;
     if (typeof window === 'undefined' || window.location.hostname === 'localhost') return;
+    // Require analytics consent before session replay
+    if (!hasConsent('analytics')) return;
 
     logRocketInitialized = true;
     import('logrocket').then(({ default: LogRocket }) => {
@@ -110,6 +113,7 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
 
     // Defer LogRocket initialization for optimal performance
     // Load after 3 seconds or on first user interaction, whichever comes first
+    // Only initializes when analytics consent is granted
     useEffect(() => {
         const timeoutId = setTimeout(initLogRocket, 3000);
 
@@ -126,11 +130,16 @@ export function EssentialProviders({ children, lang }: EssentialProvidersProps) 
             window.addEventListener(event, handleInteraction, { once: true, passive: true });
         });
 
+        // Also listen for consent changes — user may grant analytics after page load
+        const handleConsent = () => initLogRocket();
+        window.addEventListener('cookie-consent-change', handleConsent);
+
         return () => {
             clearTimeout(timeoutId);
             events.forEach(event => {
                 window.removeEventListener(event, handleInteraction);
             });
+            window.removeEventListener('cookie-consent-change', handleConsent);
         };
     }, []);
 
