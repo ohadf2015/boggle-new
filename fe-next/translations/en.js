@@ -9,8 +9,8 @@ const en = {
   },
   "seo": {
     "title": "Free Multiplayer Word Game - Play Online",
-    "description": "Play the best free multiplayer word game online! LexiClash combines Boggle-style gameplay with real-time competition. Race friends to find words, build combos, and climb leaderboards. Perfect Wordle alternative for groups. No download - play instantly in 5 languages. Great for parties, team building, and family game nights!",
-    "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download",
+    "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
+    "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
     "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
     "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
@@ -54,10 +54,10 @@ const en = {
       "ogDescription": "Access LexiClash Terms of Service and Privacy Policy."
     },
     "singleplayer": {
-      "title": "Single Player - Practice & Challenge",
-      "description": "Play LexiClash solo! Practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Track your progress and beat your high scores.",
-      "ogTitle": "Single Player Mode - Practice & Challenge",
-      "ogDescription": "Practice word finding solo, challenge AI bots, and beat your high scores in LexiClash single player mode."
+      "title": "Free Boggle Online - No Download Required",
+      "description": "Play free boggle online — no download required! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Play boggle free in your browser instantly.",
+      "ogTitle": "Play Boggle Free Online - No Download",
+      "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
     },
     "daily": {
       "title": "Daily Word Challenge - Same Puzzle Worldwide",

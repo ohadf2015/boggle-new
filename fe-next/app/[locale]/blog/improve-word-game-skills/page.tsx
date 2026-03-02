@@ -1,8 +1,8 @@
 import ImproveSkillsPageClient from './PageClient';
 
 export const metadata = {
-  title: 'How to Improve Your Word Game Skills',
-  description: 'Discover proven strategies and techniques to level up your word game performance. Learn pattern recognition, vocabulary building, and competitive tactics from experienced players.',
+  title: 'How to Improve Your Word Game Skills | Free Tips',
+  description: 'Discover proven strategies to improve your word making games performance. Learn Boggle strategies, pattern recognition, vocabulary building, and free word game tips from experienced players.',
 };
 
 export default function ImproveSkillsPage() {

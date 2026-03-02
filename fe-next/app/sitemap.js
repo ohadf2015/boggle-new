@@ -251,6 +251,16 @@ export default function sitemap() {
         lastModified: now,
         changeFrequency: 'monthly',
         priority: 0.7,
+        alternates: {
+          languages: {
+            'x-default': `${baseUrl}/en/blog/${slug}`,
+            he: `${baseUrl}/he/blog/${slug}`,
+            en: `${baseUrl}/en/blog/${slug}`,
+            sv: `${baseUrl}/sv/blog/${slug}`,
+            ja: `${baseUrl}/ja/blog/${slug}`,
+            es: `${baseUrl}/es/blog/${slug}`,
+          },
+        },
       });
     });
   });
