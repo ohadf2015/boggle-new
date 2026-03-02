@@ -21,7 +21,6 @@ import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import { AdPlaceholder } from '@/components/ads';
 import ModeCard from './ModeCard';
-import ModeCardV2 from './ModeCardV2';
 import { LandingShareBanner } from './LandingShareBanner';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import Header from '@/components/Header';
@@ -573,17 +572,22 @@ const LandingView: React.FC = () => {
                 />
               </motion.div>
 
-              {/* Adventure Mode card — constrained width on desktop to match card proportions */}
-              <div className="col-span-1 sm:col-span-2 w-full max-w-lg mx-auto">
-                <ModeCardV2
+              {/* Adventure Mode card — full width, secondary style to match visual hierarchy */}
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
+                className="col-span-1 sm:col-span-2 w-full"
+              >
+                <ModeCard
                   title={t('landing.adventureMode') || 'Adventure'}
                   description={t('landing.adventureModeDesc') || '100 levels across 10 worlds'}
                   href={`/${language}/adventure`}
-                  mode="adventure"
+                  icon={<Map className="w-6 h-6" />}
                   variant="lime"
                   className="w-full"
                 />
-              </div>
+              </motion.div>
 
               {/* Secondary card - Blast Mode (visible to admins and players with blast access) */}
               {(isAdmin || profile?.blast_access) && (
@@ -600,6 +604,30 @@ const LandingView: React.FC = () => {
                   />
                 </div>
               )}
+
+              {/* Leaderboard quick link */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
+                className="col-span-1 sm:col-span-2 flex justify-center"
+              >
+                <Link
+                  href={`/${language}/leaderboard`}
+                  className={cn(
+                    'inline-flex items-center gap-2 px-5 py-2.5',
+                    'text-neo-white/80 hover:text-neo-white',
+                    'font-bold text-sm',
+                    'rounded-neo border-2 border-neo-white/15 hover:border-neo-yellow/40',
+                    'hover:bg-neo-white/5',
+                    'transition-all duration-200',
+                    'group'
+                  )}
+                >
+                  <Trophy className="w-4 h-4 text-neo-yellow group-hover:scale-110 transition-transform" />
+                  <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
+                </Link>
+              </motion.div>
 
               {/* Share banner — bottom of page, after all mode cards */}
               <div className="col-span-1 sm:col-span-2">
