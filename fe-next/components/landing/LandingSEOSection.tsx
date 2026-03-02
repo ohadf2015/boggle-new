@@ -153,7 +153,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 <Icon className="w-6 h-6 text-neo-black shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <h3 className="font-bold text-neo-black text-sm sm:text-base">{t(titleKey) || fallbackTitle}</h3>
-                  <p className="text-xs sm:text-sm text-neo-black/70 mt-1">{t(descKey) || fallbackDesc}</p>
+                  <p className="text-sm text-neo-black/70 mt-1">{t(descKey) || fallbackDesc}</p>
                 </div>
               </div>
             </motion.div>

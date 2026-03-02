@@ -34,12 +34,12 @@ if (proto.createBackgroundLayers) {
 
 function createBlastScene(): BlastScene {
   const scene = new BlastScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
 
   // Add pauseAll/resumeAll to tweens mock
-  (scene.tweens as Record<string, unknown>).pauseAll = jest.fn();
-  (scene.tweens as Record<string, unknown>).resumeAll = jest.fn();
-  (scene.tweens as Record<string, unknown>).timeScale = 1;
+  (scene.tweens as unknown as Record<string, unknown>).pauseAll = jest.fn();
+  (scene.tweens as unknown as Record<string, unknown>).resumeAll = jest.fn();
+  (scene.tweens as unknown as Record<string, unknown>).timeScale = 1;
 
   scene.create();
   return scene;
@@ -53,10 +53,14 @@ const GRID_5x5: string[][] = [
   ['U', 'V', 'W', 'X', 'Y'],
 ];
 
-function initBlastGrid(scene: BlastScene): void {
-  const tileStates = GRID_5x5.map(row =>
-    row.map(() => ({ type: 'standard' as const, hitsRemaining: 0 }))
+function makeTileStates(grid: string[][]): Array<Array<{ type: 'standard'; hitsRemaining: number; row: number; col: number; isCleared: boolean; activationEffect: null }>> {
+  return grid.map((row, rIdx) =>
+    row.map((_, cIdx) => ({ type: 'standard' as const, hitsRemaining: 0, row: rIdx, col: cIdx, isCleared: false, activationEffect: null }))
   );
+}
+
+function initBlastGrid(scene: BlastScene): void {
+  const tileStates = makeTileStates(GRID_5x5);
   GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 0 });
 }
 
@@ -146,9 +150,7 @@ describe('BlastScene hit-stop', () => {
 describe('BlastScene time dilation', () => {
   it('sets timeScale to 0.6 at combo level 5', () => {
     const scene = createBlastScene();
-    const tileStates = GRID_5x5.map(row =>
-      row.map(() => ({ type: 'standard' as const, hitsRemaining: 0 }))
-    );
+    const tileStates = makeTileStates(GRID_5x5);
 
     // Initial grid at combo 0
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 0 });
@@ -160,9 +162,7 @@ describe('BlastScene time dilation', () => {
 
   it('sets timeScale to 0.4 at combo level 8', () => {
     const scene = createBlastScene();
-    const tileStates = GRID_5x5.map(row =>
-      row.map(() => ({ type: 'standard' as const, hitsRemaining: 0 }))
-    );
+    const tileStates = makeTileStates(GRID_5x5);
 
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 0 });
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 8 });
@@ -172,9 +172,7 @@ describe('BlastScene time dilation', () => {
 
   it('sets timeScale to 0.3 at combo level 10', () => {
     const scene = createBlastScene();
-    const tileStates = GRID_5x5.map(row =>
-      row.map(() => ({ type: 'standard' as const, hitsRemaining: 0 }))
-    );
+    const tileStates = makeTileStates(GRID_5x5);
 
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 0 });
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 10 });
@@ -192,9 +190,7 @@ describe('BlastScene time dilation', () => {
       isRTL: false,
     });
 
-    const tileStates = GRID_5x5.map(row =>
-      row.map(() => ({ type: 'standard' as const, hitsRemaining: 0 }))
-    );
+    const tileStates = makeTileStates(GRID_5x5);
 
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 0 });
     GameBridge.emit('blast:grid:update', { grid: GRID_5x5, tileStates, comboLevel: 10 });

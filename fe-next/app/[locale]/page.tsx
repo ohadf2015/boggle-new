@@ -12,11 +12,11 @@ interface PageProps {
 }
 
 const titleMap: Record<string, string> = {
-  en: 'LexiClash - Free Multiplayer Word Game | Play Online With Friends',
-  he: 'לקסיקלאש - משחק מילים מרובה משתתפים חינם | שחקו אונליין עם חברים',
-  sv: 'LexiClash - Gratis Multiplayer Ordspel | Spela Online Med Vänner',
-  ja: 'LexiClash - 無料マルチプレイヤーワードゲーム | フレンドとオンラインプレイ',
-  es: 'LexiClash - Juego de Palabras Multijugador Gratis | Juega Online',
+  en: 'LexiClash - Free Multiplayer Word Game | Play Online',
+  he: 'לקסיקלאש - משחק מילים מרובה משתתפים חינם | אונליין',
+  sv: 'LexiClash - Gratis Multiplayer Ordspel | Spela Online',
+  ja: 'LexiClash - 無料マルチプレイヤーワードゲーム | オンライン',
+  es: 'LexiClash - Juego de Palabras Multijugador | Online',
 };
 
 const descriptionMap: Record<string, string> = {
@@ -89,6 +89,7 @@ export default async function HomePage({ params }: PageProps) {
           <ul>
             <li><a href={`/${locale}/legal/privacy`}>Privacy Policy</a></li>
             <li><a href={`/${locale}/legal/terms`}>Terms of Service</a></li>
+            <li><a href={`/${locale}/legal/disclaimer`}>Disclaimer</a></li>
             <li><a href={`/${locale}/about`}>About LexiClash</a></li>
             <li><a href={`/${locale}/contact`}>Contact Us</a></li>
           </ul>

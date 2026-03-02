@@ -66,9 +66,18 @@ export function EmailCaptureModal() {
       const showCount = parseInt(localStorage.getItem('email_modal_show_count') || '0');
       if (showCount >= 3) return false;
 
-      // Check if user has completed at least 1 game
+      // Require at least 5 games before showing (avoid "intrusive popup" penalty)
       const gamesCompleted = parseInt(localStorage.getItem('games_completed_count') || '0');
-      if (gamesCompleted < 1) return false;
+      if (gamesCompleted < 5) return false;
+
+      // Require at least 7 days since first visit
+      const firstVisit = localStorage.getItem('first_visit_timestamp');
+      if (!firstVisit) {
+        localStorage.setItem('first_visit_timestamp', Date.now().toString());
+        return false;
+      }
+      const daysSinceFirstVisit = (Date.now() - parseInt(firstVisit)) / (1000 * 60 * 60 * 24);
+      if (daysSinceFirstVisit < 7) return false;
 
       return true;
     };
@@ -77,13 +86,13 @@ export function EmailCaptureModal() {
       return;
     }
 
-    // Show modal after 5 seconds
+    // Show modal after 10 seconds (less intrusive than 5s)
     const timer = setTimeout(() => {
       setShowModal(true);
       // Increment show count
       const showCount = parseInt(localStorage.getItem('email_modal_show_count') || '0');
       localStorage.setItem('email_modal_show_count', (showCount + 1).toString());
-    }, 5000);
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, [isEnabled]);

@@ -17,7 +17,7 @@ import { BlastScene } from '../BlastScene';
 
 function createScene(): BlastScene {
   const scene = new BlastScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
   scene.create();
   return scene;
 }
@@ -131,9 +131,9 @@ describe('BlastScene wave celebration — tile fly-out rotation', () => {
     GameBridge.emit('blast:wave:transition', { waveNumber: 2 });
 
     // Tile fly-out tweens should include angle property
-    const flyOutTweens = tweenSpy.mock.calls.map((c: unknown[]) => c[0]);
+    const flyOutTweens = tweenSpy.mock.calls.map((c: unknown[]) => c[0] as Record<string, unknown>);
     const hasRotation = flyOutTweens.some(
-      (t: Record<string, unknown>) => t.angle !== undefined
+      (t) => t.angle !== undefined
     );
     expect(hasRotation).toBe(true);
   });
@@ -150,8 +150,8 @@ describe('BlastScene wave celebration — overshoot bounce on WAVE text', () => 
     GameBridge.emit('blast:wave:transition', { waveNumber: 3 });
 
     // Find the tween for wave text that has scaleX > 1.0
-    const allTweens = tweenSpy.mock.calls.map((c: unknown[]) => c[0]);
-    const overshootTween = allTweens.find((t: Record<string, unknown>) => {
+    const allTweens = tweenSpy.mock.calls.map((c: unknown[]) => c[0] as Record<string, unknown>);
+    const overshootTween = allTweens.find((t) => {
       const scaleXVal = t.scaleX;
       if (typeof scaleXVal === 'object' && scaleXVal !== null) {
         // Check for { from: ..., to: ... } where to > 1
@@ -205,14 +205,14 @@ describe('BlastScene wave celebration — breathing room delay', () => {
 
     // Trigger all tile fly-out onComplete callbacks to simulate animation finishing
     const flyOutTweens = tweenSpy.mock.calls
-      .map((c: unknown[]) => c[0])
-      .filter((t: Record<string, unknown>) => t.alpha === 0 && t.onComplete);
+      .map((c: unknown[]) => c[0] as Record<string, unknown>)
+      .filter((t) => t.alpha === 0 && t.onComplete);
     for (const tween of flyOutTweens) {
       (tween as { onComplete: () => void }).onComplete();
     }
 
     // After all fly-outs complete, a 200ms breathing room delay should fire
-    const delays = delayedCallSpy.mock.calls.map((c: unknown[]) => c[0]);
-    expect(delays.some((d: number) => d === 200)).toBe(true);
+    const delays = delayedCallSpy.mock.calls.map((c: unknown[]) => c[0] as number);
+    expect(delays.some((d) => d === 200)).toBe(true);
   });
 });

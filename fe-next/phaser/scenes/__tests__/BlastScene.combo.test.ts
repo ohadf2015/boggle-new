@@ -17,7 +17,7 @@ import { BlastScene } from '../BlastScene';
 
 function createScene(): BlastScene {
   const scene = new BlastScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
   scene.create();
   return scene;
 }

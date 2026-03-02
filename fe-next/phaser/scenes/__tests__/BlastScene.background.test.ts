@@ -11,7 +11,7 @@ import { BlastScene } from '../BlastScene';
 
 function createScene(a11yOverrides?: Partial<{ reduceMotion: boolean; isLowEnd: boolean }>): BlastScene {
   const scene = new BlastScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
 
   // Apply a11y overrides before create() so background creation respects them
   if (a11yOverrides) {

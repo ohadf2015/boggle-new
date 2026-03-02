@@ -22,7 +22,7 @@ jest.mock('../../effects/CameraEffects', () => ({
 
 function createScene(): GameScene {
   const scene = new GameScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
   scene.create();
   return scene;
 }

@@ -16,7 +16,7 @@ import { BlastScene } from '../BlastScene';
 
 function makeScene(): BlastScene {
   const scene = new BlastScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
   scene.create();
   return scene;
 }
@@ -51,7 +51,7 @@ describe('BlastScene camera flash on tile clear', () => {
     // First set up the grid so tiles exist
     GameBridge.emit('blast:grid:update', {
       grid: [['A']],
-      tileStates: [[{ type: 'standard', hitsRemaining: 0 }]],
+      tileStates: [[{ type: 'standard', hitsRemaining: 0, row: 0, col: 0, isCleared: false, activationEffect: null }]],
       comboLevel: 1,
     });
 
@@ -66,7 +66,7 @@ describe('BlastScene camera flash on tile clear', () => {
 
     GameBridge.emit('blast:grid:update', {
       grid: [['A']],
-      tileStates: [[{ type: 'standard', hitsRemaining: 0 }]],
+      tileStates: [[{ type: 'standard', hitsRemaining: 0, row: 0, col: 0, isCleared: false, activationEffect: null }]],
       comboLevel: 1,
     });
 
@@ -84,7 +84,7 @@ describe('BlastScene camera flash on tile clear', () => {
 
     GameBridge.emit('blast:grid:update', {
       grid: [['A']],
-      tileStates: [[{ type: 'standard', hitsRemaining: 0 }]],
+      tileStates: [[{ type: 'standard', hitsRemaining: 0, row: 0, col: 0, isCleared: false, activationEffect: null }]],
       comboLevel: 1,
     });
 

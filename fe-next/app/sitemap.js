@@ -334,6 +334,24 @@ export default function sitemap() {
         },
       },
     });
+
+    // Disclaimer
+    routes.push({
+      url: `${baseUrl}${localePath}/legal/disclaimer`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          'x-default': `${baseUrl}/en/legal/disclaimer`,
+          he: `${baseUrl}/he/legal/disclaimer`,
+          en: `${baseUrl}/en/legal/disclaimer`,
+          sv: `${baseUrl}/sv/legal/disclaimer`,
+          ja: `${baseUrl}/ja/legal/disclaimer`,
+          es: `${baseUrl}/es/legal/disclaimer`,
+        },
+      },
+    });
   });
 
   // Hebrew SEO landing page (high priority for Hebrew keyword searches)

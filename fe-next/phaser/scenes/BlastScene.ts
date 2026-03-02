@@ -80,13 +80,13 @@ export class BlastScene extends GameScene {
   private previousBlastCombo: number | null = null;
 
   // Cascade chain text overlay (cleaned up between phases)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private cascadeText: any = null;
   // Milestone text overlay
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private milestoneText: any = null;
   // Background radial glow overlay for high combo
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private radialGlow: any = null;
 
   // ─── Temporal juice state ──────────────────────────────────────────────────
@@ -95,11 +95,11 @@ export class BlastScene extends GameScene {
 
   // ─── Living background ─────────────────────────────────────────────────────
   private bgLayers: BackgroundLayers | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private backgroundGradient: any = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private ambientEmitter: any = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private vignetteOverlay: any = null;
 
   // Stored bound handlers for cleanup
@@ -677,9 +677,9 @@ export class BlastScene extends GameScene {
   }
 
   // Wave text references
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private waveText: any = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private waveScoreText: any = null;
 
   private cleanupWaveText(): void {

@@ -64,7 +64,8 @@ describe('BlastTile.setComboGlow', () => {
 
     expect((scene.tweens.add as jest.Mock).mock.calls.length).toBeGreaterThan(tweensBefore);
     // Verify tween config has yoyo and repeat for pulsing
-    const lastTweenCall = (scene.tweens.add as jest.Mock).mock.calls.at(-1)[0];
+    const tweenCalls = (scene.tweens.add as jest.Mock).mock.calls;
+    const lastTweenCall = tweenCalls[tweenCalls.length - 1][0];
     expect(lastTweenCall.yoyo).toBe(true);
     expect(lastTweenCall.repeat).toBe(-1);
   });

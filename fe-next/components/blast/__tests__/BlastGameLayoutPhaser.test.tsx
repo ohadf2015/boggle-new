@@ -26,7 +26,7 @@ jest.mock('next/dynamic', () => ({
 // Mock framer-motion to render plain divs
 jest.mock('framer-motion', () => {
   const MotionDiv = React.forwardRef<HTMLDivElement, React.PropsWithChildren<Record<string, unknown>>>(({ children, ...rest }, ref) => (
-    <div ref={ref} {...rest}>{children}</div>
+    <div ref={ref} {...rest}>{children as React.ReactNode}</div>
   ));
   MotionDiv.displayName = 'MotionDiv';
   return {

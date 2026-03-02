@@ -51,7 +51,7 @@ export class WordPathTrail extends Phaser.GameObjects.Graphics {
   private readonly opts: Required<TrailOptions>;
 
   // Flow animation timer
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Phaser types unavailable in Next.js build
+   
   private flowTimer: any = null;
 
   // Spark particle emitter

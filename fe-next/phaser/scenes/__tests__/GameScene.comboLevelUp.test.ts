@@ -24,7 +24,7 @@ jest.mock('../../effects/ComboEffect', () => ({
 function createScene(): GameScene {
   const scene = new GameScene();
   // Add addEventListener stub to game.canvas (GameScene.create reads it)
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
   // create() wires bridge subscriptions, path trail, combo ring
   scene.create();
   return scene;

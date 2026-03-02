@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -14,12 +15,15 @@ interface LegalPageLayoutProps {
     children: React.ReactNode;
     title: string;
     lastUpdated?: string;
+    /** Custom breadcrumb items. Defaults to Legal > title */
+    breadcrumbs?: { label: string; href?: string }[];
 }
 
 export default function LegalPageLayout({
     children,
     title,
-    lastUpdated = 'November 2025'
+    lastUpdated = 'November 2025',
+    breadcrumbs,
 }: LegalPageLayoutProps): React.ReactElement {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
@@ -34,6 +38,14 @@ export default function LegalPageLayout({
       <Header />
 
       <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={breadcrumbs || [
+            { label: t('legal.title') || 'Legal', href: `/${language}/legal` },
+            { label: title },
+          ]}
+        />
+
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -145,6 +157,17 @@ export default function LegalPageLayout({
                   )}
                 >
                   {t('footer.cookiePolicy')}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`/${language}/legal/disclaimer`}
+                  className={cn(
+                    'hover:underline font-medium',
+                    isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {t('legal.disclaimer.title') || 'Disclaimer'}
                 </a>
               </li>
               <li>

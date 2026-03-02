@@ -556,6 +556,6 @@ describe('GravityController landing flash', () => {
     fallTween.onComplete?.();
 
     // Tile should have setTint called with white
-    expect(tile.setTint).toHaveBeenCalledWith(0xffffff);
+    expect((tile as unknown as { setTint: jest.Mock }).setTint).toHaveBeenCalledWith(0xffffff);
   });
 });

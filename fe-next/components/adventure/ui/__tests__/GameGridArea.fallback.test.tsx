@@ -22,7 +22,7 @@ jest.mock('@/components/phaser/PhaserGameAdventure', () => ({
   },
 }));
 
-const mockAdventureGrid = jest.fn(() => <div data-testid="adventure-grid-fallback" />);
+const mockAdventureGrid = jest.fn((_props?: Record<string, unknown>) => <div data-testid="adventure-grid-fallback" />);
 jest.mock('../../AdventureGrid', () => ({
   __esModule: true,
   default: React.forwardRef(function MockAdventureGrid(props: Record<string, unknown>, _ref: React.Ref<unknown>) {

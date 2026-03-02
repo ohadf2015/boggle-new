@@ -42,7 +42,7 @@ const GRID_4x4: string[][] = [
 
 function createScene(): GameScene {
   const scene = new GameScene();
-  (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+  (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
   scene.create();
   // Build grid so tiles + layout exist for earthquake effects
   GameBridge.emit('grid:update', { grid: GRID_4x4, comboLevel: 0, fireRoundActive: false });
@@ -116,7 +116,7 @@ describe('GameScene earthquake effects', () => {
   it('should not call earthquake effects when layout is not yet built', () => {
     // Create scene without emitting grid:update
     const scene = new GameScene();
-    (scene.game.canvas as Record<string, unknown>).addEventListener = jest.fn();
+    (scene.game.canvas as unknown as Record<string, unknown>).addEventListener = jest.fn();
     scene.create();
 
     GameBridge.emit('effect:earthquake', { intensity: 'warning' });

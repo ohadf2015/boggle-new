@@ -147,8 +147,8 @@ describe('BlastTile.playClearAnimation particles', () => {
     const graphicsCalls = (scene.make.graphics as jest.Mock).mock.calls;
     const lastGraphics = (scene.make.graphics as jest.Mock).mock.results;
     // The particle texture creation should use gold's tint color (0xffd700)
-    const fillCalls = lastGraphics.flatMap((r: { value: { fillStyle: jest.Mock } }) =>
-      r.value.fillStyle.mock.calls,
+    const fillCalls = lastGraphics.flatMap((r) =>
+      (r.value as { fillStyle: jest.Mock }).fillStyle.mock.calls,
     );
     const usedGold = fillCalls.some(
       (call: unknown[]) => call[0] === 0xffd700,

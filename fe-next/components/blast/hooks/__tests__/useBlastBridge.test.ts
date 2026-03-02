@@ -339,7 +339,7 @@ describe('emitBlastEvent returned helper', () => {
     (GameBridge.emit as jest.Mock).mockClear();
 
     const payload = {
-      words: [{ word: 'CAT', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }], score: 3 }],
+      words: [{ word: 'CAT', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }], score: 3, chainLevel: 1 }],
     };
 
     act(() => {
