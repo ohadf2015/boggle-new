@@ -90,6 +90,61 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
+// Mock AdventureThemeContext to avoid provider requirement
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useAdventureTheme: () => ({
+    theme: {
+      worldId: 1,
+      background: { baseColor: 'bg-neo-navy', layers: [], texture: { type: 'none', opacity: 0, blendMode: 'normal' }, particles: { type: 'leaves', count: 0, colors: [], sizeRange: [2, 4], speed: 1 } },
+      tiles: {},
+      ui: { accentColor: 'neo-lime', textColor: 'neo-white', headerBg: 'bg-neo-navy/80' },
+      chapters: [],
+      containerClass: 'adventure-world-1',
+    },
+    worldId: 1,
+    level: 1,
+    setWorld: jest.fn(),
+    setLevel: jest.fn(),
+    isTransitioning: false,
+  }),
+  AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useHUDTheme: () => ({
+    headerBg: 'bg-neo-navy/90',
+    headerBorder: 'border-neo-black/40',
+    sidebarBg: 'bg-neo-black/40',
+    scoreAccent: 'text-neo-cyan',
+    levelBadgeColor: 'bg-neo-black/40',
+    levelBadgeText: 'text-neo-cyan',
+    objectiveAccent: 'text-neo-lime',
+    hintActiveColor: 'bg-neo-lime',
+    hintActiveText: 'text-neo-black',
+  }),
+  useTimerTheme: () => ({
+    normal: { bg: 'bg-neo-navy/80', text: 'text-neo-white', shadow: '' },
+    warning: { bg: 'bg-neo-orange/20', text: 'text-neo-orange', shadow: '' },
+    danger: { bg: 'bg-neo-red/20', text: 'text-neo-red', shadow: '' },
+    critical: { bg: 'bg-neo-red/30', text: 'text-neo-red', shadow: '' },
+  }),
+  useBossFightTheme: () => ({
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    phaseColors: {
+      phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+      phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+      enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+    },
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
 // Mock confetti util
 jest.mock('@/utils/confettiUtils', () => ({
   fireConfetti: jest.fn(),

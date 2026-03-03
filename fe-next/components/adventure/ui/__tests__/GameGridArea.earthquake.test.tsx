@@ -41,6 +41,15 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useHUDTheme: () => ({
+    headerBg: 'bg-neo-navy/90', headerBorder: 'border-neo-black/40',
+    sidebarBg: 'bg-neo-black/40', scoreAccent: 'text-neo-cyan',
+    levelBadgeColor: 'bg-neo-black/40', levelBadgeText: 'text-neo-cyan',
+    objectiveAccent: 'text-neo-lime', hintActiveColor: 'bg-neo-lime', hintActiveText: 'text-neo-black',
+  }),
+}));
+
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,

@@ -14,6 +14,9 @@ import type {
   WorldColorPalette,
   ModifierDisplayConfig,
   ChapterConfig,
+  HUDTheme,
+  TimerUrgencyTheme,
+  BossFightTheme,
 } from './types';
 
 // ==============================================
@@ -252,6 +255,56 @@ const chapters: [ChapterConfig, ChapterConfig, ChapterConfig] = [
 ];
 
 // ==============================================
+// HUD THEME (Orange/amber — tropical warm)
+// ==============================================
+
+const hud: HUDTheme = {
+  headerBg: 'bg-amber-950/90',
+  headerBorder: 'border-amber-800/40',
+  sidebarBg: 'bg-amber-950/60',
+  scoreAccent: 'text-orange-400',
+  levelBadgeColor: 'bg-amber-900/60',
+  levelBadgeText: 'text-orange-300',
+  objectiveAccent: 'text-orange-400',
+  hintActiveColor: 'bg-orange-500',
+  hintActiveText: 'text-amber-950',
+};
+
+// ==============================================
+// TIMER URGENCY THEME
+// ==============================================
+
+const timerTheme: TimerUrgencyTheme = {
+  normal: { bg: 'bg-amber-950/80', text: 'text-neo-white', shadow: '' },
+  warning: { bg: 'bg-amber-500/20', text: 'text-amber-400', shadow: 'shadow-[0_0_12px_rgba(245,158,11,0.3)]' },
+  danger: { bg: 'bg-red-500/20', text: 'text-red-400', shadow: 'shadow-[0_0_16px_rgba(239,68,68,0.4)]' },
+  critical: { bg: 'bg-red-500/30', text: 'text-red-400', shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.6)]' },
+};
+
+// ==============================================
+// BOSS FIGHT THEME
+// ==============================================
+
+const bossFight: BossFightTheme = {
+  dialogueBg: 'bg-amber-950/95',
+  dialogueBorder: 'border-orange-500/30',
+  bossNameColor: 'text-orange-400',
+  hpSegmentColors: ['bg-red-500', 'bg-amber-500', 'bg-orange-500'],
+  telegraphColor: 'bg-red-500/20',
+  telegraphProgressColor: 'bg-red-500',
+  playerHealthNormal: 'bg-orange-500',
+  playerHealthLow: 'bg-red-500',
+  phaseColors: {
+    phase1: { bg: 'bg-orange-500/20', text: 'text-orange-400' },
+    phase2: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
+    enraged: { bg: 'bg-red-500/20', text: 'text-red-400' },
+  },
+  avatarGlow: 'rgba(249, 115, 22, 0.4)',
+  victoryGlow: 'rgba(251, 146, 60, 0.6)',
+  arenaEffect: 'ocean-deck',
+};
+
+// ==============================================
 // COMPLETE THEME EXPORT
 // ==============================================
 
@@ -267,4 +320,7 @@ export const WORLD_4_THEME: WorldTheme = {
   animations,
   chapters,
   containerClass: 'world-archipelago',
+  hud,
+  timerTheme,
+  bossFight,
 };

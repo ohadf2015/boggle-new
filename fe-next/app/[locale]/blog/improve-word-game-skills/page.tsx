@@ -1,10 +1,70 @@
+import type { Metadata } from 'next';
+import { BlogPostingJsonLd } from '@/components/seo/BlogJsonLd';
 import ImproveSkillsPageClient from './PageClient';
+import { contentByLocale } from './content';
 
-export const metadata = {
-  title: 'How to Improve Your Word Game Skills | Free Tips',
-  description: 'Discover proven strategies to improve your word making games performance. Learn Boggle strategies, pattern recognition, vocabulary building, and free word game tips from experienced players.',
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+const SLUG = 'improve-word-game-skills';
+const DATE_PUBLISHED = '2025-06-15';
+
+const metaTitles: Record<string, string> = {
+  en: 'Improve Word Game Skills - Free Boggle & Word Puzzle Tips',
+  he: 'שיפור כישורי משחקי מילים - טיפים חינם',
+  sv: 'Förbättra Dina Ordspelsfärdigheter - Gratis Tips',
+  ja: 'ワードゲームスキルを向上させる - 無料攻略ガイド',
+  es: 'Mejora Tus Habilidades en Juegos de Palabras - Tips Gratis',
 };
 
-export default function ImproveSkillsPage() {
-  return <ImproveSkillsPageClient />;
+const metaDescriptions: Record<string, string> = {
+  en: 'Proven strategies to improve your word game performance. Learn Boggle strategies, pattern recognition, vocabulary building, and free tips from experienced players.',
+  he: 'אסטרטגיות מוכחות לשיפור הביצועים שלכם במשחקי מילים. למדו זיהוי תבניות, בניית אוצר מילים וטיפים מנוסים.',
+  sv: 'Beprövade strategier för att förbättra din ordspelsprestanda. Lär dig mönsterigenkänning, ordförrådsbyggande och tips.',
+  ja: 'ワードゲームのパフォーマンスを向上させる実証済み戦略。パターン認識、語彙構築、経験豊富なプレイヤーからの無料ヒント。',
+  es: 'Estrategias probadas para mejorar tu rendimiento en juegos de palabras. Aprende reconocimiento de patrones y vocabulario.',
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const title = metaTitles[locale] || metaTitles.en;
+  const description = metaDescriptions[locale] || metaDescriptions.en;
+
+  return {
+    title,
+    description,
+    openGraph: { type: 'article', title, description, url: `https://www.lexiclash.live/${locale}/blog/${SLUG}`, siteName: 'LexiClash' },
+    twitter: { card: 'summary_large_image', title, description },
+    alternates: {
+      canonical: `https://www.lexiclash.live/${locale}/blog/${SLUG}`,
+      languages: {
+        'x-default': `https://www.lexiclash.live/en/blog/${SLUG}`,
+        he: `https://www.lexiclash.live/he/blog/${SLUG}`,
+        en: `https://www.lexiclash.live/en/blog/${SLUG}`,
+        sv: `https://www.lexiclash.live/sv/blog/${SLUG}`,
+        ja: `https://www.lexiclash.live/ja/blog/${SLUG}`,
+        es: `https://www.lexiclash.live/es/blog/${SLUG}`,
+      },
+    },
+    robots: { index: true, follow: true },
+  };
+}
+
+export default async function ImproveSkillsPage({ params }: PageProps) {
+  const { locale } = await params;
+  const content = contentByLocale[locale] || contentByLocale.en;
+
+  return (
+    <>
+      <BlogPostingJsonLd
+        title={content.title}
+        description={metaDescriptions[locale] || metaDescriptions.en}
+        slug={SLUG}
+        locale={locale}
+        datePublished={DATE_PUBLISHED}
+      />
+      <ImproveSkillsPageClient />
+    </>
+  );
 }

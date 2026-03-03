@@ -10,7 +10,7 @@ const es = {
   "seo": {
     "title": "Juego de Palabras Multijugador Gratis - Online",
     "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
-    "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis",
+    "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis, juego de letras gratis, wordle en español, boggle en español gratis, juego de palabras sin descargar, juego de palabras para grupos, juego de vocabulario online, juego de palabras con amigos, juego de palabras educativo, scrabble alternativa online, juego de palabras en navegador, reto de palabras diario, juego de palabras rápido, juego cerebral de palabras",
     "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
     "ogDescription": "🎮 ¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! ⚡ Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación 🔥 ¡Juega gratis ahora!",
     "twitterTitle": "LexiClash - Juego de Palabras Multijugador Rápido",
@@ -94,6 +94,12 @@ const es = {
       "description": "Consejos, estrategias e información para entusiastas de juegos de palabras. Aprende a mejorar tu vocabulario, dominar técnicas de búsqueda de palabras y convertirte en campeón de LexiClash.",
       "ogTitle": "Blog de LexiClash - Consejos y Estrategias",
       "ogDescription": "Consejos expertos, estrategias e información para mejorar tus habilidades en juegos de palabras."
+    },
+    "adventure": {
+        "title": "Juego de Palabras Aventura - RPG de Palabras Gratis",
+        "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 100 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
+        "ogTitle": "LexiClash Aventura - Juego RPG de Palabras",
+        "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!"
     }
   },
   "cookieConsent": {
@@ -4535,6 +4541,31 @@ const es = {
         "zone1": "Túneles de Raíces",
         "zone2": "Salones de Cristal",
         "bossZone": "Cámara de Etimología"
+      },
+      "labyrinth": {
+        "zone1": "Corredores Sinuosos",
+        "zone2": "Cámaras de Rompecabezas",
+        "bossZone": "Corazón del Laberinto"
+      },
+      "palace": {
+        "zone1": "Vestíbulo de Cristal",
+        "zone2": "Salón de Reflejos",
+        "bossZone": "Trono de Espejos"
+      },
+      "nebula": {
+        "zone1": "Campos Estelares",
+        "zone2": "Deriva Cósmica",
+        "bossZone": "Horizonte de Eventos"
+      },
+      "peaks": {
+        "zone1": "Prados Alpinos",
+        "zone2": "Cumbre de Nubes",
+        "bossZone": "Torre de Babel"
+      },
+      "throne": {
+        "zone1": "Gran Biblioteca",
+        "zone2": "Estudio del Dragón",
+        "bossZone": "Sala del Trono Léxico"
       }
     },
     "bosses": {
@@ -4546,6 +4577,7 @@ const es = {
       "skipIntro": "Saltar",
       "readyToFight": "¡Vamos!",
       "enraged": "¡ENFURECIDO!",
+      "mechanicProgress": "Progreso de mecánica",
       "phases": {
         "phase1": "Fase 1",
         "phase2": "Fase 2"
@@ -4860,6 +4892,11 @@ const es = {
       "msGrammar": {
         "name": "Srta. Gramática",
         "mechanic": "Protocolo de examen sorpresa - ¡Encuentra palabras que cumplan mis requisitos!",
+        "phases": {
+          "lecture": "Clase",
+          "popTest": "Examen Sorpresa",
+          "finalExam": "Examen Final"
+        },
         "taunts": {
           "start1": "¡La clase ha comenzado! Veamos si habéis estudiado...",
           "start2": "¡Examen sorpresa! ¡Espero que estéis preparados!",

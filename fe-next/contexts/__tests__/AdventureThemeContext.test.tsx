@@ -134,15 +134,15 @@ describe('AdventureThemeProvider', () => {
     // THEN - World 3 is implemented
     expect(screen.getByTestId('is-implemented')).toHaveTextContent('true');
 
-    // WHEN - World 6 is a placeholder (worlds 1-5 are fully implemented)
+    // WHEN - World 6 is now fully implemented (all 10 worlds have themes)
     rerender(
       <AdventureThemeProvider initialWorldId={6}>
         <TestConsumer />
       </AdventureThemeProvider>
     );
 
-    // THEN
-    expect(screen.getByTestId('is-implemented')).toHaveTextContent('false');
+    // THEN - World 6 is fully implemented
+    expect(screen.getByTestId('is-implemented')).toHaveTextContent('true');
   });
 
   it('should handle world change immediately', () => {

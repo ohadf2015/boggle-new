@@ -21,6 +21,7 @@ import { memo, useMemo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import PhaseIndicator from './PhaseIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 
 // ==============================================
 // TYPES
@@ -205,6 +206,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
   bossName,
 }) => {
   const { t } = useLanguage();
+  const bossFightTheme = useBossFightTheme();
 
   const hpPercentage = useMemo(
     () => calculateHpPercentage(currentHP, maxHP),
@@ -213,8 +215,17 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 
   const isLowHP = hpPercentage <= LOW_HP_THRESHOLD * 100;
 
+  // Override segment colors with theme-derived colors
+  const themedSegments = useMemo(() => {
+    const [seg1Color, seg2Color, seg3Color] = bossFightTheme.hpSegmentColors;
+    return SEGMENTS.map((segment, i) => ({
+      ...segment,
+      color: i === 0 ? seg1Color : i === 1 ? seg2Color : seg3Color,
+    }));
+  }, [bossFightTheme.hpSegmentColors]);
+
   const segmentFills = useMemo(() => {
-    return SEGMENTS.map(segment => ({
+    return themedSegments.map(segment => ({
       ...segment,
       fill: calculateSegmentFill(
         hpPercentage,
@@ -222,7 +233,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         segment.maxThreshold
       ),
     }));
-  }, [hpPercentage]);
+  }, [hpPercentage, themedSegments]);
 
   // Flash effect when HP drops
   const prevHPRef = useRef(currentHP);

@@ -31,6 +31,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion';
+import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 
 // ==============================================
 // TYPES
@@ -64,13 +65,14 @@ export interface AttackTelegraphProps {
 export function AttackTelegraph({
   isActive,
   progress,
-  targetTiles,
-  abilityId,
+  targetTiles: _targetTiles,
+  abilityId: _abilityId,
   timeRemaining,
   abilityName,
 }: AttackTelegraphProps) {
   const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const bossFightTheme = useBossFightTheme();
 
   // Convert ms to seconds for display (ceiling to show full seconds)
   const secondsRemaining = Math.ceil(timeRemaining / 1000);
@@ -94,7 +96,7 @@ export function AttackTelegraph({
             className="
               absolute top-20 left-1/2 -translate-x-1/2
               px-6 py-3
-              bg-red-600
+              ${bossFightTheme.telegraphColor}
               border-3 border-black
               rounded-neo
               shadow-hard-lg
@@ -173,7 +175,7 @@ export function AttackTelegraph({
             aria-label={t('adventure.bosses.telegraph.progress') || 'Attack progress'}
           >
             <motion.div
-              className="h-full bg-red-500"
+              className={`h-full ${bossFightTheme.telegraphProgressColor}`}
               initial={{ width: '0%' }}
               animate={{ width: `${progress * 100}%` }}
               transition={{ duration: 0.05 }}

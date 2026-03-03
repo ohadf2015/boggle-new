@@ -180,6 +180,58 @@ describe('Boss Configuration', () => {
     });
   });
 
+  describe('Boss phase configs', () => {
+    it('should have phases defined for each boss', () => {
+      for (let world = 1; world <= WORLDS_COUNT; world++) {
+        const boss = getBossConfig(world) as BossConfig;
+        expect(boss.phases).toBeDefined();
+        expect(boss.phases.length).toBeGreaterThanOrEqual(3);
+      }
+    });
+
+    it('should have valid phase names for each boss', () => {
+      for (let world = 1; world <= WORLDS_COUNT; world++) {
+        const boss = getBossConfig(world) as BossConfig;
+        for (const phase of boss.phases) {
+          expect(phase.nameKey).toBeTruthy();
+          expect(phase.hpThreshold).toBeGreaterThanOrEqual(0);
+          expect(phase.hpThreshold).toBeLessThanOrEqual(100);
+        }
+      }
+    });
+
+    it('should have phases ordered by descending HP threshold', () => {
+      for (let world = 1; world <= WORLDS_COUNT; world++) {
+        const boss = getBossConfig(world) as BossConfig;
+        for (let i = 1; i < boss.phases.length; i++) {
+          expect(boss.phases[i].hpThreshold).toBeLessThanOrEqual(boss.phases[i - 1].hpThreshold);
+        }
+      }
+    });
+
+    it('World 1 - Ms. Grammar phases: Lecture, Pop Test, Final Exam', () => {
+      const boss = getBossConfig(1) as BossConfig;
+      expect(boss.phases).toHaveLength(3);
+      expect(boss.phases[0].nameKey).toContain('lecture');
+      expect(boss.phases[1].nameKey).toContain('popTest');
+      expect(boss.phases[2].nameKey).toContain('finalExam');
+    });
+
+    it('World 10 - Lexicon Dragon should have 9 mini-phases', () => {
+      const boss = getBossConfig(10) as BossConfig;
+      expect(boss.phases.length).toBe(9);
+    });
+
+    it('each phase should have mechanic modifiers', () => {
+      for (let world = 1; world <= WORLDS_COUNT; world++) {
+        const boss = getBossConfig(world) as BossConfig;
+        for (const phase of boss.phases) {
+          expect(phase.mechanicModifiers).toBeDefined();
+        }
+      }
+    });
+  });
+
   describe('Boss-specific configs', () => {
     it('World 1 - Ms. Grammar should have popQuiz mechanic', () => {
       const boss = getBossConfig(1) as BossConfig;

@@ -5,7 +5,7 @@
  * This is the main entry point for the theming system.
  */
 
-import type { WorldTheme, TileVisualConfig, ChapterConfig, DEFAULT_TILE_CONFIG } from './types';
+import type { WorldTheme, TileVisualConfig, ChapterConfig } from './types';
 import type { TileType } from '@/types/adventure';
 
 // Import individual world themes
@@ -14,6 +14,11 @@ import { WORLD_2_THEME } from './world2';
 import { WORLD_3_THEME } from './world3';
 import { WORLD_4_THEME } from './world4';
 import { WORLD_5_THEME } from './world5';
+import { WORLD_6_THEME } from './world6';
+import { WORLD_7_THEME } from './world7';
+import { WORLD_8_THEME } from './world8';
+import { WORLD_9_THEME } from './world9';
+import { WORLD_10_THEME } from './world10';
 
 // ==============================================
 // THEME REGISTRY
@@ -21,7 +26,6 @@ import { WORLD_5_THEME } from './world5';
 
 /**
  * Registry of all world themes, indexed by world ID
- * Worlds 4-10 use placeholder themes until fully implemented
  */
 const WORLD_THEMES: Record<number, WorldTheme> = {
   1: WORLD_1_THEME,
@@ -29,77 +33,12 @@ const WORLD_THEMES: Record<number, WorldTheme> = {
   3: WORLD_3_THEME,
   4: WORLD_4_THEME,
   5: WORLD_5_THEME,
-  // Worlds 6-10: Temporary placeholders using World 1 as base
-  // TODO: Implement full themes for worlds 6-10
-  6: createPlaceholderTheme(6, 'anagramLabyrinth', 'escher-maze', 'anagrams', 'neo-pink'),
-  7: createPlaceholderTheme(7, 'mirrorPalace', 'reflective-glass', 'palindromes', 'neo-cyan'),
-  8: createPlaceholderTheme(8, 'neologismNebula', 'space-stars', 'rareWords', 'neo-purple'),
-  9: createPlaceholderTheme(9, 'polyglotPeaks', 'mountain-aurora', 'multilingual', 'neo-cyan'),
-  10: createPlaceholderTheme(10, 'lexiconThrone', 'golden-library', 'allMechanics', 'neo-yellow'),
+  6: WORLD_6_THEME,
+  7: WORLD_7_THEME,
+  8: WORLD_8_THEME,
+  9: WORLD_9_THEME,
+  10: WORLD_10_THEME,
 };
-
-// ==============================================
-// PLACEHOLDER THEME FACTORY
-// ==============================================
-
-/**
- * Creates a placeholder theme based on World 1 with different colors
- * Used for worlds 4-10 until full themes are implemented
- */
-function createPlaceholderTheme(
-  id: number,
-  nameKey: string,
-  themeId: string,
-  mechanic: string,
-  primaryColor: string
-): WorldTheme {
-  return {
-    ...WORLD_1_THEME,
-    id,
-    nameKey: `adventure.worlds.${nameKey}`,
-    themeId,
-    mechanic,
-    colors: {
-      ...WORLD_1_THEME.colors,
-      primary: primaryColor,
-      secondary: `${primaryColor}-light`,
-    },
-    modifierDisplay: {
-      ...WORLD_1_THEME.modifierDisplay,
-      visible: true,
-      backgroundColor: `bg-${primaryColor}/20`,
-      borderColor: `border-${primaryColor}`,
-      textColor: `text-${primaryColor}`,
-    },
-    chapters: [
-      {
-        number: 1,
-        nameKey: `adventure.chapters.${nameKey}.zone1`,
-        levelCount: 2,
-        startLevel: 1,
-        isBossChapter: false,
-        accentColor: primaryColor,
-      },
-      {
-        number: 2,
-        nameKey: `adventure.chapters.${nameKey}.zone2`,
-        levelCount: 2,
-        startLevel: 3,
-        isBossChapter: false,
-        accentColor: primaryColor,
-      },
-      {
-        number: 3,
-        nameKey: `adventure.chapters.${nameKey}.bossZone`,
-        levelCount: 3,
-        startLevel: 5,
-        isBossChapter: true,
-        accentColor: primaryColor,
-      },
-    ],
-    containerClass: `world-${themeId.replace('-', '')}`,
-  };
-}
 
 // ==============================================
 // THEME GETTERS
@@ -195,14 +134,13 @@ export function getAllWorldThemes(): WorldTheme[] {
 }
 
 /**
- * Check if a world theme is fully implemented (not a placeholder)
+ * Check if a world theme is fully implemented
  *
  * @param worldId - World number (1-10)
  * @returns true if the theme is fully implemented
  */
 export function isThemeImplemented(worldId: number): boolean {
-  // Worlds 1-5 are fully implemented
-  return worldId >= 1 && worldId <= 5;
+  return worldId >= 1 && worldId <= 10;
 }
 
 // ==============================================
@@ -230,3 +168,8 @@ export { WORLD_2_THEME } from './world2';
 export { WORLD_3_THEME } from './world3';
 export { WORLD_4_THEME } from './world4';
 export { WORLD_5_THEME } from './world5';
+export { WORLD_6_THEME } from './world6';
+export { WORLD_7_THEME } from './world7';
+export { WORLD_8_THEME } from './world8';
+export { WORLD_9_THEME } from './world9';
+export { WORLD_10_THEME } from './world10';

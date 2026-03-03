@@ -14,6 +14,9 @@ import type {
   WorldColorPalette,
   ModifierDisplayConfig,
   ChapterConfig,
+  HUDTheme,
+  TimerUrgencyTheme,
+  BossFightTheme,
 } from './types';
 
 // ==============================================
@@ -244,6 +247,56 @@ const chapters: [ChapterConfig, ChapterConfig, ChapterConfig] = [
 ];
 
 // ==============================================
+// HUD THEME (Purple/amethyst — dark mysterious)
+// ==============================================
+
+const hud: HUDTheme = {
+  headerBg: 'bg-purple-950/90',
+  headerBorder: 'border-purple-800/40',
+  sidebarBg: 'bg-purple-950/60',
+  scoreAccent: 'text-violet-400',
+  levelBadgeColor: 'bg-purple-900/60',
+  levelBadgeText: 'text-violet-300',
+  objectiveAccent: 'text-violet-400',
+  hintActiveColor: 'bg-violet-500',
+  hintActiveText: 'text-purple-950',
+};
+
+// ==============================================
+// TIMER URGENCY THEME
+// ==============================================
+
+const timerTheme: TimerUrgencyTheme = {
+  normal: { bg: 'bg-purple-950/80', text: 'text-neo-white', shadow: '' },
+  warning: { bg: 'bg-amber-500/20', text: 'text-amber-400', shadow: 'shadow-[0_0_12px_rgba(245,158,11,0.3)]' },
+  danger: { bg: 'bg-red-500/20', text: 'text-red-400', shadow: 'shadow-[0_0_16px_rgba(239,68,68,0.4)]' },
+  critical: { bg: 'bg-red-500/30', text: 'text-red-400', shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.6)]' },
+};
+
+// ==============================================
+// BOSS FIGHT THEME
+// ==============================================
+
+const bossFight: BossFightTheme = {
+  dialogueBg: 'bg-purple-950/95',
+  dialogueBorder: 'border-violet-500/30',
+  bossNameColor: 'text-violet-400',
+  hpSegmentColors: ['bg-red-500', 'bg-amber-500', 'bg-violet-500'],
+  telegraphColor: 'bg-red-500/20',
+  telegraphProgressColor: 'bg-red-500',
+  playerHealthNormal: 'bg-violet-500',
+  playerHealthLow: 'bg-red-500',
+  phaseColors: {
+    phase1: { bg: 'bg-violet-500/20', text: 'text-violet-400' },
+    phase2: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
+    enraged: { bg: 'bg-red-500/20', text: 'text-red-400' },
+  },
+  avatarGlow: 'rgba(139, 92, 246, 0.4)',
+  victoryGlow: 'rgba(167, 139, 250, 0.6)',
+  arenaEffect: 'crystal-cavern',
+};
+
+// ==============================================
 // COMPLETE THEME EXPORT
 // ==============================================
 
@@ -259,4 +312,7 @@ export const WORLD_3_THEME: WorldTheme = {
   animations,
   chapters,
   containerClass: 'world-caverns',
+  hud,
+  timerTheme,
+  bossFight,
 };

@@ -12,6 +12,7 @@ import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 import { Mascot } from '@/components/ui/Mascot';
 import type { BossIntroProps } from '@/types/boss';
 
@@ -21,6 +22,7 @@ import type { BossIntroProps } from '@/types/boss';
 
 const BossIntro = memo<BossIntroProps>(({ boss, worldNumber, onStart, onSkip }) => {
   const { t } = useLanguage();
+  const bossFightTheme = useBossFightTheme();
 
   const bossName = t(boss.displayName);
   const mechanicDescription = t(boss.twistMechanic.description);
@@ -81,6 +83,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber, onStart, onSkip }) 
                 'rounded-neo shadow-hard-lg',
                 'overflow-hidden bg-neo-navy/50'
               )}
+              style={{ boxShadow: `0 0 20px ${bossFightTheme.avatarGlow}` }}
             >
               <motion.img
                 src={boss.imagePath}
@@ -109,7 +112,8 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber, onStart, onSkip }) 
             transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 20 }}
             className={cn(
               'text-center text-xl md:text-2xl font-black',
-              'text-neo-white mb-2'
+              bossFightTheme.bossNameColor,
+              'mb-2'
             )}
           >
             {bossName}

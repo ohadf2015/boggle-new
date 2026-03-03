@@ -15,6 +15,7 @@
 
 import { memo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 
 // ==============================================
 // TYPES
@@ -75,7 +76,9 @@ const PHASE_CONFIGS: Record<'phase1' | 'phase2' | 'enraged', PhaseConfig> = {
  */
 const PhaseIndicator = memo<PhaseIndicatorProps>(({ phase }) => {
   const { t } = useLanguage();
+  const bossFightTheme = useBossFightTheme();
   const config = PHASE_CONFIGS[phase];
+  const themePhase = bossFightTheme.phaseColors[phase];
 
   return (
     <div
@@ -84,8 +87,8 @@ const PhaseIndicator = memo<PhaseIndicatorProps>(({ phase }) => {
       className={`
         inline-flex items-center justify-center
         px-3 py-1
-        ${config.bgColor}
-        ${config.textColor}
+        ${themePhase.bg}
+        ${themePhase.text}
         border-3 border-neo-black
         rounded-neo
         shadow-hard-sm

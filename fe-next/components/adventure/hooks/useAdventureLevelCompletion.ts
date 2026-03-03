@@ -1,0 +1,215 @@
+/**
+ * useAdventureLevelCompletion Hook
+ *
+ * Manages level completion logic including:
+ * - XP/gold awarding on completion
+ * - Victory/defeat detection and cinematic triggering
+ * - Achievement recording and progress tracking
+ * Extracted from AdventureGame.tsx to reduce orchestrator size.
+ */
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
+import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
+import type { BossTauntEvent } from '@/types/boss';
+import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
+
+interface GameStateSlice {
+  isComplete: boolean;
+  stars: number;
+  score: number;
+  wordsFound: string[];
+  comboCount: number;
+}
+
+interface ObjectiveSlice {
+  type: string;
+  current?: number;
+  target?: number;
+}
+
+export interface UseAdventureLevelCompletionProps {
+  gameState: GameStateSlice;
+  timeRemaining: number;
+  timerSeconds: number;
+  levelConfig: { world: number; level: number };
+  objectives: ObjectiveSlice[];
+  currentLevel: number;
+  upgradeBonuses: { xpBonus: number; timeBonus: number; scoreBonus: number };
+  awardXp: (xp: number) => { leveledUp: boolean; newLevel?: number };
+  addGold: (amount: number) => void;
+  recordAttempt: (...args: any[]) => void;
+  recordCompletion: (data: any) => void;
+  endAIDirector: () => void;
+  handleEarnAchievement: (id: AdventureAchievementId) => boolean;
+  pauseGame: () => void;
+  showVictory: () => void;
+  showDefeat: () => void;
+  showLevelComplete: boolean;
+  showVictoryCinematic: boolean;
+  showDefeatCinematic: boolean;
+  isBossLevel: boolean;
+  isBossActive: boolean;
+  bossHealthPhase: string;
+  playerIsDead: boolean;
+  endBossBattle: (isVictory: boolean) => void;
+  triggerBossTaunt: (event: BossTauntEvent) => void;
+}
+
+export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
+  const {
+    gameState, timeRemaining, timerSeconds, levelConfig, objectives,
+    currentLevel, upgradeBonuses, awardXp, addGold,
+    recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement,
+    pauseGame, showVictory, showDefeat,
+    showLevelComplete, showVictoryCinematic, showDefeatCinematic,
+    isBossLevel, isBossActive, bossHealthPhase, playerIsDead,
+    endBossBattle, triggerBossTaunt,
+  } = props;
+
+  const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
+  const [hasAwardedLevelRewards, setHasAwardedLevelRewards] = useState(false);
+  const completionProcessedRef = useRef(false);
+
+  // Store callbacks in refs for stable references
+  const recordAttemptRef = useRef(recordAttempt);
+  const recordCompletionRef = useRef(recordCompletion);
+  const endAIDirectorRef = useRef(endAIDirector);
+  const handleEarnAchievementRef = useRef(handleEarnAchievement);
+
+  // Keep callback refs in sync and reset completion flag on level change
+  useEffect(() => {
+    recordAttemptRef.current = recordAttempt;
+    recordCompletionRef.current = recordCompletion;
+    endAIDirectorRef.current = endAIDirector;
+    handleEarnAchievementRef.current = handleEarnAchievement;
+    completionProcessedRef.current = false;
+  }, [recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
+
+  // Award XP and gold on level completion
+  useEffect(() => {
+    if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars > 0) {
+      const difficultyMap: Record<number, 'easy' | 'medium' | 'hard'> = {
+        1: 'easy', 2: 'easy', 3: 'medium', 4: 'medium', 5: 'hard',
+      };
+      const difficulty = difficultyMap[levelConfig.level] || 'medium';
+      const isPerfectClear = gameState.stars === 3;
+      const hasTimeBonus = timeRemaining > (timerSeconds * 0.5);
+
+      const baseXp = calculateAdventureXp(
+        difficulty,
+        Math.max(1, gameState.comboCount),
+        { perfectClear: isPerfectClear, timeBonus: hasTimeBonus ? 0.1 : 0 }
+      );
+      const earnedXp = Math.floor(baseXp * upgradeBonuses.xpBonus);
+
+      const oldLevel = currentLevel;
+      const levelUpResult = awardXp(earnedXp);
+
+      const baseGold = 10 * gameState.stars;
+      const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
+      addGold(baseGold + perfectClearGoldBonus);
+
+      if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
+        setLevelUpData({ oldLevel, newLevel: levelUpResult.newLevel, newTitles: [] });
+      }
+
+      setHasAwardedLevelRewards(true);
+    }
+  }, [gameState.isComplete, gameState.stars, gameState.comboCount, timeRemaining, hasAwardedLevelRewards, levelConfig.level, timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus]);
+
+  // Victory/Defeat Detection & Cinematic Trigger
+  useEffect(() => {
+    if (showLevelComplete || showVictoryCinematic || showDefeatCinematic) return;
+    if (completionProcessedRef.current) return;
+
+    const playerDied = isBossLevel && playerIsDead;
+
+    const shouldComplete = isBossLevel
+      ? bossHealthPhase === 'victory' || bossHealthPhase === 'defeat' || timeRemaining === 0 || playerDied
+      : gameState.isComplete || timeRemaining === 0;
+
+    if (!shouldComplete) return;
+
+    completionProcessedRef.current = true;
+
+    const isVictory = isBossLevel
+      ? bossHealthPhase === 'victory' && !playerDied
+      : gameState.stars > 0;
+
+    if (isVictory) {
+      showVictory();
+    } else {
+      showDefeat();
+    }
+    pauseGame();
+  }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, isBossLevel, bossHealthPhase, playerIsDead, showVictory, showDefeat]);
+
+  // Boss Battle Completion
+  useEffect(() => {
+    if (!completionProcessedRef.current) return;
+    if (!isBossActive || !isBossLevel) return;
+
+    const playerDied = playerIsDead;
+    const isVictory = bossHealthPhase === 'victory' && !playerDied;
+
+    if (bossHealthPhase !== 'victory' && bossHealthPhase !== 'defeat') {
+      endBossBattle(isVictory);
+    }
+
+    triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
+
+    if (isVictory) {
+      handleEarnAchievementRef.current('BOSS_SLAYER');
+    }
+  }, [isBossActive, isBossLevel, bossHealthPhase, playerIsDead, endBossBattle, triggerBossTaunt]);
+
+  // Achievement & Progress Recording
+  useEffect(() => {
+    if (!completionProcessedRef.current) return;
+    if (!gameState.isComplete && timeRemaining > 0) return;
+
+    if (gameState.stars === 3) {
+      handleEarnAchievementRef.current('PERFECT_LEVEL');
+    }
+
+    const objectiveProgress: Record<string, number> = {};
+    for (const obj of objectives) {
+      objectiveProgress[obj.type] = obj.current ?? 0;
+    }
+
+    recordAttemptRef.current(
+      levelConfig.world, levelConfig.level,
+      gameState.wordsFound.length, gameState.score,
+      timeRemaining, objectiveProgress, gameState.stars > 0
+    );
+
+    recordCompletionRef.current({
+      isCompletion: gameState.stars > 0,
+      timeRemaining,
+      timerSeconds,
+      score: gameState.score,
+      words: gameState.wordsFound.length,
+    });
+
+    endAIDirectorRef.current();
+  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds]);
+
+  const handleLevelUpClose = useCallback(() => {
+    setLevelUpData(null);
+  }, []);
+
+  // Reset rewards flag (needed for retry)
+  const resetRewards = useCallback(() => {
+    setHasAwardedLevelRewards(false);
+    completionProcessedRef.current = false;
+  }, []);
+
+  return {
+    levelUpData,
+    hasAwardedLevelRewards,
+    handleLevelUpClose,
+    resetRewards,
+    completionProcessedRef,
+  };
+}

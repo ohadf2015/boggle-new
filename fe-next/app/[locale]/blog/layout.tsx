@@ -59,6 +59,41 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   };
 }
 
-export default function BlogLayout({ children }: { children: ReactNode }): ReactNode {
-  return children;
+interface BlogLayoutProps {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}
+
+export default async function BlogLayout({ children, params }: BlogLayoutProps): Promise<ReactNode> {
+  const { locale } = await params;
+  const localePath = `/${locale}`;
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: `https://www.lexiclash.live${localePath}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `https://www.lexiclash.live${localePath}/blog`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }

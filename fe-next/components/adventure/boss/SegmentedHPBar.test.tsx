@@ -10,6 +10,28 @@ import { render, screen, within } from '@testing-library/react';
 import SegmentedHPBar from './SegmentedHPBar';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
+// Mock the theme context — defaults match DEFAULT_BOSS_FIGHT_THEME
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useBossFightTheme: () => ({
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    phaseColors: {
+      phase1: { bg: 'bg-neo-cyan', text: 'text-neo-black' },
+      phase2: { bg: 'bg-neo-lime', text: 'text-neo-black' },
+      enraged: { bg: 'bg-neo-red', text: 'text-neo-white' },
+    },
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
 // ==============================================
 // TEST HELPERS
 // ==============================================
@@ -212,20 +234,20 @@ describe('SegmentedHPBar', () => {
       expect(fill).toHaveClass('bg-neo-red');
     });
 
-    it('should have yellow/lime color for segment 2 (phase 2 zone)', () => {
+    it('should have theme color for segment 2 (phase 2 zone)', () => {
       renderHPBar({ currentHP: 500, maxHP: 1000 });
 
       const segment2 = getSegment(2);
       const fill = segment2?.querySelector('[data-fill-bar]');
-      expect(fill).toHaveClass('bg-neo-lime');
+      expect(fill).toHaveClass('bg-neo-orange');
     });
 
-    it('should have green/lime color for segment 3 (phase 1 zone)', () => {
+    it('should have theme color for segment 3 (phase 1 zone)', () => {
       renderHPBar({ currentHP: 1000, maxHP: 1000 });
 
       const segment3 = getSegment(3);
       const fill = segment3?.querySelector('[data-fill-bar]');
-      expect(fill).toHaveClass('bg-lime-500');
+      expect(fill).toHaveClass('bg-neo-lime');
     });
   });
 

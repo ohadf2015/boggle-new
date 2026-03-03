@@ -91,6 +91,28 @@ export interface BossTwistMechanic {
 }
 
 // ==============================================
+// BOSS PHASE CONFIGURATION
+// ==============================================
+
+export interface BossPhaseModifiers {
+  speedMultiplier?: number;
+  bonusMultiplier?: number;
+  extraTileCount?: number;
+  mechanicOverride?: Record<string, unknown>;
+  gridEffect?: string;
+  bossDamageMultiplier?: number;
+}
+
+export interface BossPhaseConfig {
+  nameKey: string;
+  hpThreshold: number;
+  mechanicModifiers: BossPhaseModifiers;
+  transitionTextKey?: string;
+  entryAbility?: string;
+  transitionTaunt?: BossTauntEvent;
+}
+
+// ==============================================
 // BOSS CONFIGURATION
 // ==============================================
 
@@ -114,6 +136,8 @@ export interface BossConfig {
   twistMechanic: BossTwistMechanic;
   /** Boss dialogue lines */
   taunts: BossTaunts;
+  /** Phase configurations (ordered by descending HP threshold) */
+  phases: BossPhaseConfig[];
 }
 
 // ==============================================

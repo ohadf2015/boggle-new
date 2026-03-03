@@ -14,6 +14,9 @@ import type {
   WorldColorPalette,
   ModifierDisplayConfig,
   ChapterConfig,
+  HUDTheme,
+  TimerUrgencyTheme,
+  BossFightTheme,
 } from './types';
 
 // ==============================================
@@ -237,6 +240,56 @@ const chapters: [ChapterConfig, ChapterConfig, ChapterConfig] = [
 ];
 
 // ==============================================
+// HUD THEME (Emerald/lime — pastoral warm)
+// ==============================================
+
+const hud: HUDTheme = {
+  headerBg: 'bg-emerald-950/90',
+  headerBorder: 'border-emerald-800/40',
+  sidebarBg: 'bg-emerald-950/60',
+  scoreAccent: 'text-lime-400',
+  levelBadgeColor: 'bg-emerald-900/60',
+  levelBadgeText: 'text-lime-300',
+  objectiveAccent: 'text-lime-400',
+  hintActiveColor: 'bg-lime-500',
+  hintActiveText: 'text-emerald-950',
+};
+
+// ==============================================
+// TIMER URGENCY THEME
+// ==============================================
+
+const timerTheme: TimerUrgencyTheme = {
+  normal: { bg: 'bg-emerald-950/80', text: 'text-neo-white', shadow: '' },
+  warning: { bg: 'bg-amber-500/20', text: 'text-amber-400', shadow: 'shadow-[0_0_12px_rgba(245,158,11,0.3)]' },
+  danger: { bg: 'bg-red-500/20', text: 'text-red-400', shadow: 'shadow-[0_0_16px_rgba(239,68,68,0.4)]' },
+  critical: { bg: 'bg-red-500/30', text: 'text-red-400', shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.6)]' },
+};
+
+// ==============================================
+// BOSS FIGHT THEME
+// ==============================================
+
+const bossFight: BossFightTheme = {
+  dialogueBg: 'bg-emerald-950/95',
+  dialogueBorder: 'border-lime-500/30',
+  bossNameColor: 'text-lime-400',
+  hpSegmentColors: ['bg-red-500', 'bg-amber-500', 'bg-lime-500'],
+  telegraphColor: 'bg-red-500/20',
+  telegraphProgressColor: 'bg-red-500',
+  playerHealthNormal: 'bg-lime-500',
+  playerHealthLow: 'bg-red-500',
+  phaseColors: {
+    phase1: { bg: 'bg-lime-500/20', text: 'text-lime-400' },
+    phase2: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
+    enraged: { bg: 'bg-red-500/20', text: 'text-red-400' },
+  },
+  avatarGlow: 'rgba(132, 204, 22, 0.4)',
+  victoryGlow: 'rgba(163, 230, 53, 0.6)',
+  arenaEffect: 'chalkboard',
+};
+
+// ==============================================
 // COMPLETE THEME EXPORT
 // ==============================================
 
@@ -244,7 +297,7 @@ export const WORLD_1_THEME: WorldTheme = {
   id: 1,
   nameKey: 'adventure.worlds.alphabetMeadows',
   themeId: 'sunny-pastoral',
-  mechanic: null, // Tutorial world - no mechanic
+  mechanic: null,
   colors,
   background,
   tileStyles,
@@ -252,4 +305,7 @@ export const WORLD_1_THEME: WorldTheme = {
   animations,
   chapters,
   containerClass: 'world-meadows',
+  hud,
+  timerTheme,
+  bossFight,
 };

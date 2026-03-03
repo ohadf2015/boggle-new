@@ -47,6 +47,21 @@ jest.mock('../../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
+// Mock theme context — returns default theme
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useHUDTheme: () => ({
+    headerBg: 'bg-neo-navy/70',
+    headerBorder: 'border-neo-black/20',
+    sidebarBg: 'bg-neo-black/40',
+    scoreAccent: 'text-neo-cyan',
+    levelBadgeColor: 'bg-neo-cyan',
+    levelBadgeText: 'text-neo-black',
+    objectiveAccent: 'text-neo-lime',
+    hintActiveColor: 'bg-neo-lime',
+    hintActiveText: 'text-neo-black',
+  }),
+}));
+
 describe('AdventureHUD', () => {
   const defaultProps = {
     remainingTime: 120,

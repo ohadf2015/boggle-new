@@ -96,6 +96,11 @@ const mockBoss: BossConfig = {
     onVictory: 'adventure.bosses.msGrammar.taunts.victory',
     onDefeat: 'adventure.bosses.msGrammar.taunts.defeat',
   },
+  phases: [
+    { nameKey: 'adventure.bosses.msGrammar.phases.lecture', hpThreshold: 100, mechanicModifiers: { speedMultiplier: 1 } },
+    { nameKey: 'adventure.bosses.msGrammar.phases.popTest', hpThreshold: 66, mechanicModifiers: { speedMultiplier: 1.5 } },
+    { nameKey: 'adventure.bosses.msGrammar.phases.finalExam', hpThreshold: 33, mechanicModifiers: { speedMultiplier: 2.0 } },
+  ],
 };
 
 const mockGameState: AdventureGameState = {

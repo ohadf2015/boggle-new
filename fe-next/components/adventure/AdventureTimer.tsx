@@ -3,6 +3,7 @@
  *
  * Displays countdown timer with urgency states (normal, warning, danger).
  * Features flip digit animation and pulsing glow effects.
+ * Urgency colors driven by useTimerTheme() for per-world theming.
  */
 
 'use client';
@@ -11,6 +12,7 @@ import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTimerTheme } from '@/contexts/AdventureThemeContext';
 
 // ==============================================
 // TYPES
@@ -70,7 +72,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
     // Format time
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
-    
+
     const minTens = Math.floor(minutes / 10).toString();
     const minOnes = (minutes % 10).toString();
     const secTens = Math.floor(seconds / 10).toString();
@@ -86,6 +88,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
 
     const isDanger = urgencyState === 'danger' || urgencyState === 'critical';
     const isCritical = urgencyState === 'critical';
+    const shouldPulse = isDanger;
 
     // Size classes
     const sizeClasses = {
@@ -100,35 +103,9 @@ const AdventureTimer = memo<AdventureTimerProps>(
       large: 'w-8 h-8',
     };
 
-    // Urgency styles
-    const urgencyStyles = {
-      normal: {
-        bg: 'bg-neo-navy/80 border-neo-white/20',
-        text: 'text-neo-white',
-        shadow: 'shadow-hard-sm',
-        pulse: false,
-      },
-      warning: {
-        bg: 'bg-neo-orange/20 border-neo-orange/60',
-        text: 'text-neo-orange',
-        shadow: 'shadow-[0_0_20px_rgba(255,107,53,0.3)]',
-        pulse: false,
-      },
-      danger: {
-        bg: 'bg-neo-red/20 border-neo-red/60',
-        text: 'text-neo-red',
-        shadow: 'shadow-[0_0_30px_rgba(255,0,0,0.4)]',
-        pulse: true,
-      },
-      critical: {
-        bg: 'bg-neo-red/30 border-neo-red',
-        text: 'text-neo-red',
-        shadow: 'shadow-[0_0_40px_rgba(255,0,0,0.6)]',
-        pulse: true,
-      },
-    };
-
-    const styles = urgencyStyles[urgencyState];
+    // Theme-driven urgency styles
+    const timerTheme = useTimerTheme();
+    const themeLevel = timerTheme[urgencyState];
 
     return (
       <motion.div
@@ -139,15 +116,15 @@ const AdventureTimer = memo<AdventureTimerProps>(
           'flex items-center rounded-neo border-2 font-black backdrop-blur-sm',
           'transition-all duration-300',
           sizeClasses[size],
-          styles.bg,
-          styles.text,
+          themeLevel.bg,
+          themeLevel.text,
+          themeLevel.shadow,
           className
         )}
-        style={{ boxShadow: styles.shadow }}
-        animate={styles.pulse ? {
+        animate={shouldPulse ? {
           scale: [1, 1.02, 1],
         } : {}}
-        transition={{ duration: 0.5, repeat: styles.pulse ? Infinity : 0 }}
+        transition={{ duration: 0.5, repeat: shouldPulse ? Infinity : 0 }}
       >
         {/* Icon */}
         <div className="relative">
@@ -168,16 +145,16 @@ const AdventureTimer = memo<AdventureTimerProps>(
           {/* Minutes */}
           <FlipDigit digit={minTens} />
           <FlipDigit digit={minOnes} />
-          
+
           {/* Separator */}
-          <motion.span 
+          <motion.span
             className="mx-0.5 opacity-60"
             animate={{ opacity: [0.6, 0.3, 0.6] }}
             transition={{ duration: 1, repeat: Infinity }}
           >
             :
           </motion.span>
-          
+
           {/* Seconds */}
           <FlipDigit digit={secTens} />
           <FlipDigit digit={secOnes} />

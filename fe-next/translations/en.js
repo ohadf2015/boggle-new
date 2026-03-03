@@ -8,9 +8,9 @@ const en = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "Free Multiplayer Word Game - Play Online",
+    "title": "Free Word Game Online - Multiplayer Boggle & Word Battle",
     "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
-    "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free",
+    "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
     "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
     "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
@@ -54,19 +54,19 @@ const en = {
       "ogDescription": "Access LexiClash Terms of Service and Privacy Policy."
     },
     "singleplayer": {
-      "title": "Free Boggle Online - No Download Required",
+      "title": "Play Boggle Online Free - No Download Word Game",
       "description": "Play free boggle online — no download required! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Play boggle free in your browser instantly.",
       "ogTitle": "Play Boggle Free Online - No Download",
       "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
     },
     "daily": {
-      "title": "Daily Word Challenge - Same Puzzle Worldwide",
+      "title": "Daily Word Puzzle - Free Challenge Like Wordle",
       "description": "Play the LexiClash Daily Challenge! Same puzzle for everyone worldwide each day. Share your emoji results like Wordle. Compete globally and track your daily streaks.",
       "ogTitle": "Daily Challenge - Same Puzzle Worldwide",
       "ogDescription": "Daily word puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
     },
     "multiplayer": {
-      "title": "Multiplayer Word Battle - Real-Time",
+      "title": "Word Game With Friends - Free Online Multiplayer",
       "description": "Join real-time word battles with friends! Host or join multiplayer rooms, compete live against opponents, and climb the leaderboard. Perfect for parties and game nights.",
       "ogTitle": "Multiplayer Word Battle - Compete Live",
       "ogDescription": "Real-time multiplayer word game - host rooms, invite friends, and compete in live word battles!"
@@ -90,10 +90,16 @@ const en = {
       "ogDescription": "Answers to common questions about LexiClash gameplay, scoring, accounts, and more."
     },
     "blog": {
-      "title": "Blog & Word Game Resources",
+      "title": "Word Game Tips & Strategies - Free Resources",
       "description": "Tips, strategies, and insights for word game enthusiasts. Learn how to improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
       "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
       "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
+    },
+    "adventure": {
+        "title": "Word Adventure Game - RPG Word Puzzle Free",
+        "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
+        "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
+        "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
     }
   },
   "cookieConsent": {
@@ -4567,6 +4573,31 @@ const en = {
         "zone1": "Dusty Trails",
         "zone2": "Red Rock Mesa",
         "bossZone": "Thunder Gorge"
+      },
+      "labyrinth": {
+        "zone1": "Twisted Corridors",
+        "zone2": "Puzzle Chambers",
+        "bossZone": "Heart of the Maze"
+      },
+      "palace": {
+        "zone1": "Glass Foyer",
+        "zone2": "Hall of Reflections",
+        "bossZone": "Throne of Mirrors"
+      },
+      "nebula": {
+        "zone1": "Star Fields",
+        "zone2": "Cosmic Drift",
+        "bossZone": "Event Horizon"
+      },
+      "peaks": {
+        "zone1": "Alpine Meadows",
+        "zone2": "Cloud Summit",
+        "bossZone": "Tower of Babel"
+      },
+      "throne": {
+        "zone1": "Grand Library",
+        "zone2": "Dragon's Study",
+        "bossZone": "Lexicon Throne Room"
       }
     },
     "themes": {
@@ -4773,6 +4804,7 @@ const en = {
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
       "enraged": "ENRAGED!",
+      "mechanicProgress": "Mechanic progress",
       "phases": {
         "phase1": "PHASE 1",
         "phase2": "PHASE 2"
@@ -4915,6 +4947,11 @@ const en = {
       "msGrammar": {
         "name": "Ms. Grammar",
         "mechanic": "Pop Quiz Protocol - Find words matching my requirements!",
+        "phases": {
+          "lecture": "Lecture",
+          "popTest": "Pop Test",
+          "finalExam": "Final Exam"
+        },
         "taunts": {
           "start1": "Class is in session! Let's see if you've been studying...",
           "start2": "Pop quiz time! I hope you're prepared!",

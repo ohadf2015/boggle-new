@@ -12,6 +12,7 @@ import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureGrid from '../AdventureGrid';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { PhaserGameAdventure } from '@/components/phaser/PhaserGameAdventure';
@@ -142,6 +143,7 @@ export const GameGridArea = memo(function GameGridArea({
   className,
 }: GameGridAreaProps) {
   const { t } = useLanguage();
+  const hudTheme = useHUDTheme();
   const usePhaserGrid = process.env.NEXT_PUBLIC_PHASER_GRID === 'true';
 
   // Use prop if provided, otherwise build from selected indices (backward compat)
@@ -329,7 +331,7 @@ export const GameGridArea = memo(function GameGridArea({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="text-xs text-neo-cyan/80 text-center px-4"
+                className={cn('text-xs text-center px-4', hudTheme.scoreAccent, 'opacity-80')}
               >
                 {hintLevel === 'fullReveal'
                   ? t('adventure.game.hintFullReveal')

@@ -13,6 +13,28 @@ jest.mock('../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: jest.fn(() => false),
 }));
 
+// Mock the theme context
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useBossFightTheme: () => ({
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    phaseColors: {
+      phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+      phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+      enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+    },
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
   motion: {

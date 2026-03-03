@@ -32,6 +32,27 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useBossFightTheme: () => ({
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    phaseColors: {
+      phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+      phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+      enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+    },
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
 // Mock framer-motion to render static elements for testing
 jest.mock('framer-motion', () => {
   const React = require('react');
@@ -96,6 +117,11 @@ const mockBoss: BossConfig = {
     onVictory: 'adventure.bosses.msGrammar.taunts.victory',
     onDefeat: 'adventure.bosses.msGrammar.taunts.defeat',
   },
+  phases: [
+    { nameKey: 'adventure.bosses.msGrammar.phases.lecture', hpThreshold: 100, mechanicModifiers: { speedMultiplier: 1 } },
+    { nameKey: 'adventure.bosses.msGrammar.phases.popTest', hpThreshold: 66, mechanicModifiers: { speedMultiplier: 1.5 } },
+    { nameKey: 'adventure.bosses.msGrammar.phases.finalExam', hpThreshold: 33, mechanicModifiers: { speedMultiplier: 2.0 } },
+  ],
 };
 
 const defaultProps = {

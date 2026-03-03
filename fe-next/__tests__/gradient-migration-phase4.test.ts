@@ -166,8 +166,9 @@ describe('Phase 4: Gradient Standardization', () => {
       // 6. UI simplification & progressive onboarding features (lesson tracking, feature gates)
       // 7. Blast mode special tile full-cell backgrounds (gold shimmer, bomb glow, rainbow)
       // 8. Blast mode cascade chain announcements (magenta/purple/cyan gradients)
+      // 9. Adventure worlds 6-10 full theme files (world-specific gradients)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThanOrEqual(390);
+      expect(totalGradients).toBeLessThanOrEqual(400);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients

@@ -18,7 +18,17 @@ import React, {
   useRef,
   type ReactNode,
 } from 'react';
-import type { WorldTheme, TileVisualConfig, ChapterConfig } from '@/lib/adventure/themes/types';
+import {
+  DEFAULT_HUD_THEME,
+  DEFAULT_TIMER_THEME,
+  DEFAULT_BOSS_FIGHT_THEME,
+  type WorldTheme,
+  type TileVisualConfig,
+  type ChapterConfig,
+  type HUDTheme,
+  type TimerUrgencyTheme,
+  type BossFightTheme,
+} from '@/lib/adventure/themes/types';
 import type { TileType } from '@/types/adventure';
 import {
   getWorldTheme,
@@ -246,6 +256,30 @@ export function useTileConfig(tileType: TileType): TileVisualConfig {
 export function useCurrentChapter(): ChapterConfig {
   const { getChapter } = useAdventureTheme();
   return getChapter();
+}
+
+/**
+ * Hook to get HUD theme for current world
+ */
+export function useHUDTheme(): HUDTheme {
+  const { theme } = useAdventureTheme();
+  return useMemo(() => theme.hud ?? DEFAULT_HUD_THEME, [theme.hud]);
+}
+
+/**
+ * Hook to get timer urgency theme for current world
+ */
+export function useTimerTheme(): TimerUrgencyTheme {
+  const { theme } = useAdventureTheme();
+  return useMemo(() => theme.timerTheme ?? DEFAULT_TIMER_THEME, [theme.timerTheme]);
+}
+
+/**
+ * Hook to get boss fight theme for current world
+ */
+export function useBossFightTheme(): BossFightTheme {
+  const { theme } = useAdventureTheme();
+  return useMemo(() => theme.bossFight ?? DEFAULT_BOSS_FIGHT_THEME, [theme.bossFight]);
 }
 
 // ==============================================

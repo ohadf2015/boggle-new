@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
 import type { BossDialogueProps } from '@/types/boss';
 
 // ==============================================
@@ -49,6 +50,7 @@ const TRANSITION = {
 const BossDialogue = memo<BossDialogueProps>(
   ({ boss, currentTaunt, isVisible, position = 'top' }) => {
     const { t } = useLanguage();
+    const bossFightTheme = useBossFightTheme();
 
     // BUG-008: Add fallbacks for dynamic translation keys
     const translatedTaunt = t(currentTaunt) || currentTaunt;
@@ -77,7 +79,9 @@ const BossDialogue = memo<BossDialogueProps>(
             <div
               data-testid="boss-speech-bubble"
               className={cn(
-                'bg-neo-navy/95 border-neo border-neo-white/30',
+                bossFightTheme.dialogueBg,
+                'border-neo',
+                bossFightTheme.dialogueBorder,
                 'rounded-neo shadow-hard',
                 'p-3 flex items-start gap-2'
               )}

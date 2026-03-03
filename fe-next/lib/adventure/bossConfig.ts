@@ -6,17 +6,12 @@
  * Translation keys reference entries in translations/*.js files.
  */
 
-import type { BossConfig, BossTaunts, BossTauntEvent, BossTwistMechanic } from '@/types/boss';
+import type { BossConfig, BossPhaseConfig, BossTaunts, BossTauntEvent, BossTwistMechanic } from '@/types/boss';
 
 // ==============================================
 // TAUNT BUILDER
 // ==============================================
 
-/**
- * Build the taunts object from a boss ID.
- * All bosses follow the same translation key pattern:
- *   adventure.bosses.{bossId}.taunts.{event}{N}
- */
 function buildTaunts(bossId: string): BossTaunts {
   const prefix = `adventure.bosses.${bossId}.taunts`;
   return {
@@ -30,17 +25,38 @@ function buildTaunts(bossId: string): BossTaunts {
   };
 }
 
+// ==============================================
+// PHASE BUILDER
+// ==============================================
+
 /**
- * Shorthand to build a full BossConfig.
- * Eliminates repetitive boilerplate across 10 boss definitions.
+ * Build standard 3-phase config. HP thresholds: 100 → 66 → 33
  */
+function buildPhases(
+  bossId: string,
+  phaseNames: [string, string, string],
+  modifiers: [BossPhaseConfig['mechanicModifiers'], BossPhaseConfig['mechanicModifiers'], BossPhaseConfig['mechanicModifiers']]
+): BossPhaseConfig[] {
+  const prefix = `adventure.bosses.${bossId}.phases`;
+  return [
+    { nameKey: `${prefix}.${phaseNames[0]}`, hpThreshold: 100, mechanicModifiers: modifiers[0], transitionTaunt: 'onStart' },
+    { nameKey: `${prefix}.${phaseNames[1]}`, hpThreshold: 66, mechanicModifiers: modifiers[1], transitionTaunt: 'onMechanic', entryAbility: 'phase2Entry' },
+    { nameKey: `${prefix}.${phaseNames[2]}`, hpThreshold: 33, mechanicModifiers: modifiers[2], transitionTaunt: 'onLowTime', entryAbility: 'enragedEntry' },
+  ];
+}
+
+// ==============================================
+// BOSS BUILDER
+// ==============================================
+
 function defineBoss(
   worldId: number,
   id: string,
   personality: string,
   visualTheme: string,
   imageSlug: string,
-  twistMechanic: BossTwistMechanic
+  twistMechanic: BossTwistMechanic,
+  phases: BossPhaseConfig[]
 ): BossConfig {
   return {
     id,
@@ -54,6 +70,7 @@ function defineBoss(
       description: `adventure.bosses.${id}.mechanic`,
     },
     taunts: buildTaunts(id),
+    phases,
   };
 }
 
@@ -68,151 +85,129 @@ export const BOSS_CONFIGS: Record<number, BossConfig> = {
   1: defineBoss(1, 'msGrammar',
     'A prim owl schoolteacher who treats every game as a pop quiz. Secretly roots for players.',
     'school-owl', 'ms-grammar',
-    {
-      type: 'popQuiz',
-      description: '',
-      params: {
-        requirementTypes: ['doubleLetters', 'startsWith', 'exactLength', 'containsVowel'],
-        requirementDuration: 20,
-        bonusMultiplier: 1.5,
-        penaltyMultiplier: 0.8,
-      },
-    }
+    { type: 'popQuiz', description: '', params: { requirementTypes: ['doubleLetters', 'startsWith', 'exactLength', 'containsVowel'], requirementDuration: 20, bonusMultiplier: 1.5, penaltyMultiplier: 0.8 } },
+    buildPhases('msGrammar', ['lecture', 'popTest', 'finalExam'], [
+      { speedMultiplier: 1, bonusMultiplier: 1.5 },
+      { speedMultiplier: 1.5, bonusMultiplier: 2.0, mechanicOverride: { requirementDuration: 12 } },
+      { speedMultiplier: 2.0, bonusMultiplier: 2.5, gridEffect: 'combined-quiz', bossDamageMultiplier: 1.5 },
+    ])
   ),
 
   2: defineBoss(2, 'spellingBee',
     'A giant queen bee who runs a honey empire. Annoyed people expect her to spell.',
     'hive-queen', 'spelling-bee',
-    {
-      type: 'hiveMind',
-      description: '',
-      params: {
-        stickyTileCount: 3,
-        synonymBonusMultiplier: 2.0,
-        workerBeeBlockDuration: 5,
-      },
-    }
+    { type: 'hiveMind', description: '', params: { stickyTileCount: 3, synonymBonusMultiplier: 2.0, workerBeeBlockDuration: 5 } },
+    buildPhases('spellingBee', ['buzz', 'swarm', 'sting'], [
+      { speedMultiplier: 1 },
+      { speedMultiplier: 1.3, extraTileCount: 3, gridEffect: 'sticky-multiply' },
+      { speedMultiplier: 1.8, extraTileCount: 5, bossDamageMultiplier: 1.5, gridEffect: 'all-sticky' },
+    ])
   ),
 
   3: defineBoss(3, 'professorThesaurus',
     'Ancient tortoise academic who forgot more words than most will learn. Speaks in synonyms.',
     'tweed-scholar', 'professor-thesaurus',
-    {
-      type: 'etymologyDig',
-      description: '',
-      params: {
-        rootFragments: ['bio', 'graph', 'tele', 'phon', 'log', 'morph'],
-        rootComboMultiplier: 1.8,
-        burialInterval: 15,
-        commonLettersToBury: ['E', 'T', 'A'],
-      },
-    }
+    { type: 'etymologyDig', description: '', params: { rootFragments: ['bio', 'graph', 'tele', 'phon', 'log', 'morph'], rootComboMultiplier: 1.8, burialInterval: 15, commonLettersToBury: ['E', 'T', 'A'] } },
+    buildPhases('professorThesaurus', ['dig', 'excavate', 'unearthed'], [
+      { speedMultiplier: 1, bonusMultiplier: 1.8 },
+      { speedMultiplier: 1.4, gridEffect: 'cave-in-hide', mechanicOverride: { burialInterval: 10 } },
+      { speedMultiplier: 1.8, gridEffect: 'tile-shift', bossDamageMultiplier: 1.5 },
+    ])
   ),
 
   4: defineBoss(4, 'captainMetaphor',
     'Theatrical pirate who ONLY speaks in idioms. Genuinely confused why this confuses people.',
     'pirate-parrot', 'captain-metaphor',
-    {
-      type: 'idiomBattle',
-      description: '',
-      params: {
-        idiomChallengeInterval: 25,
-        wordsPerIdiom: 3,
-        anchorTileLockDuration: 10,
-        idiomBonusMultiplier: 2.5,
-      },
-    }
+    { type: 'idiomBattle', description: '', params: { idiomChallengeInterval: 25, wordsPerIdiom: 3, anchorTileLockDuration: 10, idiomBonusMultiplier: 2.5 } },
+    buildPhases('captainMetaphor', ['setSail', 'broadside', 'maelstrom'], [
+      { speedMultiplier: 1, bonusMultiplier: 2.5 },
+      { speedMultiplier: 1.3, extraTileCount: 2, gridEffect: 'anchor-cannon' },
+      { speedMultiplier: 1.8, gridEffect: 'board-rotate', bossDamageMultiplier: 2.0 },
+    ])
   ),
 
   5: defineBoss(5, 'baronBuildaword',
     'Steampunk inventor obsessed with word efficiency. Baffled that everything is not a compound word.',
     'steampunk-weasel', 'baron-buildaword',
-    {
-      type: 'assemblyLine',
-      description: '',
-      params: {
-        conveyorSpeed: 3,
-        compoundBonusMultiplier: 3.0,
-        machineInterval: 20,
-      },
-    }
+    { type: 'assemblyLine', description: '', params: { conveyorSpeed: 3, compoundBonusMultiplier: 3.0, machineInterval: 20 } },
+    buildPhases('baronBuildaword', ['assembly', 'overdrive', 'meltdown'], [
+      { speedMultiplier: 1, bonusMultiplier: 3.0 },
+      { speedMultiplier: 1.5, mechanicOverride: { conveyorSpeed: 5 }, gridEffect: 'hazard-tiles' },
+      { speedMultiplier: 2.0, gridEffect: 'tile-decay', bossDamageMultiplier: 1.8 },
+    ])
   ),
 
   6: defineBoss(6, 'puzzleMaster',
     'Enigmatic cat in a domino mask who speaks in riddles. Finds straightforward communication offensive.',
     'mystery-cat', 'puzzle-master',
-    {
-      type: 'scrambledReality',
-      description: '',
-      params: {
-        scrambleInterval: 10,
-        anagramBonusMultiplier: 2.0,
-        riddleTileCount: 2,
-      },
-    }
+    { type: 'scrambledReality', description: '', params: { scrambleInterval: 10, anagramBonusMultiplier: 2.0, riddleTileCount: 2 } },
+    buildPhases('puzzleMaster', ['shuffle', 'labyrinth', 'chaos'], [
+      { speedMultiplier: 1, bonusMultiplier: 2.0 },
+      { speedMultiplier: 1.4, gridEffect: 'maze-paths', mechanicOverride: { scrambleInterval: 7 } },
+      { speedMultiplier: 2.0, gridEffect: 'continuous-scramble', extraTileCount: 3, bossDamageMultiplier: 1.5 },
+    ])
   ),
 
   7: defineBoss(7, 'reflectionKing',
     'Dramatic ice monarch who believes he is the protagonist. Incredibly vain but not evil.',
     'crystal-peacock', 'reflection-king',
-    {
-      type: 'mirrorMatch',
-      description: '',
-      params: {
-        mirrorAxis: 'vertical',
-        iceCrackThreshold: 2,
-        palindromeBonusMultiplier: 3.0,
-      },
-    }
+    { type: 'mirrorMatch', description: '', params: { mirrorAxis: 'vertical', iceCrackThreshold: 2, palindromeBonusMultiplier: 3.0 } },
+    buildPhases('reflectionKing', ['mirror', 'shatter', 'kaleidoscope'], [
+      { speedMultiplier: 1, bonusMultiplier: 3.0 },
+      { speedMultiplier: 1.3, gridEffect: 'mirror-crack-zones', mechanicOverride: { iceCrackThreshold: 1 } },
+      { speedMultiplier: 1.8, gridEffect: 'grid-rotate-symmetric', bossDamageMultiplier: 1.8 },
+    ])
   ),
 
   8: defineBoss(8, 'cosmicWordsmith',
     'Ancient space entity who invented several languages. Deeply disappointed mortals use words wrong.',
     'cosmic-jellyfish', 'cosmic-wordsmith',
-    {
-      type: 'stellarForge',
-      description: '',
-      params: {
-        vowelCycleInterval: 8,
-        supernovaLetters: ['Q', 'X', 'Z'],
-        supernovaBonusMultiplier: 2.5,
-        blackHoleDevourTime: 12,
-      },
-    }
+    { type: 'stellarForge', description: '', params: { vowelCycleInterval: 8, supernovaLetters: ['Q', 'X', 'Z'], supernovaBonusMultiplier: 2.5, blackHoleDevourTime: 12 } },
+    buildPhases('cosmicWordsmith', ['stellar', 'supernova', 'blackHole'], [
+      { speedMultiplier: 1, bonusMultiplier: 2.5 },
+      { speedMultiplier: 1.5, gridEffect: 'rare-letter-explosions', mechanicOverride: { vowelCycleInterval: 5 } },
+      { speedMultiplier: 2.0, gridEffect: 'tile-absorption', bossDamageMultiplier: 2.0 },
+    ])
   ),
 
   9: defineBoss(9, 'linguistSage',
     'Wise mountain goat who achieved enlightenment through ALL languages. Mixes them chaotically.',
     'mountain-goat', 'linguist-sage',
-    {
-      type: 'babelSummit',
-      description: '',
-      params: {
-        languageSwitchInterval: 15,
-        loanwordBonusMultiplier: 1.5,
-        universalWordBonusMultiplier: 3.0,
-      },
-    }
+    { type: 'babelSummit', description: '', params: { languageSwitchInterval: 15, loanwordBonusMultiplier: 1.5, universalWordBonusMultiplier: 3.0 } },
+    buildPhases('linguistSage', ['babel', 'tower', 'summit'], [
+      { speedMultiplier: 1, bonusMultiplier: 1.5 },
+      { speedMultiplier: 1.4, gridEffect: 'stacking-difficulty', mechanicOverride: { languageSwitchInterval: 10 } },
+      { speedMultiplier: 2.0, gridEffect: 'all-languages-active', bossDamageMultiplier: 1.8 },
+    ])
   ),
 
   10: defineBoss(10, 'lexiconDragon',
     'Ultimate word nerd transcended into dragon form. Anxious and overenthusiastic - wants to make friends!',
     'golden-dragon', 'lexicon-dragon',
-    {
-      type: 'finalWord',
-      description: '',
-      params: {
-        phaseOrder: [
-          'popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle',
-          'assemblyLine', 'scrambledReality', 'mirrorMatch',
-          'stellarForge', 'babelSummit',
-        ],
-        phaseDuration: 15,
-        lexiconStrikeThreshold: 5,
-        dragonHoardGoldTileCount: 6,
-        dragonHoardMinWordLength: 5,
-      },
-    }
+    { type: 'finalWord', description: '', params: {
+      phaseOrder: ['popQuiz', 'hiveMind', 'etymologyDig', 'idiomBattle', 'assemblyLine', 'scrambledReality', 'mirrorMatch', 'stellarForge', 'babelSummit'],
+      phaseDuration: 15, lexiconStrikeThreshold: 5, dragonHoardGoldTileCount: 6, dragonHoardMinWordLength: 5,
+    } },
+    (() => {
+      const prefix = 'adventure.bosses.lexiconDragon.phases';
+      const mechanics: [string, string][] = [
+        ['popQuiz', 'quiz'], ['hiveMind', 'swarm'], ['etymologyDig', 'roots'],
+        ['idiomBattle', 'idioms'], ['assemblyLine', 'assembly'], ['scrambledReality', 'scramble'],
+        ['mirrorMatch', 'mirror'], ['stellarForge', 'stellar'], ['babelSummit', 'babel'],
+      ];
+      return mechanics.map(([mechType, phaseName], i): BossPhaseConfig => ({
+        nameKey: `${prefix}.${phaseName}`,
+        hpThreshold: Math.round(100 - (i * (100 / 9))),
+        mechanicModifiers: {
+          speedMultiplier: 1 + (i * 0.15),
+          bonusMultiplier: 2.0 + (i * 0.3),
+          mechanicOverride: { activeMechanic: mechType },
+          bossDamageMultiplier: 1 + (i * 0.1),
+        },
+        transitionTaunt: 'onMechanic',
+        entryAbility: i === 0 ? undefined : 'dragonBreath',
+      }));
+    })()
   ),
 };
 

@@ -9,6 +9,28 @@ import { render, screen } from '@testing-library/react';
 import PhaseIndicator from './PhaseIndicator';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
+// Mock the theme context
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useBossFightTheme: () => ({
+    phaseColors: {
+      phase1: { bg: 'bg-neo-cyan', text: 'text-neo-black' },
+      phase2: { bg: 'bg-neo-lime', text: 'text-neo-black' },
+      enraged: { bg: 'bg-neo-red', text: 'text-neo-white' },
+    },
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
 // ==============================================
 // TEST HELPERS
 // ==============================================

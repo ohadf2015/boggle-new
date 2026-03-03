@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HomePageClient from './PageClient';
-import { FAQPageJsonLd } from '@/components/seo/JsonLd';
 
 /**
  * Main landing page - Game mode selection
@@ -35,35 +34,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const FAQ_ITEMS = [
-  {
-    question: 'Is LexiClash really free?',
-    answer: 'Yes, completely free. No hidden paywalls, no premium subscriptions. We sustain the game through non-intrusive advertising that respects your privacy.',
-  },
-  {
-    question: 'Do I need to create an account?',
-    answer: 'No. You can play as a guest instantly. Creating an account (via Google or Discord) unlocks features like leaderboard rankings, achievement tracking, and progress saving across devices.',
-  },
-  {
-    question: 'What languages are supported?',
-    answer: 'LexiClash supports English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own curated dictionary, daily challenges, and leaderboards. You can switch languages anytime from the settings menu.',
-  },
-  {
-    question: 'Can I play on my phone?',
-    answer: 'Absolutely. LexiClash is fully responsive and works on any modern mobile browser. Swipe letters to form words — the touch controls are designed specifically for mobile play.',
-  },
-  {
-    question: 'Is it safe for children?',
-    answer: 'Yes. LexiClash is designed for players ages 6 and up. We comply with COPPA regulations, serve only non-personalized ads, and do not track children\'s browsing behavior.',
-  },
-];
-
 export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
     <>
-      <FAQPageJsonLd items={FAQ_ITEMS} />
       <HomePageClient />
 
       {/* Server-rendered SEO content — visible to crawlers without JS execution.

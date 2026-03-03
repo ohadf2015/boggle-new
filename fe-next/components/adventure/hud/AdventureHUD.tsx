@@ -3,6 +3,7 @@
  *
  * Main HUD container integrating all game displays.
  * Mobile-first, landscape-optimized layout with clear visual hierarchy.
+ * Colors driven by useHUDTheme() for per-world theming.
  */
 
 'use client';
@@ -12,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureTimer from '@/components/adventure/AdventureTimer';
 import AdventureXpProgressBar from '@/components/adventure/meta/AdventureXpProgressBar';
 import { CurrencyDisplay } from '@/components/adventure/meta/CurrencyDisplay';
@@ -74,6 +76,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
   }) => {
     const prefersReducedMotion = usePrefersReducedMotion();
     const { t } = useLanguage();
+    const hudTheme = useHUDTheme();
 
     return (
       <div
@@ -86,8 +89,8 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           data-testid="hud-top-bar"
           className={cn(
             'flex items-center justify-between gap-2 p-2',
-            'bg-neo-navy/70 backdrop-blur-sm',
-            'border-b-2 border-neo-black/20',
+            hudTheme.headerBg, 'backdrop-blur-sm',
+            'border-b-2', hudTheme.headerBorder,
             'pointer-events-auto'
           )}
         >
@@ -97,7 +100,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
             <div
               className={cn(
                 'flex-shrink-0 px-2 py-1',
-                'bg-neo-cyan text-neo-black',
+                hudTheme.levelBadgeColor, hudTheme.levelBadgeText,
                 'rounded-neo border-2 border-neo-black',
                 'shadow-hard-sm',
                 'font-neo-display font-black text-sm'
@@ -139,8 +142,8 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           className={cn(
             'fixed bottom-0 left-0 right-0',
             'flex items-end justify-between gap-2 p-2',
-            'bg-neo-navy/70 backdrop-blur-sm',
-            'border-t-2 border-neo-black/20',
+            hudTheme.headerBg, 'backdrop-blur-sm',
+            'border-t-2', hudTheme.headerBorder,
             'pointer-events-auto'
           )}
         >

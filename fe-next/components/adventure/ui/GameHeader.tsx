@@ -3,6 +3,7 @@
  *
  * Organized header bar with level info, score, and timer.
  * Clean visual hierarchy with distinct sections.
+ * Colors driven by useHUDTheme() for per-world theming.
  */
 
 'use client';
@@ -12,6 +13,7 @@ import { motion } from 'framer-motion';
 import { Pause, Play, LogOut, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureTimer from '../AdventureTimer';
 import { RollingNumber } from './RollingNumber';
 
@@ -45,14 +47,15 @@ export const GameHeader = memo(function GameHeader({
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
+  const hudTheme = useHUDTheme();
 
   return (
     <header
       className={cn(
         'flex items-center justify-between',
         'px-3 sm:px-4 py-2 sm:py-3',
-        'bg-neo-navy/90 backdrop-blur-md',
-        'border-b-3 border-neo-black/40',
+        hudTheme.headerBg, 'backdrop-blur-md',
+        'border-b-3', hudTheme.headerBorder,
         'flex-shrink-0',
         'shadow-hard-sm',
         className
@@ -61,16 +64,16 @@ export const GameHeader = memo(function GameHeader({
       {/* Left: Level Info */}
       <div className="flex items-center gap-2 sm:gap-4">
         {/* Level Badge */}
-        <motion.div 
+        <motion.div
           className={cn(
             'flex items-center gap-1.5 sm:gap-2',
             'px-2 sm:px-3 py-1 sm:py-1.5',
-            'bg-neo-black/40 rounded-neo',
+            hudTheme.levelBadgeColor, 'rounded-neo',
             'border-2 border-neo-white/10'
           )}
           whileHover={{ scale: 1.02 }}
         >
-          <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-neo-cyan" />
+          <MapPin className={cn('w-3 h-3 sm:w-4 sm:h-4', hudTheme.levelBadgeText)} />
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-neo-white/60 hidden sm:inline">{t('adventure.world')}</span>
             <span className="text-xs text-neo-white/60 sm:hidden">W</span>
@@ -78,7 +81,7 @@ export const GameHeader = memo(function GameHeader({
             <span className="text-neo-white/30">/</span>
             <span className="text-xs text-neo-white/60 hidden sm:inline">{t('adventure.level')}</span>
             <span className="text-xs text-neo-white/60 sm:hidden">L</span>
-            <span className="font-black text-neo-cyan">{levelNumber}</span>
+            <span className={cn('font-black', hudTheme.levelBadgeText)}>{levelNumber}</span>
           </div>
         </motion.div>
 
@@ -99,7 +102,7 @@ export const GameHeader = memo(function GameHeader({
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Mobile Score - Compact */}
         <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-neo-black/30 rounded-neo">
-          <RollingNumber 
+          <RollingNumber
             value={score}
             variant="white"
             className="text-sm font-black"
@@ -107,7 +110,7 @@ export const GameHeader = memo(function GameHeader({
         </div>
 
         {/* Timer */}
-        <AdventureTimer 
+        <AdventureTimer
           timeRemaining={timeRemaining}
           size="compact"
         />

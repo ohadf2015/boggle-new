@@ -3,6 +3,7 @@
  *
  * Organized sidebar with objectives, combo display, and hints.
  * Optimized for mobile with compact layout and proper scrolling.
+ * Colors driven by useHUDTheme() for per-world theming.
  */
 
 'use client';
@@ -12,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureObjectives from '../AdventureObjectives';
 import type { LevelObjective } from '@/types/adventure';
 
@@ -47,13 +49,14 @@ export const GameSidebar = memo(function GameSidebar({
   className,
 }: GameSidebarProps) {
   const { t } = useLanguage();
+  const hudTheme = useHUDTheme();
 
   return (
     <aside
       className={cn(
         'flex flex-col',
         'h-full',
-        'bg-neo-navy/60 backdrop-blur-sm',
+        hudTheme.sidebarBg, 'backdrop-blur-sm',
         className
       )}
     >
@@ -61,9 +64,9 @@ export const GameSidebar = memo(function GameSidebar({
       <div className="lg:hidden flex flex-row gap-2 p-2">
         {/* Objectives - Fill available width */}
         <div className="flex-1 min-w-0">
-          <div className="bg-neo-black/40 rounded-neo-lg p-2 border-2 border-neo-black/50">
+          <div className={cn(hudTheme.sidebarBg, 'rounded-neo-lg p-2 border-2 border-neo-black/50')}>
             <div className="flex items-center gap-1.5 mb-1.5">
-              <Target className="w-3 h-3 text-neo-yellow" />
+              <Target className={cn('w-3 h-3', hudTheme.objectiveAccent)} />
               <span className="text-[10px] font-bold text-neo-white/70 uppercase">
                 {t('adventure.game.objectives')}
               </span>
@@ -89,7 +92,7 @@ export const GameSidebar = memo(function GameSidebar({
               'font-bold text-sm',
               'border-2 transition-all',
               hasHintsAvailable
-                ? 'bg-neo-yellow text-neo-black border-neo-black'
+                ? cn(hudTheme.hintActiveColor, hudTheme.hintActiveText, 'border-neo-black')
                 : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
             )}
           >
@@ -128,7 +131,7 @@ export const GameSidebar = memo(function GameSidebar({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            'bg-neo-black/40 backdrop-blur-sm',
+            hudTheme.sidebarBg, 'backdrop-blur-sm',
             'border-3 border-neo-black/50',
             'rounded-neo-lg p-3',
             'shadow-hard'
@@ -136,7 +139,7 @@ export const GameSidebar = memo(function GameSidebar({
         >
           <div className="flex items-center gap-2 mb-2">
             <div className="w-7 h-7 rounded-neo bg-neo-yellow/20 border-2 border-neo-yellow/40 flex items-center justify-center">
-              <Target className="w-3.5 h-3.5 text-neo-yellow" />
+              <Target className={cn('w-3.5 h-3.5', hudTheme.objectiveAccent)} />
             </div>
             <h2 className="text-xs font-black text-neo-white/80 uppercase tracking-wide">
               {t('adventure.game.objectives')}
@@ -164,7 +167,7 @@ export const GameSidebar = memo(function GameSidebar({
               'border-3 transition-all duration-200',
               'shadow-hard',
               hasHintsAvailable
-                ? 'bg-neo-yellow text-neo-black border-neo-black hover:shadow-hard-lg'
+                ? cn(hudTheme.hintActiveColor, hudTheme.hintActiveText, 'border-neo-black hover:shadow-hard-lg')
                 : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
             )}
           >

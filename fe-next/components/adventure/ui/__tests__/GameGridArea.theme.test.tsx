@@ -1,0 +1,94 @@
+/**
+ * GameGridArea Theme Integration Tests
+ *
+ * Verifies that GameGridArea uses HUD theme values from useHUDTheme()
+ * for feedback message and hint area coloring.
+ */
+
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { GameGridArea } from '../GameGridArea';
+
+const mockHUDTheme = {
+  headerBg: 'bg-emerald-950/90',
+  headerBorder: 'border-emerald-800/40',
+  sidebarBg: 'bg-emerald-900/40',
+  scoreAccent: 'text-emerald-300',
+  levelBadgeColor: 'bg-emerald-900/60',
+  levelBadgeText: 'text-emerald-400',
+  objectiveAccent: 'text-emerald-300',
+  hintActiveColor: 'bg-emerald-400',
+  hintActiveText: 'text-emerald-950',
+};
+
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useHUDTheme: () => mockHUDTheme,
+}));
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+    locale: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+jest.mock('../../AdventureGrid', () => ({
+  __esModule: true,
+  default: React.forwardRef(function MockAdventureGrid() { return <div data-testid="mock-grid" />; }),
+}));
+
+jest.mock('@/components/game/WordFormingArea', () => ({
+  __esModule: true,
+  default: ({ word }: any) => <div data-testid="mock-word-area">{word}</div>,
+}));
+
+jest.mock('@/components/phaser/PhaserGameAdventure', () => ({
+  PhaserGameAdventure: () => <div data-testid="mock-phaser" />,
+}));
+
+describe('GameGridArea — Theme Integration', () => {
+  const defaultProps = {
+    tiles: [
+      { row: 0, col: 0, letter: 'A', type: 'standard' as const, id: '0-0', isCleared: false },
+    ],
+    gridSize: 4,
+    selectedIndices: [],
+    onTileSelect: jest.fn(),
+    onWordSubmit: jest.fn(),
+    onDragStart: jest.fn(),
+    onDragEnter: jest.fn(),
+    gridRef: { current: null },
+    isInteractive: true,
+    isDisabled: false,
+    entryPhase: 'play',
+    showCascade: false,
+    onCascadeComplete: jest.fn(),
+    hintHighlightIndices: [],
+    pathPoints: [],
+    validationError: null,
+    isValidating: false,
+    isWordValid: false,
+    wasWordSubmitted: false,
+    lastAccepted: null,
+    selectedLength: 0,
+    minWordLength: 3,
+    hintLevel: 'none' as const,
+  };
+
+  it('should apply scoreAccent from theme to hint message', () => {
+    const { container } = render(
+      <GameGridArea {...defaultProps} hintLevel="length" />
+    );
+    // Hint messages should use the theme accent
+    const hintElements = container.querySelectorAll('[class*="text-emerald-300"]');
+    expect(hintElements.length).toBeGreaterThan(0);
+  });
+
+  it('should render validation error with proper styling', () => {
+    render(
+      <GameGridArea {...defaultProps} validationError="Too short!" />
+    );
+    expect(screen.getByText('Too short!')).toBeInTheDocument();
+  });
+});

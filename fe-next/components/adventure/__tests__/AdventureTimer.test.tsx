@@ -9,6 +9,45 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AdventureTimer from '../AdventureTimer';
 
+// Mock theme context — returns default theme (matches old hardcoded values)
+jest.mock('@/contexts/AdventureThemeContext', () => ({
+  useTimerTheme: () => ({
+    normal: { bg: 'bg-neo-navy/80', text: 'text-neo-white', shadow: '' },
+    warning: { bg: 'bg-neo-orange/20', text: 'text-neo-orange', shadow: '' },
+    danger: { bg: 'bg-neo-red/20', text: 'text-neo-red', shadow: '' },
+    critical: { bg: 'bg-neo-red/30', text: 'text-neo-red', shadow: '' },
+  }),
+  useHUDTheme: () => ({
+    headerBg: 'bg-neo-navy/90',
+    headerBorder: 'border-neo-black/40',
+    sidebarBg: 'bg-neo-black/40',
+    scoreAccent: 'text-neo-cyan',
+    levelBadgeColor: 'bg-neo-black/40',
+    levelBadgeText: 'text-neo-cyan',
+    objectiveAccent: 'text-neo-lime',
+    hintActiveColor: 'bg-neo-lime',
+    hintActiveText: 'text-neo-black',
+  }),
+  useBossFightTheme: () => ({
+    dialogueBg: 'bg-neo-navy/95',
+    dialogueBorder: 'border-neo-white/20',
+    bossNameColor: 'text-neo-red',
+    hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+    telegraphColor: 'bg-neo-red/20',
+    telegraphProgressColor: 'bg-neo-red',
+    playerHealthNormal: 'bg-neo-lime',
+    playerHealthLow: 'bg-neo-red',
+    phaseColors: {
+      phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+      phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+      enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+    },
+    avatarGlow: 'rgba(239, 68, 68, 0.4)',
+    victoryGlow: 'rgba(163, 230, 53, 0.6)',
+    arenaEffect: 'none',
+  }),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================

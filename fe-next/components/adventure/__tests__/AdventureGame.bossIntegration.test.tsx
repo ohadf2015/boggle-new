@@ -167,6 +167,11 @@ const mockBossConfig = {
     onVictory: 'adventure.bosses.msGrammar.tauntVictory',
     onDefeat: 'adventure.bosses.msGrammar.tauntDefeat',
   },
+  phases: [
+    { nameKey: 'adventure.bosses.msGrammar.phases.lecture', hpThreshold: 100, mechanicModifiers: { speedMultiplier: 1 } },
+    { nameKey: 'adventure.bosses.msGrammar.phases.popTest', hpThreshold: 66, mechanicModifiers: { speedMultiplier: 1.5 } },
+    { nameKey: 'adventure.bosses.msGrammar.phases.finalExam', hpThreshold: 33, mechanicModifiers: { speedMultiplier: 2.0 } },
+  ],
 };
 
 describe('AdventureGame - Boss Battle Integration', () => {

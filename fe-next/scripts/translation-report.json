@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3557,
+    "totalKeysInCode": 3591,
     "keyCountByLanguage": {
-      "en": 5111,
-      "he": 5110,
-      "sv": 5104,
-      "ja": 5119,
-      "es": 4773
+      "en": 5125,
+      "he": 5141,
+      "sv": 5135,
+      "ja": 5150,
+      "es": 4787
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 19,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -67,7 +67,7 @@
         "pattern": "t(currentTaunt)",
         "variable": "currentTaunt",
         "file": "components/adventure/BossDialogue.tsx",
-        "line": 54,
+        "line": 56,
         "context": "const translatedTaunt = t(currentTaunt) || currentTaunt;",
         "type": "variable_key"
       },
@@ -91,7 +91,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 252,
+        "line": 263,
         "context": "{t(bossName) || bossName}",
         "type": "variable_key"
       },
@@ -99,7 +99,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 273,
+        "line": 284,
         "context": "aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}",
         "type": "variable_key"
       },
@@ -160,27 +160,218 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "adventure.bosses.mechanicProgress",
+      "usages": [
+        {
+          "file": "components/adventure/boss/BossMechanicWidget.tsx",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "key": "adventure.bosses.msGrammar.phases.finalExam",
+      "usages": [
+        {
+          "file": "components/adventure/__tests__/AdventureGame.bossIntegration.test.tsx",
+          "line": 173
+        },
+        {
+          "file": "components/adventure/__tests__/BossDialogue.test.tsx",
+          "line": 101
+        },
+        {
+          "file": "components/adventure/__tests__/BossIntro.test.tsx",
+          "line": 123
+        },
+        {
+          "file": "components/adventure/__tests__/BossVictory.test.tsx",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "key": "adventure.bosses.msGrammar.phases.lecture",
+      "usages": [
+        {
+          "file": "components/adventure/__tests__/AdventureGame.bossIntegration.test.tsx",
+          "line": 171
+        },
+        {
+          "file": "components/adventure/__tests__/BossDialogue.test.tsx",
+          "line": 99
+        },
+        {
+          "file": "components/adventure/__tests__/BossIntro.test.tsx",
+          "line": 121
+        },
+        {
+          "file": "components/adventure/__tests__/BossVictory.test.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "adventure.bosses.msGrammar.phases.popTest",
+      "usages": [
+        {
+          "file": "components/adventure/__tests__/AdventureGame.bossIntegration.test.tsx",
+          "line": 172
+        },
+        {
+          "file": "components/adventure/__tests__/BossDialogue.test.tsx",
+          "line": 100
+        },
+        {
+          "file": "components/adventure/__tests__/BossIntro.test.tsx",
+          "line": 122
+        },
+        {
+          "file": "components/adventure/__tests__/BossVictory.test.tsx",
+          "line": 101
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.labyrinth.bossZone",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world6.ts",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.labyrinth.zone1",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world6.ts",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.labyrinth.zone2",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world6.ts",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.nebula.bossZone",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world8.ts",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.nebula.zone1",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world8.ts",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.nebula.zone2",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world8.ts",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.palace.bossZone",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world7.ts",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.palace.zone1",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world7.ts",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.palace.zone2",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world7.ts",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.peaks.bossZone",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world9.ts",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.peaks.zone1",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world9.ts",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.peaks.zone2",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world9.ts",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.throne.bossZone",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world10.ts",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.throne.zone1",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world10.ts",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "adventure.chapters.throne.zone2",
+      "usages": [
+        {
+          "file": "lib/adventure/themes/world10.ts",
+          "line": 225
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "share.qrCode",
-      "legal.disclaimer.title",
-      "legal.disclaimer.general.title",
-      "legal.disclaimer.general.content",
-      "legal.disclaimer.noProfessionalAdvice.title",
-      "legal.disclaimer.noProfessionalAdvice.content",
-      "legal.disclaimer.asIs.title",
-      "legal.disclaimer.asIs.content",
-      "legal.disclaimer.thirdParty.title",
-      "legal.disclaimer.thirdParty.content",
-      "legal.disclaimer.advertising.title",
-      "legal.disclaimer.advertising.content",
-      "legal.disclaimer.liability.title",
-      "legal.disclaimer.liability.content",
-      "legal.disclaimer.changes.title",
-      "legal.disclaimer.changes.content",
-      "legal.disclaimer.contact.title",
-      "legal.disclaimer.contact.content",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -196,23 +387,6 @@
     ],
     "sv": [
       "share.qrCode",
-      "legal.disclaimer.title",
-      "legal.disclaimer.general.title",
-      "legal.disclaimer.general.content",
-      "legal.disclaimer.noProfessionalAdvice.title",
-      "legal.disclaimer.noProfessionalAdvice.content",
-      "legal.disclaimer.asIs.title",
-      "legal.disclaimer.asIs.content",
-      "legal.disclaimer.thirdParty.title",
-      "legal.disclaimer.thirdParty.content",
-      "legal.disclaimer.advertising.title",
-      "legal.disclaimer.advertising.content",
-      "legal.disclaimer.liability.title",
-      "legal.disclaimer.liability.content",
-      "legal.disclaimer.changes.title",
-      "legal.disclaimer.changes.content",
-      "legal.disclaimer.contact.title",
-      "legal.disclaimer.contact.content",
       "buzz.error.loading",
       "buzz.error.failed",
       "buzz.error.noInternet",
@@ -266,23 +440,6 @@
       "challengeAction"
     ],
     "ja": [
-      "legal.disclaimer.title",
-      "legal.disclaimer.general.title",
-      "legal.disclaimer.general.content",
-      "legal.disclaimer.noProfessionalAdvice.title",
-      "legal.disclaimer.noProfessionalAdvice.content",
-      "legal.disclaimer.asIs.title",
-      "legal.disclaimer.asIs.content",
-      "legal.disclaimer.thirdParty.title",
-      "legal.disclaimer.thirdParty.content",
-      "legal.disclaimer.advertising.title",
-      "legal.disclaimer.advertising.content",
-      "legal.disclaimer.liability.title",
-      "legal.disclaimer.liability.content",
-      "legal.disclaimer.changes.title",
-      "legal.disclaimer.changes.content",
-      "legal.disclaimer.contact.title",
-      "legal.disclaimer.contact.content",
       "challenge.yourRecord",
       "challenge.noRecord",
       "challenge.newRecord",

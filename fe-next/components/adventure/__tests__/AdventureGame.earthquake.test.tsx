@@ -187,6 +187,41 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
     AdventureThemeContext: ctx,
     useAdventureTheme: () => ({ theme: ctx._currentValue.theme, worldId: 1, level: 1, setWorld: jest.fn(), setLevel: jest.fn(), isTransitioning: false, chapter: { id: 1, name: 'Tutorial', levels: [1,2], starThreshold: 0, accentColor: 'neo-lime' } }),
     AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+    useHUDTheme: () => ({
+      headerBg: 'bg-neo-navy/90',
+      headerBorder: 'border-neo-black/40',
+      sidebarBg: 'bg-neo-black/40',
+      scoreAccent: 'text-neo-cyan',
+      levelBadgeColor: 'bg-neo-black/40',
+      levelBadgeText: 'text-neo-cyan',
+      objectiveAccent: 'text-neo-lime',
+      hintActiveColor: 'bg-neo-lime',
+      hintActiveText: 'text-neo-black',
+    }),
+    useTimerTheme: () => ({
+      normal: { bg: 'bg-neo-navy/80', text: 'text-neo-white', shadow: '' },
+      warning: { bg: 'bg-neo-orange/20', text: 'text-neo-orange', shadow: 'shadow-[0_0_12px_rgba(255,107,53,0.3)]' },
+      danger: { bg: 'bg-neo-red/20', text: 'text-neo-red', shadow: 'shadow-[0_0_16px_rgba(239,68,68,0.4)]' },
+      critical: { bg: 'bg-neo-red/30', text: 'text-neo-red', shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.6)]' },
+    }),
+    useBossFightTheme: () => ({
+      dialogueBg: 'bg-neo-navy/95',
+      dialogueBorder: 'border-neo-white/20',
+      bossNameColor: 'text-neo-red',
+      hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+      telegraphColor: 'bg-neo-red/20',
+      telegraphProgressColor: 'bg-neo-red',
+      playerHealthNormal: 'bg-neo-lime',
+      playerHealthLow: 'bg-neo-red',
+      phaseColors: {
+        phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+        phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+        enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+      },
+      avatarGlow: 'rgba(239, 68, 68, 0.4)',
+      victoryGlow: 'rgba(163, 230, 53, 0.6)',
+      arenaEffect: 'none',
+    }),
   };
 });
 

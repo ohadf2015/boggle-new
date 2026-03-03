@@ -222,6 +222,55 @@ export interface ChapterConfig {
 }
 
 // ==============================================
+// HUD THEME TYPES
+// ==============================================
+
+export interface HUDTheme {
+  headerBg: string;
+  headerBorder: string;
+  sidebarBg: string;
+  scoreAccent: string;
+  levelBadgeColor: string;
+  levelBadgeText: string;
+  objectiveAccent: string;
+  hintActiveColor: string;
+  hintActiveText: string;
+}
+
+export interface UrgencyLevelStyle {
+  bg: string;
+  text: string;
+  shadow: string;
+}
+
+export interface TimerUrgencyTheme {
+  normal: UrgencyLevelStyle;
+  warning: UrgencyLevelStyle;
+  danger: UrgencyLevelStyle;
+  critical: UrgencyLevelStyle;
+}
+
+export interface BossPhaseColors {
+  bg: string;
+  text: string;
+}
+
+export interface BossFightTheme {
+  dialogueBg: string;
+  dialogueBorder: string;
+  bossNameColor: string;
+  hpSegmentColors: [string, string, string];
+  telegraphColor: string;
+  telegraphProgressColor: string;
+  playerHealthNormal: string;
+  playerHealthLow: string;
+  phaseColors: Record<'phase1' | 'phase2' | 'enraged', BossPhaseColors>;
+  avatarGlow: string;
+  victoryGlow: string;
+  arenaEffect: string;
+}
+
+// ==============================================
 // MAIN WORLD THEME
 // ==============================================
 
@@ -251,6 +300,12 @@ export interface WorldTheme {
   chapters: [ChapterConfig, ChapterConfig, ChapterConfig];
   /** World-specific CSS class to apply */
   containerClass: string;
+  /** HUD theme (optional, falls back to DEFAULT_HUD_THEME) */
+  hud?: HUDTheme;
+  /** Timer urgency theme (optional, falls back to DEFAULT_TIMER_THEME) */
+  timerTheme?: TimerUrgencyTheme;
+  /** Boss fight theme (optional, falls back to DEFAULT_BOSS_FIGHT_THEME) */
+  bossFight?: BossFightTheme;
 }
 
 // ==============================================
@@ -312,4 +367,42 @@ export const DEFAULT_TEXTURE: TextureConfig = {
   type: 'none',
   opacity: 0,
   blendMode: 'normal',
+};
+
+export const DEFAULT_HUD_THEME: HUDTheme = {
+  headerBg: 'bg-neo-navy/90',
+  headerBorder: 'border-neo-black/40',
+  sidebarBg: 'bg-neo-black/40',
+  scoreAccent: 'text-neo-cyan',
+  levelBadgeColor: 'bg-neo-black/40',
+  levelBadgeText: 'text-neo-cyan',
+  objectiveAccent: 'text-neo-lime',
+  hintActiveColor: 'bg-neo-lime',
+  hintActiveText: 'text-neo-black',
+};
+
+export const DEFAULT_TIMER_THEME: TimerUrgencyTheme = {
+  normal: { bg: 'bg-neo-navy/80', text: 'text-neo-white', shadow: '' },
+  warning: { bg: 'bg-neo-orange/20', text: 'text-neo-orange', shadow: 'shadow-[0_0_12px_rgba(255,107,53,0.3)]' },
+  danger: { bg: 'bg-neo-red/20', text: 'text-neo-red', shadow: 'shadow-[0_0_16px_rgba(239,68,68,0.4)]' },
+  critical: { bg: 'bg-neo-red/30', text: 'text-neo-red', shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.6)]' },
+};
+
+export const DEFAULT_BOSS_FIGHT_THEME: BossFightTheme = {
+  dialogueBg: 'bg-neo-navy/95',
+  dialogueBorder: 'border-neo-white/20',
+  bossNameColor: 'text-neo-red',
+  hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
+  telegraphColor: 'bg-neo-red/20',
+  telegraphProgressColor: 'bg-neo-red',
+  playerHealthNormal: 'bg-neo-lime',
+  playerHealthLow: 'bg-neo-red',
+  phaseColors: {
+    phase1: { bg: 'bg-neo-lime/20', text: 'text-neo-lime' },
+    phase2: { bg: 'bg-neo-orange/20', text: 'text-neo-orange' },
+    enraged: { bg: 'bg-neo-red/20', text: 'text-neo-red' },
+  },
+  avatarGlow: 'rgba(239, 68, 68, 0.4)',
+  victoryGlow: 'rgba(163, 230, 53, 0.6)',
+  arenaEffect: 'none',
 };

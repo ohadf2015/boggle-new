@@ -1,0 +1,200 @@
+/**
+ * useAdventureGameInit Tests
+ *
+ * Tests for the hook that consolidates initialization of:
+ * adaptive difficulty, AI director, XP, currency, skills, achievements, combo
+ */
+
+import { renderHook, act } from '@testing-library/react';
+import { useAdventureGameInit } from '../useAdventureGameInit';
+import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
+import { useAIDirector } from '@/hooks/useAIDirector';
+import { useAdventureXp } from '@/hooks/useAdventureXp';
+import { useAdventureCurrency } from '@/hooks/useAdventureCurrency';
+import { useSkillPoints } from '@/hooks/useSkillPoints';
+import { useSkillEffects } from '@/hooks/useSkillEffects';
+import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
+import { useComboMilestone } from '@/hooks/useComboMilestone';
+import { registerAllAbilities } from '@/lib/adventure/abilities';
+import { showAchievementToast } from '@/components/achievements/AchievementToast';
+
+jest.mock('@/hooks/useAdaptiveDifficulty');
+jest.mock('@/hooks/useAIDirector');
+jest.mock('@/hooks/useAdventureXp');
+jest.mock('@/hooks/useAdventureCurrency');
+jest.mock('@/hooks/useSkillPoints');
+jest.mock('@/hooks/useSkillEffects');
+jest.mock('@/hooks/useAdventureAchievements');
+jest.mock('@/hooks/useComboMilestone');
+jest.mock('@/lib/adventure/abilities');
+jest.mock('@/components/achievements/AchievementToast');
+
+const mockUseAdaptiveDifficulty = useAdaptiveDifficulty as jest.MockedFunction<typeof useAdaptiveDifficulty>;
+const mockUseAIDirector = useAIDirector as jest.MockedFunction<typeof useAIDirector>;
+const mockUseAdventureXp = useAdventureXp as jest.MockedFunction<typeof useAdventureXp>;
+const mockUseAdventureCurrency = useAdventureCurrency as jest.MockedFunction<typeof useAdventureCurrency>;
+const mockUseSkillPoints = useSkillPoints as jest.MockedFunction<typeof useSkillPoints>;
+const mockUseSkillEffects = useSkillEffects as jest.MockedFunction<typeof useSkillEffects>;
+const mockUseAdventureAchievements = useAdventureAchievements as jest.MockedFunction<typeof useAdventureAchievements>;
+const mockUseComboMilestone = useComboMilestone as jest.MockedFunction<typeof useComboMilestone>;
+
+describe('useAdventureGameInit', () => {
+  const defaultProps = {
+    world: 1,
+    level: 3,
+    timerSeconds: 120,
+  };
+
+  const mockAdaptiveDifficulty = {
+    tier: 'medium' as const,
+    adjustedConfig: { timerSeconds: 120, gridSize: 5, objectives: [{ type: 'score', target: 100 }], world: 1, level: 3, minWordLength: 3 },
+    hintData: { level: 'none' as const, highlightTiles: [] },
+    powerUpCooldownMultiplier: 1,
+    recordCompletion: jest.fn(),
+  };
+
+  const mockAIDirector = {
+    intensityAdjustments: { hintEscalationRate: 1, difficultyModifier: 0 },
+    flowState: 'normal' as const,
+    startSession: jest.fn(),
+    endSession: jest.fn(),
+    recordWord: jest.fn(),
+    handleTransition: jest.fn(),
+    isBossBattle: false,
+  };
+
+  const mockXp = {
+    totalXp: 0,
+    currentLevel: 1,
+    xpProgress: 0,
+    awardXp: jest.fn().mockReturnValue({ leveledUp: false }),
+    pendingUpdate: null,
+    acknowledgePersistence: jest.fn(),
+  };
+
+  const mockCurrency = {
+    gold: 0,
+    upgrades: { timeBonus: 0, scoreBonus: 0, xpBonus: 0 },
+    addGold: jest.fn(),
+    purchase: jest.fn(),
+    getUpgradeEffect: jest.fn().mockReturnValue({ multiplier: 1 }),
+    pendingUpdate: null,
+    acknowledgePersistence: jest.fn(),
+  };
+
+  const mockSkillEffectsVal = {
+    bossDamageMultiplier: 1,
+    comboMultiplierBonus: 0,
+    getLongWordDamageMultiplier: jest.fn().mockReturnValue(1),
+  };
+
+  const mockAchievements = {
+    earnAchievement: jest.fn().mockReturnValue(true),
+    getCount: jest.fn().mockReturnValue(0),
+  };
+
+  const mockComboMilestone = {
+    currentMilestone: null,
+    checkMilestone: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseAdaptiveDifficulty.mockReturnValue(mockAdaptiveDifficulty as any);
+    mockUseAIDirector.mockReturnValue(mockAIDirector as any);
+    mockUseAdventureXp.mockReturnValue(mockXp as any);
+    mockUseAdventureCurrency.mockReturnValue(mockCurrency as any);
+    mockUseSkillPoints.mockReturnValue(undefined as any);
+    mockUseSkillEffects.mockReturnValue(mockSkillEffectsVal as any);
+    mockUseAdventureAchievements.mockReturnValue(mockAchievements as any);
+    mockUseComboMilestone.mockReturnValue(mockComboMilestone as any);
+  });
+
+  it('should register all abilities on mount', () => {
+    renderHook(() => useAdventureGameInit(defaultProps));
+    expect(registerAllAbilities).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return adaptive difficulty data', () => {
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    expect(result.current.tier).toBe('medium');
+    expect(result.current.hintData).toEqual(mockAdaptiveDifficulty.hintData);
+    expect(result.current.recordCompletion).toBe(mockAdaptiveDifficulty.recordCompletion);
+  });
+
+  it('should compute adjustedLevelConfig with time bonus', () => {
+    mockCurrency.getUpgradeEffect.mockReturnValue({ multiplier: 1.2 });
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    // timeBonus multiplier 1.2, bonus = floor(120 * (1.2 - 1)) = floor(23.999...) = 23
+    expect(result.current.adjustedLevelConfig.timerSeconds).toBe(143);
+  });
+
+  it('should return upgrade bonuses', () => {
+    mockCurrency.getUpgradeEffect.mockReturnValue({ multiplier: 1.5 });
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    expect(result.current.upgradeBonuses.timeBonus).toBe(1.5);
+    expect(result.current.upgradeBonuses.scoreBonus).toBe(1.5);
+    expect(result.current.upgradeBonuses.xpBonus).toBe(1.5);
+  });
+
+  it('should return AI director controls', () => {
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    expect(result.current.startAIDirector).toBe(mockAIDirector.startSession);
+    expect(result.current.endAIDirector).toBe(mockAIDirector.endSession);
+    expect(result.current.recordAIWord).toBe(mockAIDirector.recordWord);
+    expect(result.current.handleAITransition).toBe(mockAIDirector.handleTransition);
+  });
+
+  it('should return XP and currency state', () => {
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    expect(result.current.currentLevel).toBe(1);
+    expect(result.current.awardXp).toBe(mockXp.awardXp);
+    expect(result.current.addGold).toBe(mockCurrency.addGold);
+  });
+
+  it('should return skill effects', () => {
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    expect(result.current.skillEffects).toBe(mockSkillEffectsVal);
+  });
+
+  it('should return combo milestone data', () => {
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    expect(result.current.currentMilestone).toBeNull();
+    expect(result.current.checkMilestone).toBe(mockComboMilestone.checkMilestone);
+  });
+
+  describe('handleEarnAchievement', () => {
+    it('should call earnAchievement and show toast when new', () => {
+      mockAchievements.earnAchievement.mockReturnValue(true);
+      mockAchievements.getCount.mockReturnValue(0);
+
+      const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+      const isNew = result.current.handleEarnAchievement('FIRST_WORD' as any);
+
+      expect(isNew).toBe(true);
+      expect(mockAchievements.earnAchievement).toHaveBeenCalledWith('FIRST_WORD');
+      expect(showAchievementToast).toHaveBeenCalled();
+    });
+
+    it('should not show toast when achievement not new/upgraded', () => {
+      mockAchievements.earnAchievement.mockReturnValue(false);
+
+      const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+      const isNew = result.current.handleEarnAchievement('FIRST_WORD' as any);
+
+      expect(isNew).toBe(false);
+      expect(showAchievementToast).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should compute adjusted inactivity threshold from AI director', () => {
+    mockUseAIDirector.mockReturnValue({
+      ...mockAIDirector,
+      intensityAdjustments: { hintEscalationRate: 2, difficultyModifier: 0 },
+    } as any);
+
+    const { result } = renderHook(() => useAdventureGameInit(defaultProps));
+    // base 15000 / 2 = 7500
+    expect(result.current.adjustedInactivityThresholdMs).toBe(7500);
+  });
+});

@@ -1,0 +1,290 @@
+/**
+ * useAdventureWordSubmit Tests
+ *
+ * Tests for the word submission callback hook that handles
+ * validation, scoring, boss damage, achievements, and feedback.
+ */
+
+import { renderHook, act } from '@testing-library/react';
+import { useAdventureWordSubmit } from '../useAdventureWordSubmit';
+
+describe('useAdventureWordSubmit', () => {
+  const mockValidateWord = jest.fn();
+  const mockSubmitWordWithPath = jest.fn();
+  const mockClearSelection = jest.fn();
+  const mockClearCurrentHint = jest.fn();
+  const mockRecordActivity = jest.fn();
+  const mockResetOnGameAction = jest.fn();
+  const mockCheckBossWord = jest.fn();
+  const mockDealBossDamage = jest.fn();
+  const mockTriggerBossTaunt = jest.fn();
+  const mockHandleEarnAchievement = jest.fn();
+  const mockRecordAIWord = jest.fn();
+  const mockHandleAITransition = jest.fn();
+  const mockAddScorePopup = jest.fn();
+  const mockGetScoreMultiplier = jest.fn().mockReturnValue(1);
+  const mockT = jest.fn().mockImplementation((key: string) => key);
+
+  const defaultProps = {
+    isPlaying: true,
+    isPaused: false,
+    isValidating: false,
+    isCascading: false,
+    currentWord: '',
+    selectedIndices: [] as number[],
+    gridSize: 5,
+    minWordLength: 3,
+    validateWord: mockValidateWord,
+    submitWordWithPath: mockSubmitWordWithPath,
+    clearSelection: mockClearSelection,
+    clearCurrentHint: mockClearCurrentHint,
+    recordActivity: mockRecordActivity,
+    resetOnGameAction: mockResetOnGameAction,
+    comboCount: 0,
+    wordsFound: [] as string[],
+    isBossActive: false,
+    bossConfig: null as any,
+    checkBossWord: mockCheckBossWord,
+    dealBossDamage: mockDealBossDamage,
+    triggerBossTaunt: mockTriggerBossTaunt,
+    handleEarnAchievement: mockHandleEarnAchievement,
+    recordAIWord: mockRecordAIWord,
+    handleAITransition: mockHandleAITransition,
+    addScorePopup: mockAddScorePopup,
+    getScoreMultiplier: mockGetScoreMultiplier,
+    upgradeBonuses: { scoreBonus: 1, timeBonus: 1, xpBonus: 1 },
+    skillEffects: {
+      bossDamageMultiplier: 1,
+      comboMultiplierBonus: 0,
+      getLongWordDamageMultiplier: jest.fn().mockReturnValue(1),
+    },
+    t: mockT,
+    getPopupStartPosition: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('should return handleWordSubmit callback and feedback state', () => {
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+    expect(result.current.handleWordSubmit).toBeInstanceOf(Function);
+    expect(result.current.validationFeedback).toEqual({
+      error: null,
+      wasSubmitted: false,
+      isValid: false,
+    });
+    expect(result.current.wordFeedback).toBeNull();
+    expect(result.current.lastAccepted).toBeNull();
+  });
+
+  it('should not submit when not playing', async () => {
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({ ...defaultProps, isPlaying: false })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(mockValidateWord).not.toHaveBeenCalled();
+  });
+
+  it('should not submit when paused', async () => {
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({ ...defaultProps, isPaused: true })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(mockValidateWord).not.toHaveBeenCalled();
+  });
+
+  it('should not submit word shorter than minWordLength', async () => {
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({ ...defaultProps, minWordLength: 3 })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hi', [0, 1]);
+    });
+
+    expect(mockValidateWord).not.toHaveBeenCalled();
+  });
+
+  it('should not submit when cascading', async () => {
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({ ...defaultProps, isCascading: true })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(mockValidateWord).not.toHaveBeenCalled();
+  });
+
+  it('should handle valid word submission', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(mockValidateWord).toHaveBeenCalledWith('hello', expect.any(Array));
+    expect(mockSubmitWordWithPath).toHaveBeenCalled();
+    expect(mockClearSelection).toHaveBeenCalled();
+    expect(mockClearCurrentHint).toHaveBeenCalled();
+    expect(mockRecordActivity).toHaveBeenCalled();
+    expect(mockResetOnGameAction).toHaveBeenCalled();
+    expect(mockRecordAIWord).toHaveBeenCalledWith(true, 0);
+    expect(mockAddScorePopup).toHaveBeenCalled();
+    expect(result.current.validationFeedback.isValid).toBe(true);
+    expect(result.current.lastAccepted).toEqual({ word: 'hello', score: 50 });
+  });
+
+  it('should handle rejected word', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: false, errorKey: 'error.notAWord' });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('xyz', [0, 1, 2]);
+    });
+
+    expect(mockClearSelection).toHaveBeenCalled();
+    expect(mockRecordAIWord).toHaveBeenCalledWith(false, 0);
+    expect(result.current.validationFeedback.error).toBe('error.notAWord');
+    expect(result.current.wordFeedback?.type).toBe('rejected');
+  });
+
+  it('should deal boss damage on valid word when boss active', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 100 });
+    mockCheckBossWord.mockReturnValue({
+      scoreMultiplier: 1.5,
+      meetsRequirement: true,
+      triggerTaunt: null,
+    });
+    mockDealBossDamage.mockReturnValue(15);
+
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({
+        ...defaultProps,
+        isBossActive: true,
+        bossConfig: { id: 'boss' },
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('power', [0, 1, 2, 3, 4]);
+    });
+
+    expect(mockCheckBossWord).toHaveBeenCalledWith('power');
+    expect(mockDealBossDamage).toHaveBeenCalled();
+  });
+
+  it('should trigger boss taunt on bad word when boss active', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: false, errorKey: 'error.notAWord' });
+
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({
+        ...defaultProps,
+        isBossActive: true,
+        bossConfig: { id: 'boss' },
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('bad', [0, 1, 2]);
+    });
+
+    expect(mockTriggerBossTaunt).toHaveBeenCalledWith('onBadWord');
+  });
+
+  it('should earn FIRST_WORD achievement on first valid word', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 30 });
+
+    const { result } = renderHook(() =>
+      useAdventureWordSubmit({ ...defaultProps, wordsFound: [] })
+    );
+
+    await act(async () => {
+      await result.current.handleWordSubmit('cat', [0, 1, 2]);
+    });
+
+    expect(mockHandleEarnAchievement).toHaveBeenCalledWith('FIRST_WORD');
+  });
+
+  it('should earn LONG_WORD_6 achievement for 6+ letter words', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 80 });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('strong', [0, 1, 2, 3, 4, 5]);
+    });
+
+    expect(mockHandleEarnAchievement).toHaveBeenCalledWith('LONG_WORD_6');
+  });
+
+  it('should clear feedback after timeout on valid word', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(result.current.validationFeedback.isValid).toBe(true);
+
+    act(() => {
+      jest.advanceTimersByTime(1200);
+    });
+
+    expect(result.current.validationFeedback.isValid).toBe(false);
+    expect(result.current.lastAccepted).toBeNull();
+  });
+
+  it('should clear error feedback after timeout on rejected word', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: false, errorKey: 'error.notAWord' });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('xyz', [0, 1, 2]);
+    });
+
+    expect(result.current.validationFeedback.error).toBe('error.notAWord');
+
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(result.current.validationFeedback.error).toBeNull();
+  });
+
+  it('should store last submitted word path for explosion effects', async () => {
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(result.current.lastSubmittedWordRef.current).toEqual({
+      word: 'hello',
+      path: expect.any(Array),
+    });
+  });
+});

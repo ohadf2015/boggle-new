@@ -10,7 +10,7 @@ const sv = {
   "seo": {
     "title": "Gratis Multiplayer Ordspel - Spela Online",
     "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
-    "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel",
+    "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel, alfapet online gratis, ordspel utan nedladdning, ordspel för fester, dagligt ordpussel, ordlek med vänner, ordäventyr spel",
     "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
     "ogDescription": "🎮 Tävla mot vänner i spännande ordstrider i realtid! ⚡ Hitta ord snabbt, överträffa motståndarna, klättra på topplistan 🔥 Perfekt för fester och spelkvällar. Spela gratis!",
     "twitterTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
@@ -94,6 +94,12 @@ const sv = {
       "description": "Tips, strategier och insikter för ordspelsentusiaster. Lär dig förbättra ditt ordförråd, bemästra ordsökningstekniker och bli en LexiClash-mästare.",
       "ogTitle": "LexiClash Blogg - Ordspelstips & Strategier",
       "ogDescription": "Experttips, strategier och insikter för att förbättra dina ordspelsfärdigheter."
+    },
+    "adventure": {
+        "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
+        "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
+        "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
+        "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
     }
   },
   "cookieConsent": {
@@ -4618,6 +4624,31 @@ const sv = {
         "zone1": "Dammiga stigar",
         "zone2": "Roda klippmesaen",
         "bossZone": "Askravinen"
+      },
+      "labyrinth": {
+        "zone1": "Slingrande korridorer",
+        "zone2": "Pusselkammare",
+        "bossZone": "Labyrintens hjärta"
+      },
+      "palace": {
+        "zone1": "Glasfoajén",
+        "zone2": "Reflektionernas sal",
+        "bossZone": "Spegeltronen"
+      },
+      "nebula": {
+        "zone1": "Stjärnfält",
+        "zone2": "Kosmisk drift",
+        "bossZone": "Händelsehorisonten"
+      },
+      "peaks": {
+        "zone1": "Alpängar",
+        "zone2": "Molntoppen",
+        "bossZone": "Babels torn"
+      },
+      "throne": {
+        "zone1": "Stora biblioteket",
+        "zone2": "Drakens studerkammare",
+        "bossZone": "Lexikonets tronsal"
       }
     },
     "themes": {
@@ -4799,6 +4830,7 @@ const sv = {
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",
       "enraged": "RASANDE!",
+      "mechanicProgress": "Mekanikframsteg",
       "phases": {
         "phase1": "FAS 1",
         "phase2": "FAS 2"
@@ -4941,6 +4973,11 @@ const sv = {
       "msGrammar": {
         "name": "Fröken Grammatik",
         "mechanic": "Prov-protokollet - Hitta ord som matchar mina krav!",
+        "phases": {
+          "lecture": "Föreläsning",
+          "popTest": "Prov",
+          "finalExam": "Slutprov"
+        },
         "taunts": {
           "start1": "Lektionen har börjat! Låt oss se om ni har pluggat...",
           "start2": "Överraskningsprov! Jag hoppas ni är förberedda!",
