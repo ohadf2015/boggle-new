@@ -25,9 +25,8 @@ jest.mock('../../BossDialogue', () => {
   };
 });
 
-import BossActiveBattleUI from '../BossActiveBattleUI';
+import BossActiveBattleUI, { type BossActiveBattleUIProps } from '../BossActiveBattleUI';
 import type { BossConfig } from '@/types/boss';
-import type { BossActiveBattleUIProps } from '../BossActiveBattleUI';
 
 // ==============================================
 // FIXTURES
