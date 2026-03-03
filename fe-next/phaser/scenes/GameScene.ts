@@ -52,6 +52,14 @@ export class GameScene extends Phaser.Scene {
 
   private currentPath: PathCell[] = [];
   private isDragging = false;
+  /** True once pointer moves after pointerDown — distinguishes drag from tap. */
+  private hasMoved = false;
+  /** True while pointer is held down. */
+  private pointerDown = false;
+  /** The tile hit on the most recent pointerDown (null if outside grid). */
+  private downHit: { row: number; col: number } | null = null;
+  /** True when currentPath was built by taps (not drag). */
+  private isTapMode = false;
   protected layout!: GridLayout;
   private comboLevel = 0;
   private previousComboLevel: number | null = null; // null = no previous update yet
@@ -273,21 +281,50 @@ export class GameScene extends Phaser.Scene {
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (!this.layout) return;
 
+    this.pointerDown = true;
+    this.hasMoved = false;
+    this.downHit = getTileAtPoint(pointer.x, pointer.y, this.layout);
+
+    if (this.isTapMode && this.currentPath.length > 0) {
+      // We have an accumulated tap path. Don't clear it — wait for pointerUp
+      // (tap continues) or pointerMove (drag clears it).
+      return;
+    }
+
+    // Fresh interaction — select the first tile immediately (needed for drag mode
+    // visuals like grid dimming). If this turns out to be a tap (no pointerMove),
+    // onPointerUp will keep the path alive instead of submitting.
     this.isDragging = true;
+    this.isTapMode = false;
     this.currentPath = [];
     this.pathTrail.clear();
-    // Immediately reset any tiles still in selected/submitted state from the
-    // previous word (e.g. waiting for the 400ms reset-after-feedback timer).
-    // This prevents "stuck" highlights when the user starts a new drag before
-    // the delayed reset fires.
     this.resetAllTiles();
 
-    const hit = getTileAtPoint(pointer.x, pointer.y, this.layout);
-    if (hit) this.selectTile(hit.row, hit.col);
+    if (this.downHit) this.selectTile(this.downHit.row, this.downHit.col);
   }
 
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
-    if (!this.isDragging || !this.layout) return;
+    if (!this.pointerDown || !this.layout) return;
+
+    // First move after pointerDown — confirm drag mode
+    if (!this.hasMoved) {
+      this.hasMoved = true;
+
+      if (this.isTapMode) {
+        // Had an accumulated tap path — clear it and start fresh drag
+        this.isTapMode = false;
+        this.currentPath = [];
+        this.pathTrail.clear();
+        this.resetAllTiles();
+        this.isDragging = true;
+
+        // Select the tile that was hit on pointerDown (drag starts there)
+        if (this.downHit) this.selectTile(this.downHit.row, this.downHit.col);
+      }
+      // else: fresh interaction — tile already selected in onPointerDown
+    }
+
+    if (!this.isDragging) return;
 
     const hit = getTileAtPoint(pointer.x, pointer.y, this.layout);
     if (!hit) return;
@@ -304,20 +341,110 @@ export class GameScene extends Phaser.Scene {
   }
 
   private onPointerUp(): void {
-    if (!this.isDragging) return;
-    this.isDragging = false;
-    this.clearGridDimming();
-    this.clearWordMomentum();
+    this.pointerDown = false;
 
+    if (this.hasMoved) {
+      // This was a drag — submit the word (existing behavior)
+      this.isDragging = false;
+      this.clearGridDimming();
+      this.clearWordMomentum();
+
+      if (this.currentPath.length > 0) {
+        this.lastSubmitCenter = this.getPathCenter();
+        const word = getPathWord(this.currentPath);
+        GameBridge.emit('word:submit', { word, path: this.currentPath });
+      }
+
+      this.currentPath = [];
+      this.pathTrail.clear();
+      this.isTapMode = false;
+      return;
+    }
+
+    // No move — this is a tap
+    this.isDragging = false;
+    this.handleTap();
+  }
+
+  /** Handle a tap (pointerDown + pointerUp without move). */
+  private handleTap(): void {
+    if (!this.layout) return;
+
+    const hit = this.downHit;
+
+    if (!this.isTapMode) {
+      // First tap in a sequence — tile was already selected by onPointerDown.
+      // If tapped outside grid (no hit), the path is empty so nothing to do.
+      // If tapped on a tile, just switch to tap mode and keep the path alive.
+      if (hit && this.currentPath.length > 0) {
+        this.isTapMode = true;
+      }
+      return;
+    }
+
+    // ── Subsequent taps (isTapMode is true, path accumulated from prior taps) ──
+
+    // Tap outside grid with an accumulated path → submit
+    if (!hit) {
+      if (this.currentPath.length > 0) {
+        this.submitTapPath();
+      }
+      return;
+    }
+
+    const last = this.currentPath[this.currentPath.length - 1];
+
+    // Tap on the last selected tile → submit
+    if (last && last.row === hit.row && last.col === hit.col) {
+      this.submitTapPath();
+      return;
+    }
+
+    // Tap on an earlier tile in the path → deselect back to that point
+    const earlierIdx = this.currentPath.findIndex(
+      (c) => c.row === hit.row && c.col === hit.col
+    );
+    if (earlierIdx >= 0) {
+      const removed = this.currentPath.splice(earlierIdx + 1);
+      removed.forEach((c) => {
+        const t = this.tiles.get(`${c.row},${c.col}`);
+        if (t) t.reset();
+      });
+      this.pathTrail.updatePath(
+        this.currentPath,
+        this.layout,
+        getComboHexColors(this.comboLevel).glowColor
+      );
+      this.updateGridDimming();
+      GameBridge.emit('word:change', {
+        word: getPathWord(this.currentPath),
+        letterCount: this.currentPath.length,
+        path: this.currentPath,
+      });
+      GameBridge.emit('selection:change', { cells: [...this.currentPath] });
+      return;
+    }
+
+    // Tap on a new tile — must be adjacent to last
+    if (last && !isAdjacentCell(last, hit)) {
+      return;
+    }
+
+    this.selectTile(hit.row, hit.col);
+  }
+
+  /** Submit the current tap-accumulated path and reset. */
+  private submitTapPath(): void {
     if (this.currentPath.length > 0) {
-      // Store path center before clearing — used by word:feedback and combo effects
       this.lastSubmitCenter = this.getPathCenter();
       const word = getPathWord(this.currentPath);
       GameBridge.emit('word:submit', { word, path: this.currentPath });
     }
-
     this.currentPath = [];
     this.pathTrail.clear();
+    this.isTapMode = false;
+    this.clearGridDimming();
+    this.clearWordMomentum();
   }
 
   private selectTile(row: number, col: number): void {

@@ -118,15 +118,19 @@ describe('GameScene grid dimming', () => {
     expect(tile12.setAlpha).toHaveBeenCalledWith(0.7);
   });
 
-  it('clears all dimming on pointer up', () => {
+  it('clears all dimming on pointer up after drag', () => {
     const scene = createScene();
     GameBridge.emit('grid:update', { grid: GRID_4x4, comboLevel: 0, fireRoundActive: false });
 
     const pointerDown = getInputHandler(scene, 'pointerdown');
+    const pointerMove = getInputHandler(scene, 'pointermove');
     const pointerUp = getInputHandler(scene, 'pointerup');
 
+    // Start a drag: pointerDown on (0,0) then move to (0,1)
     const pos00 = getTilePosition(scene, 0, 0);
+    const pos01 = getTilePosition(scene, 0, 1);
     pointerDown.call(scene, { x: pos00.x, y: pos00.y });
+    pointerMove.call(scene, { x: pos01.x, y: pos01.y });
 
     // Now release — all tiles should have dimming cleared
     const tile22 = getTile(scene, 2, 2);
@@ -134,7 +138,7 @@ describe('GameScene grid dimming', () => {
 
     pointerUp.call(scene);
 
-    // After pointer up, dimming is cleared — setDimmed('none') calls setAlpha(1)
+    // After drag pointer up, dimming is cleared — setDimmed('none') calls setAlpha(1)
     expect(tile22.setAlpha).toHaveBeenCalledWith(1);
   });
 });
