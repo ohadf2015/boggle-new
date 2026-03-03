@@ -74,6 +74,16 @@ jest.mock('../../utils/share', () => ({
   getJoinUrl: (code: string) => `https://example.com?room=${code}`,
 }));
 
+// Mock AuthContext
+jest.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: false }),
+}));
+
+// Mock SocketContext
+jest.mock('../../utils/SocketContext', () => ({
+  useSocket: () => ({ socket: { emit: jest.fn(), on: jest.fn(), off: jest.fn() } }),
+}));
+
 import PlayerWaitingView from '../../player/components/PlayerWaitingView';
 
 const mockT = (key: string) => key;
@@ -146,7 +156,7 @@ describe('PlayerWaitingView - Command Center Style', () => {
 
     it('should show waiting message text', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      expect(screen.getAllByText('playerView.waitingForHostToStart').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('playerView.hostWillStart').length).toBeGreaterThan(0);
     });
   });
 

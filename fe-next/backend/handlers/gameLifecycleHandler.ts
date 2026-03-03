@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, GameUser, LetterGrid, Language, DifficultyLevel, Avatar } from '@/shared/types';
+import type { Game, LetterGrid, Language, DifficultyLevel, Avatar } from '@/shared/types';
 
 import {
   createGame,
@@ -15,6 +15,7 @@ import {
   addUserToGame,
   getGameBySocketId,
   getUsernameBySocketId,
+  getSocketIdByUsername,
   getGameUsers,
   getActiveRooms,
   resetGameForNewRound,
@@ -49,10 +50,11 @@ import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
 import { findAllWords, getCachedTrie } from '../modules/boggleSolver.js';
-import { validatePayload, createGameSchema, startGameSchema } from '../utils/socketValidation.js';
+import { validatePayload, createGameSchema } from '../utils/socketValidation.js';
 import { stopAllBots } from '../modules/botManager.js';
 import { spamDetector } from '../modules/spamDetector.js';
 import { notifyRoomCreated, notifyGameStarted } from '../modules/notificationService.js';
+import { isInProgress } from '../utils/gameStateMachine.js';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -405,8 +407,28 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       }
     });
 
-    // Set acknowledgment timeout
-    gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, () => {
+    // Schedule retries for players who don't acknowledge quickly
+    // Uses exponential backoff (100ms, 200ms, 400ms, 800ms) to re-emit startGame
+    // to individual players who haven't acknowledged yet
+    gameStartCoordinator.scheduleRetries(gameCode, playerUsernames, (username: string) => {
+      const targetSocketId = getSocketIdByUsername(gameCode, username);
+      if (!targetSocketId) return false;
+      const targetSocket = getSocketById(io, targetSocketId);
+      if (!targetSocket) return false;
+      return safeEmit(targetSocket, 'startGame', {
+        letterGrid,
+        timerSeconds: validTimer,
+        language: gameLang,
+        minWordLength: minWordLength || 2,
+        messageId,
+        gameSessionId: game.gameSessionId,
+        boardTheme: boardTheme || null,
+        retry: true
+      });
+    });
+
+    // Set acknowledgment timeout - start timer even if not all players acknowledged
+    gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 3000, () => {
       startGameTimer(io, gameCode, validTimer);
     });
 
@@ -481,8 +503,33 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     logger.info('DEBUG', `Game state query for ${gameCode}: ${game?.gameState || 'NO_GAME'}`);
   });
 
+  // Handle requestGameState - allows players who missed startGame to recover
+  // This is a safety net: if a player reconnects or their socket briefly drops
+  // during the startGame broadcast, they can request current game state
+  socket.on('requestGameState', () => {
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game) return;
+
+    if (isInProgress(game.gameState)) {
+      logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
+      safeEmit(socket, 'startGame', {
+        letterGrid: game.letterGrid,
+        timerSeconds: game.remainingTime || game.timerSeconds,
+        language: game.language,
+        minWordLength: game.minWordLength || 2,
+        messageId: 'recovery-' + Date.now(),
+        reconnect: true,
+        skipAck: true,
+        boardTheme: (game as unknown as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null
+      });
+    }
+  });
+
   // Handle reset game
-  socket.on('resetGame', (data: unknown, callback?: ResetGameCallback) => {
+  socket.on('resetGame', (_data: unknown, callback?: ResetGameCallback) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       if (typeof callback === 'function') callback({ success: false, error: 'Rate limited' });
@@ -580,6 +627,66 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     });
   });
 
+  // Handle player toggling lobby ready state (before game starts)
+  socket.on('lobbyReady', (data: { ready: boolean }) => {
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+
+    if (!gameCode || !username) return;
+
+    const game = getGame(gameCode);
+    if (!game) return;
+
+    // Only allow during waiting state (lobby)
+    if (game.gameState !== 'waiting') return;
+
+    if (data?.ready) {
+      markPlayerReadyForNextGame(gameCode, username);
+    } else {
+      // Unready: remove from ready list using the game object directly
+      delete game.playersReadyForNextGame[username];
+    }
+
+    const result = getPlayersReadyCount(gameCode);
+    if (result) {
+      broadcastToRoom(io, getGameRoom(gameCode), 'playersReadyUpdate', {
+        readyCount: result.readyCount,
+        totalPlayers: result.totalPlayers,
+        readyUsernames: result.readyUsernames,
+      });
+    }
+  });
+
+  // Handle guest name update in lobby
+  socket.on('updateGuestName', (data: { newName: string }) => {
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+
+    if (!gameCode || !username || !data?.newName) return;
+
+    const game = getGame(gameCode);
+    if (!game || game.gameState !== 'waiting') return;
+
+    const trimmedName = data.newName.trim().slice(0, 20);
+    if (!trimmedName) return;
+
+    const user = game.users[username];
+    if (!user || user.isHost) return;
+
+    // Re-register under new username
+    game.users[trimmedName] = { ...user, username: trimmedName };
+    if (trimmedName !== username) {
+      delete game.users[username];
+    }
+
+    // Broadcast updated player list
+    broadcastToRoom(io, getGameRoom(gameCode), 'playerListUpdate', {
+      users: getGameUsers(gameCode),
+    });
+
+    logger.info('SOCKET', `Guest ${username} changed name to ${trimmedName} in ${gameCode}`);
+  });
+
   // Handle request to get current ready count
   socket.on('getPlayersReadyCount', () => {
     const gameCode = getGameBySocketId(socket.id);
@@ -603,7 +710,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 /**
  * Handle existing authenticated connection when creating a game
  */
-async function handleExistingAuthConnection(io: Server, socket: Socket, authUserId: string, gameCode: string): Promise<void> {
+async function handleExistingAuthConnection(io: Server, socket: Socket, authUserId: string, _gameCode: string): Promise<void> {
   const existingConnection: AuthConnection | null = getAuthUserConnection(authUserId);
   if (!existingConnection) return;
 
@@ -661,7 +768,7 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
 /**
  * Initialize player data structures for a new game
  */
-function initializePlayerData(game: Game, gameCode: string): void {
+function initializePlayerData(_game: Game, gameCode: string): void {
   const users = getGameUsers(gameCode);
   const playerUsernames = users.map(u => u.username);
   const gameForInit = getGame(gameCode);

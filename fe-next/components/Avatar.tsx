@@ -87,6 +87,7 @@ const Avatar = memo<AvatarProps>(({
           referrerPolicy="no-referrer"
           loading="lazy"
           priority={false}
+          unoptimized={profilePictureUrl.startsWith('http')}
         />
       </div>
     );

@@ -15,7 +15,7 @@ import {
 import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import logger from '@/utils/logger';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
-import type { ActiveRoom, Language } from '@/shared/types/game';
+import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
 
 const SOCKET_CONFIG = {
   RECONNECTION_ATTEMPTS: 10,
@@ -41,7 +41,7 @@ interface UseMultiplayerSocketOptions {
     language?: Language;
     roomName?: string;
   }) => void;
-  onUpdateUsers: (users: Array<{ username: string; score?: number }>) => void;
+  onUpdateUsers: (users: Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>) => void;
   onActiveRooms: (rooms: ActiveRoom[]) => void;
   onJoinedAsSpectator: (data: {
     gameCode: string;
@@ -179,17 +179,27 @@ export function useMultiplayerSocket(
       setSocket(socketInstance);
       socketInstance.emit('getActiveRooms');
 
-      // Handle reconnection to game
+      // Handle reconnection to game - re-emit join to restore server-side state
       if (wasConnectedRef.current) {
         const savedSession = window.sessionStorage.getItem('gameSession');
         if (savedSession) {
-          const parsedSession = JSON.parse(savedSession);
-          if (parsedSession.gameCode) {
-            logger.log('[SOCKET.IO] Reconnecting to game:', parsedSession.gameCode);
-            toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
-              id: 'socket-reconnecting-to-game',
-              duration: 2000,
-            });
+          try {
+            const parsedSession = JSON.parse(savedSession);
+            if (parsedSession.gameCode && parsedSession.username) {
+              logger.log('[SOCKET.IO] Reconnecting to game:', parsedSession.gameCode);
+              toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
+                id: 'socket-reconnecting-to-game',
+                duration: 2000,
+              });
+              // Re-emit join to restore server-side socket mapping and get current game state
+              // The server's handleReconnection will send startGame if game is in progress
+              socketInstance.emit('join', {
+                gameCode: parsedSession.gameCode,
+                username: parsedSession.username,
+              });
+            }
+          } catch {
+            logger.error('[SOCKET.IO] Failed to parse saved session for reconnection');
           }
         }
       }
@@ -240,6 +250,22 @@ export function useMultiplayerSocket(
       });
       onJoined(data);
       setAttemptingReconnect(false);
+
+      // Safety net: if this is a reconnection, the server sends startGame immediately after joined.
+      // If we don't receive startGame within 3 seconds, request game state explicitly.
+      // This handles edge cases where the startGame emit is lost.
+      if (data.reconnected) {
+        const fallbackTimer = setTimeout(() => {
+          logger.log('[SOCKET.IO] Requesting game state (startGame not received after reconnection)');
+          socketInstance.emit('requestGameState');
+        }, 3000);
+
+        // Cancel fallback if we receive startGame before timeout
+        const cancelFallback = () => clearTimeout(fallbackTimer);
+        socketInstance.once('startGame', cancelFallback);
+        socketInstance.once('resetGame', cancelFallback);
+        socketInstance.once('disconnect', cancelFallback);
+      }
     });
 
     socketInstance.on('updateUsers', (data) => {

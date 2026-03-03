@@ -91,7 +91,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             '/education',
             '/student',
             '/teacher',
-            // REMOVED: '/multiplayer' - Keep bottom nav visible on multiplayer lobby
+            // Multiplayer has its own header with exit button, room code, and player count
+            '/multiplayer',
             // REMOVED: '/profile' - GlobalBottomNav should remain visible on profile
             // to avoid confusing tab switching UX
         ];

@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Crown, Bot, Copy, LogOut, Plus } from 'lucide-react';
+import { Users, Crown, Bot, Copy, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { cn } from '../../lib/utils';
+import { useAuth } from '../../contexts/AuthContext';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -34,6 +35,14 @@ interface PlayerWaitingViewProps {
   setShowExitConfirm: (show: boolean) => void;
   onExitRoom: () => void;
   onConfirmExit: () => void;
+  /** Called when player toggles their ready state */
+  onToggleReady?: () => void;
+  /** Whether this player is currently ready */
+  isReady?: boolean;
+  /** Usernames of players who have marked themselves ready */
+  readyUsernames?: string[];
+  /** Called when guest changes their display name */
+  onNameChange?: (newName: string) => void;
 }
 
 // Avatar color palette (matches host view)
@@ -51,8 +60,26 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   setShowExitConfirm,
   onExitRoom,
   onConfirmExit,
+  onToggleReady,
+  isReady = false,
+  readyUsernames = [],
+  onNameChange,
 }): React.ReactElement => {
+  const { isAuthenticated } = useAuth();
   const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - playersReady.length);
+  const readySet = new Set(readyUsernames);
+
+  // Guest name editing state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState(username);
+
+  const handleSaveName = () => {
+    const trimmed = editNameValue.trim();
+    if (trimmed && trimmed !== username) {
+      onNameChange?.(trimmed);
+    }
+    setIsEditingName(false);
+  };
 
   // Player roster - horizontal scroll with circular avatars (matches host style)
   const renderPlayerRoster = (): React.ReactElement => (
@@ -70,6 +97,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             const isHostPlayer = typeof player === 'object' ? player.isHost : false;
             const isBot = typeof player === 'object' ? player.isBot : false;
             const isMe = name === username;
+            const isPlayerReady = readySet.has(name);
 
             return (
               <motion.div
@@ -112,6 +140,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                       <Bot className="w-3 h-3 text-neo-black" />
                     </div>
                   )}
+                  {/* Ready indicator */}
+                  {isPlayerReady && !isHostPlayer && (
+                    <div
+                      data-testid={`ready-indicator-${name}`}
+                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center"
+                    >
+                      <Check className="w-3 h-3 text-neo-black" />
+                    </div>
+                  )}
                 </div>
                 <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
                   {name}
@@ -136,36 +173,95 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     </section>
   );
 
-  // Waiting status banner (player-specific, replaces StartButton)
-  const renderWaitingStatus = (): React.ReactElement => (
+  // Ready button + waiting status
+  const renderReadySection = (): React.ReactElement => (
     <motion.div
       data-testid="waiting-status"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="bg-neo-cream text-neo-black p-6 rounded-xl border-3 border-neo-black shadow-hard text-center"
+      className="space-y-3"
     >
-      <motion.div
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        className="text-4xl mb-3"
+      {/* Ready Button */}
+      <motion.button
+        data-testid="ready-button"
+        onClick={onToggleReady}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        className={cn(
+          'w-full p-4 rounded-neo border-3 border-neo-black shadow-hard-sm font-bold text-lg uppercase transition-colors',
+          isReady
+            ? 'bg-neo-lime text-neo-black'
+            : 'bg-white/10 text-neo-cream hover:bg-white/20'
+        )}
       >
-        ⏳
-      </motion.div>
-      <h2 className="font-neo-display font-bold text-xl uppercase leading-none mb-2">
-        {t('playerView.waitingForHostToStart') || 'Waiting for host to start...'}
-      </h2>
-      <p className="text-sm text-gray-600">
+        <div className="flex items-center justify-center gap-2">
+          {isReady && <Check className="w-5 h-5" />}
+          <span>
+            {isReady
+              ? (t('playerView.readyConfirmed') || 'Ready!')
+              : (t('playerView.readyUp') || 'Ready Up!')}
+          </span>
+        </div>
+      </motion.button>
+
+      {/* Waiting hint */}
+      <p className="text-sm text-center text-slate-400">
         {t('playerView.hostWillStart') || 'The host will start the game when everyone is ready'}
       </p>
+
+      {/* Guest name editing */}
+      {!isAuthenticated && (
+        <div className="flex items-center justify-center gap-2">
+          {isEditingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                data-testid="name-edit-input"
+                type="text"
+                value={editNameValue}
+                onChange={(e) => setEditNameValue(e.target.value)}
+                maxLength={20}
+                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neo-cyan"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveName();
+                  if (e.key === 'Escape') setIsEditingName(false);
+                }}
+              />
+              <button
+                data-testid="name-save-button"
+                onClick={handleSaveName}
+                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm"
+              >
+                <Check className="w-4 h-4 text-neo-black" />
+              </button>
+              <button
+                onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo"
+              >
+                <X className="w-4 h-4 text-neo-cream" />
+              </button>
+            </div>
+          ) : (
+            <button
+              data-testid="edit-name-button"
+              onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+              className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>{t('playerView.editName') || 'Change name'}</span>
+            </button>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 
   // Mobile scrollable content (mirrors host's renderLobbyContent)
   const renderMobileContent = (): React.ReactElement => (
     <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
-      {/* 1. Waiting Status - replaces StartButton */}
-      <section>{renderWaitingStatus()}</section>
+      {/* 1. Ready Section - replaces old waiting status */}
+      <section>{renderReadySection()}</section>
 
       {/* 2. Player Roster */}
       {renderPlayerRoster()}
@@ -245,7 +341,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           <DesktopLobbyLayout
             leftContent={
               <>
-                {renderWaitingStatus()}
+                {renderReadySection()}
                 {renderPlayerRoster()}
               </>
             }

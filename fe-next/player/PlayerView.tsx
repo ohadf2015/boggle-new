@@ -171,6 +171,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [highlightedCells, setHighlightedCells] = useState<GridPosition[]>([]);
   const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
 
+  // Lobby ready state
+  const [isLobbyReady, setIsLobbyReady] = useState<boolean>(false);
+  const [lobbyReadyUsernames, setLobbyReadyUsernames] = useState<string[]>([]);
+
   // UI state
   const [showQR, setShowQR] = useState<boolean>(false);
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
@@ -270,6 +274,50 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     // Start music immediately when startGame event is received for better synchronization
     onGameStart: handleGameStart,
   });
+
+  // Lobby ready: listen for playersReadyUpdate during waiting state
+  useEffect(() => {
+    if (!socket || gameActive) return;
+
+    const handleLobbyReadyUpdate = (data: { readyCount: number; totalPlayers: number; readyUsernames?: string[] }) => {
+      if (data.readyUsernames) {
+        setLobbyReadyUsernames(data.readyUsernames);
+      }
+    };
+
+    socket.on('playersReadyUpdate', handleLobbyReadyUpdate);
+    return () => {
+      socket.off('playersReadyUpdate', handleLobbyReadyUpdate);
+    };
+  }, [socket, gameActive]);
+
+  // Toggle lobby ready and emit to server
+  const handleToggleLobbyReady = useCallback(() => {
+    if (!socket) return;
+    const newReady = !isLobbyReady;
+    setIsLobbyReady(newReady);
+    socket.emit('lobbyReady', { ready: newReady });
+  }, [socket, isLobbyReady]);
+
+  // Handle guest name change
+  const handleNameChange = useCallback((newName: string) => {
+    // Store in localStorage for persistence across sessions
+    import('@/utils/profileStorage').then(({ setStoredUsername }) => {
+      setStoredUsername(newName);
+    });
+    // Notify server if socket is available
+    if (socket) {
+      socket.emit('updateGuestName', { newName });
+    }
+  }, [socket]);
+
+  // Reset lobby ready state when game starts
+  useEffect(() => {
+    if (gameActive) {
+      setIsLobbyReady(false);
+      setLobbyReadyUsernames([]);
+    }
+  }, [gameActive]);
 
   // Reset urgent music ref when game becomes active (for urgent music trigger)
   useEffect(() => {
@@ -685,6 +733,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
+          onToggleReady={handleToggleLobbyReady}
+          isReady={isLobbyReady}
+          readyUsernames={lobbyReadyUsernames}
+          onNameChange={handleNameChange}
         />
     );
   }

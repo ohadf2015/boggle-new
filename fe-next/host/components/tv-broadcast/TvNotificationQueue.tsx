@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState, useEffect, useRef } from 'react';
+import { memo, useCallback, useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import TvNotification, { TvNotificationData } from './TvNotification';
 
@@ -11,7 +11,7 @@ interface TvNotificationQueueProps {
 }
 
 // Minimum gap between notifications in milliseconds
-const MIN_GAP_MS = 1200;
+const MIN_GAP_MS = 3500;
 
 /**
  * TvNotificationQueue - Manages and displays notifications
@@ -24,14 +24,11 @@ const TvNotificationQueue = memo<TvNotificationQueueProps>(({
   onDismiss,
   maxVisible = 1,
 }) => {
-  const [lastDismissTime, setLastDismissTime] = useState(0);
   const [isGapActive, setIsGapActive] = useState(false);
   const gapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle dismiss with gap enforcement
   const handleDismiss = useCallback((id: string) => {
-    const now = Date.now();
-    setLastDismissTime(now);
     setIsGapActive(true);
     onDismiss(id);
 

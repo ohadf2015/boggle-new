@@ -29,7 +29,7 @@ import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
 import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
 import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
 import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
-import type { Language, ActiveRoom } from '@/shared/types/game';
+import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -95,7 +95,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const [error, setError] = useState<string>('');
   const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
   const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
-  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number }>>(
+  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>>(
     []
   );
   const [isJoining, setIsJoining] = useState<boolean>(false);
