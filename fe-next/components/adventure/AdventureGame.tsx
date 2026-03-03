@@ -102,8 +102,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const { selectedIndices, currentWord, selectTile, clearSelection, getPath, pathPoints } = useAdventureSelection({
       tiles, gridSize: levelConfig.gridSize, disabled: !isPlaying || isPaused || isValidating, gridRef,
     });
-    const [phaserCurrentWord, setPhaserCurrentWord] = useState<string>('');
-    const effectiveCurrentWord = phaserCurrentWord || currentWord;
+    const effectiveCurrentWord = currentWord;
 
     const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint } = useAdventureHints({
       grid: initialGrid, language: language || 'en', foundWords: gameState.wordsFound,
@@ -331,10 +330,9 @@ const AdventureGame = memo<AdventureGameProps>(
               lastAccepted={wordSubmit.lastAccepted}
               selectedLength={selectedIndices.length} minWordLength={minWordLength}
               wordFeedback={wordSubmit.wordFeedback}
-              currentWord={effectiveCurrentWord} comboCount={gameState.comboCount}
+              currentWord={effectiveCurrentWord}
               worldId={levelConfig.world}
-              hintLevel={init.hintData.level}
-              onPhaserWordChange={setPhaserCurrentWord} />
+              hintLevel={init.hintData.level} />
           }
           sidebar={
             <GameSidebar objectives={objectives}

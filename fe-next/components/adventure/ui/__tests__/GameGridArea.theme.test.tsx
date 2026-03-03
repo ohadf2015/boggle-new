@@ -55,9 +55,6 @@ jest.mock('@/components/game/WordFormingArea', () => ({
   default: ({ word }: any) => <div data-testid="mock-word-area">{word}</div>,
 }));
 
-jest.mock('@/components/phaser/PhaserGameAdventure', () => ({
-  PhaserGameAdventure: () => <div data-testid="mock-phaser" />,
-}));
 
 describe('GameGridArea — Theme Integration', () => {
   const defaultProps = {

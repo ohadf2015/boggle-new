@@ -44,14 +44,15 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('../../AdventureGrid', () => ({
-  __esModule: true,
-  default: jest.fn(() => <div data-testid="adventure-grid" />),
-}));
-
-jest.mock('@/components/phaser/PhaserGameAdventure', () => ({
-  PhaserGameAdventure: jest.fn(() => <div data-testid="phaser-game-adventure" />),
-}));
+jest.mock('../../AdventureGrid', () => {
+  const R = require('react');
+  return {
+    __esModule: true,
+    default: R.forwardRef(function MockAdventureGrid(_props: Record<string, unknown>, _ref: unknown) {
+      return <div data-testid="adventure-grid" />;
+    }),
+  };
+});
 
 jest.mock('../../themed/BoardFrame', () => {
   const R = require('react');
@@ -157,8 +158,8 @@ describe('GameGridArea', () => {
     expect(screen.getByText(/adventure.hints.minLetters3/)).toBeInTheDocument();
   });
 
-  it('should render Phaser game adventure grid', () => {
+  it('should render adventure grid', () => {
     render(<GameGridArea {...defaultProps} />);
-    expect(screen.getByTestId('phaser-game-adventure')).toBeInTheDocument();
+    expect(screen.getByTestId('adventure-grid')).toBeInTheDocument();
   });
 });

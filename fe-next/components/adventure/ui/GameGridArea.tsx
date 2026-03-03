@@ -2,14 +2,13 @@
  * GameGridArea Component
  *
  * Organized grid area with feedback, word preview, and the game board.
- * Uses Phaser (AdventureScene) for grid rendering by default, with
- * React AdventureGrid as error boundary fallback.
+ * Uses React AdventureGrid for grid rendering.
  * Board is wrapped with BoardFrame for world-themed edge decorations.
  */
 
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,30 +16,7 @@ import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureGrid from '../AdventureGrid';
 import BoardFrame from '../themed/BoardFrame';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
-import { PhaserGameAdventure } from '@/components/phaser/PhaserGameAdventure';
 import type { GridTileState } from '@/types/adventure';
-
-/** Convert flat GridTileState[] to 2D string[][] for Phaser */
-function tilesToGrid(tiles: GridTileState[], gridSize: number): string[][] {
-  const grid: string[][] = Array.from({ length: gridSize }, () => Array(gridSize).fill(''));
-  tiles.forEach((tile) => {
-    if (tile.row < gridSize && tile.col < gridSize) {
-      grid[tile.row][tile.col] = tile.letter;
-    }
-  });
-  return grid;
-}
-
-/** Build tileStates record for Phaser adventure overlays */
-function tilesToStateMap(tiles: GridTileState[]): Record<string, string> {
-  const map: Record<string, string> = {};
-  tiles.forEach((tile) => {
-    if (tile.type !== 'standard') {
-      map[`${tile.row},${tile.col}`] = tile.type;
-    }
-  });
-  return map;
-}
 
 // ==============================================
 // TYPES
@@ -79,9 +55,6 @@ interface GameGridAreaProps {
   wordFeedback?: WordFeedback | null;
   currentWord?: string;
 
-  // Phaser grid
-  comboCount?: number;
-
   // World theming
   worldId?: number;
 
@@ -91,23 +64,7 @@ interface GameGridAreaProps {
   // Hint
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
 
-  // Phaser word change callback (for live drag preview)
-  onPhaserWordChange?: (word: string) => void;
-
   className?: string;
-}
-
-// ==============================================
-// ERROR BOUNDARY
-// ==============================================
-
-class PhaserErrorBoundary extends React.Component<
-  { children: React.ReactNode; fallback: React.ReactNode },
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-  static getDerivedStateFromError() { return { hasError: true }; }
-  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
 }
 
 // ==============================================
@@ -125,7 +82,6 @@ export const GameGridArea = memo(function GameGridArea({
   gridRef,
   isInteractive,
   isDisabled,
-  entryPhase,
   showCascade,
   onCascadeComplete,
   hintHighlightIndices,
@@ -139,11 +95,7 @@ export const GameGridArea = memo(function GameGridArea({
   minWordLength,
   wordFeedback,
   currentWord: currentWordProp,
-  comboCount,
-  worldId,
-  lockedTileIndices,
   hintLevel,
-  onPhaserWordChange,
   className,
 }: GameGridAreaProps) {
   const { t } = useLanguage();
@@ -151,30 +103,6 @@ export const GameGridArea = memo(function GameGridArea({
 
   // Use prop if provided, otherwise build from selected indices (backward compat)
   const currentWord = currentWordProp ?? selectedIndices.map(i => tiles[i]?.letter || '').join('');
-
-  // React AdventureGrid fallback — used if Phaser crashes via error boundary
-  const adventureGridFallback = (
-    <AdventureGrid
-      ref={gridRef}
-      tiles={tiles}
-      gridSize={gridSize}
-      selectedIndices={selectedIndices}
-      onTileSelect={onTileSelect}
-      onWordSubmit={onWordSubmit}
-      onDragStart={onDragStart}
-      onDragEnter={onDragEnter}
-      interactive={isInteractive}
-      disabled={isDisabled}
-      showWordPreview={false}
-      pathPoints={pathPoints}
-      isWordValid={isWordValid}
-      wasWordSubmitted={wasWordSubmitted}
-      showCascade={showCascade}
-      onCascadeComplete={onCascadeComplete}
-      hintHighlightIndices={hintHighlightIndices}
-      className="h-full"
-    />
-  );
 
   return (
     <div
@@ -279,29 +207,26 @@ export const GameGridArea = memo(function GameGridArea({
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           >
             <BoardFrame>
-              <PhaserErrorBoundary fallback={adventureGridFallback}>
-                <div className="relative w-full h-full">
-                  <PhaserGameAdventure
-                    grid={tilesToGrid(tiles, gridSize)}
-                    comboLevel={comboCount ?? 0}
-                    tileStates={tilesToStateMap(tiles)}
-                    wordFeedback={wordFeedback}
-                    worldId={worldId}
-                    lockedTileIndices={lockedTileIndices}
-                    hintCells={hintHighlightIndices.map((i) => ({
-                      row: Math.floor(i / gridSize),
-                      col: i % gridSize,
-                    }))}
-                    onWordSubmit={(word, path) => {
-                      const indices = path.map(cell => cell.row * gridSize + cell.col);
-                      onWordSubmit(word, indices);
-                    }}
-                    onWordChange={(word) => {
-                      onPhaserWordChange?.(word);
-                    }}
-                  />
-                </div>
-              </PhaserErrorBoundary>
+              <AdventureGrid
+                ref={gridRef}
+                tiles={tiles}
+                gridSize={gridSize}
+                selectedIndices={selectedIndices}
+                onTileSelect={onTileSelect}
+                onWordSubmit={onWordSubmit}
+                onDragStart={onDragStart}
+                onDragEnter={onDragEnter}
+                interactive={isInteractive}
+                disabled={isDisabled}
+                showWordPreview={false}
+                pathPoints={pathPoints}
+                isWordValid={isWordValid}
+                wasWordSubmitted={wasWordSubmitted}
+                showCascade={showCascade}
+                onCascadeComplete={onCascadeComplete}
+                hintHighlightIndices={hintHighlightIndices}
+                className="h-full"
+              />
             </BoardFrame>
           </motion.div>
         </div>
