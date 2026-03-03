@@ -19,6 +19,7 @@ import logger from '@/utils/logger';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
+import { useGameMode } from '@/hooks/gameState';
 
 interface UseHostGameActionsOptions {
   socket: Socket | null;
@@ -78,6 +79,7 @@ export interface UseHostGameActionsReturn {
 }
 
 export function useHostGameActions(options: UseHostGameActionsOptions): UseHostGameActionsReturn {
+  const gameMode = useGameMode();
   const {
     socket,
     gameCode,
@@ -185,6 +187,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       minWordLength: minWordLength,
       difficulty: difficulty,
       boardTheme: boardTheme,
+      gameMode: gameMode || 'classic',
     });
 
     neoSuccessToast(t('common.gameStarted'), {

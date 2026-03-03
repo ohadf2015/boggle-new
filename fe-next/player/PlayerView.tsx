@@ -23,7 +23,6 @@ import type {
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
-import ValidationModal from '../components/results/ValidationModal';
 import NewPlayerOnboarding from '../components/game/NewPlayerOnboarding';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
@@ -741,16 +740,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     );
   }
 
-  // Waiting for results - show simple view with validation modal overlay
+  // Waiting for results — brief transition until scores arrive (no validation modal)
   if (waitingForResults) {
     return (
-      <div className="flex-1 w-full bg-neo-cream text-neo-black dark:bg-slate-900 dark:text-white flex items-center justify-center transition-colors duration-300">
-        <ValidationModal
-          isOpen={true}
-          t={t}
-          foundWords={mappedFoundWords}
-        />
-      </div>
+      <div className="flex-1 w-full bg-neo-navy flex items-center justify-center" />
     );
   }
 

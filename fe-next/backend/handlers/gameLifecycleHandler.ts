@@ -263,7 +263,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme } = data;
+    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode } = data as any;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -337,7 +337,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       difficulty: difficulty || 'MEDIUM',
       gameStartedAt: Date.now(),
       boardTheme: boardTheme || null, // Store theme for late joiners
-      lessonVocabulary: lessonVocabulary
+      lessonVocabulary: lessonVocabulary,
+      gameMode: gameMode || 'classic',
+      modeHistory: [...(game.modeHistory || []), gameMode || 'classic']
     });
 
     // Transition state using state machine
@@ -372,7 +374,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       minWordLength: minWordLength || 2,
       messageId,
       gameSessionId: game.gameSessionId,
-      boardTheme: boardTheme || null
+      boardTheme: boardTheme || null,
+      gameMode: game.gameMode || 'classic'
     });
 
     // Calculate and emit total words on board (async, non-blocking)

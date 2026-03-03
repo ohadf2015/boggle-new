@@ -22,9 +22,9 @@ import { CascadeHighlightController } from '../objects/CascadeHighlightControlle
 import { ScorePopupManager } from '../objects/ScorePopupManager';
 import { BlastParticleManager } from '../objects/BlastParticleManager';
 import { cameraShake, cameraFlash, cameraZoom } from '../effects/CameraEffects';
-import { playComboParticles } from '../objects/ParticleManager';
+import { getHitStopDuration } from '../objects/BlastEnhancedEffects';
+import { AUTO_TRIGGER_STAGGER_MS } from '@/components/blast/utils/blastLevelClear';
 import { playComboLevelUp } from '../effects/ComboEffect';
-import { BackgroundLayers } from '../effects/BackgroundLayers';
 import { buildGridLayout } from '@/lib/phaser/logic/GridGeometry';
 import { getComboHexColors } from '@/lib/phaser/logic/ComboTracker';
 import type { BlastTileState } from '@/components/blast/types';
@@ -94,8 +94,6 @@ export class BlastScene extends GameScene {
   private isDilated = false;
 
   // ─── Living background ─────────────────────────────────────────────────────
-  private bgLayers: BackgroundLayers | null = null;
-   
   private backgroundGradient: any = null;
    
   private ambientEmitter: any = null;
@@ -114,6 +112,8 @@ export class BlastScene extends GameScene {
     onShake: (p: BridgeEvents['blast:shake']) => this.handleShake(p),
     onWaveTransition: (p: BridgeEvents['blast:wave:transition']) => this.handleWaveTransition(p),
     onWordFeedback: (p: BridgeEvents['word:feedback']) => this.handleBlastWordFeedback(p),
+    onComboTrigger: (p: BridgeEvents['blast:combo:trigger']) => this.handleComboTrigger(p),
+    onLevelClear: (p: BridgeEvents['blast:level:clear']) => this.handleLevelClear(p),
   };
 
   constructor() {
@@ -149,6 +149,8 @@ export class BlastScene extends GameScene {
     GameBridge.on('blast:shake', this.blastHandlers.onShake);
     GameBridge.on('blast:wave:transition', this.blastHandlers.onWaveTransition);
     GameBridge.on('word:feedback', this.blastHandlers.onWordFeedback);
+    GameBridge.on('blast:combo:trigger', this.blastHandlers.onComboTrigger);
+    GameBridge.on('blast:level:clear', this.blastHandlers.onLevelClear);
   }
 
   private unsubscribeBlastBridge(): void {
@@ -162,6 +164,8 @@ export class BlastScene extends GameScene {
     GameBridge.off('blast:shake', this.blastHandlers.onShake);
     GameBridge.off('blast:wave:transition', this.blastHandlers.onWaveTransition);
     GameBridge.off('word:feedback', this.blastHandlers.onWordFeedback);
+    GameBridge.off('blast:combo:trigger', this.blastHandlers.onComboTrigger);
+    GameBridge.off('blast:level:clear', this.blastHandlers.onLevelClear);
   }
 
   // ─── Blast-specific handlers ───────────────────────────────────────────────
@@ -603,6 +607,103 @@ export class BlastScene extends GameScene {
     });
   }
 
+  // ─── Combo trigger handler ──────────────────────────────────────────────────
+
+  private handleComboTrigger({ comboType, label, clearedCount }: BridgeEvents['blast:combo:trigger']): void {
+    const cx = this.scale.width / 2;
+    const cy = this.scale.height / 2;
+    const particleConfig = { reduceMotion: this.a11y.reduceMotion, isLowEnd: this.a11y.isLowEnd };
+
+    // Hit-stop: freeze briefly for impact
+    if (!this.a11y.reduceMotion) {
+      this.isHitStopped = true;
+      this.time.timeScale = 0;
+      this.time.delayedCall(200, () => {
+        this.isHitStopped = false;
+        this.time.timeScale = 1;
+      });
+    }
+
+    // Camera effects per combo type
+    switch (comboType) {
+      case 'prism_prism':
+        cameraFlash(this.cameras.main, 0xffffff, 500, this.a11y.reduceMotion);
+        cameraShake(this.cameras.main, 'fire-round', this.a11y.reduceMotion);
+        this.particles.playConfetti(this, cx, cy, particleConfig);
+        break;
+      case 'bomb_bomb':
+        cameraShake(this.cameras.main, 'fire-round', this.a11y.reduceMotion);
+        cameraFlash(this.cameras.main, 0xff6b35, 300, this.a11y.reduceMotion);
+        break;
+      case 'lightning_lightning':
+        cameraFlash(this.cameras.main, 0x00ffff, 200, this.a11y.reduceMotion);
+        cameraShake(this.cameras.main, 'shaking', this.a11y.reduceMotion);
+        break;
+      default:
+        cameraShake(this.cameras.main, 'shaking', this.a11y.reduceMotion);
+        break;
+    }
+
+    // Show combo label text banner
+    this.showComboText(label);
+  }
+
+  /** Show combo label text centered with overshoot animation. */
+  private showComboText(label: string): void {
+    const cx = this.scale.width / 2;
+    const cy = this.scale.height * 0.35;
+
+    // Use the translation key's last segment as display text fallback
+    const displayText = label.split('.').pop()?.replace(/_/g, ' ').toUpperCase() ?? label;
+
+    const comboText = this.add.text(cx, cy, displayText, {
+      fontSize: '40px',
+      fontFamily: "'Fredoka', 'Rubik', sans-serif",
+      color: '#ff1493',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 6,
+    });
+    comboText.setOrigin(0.5, 0.5);
+    comboText.setDepth(55);
+
+    if (this.a11y.reduceMotion) {
+      this.time.delayedCall(1200, () => comboText.destroy());
+      return;
+    }
+
+    comboText.setAlpha(0);
+    comboText.setScale(0);
+    this.tweens.add({
+      targets: comboText,
+      alpha: 1,
+      scaleX: { from: 0, to: 1.3 },
+      scaleY: { from: 0, to: 1.3 },
+      duration: 250,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        this.tweens.add({
+          targets: comboText,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 150,
+          ease: 'Sine.easeOut',
+          onComplete: () => {
+            this.time.delayedCall(800, () => {
+              this.tweens.add({
+                targets: comboText,
+                alpha: 0,
+                y: cy - 30,
+                duration: 300,
+                onComplete: () => comboText.destroy(),
+              });
+            });
+          },
+        });
+      },
+    });
+  }
+
   /** Show "WAVE N" text centered on canvas. */
   private showWaveText(waveNumber: number): void {
     this.cleanupWaveText();
@@ -677,10 +778,15 @@ export class BlastScene extends GameScene {
   }
 
   // Wave text references
-   
+
   private waveText: any = null;
-   
+
   private waveScoreText: any = null;
+
+  // Level-clear text references
+  private levelClearText: any = null;
+  private levelClearScoreText: any = null;
+  private levelClearBonusText: any = null;
 
   private cleanupWaveText(): void {
     if (this.waveText) {
@@ -693,6 +799,161 @@ export class BlastScene extends GameScene {
     if (this.waveScoreText) {
       this.waveScoreText.destroy();
       this.waveScoreText = null;
+    }
+  }
+
+  // ─── Level-clear celebration ───────────────────────────────────────────────
+
+  private handleLevelClear({ autoTriggerSequence, movesRemaining, moveBonus, totalScore }: BridgeEvents['blast:level:clear']): void {
+    const cx = this.scale.width / 2;
+    const cy = this.scale.height / 2;
+    const particleConfig = { reduceMotion: this.a11y.reduceMotion, isLowEnd: this.a11y.isLowEnd };
+
+    // 1. Schedule auto-trigger explosions for remaining special tiles
+    for (const step of autoTriggerSequence) {
+      this.time.delayedCall(step.delayMs, () => {
+        const tile = this.blastTiles.get(`${step.row},${step.col}`);
+        if (tile) {
+          this.playExplosionForType(step.type, tile.x, tile.y, particleConfig);
+        }
+      });
+    }
+
+    // Calculate when auto-trigger sequence ends
+    const sequenceDuration = autoTriggerSequence.length > 0
+      ? autoTriggerSequence[autoTriggerSequence.length - 1].delayMs + AUTO_TRIGGER_STAGGER_MS
+      : 0;
+
+    // 2. After sequence ends, show celebration
+    const showCelebration = () => {
+      // Confetti burst (skip if reduceMotion)
+      if (!this.a11y.reduceMotion) {
+        this.particles.playConfetti(this, cx, cy, particleConfig);
+        cameraFlash(this.cameras.main, 0xffd700, 300, this.a11y.reduceMotion);
+      }
+
+      // "LEVEL COMPLETE!" banner
+      this.showLevelClearText(cx, cy);
+
+      // Score text
+      this.showLevelClearScore(cx, cy + 50, totalScore);
+
+      // Move bonus text (only if there are remaining moves)
+      if (movesRemaining > 0 && moveBonus > 0) {
+        this.showLevelClearBonus(cx, cy + 85, moveBonus);
+      }
+
+      // Emit completion after celebration display time
+      this.time.delayedCall(1500, () => {
+        this.cleanupLevelClearText();
+        GameBridge.emit('blast:anim:complete', { phase: 'level-clear' });
+      });
+    };
+
+    if (sequenceDuration > 0) {
+      this.time.delayedCall(sequenceDuration, showCelebration);
+    } else {
+      showCelebration();
+    }
+  }
+
+  private showLevelClearText(x: number, y: number): void {
+    this.levelClearText = this.add.text(x, y, 'LEVEL COMPLETE!', {
+      fontSize: '48px',
+      fontFamily: "'Fredoka', 'Rubik', sans-serif",
+      color: '#ffe135',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 6,
+    });
+    this.levelClearText.setOrigin(0.5, 0.5);
+    this.levelClearText.setDepth(55);
+
+    if (!this.a11y.reduceMotion) {
+      this.levelClearText.setAlpha(0);
+      this.levelClearText.setScale(0);
+      this.tweens.add({
+        targets: this.levelClearText,
+        alpha: 1,
+        scaleX: { from: 0, to: 1.3 },
+        scaleY: { from: 0, to: 1.3 },
+        duration: 300,
+        ease: 'Back.easeOut',
+        onComplete: () => {
+          if (this.levelClearText) {
+            this.tweens.add({
+              targets: this.levelClearText,
+              scaleX: 1,
+              scaleY: 1,
+              duration: 150,
+              ease: 'Sine.easeOut',
+            });
+          }
+        },
+      });
+    }
+  }
+
+  private showLevelClearScore(x: number, y: number, totalScore: number): void {
+    this.levelClearScoreText = this.add.text(x, y, `${totalScore} pts`, {
+      fontSize: '28px',
+      fontFamily: "'Fredoka', 'Rubik', sans-serif",
+      color: '#ffffff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 4,
+    });
+    this.levelClearScoreText.setOrigin(0.5, 0.5);
+    this.levelClearScoreText.setDepth(55);
+
+    if (!this.a11y.reduceMotion) {
+      this.levelClearScoreText.setAlpha(0);
+      this.tweens.add({
+        targets: this.levelClearScoreText,
+        alpha: 1,
+        duration: 300,
+        delay: 200,
+        ease: 'Sine.easeOut',
+      });
+    }
+  }
+
+  private showLevelClearBonus(x: number, y: number, bonus: number): void {
+    this.levelClearBonusText = this.add.text(x, y, `Move Bonus: +${bonus}`, {
+      fontSize: '22px',
+      fontFamily: "'Fredoka', 'Rubik', sans-serif",
+      color: '#00ffff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 3,
+    });
+    this.levelClearBonusText.setOrigin(0.5, 0.5);
+    this.levelClearBonusText.setDepth(55);
+
+    if (!this.a11y.reduceMotion) {
+      this.levelClearBonusText.setAlpha(0);
+      this.tweens.add({
+        targets: this.levelClearBonusText,
+        alpha: 1,
+        duration: 300,
+        delay: 400,
+        ease: 'Sine.easeOut',
+      });
+    }
+  }
+
+  private cleanupLevelClearText(): void {
+    if (this.levelClearText) {
+      this.levelClearText.destroy();
+      this.levelClearText = null;
+    }
+    if (this.levelClearScoreText) {
+      this.levelClearScoreText.destroy();
+      this.levelClearScoreText = null;
+    }
+    if (this.levelClearBonusText) {
+      this.levelClearBonusText.destroy();
+      this.levelClearBonusText = null;
     }
   }
 
@@ -735,21 +996,41 @@ export class BlastScene extends GameScene {
     y: number,
     config: { reduceMotion: boolean; isLowEnd: boolean },
   ): void {
+    const combo = this.previousBlastCombo ?? 0;
+
     switch (type) {
       case 'bomb':
         this.particles.playBombExplosion(this, x, y, config);
+        this.particles.playBombShockwave(this, x, y, config, combo);
+        cameraShake(this.cameras.main, 'shaking', config.reduceMotion);
         break;
       case 'lightning':
         this.particles.playLightningStrike(this, x, y, this.scale.height, config);
+        this.particles.playLightningBolt(this, x, y, this.scale.height, config, combo);
         break;
       case 'prism':
         this.particles.playPrismDetonation(this, x, y, this.scale.width, this.scale.height, config);
+        this.particles.playPrismBeams(this, x, y, this.scale.width, this.scale.height, config, combo);
         break;
       case 'gem':
         this.particles.playGemCollect(this, x, y, config);
+        this.particles.playGemPop(this, x, y, config, combo);
+        break;
+      case 'ice':
+        this.particles.playIceShatter(this, x, y, config);
+        this.particles.playIceShards(this, x, y, 'ice', config, combo);
+        break;
+      case 'frozen':
+        this.particles.playIceShatter(this, x, y, config);
+        this.particles.playIceShards(this, x, y, 'frozen', config, combo);
         break;
       case 'magnet':
         this.particles.playMagnetPull(this, x, y, [], config);
+        this.particles.playMagnetFieldPull(this, x, y, [], config, combo);
+        break;
+      case 'gold':
+        this.particles.playGoldSparkle(this, x, y, config);
+        this.particles.playGoldMidasWave(this, x, y, config, combo);
         break;
       case 'cascade':
         this.particles.playCascadeExplosion(this, x, y, config);
@@ -758,6 +1039,25 @@ export class BlastScene extends GameScene {
         this.particles.playWordClearBurst(this, x, y, 0xffe135, 1, config);
         break;
     }
+
+    // Per-type hit-stop: brief freeze on special tile explosion
+    this.applyTileHitStop(type, config.reduceMotion);
+  }
+
+  /** Apply a brief hit-stop freeze specific to the tile type being cleared. */
+  private applyTileHitStop(type: string, reduceMotion: boolean): void {
+    if (reduceMotion || this.isHitStopped) return;
+
+    const freezeMs = getHitStopDuration(type);
+    if (freezeMs <= 0) return;
+
+    this.isHitStopped = true;
+    this.tweens.pauseAll();
+
+    this.time.delayedCall(freezeMs, () => {
+      this.tweens.resumeAll();
+      this.isHitStopped = false;
+    });
   }
 
   // ─── Living background ─────────────────────────────────────────────────────
@@ -915,6 +1215,7 @@ export class BlastScene extends GameScene {
     this.cleanupWaveText();
     this.cleanupWaveScoreText();
     this.cleanupMilestoneText();
+    this.cleanupLevelClearText();
     this.cleanupBackgroundLayers();
     if (this.radialGlow) {
       this.radialGlow.destroy();

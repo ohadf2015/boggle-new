@@ -639,36 +639,36 @@ const en = {
     "selectAvatar": "Select an avatar",
     "playingAs": "Playing as",
     "defaultPlayerNames": [
-      "Probably a Potato",
+      "Sneaky Potato",
       "Donut Disturb",
-      "Baron Von Waffle",
-      "Llama Del Rey",
-      "Sir Spells-a-Lot",
-      "Taco 'bout Talent",
-      "CEO of Mochi",
-      "Penguin with a Plan",
-      "Legally a Walrus",
-      "Banana for Scale",
-      "Professional Goose",
+      "Baron Waffle",
+      "Llama Rey",
+      "Taco Talent",
+      "Mochi Boss",
+      "Sly Penguin",
+      "Rogue Walrus",
+      "Pro Goose",
       "Captain Pretzel",
-      "Existential Avocado",
+      "Cosmic Avocado",
       "Unhinged Flamingo",
-      "Dragon in Disguise",
-      "Plot Twist Salmon",
-      "Trust Me I'm a Bear",
-      "Zero Chill Zebra",
-      "Koala-fied Player",
-      "Raccoon in a Suit",
-      "Hippo on Espresso",
+      "Secret Dragon",
+      "Turbo Salmon",
+      "Grumpy Bear",
+      "Chill Zebra",
+      "Fancy Koala",
+      "Slick Raccoon",
+      "Hyper Hippo",
       "Vibing Jellyfish",
-      "Main Character Fox",
-      "Cookie Monster Jr",
-      "Sloth Mode: ON",
+      "Sly Fox",
+      "Cookie Junior",
+      "Lazy Sloth",
       "Ninja Noodle",
       "Disco Pickle",
       "Falafel Royale",
-      "Not a Robot",
-      "Duke of Donuts"
+      "Funky Robot",
+      "Donut Duke",
+      "Banana Bandit",
+      "Chaos Turtle"
     ]
   },
   "multiplayerFlow": {
@@ -888,6 +888,8 @@ const en = {
     "exitFullscreen": "Exit fullscreen",
     "host": "HOST",
     "hostBadge": "This player is the host",
+    "rankUp": "Moved up",
+    "rankDown": "Moved down",
     "notifications": {
       "longWord": "WORD POWER!",
       "epicWord": "MONSTER WORD!",
@@ -987,7 +989,155 @@ const en = {
       "awardsIntro5": "Let's celebrate the legends!"
     },
     "andMore": "and {count} more player",
-    "andMorePlural": "and {count} more players"
+    "andMorePlural": "and {count} more players",
+    "spotlight": {
+      "heading": "🎭 Player Spotlight",
+      "mascotIntro1": "Let's see what kind of players we've got!",
+      "mascotIntro2": "Every player has a story. Here's yours!",
+      "mascotIntro3": "Time to meet the cast of characters!",
+      "mascotIntro4": "Who played how? Let's find out!",
+      "mascotIntro5": "The spotlight is on YOU!",
+      "andMore": "and {count} more player",
+      "andMorePlural": "and {count} more players",
+      "archetypes": {
+        "the-ghost": {
+          "title": "THE GHOST",
+          "stat": "unique finds",
+          "quip1": "Found words that don't even exist in other players' nightmares.",
+          "quip2": "Operating in a dimension only they can see.",
+          "quip3": "Invisible to the competition. Deadly on the scoreboard.",
+          "quip4": "If a word falls in the grid and only one player finds it... was it even there?"
+        },
+        "the-sniper": {
+          "title": "THE SNIPER",
+          "stat": "accuracy",
+          "quip1": "Other players guess. This one KNOWS.",
+          "quip2": "Doesn't miss. Doesn't flinch. Doesn't submit garbage.",
+          "quip3": "Every word a bullseye. Every keystroke intentional.",
+          "quip4": "Surgical precision. No wasted moves."
+        },
+        "the-philosopher": {
+          "title": "THE PHILOSOPHER",
+          "stat": "avg length",
+          "quip1": "Why use short word when long word do trick better?",
+          "quip2": "The thinking person's player. Big words, big brain.",
+          "quip3": "While others typed 'cat', this one typed 'catastrophe'.",
+          "quip4": "Quality over quantity. Always."
+        },
+        "the-one-hit-wonder": {
+          "title": "THE ONE-HIT WONDER",
+          "stat": "best word",
+          "quip1": "One word to rule them all.",
+          "quip2": "Came for one word. Made it count.",
+          "quip3": "Sometimes you only need one perfect shot.",
+          "quip4": "Few words, but what a word it was."
+        },
+        "the-silent-assassin": {
+          "title": "THE SILENT ASSASSIN",
+          "stat": "pts/word",
+          "quip1": "Fewer words, maximum damage.",
+          "quip2": "Quiet but deadly. The scoreboard tells the story.",
+          "quip3": "Economy of motion. Every word a precision strike.",
+          "quip4": "Speaks softly, carries a massive vocabulary."
+        },
+        "the-sleeping-giant": {
+          "title": "THE SLEEPING GIANT",
+          "stat": "2nd half pts",
+          "quip1": "Started taking a nap, then woke up and chose violence.",
+          "quip2": "Slow start? No. Strategic patience.",
+          "quip3": "The comeback that nobody saw coming.",
+          "quip4": "Like a rocket... just needed a longer countdown."
+        },
+        "the-frontrunner": {
+          "title": "THE FRONTRUNNER",
+          "stat": "1st half pts",
+          "quip1": "Came out swinging and never looked back.",
+          "quip2": "Sprinted while others were still warming up.",
+          "quip3": "First to attack the grid. First to dominate.",
+          "quip4": "Set the pace. The rest played catch-up."
+        },
+        "the-speed-runner": {
+          "title": "THE SPEED RUNNER",
+          "stat": "WPM",
+          "quip1": "Fingers faster than the eye can follow.",
+          "quip2": "Rapid fire. Short bursts. Devastating results.",
+          "quip3": "Typing at the speed of thought.",
+          "quip4": "Quick words, quick wins."
+        },
+        "the-machine-gun": {
+          "title": "THE MACHINE GUN",
+          "stat": "total words",
+          "quip1": "Quantity is a quality all its own. Just ask this legend.",
+          "quip2": "More words than a dictionary. Unstoppable output.",
+          "quip3": "The grid never stood a chance against this volume.",
+          "quip4": "Brrrrrt. That's the sound of words being submitted."
+        },
+        "the-metronome": {
+          "title": "THE METRONOME",
+          "stat": "pace",
+          "quip1": "Tick. Word. Tock. Word. Like clockwork.",
+          "quip2": "Consistency is the secret weapon nobody talks about.",
+          "quip3": "A rhythm so steady, you could set your watch to it.",
+          "quip4": "No rush. No panic. Just pure, steady output."
+        },
+        "the-wildcard": {
+          "title": "THE WILDCARD",
+          "stat": "length variety",
+          "quip1": "Short words, long words, medium words — ALL the words.",
+          "quip2": "Unpredictable. Unclassifiable. Unstoppable.",
+          "quip3": "The only strategy is having no strategy.",
+          "quip4": "Jack of all lengths, master of confusion."
+        },
+        "the-marathon-runner": {
+          "title": "THE MARATHON RUNNER",
+          "stat": "coverage",
+          "quip1": "First to start, last to stop. Endurance champion.",
+          "quip2": "Still going while others took breaks.",
+          "quip3": "From the first second to the last. Never stopped.",
+          "quip4": "The tortoise who also happened to be a hare."
+        },
+        "the-combo-master": {
+          "title": "THE COMBO MASTER",
+          "stat": "max combo",
+          "quip1": "C-C-C-COMBO BREAKER! Wait, no, combo BUILDER.",
+          "quip2": "Chained words like a word-finding machine.",
+          "quip3": "When you're on a streak, why stop?",
+          "quip4": "Combo level: legendary. Opposition: shaking."
+        },
+        "the-fire-walker": {
+          "title": "THE FIRE WALKER",
+          "stat": "fire bonus",
+          "quip1": "Thrives when the heat is on. Literally.",
+          "quip2": "Fire round? More like THEIR round.",
+          "quip3": "Some players fear the fire. This one dances in it.",
+          "quip4": "Hot hands, hotter scores."
+        },
+        "the-social-butterfly": {
+          "title": "THE SOCIAL BUTTERFLY",
+          "stat": "popular picks",
+          "quip1": "Great minds think alike — and this one thinks like everyone.",
+          "quip2": "Found all the words everyone else found, plus vibes.",
+          "quip3": "Popular word picks? This player has the crowd's favorites.",
+          "quip4": "Always on the same wavelength as the group."
+        },
+        "the-underdog": {
+          "title": "THE UNDERDOG",
+          "stat": "accuracy",
+          "quip1": "Down in the rankings, up in accuracy. Respect.",
+          "quip2": "The score doesn't tell the whole story.",
+          "quip3": "Not first place, but definitely first in heart.",
+          "quip4": "Proof that rankings aren't everything."
+        },
+        "the-participant": {
+          "title": "THE PARTICIPANT",
+          "stat": "words",
+          "quip1": "Not every hero wears a cape. Some just submit words.",
+          "quip2": "Showed up. Played the game. That's what counts.",
+          "quip3": "A player of mystery. A legend in the making.",
+          "quip4": "The journey of a thousand words begins with one."
+        }
+      }
+    }
   },
   "playerView": {
     "getReadyHint": "Scan the grid now!",
@@ -5395,7 +5545,32 @@ const en = {
     "hintCooldown": "Used",
     "waveClear": "Wave Clear!",
     "tapToContinue": "Tap to continue",
-    "celebrateAgain": "Celebrate again"
+    "levelComplete": "Level Complete!",
+    "moveBonus": "Move Bonus",
+    "nextWave": "Next Wave",
+    "celebrateAgain": "Celebrate again",
+    "movesLeft": "Moves",
+    "bonusMove": "+1 Move!",
+    "bonusMoves": "+{count} Moves!",
+    "outOfMoves": "Out of Moves!",
+    "movesBonus": "Move Bonus",
+    "objective": {
+      "scoreTarget": "Score {target} pts",
+      "collectType": "Collect {target} {tileType}",
+      "clearAllType": "Clear all {tileType}",
+      "wordLength": "{target} words of {minWordLength}+ letters"
+    },
+    "combo": {
+      "bomb_bomb": "MEGA BLAST!",
+      "bomb_lightning": "THUNDER BOMB!",
+      "bomb_prism": "SHATTER STORM!",
+      "lightning_lightning": "CHAIN LIGHTNING!",
+      "lightning_prism": "CROSS THUNDER!",
+      "prism_prism": "TOTAL DESTRUCTION!",
+      "gold_special": "GOLDEN POWER!",
+      "rainbow_special": "DOUBLE RAINBOW!",
+      "triple_special": "TRIPLE THREAT!"
+    }
   },
   "student": {
         "activeGame": {
@@ -6745,6 +6920,23 @@ const en = {
   },
   ads: {
     label: "Advertisement"
+  },
+  gameModes: {
+    classic: {
+      name: "Classic",
+      description: "Find as many words as you can!"
+    },
+    blast: {
+      name: "Blast",
+      description: "Clear tiles with combos and special powers!"
+    },
+    wordHunt: {
+      name: "Word Hunt",
+      description: "Race to find the target word!"
+    },
+    random: "Random",
+    nextMode: "Next Mode",
+    randomizing: "Randomizing..."
   }
 };
 

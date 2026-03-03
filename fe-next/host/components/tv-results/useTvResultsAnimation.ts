@@ -11,6 +11,7 @@ export type AnimationPhase =
   | 'podium-1st'
   | 'confetti'
   | 'awards'
+  | 'player-spotlight'
   | 'leaderboard'
   | 'controls'
   | 'complete'
@@ -34,6 +35,7 @@ const ANIMATION_SEQUENCE: AnimationPhaseConfig[] = [
   { phase: 'podium-1st', duration: 3000, sound: 'victory' },
   { phase: 'confetti', duration: 1500 },
   { phase: 'awards', duration: 3000, sound: 'ding' },
+  { phase: 'player-spotlight', duration: 4000, sound: 'pop' },
   { phase: 'leaderboard', duration: 1000 },
   { phase: 'controls', duration: 500, sound: 'ready' },
   { phase: 'complete', duration: 0 },

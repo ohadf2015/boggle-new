@@ -6,14 +6,17 @@ import type { BlastExplosion, BlastScorePopup, BlastTileType } from './types';
 
 /** Varied colors per explosion type — avoids monotone orange */
 const EXPLOSION_COLORS: Record<BlastExplosion['type'], string> = {
-  bomb: '#FF4444',      // red
-  clear: '#FFD700',     // gold
-  word: '#00FFFF',      // cyan (was orange — now varied via palette in ExplosionEffect)
-  cascade: '#FF00FF',   // magenta — distinct from player word clears
-  lightning: '#FFFF00', // electric yellow
-  magnet: '#8B00FF',    // purple
-  prism: '#FF69B4',     // hot pink — spectrum detonation
-  gem: '#50C878',       // emerald green — collection sparkle
+  bomb: '#FF4444',              // red
+  clear: '#FFD700',             // gold
+  word: '#00FFFF',              // cyan
+  cascade: '#FF00FF',           // magenta — distinct from player word clears
+  lightning: '#FFFF00',         // electric yellow
+  magnet: '#8B00FF',            // purple
+  prism: '#FF69B4',             // hot pink — spectrum detonation
+  gem: '#50C878',               // emerald green — collection sparkle
+  combo: '#FF6B35',             // orange — special tile combo
+  mega_blast: '#FF1493',        // deep pink — mega blast combo
+  total_destruction: '#FFE135', // bright yellow — total destruction
 };
 
 /** Drop-shadow color per tile type for score popups */

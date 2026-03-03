@@ -11,17 +11,22 @@ import type { WordHuntResult } from '@/utils/dailyChallenge';
 import type { WordHuntStats } from '../types';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
-      <div ref={ref} data-testid={props['data-testid'] as string} {...props}>{children}</div>
-    )),
-    span: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLSpanElement>) => (
-      <span ref={ref} {...props}>{children}</span>
-    )),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+jest.mock('framer-motion', () => {
+  const MotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
+    <div ref={ref} data-testid={props['data-testid'] as string} {...props}>{children}</div>
+  ));
+  MotionDiv.displayName = 'MotionDiv';
+
+  const MotionSpan = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLSpanElement>) => (
+    <span ref={ref} {...props}>{children}</span>
+  ));
+  MotionSpan.displayName = 'MotionSpan';
+
+  return {
+    motion: { div: MotionDiv, span: MotionSpan },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
 
 // Mock the calculator to control facts output
 jest.mock('@/utils/dailyWordHuntFactsCalculator', () => ({

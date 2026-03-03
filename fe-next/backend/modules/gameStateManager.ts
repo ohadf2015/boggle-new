@@ -106,7 +106,9 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     lastActivity: Date.now(),
     gameSessionId: 0,
     playersReadyForNextGame: {},
-    selectedVocabulary: new Set<string>()
+    selectedVocabulary: new Set<string>(),
+    gameMode: 'classic',
+    modeHistory: []
   };
   persistGameState(gameCode);
   return games[gameCode];

@@ -29,7 +29,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
-import type { LetterGrid, LeaderboardEntry, Language, WordDetail } from '@/shared/types/game';
+import type { LetterGrid, LeaderboardEntry, Language, WordDetail, GameMode } from '@/shared/types/game';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload, BoardTheme } from '@/shared/types/socket';
 import type { Player, TournamentData, TournamentStanding, ComboState } from './types';
 import { COMBO_SHIELD_INTERVAL } from '@/utils/consts';
@@ -92,6 +92,9 @@ interface GameState {
   // Board theme
   boardTheme: BoardTheme | null;
 
+  // Game mode (multiplayer mode rotation)
+  gameMode: GameMode;
+
   // Internal refs (not reactive, for callbacks)
   _comboTimeoutId: NodeJS.Timeout | null;
 }
@@ -146,6 +149,9 @@ interface GameActions {
   // Board theme actions
   setBoardTheme: (value: BoardTheme | null | ((prev: BoardTheme | null) => BoardTheme | null)) => void;
 
+  // Game mode actions
+  setGameMode: (value: GameMode | ((prev: GameMode) => GameMode)) => void;
+
   // Reset actions
   resetForNewRound: () => void;
   resetAll: () => void;
@@ -183,6 +189,7 @@ const initialState: GameState = {
   xpGainedData: null,
   levelUpData: null,
   boardTheme: null,
+  gameMode: 'classic',
   _comboTimeoutId: null,
 };
 
@@ -401,6 +408,14 @@ export const useGameStore = create<GameStore>()(
     })),
 
     // ==========================================
+    // Game Mode Actions
+    // ==========================================
+
+    setGameMode: (value) => set((state) => ({
+      gameMode: applySetState(value, state.gameMode)
+    })),
+
+    // ==========================================
     // Reset Actions
     // ==========================================
 
@@ -483,6 +498,9 @@ export const useLevelUpData = () => useGameStore((state) => state.levelUpData);
 // Board theme selector
 export const useBoardTheme = () => useGameStore((state) => state.boardTheme);
 
+// Game mode selector
+export const useGameMode = () => useGameStore((state) => state.gameMode);
+
 // ==========================================
 // Actions Object (static, no re-renders)
 // ==========================================
@@ -528,6 +546,7 @@ const getActions = (state: GameStore) => ({
   setXpGainedData: state.setXpGainedData,
   setLevelUpData: state.setLevelUpData,
   setBoardTheme: state.setBoardTheme,
+  setGameMode: state.setGameMode,
   resetForNewRound: state.resetForNewRound,
   resetAll: state.resetAll,
 });

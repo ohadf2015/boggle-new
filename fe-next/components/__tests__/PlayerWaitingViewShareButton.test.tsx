@@ -115,11 +115,9 @@ describe('PlayerWaitingView - Command Center Style', () => {
   });
 
   describe('Header', () => {
-    it('should display the room code with glow styling', () => {
+    it('should not display room code in header (removed)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      const roomCode = screen.getByTestId('room-code');
-      expect(roomCode).toHaveTextContent('ABC123');
-      expect(roomCode.className).toContain('text-neo-cyan');
+      expect(screen.queryByTestId('room-code')).not.toBeInTheDocument();
     });
 
     it('should display player count badge', () => {
@@ -140,10 +138,9 @@ describe('PlayerWaitingView - Command Center Style', () => {
       expect(defaultProps.onExitRoom).toHaveBeenCalledTimes(1);
     });
 
-    it('should have a copy code button', () => {
+    it('should not have a copy code button (room code removed)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      const copyBtn = screen.getByRole('button', { name: /copy/i });
-      expect(copyBtn).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /copy/i })).not.toBeInTheDocument();
     });
   });
 

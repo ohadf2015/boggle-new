@@ -6,6 +6,8 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
 import { detectVerticalWords } from '../utils/blastVerticalScanner';
+import { detectSpecialCombos } from '../utils/blastCombos';
+import { GameBridge } from '@/lib/phaser/bridge/GameBridge';
 import type { LetterGrid } from '@/shared/types/game';
 import {
   DEFAULT_BLAST_CONFIG,
@@ -44,6 +46,7 @@ import {
 import { useBlastCascade, type BlastCascadePhase, type CascadeAnimationData } from './useBlastCascade';
 import { getInitialHitsRemaining } from '../utils/blastTileUtils';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
+import { calculateBonusMoves, calculateLeftoverMoveBonus } from '../utils/blastMoveUtils';
 
 // ==================== Helpers ====================
 
@@ -158,6 +161,8 @@ export interface UseBlastGameReturn {
 export interface UseBlastGameOptions {
   /** Called when an auto-cascade detects and clears a vertical word */
   onAutoCascadeWord?: (word: string, score: number, chainLevel: number) => void;
+  /** Number of moves allowed for this wave (from WaveConfig.movesAllowed) */
+  movesAllowed?: number;
 }
 
 // ==================== Hook ====================
@@ -195,6 +200,9 @@ export function useBlastGame(
     generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution)
   );
 
+  // Move limit from options (default: unlimited via high number)
+  const movesAllowed = options?.movesAllowed ?? Infinity;
+
   // Game state
   const [gameState, setGameState] = useState<BlastGameState>({
     score: 0,
@@ -205,6 +213,11 @@ export function useBlastGame(
     isComplete: false,
     isDeadEnd: false,
     cascadeChainLevel: 0,
+    movesRemaining: movesAllowed === Infinity ? Infinity : movesAllowed,
+    movesUsed: 0,
+    totalMoves: movesAllowed === Infinity ? Infinity : movesAllowed,
+    bonusMoveScore: 0,
+    tileTypeClears: {} as Record<import('../types').BlastTileType, number>,
   });
 
   // Explosions for animation
@@ -314,6 +327,7 @@ export function useBlastGame(
             let totalCascadeScore = 0;
             let newlyClearedCount = 0;
             const cascadeWords: string[] = [];
+            const cascadeClearedTypes: Partial<Record<BlastTileType, number>> = {};
 
             const nextTileStates = newTileStates.map(row => row.map(tile => ({ ...tile })));
 
@@ -325,9 +339,11 @@ export function useBlastGame(
               cascadeWords.push(vw.word);
 
               for (const cell of vw.path) {
-                if (!nextTileStates[cell.row][cell.col].isCleared) {
-                  nextTileStates[cell.row][cell.col].isCleared = true;
+                const t = nextTileStates[cell.row][cell.col];
+                if (!t.isCleared) {
+                  t.isCleared = true;
                   newlyClearedCount++;
+                  cascadeClearedTypes[t.type] = (cascadeClearedTypes[t.type] || 0) + 1;
                 }
               }
 
@@ -353,13 +369,20 @@ export function useBlastGame(
               onAutoCascadeWordRef.current?.(vw.word, wordScore, chainLevel);
             }
 
-            setGameState(prev => ({
-              ...prev,
-              score: prev.score + totalCascadeScore,
-              wordsFound: [...prev.wordsFound, ...cascadeWords],
-              tilesCleared: prev.tilesCleared + newlyClearedCount,
-              cascadeChainLevel: chainLevel,
-            }));
+            setGameState(prev => {
+              const mergedTypeClears = { ...prev.tileTypeClears };
+              for (const [tType, count] of Object.entries(cascadeClearedTypes)) {
+                mergedTypeClears[tType as BlastTileType] = (mergedTypeClears[tType as BlastTileType] || 0) + (count as number);
+              }
+              return {
+                ...prev,
+                score: prev.score + totalCascadeScore,
+                wordsFound: [...prev.wordsFound, ...cascadeWords],
+                tilesCleared: prev.tilesCleared + newlyClearedCount,
+                cascadeChainLevel: chainLevel,
+                tileTypeClears: mergedTypeClears,
+              };
+            });
 
             setExplosions(prev => [...prev, ...newExplosions]);
             setTileStates(nextTileStates);
@@ -400,10 +423,25 @@ export function useBlastGame(
   }, []);
 
   // Auto-complete when cumulative tilesCleared reaches the board size
+  // Award leftover move bonus (Sugar Crush equivalent)
   useEffect(() => {
-    const { tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
+    const { tilesCleared, totalTiles, isComplete, isDeadEnd, movesRemaining } = gameState;
     if (!isComplete && !isDeadEnd && tilesCleared >= totalTiles && totalTiles > 0) {
-      setGameState(prev => ({ ...prev, isComplete: true }));
+      const bonus = calculateLeftoverMoveBonus(movesRemaining);
+      setGameState(prev => ({
+        ...prev,
+        isComplete: true,
+        bonusMoveScore: bonus,
+        score: prev.score + bonus,
+      }));
+    }
+  }, [gameState]);
+
+  // Game over when moves exhausted (only if move limit is finite)
+  useEffect(() => {
+    const { movesRemaining, isComplete, isDeadEnd, movesUsed } = gameState;
+    if (!isComplete && !isDeadEnd && movesUsed > 0 && movesRemaining <= 0 && isFinite(gameState.totalMoves)) {
+      setGameState(prev => ({ ...prev, isDeadEnd: true }));
     }
   }, [gameState]);
 
@@ -476,6 +514,14 @@ export function useBlastGame(
 
       // Clear path tiles and collect effects
       let newlyClearedCount = 0;
+      const clearedTypeCounts: Partial<Record<BlastTileType, number>> = {};
+
+      // Helper: mark a tile as cleared and track its type
+      const markCleared = (t: BlastTileState) => {
+        t.isCleared = true;
+        newlyClearedCount++;
+        clearedTypeCounts[t.type] = (clearedTypeCounts[t.type] || 0) + 1;
+      };
 
       // Helper: check if a tile is multi-hit and not on its final hit
       const isMultiHitAlive = (t: BlastTileState) =>
@@ -490,6 +536,75 @@ export function useBlastGame(
       // BFS bomb queue (shared across path and prism cross-clear)
       const bombQueue: Array<{ row: number; col: number; depth: number }> = [];
       const processedBombs = new Set<string>();
+
+      // ── Combo detection ──────────────────────────────────────────────────
+      const detectedCombos = detectSpecialCombos(path, next);
+      let comboMultiplier = 1;
+      if (detectedCombos.length > 0) {
+        for (const combo of detectedCombos) {
+          comboMultiplier *= combo.scoreMultiplier;
+          switch (combo.type) {
+            case 'bomb_bomb': {
+              const midRow = Math.round((combo.tiles[0].row + combo.tiles[1].row) / 2);
+              const midCol = Math.round((combo.tiles[0].col + combo.tiles[1].col) / 2);
+              for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+                const r = midRow + dr, c = midCol + dc;
+                if (r >= 0 && r < gridSize && c >= 0 && c < gridSize && !next[r][c].isCleared) {
+                  if (isMultiHitAlive(next[r][c])) hitMultiHitTile(next[r][c]); else markCleared(next[r][c]);
+                }
+              }
+              newExplosions.push({ id: `combo-bb-${now}`, row: midRow, col: midCol, type: 'mega_blast', intensity: 4, timestamp: now });
+              break;
+            }
+            case 'bomb_lightning': {
+              const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
+              for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
+                const col = bt.col + dc;
+                if (col < 0 || col >= gridSize) continue;
+                for (let r = 0; r < gridSize; r++) if (!next[r][col].isCleared) {
+                  if (isMultiHitAlive(next[r][col])) hitMultiHitTile(next[r][col]); else markCleared(next[r][col]);
+                }
+              }
+              newExplosions.push({ id: `combo-bl-${now}`, row: bt.row, col: bt.col, type: 'combo', intensity: 4, timestamp: now });
+              break;
+            }
+            case 'bomb_prism': {
+              const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
+              for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+                const cR = bt.row + dr, cC = bt.col + dc;
+                if (cR < 0 || cR >= gridSize || cC < 0 || cC >= gridSize) continue;
+                for (let r = 0; r < gridSize; r++) if (!next[r][cC].isCleared) { if (isMultiHitAlive(next[r][cC])) hitMultiHitTile(next[r][cC]); else markCleared(next[r][cC]); }
+                for (let c = 0; c < gridSize; c++) if (!next[cR][c].isCleared) { if (isMultiHitAlive(next[cR][c])) hitMultiHitTile(next[cR][c]); else markCleared(next[cR][c]); }
+              }
+              newExplosions.push({ id: `combo-bp-${now}`, row: bt.row, col: bt.col, type: 'combo', intensity: 4, timestamp: now });
+              break;
+            }
+            case 'lightning_lightning': {
+              const cols = new Set(path.map(p => p.col));
+              for (const col of cols) for (let r = 0; r < gridSize; r++) if (!next[r][col].isCleared) { if (isMultiHitAlive(next[r][col])) hitMultiHitTile(next[r][col]); else markCleared(next[r][col]); }
+              newExplosions.push({ id: `combo-ll-${now}`, row: combo.tiles[0].row, col: combo.tiles[0].col, type: 'combo', intensity: 4, timestamp: now });
+              break;
+            }
+            case 'lightning_prism': {
+              for (const tile of combo.tiles) for (let d = -1; d <= 1; d++) {
+                const row = tile.row + d, col = tile.col + d;
+                if (row >= 0 && row < gridSize) for (let c = 0; c < gridSize; c++) if (!next[row][c].isCleared) { if (isMultiHitAlive(next[row][c])) hitMultiHitTile(next[row][c]); else markCleared(next[row][c]); }
+                if (col >= 0 && col < gridSize) for (let r = 0; r < gridSize; r++) if (!next[r][col].isCleared) { if (isMultiHitAlive(next[r][col])) hitMultiHitTile(next[r][col]); else markCleared(next[r][col]); }
+              }
+              newExplosions.push({ id: `combo-lp-${now}`, row: combo.tiles[0].row, col: combo.tiles[0].col, type: 'combo', intensity: 4, timestamp: now });
+              break;
+            }
+            case 'prism_prism': {
+              for (let r = 0; r < gridSize; r++) for (let c = 0; c < gridSize; c++) if (!next[r][c].isCleared) markCleared(next[r][c]);
+              newExplosions.push({ id: `combo-pp-${now}`, row: 3, col: 3, type: 'total_destruction', intensity: 4, timestamp: now });
+              break;
+            }
+            default: break;
+          }
+          GameBridge.emit('blast:combo:trigger', { comboType: combo.type, tiles: combo.tiles.map(t => ({ row: t.row, col: t.col })), label: combo.label, clearedCount: newlyClearedCount });
+        }
+        bonusScore += baseScore * (comboMultiplier - 1);
+      }
 
       for (const cell of path) {
         const tile = next[cell.row]?.[cell.col];
@@ -507,8 +622,7 @@ export function useBlastGame(
           continue; // Don't clear yet
         }
 
-        tile.isCleared = true;
-        newlyClearedCount++;
+        markCleared(tile);
         tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
 
         switch (tile.type) {
@@ -572,8 +686,7 @@ export function useBlastGame(
               if (isMultiHitAlive(target)) {
                 hitMultiHitTile(target);
               } else {
-                target.isCleared = true;
-                newlyClearedCount++;
+                markCleared(target);
                 if (target.type === 'bomb' && !processedBombs.has(`${cell.row},${c}`)) {
                   processedBombs.add(`${cell.row},${c}`);
                   bombQueue.push({ row: cell.row, col: c, depth: 0 });
@@ -588,8 +701,7 @@ export function useBlastGame(
               if (isMultiHitAlive(target)) {
                 hitMultiHitTile(target);
               } else {
-                target.isCleared = true;
-                newlyClearedCount++;
+                markCleared(target);
                 if (target.type === 'bomb' && !processedBombs.has(`${r},${cell.col}`)) {
                   processedBombs.add(`${r},${cell.col}`);
                   bombQueue.push({ row: r, col: cell.col, depth: 0 });
@@ -626,8 +738,7 @@ export function useBlastGame(
               if (isMultiHitAlive(target)) {
                 hitMultiHitTile(target);
               } else {
-                target.isCleared = true;
-                newlyClearedCount++;
+                markCleared(target);
                 bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
               }
             }
@@ -648,8 +759,7 @@ export function useBlastGame(
                 if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
                   const target = next[r][c];
                   if (!target.isCleared && (target.type === 'wildcard' || target.type === 'rainbow')) {
-                    target.isCleared = true;
-                    newlyClearedCount++;
+                    markCleared(target);
                     bonusScore += MAGNET_ATTRACT_BONUS;
                   }
                 }
@@ -679,8 +789,7 @@ export function useBlastGame(
                 if (isMultiHitAlive(next[r][c])) {
                   hitMultiHitTile(next[r][c]);
                 } else {
-                  next[r][c].isCleared = true;
-                  newlyClearedCount++;
+                  markCleared(next[r][c]);
                   bonusScore += BOMB_AREA_CLEAR_BONUS;
                   if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
                     processedBombs.add(`${r},${c}`);
@@ -725,13 +834,26 @@ export function useBlastGame(
         bestWordRef.current = word;
       }
 
-      // Update game state with score (tilesCleared tracks running total for results)
-      setGameState(prev => ({
-        ...prev,
-        score: prev.score + totalScore,
-        wordsFound: [...prev.wordsFound, word],
-        tilesCleared: prev.tilesCleared + newlyClearedCount,
-      }));
+      // Calculate bonus moves for long words
+      const bonusMoveCount = calculateBonusMoves(word.length);
+
+      // Update game state with score + move tracking + per-type clears
+      setGameState(prev => {
+        const newMovesRemaining = Math.max(0, prev.movesRemaining - 1) + bonusMoveCount;
+        const mergedTypeClears = { ...prev.tileTypeClears };
+        for (const [tType, count] of Object.entries(clearedTypeCounts)) {
+          mergedTypeClears[tType as BlastTileType] = (mergedTypeClears[tType as BlastTileType] || 0) + (count as number);
+        }
+        return {
+          ...prev,
+          score: prev.score + totalScore,
+          wordsFound: [...prev.wordsFound, word],
+          tilesCleared: prev.tilesCleared + newlyClearedCount,
+          movesRemaining: newMovesRemaining,
+          movesUsed: prev.movesUsed + 1,
+          tileTypeClears: mergedTypeClears,
+        };
+      });
 
       if (newExplosions.length > 0) {
         setExplosions(prev => [...prev, ...newExplosions]);

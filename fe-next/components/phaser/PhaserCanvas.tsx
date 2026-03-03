@@ -70,7 +70,7 @@ export default function PhaserCanvas({ sceneType = 'game', deviceConfig }: Phase
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [sceneType]);
+  }, [sceneType, deviceConfig]);
 
   return (
     <div

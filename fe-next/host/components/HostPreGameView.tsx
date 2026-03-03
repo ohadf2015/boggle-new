@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Crown, Bot, Monitor, LogOut, ChevronDown, BookOpen, Copy, Plus } from 'lucide-react';
+import { Users, Crown, Bot, Monitor, LogOut, ChevronDown, BookOpen, Copy, Plus, Zap, PartyPopper, Trophy } from 'lucide-react';
 import { Checkbox } from '../../components/ui/checkbox';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
@@ -12,6 +12,7 @@ import { useNativeShare } from '../../hooks/useNativeShare';
 import { cn } from '../../lib/utils';
 import { getJoinUrl, copyJoinUrl } from '../../utils/share';
 import { useSocket } from '../../utils/SocketContext';
+import { useGameActions } from '@/hooks/gameState';
 
 import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -22,7 +23,7 @@ import {
   InviteCard,
 } from './pre-game/desktop';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
-import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
+import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel, GameMode } from '@/shared/types/game';
 
 // ==================== Types ====================
 
@@ -115,6 +116,18 @@ function HostPreGameView({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
+  const [selectedGameMode, setSelectedGameMode] = useState<GameMode | 'random'>('random');
+  const { setGameMode: setStoreGameMode } = useGameActions();
+
+  // When host selects a specific mode, update the store
+  // When 'random' is selected, the server will pick via gameModeSelector
+  useEffect(() => {
+    if (selectedGameMode !== 'random') {
+      setStoreGameMode(selectedGameMode);
+    } else {
+      setStoreGameMode('classic'); // Default; server overrides via rotation
+    }
+  }, [selectedGameMode, setStoreGameMode]);
 
   // Apply default preset on mount
   useEffect(() => {
@@ -239,6 +252,13 @@ function HostPreGameView({
     challenge: 'bg-neo-orange text-neo-black',
   };
 
+  // Lucide icons for each preset (instead of emojis)
+  const presetIcons: Record<PresetKey, React.ReactNode> = {
+    fast: <Zap className="w-5 h-5" />,
+    party: <PartyPopper className="w-5 h-5" />,
+    challenge: <Trophy className="w-5 h-5" />,
+  };
+
   // Render player roster (shared between mobile and desktop)
   const renderPlayerRoster = (hostLabel?: string): React.ReactElement => (
     <section className="space-y-2">
@@ -332,50 +352,103 @@ function HostPreGameView({
   // Render battle mode card (shared between mobile and desktop)
   const renderBattleModeCard = (): React.ReactElement => (
     <section>
-      <div className="bg-neo-cream text-neo-black p-4 rounded-xl border-3 border-neo-black shadow-hard">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-neo-display font-bold text-xl leading-none uppercase">
-              {t('hostView.battleMode') || 'Battle Mode'}
-            </h2>
-            <p className="text-[9px] font-bold uppercase text-gray-500 tracking-widest mt-1">
-              {t('hostView.preset') || 'Preset'}: {t(GAME_PRESETS[selectedPreset].nameKey)}
-            </p>
+      <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-neo-purple/10 via-transparent to-neo-cyan/5 pointer-events-none" />
+
+        <div className="relative flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-neo-pink/20 border-2 border-neo-pink/40 flex items-center justify-center text-neo-pink">
+              {presetIcons[selectedPreset]}
+            </div>
+            <div>
+              <h2 className="font-neo-display font-bold text-xl leading-none uppercase text-neo-white">
+                {t('hostView.battleMode') || 'Battle Mode'}
+              </h2>
+              <p className="text-[9px] font-bold uppercase text-neo-cream/50 tracking-widest mt-1">
+                {t('hostView.preset') || 'Preset'}: {t(GAME_PRESETS[selectedPreset].nameKey)}
+              </p>
+            </div>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <span className="bg-neo-cyan px-2 py-0.5 border-2 border-neo-black rounded text-[9px] font-black">
+            <span className="bg-neo-cyan/20 text-neo-cyan px-2 py-0.5 border-2 border-neo-cyan/40 rounded text-[9px] font-black">
               {timerValue}:00 {t('common.minutes') || 'MIN'}
             </span>
-            <span className="bg-neo-pink px-2 py-0.5 border-2 border-neo-black rounded text-[9px] font-black text-white">
+            <span className="bg-neo-pink/20 text-neo-pink px-2 py-0.5 border-2 border-neo-pink/40 rounded text-[9px] font-black">
               {GAME_PRESETS[selectedPreset].difficulty}
             </span>
           </div>
         </div>
 
-        {/* Preset Buttons - Inline 3-column */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* Preset Buttons - Inline 3-column with icons */}
+        <div className="relative grid grid-cols-3 gap-2">
           {(Object.keys(GAME_PRESETS) as Array<keyof typeof GAME_PRESETS>).map((key) => {
+            const preset = GAME_PRESETS[key];
             const isActive = selectedPreset === key;
             return (
-              <button
+              <motion.button
                 key={key}
                 onClick={() => handleApplyPreset(key)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 className={cn(
-                  'py-2 rounded font-bold text-[10px] uppercase border-2 border-neo-black transition-all',
+                  'py-2.5 rounded-lg font-bold text-[10px] uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-1',
                   isActive
                     ? `${presetActiveColors[key]} shadow-hard-sm`
-                    : 'bg-transparent hover:bg-gray-100'
+                    : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream hover:border-neo-white/40'
                 )}
               >
-                {t(GAME_PRESETS[key].nameKey)}
-              </button>
+                {presetIcons[key]}
+                <span>{t(preset.nameKey)}</span>
+              </motion.button>
             );
           })}
         </div>
 
+        {/* Game Mode Selector */}
+        <div className="relative mt-3 pt-3 border-t border-neo-white/10">
+          <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-2">
+            {t('gameModes.nextMode') || 'Next Mode'}
+          </p>
+          <div className="grid grid-cols-4 gap-1.5">
+            {(['random', 'classic', 'blast', 'word-hunt'] as const).map((mode) => {
+              const isActive = selectedGameMode === mode;
+              const modeLabels: Record<string, string> = {
+                random: t('gameModes.random') || 'Random',
+                classic: t('gameModes.classic.name') || 'Classic',
+                blast: t('gameModes.blast.name') || 'Blast',
+                'word-hunt': t('gameModes.wordHunt.name') || 'Word Hunt',
+              };
+              const modeIcons: Record<string, string> = {
+                random: '🎲',
+                classic: '📝',
+                blast: '💥',
+                'word-hunt': '🎯',
+              };
+              return (
+                <button
+                  key={mode}
+                  onClick={() => setSelectedGameMode(mode)}
+                  data-testid={`game-mode-${mode}`}
+                  className={cn(
+                    'py-1.5 rounded-lg font-bold text-[9px] uppercase border-2 border-neo-black transition-colors flex flex-col items-center gap-0.5',
+                    isActive
+                      ? 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60 shadow-hard-sm'
+                      : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream'
+                  )}
+                >
+                  <span className="text-sm">{modeIcons[mode]}</span>
+                  <span className="leading-none">{modeLabels[mode]}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* TV Mode Toggle - always visible */}
-        <div className="mt-3 pt-3 border-t border-neo-black/10 flex items-center gap-2">
-          <Monitor className="w-4 h-4 text-neo-cream/80 flex-shrink-0" />
+        <div className="relative mt-3 pt-3 border-t border-neo-white/10 flex items-center gap-2">
+          <Monitor className="w-4 h-4 text-neo-cream/50 flex-shrink-0" />
           <Checkbox
             id="broadcastMode"
             checked={!hostPlaying}
@@ -383,7 +456,7 @@ function HostPreGameView({
           />
           <label
             htmlFor="broadcastMode"
-            className="text-xs font-bold uppercase text-neo-black cursor-pointer flex-1"
+            className="text-xs font-bold uppercase text-neo-cream/80 cursor-pointer flex-1"
           >
             {t('hostView.broadcastModeTitle') || 'TV Mode'}
           </label>
@@ -392,7 +465,7 @@ function HostPreGameView({
         {/* Advanced Settings Toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full mt-3 py-1 flex items-center justify-center gap-1 text-[9px] font-black uppercase border-t border-neo-black/10 pt-3 text-gray-500 hover:text-neo-black transition-colors"
+          className="relative w-full mt-3 py-1 flex items-center justify-center gap-1 text-[9px] font-black uppercase border-t border-neo-white/10 pt-3 text-neo-cream/40 hover:text-neo-cream transition-colors"
           aria-expanded={showAdvanced}
           aria-controls="advanced-settings-panel"
         >
@@ -423,12 +496,32 @@ function HostPreGameView({
     </section>
   );
 
+  // Staggered entrance animation for lobby sections
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        type: 'spring' as const,
+        stiffness: 300,
+        damping: 24,
+      },
+    }),
+  };
+
   // Render Command Center Mobile Content (single-scroll vertical flow)
   const renderLobbyContent = (): React.ReactElement => (
     <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
 
       {/* 1. Start Button - HERO at top */}
-      <section>
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        custom={0}
+      >
         <StartButton
           onStartGame={onStartGame}
           disabled={isStartDisabled}
@@ -437,32 +530,42 @@ function HostPreGameView({
           maxPlayers={maxPlayers}
           t={t}
         />
-      </section>
+      </motion.div>
 
       {/* 2. Player Roster - Horizontal scroll */}
-      {renderPlayerRoster(`${t('hostView.hostIs') || 'Host is'} ${username}`)}
+      <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
+        {renderPlayerRoster(`${t('hostView.hostIs') || 'Host is'} ${username}`)}
+      </motion.div>
 
       {/* 3. Battle Mode Settings Card */}
-      {renderBattleModeCard()}
+      <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
+        {renderBattleModeCard()}
+      </motion.div>
 
       {/* 4. Share/Invite Strip */}
-      <MobileShareSection gameCode={gameCode} t={t} />
+      <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
+        <MobileShareSection gameCode={gameCode} t={t} />
+      </motion.div>
 
       {/* 5. Battle Feed / Chat */}
-      <section className="pb-4">
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
-          {t('hostView.roomChat') || 'Room Chat'}
-        </h3>
-        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-48 sm:h-64">
+      <motion.div
+        className="pb-4"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        custom={4}
+      >
+        <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-56 sm:h-72">
           <RoomChat
             username="Host"
             isHost={true}
             gameCode={gameCode}
             className="h-full"
             onNewMessage={() => {}}
+            variant="embedded"
           />
         </div>
-      </section>
+      </motion.div>
     </div>
   );
 
@@ -566,7 +669,7 @@ function HostPreGameView({
                 {/* Battle Feed / Chat */}
                 <div
                   data-testid="desktop-chat-area"
-                  className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-4 border-neo-black shadow-hard overflow-hidden"
+                  className="flex-1 min-h-0 bg-neo-navy-light/50 rounded-neo-lg border-3 border-neo-white/10 overflow-hidden"
                 >
                   <RoomChat
                     username="Host"
@@ -574,6 +677,7 @@ function HostPreGameView({
                     gameCode={gameCode}
                     className="h-full"
                     onNewMessage={() => {}}
+                    variant="embedded"
                   />
                 </div>
               </>

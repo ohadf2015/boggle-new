@@ -1,0 +1,119 @@
+import React from 'react';
+import { render, screen, act } from '@testing-library/react';
+import { GameModeIntro } from '../GameModeIntro';
+import type { GameMode } from '@/shared/types/game';
+
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
+      <div ref={ref} {...props}>{children}</div>
+    )),
+    h1: React.forwardRef(({ children, ...props }: any, ref: any) => (
+      <h1 ref={ref} {...props}>{children}</h1>
+    )),
+    p: React.forwardRef(({ children, ...props }: any, ref: any) => (
+      <p ref={ref} {...props}>{children}</p>
+    )),
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
+const mockT = (key: string) => {
+  const translations: Record<string, string> = {
+    'gameModes.classic.name': 'Classic',
+    'gameModes.classic.description': 'Find as many words as you can!',
+    'gameModes.blast.name': 'Blast',
+    'gameModes.blast.description': 'Clear tiles with combos and special powers!',
+    'gameModes.wordHunt.name': 'Word Hunt',
+    'gameModes.wordHunt.description': 'Race to find the target word!',
+  };
+  return translations[key] || key;
+};
+
+describe('GameModeIntro', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('should render classic mode intro', () => {
+    render(<GameModeIntro mode="classic" t={mockT} onComplete={jest.fn()} />);
+    expect(screen.getByText('Classic')).toBeInTheDocument();
+    expect(screen.getByText('Find as many words as you can!')).toBeInTheDocument();
+  });
+
+  it('should render blast mode intro', () => {
+    render(<GameModeIntro mode="blast" t={mockT} onComplete={jest.fn()} />);
+    expect(screen.getByText('Blast')).toBeInTheDocument();
+    expect(screen.getByText('Clear tiles with combos and special powers!')).toBeInTheDocument();
+  });
+
+  it('should render word-hunt mode intro', () => {
+    render(<GameModeIntro mode="word-hunt" t={mockT} onComplete={jest.fn()} />);
+    expect(screen.getByText('Word Hunt')).toBeInTheDocument();
+    expect(screen.getByText('Race to find the target word!')).toBeInTheDocument();
+  });
+
+  it('should call onComplete after duration', () => {
+    const onComplete = jest.fn();
+    render(<GameModeIntro mode="classic" t={mockT} onComplete={onComplete} duration={3000} />);
+
+    expect(onComplete).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('should use default 3-second duration', () => {
+    const onComplete = jest.fn();
+    render(<GameModeIntro mode="classic" t={mockT} onComplete={onComplete} />);
+
+    act(() => {
+      jest.advanceTimersByTime(2999);
+    });
+    expect(onComplete).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render mode icon', () => {
+    const { container } = render(<GameModeIntro mode="classic" t={mockT} onComplete={jest.fn()} />);
+    expect(container.querySelector('[data-testid="game-mode-intro"]')).toBeInTheDocument();
+  });
+
+  it('should have correct data-mode attribute', () => {
+    const { container } = render(<GameModeIntro mode="blast" t={mockT} onComplete={jest.fn()} />);
+    const element = container.querySelector('[data-testid="game-mode-intro"]');
+    expect(element).toHaveAttribute('data-mode', 'blast');
+  });
+
+  it('should render in TV mode with larger text', () => {
+    render(<GameModeIntro mode="classic" t={mockT} onComplete={jest.fn()} isTv />);
+    const element = screen.getByTestId('game-mode-intro');
+    expect(element).toHaveAttribute('data-tv', 'true');
+  });
+
+  it('should clean up timer on unmount', () => {
+    const onComplete = jest.fn();
+    const { unmount } = render(
+      <GameModeIntro mode="classic" t={mockT} onComplete={onComplete} />
+    );
+    unmount();
+
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+});

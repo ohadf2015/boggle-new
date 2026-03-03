@@ -181,9 +181,9 @@ describe('PlayerWaitingView', () => {
   });
 
   describe('Existing Functionality', () => {
-    it('should render room code', () => {
+    it('should not render room code in header (removed)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
-      expect(screen.getByTestId('room-code')).toHaveTextContent('ABCD');
+      expect(screen.queryByTestId('room-code')).not.toBeInTheDocument();
     });
 
     it('should render player names in roster', () => {

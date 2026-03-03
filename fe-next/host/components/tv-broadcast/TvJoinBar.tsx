@@ -4,6 +4,7 @@ import React, { memo, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 
 interface TvJoinBarProps {
   gameCode: string;
@@ -75,10 +76,22 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
                 {t('tvBroadcast.players')}
               </p>
-              <div className="flex items-center gap-2 text-neo-cream">
+              <motion.div
+                key={playerCount}
+                initial={{ scale: 1.15 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                className="flex items-center gap-2 text-neo-cream"
+                data-testid="player-count-wrapper"
+              >
                 <Users className="w-6 h-6" />
-                <span className="text-3xl font-black">{playerCount}</span>
-              </div>
+                <AnimatedCounter
+                  value={playerCount}
+                  className="text-3xl font-black text-neo-cream"
+                  size="xl"
+                  formatValue={(v) => String(Math.round(v))}
+                />
+              </motion.div>
             </div>
 
             {/* QR Code */}

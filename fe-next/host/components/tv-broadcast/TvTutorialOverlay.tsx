@@ -233,7 +233,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
                   variant="outline"
                   className="flex-1 py-3 border-2 border-neo-black bg-neo-cream hover:bg-neo-black/10 text-neo-black font-bold"
                 >
-                  <ChevronLeft className="w-5 h-5 me-1" />
+                  <ChevronLeft className="w-5 h-5 me-1 rtl:rotate-180" />
                   {t('common.previous') || 'Back'}
                 </Button>
               )}
@@ -242,7 +242,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
                 className={`${isFirstStep ? 'w-full' : 'flex-1'} py-3 bg-neo-purple hover:bg-neo-purple/90 text-neo-cream font-bold border-2 border-neo-black shadow-hard-sm`}
               >
                 {isLastStep ? (t('tvTutorial.letsGo') || "Let's Go!") : (t('common.next') || 'Next')}
-                {!isLastStep && <ChevronRight className="w-5 h-5 ms-1" />}
+                {!isLastStep && <ChevronRight className="w-5 h-5 ms-1 rtl:rotate-180" />}
               </Button>
             </div>
           </div>

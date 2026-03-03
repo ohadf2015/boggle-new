@@ -86,14 +86,17 @@ const GLOW_BASES: Record<BlastTileType, GlowBase> = {
 // ─── Explosion colours (per explosion type) ──────────────────────────────────
 
 const EXPLOSION_COLORS: Record<BlastExplosion['type'], number> = {
-  word:      0xffe135, // neo-yellow
-  bomb:      0xff4628, // red-orange
-  clear:     0x00ffff, // neo-cyan
-  cascade:   0xff1493, // neo-pink / magenta
-  lightning: 0xffe100, // electric yellow
-  magnet:    0x8b00ff, // violet
-  prism:     0xff69b4, // hot pink
-  gem:       0x50c878, // emerald
+  word:               0xffe135, // neo-yellow
+  bomb:               0xff4628, // red-orange
+  clear:              0x00ffff, // neo-cyan
+  cascade:            0xff1493, // neo-pink / magenta
+  lightning:          0xffe100, // electric yellow
+  magnet:             0x8b00ff, // violet
+  prism:              0xff69b4, // hot pink
+  gem:                0x50c878, // emerald
+  combo:              0xff6b35, // orange — special tile combo
+  mega_blast:         0xff1493, // deep pink — mega blast
+  total_destruction:  0xffe135, // bright yellow — total destruction
 };
 
 // ─── BLAST_TILE_CONFIGS — static lookup per special type ─────────────────────

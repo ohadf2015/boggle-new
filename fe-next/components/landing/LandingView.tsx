@@ -342,7 +342,7 @@ const LandingView: React.FC = () => {
             </Suspense>
           </div>
           {/* Landscape/Mobile Portrait: 2-column grid layout */}
-          <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-fr content-center">
+          <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-auto content-center">
             {/* Multiplayer Card - Compact with glow */}
             <motion.div
               initial={{ opacity: 0, y: 16, scale: 0.95 }}
@@ -430,18 +430,18 @@ const LandingView: React.FC = () => {
               <Link
                 href={`/${language}/adventure`}
                 className={cn(
-                  'flex items-center gap-3 p-3 sm:p-4 relative',
+                  'flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-2.5 relative',
                   'bg-gradient-to-br from-neo-lime via-lime-400 to-lime-500',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'transition-all duration-200 min-h-[72px]',
+                  'transition-all duration-200',
                   'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgba(163,230,53,0.5))]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.adventureMode') || 'Adventure'} - ${t('landing.adventureModeDesc') || '100 levels across 10 worlds'}`}
               >
                 {/* Icon container */}
-                <div className="flex-shrink-0 w-11 h-11 sm:w-13 sm:h-13 bg-neo-black/15 rounded-neo border-2 border-neo-black/20 flex items-center justify-center">
-                  <Map className="w-6 h-6 sm:w-7 sm:h-7 text-neo-black" aria-hidden="true" />
+                <div className="flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 bg-neo-black/15 rounded-neo border-2 border-neo-black/20 flex items-center justify-center">
+                  <Map className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" aria-hidden="true" />
                 </div>
                 {/* Text */}
                 <div className="flex-1 min-w-0">

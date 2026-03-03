@@ -638,36 +638,36 @@ const sv = {
     "selectAvatar": "Välj en avatar",
     "playingAs": "Spelar som",
     "defaultPlayerNames": [
-      "Antagligen en Potatis",
-      "Munk Stör Ej",
-      "Baron Von Våffla",
+      "Smyg Potatis",
+      "Munk Störej",
+      "Baron Våffla",
       "Lagom Lama",
       "Fika Flamingo",
-      "Taco med Talang",
-      "VD för Mochi",
-      "Pingvin med Plan",
-      "Tekniskt en Valross",
-      "Banan som Referens",
-      "Professionell Gås",
+      "Taco Talang",
+      "Mochi Boss",
+      "Slug Pingvin",
+      "Fräck Valross",
+      "Proffs Gås",
       "Kapten Kringla",
-      "Existentiell Avokado",
-      "Oförutsägbar Flamingo",
-      "Drake i Förklädnad",
-      "Plot Twist Lax",
-      "Lita på mig jag är Björn",
-      "Noll Chill Zebra",
-      "Kvalificerad Koala",
-      "Tvättbjörn i Kostym",
-      "Flodhäst på Espresso",
+      "Kosmisk Avokado",
+      "Galen Flamingo",
+      "Hemlig Drake",
+      "Turbo Lax",
+      "Grull Björn",
+      "Chill Zebra",
+      "Fancy Koala",
+      "Snygg Tvättbjörn",
+      "Hyper Flodhäst",
       "Vibbar Manet",
-      "Huvudroll Räv",
+      "Slug Räv",
       "Kaka Junior",
-      "Sengångare Läge: PÅ",
+      "Lat Sengångare",
       "Ninja Nudel",
       "Disco Gurka",
       "Falafel Royale",
-      "Inte en Robot",
-      "Hertigen av Munkar"
+      "Funky Robot",
+      "Munk Hertig",
+      "Kaos Sköldpadda"
     ]
   },
   "multiplayerFlow": {
@@ -887,6 +887,8 @@ const sv = {
     "exitFullscreen": "Avsluta helskärm",
     "host": "VÄRD",
     "hostBadge": "Denna spelare är värden",
+    "rankUp": "Gick upp",
+    "rankDown": "Gick ner",
     "notifications": {
       "longWord": "ORDKRAFT!",
       "epicWord": "MONSTERORD!",
@@ -986,7 +988,36 @@ const sv = {
       "awardsIntro5": "Låt oss fira legenderna!"
     },
     "andMore": "och {count} spelare till",
-    "andMorePlural": "och {count} spelare till"
+    "andMorePlural": "och {count} spelare till",
+    "spotlight": {
+      "heading": "🎭 Spelarspotlight",
+      "mascotIntro1": "Låt oss se vilka spelare vi har!",
+      "mascotIntro2": "Varje spelare har en historia. Här är din!",
+      "mascotIntro3": "Dags att möta karaktärerna!",
+      "mascotIntro4": "Vem spelade hur? Låt oss ta reda på det!",
+      "mascotIntro5": "Strålkastaren är på DIG!",
+      "andMore": "och {count} spelare till",
+      "andMorePlural": "och {count} spelare till",
+      "archetypes": {
+        "the-ghost": { "title": "SPÖKET", "stat": "unika fynd", "quip1": "Hittade ord som inte ens finns i andra spelares mardrömmar.", "quip2": "Verkar i en dimension bara de kan se.", "quip3": "Osynlig för konkurrenterna. Dödlig på poängtavlan.", "quip4": "Om ett ord finns på brädet och bara en spelare hittar det... fanns det verkligen där?" },
+        "the-sniper": { "title": "PRICKSKYTTEN", "stat": "precision", "quip1": "Andra spelare gissar. Den här VET.", "quip2": "Missar inte. Tvekar inte. Skickar inte skräp.", "quip3": "Varje ord en fullträff. Varje tangenttryck avsiktligt.", "quip4": "Kirurgisk precision. Inga slösade drag." },
+        "the-philosopher": { "title": "FILOSOFEN", "stat": "snittlängd", "quip1": "Varför använda korta ord när långa fungerar bättre?", "quip2": "Tänkarens spelare. Stora ord, stor hjärna.", "quip3": "Medan andra skrev 'katt', skrev den här 'katastrof'.", "quip4": "Kvalitet framför kvantitet. Alltid." },
+        "the-one-hit-wonder": { "title": "ENGÅNGSUNDRET", "stat": "bästa ord", "quip1": "Ett ord för att styra dem alla.", "quip2": "Kom för ett ord. Fick det att räknas.", "quip3": "Ibland behöver man bara ett perfekt skott.", "quip4": "Få ord, men vilket ord det var." },
+        "the-silent-assassin": { "title": "TYSTA LÖNNMÖRDAREN", "stat": "poäng/ord", "quip1": "Färre ord, maximal skada.", "quip2": "Tyst men dödlig. Poängtavlan berättar historien.", "quip3": "Ekonomi i rörelse. Varje ord ett precisionsslag.", "quip4": "Talar tyst, bär ett massivt ordförråd." },
+        "the-sleeping-giant": { "title": "SOVANDE JÄTTEN", "stat": "2:a halvlek poäng", "quip1": "Började ta en tupplur, vaknade sedan och valde våld.", "quip2": "Långsam start? Nej. Strategiskt tålamod.", "quip3": "Comebacken ingen såg komma.", "quip4": "Som en raket... behövde bara en längre nedräkning." },
+        "the-frontrunner": { "title": "LEDAREN", "stat": "1:a halvlek poäng", "quip1": "Kom ut slagandes och tittade aldrig tillbaka.", "quip2": "Sprintade medan andra fortfarande värmde upp.", "quip3": "Först att attackera brädet. Först att dominera.", "quip4": "Satte tempot. Resten jagade ikapp." },
+        "the-speed-runner": { "title": "SNABBSPRINTERN", "stat": "ord/min", "quip1": "Fingrar snabbare än ögat kan följa.", "quip2": "Snabba skurar. Korta salvor. Förödande resultat.", "quip3": "Skriver i tankens hastighet.", "quip4": "Snabba ord, snabba vinster." },
+        "the-machine-gun": { "title": "KULSPRUTAN", "stat": "totalt antal ord", "quip1": "Kvantitet är en kvalitet i sig. Fråga bara den här legenden.", "quip2": "Fler ord än en ordbok. Ostoppbar produktion.", "quip3": "Brädet hade ingen chans mot denna volym.", "quip4": "Brrrrrt. Det är ljudet av ord som skickas in." },
+        "the-metronome": { "title": "METRONOMEN", "stat": "takt", "quip1": "Tick. Ord. Tock. Ord. Som ett urverk.", "quip2": "Konsekvens är det hemliga vapnet ingen pratar om.", "quip3": "En rytm så stadig att man kan ställa klockan efter den.", "quip4": "Ingen brådska. Ingen panik. Bara ren, stadig produktion." },
+        "the-wildcard": { "title": "JOKERN", "stat": "längdvariation", "quip1": "Korta ord, långa ord, medellånga ord — ALLA ord.", "quip2": "Oförutsägbar. Oklassificerbar. Ostoppbar.", "quip3": "Den enda strategin är att inte ha en strategi.", "quip4": "Mästare på alla längder, kung av förvirring." },
+        "the-marathon-runner": { "title": "MARATONLÖPAREN", "stat": "täckning", "quip1": "Först att starta, sist att sluta. Uthållighetsmästare.", "quip2": "Fortsatte medan andra tog pauser.", "quip3": "Från första sekunden till sista. Slutade aldrig.", "quip4": "Sköldpaddan som också råkade vara en hare." },
+        "the-combo-master": { "title": "KOMBOMÄSTAREN", "stat": "max combo", "quip1": "K-K-K-KOMBOBRYTARE! Nej vänta, kombo-BYGGARE.", "quip2": "Kedjade ord som en ordmaskin.", "quip3": "När du är på en svit, varför sluta?", "quip4": "Kombonivå: legendarisk. Motstånd: skakande." },
+        "the-fire-walker": { "title": "ELDVANDRAREN", "stat": "eldbonus", "quip1": "Trivs när hettan är på. Bokstavligt.", "quip2": "Eldrundan? Mer som DERAS runda.", "quip3": "Vissa spelare fruktar elden. Den här dansar i den.", "quip4": "Heta händer, hetare poäng." },
+        "the-social-butterfly": { "title": "SOCIALA FJÄRILEN", "stat": "populära val", "quip1": "Stora hjärnor tänker lika — och den här tänker som alla.", "quip2": "Hittade alla ord som alla andra hittade, plus vibbar.", "quip3": "Populära ordval? Den här spelaren har publikfavoriterna.", "quip4": "Alltid på samma våglängd som gruppen." },
+        "the-underdog": { "title": "UNDERDOGEN", "stat": "precision", "quip1": "Lågt i rankingen, högt i precision. Respekt.", "quip2": "Poängen berättar inte hela historien.", "quip3": "Inte förstaplats, men definitivt först i hjärtat.", "quip4": "Bevis på att rankingar inte är allt." },
+        "the-participant": { "title": "DELTAGAREN", "stat": "ord", "quip1": "Inte alla hjältar bär mantel. Vissa skickar bara ord.", "quip2": "Dök upp. Spelade spelet. Det är vad som räknas.", "quip3": "En mystisk spelare. En legend i vardande.", "quip4": "Resan på tusen ord börjar med ett." }
+      }
+    }
   },
   "playerView": {
     "wordsFound": "Ord hittade",
@@ -5424,7 +5455,32 @@ const sv = {
     "hintCooldown": "Använt",
     "waveClear": "Vågen klar!",
     "tapToContinue": "Tryck för att fortsätta",
-    "celebrateAgain": "Fira igen"
+    "levelComplete": "Nivå klar!",
+    "moveBonus": "Dragbonus",
+    "nextWave": "Nästa våg",
+    "celebrateAgain": "Fira igen",
+    "movesLeft": "Drag",
+    "bonusMove": "+1 Drag!",
+    "bonusMoves": "+{count} Drag!",
+    "outOfMoves": "Inga drag kvar!",
+    "movesBonus": "Dragbonus",
+    "objective": {
+      "scoreTarget": "Nå {target} poäng",
+      "collectType": "Samla {target} {tileType}",
+      "clearAllType": "Rensa alla {tileType}",
+      "wordLength": "{target} ord med {minWordLength}+ bokstäver"
+    },
+    "combo": {
+      "bomb_bomb": "MEGASMALL!",
+      "bomb_lightning": "ASKBOMB!",
+      "bomb_prism": "SPLITTERSTORM!",
+      "lightning_lightning": "KEDJEBLIXTAR!",
+      "lightning_prism": "KORSASKA!",
+      "prism_prism": "TOTAL FORSTORING!",
+      "gold_special": "GULDKRAFT!",
+      "rainbow_special": "DUBBEL REGNBAGE!",
+      "triple_special": "TRIPPELHOT!"
+    }
   },
   "student": {
     "activeGame": {
@@ -6755,6 +6811,23 @@ const sv = {
   },
   ads: {
     label: "Annons"
+  },
+  gameModes: {
+    classic: {
+      name: "Klassiskt",
+      description: "Hitta så många ord du kan!"
+    },
+    blast: {
+      name: "Blast",
+      description: "Rensa brickor med kombos och specialkrafter!"
+    },
+    wordHunt: {
+      name: "Ordjakt",
+      description: "Tävla om att hitta målordet!"
+    },
+    random: "Slumpmässigt",
+    nextMode: "Nästa läge",
+    randomizing: "Slumpar..."
   }
 };
 

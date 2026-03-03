@@ -14,10 +14,8 @@ const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRev
 const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
 const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
-const RewardsSummary = dynamic(() => import('@/components/results/RewardsSummary'), { ssr: false });
 // Mobile compact components
 const MobileCompactStats = dynamic(() => import('@/components/results/MobileCompactStats'), { ssr: false });
-const MobileCompactRewards = dynamic(() => import('@/components/results/MobileCompactRewards'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
@@ -136,10 +134,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   onStartGame,
   onMarkReady,
   onExit,
-  winStreakData,
-  isAuthenticated,
   currentPlayerData,
-  isCurrentUserWinner,
   currentPlayerValidWords,
   currentPlayerArchetype,
   currentPlayerRank,
@@ -329,25 +324,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         )
       )}
 
-      {/* Rewards Summary - Shows win streak prominently for winners */}
-      {winStreakData && winStreakData.currentStreak > 0 && (
-        isMobile ? (
-          <MobileCompactRewards
-            winStreak={winStreakData.currentStreak}
-            coins={0}
-            isAuthenticated={isAuthenticated}
-          />
-        ) : (
-          <RewardsSummary
-            coinReward={null}
-            isAuthenticated={isAuthenticated}
-            winStreak={winStreakData}
-            achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
-            isWinner={isCurrentUserWinner}
-            onAchievementsClick={onShowDetails}
-          />
-        )
-      )}
 
       {/* Brain Points Feedback */}
       <BrainPointsDisplay reward={brainPointsReward} variant="compact" />

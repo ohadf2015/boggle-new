@@ -6,7 +6,7 @@ import { useEffect, useCallback, useRef, useMemo, useState, MutableRefObject } f
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
-import { executeAfterMinimumWait, MINIMUM_WAITING_TIME_MS } from '@/shared/utils/timingUtils';
+
 import {
   sendStartGameAck,
   createRoomClosedDueToInactivityHandler,
@@ -205,9 +205,6 @@ export function useHostGameEvents({
       if (data.remainingTime === 0 && gameStarted) {
         setGameStarted(false);
         setShowStartAnimation(false);
-        if (!waitingStartTimeRef.current) {
-          waitingStartTimeRef.current = Date.now();
-        }
         setWaitingForResults(true);
         triggerGameOverCelebration();
         neoSuccessToast(t('hostView.gameOverCheckScores'), {
@@ -223,9 +220,6 @@ export function useHostGameEvents({
         setGameStarted(false);
         setRemainingTime(0);
         setShowStartAnimation(false);
-        if (!waitingStartTimeRef.current) {
-          waitingStartTimeRef.current = Date.now();
-        }
         setWaitingForResults(true);
       }
     };
@@ -233,35 +227,30 @@ export function useHostGameEvents({
     const handleValidationComplete = (data: any) => {
       logger.log('[HOST] Received validationComplete event:', data);
 
-      const showResults = () => {
-        const currentOnShowResults = onShowResultsRef.current;
-        const currentTableData = tableDataRef.current;
+      // Transition directly to results — no validation modal delay
+      const currentOnShowResults = onShowResultsRef.current;
+      const currentTableData = tableDataRef.current;
 
-        setWaitingForResults(false);
-        waitingStartTimeRef.current = null;
+      setWaitingForResults(false);
+      waitingStartTimeRef.current = null;
 
-        showGameCompleteToast(t);
+      showGameCompleteToast(t);
 
-        // Always set final scores (needed for TV broadcast mode)
-        // Wrap in expected structure with players property
-        setFinalScores({
-          players: data.scores,
-          gameCode: ''
+      // Always set final scores (needed for TV broadcast mode)
+      setFinalScores({
+        players: data.scores,
+        gameCode: ''
+      });
+
+      // Only call onShowResults if host is playing (not in broadcast mode)
+      if (hostPlaying && currentOnShowResults) {
+        currentOnShowResults({
+          scores: data.scores,
+          letterGrid: currentTableData,
+          duplicateRuleDisabled: data.duplicateRuleDisabled,
+          playerCount: data.playerCount,
         });
-
-        // Only call onShowResults if host is playing (not in broadcast mode)
-        // In broadcast mode, we want to stay in HostView to show TvResultsView
-        if (hostPlaying && currentOnShowResults) {
-          currentOnShowResults({
-            scores: data.scores,
-            letterGrid: currentTableData,
-            duplicateRuleDisabled: data.duplicateRuleDisabled,
-            playerCount: data.playerCount,
-          });
-        }
-      };
-
-      executeAfterMinimumWait(waitingStartTimeRef.current, showResults);
+      }
     };
 
     const handleResetGame = (data: any) => {

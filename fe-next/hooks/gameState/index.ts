@@ -50,6 +50,7 @@ export {
   useXpGainedData,
   useLevelUpData,
   useBoardTheme,
+  useGameMode,
   useGameActions,
 } from './store';
 

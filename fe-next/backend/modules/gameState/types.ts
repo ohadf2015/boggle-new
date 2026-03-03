@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language, GridPosition } from '@/shared/types/game';
+import type { LetterGrid, Language, GridPosition, GameMode } from '@/shared/types/game';
 
 // Redis client interface
 export interface RedisClient {
@@ -101,6 +101,8 @@ export interface GameState {
   totalBoardWords?: number;
   firstWordFound?: boolean;
   startTime?: number;
+  gameMode?: GameMode;
+  modeHistory?: GameMode[];
 }
 
 // Game creation data interface

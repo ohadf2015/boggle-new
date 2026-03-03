@@ -44,9 +44,11 @@ interface RoomChatProps {
   gameCode: string;
   className?: string;
   onNewMessage?: () => void;
+  /** 'standalone' = speech-bubble with cream bg + tail; 'embedded' = transparent, no rotation/tail */
+  variant?: 'standalone' | 'embedded';
 }
 
-const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, className = '', onNewMessage }) => {
+const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, className = '', onNewMessage, variant = 'standalone' }) => {
   const { t } = useLanguage();
   const { socket } = useSocket();
   const { playMessageSound } = useSoundEffects();
@@ -235,11 +237,10 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   };
 
   return (
-    // NEO-BRUTALIST: Speech bubble container with tail and tilt
-    <div className={`speech-bubble rotate-[1deg] flex flex-col mb-4 ${className}`}>
-      {/* NEO-BRUTALIST Header */}
-      <div className="py-3 px-4 border-b-3 border-neo-black flex-shrink-0">
-        <h3 className="text-neo-black text-base font-black uppercase flex items-center gap-2">
+    <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
+      {/* Header */}
+      <div className={`py-3 px-4 flex-shrink-0 ${variant === 'standalone' ? 'border-b-3 border-neo-black' : 'border-b-2 border-neo-white/10'}`}>
+        <h3 className={`text-base font-black uppercase flex items-center gap-2 ${variant === 'standalone' ? 'text-neo-black' : 'text-neo-cream'}`}>
           <MessageSquare className="text-neo-pink" />
           {t('chat.title') || 'Room Chat'}
           {unreadCount > 0 && (
@@ -259,7 +260,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         {/* Messages Area with Virtual Scrolling */}
         <div
           ref={parentRef}
-          className="flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 max-h-[250px] sm:max-h-[350px] md:max-h-[400px]"
+          className={`flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 ${variant === 'embedded' ? '' : 'max-h-[250px] sm:max-h-[350px] md:max-h-[400px]'}`}
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-4 gap-2">
@@ -290,7 +291,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <div className="bg-neo-black text-neo-white px-3 py-1 font-black uppercase text-xs tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
                   {t('chat.noMessages') || 'No messages yet'}
                 </div>
-                <p className="text-neo-black/75 font-bold text-[10px] mt-2 uppercase tracking-wide">
+                <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-cream/40' : 'text-neo-black/75'}`}>
                   {t('chat.startChatting') || 'Start chatting!'}
                 </p>
               </AdaptiveMotion.div>
@@ -334,16 +335,20 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                         >
                           {msg.username}
                         </Badge>
-                        <span className="text-xs text-neo-black/70 font-medium">
+                        <span className={`text-xs font-medium ${variant === 'embedded' ? 'text-neo-cream/50' : 'text-neo-black/70'}`}>
                           {formatTime(msg.timestamp)}
                         </span>
                       </div>
-                      {/* NEO-BRUTALIST message bubble */}
+                      {/* Message bubble */}
                       <div
-                        className={`px-3 py-2 max-w-[80%] break-words border-2 border-neo-black rounded-neo font-medium ${
-                          isOwnMessage
-                            ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
-                            : 'bg-neo-white text-neo-black shadow-hard-sm'
+                        className={`px-3 py-2 max-w-[80%] break-words border-2 rounded-neo font-medium ${
+                          variant === 'embedded'
+                            ? isOwnMessage
+                              ? 'bg-neo-cyan/20 text-neo-cyan border-neo-cyan/30'
+                              : 'bg-neo-white/10 text-neo-cream border-neo-white/20'
+                            : isOwnMessage
+                              ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm'
+                              : 'bg-neo-white text-neo-black border-neo-black shadow-hard-sm'
                         }`}
                       >
                         {msg.message}

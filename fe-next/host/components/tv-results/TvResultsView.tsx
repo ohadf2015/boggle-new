@@ -7,6 +7,7 @@ import { Socket } from 'socket.io-client';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
 import TvResultsStatsGrid from './TvResultsStatsGrid';
 import TvResultsAwards from './TvResultsAwards';
+import TvResultsPlayerSpotlight from './TvResultsPlayerSpotlight';
 import TvResultsLeaderboard from './TvResultsLeaderboard';
 import TvResultsControls from './TvResultsControls';
 import TournamentStandings from '../../../components/TournamentStandings';
@@ -311,6 +312,16 @@ const TvResultsView = memo<TvResultsViewProps>(({
                   <TvResultsAwards
                     players={playerData}
                     visible={getPhaseVisibility('awards')}
+                    gameDuration={gameDuration}
+                    t={t}
+                  />
+                </div>
+
+                {/* Player Spotlight */}
+                <div className="flex-shrink-0">
+                  <TvResultsPlayerSpotlight
+                    players={playerData}
+                    visible={getPhaseVisibility('player-spotlight')}
                     gameDuration={gameDuration}
                     t={t}
                   />

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { memo } from 'react';
-import { motion } from 'framer-motion';
-import { Flame, Crown, Medal, Award, WifiOff, Clock } from 'lucide-react';
+import React, { memo, useRef, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Flame, Crown, Medal, Award, WifiOff, Clock, ArrowUp, ArrowDown } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
+import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { cn } from '../../../lib/utils';
 
@@ -49,7 +50,7 @@ const RANK_CONFIGS = {
 
 /**
  * TvPlayerCard - Individual player card for TV broadcast leaderboard
- * Shows avatar, name, score, combo level, and rank
+ * Shows avatar, name, score, combo level, rank, and animated transitions
  */
 const TvPlayerCard = memo<TvPlayerCardProps>(({
   username,
@@ -62,37 +63,99 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   isBot = false,
   presenceStatus = 'active',
   disconnected = false,
-  index,
+  index: _index,
   t,
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
   const isTopThree = rank <= 3;
   const isAway = disconnected || presenceStatus === 'afk' || presenceStatus === 'idle';
 
+  // Track previous score for flash effect
+  const prevScoreRef = useRef(score);
+  const isFirstRender = useRef(true);
+  const [isFlashing, setIsFlashing] = useState(false);
+
+  // Track previous rank for rank change arrows
+  const prevRankRef = useRef(rank);
+  const [rankChange, setRankChange] = useState<'up' | 'down' | null>(null);
+
+  // Score change flash
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return undefined;
+    }
+
+    if (score !== prevScoreRef.current) {
+      setIsFlashing(true);
+      const timer = setTimeout(() => setIsFlashing(false), 600);
+      prevScoreRef.current = score;
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [score]);
+
+  // Rank change detection
+  useEffect(() => {
+    if (prevRankRef.current === rank) return;
+
+    const direction = rank < prevRankRef.current ? 'up' : 'down';
+    setRankChange(direction);
+    prevRankRef.current = rank;
+
+    const timer = setTimeout(() => setRankChange(null), 3000);
+    return () => clearTimeout(timer);
+  }, [rank]);
+
   return (
     <motion.div
-      initial={{ x: 50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: index * 0.05, type: 'spring', stiffness: 300, damping: 25 }}
+      layout
+      layoutId={`player-${username}`}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className={cn(
-        'flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black transition-all',
+        'flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black transition-colors',
         isTopThree
           ? `${rankConfig?.bgColor} ${rankConfig?.shadowColor}`
-          : 'bg-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5'
+          : 'bg-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5',
+        isFlashing && 'ring-2 ring-neo-yellow'
       )}
     >
-      {/* Rank Badge */}
-      <div
-        className={cn(
-          'w-10 h-10 flex items-center justify-center rounded-neo border-2 border-neo-black font-black text-lg',
-          isTopThree ? 'bg-neo-black text-neo-cream' : 'bg-neo-white text-neo-black'
-        )}
-      >
-        {isTopThree && rankConfig?.icon ? (
-          <rankConfig.icon className="w-5 h-5" />
-        ) : (
-          `#${rank}`
-        )}
+      {/* Rank Badge + Change Arrow */}
+      <div className="relative">
+        <div
+          className={cn(
+            'w-10 h-10 flex items-center justify-center rounded-neo border-2 border-neo-black font-black text-lg',
+            isTopThree ? 'bg-neo-black text-neo-cream' : 'bg-neo-white text-neo-black'
+          )}
+        >
+          {isTopThree && rankConfig?.icon ? (
+            <rankConfig.icon className="w-5 h-5" />
+          ) : (
+            `#${rank}`
+          )}
+        </div>
+
+        {/* Rank change arrow */}
+        <AnimatePresence>
+          {rankChange && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className={cn(
+                'absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center border border-neo-black',
+                rankChange === 'up' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+              )}
+              aria-label={rankChange === 'up' ? t('tvBroadcast.rankUp') : t('tvBroadcast.rankDown')}
+            >
+              {rankChange === 'up' ? (
+                <ArrowUp className="w-3 h-3" />
+              ) : (
+                <ArrowDown className="w-3 h-3" />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Avatar */}
@@ -114,7 +177,6 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             {t('tvBroadcast.host')}
           </div>
         )}
-        {/* Disconnected indicator */}
         {disconnected && !isBot && (
           <div
             className="absolute -top-1 -right-1 bg-neo-red text-neo-cream p-1 rounded-full border border-neo-black"
@@ -124,7 +186,6 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             <WifiOff className="w-3 h-3" />
           </div>
         )}
-        {/* AFK/Idle indicator (only show if not disconnected) */}
         {!disconnected && presenceStatus === 'afk' && !isBot && (
           <div
             className="absolute -top-1 -right-1 bg-neo-orange text-neo-black p-1 rounded-full border border-neo-black"
@@ -176,19 +237,17 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         </motion.div>
       )}
 
-      {/* Score */}
+      {/* Score — uses AnimatedCounter for spring-based counting */}
       <div className="text-right">
-        <motion.p
-          key={score}
-          initial={{ scale: 1.2 }}
-          animate={{ scale: 1 }}
+        <AnimatedCounter
+          value={score}
           className={cn(
             'font-black text-2xl',
             isTopThree ? rankConfig?.textColor : 'text-neo-black'
           )}
-        >
-          {score}
-        </motion.p>
+          size="xl"
+          formatValue={(v) => Math.round(v).toLocaleString()}
+        />
         <p
           className={cn(
             'text-xs font-bold uppercase',

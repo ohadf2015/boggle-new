@@ -9,7 +9,7 @@ import { useEffect, useRef, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
-import { executeAfterMinimumWait } from '@/shared/utils/timingUtils';
+
 import {
   sendStartGameAck,
   createHostLeftRoomClosingHandler,
@@ -124,6 +124,7 @@ export function usePlayerGameEvents({
     setLevelUpData,
     setBoardTheme,
     setTotalBoardWords,
+    setGameMode,
   } = useGameActions();
 
   // Track if was in active game (TODO: move to GameState context)
@@ -205,6 +206,7 @@ export function usePlayerGameEvents({
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
       if ((data as any).boardTheme) setBoardTheme((data as any).boardTheme);
+      if (data.gameMode) setGameMode(data.gameMode);
 
       if ((data as any).lateJoin) {
         setGameActive(true);
@@ -230,12 +232,7 @@ export function usePlayerGameEvents({
       gameActiveRef.current = false;
       setRemainingTime(0);
       setShowStartAnimation(false);
-      // Always show validation screen when game ends, regardless of wasActive status
-      // This ensures players see the AI validation phase even if they joined late
-      logger.log('[PLAYER] Setting waitingForResults to true');
-      if (!waitingStartTimeRef.current) {
-        waitingStartTimeRef.current = Date.now();
-      }
+      // Mark waiting so UI knows game ended (but no validation modal is shown)
       setWaitingForResults(true);
     };
 
@@ -281,9 +278,6 @@ export function usePlayerGameEvents({
         setGameActive(false);
         gameActiveRef.current = false;
         setShowStartAnimation(false);
-        if (!waitingStartTimeRef.current) {
-          waitingStartTimeRef.current = Date.now();
-        }
         setWaitingForResults(true);
       }
     };
@@ -291,45 +285,39 @@ export function usePlayerGameEvents({
     const handleValidatedScores = (data: any) => {
       logger.log('[PLAYER] Received validatedScores event:', data);
 
-      const showResults = () => {
-        setWaitingForResults(false);
-        setShowWordFeedback(false);
-        setWordToVote(null);
-        waitingStartTimeRef.current = null;
+      // Transition directly to results — no validation modal delay
+      setWaitingForResults(false);
+      setShowWordFeedback(false);
+      setWordToVote(null);
+      waitingStartTimeRef.current = null;
 
-        const currentOnShowResults = onShowResultsRef.current;
-        if (currentOnShowResults) {
-          currentOnShowResults({
-            scores: data.scores,
-            letterGrid: data.letterGrid,
-            duplicateRuleDisabled: data.duplicateRuleDisabled,
-            playerCount: data.playerCount,
-          });
-        }
-      };
-
-      executeAfterMinimumWait(waitingStartTimeRef.current, showResults);
+      const currentOnShowResults = onShowResultsRef.current;
+      if (currentOnShowResults) {
+        currentOnShowResults({
+          scores: data.scores,
+          letterGrid: data.letterGrid,
+          duplicateRuleDisabled: data.duplicateRuleDisabled,
+          playerCount: data.playerCount,
+        });
+      }
     };
 
     const handleFinalScores = (data: any) => {
       logger.log('[PLAYER] Received legacy finalScores event:', data);
 
-      const showResults = () => {
-        setWaitingForResults(false);
-        setShowWordFeedback(false);
-        setWordToVote(null);
-        waitingStartTimeRef.current = null;
+      // Transition directly to results — no validation modal delay
+      setWaitingForResults(false);
+      setShowWordFeedback(false);
+      setWordToVote(null);
+      waitingStartTimeRef.current = null;
 
-        const currentOnShowResults = onShowResultsRef.current;
-        if (currentOnShowResults) {
-          currentOnShowResults({
-            scores: data.scores,
-            letterGrid: letterGrid,
-          });
-        }
-      };
-
-      executeAfterMinimumWait(waitingStartTimeRef.current, showResults);
+      const currentOnShowResults = onShowResultsRef.current;
+      if (currentOnShowResults) {
+        currentOnShowResults({
+          scores: data.scores,
+          letterGrid: letterGrid,
+        });
+      }
     };
 
     const handleResetGame = (data: any) => {

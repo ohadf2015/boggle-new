@@ -80,6 +80,16 @@ export interface BlastGameState {
   isDeadEnd: boolean;
   /** Current cascade chain level (0 = no cascade active) */
   cascadeChainLevel: number;
+  /** Moves remaining in the current wave */
+  movesRemaining: number;
+  /** Moves used so far in the current wave */
+  movesUsed: number;
+  /** Total moves allowed for the current wave */
+  totalMoves: number;
+  /** Bonus score accumulated from leftover moves at end of level */
+  bonusMoveScore: number;
+  /** Per-type count of tiles cleared this wave (for objective tracking) */
+  tileTypeClears: Record<BlastTileType, number>;
 }
 
 /** Per-wave summary for results breakdown */
@@ -191,13 +201,33 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   frozen: 0,
 };
 
+// ==================== Objectives ====================
+
+export type BlastObjectiveType = 'collect_type' | 'clear_all_type' | 'score_target' | 'word_length';
+
+export interface BlastObjective {
+  type: BlastObjectiveType;
+  /** Which tile type to collect (for collect_type/clear_all_type) */
+  tileType?: BlastTileType;
+  /** Target count (for collect_type) or score (for score_target) or word count (for word_length) */
+  target: number;
+  /** Minimum word length required (for word_length type) */
+  minWordLength?: number;
+}
+
+export interface BlastObjectiveProgress {
+  objective: BlastObjective;
+  current: number;
+  isComplete: boolean;
+}
+
 // ==================== Animation Events ====================
 
 export interface BlastExplosion {
   id: string;
   row: number;
   col: number;
-  type: 'word' | 'bomb' | 'clear' | 'cascade' | 'lightning' | 'magnet' | 'prism' | 'gem';
+  type: 'word' | 'bomb' | 'clear' | 'cascade' | 'lightning' | 'magnet' | 'prism' | 'gem' | 'combo' | 'mega_blast' | 'total_destruction';
   intensity: 1 | 2 | 3 | 4;
   timestamp: number;
 }
@@ -213,4 +243,13 @@ export interface BlastScorePopup {
   timestamp: number;
   /** Tile type that triggered this popup (for color-coded display) */
   tileType?: BlastTileType;
+}
+
+// ==================== Combo Events ====================
+
+export interface BlastComboEvent {
+  comboType: import('./utils/blastCombos').BlastComboType;
+  tiles: Array<{ row: number; col: number }>;
+  label: string;
+  clearedCount: number;
 }

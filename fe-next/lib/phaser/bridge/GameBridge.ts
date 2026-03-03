@@ -12,7 +12,9 @@
 
 import type { LetterGrid } from '@/types';
 import type { TileType, TileActivationEffect } from '@/types/adventure';
-import type { BlastTileState, BlastExplosion, BlastScorePopup, CascadeHighlightWord } from '@/components/blast/types';
+import type { BlastTileState, BlastExplosion, BlastScorePopup, CascadeHighlightWord, BlastComboEvent } from '@/components/blast/types';
+import type { BlastComboType } from '@/components/blast/utils/blastCombos';
+import type { AutoTriggerStep } from '@/components/blast/utils/blastLevelClear';
 
 // ─── Event payload types ──────────────────────────────────────────────────────
 
@@ -109,6 +111,20 @@ export interface BridgeEvents {
     /** Optional wave score for the summary text */
     score?: number;
   };
+  /** Combo triggered — spectacular multi-tile effect */
+  'blast:combo:trigger': {
+    comboType: BlastComboType;
+    tiles: Array<{ row: number; col: number }>;
+    label: string;
+    clearedCount: number;
+  };
+  /** Level cleared — auto-trigger remaining special tiles + victory celebration */
+  'blast:level:clear': {
+    autoTriggerSequence: AutoTriggerStep[];
+    movesRemaining: number;
+    moveBonus: number;
+    totalScore: number;
+  };
 
   // ── React → Phaser (Boss UI) ────────────────────────────────────────────────
   /** Initialize boss UI — sent when boss battle starts */
@@ -181,7 +197,7 @@ export interface BridgeEvents {
   // ── Phaser → React (Blast Mode) ─────────────────────────────────────────────
   /** Animation phase completed — React can proceed to next cascade phase */
   'blast:anim:complete': {
-    phase: 'clear' | 'gravity' | 'cascade-highlight' | 'cascade-clear' | 'wave-transition';
+    phase: 'clear' | 'gravity' | 'cascade-highlight' | 'cascade-clear' | 'wave-transition' | 'level-clear';
   };
 }
 

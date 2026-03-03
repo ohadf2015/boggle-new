@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Crown, Bot, Copy, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
+import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
@@ -292,29 +292,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       {/* Header - Command Center style (matches host) */}
       <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
-          {/* Room Code Display */}
-          <div className="flex flex-col">
-            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
-              {t('roomCode.label') || 'Room Code'}
-            </span>
-            <div className="flex items-center gap-2">
-              <span
-                data-testid="room-code"
-                className="text-2xl font-neo-display font-bold text-neo-cyan uppercase leading-none"
-                style={{ textShadow: '0 0 12px rgba(0, 255, 255, 0.6)' }}
-              >
-                {gameCode}
-              </span>
-              <button
-                onClick={() => navigator.clipboard.writeText(gameCode)}
-                className="text-slate-400 hover:text-neo-white transition-colors p-1"
-                aria-label={t('roomCode.copy') || 'Copy code'}
-              >
-                <Copy className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
           {/* Right side: Player count + Exit */}
           <div className="flex items-center gap-2">
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">

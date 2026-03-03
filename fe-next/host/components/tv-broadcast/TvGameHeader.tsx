@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Radio } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import CircularTimer from '../../../components/CircularTimer';
 
 interface TvGameHeaderProps {
@@ -38,14 +38,28 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
           className="flex items-center gap-2"
         >
           <motion.div
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            data-testid="live-badge"
             className="flex items-center gap-2 bg-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
+            animate={{
+              boxShadow: [
+                '4px 4px 0 rgba(0,0,0,1), 0 0 0px rgba(239,68,68,0)',
+                '4px 4px 0 rgba(0,0,0,1), 0 0 12px rgba(239,68,68,0.6)',
+                '4px 4px 0 rgba(0,0,0,1), 0 0 0px rgba(239,68,68,0)',
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             role="status"
             aria-live="polite"
             aria-label={t('tvBroadcast.liveGameInProgress') || 'Live game in progress'}
           >
-            <Radio className="w-5 h-5" aria-hidden="true" />
+            {/* Pulsing recording dot */}
+            <motion.div
+              data-testid="live-recording-dot"
+              className="w-3 h-3 rounded-full bg-neo-cream"
+              animate={{ scale: [1, 1.4, 1], opacity: [1, 0.7, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              aria-hidden="true"
+            />
             <span className="font-black text-lg uppercase tracking-wider">{t('tvBroadcast.live')}</span>
           </motion.div>
         </motion.div>

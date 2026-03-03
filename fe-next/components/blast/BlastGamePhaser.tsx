@@ -20,9 +20,11 @@ import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordS
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
 import { useBlastHint } from './hooks/useBlastHint';
+import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastBridge } from './hooks/useBlastBridge';
 import { BlastGameLayoutPhaser } from './BlastGameLayoutPhaser';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { calculateBonusMoves } from './utils/blastMoveUtils';
 import type { BlastGameConfig, BlastResultsData } from './types';
 import type { WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
@@ -66,8 +68,11 @@ export function BlastGamePhaser({
     playWordAcceptedSound();
   }, [combo, playWordAcceptedSound]);
 
-  // Core blast game state
-  const blast = useBlastGame(config, { onAutoCascadeWord: handleAutoCascadeWord });
+  // Core blast game state (with move limit from wave config)
+  const blast = useBlastGame(config, {
+    onAutoCascadeWord: handleAutoCascadeWord,
+    movesAllowed: waveConfig?.movesAllowed,
+  });
 
   // Spam detection
   const spamDetection = useSpamDetection();
@@ -90,6 +95,14 @@ export function BlastGamePhaser({
     minWordLength,
   );
 
+  // Objective tracking
+  const { objectiveProgress, allObjectivesComplete } = useBlastObjectives({
+    gameState: blast.gameState,
+    tileTypeClears: blast.gameState.tileTypeClears,
+    waveNumber,
+    wordsFound: blast.gameState.wordsFound,
+  });
+
   // Game timing
   const gameStartTimeRef = useRef(0);
   useEffect(() => {
@@ -104,8 +117,8 @@ export function BlastGamePhaser({
     if (blast.gameState.isComplete && !confettiFiredRef.current) {
       confettiFiredRef.current = true;
       confetti({
-        particleCount: 120,
-        spread: 70,
+        particleCount: 40,
+        spread: 50,
         origin: { y: 0.6 },
         colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
       });
@@ -119,10 +132,21 @@ export function BlastGamePhaser({
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
 
+  // Bonus move popup
+  const [bonusMoveAwarded, setBonusMoveAwarded] = useState<number | undefined>();
+  const bonusMoveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Track last submitted path for tile clearing
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
 
   const handleWordAccepted = useCallback((data: { word: string; score: number }) => {
+    const bonus = calculateBonusMoves(data.word.length);
+    if (bonus > 0) {
+      setBonusMoveAwarded(bonus);
+      if (bonusMoveTimerRef.current) clearTimeout(bonusMoveTimerRef.current);
+      bonusMoveTimerRef.current = setTimeout(() => setBonusMoveAwarded(undefined), 1500);
+    }
+
     if (lastPathRef.current.length > 0) {
       blast.clearTilesForWord(lastPathRef.current, data.word, data.score);
       lastPathRef.current = [];
@@ -176,7 +200,7 @@ export function BlastGamePhaser({
 
   // Detect game completion or dead end
   useEffect(() => {
-    if (blast.gameState.isComplete) {
+    if (blast.gameState.isComplete && allObjectivesComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = blast.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
       const scoreThreshold = waveConfig?.scoreThreshold;
@@ -204,7 +228,7 @@ export function BlastGamePhaser({
     }
 
     return undefined;
-  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig]);
+  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, allObjectivesComplete, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig]);
 
   const handleQuitRequest = useCallback(() => {
     setShowQuitConfirm(true);
@@ -247,6 +271,8 @@ export function BlastGamePhaser({
       setShowQuitConfirm={setShowQuitConfirm}
       showEndGameConfirm={showEndGameConfirm}
       setShowEndGameConfirm={setShowEndGameConfirm}
+      objectiveProgress={objectiveProgress}
+      bonusMoveAwarded={bonusMoveAwarded}
       hintPath={hintPath}
       hasHintAvailable={hasHintAvailable}
       onRequestHint={requestHint}

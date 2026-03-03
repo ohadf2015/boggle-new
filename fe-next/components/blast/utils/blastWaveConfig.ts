@@ -33,24 +33,26 @@ export interface WaveConfig {
   prismEnabled: boolean;
   /** Whether frozen tiles can appear */
   frozenEnabled: boolean;
+  /** Number of moves allowed per wave */
+  movesAllowed: number;
 }
 
 /** Wave parameter lookup table (1-indexed, capped at 6) */
 const WAVE_TABLE: WaveConfig[] = [
   // Placeholder index 0 (unused)
-  { minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22, vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: false, prismEnabled: false, frozenEnabled: false },
-  // Wave 1 — basics only
-  { minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22, vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: false, prismEnabled: false, frozenEnabled: false },
-  // Wave 2 — gems unlock
-  { minWordLength: 2, specialTileChance: 0.17, iceDistribution: 0.20, goldDistribution: 0.20, vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: true, prismEnabled: false, frozenEnabled: false },
-  // Wave 3 — prisms unlock
-  { minWordLength: 3, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18, vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 30, lightningEnabled: false, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: false },
-  // Wave 4 — frozen + lightning unlock
-  { minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16, vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 50, lightningEnabled: true, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: true },
-  // Wave 5 — all minus magnet
-  { minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14, vowelModifier: 0.80, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80, lightningEnabled: true, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: true },
-  // Wave 6+ — everything unlocked
-  { minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12, vowelModifier: 0.75, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120, lightningEnabled: true, magnetEnabled: true, gemEnabled: true, prismEnabled: true, frozenEnabled: true },
+  { minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22, vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: false, prismEnabled: false, frozenEnabled: false, movesAllowed: 20 },
+  // Wave 1 — basics only (20 moves — generous intro)
+  { minWordLength: 2, specialTileChance: 0.15, iceDistribution: 0.17, goldDistribution: 0.22, vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: false, prismEnabled: false, frozenEnabled: false, movesAllowed: 20 },
+  // Wave 2 — gems unlock (18 moves)
+  { minWordLength: 2, specialTileChance: 0.17, iceDistribution: 0.20, goldDistribution: 0.20, vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined, lightningEnabled: false, magnetEnabled: false, gemEnabled: true, prismEnabled: false, frozenEnabled: false, movesAllowed: 18 },
+  // Wave 3 — prisms unlock (16 moves)
+  { minWordLength: 3, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18, vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: 30, lightningEnabled: false, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: false, movesAllowed: 16 },
+  // Wave 4 — frozen + lightning unlock (15 moves)
+  { minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16, vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 50, lightningEnabled: true, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: true, movesAllowed: 15 },
+  // Wave 5 — all minus magnet (14 moves)
+  { minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14, vowelModifier: 0.80, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 80, lightningEnabled: true, magnetEnabled: false, gemEnabled: true, prismEnabled: true, frozenEnabled: true, movesAllowed: 14 },
+  // Wave 6+ — everything unlocked (12 moves — tight, requires strategy)
+  { minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12, vowelModifier: 0.75, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 120, lightningEnabled: true, magnetEnabled: true, gemEnabled: true, prismEnabled: true, frozenEnabled: true, movesAllowed: 12 },
 ];
 
 /**
@@ -68,6 +70,39 @@ export function getWaveConfig(wave: number): WaveConfig {
   }
 
   return config;
+}
+
+// ==================== Wave Objectives ====================
+
+import type { BlastObjective } from '../types';
+
+/** Objectives per wave (1-indexed). Wave 6+ uses a scaling formula. */
+const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
+  1: [{ type: 'score_target', target: 20 }],
+  2: [{ type: 'collect_type', tileType: 'gem', target: 3 }],
+  3: [{ type: 'clear_all_type', tileType: 'ice', target: 0 }, { type: 'score_target', target: 40 }],
+  4: [{ type: 'collect_type', tileType: 'bomb', target: 4 }, { type: 'word_length', target: 2, minWordLength: 5 }],
+  5: [{ type: 'clear_all_type', tileType: 'frozen', target: 0 }, { type: 'collect_type', tileType: 'lightning', target: 3 }],
+  6: [{ type: 'score_target', target: 120 }, { type: 'collect_type', tileType: 'prism', target: 2 }],
+};
+
+/**
+ * Get objectives for a given wave number.
+ * Waves 1-6 use the lookup table. Wave 7+ uses wave 6 pattern
+ * with linearly increasing score target.
+ */
+export function getWaveObjectives(wave: number): BlastObjective[] {
+  const clamped = Math.max(wave, 1);
+
+  if (clamped <= 6) {
+    return WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
+  }
+
+  // Wave 7+: score_target scales + collect prism
+  return [
+    { type: 'score_target', target: 120 + (clamped - 6) * 40 },
+    { type: 'collect_type', tileType: 'prism', target: 2 },
+  ];
 }
 
 /** Lightning share when enabled (taken from gold + rainbow) */

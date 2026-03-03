@@ -24,7 +24,6 @@ const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
 const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
-const RewardsSummary = dynamic(() => import('@/components/results/RewardsSummary'), { ssr: false });
 const NextStepPrompt = dynamic(() => import('@/components/results/NextStepPrompt'), { ssr: false });
 const BrainPointsDisplay = dynamic(() => import('@/components/results/BrainPointsDisplay'), { ssr: false });
 
@@ -128,7 +127,6 @@ export function ResultsTabContent({
   isCurrentUserInBanner,
   gameCode,
   isHost,
-  isCurrentUserWinner,
   isBotsOnlyGame,
   hasZeroScore,
   isCurrentPlayerReady,
@@ -140,10 +138,8 @@ export function ResultsTabContent({
   onExitRoom,
   onTabChange,
   nearMisses,
-  winStreakData,
   brainPointsReward,
   duplicateRuleDisabled,
-  isAuthenticated,
   t,
 }: ResultsTabContentProps) {
   return (
@@ -163,17 +159,6 @@ export function ResultsTabContent({
         />
       )}
 
-      {/* Rewards Summary - Shows win streak prominently for winners */}
-      {winStreakData && winStreakData.currentStreak > 0 && (
-        <RewardsSummary
-          coinReward={null}
-          isAuthenticated={isAuthenticated}
-          winStreak={winStreakData}
-          achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
-          isWinner={isCurrentUserWinner}
-          onAchievementsClick={() => onTabChange('details')}
-        />
-      )}
 
       {/* Compact Stats Row - Using shared component */}
       {currentPlayerData && currentPlayerRank > 0 && (

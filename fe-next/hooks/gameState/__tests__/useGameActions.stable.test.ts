@@ -79,6 +79,7 @@ describe('useGameActions stability', () => {
       'setXpGainedData',
       'setLevelUpData',
       'setBoardTheme',
+      'setGameMode',
       'resetForNewRound',
       'resetAll',
     ];

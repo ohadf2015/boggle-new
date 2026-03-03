@@ -3,10 +3,12 @@
  *
  * All effects respect config.reduceMotion (skip) and config.isLowEnd (halve).
  * Uses scene.add.particles() to create emitters, auto-destroyed after lifespan.
+ * Enhanced effects (shockwaves, bolts, beams) are in BlastEnhancedEffects.ts.
  */
 
 import Phaser from 'phaser';
 import { getExplosionColor } from '@/lib/phaser/logic/BlastTileRules';
+import * as Enhanced from './BlastEnhancedEffects';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -261,5 +263,35 @@ export class BlastParticleManager {
         emitting: false,
       });
     }
+  }
+
+  // ─── Enhanced effects (delegated to BlastEnhancedEffects.ts) ──────────────
+
+  playBombShockwave(scene: Phaser.Scene, x: number, y: number, config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playBombShockwave(scene, x, y, config, comboLevel);
+  }
+
+  playLightningBolt(scene: Phaser.Scene, x: number, y: number, screenHeight: number, config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playLightningBolt(scene, x, y, screenHeight, config, comboLevel);
+  }
+
+  playPrismBeams(scene: Phaser.Scene, x: number, y: number, w: number, h: number, config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playPrismBeams(scene, x, y, w, h, config, comboLevel);
+  }
+
+  playGemPop(scene: Phaser.Scene, x: number, y: number, config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playGemPop(scene, x, y, config, comboLevel);
+  }
+
+  playIceShards(scene: Phaser.Scene, x: number, y: number, variant: 'ice' | 'frozen', config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playIceShards(scene, x, y, variant, config, comboLevel);
+  }
+
+  playMagnetFieldPull(scene: Phaser.Scene, x: number, y: number, targets: Array<{ x: number; y: number }>, config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playMagnetFieldPull(scene, x, y, targets, config, comboLevel);
+  }
+
+  playGoldMidasWave(scene: Phaser.Scene, x: number, y: number, config: ParticleConfig, comboLevel = 0): void {
+    Enhanced.playGoldMidasWave(scene, x, y, config, comboLevel);
   }
 }

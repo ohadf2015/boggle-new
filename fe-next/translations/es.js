@@ -716,36 +716,36 @@ const es = {
     "selectAvatar": "Selecciona un avatar",
     "playingAs": "Jugando como",
     "defaultPlayerNames": [
-      "Probablemente una Papa",
-      "Donut No Molestar",
-      "Barón Von Waffle",
+      "Papa Astuta",
+      "Donut Travieso",
+      "Barón Waffle",
       "Llama Dramática",
-      "Señor Deletreos",
-      "Taco con Talento",
-      "CEO del Mochi",
-      "Pingüino con Plan",
-      "Legalmente una Morsa",
-      "Banana de Referencia",
+      "Taco Turbo",
+      "Mochi Jefe",
+      "Pingüino Astuto",
+      "Morsa Sospechosa",
       "Ganso Profesional",
       "Capitán Pretzel",
-      "Aguacate Existencial",
-      "Flamenco Descontrolado",
-      "Dragón de Incógnito",
-      "Plot Twist Salmón",
-      "Confía Soy un Oso",
-      "Cebra Sin Paciencia",
-      "Koala Certificado",
-      "Mapache de Traje",
-      "Hipopótamo con Café",
-      "Medusa en Modo Zen",
-      "Protagonista Zorro",
+      "Aguacate Cósmico",
+      "Flamenco Loco",
+      "Dragón Secreto",
+      "Salmón Turbo",
+      "Oso Gruñón",
+      "Cebra Relajada",
+      "Koala Elegante",
+      "Mapache Chic",
+      "Hipo Híper",
+      "Medusa Relajada",
+      "Zorro Astuto",
       "Galleta Junior",
-      "Perezoso Modo: ON",
+      "Perezoso Pro",
       "Ninja Fideo",
       "Pepinillo Disco",
       "Falafel Royal",
-      "No Soy un Robot",
-      "Duque de Donuts"
+      "Robot Funky",
+      "Duque Donut",
+      "Banana Bandido",
+      "Tortuga Caótica"
     ]
   },
   "multiplayerFlow": {
@@ -965,6 +965,8 @@ const es = {
     "exitFullscreen": "Salir de pantalla completa",
     "host": "ANFITRIÓN",
     "hostBadge": "Este jugador es el anfitrión",
+    "rankUp": "Subió",
+    "rankDown": "Bajó",
     "notifications": {
       "longWord": "¡PODER DE PALABRAS!",
       "epicWord": "¡PALABRA MONSTRUOSA!",
@@ -6446,6 +6448,23 @@ const es = {
   },
   "ads": {
     "label": "Anuncio"
+  },
+  "gameModes": {
+    "classic": {
+      "name": "Clásico",
+      "description": "¡Encuentra todas las palabras que puedas!"
+    },
+    "blast": {
+      "name": "Blast",
+      "description": "¡Elimina fichas con combos y poderes especiales!"
+    },
+    "wordHunt": {
+      "name": "Caza de Palabras",
+      "description": "¡Compite por encontrar la palabra objetivo!"
+    },
+    "random": "Aleatorio",
+    "nextMode": "Siguiente modo",
+    "randomizing": "Aleatorizando..."
   }
 };
 

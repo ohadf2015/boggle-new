@@ -15,12 +15,14 @@ import { BlastHelpModal } from './BlastHelpModal';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
-import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase } from './types';
+import type { BlastTileState, BlastExplosion, BlastScorePopup, BlastGameState, CascadeHighlightData, CascadeHighlightPhase, BlastObjectiveProgress } from './types';
 import type { BlastCascadePhase, CascadeAnimationData } from './hooks/useBlastCascade';
 import { cn } from '@/lib/utils';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
+import { BlastMoveCounter } from './BlastMoveCounter';
+import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
 
 interface BlastGameLayoutProps {
   // Grid
@@ -71,6 +73,12 @@ interface BlastGameLayoutProps {
   hasHintAvailable?: boolean;
   onRequestHint?: () => void;
   onClearHint?: () => void;
+  // Objectives
+  /** Objective progress for current wave */
+  objectiveProgress?: BlastObjectiveProgress[];
+  // Move counter
+  /** Bonus move popup trigger (number of bonus moves just awarded) */
+  bonusMoveAwarded?: number;
   // Quit dialog
   showQuitConfirm: boolean;
   setShowQuitConfirm: (show: boolean) => void;
@@ -120,13 +128,15 @@ export function BlastGameLayout({
   setShowQuitConfirm,
   showEndGameConfirm,
   setShowEndGameConfirm,
+  objectiveProgress,
+  bonusMoveAwarded,
   hintPath = null,
   hasHintAvailable = false,
   onRequestHint,
   onClearHint,
   t,
 }: BlastGameLayoutProps) {
-  const { score, tilesCleared, totalTiles, isComplete, wordsFound } = gameState;
+  const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
   const earnedStars = calculateEarnedStars(tilesCleared, totalTiles);
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
@@ -384,6 +394,14 @@ export function BlastGameLayout({
           </div>
         </motion.div>
 
+        {/* Move counter (visible when move limit is finite) */}
+        <BlastMoveCounter
+          movesRemaining={movesRemaining}
+          totalMoves={totalMoves}
+          t={t}
+          bonusMoveAwarded={bonusMoveAwarded}
+        />
+
         {/* Words found count - clickable to expand list */}
         <button
           onClick={() => setShowFoundWords(prev => !prev)}
@@ -416,6 +434,13 @@ export function BlastGameLayout({
           <div className="text-[10px] font-bold text-fuchsia-300/50 uppercase tracking-wider text-center tabular-nums">
             {t('blast.totalScore') || 'Total'}: {(cumulativeScore + score).toLocaleString()}
           </div>
+        </div>
+      )}
+
+      {/* Objective progress */}
+      {objectiveProgress && objectiveProgress.length > 0 && (
+        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
+          <BlastObjectiveDisplay objectiveProgress={objectiveProgress} t={t} />
         </div>
       )}
 

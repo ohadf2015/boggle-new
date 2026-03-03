@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, LayoutGroup } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
@@ -83,35 +83,37 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     );
   }
 
-  // Non-virtual rendering for small player counts
+  // Non-virtual rendering for small player counts — uses LayoutGroup for FLIP reordering
   if (!useVirtual) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="h-full overflow-y-auto overscroll-contain scrollable-area p-4 space-y-2"
-      >
-        <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2">
-          {t('tvBroadcast.leaderboard')}
-        </h3>
-        {sortedPlayers.map((player, index) => (
-          <TvPlayerCard
-            key={player.username}
-            username={player.username}
-            avatar={player.avatar}
-            score={player.score}
-            wordCount={player.wordCount}
-            rank={index + 1}
-            comboLevel={playerCombos[player.username]?.level || 0}
-            isHost={player.username === hostUsername || player.isHost}
-            isBot={player.isBot}
-            presenceStatus={player.presenceStatus}
-            disconnected={player.disconnected}
-            index={index}
-            t={t}
-          />
-        ))}
-      </motion.div>
+      <LayoutGroup>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="h-full overflow-y-auto overscroll-contain scrollable-area p-4 flex flex-col gap-2"
+        >
+          <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2">
+            {t('tvBroadcast.leaderboard')}
+          </h3>
+          {sortedPlayers.map((player, index) => (
+            <TvPlayerCard
+              key={player.username}
+              username={player.username}
+              avatar={player.avatar}
+              score={player.score}
+              wordCount={player.wordCount}
+              rank={index + 1}
+              comboLevel={playerCombos[player.username]?.level || 0}
+              isHost={player.username === hostUsername || player.isHost}
+              isBot={player.isBot}
+              presenceStatus={player.presenceStatus}
+              disconnected={player.disconnected}
+              index={index}
+              t={t}
+            />
+          ))}
+        </motion.div>
+      </LayoutGroup>
     );
   }
 

@@ -8,6 +8,7 @@ import type {
   LetterGrid,
   Avatar,
   GameUser,
+  GameMode,
   ActiveRoom,
   LeaderboardEntry,
   TournamentStanding,
@@ -263,6 +264,7 @@ export interface StartGamePayload {
   timerSeconds: number;
   language?: Language;
   minWordLength?: number;
+  gameMode?: GameMode;
 }
 
 export interface JoinedPayload {
@@ -293,6 +295,7 @@ export interface StartGameBroadcast {
   reconnect?: boolean;
   lateJoin?: boolean;
   skipAck?: boolean;
+  gameMode?: GameMode;
 }
 
 export interface WordAcceptedPayload {

@@ -4,8 +4,11 @@
  * Tests for the AchievementQueueProvider component that handles
  * achievement notifications in multiplayer mode.
  *
- * Key behavior: In multiplayer, achievements should show ONLY as toast
- * notifications, NOT as full-screen modals (which disrupt gameplay).
+ * Key behaviors:
+ * - Shows ONLY one achievement notification at a time (sequential queue)
+ * - Displays achievement icon and translated name (rich notification)
+ * - Does NOT show full-screen modals (non-intrusive for gameplay)
+ * - Auto-dismisses after timeout and shows next queued achievement
  */
 
 import React from 'react';
@@ -23,16 +26,6 @@ jest.mock('next/navigation', () => ({
   }),
   usePathname: () => '/en/play',
 }));
-
-// Mock toast module
-jest.mock('@/components/ui/EnhancedToast', () => ({
-  toast: {
-    success: jest.fn(),
-  },
-}));
-
-// Import the mock after jest.mock
-import { toast } from '@/components/ui/EnhancedToast';
 
 // Mock SoundEffectsContext for UnifiedAchievementModal
 jest.mock('@/contexts/SoundEffectsContext', () => ({
@@ -113,27 +106,44 @@ describe('AchievementQueueProvider', () => {
     icon: '🩸',
   };
 
+  const secondAchievement = {
+    key: 'SPEED_DEMON',
+    icon: '⚡',
+  };
+
+  const thirdAchievement = {
+    key: 'WORD_MASTER',
+    icon: '📚',
+  };
+
   // Test component that uses the queue
-  const TestConsumer = () => {
+  const TestConsumer = ({ achievements }: { achievements?: Array<{ key: string; icon: string }> }) => {
     const { queueAchievement } = useAchievementQueue();
     return (
-      <button onClick={() => queueAchievement(testAchievement)}>
-        Trigger Achievement
-      </button>
+      <>
+        <button onClick={() => queueAchievement(testAchievement)}>
+          Trigger Achievement
+        </button>
+        {achievements && (
+          <button onClick={() => achievements.forEach(a => queueAchievement(a))}>
+            Trigger Multiple
+          </button>
+        )}
+      </>
     );
   };
 
-  const renderWithProviders = () => {
+  const renderWithProviders = (achievements?: Array<{ key: string; icon: string }>) => {
     return render(
       <LanguageProvider>
         <AchievementQueueProvider>
-          <TestConsumer />
+          <TestConsumer achievements={achievements} />
         </AchievementQueueProvider>
       </LanguageProvider>
     );
   };
 
-  it('should show toast notification when achievement is queued', async () => {
+  it('should show achievement notification with icon when queued', () => {
     renderWithProviders();
 
     // GIVEN: A rendered provider with test consumer
@@ -144,15 +154,63 @@ describe('AchievementQueueProvider', () => {
       button.click();
     });
 
-    // THEN: Toast notification should be shown (no share action during gameplay)
-    expect(toast.success).toHaveBeenCalledTimes(1);
-    expect(toast.success).toHaveBeenCalledWith(
-      expect.stringContaining('Achievement'),
-      expect.any(String)
-    );
+    // Allow notification to appear
+    act(() => {
+      jest.advanceTimersByTime(150);
+    });
+
+    // THEN: Achievement notification should show with icon and name
+    const notification = screen.getByTestId('achievement-inline-toast');
+    expect(notification).toBeInTheDocument();
+
+    // Should display the achievement icon
+    expect(screen.getByTestId('achievement-inline-icon')).toHaveTextContent('🎯'); // FIRST_BLOOD icon from ACHIEVEMENT_ICONS
   });
 
-  it('should NOT show full-screen modal in multiplayer mode', async () => {
+  it('should show only ONE notification at a time when multiple achievements arrive', () => {
+    const achievements = [testAchievement, secondAchievement, thirdAchievement];
+    renderWithProviders(achievements);
+
+    // WHEN: Multiple achievements are queued simultaneously
+    act(() => {
+      screen.getByText('Trigger Multiple').click();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(150);
+    });
+
+    // THEN: Only ONE notification should be visible
+    const notifications = screen.getAllByTestId('achievement-inline-toast');
+    expect(notifications).toHaveLength(1);
+  });
+
+  it('should show next achievement after current one auto-dismisses', () => {
+    const achievements = [testAchievement, secondAchievement];
+    renderWithProviders(achievements);
+
+    // GIVEN: Two achievements queued
+    act(() => {
+      screen.getByText('Trigger Multiple').click();
+    });
+    act(() => {
+      jest.advanceTimersByTime(150);
+    });
+
+    // First notification visible
+    expect(screen.getByTestId('achievement-inline-toast')).toBeInTheDocument();
+
+    // WHEN: First notification auto-dismisses (3000ms + 500ms gap)
+    act(() => {
+      jest.advanceTimersByTime(2500);
+    });
+
+    // THEN: Second notification should now be visible
+    const notification = screen.getByTestId('achievement-inline-toast');
+    expect(notification).toBeInTheDocument();
+  });
+
+  it('should NOT show full-screen modal in multiplayer mode', () => {
     renderWithProviders();
 
     // GIVEN: A rendered provider with test consumer
@@ -169,9 +227,26 @@ describe('AchievementQueueProvider', () => {
     });
 
     // THEN: Full-screen modal should NOT be displayed
-    // The UnifiedAchievementModal has data-testid="unified-achievement-modal"
     const modal = screen.queryByTestId('unified-achievement-modal');
     expect(modal).not.toBeInTheDocument();
+  });
+
+  it('should display achievement name from translations', () => {
+    renderWithProviders();
+
+    // WHEN: Achievement is queued
+    act(() => {
+      screen.getByText('Trigger Achievement').click();
+    });
+    act(() => {
+      jest.advanceTimersByTime(150);
+    });
+
+    // THEN: Achievement name should be displayed
+    const nameEl = screen.getByTestId('achievement-inline-name');
+    expect(nameEl).toBeInTheDocument();
+    // Translation falls back to key if not found
+    expect(nameEl.textContent).toBeTruthy();
   });
 
   it('should provide queueAchievement function via context', () => {
@@ -211,5 +286,73 @@ describe('AchievementQueueProvider', () => {
     );
 
     consoleSpy.mockRestore();
+  });
+
+  it('should auto-dismiss notification after timeout', () => {
+    renderWithProviders();
+
+    // GIVEN: Achievement notification is showing
+    act(() => {
+      screen.getByText('Trigger Achievement').click();
+    });
+    act(() => {
+      jest.advanceTimersByTime(150);
+    });
+    expect(screen.getByTestId('achievement-inline-toast')).toBeInTheDocument();
+
+    // WHEN: Auto-dismiss timeout expires (2000ms)
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    // THEN: Notification should be gone
+    expect(screen.queryByTestId('achievement-inline-toast')).not.toBeInTheDocument();
+  });
+
+  it('should cap queue at 5 achievements', () => {
+    const TestManyConsumer = () => {
+      const { queueAchievement } = useAchievementQueue();
+      return (
+        <button onClick={() => {
+          for (let i = 0; i < 8; i++) {
+            queueAchievement({ key: `ACH_${i}`, icon: '🏅' });
+          }
+        }}>
+          Trigger Many
+        </button>
+      );
+    };
+
+    render(
+      <LanguageProvider>
+        <AchievementQueueProvider>
+          <TestManyConsumer />
+        </AchievementQueueProvider>
+      </LanguageProvider>
+    );
+
+    // WHEN: 8 achievements queued
+    act(() => {
+      screen.getByText('Trigger Many').click();
+    });
+    act(() => {
+      jest.advanceTimersByTime(150);
+    });
+
+    // First one showing, rest in queue (max 5 total)
+    expect(screen.getByTestId('achievement-inline-toast')).toBeInTheDocument();
+
+    // Cycle through all — should only see 5 total (capped)
+    let shownCount = 1;
+    for (let i = 0; i < 10; i++) {
+      act(() => {
+        jest.advanceTimersByTime(2500);
+      });
+      if (screen.queryByTestId('achievement-inline-toast')) {
+        shownCount++;
+      }
+    }
+    // Max 5 achievements should have been shown
+    expect(shownCount).toBeLessThanOrEqual(5);
   });
 });

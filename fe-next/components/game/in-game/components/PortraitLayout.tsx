@@ -265,7 +265,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[110px] md:min-h-[120px] lg:min-h-[140px]"
+                className="flex w-full items-center justify-center relative min-h-[110px] md:min-h-[120px] lg:min-h-[110px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -287,7 +287,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   className="relative z-20 shrink-0"
                 >
                   <div className="hidden lg:block">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
                   </div>
                   <div className="hidden md:block lg:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
@@ -355,7 +355,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Forming Area - tight spacing to board */}
           {isPlaying && (
-            <div className="flex items-center justify-center flex-shrink-0 -mt-1 mb-0">
+            <div className="flex items-center justify-center flex-shrink-0 -mt-2 lg:-mt-3 mb-0">
               <WordFormingArea
                 word={isTypingMode ? typedWord : formedWord}
                 letterCount={isTypingMode ? typedWord.length : letterCount}
@@ -397,7 +397,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           )}
 
           {/* Grid - no expansion on mobile to stay close to word forming area, centers on desktop */}
-          <div className="flex-grow-0 md:flex-1 flex flex-col items-center justify-center min-h-0 overflow-hidden pt-1 md:pt-0 gap-2">
+          <div className="flex-grow-0 md:flex-1 flex flex-col items-center justify-start min-h-0 overflow-hidden pt-1 md:pt-0 gap-2">
             {USE_PHASER_GRID ? (
               <div className="relative w-full aspect-square max-w-[min(100%,60vh)]">
                 <PhaserGame

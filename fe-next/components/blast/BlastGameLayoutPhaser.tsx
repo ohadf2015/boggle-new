@@ -24,11 +24,13 @@ import { BlastFoundWords } from './BlastFoundWords';
 import { BlastHelpModal } from './BlastHelpModal';
 import { BlastCascadeWordBanner } from './BlastCascadeWordBanner';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
-import type { BlastGameState, CascadeHighlightData, CascadeHighlightPhase } from './types';
+import type { BlastGameState, CascadeHighlightData, CascadeHighlightPhase, BlastObjectiveProgress } from './types';
 import { cn } from '@/lib/utils';
 import { vibrateBlastCascade } from '@/components/grid/hapticFeedback';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { Mascot } from '@/components/ui/Mascot';
+import { BlastMoveCounter } from './BlastMoveCounter';
+import { BlastObjectiveDisplay } from './BlastObjectiveDisplay';
 
 // ─── Dynamic import: Phaser canvas (browser-only) ────────────────────────────
 
@@ -68,6 +70,10 @@ interface BlastGameLayoutPhaserProps {
   // End game dialog
   showEndGameConfirm: boolean;
   setShowEndGameConfirm: (show: boolean) => void;
+  // Objectives
+  objectiveProgress?: BlastObjectiveProgress[];
+  // Move counter
+  bonusMoveAwarded?: number;
   // Hint system
   hintPath?: Array<{ row: number; col: number }> | null;
   hasHintAvailable?: boolean;
@@ -101,13 +107,15 @@ export function BlastGameLayoutPhaser({
   setShowQuitConfirm,
   showEndGameConfirm,
   setShowEndGameConfirm,
+  objectiveProgress,
+  bonusMoveAwarded,
   hintPath = null,
   hasHintAvailable = false,
   onRequestHint,
   onClearHint,
   t,
 }: BlastGameLayoutPhaserProps) {
-  const { score, tilesCleared, totalTiles, isComplete, wordsFound } = gameState;
+  const { score, tilesCleared, totalTiles, isComplete, wordsFound, movesRemaining, totalMoves } = gameState;
   const earnedStars = calculateEarnedStars(tilesCleared, totalTiles);
   const [showHelp, setShowHelp] = useState(false);
   const [showFoundWords, setShowFoundWords] = useState(false);
@@ -308,6 +316,14 @@ export function BlastGameLayoutPhaser({
           </div>
         </motion.div>
 
+        {/* Move counter */}
+        <BlastMoveCounter
+          movesRemaining={movesRemaining}
+          totalMoves={totalMoves}
+          t={t}
+          bonusMoveAwarded={bonusMoveAwarded}
+        />
+
         <button
           onClick={() => setShowFoundWords(prev => !prev)}
           className="text-center cursor-pointer hover:scale-105 transition-transform"
@@ -338,6 +354,13 @@ export function BlastGameLayoutPhaser({
           <div className="text-[10px] font-bold text-fuchsia-300/50 uppercase tracking-wider text-center tabular-nums">
             {t('blast.totalScore') || 'Total'}: {(cumulativeScore + score).toLocaleString()}
           </div>
+        </div>
+      )}
+
+      {/* Objective progress */}
+      {objectiveProgress && objectiveProgress.length > 0 && (
+        <div className="px-4 max-w-md mx-auto w-full relative z-30 mb-1">
+          <BlastObjectiveDisplay objectiveProgress={objectiveProgress} t={t} />
         </div>
       )}
 

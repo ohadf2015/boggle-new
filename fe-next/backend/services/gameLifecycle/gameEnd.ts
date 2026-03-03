@@ -71,10 +71,6 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
 
   logger.info('GAME', `Game ${gameCode} ending, calculating final scores`);
 
-  // Small delay to allow clients to process endGame event and set up waiting state
-  // This prevents race conditions where validatedScores arrives before UI is ready
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
   // Calculate and broadcast final scores
   await calculateAndBroadcastFinalScores(io, gameCode);
 

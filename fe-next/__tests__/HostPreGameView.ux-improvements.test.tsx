@@ -24,10 +24,9 @@ describe('HostPreGameView UX improvements', () => {
     expect(source).not.toContain('"bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-72"');
   });
 
-  it('uses roomChat translation key for chat section heading', () => {
-    // "Battle Feed" is confusing jargon — should use hostView.roomChat
+  it('does not use battleFeed jargon for chat section', () => {
+    // "Battle Feed" is confusing jargon — chat heading is provided by RoomChat component itself
     expect(source).not.toContain("t('hostView.battleFeed')");
-    expect(source).toContain("t('hostView.roomChat')");
   });
 
   it('TV Mode toggle appears outside the advanced settings accordion', () => {

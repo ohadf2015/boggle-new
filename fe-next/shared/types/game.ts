@@ -9,6 +9,8 @@ export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
 
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 
+export type GameMode = 'classic' | 'blast' | 'word-hunt';
+
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
 
 export type PresenceStatus = 'active' | 'idle' | 'afk';

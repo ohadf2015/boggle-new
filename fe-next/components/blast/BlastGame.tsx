@@ -10,6 +10,8 @@ import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordS
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
 import { useBlastHint } from './hooks/useBlastHint';
+import { useBlastObjectives } from './hooks/useBlastObjectives';
+import { calculateBonusMoves } from './utils/blastMoveUtils';
 import { BlastGameLayout } from './BlastGameLayout';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import type { BlastGameConfig, BlastResultsData } from './types';
@@ -63,8 +65,11 @@ export function BlastGame({
     playWordAcceptedSound();
   }, [combo, playWordAcceptedSound]);
 
-  // Core blast game state (with cascade callback)
-  const blast = useBlastGame(config, { onAutoCascadeWord: handleAutoCascadeWord });
+  // Core blast game state (with cascade callback + move limit from wave config)
+  const blast = useBlastGame(config, {
+    onAutoCascadeWord: handleAutoCascadeWord,
+    movesAllowed: waveConfig?.movesAllowed,
+  });
 
   // Spam detection
   const spamDetection = useSpamDetection();
@@ -88,6 +93,14 @@ export function BlastGame({
     minWordLength,
   );
 
+  // Objective tracking
+  const { objectiveProgress, allObjectivesComplete } = useBlastObjectives({
+    gameState: blast.gameState,
+    tileTypeClears: blast.gameState.tileTypeClears,
+    waveNumber,
+    wordsFound: blast.gameState.wordsFound,
+  });
+
   // Game timing - initialized once via effect
   const gameStartTimeRef = useRef(0);
   useEffect(() => {
@@ -102,8 +115,8 @@ export function BlastGame({
     if (blast.gameState.isComplete && !confettiFiredRef.current) {
       confettiFiredRef.current = true;
       confetti({
-        particleCount: 120,
-        spread: 70,
+        particleCount: 40,
+        spread: 50,
         origin: { y: 0.6 },
         colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
       });
@@ -120,11 +133,23 @@ export function BlastGame({
   // End game confirmation dialog
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
 
+  // Bonus move popup (auto-clears after animation)
+  const [bonusMoveAwarded, setBonusMoveAwarded] = useState<number | undefined>();
+  const bonusMoveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Track last submitted path for tile clearing
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
 
   // Direct callback when a word is accepted
   const handleWordAccepted = useCallback((data: { word: string; score: number }) => {
+    // Check for bonus moves from long words
+    const bonus = calculateBonusMoves(data.word.length);
+    if (bonus > 0) {
+      setBonusMoveAwarded(bonus);
+      if (bonusMoveTimerRef.current) clearTimeout(bonusMoveTimerRef.current);
+      bonusMoveTimerRef.current = setTimeout(() => setBonusMoveAwarded(undefined), 1500);
+    }
+
     if (lastPathRef.current.length > 0) {
       blast.clearTilesForWord(lastPathRef.current, data.word, data.score);
       lastPathRef.current = [];
@@ -166,12 +191,12 @@ export function BlastGame({
 
   // Detect game completion or dead end
   useEffect(() => {
-    if (blast.gameState.isComplete) {
+    if (blast.gameState.isComplete && allObjectivesComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = blast.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
       const scoreThreshold = waveConfig?.scoreThreshold;
 
-      // Wave complete: board cleared + threshold met (or no threshold)
+      // Wave complete: board cleared + objectives met + threshold met (or no threshold)
       if (onWaveComplete && (!scoreThreshold || score >= scoreThreshold)) {
         const timer = setTimeout(() => {
           onWaveComplete(score, wordsFound, clearPct);
@@ -196,7 +221,7 @@ export function BlastGame({
     }
 
     return undefined;
-  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig]);
+  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, allObjectivesComplete, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig]);
 
   const handleQuitRequest = useCallback(() => {
     setShowQuitConfirm(true);
@@ -252,6 +277,8 @@ export function BlastGame({
       setShowQuitConfirm={setShowQuitConfirm}
       showEndGameConfirm={showEndGameConfirm}
       setShowEndGameConfirm={setShowEndGameConfirm}
+      objectiveProgress={objectiveProgress}
+      bonusMoveAwarded={bonusMoveAwarded}
       hintPath={hintPath}
       hasHintAvailable={hasHintAvailable}
       onRequestHint={requestHint}
