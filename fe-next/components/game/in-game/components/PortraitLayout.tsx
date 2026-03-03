@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useState, useEffect, useCallback, type ReactNode, type RefObject } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -279,7 +279,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 />
 
                 {/* Timer (center) */}
-                <motion.div
+                <AdaptiveMotion.div
                   data-tutorial="timer"
                   data-testid="timer-container"
                   initial={{ scale: 0, opacity: 0 }}
@@ -295,7 +295,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   <div className="md:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
                   </div>
-                </motion.div>
+                </AdaptiveMotion.div>
 
                 {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
                 {isPlaying && (
@@ -329,14 +329,14 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                           isDanger={comboDanger}
                         />
                       ) : (
-                        <motion.div
+                        <AdaptiveMotion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.5 }}
                           className="text-[10px] text-neo-cream/40 text-right leading-tight max-w-[70px]"
                         >
                           <span className="text-neo-cyan/60">⚡</span>{' '}
                           {t('game.comboHint') || 'Find words fast!'}
-                        </motion.div>
+                        </AdaptiveMotion.div>
                       )}
                     </div>
                     <ScoreDisplay
@@ -367,7 +367,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Tournament Progress Banner */}
           {tournamentData && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="max-w-7xl mx-auto mb-1"
@@ -393,7 +393,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {/* Grid - no expansion on mobile to stay close to word forming area, centers on desktop */}
@@ -493,7 +493,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             />
 
             {/* Chat Component */}
-            <motion.div
+            <AdaptiveMotion.div
               className="hidden lg:block"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -505,7 +505,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 gameCode={gameCode}
                 className="max-h-[150px]"
               />
-            </motion.div>
+            </AdaptiveMotion.div>
           </div>
         )}
       </div>

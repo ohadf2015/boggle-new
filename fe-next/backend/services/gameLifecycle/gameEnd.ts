@@ -54,15 +54,17 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   // This breaks circular dependencies (earthquakeHandler, hintHandler subscribe)
   gameCleanupEmitter.emitGameEnd(gameCode);
 
+  // Record end timestamp BEFORE state transition so the grace period
+  // is active immediately when gameState becomes 'finished'
+  game.gameEndedAt = Date.now();
+
   // Transition game state using state machine (guards against invalid transitions)
   const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });
   if (!transitionResult.success) {
+    game.gameEndedAt = null; // Reset if transition failed
     logger.warn('GAME', `Failed to end game ${gameCode}: ${transitionResult.error}`);
     return;
   }
-
-  // Record end timestamp for grace period handling
-  game.gameEndedAt = Date.now();
 
   // Notify clients that game has ended (sets up waiting state)
   broadcastToRoom(io, getGameRoom(gameCode), 'endGame', {});

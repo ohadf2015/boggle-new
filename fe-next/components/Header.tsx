@@ -2,7 +2,7 @@ import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility, Brain, Lock, Newspaper } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, Trophy, ScrollText, Coffee, User, Gift, Accessibility, Brain, Lock, Newspaper, Info, HelpCircle, Mail, Cookie } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -21,6 +21,8 @@ import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
 import { NotificationBell } from './notifications/NotificationBell';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import HeaderMenuDropdown from './HeaderMenuDropdown';
+import { InstagramIcon } from '@/components/icons/SocialIcons';
+import { ManageCookiesButton } from '@/components/CookieConsent';
 
 /**
  * Header Props
@@ -685,36 +687,50 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
                                     {/* Info Links Section - replaces footer on mobile */}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                    <div className="flex flex-col gap-1.5">
+                                        <span className="text-[10px] font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                             {t('common.info') || 'Info'}
                                         </span>
-                                        <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col gap-1.5">
                                             <Link
-                                                href={`/${language}/rules`}
+                                                href={`/${language}/about`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-3 border-neo-black text-neo-black">
-                                                    <BookOpen className="w-4 h-4" aria-hidden="true" />
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-cyan border-2 border-neo-black text-neo-black">
+                                                    <Info className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('footer.aboutGame') || 'About the Game'}</span>
+                                                <span>{t('footer.about') || 'About'}</span>
+                                            </Link>
+                                            <Link
+                                                href={`/${language}/faq`}
+                                                onClick={() => setShowMobileMenu(false)}
+                                                className={cn(
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "shadow-hard-sm hover:shadow-hard"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-yellow border-2 border-neo-black text-neo-black">
+                                                    <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                                                </span>
+                                                <span>{t('footer.faq') || 'FAQ'}</span>
                                             </Link>
                                             <Link
                                                 href={`/${language}/blog`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-orange border-3 border-neo-black text-neo-black">
-                                                    <Newspaper className="w-4 h-4" aria-hidden="true" />
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-orange border-2 border-neo-black text-neo-black">
+                                                    <Newspaper className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.blog') || 'Blog'}</span>
                                             </Link>
@@ -722,43 +738,43 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 href={`/${language}/leaderboard`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime border-3 border-neo-black text-neo-black">
-                                                    <Trophy className="w-4 h-4" aria-hidden="true" />
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-lime border-2 border-neo-black text-neo-black">
+                                                    <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
                                             </Link>
                                             <Link
-                                                href={`/${language}/legal/terms`}
+                                                href={`/${language}/contact`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                    "bg-white dark:bg-slate-700 hover:bg-neo-lime/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-3 border-neo-black text-neo-black">
-                                                    <ScrollText className="w-4 h-4" aria-hidden="true" />
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-cream border-2 border-neo-black text-neo-black">
+                                                    <Mail className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('legal.termsOfService')}</span>
+                                                <span>{t('footer.contact') || 'Contact'}</span>
                                             </Link>
                                             <Link
-                                                href={`/${language}/legal/privacy`}
+                                                href={`/${language}/legal`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-lime/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink-light border-3 border-neo-black">
-                                                    <Shield className="w-4 h-4 text-neo-black" aria-hidden="true" />
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-pink-light border-2 border-neo-black">
+                                                    <ScrollText className="w-3.5 h-3.5 text-neo-black" aria-hidden="true" />
                                                 </span>
-                                                <span>{t('legal.privacyPolicy')}</span>
+                                                <span>{t('legal.title') || 'Legal'}</span>
                                             </Link>
                                             <a
                                                 href="https://ko-fi.com/lexiclash"
@@ -767,17 +783,48 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 onClick={() => setShowMobileMenu(false)}
                                                 aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-neo-pink/20 dark:bg-slate-700 hover:bg-neo-pink/40 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-3 border-neo-black text-white">
-                                                    <Coffee className="w-4 h-4" aria-hidden="true" />
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-pink border-2 border-neo-black text-white">
+                                                    <Coffee className="w-3.5 h-3.5" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('support.kofiFooter')}</span>
                                                 <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
                                             </a>
+                                            <a
+                                                href="https://www.instagram.com/lexi.clash"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                onClick={() => setShowMobileMenu(false)}
+                                                aria-label="Instagram"
+                                                className={cn(
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-pink/30 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "shadow-hard-sm hover:shadow-hard"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-neo-black text-white">
+                                                    <InstagramIcon className="w-3.5 h-3.5" size="0.875em" />
+                                                </span>
+                                                <span>Instagram</span>
+                                                <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
+                                            </a>
+                                            <div
+                                                onClick={() => setShowMobileMenu(false)}
+                                                className={cn(
+                                                    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "shadow-hard-sm hover:shadow-hard"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-6 h-6 rounded-md bg-neo-lime border-2 border-neo-black text-neo-black">
+                                                    <Cookie className="w-3.5 h-3.5" aria-hidden="true" />
+                                                </span>
+                                                <ManageCookiesButton />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

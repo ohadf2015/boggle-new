@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../utils/accessibility';
 import { formatTimeMMSS } from '@/shared/utils';
+import { preloadResultsChunks } from '@/utils/preloadResults';
 
 /**
  * CircularTimer Props
@@ -42,6 +43,11 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const isLowTime = remainingTime <= 20;
   // Even more urgent at 10 seconds
   const isVeryLowTime = remainingTime <= 10 && remainingTime > 0;
+
+  // Preload results page chunks when timer is low (idempotent — safe to call repeatedly)
+  if (isVeryLowTime) {
+    preloadResultsChunks();
+  }
 
   const svgCenter = config.svgSize / 2;
 

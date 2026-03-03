@@ -92,9 +92,15 @@ export function useContainerDimensions(minDimension: number = 50) {
 
     // Add polling as fallback for edge cases (reduced frequency)
     // Stop polling once dimensions are valid to save battery on mobile
+    // Max 30 attempts (9 seconds) to prevent indefinite polling
+    let pollCount = 0;
+    const MAX_POLLS = 30;
     const pollInterval = setInterval(() => {
-      if (!measuredRef.current) {
+      if (!measuredRef.current && pollCount < MAX_POLLS) {
+        pollCount++;
         checkDimensions();
+      } else {
+        clearInterval(pollInterval);
       }
     }, 300);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Medal, Award } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
@@ -35,7 +35,7 @@ const PODIUM_CONFIG = {
     size: 'large',
     avatarSize: 120,
     scoreSize: 'text-5xl',
-    nameSize: 'text-2xl',
+    nameSize: 'text-3xl',
     height: 'h-72',
     order: 2, // Center position
   },
@@ -48,7 +48,7 @@ const PODIUM_CONFIG = {
     size: 'medium',
     avatarSize: 100,
     scoreSize: 'text-4xl',
-    nameSize: 'text-xl',
+    nameSize: 'text-2xl',
     height: 'h-60',
     order: 1, // Left position
   },
@@ -61,7 +61,7 @@ const PODIUM_CONFIG = {
     size: 'small',
     avatarSize: 80,
     scoreSize: 'text-3xl',
-    nameSize: 'text-lg',
+    nameSize: 'text-2xl',
     height: 'h-52',
     order: 3, // Right position
   },
@@ -241,9 +241,12 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
         className={cn(
           'font-black uppercase truncate max-w-full text-center mb-2',
+          'bg-black/30 px-3 py-1 rounded-neo',
           config.textColor,
           config.nameSize
         )}
+        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+        title={player.username}
       >
         {player.username}
       </motion.p>

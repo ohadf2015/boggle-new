@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -69,19 +68,24 @@ export function LevelUpCelebration({
   const { isLowEnd, prefersReducedMotion, enableGlowEffects, enableComplexAnimations } =
     useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const timelineRef = useRef<{ kill: () => void } | null>(null);
   const [phase, setPhase] = useState<'flash' | 'badge' | 'reveal' | 'rewards' | 'done'>('flash');
 
   // Get icon based on level milestone
   const LevelIcon = level >= 50 ? Crown : level >= 25 ? Trophy : level >= 10 ? Star : Sparkles;
 
-  // GSAP Timeline Animation
+  // GSAP Timeline Animation — dynamically imported to save ~30KB from initial bundle
   useEffect(() => {
     if (!show || !containerRef.current || prefersReducedMotion) return;
 
     const container = containerRef.current;
-    const ctx = gsap.context(() => {
-      timelineRef.current = gsap.timeline({
+    let ctx: { revert: () => void } | null = null;
+
+    import('gsap').then(({ default: gsap }) => {
+      if (!container.isConnected) return; // Component unmounted during load
+
+      ctx = gsap.context(() => {
+      const tl = gsap.timeline({
         onComplete: () => {
           setPhase('done');
           if (autoDismissAfter > 0 && onDismiss) {
@@ -89,8 +93,7 @@ export function LevelUpCelebration({
           }
         },
       });
-
-      const tl = timelineRef.current;
+      timelineRef.current = tl;
 
       // Phase 1: Flash
       tl.to('.level-flash', {
@@ -172,9 +175,10 @@ export function LevelUpCelebration({
           ease: 'power1.inOut',
         });
     }, container);
+    }); // end dynamic import
 
     return () => {
-      ctx.revert();
+      ctx?.revert();
       timelineRef.current?.kill();
     };
   }, [show, prefersReducedMotion, enableComplexAnimations, autoDismissAfter, onDismiss, rewards]);

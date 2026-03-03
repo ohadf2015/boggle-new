@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import CircularTimer from '@/components/CircularTimer';
 import GridComponent from '@/components/GridComponent';
@@ -210,10 +210,10 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
               )}
 
               {isPlaying && playerRank && playerRank > 0 && leaderboard.length > 1 && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex flex-col items-center">
+                <AdaptiveMotion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex flex-col items-center">
                   <div className="landscape-stat-secondary text-white">#{playerRank}</div>
                   <div className="landscape-stat-label text-white">{t('common.rank') || 'RANK'}</div>
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
 
               {isPlaying && (
@@ -345,14 +345,14 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                       isDanger={comboDanger}
                     />
                   ) : (
-                    <motion.div
+                    <AdaptiveMotion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 0.6 }}
                       className="text-[10px] text-neo-cream/50 text-center leading-tight"
                     >
                       <span className="text-neo-cyan">⚡</span>{' '}
                       {t('game.comboHint') || 'Find words fast for combo!'}
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   )}
                 </div>
               )}

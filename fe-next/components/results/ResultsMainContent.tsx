@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Trophy, Star, Play, Check } from 'lucide-react';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
-import type { Player, WordObject } from '@/components/results/types';
+import type { Player } from '@/components/results/types';
 
 // Dynamic imports for heavy components
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
@@ -21,6 +21,7 @@ const MobileCompactRewards = dynamic(() => import('@/components/results/MobileCo
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
+import ComparativeInsights from '@/components/results/ComparativeInsights';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { AdPlaceholder } from '@/components/ads';
 
@@ -111,6 +112,8 @@ export interface ResultsMainContentProps {
   bannerSize?: '320x50' | '300x250';
   /** Use compact mobile layout */
   isMobile?: boolean;
+  /** All player words for comparative insights */
+  allPlayerWords?: Record<string, Array<{ word: string; score: number }>>;
 }
 
 // ==============================================
@@ -156,6 +159,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   showBanner = true,
   bannerSize = '320x50',
   isMobile = false,
+  allPlayerWords,
 }) => {
   // Derived state
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
@@ -180,90 +184,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* Near-Miss Notifications - Motivate "one more game" */}
-      {nearMisses.length > 0 && (
-        <NearMissCard
-          nearMisses={nearMisses}
-          t={t}
-          onPlayAgain={isHost ? onStartGame : onMarkReady}
-          compact
-        />
-      )}
-
-      {/* Rewards Summary - Shows win streak prominently for winners */}
-      {winStreakData && winStreakData.currentStreak > 0 && (
-        isMobile ? (
-          <MobileCompactRewards
-            winStreak={winStreakData.currentStreak}
-            coins={0}
-            isAuthenticated={isAuthenticated}
-          />
-        ) : (
-          <RewardsSummary
-            coinReward={null}
-            isAuthenticated={isAuthenticated}
-            winStreak={winStreakData}
-            achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
-            isWinner={isCurrentUserWinner}
-            onAchievementsClick={onShowDetails}
-          />
-        )
-      )}
-
-      {/* Compact Stats Row */}
-      {currentPlayerData && currentPlayerRank > 0 && (
-        isMobile ? (
-          <MobileCompactStats
-            wordCount={currentPlayerValidWords.length}
-            accuracy={accuracy}
-            totalWords={currentPlayerData?.allWords?.length || 0}
-            archetype={currentPlayerArchetype}
-            achievements={currentPlayerData?.achievements}
-          />
-        ) : (
-          <CompactResultsStats
-            wordCount={currentPlayerValidWords.length}
-            accuracy={accuracy}
-            totalWords={currentPlayerData?.allWords?.length || 0}
-            archetype={currentPlayerArchetype}
-            achievements={currentPlayerData?.achievements}
-          />
-        )
-      )}
-
-      {/* Brain Points Feedback */}
-      <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
-
-      {/* Compact Top 3 Leaderboard with Score Reveal Animation */}
-      {sortedScores.length > 1 && (
-        scoreRevealComplete ? (
-          isMobile ? (
-            <MobileCompactLeaderboard
-              participants={sortedScores.map(p => ({
-                name: p.username,
-                score: p.score,
-                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-              }))}
-            />
-          ) : (
-            <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
-          )
-        ) : (
-          <ScoreRevealAnimation
-            players={sortedScores.map(p => ({
-              username: p.username,
-              finalScore: p.score,
-              avatar: p.avatar,
-              isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-            }))}
-            currentUsername={username}
-            duration={2500}
-            onComplete={() => setScoreRevealComplete(true)}
-          />
-        )
-      )}
-
-      {/* Primary CTA - Play Again / Ready / Next Step */}
+      {/* Primary CTA - Play Again / Ready / Next Step (above the fold) */}
       {gameCode && onReturnToRoom && (
         isBotsOnlyGame ? (
           <NextStepPrompt
@@ -338,6 +259,98 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           isHost={isHost}
         />
       )}
+
+      {/* Comparative Insights */}
+      {allPlayerWords && username && sortedScores.length > 1 && (
+        <ComparativeInsights
+          allPlayerWords={allPlayerWords}
+          currentUsername={username}
+          t={t}
+        />
+      )}
+
+      {/* Near-Miss Notifications - Motivate "one more game" */}
+      {nearMisses.length > 0 && (
+        <NearMissCard
+          nearMisses={nearMisses}
+          t={t}
+          onPlayAgain={isHost ? onStartGame : onMarkReady}
+          compact
+        />
+      )}
+
+      {/* Compact Stats Row */}
+      {currentPlayerData && currentPlayerRank > 0 && (
+        isMobile ? (
+          <MobileCompactStats
+            wordCount={currentPlayerValidWords.length}
+            accuracy={accuracy}
+            totalWords={currentPlayerData?.allWords?.length || 0}
+            archetype={currentPlayerArchetype}
+            achievements={currentPlayerData?.achievements}
+          />
+        ) : (
+          <CompactResultsStats
+            wordCount={currentPlayerValidWords.length}
+            accuracy={accuracy}
+            totalWords={currentPlayerData?.allWords?.length || 0}
+            archetype={currentPlayerArchetype}
+            achievements={currentPlayerData?.achievements}
+          />
+        )
+      )}
+
+      {/* Compact Top 3 Leaderboard with Score Reveal Animation */}
+      {sortedScores.length > 1 && (
+        scoreRevealComplete ? (
+          isMobile ? (
+            <MobileCompactLeaderboard
+              participants={sortedScores.map(p => ({
+                name: p.username,
+                score: p.score,
+                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+              }))}
+            />
+          ) : (
+            <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+          )
+        ) : (
+          <ScoreRevealAnimation
+            players={sortedScores.map(p => ({
+              username: p.username,
+              finalScore: p.score,
+              avatar: p.avatar,
+              isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+            }))}
+            currentUsername={username}
+            duration={2500}
+            onComplete={() => setScoreRevealComplete(true)}
+          />
+        )
+      )}
+
+      {/* Rewards Summary - Shows win streak prominently for winners */}
+      {winStreakData && winStreakData.currentStreak > 0 && (
+        isMobile ? (
+          <MobileCompactRewards
+            winStreak={winStreakData.currentStreak}
+            coins={0}
+            isAuthenticated={isAuthenticated}
+          />
+        ) : (
+          <RewardsSummary
+            coinReward={null}
+            isAuthenticated={isAuthenticated}
+            winStreak={winStreakData}
+            achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
+            isWinner={isCurrentUserWinner}
+            onAchievementsClick={onShowDetails}
+          />
+        )
+      )}
+
+      {/* Brain Points Feedback */}
+      <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
 
       {/* Large Room Notice - Compact */}
       {duplicateRuleDisabled && (

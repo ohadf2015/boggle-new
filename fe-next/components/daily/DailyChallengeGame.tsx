@@ -16,6 +16,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useMusic } from '@/contexts/MusicContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -64,6 +65,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const { stopMusic } = useMusic();
   const { awardComboMilestone } = useCoinContext();
   const isLandscape = useMobileLandscape();
+  const { isLowEnd } = useDevicePerformance();
 
   // Game state
   const [score, setScore] = useState(0);
@@ -133,6 +135,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
   // Combo system - handles combo state, refs, and timeouts
   const combo = useComboSystem({
+    timerIntervalMs: isLowEnd ? 500 : 250,
     onComboSound: (level) => {
       if (level >= 3) {
         playComboSound?.(level);

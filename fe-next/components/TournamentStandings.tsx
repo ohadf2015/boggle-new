@@ -5,6 +5,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
+import SessionStatsCard from './results/SessionStatsCard';
 import type { Avatar } from '@/types';
 
 interface TournamentPlayerStanding {
@@ -177,6 +178,13 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             );
           })}
         </div>
+
+        {/* Session Stats */}
+        <SessionStatsCard
+          standings={standings}
+          currentRound={currentRound}
+          t={t}
+        />
 
         {/* Winner announcement for completed tournament */}
         {isComplete && standings[0] && (

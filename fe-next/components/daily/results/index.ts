@@ -94,3 +94,5 @@ export type { MoreOptionsAccordionProps } from './MoreOptionsAccordion';
 
 export { EmojiShareCard } from './EmojiShareCard';
 export type { EmojiShareCardProps } from './EmojiShareCard';
+
+export { default as DailyWordHuntFacts } from './DailyWordHuntFacts';

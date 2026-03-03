@@ -58,7 +58,7 @@ export function PhaserGame({
   onWordChange,
 }: PhaserGameProps) {
   const { settings, shouldReduceMotion } = useAccessibility();
-  const { isLowEnd } = useDevicePerformance();
+  const { isLowEnd, targetFPS } = useDevicePerformance();
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
 
@@ -144,7 +144,7 @@ export function PhaserGame({
       data-testid="phaser-game"
       className="relative w-full h-full"
     >
-      <PhaserCanvas sceneType={sceneType} />
+      <PhaserCanvas sceneType={sceneType} deviceConfig={{ isLowEnd, targetFPS }} />
     </div>
   );
 }

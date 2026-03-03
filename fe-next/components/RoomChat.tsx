@@ -12,7 +12,7 @@ const CardContent = CardContentComponent as any;
 const Input = InputComponent as any;
 const Button = ButtonComponent as any;
 const Badge = BadgeComponent as any;
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -21,7 +21,6 @@ import { Send, MessageSquare, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
 
-const MAX_CHAT_HEIGHT = 400; // Max height in pixels
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
 
 interface ChatMessage {
@@ -58,6 +57,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const [latestAnnouncement, setLatestAnnouncement] = useState('');
   const parentRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesLengthRef = useRef(0);
 
   // Virtual scrolling setup
   const virtualizer = useVirtualizer({
@@ -99,7 +99,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
       announce(announcementText);
 
       // Show toast notification with click to scroll
-      const newMessageIndex = messages.length; // Index of the new message (will be added after this)
+      const newMessageIndex = messagesLengthRef.current; // Use ref to avoid stale closure
       toast(
         <div
           className="flex items-center gap-3 cursor-pointer"
@@ -147,7 +147,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         window.navigator.vibrate(200);
       }
     }
-  }, [username, isHost, messages.length, virtualizer, playMessageSound, onNewMessage, announce]);
+  }, [username, isHost, virtualizer, playMessageSound, onNewMessage, announce]);
 
   useEffect(() => {
     if (!socket) return;
@@ -189,8 +189,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     };
   }, [socket, gameCode]);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive + keep ref in sync
   useEffect(() => {
+    messagesLengthRef.current = messages.length;
     if (messages.length > 0) {
       virtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'smooth' });
       setUnreadCount(0);
@@ -242,7 +243,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
           <MessageSquare className="text-neo-pink" />
           {t('chat.title') || 'Room Chat'}
           {unreadCount > 0 && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               className="relative"
@@ -250,7 +251,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
               <Badge variant="destructive" className="animate-pulse">
                 {unreadCount}
               </Badge>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
         </h3>
       </div>
@@ -258,13 +259,12 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         {/* Messages Area with Virtual Scrolling */}
         <div
           ref={parentRef}
-          className="flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600"
-          style={{ maxHeight: MAX_CHAT_HEIGHT }}
+          className="flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 max-h-[250px] sm:max-h-[350px] md:max-h-[400px]"
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-4 gap-2">
               {/* NEO-BRUTALIST empty state - compact version */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.8, rotate: -5 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -278,10 +278,10 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <div className="bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm p-2 rotate-[-2deg]">
                   <MessageSquare className="text-2xl text-neo-black" />
                 </div>
-              </motion.div>
+              </AdaptiveMotion.div>
 
               {/* Text with Neo-Brutalist styling - smaller */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -293,7 +293,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <p className="text-neo-black/75 font-bold text-[10px] mt-2 uppercase tracking-wide">
                   {t('chat.startChatting') || 'Start chatting!'}
                 </p>
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
           ) : (
             <div
@@ -320,7 +320,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                       transform: `translateY(${virtualItem.start}px)`,
                     }}
                   >
-                    <motion.div
+                    <AdaptiveMotion.div
                       id={msg.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -348,7 +348,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                       >
                         {msg.message}
                       </div>
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   </div>
                 );
               })}

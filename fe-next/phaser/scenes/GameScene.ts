@@ -76,6 +76,8 @@ export class GameScene extends Phaser.Scene {
   };
 
   // Stored bound handlers so GameBridge.off() can remove the exact same reference
+  private readonly contextMenuHandler = (e: Event) => e.preventDefault();
+
   private readonly handlers = {
     onGridUpdate: (p: BridgeEvents['grid:update']) => this.handleGridUpdate(p),
     onWordFeedback: (p: BridgeEvents['word:feedback']) => this.handleWordFeedback(p),
@@ -92,7 +94,7 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     // Disable default right-click / context menu on canvas
-    this.game.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    this.game.canvas.addEventListener('contextmenu', this.contextMenuHandler);
     // Touch: prevent scroll while interacting with the canvas
     this.game.canvas.style.touchAction = 'none';
 
@@ -569,6 +571,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private cleanup(): void {
+    // Remove contextmenu handler to prevent listener accumulation on scene recreation
+    this.game.canvas.removeEventListener('contextmenu', this.contextMenuHandler);
     // Stop fire round ambient before unsubscribing
     if (this.fireRoundHandle) {
       stopFireRoundAmbient(this, this.fireRoundHandle);

@@ -39,6 +39,12 @@ export default function LegalIndexPageClient(): React.ReactElement {
       descriptionKey: 'legal.index.cookiesDescription',
       icon: '🍪',
     },
+    {
+      href: `/${locale}/legal/disclaimer`,
+      titleKey: 'legal.disclaimer.title',
+      descriptionKey: 'legal.index.disclaimerDescription',
+      icon: '⚠️',
+    },
   ];
 
   return (

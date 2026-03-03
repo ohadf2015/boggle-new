@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { memo, useState } from 'react';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Users, Crown, Link, MessageCircle, QrCode, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import ExitRoomButton from '../ExitRoomButton';
@@ -14,6 +14,8 @@ import ShareButton from '../ShareButton';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
 import { copyJoinUrl, shareViaWhatsApp, getJoinUrl } from '../../utils/share';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useSocket } from '../../utils/SocketContext';
+import EmojiAvatarPicker, { type AvatarSelection } from '../EmojiAvatarPicker';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { Language, LetterGrid, GameUser, GridPosition } from '@/shared/types';
 
@@ -37,7 +39,7 @@ interface WaitingScreenProps {
  * Shared waiting screen component for both Host and Player views
  * Shows pre-game state with room code, players list, grid preview, and chat
  */
-const WaitingScreen: React.FC<WaitingScreenProps> = ({
+const WaitingScreen = memo<WaitingScreenProps>(function WaitingScreen({
   gameCode,
   roomName,
   gameLanguage,
@@ -51,9 +53,19 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
   onExitRoom,
   // Host-only props
   gameSettings = null, // Component to render game settings (host only)
-}) => {
+}) {
   const { t } = useLanguage();
+  const { socket } = useSocket();
   const isLandscape = useMobileLandscape();
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+
+  const currentPlayer = playersReady.find(p => p.username === username);
+
+  const handleAvatarSave = (selection: AvatarSelection) => {
+    if (socket && gameCode) {
+      socket.emit('updateAvatar', { gameCode, avatarImage: selection.avatarImage });
+    }
+  };
 
   // Landscape mode layout - optimized 3-column: room info | grid | players
   if (isLandscape) {
@@ -127,7 +139,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             username={isHost ? "Host" : username}
             isHost={isHost}
             gameCode={gameCode}
-            className="h-full w-full min-h-[400px]"
+            className="h-full w-full min-h-[250px] sm:min-h-[350px] md:min-h-[400px]"
           />
         </div>
 
@@ -151,7 +163,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 clickAnimation="bounce"
                 tooltip={t('playerView.waitForGameStart')}
               />
-              <motion.div
+              <AdaptiveMotion.div
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="bg-neo-cyan/20 border-3 border-neo-cyan/50 rounded-neo px-3 py-2 text-center"
@@ -159,7 +171,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 <span className="text-xs font-bold text-neo-cyan uppercase">
                   {t('playerView.waitForGameStart')}
                 </span>
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
           )}
 
@@ -168,7 +180,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             <Users className="w-4 h-4 text-neo-pink" />
             <span>{playersReady.length}</span>
           </div>
-          <div className="flex-1 overflow-y-auto space-y-2">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-2" style={{ WebkitOverflowScrolling: 'touch' }}>
             {playersReady.map((player) => {
               const playerUsername = player.username;
               const avatar = player.avatar;
@@ -184,12 +196,27 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                 >
                   <div className="flex items-center gap-2 w-full truncate">
-                    <Avatar
-                      profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                      avatarImage={avatar?.avatarImage}
-                      size="xl"
-                      className="flex-shrink-0"
-                    />
+                    {isMe ? (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setShowAvatarPicker(true); }}
+                        className="flex-shrink-0 rounded-full ring-2 ring-neo-cyan/50 hover:ring-neo-cyan transition-all cursor-pointer"
+                        aria-label={t('profile.chooseAvatar') || 'Change avatar'}
+                      >
+                        <Avatar
+                          profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+                          avatarImage={avatar?.avatarImage}
+                          size="xl"
+                        />
+                      </button>
+                    ) : (
+                      <Avatar
+                        profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+                        avatarImage={avatar?.avatarImage}
+                        size="xl"
+                        className="flex-shrink-0"
+                      />
+                    )}
                     {playerIsHost && <Crown className="w-4 h-4 flex-shrink-0" />}
                     <span className="truncate text-sm font-bold">{playerUsername}</span>
                     {isMe && <span className="text-xs opacity-70">({t('playerView.me')})</span>}
@@ -229,6 +256,14 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Avatar Picker Modal (landscape) */}
+        <EmojiAvatarPicker
+          isOpen={showAvatarPicker}
+          onClose={() => setShowAvatarPicker(false)}
+          onSave={handleAvatarSave}
+          currentAvatarImage={currentPlayer?.avatar?.avatarImage}
+        />
       </div>
     );
   }
@@ -312,7 +347,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           ) : (
             // Player: Waiting Message - NEO-BRUTALIST with Interactive Mascot
             <div className="flex-1 p-4 sm:p-6 md:p-8 bg-slate-800/95 text-white border-4 border-neo-black shadow-hard flex flex-col items-center justify-center rotate-[-0.5deg]">
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.9, rotate: -3 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -334,10 +369,10 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   clickAnimation="bounce"
                   tooltip={t('playerView.clickToWakeUp')}
                 />
-              </motion.div>
+              </AdaptiveMotion.div>
 
               {/* Text */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
@@ -346,19 +381,19 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 <div className="bg-neo-black text-neo-white px-6 py-3 font-black uppercase text-xl md:text-2xl tracking-wider rotate-[1deg] shadow-hard border-4 border-neo-black">
                   {t('playerView.waitForGameStart')}
                 </div>
-                <motion.p
+                <AdaptiveMotion.p
                   animate={{ opacity: [0.6, 1, 0.6] }}
                   transition={{ duration: 2, repeat: Infinity }}
                   className="text-slate-400 font-bold text-sm mt-4 uppercase tracking-wide"
                 >
                   {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
-                </motion.p>
-              </motion.div>
+                </AdaptiveMotion.p>
+              </AdaptiveMotion.div>
 
               {/* Decorative dots */}
               <div className="flex gap-3 mt-6">
                 {[0, 1, 2].map((i) => (
-                  <motion.div
+                  <AdaptiveMotion.div
                     key={i}
                     animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
                     transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
@@ -379,7 +414,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               <Users className="w-4 h-4 text-neo-pink" />
               {t(isHost ? 'hostView.playersJoined' : 'playerView.players')} ({playersReady.length})
             </h3>
-            <div className="flex flex-col gap-3 flex-1 overflow-y-auto relative z-10">
+            <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto overscroll-contain relative z-10" style={{ WebkitOverflowScrolling: 'touch' }}>
               {playersReady.map((player, index) => {
                 const playerUsername = player.username;
                 const avatar = player.avatar;
@@ -387,7 +422,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 const isMe = playerUsername === username;
 
                 return (
-                  <motion.div
+                  <AdaptiveMotion.div
                     key={playerUsername}
                     initial={{ scale: 0, opacity: 0, rotate: -5 }}
                     animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -401,12 +436,27 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                       style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                     >
                       <div className="flex items-center gap-3">
-                        <Avatar
-                          profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                          avatarImage={avatar?.avatarImage}
-                          size="2xl"
-                          className="flex-shrink-0"
-                        />
+                        {isMe ? (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowAvatarPicker(true); }}
+                            className="flex-shrink-0 rounded-full ring-2 ring-neo-cyan/50 hover:ring-neo-cyan transition-all cursor-pointer"
+                            aria-label={t('profile.chooseAvatar') || 'Change avatar'}
+                          >
+                            <Avatar
+                              profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+                              avatarImage={avatar?.avatarImage}
+                              size="2xl"
+                            />
+                          </button>
+                        ) : (
+                          <Avatar
+                            profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+                            avatarImage={avatar?.avatarImage}
+                            size="2xl"
+                            className="flex-shrink-0"
+                          />
+                        )}
                         {playerIsHost && <Crown className="w-4 h-4 text-neo-lime" />}
                         <SlotMachineText text={playerUsername} />
                         {isMe && (
@@ -416,7 +466,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                         )}
                       </div>
                     </Badge>
-                  </motion.div>
+                  </AdaptiveMotion.div>
                 );
               })}
             </div>
@@ -434,7 +484,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             username={isHost ? "Host" : username}
             isHost={isHost}
             gameCode={gameCode}
-            className="h-full min-h-[400px]"
+            className="h-full min-h-[250px] sm:min-h-[350px] md:min-h-[400px]"
           />
         </div>
       </div>
@@ -472,8 +522,16 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Avatar Picker Modal */}
+      <EmojiAvatarPicker
+        isOpen={showAvatarPicker}
+        onClose={() => setShowAvatarPicker(false)}
+        onSave={handleAvatarSave}
+        currentAvatarImage={currentPlayer?.avatar?.avatarImage}
+      />
     </div>
   );
-};
+});
 
 export default WaitingScreen;

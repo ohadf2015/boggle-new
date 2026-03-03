@@ -27,7 +27,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
   return (
     <footer
       role="contentinfo"
-      className={cn('py-3 px-2 sm:px-3 lg:px-4 mt-auto border-t-4 border-neo-black bg-neo-navy text-white content-visibility-auto-sm', className)}
+      className={cn('hidden sm:block py-3 px-2 sm:px-3 lg:px-4 mt-auto border-t-4 border-neo-black bg-neo-navy text-white content-visibility-auto-sm', className)}
     >
       <div className="w-full">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -82,7 +82,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link
-              href={`/${language}/legal/terms`}
+              href={`/${language}/legal`}
               className="
                 min-h-[48px] px-3 flex items-center
                 text-sm font-bold uppercase tracking-wide
@@ -91,46 +91,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('legal.termsOfService')}
-            </Link>
-            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
-            <Link
-              href={`/${language}/legal/privacy`}
-              className="
-                min-h-[48px] px-3 flex items-center
-                text-sm font-bold uppercase tracking-wide
-                text-neo-cream/90 hover:text-neo-lime
-                transition-colors duration-100
-                hover:underline underline-offset-4 decoration-2
-              "
-            >
-              {t('legal.privacyPolicy')}
-            </Link>
-            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
-            <Link
-              href={`/${language}/legal/cookies`}
-              className="
-                min-h-[48px] px-3 flex items-center
-                text-sm font-bold uppercase tracking-wide
-                text-neo-cream/90 hover:text-neo-lime
-                transition-colors duration-100
-                hover:underline underline-offset-4 decoration-2
-              "
-            >
-              {t('footer.cookiePolicy')}
-            </Link>
-            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
-            <Link
-              href={`/${language}/legal/disclaimer`}
-              className="
-                min-h-[48px] px-3 flex items-center
-                text-sm font-bold uppercase tracking-wide
-                text-neo-cream/90 hover:text-neo-lime
-                transition-colors duration-100
-                hover:underline underline-offset-4 decoration-2
-              "
-            >
-              {t('legal.disclaimer.title') || 'Disclaimer'}
+              {t('legal.title') || 'Legal'}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link

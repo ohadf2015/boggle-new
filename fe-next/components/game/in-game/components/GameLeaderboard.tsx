@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Crown, Type } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import PresenceIndicator from '@/components/PresenceIndicator';
@@ -131,7 +131,7 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
   );
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow relative -rotate-1"
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
@@ -165,6 +165,6 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
           )}
         </div>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });

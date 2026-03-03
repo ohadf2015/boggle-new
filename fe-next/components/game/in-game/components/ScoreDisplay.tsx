@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import ScoreBreakdownTooltip from '../../ScoreBreakdownTooltip';
 import type { TranslationFn } from '../types';
 
@@ -44,7 +44,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
   if (isLandscape) {
     return (
       <div className="flex flex-col items-center relative">
-        <motion.div
+        <AdaptiveMotion.div
           key={score}
           initial={{ scale: 1.4, color: '#BFFF00' }}
           animate={{ scale: 1, color: '#1a1a2e' }}
@@ -52,7 +52,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           className="landscape-stat-primary text-neo-black"
         >
           {score}
-        </motion.div>
+        </AdaptiveMotion.div>
         <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
           {t('common.score') || 'SCORE'}
           <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
@@ -64,7 +64,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
   // Desktop variant (larger, hover effect)
   if (isDesktop) {
     return (
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-4 py-1.5 min-w-[90px] overflow-hidden"
@@ -72,9 +72,9 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
         whileHover={{ scale: 1.05 }}
       >
         {/* Expanding pulse ring on score increase */}
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {pulseKey > 0 && (
-            <motion.div
+            <AdaptiveMotion.div
               key={`pulse-${pulseKey}`}
               className="absolute inset-0 rounded-neo border-2 border-neo-lime pointer-events-none"
               initial={{ scale: 1, opacity: 0.7 }}
@@ -83,10 +83,10 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
               transition={{ duration: 0.5, ease: 'easeOut' }}
             />
           )}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
         <div className="text-center relative z-10">
-          <motion.div
+          <AdaptiveMotion.div
             key={score}
             initial={{ scale: 1.4, y: -4 }}
             animate={{ scale: 1, y: 0 }}
@@ -95,14 +95,14 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5)' }}
           >
             {score}
-          </motion.div>
+          </AdaptiveMotion.div>
           <div className="text-sm font-bold uppercase tracking-wider text-neo-black flex items-center justify-center gap-0.5">
             {t('common.score') || 'Score'}
             <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
           </div>
         </div>
         {rank && rank > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             key={`rank-${rank}`}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -110,15 +110,15 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-6 h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-xs font-black shadow-hard-sm"
           >
             #{rank}
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 
   // Mobile variant
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-hidden"
@@ -127,9 +127,9 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
       }}
     >
       {/* Expanding pulse ring on score increase */}
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {pulseKey > 0 && (
-          <motion.div
+          <AdaptiveMotion.div
             key={`pulse-${pulseKey}`}
             className="absolute inset-0 rounded-neo border-2 border-neo-lime pointer-events-none"
             initial={{ scale: 1, opacity: 0.7 }}
@@ -138,9 +138,9 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
       <div className="text-center relative z-10">
-        <motion.div
+        <AdaptiveMotion.div
           key={score}
           initial={{ scale: 1.4, y: -3 }}
           animate={{ scale: 1, y: 0 }}
@@ -149,14 +149,14 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
         >
           {score}
-        </motion.div>
+        </AdaptiveMotion.div>
         <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px] md:text-xs">
           {t('common.score') || 'Score'}
         </div>
       </div>
       {/* Rank badge with spring entrance */}
       {rank && rank > 0 && leaderboardSize > 1 && (
-        <motion.div
+        <AdaptiveMotion.div
           key={`rank-${rank}`}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -164,8 +164,8 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-hard-sm"
         >
           #{rank}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 });

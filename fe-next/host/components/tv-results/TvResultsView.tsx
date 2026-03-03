@@ -15,6 +15,7 @@ import { HostWordSelector } from '../../../components/multiplayer/HostWordSelect
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
 import { cn } from '../../../lib/utils';
+import { DJMascotWithEntrance } from '../../../components/ui/DJMascot';
 import { useSoundEffects } from '../../../contexts/SoundEffectsContext';
 import { useMusic } from '../../../contexts/MusicContext';
 import type { PlayerResult } from '@/types/components';
@@ -232,8 +233,13 @@ const TvResultsView = memo<TvResultsViewProps>(({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="flex-shrink-0 py-6 px-8 text-center"
+              className="relative flex-shrink-0 py-6 px-8 text-center"
             >
+              {/* DJ Mascot */}
+              <div className="absolute bottom-0 left-4">
+                <DJMascotWithEntrance size="lg" delay={0.5} />
+              </div>
+
               <motion.h1
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}

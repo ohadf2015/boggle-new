@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, memo, useRef } from 'react';
+import React, { useEffect, useState, memo, useRef, useMemo } from 'react';
 import { Button } from '../components/ui/button';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
@@ -390,8 +390,8 @@ const HostView: React.FC<HostViewProps> = memo(({
     },
   });
 
-  // Build leaderboard for waiting view
-  const leaderboard = state.players.playersReady
+  // Build leaderboard for waiting view — memoized to avoid re-sorting on every timer tick
+  const leaderboard = useMemo(() => state.players.playersReady
     .map((player) => {
       const name = typeof player === 'string' ? player : player.username;
       return {
@@ -404,13 +404,13 @@ const HostView: React.FC<HostViewProps> = memo(({
     })
     .filter(p => {
       // Filter out Host if they have 0 words (Broadcast Mode)
-      // We check if the username matches the current host specific username or the isHost flag
       if ((p.username === username || p.isHost) && p.wordCount === 0) {
         return false;
       }
       return true;
     })
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.score - a.score),
+  [state.players.playersReady, state.players.playerScores, state.players.playerWordCounts, username]);
 
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;

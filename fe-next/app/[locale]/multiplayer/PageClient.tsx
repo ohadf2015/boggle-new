@@ -406,10 +406,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         `🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`
       );
 
-      if (!socket || !isConnected) {
+      // Use socket.connected directly — React state (isConnected) can lag behind
+      // the actual socket state by 1-3ms, causing false "not connected" errors
+      if (!socket?.connected) {
         console.error('❌ [JOIN] Cannot join - socket not connected', {
           socket: !!socket,
           isConnected,
+          socketConnected: socket?.connected,
         });
         setError(t('errors.notConnected') || 'Not connected to server');
         toast.error(t('common.notConnected') || 'Not connected to server', {

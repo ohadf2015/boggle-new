@@ -213,11 +213,11 @@ describe('GlobalBottomNav', () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it('should show on multiplayer lobby path (Play tab visible)', () => {
+        it('should hide on multiplayer path (has own nav)', () => {
             (usePathname as jest.Mock).mockReturnValue('/en/multiplayer');
 
             const { container } = render(<GlobalBottomNav />);
-            expect(container.firstChild).not.toBeNull();
+            expect(container.firstChild).toBeNull();
         });
 
         it('should hide on singleplayer path (has own nav)', () => {

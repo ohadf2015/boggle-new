@@ -138,57 +138,52 @@ export function MusicProvider({ children }: MusicProviderProps) {
         return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     }, []);
 
-    // Initialize Howl instances
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
+    // Lazy Howl creation — only instantiate a Howl when the track is first needed.
+    // This defers audio object allocation and AudioNode setup until playback,
+    // saving ~40MB of memory for users who never hear most tracks.
+    const getOrCreateHowl = useCallback((key: TrackKey): Howl => {
+        if (howlsRef.current[key]) return howlsRef.current[key];
 
-        Object.entries(TRACKS).forEach(([key, src]) => {
-            // Use Howler's native loop: true for seamless, reliable looping
-            // This is simpler and avoids the complexity of manual crossfade-to-self
-            howlsRef.current[key as TrackKey] = createLazyHowl(src, {
-                loop: true, // Native looping for seamless playback
-                volume: 0,
-                // html5: true set by createLazyHowl for iOS Safari compatibility
-                // preload: false set by createLazyHowl to prevent automatic loading
-                onloaderror: (id, err) => {
-                    logger.error(`[Music] Failed to load ${key}:`, err);
-                },
-                onplayerror: (id, err) => {
-                    logger.error(`[Music] Failed to play ${key}:`, err);
-                    // Try to unlock and retry - wrap in catch for iOS Safari errors
-                    if (Howler.ctx && Howler.ctx.state === 'suspended') {
-                        Howler.ctx.resume()
-                            .then(() => {
-                                try {
-                                    howlsRef.current[key as TrackKey]?.play();
-                                } catch (playErr) {
-                                    logger.warn(`[Music] Retry play failed for ${key}:`, playErr);
-                                }
-                            })
-                            .catch((resumeErr: Error) => {
-                                // Silently handle iOS Safari audio device errors - log only in development
-                                logger.log(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
-                            });
-                    }
-                },
-                // Note: With loop: true, onend is not called - Howler handles looping natively
-                // This avoids the previous bug where we tried to crossfade a single instance to itself
-            });
+        const src = TRACKS[key];
+        const howl = createLazyHowl(src, {
+            loop: true,
+            volume: 0,
+            onloaderror: (id, err) => {
+                logger.warn(`[Music] Failed to load ${key}:`, err);
+            },
+            onplayerror: (id, err) => {
+                logger.warn(`[Music] Failed to play ${key}:`, err);
+                if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                    Howler.ctx.resume()
+                        .then(() => {
+                            try {
+                                howlsRef.current[key]?.play();
+                            } catch (playErr) {
+                                logger.warn(`[Music] Retry play failed for ${key}:`, playErr);
+                            }
+                        })
+                        .catch((resumeErr: Error) => {
+                            logger.log(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
+                        });
+                }
+            },
         });
+        howlsRef.current[key] = howl;
+        return howl;
+    }, []);
 
-        // Copy ref values for cleanup to avoid stale ref warnings
+    // Cleanup Howl instances on unmount
+    useEffect(() => {
         const howls = howlsRef.current;
         const fadeTimeout = fadeTimeoutRef.current;
 
         return () => {
-            // Cleanup on unmount
             Object.values(howls).forEach(howl => {
                 howl.unload();
             });
             if (fadeTimeout) {
                 clearTimeout(fadeTimeout);
             }
-            // Note: transitionTimeoutRef cleanup is in the useCallback scope
         };
     }, []);
 
@@ -460,11 +455,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
             logger.log('[Music] Cancelled pending unlock timeout for new track:', trackKey);
         }
 
-        const newHowl = howlsRef.current[trackKey];
-        if (!newHowl) {
-            logger.warn(`[Music] Track not found: ${trackKey}`);
-            return;
-        }
+        const newHowl = getOrCreateHowl(trackKey);
 
         // Preload the track on-demand if not loaded yet
         // CRITICAL for iOS Safari: Don't await preload - call play() synchronously
@@ -586,7 +577,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 fadeToTrackRef.current?.(pendingTrack, pendingFadeOut, pendingFadeIn);
             }
         }, Math.max(fadeOutMs, fadeInMs));
-    }, []); // Using refs instead of state to avoid stale closures
+    }, [getOrCreateHowl]); // Using refs instead of state to avoid stale closures
 
     // Keep ref in sync for recursive calls
     useEffect(() => {
@@ -608,7 +599,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
                     await Howler.ctx.resume();
                     logger.log('[Music] AudioContext resumed successfully');
                 } catch (err) {
-                    logger.error('[Music] Failed to resume AudioContext:', err);
+                    logger.warn('[Music] Failed to resume AudioContext:', err);
                 }
             }
 
@@ -629,13 +620,10 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 pendingUnlockTrackRef.current = null;
                 logger.log('[Music] Playing pending track:', trackKey);
 
-                // Pre-load the track synchronously if needed, then play immediately
-                const pendingHowl = howlsRef.current[trackKey];
-                if (pendingHowl && pendingHowl.state() === 'unloaded') {
-                    // Load the track - this starts loading but doesn't block
+                // Ensure Howl instance exists (lazy-created if needed)
+                const pendingHowl = getOrCreateHowl(trackKey);
+                if (pendingHowl.state() === 'unloaded') {
                     pendingHowl.load();
-                    // Play once loaded - Howler queues play() calls made before load completes
-                    // This maintains the user gesture chain because play() is called synchronously
                     logger.log('[Music] Track not loaded, loading and playing:', trackKey);
                 }
 
@@ -664,7 +652,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
         };
 
         return cleanup;
-    }, [audioUnlocked, fadeToTrack]);
+    }, [audioUnlocked, fadeToTrack, getOrCreateHowl]);
 
     // Play a track (with short fade)
     const playTrack = useCallback((trackKey: TrackKey) => {
@@ -746,11 +734,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
 
     // Preload a specific music track (for eager loading, e.g., in game lobby)
     const preloadMusicTrack = useCallback(async (trackKey: TrackKey) => {
-        const howl = howlsRef.current[trackKey];
-        if (!howl) {
-            logger.warn(`[Music] Cannot preload track: ${trackKey} not found`);
-            return;
-        }
+        const howl = getOrCreateHowl(trackKey);
 
         if (howl.state() === 'unloaded') {
             logger.log('[Music] Preloading track:', trackKey);
@@ -763,7 +747,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
         } else {
             logger.log('[Music] Track already loaded:', trackKey);
         }
-    }, []);
+    }, [getOrCreateHowl]);
 
     // Memoize TRACKS object to prevent recreation on every render
     const TRACKS_CONST = useMemo(() => ({

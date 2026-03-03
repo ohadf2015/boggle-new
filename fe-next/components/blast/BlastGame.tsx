@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastGame } from './hooks/useBlastGame';
@@ -47,11 +48,13 @@ export function BlastGame({
 }: BlastGameProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const { isLowEnd } = useDevicePerformance();
 
   // Combo system
   const combo = useComboSystem({
     trackMaxCombo: true,
     onComboSound: playComboSound,
+    timerIntervalMs: isLowEnd ? 500 : 250,
   });
 
   // Auto-cascade word callback: increment combo + play sound for each cascade word

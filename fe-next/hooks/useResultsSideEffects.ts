@@ -383,7 +383,8 @@ export function useResultsSideEffects({
       authLoading ||
       hasShownUpgradePrompt ||
       !hasUpdatedStatsRef.current ||
-      showWordFeedback
+      showWordFeedback ||
+      gameCode
     ) {
       return;
     }
@@ -424,7 +425,7 @@ export function useResultsSideEffects({
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(initialCheckTimeout);
     };
-  }, [isAuthenticated, user, authLoading, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback]);
+  }, [isAuthenticated, user, authLoading, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback, gameCode]);
 
   // ==============================================
   // RETURN ALL DATA

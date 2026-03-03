@@ -1,10 +1,11 @@
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import TapToDragTooltip from '../../TapToDragTooltip';
 import KeyboardHintTooltip from '../../KeyboardHintTooltip';
 import { KeyboardShortcutsOverlay, KeyboardModeIndicator, KeyboardQuickTip } from '@/components/keyboard';
+import DirectionHintOverlay from '../../DirectionHintOverlay';
 import type { EarthquakeState, TranslationFn } from '../types';
 import type { Language } from '@/shared/types/game';
 
@@ -93,6 +94,9 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
 
       {/* Keyboard Shortcuts Overlay - Desktop only */}
       {isDesktop && <KeyboardShortcutsOverlay isOpen={isHelpOpen} onClose={onCloseHelp} t={t} />}
+
+      {/* Direction hint overlay - one-time tutorial for new players */}
+      {isPlaying && <DirectionHintOverlay t={t} />}
     </>
   );
 });

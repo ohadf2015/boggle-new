@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 3591,
+    "totalKeysInCode": 3594,
     "keyCountByLanguage": {
-      "en": 5125,
-      "he": 5141,
-      "sv": 5135,
-      "ja": 5150,
-      "es": 4787
+      "en": 5147,
+      "he": 5163,
+      "sv": 5157,
+      "ja": 5172,
+      "es": 4805
     },
-    "missingFromEnglish": 19,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 6,
@@ -160,215 +160,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "adventure.bosses.mechanicProgress",
-      "usages": [
-        {
-          "file": "components/adventure/boss/BossMechanicWidget.tsx",
-          "line": 90
-        }
-      ]
-    },
-    {
-      "key": "adventure.bosses.msGrammar.phases.finalExam",
-      "usages": [
-        {
-          "file": "components/adventure/__tests__/AdventureGame.bossIntegration.test.tsx",
-          "line": 173
-        },
-        {
-          "file": "components/adventure/__tests__/BossDialogue.test.tsx",
-          "line": 101
-        },
-        {
-          "file": "components/adventure/__tests__/BossIntro.test.tsx",
-          "line": 123
-        },
-        {
-          "file": "components/adventure/__tests__/BossVictory.test.tsx",
-          "line": 102
-        }
-      ]
-    },
-    {
-      "key": "adventure.bosses.msGrammar.phases.lecture",
-      "usages": [
-        {
-          "file": "components/adventure/__tests__/AdventureGame.bossIntegration.test.tsx",
-          "line": 171
-        },
-        {
-          "file": "components/adventure/__tests__/BossDialogue.test.tsx",
-          "line": 99
-        },
-        {
-          "file": "components/adventure/__tests__/BossIntro.test.tsx",
-          "line": 121
-        },
-        {
-          "file": "components/adventure/__tests__/BossVictory.test.tsx",
-          "line": 100
-        }
-      ]
-    },
-    {
-      "key": "adventure.bosses.msGrammar.phases.popTest",
-      "usages": [
-        {
-          "file": "components/adventure/__tests__/AdventureGame.bossIntegration.test.tsx",
-          "line": 172
-        },
-        {
-          "file": "components/adventure/__tests__/BossDialogue.test.tsx",
-          "line": 100
-        },
-        {
-          "file": "components/adventure/__tests__/BossIntro.test.tsx",
-          "line": 122
-        },
-        {
-          "file": "components/adventure/__tests__/BossVictory.test.tsx",
-          "line": 101
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.labyrinth.bossZone",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world6.ts",
-          "line": 233
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.labyrinth.zone1",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world6.ts",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.labyrinth.zone2",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world6.ts",
-          "line": 225
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.nebula.bossZone",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world8.ts",
-          "line": 233
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.nebula.zone1",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world8.ts",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.nebula.zone2",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world8.ts",
-          "line": 225
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.palace.bossZone",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world7.ts",
-          "line": 233
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.palace.zone1",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world7.ts",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.palace.zone2",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world7.ts",
-          "line": 225
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.peaks.bossZone",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world9.ts",
-          "line": 233
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.peaks.zone1",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world9.ts",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.peaks.zone2",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world9.ts",
-          "line": 225
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.throne.bossZone",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world10.ts",
-          "line": 233
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.throne.zone1",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world10.ts",
-          "line": 217
-        }
-      ]
-    },
-    {
-      "key": "adventure.chapters.throne.zone2",
-      "usages": [
-        {
-          "file": "lib/adventure/themes/world10.ts",
-          "line": 225
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "share.qrCode",
@@ -468,6 +260,9 @@
     ],
     "es": [
       "common.email",
+      "playerView.readyUp",
+      "playerView.readyConfirmed",
+      "playerView.editName",
       "achievements.duelWinner.name",
       "achievements.duelWinner.description",
       "achievements.practiceMaster.name",
@@ -499,6 +294,7 @@
       "buzz.error.failed",
       "buzz.error.noInternet",
       "accessibility.skipToMain",
+      "adventure.bosses.mechanicProgress",
       "adventure.bosses.phases.phase1",
       "adventure.bosses.phases.phase2",
       "adventure.bosses.telegraph.incoming",

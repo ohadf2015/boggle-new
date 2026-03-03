@@ -57,6 +57,7 @@ import {
   MoreOptionsAccordion,
   SharePanel,
   EmojiShareCard,
+  DailyWordHuntFacts,
 } from './results';
 
 // ============================================================================
@@ -330,6 +331,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
         >
           <RankBadge stats={stats} t={t} />
+        </motion.div>
+      )}
+
+      {/* Witty facts — data-driven insights about the player's performance */}
+      {stats && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <DailyWordHuntFacts result={result} stats={stats} t={t} />
         </motion.div>
       )}
 

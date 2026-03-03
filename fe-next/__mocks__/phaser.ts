@@ -134,6 +134,8 @@ class Scene {
   game = {
     canvas: {
       style: {} as CSSStyleDeclaration,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
     },
     events: {
       on: jest.fn(),

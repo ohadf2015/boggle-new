@@ -94,6 +94,10 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
   // Force update trigger for when consumers need the latest values
   const [, forceUpdate] = useState(0);
 
+  // Previous output values for change detection (avoid unnecessary re-renders)
+  const prevOutputRef = useRef({ x: 0, y: 0 });
+  const EPSILON = 0.1; // Minimum change to trigger a re-render
+
   // Update combined output and CSS properties
   const updateOutput = useCallback(() => {
     const x = gyroRef.current.x + gestureRef.current.x + ambientRef.current.x;
@@ -105,6 +109,14 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
 
     // Update CSS custom properties (moves animation to compositor thread)
     updateCSSProperties(x, y, opts.cssTarget);
+
+    // Only trigger React re-render when output values meaningfully change
+    const dx = Math.abs(x - prevOutputRef.current.x);
+    const dy = Math.abs(y - prevOutputRef.current.y);
+    if (dx > EPSILON || dy > EPSILON) {
+      prevOutputRef.current = { x, y };
+      forceUpdate((n) => n + 1);
+    }
   }, [isGyroActive, opts.cssTarget]);
 
   // Visibility API - pause RAF when tab is hidden
@@ -265,18 +277,6 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       }
     };
   }, [opts.enableAmbient, opts.ambientSpeed, opts.intensity, prefersReducedMotion, updateOutput]);
-
-  // Trigger initial render and periodic sync for consumers that need values
-  // This is a low-frequency update (not 60fps) just to sync React state with refs
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-
-    const syncInterval = setInterval(() => {
-      forceUpdate((n) => n + 1);
-    }, 100); // 10fps sync is enough for consumers
-
-    return () => clearInterval(syncInterval);
-  }, [prefersReducedMotion]);
 
   // Return static values for reduced motion
   if (prefersReducedMotion) {

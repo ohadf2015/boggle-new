@@ -7,7 +7,7 @@ import type { MutableRefObject } from 'react';
 // ==================== Constants ====================
 
 /** Base combo chain window in milliseconds */
-export const COMBO_BASE_WINDOW_MS = 3000;
+export const COMBO_BASE_WINDOW_MS = 4000;
 
 /** Bonus time per combo level in milliseconds */
 export const COMBO_LEVEL_BONUS_MS = 1000;

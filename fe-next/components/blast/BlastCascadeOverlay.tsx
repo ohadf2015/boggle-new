@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import anime from 'animejs';
 import { BLAST_ANIM, type BlastCascadePhase, type CascadeAnimationData } from './hooks/useBlastCascade';
 import type { BlastTileType } from './types';
 
@@ -49,72 +48,76 @@ export function BlastCascadeOverlay({
   const overlayRef = useRef<HTMLDivElement>(null);
   const cellSize = containerWidth / gridSize;
 
-  // Run anime.js animations when phase changes
+  // Run anime.js animations when phase changes — dynamically imported to save ~6KB
   useEffect(() => {
     if (!overlayRef.current || !data || phase === 'idle') return;
 
     const el = overlayRef.current;
 
-    if (phase === 'clearing') {
-      const clearTargets = el.querySelectorAll('.blast-cascade-clear');
-      if (clearTargets.length > 0) {
-        anime({
-          targets: clearTargets,
-          scale: [1, 1.2, 0],
-          opacity: [1, 1, 0],
-          rotate: anime.stagger([-8, 8]),
-          filter: ['brightness(1)', 'brightness(1.5)', 'brightness(0.3)'],
-          duration: BLAST_ANIM.clear.duration,
-          easing: BLAST_ANIM.clear.easing,
-          delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
-        });
-      }
-    }
+    import('animejs').then(({ default: anime }) => {
+      if (!el.isConnected) return;
 
-    if (phase === 'falling') {
-      const fallTargets = el.querySelectorAll('.blast-cascade-fall');
-      if (fallTargets.length > 0) {
-        anime({
-          targets: fallTargets,
-          translateY: [
-            function (el: Element) {
-              const dist = Number((el as HTMLElement).dataset.fallDistance || 0);
-              return -dist * cellSize;
-            },
-            0,
-          ],
-          scaleY: [0.88, 1.12, 0.97, 1.0],
-          scaleX: [1.08, 0.92, 1.02, 1.0],
-          duration: function (el: Element) {
-            const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
-            return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
-          },
-          easing: BLAST_ANIM.fall.easing,
-        });
+      if (phase === 'clearing') {
+        const clearTargets = el.querySelectorAll('.blast-cascade-clear');
+        if (clearTargets.length > 0) {
+          anime({
+            targets: clearTargets,
+            scale: [1, 1.2, 0],
+            opacity: [1, 1, 0],
+            rotate: anime.stagger([-8, 8]),
+            filter: ['brightness(1)', 'brightness(1.5)', 'brightness(0.3)'],
+            duration: BLAST_ANIM.clear.duration,
+            easing: BLAST_ANIM.clear.easing,
+            delay: anime.stagger(BLAST_ANIM.clear.stagger, { from: 'center' }),
+          });
+        }
       }
-    }
 
-    if (phase === 'appearing') {
-      const newTargets = el.querySelectorAll('.blast-cascade-new');
-      if (newTargets.length > 0) {
-        anime({
-          targets: newTargets,
-          translateY: [
-            function (el: Element) {
-              const offset = Number((el as HTMLElement).dataset.spawnOffset || 1);
-              return -offset * cellSize;
+      if (phase === 'falling') {
+        const fallTargets = el.querySelectorAll('.blast-cascade-fall');
+        if (fallTargets.length > 0) {
+          anime({
+            targets: fallTargets,
+            translateY: [
+              function (el: Element) {
+                const dist = Number((el as HTMLElement).dataset.fallDistance || 0);
+                return -dist * cellSize;
+              },
+              0,
+            ],
+            scaleY: [0.88, 1.12, 0.97, 1.0],
+            scaleX: [1.08, 0.92, 1.02, 1.0],
+            duration: function (el: Element) {
+              const dist = Number((el as HTMLElement).dataset.fallDistance || 1);
+              return BLAST_ANIM.fall.baseDuration + dist * BLAST_ANIM.fall.perRowDuration;
             },
-            0,
-          ],
-          scale: [0.5, 1],
-          opacity: [0, 1],
-          boxShadow: ['0 0 12px rgba(255,255,255,0.6)', '0 0 0px rgba(255,255,255,0)'],
-          duration: BLAST_ANIM.appear.duration,
-          easing: BLAST_ANIM.appear.easing,
-          delay: anime.stagger(BLAST_ANIM.appear.stagger, { from: 'first' }),
-        });
+            easing: BLAST_ANIM.fall.easing,
+          });
+        }
       }
-    }
+
+      if (phase === 'appearing') {
+        const newTargets = el.querySelectorAll('.blast-cascade-new');
+        if (newTargets.length > 0) {
+          anime({
+            targets: newTargets,
+            translateY: [
+              function (el: Element) {
+                const offset = Number((el as HTMLElement).dataset.spawnOffset || 1);
+                return -offset * cellSize;
+              },
+              0,
+            ],
+            scale: [0.5, 1],
+            opacity: [0, 1],
+            boxShadow: ['0 0 12px rgba(255,255,255,0.6)', '0 0 0px rgba(255,255,255,0)'],
+            duration: BLAST_ANIM.appear.duration,
+            easing: BLAST_ANIM.appear.easing,
+            delay: anime.stagger(BLAST_ANIM.appear.stagger, { from: 'first' }),
+          });
+        }
+      }
+    });
   }, [phase, data, cellSize]);
 
   if (!data || phase === 'idle') return null;

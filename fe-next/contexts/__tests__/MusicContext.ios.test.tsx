@@ -4,17 +4,12 @@
  * Tests that audio is configured correctly for iOS Safari compatibility.
  * iOS Safari has strict requirements for Web Audio API that require special handling.
  *
- * Key iOS Safari Issues:
- * 1. Web Audio API (html5: false) doesn't play when device is in silent mode
- * 2. AudioContext requires user gesture to start
- * 3. Can throw InvalidStateError for device-related issues
- *
- * Solution:
- * Use html5: true for iOS Safari to ensure audio plays regardless of silent mode.
+ * Note: Howl instances are lazy-initialized (created on first use, not at mount).
+ * Tests trigger track creation via playTrack() to verify configuration.
  */
 
 import React from 'react';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 
 // Track Howl constructor calls and their options
 const howlConstructorCalls: Array<{ src: string[]; html5: boolean }> = [];
@@ -69,11 +64,8 @@ jest.mock('@/hooks/useLocalStorageState', () => ({
   ]),
 }));
 
-// We need to import the actual module to test Howl configuration
-// This must come after mocks are set up
 import { MusicProvider, useMusic } from '../MusicContext';
 
-// Helper wrapper for hooks
 function createWrapper() {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return <MusicProvider>{children}</MusicProvider>;
@@ -88,25 +80,30 @@ describe('MusicContext iOS Safari Compatibility', () => {
 
   describe('Howl configuration for iOS', () => {
     it('should use html5: true for iOS Safari compatibility', () => {
-      // Render the provider to trigger Howl initialization
-      renderHook(() => useMusic(), { wrapper: createWrapper() });
+      // Howl instances are lazy-initialized — unlock audio then trigger playTrack
+      const { result } = renderHook(() => useMusic(), { wrapper: createWrapper() });
 
-      // Check that all Howl instances are created with html5: true
+      act(() => {
+        result.current.unlockAudio();
+        result.current.playTrack('lobby');
+      });
+
       expect(howlConstructorCalls.length).toBeGreaterThan(0);
 
-      // IMPORTANT: For iOS Safari, all audio should use html5: true
-      // This ensures audio plays even when device is in silent mode
       const hasHtml5False = howlConstructorCalls.some((call) => call.html5 === false);
-
-      // This test should FAIL with current implementation (html5: false)
-      // and PASS after fix (html5: true)
       expect(hasHtml5False).toBe(false);
     });
 
     it('should configure all music tracks with html5: true', () => {
-      renderHook(() => useMusic(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useMusic(), { wrapper: createWrapper() });
 
-      // Expected music tracks
+      // Unlock audio then trigger lazy creation for all tracks
+      const trackKeys = ['lobby', 'beforeGame', 'inGame', 'almostOutOfTime', 'bossaArcade', 'bossa'] as const;
+      act(() => {
+        result.current.unlockAudio();
+        trackKeys.forEach((key) => result.current.playTrack(key));
+      });
+
       const expectedTracks = [
         '/music/in_lobby.mp3',
         '/music/before_game.mp3',
@@ -116,13 +113,11 @@ describe('MusicContext iOS Safari Compatibility', () => {
         '/music/bossa.mp3',
       ];
 
-      // Verify all tracks are configured
       expectedTracks.forEach((trackPath) => {
         const trackCall = howlConstructorCalls.find((call) =>
           call.src.includes(trackPath)
         );
         expect(trackCall).toBeDefined();
-        // Each track should use html5: true for iOS compatibility
         expect(trackCall?.html5).toBe(true);
       });
     });

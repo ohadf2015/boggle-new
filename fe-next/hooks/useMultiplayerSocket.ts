@@ -144,6 +144,11 @@ export function useMultiplayerSocket(
       setSocket(socketInstance);
       setIsConnected(true);
       socketInstance.emit('getActiveRooms');
+    } else if (socketInstance.connected) {
+      // Socket was connecting in background and is now connected — sync state immediately
+      setSocket(socketInstance);
+      setIsConnected(true);
+      socketInstance.emit('getActiveRooms');
     }
 
     // Remove any existing listeners before adding new ones

@@ -328,6 +328,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isCurrentPlayerReady,
     readyUsernames,
     duplicateRuleDisabled: duplicateRuleDisabled ?? false,
+    allPlayerWords,
     t,
   };
 
@@ -395,7 +396,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
 
         {/* Tab Content - Scrollable area */}
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-[--mobile-bottom-safe]">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-24"
+          style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
+        >
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div

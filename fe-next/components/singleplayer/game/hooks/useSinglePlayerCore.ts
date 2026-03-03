@@ -7,6 +7,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { useComboSystem } from '@/hooks/useComboSystem';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -79,6 +80,9 @@ export function useSinglePlayerCore({
     setGameActive,
   } = useSoundEffects();
   const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
+
+  // Device performance detection
+  const { isLowEnd } = useDevicePerformance();
 
   // Layout detection
   const isLandscape = useMobileLandscape();
@@ -181,6 +185,7 @@ export function useSinglePlayerCore({
       if (coinsAwarded > 0) setComboCoinReward(coinsAwarded);
     },
     trackMaxCombo: true,
+    timerIntervalMs: isLowEnd ? 500 : 250,
   });
 
   // Direction guidance

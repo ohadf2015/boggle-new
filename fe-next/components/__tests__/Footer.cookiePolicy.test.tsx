@@ -11,7 +11,7 @@ jest.mock('@/components/icons/SocialIcons', () => ({
   InstagramIcon: () => <span>Instagram</span>,
 }));
 
-describe('Footer - Cookie Policy link', () => {
+describe('Footer - Legal link', () => {
   let Footer: any;
 
   beforeAll(async () => {
@@ -19,10 +19,10 @@ describe('Footer - Cookie Policy link', () => {
     Footer = mod.default;
   });
 
-  it('renders a Cookie Policy link', () => {
+  it('renders a consolidated Legal link pointing to /legal', () => {
     render(<Footer />);
-    const link = screen.getByText('footer.cookiePolicy');
+    const link = screen.getByText('legal.title');
     expect(link).toBeInTheDocument();
-    expect(link.closest('a')).toHaveAttribute('href', '/en/legal/cookies');
+    expect(link.closest('a')).toHaveAttribute('href', '/en/legal');
   });
 });

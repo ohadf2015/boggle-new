@@ -716,29 +716,36 @@ const es = {
     "selectAvatar": "Selecciona un avatar",
     "playingAs": "Jugando como",
     "defaultPlayerNames": [
-      "Pepinillo Astuto",
-      "Papa Disco",
-      "Banana Cósmica",
-      "Waffle Esponjoso",
-      "Taco Crujiente",
-      "Mochi Suave",
-      "Pretzel Retorcido",
-      "Galleta Gruesa",
-      "Donut Pegajoso",
-      "Aguacate Picante",
-      "Fideo Masticable",
-      "Falafel Crujiente",
-      "Calabacín Loco",
-      "Salmón Tonto",
-      "Ganso Risueño",
-      "Morsa Loca",
-      "Pingüino Alegre",
-      "Llama Alocada",
-      "Dragón Mareado",
-      "Flamenco Funky",
-      "Oso Saltarín",
-      "Cebra Veloz",
-      "Perezoso Sassy"
+      "Probablemente una Papa",
+      "Donut No Molestar",
+      "Barón Von Waffle",
+      "Llama Dramática",
+      "Señor Deletreos",
+      "Taco con Talento",
+      "CEO del Mochi",
+      "Pingüino con Plan",
+      "Legalmente una Morsa",
+      "Banana de Referencia",
+      "Ganso Profesional",
+      "Capitán Pretzel",
+      "Aguacate Existencial",
+      "Flamenco Descontrolado",
+      "Dragón de Incógnito",
+      "Plot Twist Salmón",
+      "Confía Soy un Oso",
+      "Cebra Sin Paciencia",
+      "Koala Certificado",
+      "Mapache de Traje",
+      "Hipopótamo con Café",
+      "Medusa en Modo Zen",
+      "Protagonista Zorro",
+      "Galleta Junior",
+      "Perezoso Modo: ON",
+      "Ninja Fideo",
+      "Pepinillo Disco",
+      "Falafel Royal",
+      "No Soy un Robot",
+      "Duque de Donuts"
     ]
   },
   "multiplayerFlow": {
@@ -1032,6 +1039,30 @@ const es = {
     "bestComboStreak": "¡Racha imparable!",
     "mostUniqueFinds": "¡Encontró palabras que nadie más vio!",
     "strongFinisher": "¡Dominó los segundos finales!",
+    "vocabularyVirtuoso": "VIRTUOSO DEL VOCABULARIO",
+    "longestSingleWord": "¡Encontró la palabra más larga!",
+    "speedDemon": "DEMONIO DE LA VELOCIDAD",
+    "highestWpm": "¡Más palabras por minuto!",
+    "comebackKid": "REY DE LA REMONTADA",
+    "biggestImprovement": "¡Mayor mejora del inicio al final!",
+    "explorer": "EXPLORADOR",
+    "mostVariety": "¡Mayor variedad de longitudes!",
+    "lengths": "longitudes",
+    "steadyEddie": "RITMO CONSTANTE",
+    "mostConsistent": "¡El ritmo más consistente!",
+    "shortAndSweet": "CORTO Y DULCE",
+    "most3LetterWords": "¡Maestro de palabras de 3 letras!",
+    "bigBrain": "GRAN CEREBRO",
+    "highestAvgScore": "¡Mayor puntuación promedio!",
+    "socialButterfly": "MARIPOSA SOCIAL",
+    "mostSharedWords": "¡Las elecciones más populares!",
+    "mascotComments": {
+      "awardsIntro1": "Y los premios van para...",
+      "awardsIntro2": "¡Redoble de tambores!",
+      "awardsIntro3": "¿Quién se llevará la gloria?",
+      "awardsIntro4": "¡El momento que esperaban!",
+      "awardsIntro5": "¡Celebremos a las leyendas!"
+    },
     "andMore": "y {count} jugador más",
     "andMorePlural": "y {count} jugadores más"
   },
@@ -1267,7 +1298,14 @@ const es = {
     "hostStartDescription": "¡Inicia una nueva partida cuando todos estén listos!",
     "yourPlace": "{place} de {total}",
     "pointsFromFirst": "{points} pts del 1°",
-    "potentialScore": "+{points} pts potencial"
+    "potentialScore": "+{points} pts potencial",
+    "comparativeInsights": {
+      "title": "Cómo te comparaste",
+      "uniqueWords": "¡Encontraste {count} palabra(s) que nadie más encontró!",
+      "longestWord": "Tu palabra más larga fue {count} letra(s) más larga que el promedio",
+      "scoreAbove": "Puntuaste {pct}% más que el promedio",
+      "scoreBelow": "Puntuaste {pct}% menos que el promedio"
+    }
   },
   "nextStep": {
     "backToLobby": "Volver al Lobby",
@@ -1931,7 +1969,8 @@ const es = {
       "aboutDescription": "Conoce nuestra empresa, misión y equipo",
       "termsDescription": "Reglas y directrices para usar LexiClash",
       "privacyDescription": "Cómo recopilamos, usamos y protegemos tus datos",
-      "cookiesDescription": "Cómo usamos cookies y cómo gestionarlas"
+      "cookiesDescription": "Cómo usamos cookies y cómo gestionarlas",
+      "disclaimerDescription": "Descargos de responsabilidad importantes sobre nuestro servicio y contenido"
     },
     "terms": {
       "title": "Términos de Servicio",
@@ -2204,6 +2243,41 @@ const es = {
       "values": {
         "title": "Lo que defendemos",
         "content": "Creemos que los juegos deben ser accesibles para todos. LexiClash es gratuito sin muros de pago. Priorizamos la accesibilidad con soporte completo de lector de pantalla, navegacion por teclado y diseno de alto contraste."
+      }
+    },
+    "disclaimer": {
+      "title": "Descargo de Responsabilidad",
+      "general": {
+        "title": "Descargo General",
+        "content": "La información proporcionada en LexiClash es solo para fines de entretenimiento y educación general. Si bien nos esforzamos por ser precisos, no ofrecemos garantías ni representaciones respecto a la integridad, exactitud o fiabilidad de cualquier contenido en este sitio web. Tu uso del sitio y la confianza en cualquier información es bajo tu propio riesgo."
+      },
+      "noProfessionalAdvice": {
+        "title": "No es Asesoramiento Profesional",
+        "content": "LexiClash es una plataforma de juegos de palabras. Nada en este sitio web constituye asesoramiento profesional, educativo, lingüístico o de cualquier otro tipo. El contenido del juego, las definiciones de palabras y las funciones educativas se proporcionan para entretenimiento y no deben considerarse como referencias lingüísticas autorizadas."
+      },
+      "asIs": {
+        "title": "Base \"Tal Cual\"",
+        "content": "LexiClash se proporciona \"tal cual\" y \"según disponibilidad\" sin garantías de ningún tipo, ya sean expresas o implícitas. No garantizamos que el servicio sea ininterrumpido, seguro o libre de errores. Las puntuaciones del juego, las tablas de clasificación y las estadísticas se proporcionan con fines de entretenimiento."
+      },
+      "thirdParty": {
+        "title": "Enlaces y Contenido de Terceros",
+        "content": "LexiClash puede contener enlaces a sitios web o servicios de terceros. No tenemos control sobre el contenido, las políticas de privacidad o las prácticas de ningún sitio de terceros. No respaldamos ni asumimos responsabilidad por ningún contenido, producto o servicio de terceros."
+      },
+      "advertising": {
+        "title": "Contenido Publicitario",
+        "content": "LexiClash muestra anuncios proporcionados por redes publicitarias de terceros, incluyendo Google AdSense. Estos anuncios no son respaldados por LexiClash. El contenido de los anuncios es determinado por las redes publicitarias basándose en diversos factores y puede no reflejar las opiniones o valores de LexiClash. No somos responsables de la exactitud o el contenido de los anuncios mostrados en el sitio."
+      },
+      "liability": {
+        "title": "Limitación de Responsabilidad",
+        "content": "En la máxima medida permitida por la ley, LexiClash y sus creadores no serán responsables de ningún daño indirecto, incidental, especial, consecuente o punitivo que surja del uso del servicio, incluyendo pero no limitado a la pérdida de datos, pérdida de ganancias o interrupción del servicio."
+      },
+      "changes": {
+        "title": "Cambios a Este Descargo",
+        "content": "Nos reservamos el derecho de actualizar este descargo de responsabilidad en cualquier momento. Los cambios se publicarán en esta página con una fecha de revisión actualizada. Tu uso continuado de LexiClash después de los cambios constituye la aceptación del descargo actualizado."
+      },
+      "contact": {
+        "title": "Contáctanos",
+        "content": "Si tienes preguntas sobre este descargo de responsabilidad, contáctanos en lexiclash.game@gmail.com."
       }
     }
   },

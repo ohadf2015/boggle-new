@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
 import { Gift, Sparkles, Coins, Crown, X, Award } from 'lucide-react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -67,7 +66,7 @@ export function AdminGiftModal({
   const { t } = useLanguage();
   const { isLowEnd, prefersReducedMotion, enableGlowEffects } = useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const timelineRef = useRef<{ kill: () => void } | null>(null);
   const [phase, setPhase] = useState<'entrance' | 'reveal' | 'ready' | 'claiming' | 'done'>('entrance');
   const [claiming, setClaiming] = useState(false);
   // Track XP/coins at start to show before/after
@@ -112,73 +111,78 @@ export function AdminGiftModal({
     }
 
     const container = containerRef.current;
-    const ctx = gsap.context(() => {
-      timelineRef.current = gsap.timeline({
-        onComplete: () => setPhase('ready'),
-      });
+    let ctx: { revert: () => void } | null = null;
 
-      const tl = timelineRef.current;
+    import('gsap').then(({ default: gsap }) => {
+      if (!container.isConnected) return;
 
-      // Phase 1: Flash overlay
-      tl.to('.gift-flash', {
-        opacity: 1,
-        duration: 0.1,
-        ease: 'power2.in',
-      })
-        .to('.gift-flash', {
+      ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          onComplete: () => setPhase('ready'),
+        });
+        timelineRef.current = tl;
+
+        // Phase 1: Flash overlay
+        tl.to('.gift-flash', {
+          opacity: 1,
+          duration: 0.1,
+          ease: 'power2.in',
+        })
+          .to('.gift-flash', {
+            opacity: 0,
+            duration: 0.3,
+            ease: 'power2.out',
+          });
+
+        // Phase 2: Crown/Gift icon entrance
+        tl.from('.gift-icon-container', {
+          scale: 0,
+          rotation: -180,
+          duration: 0.6,
+          ease: 'back.out(1.7)',
+        }, '-=0.1');
+
+        // Phase 3: Title reveal
+        tl.from('.gift-title', {
           opacity: 0,
+          y: 20,
+          duration: 0.4,
+          ease: 'power2.out',
+        }, '-=0.2');
+
+        setPhase('reveal');
+
+        // Phase 4: Message reveal
+        tl.from('.gift-message', {
+          opacity: 0,
+          y: 15,
+          duration: 0.4,
+          ease: 'power2.out',
+        }, '-=0.1');
+
+        // Phase 5: Rewards reveal
+        if (gift.xp_amount > 0 || gift.coin_amount > 0) {
+          tl.from('.gift-rewards', {
+            opacity: 0,
+            y: 10,
+            duration: 0.3,
+            ease: 'power2.out',
+          }, '-=0.1');
+        }
+
+        // Phase 6: Claim button pulse
+        tl.from('.gift-claim-btn', {
+          opacity: 0,
+          scale: 0.9,
           duration: 0.3,
           ease: 'power2.out',
         });
 
-      // Phase 2: Crown/Gift icon entrance
-      tl.from('.gift-icon-container', {
-        scale: 0,
-        rotation: -180,
-        duration: 0.6,
-        ease: 'back.out(1.7)',
-      }, '-=0.1');
-
-      // Phase 3: Title reveal
-      tl.from('.gift-title', {
-        opacity: 0,
-        y: 20,
-        duration: 0.4,
-        ease: 'power2.out',
-      }, '-=0.2');
-
-      setPhase('reveal');
-
-      // Phase 4: Message reveal
-      tl.from('.gift-message', {
-        opacity: 0,
-        y: 15,
-        duration: 0.4,
-        ease: 'power2.out',
-      }, '-=0.1');
-
-      // Phase 5: Rewards reveal
-      if (gift.xp_amount > 0 || gift.coin_amount > 0) {
-        tl.from('.gift-rewards', {
-          opacity: 0,
-          y: 10,
-          duration: 0.3,
-          ease: 'power2.out',
-        }, '-=0.1');
-      }
-
-      // Phase 6: Claim button pulse
-      tl.from('.gift-claim-btn', {
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.3,
-        ease: 'power2.out',
-      });
-
-    }, container);
+      }, container);
+    }); // end dynamic import
 
     return () => {
-      ctx.revert();
+      ctx?.revert();
       if (timelineRef.current) {
         timelineRef.current.kill();
       }
