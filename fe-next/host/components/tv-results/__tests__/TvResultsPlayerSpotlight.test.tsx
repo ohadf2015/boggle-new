@@ -2,20 +2,24 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
-      <div ref={ref} data-testid={props['data-testid'] as string} {...filterDomProps(props)}>{children}</div>
-    )),
-    h3: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <h3 {...filterDomProps(props)}>{children}</h3>
-    ),
-    p: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <p {...filterDomProps(props)}>{children}</p>
-    ),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+jest.mock('framer-motion', () => {
+  const MotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
+    <div ref={ref} data-testid={props['data-testid'] as string} {...filterDomProps(props)}>{children}</div>
+  ));
+  MotionDiv.displayName = 'MotionDiv';
+  return {
+    motion: {
+      div: MotionDiv,
+      h3: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+        <h3 {...filterDomProps(props)}>{children}</h3>
+      ),
+      p: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+        <p {...filterDomProps(props)}>{children}</p>
+      ),
+    },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
 
 // Filter out non-DOM props from framer-motion
 function filterDomProps(props: Record<string, unknown>) {

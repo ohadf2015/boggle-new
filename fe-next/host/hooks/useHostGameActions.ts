@@ -217,6 +217,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setHostAchievements,
     setTournamentCreating,
     tournamentTimeoutRef,
+    gameMode,
   ]);
 
   const stopGame = useCallback(() => {

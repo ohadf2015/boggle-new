@@ -4,20 +4,28 @@ import { GameModeIntro } from '../GameModeIntro';
 import type { GameMode } from '@/shared/types/game';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
-    h1: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <h1 ref={ref} {...props}>{children}</h1>
-    )),
-    p: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <p ref={ref} {...props}>{children}</p>
-    )),
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+jest.mock('framer-motion', () => {
+  const MotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <div ref={ref} {...props}>{children}</div>
+  ));
+  MotionDiv.displayName = 'MotionDiv';
+  const MotionH1 = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <h1 ref={ref} {...props}>{children}</h1>
+  ));
+  MotionH1.displayName = 'MotionH1';
+  const MotionP = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <p ref={ref} {...props}>{children}</p>
+  ));
+  MotionP.displayName = 'MotionP';
+  return {
+    motion: {
+      div: MotionDiv,
+      h1: MotionH1,
+      p: MotionP,
+    },
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+  };
+});
 
 const mockT = (key: string) => {
   const translations: Record<string, string> = {
