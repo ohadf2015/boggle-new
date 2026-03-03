@@ -360,25 +360,6 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useEarthquakeFireRound', () => ({
-  useEarthquakeFireRound: () => ({
-    earthquakeState: 'idle' as const,
-    fireRoundActive: false,
-    fireRoundRemaining: 0,
-    getScoreMultiplier: jest.fn(() => 1),
-    forceEarthquake: jest.fn(),
-  }),
-}));
-
-jest.mock('@/components/earthquake', () => ({
-  EarthquakeWarning: ({ isVisible }: { isVisible: boolean }) =>
-    isVisible ? <div data-testid="earthquake-warning" /> : null,
-  FireRoundIndicator: ({ isActive }: { isActive: boolean }) =>
-    isActive ? <div data-testid="fire-round-indicator" /> : null,
-  EffectsPreferencePrompt: () => null,
-  ComicDustReveal: () => null,
-}));
-
 // Capture the onWordSubmit callback from GameGridArea
 let capturedOnWordSubmit: ((word: string, indices: number[]) => void) | null = null;
 let capturedGridProps: any = null;

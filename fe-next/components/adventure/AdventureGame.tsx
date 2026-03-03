@@ -19,7 +19,6 @@ import { useAdventureGameInit } from './hooks/useAdventureGameInit';
 import { useAdventureWordSubmit } from './hooks/useAdventureWordSubmit';
 import { useAdventureLevelCompletion } from './hooks/useAdventureLevelCompletion';
 import { useAdventureBossOrchestration } from './hooks/useAdventureBossOrchestration';
-import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import { useLexiStuckDetection } from '@/hooks/useLexiStuckDetection';
 import { neoInfoToast } from '@/components/NeoToast';
 import AdventureEffectsLayer from './effects/AdventureEffectsLayer';
@@ -30,9 +29,7 @@ import { VictoryCinematic, VICTORY_DURATION_FRAMES, DefeatCinematic, DEFEAT_DURA
 import { CinematicPlayer } from './boss/cinematics/CinematicPlayer';
 import GameplayBackground from './themed/GameplayBackground';
 import { GameHeader, GameSidebar, GameGridArea, PauseOverlay, GameLayout } from './ui';
-import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
-import type { Language, DifficultyLevel } from '@/types';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
 
@@ -95,15 +92,7 @@ const AdventureGame = memo<AdventureGameProps>(
       addTime, shake: (intensity: number) => effects.shake(intensity),
     });
 
-    const { earthquakeState, fireRoundActive, fireRoundRemaining, getScoreMultiplier } = useEarthquakeFireRound({
-      enabled: isPlaying && entryPhase === 'playing' && !isPaused,
-      gameDurationSeconds: init.adjustedLevelConfig.timerSeconds, currentTimeSeconds: timeRemaining,
-      language: (language || 'en') as Language, difficulty: 'MEDIUM' as DifficultyLevel, mode: 'singleplayer',
-      onGridRegenerate: (newGrid) => regenerateGrid(newGrid), onEarthquakeStart: () => pauseGame(),
-      onEarthquakeShake: () => {}, onFireRoundStart: () => startGame(), onFireRoundEnd: () => {},
-      onTimerPause: () => pauseGame(), onTimerResume: () => startGame(),
-      config: { minGameDurationSeconds: 45 },
-    });
+    const getScoreMultiplier = () => 1;
 
     const minWordLength = levelConfig.minWordLength ?? 3;
     const { validateWord, isValidating } = useAdventureWordValidation({
@@ -343,7 +332,7 @@ const AdventureGame = memo<AdventureGameProps>(
               selectedLength={selectedIndices.length} minWordLength={minWordLength}
               wordFeedback={wordSubmit.wordFeedback}
               currentWord={effectiveCurrentWord} comboCount={gameState.comboCount}
-              earthquakeState={earthquakeState} fireRoundActive={fireRoundActive}
+              worldId={levelConfig.world}
               hintLevel={init.hintData.level}
               onPhaserWordChange={setPhaserCurrentWord} />
           }
@@ -357,21 +346,20 @@ const AdventureGame = memo<AdventureGameProps>(
           }
           overlays={
             <>
-              <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
-              <FireRoundIndicator isActive={fireRoundActive} remainingSeconds={fireRoundRemaining} />
-
               <BossOverlay boss={bossOrch.bossConfig}
-                maxHP={isBossLevel ? 100 : 0}
-                healthState={bossOrch.bossHealthState}
-                currentTaunt={bossOrch.bossTaunt} showTaunt={bossOrch.showBossTaunt}
+                currentHP={bossOrch.bossCurrentHP}
+                maxHP={bossOrch.bossMaxHP}
+                phase={bossOrch.bossPhase}
+                isActive={bossOrch.isBossActive}
+                currentTaunt={bossOrch.bossTaunt}
                 showIntro={bossOrch.showBossIntro}
-                onStartBattle={bossOrch.handleBossIntroStart} onSkipIntro={bossOrch.handleBossIntroSkip}
+                onStartBattle={bossOrch.handleBossIntroStart}
                 showVictory={showLevelComplete && bossOrch.bossHealthState.phase === 'victory'}
                 showDefeat={showLevelComplete && (bossOrch.bossHealthState.phase === 'defeat' || bossOrch.playerHealthState.isDead)}
                 stars={gameState.stars} score={gameState.score}
                 wordsFound={gameState.wordsFound} gameState={gameState}
                 onContinue={handleContinue} onRetry={handleRetry}
-                worldNumber={levelConfig.world} effectCallbacks={bossOrch.bossEffectCallbacks} />
+                worldNumber={levelConfig.world} />
 
               {isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete && !bossOrch.playerHealthState.isDead && (
                 <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">

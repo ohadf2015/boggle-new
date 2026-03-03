@@ -17,8 +17,6 @@ import {
   type AdventureTile,
 } from '@/lib/phaser/logic/AdventureTileRules';
 import {
-  startFireGlow,
-  stopFireGlow,
   playFreezeEffect,
   playMeltEffect,
 } from '../effects/TileEffects';
@@ -39,14 +37,20 @@ const TILE_TYPE_TINTS: Partial<Record<AdventureTile['type'], number>> = {
 export class AdventureScene extends GameScene {
   // Map from "row,col" → adventure tile metadata
   private adventureTiles: Map<string, AdventureTile> = new Map();
-  // Map from "row,col" → active fire-glow tween (for cleanup)
-  private fireGlowTweens: Map<string, Phaser.Tweens.Tween> = new Map();
   // Active rainbow glow timer events (for cleanup on destroy/rebuild)
   private rainbowTimers: Phaser.Time.TimerEvent[] = [];
   // Unsubscribe functions for bridge listeners added in create()
   private bridgeUnsubs: Array<() => void> = [];
   // Boss UI manager — renders all boss battle visuals on canvas
   private bossUI: BossUIManager | null = null;
+  // Set of locked tile keys ("row,col") — tiles made unselectable by boss abilities
+  private lockedTileKeys: Set<string> = new Set();
+  // Lock icon overlays for locked tiles
+  private lockOverlays: Map<string, Phaser.GameObjects.Graphics> = new Map();
+  // World-themed edge decoration graphics (cleaned up on destroy/rebuild)
+  private edgeDecorations: Phaser.GameObjects.Graphics | null = null;
+  // Current world ID for theming (default 1)
+  private worldId = 1;
 
   constructor() {
     // Register under the same key as GameScene — BootScene always starts 'GameScene',
@@ -60,6 +64,11 @@ export class AdventureScene extends GameScene {
     // Call parent for standard tile creation
     super.handleGridUpdate(payload);
 
+    // Set worldId from payload for edge decoration theming
+    if (payload.worldId !== undefined) {
+      this.worldId = payload.worldId;
+    }
+
     // Overlay adventure tile visuals from tileStates
     if (payload.tileStates) {
       this.applyTileTypeOverlays(payload.tileStates);
@@ -68,12 +77,8 @@ export class AdventureScene extends GameScene {
     // Start rainbow glow timers after tile overlays are applied
     this.initRainbowGlows();
 
-    // Apply fire round glow if active
-    if (payload.fireRoundActive) {
-      this.startFireRoundGlows();
-    } else {
-      this.stopAllFireGlows();
-    }
+    // Draw world-themed edge decorations around the grid
+    this.drawEdgeDecorations();
   }
 
   // ─── Adventure tile overlays ───────────────────────────────────────────
@@ -266,21 +271,6 @@ export class AdventureScene extends GameScene {
     this.rainbowTimers.push(timer as unknown as Phaser.Time.TimerEvent);
   }
 
-  // ─── Fire round glows ──────────────────────────────────────────────────
-
-  private startFireRoundGlows(): void {
-    this.tiles.forEach((tile, key) => {
-      if (this.fireGlowTweens.has(key)) return;
-      const tween = startFireGlow(this, tile as unknown as { alpha: number } & Phaser.GameObjects.GameObject, this.a11y);
-      if (tween) this.fireGlowTweens.set(key, tween);
-    });
-  }
-
-  private stopAllFireGlows(): void {
-    this.tiles.forEach((tile) => stopFireGlow(this, tile));
-    this.fireGlowTweens.clear();
-  }
-
   // ─── Hint highlight ────────────────────────────────────────────────────
 
   /** Keys of tiles currently showing hint glow, for diff-based updates. */
@@ -319,6 +309,137 @@ export class AdventureScene extends GameScene {
     this.hintedTileKeys.clear();
   }
 
+  // ─── Locked tiles (boss abilities) ────────────────────────────────────
+
+  /** Handle tiles:lock bridge event — dim and make tiles unselectable. */
+  private handleTilesLock({ lockedIndices, gridSize }: { lockedIndices: number[]; gridSize: number }): void {
+    // Clear previous locks
+    this.clearLockedTiles();
+
+    for (const idx of lockedIndices) {
+      const row = Math.floor(idx / gridSize);
+      const col = idx % gridSize;
+      const key = `${row},${col}`;
+      const tile = this.tiles.get(key);
+      if (!tile) continue;
+
+      this.lockedTileKeys.add(key);
+      // Dim tile to indicate locked state
+      tile.setDimmed('dimmed');
+
+      // Draw lock icon overlay
+      const lockG = this.add.graphics();
+      lockG.setDepth(20);
+      const size = this.layout?.tileSize ?? 60;
+      const iconSize = size * 0.3;
+
+      // Semi-transparent dark overlay
+      lockG.fillStyle(0x000000, 0.3);
+      lockG.fillRoundedRect(tile.x - size / 2, tile.y - size / 2, size, size, 8);
+
+      // Lock icon: padlock body + shackle
+      const cx = tile.x;
+      const cy = tile.y;
+      lockG.fillStyle(0x666666, 0.9);
+      lockG.fillRoundedRect(cx - iconSize / 2, cy - iconSize * 0.1, iconSize, iconSize * 0.7, 3);
+      lockG.lineStyle(2, 0x666666, 0.9);
+      lockG.beginPath();
+      lockG.arc(cx, cy - iconSize * 0.1, iconSize * 0.3, Math.PI, 0, false);
+      lockG.strokePath();
+
+      this.lockOverlays.set(key, lockG);
+    }
+  }
+
+  /** Clear all locked tile visual indicators and restore selectability. */
+  private clearLockedTiles(): void {
+    this.lockedTileKeys.forEach((key) => {
+      this.tiles.get(key)?.setDimmed('none');
+    });
+    this.lockOverlays.forEach((g) => g.destroy());
+    this.lockOverlays.clear();
+    this.lockedTileKeys.clear();
+  }
+
+  /** Check if a tile is locked (called by selectTile override). */
+  isTileLocked(row: number, col: number): boolean {
+    return this.lockedTileKeys.has(`${row},${col}`);
+  }
+
+  // ─── World-themed edge decorations ──────────────────────────────────
+
+  /** Set the world ID for edge decorations. Called from React via bridge or props. */
+  setWorldId(worldId: number): void {
+    this.worldId = worldId;
+    // Redraw decorations if layout exists
+    if (this.layout) {
+      this.drawEdgeDecorations();
+    }
+  }
+
+  /** Draw subtle world-themed border glow around the grid area. */
+  private drawEdgeDecorations(): void {
+    // Clean up previous decorations
+    this.edgeDecorations?.destroy();
+
+    if (!this.layout) return;
+
+    const g = this.add.graphics();
+    g.setDepth(1); // Behind tiles (tiles are at depth 10+)
+
+    // Calculate grid bounding box from layout
+    const tilePositions = this.layout.tiles;
+    if (tilePositions.length === 0) return;
+
+    const halfTile = this.layout.tileSize / 2;
+    const padding = 8;
+    const minX = Math.min(...tilePositions.map(t => t.x)) - halfTile - padding;
+    const maxX = Math.max(...tilePositions.map(t => t.x)) + halfTile + padding;
+    const minY = Math.min(...tilePositions.map(t => t.y)) - halfTile - padding;
+    const maxY = Math.max(...tilePositions.map(t => t.y)) + halfTile + padding;
+    const w = maxX - minX;
+    const h = maxY - minY;
+
+    // World-specific colour palettes for edge glow
+    const worldColors: Record<number, { primary: number; secondary: number; alpha: number }> = {
+      1: { primary: 0xbeff00, secondary: 0x88cc00, alpha: 0.15 }, // Meadows — green
+      2: { primary: 0x00ffff, secondary: 0x0088cc, alpha: 0.15 }, // Springs — cyan
+      3: { primary: 0x9b59b6, secondary: 0x6b3fa0, alpha: 0.15 }, // Caverns — purple
+      4: { primary: 0xff6b35, secondary: 0xcc4400, alpha: 0.15 }, // Volcano — orange
+      5: { primary: 0xffd700, secondary: 0xccaa00, alpha: 0.15 }, // Desert — gold
+      6: { primary: 0x4488ff, secondary: 0x2266cc, alpha: 0.15 }, // Tundra — blue
+      7: { primary: 0xff1493, secondary: 0xcc1177, alpha: 0.15 }, // Mystic — pink
+      8: { primary: 0x00ff88, secondary: 0x00cc66, alpha: 0.15 }, // Jungle — emerald
+      9: { primary: 0xff4444, secondary: 0xcc2222, alpha: 0.15 }, // Inferno — red
+      10: { primary: 0xffffff, secondary: 0xccccff, alpha: 0.12 }, // Celestial — white
+    };
+
+    const colors = worldColors[this.worldId] ?? worldColors[1];
+
+    // Outer glow border — two stroked rectangles at different alphas
+    g.lineStyle(3, colors.primary, colors.alpha * 2);
+    g.strokeRoundedRect(minX, minY, w, h, 12);
+
+    g.lineStyle(6, colors.secondary, colors.alpha);
+    g.strokeRoundedRect(minX - 3, minY - 3, w + 6, h + 6, 14);
+
+    // Corner accents — small filled circles at each corner
+    const cornerRadius = 6;
+    const corners = [
+      { x: minX, y: minY },
+      { x: maxX, y: minY },
+      { x: minX, y: maxY },
+      { x: maxX, y: maxY },
+    ];
+
+    corners.forEach(({ x, y }) => {
+      g.fillStyle(colors.primary, colors.alpha * 3);
+      g.fillCircle(x, y, cornerRadius);
+    });
+
+    this.edgeDecorations = g;
+  }
+
   // ─── Rainbow timer cleanup ───────────────────────────────────────────
 
   private cleanupRainbowTimers(): void {
@@ -333,7 +454,7 @@ export class AdventureScene extends GameScene {
     // Initialize boss UI manager (subscribes to boss:* bridge events)
     this.bossUI = new BossUIManager(this);
     this.bossUI.init();
-    // Subscribe to hint events and track unsubs for cleanup
+    // Subscribe to hint events, tile lock events, and track unsubs for cleanup
     this.bridgeUnsubs.push(
       GameBridge.on('selection:highlight', ({ cells }) => {
         if (cells.length === 0) {
@@ -342,6 +463,7 @@ export class AdventureScene extends GameScene {
           this.highlightHintTiles(cells);
         }
       }),
+      GameBridge.on('tiles:lock', (payload) => this.handleTilesLock(payload)),
       GameBridge.on('scene:destroy', () => this.cleanupAdventure()),
     );
   }
@@ -349,6 +471,9 @@ export class AdventureScene extends GameScene {
   /** Clean up all adventure-specific resources. */
   private cleanupAdventure(): void {
     this.cleanupRainbowTimers();
+    this.clearLockedTiles();
+    this.edgeDecorations?.destroy();
+    this.edgeDecorations = null;
     this.bossUI?.destroy();
     this.bossUI = null;
     this.bridgeUnsubs.forEach((unsub) => unsub());
@@ -365,6 +490,9 @@ export class AdventureScene extends GameScene {
   protected override buildGrid(grid: string[][]): void {
     // Clean up previous grid visuals before rebuilding
     this.cleanupRainbowTimers();
+    this.clearLockedTiles();
+    this.edgeDecorations?.destroy();
+    this.edgeDecorations = null;
     this.hintedTileKeys.clear(); // tiles are destroyed; stale keys must go
     super.buildGrid(grid);
   }

@@ -31,6 +31,7 @@ export interface BridgeEvents {
     comboLevel: number;
     fireRoundActive: boolean;
     tileStates?: Record<string, string>;
+    worldId?: number;
   };
   /** Word submission result — drives tile animations */
   'word:feedback': {
@@ -54,6 +55,11 @@ export interface BridgeEvents {
     isLowEnd: boolean;
     /** Whether the current locale is RTL (e.g. Hebrew). Phaser can mirror directional UI. */
     isRTL: boolean;
+  };
+  /** Lock specific tiles (boss ability) — makes them unselectable with visual indicator */
+  'tiles:lock': {
+    lockedIndices: number[];
+    gridSize: number;
   };
   /** Tear down the Phaser game and clean up resources */
   'scene:destroy': undefined;

@@ -141,7 +141,7 @@ const AdventureTimer = memo<AdventureTimerProps>(
         </div>
 
         {/* Time display with flip animation */}
-        <div className="flex items-center font-mono tabular-nums">
+        <div dir="ltr" className="flex items-center font-mono tabular-nums">
           {/* Minutes */}
           <FlipDigit digit={minTens} />
           <FlipDigit digit={minOnes} />

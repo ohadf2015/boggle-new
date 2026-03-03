@@ -12,9 +12,6 @@ import { render, screen, act } from '@testing-library/react';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { GridTileState } from '@/types/adventure';
 
-// Enable Phaser grid for these tests
-process.env.NEXT_PUBLIC_PHASER_GRID = 'true';
-
 // ─── Track props passed to PhaserGameAdventure ────────────────────────────────
 
 let capturedAdventureProps: Record<string, unknown> = {};
@@ -33,14 +30,26 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
-  useHUDTheme: () => ({
-    headerBg: 'bg-neo-navy/90', headerBorder: 'border-neo-black/40',
-    sidebarBg: 'bg-neo-black/40', scoreAccent: 'text-neo-cyan',
-    levelBadgeColor: 'bg-neo-black/40', levelBadgeText: 'text-neo-cyan',
-    objectiveAccent: 'text-neo-lime', hintActiveColor: 'bg-neo-lime', hintActiveText: 'text-neo-black',
-  }),
-}));
+jest.mock('@/contexts/AdventureThemeContext', () => {
+  const R = require('react');
+  return {
+    useHUDTheme: () => ({
+      headerBg: 'bg-neo-navy/90', headerBorder: 'border-neo-black/40',
+      sidebarBg: 'bg-neo-black/40', scoreAccent: 'text-neo-cyan',
+      levelBadgeColor: 'bg-neo-black/40', levelBadgeText: 'text-neo-cyan',
+      objectiveAccent: 'text-neo-lime', hintActiveColor: 'bg-neo-lime', hintActiveText: 'text-neo-black',
+    }),
+    AdventureThemeContext: R.createContext({ worldId: 1 }),
+  };
+});
+
+jest.mock('../../themed/BoardFrame', () => {
+  const R = require('react');
+  return {
+    __esModule: true,
+    default: ({ children }: { children: unknown }) => R.createElement('div', { 'data-testid': 'board-frame' }, children),
+  };
+});
 
 jest.mock('framer-motion', () => ({
   motion: {

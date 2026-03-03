@@ -78,6 +78,7 @@ jest.mock('@/hooks/useLexiReactions');
 jest.mock('@/hooks/useAdventureHints');
 jest.mock('@/hooks/useBossMechanics');
 jest.mock('@/hooks/useBossHealth');
+jest.mock('@/hooks/useAdventureBossNew');
 
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
@@ -86,6 +87,7 @@ import { useLexiReactions } from '@/hooks/useLexiReactions';
 import { useAdventureHints } from '@/hooks/useAdventureHints';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
 import { useBossHealth } from '@/hooks/useBossHealth';
+import { useAdventureBossNew } from '@/hooks/useAdventureBossNew';
 
 // Type the mocks
 const mockUseAdventureGame = useAdventureGame as jest.MockedFunction<typeof useAdventureGame>;
@@ -95,6 +97,7 @@ const mockUseLexiReactions = useLexiReactions as jest.MockedFunction<typeof useL
 const mockUseAdventureHints = useAdventureHints as jest.MockedFunction<typeof useAdventureHints>;
 const mockUseBossMechanics = useBossMechanics as jest.MockedFunction<typeof useBossMechanics>;
 const mockUseBossHealth = useBossHealth as jest.MockedFunction<typeof useBossHealth>;
+const mockUseAdventureBossNew = useAdventureBossNew as jest.MockedFunction<typeof useAdventureBossNew>;
 
 // Helper function to wrap component with providers
 function renderWithProviders(ui: React.ReactElement) {
@@ -300,6 +303,23 @@ describe('AdventureGame - Boss Battle Integration', () => {
       hpPercentage: 100,
       isEnraged: false,
     });
+
+    // New boss hook mock (used by orchestration)
+    mockUseAdventureBossNew.mockReturnValue({
+      isActive: false,
+      hp: 100,
+      maxHP: 100,
+      hpPercentage: 100,
+      phase: 'normal',
+      boss: null,
+      currentTaunt: null,
+      lockedTiles: [],
+      startBattle: mockStartBattle,
+      endBattle: mockEndBattle,
+      dealDamage: mockDealDamage,
+      triggerTaunt: jest.fn(),
+      reset: jest.fn(),
+    } as any);
   });
 
   // ==============================================
@@ -319,13 +339,10 @@ describe('AdventureGame - Boss Battle Integration', () => {
         />
       );
 
-      // useBossMechanics should be called with worldId
-      expect(mockUseBossMechanics).toHaveBeenCalledWith(
+      // useAdventureBossNew should be called with worldId
+      expect(mockUseAdventureBossNew).toHaveBeenCalledWith(
         expect.objectContaining({ worldId: 1 })
       );
-
-      // useBossHealth should be called with maxHP
-      expect(mockUseBossHealth).toHaveBeenCalledWith(100);
     });
 
     it('should NOT activate boss mechanics for regular levels', () => {
@@ -340,8 +357,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         />
       );
 
-      // useBossMechanics should be called with null worldId
-      expect(mockUseBossMechanics).toHaveBeenCalledWith(
+      // useAdventureBossNew should be called with null worldId
+      expect(mockUseAdventureBossNew).toHaveBeenCalledWith(
         expect.objectContaining({ worldId: null })
       );
     });

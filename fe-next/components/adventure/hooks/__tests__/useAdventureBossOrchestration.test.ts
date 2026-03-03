@@ -1,21 +1,22 @@
 /**
- * useAdventureBossOrchestration Tests
+ * useAdventureBossOrchestration Tests (Simplified)
  *
- * Tests for the hook that orchestrates boss-specific concerns:
- * - Boss config from useAdventureBoss
- * - Player health management
- * - Boss effect callbacks (damage, timer penalty, screen shake, scramble)
+ * Tests for the simplified boss orchestration hook that wraps useAdventureBossNew.
  */
 
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useAdventureBossOrchestration } from '../useAdventureBossOrchestration';
-import { useAdventureBoss } from '../useAdventureBoss';
+import { useAdventureBossNew } from '@/hooks/useAdventureBossNew';
 import { usePlayerHealth } from '@/hooks/usePlayerHealth';
 
-jest.mock('../useAdventureBoss');
+jest.mock('@/hooks/useAdventureBossNew');
 jest.mock('@/hooks/usePlayerHealth');
+jest.mock('@/lib/adventure/bossConfig', () => ({
+  getBossConfig: jest.fn().mockReturnValue({ id: 'test-boss' }),
+  getBossTaunt: jest.fn().mockReturnValue('taunt_key'),
+}));
 
-const mockUseAdventureBoss = useAdventureBoss as jest.MockedFunction<typeof useAdventureBoss>;
+const mockUseAdventureBossNew = useAdventureBossNew as jest.MockedFunction<typeof useAdventureBossNew>;
 const mockUsePlayerHealth = usePlayerHealth as jest.MockedFunction<typeof usePlayerHealth>;
 
 describe('useAdventureBossOrchestration', () => {
@@ -23,27 +24,26 @@ describe('useAdventureBossOrchestration', () => {
   const mockResetPlayerHealth = jest.fn();
   const mockShake = jest.fn();
   const mockAddTime = jest.fn();
+  const mockDealDamage = jest.fn().mockReturnValue(10);
+  const mockStartBattle = jest.fn();
+  const mockEndBattle = jest.fn();
+  const mockTriggerTaunt = jest.fn();
+  const mockReset = jest.fn();
 
   const mockBossReturn = {
-    isBossActive: true,
-    bossConfig: { id: 'test-boss', name: 'Test Boss' },
-    bossTaunt: null,
-    showBossTaunt: false,
-    bossHealthState: { currentHP: 100, maxHP: 100, phase: 'active', totalDamageDealt: 0, isActive: true, isDead: false },
-    bossHPPercentage: 100,
-    isEnraged: false,
-    bossState: {},
-    showBossIntro: true,
-    showBossFireworks: false,
-    defeatedBossTier: 'mini' as const,
-    checkBossWord: jest.fn(),
-    dealBossDamage: jest.fn(),
-    triggerBossTaunt: jest.fn(),
-    startBossBattle: jest.fn(),
-    endBossBattle: jest.fn(),
-    resetBossHealth: jest.fn(),
-    handleBossIntroStart: jest.fn(),
-    handleBossIntroSkip: jest.fn(),
+    isActive: true,
+    hp: 100,
+    maxHP: 100,
+    hpPercentage: 100,
+    phase: 'normal' as const,
+    boss: { id: 'test-boss', name: 'Test Boss' },
+    currentTaunt: null,
+    lockedTiles: [],
+    startBattle: mockStartBattle,
+    endBattle: mockEndBattle,
+    dealDamage: mockDealDamage,
+    triggerTaunt: mockTriggerTaunt,
+    reset: mockReset,
   };
 
   const mockPlayerHealthReturn = {
@@ -68,15 +68,15 @@ describe('useAdventureBossOrchestration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseAdventureBoss.mockReturnValue(mockBossReturn as any);
+    mockUseAdventureBossNew.mockReturnValue(mockBossReturn as any);
     mockUsePlayerHealth.mockReturnValue(mockPlayerHealthReturn as any);
   });
 
-  it('should return boss state from useAdventureBoss', () => {
+  it('should return boss state from useAdventureBossNew', () => {
     const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
 
     expect(result.current.isBossActive).toBe(true);
-    expect(result.current.bossConfig).toEqual(mockBossReturn.bossConfig);
+    expect(result.current.bossConfig).toEqual(mockBossReturn.boss);
     expect(result.current.showBossIntro).toBe(true);
   });
 
@@ -99,44 +99,25 @@ describe('useAdventureBossOrchestration', () => {
     expect(mockUsePlayerHealth).toHaveBeenCalledWith(0);
   });
 
+  it('should pass null worldId to boss hook for non-boss levels', () => {
+    renderHook(() =>
+      useAdventureBossOrchestration({ ...defaultProps, isBossLevel: false })
+    );
+    expect(mockUseAdventureBossNew).toHaveBeenCalledWith(
+      expect.objectContaining({ worldId: null })
+    );
+  });
+
+  it('should expose new boss state fields', () => {
+    const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+
+    expect(result.current.bossPhase).toBe('normal');
+    expect(result.current.bossCurrentHP).toBe(100);
+    expect(result.current.bossMaxHP).toBe(100);
+    expect(result.current.lockedTiles).toEqual([]);
+  });
+
   describe('bossEffectCallbacks', () => {
-    it('should deal player damage on boss level', () => {
-      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
-
-      result.current.bossEffectCallbacks.onPlayerDamage?.(25);
-      expect(mockTakeDamage).toHaveBeenCalledWith(25);
-    });
-
-    it('should not deal player damage on non-boss level', () => {
-      const { result } = renderHook(() =>
-        useAdventureBossOrchestration({ ...defaultProps, isBossLevel: false })
-      );
-
-      result.current.bossEffectCallbacks.onPlayerDamage?.(25);
-      expect(mockTakeDamage).not.toHaveBeenCalled();
-    });
-
-    it('should apply timer penalty as negative addTime', () => {
-      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
-
-      result.current.bossEffectCallbacks.onTimerPenalty?.(5);
-      expect(mockAddTime).toHaveBeenCalledWith(-5);
-    });
-
-    it('should trigger screen shake with given intensity', () => {
-      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
-
-      result.current.bossEffectCallbacks.onScreenShake?.(6);
-      expect(mockShake).toHaveBeenCalledWith(6);
-    });
-
-    it('should use default intensity 4 for screen shake when not specified', () => {
-      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
-
-      result.current.bossEffectCallbacks.onScreenShake?.();
-      expect(mockShake).toHaveBeenCalledWith(4);
-    });
-
     it('should have onDamageFlash and onScramble callbacks', () => {
       const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
 
@@ -149,20 +130,65 @@ describe('useAdventureBossOrchestration', () => {
     });
   });
 
-  it('should pass through boss intro handlers', () => {
-    const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+  describe('handleBossIntroStart', () => {
+    it('should hide intro, start battle, start game, and start AI director', () => {
+      const startGame = jest.fn();
+      const startAIDirector = jest.fn();
+      const { result } = renderHook(() =>
+        useAdventureBossOrchestration({ ...defaultProps, startGame, startAIDirector })
+      );
 
-    expect(result.current.handleBossIntroStart).toBe(mockBossReturn.handleBossIntroStart);
-    expect(result.current.handleBossIntroSkip).toBe(mockBossReturn.handleBossIntroSkip);
+      act(() => {
+        result.current.handleBossIntroStart();
+      });
+
+      expect(result.current.showBossIntro).toBe(false);
+      expect(mockStartBattle).toHaveBeenCalled();
+      expect(startGame).toHaveBeenCalled();
+      expect(startAIDirector).toHaveBeenCalled();
+    });
   });
 
-  it('should pass through boss combat functions', () => {
-    const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+  describe('dealBossDamage', () => {
+    it('should multiply base damage by mechanic multiplier and call dealDamage', () => {
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
 
-    expect(result.current.checkBossWord).toBe(mockBossReturn.checkBossWord);
-    expect(result.current.dealBossDamage).toBe(mockBossReturn.dealBossDamage);
-    expect(result.current.triggerBossTaunt).toBe(mockBossReturn.triggerBossTaunt);
-    expect(result.current.endBossBattle).toBe(mockBossReturn.endBossBattle);
-    expect(result.current.resetBossHealth).toBe(mockBossReturn.resetBossHealth);
+      result.current.dealBossDamage(10, 3, 2.0, 0.5);
+
+      // 10 * 2.0 = 20
+      expect(mockDealDamage).toHaveBeenCalledWith(20);
+    });
+  });
+
+  describe('checkBossWord', () => {
+    it('should return bonus for words with 5+ letters', () => {
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+
+      const goodResult = result.current.checkBossWord('hello');
+      expect(goodResult.meetsRequirement).toBe(true);
+      expect(goodResult.scoreMultiplier).toBe(1.5);
+    });
+
+    it('should return no bonus for words under 5 letters', () => {
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+
+      const badResult = result.current.checkBossWord('hi');
+      expect(badResult.meetsRequirement).toBe(false);
+      expect(badResult.scoreMultiplier).toBe(1.0);
+    });
+  });
+
+  describe('bossHealthState compatibility', () => {
+    it('should expose health state in old format', () => {
+      const { result } = renderHook(() => useAdventureBossOrchestration(defaultProps));
+
+      expect(result.current.bossHealthState).toEqual(
+        expect.objectContaining({
+          currentHP: 100,
+          maxHP: 100,
+          isActive: true,
+        })
+      );
+    });
   });
 });

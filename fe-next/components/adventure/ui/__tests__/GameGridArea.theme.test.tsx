@@ -21,9 +21,21 @@ const mockHUDTheme = {
   hintActiveText: 'text-emerald-950',
 };
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
-  useHUDTheme: () => mockHUDTheme,
-}));
+jest.mock('@/contexts/AdventureThemeContext', () => {
+  const R = require('react');
+  return {
+    useHUDTheme: () => mockHUDTheme,
+    AdventureThemeContext: R.createContext({ worldId: 1 }),
+  };
+});
+
+jest.mock('../../themed/BoardFrame', () => {
+  const R = require('react');
+  return {
+    __esModule: true,
+    default: ({ children }: { children: unknown }) => R.createElement('div', { 'data-testid': 'board-frame' }, children),
+  };
+});
 
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({

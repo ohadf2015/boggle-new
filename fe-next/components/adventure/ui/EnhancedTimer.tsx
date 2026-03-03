@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -219,7 +219,7 @@ export const EnhancedTimer = memo(function EnhancedTimer({
       )}
 
       {/* Time display with flip animation */}
-      <div className="flex items-center font-mono tabular-nums">
+      <div dir="ltr" className="flex items-center font-mono tabular-nums">
         {/* Minutes */}
         <FlipDigit digit={minTens} prefersReducedMotion={prefersReducedMotion} />
         <FlipDigit digit={minOnes} prefersReducedMotion={prefersReducedMotion} />

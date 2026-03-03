@@ -43,8 +43,9 @@ export interface BossTelegraphState {
 export interface PhaserGameAdventureProps {
   grid: string[][];
   comboLevel: number;
-  fireRoundActive: boolean;
-  /** Earthquake phase — drives camera shake in Phaser */
+  /** @deprecated Fire round is not used in adventure mode. Kept for other mode compatibility. */
+  fireRoundActive?: boolean;
+  /** @deprecated Earthquake is not used in adventure mode. Kept for other mode compatibility. */
   earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
   /** Map of "row,col" → TileType for adventure overlays */
   tileStates?: Record<string, string>;
@@ -52,6 +53,10 @@ export interface PhaserGameAdventureProps {
   wordFeedback?: WordFeedback | null;
   /** Hint cells to highlight */
   hintCells?: Array<{ row: number; col: number }>;
+  /** World ID for themed edge decorations (1-10) */
+  worldId?: number;
+  /** Flat indices of tiles locked by boss abilities — unselectable with lock overlay */
+  lockedTileIndices?: number[];
   /** Boss state — when provided, boss UI renders in Phaser canvas */
   bossState?: BossState | null;
   /** Boss taunt — speech bubble displayed on canvas */
@@ -72,11 +77,13 @@ export interface PhaserGameAdventureProps {
 export function PhaserGameAdventure({
   grid,
   comboLevel,
-  fireRoundActive,
+  fireRoundActive = false,
   earthquakeState = 'idle',
   wordFeedback,
   tileStates,
   hintCells,
+  worldId,
+  lockedTileIndices,
   bossState,
   bossTaunt,
   bossTelegraph,
@@ -91,13 +98,13 @@ export function PhaserGameAdventure({
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
 
-  const gridStateRef = useRef({ grid, comboLevel, fireRoundActive, tileStates });
-  gridStateRef.current = { grid, comboLevel, fireRoundActive, tileStates };
+  const gridStateRef = useRef({ grid, comboLevel, fireRoundActive, tileStates, worldId });
+  gridStateRef.current = { grid, comboLevel, fireRoundActive, tileStates, worldId };
 
   // Grid + tile-state update (handles live changes while scene is running)
   useEffect(() => {
-    GameBridge.emit('grid:update', { grid, comboLevel, fireRoundActive, tileStates });
-  }, [grid, comboLevel, fireRoundActive, tileStates]);
+    GameBridge.emit('grid:update', { grid, comboLevel, fireRoundActive, tileStates, worldId });
+  }, [grid, comboLevel, fireRoundActive, tileStates, worldId]);
 
   // Send initial grid once the adventure scene finishes booting
   useEffect(() => {
@@ -123,6 +130,16 @@ export function PhaserGameAdventure({
       GameBridge.emit('effect:earthquake', { intensity: earthquakeState });
     }
   }, [earthquakeState]);
+
+  // Locked tiles → Phaser tile lock overlay
+  useEffect(() => {
+    if (!lockedTileIndices || lockedTileIndices.length === 0) {
+      // Clear any previous locks by sending empty array
+      GameBridge.emit('tiles:lock', { lockedIndices: [], gridSize: grid.length });
+      return;
+    }
+    GameBridge.emit('tiles:lock', { lockedIndices: lockedTileIndices, gridSize: grid.length });
+  }, [lockedTileIndices, grid.length]);
 
   // Word feedback → Phaser tile animations
   // 'checking'/'pending' are React-UI-only states; Phaser doesn't handle them.

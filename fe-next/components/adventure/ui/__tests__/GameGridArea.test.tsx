@@ -17,19 +17,23 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
-  useHUDTheme: () => ({
-    headerBg: 'bg-neo-navy/90',
-    headerBorder: 'border-neo-black/40',
-    sidebarBg: 'bg-neo-black/40',
-    scoreAccent: 'text-neo-cyan',
-    levelBadgeColor: 'bg-neo-black/40',
-    levelBadgeText: 'text-neo-cyan',
-    objectiveAccent: 'text-neo-lime',
-    hintActiveColor: 'bg-neo-lime',
-    hintActiveText: 'text-neo-black',
-  }),
-}));
+jest.mock('@/contexts/AdventureThemeContext', () => {
+  const R = require('react');
+  return {
+    useHUDTheme: () => ({
+      headerBg: 'bg-neo-navy/90',
+      headerBorder: 'border-neo-black/40',
+      sidebarBg: 'bg-neo-black/40',
+      scoreAccent: 'text-neo-cyan',
+      levelBadgeColor: 'bg-neo-black/40',
+      levelBadgeText: 'text-neo-cyan',
+      objectiveAccent: 'text-neo-lime',
+      hintActiveColor: 'bg-neo-lime',
+      hintActiveText: 'text-neo-black',
+    }),
+    AdventureThemeContext: R.createContext({ worldId: 1 }),
+  };
+});
 
 jest.mock('framer-motion', () => ({
   motion: {
@@ -44,6 +48,18 @@ jest.mock('../../AdventureGrid', () => ({
   __esModule: true,
   default: jest.fn(() => <div data-testid="adventure-grid" />),
 }));
+
+jest.mock('@/components/phaser/PhaserGameAdventure', () => ({
+  PhaserGameAdventure: jest.fn(() => <div data-testid="phaser-game-adventure" />),
+}));
+
+jest.mock('../../themed/BoardFrame', () => {
+  const R = require('react');
+  return {
+    __esModule: true,
+    default: ({ children }: { children: unknown }) => R.createElement('div', { 'data-testid': 'board-frame' }, children),
+  };
+});
 
 jest.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
@@ -141,8 +157,8 @@ describe('GameGridArea', () => {
     expect(screen.getByText(/adventure.hints.minLetters3/)).toBeInTheDocument();
   });
 
-  it('should render AdventureGrid', () => {
+  it('should render Phaser game adventure grid', () => {
     render(<GameGridArea {...defaultProps} />);
-    expect(screen.getByTestId('adventure-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('phaser-game-adventure')).toBeInTheDocument();
   });
 });
