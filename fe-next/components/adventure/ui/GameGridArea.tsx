@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
 import AdventureGrid from '../AdventureGrid';
-import BoardFrame from '../themed/BoardFrame';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import type { GridTileState } from '@/types/adventure';
 
@@ -206,7 +205,6 @@ export const GameGridArea = memo(function GameGridArea({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           >
-            <BoardFrame>
               <AdventureGrid
                 ref={gridRef}
                 tiles={tiles}
@@ -227,7 +225,6 @@ export const GameGridArea = memo(function GameGridArea({
                 hintHighlightIndices={hintHighlightIndices}
                 className="h-full"
               />
-            </BoardFrame>
           </motion.div>
         </div>
 

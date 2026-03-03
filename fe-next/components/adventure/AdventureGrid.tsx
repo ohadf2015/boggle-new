@@ -305,7 +305,7 @@ const AdventureGrid = memo(
     }, []);
 
     return (
-      <div className={cn('flex flex-col gap-2', className)}>
+      <div className={cn('flex flex-col', showWordPreview && 'gap-2', className)}>
         {/* Word Preview - Always reserve space to prevent layout shift */}
         {showWordPreview && (
           <div
@@ -335,7 +335,7 @@ const AdventureGrid = memo(
         )}
 
         {/* Grid with world-themed board frame */}
-        <BoardFrame>
+        <BoardFrame className="flex-1 flex flex-col">
           <div
           ref={containerRef}
           dir="ltr"
@@ -347,12 +347,13 @@ const AdventureGrid = memo(
           style={{
             padding: GRID_PADDING,
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))`,
             containerType: 'size' as const,
             ['--cell-font-size' as string]: `calc((100cqw / ${gridSize}) * 0.50)`,
           }}
           className={cn(
             'adventure-grid',
-            'relative grid',
+            'relative grid flex-1',
             GRID_GAP_CLASS,
             'bg-neo-cream rounded-neo',
             'select-none touch-none',

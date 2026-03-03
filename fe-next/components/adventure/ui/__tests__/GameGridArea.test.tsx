@@ -54,14 +54,6 @@ jest.mock('../../AdventureGrid', () => {
   };
 });
 
-jest.mock('../../themed/BoardFrame', () => {
-  const R = require('react');
-  return {
-    __esModule: true,
-    default: ({ children }: { children: unknown }) => R.createElement('div', { 'data-testid': 'board-frame' }, children),
-  };
-});
-
 jest.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: jest.fn(({ word, feedback, compact }: { word: string; letterCount?: number; feedback?: unknown; compact?: boolean }) => (

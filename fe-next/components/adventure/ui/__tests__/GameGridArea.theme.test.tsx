@@ -29,14 +29,6 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
-jest.mock('../../themed/BoardFrame', () => {
-  const R = require('react');
-  return {
-    __esModule: true,
-    default: ({ children }: { children: unknown }) => R.createElement('div', { 'data-testid': 'board-frame' }, children),
-  };
-});
-
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
