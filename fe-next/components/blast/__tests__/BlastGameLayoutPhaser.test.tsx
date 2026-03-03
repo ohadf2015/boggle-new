@@ -89,6 +89,11 @@ const mockGameState: BlastGameState = {
   wordsFound: ['CAT', 'DOG'],
   comboCount: 0,
   cascadeChainLevel: 0,
+  movesRemaining: 10,
+  movesUsed: 0,
+  totalMoves: 10,
+  bonusMoveScore: 0,
+  tileTypeClears: {} as BlastGameState['tileTypeClears'],
 };
 
 function defaultProps() {

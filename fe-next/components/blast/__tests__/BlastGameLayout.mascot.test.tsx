@@ -121,6 +121,11 @@ const defaultGameState: BlastGameState = {
   comboCount: 0,
   isDeadEnd: false,
   cascadeChainLevel: 0,
+  movesRemaining: 10,
+  movesUsed: 0,
+  totalMoves: 10,
+  bonusMoveScore: 0,
+  tileTypeClears: {} as BlastGameState['tileTypeClears'],
 };
 
 const baseProps = {

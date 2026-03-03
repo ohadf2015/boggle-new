@@ -2,6 +2,7 @@ import {
   assignArchetypes,
   ARCHETYPES,
   type SpotlightPlayer,
+  type SpotlightWord,
   type ArchetypeAssignment,
 } from '../playerSpotlightEngine';
 
@@ -21,7 +22,7 @@ function makePlayer(
 
 function makeWord(
   word: string,
-  overrides: Partial<SpotlightPlayer['allWords'][0]> = {}
+  overrides: Partial<SpotlightWord> = {}
 ) {
   return {
     word,
