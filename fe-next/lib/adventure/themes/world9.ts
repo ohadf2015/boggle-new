@@ -41,6 +41,7 @@ const colors: WorldColorPalette = {
 
 const background: WorldBackground = {
   baseColor: 'bg-gradient-to-b from-slate-950 via-teal-950 to-emerald-950',
+  illustrationPath: '/images/adventure/backgrounds/peaks.webp',
   layers: [
     {
       id: 'peaks-sky',

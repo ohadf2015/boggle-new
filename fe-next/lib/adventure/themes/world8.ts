@@ -41,6 +41,7 @@ const colors: WorldColorPalette = {
 
 const background: WorldBackground = {
   baseColor: 'bg-gradient-to-b from-slate-950 via-indigo-950 to-violet-950',
+  illustrationPath: '/images/adventure/backgrounds/nebula.webp',
   layers: [
     {
       id: 'nebula-void',

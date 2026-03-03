@@ -41,6 +41,7 @@ const colors: WorldColorPalette = {
 
 const background: WorldBackground = {
   baseColor: 'bg-gradient-to-b from-neo-navy via-slate-950 to-pink-950',
+  illustrationPath: '/images/adventure/backgrounds/labyrinth.webp',
   layers: [
     {
       id: 'labyrinth-void',

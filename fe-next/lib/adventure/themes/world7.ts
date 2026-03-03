@@ -41,6 +41,7 @@ const colors: WorldColorPalette = {
 
 const background: WorldBackground = {
   baseColor: 'bg-gradient-to-b from-slate-900 via-sky-950 to-cyan-950',
+  illustrationPath: '/images/adventure/backgrounds/palace.webp',
   layers: [
     {
       id: 'palace-sky',
