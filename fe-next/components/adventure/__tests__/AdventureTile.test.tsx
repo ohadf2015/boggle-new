@@ -218,42 +218,42 @@ describe('AdventureTile', () => {
     });
   });
 
-  describe('World Theming', () => {
-    it('should apply world 1 texture class to standard tiles', () => {
+  describe('Standard Tile Styling', () => {
+    it('should apply letter-tile-gradient class to standard tiles', () => {
       const { container } = render(<AdventureTile {...defaultProps} worldId={1} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-texture-meadows');
+      expect(tile).toHaveClass('letter-tile-gradient');
     });
 
-    it('should apply world 2 texture class to standard tiles', () => {
+    it('should apply text-neo-black to standard tiles', () => {
       const { container } = render(<AdventureTile {...defaultProps} worldId={2} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-texture-springs');
+      expect(tile).toHaveClass('text-neo-black');
     });
 
-    it('should apply world 3 texture class to standard tiles', () => {
+    it('should use same gradient class regardless of worldId', () => {
       const { container } = render(<AdventureTile {...defaultProps} worldId={3} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-texture-caverns');
+      expect(tile).toHaveClass('letter-tile-gradient');
     });
 
-    it('should NOT apply texture class to special tiles (gold)', () => {
+    it('should NOT apply letter-tile-gradient to special tiles (gold)', () => {
       const goldTile = { ...baseTile, type: 'gold' as const };
       const { container } = render(<AdventureTile {...defaultProps} tile={goldTile} worldId={1} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).not.toHaveClass('tile-texture-meadows');
+      expect(tile).not.toHaveClass('letter-tile-gradient');
     });
 
-    it('should apply world-specific border class to standard tiles', () => {
-      const { container } = render(<AdventureTile {...defaultProps} worldId={2} />);
+    it('should have 6px border radius via inline style', () => {
+      const { container } = render(<AdventureTile {...defaultProps} />);
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('tile-border-springs');
+      expect(tile).toHaveStyle({ borderRadius: '6px' });
     });
 
-    it('should apply letter glow class based on world', () => {
-      const { container } = render(<AdventureTile {...defaultProps} worldId={2} />);
-      const letter = screen.getByText('A');
-      expect(letter).toHaveClass('letter-glow-springs');
+    it('should have font-size from CSS variable', () => {
+      const { container } = render(<AdventureTile {...defaultProps} />);
+      const tile = container.querySelector('[role="gridcell"]');
+      expect(tile).toHaveStyle({ fontSize: 'var(--cell-font-size)' });
     });
   });
 
@@ -433,8 +433,9 @@ describe('AdventureTile', () => {
         <AdventureTile {...defaultProps} isHintHighlighted={true} isSelected={false} />
       );
       const tile = container.querySelector('[role="gridcell"]');
-      expect(tile).toHaveClass('ring-2');
-      expect(tile).toHaveClass('ring-neo-yellow');
+      expect(tile).toHaveClass('bg-neo-lime');
+      expect(tile).toHaveClass('text-neo-black');
+      expect(tile).toHaveClass('z-10');
       expect(tile).toHaveClass('animate-pulse');
     });
 

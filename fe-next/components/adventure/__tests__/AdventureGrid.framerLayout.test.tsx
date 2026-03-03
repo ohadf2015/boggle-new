@@ -217,7 +217,7 @@ describe('AdventureGrid - Framer Layout Animations', () => {
 
       const gridContainer = container.querySelector('[role="grid"]');
       expect(gridContainer).toHaveClass('grid');
-      expect(gridContainer).toHaveClass('grid-cols-4');
+      expect(gridContainer).toHaveStyle({ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' });
     });
 
     it('should preserve tile order during position changes', () => {

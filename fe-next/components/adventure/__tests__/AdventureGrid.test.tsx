@@ -333,7 +333,7 @@ describe('AdventureGrid', () => {
       expect(cells.length).toBe(25);
     });
 
-    it('should apply correct grid layout classes', () => {
+    it('should apply correct grid layout via inline style', () => {
       // GIVEN
       const tiles = createMockTiles(4);
 
@@ -342,7 +342,7 @@ describe('AdventureGrid', () => {
 
       // THEN
       const grid = container.querySelector('.adventure-grid');
-      expect(grid).toHaveClass('grid-cols-4');
+      expect(grid).toHaveStyle({ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' });
     });
   });
 

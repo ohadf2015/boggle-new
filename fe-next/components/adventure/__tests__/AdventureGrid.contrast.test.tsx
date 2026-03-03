@@ -50,10 +50,8 @@ describe('AdventureGrid Contrast', () => {
       const cells = screen.getAllByRole('gridcell');
       const firstCell = cells[0];
 
-      // Standard tiles use world-specific light background gradients
-      // World 1 (meadows default): from-[#fdfcf0] via-[#f5f0e0] to-[#ede8d4]
-      expect(firstCell).toHaveClass('bg-gradient-to-br');
-      expect(firstCell.className).toMatch(/from-\[#fdfcf0\]/);
+      // Standard tiles use letter-tile-gradient (same as regular grid)
+      expect(firstCell).toHaveClass('letter-tile-gradient');
     });
 
     it('should have proper text color on standard tiles', () => {
@@ -67,9 +65,8 @@ describe('AdventureGrid Contrast', () => {
       const cells = screen.getAllByRole('gridcell');
       const firstCell = cells[0];
 
-      // Standard tiles have dark text via the letter span's drop-shadow and
-      // world-specific letter-glow class. The tile itself uses font-black weight
-      // and the letter span inside has the glow/shadow for readability.
+      // Standard tiles have dark text via text-neo-black class and the letter
+      // span's drop-shadow. The tile itself uses font-black weight.
       expect(firstCell).toHaveClass('font-black');
       // Verify the letter span inside has a text-rendering class for contrast
       const letterSpan = firstCell.querySelector('span');
@@ -77,7 +74,7 @@ describe('AdventureGrid Contrast', () => {
       expect(letterSpan!.className).toMatch(/drop-shadow/);
     });
 
-    it('should apply world theming WITHOUT overriding base background', () => {
+    it('should apply consistent styling across all worlds', () => {
       // GIVEN
       const tiles = createMockTiles(4);
 
@@ -88,11 +85,9 @@ describe('AdventureGrid Contrast', () => {
       const cells = screen.getAllByRole('gridcell');
       const firstCell = cells[0];
 
-      // World theming classes should coexist with background gradient
-      // The texture is an overlay, not a replacement for the background
-      expect(firstCell).toHaveClass('tile-texture-meadows');
-      // Must still have world-specific light background gradient
-      expect(firstCell.className).toMatch(/from-\[#fdfcf0\]/);
+      // All standard tiles use the same letter-tile-gradient regardless of world
+      expect(firstCell).toHaveClass('letter-tile-gradient');
+      expect(firstCell).toHaveClass('text-neo-black');
     });
   });
 

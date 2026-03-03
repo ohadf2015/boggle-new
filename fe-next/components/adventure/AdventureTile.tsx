@@ -7,7 +7,7 @@
  * Handles:
  * - Tile selection states and animations
  * - Special tile types (gold, ice, bomb, rainbow, chain, time)
- * - World-specific theming
+ * - Standard tiles styled to match GridComponent (letter-tile-gradient)
  * - Cascade animations
  * - Activation effects
  * - Performance-aware rendering
@@ -79,42 +79,6 @@ const TILE_TYPE_CLASSES: Record<TileType, string> = {
   multiplier: 'tile-multiplier',
 };
 
-// World-specific theming classes
-const TEXTURE_CLASSES: Record<number, string> = {
-  1: 'tile-texture-meadows',
-  2: 'tile-texture-springs',
-  3: 'tile-texture-caverns',
-};
-
-const BORDER_CLASSES: Record<number, string> = {
-  1: 'tile-border-meadows',
-  2: 'tile-border-springs',
-  3: 'tile-border-caverns',
-};
-
-const LETTER_GLOW_CLASSES: Record<number, string> = {
-  1: 'letter-glow-meadows',
-  2: 'letter-glow-springs',
-  3: 'letter-glow-caverns',
-};
-
-// World-specific standard tile background classes
-const STANDARD_TILE_BG_CLASSES: Record<number, string> = {
-  1: 'bg-gradient-to-br from-[#fdfcf0] via-[#f5f0e0] to-[#ede8d4]',
-  2: 'bg-gradient-to-br from-[#f0f8ff] via-[#e6f2fa] to-[#daedf7]',
-  3: 'bg-gradient-to-br from-[#f5f0ff] via-[#ede6fa] to-[#e5dcf5]',
-};
-
-// Tile types that should NOT receive texture/border theming
-const SPECIAL_TILE_TYPES: Set<TileType> = new Set([
-  'gold',
-  'ice',
-  'bomb',
-  'rainbow',
-  'chain',
-  'time',
-]);
-
 // ==============================================
 // COMPONENT
 // ==============================================
@@ -142,12 +106,6 @@ export const AdventureTile = memo(({
   getTileAriaLabel,
   chainCascadeDelay,
 }: AdventureTileProps) => {
-  // World-specific theming
-  const isStandardTile = !SPECIAL_TILE_TYPES.has(tile.type);
-  const textureClass = isStandardTile ? TEXTURE_CLASSES[worldId] : '';
-  const borderClass = isStandardTile ? BORDER_CLASSES[worldId] : '';
-  const letterGlowClass = LETTER_GLOW_CLASSES[worldId] || LETTER_GLOW_CLASSES[1];
-
   // Chain cascade delay takes priority over tile.cascadeDelay
   const effectiveCascadeDelay = chainCascadeDelay ?? tile.cascadeDelay;
 
@@ -170,10 +128,9 @@ export const AdventureTile = memo(({
         scale: 0.8,
       } : undefined}
       animate={{
-        y: isSelected ? -4 : 0,
+        y: isSelected ? -2 : 0,
         opacity: 1,
-        scale: isSelected ? 1.15 : 1,
-        rotate: isSelected && !prefersReducedMotion ? [0, -2, 2, 0] : 0,
+        scale: isSelected ? 1.05 : 1,
       }}
       transition={
         prefersReducedMotion
@@ -196,19 +153,17 @@ export const AdventureTile = memo(({
       }
       whileTap={!prefersReducedMotion ? { scale: 0.95 } : undefined}
       style={{
+        borderRadius: '6px',
+        fontSize: 'var(--cell-font-size)',
         animationDelay: effectiveCascadeDelay
           ? `${effectiveCascadeDelay}ms`
           : undefined,
       }}
       className={cn(
-        // Base tile styles - overflow-hidden ensures effects stay within cell bounds
+        // Base tile styles — match GridComponent baseline
         'relative aspect-square flex items-center justify-center',
-        'font-black text-xl cursor-pointer overflow-hidden',
-        'border-2 border-neo-black/30 rounded-neo',
-
-        // World-specific theming
-        textureClass,
-        borderClass,
+        'font-black cursor-pointer overflow-hidden',
+        'border-2 border-neo-black/30',
 
         // Type-specific classes
         TILE_TYPE_CLASSES[tile.type],
@@ -233,15 +188,15 @@ export const AdventureTile = memo(({
         // Bomb row preview: highlight tiles in bomb's row when bomb is selected
         bombRowPreview !== null && tile.row === bombRowPreview && 'bomb-row-preview',
 
-        // Hint highlight: show which tiles form the hinted word
+        // Hint highlight: match GridComponent's lime bg + yellow glow style
         isHintHighlighted && !isSelected && [
-          'ring-2 ring-neo-yellow',
-          'shadow-[0_0_16px_rgba(255,225,53,0.7),0_0_32px_rgba(255,225,53,0.3)]',
+          'bg-neo-lime text-neo-black border-2 border-neo-black/60 z-10',
+          'shadow-[0_0_12px_rgba(255,225,53,0.5)]',
           'animate-pulse',
         ],
 
-        // Standard tile background - world-specific tint
-        tile.type === 'standard' && (STANDARD_TILE_BG_CLASSES[worldId] || STANDARD_TILE_BG_CLASSES[1]),
+        // Standard tile background — use same gradient as GridComponent
+        tile.type === 'standard' && 'letter-tile-gradient text-neo-black',
 
         // Gold tile - golden glow
         tile.type === 'gold' && [
@@ -408,8 +363,9 @@ export const AdventureTile = memo(({
       {/* Contained ripple that stays within cell bounds - no blur, no overflow */}
       {isSelected && enableComplexAnimations && !prefersReducedMotion && (
         <motion.div
-          className="absolute inset-0 pointer-events-none rounded-neo"
+          className="absolute inset-0 pointer-events-none"
           style={{
+            borderRadius: '6px',
             background: 'radial-gradient(circle at center, rgba(255, 200, 100, 0.6) 0%, rgba(255, 200, 100, 0.2) 50%, transparent 70%)',
           }}
           initial={{ opacity: 0 }}
@@ -418,15 +374,13 @@ export const AdventureTile = memo(({
         />
       )}
 
-      {/* Letter */}
+      {/* Letter — inherits theme fonts (Fredoka/Rubik) like GridComponent */}
       <span
         className={cn(
           'relative z-10 select-none',
-          letterGlowClass,
           'drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]',
           (tile.type === 'gold' || tile.type === 'rainbow') && 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'
         )}
-        style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
       >
         {tile.letter}
       </span>

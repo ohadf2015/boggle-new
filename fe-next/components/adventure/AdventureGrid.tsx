@@ -20,6 +20,7 @@ import { AdventureTile } from './AdventureTile';
 import './AdventureTile.css';
 import { useGridGestures } from './useGridGestures';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
+import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 
 // ==============================================
 // TYPES
@@ -80,11 +81,6 @@ const TILE_TYPE_LABELS: Record<TileType, string> = {
   multiplier: 'multiplier tile (2x score)',
 };
 
-const GRID_COLS_CLASSES: Record<number, string> = {
-  4: 'grid-cols-4',
-  5: 'grid-cols-5',
-  6: 'grid-cols-6',
-};
 
 // ==============================================
 // COMPONENT
@@ -348,12 +344,18 @@ const AdventureGrid = memo(
           onMouseUp={interactive ? handleMouseUp : undefined}
           onTouchMove={interactive ? handleTouchMove : undefined}
           onTouchEnd={interactive ? handleMouseUp : undefined}
+          style={{
+            padding: GRID_PADDING,
+            gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
+            containerType: 'size' as const,
+            ['--cell-font-size' as string]: `calc((100cqw / ${gridSize}) * 0.50)`,
+          }}
           className={cn(
             'adventure-grid',
-            'relative grid gap-1 p-1.5',
-            'bg-[#FFFEF0]/60 rounded-neo',
+            'relative grid',
+            GRID_GAP_CLASS,
+            'bg-neo-cream rounded-neo',
             'select-none touch-none',
-            GRID_COLS_CLASSES[gridSize] || 'grid-cols-4',
             disabled && 'adventure-grid-disabled pointer-events-none'
           )}
         >
