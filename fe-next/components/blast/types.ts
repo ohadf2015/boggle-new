@@ -112,6 +112,24 @@ export interface BlastResultsData {
 export const GOLD_MULTIPLIER = 3;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
+
+// ==================== Vortex (Magnet Rework) Constants ====================
+
+/** Pull radius for Vortex tile (Manhattan distance) */
+export const VORTEX_PULL_RADIUS = 2;
+/** Explode radius for Vortex tile after pull phase (same as bomb) */
+export const VORTEX_EXPLODE_RADIUS = 1;
+/** Bonus score per tile pulled toward vortex center */
+export const VORTEX_PULL_BONUS = 2;
+/** Bonus score per tile cleared by vortex explosion */
+export const VORTEX_EXPLODE_BONUS = 2;
+
+// ==================== Frost (Frozen Rework) Constants ====================
+
+/** Number of hits required to free a Frost tile (down from frozen's 3) */
+export const FROST_HITS_REQUIRED = 2;
+/** Bonus score awarded when Frost tile is freed and inner special activates */
+export const FROST_REVEAL_BONUS = 3;
 /** Bonus score for rainbow tiles (legacy — replaced by RAINBOW_BOOST_MULTIPLIER) */
 export const RAINBOW_BONUS = 5;
 /** Multiplier applied by Rainbow Boost: copies and doubles the best special's effect, or doubles word score solo */

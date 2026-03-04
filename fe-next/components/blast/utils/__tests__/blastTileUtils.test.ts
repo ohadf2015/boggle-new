@@ -14,8 +14,8 @@ describe('getInitialHitsRemaining', () => {
     expect(getInitialHitsRemaining('gem')).toBe(3);
   });
 
-  it('returns 3 for frozen tiles', () => {
-    expect(getInitialHitsRemaining('frozen')).toBe(3);
+  it('returns 2 for frozen tiles (Frost redesign: 2-hit reveal, down from 3)', () => {
+    expect(getInitialHitsRemaining('frozen')).toBe(2);
   });
 
   it('returns 0 for standard tiles', () => {

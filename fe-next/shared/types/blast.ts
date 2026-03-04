@@ -47,4 +47,6 @@ export interface BlastTileState {
   activationEffect: string | null;
   /** Hits remaining before ice/frozen tile clears (2 → 1 → 0=cleared) */
   hitsRemaining: number;
+  /** For Frost (frozen) tiles: the hidden special revealed on second hit */
+  innerType?: BlastTileType;
 }

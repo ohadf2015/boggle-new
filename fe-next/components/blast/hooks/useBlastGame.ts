@@ -32,6 +32,11 @@ import {
   CASCADE_CHAIN_BONUS_MULTIPLIER,
   CASCADE_HIGHLIGHT_DURATION,
   CASCADE_HIGHLIGHT_LINGER,
+  VORTEX_PULL_RADIUS,
+  VORTEX_EXPLODE_RADIUS,
+  VORTEX_PULL_BONUS,
+  VORTEX_EXPLODE_BONUS,
+  FROST_REVEAL_BONUS,
   type BlastGameConfig,
   type BlastGameState,
   type BlastTileState,
@@ -74,16 +79,46 @@ function rollSpecialFromDistribution(
   return 'wildcard'; // Fallback (catches rounding errors)
 }
 
+/**
+ * Valid inner types for Frost tiles — only explosion/effect specials, not obstacles or multipliers.
+ * Wave-gating is applied at call site using rollSpecialFromDistribution with wave distribution.
+ */
+const FROST_INNER_CANDIDATES: BlastTileType[] = ['bomb', 'lightning', 'prism', 'gem', 'rainbow'];
+
 /** Generate initial tile states with special tile placement */
 function generateTileStates(
   gridSize: number,
   specialTileChance: number,
   seed: number = Date.now(),
   customDistribution?: Record<string, number>,
+  currentWave: number = 1,
 ): BlastTileState[][] {
   const random = seededRandom(seed);
   const tiles: BlastTileState[][] = [];
   const dist = customDistribution ?? SPECIAL_TILE_DISTRIBUTION;
+
+  // Build wave-gated distribution for frost inner type selection
+  const waveConfigForFrost = getWaveConfig(currentWave);
+  const waveDistForFrost = getWaveDistribution(waveConfigForFrost);
+  // Filter to only frost-eligible inner types (explosion/effect specials)
+  const frostInnerDist: Record<string, number> = {};
+  for (const t of FROST_INNER_CANDIDATES) {
+    if ((waveDistForFrost[t] ?? 0) > 0) {
+      frostInnerDist[t] = waveDistForFrost[t] ?? 0;
+    }
+  }
+  // Normalize to sum to 1.0 so rollSpecialFromDistribution doesn't fall through to wildcard
+  const frostInnerTotal = Object.values(frostInnerDist).reduce((a, b) => a + b, 0);
+  if (frostInnerTotal > 0) {
+    for (const k of Object.keys(frostInnerDist)) {
+      frostInnerDist[k] /= frostInnerTotal;
+    }
+  }
+  // Fallback: if wave gating excludes all candidates, use bomb+rainbow as safe defaults
+  const hasFrostInnerCandidates = Object.values(frostInnerDist).some(v => v > 0);
+  const effectiveFrostInnerDist = hasFrostInnerCandidates
+    ? frostInnerDist
+    : { bomb: 0.5, rainbow: 0.5 };
 
   for (let row = 0; row < gridSize; row++) {
     tiles[row] = [];
@@ -94,6 +129,13 @@ function generateTileStates(
         type = rollSpecialFromDistribution(random(), dist);
       }
 
+      // Frost (frozen) tiles get an innerType assigned at generation:
+      // the hidden special that activates on the second (freeing) hit.
+      const innerType: BlastTileType | undefined =
+        type === 'frozen'
+          ? rollSpecialFromDistribution(random(), effectiveFrostInnerDist)
+          : undefined;
+
       tiles[row][col] = {
         row,
         col,
@@ -101,6 +143,7 @@ function generateTileStates(
         isCleared: false,
         activationEffect: null,
         hitsRemaining: getInitialHitsRemaining(type),
+        ...(innerType !== undefined ? { innerType } : {}),
       };
     }
   }
@@ -200,18 +243,18 @@ export function useBlastGame(
   // Mutable grid state — updated after each cascade completes
   const [currentGrid, setCurrentGrid] = useState<LetterGrid | null>(null);
 
+  // Move limit from options (default: unlimited via high number)
+  const movesAllowed = options?.movesAllowed ?? Infinity;
+  // Current wave number for Treasure Gem spawn gating + Frost inner type gating (default: 1)
+  const currentWave = options?.currentWave ?? 1;
+
   // Tile state management — guarantee objective tiles are present on the board
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {
-    const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution);
+    const tiles = generateTileStates(gridSize, specialTileChance, Date.now(), customDistribution, currentWave);
     return options?.waveObjectives
       ? guaranteeObjectiveTiles(tiles, options.waveObjectives)
       : tiles;
   });
-
-  // Move limit from options (default: unlimited via high number)
-  const movesAllowed = options?.movesAllowed ?? Infinity;
-  // Current wave number for Treasure Gem spawn gating (default: 1)
-  const currentWave = options?.currentWave ?? 1;
 
   // Game state
   const [gameState, setGameState] = useState<BlastGameState>({
@@ -681,10 +724,14 @@ export function useBlastGame(
           tile.hitsRemaining--;
 
           // Gem: shard-specific activationEffect (gem-shard-1, gem-shard-2)
-          // Ice/frozen/prism: use generic crack effect
+          // Frost (frozen): 'frost-crack' on first hit
+          // Ice/prism: use generic crack effect
           if (tile.type === 'gem') {
             // hitsRemaining after decrement: 2 = shard-1, 1 = shard-2
             tile.activationEffect = tile.hitsRemaining === 2 ? 'gem-shard-1' : 'gem-shard-2';
+          } else if (tile.type === 'frozen') {
+            // Frost redesign: 'frost-crack' reveals the inner tile on first hit
+            tile.activationEffect = 'frost-crack';
           } else {
             tile.activationEffect = `${tile.type}-crack`;
           }
@@ -966,10 +1013,112 @@ export function useBlastGame(
             break;
           }
 
-          case 'frozen':
-            // Final hit — bonus for clearing toughest obstacle
-            bonusScore += FROZEN_CLEAR_BONUS;
+          case 'frozen': {
+            // Frost redesign: second (final) hit — free and activate inner special
+            tile.activationEffect = 'frost-free';
+            bonusScore += FROST_REVEAL_BONUS;
+
+            // Activate the inner tile's effect if it exists
+            if (tile.innerType) {
+              switch (tile.innerType) {
+                case 'bomb': {
+                  // Inner bomb detonates from frost position
+                  if (!processedBombs.has(`${cell.row},${cell.col}`)) {
+                    processedBombs.add(`${cell.row},${cell.col}`);
+                    bombQueue.push({ row: cell.row, col: cell.col, depth: 0 });
+                  }
+                  break;
+                }
+                case 'lightning': {
+                  // Inner lightning clears entire column from frost position
+                  const frozenKey = `${cell.row},${cell.col}`;
+                  if (!processedLightning.has(frozenKey)) {
+                    processedLightning.add(frozenKey);
+                    for (let r = 0; r < gridSize; r++) {
+                      if (r === cell.row) continue;
+                      const ltarget = next[r][cell.col];
+                      if (ltarget.isCleared) continue;
+                      if (isMultiHitAlive(ltarget)) {
+                        hitMultiHitTile(ltarget);
+                      } else {
+                        markCleared(ltarget);
+                        bonusScore += LIGHTNING_COLUMN_CLEAR_BONUS;
+                        if (ltarget.type === 'bomb' && !processedBombs.has(`${r},${cell.col}`)) {
+                          processedBombs.add(`${r},${cell.col}`);
+                          bombQueue.push({ row: r, col: cell.col, depth: 0 });
+                        }
+                      }
+                    }
+                  }
+                  break;
+                }
+                case 'prism': {
+                  // Inner prism cross-clears row + column from frost position
+                  bonusScore += PRISM_CROSS_BONUS;
+                  // Cross-clear row
+                  for (let c = 0; c < gridSize; c++) {
+                    if (c === cell.col) continue;
+                    const ptarget = next[cell.row][c];
+                    if (ptarget.isCleared) continue;
+                    if (isMultiHitAlive(ptarget)) {
+                      hitMultiHitTile(ptarget);
+                    } else {
+                      markCleared(ptarget);
+                      if (ptarget.type === 'bomb' && !processedBombs.has(`${cell.row},${c}`)) {
+                        processedBombs.add(`${cell.row},${c}`);
+                        bombQueue.push({ row: cell.row, col: c, depth: 0 });
+                      }
+                    }
+                  }
+                  // Cross-clear column
+                  for (let r = 0; r < gridSize; r++) {
+                    if (r === cell.row) continue;
+                    const ptarget = next[r][cell.col];
+                    if (ptarget.isCleared) continue;
+                    if (isMultiHitAlive(ptarget)) {
+                      hitMultiHitTile(ptarget);
+                    } else {
+                      markCleared(ptarget);
+                      if (ptarget.type === 'bomb' && !processedBombs.has(`${r},${cell.col}`)) {
+                        processedBombs.add(`${r},${cell.col}`);
+                        bombQueue.push({ row: r, col: cell.col, depth: 0 });
+                      }
+                    }
+                  }
+                  break;
+                }
+                case 'gem': {
+                  // Inner gem: DO NOT clear — convert frost tile into a fresh Treasure Gem.
+                  // The frost tile was already markCleared above; un-clear it and convert.
+                  tile.isCleared = false;
+                  newlyClearedCount--; // Undo the clear count
+                  if (clearedTypeCounts['frozen']) {
+                    clearedTypeCounts['frozen']--;
+                    if (clearedTypeCounts['frozen'] === 0) delete clearedTypeCounts['frozen'];
+                  }
+                  tile.type = 'gem';
+                  tile.hitsRemaining = getInitialHitsRemaining('gem');
+                  tile.innerType = undefined;
+                  tile.activationEffect = 'frost-gem-reveal'; // Special animation cue
+                  break;
+                }
+                case 'rainbow': {
+                  // Inner rainbow: apply solo multiplier to this word's base score
+                  // (We can't re-fire rainbow from here without circular logic,
+                  //  so we award the solo bonus as a flat multiplier on base.)
+                  rainbowSoloMultiplier = Math.max(rainbowSoloMultiplier, 2);
+                  break;
+                }
+                default: break;
+              }
+            }
+
+            newExplosions.push({
+              id: `frost-${now}-${cell.row}-${cell.col}`,
+              row: cell.row, col: cell.col, type: 'clear', intensity: 3, timestamp: now,
+            });
             break;
+          }
 
           case 'lightning': {
             // Lightning clears entire column
@@ -997,21 +1146,85 @@ export function useBlastGame(
           }
 
           case 'magnet': {
-            // Magnet attracts (clears) adjacent wildcard tiles
+            // Vortex (rework of Magnet): pull tiles toward center, then explode radius 1.
+            // Display name is "Vortex" but tile type key remains 'magnet'.
             newExplosions.push({
               id: `magnet-${now}-${cell.row}-${cell.col}`,
-              row: cell.row, col: cell.col, type: 'magnet', intensity: 2, timestamp: now,
+              row: cell.row, col: cell.col, type: 'magnet', intensity: 3, timestamp: now,
             });
-            for (let dr = -MAGNET_RADIUS; dr <= MAGNET_RADIUS; dr++) {
-              for (let dc = -MAGNET_RADIUS; dc <= MAGNET_RADIUS; dc++) {
+
+            // ── Phase 1: Pull — from outermost ring inward (radius 2 first, then 1) ──
+            // For each tile within Manhattan distance VORTEX_PULL_RADIUS:
+            //   Calculate the step toward center. If the cell 1 step closer is empty
+            //   (cleared) or is the magnet itself, swap the tile into that position.
+            for (let pullRadius = VORTEX_PULL_RADIUS; pullRadius >= 1; pullRadius--) {
+              for (let dr = -pullRadius; dr <= pullRadius; dr++) {
+                for (let dc = -pullRadius; dc <= pullRadius; dc++) {
+                  // Only process tiles at exactly this Manhattan radius
+                  if (Math.abs(dr) + Math.abs(dc) !== pullRadius) continue;
+                  const r = cell.row + dr;
+                  const c = cell.col + dc;
+                  if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+                  const sourceTile = next[r][c];
+                  if (sourceTile.isCleared) continue;
+
+                  // Calculate 1-step direction toward vortex center
+                  const stepR = dr === 0 ? 0 : (dr > 0 ? -1 : 1);
+                  const stepC = dc === 0 ? 0 : (dc > 0 ? -1 : 1);
+                  // Prefer moving along the axis with greater distance
+                  let moveR = 0, moveC = 0;
+                  if (Math.abs(dr) >= Math.abs(dc)) {
+                    moveR = stepR;
+                  } else {
+                    moveC = stepC;
+                  }
+
+                  const targetR = r + moveR;
+                  const targetC = c + moveC;
+                  if (targetR < 0 || targetR >= gridSize || targetC < 0 || targetC >= gridSize) continue;
+                  const targetTile = next[targetR][targetC];
+
+                  // Swap if target is the vortex itself (cleared) or is an empty/cleared cell
+                  if (targetTile.isCleared) {
+                    // Swap all tile properties (letter is in grid, but swap tile state)
+                    const tmpType = sourceTile.type;
+                    const tmpHits = sourceTile.hitsRemaining;
+                    const tmpEffect = sourceTile.activationEffect;
+                    const tmpInner = sourceTile.innerType;
+                    sourceTile.type = targetTile.type;
+                    sourceTile.hitsRemaining = targetTile.hitsRemaining;
+                    sourceTile.activationEffect = targetTile.activationEffect;
+                    sourceTile.innerType = targetTile.innerType;
+                    targetTile.type = tmpType;
+                    targetTile.hitsRemaining = tmpHits;
+                    targetTile.activationEffect = tmpEffect;
+                    targetTile.innerType = tmpInner;
+                    targetTile.isCleared = false;
+                    sourceTile.isCleared = true;
+                    bonusScore += VORTEX_PULL_BONUS;
+                  }
+                }
+              }
+            }
+
+            // ── Phase 2: Explode — clear tiles within radius 1 of vortex position ──
+            for (let dr = -VORTEX_EXPLODE_RADIUS; dr <= VORTEX_EXPLODE_RADIUS; dr++) {
+              for (let dc = -VORTEX_EXPLODE_RADIUS; dc <= VORTEX_EXPLODE_RADIUS; dc++) {
                 if (dr === 0 && dc === 0) continue;
                 const r = cell.row + dr;
                 const c = cell.col + dc;
-                if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
-                  const target = next[r][c];
-                  if (!target.isCleared && (target.type === 'wildcard' || target.type === 'rainbow')) {
-                    markCleared(target);
-                    bonusScore += MAGNET_ATTRACT_BONUS;
+                if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+                const etarget = next[r][c];
+                if (etarget.isCleared) continue;
+                if (isMultiHitAlive(etarget)) {
+                  hitMultiHitTile(etarget);
+                } else {
+                  markCleared(etarget);
+                  bonusScore += VORTEX_EXPLODE_BONUS;
+                  // Chain-propagate bombs found in explode zone
+                  if (etarget.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
+                    processedBombs.add(`${r},${c}`);
+                    bombQueue.push({ row: r, col: c, depth: 0 });
                   }
                 }
               }

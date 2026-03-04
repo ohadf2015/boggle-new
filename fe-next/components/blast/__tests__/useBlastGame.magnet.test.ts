@@ -1,8 +1,11 @@
 /**
- * useBlastGame — Magnet tile clearing tests.
+ * useBlastGame — Vortex (Magnet) tile tests.
  *
- * Magnet tile effect: pulls (clears) all wildcard tiles in 8 adjacent cells.
- * +3 bonus per attracted wildcard.
+ * Vortex redesign: tile type key remains 'magnet' in code.
+ * New behavior: pulls tiles within radius 2 toward center, then explodes radius 1.
+ * Old behavior (attract wildcards only) removed.
+ *
+ * Awards VORTEX_PULL_BONUS per tile pulled + VORTEX_EXPLODE_BONUS per tile exploded.
  */
 
 import { renderHook, act } from '@testing-library/react';
@@ -43,19 +46,17 @@ jest.mock('@/shared/utils/scoring', () => ({
 }));
 
 import { useBlastGame } from '../hooks/useBlastGame';
-import { MAGNET_ATTRACT_BONUS } from '../types';
+import {
+  VORTEX_PULL_BONUS,
+  VORTEX_EXPLODE_BONUS,
+  VORTEX_PULL_RADIUS,
+  VORTEX_EXPLODE_RADIUS,
+} from '../types';
 
-/**
- * Distribution where odd rows get magnet, even rows get wildcard.
- * We use alternating pattern: first half magnet, second half wildcard.
- * With 50/50 split, ~half the grid is magnet and ~half wildcard.
- */
-const MAGNET_WILDCARD_DIST = { magnet: 0.5, wildcard: 0.5 };
-
-/** Distribution with only magnet tiles (to test no-wildcard case) */
+/** Distribution with only magnet (Vortex) tiles */
 const MAGNET_ONLY_DIST = { magnet: 1.0 };
 
-describe('useBlastGame — magnet tile', () => {
+describe('useBlastGame — Vortex (Magnet) tile', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn()
@@ -76,90 +77,25 @@ describe('useBlastGame — magnet tile', () => {
     jest.restoreAllMocks();
   });
 
-  it('should clear adjacent wildcard tiles when magnet is in path', () => {
+  it('should award score above base when vortex activates (pull + explode bonuses)', () => {
     const { result } = renderHook(() => useBlastGame({
       gridSize: 4,
       specialTileChance: 1,
       language: 'en',
-      customDistribution: MAGNET_WILDCARD_DIST,
+      customDistribution: MAGNET_ONLY_DIST,
     }));
 
-    // Find a magnet tile NOT on edge (so it has 8 neighbors)
-    const magnetTile = result.current.tileStates
-      .flat()
-      .find(t => t.type === 'magnet' && t.row > 0 && t.row < 3 && t.col > 0 && t.col < 3);
-    if (!magnetTile) return;
-
-    // Count adjacent wildcards before clearing
-    const adjacentWildcards: Array<{ row: number; col: number }> = [];
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        if (dr === 0 && dc === 0) continue;
-        const r = magnetTile.row + dr;
-        const c = magnetTile.col + dc;
-        if (r >= 0 && r < 4 && c >= 0 && c < 4) {
-          if (result.current.tileStates[r][c].type === 'wildcard') {
-            adjacentWildcards.push({ row: r, col: c });
-          }
-        }
-      }
-    }
-
-    if (adjacentWildcards.length === 0) return;
-
+    const baseScore = 5;
     act(() => {
       result.current.clearTilesForWord(
-        [{ row: magnetTile.row, col: magnetTile.col }],
-        'm', 5
+        [{ row: 1, col: 1 }],
+        'm', baseScore
       );
     });
 
-    // All adjacent wildcards should be cleared
-    for (const wc of adjacentWildcards) {
-      expect(result.current.tileStates[wc.row][wc.col].isCleared).toBe(true);
-    }
-  });
-
-  it('should add MAGNET_ATTRACT_BONUS per attracted wildcard', () => {
-    const { result } = renderHook(() => useBlastGame({
-      gridSize: 4,
-      specialTileChance: 1,
-      language: 'en',
-      customDistribution: MAGNET_WILDCARD_DIST,
-    }));
-
-    const magnetTile = result.current.tileStates
-      .flat()
-      .find(t => t.type === 'magnet' && t.row > 0 && t.row < 3 && t.col > 0 && t.col < 3);
-    if (!magnetTile) return;
-
-    // Count attractable tiles (wildcards + rainbows) in MAGNET_RADIUS (5×5 area)
-    let attractableCount = 0;
-    for (let dr = -2; dr <= 2; dr++) {
-      for (let dc = -2; dc <= 2; dc++) {
-        if (dr === 0 && dc === 0) continue;
-        const r = magnetTile.row + dr;
-        const c = magnetTile.col + dc;
-        if (r >= 0 && r < 4 && c >= 0 && c < 4) {
-          const type = result.current.tileStates[r][c].type;
-          if (type === 'wildcard' || type === 'rainbow') {
-            attractableCount++;
-          }
-        }
-      }
-    }
-
-    if (attractableCount === 0) return;
-
-    act(() => {
-      result.current.clearTilesForWord(
-        [{ row: magnetTile.row, col: magnetTile.col }],
-        'm', 5
-      );
-    });
-
-    const expectedScore = 5 + attractableCount * MAGNET_ATTRACT_BONUS;
-    expect(result.current.gameState.score).toBe(expectedScore);
+    // Vortex awards VORTEX_PULL_BONUS and VORTEX_EXPLODE_BONUS for nearby tiles
+    // On a 4x4 all-magnet grid, radius-1 tiles exist and will be exploded.
+    expect(result.current.gameState.score).toBeGreaterThan(baseScore);
   });
 
   it('should create magnet explosion event', () => {
@@ -167,7 +103,7 @@ describe('useBlastGame — magnet tile', () => {
       gridSize: 4,
       specialTileChance: 1,
       language: 'en',
-      customDistribution: MAGNET_WILDCARD_DIST,
+      customDistribution: MAGNET_ONLY_DIST,
     }));
 
     const magnetTile = result.current.tileStates.flat().find(t => t.type === 'magnet');
@@ -184,49 +120,45 @@ describe('useBlastGame — magnet tile', () => {
     expect(magnetExplosions.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('should not attract non-wildcard tiles', () => {
+  it('should explode radius-1 tiles after pull phase', () => {
     const { result } = renderHook(() => useBlastGame({
-      gridSize: 4,
+      gridSize: 5,
       specialTileChance: 1,
       language: 'en',
       customDistribution: MAGNET_ONLY_DIST,
     }));
 
-    // All tiles are magnet — no wildcards to attract
-    const magnetTile = result.current.tileStates[1][1]; // Middle tile
-    expect(magnetTile.type).toBe('magnet');
-
+    // Vortex at center (2,2) — radius-1 tiles should be cleared by explosion
     act(() => {
       result.current.clearTilesForWord(
-        [{ row: 1, col: 1 }],
+        [{ row: 2, col: 2 }],
         'm', 5
       );
     });
 
-    // Only the path tile itself should be cleared (no magnet effect on magnets)
-    expect(result.current.tileStates[1][1].isCleared).toBe(true);
-    // Adjacent non-wildcard tiles should NOT be cleared
-    expect(result.current.tileStates[0][0].isCleared).toBe(false);
-    expect(result.current.tileStates[0][1].isCleared).toBe(false);
-    expect(result.current.tileStates[1][0].isCleared).toBe(false);
+    // Radius 1 cardinal neighbors should be cleared by vortex explosion
+    const radius1Positions = [
+      { row: 1, col: 2 },
+      { row: 3, col: 2 },
+      { row: 2, col: 1 },
+      { row: 2, col: 3 },
+    ];
+    const clearedCount = radius1Positions.filter(
+      p => result.current.tileStates[p.row][p.col].isCleared
+    ).length;
+    expect(clearedCount).toBeGreaterThan(0);
   });
 
-  it('should give no bonus when no adjacent wildcards exist', () => {
-    const { result } = renderHook(() => useBlastGame({
-      gridSize: 4,
-      specialTileChance: 1,
-      language: 'en',
-      customDistribution: MAGNET_ONLY_DIST,
-    }));
+  it('should award VORTEX_PULL_RADIUS constant is 2', () => {
+    expect(VORTEX_PULL_RADIUS).toBe(2);
+  });
 
-    act(() => {
-      result.current.clearTilesForWord(
-        [{ row: 1, col: 1 }],
-        'm', 5
-      );
-    });
+  it('should award VORTEX_EXPLODE_RADIUS constant is 1', () => {
+    expect(VORTEX_EXPLODE_RADIUS).toBe(1);
+  });
 
-    // Score should be just the base (no magnet bonus since no wildcards)
-    expect(result.current.gameState.score).toBe(5);
+  it('VORTEX_PULL_BONUS and VORTEX_EXPLODE_BONUS are positive', () => {
+    expect(VORTEX_PULL_BONUS).toBeGreaterThan(0);
+    expect(VORTEX_EXPLODE_BONUS).toBeGreaterThan(0);
   });
 });
