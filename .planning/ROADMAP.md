@@ -202,7 +202,7 @@ Plans:
 
 Plans:
 - [ ] 55-01-PLAN.md — Remove dead constants + fix lint duplicate-import errors (Wave 1)
-- [ ] 55-02-PLAN.md — Update REQUIREMENTS.md and ROADMAP.md stale entries (Wave 1)
+- [x] 55-02-PLAN.md — Update REQUIREMENTS.md and ROADMAP.md stale entries (Wave 1)
 
 ---
 
@@ -231,4 +231,4 @@ Plans:
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
 | 53. Gap Closure — Wildcard Type Cleanup | 1/1 | Complete    | 2026-03-04 | - |
 | 54. Gap Closure — MP Combo Sync + Codex Wiring | 1/1 | Complete    | 2026-03-04 | - |
-| 55. Tech Debt & Docs Cleanup | v3.0 | 0/2 | Pending | - |
+| 55. Tech Debt & Docs Cleanup | v3.0 | 1/2 | In Progress | - |
