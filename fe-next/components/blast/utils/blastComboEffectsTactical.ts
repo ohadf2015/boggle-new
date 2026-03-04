@@ -8,9 +8,8 @@ import {
   FROST_REVEAL_BONUS,
 } from '../types';
  
-import type { ComboEffectContext, ComboEffectResult } from './blastComboEffects';
+import { applyToTile, fireVortex, pushExplosion, type ComboEffectContext, type ComboEffectResult } from './blastComboEffects';
 import { scaledRadius } from './blastComboScaling';
-import { applyToTile, fireVortex, pushExplosion } from './blastComboEffects'; // eslint-disable-line no-duplicate-imports
 
 /**
  * Handle tactical combo types (mirror/magnet/gem/frozen crosses).

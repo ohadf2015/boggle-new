@@ -231,4 +231,4 @@ Plans:
 | 52. Multiplayer Sync | 4/4 | Complete    | 2026-03-04 | - |
 | 53. Gap Closure — Wildcard Type Cleanup | 1/1 | Complete    | 2026-03-04 | - |
 | 54. Gap Closure — MP Combo Sync + Codex Wiring | 1/1 | Complete    | 2026-03-04 | - |
-| 55. Tech Debt & Docs Cleanup | v3.0 | 1/2 | In Progress | - |
+| 55. Tech Debt & Docs Cleanup | 1/2 | In Progress|  | - |
