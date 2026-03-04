@@ -202,8 +202,10 @@ describe('guaranteeObjectiveTiles', () => {
       expect(countType(grid, 'standard')).toBe(36);
     });
 
-    it('should handle case when not enough standard tiles to replace', () => {
-      // GIVEN: tiny 2x2 grid (4 tiles), 3 already special, need 3 gems
+    it('should handle case when board already violates standard ratio without crashing', () => {
+      // GIVEN: tiny 2x2 grid (4 tiles), 3 already special (75% special — already over 40% budget)
+      // With MIN_STANDARD_RATIO=0.6, minStandardCount=ceil(4*0.6)=3, conversionBudget=max(0,1-3)=0
+      // The board already violates the ratio, so NO additional specials should be placed.
       const grid = makeStandardGrid(2);
       grid[0][0].type = 'gold';
       grid[0][1].type = 'bomb';
@@ -213,15 +215,17 @@ describe('guaranteeObjectiveTiles', () => {
         { type: 'collect_type', tileType: 'gem', target: 3 },
       ];
 
-      // WHEN: should place as many as possible without crashing
+      // WHEN: should not crash and should respect the minimum ratio
       const result = guaranteeObjectiveTiles(grid, objectives);
 
-      // THEN: at least 1 gem (the only available standard slot)
-      expect(countType(result, 'gem')).toBeGreaterThanOrEqual(1);
-      // Existing specials preserved
+      // THEN: board is already over special budget — no gems placed (budget=0)
+      expect(countType(result, 'gem')).toBe(0);
+      // Existing specials preserved unchanged
       expect(result[0][0].type).toBe('gold');
       expect(result[0][1].type).toBe('bomb');
       expect(result[1][0].type).toBe('rainbow');
+      // The one standard tile remains standard
+      expect(result[1][1].type).toBe('standard');
     });
 
     it('should set correct hitsRemaining for placed tiles', () => {
