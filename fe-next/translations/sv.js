@@ -2124,6 +2124,13 @@ const sv = {
       "signUpButton": "Skapa konto",
       "checkEmail": "Kolla din e-post för att verifiera ditt konto!",
       "emailInUse": "Denna e-post är redan registrerad",
+      "emailRequired": "E-post krävs",
+      "invalidEmail": "Ange en giltig e-postadress",
+      "emailTooLong": "E-postadressen är för lång",
+      "passwordRequired": "Lösenord krävs",
+      "passwordTooShort": "Lösenordet måste vara minst 8 tecken",
+      "passwordTooLong": "Lösenordet är för långt",
+      "weakPassword": "Lösenordet behöver versaler, gemener och en siffra",
       "skipForNow": "Hoppa över för nu",
       "skipHover": "(Lexi blir ledsen, men okej...)",
       "mascotTooltip": "Klicka på mig!",
@@ -2134,6 +2141,13 @@ const sv = {
         "streakProtector": "Skydda din streak! Registrera dig innan den försvinner!",
         "makeMomProud": "Gör mamma stolt - visa upp dina ordkunskaper på topplistan!"
       }
+    },
+    "magicLink": {
+      "sendLink": "Skicka en inloggningslänk",
+      "checkEmail": "Kolla din e-post efter en inloggningslänk!",
+      "usePassword": "Använd lösenord istället",
+      "useMagicLink": "Använd magisk länk",
+      "divider": "eller fortsätt med e-post"
     },
     "callback": {
       "completingSignIn": "Slutför inloggning...",

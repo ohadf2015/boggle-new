@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, type LucideIcon } from 'lucide-react';
+import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, Wand2, type LucideIcon } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
+import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink } from '../../lib/supabase';
 import { cn } from '../../lib/utils';
 import { setPendingDailyResult, type WordHuntResult } from '../../utils/dailyChallenge';
 import { validateEmail, validatePassword } from '../../utils/validation';
@@ -67,6 +67,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [usePassword, setUsePassword] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>('signup');
 
   // Email form state
@@ -176,6 +177,35 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         setIsLoading(null);
       }
       // For signin, the auth context will handle the redirect
+    } catch (err) {
+      setError((err as Error).message || 'An error occurred');
+      setIsLoading(null);
+    }
+  };
+
+  const handleMagicLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('magiclink');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      setPendingDailyResult(pendingResult);
+      const result = await signInWithMagicLink(email);
+
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        setSuccess(t('auth.magicLink.checkEmail') || 'Check your email for a sign-in link!');
+      }
+      setIsLoading(null);
     } catch (err) {
       setError((err as Error).message || 'An error occurred');
       setIsLoading(null);
@@ -388,91 +418,145 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
               </motion.button>
             ) : (
-              <motion.form
+              <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
-                onSubmit={handleEmailSubmit}
                 className="space-y-3"
               >
                 {/* Divider */}
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <div className="flex-1 h-px bg-gray-600" />
-                  <span>{authMode === 'signup' ? t('auth.signUp') : t('auth.signIn')}</span>
+                  <span>{t('auth.magicLink.divider') || 'or continue with email'}</span>
                   <div className="flex-1 h-px bg-gray-600" />
                 </div>
 
-                {/* Email Input */}
-                <div>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => handleEmailChange(e.target.value)}
-                    placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
-                    className={cn(
-                      "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
-                      emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
-                    )}
-                    disabled={isAnyLoading}
-                  />
-                  {emailError && (
-                    <p className="mt-1 text-xs text-red-400">{emailError}</p>
-                  )}
-                </div>
-
-                {/* Password Input */}
-                <div>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => handlePasswordChange(e.target.value)}
-                      placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
-                      className={cn(
-                        "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
-                        passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                {!usePassword ? (
+                  /* Magic Link Form (default) */
+                  <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
+                    <div>
+                      <input
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                        className={cn(
+                          "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
+                          emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                        )}
+                        disabled={isAnyLoading}
+                      />
+                      {emailError && (
+                        <p className="mt-1 text-xs text-red-400">{emailError}</p>
                       )}
-                      disabled={isAnyLoading}
-                    />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      disabled={isAnyLoading || !email || !!emailError}
+                      className="w-full"
+                    >
+                      {isLoading === 'magiclink' ? (
+                        <Loader size="sm" />
+                      ) : (
+                        <>
+                          <Wand2 className="w-4 h-4" />
+                          <span className="ml-2">{t('auth.magicLink.sendLink') || 'Send me a sign-in link'}</span>
+                        </>
+                      )}
+                    </Button>
+
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                      onClick={() => setUsePassword(true)}
+                      className="w-full text-xs text-gray-500 hover:text-gray-300"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {t('auth.magicLink.usePassword') || 'Use password instead'}
                     </button>
-                  </div>
-                  {passwordError && (
-                    <p className="mt-1 text-xs text-red-400">{passwordError}</p>
-                  )}
-                </div>
+                  </form>
+                ) : (
+                  /* Password Form */
+                  <form onSubmit={handleEmailSubmit} className="space-y-3">
+                    <div>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                        className={cn(
+                          "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
+                          emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                        )}
+                        disabled={isAnyLoading}
+                      />
+                      {emailError && (
+                        <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                      )}
+                    </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                  className="w-full"
-                >
-                  {isLoading === 'email' ? (
-                    <Loader size="sm" />
-                  ) : (
-                    authMode === 'signup'
-                      ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
-                      : t('auth.signIn')
-                  )}
-                </Button>
+                    <div>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => handlePasswordChange(e.target.value)}
+                          placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
+                          className={cn(
+                            "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
+                            passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                          )}
+                          disabled={isAnyLoading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      {passwordError && (
+                        <p className="mt-1 text-xs text-red-400">{passwordError}</p>
+                      )}
+                    </div>
 
-                {/* Toggle auth mode */}
-                <button
-                  type="button"
-                  onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                  className="w-full text-xs text-gray-500 hover:text-gray-300"
-                >
-                  {authMode === 'signup'
-                    ? t('auth.alreadyHaveAccount')
-                    : t('auth.noAccount')}
-                </button>
-              </motion.form>
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
+                      className="w-full"
+                    >
+                      {isLoading === 'email' ? (
+                        <Loader size="sm" />
+                      ) : (
+                        authMode === 'signup'
+                          ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
+                          : t('auth.signIn')
+                      )}
+                    </Button>
+
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
+                        className="text-xs text-gray-500 hover:text-gray-300"
+                      >
+                        {authMode === 'signup'
+                          ? t('auth.alreadyHaveAccount')
+                          : t('auth.noAccount')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUsePassword(false)}
+                        className="text-xs text-gray-500 hover:text-gray-300"
+                      >
+                        {t('auth.magicLink.useMagicLink') || 'Use magic link'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </motion.div>
             )}
 
             {/* Continue as Guest - more prominent with humor */}

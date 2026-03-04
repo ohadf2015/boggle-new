@@ -190,8 +190,10 @@ export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 128;
 
 // Email validation pattern
-// Matches standard email format: local@domain.tld
-export const EMAIL_VALID_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Matches standard email format: local@domain.tld (TLD must be 2+ chars per ICANN rules)
+export const EMAIL_VALID_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+export const EMAIL_MAX_LENGTH = 254; // RFC 5321
+export const EMAIL_LOCAL_MAX_LENGTH = 64; // RFC 5321
 
 // Password must contain at least one uppercase, one lowercase, one number
 export const PASSWORD_STRENGTH_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;

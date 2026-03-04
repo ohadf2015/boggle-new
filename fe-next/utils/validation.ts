@@ -15,6 +15,8 @@ import {
   PASSWORD_MAX_LENGTH,
   NAME_VALID_PATTERN,
   EMAIL_VALID_PATTERN,
+  EMAIL_MAX_LENGTH,
+  EMAIL_LOCAL_MAX_LENGTH,
   PASSWORD_STRENGTH_PATTERN,
 } from './consts';
 
@@ -168,6 +170,12 @@ export const validateEmail = (email: string): ValidationResult => {
   }
 
   const trimmed = email.trim().toLowerCase();
+
+  // RFC 5321: total max 254, local part max 64
+  const atIndex = trimmed.indexOf('@');
+  if (trimmed.length > EMAIL_MAX_LENGTH || (atIndex > 0 && atIndex > EMAIL_LOCAL_MAX_LENGTH)) {
+    return { isValid: false, error: 'auth.inlineSignup.emailTooLong' };
+  }
 
   if (!EMAIL_VALID_PATTERN.test(trimmed)) {
     return { isValid: false, error: 'auth.inlineSignup.invalidEmail' };

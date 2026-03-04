@@ -2136,6 +2136,13 @@ const he = {
       "signUpButton": "צור חשבון",
       "checkEmail": "בדוק את האימייל שלך לאימות החשבון!",
       "emailInUse": "כתובת האימייל הזו כבר רשומה",
+      "emailRequired": "נדרש אימייל",
+      "invalidEmail": "נא להזין כתובת אימייל תקינה",
+      "emailTooLong": "כתובת האימייל ארוכה מדי",
+      "passwordRequired": "נדרשת סיסמה",
+      "passwordTooShort": "הסיסמה חייבת להכיל לפחות 8 תווים",
+      "passwordTooLong": "הסיסמה ארוכה מדי",
+      "weakPassword": "הסיסמה צריכה לכלול אותיות גדולות, קטנות ומספר",
       "skipForNow": "אולי אחר כך",
       "skipHover": "(לקסי יהיה עצוב, אבל בסדר...)",
       "mascotTooltip": "לחץ עליי!",
@@ -2146,6 +2153,13 @@ const he = {
         "streakProtector": "הגן על הרצף שלך! הירשם לפני שהוא נעלם!",
         "makeMomProud": "תעשה לאמא נחת - הראה את כישורי המילים שלך בטבלת המובילים!"
       }
+    },
+    "magicLink": {
+      "sendLink": "שלחו לי קישור להתחברות",
+      "checkEmail": "בדקו את האימייל - שלחנו קישור להתחברות!",
+      "usePassword": "השתמשו בסיסמה במקום",
+      "useMagicLink": "קישור קסם",
+      "divider": "או המשיכו עם אימייל"
     },
     "callback": {
       "completingSignIn": "משלים התחברות...",

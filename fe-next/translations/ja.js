@@ -2126,6 +2126,13 @@ const ja = {
       "signUpButton": "アカウント作成",
       "checkEmail": "確認メールをチェックしてください！",
       "emailInUse": "このメールアドレスは既に登録されています",
+      "emailRequired": "メールアドレスが必要です",
+      "invalidEmail": "有効なメールアドレスを入力してください",
+      "emailTooLong": "メールアドレスが長すぎます",
+      "passwordRequired": "パスワードが必要です",
+      "passwordTooShort": "パスワードは8文字以上必要です",
+      "passwordTooLong": "パスワードが長すぎます",
+      "weakPassword": "大文字、小文字、数字を含むパスワードが必要です",
       "skipForNow": "今はスキップ",
       "skipHover": "（レクシーは悲しむけど、いいよ...）",
       "mascotTooltip": "クリックして！",
@@ -2136,6 +2143,13 @@ const ja = {
         "streakProtector": "連続記録を守ろう！消える前に登録して！",
         "makeMomProud": "お母さんを喜ばせよう - リーダーボードで言葉の才能を見せつけて！"
       }
+    },
+    "magicLink": {
+      "sendLink": "サインインリンクを送信",
+      "checkEmail": "メールでサインインリンクを確認してください！",
+      "usePassword": "パスワードを使用",
+      "useMagicLink": "マジックリンクを使用",
+      "divider": "またはメールで続行"
     },
     "callback": {
       "completingSignIn": "サインイン中...",

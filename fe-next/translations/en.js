@@ -2244,6 +2244,13 @@ const en = {
       "signUpButton": "Create Account",
       "checkEmail": "Check your email to verify your account!",
       "emailInUse": "This email is already registered",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Please enter a valid email address",
+      "emailTooLong": "That email is too long",
+      "passwordRequired": "Password is required",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordTooLong": "Password is too long",
+      "weakPassword": "Password needs uppercase, lowercase, and a number",
       "skipForNow": "Skip for now",
       "skipHover": "(Lexi will be sad, but okay...)",
       "mascotTooltip": "Click me!",
@@ -2255,6 +2262,15 @@ const en = {
         "makeMomProud": "Make your mom proud - show off your word skills on the leaderboard!"
       }
     },
+    "magicLink": {
+      "sendLink": "Send me a sign-in link",
+      "checkEmail": "Check your email for a sign-in link!",
+      "usePassword": "Use password instead",
+      "useMagicLink": "Use magic link",
+      "divider": "or continue with email",
+      "noPassword": "No password needed"
+    },
+    "trustBadge": "Secure & private",
     "callback": {
       "completingSignIn": "Finishing up...",
       "takingTooLong": "Taking a bit longer than usual. Wanna try again?",

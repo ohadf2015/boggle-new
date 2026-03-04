@@ -10,6 +10,8 @@ import {
   validateGameCode,
   validateWord,
   sanitizeInput,
+  validateEmail,
+  validatePassword,
 } from '../validation';
 
 describe('validateUsername', () => {
@@ -280,5 +282,166 @@ describe('sanitizeInput', () => {
 
   it('handles complex HTML', () => {
     expect(sanitizeInput('<div><p>Text</p></div>')).toBe('Text');
+  });
+});
+
+describe('validateEmail', () => {
+  describe('valid emails', () => {
+    it('accepts standard email formats', () => {
+      expect(validateEmail('user@example.com')).toEqual({ isValid: true });
+      expect(validateEmail('name.surname@domain.co')).toEqual({ isValid: true });
+      expect(validateEmail('user+tag@gmail.com')).toEqual({ isValid: true });
+    });
+
+    it('accepts emails with subdomains', () => {
+      expect(validateEmail('user@mail.example.com')).toEqual({ isValid: true });
+    });
+
+    it('trims and lowercases for validation', () => {
+      expect(validateEmail('  User@Example.COM  ')).toEqual({ isValid: true });
+    });
+  });
+
+  describe('invalid emails', () => {
+    it('rejects empty email', () => {
+      expect(validateEmail('')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.emailRequired',
+      });
+    });
+
+    it('rejects whitespace-only email', () => {
+      expect(validateEmail('   ')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.emailRequired',
+      });
+    });
+
+    it('rejects email without @', () => {
+      expect(validateEmail('userexample.com')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.invalidEmail',
+      });
+    });
+
+    it('rejects email without domain', () => {
+      expect(validateEmail('user@')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.invalidEmail',
+      });
+    });
+
+    it('rejects email without TLD', () => {
+      expect(validateEmail('user@example')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.invalidEmail',
+      });
+    });
+
+    it('rejects email with spaces in middle', () => {
+      expect(validateEmail('user @example.com')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.invalidEmail',
+      });
+    });
+
+    it('rejects email with single-char TLD', () => {
+      expect(validateEmail('user@example.c')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.invalidEmail',
+      });
+    });
+
+    it('rejects email exceeding max length (254 chars)', () => {
+      const longLocal = 'a'.repeat(243); // 243 + @ + example.com = 255
+      expect(validateEmail(`${longLocal}@example.com`)).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.emailTooLong',
+      });
+    });
+
+    it('rejects email with local part exceeding 64 chars', () => {
+      const longLocal = 'a'.repeat(65);
+      expect(validateEmail(`${longLocal}@example.com`)).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.emailTooLong',
+      });
+    });
+  });
+});
+
+describe('validatePassword', () => {
+  describe('valid passwords', () => {
+    it('accepts passwords meeting minimum length (8 chars)', () => {
+      expect(validatePassword('abcdefgh')).toEqual({ isValid: true });
+    });
+
+    it('accepts long passwords up to max length', () => {
+      expect(validatePassword('a'.repeat(128))).toEqual({ isValid: true });
+    });
+
+    it('accepts passwords with special characters', () => {
+      expect(validatePassword('p@ssw0rd!')).toEqual({ isValid: true });
+    });
+  });
+
+  describe('invalid passwords', () => {
+    it('rejects empty password', () => {
+      expect(validatePassword('')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.passwordRequired',
+      });
+    });
+
+    it('rejects too short password (< 8 chars)', () => {
+      expect(validatePassword('abc')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.passwordTooShort',
+      });
+      expect(validatePassword('1234567')).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.passwordTooShort',
+      });
+    });
+
+    it('rejects too long password (> 128 chars)', () => {
+      expect(validatePassword('a'.repeat(129))).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.passwordTooLong',
+      });
+    });
+  });
+
+  describe('password strength validation', () => {
+    it('accepts strong passwords when requireStrength is true', () => {
+      expect(validatePassword('MyPassw0rd', true)).toEqual({ isValid: true });
+      expect(validatePassword('Test1234', true)).toEqual({ isValid: true });
+    });
+
+    it('rejects passwords without uppercase when requireStrength is true', () => {
+      expect(validatePassword('mypassw0rd', true)).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.weakPassword',
+      });
+    });
+
+    it('rejects passwords without lowercase when requireStrength is true', () => {
+      expect(validatePassword('MYPASSW0RD', true)).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.weakPassword',
+      });
+    });
+
+    it('rejects passwords without digit when requireStrength is true', () => {
+      expect(validatePassword('MyPassword', true)).toEqual({
+        isValid: false,
+        error: 'auth.inlineSignup.weakPassword',
+      });
+    });
+
+    it('does not check strength by default', () => {
+      // Lowercase-only password passes without requireStrength
+      expect(validatePassword('abcdefgh')).toEqual({ isValid: true });
+    });
   });
 });

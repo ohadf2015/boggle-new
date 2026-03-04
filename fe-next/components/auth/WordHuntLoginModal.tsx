@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Mail, Wand2 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button as ButtonComponent } from '../ui/button';
 import {
@@ -14,7 +15,9 @@ import {
 
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord } from '../../lib/supabase';
+import { signInWithGoogle, signInWithDiscord, signInWithMagicLink } from '../../lib/supabase';
+import { validateEmail } from '../../utils/validation';
+import { cn } from '../../lib/utils';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -41,6 +44,10 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
     setIsLoading(provider);
@@ -64,6 +71,43 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
         setIsLoading(null);
       }
       // OAuth will redirect, so no need to close modal
+    } catch (err) {
+      setError((err as Error).message || 'An error occurred');
+      setIsLoading(null);
+    }
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value) {
+      const result = validateEmail(value);
+      setEmailError(result.isValid ? null : (result.error ? t(result.error) : null));
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const handleMagicLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('magiclink');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      const result = await signInWithMagicLink(email);
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        setSuccess(t('auth.magicLink.checkEmail') || 'Check your email for a sign-in link!');
+      }
+      setIsLoading(null);
     } catch (err) {
       setError((err as Error).message || 'An error occurred');
       setIsLoading(null);
@@ -99,41 +143,112 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             </p>
           </motion.div>
 
-          {/* Sign In Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-3 mb-4"
-          >
-            <Button
-              onClick={() => handleSignIn('google')}
-              disabled={isLoading !== null}
-              className="w-full h-12 bg-white text-gray-800 hover:bg-gray-50 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
-              asChild={false}
+          {/* Success Message */}
+          {success ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-4 p-4 rounded-lg bg-emerald-900/30 border border-emerald-500/50 text-center"
             >
-              {isLoading === 'google' ? (
-                <Loader size="sm" />
-              ) : (
-                <GoogleIcon className="w-5 h-5" />
-              )}
-              <span>{t('auth.signInWith', { provider: 'Google' })}</span>
-            </Button>
+              <p className="text-sm font-bold text-emerald-300">{success}</p>
+            </motion.div>
+          ) : (
+            <>
+              {/* Sign In Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-3 mb-4"
+              >
+                <Button
+                  onClick={() => handleSignIn('google')}
+                  disabled={isLoading !== null}
+                  className="w-full h-12 bg-white text-gray-800 hover:bg-gray-50 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+                  asChild={false}
+                >
+                  {isLoading === 'google' ? (
+                    <Loader size="sm" />
+                  ) : (
+                    <GoogleIcon className="w-5 h-5" />
+                  )}
+                  <span>{t('auth.signInWith', { provider: 'Google' })}</span>
+                </Button>
 
-            <Button
-              onClick={() => handleSignIn('discord')}
-              disabled={isLoading !== null}
-              className="w-full h-12 bg-brand-discord text-white hover:bg-brand-discord-hover font-medium rounded-xl transition-all flex items-center justify-center gap-2"
-              asChild={false}
-            >
-              {isLoading === 'discord' ? (
-                <Loader size="sm" />
+                <Button
+                  onClick={() => handleSignIn('discord')}
+                  disabled={isLoading !== null}
+                  className="w-full h-12 bg-brand-discord text-white hover:bg-brand-discord-hover font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+                  asChild={false}
+                >
+                  {isLoading === 'discord' ? (
+                    <Loader size="sm" />
+                  ) : (
+                    <DiscordIcon className="w-5 h-5" />
+                  )}
+                  <span>{t('auth.signInWith', { provider: 'Discord' })}</span>
+                </Button>
+              </motion.div>
+
+              {/* Magic Link Form */}
+              {!showEmailForm ? (
+                <button
+                  onClick={() => setShowEmailForm(true)}
+                  className="w-full mb-4 text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
+                </button>
               ) : (
-                <DiscordIcon className="w-5 h-5" />
+                <motion.form
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  onSubmit={handleMagicLinkSubmit}
+                  className="mb-4 space-y-3"
+                >
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex-1 h-px bg-gray-600" />
+                    <span>{t('auth.magicLink.divider') || 'or continue with email'}</span>
+                    <div className="flex-1 h-px bg-gray-600" />
+                  </div>
+
+                  <div>
+                    <input
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => handleEmailChange(e.target.value)}
+                      placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl border-2 bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
+                        emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                      )}
+                      disabled={isLoading !== null}
+                    />
+                    {emailError && (
+                      <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isLoading !== null || !email || !!emailError}
+                    className="w-full h-12 bg-cyan-500 text-white hover:bg-cyan-600 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+                    asChild={false}
+                  >
+                    {isLoading === 'magiclink' ? (
+                      <Loader size="sm" />
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4" />
+                        <span>{t('auth.magicLink.sendLink') || 'Send me a sign-in link'}</span>
+                      </>
+                    )}
+                  </Button>
+                </motion.form>
               )}
-              <span>{t('auth.signInWith', { provider: 'Discord' })}</span>
-            </Button>
-          </motion.div>
+            </>
+          )}
 
           {/* Error Message */}
           {error && (

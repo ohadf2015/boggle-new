@@ -1940,6 +1940,13 @@ const es = {
       "signUpButton": "Crear cuenta",
       "checkEmail": "¡Revisa tu email para verificar tu cuenta!",
       "emailInUse": "Este email ya está registrado",
+      "emailRequired": "Se requiere email",
+      "invalidEmail": "Ingresa un email válido",
+      "emailTooLong": "El email es demasiado largo",
+      "passwordRequired": "Se requiere contraseña",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+      "passwordTooLong": "La contraseña es demasiado larga",
+      "weakPassword": "La contraseña necesita mayúsculas, minúsculas y un número",
       "skipForNow": "Saltar por ahora",
       "skipHover": "(Lexi estará triste, pero está bien...)",
       "mascotTooltip": "¡Haz clic!",
@@ -1950,6 +1957,13 @@ const es = {
         "streakProtector": "¡Protege tu racha! ¡Regístrate antes de que desaparezca!",
         "makeMomProud": "¡Haz que mamá esté orgullosa - muestra tus habilidades de palabras en la tabla!"
       }
+    },
+    "magicLink": {
+      "sendLink": "Envíame un enlace de inicio de sesión",
+      "checkEmail": "¡Revisa tu correo para un enlace de inicio de sesión!",
+      "usePassword": "Usar contraseña",
+      "useMagicLink": "Usar enlace mágico",
+      "divider": "o continúa con correo"
     },
     "callback": {
       "completingSignIn": "Completando inicio de sesión...",
