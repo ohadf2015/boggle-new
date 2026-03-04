@@ -214,3 +214,232 @@ describe('BlastTile.playClearAnimation Promise', () => {
     expect(result).toBeInstanceOf(Promise);
   });
 });
+
+// ─── Per-type death animations ────────────────────────────────────────────────
+
+describe('BlastTile per-type death animations', () => {
+  // Helper: get tween calls made during playClearAnimation (clears mocks first)
+  function getDeathTweens(type: BlastTileType): Array<Record<string, unknown>> {
+    const tile = makeTile('A', type, 0);
+    const scene = (tile as unknown as { scene: Phaser.Scene }).scene;
+    (scene.tweens.add as jest.Mock).mockClear();
+    tile.playClearAnimation();
+    return getTweenCalls(tile);
+  }
+
+  // ─── bomb: explosive burst — scaleX to >= 1.5 ─────────────────────────────
+  it('bomb death: produces a tween with scaleX >= 1.5 (explosive burst)', () => {
+    const tweens = getDeathTweens('bomb');
+    const hasExplosiveBurst = tweens.some((t) => {
+      const scaleX = t.scaleX as { to?: number } | undefined;
+      return scaleX !== undefined && typeof scaleX === 'object' && (scaleX.to ?? 0) >= 1.5;
+    });
+    expect(hasExplosiveBurst).toBe(true);
+  });
+
+  // ─── ice: shatter spin — angle rotation >= 90 ─────────────────────────────
+  it('ice death: produces a tween with angle rotation >= 90 (shatter spin)', () => {
+    const tweens = getDeathTweens('ice');
+    const hasHighAngle = tweens.some((t) => {
+      const angle = t.angle as { to?: number } | number | undefined;
+      if (typeof angle === 'number') return Math.abs(angle) >= 90;
+      if (typeof angle === 'object' && angle !== null) return Math.abs((angle as { to?: number }).to ?? 0) >= 90;
+      return false;
+    });
+    expect(hasHighAngle).toBe(true);
+  });
+
+  // ─── lightning: zap flash — alpha oscillation (multiple tweens or duration <= 50) ──
+  it('lightning death: produces a rapid alpha tween (zap flash)', () => {
+    const tweens = getDeathTweens('lightning');
+    // Lightning should produce multiple tweens (rapid flicker) or a very short duration alpha tween
+    const hasZap = tweens.some((t) => {
+      const alpha = t.alpha as { from?: number; to?: number } | number | undefined;
+      const dur = t.duration as number | undefined;
+      // Either a very short alpha tween (<=50ms) or a multi-step flicker pattern
+      if (alpha !== undefined && dur !== undefined && dur <= 50) return true;
+      // Or multiple tweens total indicates rapid sequence
+      return false;
+    }) || tweens.length >= 3;
+    expect(hasZap).toBe(true);
+  });
+
+  // ─── prism: refraction burst — scaleX AND scaleY both expand ──────────────
+  it('prism death: produces a tween with scaleX AND scaleY both expanding (refraction burst)', () => {
+    const tweens = getDeathTweens('prism');
+    const hasRefraction = tweens.some((t) => {
+      const sx = t.scaleX as { to?: number } | undefined;
+      const sy = t.scaleY as { to?: number } | undefined;
+      return (
+        sx !== undefined &&
+        sy !== undefined &&
+        typeof sx === 'object' &&
+        typeof sy === 'object' &&
+        (sx.to ?? 0) >= 1.2 &&
+        (sy.to ?? 0) >= 1.2
+      );
+    });
+    expect(hasRefraction).toBe(true);
+  });
+
+  // ─── rainbow: dissolve — alpha fade with NO rotation ─────────────────────
+  it('rainbow death: produces an alpha tween with no rotation property (dissolve)', () => {
+    const tweens = getDeathTweens('rainbow');
+    // Rainbow uses pure alpha fade — at least one alpha tween exists
+    const hasAlpha = tweens.some((t) => t.alpha !== undefined);
+    // None of the tweens should have an angle property (pure dissolve, no spin)
+    const hasAngle = tweens.some((t) => t.angle !== undefined);
+    expect(hasAlpha).toBe(true);
+    expect(hasAngle).toBe(false);
+  });
+
+  // ─── gem: extra particle burst ─────────────────────────────────────────────
+  it('gem death: emits particles (spark burst)', () => {
+    const tile = makeTile('A', 'gem', 0);
+    const scene = (tile as unknown as { scene: Phaser.Scene }).scene;
+    (scene.add.particles as jest.Mock).mockClear();
+    tile.playClearAnimation();
+    const particleCalls = (scene.add.particles as jest.Mock).mock.calls.length;
+    expect(particleCalls).toBeGreaterThanOrEqual(1);
+  });
+
+  // ─── frozen: icy melt — has a tween (gentle rotation) ────────────────────
+  it('frozen death: produces a tween (icy melt)', () => {
+    const tweens = getDeathTweens('frozen');
+    expect(tweens.length).toBeGreaterThanOrEqual(1);
+  });
+
+  // ─── gold: gold burst — scale expansion ───────────────────────────────────
+  it('gold death: produces a tween with scale expansion (gold burst)', () => {
+    const tweens = getDeathTweens('gold');
+    const hasExpansion = tweens.some((t) => {
+      const sx = t.scaleX as { to?: number } | undefined;
+      return sx !== undefined && typeof sx === 'object' && (sx.to ?? 0) >= 1.1;
+    });
+    expect(hasExpansion).toBe(true);
+  });
+
+  // ─── silver: silver burst — scale expansion ───────────────────────────────
+  it('silver death: produces a tween with scale expansion (silver burst)', () => {
+    const tweens = getDeathTweens('silver');
+    const hasExpansion = tweens.some((t) => {
+      const sx = t.scaleX as { to?: number } | undefined;
+      return sx !== undefined && typeof sx === 'object' && (sx.to ?? 0) >= 1.1;
+    });
+    expect(hasExpansion).toBe(true);
+  });
+
+  // ─── diamond: diamond burst — scale expansion ─────────────────────────────
+  it('diamond death: produces a tween with scale expansion (diamond burst)', () => {
+    const tweens = getDeathTweens('diamond');
+    const hasExpansion = tweens.some((t) => {
+      const sx = t.scaleX as { to?: number } | undefined;
+      return sx !== undefined && typeof sx === 'object' && (sx.to ?? 0) >= 1.1;
+    });
+    expect(hasExpansion).toBe(true);
+  });
+
+  // ─── magnet: magnetic pulse — full spin (angle 360) ───────────────────────
+  it('magnet death: produces a tween with angle 360 spin (magnetic pulse)', () => {
+    const tweens = getDeathTweens('magnet');
+    const hasSpin = tweens.some((t) => {
+      const angle = t.angle as { to?: number } | number | undefined;
+      if (typeof angle === 'number') return Math.abs(angle) >= 180;
+      if (typeof angle === 'object' && angle !== null) return Math.abs((angle as { to?: number }).to ?? 0) >= 180;
+      return false;
+    });
+    expect(hasSpin).toBe(true);
+  });
+
+  // ─── mirror: mirror shatter — scaleX to negative (flip) ──────────────────
+  it('mirror death: produces a tween with scaleX (mirror shatter)', () => {
+    const tweens = getDeathTweens('mirror');
+    const hasMirrorShatter = tweens.some((t) => t.scaleX !== undefined);
+    expect(hasMirrorShatter).toBe(true);
+  });
+
+  // ─── standard: regression — still plays generic death ─────────────────────
+  it('standard tile: still plays generic death animation (regression)', () => {
+    const tweens = getDeathTweens('standard');
+    // Standard should still produce >=2 tweens (squash + clear)
+    expect(tweens.length).toBeGreaterThanOrEqual(2);
+    // And have rotation
+    const hasRotation = tweens.some((t) => t.angle !== undefined || t.rotation !== undefined);
+    expect(hasRotation).toBe(true);
+  });
+
+  // ─── Each special type produces at least 1 tween distinct from generic ────
+  it('each special type produces at least 1 tween call', () => {
+    const specialTypes: BlastTileType[] = [
+      'bomb', 'ice', 'lightning', 'prism', 'rainbow', 'gem',
+      'frozen', 'gold', 'silver', 'diamond', 'magnet', 'mirror',
+    ];
+    for (const type of specialTypes) {
+      const tweens = getDeathTweens(type);
+      expect(tweens.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  // ─── Promise resolves for every tile type ─────────────────────────────────
+  it.each<BlastTileType>([
+    'standard', 'bomb', 'ice', 'lightning', 'prism', 'rainbow',
+    'gem', 'frozen', 'gold', 'silver', 'diamond', 'magnet', 'mirror',
+  ])('Promise resolves for tile type: %s', async (type) => {
+    const tile = makeTile('A', type, 0);
+    await expect(tile.playClearAnimation()).resolves.toBeUndefined();
+  });
+
+  // ─── reduceMotion: single fade for bomb, mirror, diamond ─────────────────
+  it('reduceMotion: bomb still produces single fade tween', () => {
+    const tile = makeTile('A', 'bomb', 0);
+    const scene = (tile as unknown as { scene: Phaser.Scene }).scene;
+    (scene.tweens.add as jest.Mock).mockClear();
+    tile.playClearAnimation({ reduceMotion: true });
+    expect((scene.tweens.add as jest.Mock).mock.calls.length).toBe(1);
+  });
+
+  it('reduceMotion: mirror still produces single fade tween', () => {
+    const tile = makeTile('A', 'mirror', 0);
+    const scene = (tile as unknown as { scene: Phaser.Scene }).scene;
+    (scene.tweens.add as jest.Mock).mockClear();
+    tile.playClearAnimation({ reduceMotion: true });
+    expect((scene.tweens.add as jest.Mock).mock.calls.length).toBe(1);
+  });
+
+  it('reduceMotion: diamond still produces single fade tween', () => {
+    const tile = makeTile('A', 'diamond', 0);
+    const scene = (tile as unknown as { scene: Phaser.Scene }).scene;
+    (scene.tweens.add as jest.Mock).mockClear();
+    tile.playClearAnimation({ reduceMotion: true });
+    expect((scene.tweens.add as jest.Mock).mock.calls.length).toBe(1);
+  });
+
+  // ─── isLowEnd: halves particle count for bomb and gem ───────────────────
+  it('isLowEnd: halves particle count for bomb', () => {
+    const normalTile = makeTile('A', 'bomb', 0);
+    const normalScene = (normalTile as unknown as { scene: Phaser.Scene }).scene;
+    normalTile.playClearAnimation();
+    const normalQty = (normalScene.add.particles as jest.Mock).mock.calls[0]?.[3]?.quantity ?? 0;
+
+    const lowTile = makeTile('A', 'bomb', 0);
+    const lowScene = (lowTile as unknown as { scene: Phaser.Scene }).scene;
+    lowTile.playClearAnimation({ isLowEnd: true });
+    const lowQty = (lowScene.add.particles as jest.Mock).mock.calls[0]?.[3]?.quantity ?? 0;
+
+    expect(lowQty).toBe(Math.ceil(normalQty / 2));
+  });
+
+  it('isLowEnd: halves particle count for gem', () => {
+    const normalTile = makeTile('A', 'gem', 0);
+    const normalScene = (normalTile as unknown as { scene: Phaser.Scene }).scene;
+    normalTile.playClearAnimation();
+    const normalQty = (normalScene.add.particles as jest.Mock).mock.calls[0]?.[3]?.quantity ?? 0;
+
+    const lowTile = makeTile('A', 'gem', 0);
+    const lowScene = (lowTile as unknown as { scene: Phaser.Scene }).scene;
+    lowTile.playClearAnimation({ isLowEnd: true });
+    const lowQty = (lowScene.add.particles as jest.Mock).mock.calls[0]?.[3]?.quantity ?? 0;
+
+    expect(lowQty).toBe(Math.ceil(normalQty / 2));
+  });
+});
