@@ -215,6 +215,111 @@ describe('BlastTile type-specific animations', () => {
     );
     expect(idleTweens.length).toBe(1); // Only the breathing tween
   });
+
+  it('mirror: adds mirror-shimmer idle tween (_idleType="mirror-shimmer")', () => {
+    const scene = makeScene();
+    const tile = new BlastTile(scene, 0, 0, 'A', 80, 'mirror', 0);
+    tile.startIdleAnimations({ reduceMotion: false, isLowEnd: false });
+
+    const tweenAdd = scene.tweens.add as jest.Mock;
+    const shimmerCall = tweenAdd.mock.calls.find(
+      (call) => call[0]?._idleType === 'mirror-shimmer'
+    );
+    expect(shimmerCall).toBeDefined();
+  });
+
+  it('silver: adds gleam idle tween (_idleType="gleam")', () => {
+    const scene = makeScene();
+    const tile = new BlastTile(scene, 0, 0, 'A', 80, 'silver', 0);
+    tile.startIdleAnimations({ reduceMotion: false, isLowEnd: false });
+
+    const tweenAdd = scene.tweens.add as jest.Mock;
+    const gleamCall = tweenAdd.mock.calls.find(
+      (call) => call[0]?._idleType === 'gleam'
+    );
+    expect(gleamCall).toBeDefined();
+  });
+
+  it('diamond: adds diamond-sparkle idle tween (_idleType="diamond-sparkle")', () => {
+    const scene = makeScene();
+    const tile = new BlastTile(scene, 0, 0, 'A', 80, 'diamond', 0);
+    tile.startIdleAnimations({ reduceMotion: false, isLowEnd: false });
+
+    const tweenAdd = scene.tweens.add as jest.Mock;
+    const sparkleCall = tweenAdd.mock.calls.find(
+      (call) => call[0]?._idleType === 'diamond-sparkle'
+    );
+    expect(sparkleCall).toBeDefined();
+  });
+
+  it('mirror shimmer targets overlay alpha oscillation (not scaleX flip)', () => {
+    const scene = makeScene();
+    const tile = new BlastTile(scene, 0, 0, 'A', 80, 'mirror', 0);
+    tile.startIdleAnimations({ reduceMotion: false, isLowEnd: false });
+
+    const tweenAdd = scene.tweens.add as jest.Mock;
+    const shimmerCall = tweenAdd.mock.calls.find(
+      (call) => call[0]?._idleType === 'mirror-shimmer'
+    );
+    expect(shimmerCall).toBeDefined();
+    const config = shimmerCall![0];
+    // Should animate alpha, NOT scaleX (to avoid RTL flip issues)
+    expect(config.alpha).toBeDefined();
+    expect(config.scaleX).toBeUndefined();
+  });
+
+  it('diamond sparkle animates scale', () => {
+    const scene = makeScene();
+    const tile = new BlastTile(scene, 0, 0, 'A', 80, 'diamond', 0);
+    tile.startIdleAnimations({ reduceMotion: false, isLowEnd: false });
+
+    const tweenAdd = scene.tweens.add as jest.Mock;
+    const sparkleCall = tweenAdd.mock.calls.find(
+      (call) => call[0]?._idleType === 'diamond-sparkle'
+    );
+    const config = sparkleCall![0];
+    expect(config.scaleX).toBeDefined();
+    expect(config.scaleY).toBeDefined();
+  });
+});
+
+// ─── reduceMotion / isLowEnd guards for new types ────────────────────────────
+
+describe('BlastTile new type guards (mirror/silver/diamond)', () => {
+  const NEW_TYPES: Array<'mirror' | 'silver' | 'diamond'> = ['mirror', 'silver', 'diamond'];
+  const IDLE_TYPE_MAP = {
+    mirror: 'mirror-shimmer',
+    silver: 'gleam',
+    diamond: 'diamond-sparkle',
+  };
+
+  it('reduceMotion: no type-specific tweens for mirror/silver/diamond', () => {
+    for (const tileType of NEW_TYPES) {
+      const scene = makeScene();
+      const tile = new BlastTile(scene, 0, 0, 'A', 80, tileType, 0);
+      tile.startIdleAnimations({ reduceMotion: true, isLowEnd: false });
+
+      const tweenAdd = scene.tweens.add as jest.Mock;
+      const idleTweens = tweenAdd.mock.calls.filter(
+        (call) => call[0]?._idleType === IDLE_TYPE_MAP[tileType]
+      );
+      expect(idleTweens.length).toBe(0);
+    }
+  });
+
+  it('isLowEnd: no type-specific tweens for mirror/silver/diamond', () => {
+    for (const tileType of NEW_TYPES) {
+      const scene = makeScene();
+      const tile = new BlastTile(scene, 0, 0, 'A', 80, tileType, 0);
+      tile.startIdleAnimations({ reduceMotion: false, isLowEnd: true });
+
+      const tweenAdd = scene.tweens.add as jest.Mock;
+      const idleTweens = tweenAdd.mock.calls.filter(
+        (call) => call[0]?._idleType === IDLE_TYPE_MAP[tileType]
+      );
+      expect(idleTweens.length).toBe(0);
+    }
+  });
 });
 
 // ─── Pause / Resume on select ────────────────────────────────────────────────

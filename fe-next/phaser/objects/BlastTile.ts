@@ -253,8 +253,7 @@ export class BlastTile extends LetterTile {
         break;
 
       case 'gold':
-      case 'wildcard':
-        // Gold/wildcard: gentle glow pulse on overlay
+        // Gold: gentle glow pulse on overlay
         this.scene.tweens.add({
           targets: this.overlay,
           alpha: { from: 1, to: 0.7 },
@@ -263,6 +262,46 @@ export class BlastTile extends LetterTile {
           yoyo: true,
           repeat: -1,
         });
+        break;
+
+      case 'mirror':
+        // Reflective shimmer — alpha oscillation on overlay (avoiding scaleX flip for RTL compat)
+        this.scene.tweens.add({
+          targets: this.overlay,
+          alpha: { from: 1, to: 0.4 },
+          duration: 1500,
+          ease: 'Sine.easeInOut',
+          yoyo: true,
+          repeat: -1,
+          _idleType: 'mirror-shimmer',
+        } as Phaser.Types.Tweens.TweenBuilderConfig & { _idleType: string });
+        break;
+
+      case 'silver':
+        // Metallic gleam — quick alpha flash on overlay
+        this.scene.tweens.add({
+          targets: this.overlay,
+          alpha: { from: 1, to: 0.5 },
+          duration: 1200,
+          ease: 'Sine.easeInOut',
+          yoyo: true,
+          repeat: -1,
+          _idleType: 'gleam',
+        } as Phaser.Types.Tweens.TweenBuilderConfig & { _idleType: string });
+        break;
+
+      case 'diamond':
+        // Sparkle — scale pulse (slightly larger than breathing)
+        this.scene.tweens.add({
+          targets: this,
+          scaleX: { from: 1, to: 1.06 },
+          scaleY: { from: 1, to: 1.06 },
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          yoyo: true,
+          repeat: -1,
+          _idleType: 'diamond-sparkle',
+        } as Phaser.Types.Tweens.TweenBuilderConfig & { _idleType: string });
         break;
     }
   }
