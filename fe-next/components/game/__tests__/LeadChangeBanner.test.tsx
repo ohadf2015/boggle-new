@@ -3,17 +3,18 @@ import { render, screen, act } from '@testing-library/react';
 import { LeadChangeBanner } from '../LeadChangeBanner';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 
-// Mock framer-motion
-const MockMotionDiv = React.forwardRef(function MockMotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
-  return <div ref={ref} data-testid={props['data-testid'] as string} {...props}>{children}</div>;
+// Mock framer-motion — factory must be self-contained (jest.mock is hoisted)
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
+    return React.createElement('div', { ref, 'data-testid': props['data-testid'], ...props }, children);
+  });
+  MotionDiv.displayName = 'MotionDiv';
+  return {
+    motion: { div: MotionDiv },
+    AnimatePresence: ({ children }: any) => children,
+  };
 });
-
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: MockMotionDiv,
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
 
 // Mock translations
 jest.mock('@/contexts/LanguageContext', () => ({
