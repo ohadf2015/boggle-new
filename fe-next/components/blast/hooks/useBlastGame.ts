@@ -625,17 +625,17 @@ export function useBlastGame(
             }
             default: break;
           }
-        }
-        bonusScore += baseScore * (comboMultiplier - 1);
 
-        // BUGF-03 fix: after each combo pre-clear, mark any bomb tiles in the
-        // combo's tile list as processed so the main path loop won't re-queue them
-        // into the bomb BFS (which would double-award BOMB_AREA_CLEAR_BONUS).
-        for (const tile of combo.tiles) {
-          if (tile.tileType === 'bomb') {
-            processedBombs.add(`${tile.row},${tile.col}`);
+          // BUGF-03 fix: after each combo pre-clear, mark any bomb tiles in the
+          // combo's tile list as processed so the main path loop won't re-queue them
+          // into the bomb BFS (which would double-award BOMB_AREA_CLEAR_BONUS).
+          for (const tile of combo.tiles) {
+            if (tile.tileType === 'bomb') {
+              processedBombs.add(`${tile.row},${tile.col}`);
+            }
           }
         }
+        bonusScore += baseScore * (comboMultiplier - 1);
       }
 
       for (const cell of path) {
