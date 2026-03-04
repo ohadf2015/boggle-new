@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: completed
-stopped_at: Completed 52-04-PLAN.md
-last_updated: "2026-03-04T18:11:01.076Z"
+stopped_at: Completed 52-03-PLAN.md
+last_updated: "2026-03-04T18:15:36.192Z"
 last_activity: "2026-03-04 — 48-04 complete: BlastComboFlash tier-based overlay + audio sting callback"
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 28
-  completed_plans: 26
+  completed_plans: 27
   percent: 98
 ---
 
@@ -71,6 +71,7 @@ Progress: [██████████] 98%
 | Phase 51-tile-idle-death-animations P02 | 3 | 2 tasks | 2 files |
 | Phase 52 P01 | 6 | 2 tasks | 3 files |
 | Phase 52 P04 | 15 | 2 tasks | 5 files |
+| Phase 52 P03 | 14 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
 - [Phase 52]: Handler functions exported separately (handlePost/Get, mergeDiscoveredCombos) for direct unit testing without Next.js mocking complexity
 - [Phase 52]: useBlastComboDiscovery accepts optional userId param (not useUser hook) for simplicity and testability
 - [Phase 52]: Combo Codex sync: fire-and-forget POST (localStorage written first), init GET union merge (never shrinks)
+- [Phase 52]: rng param goes AFTER spawnModifier in rollSpecialType to avoid breaking existing callers
+- [Phase 52]: [Phase 52-03]: each cascade creates fresh RNG from same seed (not stateful); boards remain client-authoritative; seeded refill reduces divergence not lockstep
 
 ### Pending Todos
 
@@ -137,6 +140,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T18:11:01.074Z
-Stopped at: Completed 52-04-PLAN.md
+Last session: 2026-03-04T18:15:36.190Z
+Stopped at: Completed 52-03-PLAN.md
 Resume file: None
