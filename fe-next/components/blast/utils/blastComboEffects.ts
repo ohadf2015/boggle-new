@@ -1,7 +1,16 @@
 import type { BlastTileState } from '../types';
 import type { BlastExplosion } from '../types';
 import type { SpecialCombo } from './blastCombos';
-import { BOMB_RADIUS } from '../types';
+import {
+  BOMB_RADIUS,
+  VORTEX_PULL_RADIUS,
+  VORTEX_EXPLODE_RADIUS,
+  VORTEX_PULL_BONUS,
+  VORTEX_EXPLODE_BONUS,
+  TREASURE_GEM_COMPLETION_BONUS,
+  RAINBOW_BOOST_MULTIPLIER,
+  FROST_REVEAL_BONUS,
+} from '../types';
 
 // ==================== Types ====================
 
@@ -55,6 +64,83 @@ function applyToTile(
     ctx.hitMultiHitTile(tile);
   } else {
     ctx.markCleared(tile);
+  }
+}
+
+/** Fire row+column cross-clear centered at (centerRow, centerCol) */
+function fireCrossClear(
+  centerRow: number,
+  centerCol: number,
+  ctx: ComboEffectContext,
+): void {
+  const { next, gridSize } = ctx;
+  for (let c = 0; c < gridSize; c++) applyToTile(next[centerRow][c], ctx);
+  for (let r = 0; r < gridSize; r++) applyToTile(next[r][centerCol], ctx);
+}
+
+/** Execute vortex pull+explode centered at (centerRow, centerCol) with given pull radius */
+function fireVortex(
+  centerRow: number,
+  centerCol: number,
+  pullRadius: number,
+  result: ComboEffectResult,
+  ctx: ComboEffectContext,
+): void {
+  const { next, gridSize } = ctx;
+  // Phase 1: Pull — outermost ring inward (axis-preference movement)
+  for (let pr = pullRadius; pr >= 1; pr--) {
+    for (let dr = -pr; dr <= pr; dr++) {
+      for (let dc = -pr; dc <= pr; dc++) {
+        if (Math.abs(dr) + Math.abs(dc) !== pr) continue;
+        const r = centerRow + dr;
+        const c = centerCol + dc;
+        if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+        const sourceTile = next[r][c];
+        if (sourceTile.isCleared) continue;
+        const stepR = dr === 0 ? 0 : (dr > 0 ? -1 : 1);
+        const stepC = dc === 0 ? 0 : (dc > 0 ? -1 : 1);
+        let moveR = 0, moveC = 0;
+        if (Math.abs(dr) >= Math.abs(dc)) {
+          moveR = stepR;
+        } else {
+          moveC = stepC;
+        }
+        const targetR = r + moveR;
+        const targetC = c + moveC;
+        if (targetR < 0 || targetR >= gridSize || targetC < 0 || targetC >= gridSize) continue;
+        const targetTile = next[targetR][targetC];
+        if (targetTile.isCleared) {
+          const tmpType = sourceTile.type;
+          const tmpHits = sourceTile.hitsRemaining;
+          const tmpEffect = sourceTile.activationEffect;
+          const tmpInner = sourceTile.innerType;
+          sourceTile.type = targetTile.type;
+          sourceTile.hitsRemaining = targetTile.hitsRemaining;
+          sourceTile.activationEffect = targetTile.activationEffect;
+          sourceTile.innerType = targetTile.innerType;
+          targetTile.type = tmpType;
+          targetTile.hitsRemaining = tmpHits;
+          targetTile.activationEffect = tmpEffect;
+          targetTile.innerType = tmpInner;
+          targetTile.isCleared = false;
+          sourceTile.isCleared = true;
+          result.bonusScore += VORTEX_PULL_BONUS;
+        }
+      }
+    }
+  }
+  // Phase 2: Explode — clear tiles within radius 1 of vortex position
+  for (let dr = -VORTEX_EXPLODE_RADIUS; dr <= VORTEX_EXPLODE_RADIUS; dr++) {
+    for (let dc = -VORTEX_EXPLODE_RADIUS; dc <= VORTEX_EXPLODE_RADIUS; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const r = centerRow + dr;
+      const c = centerCol + dc;
+      if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+      const etarget = next[r][c];
+      if (etarget.isCleared) continue;
+      applyToTile(etarget, ctx);
+      result.bonusScore += VORTEX_EXPLODE_BONUS;
+    }
   }
 }
 
@@ -202,8 +288,156 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
       break;
     }
 
+    // ── 48-03: Prism cross-type combos ──────────────────────────────────────
+
+    case 'prism_magnet': {
+      // Vortex Lattice: pull toward magnet position + cross-clear from magnet
+      const mt = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
+      if (!mt) break;
+      fireVortex(mt.row, mt.col, VORTEX_PULL_RADIUS, result, ctx);
+      fireCrossClear(mt.row, mt.col, ctx);
+      result.explosions.push({
+        id: `combo-pm-${now}`,
+        row: mt.row,
+        col: mt.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
+    case 'prism_gem': {
+      // Crystal Lattice: complete gem + cross-clear from prism
+      const pt = combo.tiles.find(t => t.tileType === 'prism') ?? combo.tiles[0];
+      const gt = combo.tiles.find(t => t.tileType === 'gem') ?? combo.tiles[1];
+      if (!pt) break;
+      if (gt) {
+        const gemTile = next[gt.row]?.[gt.col];
+        if (gemTile) {
+          gemTile.hitsRemaining = 0;
+          ctx.markCleared(gemTile);
+          result.bonusScore += TREASURE_GEM_COMPLETION_BONUS;
+        }
+      }
+      fireCrossClear(pt.row, pt.col, ctx);
+      result.explosions.push({
+        id: `combo-pg-${now}`,
+        row: pt.row,
+        col: pt.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
+    case 'prism_frozen': {
+      // Frost Lattice: free ALL frost tiles on board + cross-clear from prism
+      const pft = combo.tiles.find(t => t.tileType === 'prism') ?? combo.tiles[0];
+      if (!pft) break;
+      const { next: grid, gridSize } = ctx;
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          const tile = grid[r][c];
+          if (tile.type === 'frozen' && !tile.isCleared) {
+            tile.hitsRemaining = 0;
+            ctx.markCleared(tile);
+          }
+        }
+      }
+      fireCrossClear(pft.row, pft.col, ctx);
+      result.explosions.push({
+        id: `combo-pf-${now}`,
+        row: pft.row,
+        col: pft.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
+    // ── 48-03: Rainbow cross-type combos ──────────────────────────────────
+
+    case 'rainbow_mirror': {
+      // Kaleidoscope: score-only — mirror triples rainbow's amplification → +3 * baseScore
+      // baseScore defaults to 1 (caller multiplies by word score)
+      const baseScore = 1;
+      result.bonusScore += baseScore * 3;
+      const rbt = combo.tiles.find(t => t.tileType === 'rainbow') ?? combo.tiles[0];
+      result.explosions.push({
+        id: `combo-rm-${now}`,
+        row: rbt.row,
+        col: rbt.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
+    case 'rainbow_magnet': {
+      // Whirlwind: enhanced vortex pull (radius +1) + explode
+      const rmt = combo.tiles.find(t => t.tileType === 'magnet') ?? combo.tiles[1];
+      if (!rmt) break;
+      const boostedRadius = VORTEX_PULL_RADIUS + 1;
+      fireVortex(rmt.row, rmt.col, boostedRadius, result, ctx);
+      result.explosions.push({
+        id: `combo-rma-${now}`,
+        row: rmt.row,
+        col: rmt.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
+    case 'rainbow_gem': {
+      // Lucky Boost: bonus score for boosted gem completion (gem NOT auto-completed)
+      result.bonusScore += RAINBOW_BOOST_MULTIPLIER * TREASURE_GEM_COMPLETION_BONUS;
+      const rgt = combo.tiles.find(t => t.tileType === 'rainbow') ?? combo.tiles[0];
+      result.explosions.push({
+        id: `combo-rg-${now}`,
+        row: rgt.row,
+        col: rgt.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
+    case 'rainbow_frozen': {
+      // Frost Bloom: advance ALL frost tiles by 1 hit (mass reveal)
+      const { next: rFGrid, gridSize: rFSize } = ctx;
+      for (let r = 0; r < rFSize; r++) {
+        for (let c = 0; c < rFSize; c++) {
+          const tile = rFGrid[r][c];
+          if (tile.type === 'frozen' && !tile.isCleared) {
+            ctx.hitMultiHitTile(tile);
+            // If tile is now at 0 hits, mark cleared
+            if (tile.hitsRemaining <= 0) {
+              ctx.markCleared(tile);
+            }
+          }
+        }
+      }
+      const rfbt = combo.tiles.find(t => t.tileType === 'rainbow') ?? combo.tiles[0];
+      result.explosions.push({
+        id: `combo-rfz-${now}`,
+        row: rfbt.row,
+        col: rfbt.col,
+        type: 'combo',
+        intensity: 4,
+        timestamp: now,
+      });
+      break;
+    }
+
     default:
-      // New combo types (48-02/48-03) — no-op skeleton, returns empty result
+      // Unknown combo types — no-op skeleton, returns empty result
       break;
   }
 
