@@ -178,7 +178,7 @@ Plans:
 | 46. Foundation — Unified Types & Bug Fixes | v3.0 | 4/4 | Complete | 2026-03-04 |
 | 47. Tile Reworks — New Behaviors & Spawn Tables | 5/5 | Complete    | 2026-03-04 | ~12min |
 | 48. Combination System Core | 3/4 | Complete    | 2026-03-04 | - |
-| 49. Combination UX | 4/5 | In progress (gap closure) | - | - |
+| 49. Combination UX | 5/5 | Complete   | 2026-03-04 | - |
 | 50. Psychological Hooks | v3.0 | 0/4 | Not started | - |
 | 51. Visual Polish — Tile Animations | v3.0 | 0/2 | Not started | - |
 | 52. Multiplayer Sync | v3.0 | 0/4 | Not started | - |
