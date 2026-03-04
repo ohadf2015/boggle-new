@@ -70,8 +70,19 @@ const mockOnComboDetected = jest.fn();
 const mockAcknowledgeDiscovery = jest.fn();
 const mockUseBlastComboDiscovery = jest.fn();
 
+// Captures the options argument passed to useBlastComboDiscovery
+let capturedDiscoveryOptions: any = undefined;
 jest.mock('../hooks/useBlastComboDiscovery', () => ({
-  useBlastComboDiscovery: () => mockUseBlastComboDiscovery(),
+  useBlastComboDiscovery: (opts?: any) => {
+    capturedDiscoveryOptions = opts;
+    return mockUseBlastComboDiscovery();
+  },
+}));
+
+// Mutable variable to control auth state in tests
+let mockAuthUser: { id: string } | null = null;
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: mockAuthUser }),
 }));
 
 // Capture props passed to BlastGame
@@ -110,6 +121,8 @@ describe('BlastView discovery prop wiring', () => {
     jest.clearAllMocks();
     capturedBlastGameProps = null;
     capturedReadyScreenProps = null;
+    capturedDiscoveryOptions = undefined;
+    mockAuthUser = null;
 
     // Default: no pending discovery
     mockUseBlastComboDiscovery.mockReturnValue({
@@ -156,5 +169,18 @@ describe('BlastView discovery prop wiring', () => {
     renderAndStartGame();
     expect(capturedBlastGameProps?.acknowledgeDiscovery).toBeDefined();
     expect(capturedBlastGameProps?.acknowledgeDiscovery).toBe(mockAcknowledgeDiscovery);
+  });
+
+  it('passes userId from useAuth to useBlastComboDiscovery when user is authenticated', () => {
+    mockAuthUser = { id: 'user-123' };
+    render(<BlastView />);
+    expect(capturedDiscoveryOptions).toBeDefined();
+    expect(capturedDiscoveryOptions?.userId).toBe('user-123');
+  });
+
+  it('passes undefined userId to useBlastComboDiscovery when user is null (unauthenticated)', () => {
+    mockAuthUser = null;
+    render(<BlastView />);
+    expect(capturedDiscoveryOptions?.userId).toBeUndefined();
   });
 });

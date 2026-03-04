@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { BlastGame } from './BlastGame';
 import { BlastResults } from './BlastResults';
@@ -25,6 +26,7 @@ const BlastView: React.FC = () => {
   const { language, t } = useLanguage();
   const { unlockAudio } = useMusic();
   const setIsInGame = useHideNavigation();
+  const { user } = useAuth();
 
   const [phase, setPhase] = useState<BlastPhase>('ready');
   const [results, setResults] = useState<BlastResultsData | null>(null);
@@ -38,7 +40,7 @@ const BlastView: React.FC = () => {
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
 
-  const { discoveredCombos, pendingDiscovery, onComboDetected, acknowledgeDiscovery } = useBlastComboDiscovery();
+  const { discoveredCombos, pendingDiscovery, onComboDetected, acknowledgeDiscovery } = useBlastComboDiscovery({ userId: user?.id });
 
   const baseConfig = resolveBlastConfig((language as Language) || 'en', 'medium');
 
