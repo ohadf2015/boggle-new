@@ -70,7 +70,7 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 47-01-PLAN.md — Rainbow Boost rework: amplify best special or 2x word score (TILE-01) (Wave 1)
+- [x] 47-01-PLAN.md — Rainbow Boost rework: amplify best special or 2x word score (TILE-01) (Wave 1)
 - [ ] 47-02-PLAN.md — Treasure Gem shard collector: 3-hit accumulation, +25 bonus, spawn 2 specials (TILE-02) (Wave 2)
 - [ ] 47-03-PLAN.md — Vortex pull+explode and Frost 2-hit reveal with inner special activation (TILE-03, TILE-04) (Wave 3)
 - [ ] 47-04-PLAN.md — Mirror tile, Wildcard removal, Silver/Gold/Diamond tier system (TILE-05, TILE-06, TILE-07) (Wave 4)
@@ -175,7 +175,7 @@ Plans:
 | 44. Milestone Gap Closure & Tech Debt | v2.0 | 1/1 | Complete | 2026-02-14 |
 | 45. Practice XP Server-Side Wiring | v2.0 | 1/1 | Complete | 2026-02-14 |
 | 46. Foundation — Unified Types & Bug Fixes | v3.0 | 4/4 | Complete | 2026-03-04 |
-| 47. Tile Reworks — New Behaviors & Spawn Tables | v3.0 | 0/5 | Not started | - |
+| 47. Tile Reworks — New Behaviors & Spawn Tables | v3.0 | 1/5 | In progress | ~12min |
 | 48. Combination System Core | v3.0 | 0/4 | Not started | - |
 | 49. Combination UX | v3.0 | 0/4 | Not started | - |
 | 50. Psychological Hooks | v3.0 | 0/4 | Not started | - |

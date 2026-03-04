@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 47 of 52 (Tile Reworks — New Behaviors & Spawn Tables)
-Plan: 0 of 5 in current phase
-Status: Ready to plan
-Last activity: 2026-03-04 — Phase 46 complete (4/4 plans, 12/12 must-haves verified, 631 blast tests pass)
+Plan: 1 of 5 in current phase
+Status: In progress
+Last activity: 2026-03-04 — 47-01 complete: Rainbow Boost mechanic (copies+doubles best offensive special, or 2x solo)
 
-Progress: [███░░░░░░░░░░░░░░░░░] 15% (v3.0 milestone, 4/27 plans complete)
+Progress: [████░░░░░░░░░░░░░░░░] 19% (v3.0 milestone, 5/27 plans complete)
 
 ## Performance Metrics
 
@@ -29,7 +29,7 @@ Progress: [███░░░░░░░░░░░░░░░░░] 15% (v3
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 46 | 4 | ~28min (4/4 complete) | ~7min |
-| 47 | 5 | - | - |
+| 47 | 5 | ~12min (1/5 complete) | ~12min |
 | 48 | 4 | - | - |
 | 49 | 4 | - | - |
 | 50 | 4 | - | - |
@@ -43,6 +43,7 @@ Progress: [███░░░░░░░░░░░░░░░░░] 15% (v3
 ### Decisions
 
 Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
+- [Phase 47 - 47-01]: Rainbow Boost pre-scan finds bestOffensiveSpecial before main path loop; gold/ice/frozen excluded from amplification; rainbowSoloMultiplier applied to effectiveBase before goldMultiplier
 - Rainbow Boost: copies+doubles best special in word; solo = 2x word score
 - Remove Wildcard: no mechanic, diluting pool at ~17% spawn rate
 - Mirror tile (new): doubles combo partner's effect
@@ -70,5 +71,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 46 complete. Verified 12/12 must-haves. Ready to plan Phase 47.
+Stopped at: 47-01-PLAN.md complete. Rainbow Boost implemented. 657 blast tests pass.
 Resume file: None
