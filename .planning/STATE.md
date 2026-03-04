@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Blast Mode Special Tiles Redesign
 status: executing
-stopped_at: 47-01-PLAN.md complete. Rainbow Boost implemented. 657 blast tests pass.
-last_updated: "2026-03-04T12:24:11.632Z"
-last_activity: "2026-03-04 — 47-01 complete: Rainbow Boost mechanic (copies+doubles best offensive special, or 2x solo)"
+stopped_at: Completed 47-03-PLAN.md
+last_updated: "2026-03-04T12:36:07.890Z"
+last_activity: "2026-03-04 — 47-03 complete: Vortex (pull+explode, rework of Magnet) + Frost (2-hit reveal with inner special, rework of Frozen)"
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
   percent: 98
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 47 of 52 (Tile Reworks — New Behaviors & Spawn Tables)
-Plan: 2 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In progress
-Last activity: 2026-03-04 — 47-02 complete: Treasure Gem mechanic (3-hit shard collector, +25 completion bonus, spawns 2 wave-gated specials)
+Last activity: 2026-03-04 — 47-03 complete: Vortex (pull+explode, rework of Magnet) + Frost (2-hit reveal with inner special, rework of Frozen)
 
 Progress: [██████████] 98%
 
@@ -53,12 +53,14 @@ Progress: [██████████] 98%
 | 52 | 4 | - | - |
 
 *Updated after each plan completion*
+| Phase 47 P03 | 8 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Recent decisions affecting v3.0 (see PROJECT.md Key Decisions for full log):
+- [Phase 47 - 47-03]: Vortex pull: axis-preference movement (larger delta axis first); swap only with cleared cells; normalize frost innerType distribution to 1.0; frost gem conversion un-clears tile in-place
 - [Phase 47 - 47-02]: Treasure Gem: gemsCompletedThisWord counter in path loop; spawn logic post-loop (before bomb BFS); currentWave defaults to 1 for wave-gated distribution
 - [Phase 47 - 47-01]: Rainbow Boost pre-scan finds bestOffensiveSpecial before main path loop; gold/ice/frozen excluded from amplification; rainbowSoloMultiplier applied to effectiveBase before goldMultiplier
 - Rainbow Boost: copies+doubles best special in word; solo = 2x word score
@@ -87,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-04T00:07:00Z
-Stopped at: 47-02-PLAN.md complete. Treasure Gem implemented. 675 blast tests pass.
+Last session: 2026-03-04T12:36:07.888Z
+Stopped at: Completed 47-03-PLAN.md
 Resume file: None
