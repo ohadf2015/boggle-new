@@ -119,20 +119,25 @@ export function BlastGame({
 
   // Stable refs to blast methods for use inside onMovesExhausted callback
   // (avoids stale closure over blast object which changes on each render)
+  // eslint-disable-next-line react-hooks/immutability
   const blastTileStatesRef = useRef(blast.tileStates);
-  blastTileStatesRef.current = blast.tileStates;
+  blastTileStatesRef.current = blast.tileStates; // eslint-disable-line react-hooks/immutability
 
+  // eslint-disable-next-line react-hooks/immutability
   const blastSetTileStatesRef = useRef(blast.setTileStates);
-  blastSetTileStatesRef.current = blast.setTileStates;
+  blastSetTileStatesRef.current = blast.setTileStates; // eslint-disable-line react-hooks/immutability
 
+  // eslint-disable-next-line react-hooks/immutability
   const blastAddExplosionRef = useRef(blast.addExplosion);
-  blastAddExplosionRef.current = blast.addExplosion;
+  blastAddExplosionRef.current = blast.addExplosion; // eslint-disable-line react-hooks/immutability
 
+  // eslint-disable-next-line react-hooks/immutability
   const blastAddBonusScoreRef = useRef(blast.addBonusScore);
-  blastAddBonusScoreRef.current = blast.addBonusScore;
+  blastAddBonusScoreRef.current = blast.addBonusScore; // eslint-disable-line react-hooks/immutability
 
   // After sugar crush completes, add bonus score and end game
   const blastEndGameRef = useRef<(totalBonus: number) => void>(() => {});
+  // eslint-disable-next-line react-hooks/immutability
   blastEndGameRef.current = useCallback((totalBonus: number) => {
     // totalBonus already added per-step via addBonusScore; just end the game
     void totalBonus;

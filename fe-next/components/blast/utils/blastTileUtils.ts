@@ -1,5 +1,5 @@
-import type { BlastTileType } from '../types';
 import { FROST_HITS_REQUIRED } from '../types';
+import type { BlastTileType } from '../types'; // eslint-disable-line no-duplicate-imports
 
 /**
  * Get initial hitsRemaining for a tile type.

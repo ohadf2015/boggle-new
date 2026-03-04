@@ -13,7 +13,7 @@ jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onAnimationComplete, style, className, 'data-testid': testId, ...rest }: any) => {
       // Simulate animation completing immediately for tests
-      React.useEffect(() => {
+      React.useEffect(() => { // eslint-disable-line react-hooks/rules-of-hooks
         if (onAnimationComplete) onAnimationComplete();
       }, [onAnimationComplete]);
       return (

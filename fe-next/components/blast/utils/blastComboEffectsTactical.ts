@@ -7,11 +7,10 @@ import {
   TREASURE_GEM_COMPLETION_BONUS,
   FROST_REVEAL_BONUS,
 } from '../types';
+// eslint-disable-next-line no-duplicate-imports
 import type { ComboEffectContext, ComboEffectResult } from './blastComboEffects';
 import { scaledRadius } from './blastComboScaling';
-
-// Re-use helpers via import (they need to be exported from main file)
-import { applyToTile, fireVortex, pushExplosion } from './blastComboEffects';
+import { applyToTile, fireVortex, pushExplosion } from './blastComboEffects'; // eslint-disable-line no-duplicate-imports
 
 /**
  * Handle tactical combo types (mirror/magnet/gem/frozen crosses).
